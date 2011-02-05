@@ -575,7 +575,7 @@
         {
             if (!(symbol is Namespace))
             {
-                throw new WrongParentSymbolException(this, symbol.GetType(), System.Type.GetType("Hime.Kernel.Namespace"));
+                throw new WrongParentSymbolException(this, symbol.GetType(),typeof(Namespace));
             }
             this.p_Parent = (Namespace)symbol;
         }

@@ -8,7 +8,7 @@
         public static void GenerateNextStep(string Path)
         {
             // Initialise logs
-            log4net.ILog Log = LogUtils.getLog(typeof(KernelDaemon));
+            Hime.Kernel.Reporting.Reporter Reporter = new Hime.Kernel.Reporting.Reporter(typeof(KernelDaemon));
 
             // Test path
             Path += "\\Daemon\\";
@@ -16,8 +16,8 @@
                 System.IO.Directory.Delete(Path, true);
             System.IO.Directory.CreateDirectory(Path);
 
-            Log.Info("Daemon: Hime Systems Daemon");
-            Log.Info("Daemon: output at : " + Path);
+            Reporter.Info("Daemon", "Hime Systems Daemon");
+            Reporter.Info("Daemon", "output at : " + Path);
 
             // Checkout resources
             Resources.AccessorSession Session = Resources.ResourceAccessor.CreateCheckoutSession();
@@ -31,18 +31,18 @@
             Compiler.AddInputFile(Path + "Generators.ContextFreeGrammars.gram");
             Compiler.AddInputFile(Path + "Generators.ContextSensitiveGrammars.gram");
             Namespace DaemonRoot = new Namespace(null, "global");
-            Compiler.Compile(DaemonRoot, Log);
+            Compiler.Compile(DaemonRoot, Reporter);
 
             // Close session
             Session.Close();
 
             // Generate parser for FileCentralDogma
             Generators.Parsers.Grammar FileCentralDogma = (Generators.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
-            FileCentralDogma.GenerateParser("Hime.Kernel.Resources.Parser", Hime.Generators.Parsers.GrammarParseMethod.LALR1, Path + "KernelResources.Parser.cs", Log);
+            FileCentralDogma.GenerateParser("Hime.Kernel.Resources.Parser", Hime.Generators.Parsers.GrammarParseMethod.LALR1, Path + "KernelResources.Parser.cs", Reporter);
 
             // Export log
-            //LogXML.ExportHTML(Path + "DaemonLog.html", "Daemon Log");
-            //System.Diagnostics.Process.Start(Path + "DaemonLog.html");
+            Reporter.ExportHTML(Path + "DaemonLog.html", "Daemon Log");
+            System.Diagnostics.Process.Start(Path + "DaemonLog.html");
         }
     }
 }

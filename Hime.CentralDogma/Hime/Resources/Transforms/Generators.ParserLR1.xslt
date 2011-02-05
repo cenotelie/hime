@@ -53,14 +53,14 @@
     private static ushort[][][] p_StateReducsOnTerminal = { <xsl:for-each select="States/State"><xsl:if test="position()!=1">, </xsl:if>p_StateReducsOnTerminal_<xsl:value-of select="@ID"/></xsl:for-each> };
     private static int          p_ErrorSimulationLength = 3;
     
-    private System.Collections.Generic.List&lt;Hime.Kernel.Parsers.IParserError&gt; p_Errors;
+    private System.Collections.Generic.List&lt;Hime.Kernel.Parsers.ParserError&gt; p_Errors;
     private Lexer_<xsl:value-of select="../@Name"/> p_Lexer;
     private Hime.Kernel.Parsers.SyntaxTreeNodeCollection p_Nodes;
     private System.Collections.Generic.Stack&lt;ushort&gt; p_Stack;
     private Hime.Kernel.Parsers.SymbolToken p_NextToken;
     private ushort p_CurrentState;
 
-    public System.Collections.Generic.List&lt;Hime.Kernel.Parsers.IParserError&gt; Errors { get { return p_Errors; } }
+    public System.Collections.Generic.List&lt;Hime.Kernel.Parsers.ParserError&gt; Errors { get { return p_Errors; } }
   </xsl:template>
 
   <xsl:template name="Hime_ClassParserLR1_DataAccess">
@@ -338,7 +338,7 @@
     
 	    public Parser_<xsl:value-of select="../@Name"/>(Lexer_<xsl:value-of select="../@Name"/> input)
 	    {
-		    p_Errors = new System.Collections.Generic.List&lt;Hime.Kernel.Parsers.IParserError&gt;();
+		    p_Errors = new System.Collections.Generic.List&lt;Hime.Kernel.Parsers.ParserError&gt;();
 		    p_Lexer = input;
 		    p_Nodes = new Hime.Kernel.Parsers.SyntaxTreeNodeCollection();
 		    p_Stack = new System.Collections.Generic.Stack&lt;ushort&gt;();
@@ -360,7 +360,7 @@
     
 	    public Parser_<xsl:value-of select="../@Name"/>(Lexer_<xsl:value-of select="../@Name"/> input)
 	    {
-		    p_Errors = new System.Collections.Generic.List&lt;Hime.Kernel.Parsers.IParserError&gt;();
+		    p_Errors = new System.Collections.Generic.List&lt;Hime.Kernel.Parsers.ParserError&gt;();
 		    p_Lexer = input;
 		    p_Nodes = new Hime.Kernel.Parsers.SyntaxTreeNodeCollection();
 		    p_Stack = new System.Collections.Generic.Stack&lt;ushort&gt;();

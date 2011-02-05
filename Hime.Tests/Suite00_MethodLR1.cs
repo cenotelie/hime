@@ -10,6 +10,8 @@ namespace Tests
     [TestFixture]
     public class Suite00_MethodLR1
     {
+        private static Hime.Kernel.Reporting.Reporter p_Reporter = new Hime.Kernel.Reporting.Reporter(typeof(Suite00_MethodLR1));
+
         // TODO: try to move down this test to the level of the method at fault in MethodLR1
         [Test]
         public void Test001_ReturnsFalseOnConflictuousGrammar_LALR1()
@@ -17,9 +19,9 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
         }
 
@@ -29,9 +31,9 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
         }
 
@@ -41,11 +43,11 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'A'd'|'a'B'e'|'b'A'e'|'b'B'd'; A->'c'; B->'c';} }");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
-            result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsTrue(result);
         }
 
@@ -55,9 +57,9 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
         }
 
@@ -67,9 +69,9 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
         }
 
@@ -79,9 +81,9 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
         }
 
@@ -91,9 +93,9 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", log4net.LogManager.GetLogger("Tests"), false);
+            bool result = grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LR1, "TestAnalyze.cs", p_Reporter, false);
             Assert.IsFalse(result);
         }
     }

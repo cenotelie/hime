@@ -132,7 +132,7 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Return true if the construction succeeded, false otherwise</returns>
-        public bool Construct(Grammar Grammar, log4net.ILog Log)
+        public bool Construct(Grammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             if (Grammar is CFGrammar)
                 return Construct((CFGrammar)Grammar, Log);
@@ -144,9 +144,9 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Return true if the construction succeeded, false otherwise</returns>
-        public bool Construct(CFGrammar Grammar, log4net.ILog Log)
+        public bool Construct(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
-            Log.Info("Constructing LR(0) data ...");
+            Log.Info("LR(0)", "Constructing LR(0) data ...");
             p_Grammar = Grammar;
             p_Graph = ConstructGraph(Grammar, Log);
             // Output conflicts
@@ -155,11 +155,11 @@
             {
                 foreach (LRConflict Conflict in Set.Conflicts)
                 {
-                    Log.Error("LR(0): " + Conflict.ToString());
+                    Log.Report(Conflict);
                     Error = true;
                 }
             }
-            Log.Info("Done !");
+            Log.Info("LR(0)", "Done !");
             return (!Error);
         }
 
@@ -169,7 +169,7 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Returns the constructed LR graph</returns>
-        public static LRGraph ConstructGraph(CFGrammar Grammar, log4net.ILog Log)
+        public static LRGraph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             // Create the first set
             CFVariable AxiomVar = Grammar.GetVariable("_Axiom_");
@@ -184,7 +184,7 @@
             {
                 Graph.Sets[i].BuildGraph(Graph);
                 Graph.Sets[i].ID = i;
-                Log.Info("Set I" + i.ToString() + " on " + Graph.Sets.Count.ToString() + " completed");
+                Log.Info("LR(0)", "Set I" + i.ToString() + " on " + Graph.Sets.Count.ToString() + " completed");
             }
             foreach (LRItemSet Set in Graph.Sets)
                 Set.BuildActions(new SetActions());

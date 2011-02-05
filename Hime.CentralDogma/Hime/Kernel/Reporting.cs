@@ -1,0 +1,205 @@
+﻿namespace Hime.Kernel.Reporting
+{
+    public enum Level
+    {
+        Info,
+        Warning,
+        Error
+    }
+
+    public interface Entry
+    {
+        Level Level { get; }
+        string Component { get; }
+        string Message { get; }
+    }
+
+    public class BaseEntry : Entry
+    {
+        protected Level p_Level;
+        protected string p_Component;
+        protected string p_Message;
+
+        public Level Level { get { return p_Level; } }
+        public string Component { get { return p_Component; } }
+        public string Message { get { return p_Message; } }
+
+        public BaseEntry(Level level, string component, string message)
+        {
+            p_Level = level;
+            p_Component = component;
+            p_Message = message;
+        }
+    }
+
+    public class Section
+    {
+        protected System.Collections.Generic.List<Entry> p_Entries;
+        protected string p_Name;
+
+        public System.Collections.Generic.IEnumerable<Entry> Entries { get { return p_Entries; } }
+        public string Name { get { return p_Name; } }
+
+        public Section(string name)
+        {
+            p_Name = name;
+            p_Entries = new System.Collections.Generic.List<Entry>();
+        }
+
+        public void AddEntry(Entry entry)
+        {
+            p_Entries.Add(entry);
+        }
+
+
+        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
+        {
+            System.Xml.XmlNode node = Doc.CreateElement("Section");
+            node.Attributes.Append(Doc.CreateAttribute("id"));
+            node.Attributes.Append(Doc.CreateAttribute("name"));
+            node.Attributes["id"].Value = "section" + GetHashCode().ToString("X");
+            node.Attributes["name"].Value = Name;
+            foreach (Entry entry in p_Entries)
+                node.AppendChild(GetXMLNode_Entry(Doc, entry));
+            return node;
+        }
+        private System.Xml.XmlNode GetXMLNode_Entry(System.Xml.XmlDocument Doc, Entry Entry)
+        {
+            System.Xml.XmlNode node = Doc.CreateElement("Entry");
+            node.Attributes.Append(Doc.CreateAttribute("mark"));
+            node.Attributes["mark"].Value = Entry.Level.ToString();
+
+            System.Xml.XmlNode Node1 = Doc.CreateElement("Data");
+            Node1.InnerText = Entry.Component;
+            node.AppendChild(Node1);
+
+            System.Xml.XmlNode Node2 = Doc.CreateElement("Data");
+            Node2.InnerText = Entry.Message;
+            node.AppendChild(Node2);
+            return node;
+        }
+    }
+
+    public class Report
+    {
+        protected System.Collections.Generic.Dictionary<string, Section> p_Sections;
+        public System.Collections.Generic.IEnumerable<Section> Sections { get { return p_Sections.Values; } }
+
+        public Report()
+        {
+            p_Sections = new System.Collections.Generic.Dictionary<string, Section>();
+        }
+
+        public Section AddSection(string name)
+        {
+            Section section = new Section(name);
+            p_Sections.Add(name, section);
+            return section;
+        }
+
+        public void AddEntry(string section, Entry entry)
+        {
+            p_Sections[section].AddEntry(entry);
+        }
+
+        public System.Xml.XmlDocument GetXML(string title)
+        {
+            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
+            Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "utf-8", "yes"));
+            Doc.AppendChild(Doc.CreateElement("Log"));
+            Doc.ChildNodes[1].Attributes.Append(Doc.CreateAttribute("title"));
+            Doc.ChildNodes[1].Attributes["title"].Value = title;
+            foreach (Section section in p_Sections.Values)
+                Doc.ChildNodes[1].AppendChild(section.GetXMLNode(Doc));
+            return Doc;
+        }
+    }
+
+
+
+    public class Reporter
+    {
+        protected Report p_Report;
+        protected Section p_CurrentSection;
+        protected log4net.ILog p_Log;
+
+        public Report Result { get { return p_Report; } }
+
+        private static bool p_Configured = false;
+        private static void Configure()
+        {
+            if (p_Configured)
+                return;
+            log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout("%-5p: %m%n");
+            log4net.Appender.ConsoleAppender appender = new log4net.Appender.ConsoleAppender(layout);
+            log4net.Config.BasicConfigurator.Configure(appender);
+            p_Configured = true;
+        }
+
+        public Reporter(System.Type type)
+        {
+            Configure();
+            p_Log = log4net.LogManager.GetLogger(type);
+            p_Report = new Report();
+        }
+
+        public void BeginSection(string name) { p_CurrentSection = p_Report.AddSection(name); }
+        public void EndSection() { p_CurrentSection = null; }
+
+        public void Info(string component, string message)
+        {
+            p_CurrentSection.AddEntry(new BaseEntry(Level.Info, component, message));
+            p_Log.Info(component + ": " + message);
+        }
+        public void Warn(string component, string message)
+        {
+            p_CurrentSection.AddEntry(new BaseEntry(Level.Warning, component, message));
+            p_Log.Warn(component + ": " + message);
+        }
+        public void Error(string component, string message)
+        {
+            p_CurrentSection.AddEntry(new BaseEntry(Level.Error, component, message));
+            p_Log.Error(component + ": " + message);
+        }
+        public void Fatal(string component, string message)
+        {
+            p_CurrentSection.AddEntry(new BaseEntry(Level.Error, component, message));
+            p_Log.Error(component + ": " + message);
+        }
+        public void Report(Entry entry)
+        {
+            p_CurrentSection.AddEntry(entry);
+            switch (entry.Level)
+            {
+                case Level.Info: p_Log.Info(entry.Component + ": " + entry.Message); break;
+                case Level.Warning: p_Log.Warn(entry.Component + ": " + entry.Message); break;
+                case Level.Error: p_Log.Error(entry.Component + ": " + entry.Message); break;
+            }
+        }
+
+        public void ExportHTML(string fileName, string title)
+        {
+            System.Xml.XmlDocument Doc = p_Report.GetXML(title);
+            System.IO.FileInfo File = new System.IO.FileInfo(fileName);
+            Doc.ChildNodes[1].Attributes["title"].Value = title;
+            Doc.Save(fileName + ".xml");
+            System.IO.Directory.CreateDirectory(File.DirectoryName + "\\hime_data");
+
+            Resources.AccessorSession Session = Resources.ResourceAccessor.CreateCheckoutSession();
+            Session.AddCheckoutFile(fileName + ".xml");
+            Resources.ResourceAccessor.CheckOut(Session, "Transforms.Logs.LogXML.xslt", File.DirectoryName + "LogXML.xslt");
+            Resources.ResourceAccessor.Export("Visuals.button_plus.gif", File.DirectoryName + "\\hime_data\\button_plus.gif");
+            Resources.ResourceAccessor.Export("Visuals.button_minus.gif", File.DirectoryName + "\\hime_data\\button_minus.gif");
+            Resources.ResourceAccessor.Export("Visuals.Hime.Error.png", File.DirectoryName + "\\hime_data\\Hime.Error.png");
+            Resources.ResourceAccessor.Export("Visuals.Hime.Warning.png", File.DirectoryName + "\\hime_data\\Hime.Warning.png");
+            Resources.ResourceAccessor.Export("Visuals.Hime.Info.png", File.DirectoryName + "\\hime_data\\Hime.Info.png");
+            Resources.ResourceAccessor.Export("Visuals.Hime.Logo.png", File.DirectoryName + "\\hime_data\\Hime.Logo.png");
+
+            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(File.DirectoryName + "LogXML.xslt");
+            Transform.Transform(fileName + ".xml", fileName);
+
+            Session.Close();
+        }
+    }
+}

@@ -28,7 +28,7 @@
         private System.Collections.Generic.List<string> p_InputRawResources;
         private System.Collections.Generic.List<CompilerError> p_OutputErrors;
         private Namespace p_OutputRootNamespace;
-        private log4net.ILog p_OutputLog;
+        private Hime.Kernel.Reporting.Reporter p_OutputLog;
         private Parsers.SyntaxTreeNode p_IntermediateRoot;
         private ResourceGraph p_IntermediateResources;
         private ResourceCompilerRegister p_PluginRegister;
@@ -60,19 +60,19 @@
             p_InputRawResources.Add(Data);
         }
 
-        public void Compile(Namespace RootNamespace, log4net.ILog Log)
+        public void Compile(Namespace RootNamespace, Hime.Kernel.Reporting.Reporter Log)
         {
             p_OutputRootNamespace = RootNamespace;
             p_OutputLog = Log;
 
-            p_OutputLog.Info(CompilerName);
-            p_OutputLog.Info("Compiler: " + CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString());
+            p_OutputLog.BeginSection("Compiler " + CompilerName);
+            p_OutputLog.Info("Compiler", CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString());
             foreach (IResourceCompiler Plugin in p_PluginRegister.Compilers)
-                p_OutputLog.Info("Compiler: Register plugin " + Plugin.ToString());
+                p_OutputLog.Info("Compiler", "Register plugin " + Plugin.ToString());
             foreach (string ResourceName in p_InputNamedResources.Keys)
-                p_OutputLog.Info("Compiler: Compilation unit " + ResourceName);
+                p_OutputLog.Info("Compiler", "Compilation unit " + ResourceName);
             if (p_InputRawResources.Count != 0)
-                p_OutputLog.Info("Compiler: Compilation unit " + p_InputRawResources.Count.ToString() + " raw resources");
+                p_OutputLog.Info("Compiler", "Compilation unit " + p_InputRawResources.Count.ToString() + " raw resources");
 
             // Parse
             foreach (string ResourceName in p_InputNamedResources.Keys)
@@ -105,6 +105,7 @@
                 if (Solved == 0)
                 {  }
             }
+            p_OutputLog.EndSection();
         }
 
 
@@ -134,42 +135,24 @@
             Parsers.SyntaxTreeNode UnitRoot = null;
             try { UnitRoot = UnitParser.Analyse(); }
             catch (System.Exception e) {
-                p_OutputLog.Fatal("Parser: encountered a fatal error. Exception thrown: " + e.Message);
+                p_OutputLog.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
                 return false;
             }
 
             foreach (Hime.Kernel.Parsers.LexerTextError Error in UnitLexer.Errors)
             {
-                p_OutputLog.Error("Error @(" + Error.Line.ToString() + ", " + Error.Column.ToString() + ") " + Error.ToString());
+                p_OutputLog.Report(Error);
                 IsError = true;
             }
-            foreach (Hime.Kernel.Parsers.IParserError Error in UnitParser.Errors)
+            foreach (Hime.Kernel.Parsers.ParserError Error in UnitParser.Errors)
             {
-                string where = null;
-                if (Error is Hime.Kernel.Parsers.ParserErrorUnexpectedToken)
-                {
-                    Hime.Kernel.Parsers.ParserErrorUnexpectedToken UnexpError = (Hime.Kernel.Parsers.ParserErrorUnexpectedToken)Error;
-                    if (UnexpError.UnexpectedToken is Hime.Kernel.Parsers.SymbolTokenText)
-                    {
-                        Hime.Kernel.Parsers.SymbolTokenText Token = (Hime.Kernel.Parsers.SymbolTokenText)UnexpError.UnexpectedToken;
-                        where = "Line " + Token.Line.ToString();
-                    }
-                    else
-                    {
-                        where = "End of file";
-                    }
-                }
-                else
-                {
-                    where = "File";
-                }
-                p_OutputLog.Error("Error @" + where + ": " + Error.Message);
+                p_OutputLog.Report(Error);
                 IsError = true;
             }
 
             if (UnitRoot == null)
             {
-                p_OutputLog.Error("Parser: encountered an unrecoverable error.");
+                p_OutputLog.Error("Parser", "encountered an unrecoverable error.");
                 IsError = true;
             }
             else

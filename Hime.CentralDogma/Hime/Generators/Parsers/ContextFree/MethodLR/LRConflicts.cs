@@ -18,7 +18,7 @@
     /// <summary>
     /// Represents a conflict in a LR set graph
     /// </summary>
-    public class LRConflict
+    public class LRConflict : Hime.Kernel.Reporting.Entry
     {
         /// <summary>
         /// Parse method used
@@ -37,6 +37,17 @@
         /// </summary>
         private System.Collections.Generic.List<LRItem> p_Items;
 
+        public Hime.Kernel.Reporting.Level Level {
+            get
+            {
+                if (p_Method == GrammarParseMethod.LR0) return Hime.Kernel.Reporting.Level.Error;
+                if (p_Method == GrammarParseMethod.LR1) return Hime.Kernel.Reporting.Level.Error;
+                if (p_Method == GrammarParseMethod.LALR1) return Hime.Kernel.Reporting.Level.Error;
+                return Hime.Kernel.Reporting.Level.Warning;
+            }
+        }
+        public string Component { get { return p_Method.ToString(); } }
+        public string Message { get { return ToString(); } }
 
         /// <summary>
         /// Get the used parse method

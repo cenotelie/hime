@@ -94,10 +94,10 @@
     <Compile Include="Hime\Kernel\Graph\KernelGraph.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphAlgos.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphVisuals.cs" />
-    <Compile Include="Hime\Kernel\Logging.cs" />
     <Compile Include="Hime\Kernel\Parsers\BaseParsers.cs" />
     <Compile Include="Hime\Kernel\KernelDaemon.cs" />
     <Compile Include="Hime\Kernel\KernelNaming.cs" />
+    <Compile Include="Hime\Kernel\Reporting.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Embedded.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Compiler.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.CompilerErrors.cs" />

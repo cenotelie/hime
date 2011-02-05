@@ -7,10 +7,10 @@
         int CompilerVersionMinor { get; }
         string[] ResourceNames { get; }
 
-        void CreateResource(Symbol Container, Parsers.SyntaxTreeNode SyntaxNode, ResourceGraph Graph, log4net.ILog Log);
-        void CreateDependencies(Resource Resource, ResourceGraph Graph, log4net.ILog Log);
-        int CompileSolveDependencies(Resource Resource, log4net.ILog Log);
-        void Compile(Resource Resource, log4net.ILog Log);
+        void CreateResource(Symbol Container, Parsers.SyntaxTreeNode SyntaxNode, ResourceGraph Graph, Hime.Kernel.Reporting.Reporter Log);
+        void CreateDependencies(Resource Resource, ResourceGraph Graph, Hime.Kernel.Reporting.Reporter Log);
+        int CompileSolveDependencies(Resource Resource, Hime.Kernel.Reporting.Reporter Log);
+        void Compile(Resource Resource, Hime.Kernel.Reporting.Reporter Log);
         string ToString();
     }
 }

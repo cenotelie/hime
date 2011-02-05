@@ -400,18 +400,16 @@
     /// <summary>
     /// Interface for lexer errors
     /// </summary>
-    public interface ILexerError
+    public abstract class LexerError : Hime.Kernel.Reporting.Entry
     {
-        /// <summary>
-        /// Get the error message
-        /// </summary>
-        /// <value>Error message</value>
-        string Message { get; }
+        public Hime.Kernel.Reporting.Level Level { get { return Hime.Kernel.Reporting.Level.Error; } }
+        public abstract string Component { get; }
+        public abstract string Message { get; }
     }
     /// <summary>
     /// Text lexer error
     /// </summary>
-    public abstract class LexerTextError : ILexerError
+    public abstract class LexerTextError : LexerError
     {
         /// <summary>
         /// Line of the error
@@ -432,11 +430,6 @@
         /// </summary>
         /// <value>The column of the error</value>
         public int Column { get { return p_Column; } }
-        /// <summary>
-        /// Get the error message
-        /// </summary>
-        /// <value>Error message</value>
-        public abstract string Message { get; }
 
         /// <summary>
         /// Constructs the lexer error
@@ -457,10 +450,12 @@
     }
     public class LexerTextErrorDiscardedChar : LexerTextError
     {
+        protected string p_Component;
         protected char p_Discarded;
         protected string p_Message;
 
         public char Discarded { get { return p_Discarded; } }
+        public override string Component { get { return p_Component; } }
         public override string Message { get { return p_Message; } }
 
         public LexerTextErrorDiscardedChar(char Discarded, int Line, int Column) : base(Line, Column)
@@ -472,6 +467,7 @@
             Builder.Append(System.Convert.ToInt32(p_Discarded).ToString("X"));
             Builder.Append(")");
             p_Message = Builder.ToString();
+            p_Component = "Lexer";
         }
         public override string ToString() { return p_Message; }
     }
@@ -575,9 +571,15 @@
         public ParserException(string message, System.Exception innerException) : base(message, innerException) { }
         protected ParserException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
-    public interface IParserError { string Message { get; } }
-    public class ParserErrorUnexpectedToken : IParserError
+    public abstract class ParserError : Hime.Kernel.Reporting.Entry
     {
+        public Hime.Kernel.Reporting.Level Level { get { return Hime.Kernel.Reporting.Level.Error; } }
+        public abstract string Component { get; }
+        public abstract string Message { get; }
+    }
+    public class ParserErrorUnexpectedToken : ParserError
+    {
+        private string p_Component;
         private SymbolToken p_Token;
         private System.Collections.ObjectModel.Collection<string> p_Expected;
         private System.Collections.ObjectModel.ReadOnlyCollection<string> p_ReadOnlyExpected;
@@ -585,7 +587,8 @@
 
         public SymbolToken UnexpectedToken { get { return p_Token; } }
         public System.Collections.ObjectModel.ReadOnlyCollection<string> ExpectedTokens { get { return p_ReadOnlyExpected; } }
-        public string Message { get { return p_Message; } }
+        public override string Component { get { return p_Component; } }
+        public override string Message { get { return p_Message; } }
 
         public ParserErrorUnexpectedToken(SymbolToken Token, string[] Expected)
         {
@@ -602,6 +605,7 @@
             }
             Builder.Append(" }.");
             p_Message = Builder.ToString();
+            p_Component = "Parser";
         }
         public override string ToString() { return "Parser Error : unexpected token"; }
     }
@@ -773,7 +777,7 @@
 
     public interface IParser
     {
-        System.Collections.Generic.List<IParserError> Errors { get; }
+        System.Collections.Generic.List<ParserError> Errors { get; }
         SyntaxTreeNode Analyse();
     }
 }

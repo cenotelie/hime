@@ -8,6 +8,7 @@ namespace Tests
     [TestFixture]
     public class Suite02_LR
     {
+        private static Hime.Kernel.Reporting.Reporter p_Reporter = new Hime.Kernel.Reporting.Reporter(typeof(Suite02_LR));
 
         public const string gram01_rules = "E->T Ep;"
                                                 + "Ep->'+' T Ep;"
@@ -27,7 +28,7 @@ namespace Tests
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText(text);
-            compiler.Compile(root, log4net.LogManager.GetLogger("Tests"));
+            compiler.Compile(root, p_Reporter);
             return (Hime.Generators.Parsers.ContextFree.CFGrammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(name));
         }
 
@@ -42,7 +43,7 @@ namespace Tests
             expected.Add("F", new string[]{ "nb", "(" });
 
             Hime.Generators.Parsers.ContextFree.CFGrammar gram = BuildGrammar("Test", gram01);
-            gram.GenerateParser("Test", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "Test.cs", log4net.LogManager.GetLogger("Tests"));
+            gram.GenerateParser("Test", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "Test.cs", p_Reporter);
             foreach (Hime.Generators.Parsers.ContextFree.CFVariable var in gram.Variables)
             {
                 if (!expected.ContainsKey(var.LocalName))

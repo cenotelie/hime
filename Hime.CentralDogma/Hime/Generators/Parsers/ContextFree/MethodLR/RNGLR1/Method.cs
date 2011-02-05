@@ -145,7 +145,7 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Return true if the construction succeeded, false otherwise</returns>
-        public bool Construct(Grammar Grammar, log4net.ILog Log)
+        public bool Construct(Grammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             if (Grammar is CFGrammar)
                 return Construct((CFGrammar)Grammar, Log);
@@ -157,9 +157,9 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Return true if the construction succeeded, false otherwise</returns>
-        public bool Construct(CFGrammar Grammar, log4net.ILog Log)
+        public bool Construct(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
-            Log.Info("Constructing RNGLR(1) data ...");
+            Log.Info("RNGLR(1)", "Constructing RNGLR(1) data ...");
             p_Grammar = Grammar;
             p_Graph = ConstructGraph(Grammar, Log);
             // Output conflicts
@@ -168,11 +168,11 @@
             {
                 foreach (LRConflict Conflict in Set.Conflicts)
                 {
-                    Log.Warn("RNGLR(1): " + Conflict.ToString());
+                    Log.Report(Conflict);
                     Error = true;
                 }
             }
-            Log.Info("Done !");
+            Log.Info("RNGLR(1)", "Done !");
             return (!Error);
         }
 
@@ -182,7 +182,7 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Returns the constructed LR graph</returns>
-        public static LRGraph ConstructGraph(CFGrammar Grammar, log4net.ILog Log)
+        public static LRGraph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             LRGraph GraphLR1 = MethodLR1.ConstructGraph(Grammar, Log);
             foreach (LRItemSet Set in GraphLR1.Sets)

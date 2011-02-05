@@ -4,18 +4,18 @@
     {
         static void Compile()
         {
-            log4net.ILog LogProxy = Hime.Kernel.LogUtils.getLog(typeof(Program));
+            Hime.Kernel.Reporting.Reporter Reporter = new Hime.Kernel.Reporting.Reporter(typeof(Program));
 
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
-            compiler.Compile(root, LogProxy);
+            compiler.Compile(root, Reporter);
             Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", LogProxy, false);
-            grammar.GenerateGrammarInfo("Grammar.xml", LogProxy);
+            grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", Reporter, false);
+            grammar.GenerateGrammarInfo("Grammar.xml", Reporter);
 
-            //LogXML.ExportHTML("LogTest.html", "Grammar Log");
-            //System.Diagnostics.Process.Start("LogTest.html");
+            Reporter.ExportHTML("LogTest.html", "Grammar Log");
+            System.Diagnostics.Process.Start("LogTest.html");
         }
 
         static void Parse()

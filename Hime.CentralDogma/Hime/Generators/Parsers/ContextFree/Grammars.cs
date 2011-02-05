@@ -2,7 +2,7 @@
 {
     public interface CFGrammarMethod : GrammarMethod
     {
-        bool Construct(CFGrammar Grammar, log4net.ILog Log);
+        bool Construct(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log);
     }
 
 
@@ -177,21 +177,21 @@
         public abstract void Inherit(CFGrammar Parent);
         public abstract CFGrammar Clone();
 
-        protected bool Prepare_AddRealAxiom(log4net.ILog Log)
+        protected bool Prepare_AddRealAxiom(Hime.Kernel.Reporting.Reporter Log)
         {
-            Log.Info("Creating axiom ...");
+            Log.Info("Grammar", "Creating axiom ...");
 
             // Search for Axiom option
             if (!p_Options.ContainsKey("Axiom"))
             {
-                Log.Error("Grammar: Axiom option is undefined");
+                Log.Error("Grammar", "Axiom option is undefined");
                 return false;
             }
             // Search for the variable specified as the Axiom
             string name = p_Options["Axiom"];
             if (!p_Variables.ContainsKey(name))
             {
-                Log.Error("Grammar: Cannot find axiom variable " + name);
+                Log.Error("Grammar", "Cannot find axiom variable " + name);
                 return false;
             }
 
@@ -202,13 +202,13 @@
             Parts.Add(new RuleDefinitionPart(TerminalDollar.Instance, RuleDefinitionPartAction.Drop));
             Axiom.AddRule(new CFRule(Axiom, new CFRuleDefinition(Parts), false));
 
-            Log.Info("Done !");
+            Log.Info("Grammar", "Done !");
             return true;
         }
 
-        protected bool Prepare_ComputeFirsts(log4net.ILog Log)
+        protected bool Prepare_ComputeFirsts(Hime.Kernel.Reporting.Reporter Log)
         {
-            Log.Info("Computing Firsts sets ...");
+            Log.Info("Grammar", "Computing Firsts sets ...");
 
             bool mod = true;
             // While some modification has occured, repeat the process
@@ -220,13 +220,13 @@
                         mod = true;
             }
 
-            Log.Info("Done !");
+            Log.Info("Grammar", "Done !");
             return true;
         }
 
-        protected bool Prepare_ComputeFollowers(log4net.ILog Log)
+        protected bool Prepare_ComputeFollowers(Hime.Kernel.Reporting.Reporter Log)
         {
-            Log.Info("Computing Followers sets ...");
+            Log.Info("Grammar", "Computing Followers sets ...");
 
             bool mod = true;
             // Apply step 1 to each variable
@@ -241,7 +241,7 @@
                         mod = true;
             }
 
-            Log.Info("Done !");
+            Log.Info("Grammar", "Done !");
             return true;
         }
 
@@ -272,7 +272,7 @@
             return Node;
         }
 
-        public override void GenerateGrammarInfo(string File, log4net.ILog Log)
+        public override void GenerateGrammarInfo(string File, Hime.Kernel.Reporting.Reporter Log)
         {
             System.Xml.XmlDocument Document = new System.Xml.XmlDocument();
             Document.AppendChild(Document.CreateXmlDeclaration("1.0", "utf-8", null));
@@ -337,68 +337,69 @@
         }
 
 
-        public override System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, GrammarParseMethod MethodName, log4net.ILog Log, bool DrawVisual)
+        public override System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, GrammarParseMethod MethodName, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
         {
-            Log.Info(p_Name + " parser data generation");
-            if (!Prepare_AddRealAxiom(Log)) return null;
-            if (!Prepare_ComputeFirsts(Log)) return null;
-            if (!Prepare_ComputeFollowers(Log)) return null;
-            if (!Prepare_DFA(Log)) return null;
-            Log.Info("Grammar: Lexer DFA generated");
+            Log.BeginSection(p_Name + " parser data generation");
+            if (!Prepare_AddRealAxiom(Log)) { Log.EndSection(); return null; }
+            if (!Prepare_ComputeFirsts(Log)) { Log.EndSection(); return null; }
+            if (!Prepare_ComputeFollowers(Log)) { Log.EndSection(); return null; }
+            if (!Prepare_DFA(Log)) { Log.EndSection(); return null; }
+            Log.Info("Grammar", "Lexer DFA generated");
 
             GrammarMethod Method = null;
             if (MethodName == GrammarParseMethod.LR0)
             {
                 Method = new LR.MethodLR0();
-                Log.Info("Grammar: Parsing method is set to LR(0)");
+                Log.Info("Grammar", "Parsing method is set to LR(0)");
             }
             else if (MethodName == GrammarParseMethod.LR1)
             {
                 Method = new LR.MethodLR1();
-                Log.Info("Grammar: Parsing method is set to LR(1)");
+                Log.Info("Grammar", "Parsing method is set to LR(1)");
             }
             else if (MethodName == GrammarParseMethod.LALR1)
             {
                 Method = new LR.MethodLALR1();
-                Log.Info("Grammar: Parsing method is set to LALR(1)");
+                Log.Info("Grammar", "Parsing method is set to LALR(1)");
             }
             else if (MethodName == GrammarParseMethod.GLR1)
             {
                 Method = new LR.MethodGLR1();
-                Log.Info("Grammar: Parsing method is set to GLR(1)");
-                Log.Warn("Grammar: Code generation is not yet supported for this parsing method");
+                Log.Info("Grammar", "Parsing method is set to GLR(1)");
+                Log.Warn("Grammar", "Code generation is not yet supported for this parsing method");
             }
             else if (MethodName == GrammarParseMethod.GLALR1)
             {
                 Method = new LR.MethodGLALR1();
-                Log.Info("Grammar: Parsing method is set to GLALR(1)");
-                Log.Warn("Grammar: Code generation is not yet supported for this parsing method");
+                Log.Info("Grammar", "Parsing method is set to GLALR(1)");
+                Log.Warn("Grammar", "Code generation is not yet supported for this parsing method");
             }
             else if (MethodName == GrammarParseMethod.RNGLR1)
             {
                 Method = new LR.MethodRNGLR1();
-                Log.Info("Grammar: Parsing method is set to RNGLR(1)");
-                Log.Warn("Grammar: Code generation is not yet supported for this parsing method");
+                Log.Info("Grammar", "Parsing method is set to RNGLR(1)");
+                Log.Warn("Grammar", "Code generation is not yet supported for this parsing method");
             }
             else if (MethodName == GrammarParseMethod.RNGLALR1)
             {
                 Method = new LR.MethodRNGLALR1();
-                Log.Info("Grammar: Parsing method is set to RNGLALR(1)");
-                Log.Warn("Grammar: Code generation is not yet supported for this parsing method");
+                Log.Info("Grammar", "Parsing method is set to RNGLALR(1)");
+                Log.Warn("Grammar", "Code generation is not yet supported for this parsing method");
             }
             else
             {
-                Log.Error("Grammar: The provided method is not appropriate for this grammar");
+                Log.Error("Grammar", "The provided method is not appropriate for this grammar");
+                Log.EndSection();
                 return null;
             }
-            if (!Method.Construct(this, Log))
-                return null;
+            if (!Method.Construct(this, Log)) { Log.EndSection(); return null; }
             if (DrawVisual)
             {
                 p_FinalDFA.GenerateVisual().Save(p_CompleteName.ToString() + "_DFA.bmp");
                 Method.GenerateVisual().Save(p_CompleteName.ToString() + "_Parser.bmp");
-               Log.Info("Grammar: Visuals for the DFA and the LR graph have been generated");
+                Log.Info("Grammar", "Visuals for the DFA and the LR graph have been generated");
             }
+            Log.EndSection();
 
             System.Xml.XmlNode Node = Document.CreateElement("ContextFreeGrammar");
             Node.Attributes.Append(Document.CreateAttribute("Name"));
@@ -426,11 +427,11 @@
         }
 
 
-        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, log4net.ILog Log)
+        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, Hime.Kernel.Reporting.Reporter Log)
         {
             return GenerateParser(Namespace, MethodName, File, Log, false);
         }
-        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, log4net.ILog Log, bool DrawVisual)
+        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
         {
             System.Xml.XmlDocument Document = new System.Xml.XmlDocument();
             Document.AppendChild(Document.CreateXmlDeclaration("1.0", "utf-8", null));
@@ -455,9 +456,9 @@
             return true;
         }
 
-        protected bool Prepare_DFA(log4net.ILog Log)
+        protected bool Prepare_DFA(Hime.Kernel.Reporting.Reporter Log)
         {
-            Log.Info("Generating DFA for Terminals ...");
+            Log.Info("Grammar", "Generating DFA for Terminals ...");
 
             // Construct a global NFA for all the terminals
             Automata.NFA Final = new Automata.NFA();
@@ -473,7 +474,7 @@
             p_FinalDFA = p_FinalDFA.Minimize();
             p_FinalDFA.RepackTransitions();
 
-            Log.Info("Done !");
+            Log.Info("Grammar", "Done !");
             return true;
         }
 
@@ -606,14 +607,14 @@
             return Result;
         }
 
-        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, log4net.ILog Log)
+        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, Hime.Kernel.Reporting.Reporter Log)
         {
             return GenerateParser(Namespace, MethodName, File, Log, false);
         }
 
-        public override System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, GrammarParseMethod MethodName, log4net.ILog Log, bool DrawVisual)
+        public override System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, GrammarParseMethod MethodName, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
         {
-            Log.Info(p_Name + " parser generation");
+            Log.Info("Grammar", p_Name + " parser generation");
             if (!Prepare_AddRealAxiom(Log)) return null;
             if (!Prepare_ComputeFirsts(Log)) return null;
             if (!Prepare_ComputeFollowers(Log)) return null;
@@ -622,30 +623,30 @@
             if (MethodName == GrammarParseMethod.LR1)
             {
                 Method = new LR.MethodLR1();
-                Log.Info("Grammar: Parsing method is set to LR(1)");
+                Log.Info("Grammar", "Parsing method is set to LR(1)");
             }
             else if (MethodName == GrammarParseMethod.GLR1)
             {
                 Method = new LR.MethodGLR1();
-                Log.Info("Grammar: Parsing method is set to GLR(1)");
-                Log.Warn("Grammar: Code generation is not yet supported for this parsing method");
+                Log.Info("Grammar", "Parsing method is set to GLR(1)");
+                Log.Warn("Grammar", "Code generation is not yet supported for this parsing method");
             }
             else if (MethodName == GrammarParseMethod.RNGLR1)
             {
                 Method = new LR.MethodRNGLR1();
-                Log.Info("Grammar: Parsing method is set to RNGLR(1)");
-                Log.Warn("Grammar: Code generation is not yet supported for this parsing method");
+                Log.Info("Grammar", "Parsing method is set to RNGLR(1)");
+                Log.Warn("Grammar", "Code generation is not yet supported for this parsing method");
             }
             else
             {
-                Log.Error("Grammar: The provided method is not appropriate for this grammar");
+                Log.Error("Grammar", "The provided method is not appropriate for this grammar");
                 return null;
             }
             Method.Construct(this, Log);
             if (DrawVisual)
             {
                 Method.GenerateVisual().Save(p_CompleteName.ToString() + "_Parser.bmp");
-                Log.Info("Grammar: A visual for the LR graph has been generated");
+                Log.Info("Grammar", "A visual for the LR graph has been generated");
             }
 
             System.Xml.XmlNode Node = Document.CreateElement("ContextFreeGrammar");
@@ -661,7 +662,7 @@
             return Node;
         }
 
-        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, log4net.ILog Log, bool DrawVisual)
+        public override bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
         {
             System.Xml.XmlDocument Document = new System.Xml.XmlDocument();
             Document.AppendChild(Document.CreateXmlDeclaration("1.0", "utf-8", null));
