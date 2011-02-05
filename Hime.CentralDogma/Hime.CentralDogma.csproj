@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Hime.CentralDogma</RootNamespace>
+    <AssemblyName>Hime.CentralDogma</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Hime\Generators\Automata\NFA.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\CompilerContext.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\Compiler.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\Grammars.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\GLALR1\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\GLR1\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LALR1\Items.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LALR1\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LR0\Items.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LR0\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LR1\Items.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LR1\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LRGraph.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LRConflicts.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LRSets.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\LRItems.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\RNGLALR1\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\RNGLR1\LRSets.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\MethodLR\RNGLR1\Method.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\Rules.cs" />
+    <Compile Include="Hime\Generators\Parsers\ContextFree\Symbols.cs" />
+    <Compile Include="Hime\Generators\Automata\DFA.cs" />
+    <Compile Include="Hime\Generators\Grammars.cs" />
+    <Compile Include="Hime\Generators\Rules.cs" />
+    <Compile Include="Hime\Generators\Symbols.cs" />
+    <Compile Include="Hime\Kernel\Binary\BaseBinary.cs" />
+    <Compile Include="Hime\Kernel\Graph\KernelGraph.cs" />
+    <Compile Include="Hime\Kernel\Graph\KernelGraphAlgos.cs" />
+    <Compile Include="Hime\Kernel\Graph\KernelGraphVisuals.cs" />
+    <Compile Include="Hime\Kernel\Parsers\BaseParsers.cs" />
+    <Compile Include="Hime\Kernel\KernelDaemon.cs" />
+    <Compile Include="Hime\Kernel\Logs\BaseLogs.cs" />
+    <Compile Include="Hime\Kernel\KernelNaming.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.Embedded.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.Compiler.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.CompilerErrors.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.Dependency.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.Exceptions.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.Extensions.cs" />
+    <Compile Include="Hime\Kernel\Resources\KernelResources.Parser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.Ontologies.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.W3CGrammars.gram" />
+    <None Include="Hime\Resources\Pending\Tokenizer.gram">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Hime\Resources\Translators\W3CEBNF.trans" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.Error.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.Info.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.Logo.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.Warning.svg" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Asm.PE.format" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.CIL.PE.format" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.Library.gram" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.CIL.Asm.gram" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.B.gram">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.CIL.CSharp.gram" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Asm.x86_32.gram" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Java.Bytecode.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.Formats.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.ContextSensitiveGrammars.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.ContextFreeGrammars.gram" />
+    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Java.ClassFile.format" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Hime\Resources\Visuals\button_minus.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Hime\Resources\Visuals\button_plus.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Hime\Resources\Transforms\Generators.Lexers.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Generators.ParserLR1.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Generators.CFGrammars.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Generators.Resources.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Logs.LogXML.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Error.png" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Info.png" />
+    <Content Include="Hime\Resources\Icons\Hime.Logo.ico" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Logo.png" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Warning.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

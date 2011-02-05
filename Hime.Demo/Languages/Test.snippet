@@ -1,0 +1,11 @@
+﻿namespace Test
+{
+	public #Snippet<TestSnippet[]>#
+		#ForEach<$Symbol in /Lexer/Terminals>#
+			#If<(index($Symbol) == 0) || (§/Lexer@Separator§ == "True")>#
+			 coucou
+			#End#
+			
+		#End#
+	#SnippetEnd#
+}

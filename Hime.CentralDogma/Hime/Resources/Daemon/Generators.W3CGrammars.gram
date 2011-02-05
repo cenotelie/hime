@@ -1,0 +1,32 @@
+﻿namespace Hime.Generators.Parsers
+{
+	public grammar cf GrammarW3C : Kernel.GrammarKernel
+	{
+		options {}
+		terminals
+		{
+			SYMBOL_TERMINAL	-> '\'' ([^\\'] | '\\\\' | '\\\'')+ '\'';
+		}
+		rules
+		{
+			w3c_symbol_terminal	-> SYMBOL_TERMINAL ;
+			w3c_symbol_variable	-> NAME ;
+			
+			w3c_rule_element		-> w3c_symbol_terminal^
+									|  w3c_symbol_variable^
+									|  w3c_rule_op_optional^
+									|  w3c_rule_op_closure^ ;
+			w3c_rule_op_optional	-> !'[' w3c_rule_production ']'! ;
+			w3c_rule_op_closure		-> !'{' w3c_rule_production '}'! ;
+			w3c_rule_op_concat		-> w3c_rule_element^
+									|  w3c_rule_op_concat w3c_rule_element ;
+			w3c_rule_op_union		-> w3c_rule_op_concat^
+									|  w3c_rule_op_union '|'^ w3c_rule_op_concat ;
+			w3c_rule_production		-> w3c_rule_op_union^ ;
+			
+			w3c_rule				-> NAME '::='! w3c_rule_production ';'! ;
+			
+			w3c_grammar				-> w3c_rule+ ;
+		}
+	}
+}

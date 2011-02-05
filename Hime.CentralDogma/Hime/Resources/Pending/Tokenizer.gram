@@ -1,0 +1,283 @@
+﻿namespace jp.cit.langrid
+{
+	public grammar cf SentenceFR
+	{
+		options { }
+		terminals
+		{
+			NEW_LINE		-> 0x000D /* CR */
+							|  0x000A /* LF */
+							|  0x000D 0x000A /* CR LF */
+							|  0x2028 /* LS */
+							|  0x2029 /* PS */ ;
+			
+			CHAR_WHITE_SPACE		-> 0x0020			// SPACE
+									| 0x0009			// HORIZONTAL TABULATION
+									| 0x000B			// VERTICAL TABULATION
+									| 0x000C			// FF
+									| 0x00A0			// NO-BREAK SPACE
+									| 0x202F			// NARROW NO-BREAK SPACE
+									| 0x205F ;			// MEDIUM MATHEMATICAL SPACE
+			
+			CHAR_DASH				->	0x002D				// HYPHEN-MINUS
+									| 0x00AD				// SOFT HYPHEN
+									| 0x2010 .. 0x2015		// HYPHEN..HORIZONTAL BAR
+									| 0x2212				// MINUS SIGN
+									| 0x2E17				// DOUBLE OBLIQUE HYPHEN
+									| 0x2E1A				// HYPHEN WITH DIAERESIS
+									| 0x301C				// WAVE DASH
+									| 0x3030 ;				// WAVY DASH
+			
+			CHAR_ASTERISK			-> 0x002A ;				// ASTERISK
+			CHAR_PLUS_SIGN			-> 0x002B ;				// PLUS SIGN
+			CHAR_SOLIDUS			-> 0x002F ;				// SOLIDUS
+			CHAR_DEGREE_SIGN		-> 0x00B0 ;				// DEGREE SIGN
+			CHAR_ORDINAL_INDICATOR	-> 0x00BA ;				// MASCULINE ORDINAL INDICATOR
+			
+			CHAR_APOSTROPHE			-> 0x0027 ;				// APOSTROPHE
+			CHAR_QUOTATION			-> 0x0022 ;				// DOUBLE QUOTE
+			CHAR_QUOTATION_LEFT		-> 0x00AB ;				// LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+			CHAR_QUOTATION_RIGHT	-> 0x00BB ;				// RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+			
+			CHAR_BRACKET_LEFT			-> 0x0028 ;
+			CHAR_BRACKET_RIGHT			-> 0x0029 ;
+			CHAR_SQUARE_BRACKET_LEFT	-> '[' ;
+			CHAR_SQUARE_BRACKET_RIGHT	-> ']' ;
+			
+			CHAR_COMMA				-> 0x002C ;				// COMMA
+			CHAR_COLON				-> 0x003A ;				// COLON
+			CHAR_SEMICOLON			-> 0x003B ;				// SEMICOLON
+			CHAR_FULL_STOP			-> 0x002E ;				// FULL STOP
+			CHAR_EXCLAMATION_MARK	-> 0x0021 ;				// EXCLAMATION MARK
+			CHAR_QUESTION_MARK		-> 0x003F ;				// QUESTION MARK
+			CHAR_ELLIPSIS			-> 0x2026				// HORIZONTAL ELLIPSIS
+									|  CHAR_FULL_STOP CHAR_FULL_STOP CHAR_FULL_STOP ;
+			
+			CHAR_LATIN_BASIC		-> [a-zA-Z] ;
+			CHAR_LATIN_SUPP			-> 0x00C0 .. 0x00D6 | 0x00D8 .. 0x00F6 | 0x00F8 .. 0x00FF ;
+			CHAR_LATIN_EXT_A		-> 0x0100 .. 0x017F ;
+			CHAR_LATIN_EXT_B		-> 0x0180 .. 0x024F ;
+			CHAR_LATIN_EXT_IPA		-> 0x0250 .. 0x02AF ;
+			CHAR_LATIN_MODIFIER		-> 0x02B0 .. 0x02FF ;
+			CHAR_LATIN_DIACRITICAL	-> 0x0300 .. 0x036F ;
+			
+			TOKEN_SPACE				-> (CHAR_WHITE_SPACE | NEW_LINE)+ ;
+			TOKEN_WORD_LATIN_BEGIN	-> CHAR_LATIN_BASIC | CHAR_LATIN_SUPP | CHAR_LATIN_EXT_A | CHAR_LATIN_EXT_B | CHAR_LATIN_EXT_IPA | CHAR_LATIN_MODIFIER | CHAR_LATIN_DIACRITICAL ;
+			TOKEN_WORD_LATIN		-> TOKEN_WORD_LATIN_BEGIN (TOKEN_WORD_LATIN_BEGIN | CHAR_DASH | CHAR_APOSTROPHE)*
+									|  'M.'
+									|  'etc.'
+									|  [nN] CHAR_ORDINAL_INDICATOR;
+			TOKEN_NUMERIC_INTEGER	-> '0' | [1-9] [0-9]*;
+			TOKEN_NUMERIC_FLOAT		-> TOKEN_NUMERIC_INTEGER CHAR_COMMA TOKEN_NUMERIC_INTEGER ;
+			TOKEN_NUMERIC			-> (CHAR_PLUS_SIGN | CHAR_DASH)? (TOKEN_NUMERIC_INTEGER | TOKEN_NUMERIC_FLOAT) ;
+			TOKEN_PERCENT			-> TOKEN_NUMERIC CHAR_WHITE_SPACE* '%' ;
+			TOKEN_TEMPERATURE		-> TOKEN_NUMERIC CHAR_WHITE_SPACE* (CHAR_DEGREE_SIGN | CHAR_ORDINAL_INDICATOR) 'C'? ;
+			TOKEN_SPEECH_POINT		-> [a-zA-Z] CHAR_BRACKET_RIGHT					// a) b) c) ...
+									|  [XVI]+ CHAR_FULL_STOP ;						// I. II. III. ...
+		}
+		rules
+		{
+			element_nested<LEFT, RIGHT>	-> LEFT sentences RIGHT ;
+			element				-> TOKEN_WORD_LATIN
+								|  CHAR_ASTERISK
+								|  CHAR_PLUS_SIGN
+								|  CHAR_SOLIDUS
+								|  CHAR_QUOTATION
+								|  TOKEN_NUMERIC
+								|  TOKEN_PERCENT
+								|  TOKEN_TEMPERATURE
+								|  TOKEN_SPEECH_POINT
+								|  element_nested<CHAR_QUOTATION_LEFT, CHAR_QUOTATION_RIGHT>
+								|  element_nested<CHAR_BRACKET_LEFT, CHAR_BRACKET_RIGHT>
+								|  element_nested<CHAR_SQUARE_BRACKET_LEFT, CHAR_SQUARE_BRACKET_RIGHT> ;
+			
+			clause				-> element+ ;
+			clause_op0			-> clause
+								|  clause_op0 CHAR_COMMA clause
+								|  clause_op0 CHAR_COLON clause
+								|  clause_op0 CHAR_SEMICOLON clause ;
+			clause_op1			-> clause_op0
+								|  clause_op0 CHAR_COMMA
+								|  clause_op0 CHAR_COLON
+								|  clause_op0 CHAR_SEMICOLON ;
+			
+			sentence_stop		-> CHAR_FULL_STOP
+								|  CHAR_ELLIPSIS
+								|  CHAR_EXCLAMATION_MARK
+								|  CHAR_QUESTION_MARK ;
+			sentence_complete	-> clause_op0? sentence_stop ;
+			sentence_incomplete	-> clause_op1 ;
+			sentences			-> sentence_complete*
+								|  sentence_incomplete ;
+		}
+	}
+	
+	public grammar cf SentenceEN
+	{
+		options { }
+		terminals
+		{
+			NEW_LINE		-> 0x000D /* CR */
+							|  0x000A /* LF */
+							|  0x000D 0x000A /* CR LF */
+							|  0x2028 /* LS */
+							|  0x2029 /* PS */ ;
+			
+			CHAR_WHITE_SPACE		-> 0x0020			// SPACE
+									| 0x0009			// HORIZONTAL TABULATION
+									| 0x000B			// VERTICAL TABULATION
+									| 0x000C			// FF
+									| 0x00A0			// NO-BREAK SPACE
+									| 0x202F			// NARROW NO-BREAK SPACE
+									| 0x205F ;			// MEDIUM MATHEMATICAL SPACE
+			
+			CHAR_DASH				->	0x002D				// HYPHEN-MINUS
+									| 0x00AD				// SOFT HYPHEN
+									| 0x2010 .. 0x2015		// HYPHEN..HORIZONTAL BAR
+									| 0x2212				// MINUS SIGN
+									| 0x2E17				// DOUBLE OBLIQUE HYPHEN
+									| 0x2E1A				// HYPHEN WITH DIAERESIS
+									| 0x301C				// WAVE DASH
+									| 0x3030 ;				// WAVY DASH
+			
+			CHAR_ASTERISK			-> 0x002A ;				// ASTERISK
+			CHAR_PLUS_SIGN			-> 0x002B ;				// PLUS SIGN
+			CHAR_SOLIDUS			-> 0x002F ;				// SOLIDUS
+			CHAR_DEGREE_SIGN		-> 0x00B0 ;				// DEGREE SIGN
+			CHAR_ORDINAL_INDICATOR	-> 0x00BA ;				// MASCULINE ORDINAL INDICATOR
+			
+			CHAR_APOSTROPHE			-> 0x0027 ;				// APOSTROPHE
+			CHAR_QUOTATION			-> 0x0022 ;				// DOUBLE QUOTE
+			CHAR_QUOTATION_LEFT		-> 0x00AB ;				// LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+			CHAR_QUOTATION_RIGHT	-> 0x00BB ;				// RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+			
+			CHAR_BRACKET_LEFT			-> 0x0028 ;
+			CHAR_BRACKET_RIGHT			-> 0x0029 ;
+			CHAR_SQUARE_BRACKET_LEFT	-> '[' ;
+			CHAR_SQUARE_BRACKET_RIGHT	-> ']' ;
+			
+			CHAR_COMMA				-> 0x002C ;				// COMMA
+			CHAR_COLON				-> 0x003A ;				// COLON
+			CHAR_SEMICOLON			-> 0x003B ;				// SEMICOLON
+			CHAR_FULL_STOP			-> 0x002E ;				// FULL STOP
+			CHAR_EXCLAMATION_MARK	-> 0x0021 ;				// EXCLAMATION MARK
+			CHAR_QUESTION_MARK		-> 0x003F ;				// QUESTION MARK
+			CHAR_ELLIPSIS			-> 0x2026				// HORIZONTAL ELLIPSIS
+									|  CHAR_FULL_STOP CHAR_FULL_STOP CHAR_FULL_STOP ;
+			
+			CHAR_LATIN_BASIC		-> [a-zA-Z] ;
+			CHAR_LATIN_SUPP			-> 0x00C0 .. 0x00D6 | 0x00D8 .. 0x00F6 | 0x00F8 .. 0x00FF ;
+			CHAR_LATIN_EXT_A		-> 0x0100 .. 0x017F ;
+			CHAR_LATIN_EXT_B		-> 0x0180 .. 0x024F ;
+			CHAR_LATIN_EXT_IPA		-> 0x0250 .. 0x02AF ;
+			CHAR_LATIN_MODIFIER		-> 0x02B0 .. 0x02FF ;
+			CHAR_LATIN_DIACRITICAL	-> 0x0300 .. 0x036F ;
+			
+			TOKEN_SPACE				-> (CHAR_WHITE_SPACE | NEW_LINE)+ ;
+			TOKEN_WORD_LATIN		-> (CHAR_LATIN_BASIC | CHAR_LATIN_SUPP | CHAR_LATIN_EXT_A | CHAR_LATIN_EXT_B | CHAR_LATIN_EXT_IPA | CHAR_LATIN_MODIFIER | CHAR_LATIN_DIACRITICAL)+
+									|  'M.'
+									|  'etc.'
+									|  [nN] CHAR_ORDINAL_INDICATOR;
+			TOKEN_NUMERIC_INTEGER	-> '0' | [1-9] [0-9]*;
+			TOKEN_NUMERIC_FLOAT		-> TOKEN_NUMERIC_INTEGER CHAR_COMMA TOKEN_NUMERIC_INTEGER ;
+			TOKEN_NUMERIC			-> (CHAR_PLUS_SIGN | CHAR_DASH)? (TOKEN_NUMERIC_INTEGER | TOKEN_NUMERIC_FLOAT) ;
+			TOKEN_PERCENT			-> TOKEN_NUMERIC CHAR_WHITE_SPACE* '%' ;
+			TOKEN_TEMPERATURE		-> TOKEN_NUMERIC CHAR_WHITE_SPACE* (CHAR_DEGREE_SIGN | CHAR_ORDINAL_INDICATOR) 'C'? ;
+			TOKEN_SPEECH_POINT		-> [a-zA-Z] CHAR_BRACKET_RIGHT					// a) b) c) ...
+									|  [XVI]+ CHAR_FULL_STOP ;						// I. II. III. ...
+		}
+		rules
+		{
+			element_nested<LEFT, RIGHT>	-> LEFT sentences RIGHT ;
+			element				-> TOKEN_WORD_LATIN
+								|  CHAR_ASTERISK
+								|  CHAR_PLUS_SIGN
+								|  CHAR_SOLIDUS
+								|  CHAR_DASH
+								|  CHAR_APOSTROPHE
+								|  CHAR_QUOTATION
+								|  TOKEN_NUMERIC
+								|  TOKEN_PERCENT
+								|  TOKEN_TEMPERATURE
+								|  TOKEN_SPEECH_POINT
+								|  element_nested<CHAR_QUOTATION_LEFT, CHAR_QUOTATION_RIGHT>
+								|  element_nested<CHAR_BRACKET_LEFT, CHAR_BRACKET_RIGHT>
+								|  element_nested<CHAR_SQUARE_BRACKET_LEFT, CHAR_SQUARE_BRACKET_RIGHT> ;
+			
+			clause				-> element+ ;
+			clause_op0			-> clause
+								|  clause_op0 CHAR_COMMA clause
+								|  clause_op0 CHAR_COLON clause
+								|  clause_op0 CHAR_SEMICOLON clause ;
+			clause_op1			-> clause_op0
+								|  clause_op0 CHAR_COMMA
+								|  clause_op0 CHAR_COLON
+								|  clause_op0 CHAR_SEMICOLON ;
+			
+			sentence_stop		-> CHAR_FULL_STOP
+								|  CHAR_ELLIPSIS
+								|  CHAR_EXCLAMATION_MARK
+								|  CHAR_QUESTION_MARK ;
+			sentence_complete	-> clause_op0? sentence_stop ;
+			sentence_incomplete	-> clause_op1 ;
+			sentences			-> sentence_complete*
+								|  sentence_incomplete ;
+		}
+	}
+	
+	
+	
+	public grammar cf EUParliamentFR : SentenceFR
+	{
+		options
+		{
+			Axiom = "file";
+			Separator = "TOKEN_SPACE";
+		}
+		terminals
+		{
+			TAG_CHAPTER		-> '<CHAPTER' [^>]+ '>' ;
+			TAG_SPEAKER		-> '<SPEAKER' [^>]+ '>' ;
+			TAG_PARAGRAPH	-> '<P>' ;
+		}
+		rules
+		{
+			paragraph			-> TAG_PARAGRAPH^ TAG_SPEAKER+ sentences
+								|  TAG_PARAGRAPH^ sentences ;
+			
+			chapter_title		-> sentences ;
+			chapter				-> TAG_CHAPTER^ chapter_title
+									TAG_SPEAKER sentences
+									paragraph* ;
+			
+			file				-> chapter+ ;
+		}
+	}
+	
+	public grammar cf EUParliamentEN : SentenceEN
+	{
+		options
+		{
+			Axiom = "file";
+			Separator = "TOKEN_SPACE";
+		}
+		terminals
+		{
+			TAG_CHAPTER		-> '<CHAPTER' [^>]+ '>' ;
+			TAG_SPEAKER		-> '<SPEAKER' [^>]+ '>' ;
+			TAG_PARAGRAPH	-> '<P>' ;
+		}
+		rules
+		{
+			paragraph			-> TAG_PARAGRAPH^ TAG_SPEAKER+ sentences
+								|  TAG_PARAGRAPH^ sentences ;
+			
+			chapter_title		-> sentences ;
+			chapter				-> TAG_CHAPTER^ chapter_title
+									TAG_SPEAKER sentences
+									paragraph* ;
+			
+			file				-> chapter+ ;
+		}
+	}
+}

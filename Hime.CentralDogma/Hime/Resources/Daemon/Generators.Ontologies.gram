@@ -1,0 +1,14 @@
+﻿namespace Hime.Generators.Ontologies
+{
+	public grammar cf GrammarOntology : Kernel.GrammarKernel
+	{
+		options {}
+		terminals
+		{
+		}
+		rules
+		{
+			ontology	-> 'Ontology' '('  ')'
+		}
+	}
+}

@@ -1,0 +1,14 @@
+public grammar cf Test
+{
+	options
+	{
+		Axiom = "file";
+	}
+	terminals { TEST -> [cd]+ - ('c' 'd'+ - 'cdd'); }
+	rules
+	{
+		DATA1	-> ('a' | 'b')* ;
+		DATA2	-> 'a' 'b'+ ;
+		file -> TEST;
+	}
+}

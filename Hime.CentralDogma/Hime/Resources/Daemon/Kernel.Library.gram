@@ -1,0 +1,13 @@
+﻿namespace Hime.Kernel.Library
+{
+	public grammar cf GrammarLibFlag
+	{
+		options {}
+		rules
+		{
+			flag_on		-> 0b1 ;
+			flag_off	-> 0b0 ;
+			flag_value	-> flag_on^ | flag_off^ ;
+		}
+	}
+}

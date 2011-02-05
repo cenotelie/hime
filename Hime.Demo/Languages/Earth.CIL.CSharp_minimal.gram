@@ -1,0 +1,66 @@
+﻿namespace Hime.Earth.CIL
+{
+	public grammar cf GrammarCSharp
+	{
+		options
+		{
+			Axiom = "compilation_unit";
+			Separator = "SEPARATOR";
+		}
+		terminals
+		{
+			NEW_LINE		-> 0x000D /* CR */
+							|  0x000A /* LF */
+							|  0x000D 0x000A /* CR LF */
+							|  0x2028 /* LS */
+							|  0x2029 /* PS */ ;
+			WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+			COMMENT_LINE	-> '//' (0x0000 .. 0xFFFF - NEW_LINE) NEW_LINE ;
+			COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
+			SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
+			
+			NULL_LITTERAL				-> 'null' ;
+			BOOLEAN_LITTERAL_TRUE		-> 'true' ;
+			BOOLEAN_LITTERAL_FALSE		-> 'false' ;
+			INTEGER_LITTERAL_SUFFIX		-> 'U' | 'u' | 'L' | 'l' | 'UL' | 'Ul' | 'uL' | 'ul' | 'LU' | 'Lu' | 'lU' | 'lu' ;
+			INTEGER_LITTERAL_DECIMAL	-> [1-9] [0-9]* | '0' INTEGER_LITTERAL_SUFFIX? ;
+			INTEGER_LITTERAL_HEXA		-> '0' ('x' | 'X') [a-fA-F0-9]+ INTEGER_LITTERAL_SUFFIX? ;
+			REAL_LITTERAL_SUFFIX		-> 'F' | 'f' | 'D' | 'd' | 'M' | 'm' ;
+			REAL_LITTERAL				-> INTEGER_LITTERAL_DECIMAL? '.' INTEGER_LITTERAL_DECIMAL  (('e' | 'E') ('+' | '-')? INTEGER_LITTERAL_DECIMAL)? REAL_LITTERAL_SUFFIX?
+										|  INTEGER_LITTERAL_DECIMAL ('e' | 'E') ('+' | '-')? INTEGER_LITTERAL_DECIMAL REAL_LITTERAL_SUFFIX?
+										|  INTEGER_LITTERAL_DECIMAL REAL_LITTERAL_SUFFIX ;
+			CHARACTER_LITTERAL			-> '\'' ( (0x0000 .. 0xFFFF - ('\'' | '\\' | NEW_LINE))
+												| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
+												| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
+												| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
+											) '\'' ;
+			STRING_LITTERAL_REGULAR		-> '"'  ( (0x0000 .. 0xFFFF - ('"' | '\\' | NEW_LINE))
+												| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
+												| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
+												| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
+											)* '"' ;
+			STRING_LITTERAL_VERBATIM	-> '@' '"' ([^"] | '""')* '"' ;
+			
+			IDENTIFIER		-> '@'? [a-zA-Z] [a-zA-Z0-9_]* ;
+		}
+		rules
+		{
+			qualified_name		-> IDENTIFIER ('.' IDENTIFIER)*;
+			
+			/* Types grammar */
+			type					-> qualified_name ;
+			
+			/* Expressions grammar */
+			exp_atom				-> IDENTIFIER
+									|  '(' expression ')' ;
+									
+			exp_op1_cast			-> '(' type ')' exp_op1 ;
+			exp_op1					-> exp_atom
+									|  exp_op1_cast ;
+
+			expression				-> exp_op1 ;
+			
+			compilation_unit		-> expression ;
+		}
+	}
+}

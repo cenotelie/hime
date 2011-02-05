@@ -1,0 +1,118 @@
+﻿namespace Hime.Generators.Parsers.ContextFree.LR
+{
+    /// <summary>
+    /// Represents a LR(0) item
+    /// </summary>
+    public class LRItemLR0 : LRItem
+    {
+        /// <summary>
+        /// Construct the item from a rule, the dot position in the rule
+        /// </summary>
+        /// <param name="Rule">The rule on which the item is based</param>
+        /// <param name="DotPosition">The position of the dot in the rule</param>
+        public LRItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
+        /// <summary>
+        /// Construct the item from a rule, the dot position in the rule
+        /// </summary>
+        /// <param name="Rule">The rule on which the item is based</param>
+        /// <param name="DotPosition">The position of the dot in the rule</param>
+        /// <param name="Watermark">A watermark to propagate</param>
+        public LRItemLR0(CFRule Rule, int DotPosition, LRItemWatermark Watermark) : base(Rule, DotPosition, Watermark) { }
+
+        /// <summary>
+        /// Get the child of the current item
+        /// </summary>
+        /// <returns>Returns the child item or null if the item's action is Reduce</returns>
+        public override LRItem GetChild()
+        {
+            if (Action == LRItemAction.Reduce) return null;
+            return new LRItemLR0(p_Rule, p_DotPosition + 1, p_Watermark);
+        }
+        /// <summary>
+        /// Compute the closure for this item and add it to given list
+        /// </summary>
+        /// <param name="Closure">The closure of items being computed</param>
+        public override void CloseTo(System.Collections.Generic.List<LRItem> Closure)
+        {
+            Symbol Next = NextSymbol;
+            if (Next == null)
+                return;
+            if (Next is CFVariable)
+            {
+                CFVariable Var = (CFVariable)Next;
+                foreach (CFRule R in Var.Rules)
+                {
+                    LRItemLR0 New = new LRItemLR0(R, 0, p_Watermark);
+                    bool Found = false;
+                    foreach (LRItem Previous in Closure)
+                    {
+                        if (Previous.Equals(New))
+                        {
+                            Previous.Watermark.AddWatermark(p_Watermark);
+                            Found = true;
+                            break;
+                        }
+                    }
+                    if (!Found) Closure.Add(New);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test if two objects are equals in a general meaning
+        /// </summary>
+        /// <param name="obj">The object to test</param>
+        /// <returns>
+        /// If obj is not of the same type as this, returns false;
+        /// If obj is of the same type as this, returns true if the two items are equivalent, false otherwise
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            if (obj is LRItemLR0)
+            {
+                LRItemLR0 Tested = (LRItemLR0)obj;
+                return Equals_Base(Tested);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a string representing the item
+        /// </summary>
+        /// <param name="ShowLookaheads">True if the lookaheads should be displayed</param>
+        /// <returns>A string representing the item</returns>
+        public override string ToString() { return ToString(false); }
+        /// <summary>
+        /// Returns a string representing the item with decoration
+        /// </summary>
+        /// <param name="ShowDecoration">True to show the decoration (lookaheads and watermarks)</param>
+        /// <returns>A string represeting the item</returns>
+        public override string ToString(bool ShowDecoration)
+        {
+            System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");
+            Builder.Append(p_Rule.Variable.ToString());
+            Builder.Append(" ->");
+            int i = 0;
+            foreach (RuleDefinitionPart Part in p_Definition.Parts)
+            {
+                if (i == p_DotPosition)
+                    Builder.Append(" .");
+                Builder.Append(" ");
+                Builder.Append(Part.ToString());
+                i++;
+            }
+            if (i == p_DotPosition)
+                Builder.Append(" . ");
+            if (ShowDecoration)
+            {
+                if (!p_Watermark.IsNeutral)
+                {
+                    Builder.Append("   ");
+                    Builder.Append(p_Watermark.ToString());
+                }
+            }
+            Builder.Append("]");
+            return Builder.ToString();
+        }
+    }
+}
