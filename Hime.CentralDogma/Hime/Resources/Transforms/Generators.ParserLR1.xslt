@@ -36,7 +36,7 @@
     private static Production[] p_Rules = { <xsl:for-each select="Rules/Rule"><xsl:if test="position()!=1">, </xsl:if>ReduceRule_<xsl:value-of select="@HeadSID"/>_<xsl:value-of select="@RuleID"/></xsl:for-each> };
     private static ushort[]     p_RulesHeadID = { <xsl:for-each select="Rules/Rule"><xsl:if test="position()!=1">, </xsl:if>0x<xsl:value-of select="@HeadSID"/></xsl:for-each> };
     private static string[]     p_RulesHeadName = { <xsl:for-each select="Rules/Rule"><xsl:if test="position()!=1">, </xsl:if>"<xsl:value-of select="@HeadName"/>"</xsl:for-each> };
-    private static ushort[]     p_RulesParserLength = { <xsl:for-each select="Rules/Rule"><xsl:if test="position()!=1">, </xsl:if>0x<xsl:value-of select="RuleDefinition/@ParserLength"/></xsl:for-each> };
+    private static ushort[]     p_RulesParserLength = { <xsl:for-each select="Rules/Rule"><xsl:if test="position()!=1">, </xsl:if><xsl:value-of select="RuleDefinition/@ParserLength"/></xsl:for-each> };
     <xsl:for-each select="States/State">
     private static ushort[]     p_StateExpectedIDs_<xsl:value-of select="@ID"/> = { <xsl:for-each select="Expected/Symbol"><xsl:if test="position()!=1">, </xsl:if>0x<xsl:value-of select="@SID"/></xsl:for-each> };
     private static string[]     p_StateExpectedNames_<xsl:value-of select="@ID"/> = { <xsl:for-each select="Expected/Symbol"><xsl:if test="position()!=1">, </xsl:if>"<xsl:value-of select="@Name"/>"</xsl:for-each> };

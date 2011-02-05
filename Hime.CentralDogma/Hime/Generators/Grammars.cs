@@ -73,17 +73,17 @@
         protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol){ p_Parent = Symbol; }
         protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { p_CompleteName = Name; }
 
-        public abstract System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, GrammarParseMethod MethodName, Hime.Kernel.Logs.Log Log, bool DrawVisual);
-        public abstract bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, Hime.Kernel.Logs.Log Log);
-        public abstract bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, Hime.Kernel.Logs.Log Log, bool DrawVisual);
-        public abstract void GenerateGrammarInfo(string File, Hime.Kernel.Logs.Log Log);
+        public abstract System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, GrammarParseMethod MethodName, log4net.ILog Log, bool DrawVisual);
+        public abstract bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, log4net.ILog Log);
+        public abstract bool GenerateParser(string Namespace, GrammarParseMethod MethodName, string File, log4net.ILog Log, bool DrawVisual);
+        public abstract void GenerateGrammarInfo(string File, log4net.ILog Log);
     }
 
 
 
     public interface GrammarMethod
     {
-        bool Construct(Grammar Grammar, Kernel.Logs.Log Log);
+        bool Construct(Grammar Grammar, log4net.ILog Log);
         System.Xml.XmlNode GenerateData(System.Xml.XmlDocument Doc);
         System.Drawing.Bitmap GenerateVisual();
     }

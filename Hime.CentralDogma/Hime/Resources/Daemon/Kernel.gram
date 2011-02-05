@@ -15,7 +15,9 @@
 			COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
 			SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
 			
-			NAME			-> [a-zA-Z_] [0-9a-zA-Z_]* ;
+			NAME_CHARACTER_FIRST	-> [_a-zA-Z] | \ub{IsGreek};
+			NAME_CHARACTER			-> NAME_CHARACTER_FIRST | [0-9] ;
+			NAME					-> '@'? NAME_CHARACTER_FIRST NAME_CHARACTER* ;
 		}
 		rules
 		{

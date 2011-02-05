@@ -6,7 +6,7 @@
         private const string p_SubruleHeadRadical = "";
         private const string p_SubruleHeadRadicalMultiplicity = p_SubruleHeadRadical + "_m";
         private const string p_SubruleHeadRadicalRestrict = p_SubruleHeadRadical + "_r";
-        private Kernel.Logs.Log p_Log;
+        private log4net.ILog p_Log;
 
         public string CompilerName { get { return "HimeSystems.CentralDogma.ContextFreeGrammarCompiler"; } }
         public int CompilerVersionMajor { get { return 1; } }
@@ -15,7 +15,7 @@
 
         public CFGrammarCompiler() { }
 
-        public void CreateResource(Kernel.Symbol Container, Kernel.Parsers.SyntaxTreeNode SyntaxNode, Kernel.Resources.ResourceGraph Graph, Kernel.Logs.Log Log)
+        public void CreateResource(Kernel.Symbol Container, Kernel.Parsers.SyntaxTreeNode SyntaxNode, Kernel.Resources.ResourceGraph Graph, log4net.ILog Log)
         {
             Kernel.SymbolAccess Access = Kernel.Resources.ResourceCompiler.CompileSymbolAccess(SyntaxNode.Children[0]);
             string Name = ((Kernel.Parsers.SymbolTokenText)SyntaxNode.Children[1].Symbol).ValueText;
@@ -31,7 +31,7 @@
             Container.SymbolAddChild(Grammar);
             Graph.AddResource(Resource);
         }
-        public void CreateDependencies(Kernel.Resources.Resource Resource, Kernel.Resources.ResourceGraph Graph, Kernel.Logs.Log Log)
+        public void CreateDependencies(Kernel.Resources.Resource Resource, Kernel.Resources.ResourceGraph Graph, log4net.ILog Log)
         {
             foreach (Kernel.Parsers.SyntaxTreeNode Parent in Resource.SyntaxNode.Children[2].Children)
             {
@@ -68,7 +68,7 @@
                 }
             }
         }
-        public int CompileSolveDependencies(Kernel.Resources.Resource Resource, Kernel.Logs.Log Log)
+        public int CompileSolveDependencies(Kernel.Resources.Resource Resource, log4net.ILog Log)
         {
             CFGrammar Grammar = (CFGrammar)Resource.Symbol;
             int Solved = 0;
@@ -85,7 +85,7 @@
             }
             return Solved;
         }
-        public void Compile(Kernel.Resources.Resource Resource, Kernel.Logs.Log Log)
+        public void Compile(Kernel.Resources.Resource Resource, log4net.ILog Log)
         {
             p_Log = Log;
             if (Resource.Symbol is CFGrammarText)
@@ -193,6 +193,31 @@
             }
             return Final;
         }
+        private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(Hime.Kernel.Parsers.SyntaxTreeNode Node)
+        {
+            Automata.NFA Final = new Hime.Generators.Parsers.Automata.NFA();
+            Final.StateEntry = Final.AddNewState();
+            Final.StateExit = Final.AddNewState();
+            Hime.Kernel.Parsers.SymbolTokenText token = (Hime.Kernel.Parsers.SymbolTokenText)Node.Symbol;
+            string value = token.ValueText.Substring(4, token.ValueText.Length - 5);
+            Hime.Generators.Parsers.UnicodeBlock block = Hime.Generators.Parsers.UnicodeBlock.Categories[value];
+            // Create transition and return
+            Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), Final.StateExit);
+            return Final;
+        }
+        private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(Hime.Kernel.Parsers.SyntaxTreeNode Node)
+        {
+            Automata.NFA Final = new Hime.Generators.Parsers.Automata.NFA();
+            Final.StateEntry = Final.AddNewState();
+            Final.StateExit = Final.AddNewState();
+            Hime.Kernel.Parsers.SymbolTokenText token = (Hime.Kernel.Parsers.SymbolTokenText)Node.Symbol;
+            string value = token.ValueText.Substring(4, token.ValueText.Length - 5);
+            Hime.Generators.Parsers.UnicodeCategory category = Hime.Generators.Parsers.UnicodeCategory.Classes[value];
+            // Create transitions and return
+            foreach (Hime.Generators.Parsers.UnicodeSpan span in category.Spans)
+                Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), Final.StateExit);
+            return Final;
+        }
         private Automata.NFA Compile_Recognize_terminal_def_atom_span(Hime.Kernel.Parsers.SyntaxTreeNode Node)
         {
             Automata.NFA Final = new Hime.Generators.Parsers.Automata.NFA();
@@ -223,7 +248,7 @@
             Terminal Ref = Data.GetTerminal(Token.ValueText);
             if (Ref == null)
             {
-                p_Log.EntryBegin("Error"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Cannot find terminal " + Token.ValueText); p_Log.EntryEnd();
+                p_Log.Error("Compiler: Cannot find terminal " + Token.ValueText);
                 Automata.NFA Final = new Hime.Generators.Parsers.Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -273,6 +298,10 @@
                     return Compile_Recognize_terminal_def_atom_text(Node);
                 if (Token.Name == "SYMBOL_TERMINAL_SET")
                     return Compile_Recognize_terminal_def_atom_set(Node);
+                if (Token.Name == "SYMBOL_TERMINAL_UCAT")
+                    return Compile_Recognize_terminal_def_atom_ucat(Node);
+                if (Token.Name == "SYMBOL_TERMINAL_UBLOCK")
+                    return Compile_Recognize_terminal_def_atom_ublock(Node);
                 if (Token.ValueText == "..")
                     return Compile_Recognize_terminal_def_atom_span(Node);
                 if (Token.Name == "NAME")
@@ -403,7 +432,7 @@
                     Defs.Add(new CFRuleDefinition(Symbol));
                 else
                 {
-                    p_Log.EntryBegin("Error"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Unrecognized symbol " + Token.ValueText + " in rule definition"); p_Log.EntryEnd();
+                    p_Log.Error("Compiler: Unrecognized symbol " + Token.ValueText + " in rule definition");
                     Defs.Add(new CFRuleDefinition());
                 }
             }
@@ -419,7 +448,7 @@
             // check for meta-rule existence
             if (!Context.IsTemplateRule(Name, ParamCount))
             {
-                p_Log.EntryBegin("Error"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Meta-rule " + Name + " does not exist with " + ParamCount.ToString() + " parameters"); p_Log.EntryEnd();
+                p_Log.Error("Compiler: Meta-rule " + Name + " does not exist with " + ParamCount.ToString() + " parameters");
                 Defs.Add(new CFRuleDefinition());
                 return Defs;
             }
@@ -578,16 +607,16 @@
 
         private void Compile_Recognize_grammar_text(CFGrammar Data, Hime.Kernel.Parsers.SyntaxTreeNode GrammarNode)
         {
-            p_Log.EntryBegin("Info"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Compiling grammar " + Data.LocalName); p_Log.EntryEnd();
-            p_Log.EntryBegin("Info"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Grammar takes text as input"); p_Log.EntryEnd();
+            p_Log.Info("Compiler: Compiling grammar " + Data.LocalName);
+            p_Log.Info("Compiler: Grammar takes text as input");
             Compile_Recognize_grammar_options(Data, GrammarNode.Children[3]);
             Compile_Recognize_grammar_terminals(Data, GrammarNode.Children[4]);
             Compile_Recognize_grammar_rules(Data, GrammarNode.Children[5]);
         }
         private void Compile_Recognize_grammar_bin(CFGrammar Data, Hime.Kernel.Parsers.SyntaxTreeNode GrammarNode)
         {
-            p_Log.EntryBegin("Info"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Compiling grammar " + Data.LocalName); p_Log.EntryEnd();
-            p_Log.EntryBegin("Info"); p_Log.EntryAddData("Compiler"); p_Log.EntryAddData("Grammar takes binary as input"); p_Log.EntryEnd();
+            p_Log.Info("Compiler: Compiling grammar " + Data.LocalName);
+            p_Log.Info("Compiler: Grammar takes binary as input");
             Compile_Recognize_grammar_options(Data, GrammarNode.Children[3]);
             Compile_Recognize_grammar_rules(Data, GrammarNode.Children[4]);
         }

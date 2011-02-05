@@ -8,10 +8,7 @@
         public static void GenerateNextStep(string Path)
         {
             // Initialise logs
-            Kernel.Logs.LogProxy Log = new Hime.Kernel.Logs.LogProxy();
-            Kernel.Logs.LogXML LogXML = new Hime.Kernel.Logs.LogXML();
-            Log.AddTarget(Kernel.Logs.LogConsole.Instance);
-            Log.AddTarget(LogXML);
+            log4net.ILog Log = LogUtils.getLog(typeof(KernelDaemon));
 
             // Test path
             Path += "\\Daemon\\";
@@ -19,10 +16,8 @@
                 System.IO.Directory.Delete(Path, true);
             System.IO.Directory.CreateDirectory(Path);
 
-            Log.SectionBegin("Daemon");
-            Log.EntryBegin("Info"); Log.EntryAddData("Daemon"); Log.EntryAddData("Hime Systems Daemon"); Log.EntryEnd();
-            Log.EntryBegin("Info"); Log.EntryAddData("Daemon"); Log.EntryAddData("output at : " + Path); Log.EntryEnd();
-            Log.SectionEnd();
+            Log.Info("Daemon: Hime Systems Daemon");
+            Log.Info("Daemon: output at : " + Path);
 
             // Checkout resources
             Resources.AccessorSession Session = Resources.ResourceAccessor.CreateCheckoutSession();
@@ -46,8 +41,8 @@
             FileCentralDogma.GenerateParser("Hime.Kernel.Resources.Parser", Hime.Generators.Parsers.GrammarParseMethod.LALR1, Path + "KernelResources.Parser.cs", Log);
 
             // Export log
-            LogXML.ExportHTML(Path + "DaemonLog.html", "Daemon Log");
-            System.Diagnostics.Process.Start(Path + "DaemonLog.html");
+            //LogXML.ExportHTML(Path + "DaemonLog.html", "Daemon Log");
+            //System.Diagnostics.Process.Start(Path + "DaemonLog.html");
         }
     }
 }

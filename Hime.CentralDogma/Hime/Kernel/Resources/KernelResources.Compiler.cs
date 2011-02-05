@@ -28,7 +28,7 @@
         private System.Collections.Generic.List<string> p_InputRawResources;
         private System.Collections.Generic.List<CompilerError> p_OutputErrors;
         private Namespace p_OutputRootNamespace;
-        private Logs.Log p_OutputLog;
+        private log4net.ILog p_OutputLog;
         private Parsers.SyntaxTreeNode p_IntermediateRoot;
         private ResourceGraph p_IntermediateResources;
         private ResourceCompilerRegister p_PluginRegister;
@@ -60,34 +60,19 @@
             p_InputRawResources.Add(Data);
         }
 
-        public void Compile(Namespace RootNamespace, Logs.Log Log)
+        public void Compile(Namespace RootNamespace, log4net.ILog Log)
         {
             p_OutputRootNamespace = RootNamespace;
             p_OutputLog = Log;
 
-            p_OutputLog.SectionBegin(CompilerName);
-            p_OutputLog.EntryBegin("Info"); p_OutputLog.EntryAddData("Compiler"); p_OutputLog.EntryAddData(CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString()); p_OutputLog.EntryEnd();
+            p_OutputLog.Info(CompilerName);
+            p_OutputLog.Info("Compiler: " + CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString());
             foreach (IResourceCompiler Plugin in p_PluginRegister.Compilers)
-            {
-                p_OutputLog.EntryBegin("Info");
-                p_OutputLog.EntryAddData("Compiler");
-                p_OutputLog.EntryAddData("Register plugin : " + Plugin.ToString());
-                p_OutputLog.EntryEnd();
-            }
+                p_OutputLog.Info("Compiler: Register plugin " + Plugin.ToString());
             foreach (string ResourceName in p_InputNamedResources.Keys)
-            {
-                p_OutputLog.EntryBegin("Info");
-                p_OutputLog.EntryAddData("Compiler");
-                p_OutputLog.EntryAddData("Compilation unit : " + ResourceName);
-                p_OutputLog.EntryEnd();
-            }
+                p_OutputLog.Info("Compiler: Compilation unit " + ResourceName);
             if (p_InputRawResources.Count != 0)
-            {
-                p_OutputLog.EntryBegin("Info");
-                p_OutputLog.EntryAddData("Compiler");
-                p_OutputLog.EntryAddData("Compilation unit : " + p_InputRawResources.Count.ToString() + " raw resources");
-                p_OutputLog.EntryEnd();
-            }
+                p_OutputLog.Info("Compiler: Compilation unit " + p_InputRawResources.Count.ToString() + " raw resources");
 
             // Parse
             foreach (string ResourceName in p_InputNamedResources.Keys)
@@ -120,8 +105,6 @@
                 if (Solved == 0)
                 {  }
             }
-
-            p_OutputLog.SectionEnd();
         }
 
 
@@ -150,44 +133,43 @@
             Parser.Parser_Hime_Kernel_FileCentralDogma UnitParser = new Parser.Parser_Hime_Kernel_FileCentralDogma(UnitLexer);
             Parsers.SyntaxTreeNode UnitRoot = null;
             try { UnitRoot = UnitParser.Analyse(); }
-            catch (System.Exception e) { }
+            catch (System.Exception e) {
+                p_OutputLog.Fatal("Parser: encountered a fatal error. Exception thrown: " + e.Message);
+                return false;
+            }
 
             foreach (Hime.Kernel.Parsers.LexerTextError Error in UnitLexer.Errors)
             {
-                p_OutputLog.EntryBegin("Error");
-                p_OutputLog.EntryAddData("(" + Error.Line.ToString() + ", " + Error.Column.ToString() + ")");
-                p_OutputLog.EntryAddData(Error.ToString());
-                p_OutputLog.EntryEnd();
+                p_OutputLog.Error("Error @(" + Error.Line.ToString() + ", " + Error.Column.ToString() + ") " + Error.ToString());
                 IsError = true;
             }
             foreach (Hime.Kernel.Parsers.IParserError Error in UnitParser.Errors)
             {
-                p_OutputLog.EntryBegin("Error");
+                string where = null;
                 if (Error is Hime.Kernel.Parsers.ParserErrorUnexpectedToken)
                 {
                     Hime.Kernel.Parsers.ParserErrorUnexpectedToken UnexpError = (Hime.Kernel.Parsers.ParserErrorUnexpectedToken)Error;
                     if (UnexpError.UnexpectedToken is Hime.Kernel.Parsers.SymbolTokenText)
                     {
                         Hime.Kernel.Parsers.SymbolTokenText Token = (Hime.Kernel.Parsers.SymbolTokenText)UnexpError.UnexpectedToken;
-                        p_OutputLog.EntryAddData("Line " + Token.Line.ToString());
+                        where = "Line " + Token.Line.ToString();
                     }
                     else
                     {
-                        p_OutputLog.EntryAddData("End of file");
+                        where = "End of file";
                     }
                 }
                 else
                 {
-                    p_OutputLog.EntryAddData("File");
+                    where = "File";
                 }
-                p_OutputLog.EntryAddData(Error.Message);
-                p_OutputLog.EntryEnd();
+                p_OutputLog.Error("Error @" + where + ": " + Error.Message);
                 IsError = true;
             }
 
             if (UnitRoot == null)
             {
-                p_OutputLog.EntryBegin("Error"); p_OutputLog.EntryAddData("Compiler"); p_OutputLog.EntryAddData("The parser encountered an unrecoverable error."); p_OutputLog.EntryEnd();
+                p_OutputLog.Error("Parser: encountered an unrecoverable error.");
                 IsError = true;
             }
             else

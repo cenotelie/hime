@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 
-namespace Hime.Generators.Parsers.LR
+namespace Tests
 {
     [TestFixture]
     public class Suite01_CFGramCompiler

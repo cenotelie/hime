@@ -55,6 +55,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\..\..\NetLibs\Log4Net\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -84,15 +87,16 @@
     <Compile Include="Hime\Generators\Parsers\ContextFree\Symbols.cs" />
     <Compile Include="Hime\Generators\Automata\DFA.cs" />
     <Compile Include="Hime\Generators\Grammars.cs" />
+    <Compile Include="Hime\Generators\Parsers\Unicode.cs" />
     <Compile Include="Hime\Generators\Rules.cs" />
     <Compile Include="Hime\Generators\Symbols.cs" />
     <Compile Include="Hime\Kernel\Binary\BaseBinary.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraph.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphAlgos.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphVisuals.cs" />
+    <Compile Include="Hime\Kernel\Logging.cs" />
     <Compile Include="Hime\Kernel\Parsers\BaseParsers.cs" />
     <Compile Include="Hime\Kernel\KernelDaemon.cs" />
-    <Compile Include="Hime\Kernel\Logs\BaseLogs.cs" />
     <Compile Include="Hime\Kernel\KernelNaming.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Embedded.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Compiler.cs" />

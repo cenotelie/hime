@@ -8,6 +8,8 @@
 			QUOTED_DATA				-> '"' [^"]* '"';
 			SYMBOL_TERMINAL_TEXT	-> '\'' ([^\\'] | '\\\\' | '\\\'')+ '\'';
 			SYMBOL_TERMINAL_SET		-> '[' ([^\\\[\]] | '\\\\' | '\\[' | '\\]')+ ']';
+			SYMBOL_TERMINAL_UBLOCK	-> '\\ub' '{' NAME '}' ;
+			SYMBOL_TERMINAL_UCAT	-> '\\uc' '{' NAME '}' ;
 			
 			SYMBOL_VALUE_UINT8		-> '0x' [a-fA-F0-9] [a-fA-F0-9] ;
 			SYMBOL_VALUE_UINT16		-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
@@ -33,11 +35,15 @@
 			terminal_def_atom_unicode	-> (SYMBOL_VALUE_UINT8 | SYMBOL_VALUE_UINT16)^ ;
 			terminal_def_atom_text		-> SYMBOL_TERMINAL_TEXT^ ;
 			terminal_def_atom_set		-> SYMBOL_TERMINAL_SET^ ;
+			terminal_def_atom_ublock	-> SYMBOL_TERMINAL_UBLOCK^ ;
+			terminal_def_atom_ucat		-> SYMBOL_TERMINAL_UCAT^ ;
 			terminal_def_atom_span		-> terminal_def_atom_unicode '..'^ terminal_def_atom_unicode ;
 			terminal_def_atom		-> terminal_def_atom_unicode^
 									|  terminal_def_atom_text^
 									|  terminal_def_atom_set^
 									|  terminal_def_atom_span^
+									|  terminal_def_atom_ucat^
+									|  terminal_def_atom_ublock^
 									|  NAME^;
 			terminal_def_element	-> terminal_def_atom^ | '('! terminal_definition^ ')'!;
 			terminal_def_repetition	-> terminal_def_element^ (('*' | '+' | '?')^ )?;

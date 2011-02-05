@@ -132,7 +132,7 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Return true if the construction succeeded, false otherwise</returns>
-        public bool Construct(Grammar Grammar, Kernel.Logs.Log Log)
+        public bool Construct(Grammar Grammar, log4net.ILog Log)
         {
             if (Grammar is CFGrammar)
                 return Construct((CFGrammar)Grammar, Log);
@@ -144,9 +144,9 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Return true if the construction succeeded, false otherwise</returns>
-        public bool Construct(CFGrammar Grammar, Kernel.Logs.Log Log)
+        public bool Construct(CFGrammar Grammar, log4net.ILog Log)
         {
-            Log.RawOutput("Constructing LR(0) data ...");
+            Log.Info("Constructing LR(0) data ...");
             p_Grammar = Grammar;
             p_Graph = ConstructGraph(Grammar, Log);
             // Output conflicts
@@ -155,14 +155,11 @@
             {
                 foreach (LRConflict Conflict in Set.Conflicts)
                 {
-                    Log.EntryBegin("Error");
-                    Log.EntryAddData("LR(0)");
-                    Log.EntryAddData(Conflict.ToString());
-                    Log.EntryEnd();
+                    Log.Error("LR(0): " + Conflict.ToString());
                     Error = true;
                 }
             }
-            Log.RawOutput("Done !");
+            Log.Info("Done !");
             return (!Error);
         }
 
@@ -172,7 +169,7 @@
         /// <param name="Grammar">The original grammar</param>
         /// <param name="Log">Log for output</param>
         /// <returns>Returns the constructed LR graph</returns>
-        public static LRGraph ConstructGraph(CFGrammar Grammar, Kernel.Logs.Log Log)
+        public static LRGraph ConstructGraph(CFGrammar Grammar, log4net.ILog Log)
         {
             // Create the first set
             CFVariable AxiomVar = Grammar.GetVariable("_Axiom_");
@@ -187,7 +184,7 @@
             {
                 Graph.Sets[i].BuildGraph(Graph);
                 Graph.Sets[i].ID = i;
-                Log.RawOutput("Set I" + i.ToString() + " on " + Graph.Sets.Count.ToString() + " completed");
+                Log.Info("Set I" + i.ToString() + " on " + Graph.Sets.Count.ToString() + " completed");
             }
             foreach (LRItemSet Set in Graph.Sets)
                 Set.BuildActions(new SetActions());
