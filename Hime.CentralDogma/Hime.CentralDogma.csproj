@@ -110,28 +110,25 @@
   <ItemGroup>
     <EmbeddedResource Include="Hime\Resources\Daemon\Generators.Ontologies.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Generators.W3CGrammars.gram" />
-    <None Include="Hime\Resources\Pending\Tokenizer.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Hime\Resources\Translators\W3CEBNF.trans" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Tokenizer.gram" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Error.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Info.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Logo.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Warning.svg" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Asm.PE.format" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.CIL.PE.format" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.Asm.PE.format" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.PE.format" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.Library.gram" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.CIL.Asm.gram" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.B.gram">
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.Asm.gram" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.B.gram">
     </EmbeddedResource>
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.CIL.CSharp.gram" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Asm.x86_32.gram" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Java.Bytecode.gram" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.CSharp.gram" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.Asm.x86_32.gram" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.Java.Bytecode.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Generators.Formats.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Generators.ContextSensitiveGrammars.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Generators.ContextFreeGrammars.gram" />
-    <EmbeddedResource Include="Hime\Resources\Pending\Earth.Java.ClassFile.format" />
+    <EmbeddedResource Include="Hime\Resources\Examples\Earth.Java.ClassFile.format" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Hime\Resources\Visuals\button_minus.gif" />
