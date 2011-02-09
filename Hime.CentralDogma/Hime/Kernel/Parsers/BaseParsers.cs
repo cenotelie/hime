@@ -544,13 +544,13 @@
         protected const byte p_Flag7 = 0x7F;
         protected const byte p_Flag8 = 0xFF;
 
-        protected Binary.DataInput p_Input;
+        protected Hime.Redist.Binary.DataInput p_Input;
         protected int p_CurrentBitLeft;
         protected bool p_DollarEmitted;
 		
 		public int InputLength { get { return p_Input.Length; } }
 
-        protected LexerBinary(Binary.DataInput input)
+        protected LexerBinary(Hime.Redist.Binary.DataInput input)
 		{
 			p_Input = input;
 			p_CurrentBitLeft = 8;

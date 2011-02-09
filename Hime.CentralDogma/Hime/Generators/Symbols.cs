@@ -1,12 +1,12 @@
 ﻿namespace Hime.Generators.Parsers
 {
     /// <summary>
-    /// Base class for a grammar symbol
+    /// Base class for grammar symbols
     /// </summary>
     public abstract class Symbol : Hime.Kernel.Symbol
     {
         /// <summary>
-        /// Parent symbol set grammar
+        /// Parent symbol grammar
         /// </summary>
         protected Grammar p_Parent;
         /// <summary>

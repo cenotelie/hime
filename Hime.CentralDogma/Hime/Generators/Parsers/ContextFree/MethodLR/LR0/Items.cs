@@ -11,13 +11,6 @@
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
         public LRItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
-        /// <summary>
-        /// Construct the item from a rule, the dot position in the rule
-        /// </summary>
-        /// <param name="Rule">The rule on which the item is based</param>
-        /// <param name="DotPosition">The position of the dot in the rule</param>
-        /// <param name="Watermark">A watermark to propagate</param>
-        public LRItemLR0(CFRule Rule, int DotPosition, LRItemWatermark Watermark) : base(Rule, DotPosition, Watermark) { }
 
         /// <summary>
         /// Get the child of the current item
@@ -26,7 +19,7 @@
         public override LRItem GetChild()
         {
             if (Action == LRItemAction.Reduce) return null;
-            return new LRItemLR0(p_Rule, p_DotPosition + 1, p_Watermark);
+            return new LRItemLR0(p_Rule, p_DotPosition + 1);
         }
         /// <summary>
         /// Compute the closure for this item and add it to given list
@@ -42,13 +35,12 @@
                 CFVariable Var = (CFVariable)Next;
                 foreach (CFRule R in Var.Rules)
                 {
-                    LRItemLR0 New = new LRItemLR0(R, 0, p_Watermark);
+                    LRItemLR0 New = new LRItemLR0(R, 0);
                     bool Found = false;
                     foreach (LRItem Previous in Closure)
                     {
                         if (Previous.Equals(New))
                         {
-                            Previous.Watermark.AddWatermark(p_Watermark);
                             Found = true;
                             break;
                         }
@@ -103,14 +95,6 @@
             }
             if (i == p_DotPosition)
                 Builder.Append(" . ");
-            if (ShowDecoration)
-            {
-                if (!p_Watermark.IsNeutral)
-                {
-                    Builder.Append("   ");
-                    Builder.Append(p_Watermark.ToString());
-                }
-            }
             Builder.Append("]");
             return Builder.ToString();
         }

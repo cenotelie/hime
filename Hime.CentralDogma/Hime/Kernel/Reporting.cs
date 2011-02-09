@@ -82,24 +82,19 @@
 
     public class Report
     {
-        protected System.Collections.Generic.Dictionary<string, Section> p_Sections;
-        public System.Collections.Generic.IEnumerable<Section> Sections { get { return p_Sections.Values; } }
+        protected System.Collections.Generic.List<Section> p_Sections;
+        public System.Collections.Generic.List<Section> Sections { get { return p_Sections; } }
 
         public Report()
         {
-            p_Sections = new System.Collections.Generic.Dictionary<string, Section>();
+            p_Sections = new System.Collections.Generic.List<Section>();
         }
 
         public Section AddSection(string name)
         {
             Section section = new Section(name);
-            p_Sections.Add(name, section);
+            p_Sections.Add(section);
             return section;
-        }
-
-        public void AddEntry(string section, Entry entry)
-        {
-            p_Sections[section].AddEntry(entry);
         }
 
         public System.Xml.XmlDocument GetXML(string title)
@@ -109,7 +104,7 @@
             Doc.AppendChild(Doc.CreateElement("Log"));
             Doc.ChildNodes[1].Attributes.Append(Doc.CreateAttribute("title"));
             Doc.ChildNodes[1].Attributes["title"].Value = title;
-            foreach (Section section in p_Sections.Values)
+            foreach (Section section in p_Sections)
                 Doc.ChildNodes[1].AppendChild(section.GetXMLNode(Doc));
             return Doc;
         }

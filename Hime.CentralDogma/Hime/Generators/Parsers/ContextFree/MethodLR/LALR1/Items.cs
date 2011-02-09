@@ -24,19 +24,11 @@
         /// <param name="Lookaheads">The lookaheads values</param>
         public LRItemLALR1(CFRule Rule, int DotPosition, TerminalSet Lookaheads) : base(Rule, DotPosition) { p_Lookaheads = new TerminalSet(Lookaheads); }
         /// <summary>
-        /// Construct the item from a rule, the dot position in the rule and the lookahead value
-        /// </summary>
-        /// <param name="Rule">The rule on which the item is based</param>
-        /// <param name="DotPosition">The position of the dot in the rule</param>
-        /// <param name="Lookaheads">The lookaheads values</param>
-        /// <param name="Watermark">A watermark to propagate</param>
-        public LRItemLALR1(CFRule Rule, int DotPosition, TerminalSet Lookaheads, LRItemWatermark Watermark) : base(Rule, DotPosition, Watermark) { p_Lookaheads = new TerminalSet(Lookaheads); }
-        /// <summary>
         /// Constructs the item from another item
         /// </summary>
         /// <param name="Copied">The copied item</param>
         /// <remarks>The lookaheads are left empty</remarks>
-        public LRItemLALR1(LRItem Copied) : base(Copied.BaseRule, Copied.DotPosition, Copied.Watermark) { p_Lookaheads = new TerminalSet(); }
+        public LRItemLALR1(LRItem Copied) : base(Copied.BaseRule, Copied.DotPosition) { p_Lookaheads = new TerminalSet(); }
 
         /// <summary>
         /// Get the child of the current item
@@ -45,7 +37,7 @@
         public override LRItem GetChild()
         {
             if (Action == LRItemAction.Reduce) return null;
-            return new LRItemLALR1(p_Rule, p_DotPosition + 1, new TerminalSet(p_Lookaheads), p_Watermark);
+            return new LRItemLALR1(p_Rule, p_DotPosition + 1, new TerminalSet(p_Lookaheads));
         }
         /// <summary>
         /// Compute the closure for this item and add it to given list
@@ -80,7 +72,7 @@
                 // For each rule that has Next as a head variable :
                 foreach (CFRule Rule in NextVar.Rules)
                 {
-                    LRItemLALR1 New = new LRItemLALR1(Rule, 0, Firsts, p_Watermark);
+                    LRItemLALR1 New = new LRItemLALR1(Rule, 0, Firsts);
                     // Tell if a previous item was found with same rule and dot position
                     bool FoundPrevious = false;
                     // For all items in Closure that are equal with the new child in the LR(0) way :
@@ -90,7 +82,6 @@
                         {
                             // Same item => Add new lookaheads
                             Previous.Lookaheads.AddRange(Firsts);
-                            Previous.Watermark.AddWatermark(p_Watermark);
                             FoundPrevious = true;
                             break;
                         }
@@ -170,11 +161,6 @@
                 {
                     if (j != 0) Builder.Append("/");
                     Builder.Append(p_Lookaheads[j].ToString());
-                }
-                if (!p_Watermark.IsNeutral)
-                {
-                    Builder.Append("   ");
-                    Builder.Append(p_Watermark.ToString());
                 }
             }
             Builder.Append("]");

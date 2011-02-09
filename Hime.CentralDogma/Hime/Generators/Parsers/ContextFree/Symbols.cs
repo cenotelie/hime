@@ -5,9 +5,6 @@
     /// </summary>
     public class CFVariable : Variable
     {
-        /// <summary>
-        /// 
-        /// </summary>
         protected System.Collections.Generic.List<CFRule> p_Rules;
         protected TerminalSet p_Firsts;
         protected TerminalSet p_Followers;

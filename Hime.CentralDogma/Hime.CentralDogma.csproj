@@ -91,7 +91,6 @@
     <Compile Include="Hime\Generators\Parsers\Unicode.cs" />
     <Compile Include="Hime\Generators\Rules.cs" />
     <Compile Include="Hime\Generators\Symbols.cs" />
-    <Compile Include="Hime\Kernel\Binary\BaseBinary.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraph.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphAlgos.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphVisuals.cs" />
@@ -149,7 +148,12 @@
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Logo.png" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Warning.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
+      <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
+      <Name>Hime.Redist</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>

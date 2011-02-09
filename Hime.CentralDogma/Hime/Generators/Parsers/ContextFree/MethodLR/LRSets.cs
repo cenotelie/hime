@@ -407,53 +407,10 @@
         /// <remarks>This function does not build the children sets</remarks>
         public void BuildActions(ILRItemSetActions Actions)
         {
-            //CheckWatermarks();
             p_Actions = Actions;
             p_Actions.Build(this);
         }
-
-        /// <summary>
-        /// Check watermarks for the base rule of each item
-        /// </summary>
-        private void CheckWatermarks()
-        {
-            System.Collections.Generic.List<int> Negatives = new System.Collections.Generic.List<int>();
-            for (int i = 0; i != p_Items.Count; i++)
-            {
-                if (p_Items[i].Action == LRItemAction.Reduce)
-                {
-                    bool negative = false;
-                    foreach (int Mark in p_Items[i].Watermark.Marks)
-                    {
-                        if (Mark < 0)
-                        {
-                            Negatives.Add(Mark);
-                            negative = true;
-                        }
-                    }
-                    if (negative)
-                    {
-                        p_Items.RemoveAt(i);
-                        i--;
-                    }
-                }
-            }
-            for (int i = 0; i != p_Items.Count; i++)
-            {
-                if (p_Items[i].Action == LRItemAction.Reduce)
-                {
-                    foreach (int Mark in Negatives)
-                    {
-                        if (p_Items[i].Watermark.Marks.Contains(-Mark))
-                        {
-                            p_Items.RemoveAt(i);
-                            i--;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        
 
         public Hime.Kernel.Graph.Vertex CreateVertex(float LineSize, float CharacterWidth)
         {

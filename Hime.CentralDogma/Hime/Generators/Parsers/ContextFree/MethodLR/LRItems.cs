@@ -18,53 +18,6 @@
 
 
     /// <summary>
-    /// Represents a watermark for a LR item
-    /// </summary>
-    public class LRItemWatermark
-    {
-        private System.Collections.Generic.List<int> p_Marks;
-
-        public System.Collections.Generic.List<int> Marks { get { return p_Marks; } }
-        public bool IsNeutral { get { return (p_Marks.Count == 1 && p_Marks[0] == 0); } }
-
-        public LRItemWatermark(int BaseMark)
-        {
-            p_Marks = new System.Collections.Generic.List<int>();
-            p_Marks.Add(BaseMark);
-        }
-        public LRItemWatermark(LRItemWatermark Copied)
-        {
-            p_Marks = new System.Collections.Generic.List<int>(Copied.p_Marks);
-        }
-
-        public void AddMark(int Mark)
-        {
-            if (!p_Marks.Contains(Mark))
-                p_Marks.Add(Mark);
-        }
-        public void AddWatermark(LRItemWatermark Watermark)
-        {
-            foreach (int Mark in Watermark.p_Marks)
-                AddMark(Mark);
-        }
-
-        public override string ToString()
-        {
-            System.Text.StringBuilder Builder = new System.Text.StringBuilder("{");
-            for (int i = 0; i != p_Marks.Count; i++)
-            {
-                if (i != 0)
-                    Builder.Append("|");
-                Builder.Append(p_Marks[i].ToString());
-            }
-            Builder.Append("}");
-            return Builder.ToString();
-        }
-    }
-
-
-
-    /// <summary>
     /// Represents a LR item
     /// </summary>
     /// <remarks>
@@ -85,10 +38,6 @@
         /// The position of the item dot in the rule
         /// </summary>
         protected int p_DotPosition;
-        /// <summary>
-        /// Watermark for the item
-        /// </summary>
-        protected LRItemWatermark p_Watermark;
 
         /// <summary>
         /// Get the rule on which this item is based
@@ -113,11 +62,6 @@
                 return LRItemAction.Reduce;
             }
         }
-        /// <summary>
-        /// Get the watermark for the item
-        /// </summary>
-        /// <value>The watermark for the item</value>
-        public LRItemWatermark Watermark { get { return p_Watermark; } }
         
         /// <summary>
         /// Get the symbol that is right after the dot in the rule definition
@@ -140,29 +84,6 @@
             p_Rule = Rule;
             p_Definition = p_Rule.Definition.GetChoiceAtIndex(0);
             p_DotPosition = DotPosition;
-            p_Watermark = new LRItemWatermark(Rule.Watermark);
-        }
-        /// <summary>
-        /// Construct the item from a rule, the dot position in the rule
-        /// </summary>
-        /// <param name="Rule">The rule on which the item is based</param>
-        /// <param name="DotPosition">The position of the dot in the rule</param>
-        /// <param name="Watermark">A watermark to propagate</param>
-        public LRItem(CFRule Rule, int DotPosition, LRItemWatermark Watermark)
-        {
-            p_Rule = Rule;
-            p_Definition = p_Rule.Definition.GetChoiceAtIndex(0);
-            p_DotPosition = DotPosition;
-            if (Watermark.IsNeutral)
-            {
-                p_Watermark = new LRItemWatermark(Rule.Watermark);
-            }
-            else
-            {
-                p_Watermark = new LRItemWatermark(Watermark);
-                if (Rule.Watermark != 0)
-                    p_Watermark.AddMark(Rule.Watermark);
-            }
         }
 
         /// <summary>

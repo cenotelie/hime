@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.CentralDogma", "Hime.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Tests", "Hime.Tests\Hime.Tests.csproj", "{C142D6E0-4C90-4A24-865D-C3F0FC327018}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Redist", "Hime.Redist\Hime.Redist.csproj", "{8E4DE283-BA6E-4779-8C79-EB708002EDCC}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -51,6 +53,16 @@ Global
 		{C142D6E0-4C90-4A24-865D-C3F0FC327018}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C142D6E0-4C90-4A24-865D-C3F0FC327018}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{C142D6E0-4C90-4A24-865D-C3F0FC327018}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Release|.NET.ActiveCfg = Release|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8E4DE283-BA6E-4779-8C79-EB708002EDCC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
