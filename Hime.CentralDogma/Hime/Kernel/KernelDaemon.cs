@@ -37,8 +37,8 @@
             Session.Close();
 
             // Generate parser for FileCentralDogma
-            Generators.Parsers.Grammar FileCentralDogma = (Generators.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
-            FileCentralDogma.GenerateParser("Hime.Kernel.Resources.Parser", Hime.Generators.Parsers.GrammarParseMethod.LALR1, Path + "KernelResources.Parser.cs", Reporter);
+            Hime.Parsers.Grammar FileCentralDogma = (Hime.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
+            FileCentralDogma.GenerateParser("Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs", Reporter);
 
             // Export log
             Reporter.ExportHTML(Path + "DaemonLog.html", "Daemon Log");

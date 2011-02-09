@@ -46,7 +46,7 @@
             p_IntermediateRoot = new Parsers.SyntaxTreeNode(null);
             p_IntermediateResources = new ResourceGraph();
             p_PluginRegister = new ResourceCompilerRegister();
-            p_PluginRegister.RegisterCompiler(new Generators.Parsers.ContextFree.CFGrammarCompiler());
+            p_PluginRegister.RegisterCompiler(new Hime.Parsers.CF.CFGrammarCompiler());
         }
 
         public void AddInputFile(string FileName)

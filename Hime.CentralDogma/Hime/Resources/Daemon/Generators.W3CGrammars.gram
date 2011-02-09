@@ -1,4 +1,4 @@
-﻿namespace Hime.Generators.Parsers
+﻿namespace Hime.Parsers
 {
 	public grammar cf GrammarW3C : Kernel.GrammarKernel
 	{

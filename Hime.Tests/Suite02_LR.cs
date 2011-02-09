@@ -23,13 +23,13 @@ namespace Tests
         public const string gram01 = "public grammar cf Test { options{ Axiom=\"E\"; } terminals{} rules{ " + gram01_rules + " }  }";
 
 
-        public static Hime.Generators.Parsers.ContextFree.CFGrammar BuildGrammar(String name, String text)
+        public static Hime.Parsers.CF.CFGrammar BuildGrammar(String name, String text)
         {
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputRawText(text);
             compiler.Compile(root, p_Reporter);
-            return (Hime.Generators.Parsers.ContextFree.CFGrammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(name));
+            return (Hime.Parsers.CF.CFGrammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(name));
         }
 
         [Test]
@@ -42,16 +42,16 @@ namespace Tests
             expected.Add("Tp", new string[]{"ε", "∗" , "/",});
             expected.Add("F", new string[]{ "nb", "(" });
 
-            Hime.Generators.Parsers.ContextFree.CFGrammar gram = BuildGrammar("Test", gram01);
-            gram.GenerateParser("Test", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "Test.cs", p_Reporter);
-            foreach (Hime.Generators.Parsers.ContextFree.CFVariable var in gram.Variables)
+            Hime.Parsers.CF.CFGrammar gram = BuildGrammar("Test", gram01);
+            gram.GenerateParser("Test", new Hime.Parsers.CF.LR.MethodLALR1(), "Test.cs", p_Reporter);
+            foreach (Hime.Parsers.CF.CFVariable var in gram.Variables)
             {
                 if (!expected.ContainsKey(var.LocalName))
                     continue;
                 string[] firsts = expected[var.LocalName];
                 if (var.Firsts.Count != firsts.Length)
                     Assert.Fail("Firsts set of " + var.LocalName + " does not have a corret size");
-                foreach (Hime.Generators.Parsers.Terminal term in var.Firsts)
+                foreach (Hime.Parsers.Terminal term in var.Firsts)
                 {
                     string name = term.LocalName;
                     if (name.StartsWith("_T["))

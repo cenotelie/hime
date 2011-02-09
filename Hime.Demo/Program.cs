@@ -8,10 +8,10 @@
 
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
+            compiler.AddInputFile("Languages\\Test.gram");
             compiler.Compile(root, Reporter);
-            Hime.Generators.Parsers.Grammar grammar = (Hime.Generators.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            grammar.GenerateParser("Analyzer", Hime.Generators.Parsers.GrammarParseMethod.LALR1, "TestAnalyze.cs", Reporter, false);
+            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
+            grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs", Reporter, false);
             grammar.GenerateGrammarInfo("Grammar.xml", Reporter);
 
             Reporter.ExportHTML("LogTest.html", "Grammar Log");
