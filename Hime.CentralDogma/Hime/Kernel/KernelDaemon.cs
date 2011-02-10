@@ -8,7 +8,8 @@
         public static void GenerateNextStep(string Path)
         {
             // Initialise logs
-            Hime.Kernel.Reporting.Reporter Reporter = new Hime.Kernel.Reporting.Reporter(typeof(KernelDaemon));
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions("Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs");
+            Hime.Kernel.Reporting.Reporter Reporter = Options.Reporter;
 
             // Test path
             Path += "\\Daemon\\";
@@ -38,7 +39,7 @@
 
             // Generate parser for FileCentralDogma
             Hime.Parsers.Grammar FileCentralDogma = (Hime.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
-            FileCentralDogma.GenerateParser("Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs", Reporter);
+            FileCentralDogma.Build(Options);
 
             // Export log
             Reporter.ExportHTML(Path + "DaemonLog.html", "Daemon Log");

@@ -3,7 +3,7 @@
     /// <summary>
     /// The action to be taken for a LR item
     /// </summary>
-    public enum LRItemAction
+    public enum ItemAction
     {
         /// <summary>
         /// Shift to a chid item
@@ -24,7 +24,7 @@
     /// Item is of the form : [Var -> alpha . NextSymbol NextChoice]
     /// Where [Var -> alpha NextSymbol NextChoice] is a rule for Var
     /// </remarks>
-    public abstract class LRItem
+    public abstract class Item
     {
         /// <summary>
         /// The rule used by the current item
@@ -53,13 +53,13 @@
         /// Get the action taken by this item
         /// </summary>
         /// <value>The action for the item</value>
-        public LRItemAction Action
+        public ItemAction Action
         {
             get
             {
                 if (p_DotPosition != p_Definition.Length)
-                    return LRItemAction.Shift;
-                return LRItemAction.Reduce;
+                    return ItemAction.Shift;
+                return ItemAction.Reduce;
             }
         }
         
@@ -79,7 +79,7 @@
         /// </summary>
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
-        public LRItem(CFRule Rule, int DotPosition)
+        public Item(CFRule Rule, int DotPosition)
         {
             p_Rule = Rule;
             p_Definition = p_Rule.Definition.GetChoiceAtIndex(0);
@@ -92,7 +92,7 @@
         /// <param name="Item">The item to test</param>
         /// <returns>Returns true if the given Item is equal to the current one, false otherwise</returns>
         /// <remarks>Test is made uppon the rule and the dot position</remarks>
-        public bool Equals_Base(LRItem Item)
+        public bool Equals_Base(Item Item)
         {
             if (p_Rule.Variable.SID != Item.p_Rule.Variable.SID)
                 return false;
@@ -105,12 +105,12 @@
         /// Get the child of the current item
         /// </summary>
         /// <returns>Returns the child item or null if the item's action is Reduce</returns>
-        public abstract LRItem GetChild();
+        public abstract Item GetChild();
         /// <summary>
         /// Compute the closure for this item and add it to given list
         /// </summary>
         /// <param name="Closure">The closure of items being computed</param>
-        public abstract void CloseTo(System.Collections.Generic.List<LRItem> Closure);
+        public abstract void CloseTo(System.Collections.Generic.List<Item> Closure);
 
         /// <summary>
         /// Test if two objects are equals in a general meaning

@@ -1,30 +1,6 @@
 ﻿namespace Hime.Parsers
 {
     /// <summary>
-    /// Grammar status
-    /// </summary>
-    public enum GrammarStatus
-    {
-        /// <summary>
-        /// Grammar loaded
-        /// </summary>
-        Loaded,
-        /// <summary>
-        /// Grammar loaded and prepared
-        /// </summary>
-        Prepared,
-        /// <summary>
-        /// Grammar prepared and data generated
-        /// </summary>
-        DataGenerated,
-        /// <summary>
-        /// Grammar prepared and parser code generated
-        /// </summary>
-        CodeGenerated
-    }
-
-
-    /// <summary>
     /// Common interface for grammars
     /// </summary>
     public abstract class Grammar : Hime.Kernel.Symbol
@@ -38,22 +14,59 @@
         protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol){ p_Parent = Symbol; }
         protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { p_CompleteName = Name; }
 
-        public abstract Automata.DFA FinalDFA { get; }
-        public abstract string GetOption(string Name);
-        public abstract Terminal GetTerminal(string Name);
-
-        public abstract System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, ParseMethod Method, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual);
-        public abstract bool GenerateParser(string Namespace, ParseMethod Method, string File, Hime.Kernel.Reporting.Reporter Log);
-        public abstract bool GenerateParser(string Namespace, ParseMethod Method, string File, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual);
-        public abstract void GenerateGrammarInfo(string File, Hime.Kernel.Reporting.Reporter Log);
+        public abstract bool Build(GrammarBuildOptions Options);
     }
 
 
-    public interface ParseMethod
+    public class GrammarBuildOptions
+    {
+        private string p_Namespace;
+        private Hime.Kernel.Reporting.Reporter p_Log;
+        private bool p_Drawvisual;
+        private ParserGenerator p_Method;
+        private System.IO.StreamWriter p_LexerWriter;
+        private System.IO.StreamWriter p_ParserWriter;
+
+        public string Namespace { get { return p_Namespace; } }
+        public Hime.Kernel.Reporting.Reporter Reporter { get { return p_Log; } }
+        public bool DrawVisual { get { return p_Drawvisual; } }
+        public ParserGenerator ParserGenerator { get { return p_Method; } }
+        public System.IO.StreamWriter LexerWriter { get { return p_LexerWriter; } }
+        public System.IO.StreamWriter ParserWriter { get { return p_ParserWriter; } }
+
+        public GrammarBuildOptions(string Namespace, ParserGenerator Generator, string File)
+        {
+            p_Namespace = Namespace;
+            p_Log = new Hime.Kernel.Reporting.Reporter(typeof(Grammar));
+            p_Drawvisual = false;
+            p_Method = Generator;
+            p_LexerWriter = new System.IO.StreamWriter(File);
+            p_ParserWriter = p_LexerWriter;
+            p_LexerWriter.WriteLine("namespace " + Namespace);
+            p_LexerWriter.WriteLine("{");
+        }
+
+        public void Close()
+        {
+            p_LexerWriter.WriteLine("}");
+            p_LexerWriter.Close();
+            if (p_ParserWriter != p_LexerWriter)
+            {
+                p_ParserWriter.WriteLine("}");
+                p_ParserWriter.Close();
+            }
+        }
+    }
+
+    public interface ParserData
+    {
+        ParserGenerator Generator { get; }
+        bool Export(GrammarBuildOptions Options);
+    }
+
+    public interface ParserGenerator
     {
         string Name { get; }
-        bool Construct(Grammar Grammar, Hime.Kernel.Reporting.Reporter Log);
-        System.Xml.XmlNode GenerateData(System.Xml.XmlDocument Doc);
-        System.Drawing.Bitmap GenerateVisual();
+        ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter);
     }
 }

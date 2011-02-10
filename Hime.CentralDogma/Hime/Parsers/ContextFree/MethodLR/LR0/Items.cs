@@ -3,29 +3,29 @@
     /// <summary>
     /// Represents a LR(0) item
     /// </summary>
-    public class LRItemLR0 : LRItem
+    public class ItemLR0 : Item
     {
         /// <summary>
         /// Construct the item from a rule, the dot position in the rule
         /// </summary>
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
-        public LRItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
+        public ItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
 
         /// <summary>
         /// Get the child of the current item
         /// </summary>
         /// <returns>Returns the child item or null if the item's action is Reduce</returns>
-        public override LRItem GetChild()
+        public override Item GetChild()
         {
-            if (Action == LRItemAction.Reduce) return null;
-            return new LRItemLR0(p_Rule, p_DotPosition + 1);
+            if (Action == ItemAction.Reduce) return null;
+            return new ItemLR0(p_Rule, p_DotPosition + 1);
         }
         /// <summary>
         /// Compute the closure for this item and add it to given list
         /// </summary>
         /// <param name="Closure">The closure of items being computed</param>
-        public override void CloseTo(System.Collections.Generic.List<LRItem> Closure)
+        public override void CloseTo(System.Collections.Generic.List<Item> Closure)
         {
             Symbol Next = NextSymbol;
             if (Next == null)
@@ -35,9 +35,9 @@
                 CFVariable Var = (CFVariable)Next;
                 foreach (CFRule R in Var.Rules)
                 {
-                    LRItemLR0 New = new LRItemLR0(R, 0);
+                    ItemLR0 New = new ItemLR0(R, 0);
                     bool Found = false;
-                    foreach (LRItem Previous in Closure)
+                    foreach (Item Previous in Closure)
                     {
                         if (Previous.Equals(New))
                         {
@@ -60,9 +60,9 @@
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj is LRItemLR0)
+            if (obj is ItemLR0)
             {
-                LRItemLR0 Tested = (LRItemLR0)obj;
+                ItemLR0 Tested = (ItemLR0)obj;
                 return Equals_Base(Tested);
             }
             return false;

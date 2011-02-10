@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a LR(1) item
     /// </summary>
-    public class LRItemLR1 : LRItem
+    public class ItemLR1 : Item
     {
         /// <summary>
         /// The values of the lookahead
@@ -22,22 +22,22 @@
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
         /// <param name="OnSymbol">The lookahead value</param>
-        public LRItemLR1(CFRule Rule, int DotPosition, Terminal Lookahead) : base(Rule, DotPosition) { p_Lookahead = Lookahead; }
+        public ItemLR1(CFRule Rule, int DotPosition, Terminal Lookahead) : base(Rule, DotPosition) { p_Lookahead = Lookahead; }
 
         /// <summary>
         /// Get the child of the current item
         /// </summary>
         /// <returns>Returns the child item or null if the item's action is Reduce</returns>
-        public override LRItem GetChild()
+        public override Item GetChild()
         {
-            if (Action == LRItemAction.Reduce) return null;
-            return new LRItemLR1(p_Rule, p_DotPosition + 1, p_Lookahead);
+            if (Action == ItemAction.Reduce) return null;
+            return new ItemLR1(p_Rule, p_DotPosition + 1, p_Lookahead);
         }
         /// <summary>
         /// Compute the closure for this item and add it to given list
         /// </summary>
         /// <param name="Closure">The closure of items being computed</param>
-        public override void CloseTo(System.Collections.Generic.List<LRItem> Closure)
+        public override void CloseTo(System.Collections.Generic.List<Item> Closure)
         {
             // Get the next symbol in the item
             Symbol Next = NextSymbol;
@@ -69,9 +69,9 @@
                     foreach (Terminal First in Firsts)
                     {
                         // Child item creation and unique insertion
-                        LRItemLR1 New = new LRItemLR1(R, 0, First);
+                        ItemLR1 New = new ItemLR1(R, 0, First);
                         bool Found = false;
-                        foreach (LRItem Previous in Closure)
+                        foreach (Item Previous in Closure)
                         {
                             if (Previous.Equals(New))
                             {
@@ -95,9 +95,9 @@
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj is LRItemLR1)
+            if (obj is ItemLR1)
             {
-                LRItemLR1 Tested = (LRItemLR1)obj;
+                ItemLR1 Tested = (ItemLR1)obj;
                 if (!Equals_Base(Tested)) return false;
                 return (Tested.p_Lookahead.SID == p_Lookahead.SID);
             }

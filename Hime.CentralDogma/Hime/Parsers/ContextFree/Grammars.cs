@@ -1,8 +1,8 @@
 ﻿namespace Hime.Parsers.CF
 {
-    public interface CFParseMethod : ParseMethod
+    public interface CFParserGenerator : ParserGenerator
     {
-        bool Construct(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log);
+        ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter);
     }
 
     public abstract class CFGrammar : Grammar
@@ -55,7 +55,7 @@
             else
                 p_Options.Add(Name, Value);
         }
-        public override string GetOption(string Name)
+        public string GetOption(string Name)
         {
             if (!p_Options.ContainsKey(Name))
                 return null;
@@ -110,7 +110,7 @@
                 return Terminal;
             }
         }
-        public override Terminal GetTerminal(string Name)
+        public Terminal GetTerminal(string Name)
         {
             if (!p_Terminals.ContainsKey(Name))
                 return null;
@@ -204,7 +204,6 @@
             Log.Info("Grammar", "Done !");
             return true;
         }
-
         protected bool Prepare_ComputeFirsts(Hime.Kernel.Reporting.Reporter Log)
         {
             Log.Info("Grammar", "Computing Firsts sets ...");
@@ -222,7 +221,6 @@
             Log.Info("Grammar", "Done !");
             return true;
         }
-
         protected bool Prepare_ComputeFollowers(Hime.Kernel.Reporting.Reporter Log)
         {
             Log.Info("Grammar", "Computing Followers sets ...");
@@ -243,49 +241,12 @@
             Log.Info("Grammar", "Done !");
             return true;
         }
-
-        protected System.Xml.XmlNode GetGrammarInfoXMLNode(System.Xml.XmlDocument Doc)
-        {
-            System.Xml.XmlNode Node = Doc.CreateElement("Grammar");
-            Node.Attributes.Append(Doc.CreateAttribute("name"));
-            Node.Attributes["name"].Value = p_CompleteName.ToString();
-
-            Node.AppendChild(Doc.CreateElement("Options"));
-            foreach (string Option in p_Options.Keys)
-            {
-                System.Xml.XmlNode opNode = Doc.CreateElement("Option");
-                opNode.Attributes.Append(Doc.CreateAttribute("Name"));
-                opNode.Attributes["Name"].Value = p_Options[Option];
-                Node.LastChild.AppendChild(opNode);
-            }
-            Node.AppendChild(Doc.CreateElement("Terminals"));
-            foreach (Terminal Terminal in p_Terminals.Values)
-                Node.LastChild.AppendChild(Terminal.GetXMLNode(Doc));
-            Node.AppendChild(Doc.CreateElement("Variables"));
-            foreach (CFVariable Variable in p_Variables.Values)
-                Node.LastChild.AppendChild(Variable.GetXMLNode(Doc));
-            Node.AppendChild(Doc.CreateElement("Virtuals"));
-            foreach (Virtual Virtual in p_Virtuals.Values)
-                Node.LastChild.AppendChild(Virtual.GetXMLNode(Doc));
-
-            return Node;
-        }
-
-        public override void GenerateGrammarInfo(string File, Hime.Kernel.Reporting.Reporter Log)
-        {
-            System.Xml.XmlDocument Document = new System.Xml.XmlDocument();
-            Document.AppendChild(Document.CreateXmlDeclaration("1.0", "utf-8", null));
-            Document.AppendChild(GetGrammarInfoXMLNode(Document));
-            Document.Save(File);
-        }
     }
 
 
     public class CFGrammarText : CFGrammar
     {
         protected Automata.DFA p_FinalDFA;
-
-        public override Automata.DFA FinalDFA { get { return p_FinalDFA; } }
 
         public CFGrammarText(string Name) : base(Name) { }
 
@@ -337,92 +298,6 @@
             return Result;
         }
 
-
-        public override System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, ParseMethod Method, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
-        {
-            System.Xml.XmlNode Node = Document.CreateElement("ContextFreeGrammar");
-            Node.Attributes.Append(Document.CreateAttribute("Name"));
-            Node.Attributes.Append(Document.CreateAttribute("Method"));
-            Node.Attributes.Append(Document.CreateAttribute("Input"));
-            Node.Attributes["Name"].Value = p_CompleteName.ToString('_');
-            Node.Attributes["Method"].Value = Method.Name;
-            Node.Attributes["Input"].Value = "Text";
-            Node.AppendChild(Generate_DataLexer(Document));
-            Node.AppendChild(Method.GenerateData(Document));
-            Node.AppendChild(Document.CreateElement("SubGrammars"));
-            
-            System.Collections.Generic.List<Grammar> SubGrammars = new System.Collections.Generic.List<Grammar>();
-            foreach (TerminalText Terminal in p_Terminals.Values)
-            {
-                if (Terminal.SubGrammar == null) continue;
-                if (SubGrammars.Contains(Terminal.SubGrammar)) continue;
-
-                Node.ChildNodes[2].AppendChild(Document.CreateElement("GrammarReference"));
-                Node.ChildNodes[2].LastChild.Attributes.Append(Document.CreateAttribute("Name"));
-                Node.ChildNodes[2].LastChild.Attributes["Name"].Value = Terminal.SubGrammar.CompleteName.ToString('_');
-                SubGrammars.Add(Terminal.SubGrammar);
-            }
-            return Node;
-        }
-
-
-        public override bool GenerateParser(string Namespace, ParseMethod Method, string File, Hime.Kernel.Reporting.Reporter Log)
-        {
-            return GenerateParser(Namespace, Method, File, Log, false);
-        }
-        public override bool GenerateParser(string Namespace, ParseMethod Method, string File, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
-        {
-            Log.BeginSection(p_Name + " parser data generation");
-            if (!Prepare_AddRealAxiom(Log)) { Log.EndSection(); return false; }
-            if (!Prepare_ComputeFirsts(Log)) { Log.EndSection(); return false; }
-            if (!Prepare_ComputeFollowers(Log)) { Log.EndSection(); return false; }
-            if (!Prepare_DFA(Log)) { Log.EndSection(); return false; }
-            Log.Info("Grammar", "Lexer DFA generated");
-
-            Log.Info("Grammar", "Parsing method is " + Method.Name);
-            if (!Method.Construct(this, Log)) { Log.EndSection(); return false; }
-            if (DrawVisual)
-            {
-                p_FinalDFA.GenerateVisual().Save(p_CompleteName.ToString() + "_DFA.bmp");
-                Method.GenerateVisual().Save(p_CompleteName.ToString() + "_Parser.bmp");
-                Log.Info("Grammar", "Visuals for the DFA and the LR graph have been generated");
-            }
-            Log.EndSection();
-
-            // New style
-            DefaultTextLexerExporter LexerExporter = new DefaultTextLexerExporter();
-            using (System.IO.StreamWriter Writer = new System.IO.StreamWriter("New_" + File))
-            {
-                Writer.WriteLine("namespace " + Namespace);
-                Writer.WriteLine("{");
-                LexerExporter.Export(p_Name, this, Writer);
-                Writer.WriteLine("}");
-            }
-
-            // Old style
-            System.Xml.XmlDocument Document = new System.Xml.XmlDocument();
-            Document.AppendChild(Document.CreateXmlDeclaration("1.0", "utf-8", null));
-            Document.AppendChild(Document.CreateElement("ResourceFile"));
-            Document.ChildNodes[1].Attributes.Append(Document.CreateAttribute("Namespace"));
-            Document.ChildNodes[1].Attributes["Namespace"].Value = Namespace;
-            System.Xml.XmlNode GrammarNode = GenerateXMLNode(Document, Method, Log, DrawVisual);
-            if (GrammarNode == null) return false;
-            Document.ChildNodes[1].AppendChild(GrammarNode);
-            Document.Save(File + ".xml");
-
-            Kernel.Resources.AccessorSession Session = Kernel.Resources.ResourceAccessor.CreateCheckoutSession();
-            Session.AddCheckoutFile(File + ".xml");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.Resources.xslt", "Generators.Resources.xslt");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.CFGrammars.xslt", "Generators.CFGrammars.xslt");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.Lexers.xslt", "Generators.Lexers.xslt");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.ParserLR1.xslt", "Generators.ParserLR1.xslt");
-            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load("Generators.Resources.xslt");
-            Transform.Transform(File + ".xml", File);
-            Session.Close();
-            return true;
-        }
-
         protected bool Prepare_DFA(Hime.Kernel.Reporting.Reporter Log)
         {
             Log.Info("Grammar", "Generating DFA for Terminals ...");
@@ -445,90 +320,35 @@
             return true;
         }
 
-        protected System.Xml.XmlNode Generate_DataLexer(System.Xml.XmlDocument Doc)
+        public override bool Build(GrammarBuildOptions Options)
         {
-            System.Xml.XmlNode Node = Doc.CreateElement("Lexer");
+            Options.Reporter.BeginSection(p_Name + " parser data generation");
+            if (!Prepare_AddRealAxiom(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFirsts(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFollowers(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            if (!Prepare_DFA(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            Options.Reporter.Info("Grammar", "Lexer DFA generated");
 
+            Terminal Separator = null;
             if (p_Options.ContainsKey("Separator"))
-            {
-                string Separator = p_Options["Separator"];
-                if (p_Terminals.ContainsKey(Separator))
-                {
-                    Node.Attributes.Append(Doc.CreateAttribute("Separator"));
-                    Node.Attributes["Separator"].Value = p_Terminals[Separator].SID.ToString();
-                }
-            }
+                Separator = p_Terminals[p_Options["Separator"]];
 
-            System.Collections.Generic.List<int> Indexes;
-            Node.AppendChild(Generate_DataLexer_Symbols(Doc, out Indexes));
+            //Generate lexer
+            Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(Options.LexerWriter, Options.Namespace, p_Name, p_FinalDFA, Separator);
+            LexerExporter.Export();
 
-            Node.AppendChild(Doc.CreateElement("States"));
-            int i = 0;
-            foreach (Automata.DFAState State in p_FinalDFA.States)
-            {
-                Node.LastChild.AppendChild(Generate_DataLexer_DFAState(Doc, State, Indexes[i]));
-                i++;
-            }
-            return Node;
-        }
-
-        private System.Xml.XmlNode Generate_DataLexer_Symbols(System.Xml.XmlDocument Doc, out System.Collections.Generic.List<int> Indexes)
-        {
-            System.Collections.Generic.List<Terminal> Symbols = new System.Collections.Generic.List<Terminal>();
-            Indexes = new System.Collections.Generic.List<int>();
-
-            System.Xml.XmlNode Node = Doc.CreateElement("Symbols");
-            foreach (Automata.DFAState State in p_FinalDFA.States)
-            {
-                if (State.Final != null)
-                {
-                    if (Symbols.Contains(State.Final))
-                    {
-                        Indexes.Add(Symbols.IndexOf(State.Final));
-                    }
-                    else
-                    {
-                        Node.AppendChild(State.Final.GetXMLNode(Doc));
-                        Indexes.Add(Symbols.Count);
-                        Symbols.Add(State.Final);
-                    }
-                }
-                else
-                {
-                    Indexes.Add(-1);
-                }
-            }
-
-            return Node;
-        }
-
-        private System.Xml.XmlNode Generate_DataLexer_DFAState(System.Xml.XmlDocument Doc, Automata.DFAState State, int FinalIndex)
-        {
-            System.Xml.XmlNode Node = Doc.CreateElement("DFAState");
-            Node.Attributes.Append(Doc.CreateAttribute("ID"));
-            Node.Attributes.Append(Doc.CreateAttribute("Final"));
-            Node.Attributes["ID"].Value = State.ID.ToString();
-            Node.Attributes["Final"].Value = FinalIndex.ToString();
-
-            foreach (Automata.TerminalNFACharSpan Span in State.Transitions.Keys)
-            {
-                Node.AppendChild(Doc.CreateElement("Transition"));
-                Node.LastChild.Attributes.Append(Doc.CreateAttribute("CharBegin"));
-                Node.LastChild.Attributes.Append(Doc.CreateAttribute("CharEnd"));
-                Node.LastChild.Attributes.Append(Doc.CreateAttribute("Next"));
-                Node.LastChild.Attributes[0].Value = System.Convert.ToUInt16(Span.Begin).ToString("X");
-                Node.LastChild.Attributes[1].Value = System.Convert.ToUInt16(Span.End).ToString("X");
-                Node.LastChild.Attributes[2].Value = State.Transitions[Span].ID.ToString("X");
-            }
-
-            return Node;
+            //Generate parser
+            Options.Reporter.Info("Grammar", "Parsing method is " + Options.ParserGenerator.Name);
+            ParserData Data = Options.ParserGenerator.Build(this, Options.Reporter);
+            if (Data == null) { Options.Reporter.EndSection(); return false; }
+            bool result = Data.Export(Options);
+            Options.Reporter.EndSection();
+            return result;
         }
     }
 
     public class CFGrammarBinary : CFGrammar
     {
-        public override Automata.DFA FinalDFA { get { return null; } }
-
         public CFGrammarBinary(string Name) : base(Name) { }
 
         public override void Inherit(CFGrammar Parent)
@@ -576,73 +396,23 @@
             return Result;
         }
 
-
-        public override System.Xml.XmlNode GenerateXMLNode(System.Xml.XmlDocument Document, ParseMethod Method, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
+        public override bool Build(GrammarBuildOptions Options)
         {
-            System.Xml.XmlNode Node = Document.CreateElement("ContextFreeGrammar");
-            Node.Attributes.Append(Document.CreateAttribute("Name"));
-            Node.Attributes.Append(Document.CreateAttribute("Method"));
-            Node.Attributes.Append(Document.CreateAttribute("Input"));
-            Node.Attributes["Name"].Value = p_CompleteName.ToString('_');
-            Node.Attributes["Method"].Value = Method.Name;
-            Node.Attributes["Input"].Value = "Text";
-            Node.AppendChild(Generate_DataLexer(Document));
-            Node.AppendChild(Method.GenerateData(Document));
-            Node.AppendChild(Document.CreateElement("SubGrammars"));
-            return Node;
-        }
+            Options.Reporter.BeginSection(p_Name + " parser data generation");
+            if (!Prepare_AddRealAxiom(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFirsts(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFollowers(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
+            Options.Reporter.Info("Grammar", "Lexer DFA generated");
 
+            //Generate lexer
 
-        public override bool GenerateParser(string Namespace, ParseMethod Method, string File, Hime.Kernel.Reporting.Reporter Log)
-        {
-            return GenerateParser(Namespace, Method, File, Log, false);
-        }
-        public override bool GenerateParser(string Namespace, ParseMethod Method, string File, Hime.Kernel.Reporting.Reporter Log, bool DrawVisual)
-        {
-            Log.BeginSection(p_Name + " parser data generation");
-            if (!Prepare_AddRealAxiom(Log)) { Log.EndSection(); return false; }
-            if (!Prepare_ComputeFirsts(Log)) { Log.EndSection(); return false; }
-            if (!Prepare_ComputeFollowers(Log)) { Log.EndSection(); return false; }
-
-            Log.Info("Grammar", "Parsing method is " + Method.Name);
-            if (!Method.Construct(this, Log)) { Log.EndSection(); return false; }
-            if (DrawVisual)
-            {
-                Method.GenerateVisual().Save(p_CompleteName.ToString() + "_Parser.bmp");
-                Log.Info("Grammar", "A visual for the LR graph has been generated");
-            }
-            Log.EndSection();
-
-            // Old style
-            System.Xml.XmlDocument Document = new System.Xml.XmlDocument();
-            Document.AppendChild(Document.CreateXmlDeclaration("1.0", "utf-8", null));
-            Document.AppendChild(Document.CreateElement("ResourceFile"));
-            Document.ChildNodes[1].Attributes.Append(Document.CreateAttribute("Namespace"));
-            Document.ChildNodes[1].Attributes["Namespace"].Value = Namespace;
-            System.Xml.XmlNode GrammarNode = GenerateXMLNode(Document, Method, Log, DrawVisual);
-            if (GrammarNode == null) return false;
-            Document.ChildNodes[1].AppendChild(GrammarNode);
-            Document.Save(File + ".xml");
-
-            Kernel.Resources.AccessorSession Session = Kernel.Resources.ResourceAccessor.CreateCheckoutSession();
-            Session.AddCheckoutFile(File + ".xml");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.Resources.xslt", "Generators.Resources.xslt");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.CFGrammars.xslt", "Generators.CFGrammars.xslt");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.Lexers.xslt", "Generators.Lexers.xslt");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Generators.ParserLR1.xslt", "Generators.ParserLR1.xslt");
-            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load("Generators.Resources.xslt");
-            Transform.Transform(File + ".xml", File);
-            Session.Close();
-            return true;
-        }
-
-        protected System.Xml.XmlNode Generate_DataLexer(System.Xml.XmlDocument Doc)
-        {
-            System.Xml.XmlNode Node = Doc.CreateElement("Lexer");
-            foreach (TerminalBin Terminal in p_Terminals.Values)
-                Node.AppendChild(Terminal.GetXMLNode(Doc));
-            return Node;
+            //Generate parser
+            Options.Reporter.Info("Grammar", "Parsing method is " + Options.ParserGenerator.Name);
+            ParserData Data = Options.ParserGenerator.Build(this, Options.Reporter);
+            if (Data == null) { Options.Reporter.EndSection(); return false; }
+            bool result = Data.Export(Options);
+            Options.Reporter.EndSection();
+            return result;
         }
     }
 }

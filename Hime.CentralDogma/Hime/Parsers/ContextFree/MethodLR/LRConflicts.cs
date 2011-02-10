@@ -3,7 +3,7 @@
     /// <summary>
     /// LR conflict type
     /// </summary>
-    public enum LRConflictType
+    public enum ConflictType
     {
         /// <summary>
         /// Shift/Reduce conflict
@@ -18,7 +18,7 @@
     /// <summary>
     /// Represents a conflict in a LR set graph
     /// </summary>
-    public class LRConflict : Hime.Kernel.Reporting.Entry
+    public class Conflict : Hime.Kernel.Reporting.Entry
     {
         /// <summary>
         /// Parse method used
@@ -27,7 +27,7 @@
         /// <summary>
         /// Conflict type
         /// </summary>
-        protected LRConflictType p_Type;
+        protected ConflictType p_Type;
         /// <summary>
         /// The conflictuous lookahead
         /// </summary>
@@ -35,7 +35,7 @@
         /// <summary>
         /// The conflictuous items
         /// </summary>
-        private System.Collections.Generic.List<LRItem> p_Items;
+        private System.Collections.Generic.List<Item> p_Items;
 
         public Hime.Kernel.Reporting.Level Level {
             get
@@ -58,7 +58,7 @@
         /// Get the conflict type
         /// </summary>
         /// <value>The conflict type</value>
-        public LRConflictType ConflictType { get { return p_Type; } }
+        public ConflictType ConflictType { get { return p_Type; } }
         /// <summary>
         /// Get the conflictuous symbol
         /// </summary>
@@ -69,25 +69,25 @@
         /// Add a conflictuous item
         /// </summary>
         /// <param name="Item">A conflictuous item</param>
-        public void AddItem(LRItem Item) { p_Items.Add(Item); }
+        public void AddItem(Item Item) { p_Items.Add(Item); }
 
         /// <summary>
         /// Constructs the conflict
         /// </summary>
         /// <param name="Method">Parse method</param>
         /// <param name="IType">Conflict type</param>
-        public LRConflict(System.Type MethodType, LRConflictType Type, Terminal Lookahead)
+        public Conflict(System.Type MethodType, ConflictType Type, Terminal Lookahead)
         {
             p_MethodType = MethodType;
             p_Type = Type;
             p_Lookahead = Lookahead;
-            p_Items = new System.Collections.Generic.List<LRItem>();
+            p_Items = new System.Collections.Generic.List<Item>();
         }
-        public LRConflict(System.Type MethodType, LRConflictType Type)
+        public Conflict(System.Type MethodType, ConflictType Type)
         {
             p_MethodType = MethodType;
             p_Type = Type;
-            p_Items = new System.Collections.Generic.List<LRItem>();
+            p_Items = new System.Collections.Generic.List<Item>();
         }
 
         /// <summary>
@@ -95,7 +95,7 @@
         /// </summary>
         /// <param name="Item">the LR Item</param>
         /// <returns>True if the given item is conflictuous</returns>
-        public bool ContainsItem(LRItem Item) { return p_Items.Contains(Item); }
+        public bool ContainsItem(Item Item) { return p_Items.Contains(Item); }
 
         /// <summary>
         /// Override the ToString method
@@ -104,7 +104,7 @@
         public override string ToString()
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("Conflict ");
-            if (p_Type == LRConflictType.ShiftReduce)
+            if (p_Type == ConflictType.ShiftReduce)
                 Builder.Append("Shift/Reduce");
             else
                 Builder.Append("Reduce/Reduce");
@@ -114,7 +114,7 @@
                 Builder.Append(p_Lookahead.ToString());
             }
             Builder.Append(" for items {");
-            foreach (LRItem Item in p_Items)
+            foreach (Item Item in p_Items)
             {
                 Builder.Append(" ");
                 Builder.Append(Item.ToString());

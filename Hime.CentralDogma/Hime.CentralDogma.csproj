@@ -66,25 +66,31 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\Exporters.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Compiler.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Grammars.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\Exporters.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLR1\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LALR1\Reductions.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LALR1\Graph.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LALR1\Items.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LALR1\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR0\Reductions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR0\Items.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR0\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Reductions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Items.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRGraph.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRConflicts.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRSets.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRItems.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\ParserData.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLALR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLALR1\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\LRSets.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Rules.cs" />

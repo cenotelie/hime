@@ -51,7 +51,7 @@
         SyntaxTreeNode Analyse();
     }
 
-    public abstract class BaseParser
+    public abstract class BaseLR1Parser
     {
         protected delegate void Production(SyntaxTreeNodeCollection nodes);
         
@@ -81,7 +81,7 @@
         protected abstract void setup();
         protected abstract SymbolToken GetNextToken(ILexer lexer, ushort state);
 
-        public BaseParser(ILexer input)
+        public BaseLR1Parser(ILexer input)
         {
             setup();
             p_Errors = new System.Collections.Generic.List<ParserError>();
@@ -304,15 +304,15 @@
 
 
 
-    public abstract class ParserText : BaseParser
+    public abstract class LR1TextParser : BaseLR1Parser
     {
-        protected ParserText(LexerText lexer) : base (lexer) { }
+        protected LR1TextParser(LexerText lexer) : base (lexer) { }
         protected override SymbolToken GetNextToken(ILexer lexer, ushort state) { return lexer.GetNextToken(); }
     }
 
-    public abstract class ParserBinary : BaseParser
+    public abstract class LR1BinaryParser : BaseLR1Parser
     {
-        protected ParserBinary(LexerBinary lexer) : base(lexer) { }
+        protected LR1BinaryParser(LexerBinary lexer) : base(lexer) { }
         protected override SymbolToken GetNextToken(ILexer lexer, ushort state) { return lexer.GetNextToken(p_StateExpectedIDs[state]); }
     }
 }

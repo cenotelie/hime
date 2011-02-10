@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a LALR(1) item
     /// </summary>
-    public class LRItemLALR1 : LRItem
+    public class ItemLALR1 : Item
     {
         /// <summary>
         /// The values of the lookahead
@@ -22,28 +22,28 @@
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
         /// <param name="Lookaheads">The lookaheads values</param>
-        public LRItemLALR1(CFRule Rule, int DotPosition, TerminalSet Lookaheads) : base(Rule, DotPosition) { p_Lookaheads = new TerminalSet(Lookaheads); }
+        public ItemLALR1(CFRule Rule, int DotPosition, TerminalSet Lookaheads) : base(Rule, DotPosition) { p_Lookaheads = new TerminalSet(Lookaheads); }
         /// <summary>
         /// Constructs the item from another item
         /// </summary>
         /// <param name="Copied">The copied item</param>
         /// <remarks>The lookaheads are left empty</remarks>
-        public LRItemLALR1(LRItem Copied) : base(Copied.BaseRule, Copied.DotPosition) { p_Lookaheads = new TerminalSet(); }
+        public ItemLALR1(Item Copied) : base(Copied.BaseRule, Copied.DotPosition) { p_Lookaheads = new TerminalSet(); }
 
         /// <summary>
         /// Get the child of the current item
         /// </summary>
         /// <returns>Returns the child item or null if the item's action is Reduce</returns>
-        public override LRItem GetChild()
+        public override Item GetChild()
         {
-            if (Action == LRItemAction.Reduce) return null;
-            return new LRItemLALR1(p_Rule, p_DotPosition + 1, new TerminalSet(p_Lookaheads));
+            if (Action == ItemAction.Reduce) return null;
+            return new ItemLALR1(p_Rule, p_DotPosition + 1, new TerminalSet(p_Lookaheads));
         }
         /// <summary>
         /// Compute the closure for this item and add it to given list
         /// </summary>
         /// <param name="Closure">The closure of items being computed</param>
-        public override void CloseTo(System.Collections.Generic.List<LRItem> Closure)
+        public override void CloseTo(System.Collections.Generic.List<Item> Closure)
         {
             // Get the next symbol in the item
             Symbol Next = NextSymbol;
@@ -72,11 +72,11 @@
                 // For each rule that has Next as a head variable :
                 foreach (CFRule Rule in NextVar.Rules)
                 {
-                    LRItemLALR1 New = new LRItemLALR1(Rule, 0, Firsts);
+                    ItemLALR1 New = new ItemLALR1(Rule, 0, Firsts);
                     // Tell if a previous item was found with same rule and dot position
                     bool FoundPrevious = false;
                     // For all items in Closure that are equal with the new child in the LR(0) way :
-                    foreach (LRItemLALR1 Previous in Closure)
+                    foreach (ItemLALR1 Previous in Closure)
                     {
                         if (Previous.Equals_Base(New))
                         {
@@ -98,7 +98,7 @@
         /// </summary>
         /// <param name="Item">The item to test</param>
         /// <returns>Returns true if the lookaheads are equals, false otherwise</returns>
-        protected bool Equals_Lookaheads(LRItemLALR1 Item)
+        protected bool Equals_Lookaheads(ItemLALR1 Item)
         {
             if (p_Lookaheads.Count != Item.p_Lookaheads.Count)
                 return false;
@@ -119,9 +119,9 @@
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj is LRItemLALR1)
+            if (obj is ItemLALR1)
             {
-                LRItemLALR1 Tested = (LRItemLALR1)obj;
+                ItemLALR1 Tested = (ItemLALR1)obj;
                 if (!Equals_Base(Tested)) return false;
                 return Equals_Lookaheads(Tested);
             }

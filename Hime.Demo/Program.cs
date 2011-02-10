@@ -4,15 +4,16 @@
     {
         static void Compile()
         {
-            Hime.Kernel.Reporting.Reporter Reporter = new Hime.Kernel.Reporting.Reporter(typeof(Program));
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs");
+            Hime.Kernel.Reporting.Reporter Reporter = Options.Reporter;
 
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
             compiler.AddInputFile("Languages\\Test.gram");
             compiler.Compile(root, Reporter);
             Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs", Reporter, false);
-            grammar.GenerateGrammarInfo("Grammar.xml", Reporter);
+            grammar.Build(Options);
+            Options.Close();
 
             Reporter.ExportHTML("LogTest.html", "Grammar Log");
             System.Diagnostics.Process.Start("LogTest.html");
@@ -20,10 +21,10 @@
 
         static void Parse()
         {
-            Analyzer.Lexer_Hime_Earth_CIL_GrammarCSharp Lex = new Analyzer.Lexer_Hime_Earth_CIL_GrammarCSharp("(x)");
-            Analyzer.Parser_Hime_Earth_CIL_GrammarCSharp Parser = new Analyzer.Parser_Hime_Earth_CIL_GrammarCSharp(Lex);
+            Analyzer.Test_Lexer Lex = new Analyzer.Test_Lexer("(15)");
+            Analyzer.Test_Parser Parser = new Analyzer.Test_Parser(Lex);
 
-            Hime.Kernel.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+            Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
             if (Root != null)
             {
                 Root = Root.ApplyActions();
@@ -35,8 +36,8 @@
         static void Main(string[] args)
         {
             //Hime.Kernel.KernelDaemon.GenerateNextStep("D:\\Data\\VisualStudioProjects");
-            Compile();
-            //Parse();
+            //Compile();
+            Parse();
         }
 
 
