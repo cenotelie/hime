@@ -60,7 +60,7 @@
             Export_Setup();
             Export_Constructor();
             p_Stream.WriteLine("    }");
-            return false;
+            return true;
         }
 
         protected void Export_Setup()

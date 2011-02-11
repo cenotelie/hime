@@ -85,13 +85,12 @@
                     // Item here is of the form [A -> alpha . beta]
                     // Create the corresponding dummy item : [A -> alpha . beta, dummy]
                     // This item is used to detect lookahead propagation
-                    ItemLALR1 DummyItem = new ItemLALR1(ItemLALR1);
-                    DummyItem.Lookaheads.Add(TerminalDummy.Instance);
+                    ItemLR1 DummyItem = new ItemLR1(ItemLALR1.BaseRule, ItemLALR1.DotPosition, TerminalDummy.Instance);
                     ItemSetKernel DummyKernel = new ItemSetKernel();
                     DummyKernel.AddItem(DummyItem);
                     ItemSet DummySet = DummyKernel.GetClosure();
                     // For each item in the closure of the dummy item
-                    foreach (ItemLALR1 Item in DummySet.Items)
+                    foreach (ItemLR1 Item in DummySet.Items)
                     {
                         // If the item action is a reduction
                         // => OnSymbol for this item will be created by the LALR(1) closure
@@ -103,17 +102,16 @@
                         // p_LR0ToKernels[SetLR0.Children[Item.NextSymbol]] is then the associated LALR(1) kernel
                         ItemLALR1 ChildLALR1 = (ItemLALR1)GetEquivalentInSet(p_LR0ToKernels[SetLR0.Children[Item.NextSymbol]], Item.GetChild());
                         // If the lookaheads of the item in the dummy set contains the dummy terminal
-                        if (Item.Lookaheads.Contains(TerminalDummy.Instance))
+                        if (Item.Lookahead == TerminalDummy.Instance)
                         {
                             // => Propagation from the parent item to the child
                             p_PropagOrigins.Add(ItemLALR1);
                             p_PropagTargets.Add(ChildLALR1);
-                            Item.Lookaheads.Remove(TerminalDummy.Instance);
                         }
-                        if (Item.Lookaheads.Count != 0)
+                        else
                         {
                             // => Spontaneous generation of lookaheads
-                            ChildLALR1.Lookaheads.AddRange(Item.Lookaheads);
+                            ChildLALR1.Lookaheads.Add(Item.Lookahead);
                         }
                     }
                 }

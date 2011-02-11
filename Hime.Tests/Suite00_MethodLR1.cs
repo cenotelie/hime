@@ -12,91 +12,78 @@ namespace Tests
     {
         private static Hime.Kernel.Reporting.Reporter p_Reporter = new Hime.Kernel.Reporting.Reporter(typeof(Suite00_MethodLR1));
 
+        private bool BuildRawText(string text, Hime.Parsers.CF.CFParserGenerator method)
+        {
+            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
+            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
+            compiler.AddInputRawText(text);
+            compiler.Compile(root, p_Reporter);
+            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
+            Hime.Parsers.GrammarBuildOptions options = new Hime.Parsers.GrammarBuildOptions(p_Reporter, "Analyzer", method, "TestAnalyze.cs");
+            bool result = grammar.Build(options);
+            options.Close();
+            return result;
+        }
+        private bool BuildFile(string file, string name, Hime.Parsers.CF.CFParserGenerator method)
+        {
+            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
+            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
+            compiler.AddInputFile(file);
+            compiler.Compile(root, p_Reporter);
+            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(name));
+            Hime.Parsers.GrammarBuildOptions options = new Hime.Parsers.GrammarBuildOptions(p_Reporter, "Analyzer", method, "TestAnalyze.cs");
+            bool result = grammar.Build(options);
+            options.Close();
+            return result;
+        }
+
         // TODO: try to move down this test to the level of the method at fault in MethodLR1
         [Test]
         public void Test001_ReturnsFalseOnConflictuousGrammar_LALR1()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
+            string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
+            Assert.IsFalse(BuildRawText(grammar, new Hime.Parsers.CF.LR.MethodLALR1()));
         }
 
         [Test]
         public void Test002_ReturnsFalseOnConflictuousGrammar_LR1()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
+            string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
+            Assert.IsFalse(BuildRawText(grammar, new Hime.Parsers.CF.LR.MethodLR1()));
         }
 
         [Test]
-        public void Test003_FindsLALR1AmbiguousAndLR1NonAmgiguous()
+        public void Test003_FindsLALR1AmbiguousAndLR1NonAmbiguous()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'A'd'|'a'B'e'|'b'A'e'|'b'B'd'; A->'c'; B->'c';} }");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
-            result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsTrue(result);
+            string grammar = "public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
+            Assert.IsFalse(BuildRawText(grammar, new Hime.Parsers.CF.LR.MethodLALR1()));
+            Assert.IsTrue(BuildRawText(grammar, new Hime.Parsers.CF.LR.MethodLR1()));
         }
 
         [Test]
         public void Test004_FindsShiftReduceForLALR1()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
+            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
+            Assert.IsFalse(BuildRawText(grammar, new Hime.Parsers.CF.LR.MethodLALR1()));
         }
 
         [Test]
         public void Test005_FindsShiftReduceForLR1()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputRawText("public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("Test"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
+            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
+            Assert.IsFalse(BuildRawText(grammar, new Hime.Parsers.CF.LR.MethodLR1()));
         }
 
         [Test]
         public void Test006_FindsAmbigousGrammarLALR1()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
+            Assert.IsFalse(BuildFile("Languages\\LALR1-ambiguous.gram", "AmbiguousLALR1", new Hime.Parsers.CF.LR.MethodLALR1()));
         }
 
         [Test]
         public void Test007_FindsAmbigousGrammarLR1()
         {
-            Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
-            compiler.Compile(root, p_Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            bool result = grammar.GenerateParser("Analyzer", new Hime.Parsers.CF.LR.MethodLR1(), "TestAnalyze.cs", p_Reporter, false);
-            Assert.IsFalse(result);
+            Assert.IsFalse(BuildFile("Languages\\LALR1-ambiguous.gram", "AmbiguousLALR1", new Hime.Parsers.CF.LR.MethodLR1()));
         }
     }
 }

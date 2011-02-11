@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="Suite00_MethodLR1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Suite01_CFGramCompiler.cs" />
     <Compile Include="Suite02_LR.cs" />
   </ItemGroup>
   <ItemGroup>

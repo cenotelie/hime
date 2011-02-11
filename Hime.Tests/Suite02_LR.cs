@@ -43,7 +43,9 @@ namespace Tests
             expected.Add("F", new string[]{ "nb", "(" });
 
             Hime.Parsers.CF.CFGrammar gram = BuildGrammar("Test", gram01);
-            gram.GenerateParser("Test", new Hime.Parsers.CF.LR.MethodLALR1(), "Test.cs", p_Reporter);
+            Hime.Parsers.GrammarBuildOptions options = new Hime.Parsers.GrammarBuildOptions(p_Reporter, "Test", new Hime.Parsers.CF.LR.MethodLALR1(), "Test.cs");
+            gram.Build(options);
+            options.Close();
             foreach (Hime.Parsers.CF.CFVariable var in gram.Variables)
             {
                 if (!expected.ContainsKey(var.LocalName))

@@ -36,10 +36,8 @@
         static void Main(string[] args)
         {
             //Compile();
-            Parse();
+            //Parse();
         }
-
-
 
         class Interpreter : Analyzer.MathExp_Parser.Actions
         {

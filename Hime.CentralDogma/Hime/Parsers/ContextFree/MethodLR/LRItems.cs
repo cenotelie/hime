@@ -94,9 +94,7 @@
         /// <remarks>Test is made uppon the rule and the dot position</remarks>
         public bool Equals_Base(Item Item)
         {
-            if (p_Rule.Variable.SID != Item.p_Rule.Variable.SID)
-                return false;
-            if (p_Rule.ID != Item.p_Rule.ID)
+            if (p_Rule != Item.p_Rule)
                 return false;
             return (p_DotPosition == Item.p_DotPosition);
         }
