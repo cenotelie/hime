@@ -21,8 +21,9 @@
 
         static void Parse()
         {
-            Analyzer.Test_Lexer Lex = new Analyzer.Test_Lexer("(15)");
-            Analyzer.Test_Parser Parser = new Analyzer.Test_Parser(Lex);
+            MyAction actions = new MyAction();
+            Analyzer.Test_Lexer Lex = new Analyzer.Test_Lexer("2 + 3");
+            Analyzer.Test_Parser Parser = new Analyzer.Test_Parser(actions, Lex);
 
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
             if (Root != null)
@@ -42,7 +43,13 @@
 
 
 
-
+        class MyAction : Analyzer.Test_Parser.Actions
+        {
+            public void OnPlus(Hime.Redist.Parsers.SyntaxTreeNode SubRoot)
+            {
+                System.Console.WriteLine("OnPlus");
+            }
+        }
 
 
         static void BuildUnicode()

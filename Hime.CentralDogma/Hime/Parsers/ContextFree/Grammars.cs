@@ -152,7 +152,7 @@
 
         public Action AddAction(Hime.Kernel.QualifiedName ActionName)
         {
-            string Name = "Action" + p_NextSID.ToString();
+            string Name = "_A" + p_NextSID.ToString();
             p_NextSID++;
             Action Action = new Action(this, Name, ActionName);
             p_Children.Add(Name, Action);

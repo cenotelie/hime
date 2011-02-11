@@ -43,8 +43,6 @@
 
 
 
-
-
     public interface IParser
     {
         System.Collections.Generic.List<ParserError> Errors { get; }
@@ -53,7 +51,7 @@
 
     public abstract class BaseLR1Parser
     {
-        protected delegate void Production(SyntaxTreeNodeCollection nodes);
+        protected delegate void Production(BaseLR1Parser parser, SyntaxTreeNodeCollection nodes);
         
         // Parser automata data
         protected Production[] p_Rules;
@@ -266,7 +264,7 @@
                 {
                     Production Reduce = p_Rules[ReductionIndex];
                     ushort HeadID = p_RulesHeadID[ReductionIndex];
-                    Reduce(p_Nodes);
+                    Reduce(this, p_Nodes);
                     for (ushort j = 0; j != p_RulesParserLength[ReductionIndex]; j++)
                         p_Stack.Pop();
                     // Shift to next state on the reduce variable

@@ -30,7 +30,11 @@
         public override bool Export(GrammarBuildOptions Options)
         {
             p_Stream = Options.ParserWriter;
-            p_Stream.WriteLine("    public class " + p_Grammar.LocalName + "_Parser : Hime.Redist.Parsers.LR1TextParser");
+            p_Stream.Write("    public class " + p_Grammar.LocalName + "_Parser : ");
+            if (p_Grammar is CFGrammarText)
+                p_Stream.WriteLine("Hime.Redist.Parsers.LR1TextParser");
+            else
+                p_Stream.WriteLine("Hime.Redist.Parsers.LR1BinaryParser");
             p_Stream.WriteLine("    {");
             foreach (CFRule rule in p_Grammar.Rules)
                 Export_Production(rule);
@@ -52,6 +56,7 @@
             Export_StateShiftsOnTerminal();
             Export_StateShiftsOnVariable();
             Export_StateReducsOnTerminal();
+            Export_Actions();
             Export_Setup();
             Export_Constructor();
             p_Stream.WriteLine("    }");
@@ -78,14 +83,29 @@
         }
         protected void Export_Constructor()
         {
-            p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
+            p_Stream.WriteLine("        private Actions p_Actions;");
+            p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(Actions actions, " + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) { p_Actions = actions; }");
+        }
+
+        protected void Export_Actions()
+        {
+            System.Collections.Generic.List<string> Names = new System.Collections.Generic.List<string>();
+            foreach (Action action in p_Grammar.Actions)
+                if (!Names.Contains(action.ActionName.NakedName))
+                    Names.Add(action.ActionName.NakedName);
+
+            p_Stream.WriteLine("        public interface Actions");
+            p_Stream.WriteLine("        {");
+            foreach (string name in Names)
+                p_Stream.WriteLine("        void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+            p_Stream.WriteLine("        }");
         }
 
         protected void Export_Production(CFRule Rule)
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)");
+            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)");
             p_Stream.WriteLine("        {");
             if (ParserLength != "0")
             {
@@ -102,7 +122,10 @@
             foreach (RuleDefinitionPart Part in Rule.Definition.Parts)
             {
                 if (Part.Symbol is Action)
-                    p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolAction(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
+                {
+                    Action action = (Action)Part.Symbol;
+                    p_Stream.WriteLine("            ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.ActionName.NakedName + "(SubRoot);");
+                }
                 else if (Part.Symbol is Virtual)
                     p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
