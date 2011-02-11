@@ -7,27 +7,27 @@
         private System.Collections.Generic.List<CFGrammarTemplateRuleInstance> p_Instances;
         private CFGrammar p_Grammar;
         private CFGrammarCompiler p_Compiler;
-        private Hime.Kernel.Parsers.SyntaxTreeNode p_RuleNode;
-        private Hime.Kernel.Parsers.SyntaxTreeNode p_DefinitionNode;
+        private Redist.Parsers.SyntaxTreeNode p_RuleNode;
+        private Redist.Parsers.SyntaxTreeNode p_DefinitionNode;
 
         public string HeadName { get { return p_HeadName; } }
         public int ParametersCount { get { return p_Parameters.Count; } }
         public System.Collections.Generic.List<string> Parameters { get { return p_Parameters; } }
         public CFGrammarCompiler Compiler { get { return p_Compiler; } }
-        public Hime.Kernel.Parsers.SyntaxTreeNode RuleNode { get { return p_RuleNode; } }
-        public Hime.Kernel.Parsers.SyntaxTreeNode DefinitionNode { get { return p_DefinitionNode; } }
+        public Redist.Parsers.SyntaxTreeNode RuleNode { get { return p_RuleNode; } }
+        public Redist.Parsers.SyntaxTreeNode DefinitionNode { get { return p_DefinitionNode; } }
 
-        public CFGrammarTemplateRule(CFGrammar Grammar, CFGrammarCompiler Compiler, Hime.Kernel.Parsers.SyntaxTreeNode RuleNode)
+        public CFGrammarTemplateRule(CFGrammar Grammar, CFGrammarCompiler Compiler, Redist.Parsers.SyntaxTreeNode RuleNode)
         {
-            p_HeadName = ((Hime.Kernel.Parsers.SymbolTokenText)RuleNode.Children[0].Symbol).ValueText;
+            p_HeadName = ((Redist.Parsers.SymbolTokenText)RuleNode.Children[0].Symbol).ValueText;
             p_Parameters = new System.Collections.Generic.List<string>();
             p_Instances = new System.Collections.Generic.List<CFGrammarTemplateRuleInstance>();
             p_Grammar = Grammar;
             p_Compiler = Compiler;
             p_RuleNode = RuleNode;
             p_DefinitionNode = RuleNode.Children[2];
-            foreach (Hime.Kernel.Parsers.SyntaxTreeNode Node in RuleNode.Children[1].Children)
-                p_Parameters.Add(((Hime.Kernel.Parsers.SymbolTokenText)Node.Symbol).ValueText);
+            foreach (Redist.Parsers.SyntaxTreeNode Node in RuleNode.Children[1].Children)
+                p_Parameters.Add(((Redist.Parsers.SymbolTokenText)Node.Symbol).ValueText);
         }
 
         public CFGrammarTemplateRule(CFGrammarTemplateRule Copied, CFGrammar Data)

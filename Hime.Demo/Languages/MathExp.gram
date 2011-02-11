@@ -1,4 +1,4 @@
-public grammar cf Test
+public grammar cf MathExp
 {
 	options
 	{
@@ -15,16 +15,16 @@ public grammar cf Test
 		SEPARATOR	-> WHITE_SPACE+;
 	}
 	rules {
-		exp_atom-> NUMBER
+		exp_atom-> NUMBER {OnNumber}
 			| '('exp ')' ;
 
 		exp_op0	-> exp_atom
-			|  exp_op0 '*' exp_atom
-			|  exp_op0 '/' exp_atom ;
+			|  exp_op0 '*' exp_atom {OnMult}
+			|  exp_op0 '/' exp_atom {OnDiv};
 		
 		exp_op1	-> exp_op0
-			|  exp_op1 '+' {OnPlus} exp_op0
-			|  exp_op1 '-' exp_op0 ;
+			|  exp_op1 '+' exp_op0 {OnPlus}
+			|  exp_op1 '-' exp_op0 {OnMinus};
 
 		exp	-> exp_op1 ;
 	}

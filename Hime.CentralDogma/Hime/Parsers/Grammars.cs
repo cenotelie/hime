@@ -34,16 +34,29 @@
         public System.IO.StreamWriter LexerWriter { get { return p_LexerWriter; } }
         public System.IO.StreamWriter ParserWriter { get { return p_ParserWriter; } }
 
-        public GrammarBuildOptions(string Namespace, ParserGenerator Generator, string File)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string File)
         {
             p_Namespace = Namespace;
-            p_Log = new Hime.Kernel.Reporting.Reporter(typeof(Grammar));
+            p_Log = Reporter;
             p_Drawvisual = false;
             p_Method = Generator;
             p_LexerWriter = new System.IO.StreamWriter(File);
             p_ParserWriter = p_LexerWriter;
             p_LexerWriter.WriteLine("namespace " + Namespace);
             p_LexerWriter.WriteLine("{");
+        }
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string FileLexer, string FileParser)
+        {
+            p_Namespace = Namespace;
+            p_Log = Reporter;
+            p_Drawvisual = false;
+            p_Method = Generator;
+            p_LexerWriter = new System.IO.StreamWriter(FileLexer);
+            p_LexerWriter.WriteLine("namespace " + Namespace);
+            p_LexerWriter.WriteLine("{"); 
+            p_ParserWriter = new System.IO.StreamWriter(FileParser);
+            p_ParserWriter.WriteLine("namespace " + Namespace);
+            p_ParserWriter.WriteLine("{");
         }
 
         public void Close()

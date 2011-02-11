@@ -166,7 +166,7 @@
             return p_Actions[Name];
         }
 
-        public CFGrammarTemplateRule AddTemplateRule(Hime.Kernel.Parsers.SyntaxTreeNode RuleNode, CFGrammarCompiler Compiler)
+        public CFGrammarTemplateRule AddTemplateRule(Redist.Parsers.SyntaxTreeNode RuleNode, CFGrammarCompiler Compiler)
         {
             CFGrammarTemplateRule Rule = new CFGrammarTemplateRule(this, Compiler, RuleNode);
             p_TemplateRules.Add(Rule);

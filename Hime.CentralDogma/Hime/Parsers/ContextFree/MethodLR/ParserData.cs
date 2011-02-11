@@ -127,10 +127,14 @@
                     p_Stream.WriteLine("            ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.ActionName.NakedName + "(SubRoot);");
                 }
                 else if (Part.Symbol is Virtual)
-                    p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
+                    p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
-                    p_Stream.WriteLine("            SubRoot.AppendChild(Definition[" + i.ToString() + "], Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
+                    p_Stream.Write("            SubRoot.AppendChild(Definition[" + i.ToString() + "]");
+                    if (Part.Action != RuleDefinitionPartAction.Nothing)
+                        p_Stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
+                    else
+                        p_Stream.WriteLine(");");
                     i++;
                 }
             }

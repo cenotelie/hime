@@ -55,6 +55,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\..\..\NetLibs\Log4Net\log4net.dll</HintPath>
@@ -104,7 +110,6 @@
     <Compile Include="Hime\Kernel\Graph\KernelGraph.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphAlgos.cs" />
     <Compile Include="Hime\Kernel\Graph\KernelGraphVisuals.cs" />
-    <Compile Include="Hime\Kernel\Parsers\BaseParsers.cs" />
     <Compile Include="Hime\Kernel\KernelDaemon.cs" />
     <Compile Include="Hime\Kernel\KernelNaming.cs" />
     <Compile Include="Hime\Kernel\Reporting.cs" />
@@ -118,8 +123,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.Ontologies.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.W3CGrammars.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Tokenizer.gram" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Error.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Info.svg" />
@@ -154,6 +157,7 @@
     <EmbeddedResource Include="Hime\Resources\Transforms\Logs.LogXML.xslt" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Error.png" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Info.png" />
+    <Content Include="Hime.Logo.ico" />
     <Content Include="Hime\Resources\Icons\Hime.Logo.ico" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Logo.png" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Warning.png" />

@@ -3,13 +3,13 @@
     public sealed class Resource
     {
         private Symbol p_Symbol;
-        private Parsers.SyntaxTreeNode p_SyntaxNode;
+        private Redist.Parsers.SyntaxTreeNode p_SyntaxNode;
         private System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, Resource>> p_Dependencies;
         private IResourceCompiler p_Compiler;
         private bool p_IsCompiled;
 
         public Symbol Symbol { get { return p_Symbol; } }
-        public Parsers.SyntaxTreeNode SyntaxNode { get { return p_SyntaxNode; } }
+        public Redist.Parsers.SyntaxTreeNode SyntaxNode { get { return p_SyntaxNode; } }
         public System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, Resource>> Dependencies { get { return p_Dependencies; } }
         public IResourceCompiler Compiler { get { return p_Compiler; } }
         public bool IsCompiled
@@ -18,7 +18,7 @@
             set { p_IsCompiled = value; }
         }
 
-        public Resource(Symbol Symbol, Parsers.SyntaxTreeNode SyntaxNode, IResourceCompiler Compiler)
+        public Resource(Symbol Symbol, Redist.Parsers.SyntaxTreeNode SyntaxNode, IResourceCompiler Compiler)
         {
             p_Symbol = Symbol;
             p_SyntaxNode = SyntaxNode;

@@ -29,7 +29,7 @@
         private System.Collections.Generic.List<CompilerError> p_OutputErrors;
         private Namespace p_OutputRootNamespace;
         private Hime.Kernel.Reporting.Reporter p_OutputLog;
-        private Parsers.SyntaxTreeNode p_IntermediateRoot;
+        private Redist.Parsers.SyntaxTreeNode p_IntermediateRoot;
         private ResourceGraph p_IntermediateResources;
         private ResourceCompilerRegister p_PluginRegister;
 
@@ -43,7 +43,7 @@
             p_InputNamedResources = new System.Collections.Generic.Dictionary<string, string>();
             p_InputRawResources = new System.Collections.Generic.List<string>();
             p_OutputErrors = new System.Collections.Generic.List<CompilerError>();
-            p_IntermediateRoot = new Parsers.SyntaxTreeNode(null);
+            p_IntermediateRoot = new Redist.Parsers.SyntaxTreeNode(null);
             p_IntermediateResources = new ResourceGraph();
             p_PluginRegister = new ResourceCompilerRegister();
             p_PluginRegister.RegisterCompiler(new Hime.Parsers.CF.CFGrammarCompiler());
@@ -81,7 +81,7 @@
                 CompileData(Data);
 
             // Build resources
-            foreach (Parsers.SyntaxTreeNode file in p_IntermediateRoot.Children)
+            foreach (Redist.Parsers.SyntaxTreeNode file in p_IntermediateRoot.Children)
                 Compile_file(file);
 
             // Build dependencies
@@ -110,14 +110,14 @@
 
 
 
-        public static QualifiedName CompileQualifiedName(Parsers.SyntaxTreeNode Node)
+        public static QualifiedName CompileQualifiedName(Redist.Parsers.SyntaxTreeNode Node)
         {
             System.Collections.Generic.List<string> Path = new System.Collections.Generic.List<string>();
-            foreach (Parsers.SyntaxTreeNode Child in Node.Children)
-                Path.Add(((Parsers.SymbolTokenText)Child.Symbol).ValueText);
+            foreach (Redist.Parsers.SyntaxTreeNode Child in Node.Children)
+                Path.Add(((Redist.Parsers.SymbolTokenText)Child.Symbol).ValueText);
             return new QualifiedName(Path);
         }
-        public static SymbolAccess CompileSymbolAccess(Parsers.SyntaxTreeNode Node)
+        public static SymbolAccess CompileSymbolAccess(Redist.Parsers.SyntaxTreeNode Node)
         {
             if (Node.Symbol.Name == "access_internal") return SymbolAccess.Internal;
             else if (Node.Symbol.Name == "access_public") return SymbolAccess.Public;
@@ -130,23 +130,23 @@
         private bool CompileData(string Data)
         {
             bool IsError = false;
-            Parser.Lexer_Hime_Kernel_FileCentralDogma UnitLexer = new Parser.Lexer_Hime_Kernel_FileCentralDogma(Data);
-            Parser.Parser_Hime_Kernel_FileCentralDogma UnitParser = new Parser.Parser_Hime_Kernel_FileCentralDogma(UnitLexer);
-            Parsers.SyntaxTreeNode UnitRoot = null;
+            Parser.FileCentralDogma_Lexer UnitLexer = new Parser.FileCentralDogma_Lexer(Data);
+            Parser.FileCentralDogma_Parser UnitParser = new Parser.FileCentralDogma_Parser(null, UnitLexer);
+            Redist.Parsers.SyntaxTreeNode UnitRoot = null;
             try { UnitRoot = UnitParser.Analyse(); }
             catch (System.Exception e) {
                 p_OutputLog.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
                 return false;
             }
 
-            foreach (Hime.Kernel.Parsers.LexerTextError Error in UnitLexer.Errors)
+            foreach (Redist.Parsers.LexerTextError Error in UnitLexer.Errors)
             {
-                p_OutputLog.Report(Error);
+                p_OutputLog.Report(new Reporting.BaseEntry(Reporting.Level.Error, "Lexer", Error.Message));
                 IsError = true;
             }
-            foreach (Hime.Kernel.Parsers.ParserError Error in UnitParser.Errors)
+            foreach (Redist.Parsers.ParserError Error in UnitParser.Errors)
             {
-                p_OutputLog.Report(Error);
+                p_OutputLog.Report(new Reporting.BaseEntry(Reporting.Level.Error, "Parser", Error.Message));
                 IsError = true;
             }
 
@@ -164,9 +164,9 @@
         }
 
 
-        private void Compile_file(Parsers.SyntaxTreeNode Node)
+        private void Compile_file(Redist.Parsers.SyntaxTreeNode Node)
         {
-            foreach (Parsers.SyntaxTreeNode Child in Node.Children)
+            foreach (Redist.Parsers.SyntaxTreeNode Child in Node.Children)
             {
                 if (Child.Symbol.Name == "Namespace")
                     Compile_namespace(Child, p_OutputRootNamespace);
@@ -179,11 +179,11 @@
                 }
             }
         }
-        private void Compile_namespace(Parsers.SyntaxTreeNode Node, Namespace CurrentNamespace)
+        private void Compile_namespace(Redist.Parsers.SyntaxTreeNode Node, Namespace CurrentNamespace)
         {
             QualifiedName Name = CompileQualifiedName(Node.Children[0]);
             CurrentNamespace = CurrentNamespace.AddSubNamespace(Name);
-            foreach (Parsers.SyntaxTreeNode Child in Node.Children[1].Children)
+            foreach (Redist.Parsers.SyntaxTreeNode Child in Node.Children[1].Children)
             {
                 if (Child.Symbol.Name == "Namespace")
                     Compile_namespace(Child, CurrentNamespace);
