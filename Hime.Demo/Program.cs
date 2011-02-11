@@ -35,9 +35,8 @@
 
         static void Main(string[] args)
         {
-            Hime.Kernel.KernelDaemon.GenerateNextStep("D:\\Data\\VisualStudioProjects");
             //Compile();
-            //Parse();
+            Parse();
         }
 
 
