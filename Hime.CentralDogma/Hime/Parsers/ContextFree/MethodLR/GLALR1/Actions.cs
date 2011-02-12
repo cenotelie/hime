@@ -6,26 +6,11 @@
     internal class ItemSetActionsGLALR1 : ItemSetReductions
     {
         /// <summary>
-        /// Dictionnary associating a list of possible set actions to a symbol
-        /// </summary>
-        private System.Collections.Generic.Dictionary<Symbol, System.Collections.Generic.List<ItemSetAction>> p_Actions;
-        /// <summary>
         /// Reduction actions
         /// </summary>
         private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetAction> Actions
-        {
-            get
-            {
-                System.Collections.Generic.List<ItemSetAction> Result = new System.Collections.Generic.List<ItemSetAction>();
-                foreach (System.Collections.Generic.List<ItemSetAction> actions in p_Actions.Values)
-                    Result.AddRange(actions);
-                foreach (ItemSetActionReduce action in p_ActionReductions)
-                    Result.Add(action);
-                return Result;
-            }
-        }
+        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
         public override TerminalSet ExpectedTerminals
         {
             get
@@ -42,7 +27,6 @@
         /// </summary>
         public ItemSetActionsGLALR1() : base()
         {
-            p_Actions = new System.Collections.Generic.Dictionary<Symbol, System.Collections.Generic.List<ItemSetAction>>();
             p_ActionReductions = new System.Collections.Generic.List<ItemSetActionReduce>();
         }
 
@@ -71,18 +55,16 @@
                     // There is already a shift action for the lookahead => conflict
                     if (Set.Children.ContainsKey(Lookahead))
                     {
-                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(p_Conflicts, Item, Set, Lookahead);
-                        if (!p_Actions.ContainsKey(Lookahead))
-                            p_Actions.Add(Lookahead, new System.Collections.Generic.List<ItemSetAction>());
-                        p_Actions[Lookahead].Add(new ItemSetActionReduce(Lookahead, Item.BaseRule));
+                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodGLALR1), p_Conflicts, Item, Set, Lookahead);
+                        ItemSetActionReduce Reduction = new ItemSetActionReduce(Lookahead, Item.BaseRule);
+                        p_ActionReductions.Add(Reduction);
                     }
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(Lookahead))
                     {
-                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(p_Conflicts, Item, Reductions[Lookahead], Set, Lookahead);
-                        if (!p_Actions.ContainsKey(Lookahead))
-                            p_Actions.Add(Lookahead, new System.Collections.Generic.List<ItemSetAction>());
-                        p_Actions[Lookahead].Add(new ItemSetActionReduce(Lookahead, Item.BaseRule));
+                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodGLALR1), p_Conflicts, Item, Reductions[Lookahead], Set, Lookahead);
+                        ItemSetActionReduce Reduction = new ItemSetActionReduce(Lookahead, Item.BaseRule);
+                        p_ActionReductions.Add(Reduction);
                     }
                     // No conflict
                     else
@@ -90,7 +72,6 @@
                         Reductions.Add(Lookahead, Item);
                         ItemSetActionReduce Reduction = new ItemSetActionReduce(Lookahead, Item.BaseRule);
                         p_ActionReductions.Add(Reduction);
-                        p_Actions[Lookahead].Add(Reduction);
                     }
                 }
             }

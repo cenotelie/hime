@@ -15,7 +15,7 @@
         public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
         public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
         {
-            Reporter.Info("GLALR(1)", "Constructing GLALR(1) data ...");
+            Reporter.Info("RNGLALR(1)", "Constructing RNGLALR(1) data ...");
             Graph Graph = ConstructGraph(Grammar, Reporter);
             // Output conflicts
             bool Error = false;
@@ -27,8 +27,8 @@
                     Error = true;
                 }
             }
-            Reporter.Info("GLALR(1)", "Done !");
-            if (Error) return null;
+            Reporter.Info("RNGLALR(1)", Graph.Sets.Count.ToString() + " states explored.");
+            Reporter.Info("RNGLALR(1)", "Done !");
             return new RNGLR1ParserData(this, Grammar, Graph);
         }
 
@@ -42,7 +42,7 @@
         {
             Graph GraphLALR1 = MethodLALR1.ConstructGraph(Grammar, Log);
             foreach (ItemSet Set in GraphLALR1.Sets)
-                Set.BuildReductions(new ItemSetActionsRNGLALR1());
+                Set.BuildReductions(new ItemSetReductionsRNGLALR1());
             return GraphLALR1;
         }
     }

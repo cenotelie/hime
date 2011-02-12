@@ -225,7 +225,7 @@
 
         public ItemSetReductions() { p_Conflicts = new System.Collections.Generic.List<Conflict>(); }
 
-        public abstract System.Collections.Generic.IEnumerable<ItemSetAction> Actions { get; }
+        public abstract System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions { get; }
         public abstract TerminalSet ExpectedTerminals { get; }
 
         public abstract void Build(ItemSet Set);

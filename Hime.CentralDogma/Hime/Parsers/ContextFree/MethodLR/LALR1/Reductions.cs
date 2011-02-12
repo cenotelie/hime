@@ -10,16 +10,7 @@
         /// </summary>
         private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetAction> Actions
-        {
-            get
-            {
-                System.Collections.Generic.List<ItemSetAction> Result = new System.Collections.Generic.List<ItemSetAction>();
-                foreach (ItemSetActionReduce action in p_ActionReductions)
-                    Result.Add(action);
-                return Result;
-            }
-        }
+        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
         public override TerminalSet ExpectedTerminals
         {
             get
@@ -56,10 +47,10 @@
                 {
                     // There is already a shift action for the lookahead => conflict
                     if (Set.Children.ContainsKey(Lookahead))
-                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(p_Conflicts, Item, Set, Lookahead);
+                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodLALR1), p_Conflicts, Item, Set, Lookahead);
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(Lookahead))
-                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(p_Conflicts, Item, Reductions[Lookahead], Set, Lookahead);
+                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodLALR1), p_Conflicts, Item, Reductions[Lookahead], Set, Lookahead);
                     else // No conflict
                     {
                         Reductions.Add(Lookahead, Item);

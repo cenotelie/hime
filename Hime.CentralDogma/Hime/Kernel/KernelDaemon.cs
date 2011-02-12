@@ -62,7 +62,7 @@
             System.Net.WebClient client = new System.Net.WebClient();
             string content = null;
             try { content = client.DownloadString("http://www.fileformat.info/info/unicode/category/" + name + "/list.htm"); }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 System.Console.WriteLine("Cannot build class: " + name);
                 return;

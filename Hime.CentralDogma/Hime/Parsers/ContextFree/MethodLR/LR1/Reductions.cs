@@ -10,11 +10,11 @@
         /// </summary>
         private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetAction> Actions
+        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions
         {
             get
             {
-                System.Collections.Generic.List<ItemSetAction> Result = new System.Collections.Generic.List<ItemSetAction>();
+                System.Collections.Generic.List<ItemSetActionReduce> Result = new System.Collections.Generic.List<ItemSetActionReduce>();
                 foreach (ItemSetActionReduce action in p_ActionReductions)
                     Result.Add(action);
                 return Result;
@@ -53,9 +53,9 @@
                 if (Item.Action == ItemAction.Shift)
                     continue;
                 // There is already a shift action for the lookahead => conflict
-                if (Set.Children.ContainsKey(Item.Lookahead)) HandleConflict_ShiftReduce(p_Conflicts, Item, Set, Item.Lookahead);
+                if (Set.Children.ContainsKey(Item.Lookahead)) HandleConflict_ShiftReduce(typeof(MethodLR1), p_Conflicts, Item, Set, Item.Lookahead);
                 // There is already a reduction action for the lookahead => conflict
-                else if (Reductions.ContainsKey(Item.Lookahead)) HandleConflict_ReduceReduce(p_Conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
+                else if (Reductions.ContainsKey(Item.Lookahead)) HandleConflict_ReduceReduce(typeof(MethodLR1), p_Conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
                 else // No conflict
                 {
                     Reductions.Add(Item.Lookahead, Item);
@@ -71,7 +71,7 @@
         /// <param name="ConflictuousItem">New conflictuous item</param>
         /// <param name="Set">Set containing the conflictuous items</param>
         /// <param name="OnSymbol">OnSymbol provoking the conflict</param>
-        public static void HandleConflict_ShiftReduce(System.Collections.Generic.List<Conflict> Conflicts, Item ConflictuousItem, ItemSet Set, Terminal Lookahead)
+        public static void HandleConflict_ShiftReduce(System.Type MethodType, System.Collections.Generic.List<Conflict> Conflicts, Item ConflictuousItem, ItemSet Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)
@@ -84,7 +84,7 @@
                 }
             }
             // No previous conflict was found
-            Conflict Conflict = new Conflict(typeof(MethodLR1), ConflictType.ShiftReduce, Lookahead);
+            Conflict Conflict = new Conflict(MethodType, ConflictType.ShiftReduce, Lookahead);
             foreach (Item Item in Set.Items)
                 if (Item.Action == ItemAction.Shift && Item.NextSymbol.SID == Lookahead.SID)
                     Conflict.AddItem(Item);
@@ -100,7 +100,7 @@
         /// <param name="PreviousItem">Previous item with the reduction action</param>
         /// <param name="Set">Set containing the conflictuous items</param>
         /// <param name="OnSymbol">OnSymbol provoking the conflict</param>
-        public static void HandleConflict_ReduceReduce(System.Collections.Generic.List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, ItemSet Set, Terminal Lookahead)
+        public static void HandleConflict_ReduceReduce(System.Type MethodType, System.Collections.Generic.List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, ItemSet Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)
@@ -113,7 +113,7 @@
                 }
             }
             // No previous conflict was found
-            Conflict Conflict = new Conflict(typeof(MethodLR1), ConflictType.ReduceReduce, Lookahead);
+            Conflict Conflict = new Conflict(MethodType, ConflictType.ReduceReduce, Lookahead);
             Conflict.AddItem(PreviousItem);
             Conflict.AddItem(ConflictuousItem);
             Conflicts.Add(Conflict);

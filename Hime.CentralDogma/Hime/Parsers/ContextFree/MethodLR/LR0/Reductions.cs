@@ -10,11 +10,11 @@
         /// </summary>
         private ItemSetActionReduce p_ActionReduce;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetAction> Actions
+        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions
         {
             get
             {
-                System.Collections.Generic.List<ItemSetAction> Result = new System.Collections.Generic.List<ItemSetAction>();
+                System.Collections.Generic.List<ItemSetActionReduce> Result = new System.Collections.Generic.List<ItemSetActionReduce>();
                 Result.Add(p_ActionReduce);
                 return Result;
             }

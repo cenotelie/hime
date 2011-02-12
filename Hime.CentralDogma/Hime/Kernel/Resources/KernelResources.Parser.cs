@@ -241,7 +241,7 @@ namespace Hime.Kernel.Resources.Parser
     }
     public class FileCentralDogma_Parser : Hime.Redist.Parsers.LR1TextParser
     {
-        private static void Production_13_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_13_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -250,7 +250,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_14_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_14_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -259,7 +259,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_15_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_15_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -268,7 +268,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_16_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_16_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -277,7 +277,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_17_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_17_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -286,7 +286,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_18_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_18_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -294,7 +294,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_18_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_18_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -302,7 +302,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_18_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_18_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -310,7 +310,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_18_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_18_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -318,7 +318,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_18_4 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_18_4 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -326,7 +326,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_19_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_19_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -334,7 +334,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_1A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_1A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 5, 5);
             nodes.RemoveRange(nodes.Count - 5, 5);
@@ -346,7 +346,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[4], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_1B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_1B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -356,12 +356,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_1B_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_1B_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x1B, "_m20"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_1C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_1C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -370,12 +370,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_1C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_1C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x1C, "_m25"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_55_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_55_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -386,7 +386,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_56_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_56_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -394,7 +394,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_56_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_56_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -402,7 +402,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_57_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_57_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -410,7 +410,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_58_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_58_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -418,7 +418,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_59_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_59_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -426,7 +426,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -434,7 +434,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -444,7 +444,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -452,7 +452,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -460,7 +460,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -468,7 +468,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -476,7 +476,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_4 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_4 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -484,7 +484,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_5 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_5 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -492,7 +492,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5C_6 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5C_6 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -500,7 +500,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -508,7 +508,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -518,7 +518,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_5E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -527,7 +527,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5E_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5E_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -536,7 +536,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5E_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5E_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -545,7 +545,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5E_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5E_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -553,7 +553,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_5F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_5F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -562,7 +562,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_60_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_60_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -571,7 +571,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_61_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_61_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -580,7 +580,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_62_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_62_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -589,12 +589,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_62_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_62_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x62, "terminal_subgrammar"));
             nodes.Add(SubRoot);
         }
-        private static void Production_63_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_63_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 5, 5);
             nodes.RemoveRange(nodes.Count - 5, 5);
@@ -606,7 +606,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[4], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_64_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_64_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -616,7 +616,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_65_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_65_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -624,7 +624,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_66_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_66_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -632,7 +632,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_67_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_67_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -643,7 +643,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -651,7 +651,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -659,7 +659,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -667,7 +667,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -675,7 +675,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_4 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_4 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -683,7 +683,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_5 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_5 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -691,7 +691,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_6 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_6 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -699,7 +699,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_7 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_7 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -707,7 +707,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_8 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_8 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -715,7 +715,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_9 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_9 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -723,7 +723,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_A (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_A (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -731,7 +731,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_68_B (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_68_B (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -739,7 +739,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_69_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_69_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -747,7 +747,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_6A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -758,7 +758,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_6B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -769,7 +769,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_6C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -779,12 +779,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_6C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x6C, "grammar_parency"));
             nodes.Add(SubRoot);
         }
-        private static void Production_6D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -792,7 +792,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_6D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -800,7 +800,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_6D_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6D_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -808,7 +808,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_6D_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6D_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -816,7 +816,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_6E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 10, 10);
             nodes.RemoveRange(nodes.Count - 10, 10);
@@ -833,7 +833,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[9], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_6F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_6F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 9, 9);
             nodes.RemoveRange(nodes.Count - 9, 9);
@@ -849,7 +849,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[8], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_70_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_70_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -859,12 +859,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_70_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_70_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x70, "_m81"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_71_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_71_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -874,12 +874,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_71_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_71_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x71, "_m83"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_72_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_72_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -889,12 +889,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_72_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_72_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x72, "_m85"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_73_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_73_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -904,12 +904,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_73_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_73_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x73, "_m93"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_74_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_74_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -918,12 +918,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_74_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_74_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x74, "_m97"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_75_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_75_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -932,12 +932,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_75_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_75_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x75, "_m101"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_76_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_76_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -947,12 +947,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_76_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_76_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x76, "_m105"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_77_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_77_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -963,7 +963,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_78_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_78_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -974,7 +974,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_79_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_79_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -983,7 +983,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_7A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -992,7 +992,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_7B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1001,7 +1001,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_7C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1010,7 +1010,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7C_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1019,7 +1019,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7C_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7C_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1028,7 +1028,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7C_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7C_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1036,7 +1036,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1045,7 +1045,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1054,7 +1054,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7D_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7D_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1062,7 +1062,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1070,7 +1070,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7E_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7E_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1080,7 +1080,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_7F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1088,7 +1088,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7F_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7F_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1096,7 +1096,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7F_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7F_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1104,7 +1104,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7F_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7F_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1112,7 +1112,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_7F_4 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_7F_4 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1120,7 +1120,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_80_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_80_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1129,7 +1129,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_81_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_81_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -1140,7 +1140,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_82_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_82_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1150,12 +1150,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_82_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_82_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x82, "_m125"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_83_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_83_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1165,12 +1165,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_83_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_83_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x83, "_m134"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_84_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_84_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1180,12 +1180,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_84_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_84_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x84, "_m136"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_85_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_85_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1195,12 +1195,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_85_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_85_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x85, "_m138"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_86_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_86_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 5, 5);
             nodes.RemoveRange(nodes.Count - 5, 5);
@@ -1212,7 +1212,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[4], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_87_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_87_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1221,7 +1221,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_87_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_87_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1230,12 +1230,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_87_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_87_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x87, "_m143"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_88_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_88_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -1246,7 +1246,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_89_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_89_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -1257,7 +1257,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_8A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8A_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1266,7 +1266,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_8B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8B_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1275,7 +1275,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_8C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8C_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1284,7 +1284,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_8D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8D_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1293,7 +1293,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8D_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1302,7 +1302,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8D_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8D_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1311,7 +1311,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8D_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8D_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1319,7 +1319,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8E_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1328,7 +1328,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8E_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8E_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1337,7 +1337,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8E_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8E_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1345,7 +1345,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8F_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1353,7 +1353,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_8F_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_8F_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1363,7 +1363,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_90_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_90_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1371,7 +1371,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_90_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_90_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1379,7 +1379,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_90_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_90_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1387,7 +1387,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_90_3 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_90_3 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1395,7 +1395,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_90_4 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_90_4 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1403,7 +1403,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_91_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_91_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1412,7 +1412,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_92_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_92_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -1423,7 +1423,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_93_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_93_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1433,12 +1433,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_93_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_93_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x93, "_m165"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_94_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_94_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1448,12 +1448,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_94_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_94_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x94, "_m174"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_95_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_95_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1463,12 +1463,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_95_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_95_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x95, "_m176"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_96_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_96_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1478,12 +1478,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_96_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_96_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x96, "_m178"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_97_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_97_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 5, 5);
             nodes.RemoveRange(nodes.Count - 5, 5);
@@ -1495,7 +1495,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[4], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_98_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_98_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1504,7 +1504,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_98_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_98_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1513,12 +1513,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_98_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_98_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x98, "_m183"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_D4_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D4_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 9, 9);
             nodes.RemoveRange(nodes.Count - 9, 9);
@@ -1534,7 +1534,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[8], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_D5_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D5_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 8, 8);
             nodes.RemoveRange(nodes.Count - 8, 8);
@@ -1549,7 +1549,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[7], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_D6_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D6_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -1560,7 +1560,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_D7_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D7_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 6, 6);
             nodes.RemoveRange(nodes.Count - 6, 6);
@@ -1573,7 +1573,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[5], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_D8_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D8_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1583,12 +1583,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_D8_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D8_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0xD8, "cs_rule_context<grammar_text_terminal>"));
             nodes.Add(SubRoot);
         }
-        private static void Production_D9_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_D9_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 7, 7);
             nodes.RemoveRange(nodes.Count - 7, 7);
@@ -1602,7 +1602,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[6], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_DA_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DA_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1611,7 +1611,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_DA_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DA_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1620,12 +1620,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_DA_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DA_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0xDA, "_m154"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_DB_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DB_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -1636,7 +1636,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[3], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_DC_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DC_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 6, 6);
             nodes.RemoveRange(nodes.Count - 6, 6);
@@ -1649,7 +1649,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[5], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_DD_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DD_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -1659,12 +1659,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[2], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_DD_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DD_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0xDD, "cs_rule_context<grammar_bin_terminal>"));
             nodes.Add(SubRoot);
         }
-        private static void Production_DE_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DE_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 7, 7);
             nodes.RemoveRange(nodes.Count - 7, 7);
@@ -1678,7 +1678,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[6], Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop);
             nodes.Add(SubRoot);
         }
-        private static void Production_DF_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DF_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1687,7 +1687,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_DF_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DF_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1696,12 +1696,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_DF_2 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_DF_2 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0xDF, "_m172"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_E0_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_E0_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -1709,7 +1709,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[0], Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote);
             nodes.Add(SubRoot);
         }
-        private static void Production_E1_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_E1_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1718,7 +1718,7 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_E2_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_E2_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
@@ -1727,12 +1727,12 @@ namespace Hime.Kernel.Resources.Parser
             SubRoot.AppendChild(Definition[1]);
             nodes.Add(SubRoot);
         }
-        private static void Production_E2_1 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_E2_1 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0xE2, "_m226"), Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);
             nodes.Add(SubRoot);
         }
-        private static void Production_E3_0 (Hime.Redist.Parsers.BaseLR1Parser parser, Hime.Redist.Parsers.SyntaxTreeNodeCollection nodes)
+        private static void Production_E3_0 (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);

@@ -27,6 +27,7 @@
                     Error = true;
                 }
             }
+            Reporter.Info("LALR(1)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LALR(1)", "Done !");
             if (Error) return null;
             return new LR1ParserData(this, Grammar, Graph);

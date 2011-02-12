@@ -3,27 +3,21 @@
     /// <summary>
     /// Represents the actions for a RNGLALR(1) set
     /// </summary>
-    internal class ItemSetActionsRNGLALR1 : ItemSetReductions
+    internal class ItemSetReductionsRNGLALR1 : ItemSetReductions
     {
-        /// <summary>
-        /// Dictionnary associating a list of possible set actions to a symbol
-        /// </summary>
-        private System.Collections.Generic.Dictionary<Symbol, System.Collections.Generic.List<ItemSetAction>> p_Actions;
         /// <summary>
         /// Reduction actions
         /// </summary>
         private System.Collections.Generic.List<ItemSetActionRNReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetAction> Actions
+        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions
         {
             get
             {
-                System.Collections.Generic.List<ItemSetAction> Result = new System.Collections.Generic.List<ItemSetAction>();
-                foreach (System.Collections.Generic.List<ItemSetAction> actions in p_Actions.Values)
-                    Result.AddRange(actions);
-                foreach (ItemSetActionReduce action in p_ActionReductions)
-                    Result.Add(action);
-                return Result;
+                System.Collections.Generic.List<ItemSetActionReduce> Temp = new System.Collections.Generic.List<ItemSetActionReduce>();
+                foreach (ItemSetActionRNReduce action in p_ActionReductions)
+                    Temp.Add(action);
+                return Temp;
             }
         }
         public override TerminalSet ExpectedTerminals
@@ -31,7 +25,7 @@
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (ItemSetActionReduce Reduction in p_ActionReductions)
+                foreach (ItemSetActionRNReduce Reduction in p_ActionReductions)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
@@ -40,9 +34,8 @@
         /// <summary>
         /// Constructs the actions
         /// </summary>
-        public ItemSetActionsRNGLALR1() : base()
+        public ItemSetReductionsRNGLALR1() : base()
         {
-            p_Actions = new System.Collections.Generic.Dictionary<Symbol, System.Collections.Generic.List<ItemSetAction>>();
             p_ActionReductions = new System.Collections.Generic.List<ItemSetActionRNReduce>();
         }
 
@@ -72,23 +65,22 @@
                     // There is already a shift action for the lookahead => conflict
                     if (Set.Children.ContainsKey(Lookahead))
                     {
-                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(p_Conflicts, Item, Set, Lookahead);
-                        if (!p_Actions.ContainsKey(Lookahead))
-                            p_Actions.Add(Lookahead, new System.Collections.Generic.List<ItemSetAction>());
-                        p_Actions[Lookahead].Add(new ItemSetActionReduce(Lookahead, Item.BaseRule));
+                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodRNGLALR1), p_Conflicts, Item, Set, Lookahead);
+                        ItemSetActionRNReduce Reduction = new ItemSetActionRNReduce(Lookahead, Item.BaseRule, Item.DotPosition);
+                        p_ActionReductions.Add(Reduction);
                     }
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(Lookahead))
                     {
-                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(p_Conflicts, Item, Reductions[Lookahead], Set, Lookahead);
-                        if (!p_Actions.ContainsKey(Lookahead))
-                            p_Actions.Add(Lookahead, new System.Collections.Generic.List<ItemSetAction>());
-                        p_Actions[Lookahead].Add(new ItemSetActionReduce(Lookahead, Item.BaseRule));
+                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodRNGLALR1), p_Conflicts, Item, Reductions[Lookahead], Set, Lookahead);
+                        ItemSetActionRNReduce Reduction = new ItemSetActionRNReduce(Lookahead, Item.BaseRule, Item.DotPosition);
+                        p_ActionReductions.Add(Reduction);
                     }
                     else // No conflict
                     {
                         Reductions.Add(Lookahead, Item);
-                        p_ActionReductions.Add(new ItemSetActionRNReduce(Lookahead, Item.BaseRule, Item.DotPosition));
+                        ItemSetActionRNReduce Reduction = new ItemSetActionRNReduce(Lookahead, Item.BaseRule, Item.DotPosition);
+                        p_ActionReductions.Add(Reduction);
                     }
                 }
             }

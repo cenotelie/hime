@@ -27,8 +27,8 @@
                     Error = true;
                 }
             }
+            Reporter.Info("RNGLR(1)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("RNGLR(1)", "Done !");
-            if (Error) return null;
             return new RNGLR1ParserData(this, Grammar, Graph);
         }
 
@@ -42,7 +42,7 @@
         {
             Graph GraphLR1 = MethodLR1.ConstructGraph(Grammar, Log);
             foreach (ItemSet Set in GraphLR1.Sets)
-                Set.BuildReductions(new ItemSetActionsRNGLR1());
+                Set.BuildReductions(new ItemSetReductionsRNGLR1());
             return GraphLR1;
         }
     }

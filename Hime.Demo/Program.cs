@@ -7,36 +7,38 @@
             Hime.Kernel.Reporting.Reporter Reporter = new Hime.Kernel.Reporting.Reporter(typeof(Program));
             Hime.Kernel.Namespace root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            compiler.AddInputFile("Languages\\MathExp.gram");
+            compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
             compiler.Compile(root, Reporter);
-            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("MathExp"));
-            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Analyzer", new Hime.Parsers.CF.LR.MethodLALR1(), "MathExp.cs");
+            Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Analyzer", new Hime.Parsers.CF.LR.MethodRNGLR1(), "LALR1-ambiguous.cs");
             grammar.Build(Options);
             Options.Close();
-            Reporter.ExportHTML("MathExp.html", "Grammar Log");
-            System.Diagnostics.Process.Start("MathExp.html");
+            Reporter.ExportHTML("LALR1-ambiguous.html", "Grammar Log");
+            System.Diagnostics.Process.Start("LALR1-ambiguous.html");
         }
 
         static void Parse()
         {
-            Interpreter interpreter = new Interpreter();
-            Analyzer.MathExp_Lexer Lex = new Analyzer.MathExp_Lexer("(2 + 3) * (5 - 2)");
-            Analyzer.MathExp_Parser Parser = new Analyzer.MathExp_Parser(interpreter, Lex);
+            Analyzer.AmbiguousLALR1_Lexer Lex = new Analyzer.AmbiguousLALR1_Lexer("");
+            Analyzer.AmbiguousLALR1_Parser Parser = new Analyzer.AmbiguousLALR1_Parser(null, Lex);
+            //Interpreter interpreter = new Interpreter();
+            //Analyzer.MathExp_Lexer Lex = new Analyzer.MathExp_Lexer("(2 + 3) * (5 - 2)");
+            //Analyzer.MathExp_Parser Parser = new Analyzer.MathExp_Parser(interpreter, Lex);
 
-            Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
-            System.Console.WriteLine("result = " + interpreter.Value);
-            if (Root != null)
+            //Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+            System.Console.WriteLine("result = " + Parser.Match());
+            /*if (Root != null)
             {
                 Root = Root.ApplyActions();
                 LangTest.WinTreeView Win = new LangTest.WinTreeView(Root);
                 Win.ShowDialog();
-            }
+            }*/
         }
 
         static void Main(string[] args)
         {
             //Compile();
-            //Parse();
+            Parse();
         }
 
         class Interpreter : Analyzer.MathExp_Parser.Actions

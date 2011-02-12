@@ -11,8 +11,7 @@
     public class SyntaxTreeNode
     {
         protected System.Collections.Generic.Dictionary<string, object> p_Properties;
-        protected SyntaxTreeNodeCollection p_Children;
-        protected System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> p_ReadOnlyChildren;
+        protected System.Collections.Generic.List<SyntaxTreeNode> p_Children;
         protected SyntaxTreeNode p_Parent;
         protected ISymbol p_Symbol;
         protected SyntaxTreeNodeAction p_Action;
@@ -20,21 +19,19 @@
         public System.Collections.Generic.Dictionary<string, object> Properties { get { return p_Properties; } }
         public ISymbol Symbol { get { return p_Symbol; } }
         public SyntaxTreeNode Parent { get { return p_Parent; } }
-        public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return p_ReadOnlyChildren; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(p_Children); } }
 
         public SyntaxTreeNode(ISymbol Symbol)
         {
             p_Properties = new System.Collections.Generic.Dictionary<string, object>();
-            p_Children = new SyntaxTreeNodeCollection();
-            p_ReadOnlyChildren = new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(p_Children);
+            p_Children = new System.Collections.Generic.List<SyntaxTreeNode>();
             p_Symbol = Symbol;
             p_Action = SyntaxTreeNodeAction.Nothing;
         }
         public SyntaxTreeNode(ISymbol Symbol, SyntaxTreeNodeAction Action)
         {
             p_Properties = new System.Collections.Generic.Dictionary<string, object>();
-            p_Children = new SyntaxTreeNodeCollection();
-            p_ReadOnlyChildren = new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(p_Children);
+            p_Children = new System.Collections.Generic.List<SyntaxTreeNode>();
             p_Symbol = Symbol;
             p_Action = Action;
         }
@@ -88,7 +85,7 @@
 
                 if (p_Children[i].p_Action == SyntaxTreeNodeAction.Replace)
                 {
-                    SyntaxTreeNodeCollection NewChildren = p_Children[i].p_Children;
+                    System.Collections.Generic.List<SyntaxTreeNode> NewChildren = p_Children[i].p_Children;
                     foreach (SyntaxTreeNode Child in NewChildren)
                         Child.p_Parent = this;
                     p_Children.RemoveAt(i);
@@ -156,11 +153,5 @@
                 Node.AppendChild(Child.GetXMLNode(Doc));
             return Node;
         }
-    }
-
-    public class SyntaxTreeNodeCollection : System.Collections.Generic.List<SyntaxTreeNode>
-    {
-        public SyntaxTreeNodeCollection() : base() { }
-        public SyntaxTreeNodeCollection(System.Collections.Generic.IEnumerable<SyntaxTreeNode> collection) : base(collection) { }
     }
 }

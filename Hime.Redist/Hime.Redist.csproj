@@ -44,7 +44,10 @@
     <Compile Include="BaseBinary.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="ParserRNGLR1.cs" />
+    <Compile Include="ParserLR1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SPPF.cs" />
     <Compile Include="Symbols.cs" />
   </ItemGroup>
   <ItemGroup>

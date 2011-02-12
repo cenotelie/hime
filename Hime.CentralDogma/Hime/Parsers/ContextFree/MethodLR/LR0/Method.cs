@@ -27,6 +27,7 @@
                     Error = true;
                 }
             }
+            Reporter.Info("LR(0)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LR(0)", "Done !");
             if (Error) return null;
             return new LR1ParserData(this, Grammar, Graph);
@@ -54,7 +55,6 @@
             {
                 Graph.Sets[i].BuildGraph(Graph);
                 Graph.Sets[i].ID = i;
-                Log.Info("LR(0)", "Set I" + i.ToString() + " on " + Graph.Sets.Count.ToString() + " completed");
             }
             foreach (ItemSet Set in Graph.Sets)
                 Set.BuildReductions(new ItemSetReductionsLR0());
