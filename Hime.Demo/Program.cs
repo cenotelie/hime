@@ -19,20 +19,16 @@
 
         static void Parse()
         {
-            Analyzer.AmbiguousLALR1_Lexer Lex = new Analyzer.AmbiguousLALR1_Lexer("");
+            Analyzer.AmbiguousLALR1_Lexer Lex = new Analyzer.AmbiguousLALR1_Lexer("(a)b");
             Analyzer.AmbiguousLALR1_Parser Parser = new Analyzer.AmbiguousLALR1_Parser(null, Lex);
-            //Interpreter interpreter = new Interpreter();
-            //Analyzer.MathExp_Lexer Lex = new Analyzer.MathExp_Lexer("(2 + 3) * (5 - 2)");
-            //Analyzer.MathExp_Parser Parser = new Analyzer.MathExp_Parser(interpreter, Lex);
 
-            //Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
-            System.Console.WriteLine("result = " + Parser.Match());
-            /*if (Root != null)
+            Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+            if (Root != null)
             {
                 Root = Root.ApplyActions();
                 LangTest.WinTreeView Win = new LangTest.WinTreeView(Root);
                 Win.ShowDialog();
-            }*/
+            }
         }
 
         static void Main(string[] args)

@@ -23,10 +23,17 @@ namespace LangTest
             foreach (Hime.Redist.Parsers.SyntaxTreeNode Child in SNode.Children)
             {
                 TreeNode VChild = null;
-                if (Child.Symbol is Hime.Redist.Parsers.SymbolToken)
-                    VChild = VNode.Nodes.Add(Child.Symbol.Name + " : \"" + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"");
+                if (Child.Symbol != null)
+                {
+                    if (Child.Symbol is Hime.Redist.Parsers.SymbolToken)
+                        VChild = VNode.Nodes.Add(Child.Symbol.Name + " : \"" + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"");
+                    else
+                        VChild = VNode.Nodes.Add(Child.Symbol.Name);
+                }
                 else
-                    VChild = VNode.Nodes.Add(Child.Symbol.Name);
+                {
+                    VChild = VNode.Nodes.Add("/!\\ null");
+                }
                 AddSubTree(VChild, Child);
             }
         }

@@ -1,75 +1,118 @@
 ﻿namespace Hime.Redist.Parsers
 {
-    public class GSSNode
-    {
-        private ushort p_Label;
-        private System.Collections.Generic.List<GSSNode> p_Edges;
-
-        public ushort Label { get { return p_Label; } }
-        public System.Collections.Generic.List<GSSNode> Edges { get { return p_Edges; } }
-
-        public GSSNode(ushort label)
-        {
-            p_Label = label;
-            p_Edges = new System.Collections.Generic.List<GSSNode>();
-        }
-
-        public System.Collections.Generic.List<GSSNode> NodesAt(int length)
-        {
-            System.Collections.Generic.List<GSSNode> nodes = new System.Collections.Generic.List<GSSNode>();
-            nodes.Add(this);
-            while (length != 0)
-            {
-                System.Collections.Generic.List<GSSNode> nexts = new System.Collections.Generic.List<GSSNode>();
-                foreach (GSSNode current in nodes)
-                    foreach (GSSNode next in current.p_Edges)
-                        if (!nexts.Contains(next))
-                            nexts.Add(next);
-                nodes = nexts;
-                if (nodes.Count == 0)
-                    return nodes;
-                length--;
-            }
-            return nodes;
-        }
-    }
-
-
-
-    public abstract class BaseRNGLR1Parser
+    public abstract class BaseRNGLR1Parser : IParser
     {
         protected delegate void Production(BaseRNGLR1Parser parser, System.Collections.Generic.List<SPPFNode> nodes, int length);
-
-        // Parser automata data
-        protected Production[] p_Rules;
-        protected ushort[] p_RulesHeadID;
-        protected string[] p_RulesHeadName;
-        protected ushort[] p_RulesParserLength;
-        protected ushort[][] p_StateExpectedIDs;
-        protected string[][] p_StateExpectedNames;
-        protected string[][] p_StateItems;
-        protected ushort[][][] p_StateShiftsOnTerminal;
-        protected ushort[][][] p_StateShiftsOnVariable;
-        protected ushort[][][] p_StateReducsOnTerminal;
-        protected ushort p_AxiomID;
-
-        protected struct Reduction
+        protected struct Rule
         {
-            public GSSNode Node;
-            public ushort VarSID;
-            public ushort Length;
-            public Reduction(GSSNode node, ushort sid, ushort length)
+            public Production OnReduction;
+            public SymbolVariable Head;
+            public Rule(Production prod, SymbolVariable head)
             {
-                Node = node;
-                VarSID = sid;
-                Length = length;
+                OnReduction = prod;
+                Head = head;
             }
         }
-        protected struct Shift
+        protected struct Terminal
+        {
+            public string Name;
+            public ushort SID;
+            public Terminal(string name, ushort sid)
+            {
+                Name = name;
+                SID = sid;
+            }
+        }
+        protected struct Reduction
+        {
+            public ushort Lookahead;
+            public Rule ToReduce;
+            public ushort Length;
+            public SPPFNode Rest;
+            public Reduction(ushort lookahead, Rule rule, ushort length, SPPFNode rest)
+            {
+                Lookahead = lookahead;
+                ToReduce = rule;
+                Length = length;
+                Rest = rest;
+            }
+        }
+        protected struct State
+        {
+            public string[] Items;
+            public Terminal[] Expected;
+            public System.Collections.Generic.Dictionary<ushort, ushort> ShiftsOnTerminal;
+            public System.Collections.Generic.Dictionary<ushort, ushort> ShiftsOnVariable;
+            public System.Collections.Generic.List<Reduction> ReducsOnTerminal;
+            public State(string[] items, Terminal[] expected, System.Collections.Generic.Dictionary<ushort, ushort> st, System.Collections.Generic.Dictionary<ushort, ushort> sv, System.Collections.Generic.List<Reduction> rt)
+            {
+                Items = items;
+                Expected = expected;
+                ShiftsOnTerminal = st;
+                ShiftsOnVariable = sv;
+                ReducsOnTerminal = rt;
+            }
+
+            public ushort GetNextByShiftOnTerminal(ushort sid)
+            {
+                if (!ShiftsOnTerminal.ContainsKey(sid))
+                    return 0xFFFF;
+                return ShiftsOnTerminal[sid];
+            }
+            public ushort GetNextByShiftOnVariable(ushort sid)
+            {
+                if (!ShiftsOnVariable.ContainsKey(sid))
+                    return 0xFFFF;
+                return ShiftsOnVariable[sid];
+            }
+            public System.Collections.Generic.List<Reduction> GetReductions(ushort sid)
+            {
+                System.Collections.Generic.List<Reduction> Reductions = new System.Collections.Generic.List<Reduction>();
+                foreach (Reduction reduction in ReducsOnTerminal)
+                    if (reduction.Lookahead == sid)
+                        Reductions.Add(reduction);
+                return Reductions;
+            }
+            public bool HasReduction(ushort tokenID, ushort varID, ushort length)
+            {
+                foreach (Reduction reduction in ReducsOnTerminal)
+                    if (reduction.Lookahead == tokenID && reduction.ToReduce.Head.SymbolID == varID && reduction.Length == length)
+                        return true;
+                return false;
+            }
+        }
+
+        // Parser automata data
+        protected SPPFNode[] p_NullVarsSPPF;
+        protected SPPFNode[] p_NullChoicesSPPF;
+        protected Rule[] p_Rules;
+        protected State[] p_States;
+        protected ushort p_AxiomID;
+        protected ushort p_AxiomNullSPPF;
+        protected ushort p_AxiomPrimeID;
+
+
+        protected struct ParserReduction
+        {
+            public GSSNode Node;
+            public SymbolVariable Variable;
+            public ushort Length;
+            public SPPFNode NullChoice;
+            public SPPFNode FirstSPPF;
+            public ParserReduction(GSSNode node, SymbolVariable var, ushort length, SPPFNode nullChoice, SPPFNode firstSPPF)
+            {
+                Node = node;
+                Variable = var;
+                Length = length;
+                NullChoice = nullChoice;
+                FirstSPPF = firstSPPF;
+            }
+        }
+        protected struct ParserShift
         {
             public GSSNode Node;
             public ushort State;
-            public Shift(GSSNode node, ushort state)
+            public ParserShift(GSSNode node, ushort state)
             {
                 Node = node;
                 State = state;
@@ -80,61 +123,16 @@
         protected System.Collections.Generic.List<ParserError> p_Errors;
         protected ILexer p_Lexer;
         protected SymbolToken p_NextToken;
-        protected System.Collections.Generic.LinkedList<Reduction> p_R;
-        protected System.Collections.Generic.LinkedList<Shift> p_Q;
+        protected System.Collections.Generic.List<System.Collections.Generic.List<GSSNode>> p_U;
+        protected System.Collections.Generic.LinkedList<ParserReduction> p_R;
+        protected System.Collections.Generic.LinkedList<ParserShift> p_Q;
+        protected System.Collections.Generic.List<SPPFNode> p_N;
 
-        protected ushort GetNextByShiftOnTerminal(ushort state, ushort sid)
-        {
-            for (int i = 0; i != p_StateShiftsOnTerminal[state].Length; i++)
-            {
-                if (p_StateShiftsOnTerminal[state][i][0] == sid)
-                    return p_StateShiftsOnTerminal[state][i][1];
-            }
-            return 0xFFFF;
-        }
-        protected ushort GetNextByShiftOnVariable(ushort state, ushort sid)
-        {
-            for (int i = 0; i != p_StateShiftsOnVariable[state].Length; i++)
-            {
-                if (p_StateShiftsOnVariable[state][i][0] == sid)
-                    return p_StateShiftsOnVariable[state][i][1];
-            }
-            return 0xFFFF;
-        }
-        protected System.Collections.Generic.List<ushort[]> GetReductions(ushort state, ushort sid)
-        {
-            System.Collections.Generic.List<ushort[]> Reductions = new System.Collections.Generic.List<ushort[]>();
-            for (int i = 0; i != p_StateReducsOnTerminal[state].Length; i++)
-            {
-                if (p_StateReducsOnTerminal[state][i][0] == sid)
-                    Reductions.Add(p_StateReducsOnTerminal[state][i]);
-            }
-            return Reductions;
-        }
-        protected bool HasReduction(ushort state, ushort tokenID, ushort varID, ushort length)
-        {
-            ushort[][] ReductionsOnState = p_StateReducsOnTerminal[state];
-            for (int i = 0; i != ReductionsOnState.Length; i++)
-            {
-                ushort[] reduction = ReductionsOnState[i];
-                if (reduction[0] != tokenID)
-                    continue;
-                if (reduction[2] != length)
-                    continue;
-                ushort rule = reduction[1];
-                if (p_RulesHeadID[rule] == varID)
-                    return true;
-            }
-            return false;
-        }
+        public System.Collections.Generic.List<ParserError> Errors { get { return p_Errors; } }
+
         
-        protected GSSNode GetInSet(System.Collections.Generic.List<GSSNode> StateSet, ushort label)
-        {
-            foreach (GSSNode node in StateSet)
-                if (node.Label == label)
-                    return node;
-            return null;
-        }
+        
+        
 
         protected abstract void setup();
 
@@ -146,95 +144,152 @@
             p_NextToken = null;
         }
 
-        public bool Match()
+        public SyntaxTreeNode Analyse()
+        {
+            return Match().GetFirstTree();
+        }
+
+        protected GSSNode GetInSet(System.Collections.Generic.List<GSSNode> StateSet, ushort label)
+        {
+            foreach (GSSNode node in StateSet)
+                if (node.DFAState == label)
+                    return node;
+            return null;
+        }
+
+        protected SPPFNode Match()
         {
             p_NextToken = p_Lexer.GetNextToken();
             if (p_NextToken.SymbolID == 2)
             {
                 // Dollar token
-                if (HasReduction(0, 2, p_AxiomID, 0))
-                {
-                    return true;
-                }
+                if (p_States[0].HasReduction(2, p_AxiomID, 0))
+                    return p_NullVarsSPPF[p_AxiomNullSPPF];
                 else
-                {
-                    return false;
-                }
+                    return null;
             }
             GSSNode v0 = new GSSNode(0);
             System.Collections.Generic.List<GSSNode> U0 = new System.Collections.Generic.List<GSSNode>();
             U0.Add(v0);
-            p_R = new System.Collections.Generic.LinkedList<Reduction>();
-            p_Q = new System.Collections.Generic.LinkedList<Shift>();
+            p_U = new System.Collections.Generic.List<System.Collections.Generic.List<GSSNode>>();
+            p_R = new System.Collections.Generic.LinkedList<ParserReduction>();
+            p_Q = new System.Collections.Generic.LinkedList<ParserShift>();
+            p_N = new System.Collections.Generic.List<SPPFNode>();
+            p_U.Add(U0);
 
-            ushort k = GetNextByShiftOnTerminal(0, p_NextToken.SymbolID);
+            ushort k = p_States[0].GetNextByShiftOnTerminal(p_NextToken.SymbolID);
             if (k != 0xFFFF)
-                p_Q.AddLast(new Shift(v0, k));
-            foreach (ushort[] reduction in GetReductions(0, p_NextToken.SymbolID))
-                p_R.AddLast(new Reduction(v0, p_RulesHeadID[reduction[1]], 0));
+                p_Q.AddLast(new ParserShift(v0, k));
+            foreach (Reduction reduction in p_States[0].GetReductions(p_NextToken.SymbolID))
+                p_R.AddLast(new ParserReduction(v0, reduction.ToReduce.Head, 0, reduction.Rest, p_NullChoicesSPPF[0]));
 
             System.Collections.Generic.List<GSSNode> Ui = U0;
             while (p_NextToken.SymbolID != 1)
             {
+                p_N.Clear();
                 while (p_R.Count != 0)
                     Reducer(Ui);
+                SymbolToken oldtoken = p_NextToken;
                 p_NextToken = p_Lexer.GetNextToken();
-                if (p_NextToken.SymbolID != 2)
-                    Ui = Shifter(Ui);
+                Ui = Shifter(Ui, oldtoken);
+                p_U.Add(Ui);
                 if (Ui.Count == 0)
-                    return false;
+                    return null;
             }
-            return true;
+            foreach (GSSNode state in Ui)
+            {
+                if (p_States[state.DFAState].HasReduction(1, p_AxiomPrimeID, 2))
+                {
+                    System.Collections.Generic.List<System.Collections.Generic.List<GSSNode>> paths = state.GetPaths(2);
+                    System.Collections.Generic.List<GSSNode> path = paths[0];
+                    SPPFNode root = path[path.Count - 2].Edges[path[path.Count - 1]];
+                    return root;
+                }
+            }
+            return null;
         }
 
         protected void Reducer(System.Collections.Generic.List<GSSNode> Ui)
         {
             GSSNode v = p_R.First.Value.Node;
-            ushort X = p_R.First.Value.VarSID;
+            SymbolVariable X = p_R.First.Value.Variable;
             ushort m = p_R.First.Value.Length;
+            SPPFNode f = p_R.First.Value.NullChoice;
+            SPPFNode y = p_R.First.Value.FirstSPPF;
             p_R.RemoveFirst();
-            System.Collections.Generic.List<GSSNode> chi = null;
-            if (m == 0) chi = v.NodesAt(0);
-            else chi = v.NodesAt(m - 1);
-            foreach (GSSNode u in chi)
+            System.Collections.Generic.List<System.Collections.Generic.List<GSSNode>> chi = null;
+            if (m == 0) chi = v.GetPaths(0);
+            else chi = v.GetPaths(m - 1);
+            foreach (System.Collections.Generic.List<GSSNode> path in chi)
             {
-                ushort k = u.Label;
-                ushort l = GetNextByShiftOnVariable(k, X);
+                System.Collections.Generic.List<SPPFNode> ys = new System.Collections.Generic.List<SPPFNode>();
+                if (m != 0) ys.Add(y);
+                for (int i = 0; i != path.Count - 1; i++)
+                    ys.Add(path[i].Edges[path[i + 1]]);
+                GSSNode u = path[path.Count - 1];
+                ushort k = u.DFAState;
+                ushort l = p_States[k].GetNextByShiftOnVariable(X.SymbolID);
+                SPPFNode z = null;
+                if (m == 0)
+                    z = f;
+                else
+                {
+                    int c = p_U.Count - 1 - path.Count;
+                    z = new SPPFNode(X, c);
+                    bool found = false;
+                    foreach (SPPFNode potential in p_N)
+                    {
+                        if (potential.EquivalentTo(z))
+                        {
+                            z = potential;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        p_N.Add(z);
+                }
                 GSSNode w = GetInSet(Ui, l);
                 if (w != null)
                 {
-                    if (!w.Edges.Contains(u))
+                    if (!w.Edges.ContainsKey(u))
                     {
-                        w.Edges.Add(u);
+                        w.Edges.Add(u, z);
                         if (m != 0)
-                            foreach (ushort[] r in GetReductions(l, p_NextToken.SymbolID))
-                                if (r[2] != 0)
-                                    p_R.AddLast(new Reduction(u, p_RulesHeadID[r[1]], r[2]));
+                            foreach (Reduction r in p_States[l].GetReductions(p_NextToken.SymbolID))
+                                if (r.Length != 0)
+                                    p_R.AddLast(new ParserReduction(u, r.ToReduce.Head, r.Length, r.Rest, z));
                     }
                 }
                 else
                 {
                     w = new GSSNode(l);
                     Ui.Add(w);
-                    w.Edges.Add(u);
-                    ushort h = GetNextByShiftOnTerminal(l, p_NextToken.SymbolID);
+                    w.Edges.Add(u, z);
+                    ushort h = p_States[l].GetNextByShiftOnTerminal(p_NextToken.SymbolID);
                     if (h != 0xFFFF)
-                        p_Q.AddLast(new Shift(w, h));
-                    foreach (ushort[] r in GetReductions(l, p_NextToken.SymbolID))
+                        p_Q.AddLast(new ParserShift(w, h));
+                    foreach (Reduction r in p_States[l].GetReductions(p_NextToken.SymbolID))
                     {
-                        if (r[2] == 0)
-                            p_R.AddLast(new Reduction(w, p_RulesHeadID[r[1]], 0));
+                        if (r.Length == 0)
+                            p_R.AddLast(new ParserReduction(w, r.ToReduce.Head, 0, r.Rest, p_NullChoicesSPPF[0]));
                         else if (m != 0)
-                            p_R.AddLast(new Reduction(u, p_RulesHeadID[r[1]], r[2]));
+                            p_R.AddLast(new ParserReduction(u, r.ToReduce.Head, r.Length, r.Rest, z));
                     }
+                }
+                if (m != 0)
+                {
+                    ys.Reverse();
+                    AddChildren(z, ys, f);
                 }
             }
         }
 
-        protected System.Collections.Generic.List<GSSNode> Shifter(System.Collections.Generic.List<GSSNode> Ui)
+        protected System.Collections.Generic.List<GSSNode> Shifter(System.Collections.Generic.List<GSSNode> Ui, SymbolToken oldtoken)
         {
             System.Collections.Generic.List<GSSNode> Uj = new System.Collections.Generic.List<GSSNode>();
-            System.Collections.Generic.LinkedList<Shift> Qp = new System.Collections.Generic.LinkedList<Shift>();
+            System.Collections.Generic.LinkedList<ParserShift> Qp = new System.Collections.Generic.LinkedList<ParserShift>();
+            SPPFNode z = new SPPFNode(oldtoken, p_U.Count - 1);
             while (p_Q.Count != 0)
             {
                 GSSNode v = p_Q.First.Value.Node;
@@ -243,28 +298,40 @@
                 GSSNode w = GetInSet(Uj, k);
                 if (w != null)
                 {
-                    w.Edges.Add(v);
-                    foreach (ushort[] r in GetReductions(k, p_NextToken.SymbolID))
-                        if (r[2] != 0)
-                            p_R.AddLast(new Reduction(v, p_RulesHeadID[r[1]], r[2]));
+                    w.Edges.Add(v, z);
+                    foreach (Reduction r in p_States[k].GetReductions(p_NextToken.SymbolID))
+                        if (r.Length != 0)
+                            p_R.AddLast(new ParserReduction(v, r.ToReduce.Head, r.Length, r.Rest, z));
                 }
                 else
                 {
                     w = new GSSNode(k);
-                    w.Edges.Add(v);
+                    w.Edges.Add(v, z);
                     Uj.Add(w);
-                    ushort h = GetNextByShiftOnTerminal(k, p_NextToken.SymbolID);
+                    ushort h = p_States[k].GetNextByShiftOnTerminal(p_NextToken.SymbolID);
                     if (h != 0xFFFF)
-                        Qp.AddLast(new Shift(w, h));
-                    foreach (ushort[] r in GetReductions(k, p_NextToken.SymbolID))
+                        Qp.AddLast(new ParserShift(w, h));
+                    foreach (Reduction r in p_States[k].GetReductions(p_NextToken.SymbolID))
                     {
-                        if (r[2] == 0) p_R.AddLast(new Reduction(w, p_RulesHeadID[r[1]], 0));
-                        else p_R.AddLast(new Reduction(v, p_RulesHeadID[r[1]], r[2]));
+                        if (r.Length == 0) p_R.AddLast(new ParserReduction(w, r.ToReduce.Head, 0, r.Rest, p_NullChoicesSPPF[0]));
+                        else p_R.AddLast(new ParserReduction(v, r.ToReduce.Head, r.Length, r.Rest, z));
                     }
                 }
             }
             p_Q = Qp;
             return Uj;
+        }
+
+        protected void AddChildren(SPPFNode y, System.Collections.Generic.List<SPPFNode> ys, SPPFNode f)
+        {
+            if (f != null)
+                foreach (SPPFNode child in f.Families[0].Children)
+                    ys.Add(child);
+            if (!y.HasEquivalentFamily(ys))
+            {
+
+                y.AddFamily(ys);
+            }
         }
     }
 }

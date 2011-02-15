@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AST.cs" />
     <Compile Include="BaseBinary.cs" />
+    <Compile Include="GSS.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ParserRNGLR1.cs" />

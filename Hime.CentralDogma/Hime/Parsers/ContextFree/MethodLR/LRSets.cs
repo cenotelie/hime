@@ -281,7 +281,7 @@
         /// Get the items in the current set
         /// </summary>
         /// <value>An enumeration of the items in the set</value>
-        public System.Collections.Generic.IEnumerable<Item> Items { get { return p_Items; } }
+        public System.Collections.Generic.IList<Item> Items { get { return p_Items; } }
         /// <summary>
         /// Get a dictionnary representing transitions
         /// </summary>
