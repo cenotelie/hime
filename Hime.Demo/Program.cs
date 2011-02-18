@@ -10,7 +10,7 @@
             compiler.AddInputFile("Languages\\LALR1-ambiguous.gram");
             compiler.Compile(root, Reporter);
             Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName("AmbiguousLALR1"));
-            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Analyzer", new Hime.Parsers.CF.LR.MethodRNGLR1(), "LALR1-ambiguous.cs");
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Analyzer", new Hime.Parsers.CF.LR.MethodRNGLALR1(), "LALR1-ambiguous.cs");
             grammar.Build(Options);
             Options.Close();
             Reporter.ExportHTML("LALR1-ambiguous.html", "Grammar Log");
@@ -19,7 +19,7 @@
 
         static void Parse()
         {
-            Analyzer.AmbiguousLALR1_Lexer Lex = new Analyzer.AmbiguousLALR1_Lexer("(a)b");
+            Analyzer.AmbiguousLALR1_Lexer Lex = new Analyzer.AmbiguousLALR1_Lexer("a * (b)*c");
             Analyzer.AmbiguousLALR1_Parser Parser = new Analyzer.AmbiguousLALR1_Parser(new MyActions(), Lex);
 
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
@@ -45,7 +45,7 @@
             }
         }
 
-        /*class Interpreter : Analyzer.MathExp_Parser.Actions
+        class Interpreter : Analyzer.MathExp_Parser.Actions
         {
             private System.Collections.Generic.Stack<float> p_Stack;
 
@@ -88,6 +88,6 @@
                 float left = p_Stack.Pop();
                 p_Stack.Push(left - right);
             }
-        }*/
+        }
     }
 }

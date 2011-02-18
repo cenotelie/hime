@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Hime.CentralDogma")]
+[assembly: AssemblyTitle("himecc")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Hime.CentralDogma")]
+[assembly: AssemblyProduct("himecc")]
 [assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b899f1bf-ccb9-4e5f-a94a-122a52f1d8e7")]
+[assembly: Guid("9ea6e226-e1bd-4ada-916f-cc26955947c0")]
 
 // Version information for an assembly consists of the following four values:
 //
