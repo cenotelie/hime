@@ -2,14 +2,19 @@
 {
     public class GSSNode
     {
+        private int p_Generation;
         private ushort p_DFAState;
         private System.Collections.Generic.Dictionary<GSSNode, SPPFNode> p_Edges;
 
+        public int Generation { get { return p_Generation; } }
         public ushort DFAState { get { return p_DFAState; } }
         public System.Collections.Generic.Dictionary<GSSNode, SPPFNode> Edges { get { return p_Edges; } }
 
-        public GSSNode(ushort label)
+        public void AddEdge(GSSNode state, SPPFNode label) { p_Edges.Add(state, label); }
+
+        public GSSNode(ushort label, int generation)
         {
+            p_Generation = generation;
             p_DFAState = label;
             p_Edges = new System.Collections.Generic.Dictionary<GSSNode, SPPFNode>();
         }

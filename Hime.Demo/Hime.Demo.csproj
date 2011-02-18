@@ -81,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LALR1-ambiguous.cs" />
-    <Compile Include="MathExp.cs" />
+    <None Include="MathExp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WinTreeView.cs">

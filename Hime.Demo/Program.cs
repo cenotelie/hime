@@ -20,7 +20,7 @@
         static void Parse()
         {
             Analyzer.AmbiguousLALR1_Lexer Lex = new Analyzer.AmbiguousLALR1_Lexer("(a)b");
-            Analyzer.AmbiguousLALR1_Parser Parser = new Analyzer.AmbiguousLALR1_Parser(null, Lex);
+            Analyzer.AmbiguousLALR1_Parser Parser = new Analyzer.AmbiguousLALR1_Parser(new MyActions(), Lex);
 
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
             if (Root != null)
@@ -37,7 +37,15 @@
             Parse();
         }
 
-        class Interpreter : Analyzer.MathExp_Parser.Actions
+        class MyActions : Analyzer.AmbiguousLALR1_Parser.Actions
+        {
+            public void OnCast(Hime.Redist.Parsers.SyntaxTreeNode SubRoot)
+            {
+                System.Console.WriteLine("OnCast");
+            }
+        }
+
+        /*class Interpreter : Analyzer.MathExp_Parser.Actions
         {
             private System.Collections.Generic.Stack<float> p_Stack;
 
@@ -80,6 +88,6 @@
                 float left = p_Stack.Pop();
                 p_Stack.Push(left - right);
             }
-        }
+        }*/
     }
 }

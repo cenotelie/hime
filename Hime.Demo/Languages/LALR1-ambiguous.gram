@@ -23,7 +23,7 @@
 
 		exp_op0					-> exp_atom ;
 			
-		exp_op1_cast			-> '(' type ')' exp_op1 ;
+		exp_op1_cast			-> '(' type ')' exp_op1 {OnCast};
 		exp_op1					-> exp_op0
 								|  exp_op1_cast ;
 			

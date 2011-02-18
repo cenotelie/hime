@@ -56,6 +56,14 @@
             p_ClassName = ClassName;
             p_ClassSID = ClassSID;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SymbolToken))
+                return false;
+            SymbolToken other = (SymbolToken)obj;
+            return (this.p_ClassSID == other.p_ClassSID);
+        }
     }
 
     /// <summary>
@@ -308,6 +316,14 @@
         /// </summary>
         /// <param name="Name">Symbol name</param>
         public SymbolVirtual(string Name) { p_Name = Name; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SymbolVirtual))
+                return false;
+            SymbolVirtual other = (SymbolVirtual)obj;
+            return (this.p_Name == other.p_Name);
+        }
     }
 
     /// <summary>
@@ -315,10 +331,14 @@
     /// </summary>
     public class SymbolAction : ISymbol
     {
+        public delegate void Callback(SyntaxTreeNode Subroot);
+
         /// <summary>
         /// Symbol name
         /// </summary>
         private string p_Name;
+
+        private Callback p_Callback;
 
         /// <summary>
         /// Get the symbol's name
@@ -331,11 +351,25 @@
         /// <value>Symbol's indentifier</value>
         public ushort SymbolID { get { return 0; } }
 
+        public Callback Action { get { return p_Callback; } }
+
         /// <summary>
         /// Constructs the virtual symbol
         /// </summary>
         /// <param name="Name">Symbol name</param>
-        public SymbolAction(string Name) { p_Name = Name; }
+        public SymbolAction(string Name, Callback callback)
+        {
+            p_Name = Name;
+            p_Callback = callback;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SymbolAction))
+                return false;
+            SymbolAction other = (SymbolAction)obj;
+            return (this.p_Name == other.p_Name);
+        }
     }
     
     /// <summary>
@@ -372,6 +406,14 @@
         {
             p_SID = SID;
             p_Name = Name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SymbolVariable))
+                return false;
+            SymbolVariable other = (SymbolVariable)obj;
+            return (this.p_SID == other.p_SID);
         }
     }
 }

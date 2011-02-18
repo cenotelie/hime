@@ -1,6 +1,5 @@
 ﻿namespace Hime.Redist.Parsers
 {
-
     public class SPPFNode
     {
         protected ISymbol p_Symbol;
@@ -32,24 +31,20 @@
             p_Families = new System.Collections.Generic.List<SPPFNodeFamily>();
         }
 
+        public void AddFamily(SPPFNodeFamily family) { p_Families.Add(family); }
         public void AddFamily(System.Collections.Generic.List<SPPFNode> nodes) { p_Families.Add(new SPPFNodeFamily(this, nodes)); }
-        public SPPFNodeFamily NewFamily() {
-            SPPFNodeFamily family = new SPPFNodeFamily(this);
-            p_Families.Add(family);
-            return family;
-        }
 
         public bool EquivalentTo(SPPFNode node)
         {
-            if (this.p_Symbol != node.p_Symbol)
+            if (!this.p_Symbol.Equals(node.p_Symbol))
                 return false;
             return (this.p_Generation == node.p_Generation);
         }
 
-        public bool HasEquivalentFamily(System.Collections.Generic.List<SPPFNode> nodes)
+        public bool HasEquivalentFamily(SPPFNodeFamily family)
         {
-            foreach (SPPFNodeFamily family in p_Families)
-                if (family.EquivalentTo(nodes))
+            foreach (SPPFNodeFamily potential in p_Families)
+                if (potential.EquivalentTo(family))
                     return true;
             return false;
         }
@@ -57,10 +52,23 @@
         public SyntaxTreeNode GetFirstTree()
         {
             SyntaxTreeNode me = new SyntaxTreeNode(p_Symbol, p_Action);
-            if (p_Families.Count >= 1)
+            if (p_Families.Count == 1)
             {
                 foreach (SPPFNode child in p_Families[0].Children)
-                    me.AppendChild(child.GetFirstTree());
+                {
+                    if (child.Symbol is SymbolAction)
+                        ((SymbolAction)child.Symbol).Action.Invoke(me);
+                    else
+                        me.AppendChild(child.GetFirstTree());
+                }
+            }
+            else if (p_Families.Count >= 1)
+            {
+                foreach (SPPFNodeFamily family in p_Families)
+                {
+                    SyntaxTreeNode subroot = new SyntaxTreeNode(null, SyntaxTreeNodeAction.Nothing);
+                    me.AppendChild(subroot);
+                }
             }
             return me;
         }
@@ -87,12 +95,12 @@
 
         public void AddChild(SPPFNode child) { p_Children.Add(child); }
 
-        public bool EquivalentTo(System.Collections.Generic.List<SPPFNode> nodes)
+        public bool EquivalentTo(SPPFNodeFamily family)
         {
-            if (p_Children.Count != nodes.Count)
+            if (p_Children.Count != family.p_Children.Count)
                 return false;
             for (int i = 0; i != p_Children.Count; i++)
-                if (!p_Children[i].EquivalentTo(nodes[i]))
+                if (!p_Children[i].EquivalentTo(family.p_Children[i]))
                     return false;
             return true;
         }

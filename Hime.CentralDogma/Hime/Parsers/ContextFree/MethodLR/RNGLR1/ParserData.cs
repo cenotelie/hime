@@ -96,42 +96,30 @@
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode> nodes, int length)");
+            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, Hime.Redist.Parsers.SPPFNode root, System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode> nodes)");
             p_Stream.WriteLine("        {");
-            /*
-            if (ParserLength != "0")
-            {
-                p_Stream.WriteLine("            System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
-                p_Stream.WriteLine("            nodes.RemoveRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
-            }
-            p_Stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")");
             if (Rule.ReplaceOnProduction)
-                p_Stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);");
-            else
-                p_Stream.WriteLine(");");
-
+                p_Stream.WriteLine("            root.Action = Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace;");
+            p_Stream.WriteLine("            Hime.Redist.Parsers.SPPFNodeFamily family = new Hime.Redist.Parsers.SPPFNodeFamily(root);");
             int i = 0;
             foreach (RuleDefinitionPart Part in Rule.Definition.Parts)
             {
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    p_Stream.WriteLine("            ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.ActionName.NakedName + "(SubRoot);");
+                    p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.ActionName.NakedName + "\", ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.ActionName.NakedName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
-                    p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
+                    p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
-                    p_Stream.Write("            SubRoot.AppendChild(Definition[" + i.ToString() + "]");
                     if (Part.Action != RuleDefinitionPartAction.Nothing)
-                        p_Stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
-                    else
-                        p_Stream.WriteLine(");");
+                        p_Stream.WriteLine("            nodes[" + i.ToString() + "].Action = Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
+                    p_Stream.WriteLine("            family.AddChild(nodes[" + i.ToString() + "]);");
                     i++;
                 }
             }
-            p_Stream.WriteLine("            nodes.Add(SubRoot);");
-            */
+            p_Stream.WriteLine("            if (!root.HasEquivalentFamily(family)) root.AddFamily(family);");
             p_Stream.WriteLine("        }");
         }
         protected void Export_Rules()
@@ -164,7 +152,7 @@
             foreach (Item item in State.Items)
             {
                 if (!first) p_Stream.Write(", ");
-                p_Stream.Write("\"" + item.ToString() + "\"");
+                p_Stream.Write("\"" + item.ToString(true) + "\"");
                 first = false;
             }
             p_Stream.WriteLine("},");
