@@ -88,13 +88,13 @@
             foreach (RuleDefinitionPart Part in p_Definition.Parts)
             {
                 if (i == p_DotPosition)
-                    Builder.Append(" .");
+                    Builder.Append(" " + p_Dot);
                 Builder.Append(" ");
                 Builder.Append(Part.ToString());
                 i++;
             }
             if (i == p_DotPosition)
-                Builder.Append(" . ");
+                Builder.Append(" " + p_Dot);
             Builder.Append("]");
             return Builder.ToString();
         }

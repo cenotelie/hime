@@ -549,6 +549,12 @@
                 }
                 return Compile_Recognize_rule_def_atom(Data, Context, Node);
             }
+            else if (Node.Symbol.Name == "emptypart")
+            {
+                CFRuleDefinitionSet set = new CFRuleDefinitionSet();
+                set.Add(new CFRuleDefinition());
+                return set;
+            }
             else if (Node.Symbol.Name == "concat")
             {
                 CFRuleDefinitionSet SetLeft = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);

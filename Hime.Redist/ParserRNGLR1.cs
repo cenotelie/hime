@@ -145,7 +145,10 @@
 
         public SyntaxTreeNode Analyse()
         {
-            return Match().GetFirstTree();
+            SPPFNode match = Match();
+            if (match == null)
+                return null;
+            return match.GetFirstTree();
         }
 
         protected GSSNode GetInSet(System.Collections.Generic.List<GSSNode> StateSet, ushort label)
@@ -321,8 +324,7 @@
         protected void AddChildren(Rule rule, SPPFNode y, System.Collections.Generic.List<SPPFNode> ys, SPPFNode f)
         {
             if (f != null)
-                foreach (SPPFNode child in f.Families[0].Children)
-                    ys.Add(child);
+                ys.Add(f);
             rule.OnReduction.Invoke(this, y, ys);
         }
     }

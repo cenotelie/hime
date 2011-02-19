@@ -227,8 +227,17 @@
             bool first = true;
             foreach (CFVariable var in p_NullableVars)
             {
+                string action = ", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace";
+                foreach (CFRule rule in var.Rules)
+                {
+                    if (!rule.ReplaceOnProduction)
+                    {
+                        action = "";
+                        break;
+                    }
+                }
                 if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\"), 0)");
+                p_Stream.Write("new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\"), 0" + action + ")");
                 first = false;
             }
             p_Stream.WriteLine(" };");
@@ -240,7 +249,7 @@
             foreach (CFRuleDefinition definition in p_NullableChoices)
             {
                 if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new Hime.Redist.Parsers.SPPFNode(null, 0)");
+                p_Stream.Write("new Hime.Redist.Parsers.SPPFNode(null, 0, Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace)");
                 first = false;
             }
             p_Stream.WriteLine(" };");

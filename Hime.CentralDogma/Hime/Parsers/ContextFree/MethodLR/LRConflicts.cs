@@ -110,8 +110,9 @@
                 Builder.Append("Reduce/Reduce");
             if (p_Lookahead != null)
             {
-                Builder.Append(" on terminal ");
+                Builder.Append(" on terminal '");
                 Builder.Append(p_Lookahead.ToString());
+                Builder.Append("'");
             }
             Builder.Append(" for items {");
             foreach (Item Item in p_Items)

@@ -72,7 +72,8 @@
 			rule_def_repetition<terminal>	-> rule_def_tree_action<terminal>^ ('*' | '+' | '?')^?;
 			rule_def_fragment<terminal>		-> rule_def_repetition<terminal>^ ("concat"^ rule_def_repetition<terminal>)*;
 			rule_def_restrict<terminal>		-> rule_def_fragment<terminal>^ ('-'^ rule_def_fragment<terminal>)*;
-			rule_definition<terminal>		-> rule_def_restrict<terminal>^ ('|'^ rule_def_restrict<terminal>)*;
+			rule_def_choice<terminal>		-> rule_def_restrict<terminal>^ | "emptypart"^ ;
+			rule_definition<terminal>		-> rule_def_choice<terminal>^ ('|'^ rule_def_choice<terminal>)*;
 			
 			/* Define rules */
 			rule_template_params			-> '<'! NAME (','! NAME)* '>'!;

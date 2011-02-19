@@ -26,6 +26,8 @@
     /// </remarks>
     public abstract class Item
     {
+        protected const string p_Dot = "•";
+
         /// <summary>
         /// The rule used by the current item
         /// </summary>

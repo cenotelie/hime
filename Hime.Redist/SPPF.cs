@@ -36,9 +36,18 @@
 
         public bool EquivalentTo(SPPFNode node)
         {
-            if (!this.p_Symbol.Equals(node.p_Symbol))
-                return false;
-            return (this.p_Generation == node.p_Generation);
+            if (this.p_Symbol == null)
+            {
+                if (node.p_Symbol != null)
+                    return false;
+                return (this.p_Generation == node.p_Generation);
+            }
+            else
+            {
+                if (!this.p_Symbol.Equals(node.p_Symbol))
+                    return false;
+                return (this.p_Generation == node.p_Generation);
+            }
         }
 
         public bool HasEquivalentFamily(SPPFNodeFamily family)
