@@ -18,15 +18,9 @@
             Reporter.Info("RNGLALR(1)", "Constructing RNGLALR(1) data ...");
             Graph Graph = ConstructGraph(Grammar, Reporter);
             // Output conflicts
-            bool Error = false;
             foreach (ItemSet Set in Graph.Sets)
-            {
                 foreach (Conflict Conflict in Set.Conflicts)
-                {
                     Reporter.Report(Conflict);
-                    Error = true;
-                }
-            }
             Reporter.Info("RNGLALR(1)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("RNGLALR(1)", "Done !");
             return new RNGLR1ParserData(this, Grammar, Graph);

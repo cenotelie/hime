@@ -42,7 +42,6 @@
             p_Stream.WriteLine("    }");
             return true;
         }
-
         protected void Export_Setup()
         {
             p_Stream.WriteLine("        protected override void setup()");
@@ -66,13 +65,12 @@
             p_Stream.WriteLine("        private Actions p_Actions;");
             p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(Actions actions, " + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) { p_Actions = actions; }");
         }
-
         protected void Export_Actions()
         {
             System.Collections.Generic.List<string> Names = new System.Collections.Generic.List<string>();
             foreach (Action action in p_Grammar.Actions)
-                if (!Names.Contains(action.ActionName.NakedName))
-                    Names.Add(action.ActionName.NakedName);
+                if (!Names.Contains(action.LocalName))
+                    Names.Add(action.LocalName);
 
             p_Stream.WriteLine("        public interface Actions");
             p_Stream.WriteLine("        {");
@@ -80,7 +78,6 @@
                 p_Stream.WriteLine("        void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
             p_Stream.WriteLine("        }");
         }
-
         protected void Export_Production(CFRule Rule)
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
@@ -104,7 +101,7 @@
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    p_Stream.WriteLine("            ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.ActionName.NakedName + "(SubRoot);");
+                    p_Stream.WriteLine("            ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.LocalName + "(SubRoot);");
                 }
                 else if (Part.Symbol is Virtual)
                     p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");

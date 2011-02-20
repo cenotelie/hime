@@ -150,11 +150,9 @@
             return p_Virtuals[Name];
         }
 
-        public Action AddAction(Hime.Kernel.QualifiedName ActionName)
+        public Action AddAction(string Name)
         {
-            string Name = "_A" + p_NextSID.ToString();
-            p_NextSID++;
-            Action Action = new Action(this, Name, ActionName);
+            Action Action = new Action(this, Name);
             p_Children.Add(Name, Action);
             p_Actions.Add(Name, Action);
             return Action;
@@ -175,6 +173,77 @@
 
         public abstract void Inherit(CFGrammar Parent);
         public abstract CFGrammar Clone();
+
+        protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
+        {
+            System.Xml.XmlNode root = Document.CreateElement("CFGrammar");
+            root.Attributes.Append(Document.CreateAttribute("Name"));
+            root.Attributes["Name"].Value = p_Name;
+            foreach (CFVariable var in p_Variables.Values)
+                root.AppendChild(var.GetXMLNode(Document));
+            return root;
+        }
+        protected void Export_Resources(string directory)
+        {
+            System.IO.Directory.CreateDirectory(directory + "\\hime_data");
+            Kernel.Resources.ResourceAccessor.Export("Transforms.Hime.css", directory + "\\hime_data\\Hime.css");
+            Kernel.Resources.ResourceAccessor.Export("Transforms.Hime.js", directory + "\\hime_data\\Hime.js");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.button_plus.gif", directory + "\\hime_data\\button_plus.gif");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.button_minus.gif", directory + "\\hime_data\\button_minus.gif");
+
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Shift.png", directory + "\\hime_data\\Hime.Shift.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Reduce.png", directory + "\\hime_data\\Hime.Reduce.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.None.png", directory + "\\hime_data\\Hime.None.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.ShiftReduce.png", directory + "\\hime_data\\Hime.ShiftReduce.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.ReduceReduce.png", directory + "\\hime_data\\Hime.ReduceReduce.png");
+
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Error.png", directory + "\\hime_data\\Hime.Error.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Warning.png", directory + "\\hime_data\\Hime.Warning.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Info.png", directory + "\\hime_data\\Hime.Info.png");
+            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Logo.png", directory + "\\hime_data\\Hime.Logo.png");
+        }
+        protected void Export_GrammarData(string directory)
+        {
+            string fileName = directory + "\\Grammar";
+            
+            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
+            Doc.AppendChild(Export_GetData(Doc));
+            System.IO.FileInfo File = new System.IO.FileInfo(fileName);
+            Doc.Save(fileName + ".xml");
+
+            Kernel.Resources.AccessorSession Session = Kernel.Resources.ResourceAccessor.CreateCheckoutSession();
+            Session.AddCheckoutFile(fileName + ".xml");
+            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Doc.CFGrammar.xslt", File.DirectoryName + "CFGrammar.xslt");
+
+            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(File.DirectoryName + "CFGrammar.xslt");
+            Transform.Transform(fileName + ".xml", fileName + ".html");
+
+            Session.Close();
+        }
+        protected void Export_ParserData(string directory, ParserData data)
+        {
+            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
+            Kernel.Resources.AccessorSession Session = Kernel.Resources.ResourceAccessor.CreateCheckoutSession();
+            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
+            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(directory + "\\LRParserData.xslt");
+            System.Collections.Generic.List<System.Xml.XmlNode> nodes = new System.Collections.Generic.List<System.Xml.XmlNode>();
+            foreach (System.Xml.XmlNode child in data.GetData(Doc).ChildNodes)
+                nodes.Add(child);
+            foreach (System.Xml.XmlNode child in nodes)
+            {
+                string fileName = directory + "\\Set_" + child.Attributes["SetID"].Value;
+                while (Doc.HasChildNodes)
+                    Doc.RemoveChild(Doc.FirstChild);
+                Doc.AppendChild(child);
+                System.IO.FileInfo File = new System.IO.FileInfo(fileName);
+                Doc.Save(fileName + ".xml");
+                Session.AddCheckoutFile(fileName + ".xml");
+                Transform.Transform(fileName + ".xml", fileName + ".html");
+            }
+            Session.Close();
+        }
 
         protected bool Prepare_AddRealAxiom(Hime.Kernel.Reporting.Reporter Log)
         {
@@ -264,7 +333,7 @@
             foreach (Virtual Virtual in Parent.Virtuals)
                 AddVirtual(Virtual.LocalName);
             foreach (Action Action in Parent.Actions)
-                AddAction(Action.ActionName);
+                AddAction(Action.LocalName);
             foreach (CFGrammarTemplateRule TemplateRule in Parent.TemplateRules)
                 p_TemplateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
             foreach (CFVariable Variable in Parent.Variables)
@@ -343,6 +412,15 @@
             if (Data == null) { Options.Reporter.EndSection(); return false; }
             bool result = Data.Export(Options);
             Options.Reporter.EndSection();
+
+            //Output data
+            if (Options.DocumentationDirectory != null)
+            {
+                System.IO.Directory.CreateDirectory(Options.DocumentationDirectory);
+                Export_Resources(Options.DocumentationDirectory);
+                Export_GrammarData(Options.DocumentationDirectory);
+                Export_ParserData(Options.DocumentationDirectory, Data);
+            }
             return result;
         }
     }
@@ -362,7 +440,7 @@
             foreach (Virtual Virtual in Parent.Virtuals)
                 AddVirtual(Virtual.LocalName);
             foreach (Action Action in Parent.Actions)
-                AddAction(Action.ActionName);
+                AddAction(Action.LocalName);
             foreach (CFGrammarTemplateRule TemplateRule in Parent.TemplateRules)
                 p_TemplateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
             foreach (CFVariable Variable in Parent.Variables)
@@ -412,6 +490,15 @@
             if (Data == null) { Options.Reporter.EndSection(); return false; }
             bool result = Data.Export(Options);
             Options.Reporter.EndSection();
+            
+            //Output data
+            if (Options.DocumentationDirectory != null)
+            {
+                System.IO.Directory.CreateDirectory(Options.DocumentationDirectory);
+                Export_Resources(Options.DocumentationDirectory);
+                Export_GrammarData(Options.DocumentationDirectory);
+                Export_ParserData(Options.DocumentationDirectory, Data);
+            }
             return result;
         }
     }

@@ -130,6 +130,11 @@
     <None Include="Hime\Resources\Visuals\svg\Hime.Error.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Info.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Logo.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.None.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.ReduceReduce.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.Reduce.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.Shift.svg" />
+    <None Include="Hime\Resources\Visuals\svg\Hime.ShiftReduce.svg" />
     <None Include="Hime\Resources\Visuals\svg\Hime.Warning.svg" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Asm.PE.format" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.PE.format" />
@@ -153,6 +158,19 @@
     <EmbeddedResource Include="Hime\Resources\Visuals\button_plus.gif" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.None.png" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.LRParserData.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.ReduceReduce.png" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.ShiftReduce.png" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Reduce.png" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Shift.png" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.CFGrammar.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Hime\Resources\Transforms\Hime.js" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Hime.css" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Generators.Lexers.xslt" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Generators.ParserLR1.xslt" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Generators.CFGrammars.xslt" />

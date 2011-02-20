@@ -103,6 +103,7 @@
             }
             return false;
         }
+        public override int GetHashCode() { return base.GetHashCode(); }
 
         /// <summary>
         /// Returns a string representing the item
@@ -118,7 +119,7 @@
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");
             Builder.Append(p_Rule.Variable.ToString());
-            Builder.Append(" ->");
+            Builder.Append(" " + p_Arrow);
             int i = 0;
             foreach (RuleDefinitionPart Part in p_Definition.Parts)
             {

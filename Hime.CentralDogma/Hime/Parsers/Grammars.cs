@@ -26,6 +26,7 @@
         private ParserGenerator p_Method;
         private System.IO.StreamWriter p_LexerWriter;
         private System.IO.StreamWriter p_ParserWriter;
+        private string p_DocumentationDir;
 
         public string Namespace { get { return p_Namespace; } }
         public Hime.Kernel.Reporting.Reporter Reporter { get { return p_Log; } }
@@ -33,6 +34,10 @@
         public ParserGenerator ParserGenerator { get { return p_Method; } }
         public System.IO.StreamWriter LexerWriter { get { return p_LexerWriter; } }
         public System.IO.StreamWriter ParserWriter { get { return p_ParserWriter; } }
+        public string DocumentationDirectory {
+            get { return p_DocumentationDir; }
+            set { p_DocumentationDir = value; }
+        }
 
         public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string File)
         {
@@ -75,6 +80,7 @@
     {
         ParserGenerator Generator { get; }
         bool Export(GrammarBuildOptions Options);
+        System.Xml.XmlNode GetData(System.Xml.XmlDocument Document);
     }
 
     public interface ParserGenerator

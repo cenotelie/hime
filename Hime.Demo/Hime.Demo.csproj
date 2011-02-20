@@ -80,7 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LALR1-ambiguous.cs" />
+    <Compile Include="Earth.CIL.CSharp.cs" />
     <Compile Include="MathExp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,6 +90,10 @@
     <Compile Include="WinTreeView.Designer.cs">
       <DependentUpon>WinTreeView.cs</DependentUpon>
     </Compile>
+    <None Include="Languages\Earth.CIL.CSharp.gram">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Languages\JAudit.Java.gram" />
     <None Include="Languages\MathExp.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -97,9 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Languages\LALR1-ambiguous.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WinTreeView.resx">

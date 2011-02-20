@@ -26,6 +26,7 @@
     /// </remarks>
     public abstract class Item
     {
+        protected const string p_Arrow = "→";
         protected const string p_Dot = "•";
 
         /// <summary>

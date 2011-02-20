@@ -401,8 +401,10 @@
         private CFRuleDefinitionSet Compile_Recognize_rule_sym_action(CFGrammar Data, Redist.Parsers.SyntaxTreeNode Node)
         {
             CFRuleDefinitionSet Set = new CFRuleDefinitionSet();
-            Hime.Kernel.QualifiedName NameAction = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Node.Children[0]);
-            Action Action = Data.AddAction(NameAction);
+            string name = ((Redist.Parsers.SymbolTokenText)Node.Children[0].Symbol).ValueText;
+            Action Action = Data.GetAction(name);
+            if (Action == null)
+                Action = Data.AddAction(name);
             Set.Add(new CFRuleDefinition(Action));
             return Set;
         }

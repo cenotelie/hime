@@ -55,7 +55,7 @@
 			
 			
 			/* Define symbols for grammar rules */
-			rule_sym_action					-> '{'! qualified_name '}'! ;
+			rule_sym_action					-> '{'! NAME '}'! ;
 			rule_sym_virtual				-> QUOTED_DATA ;
 			rule_sym_ref_params<terminal>	-> '<'! rule_def_atom<terminal> (','! rule_def_atom<terminal>)* '>'! ;
 			rule_sym_ref_template<terminal>	-> NAME rule_sym_ref_params<terminal> ;

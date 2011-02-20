@@ -302,27 +302,23 @@
             Node.Attributes["Name"].Value = p_LocalName;
             return Node;
         }
+
+        public override string ToString() { return "\"" + p_LocalName + "\""; }
     }
     
     public class Action : Symbol
     {
-        protected Hime.Kernel.QualifiedName p_ActionName;
-        public Hime.Kernel.QualifiedName ActionName { get { return p_ActionName; } }
-
-        public Action(Grammar Parent, string Name, Hime.Kernel.QualifiedName Action)
-            : base(Parent, 0, Name)
-        {
-            p_ActionName = Action;
-        }
+        public Action(Grammar Parent, string Name) : base(Parent, 0, Name) { }
 
         public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
         {
             System.Xml.XmlNode Node = Doc.CreateElement("SymbolAction");
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
             Node.Attributes["Name"].Value = p_LocalName;
-            Node.InnerText = p_ActionName.ToString();
             return Node;
         }
+
+        public override string ToString() { return "{" + p_LocalName + "}"; }
     }
 
     public abstract class Variable : Symbol

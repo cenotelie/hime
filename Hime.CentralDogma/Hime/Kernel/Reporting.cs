@@ -183,6 +183,8 @@
             Resources.AccessorSession Session = Resources.ResourceAccessor.CreateCheckoutSession();
             Session.AddCheckoutFile(fileName + ".xml");
             Resources.ResourceAccessor.CheckOut(Session, "Transforms.Logs.LogXML.xslt", File.DirectoryName + "LogXML.xslt");
+            Resources.ResourceAccessor.Export("Transforms.Hime.css", File.DirectoryName + "\\hime_data\\Hime.css");
+            Resources.ResourceAccessor.Export("Transforms.Hime.js", File.DirectoryName + "\\hime_data\\Hime.js");
             Resources.ResourceAccessor.Export("Visuals.button_plus.gif", File.DirectoryName + "\\hime_data\\button_plus.gif");
             Resources.ResourceAccessor.Export("Visuals.button_minus.gif", File.DirectoryName + "\\hime_data\\button_minus.gif");
             Resources.ResourceAccessor.Export("Visuals.Hime.Error.png", File.DirectoryName + "\\hime_data\\Hime.Error.png");

@@ -57,6 +57,7 @@
             p_ClassSID = ClassSID;
         }
 
+        public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj)
         {
             if (!(obj is SymbolToken))
@@ -317,6 +318,7 @@
         /// <param name="Name">Symbol name</param>
         public SymbolVirtual(string Name) { p_Name = Name; }
 
+        public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj)
         {
             if (!(obj is SymbolVirtual))
@@ -363,6 +365,7 @@
             p_Callback = callback;
         }
 
+        public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj)
         {
             if (!(obj is SymbolAction))
@@ -408,6 +411,7 @@
             p_Name = Name;
         }
 
+        public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj)
         {
             if (!(obj is SymbolVariable))

@@ -1,0 +1,396 @@
+﻿namespace JAudit
+{
+	public grammar cf Java
+	{
+		options
+		{
+			Axiom = "compilation_unit";
+			Separator = "WHITE_SPACE";
+		}
+		terminals
+		{
+			IDENTIFIER       -> [a-zA-Z_][a-zA-Z0-9_]*
+			EndOfLine        -> 0x000D /* CR */
+								|  0x000A /* LF */
+								|  0x000D 0x000A /* CR LF */
+								|  0x2028 /* LS */
+								|  0x2029 /* PS */ ;
+			MultiLineComment -> '/*' ([^*] | '*' [^/])* '*/' ;
+			
+			OneLineComment   -> '//' ((0x0000 .. 0xFFFF)* - ((0x0000 .. 0xFFFF)* NEW_LINE (0x0000 .. 0xFFFF)*)) NEW_LINE ;
+			EscapeSequence   -> '\\' ('\\' | '"' | 'n' | 't') ;
+			String           -> '"' ([^"\\] | EscapeSequence)* '"' ;
+			HexaDecimal      -> '0x' [0-9A-Fa-f]+ ;
+			Digits           -> [0-9]+ ;
+			FloatingPoint    -> (Digits ('e'|'E')'-'?[0-9])|('.' Digits)|(Digits '.' Digits 'f'?) ;
+			Decimal          -> Digits 'L'? ;
+		}
+		rules
+		{
+			CompilationUnit		-> ImportDeclarations TypeDeclarations
+									// TODO-> cleanup by factoring more
+								| 'package' TypeName ';' 
+									ImportDeclarations TypeDeclarations ;
+
+			// TODO-> fix conflicts
+			// TODO-> seems to me I have to inverse the order of all repetitions...
+			ImportDeclarations	-> ImportDeclaration ImportDeclarations | ;
+			
+			
+			// TODO-> make an example and ask what would be the most elegant way of implementing
+			// this (that is returning a list of stuff, without having to define subclassing
+			// manually?)
+			TypeDeclarations	-> TypeDeclaration TypeDeclarations | ;
+
+			ImportDeclaration	-> 'import' TypeName ';'
+								| 'import' TypeName '.' '*' ';' ;
+
+			TypeDeclaration		-> Modifiers 'class' IDENTIFIER ExtendsOption InterfacesOption ClassBody
+								  // TODO-> factor more
+								| Modifiers 'enum' IDENTIFIER '{' EnumConstantsOption EnumBodyOption '}'
+								| Modifiers 'interface' IDENTIFIER ClassBody
+								| 'static' StatementBlock ;
+
+			EnumBodyOption		-> ';' ClassBodyDeclarations | ;
+
+			EnumConstantsOption	-> EnumConstants | ;
+
+			EnumConstants		-> IDENTIFIER ArgumentsOption
+								| IDENTIFIER ArgumentsOption ',' EnumConstants ;
+
+			ArgumentsOption		-> Arguments | ;
+
+			ClassBody 			-> '{' ClassBodyDeclarations '}' ;
+
+			ExtendsOption		-> 'extends' Type | ;
+
+			// TODO-> put all TotoOption at the end of the grammar
+			InterfacesOption	-> Interfaces | ;
+
+			Interfaces			-> 'implements' Types ;
+
+			Types				-> Type | Type ',' Types ;
+
+			ClassBodyDeclarations -> ClassBodyDeclaration ClassBodyDeclarations | ;
+	
+			ClassBodyDeclaration -> FieldDeclaration
+								| MethodOrConstructorDeclaration
+								| ';'
+								| TypeDeclaration ;
+
+			// TODO-> factor more? see-> http->//java.sun.com/docs/books/jls/third_edition/html/syntax.html
+			MethodOrConstructorDeclaration
+				-> Modifiers Type IDENTIFIER 
+				  '(' FormalParametersOption ')' 
+				  ThrowsClauseOption
+				  StatementBlock
+				  // method without a body (abstract)
+				| Modifiers Type IDENTIFIER 
+				  '(' FormalParametersOption ')'
+				| Modifiers IDENTIFIER              // TODO-> try to simplify with a TypeOption?
+				  '(' FormalParametersOption ')'  
+				  ThrowsClauseOption
+				  StatementBlock ;
+
+			ThrowsClauseOption	-> 'throws' Type |  ;
+
+			FieldDeclaration	-> Modifiers Type VariableDeclarators ';' ;
+
+			VariableDeclarators	-> VariableDeclarator
+								| VariableDeclarator ',' VariableDeclarators ;
+
+			// TODO-> cleanup Type and TypeName redundant => remove one of them?
+			Type			-> PrimitiveType
+							| ReferenceType ;
+
+			ReferenceType	-> ClassOrInterfaceType
+							| ArrayType ;
+
+			ClassOrInterfaceType -> TypeName ;
+
+			// for reference see-> http->//java.sun.com/docs/books/jls/third_edition/html/j3TOC.html
+			// TODO-> simplify the grammar?
+
+			ArrayType		-> Type '[' ']' ;
+
+			PrimitiveType	-> 'boolean'
+							| 'int'
+							| 'long' ;
+
+			Modifiers		-> Modifier Modifiers | ;
+
+			Modifier		-> 'final'
+							| 'public'
+							| 'abstract'
+							| 'private'
+							| 'protected'
+							| 'static'
+							| 'synchronized'
+							| 'native'
+							| Annotation ;
+
+			// TODO-> factor cases
+			Annotation		-> '@' TypeName '(' Expression ')'
+							| '@' TypeName ;
+
+			FormalParametersOption-> FormalParameters | ;
+
+			FormalParameters -> FormalParameter ',' FormalParameters
+								| FormalParameter ;
+
+			FormalParameter	-> Type IDENTIFIER
+							| 'final' Type IDENTIFIER ;
+
+			StatementRepetition -> Statement StatementRepetition | ;
+
+			Statement			-> StatementExpression ';'
+								| LocalVariableDeclaration ';'
+								| StatementBlock
+								| 'if' '(' BooleanExpression ')'
+								  Statement ElseBranchOption
+								| 'for' '(' ForControl ')' Statement
+								| 'return' BooleanExpressionOption ';'
+								// TODO-> factor cases for try statement
+								| 'try' StatementBlock CatchClause
+								| 'try' StatementBlock CatchClause
+								  'finally' StatementBlock
+								| ';'
+								| 'throw' Expression ';'
+								| 'switch' '(' Expression ')'
+								  '{' SwitchBlockStatementGroups '}'
+								| 'break' ';'
+								// TODO-> factor parenthesized expression
+								| 'while' '(' BooleanExpression ')'
+								  Statement
+								| 'do' Statement
+								  'while' '(' BooleanExpression ')'
+								| 'synchronized' '(' BooleanExpression ')'
+								  Statement
+								;
+
+			LocalVariableDeclaration ->
+				  TypeOrPrimaryExpression VariableDeclarator
+				| 'final' TypeOrPrimaryExpression VariableDeclarator ;
+
+			// TODO-> cleanup
+			StatementExpression->
+				  AssignmentExpression
+				| TypeOrPrimaryExpression '++'
+				| TypeOrPrimaryExpression
+				| '++' TypeOrPrimaryExpression
+				| TypeOrPrimaryExpression '--'
+				;
+
+			SwitchBlockStatementGroups -> SwitchBlockStatementGroup SwitchBlockStatementGroups |  ;
+
+			SwitchBlockStatementGroup
+				-> 'case' Expression ':' StatementRepetition
+				| 'default' ':' StatementRepetition
+				;
+
+			CatchClause
+				-> 'catch' '(' Type IDENTIFIER ')' StatementBlock
+				;
+
+			ForControl->
+				  LocalVariableDeclaration ';' BooleanExpression ';' BooleanExpression
+				| TypeOrPrimaryExpression IDENTIFIER ':' BooleanExpression
+				| StatementExpression ';' BooleanExpression ';' Expression
+				;
+
+			BooleanExpressionOption-> BooleanExpression | ;
+
+			ElseBranchOption -> 'else' Statement | ;
+
+			StatementBlock-> '{' StatementRepetition '}' ;
+
+			VariableDeclarator -> IDENTIFIER SquareBracketRepetition InitializationOption ;
+
+			SquareBracketRepetition -> '[' ']' SquareBracketRepetition |  ;
+
+			InitializationOption
+				-> '=' VariableInitializer | ;
+
+			VariableInitializer
+				-> ArrayInitializer
+				| Expression
+				;
+
+			ArrayInitializer
+				-> '{' VariableInitializerRepetition '}'
+				;
+
+			VariableInitializerRepetition
+				-> VariableInitializer ',' VariableInitializerRepetition
+				| VariableInitializer
+				;
+
+			ExpressionNotStartingWithIdentifier->
+				  '++' Expression
+				| '--' Expression
+				;
+
+			// TODO-> remove RestOfExpression
+			// TODO-> cleanup this rule => use more recursion with TypeOrPrimaryExpression instead of IDENTIFIER
+			TypeOrPrimaryExpression->
+				  PrimitiveType
+				| IDENTIFIER TypeArgument
+			//	| TypeOrPrimaryExpression '.' IDENTIFIER TypeArgument
+				| IDENTIFIER
+				| IDENTIFIER Arguments
+				| TypeOrPrimaryExpression '.' IDENTIFIER
+				| TypeOrPrimaryExpression '.' IDENTIFIER Arguments
+				| TypeOrPrimaryExpression '[' Expression ']'
+				| TypeOrPrimaryExpression '[' ']'
+				| 'new' TypeName Arguments ClassBodyOption
+				// TODO-> cleanup/factor
+				| 'new' IDENTIFIER '[' Expression ']' // TODO-> think about it-> shouldn't it be type but without []?
+				| 'new' PrimitiveType '[' Expression ']' // TODO-> think about it-> shouldn't it be type but without []?
+				| 'new' IDENTIFIER '[' ']' '{' ArgumentList '}'
+				| 'new' PrimitiveType '[' ']' '{' ArgumentList '}'
+				| '(' Expression ')'  // TODO-> if possible remove BooleanExpression, not nice
+				;
+
+			Expression->
+				  TypeOrPrimaryExpression
+				| Expression '+=' Expression
+				| Expression '|=' Expression
+				| Expression '<<' Expression
+				| Expression '>>' Expression
+				| Expression '&=' Expression
+				| Expression '!=' Expression
+				| Expression '==' Expression
+				| Expression '>' Expression
+				| Expression '<' Expression
+				| Expression '<=' Expression
+				| Expression '&' Expression
+				| Expression '^' Expression
+				| Expression '|' Expression
+				| Expression '&&' Expression
+				| Expression '||' Expression
+				| Expression '-' Expression
+				| Expression '+' Expression
+				| Expression '/'Expression
+				| Expression '*' Expression
+				| Expression '++'
+				| '-' Expression
+				| '~' Expression
+				| ExpressionNotStartingWithIdentifier
+				| 'true'
+				| 'false'
+				| NUMBER
+				| STRING
+				| CHAR
+				| Expression '?' Expression ':' Expression
+				| '!' Expression
+				| '(' Expression ')' Expression // TODO-> think about the case where there is a < inside the type of the cast!!
+				;
+
+			// TODO-> try to cleanup using a BinaryOperator
+
+			// TODO-> remove BooleanExpression, not nice
+
+			AssignmentExpression->
+				  TypeOrPrimaryExpression AssignmentOperator Expression
+				;
+
+			AssignmentOperator->
+				  EQUAL
+				| PLUSEQUAL
+				| OREQUAL
+				| ANDEQUAL
+				| GTGTEQUAL
+				| LTLTEQUAL
+				| MINUSEQUAL
+				| MULTEQUAL
+				| DIVEQUAL
+				;
+
+			// TODO-> try to simplify/generalise, in particular the problem between types and expressions and local variable declarations, because of <> 
+			// in types conflicting with < in expressions
+			ClassBodyOption
+				-> ClassBody
+				| 
+				;
+
+			Arguments->
+				  '(' ArgumentListOption ')'
+				;
+
+			// TODO-> try to remove BooleanExpression => put in Expression
+			BooleanExpression->
+				  BooleanExpression LANGLE BooleanExpression // TODO-> there is a problem with statement x = (y < 3); 
+															 // I should be able to parse it! think about it
+				| BooleanExpression LANGLE BooleanExpression RANGLE
+				| IDENTIFIER
+				| NUMBER
+				| TRUE
+				| FALSE
+				| STRING
+				| CHAR
+				| NOT BooleanExpression
+				| MINUS BooleanExpression                         	%prec UMINUS
+				| PLUSPLUS BooleanExpression						%prec PREPLUSPLUS
+				| MINUSMINUS BooleanExpression						%prec PREMINUSMINUS
+				| BooleanExpression PLUSPLUS
+				| BooleanExpression Arguments
+				| BooleanExpression PLUS BooleanExpression
+				| BooleanExpression MINUS BooleanExpression
+				| BooleanExpression STAR BooleanExpression
+				| BooleanExpression DIV BooleanExpression
+				| BooleanExpression MOD BooleanExpression
+				| BooleanExpression DOT BooleanExpression
+				| BooleanExpression EQUALEQUAL BooleanExpression
+				| BooleanExpression XOR BooleanExpression
+				| BooleanExpression NOTEQUAL BooleanExpression
+				| BooleanExpression GTEQUAL BooleanExpression
+				| BooleanExpression AND BooleanExpression
+				| BooleanExpression ANDAND BooleanExpression
+				| BooleanExpression OROR BooleanExpression
+				| BooleanExpression LTEQUAL BooleanExpression
+				| BooleanExpression RANGLE BooleanExpression
+				| BooleanExpression '[' BooleanExpression ']'
+				| BooleanExpression EQUAL BooleanExpression
+				| BooleanExpression INSTANCEOF BooleanExpression
+				| BooleanExpression SHIFTRIGHT BooleanExpression
+				| BooleanExpression SHIFTLEFT BooleanExpression
+				| BooleanExpression PLUSEQUAL BooleanExpression
+				| BooleanExpression QMARK BooleanExpression COLON BooleanExpression
+				| NEW TypeName Arguments ClassBodyOption
+				| '(' BooleanExpression ')'
+				| '(' BooleanExpression ')' BooleanExpression
+				| '(' PrimitiveType ')' BooleanExpression
+				;
+
+			ArgumentListOption
+				-> ArgumentList
+				|
+				;
+
+			ArgumentList->
+				  BooleanExpression COMMA ArgumentList
+				| BooleanExpression
+				;
+
+			TypeName->
+				  SimpleName
+				| TypeName DOT SimpleName
+				;
+
+			SimpleName
+				-> IDENTIFIER TypeArgumentOption
+				;
+
+			TypeArgumentOption
+				-> TypeArgument
+				|
+				;
+
+			TypeArgument
+				-> LANGLE Type RANGLE
+				;
+
+		
+		}
+	}
+}

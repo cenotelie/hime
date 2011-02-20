@@ -83,8 +83,8 @@
         {
             System.Collections.Generic.List<string> Names = new System.Collections.Generic.List<string>();
             foreach (Action action in p_Grammar.Actions)
-                if (!Names.Contains(action.ActionName.NakedName))
-                    Names.Add(action.ActionName.NakedName);
+                if (!Names.Contains(action.LocalName))
+                    Names.Add(action.LocalName);
 
             p_Stream.WriteLine("        public interface Actions");
             p_Stream.WriteLine("        {");
@@ -107,7 +107,7 @@
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.ActionName.NakedName + "\", ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.ActionName.NakedName + "), 0));");
+                    p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.LocalName + "\", ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
                     p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0));");

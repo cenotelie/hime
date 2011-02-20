@@ -12,7 +12,11 @@
         /// <summary>
         /// Reduce/Reduce conflict
         /// </summary>
-        ReduceReduce
+        ReduceReduce,
+        /// <summary>
+        /// No conflict
+        /// </summary>
+        None
     }
 
     /// <summary>

@@ -72,11 +72,13 @@
             Node.Attributes.Append(Doc.CreateAttribute("SymbolType"));
             Node.Attributes.Append(Doc.CreateAttribute("SymbolID"));
             Node.Attributes.Append(Doc.CreateAttribute("SymbolName"));
+            Node.Attributes.Append(Doc.CreateAttribute("SymbolValue"));
             Node.Attributes.Append(Doc.CreateAttribute("ParserIndex"));
 
             Node.Attributes["Action"].Value = p_Action.ToString();
             Node.Attributes["SymbolID"].Value = p_Symbol.SID.ToString("X");
             Node.Attributes["SymbolName"].Value = p_Symbol.LocalName;
+            Node.Attributes["SymbolValue"].Value = p_Symbol.ToString();
 
             if (p_Symbol is Terminal)
                 Node.Attributes["SymbolType"].Value = "Terminal";
