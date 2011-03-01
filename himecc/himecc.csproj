@@ -49,6 +49,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Libraries\CommandLine\CommandLine.dll" />
+    <Content Include="Libraries\CommandLine\CommandLine.XML" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Hime.CentralDogma\Hime.CentralDogma.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
       <Name>Hime.CentralDogma</Name>

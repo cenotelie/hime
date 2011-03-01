@@ -10,7 +10,7 @@
             compiler.AddInputFile(file);
             compiler.Compile(root, Reporter);
             Hime.Parsers.Grammar grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(name));
-            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Analyser", new Hime.Parsers.CF.LR.MethodRNGLALR1(), output);
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Analyser", generator, output);
             string log = output.Replace(".cs", "_log.html");
             Options.DocumentationDirectory = "Documentation";
             grammar.Build(Options);
@@ -21,9 +21,12 @@
         
         static void Parse()
         {
-            Analyser.GrammarCSharp_Lexer Lex = new Analyser.GrammarCSharp_Lexer(System.IO.File.ReadAllText("Test.cs"));
-            Analyser.GrammarCSharp_Parser Parser = new Analyser.GrammarCSharp_Parser(null, Lex);
+            Analyzer.MathExp_Lexer Lex = new Analyzer.MathExp_Lexer("5 + 6");
+            Analyzer.MathExp_Parser Parser = new Analyzer.MathExp_Parser(new Interpreter(), Lex);
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+
+            foreach (Hime.Redist.Parsers.LexerError LexerError in Lex.Errors) System.Console.WriteLine(LexerError.ToString());
+            foreach (Hime.Redist.Parsers.ParserError ParserError in Parser.Errors) System.Console.WriteLine(ParserError.ToString());
             if (Root != null)
             {
                 Root = Root.ApplyActions();
@@ -34,9 +37,9 @@
 
         static void Main(string[] args)
         {
-            //Compile("Languages\\MathExp.gram", "MathExp", new Hime.Parsers.CF.LR.MethodRNGLALR1(), "MathExp.cs");
-            Compile("Languages\\Earth.CIL.CSharp.gram", "Hime.Earth.CIL.GrammarCSharp", new Hime.Parsers.CF.LR.MethodRNGLALR1(), "Earth.CIL.CSharp.cs");
-            //Parse();
+            //Compile("Languages\\Test.gram", "Test", new Hime.Parsers.CF.LR.MethodLALR1(), "Test.cs");
+            //Compile("Languages\\Earth.CIL.CSharp.gram", "Hime.Earth.CIL.GrammarCSharp", new Hime.Parsers.CF.LR.MethodRNGLALR1(), "Earth.CIL.CSharp.cs");
+            Parse();
         }
 
         class Interpreter : Analyzer.MathExp_Parser.Actions

@@ -1,14 +1,14 @@
 ﻿namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Interface for parsers symbols
+    /// Interface for parser symbols
     /// </summary>
     public interface ISymbol
     {
         /// <summary>
-        /// Get the symbol's identifier
+        /// Get the symbol's unique identifier
         /// </summary>
-        /// <value>Symbol's indentifier</value>
+        /// <value>Symbol's unique indentifier</value>
         ushort SymbolID { get; }
         /// <summary>
         /// Get the symbol's name
@@ -18,7 +18,7 @@
     }
 
     /// <summary>
-    /// Base class for token symbols (matched data in parsers)
+    /// Base class for token symbols (data matched by a lexer)
     /// </summary>
     public abstract class SymbolToken : ISymbol
     {
@@ -32,9 +32,9 @@
         private ushort p_ClassSID;
 
         /// <summary>
-        /// Get the symbol's identifier
+        /// Get the symbol's unique identifier
         /// </summary>
-        /// <value>Symbol's indentifier</value>
+        /// <value>Symbol's unique indentifier</value>
         public ushort SymbolID { get { return p_ClassSID; } }
         /// <summary>
         /// Get the symbol's name
@@ -77,11 +77,11 @@
         /// </summary>
         private string p_Value;
         /// <summary>
-        /// Matched line
+        /// Line of the matched token in the input
         /// </summary>
         private int p_Line;
         /// <summary>
-        /// Root of the syntax tree for the sub grammar match
+        /// Root of the AST for the sub grammar match
         /// </summary>
         private SyntaxTreeNode p_SubGrammarRoot;
 

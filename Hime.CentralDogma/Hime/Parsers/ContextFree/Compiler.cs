@@ -121,6 +121,16 @@
             Data.AddOption(Name, Value);
         }
 
+        private Automata.NFA Compile_Recognize_terminal_def_atom_any(Redist.Parsers.SyntaxTreeNode Node)
+        {
+            Automata.NFA Final = new Hime.Parsers.Automata.NFA();
+            Final.StateEntry = Final.AddNewState();
+            Final.StateExit = Final.AddNewState();
+            char begin = System.Convert.ToChar(0x0000);
+            char end = System.Convert.ToChar(0xFFFF);
+            Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(begin, end), Final.StateExit);
+            return Final;
+        }
         private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(Redist.Parsers.SyntaxTreeNode Node)
         {
             Automata.NFA Final = new Hime.Parsers.Automata.NFA();
@@ -290,6 +300,8 @@
                     Automata.NFA Right = Compile_Recognize_terminal_definition(Data, Node.Children[1]);
                     return Automata.NFA.OperatorDifference(Left, Right, false);
                 }
+                if (Token.ValueText == ".")
+                    return Compile_Recognize_terminal_def_atom_any(Node);
                 if (Token.Name == "SYMBOL_VALUE_UINT8")
                     return Compile_Recognize_terminal_def_atom_unicode(Node);
                 if (Token.Name == "SYMBOL_VALUE_UINT16")
@@ -312,13 +324,26 @@
                 Final.StateEntry.AddTransition(Automata.NFA.Epsilon, Final.StateExit);
                 return Final;
             }
-            else
+            else if (Node.Symbol is Redist.Parsers.SymbolVirtual)
             {
-                // Concatenation
-                Automata.NFA Left = Compile_Recognize_terminal_definition(Data, Node.Children[0]);
-                Automata.NFA Right = Compile_Recognize_terminal_definition(Data, Node.Children[1]);
-                return Automata.NFA.OperatorConcat(Left, Right, false);
+                Redist.Parsers.SymbolVirtual Token = (Redist.Parsers.SymbolVirtual)Node.Symbol;
+                if (Node.Symbol.Name == "range")
+                {
+                    Automata.NFA Inner = Compile_Recognize_terminal_definition(Data, Node.Children[0]);
+                    uint min = System.Convert.ToUInt32(((Redist.Parsers.SymbolTokenText)Node.Children[1].Symbol).ValueText);
+                    uint max = min;
+                    if (Node.Children.Count > 2)
+                        max = System.Convert.ToUInt32(((Redist.Parsers.SymbolTokenText)Node.Children[2].Symbol).ValueText);
+                    return Automata.NFA.OperatorRange(Inner, false, min, max);
+                }
+                else if (Node.Symbol.Name == "concat")
+                {
+                    Automata.NFA Left = Compile_Recognize_terminal_definition(Data, Node.Children[0]);
+                    Automata.NFA Right = Compile_Recognize_terminal_definition(Data, Node.Children[1]);
+                    return Automata.NFA.OperatorConcat(Left, Right, false);
+                }
             }
+            return null;
         }
         private Terminal Compile_Recognize_terminal(CFGrammar Data, Redist.Parsers.SyntaxTreeNode Node)
         {

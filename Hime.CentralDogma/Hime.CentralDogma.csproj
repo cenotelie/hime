@@ -62,8 +62,9 @@
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\..\..\NetLibs\Log4Net\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\log4net\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -158,6 +159,8 @@
     <EmbeddedResource Include="Hime\Resources\Visuals\button_plus.gif" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Libraries\log4net\log4net.dll" />
+    <Content Include="Libraries\log4net\log4net.xml" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.None.png" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.LRParserData.xslt">
       <SubType>Designer</SubType>

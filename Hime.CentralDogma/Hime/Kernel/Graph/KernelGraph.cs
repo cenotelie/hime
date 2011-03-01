@@ -83,7 +83,7 @@
         /// <summary>
         /// Adds a new out-bound edge
         /// </summary>
-        /// <param name="item">New ou-bound edge</param>
+        /// <param name="item">New out-bound edge</param>
         public void AddOutEdge(Edge item) { p_EdgesOut.Add(item); }
 
         /// <summary>

@@ -409,6 +409,35 @@
             Final.p_StateExit.AddTransition(NFA.Epsilon, Sub.p_StateEntry);
             return Final;
         }
+        public static NFA OperatorRange(NFA Sub, bool UseClones, uint Min, uint Max)
+        {
+            NFA Final = new NFA();
+            Final.p_StateEntry = new NFAState();
+            Final.p_StateExit = new NFAState();
+            Final.p_States.Add(Final.p_StateEntry);
+
+            NFAState Last = Final.p_StateEntry;
+            for (uint i = 0; i != Min; i++)
+            {
+                NFA Inner = Sub.Clone();
+                Final.p_States.AddRange(Inner.p_States);
+                Last.AddTransition(NFA.Epsilon, Inner.p_StateEntry);
+                Last = Inner.p_StateExit;
+            }
+            for (uint i = Min; i != Max; i++)
+            {
+                NFA Inner = OperatorOption(Sub, true);
+                Final.p_States.AddRange(Inner.p_States);
+                Last.AddTransition(NFA.Epsilon, Inner.p_StateEntry);
+                Last = Inner.p_StateExit;
+            }
+            Final.p_States.Add(Final.p_StateExit);
+            Last.AddTransition(NFA.Epsilon, Final.p_StateExit);
+            
+            if (Min == 0)
+                Final.p_StateEntry.AddTransition(NFA.Epsilon, Final.p_StateExit);
+            return Final;
+        }
         public static NFA OperatorConcat(NFA Left, NFA Right, bool UseClones)
         {
             NFA Final = new NFA();
