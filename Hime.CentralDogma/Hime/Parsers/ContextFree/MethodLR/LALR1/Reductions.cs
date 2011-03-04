@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the actions for a LALR(1) set
     /// </summary>
-    internal class ItemSetReductionsLALR1 : ItemSetReductions
+    class ItemSetReductionsLALR1 : ItemSetReductions
     {
         /// <summary>
         /// Reduction actions

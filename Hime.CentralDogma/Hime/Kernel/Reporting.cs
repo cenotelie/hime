@@ -126,7 +126,8 @@
             if (p_Configured)
                 return;
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout("%-5p: %m%n");
-            log4net.Appender.ConsoleAppender appender = new log4net.Appender.ConsoleAppender(layout);
+            log4net.Appender.ConsoleAppender appender = new log4net.Appender.ConsoleAppender();
+            appender.Layout = layout;
             log4net.Config.BasicConfigurator.Configure(appender);
             p_Configured = true;
         }

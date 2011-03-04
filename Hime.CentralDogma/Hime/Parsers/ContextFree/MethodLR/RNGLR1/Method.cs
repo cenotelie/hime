@@ -3,7 +3,7 @@
     /// <summary>
     /// Implements the RNGLR(1) parsing method
     /// </summary>
-    public class MethodRNGLR1 : CFParserGenerator
+    class MethodRNGLR1 : CFParserGenerator
     {
         public string Name { get { return "RNGLR1"; } }
 

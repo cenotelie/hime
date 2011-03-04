@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
   <xsl:output method="text" indent="yes"/>
   <xsl:template name="Hime_ClassLexer_Binary">
-    public class Lexer_<xsl:value-of select="../@Name"/> : Hime.Kernel.Parsers.LexerBinary
+    class Lexer_<xsl:value-of select="../@Name"/> : Hime.Kernel.Parsers.LexerBinary
 	  {		
 		  public Lexer_<xsl:value-of select="../@Name"/>(Hime.Kernel.Binary.DataInput input) : base(input) { }
 
@@ -113,7 +113,7 @@
   
   
   <xsl:template name="Hime_ClassLexer_Text">
-    public class Lexer_<xsl:value-of select="../@Name"/> : Hime.Kernel.Parsers.LexerText
+    class Lexer_<xsl:value-of select="../@Name"/> : Hime.Kernel.Parsers.LexerText
     {
       private static ushort[] p_SymbolsSID = { <xsl:for-each select="Symbols/SymbolTerminalText"><xsl:if test="position()!=1">, </xsl:if>0x<xsl:value-of select="@SID"/></xsl:for-each> };
       private static string[] p_SymbolsName = { <xsl:for-each select="Symbols/SymbolTerminalText"><xsl:if test="position()!=1">, </xsl:if>"<xsl:value-of select="@Name"/>"</xsl:for-each> };

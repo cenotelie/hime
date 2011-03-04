@@ -1,6 +1,6 @@
 ﻿namespace Hime.Kernel.Resources
 {
-    public interface IResourceCompiler
+    interface IResourceCompiler
     {
         string CompilerName { get; }
         int CompilerVersionMajor { get; }

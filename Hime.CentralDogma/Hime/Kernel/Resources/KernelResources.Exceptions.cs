@@ -3,7 +3,7 @@
     /// <summary>
     /// Base abstract exception for resources
     /// </summary>
-    public abstract class ResourceException : System.Exception
+    abstract class ResourceException : System.Exception
     {
         /// <summary>
         /// Initializes a new instance of the ResourceException class
@@ -25,7 +25,7 @@
     /// <summary>
     /// Represents error when interactig with an AccessorSession that has already been closed
     /// </summary>
-    public sealed class AccessorSessionClosedException : ResourceException
+    class AccessorSessionClosedException : ResourceException
     {
         /// <summary>
         /// Rerefence to the closed session
@@ -51,7 +51,7 @@
     /// <summary>
     /// Represents error when trying to checkout resources with a unregistered session
     /// </summary>
-    public sealed class UnregisteredAccessorSessionException : ResourceException
+    class UnregisteredAccessorSessionException : ResourceException
     {
         /// <summary>
         /// Rerefence to the unregistered session
@@ -78,7 +78,7 @@
     /// <summary>
     /// Represents error when trying to checkout resources with a unregistered session
     /// </summary>
-    public sealed class ResourceNotFoundException : ResourceException
+    class ResourceNotFoundException : ResourceException
     {
         /// <summary>
         /// Name of the unknown resource

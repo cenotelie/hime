@@ -1,0 +1,13 @@
+﻿public grammar cf Test
+{
+	options
+	{
+		Axiom = "axiom";
+	}
+	terminals {
+		COMMENT		-> '/*' .? (.{2}-'*/')* '*/' ;
+	}
+	rules {
+		axiom -> COMMENT;
+	}
+}

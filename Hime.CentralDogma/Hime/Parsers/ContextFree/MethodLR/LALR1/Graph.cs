@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a graph of LALR(1) kernels based on a LR(0) graph
     /// </summary>
-    internal class KernelGraph
+    class KernelGraph
     {
         /// <summary>
         /// The LR(0) graph

@@ -3,7 +3,7 @@
     /// <summary>
     /// Implements the LR(0) parsing method
     /// </summary>
-    public class MethodLR0 : CFParserGenerator
+    class MethodLR0 : CFParserGenerator
     {
         public string Name { get { return "LR0"; } }
 

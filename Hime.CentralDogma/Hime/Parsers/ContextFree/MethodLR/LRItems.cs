@@ -3,7 +3,7 @@
     /// <summary>
     /// The action to be taken for a LR item
     /// </summary>
-    public enum ItemAction
+    enum ItemAction
     {
         /// <summary>
         /// Shift to a chid item
@@ -24,7 +24,7 @@
     /// Item is of the form : [Var -> alpha . NextSymbol NextChoice]
     /// Where [Var -> alpha NextSymbol NextChoice] is a rule for Var
     /// </remarks>
-    public abstract class Item
+    abstract class Item
     {
         protected const string p_Arrow = "→";
         protected const string p_Dot = "•";

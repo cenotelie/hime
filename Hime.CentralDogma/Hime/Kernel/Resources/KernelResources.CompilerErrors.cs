@@ -4,7 +4,7 @@
     /// Base exception for compilers
     /// </summary>
     [System.Serializable]
-    public class CompilerException : System.Exception
+    class CompilerException : System.Exception
     {
         /// <summary>
         /// Constructs empty exception
@@ -28,7 +28,7 @@
     /// Exception thrown when a fatal error is encountered by a compiler
     /// </summary>
     [System.Serializable]
-    public sealed class CompilerFatalErrorException : CompilerException
+    class CompilerFatalErrorException : CompilerException
     {
         /// <summary>
         /// Constructs empty exception
@@ -51,7 +51,7 @@
     /// Exception thrown when a fatal error is encountered by a compiler
     /// </summary>
     [System.Serializable]
-    public sealed class NoResourceCompilerFoundException : CompilerException
+    class NoResourceCompilerFoundException : CompilerException
     {
         /// <summary>
         /// Constructs empty exception
@@ -74,7 +74,7 @@
     /// <summary>
     /// Represents a compiler error
     /// </summary>
-    public sealed class CompilerError
+    class CompilerError
     {
         /// <summary>
         /// Inner error (may be an exception)

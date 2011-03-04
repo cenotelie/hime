@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a terminal DFA state
     /// </summary>
-    public class DFAState : Kernel.Graph.IVertexData
+    public sealed class DFAState
     {
         /// <summary>
         /// The transitions from the current state
@@ -140,30 +140,12 @@
                     p_Transitions.Add(Key, Child);
             }
         }
-
-        public Hime.Kernel.Graph.Vertex CreateVertex(float LineSize, float CharacterWidth)
-        {
-            Hime.Kernel.Graph.Vertex Vertex = new Hime.Kernel.Graph.Vertex(this);
-            Vertex.Visual = new Hime.Kernel.Graph.VertexVisualCircle(LineSize * 1.5f);
-            return Vertex;
-        }
-        public void DrawContent(Hime.Kernel.Graph.VertexVisual Visual, Hime.Kernel.Graph.GraphVisual Material, float LineHeight)
-        {
-            System.Drawing.RectangleF LayoutUpper = new System.Drawing.RectangleF(Visual.Location.X + 3, Visual.Center.Y - LineHeight * 1.5f, Visual.BoundingWidth - 6, LineHeight);
-            Material.Graphic.DrawString(p_ID.ToString(), Material.FontNormal, new System.Drawing.SolidBrush(System.Drawing.Color.Black), LayoutUpper, Material.FormatCenterClip);
-            if (p_Final != null)
-            {
-                System.Drawing.RectangleF LayoutCenter = new System.Drawing.RectangleF(Visual.Location.X, Visual.Center.Y - LineHeight / 2, Visual.BoundingWidth, LineHeight);
-                Material.Graphic.DrawString(p_Final.ToString(), Material.FontNormal, new System.Drawing.SolidBrush(System.Drawing.Color.Black), LayoutCenter);
-                Material.Graphic.DrawEllipse(Visual.MaterialContourPen, Visual.Location.X - 3, Visual.Location.Y - 3, Visual.BoundingWidth + 6, Visual.BoundingHeight + 6);
-            }
-        }
     }
 
     /// <summary>
     /// Represents a set of DFA states
     /// </summary>
-    public class DFAStateGroup
+    public sealed class DFAStateGroup
     {
         /// <summary>
         /// The list of states in the current group
@@ -219,7 +201,7 @@
     /// <summary>
     /// Represents a partition of a DFA. A partition is a set of DFA state groups
     /// </summary>
-    public class DFAPartition
+    public sealed class DFAPartition
     {
         /// <summary>
         /// List of the partition's groups
@@ -451,7 +433,7 @@
     /// <summary>
     /// Represent a terminal DFA
     /// </summary>
-    public class DFA
+    public sealed class DFA
     {
         /// <summary>
         /// List of the DFA states
@@ -555,30 +537,6 @@
         {
             foreach (DFAState State in p_States)
                 State.RepackTransitions();
-        }
-
-        private Hime.Kernel.Graph.Vertex Draw_BuildGraph(Hime.Kernel.Graph.Graph Graph, DFAState State)
-        {
-            Hime.Kernel.Graph.Vertex Vertex = Graph.GetRepresentationOf(State);
-            if (Vertex == null)
-            {
-                Vertex = Graph.AddVertex(State);
-                foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, DFAState> Edge in State.Transitions)
-                {
-                    Hime.Kernel.Graph.Vertex Child = Draw_BuildGraph(Graph, Edge.Value);
-                    Graph.AddEdge(Vertex, Child, Edge.Key).Visual = new Hime.Kernel.Graph.EdgeVisualArrow();
-                }
-            }
-            return Vertex;
-        }
-
-        public System.Drawing.Bitmap GenerateVisual()
-        {
-            Hime.Kernel.Graph.Graph Graph = new Hime.Kernel.Graph.Graph(14);
-            Draw_BuildGraph(Graph, p_States[0]);
-            Hime.Kernel.Graph.PlacementAnnealingMethod Method = new Hime.Kernel.Graph.PlacementAnnealingMethod();
-            Graph.Build(Method);
-            return Graph.Draw(1);
         }
     }
 }

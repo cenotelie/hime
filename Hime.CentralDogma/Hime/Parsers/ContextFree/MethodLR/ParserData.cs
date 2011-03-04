@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers.CF.LR
 {
-    public abstract class LRParserData : ParserData
+    abstract class LRParserData : ParserData
     {
         protected ParserGenerator p_Generator;
         protected CFGrammar p_Grammar;

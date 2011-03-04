@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers.Exporters
 {
-    public class TextLexerExporter
+    class TextLexerExporter
     {
         private System.Collections.Generic.List<Terminal> p_Symbols;
         private System.Collections.Generic.List<int> p_Indices;
@@ -42,7 +42,7 @@
 
         public void Export()
         {
-            p_Stream.WriteLine("    public class " + p_Name + "_Lexer : Hime.Redist.Parsers.LexerText");
+            p_Stream.WriteLine("    class " + p_Name + "_Lexer : Hime.Redist.Parsers.LexerText");
             p_Stream.WriteLine("    {");
             Export_SymbolIDs();
             Export_SymbolNames();
@@ -50,10 +50,6 @@
                 Export_Transition_State(State);
             Export_Transitions();
             Export_Finals();
-
-            if (p_Separator != null)
-                p_Stream.WriteLine("        private static ushort p_StaticSeparator = 0x" + p_Separator.SID.ToString("X") + ";");
-
             Export_Setup();
             Export_Clone();
             Export_Constructor();
@@ -148,7 +144,7 @@
         }
     }
 
-    public class BinaryLexerExporter
+    class BinaryLexerExporter
     {
     }
 }

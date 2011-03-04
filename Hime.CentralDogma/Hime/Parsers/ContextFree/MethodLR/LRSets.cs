@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the kernel items for a set of items
     /// </summary>
-    public class ItemSetKernel
+    class ItemSetKernel
     {
         /// <summary>
         /// List of LR items
@@ -101,7 +101,7 @@
     /// <summary>
     /// Common interface for objects representing actions for a set of items
     /// </summary>
-    public interface ItemSetAction
+    interface ItemSetAction
     {
         /// <summary>
         /// Get the action type
@@ -118,7 +118,7 @@
     /// <summary>
     /// Represent a shifting action for a set of items
     /// </summary>
-    public class ItemSetActionShift : ItemSetAction
+    class ItemSetActionShift : ItemSetAction
     {
         /// <summary>
         /// The lookahead needed for the action to be taken
@@ -160,7 +160,7 @@
     /// <summary>
     /// Represent a reduction action for a set of items
     /// </summary>
-    public class ItemSetActionReduce : ItemSetAction
+    class ItemSetActionReduce : ItemSetAction
     {
         /// <summary>
         /// The lookahead needed for the action to be taken
@@ -210,7 +210,7 @@
     /// <summary>
     /// Common interface for objects representing the actions for a set of items
     /// </summary>
-    public abstract class ItemSetReductions
+    abstract class ItemSetReductions
     {
         /// <summary>
         /// List of the conflicts within the set
@@ -235,7 +235,7 @@
     /// <summary>
     /// Represents a set of LR items
     /// </summary>
-    public class ItemSet
+    class ItemSet
     {
         /// <summary>
         /// Unique identifier for the current set

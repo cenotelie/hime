@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers.CF
 {
-    public class CFGrammarTemplateRule
+    class CFGrammarTemplateRule
     {
         private string p_HeadName;
         private System.Collections.Generic.List<string> p_Parameters;
@@ -63,7 +63,7 @@
         }
     }
 
-    public class CFGrammarTemplateRuleInstance
+    class CFGrammarTemplateRuleInstance
     {
         private CFGrammarTemplateRule p_TemplateRule;
         private CFVariable p_Variable;
@@ -126,13 +126,13 @@
         }
     }
 
-    public class CFGrammarTemplateRuleParameters : System.Collections.Generic.List<Symbol>
+    class CFGrammarTemplateRuleParameters : System.Collections.Generic.List<Symbol>
     {
         public CFGrammarTemplateRuleParameters() : base() { }
         public CFGrammarTemplateRuleParameters(System.Collections.Generic.IEnumerable<Symbol> Symbols) : base(Symbols) { }
     }
 
-    public class CFGrammarCompilerContext
+    class CFGrammarCompilerContext
     {
         private CFGrammarCompiler p_Compiler;
         private System.Collections.Generic.List<CFGrammarTemplateRule> p_TemplateRules;

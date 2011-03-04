@@ -150,7 +150,7 @@
     /// <summary>
     /// Represents a NFA state for a terminal automata
     /// </summary>
-    public class NFAState : Kernel.Graph.IVertexData
+    public sealed class NFAState
     {
         /// <summary>
         /// List of the transitions from the current state
@@ -214,31 +214,13 @@
         /// Remove all transitions from the state
         /// </summary>
         public void ClearTransitions() { p_Transitions.Clear(); }
-
-        public Hime.Kernel.Graph.Vertex CreateVertex(float LineSize, float CharacterWidth)
-        {
-            Hime.Kernel.Graph.Vertex Vertex = new Hime.Kernel.Graph.Vertex(this);
-            Vertex.Visual = new Hime.Kernel.Graph.VertexVisualCircle(LineSize * 1.5f);
-            return Vertex;
-        }
-        public void DrawContent(Hime.Kernel.Graph.VertexVisual Visual, Hime.Kernel.Graph.GraphVisual Material, float LineHeight)
-        {
-            if (p_Final != null)
-            {
-                System.Drawing.RectangleF LayoutCenter = new System.Drawing.RectangleF(Visual.Location.X, Visual.Center.Y - LineHeight / 2, Visual.BoundingWidth, LineHeight);
-                Material.Graphic.DrawString(p_Final.ToString(), Material.FontNormal, new System.Drawing.SolidBrush(System.Drawing.Color.Black), LayoutCenter);
-                Material.Graphic.DrawEllipse(Visual.MaterialContourPen, Visual.Location.X - 3, Visual.Location.Y - 3, Visual.BoundingWidth + 6, Visual.BoundingHeight + 6);
-            }
-            System.Drawing.RectangleF LayoutLower = new System.Drawing.RectangleF(Visual.Location.X, Visual.Center.Y + LineHeight / 2, Visual.BoundingWidth, LineHeight);
-            Material.Graphic.DrawString(p_Mark.ToString(), Material.FontSmall, new System.Drawing.SolidBrush((p_Mark == 0) ? System.Drawing.Color.Black : System.Drawing.Color.Red), LayoutLower, Material.FormatCenterNoClip);
-        }
     }
 
 
     /// <summary>
     /// Represents a terminal NFA
     /// </summary>
-    public class NFA
+    public sealed class NFA
     {
         /// <summary>
         /// Collection of NFA states
@@ -510,30 +492,6 @@
             Right.p_StateExit.AddTransition(NFA.Epsilon, Final.p_StateExit);
             return Final;
         }
-
-        private Hime.Kernel.Graph.Vertex Draw_BuildGraph(Hime.Kernel.Graph.Graph Graph, NFAState State)
-        {
-            Hime.Kernel.Graph.Vertex Vertex = Graph.GetRepresentationOf(State);
-            if (Vertex == null)
-            {
-                Vertex = Graph.AddVertex(State);
-                foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState> Edge in State.Transitions)
-                {
-                    Hime.Kernel.Graph.Vertex Child = Draw_BuildGraph(Graph, Edge.Value);
-                    Graph.AddEdge(Vertex, Child, Edge.Key).Visual = new Hime.Kernel.Graph.EdgeVisualArrow();
-                }
-            }
-            return Vertex;
-        }
-
-        public System.Drawing.Bitmap GenerateVisual()
-        {
-            Hime.Kernel.Graph.Graph Graph = new Hime.Kernel.Graph.Graph(14);
-            Draw_BuildGraph(Graph, p_StateEntry);
-            Hime.Kernel.Graph.PlacementAnnealingMethod Method = new Hime.Kernel.Graph.PlacementAnnealingMethod();
-            Graph.Build(Method);
-            return Graph.Draw(1);
-        }
     }
 
 
@@ -541,7 +499,7 @@
     /// Represents a set of NFA states.
     /// </summary>
     /// <remarks>This is used to build a DFA equivalent to a NFA</remarks>
-    public class NFAStateSet : System.Collections.Generic.List<NFAState>
+    public sealed class NFAStateSet : System.Collections.Generic.List<NFAState>
     {
         /// <summary>
         /// Add the given item to the set if not already present

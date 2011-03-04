@@ -3,11 +3,11 @@
     /// <summary>
     /// Represents a variable in a context-free grammar
     /// </summary>
-    public class CFVariable : Variable
+    public sealed class CFVariable : Variable
     {
-        protected System.Collections.Generic.List<CFRule> p_Rules;
-        protected TerminalSet p_Firsts;
-        protected TerminalSet p_Followers;
+        private System.Collections.Generic.List<CFRule> p_Rules;
+        private TerminalSet p_Firsts;
+        private TerminalSet p_Followers;
 
         public System.Collections.Generic.List<CFRule> Rules { get { return p_Rules; } }
         public TerminalSet Firsts { get { return p_Firsts; } }

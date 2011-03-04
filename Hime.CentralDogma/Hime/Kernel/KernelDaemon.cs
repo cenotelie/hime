@@ -3,7 +3,7 @@
     /// <summary>
     /// Daemon static class
     /// </summary>
-    public sealed class KernelDaemon
+    public static class KernelDaemon
     {
         public static void GenerateNextStep(string Path)
         {

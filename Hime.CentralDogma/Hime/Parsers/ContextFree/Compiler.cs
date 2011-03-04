@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers.CF
 {
-    public class CFGrammarCompiler : Kernel.Resources.IResourceCompiler
+    class CFGrammarCompiler : Kernel.Resources.IResourceCompiler
     {
         private static string[] p_ResourcesNames = new string[] { "cf_grammar_text", "cf_grammar_bin" };
         private const string p_SubruleHeadRadical = "";

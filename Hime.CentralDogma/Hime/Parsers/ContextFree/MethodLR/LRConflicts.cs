@@ -3,7 +3,7 @@
     /// <summary>
     /// LR conflict type
     /// </summary>
-    public enum ConflictType
+    enum ConflictType
     {
         /// <summary>
         /// Shift/Reduce conflict
@@ -22,7 +22,7 @@
     /// <summary>
     /// Represents a conflict in a LR set graph
     /// </summary>
-    public class Conflict : Hime.Kernel.Reporting.Entry
+    class Conflict : Hime.Kernel.Reporting.Entry
     {
         /// <summary>
         /// Parse method used

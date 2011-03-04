@@ -1,6 +1,6 @@
 ﻿namespace Hime.Redist.Parsers
 {
-    public abstract class BaseLR1Parser
+    public abstract class BaseLR1Parser : IParser
     {
         protected delegate void Production(BaseLR1Parser parser, System.Collections.Generic.List<SyntaxTreeNode> nodes);
 

@@ -3,7 +3,7 @@
     /// <summary>
     /// Implements the GLALR(1) parsing method
     /// </summary>
-    public class MethodGLALR1 : CFParserGenerator
+    class MethodGLALR1 : CFParserGenerator
     {
         public string Name { get { return "GLALR1"; } }
 

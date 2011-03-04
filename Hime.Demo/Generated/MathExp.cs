@@ -24,7 +24,6 @@ namespace Analyzer
         private static ushort[][] p_StaticTransitions11 = {  };
         private static ushort[][][] p_StaticTransitions = { p_StaticTransitions0, p_StaticTransitions1, p_StaticTransitions2, p_StaticTransitions3, p_StaticTransitions4, p_StaticTransitions5, p_StaticTransitions6, p_StaticTransitions7, p_StaticTransitions8, p_StaticTransitions9, p_StaticTransitionsA, p_StaticTransitionsB, p_StaticTransitionsC, p_StaticTransitionsD, p_StaticTransitionsE, p_StaticTransitionsF, p_StaticTransitions10, p_StaticTransitions11 };
         private static int[] p_StaticFinals = { -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 6, 7, 7, 6, 6, 6, 6 };
-        private static ushort p_StaticSeparator = 0x7;
         protected override void setup() {
             p_SymbolsSID = p_StaticSymbolsSID;
             p_SymbolsName = p_StaticSymbolsName;

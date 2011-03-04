@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers.CF.LR
 {
-    public class LR1ParserData : LRParserData
+    class LR1ParserData : LRParserData
     {
         protected System.IO.StreamWriter p_Stream;
 
@@ -10,7 +10,7 @@
         public override bool Export(GrammarBuildOptions Options)
         {
             p_Stream = Options.ParserWriter;
-            p_Stream.Write("    public class " + p_Grammar.LocalName + "_Parser : ");
+            p_Stream.Write("    class " + p_Grammar.LocalName + "_Parser : ");
             if (p_Grammar is CFGrammarText)
                 p_Stream.WriteLine("Hime.Redist.Parsers.LR1TextParser");
             else

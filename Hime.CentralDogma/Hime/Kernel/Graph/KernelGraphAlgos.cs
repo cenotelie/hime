@@ -3,7 +3,7 @@
     /// <summary>
     /// Interface for placement methods
     /// </summary>
-    public interface IPlacementMethod
+    interface IPlacementMethod
     {
         /// <summary>
         /// Resets the parameters
@@ -19,7 +19,7 @@
     /// <summary>
     /// Set of mathematical tool functions
     /// </summary>
-    public static class PlacementTools
+    static class PlacementTools
     {
         /// <summary>
         /// Get the square distance between two points
@@ -109,7 +109,7 @@
 
 
 
-    public class PlacementState
+    class PlacementState
     {
         public System.Collections.Generic.List<System.Drawing.RectangleF> VertexPositions;
         public System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<int, int>> Edges;
@@ -140,7 +140,7 @@
 
 
 
-    public class PlacementAnnealingState : PlacementState
+    class PlacementAnnealingState : PlacementState
     {
         public float GraphAverageVertexRay;
         public float GraphExpectedSurface;
@@ -212,7 +212,7 @@
         }
     }
 
-    public class PlacementAnnealingMethod : IPlacementMethod
+    class PlacementAnnealingMethod : IPlacementMethod
     {
         private static int index = 0;
 

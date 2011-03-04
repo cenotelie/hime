@@ -1,6 +1,6 @@
 ﻿namespace Hime.Kernel.Graph
 {
-    public abstract class VertexVisual
+    abstract class VertexVisual
     {
         protected float p_X;
         protected float p_Y;
@@ -46,7 +46,7 @@
     }
 
 
-    public class VertexVisualRectangle : VertexVisual
+    class VertexVisualRectangle : VertexVisual
     {
         public VertexVisualRectangle(float Width, float Height)
         {
@@ -92,7 +92,7 @@
         }
     }
 
-    public class VertexVisualCircle : VertexVisual
+    class VertexVisualCircle : VertexVisual
     {
         public override float BoundingRay { get { return p_BoundingWidth / 2; } }
 
@@ -126,13 +126,13 @@
     }
 
 
-    public enum EdgeVisualStyle
+    enum EdgeVisualStyle
     {
         Straight,
         Curve
     }
 
-    public abstract class EdgeVisual
+    abstract class EdgeVisual
     {
         protected EdgeVisualStyle p_Style;
         protected float p_EdgeCurveCoef;
@@ -168,7 +168,7 @@
         public abstract void Draw(VertexVisual Begin, VertexVisual End, GraphVisual Material, string Value);
     }
 
-    public class EdgeVisualArrow : EdgeVisual
+    class EdgeVisualArrow : EdgeVisual
     {
         protected float p_ArrowLength;
         protected float p_ArrowWidth;
@@ -278,7 +278,7 @@
 
 
 
-    public abstract class GraphVisual
+    abstract class GraphVisual
     {
         protected System.Drawing.Font p_FontNormal;
         protected System.Drawing.Font p_FontSmall;
@@ -308,7 +308,7 @@
         }
     }
 
-    public class GraphVisualImage : GraphVisual
+    class GraphVisualImage : GraphVisual
     {
         protected System.Drawing.Bitmap p_Image;
         protected System.Drawing.Graphics p_Graphic;

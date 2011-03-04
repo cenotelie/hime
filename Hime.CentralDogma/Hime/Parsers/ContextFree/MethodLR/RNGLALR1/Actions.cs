@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the actions for a RNGLALR(1) set
     /// </summary>
-    internal class ItemSetReductionsRNGLALR1 : ItemSetReductions
+    class ItemSetReductionsRNGLALR1 : ItemSetReductions
     {
         /// <summary>
         /// Reduction actions

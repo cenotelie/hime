@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the actions for a GLR(1) set
     /// </summary>
-    internal class ItemSetActionsGLR1 : ItemSetReductions
+    class ItemSetActionsGLR1 : ItemSetReductions
     {
         /// <summary>
         /// Reduction actions

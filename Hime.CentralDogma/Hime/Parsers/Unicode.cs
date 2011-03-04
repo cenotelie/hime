@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers
 {
-    public class UnicodeSpan
+    class UnicodeSpan
     {
         protected ushort p_Begin;
         protected ushort p_End;
@@ -15,7 +15,7 @@
         }
     }
 
-    public class UnicodeBlock : UnicodeSpan
+    class UnicodeBlock : UnicodeSpan
     {
         protected string p_Name;
         public string Name { get { return p_Name; } }
@@ -147,7 +147,7 @@
         }
     }
 
-    public class UnicodeCategory
+    class UnicodeCategory
     {
         protected string p_Name;
         protected System.Collections.Generic.List<UnicodeSpan> p_Spans;

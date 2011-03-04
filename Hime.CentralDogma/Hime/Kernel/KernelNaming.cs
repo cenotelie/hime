@@ -25,7 +25,7 @@
     /// <summary>
     /// Represents a failure to resolve a name
     /// </summary>
-    public sealed class NameResolutionException : NamingException
+    public class NameResolutionException : NamingException
     {
         /// <summary>
         /// Symbol from which the name was intended to be resolved
@@ -62,7 +62,7 @@
     /// <summary>
     /// Represents an error during an ambiguous named resolution
     /// </summary>
-    public sealed class AmbiguousNameException : NamingException
+    public class AmbiguousNameException : NamingException
     {
         /// <summary>
         /// Symbol from which the name was intended to be resolved
@@ -99,7 +99,7 @@
     /// <summary>
     /// Represents a name collision error when adding a new name to a container
     /// </summary>
-    public sealed class NameCollisionException : NamingException
+    public class NameCollisionException : NamingException
     {
         /// <summary>
         /// The container symbol
@@ -136,7 +136,7 @@
     /// <summary>
     /// Represents a error when setting the parent of a symbol with the wrong type
     /// </summary>
-    public sealed class WrongParentSymbolException : NamingException
+    public class WrongParentSymbolException : NamingException
     {
         /// <summary>
         /// Symbol expecting the parent
@@ -183,7 +183,7 @@
     /// <summary>
     /// Represents an error when adding a child to a symbol
     /// </summary>
-    public sealed class CannotAddChildException : NamingException
+    public class CannotAddChildException : NamingException
     {
         /// <summary>
         /// Parent symbol
@@ -222,7 +222,7 @@
     /// <summary>
     /// Represents a name qualified by its enclosing symbols
     /// </summary>
-    public sealed class QualifiedName
+    public class QualifiedName
     {
         /// <summary>
         /// Separator character between names
@@ -496,7 +496,7 @@
     /// <summary>
     /// Represents a namespace
     /// </summary>
-    public sealed class Namespace : Symbol
+    public class Namespace : Symbol
     {
         /// <summary>
         /// Parent (enclosing) namespace

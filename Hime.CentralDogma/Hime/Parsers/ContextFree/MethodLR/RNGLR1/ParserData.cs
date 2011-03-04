@@ -1,6 +1,6 @@
 ﻿namespace Hime.Parsers.CF.LR
 {
-    public class RNGLR1ParserData : LRParserData
+    class RNGLR1ParserData : LRParserData
     {
         protected System.IO.StreamWriter p_Stream;
         protected System.Collections.Generic.List<CFVariable> p_NullableVars;
@@ -37,7 +37,7 @@
         {
             DetermineNullables();
             p_Stream = Options.ParserWriter;
-            p_Stream.WriteLine("    public class " + p_Grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
+            p_Stream.WriteLine("    class " + p_Grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
             p_Stream.WriteLine("    {");
 
             Export_NullVars();
@@ -86,7 +86,7 @@
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
-            p_Stream.WriteLine("        public interface Actions");
+            p_Stream.WriteLine("        interface Actions");
             p_Stream.WriteLine("        {");
             foreach (string name in Names)
                 p_Stream.WriteLine("        void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");

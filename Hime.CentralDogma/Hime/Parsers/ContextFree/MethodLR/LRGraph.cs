@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a LR graph
     /// </summary>
-    public class Graph
+    class Graph
     {
         /// <summary>
         /// List of the sets in the graph

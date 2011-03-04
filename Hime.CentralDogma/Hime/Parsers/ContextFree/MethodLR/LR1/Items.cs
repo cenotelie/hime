@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a LR(1) item
     /// </summary>
-    public class ItemLR1 : Item
+    class ItemLR1 : Item
     {
         /// <summary>
         /// The values of the lookahead

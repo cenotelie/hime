@@ -24,7 +24,7 @@
     /// <summary>
     /// Represent a part of a rule definition associating a symbol to an action
     /// </summary>
-    public class RuleDefinitionPart
+    public sealed class RuleDefinitionPart
     {
         /// <summary>
         /// Symbol represented by the part

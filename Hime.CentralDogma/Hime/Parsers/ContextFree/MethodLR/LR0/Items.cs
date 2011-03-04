@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a LR(0) item
     /// </summary>
-    public class ItemLR0 : Item
+    class ItemLR0 : Item
     {
         /// <summary>
         /// Construct the item from a rule, the dot position in the rule

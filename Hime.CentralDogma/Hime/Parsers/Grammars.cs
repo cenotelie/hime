@@ -18,7 +18,7 @@
     }
 
 
-    public class GrammarBuildOptions
+    public sealed class GrammarBuildOptions
     {
         private string p_Namespace;
         private Hime.Kernel.Reporting.Reporter p_Log;

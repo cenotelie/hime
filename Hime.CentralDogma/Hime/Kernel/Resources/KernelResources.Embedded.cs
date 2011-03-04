@@ -1,6 +1,6 @@
 ﻿namespace Hime.Kernel.Resources
 {
-    public sealed class AccessorSession
+    class AccessorSession
     {
         private bool p_IsClosed;
         private System.Collections.Generic.List<string> p_Files;
@@ -30,7 +30,7 @@
     }
 
 
-	public sealed class ResourceAccessor
+	class ResourceAccessor
 	{
 		private static System.Reflection.Assembly p_Assembly;
 		private static string p_RootNamespace;
@@ -73,7 +73,7 @@
             session.AddCheckoutFile(fileName);
         }
 
-        internal static void Export(string resourceName, string fileName)
+        public static void Export(string resourceName, string fileName)
         {
             System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
             if (Stream == null)

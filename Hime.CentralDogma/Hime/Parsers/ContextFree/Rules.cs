@@ -3,16 +3,16 @@
     /// <summary>
     /// Represents a rule definiton
     /// </summary>
-    public class CFRuleDefinition : RuleDefinition
+    public sealed class CFRuleDefinition : RuleDefinition
     {
         /// <summary>
         /// List of the choices
         /// </summary>
-        protected CFRuleDefinitionSet p_Choices;
+        private CFRuleDefinitionSet p_Choices;
         /// <summary>
         /// Firsts set for the current definition
         /// </summary>
-        protected TerminalSet p_Firsts;
+        private TerminalSet p_Firsts;
 
         /// <summary>
         /// Get the terminal set representing the Firsts set
@@ -80,7 +80,7 @@
         /// If the definition is [a b c] and doest not contains virtual symbols nor action symbols, the choices will be :
         /// { [a b c], [b c], [c], [] }
         /// </remarks>
-        protected void ComputeChoices()
+        private void ComputeChoices()
         {
             // Create the choices set
             p_Choices = new CFRuleDefinitionSet();
@@ -105,7 +105,7 @@
         /// </summary>
         /// <param name="Index">Index of the choice</param>
         /// <returns>Returns true if changes occur, false otherwise</returns>
-        protected bool ComputeFirsts_Choice(int Index)
+        private bool ComputeFirsts_Choice(int Index)
         {
             CFRuleDefinition Choice = p_Choices[Index]; // Current choice
             
@@ -306,7 +306,7 @@
     /// <summary>
     /// Represents a set of rule definition
     /// </summary>
-    public class CFRuleDefinitionSet : System.Collections.Generic.List<CFRuleDefinition>
+    public sealed class CFRuleDefinitionSet : System.Collections.Generic.List<CFRuleDefinition>
     {
         /// <summary>
         /// Union of the two sets
@@ -365,7 +365,7 @@
     /// Represents a flat rule obtained from a tree-represented rule
     /// </summary>
     /// <remarks>This class represents a rule by the form [Variable -> Definition]</remarks>
-    public class CFRule
+    public sealed class CFRule
     {
         /// <summary>
         /// Rule head variable (left part)

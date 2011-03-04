@@ -5,17 +5,19 @@ using CommandLine;
 
 namespace Hime.HimeCC
 {
-    enum Method
-    {
-        LR0,
-        LR1,
-        LALR1,
-        RNGLR1,
-        RNGLALR1
-    }
-
     class Options
     {
+        public Options()
+        {
+            Inputs = new string[] { };
+            GrammarName = "none";
+            Namespace = "";
+            Method = Parsers.ParsingMethod.LALR1;
+            LexerFile = null;
+            ParserFile = "none.cs";
+            ExportHTMLLog = true;
+        }
+
         [OptionArray("i", "input", Required=true, HelpText="Input grammar files")]
         public string[] Inputs;
 
@@ -26,7 +28,7 @@ namespace Hime.HimeCC
         public string Namespace;
 
         [Option("m", "method", Required = true, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1")]
-        public Method Method;
+        public Parsers.ParsingMethod Method;
 
         [Option(null, "lexer", Required = false, HelpText = "Path and name of the file for the generated lexer")]
         public string LexerFile;

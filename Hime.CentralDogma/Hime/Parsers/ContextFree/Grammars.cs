@@ -14,7 +14,7 @@
         protected System.Collections.Generic.Dictionary<string, CFVariable> p_Variables;
         protected System.Collections.Generic.Dictionary<string, Virtual> p_Virtuals;
         protected System.Collections.Generic.Dictionary<string, Action> p_Actions;
-        protected System.Collections.Generic.List<CFGrammarTemplateRule> p_TemplateRules;
+        internal System.Collections.Generic.List<CFGrammarTemplateRule> p_TemplateRules;
 
         public override string LocalName { get { return p_Name; } }
         public int NextSID { get { return p_NextSID; } }
@@ -34,7 +34,7 @@
                 return p_Rules;
             }
         }
-        public System.Collections.Generic.IEnumerable<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
+        internal System.Collections.Generic.IEnumerable<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
 
         public CFGrammar(string Name) : base()
         {
@@ -164,7 +164,7 @@
             return p_Actions[Name];
         }
 
-        public CFGrammarTemplateRule AddTemplateRule(Redist.Parsers.SyntaxTreeNode RuleNode, CFGrammarCompiler Compiler)
+        internal CFGrammarTemplateRule AddTemplateRule(Redist.Parsers.SyntaxTreeNode RuleNode, CFGrammarCompiler Compiler)
         {
             CFGrammarTemplateRule Rule = new CFGrammarTemplateRule(this, Compiler, RuleNode);
             p_TemplateRules.Add(Rule);
@@ -313,9 +313,9 @@
     }
 
 
-    public class CFGrammarText : CFGrammar
+    public sealed class CFGrammarText : CFGrammar
     {
-        protected Automata.DFA p_FinalDFA;
+        private Automata.DFA p_FinalDFA;
 
         public CFGrammarText(string Name) : base(Name) { }
 
@@ -367,7 +367,7 @@
             return Result;
         }
 
-        protected bool Prepare_DFA(Hime.Kernel.Reporting.Reporter Log)
+        private bool Prepare_DFA(Hime.Kernel.Reporting.Reporter Log)
         {
             Log.Info("Grammar", "Generating DFA for Terminals ...");
 
@@ -425,7 +425,7 @@
         }
     }
 
-    public class CFGrammarBinary : CFGrammar
+    public sealed class CFGrammarBinary : CFGrammar
     {
         public CFGrammarBinary(string Name) : base(Name) { }
 

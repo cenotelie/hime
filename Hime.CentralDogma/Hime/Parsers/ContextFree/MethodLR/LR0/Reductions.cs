@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the actions for a LR(0) set
     /// </summary>
-    internal class ItemSetReductionsLR0 : ItemSetReductions
+    class ItemSetReductionsLR0 : ItemSetReductions
     {
         /// <summary>
         /// Reduction action (possibly empty)

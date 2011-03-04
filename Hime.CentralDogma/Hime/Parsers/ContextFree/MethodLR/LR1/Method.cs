@@ -3,7 +3,7 @@
     /// <summary>
     /// Implements the LR(1) parsing method
     /// </summary>
-    public class MethodLR1 : CFParserGenerator
+    class MethodLR1 : CFParserGenerator
     {
         public string Name { get { return "LR1"; } }
 

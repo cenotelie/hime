@@ -3,7 +3,7 @@
     /// <summary>
     /// Interface for vertices inner data
     /// </summary>
-    public interface IVertexData
+    interface IVertexData
     {
         /// <summary>
         /// Creates a new vertex using the given line height and character width
@@ -25,7 +25,7 @@
     /// <summary>
     /// Represents a vertex in a graph
     /// </summary>
-    public sealed class Vertex
+    class Vertex
     {
         /// <summary>
         /// Inner data
@@ -104,7 +104,7 @@
     /// <summary>
     /// Represents an edge between two vertices of the graph
     /// </summary>
-    public sealed class Edge
+    class Edge
     {
         /// <summary>
         /// Edge's starting vertex
@@ -176,7 +176,7 @@
     /// <summary>
     /// Represents a graph
     /// </summary>
-    public sealed class Graph
+    class Graph
     {
         /// <summary>
         /// List of the vertices

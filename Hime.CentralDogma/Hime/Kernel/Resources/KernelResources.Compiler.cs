@@ -1,6 +1,6 @@
 ﻿namespace Hime.Kernel.Resources
 {
-    public sealed class ResourceCompilerRegister
+    class ResourceCompilerRegister
     {
         private System.Collections.Generic.Dictionary<string, IResourceCompiler> p_Compilers;
 
@@ -22,7 +22,7 @@
 
 
 
-    public sealed class ResourceCompiler
+    class ResourceCompiler
     {
         private System.Collections.Generic.Dictionary<string, string> p_InputNamedResources;
         private System.Collections.Generic.List<string> p_InputRawResources;

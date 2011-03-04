@@ -1,6 +1,6 @@
 ﻿namespace Hime.Kernel.Resources
 {
-    public sealed class Resource
+    class Resource
     {
         private Symbol p_Symbol;
         private Redist.Parsers.SyntaxTreeNode p_SyntaxNode;
@@ -34,7 +34,7 @@
     }
 
 
-    public sealed class ResourceGraph
+    class ResourceGraph
     {
         private System.Collections.Generic.Dictionary<Symbol, Resource> p_Resources;
 

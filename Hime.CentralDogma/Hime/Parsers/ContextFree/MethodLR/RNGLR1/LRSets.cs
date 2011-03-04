@@ -3,7 +3,7 @@
     /// <summary>
     /// Represent a right nulled reduction action for a set of items
     /// </summary>
-    public class ItemSetActionRNReduce : ItemSetActionReduce
+    class ItemSetActionRNReduce : ItemSetActionReduce
     {
         /// <summary>
         /// Length of the reduction

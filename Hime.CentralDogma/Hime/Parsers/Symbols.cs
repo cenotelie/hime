@@ -94,10 +94,10 @@
         }
     }
 
-    public class TerminalText : Terminal
+    public sealed class TerminalText : Terminal
     {
-        protected Automata.NFA p_NFA;
-        protected Grammar p_SubGrammar;
+        private Automata.NFA p_NFA;
+        private Grammar p_SubGrammar;
 
         public Automata.NFA NFA
         {
@@ -156,10 +156,10 @@
         FLAG_JOKER = 0x02
     }
 
-    public class TerminalBin : Terminal
+    public sealed class TerminalBin : Terminal
     {
-        protected TerminalBinType p_Type;
-        protected string p_Value;
+        private TerminalBinType p_Type;
+        private string p_Value;
 
         public TerminalBinType Type
         {
@@ -224,8 +224,8 @@
             return Node;
         }
     }
-    
-    public class TerminalEpsilon : Terminal
+
+    public sealed class TerminalEpsilon : Terminal
     {
         private static TerminalEpsilon p_Instance;
         private static readonly object p_Lock = new object();
@@ -246,8 +246,8 @@
 
         public override string ToString() { return "ε"; }
     }
-    
-    public class TerminalDollar : Terminal
+
+    public sealed class TerminalDollar : Terminal
     {
         private static TerminalDollar p_Instance;
         private static readonly object p_Lock = new object();
@@ -268,8 +268,8 @@
 
         public override string ToString() { return "$"; }
     }
-    
-    public class TerminalDummy : Terminal
+
+    public sealed class TerminalDummy : Terminal
     {
         private static TerminalDummy p_Instance;
         private static readonly object p_Lock = new object();
@@ -290,8 +290,8 @@
 
         public override string ToString() { return "#"; }
     }
-    
-    public class Virtual : Symbol
+
+    public sealed class Virtual : Symbol
     {
         public Virtual(Grammar Parent, string Name) : base(Parent, 0, Name) { }
 
@@ -305,8 +305,8 @@
 
         public override string ToString() { return "\"" + p_LocalName + "\""; }
     }
-    
-    public class Action : Symbol
+
+    public sealed class Action : Symbol
     {
         public Action(Grammar Parent, string Name) : base(Parent, 0, Name) { }
 
@@ -338,7 +338,7 @@
 
 
 
-    public class TerminalSet : System.Collections.Generic.List<Terminal>
+    public sealed class TerminalSet : System.Collections.Generic.List<Terminal>
     {
         public TerminalSet() : base() { }
         public TerminalSet(TerminalSet Copied) : base(Copied) { }
