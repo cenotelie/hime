@@ -16,13 +16,14 @@ namespace Hime.HimeV.Model
         private Hime.Parsers.ParsingMethod p_Method;
         private System.Reflection.Assembly p_CurrentAssembly;
 
-        public Project(string file, string name, Hime.Parsers.ParsingMethod method)
+        public Project(string name, Hime.Parsers.ParsingMethod method)
         {
             p_Files = new List<string>();
-            p_Files.Add(file);
             p_SelectedGram = Hime.Kernel.QualifiedName.ParseName(name);
             p_Method = method;
         }
+
+        public void AddFile(string file) { p_Files.Add(file); }
 
         public bool RegenerateParser()
         {

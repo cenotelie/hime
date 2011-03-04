@@ -80,8 +80,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Forms\WinAST.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\WinAST.xaml.cs">
+      <DependentUpon>WinAST.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -144,6 +151,7 @@
     <Content Include="Libraries\QuickGraph\QuickGraph.dll" />
     <Content Include="Libraries\QuickGraph\QuickGraph.Graphviz.dll" />
     <Content Include="Libraries\QuickGraph\QuickGraph.Graphviz.pdb" />
+    <Resource Include="Resources\compfile.png" />
     <Resource Include="Libraries\QuickGraph\QuickGraph.Graphviz.XML" />
     <Resource Include="Libraries\QuickGraph\QuickGraph.xml" />
   </ItemGroup>

@@ -3,47 +3,43 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="HimeV" Height="350" Width="525">
     <DockPanel LastChildFill="True">
-        <Expander Header="Options" DockPanel.Dock="Top" IsExpanded="False">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0">Method</Label>
-                <ComboBox Name="ComboMethod"  Grid.Row="0" Grid.Column="1" SelectedIndex="2">
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <TextBox Name="TextGrammarName" Width="100" Margin="2"></TextBox>
+                <ComboBox Name="ComboMethod" SelectedIndex="2" Margin="2">
                     <ComboBoxItem>LR(0)</ComboBoxItem>
                     <ComboBoxItem>LR(1)</ComboBoxItem>
                     <ComboBoxItem>LALR(1)</ComboBoxItem>
                     <ComboBoxItem>RNGLR(1)</ComboBoxItem>
                     <ComboBoxItem>RNGLALR(1)</ComboBoxItem>
                 </ComboBox>
-                <Label Grid.Row="1" Grid.Column="0">Grammar</Label>
-                <TextBox Name="GrammarName" Grid.Row="1" Grid.Column="1"></TextBox>
-            </Grid>
-        </Expander>
-        <Expander Header="Console" DockPanel.Dock="Bottom" IsExpanded="False" ExpandDirection="Up">
-            <ScrollViewer>
-                <TextBlock Name="Console">
-                </TextBlock>
-            </ScrollViewer>
-        </Expander>
-        <Expander Header="Parser Tests" DockPanel.Dock="Bottom" IsExpanded="False" ExpandDirection="Up">
-            <Grid Name="GridTests">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Name="ButtonGo" Grid.Row="0" Grid.Column="0" Click="ButtonGo_Click">GO</Button>
-                <TextBox Name="TestData" Grid.Row="0" Grid.Column="1">2 + 6</TextBox>
-            </Grid>
-        </Expander>
-        <TextBox Name="Grammar" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" VerticalAlignment="Stretch" Drop="Grammar_Drop" AllowDrop="True" PreviewDragEnter="Grammar_PreviewDragEnter" PreviewDragOver="Grammar_PreviewDragEnter" FontFamily="Anonymous Pro" FontSize="12"></TextBox>
+                <Button Name="Compile" Margin="2" Click="Compile_Click">
+                    <Image Source="/himev;component/Resources/compfile.png" Height="20"></Image>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <DockPanel LastChildFill="True" Drop="DockPanel_Drop">
+            <Expander Header="Console" DockPanel.Dock="Bottom" IsExpanded="False" ExpandDirection="Up">
+                <ScrollViewer>
+                    <TextBlock Name="Console">
+                    </TextBlock>
+                </ScrollViewer>
+            </Expander>
+            <Expander Header="Parser Tests" DockPanel.Dock="Bottom" IsExpanded="False" ExpandDirection="Up">
+                <Grid Name="GridTests">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="ButtonGo" Grid.Row="0" Grid.Column="0" Click="ButtonGo_Click">GO</Button>
+                    <TextBox Name="TestData" Grid.Row="0" Grid.Column="1">2 + 6</TextBox>
+                </Grid>
+            </Expander>
+            <TabControl Name="Grammars" AllowDrop="True"></TabControl>
+        </DockPanel>
     </DockPanel>
+    
 </Window>
