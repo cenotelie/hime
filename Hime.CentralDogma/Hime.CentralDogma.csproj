@@ -72,6 +72,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />

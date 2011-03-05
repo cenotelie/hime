@@ -11,7 +11,6 @@ namespace Hime.HimeV.Model
         private const string p_TempFile = "Parser.cs";
 
         private List<string> p_Files;
-        private Hime.Kernel.Namespace p_Root;
         private Hime.Kernel.QualifiedName p_SelectedGram;
         private Hime.Parsers.ParsingMethod p_Method;
         private System.Reflection.Assembly p_CurrentAssembly;

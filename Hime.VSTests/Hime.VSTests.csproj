@@ -45,6 +45,9 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Integration\Suite00_Ambiguous.cs" />
     <Compile Include="Integration\Tools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -86,10 +86,10 @@
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
-            p_Stream.WriteLine("        interface Actions");
+            p_Stream.WriteLine("        public interface Actions");
             p_Stream.WriteLine("        {");
             foreach (string name in Names)
-                p_Stream.WriteLine("        void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+                p_Stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
             p_Stream.WriteLine("        }");
         }
         protected void Export_Production(CFRule Rule)
@@ -135,7 +135,7 @@
                 p_Stream.WriteLine("new Rule(" + production + ", " + head + ")");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            p_Stream.WriteLine("        };");
         }
         protected void Export_State(ItemSet State)
         {
@@ -218,7 +218,7 @@
                 Export_State(State);
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            p_Stream.WriteLine("        };");
         }
         
         protected void Export_NullVars()

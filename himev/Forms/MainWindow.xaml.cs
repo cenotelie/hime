@@ -24,8 +24,6 @@ namespace Hime.HimeV
         public MainWindow()
         {
             InitializeComponent();
-
-            //System.Diagnostics.Process.GetCurrentProcess().StandardOutput.BaseStream;
         }
 
         private void ButtonGo_Click(object sender, RoutedEventArgs e)

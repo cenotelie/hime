@@ -40,6 +40,9 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="AST.cs" />
     <Compile Include="BaseBinary.cs" />
     <Compile Include="GSS.cs" />

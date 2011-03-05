@@ -75,7 +75,7 @@
             p_Stream.WriteLine("        public interface Actions");
             p_Stream.WriteLine("        {");
             foreach (string name in Names)
-                p_Stream.WriteLine("        void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+                p_Stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
             p_Stream.WriteLine("        }");
         }
         protected void Export_Production(CFRule Rule)
