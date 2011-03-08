@@ -48,6 +48,7 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="himecc\Suite00_DefaultOptions.cs" />
     <Compile Include="Integration\Suite00_Ambiguous.cs" />
     <Compile Include="Integration\Tools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +68,10 @@
     <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\himecc\himecc.csproj">
+      <Project>{7A05384E-959E-4D54-B23A-D357AC0153B5}</Project>
+      <Name>himecc</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
