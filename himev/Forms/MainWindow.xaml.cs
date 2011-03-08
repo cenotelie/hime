@@ -17,7 +17,7 @@ namespace Hime.HimeV
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Microsoft.Windows.Controls.Ribbon.RibbonWindow
     {
         private Model.Project p_Project;
 
@@ -61,17 +61,40 @@ namespace Hime.HimeV
             box.Drop += new DragEventHandler(DockPanel_Drop);
             box.TextChanged += new TextChangedEventHandler(TextGrammar_TextChanged);
 
+            DockPanel header = new DockPanel();
+            header.LastChildFill = true;
+            Button button = new Button();
+            button.Content = "x";
+            button.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+            button.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            button.Click += new RoutedEventHandler(TabClose_Click);
+            
+            Label label = new Label();
+            label.Content = System.IO.Path.GetFileName(file);
+            header.Children.Add(button);
+            header.Children.Add(label);
+            DockPanel.SetDock(button, Dock.Right);
+
             TabItem item = new TabItem();
-            item.Header = System.IO.Path.GetFileName(file);
+            item.Header = header;
             item.Tag = file;
             item.Content = box;
+            button.Tag = item;
+            
             Grammars.Items.Add(item);
             Grammars.SelectedItem = item;
         }
 
+        private void TabClose_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = (Button)sender;
+            TabItem item = (TabItem)button.Tag;
+            Grammars.Items.Remove(item);
+        }
+
         private void Compile_Click(object sender, RoutedEventArgs e)
         {
-            string selection = ((ComboBoxItem)ComboMethod.SelectedValue).Content.ToString();
+            /*string selection = ((ComboBoxItem)ComboMethod.SelectedValue).Content.ToString();
             selection = selection.Replace("(", "").Replace(")", "");
             Hime.Parsers.ParsingMethod method = (Hime.Parsers.ParsingMethod)System.Enum.Parse(typeof(Hime.Parsers.ParsingMethod), selection);
             p_Project = new Model.Project(TextGrammarName.Text, method);
@@ -86,13 +109,13 @@ namespace Hime.HimeV
             if (result)
                 TextGrammarName.Background = new SolidColorBrush(Color.FromArgb(50, 0, 255, 0));
             else
-                TextGrammarName.Background = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));
+                TextGrammarName.Background = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));*/
         }
 
         private void TextGrammar_TextChanged(object sender, TextChangedEventArgs e)
         {
             p_Project = null;
-            TextGrammarName.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+            //TextGrammarName.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
         }
     }
 }

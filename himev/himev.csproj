@@ -41,24 +41,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Windows.Shell, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="RibbonControlsLibrary, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -68,6 +73,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Forms\GrammarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Forms\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -78,6 +87,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Forms\GrammarControl.xaml.cs">
+      <DependentUpon>GrammarControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Forms\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -118,6 +130,11 @@
     <None Include="Resources\MathExp.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\svg\compile.svg" />
+    <None Include="Resources\svg\new.svg" />
+    <None Include="Resources\svg\quit.svg" />
+    <None Include="Resources\svg\save.svg" />
+    <None Include="Resources\svg\saveas.svg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Hime.Logo.ico" />
@@ -150,13 +167,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\QuickGraph\Microsoft.Contracts.dll" />
-    <Content Include="Libraries\QuickGraph\QuickGraph.dll" />
-    <Content Include="Libraries\QuickGraph\QuickGraph.Graphviz.dll" />
-    <Content Include="Libraries\QuickGraph\QuickGraph.Graphviz.pdb" />
-    <Resource Include="Resources\compfile.png" />
-    <Resource Include="Libraries\QuickGraph\QuickGraph.Graphviz.XML" />
-    <Resource Include="Libraries\QuickGraph\QuickGraph.xml" />
+    <Resource Include="Resources\compile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\quit.png" />
+    <Resource Include="Resources\new.png" />
+    <Resource Include="Resources\save.png" />
+    <Resource Include="Resources\saveas.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libraries\GraphSharp.Contracts.dll" />
+    <Content Include="Libraries\GraphSharp.Contracts.pdb" />
+    <Content Include="Libraries\GraphSharp.Controls.dll" />
+    <Content Include="Libraries\GraphSharp.dll" />
+    <Content Include="Libraries\GraphSharp.pdb" />
+    <Content Include="Libraries\Microsoft.Contracts.dll" />
+    <Content Include="Libraries\QuickGraph.dll" />
+    <Content Include="Libraries\WPFExtensions.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
