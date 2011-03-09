@@ -58,13 +58,14 @@
 
         private void Export_Constructor()
         {
-            p_Stream.WriteLine("        public " + p_Name + "_Lexer(string input) : base(input) {}");
-            p_Stream.WriteLine("        public " + p_Name + "_Lexer(string input, int position, int line, System.Collections.Generic.List<Hime.Redist.Parsers.LexerTextError> errors) : base(input, position, line, errors) {}");
+            p_Stream.WriteLine("        public " + p_Name + "_Lexer(string input) : base(new System.IO.StringReader(input)) {}");
+            p_Stream.WriteLine("        public " + p_Name + "_Lexer(System.IO.TextReader input) : base(input) {}");
+            p_Stream.WriteLine("        public " + p_Name + "_Lexer(" + p_Name + "_Lexer original) : base(original) {}");
         }
         private void Export_Clone()
         {
             p_Stream.WriteLine("        public override Hime.Redist.Parsers.ILexer Clone() {");
-            p_Stream.WriteLine("            return new " + p_Name + "_Lexer(p_Input, p_CurrentPosition, p_Line, p_Errors);");
+            p_Stream.WriteLine("            return new " + p_Name + "_Lexer(this);");
             p_Stream.WriteLine("        }");
         }
         private void Export_Setup()

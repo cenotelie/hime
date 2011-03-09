@@ -45,6 +45,7 @@
     </Compile>
     <Compile Include="AST.cs" />
     <Compile Include="BaseBinary.cs" />
+    <Compile Include="BufferedTextReader.cs" />
     <Compile Include="GSS.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />

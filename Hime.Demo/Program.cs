@@ -22,7 +22,7 @@
 
         static void Main(string[] args)
         {
-            //Hime.Parsers.CompilationTask Task = new Hime.Parsers.CompilationTask(new string[] { "Languages\\MathExp.gram" }, "MathExp", Hime.Parsers.ParsingMethod.RNGLR1, "Analyser", "MathExp.cs", true, true);
+            //Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\MathExp.gram" }, "MathExp", Hime.Parsers.ParsingMethod.RNGLR1, "Analyser", null, "MathExp.cs", true, true);
             //Task.Execute();
             Parse();
         }

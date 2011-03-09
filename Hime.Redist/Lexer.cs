@@ -125,52 +125,37 @@
 
         // Lexer state data
         protected System.Collections.Generic.List<LexerTextError> p_Errors;
-        protected string p_Input;
-        protected int p_Length;
-        protected int p_CurrentPosition;
-        protected int p_Line;
+        protected BufferedTextReader p_Input;
+        protected int p_CurrentLine;
+        protected int p_CurrentColumn;
+        protected bool p_IsDollatEmited;
 
         public System.Collections.Generic.IEnumerable<LexerTextError> Errors { get { return p_Errors; } }
-        public string InputText { get { return p_Input; } }
-        public int InputLength { get { return p_Length; } }
-        public int CurrentPosition { get { return p_CurrentPosition; } }
-        public int CurrentLine { get { return p_Line; } }
-        public int CurrentColumn
-        {
-            get
-            {
-                int Col = p_CurrentPosition;
-                for (int i = p_CurrentPosition; i != 0; i--)
-                {
-                    if (p_Input[i] == '\n')
-                    {
-                        Col = p_CurrentPosition - i;
-                        break;
-                    }
-                }
-                return Col;
-            }
-        }
+        public string InputText { get { return p_Input.GetReadText(); } }
+        public int CurrentLine { get { return p_CurrentLine; } }
+        public int CurrentColumn { get { return p_CurrentColumn; } }
+        public bool IsAtEnd { get { return p_Input.AtEnd(); } }
 
         protected abstract void setup();
         public abstract ILexer Clone();
 
-        protected LexerText(string input)
+        protected LexerText(System.IO.TextReader input)
         {
             setup();
             p_Errors = new System.Collections.Generic.List<LexerTextError>();
-            p_Input = input;
-            p_Length = input.Length;
-            p_Line = 1;
+            p_Input = new BufferedTextReader(input);
+            p_CurrentLine = 1;
+            p_CurrentColumn = 1;
+            p_IsDollatEmited = false;
         }
-        protected LexerText(string input, int position, int line, System.Collections.Generic.List<LexerTextError> errors)
+        protected LexerText(LexerText original)
         {
             setup();
-            p_Errors = new System.Collections.Generic.List<LexerTextError>(errors);
-            p_CurrentPosition = position;
-            p_Input = input;
-            p_Length = input.Length;
-            p_Line = line;
+            p_Errors = new System.Collections.Generic.List<LexerTextError>(original.p_Errors);
+            p_Input = original.p_Input.Clone();
+            p_CurrentLine = original.p_CurrentLine;
+            p_CurrentColumn = original.p_CurrentColumn;
+            p_IsDollatEmited = original.p_IsDollatEmited;
         }
 
         public string GetSymbolName(ushort SID)
@@ -186,74 +171,92 @@
         public SymbolToken GetNextToken(ushort[] IDs) { throw new LexerException("Text lexer does not support this method."); }
         public SymbolToken GetNextToken()
         {
-            if (p_CurrentPosition == p_Length)
+            if (p_Input.AtEnd())
             {
-                p_CurrentPosition++;
+                if (p_IsDollatEmited)
+                    return new SymbolTokenEpsilon();
+                p_IsDollatEmited = true;
                 return new SymbolTokenDollar();
             }
-            if (p_CurrentPosition > p_Length)
-                return new SymbolTokenEpsilon();
 
             while (true)
             {
-                if (p_CurrentPosition == p_Length)
+                if (p_Input.AtEnd())
                 {
-                    p_CurrentPosition++;
+                    p_IsDollatEmited = true;
                     return new SymbolTokenDollar();
                 }
                 SymbolTokenText Token = GetNextToken_DFA();
                 if (Token == null)
                 {
-                    p_Errors.Add(new LexerTextErrorDiscardedChar(p_Input[p_CurrentPosition], p_Line, CurrentColumn));
-                    p_CurrentPosition++;
-                }
-                else if (Token.SymbolID == p_SeparatorID)
-                {
-                    p_CurrentPosition += Token.ValueText.Length;
-                    foreach (char c in Token.ValueText) { if (c == '\n') p_Line++; }
+                    bool atend = false;
+                    char c = p_Input.Read(out atend);
+                    p_Errors.Add(new LexerTextErrorDiscardedChar(c, p_CurrentLine, p_CurrentColumn));
+                    AdvanceStats(c.ToString());
                 }
                 else
                 {
-                    if (p_SymbolsSubGrammars.ContainsKey(Token.SymbolID))
+                    AdvanceStats(Token.ValueText);
+                    if (Token.SymbolID != p_SeparatorID)
                     {
-                        Token.SubGrammarRoot = p_SymbolsSubGrammars[Token.SymbolID](Token.ValueText);
+                        if (p_SymbolsSubGrammars.ContainsKey(Token.SymbolID))
+                            Token.SubGrammarRoot = p_SymbolsSubGrammars[Token.SymbolID](Token.ValueText);
+                        return Token;
                     }
-                    p_CurrentPosition += Token.ValueText.Length;
-                    foreach (char c in Token.ValueText) { if (c == '\n') p_Line++; }
-                    return Token;
                 }
+            }
+        }
+
+        private void AdvanceStats(string text)
+        {
+            foreach (char c in text)
+            {
+                if (c == '\n')
+                {
+                    p_CurrentLine++;
+                    p_CurrentColumn = 1;
+                }
+                else
+                    p_CurrentColumn++;
             }
         }
 
         private SymbolTokenText GetNextToken_DFA()
         {
             System.Collections.Generic.List<SymbolTokenText> MatchedTokens = new System.Collections.Generic.List<SymbolTokenText>();
-            int End = p_CurrentPosition;
+            System.Text.StringBuilder Builder = new System.Text.StringBuilder();
+            int count = 0;
             ushort State = 0;
 
             while (true)
             {
                 if (p_Finals[State] != -1)
                 {
-                    string Value = p_Input.Substring(p_CurrentPosition, End - p_CurrentPosition);
-                    MatchedTokens.Add(new SymbolTokenText(p_SymbolsName[p_Finals[State]], p_SymbolsSID[p_Finals[State]], Value, p_Line));
+                    string Value = Builder.ToString();
+                    MatchedTokens.Add(new SymbolTokenText(p_SymbolsName[p_Finals[State]], p_SymbolsSID[p_Finals[State]], Value, p_CurrentLine));
                 }
-                if (End == p_Length)
+                bool atend = false;
+                char c = p_Input.Peek(out atend);
+                if (atend)
                     break;
-                ushort Char = System.Convert.ToUInt16(p_Input[End]);
+                ushort UCV = System.Convert.ToUInt16(c);
                 ushort NextState = 0xFFFF;
-                End++;
                 for (int i = 0; i != p_Transitions[State].Length; i++)
                 {
-                    if (Char >= p_Transitions[State][i][0] && Char <= p_Transitions[State][i][1])
+                    if (UCV >= p_Transitions[State][i][0] && UCV <= p_Transitions[State][i][1])
                         NextState = p_Transitions[State][i][2];
                 }
                 if (NextState == 0xFFFF)
                     break;
                 State = NextState;
+                Builder.Append(p_Input.Read(out atend));
+                count++;
             }
             if (MatchedTokens.Count == 0)
+            {
+                p_Input.Rewind(count);
                 return null;
+            }
             return MatchedTokens[MatchedTokens.Count - 1];
         }
     }

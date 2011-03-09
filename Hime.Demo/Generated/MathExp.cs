@@ -33,10 +33,11 @@ namespace Analyser
             p_SeparatorID = 0x7;
         }
         public override Hime.Redist.Parsers.ILexer Clone() {
-            return new MathExp_Lexer(p_Input, p_CurrentPosition, p_Line, p_Errors);
+            return new MathExp_Lexer(this);
         }
-        public MathExp_Lexer(string input) : base(input) {}
-        public MathExp_Lexer(string input, int position, int line, System.Collections.Generic.List<Hime.Redist.Parsers.LexerTextError> errors) : base(input, position, line, errors) {}
+        public MathExp_Lexer(string input) : base(new System.IO.StringReader(input)) {}
+        public MathExp_Lexer(System.IO.TextReader input) : base(input) {}
+        public MathExp_Lexer(MathExp_Lexer original) : base(original) {}
     }
     class MathExp_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser
     {

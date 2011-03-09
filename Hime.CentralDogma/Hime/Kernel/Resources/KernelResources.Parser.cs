@@ -234,10 +234,10 @@ namespace Hime.Kernel.Resources.Parser
             p_SeparatorID = 0x7;
         }
         public override Hime.Redist.Parsers.ILexer Clone() {
-            return new FileCentralDogma_Lexer(p_Input, p_CurrentPosition, p_Line, p_Errors);
+            return new FileCentralDogma_Lexer(this);
         }
-        public FileCentralDogma_Lexer(string input) : base(input) {}
-        public FileCentralDogma_Lexer(string input, int position, int line, System.Collections.Generic.List<Hime.Redist.Parsers.LexerTextError> errors) : base(input, position, line, errors) {}
+        public FileCentralDogma_Lexer(string input) : base(new System.IO.StringReader(input)) {}
+        public FileCentralDogma_Lexer(FileCentralDogma_Lexer original) : base(original) { }
     }
     class FileCentralDogma_Parser : Hime.Redist.Parsers.LR1TextParser
     {

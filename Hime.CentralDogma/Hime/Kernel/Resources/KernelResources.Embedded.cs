@@ -30,12 +30,6 @@
             p_IsClosed = false;
         }
 
-        ~ResourceAccessor()
-        {
-            while (p_Accessors.Count != 0)
-                p_Accessors[0].Close();
-        }
-
         public void Close()
         {
             foreach (string file in p_Files)
