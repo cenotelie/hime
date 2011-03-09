@@ -62,8 +62,15 @@
         }
         protected void Export_Constructor()
         {
-            p_Stream.WriteLine("        private Actions p_Actions;");
-            p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(Actions actions, " + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) { p_Actions = actions; }");
+            if (p_Grammar.Actions.GetEnumerator().MoveNext())
+            {
+                p_Stream.WriteLine("        private Actions p_Actions;");
+                p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { p_Actions = actions; }");
+            }
+            else
+            {
+                p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
+            }
         }
         protected void Export_Actions()
         {
@@ -72,11 +79,14 @@
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
-            p_Stream.WriteLine("        public interface Actions");
-            p_Stream.WriteLine("        {");
-            foreach (string name in Names)
-                p_Stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
-            p_Stream.WriteLine("        }");
+            if (Names.Count != 0)
+            {
+                p_Stream.WriteLine("        public interface Actions");
+                p_Stream.WriteLine("        {");
+                foreach (string name in Names)
+                    p_Stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+                p_Stream.WriteLine("        }");
+            }
         }
         protected void Export_Production(CFRule Rule)
         {

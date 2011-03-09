@@ -361,6 +361,6 @@ namespace Analyser
             BuildNullables();
         }
         private Actions p_Actions;
-        public MathExp_Parser(Actions actions, MathExp_Lexer lexer) : base (lexer) { p_Actions = actions; }
+        public MathExp_Parser(MathExp_Lexer lexer, Actions actions) : base (lexer) { p_Actions = actions; }
     }
 }

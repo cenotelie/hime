@@ -6,7 +6,7 @@
         {
             Interpreter interpreter = new Interpreter();
             Analyser.MathExp_Lexer Lex = new Analyser.MathExp_Lexer("5 + 6");
-            Analyser.MathExp_Parser Parser = new Analyser.MathExp_Parser(interpreter, Lex);
+            Analyser.MathExp_Parser Parser = new Analyser.MathExp_Parser(Lex, interpreter);
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
             System.Console.Write(interpreter.Value);
             
