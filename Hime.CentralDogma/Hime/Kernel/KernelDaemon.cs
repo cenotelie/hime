@@ -22,10 +22,10 @@
             Reporter.EndSection();
 
             // Checkout resources
-            Resources.AccessorSession Session = Resources.ResourceAccessor.CreateCheckoutSession();
-            Resources.ResourceAccessor.CheckOut(Session, "Daemon.Kernel.gram", Path + "Kernel.gram");
-            Resources.ResourceAccessor.CheckOut(Session, "Daemon.Generators.ContextFreeGrammars.gram", Path + "Generators.ContextFreeGrammars.gram");
-            Resources.ResourceAccessor.CheckOut(Session, "Daemon.Generators.ContextSensitiveGrammars.gram", Path + "Generators.ContextSensitiveGrammars.gram");
+            Resources.ResourceAccessor Session = new Resources.ResourceAccessor();
+            Session.CheckOut("Daemon.Kernel.gram", Path + "Kernel.gram");
+            Session.CheckOut("Daemon.Generators.ContextFreeGrammars.gram", Path + "Generators.ContextFreeGrammars.gram");
+            Session.CheckOut("Daemon.Generators.ContextSensitiveGrammars.gram", Path + "Generators.ContextSensitiveGrammars.gram");
 
             // Compile
             Resources.ResourceCompiler Compiler = new Hime.Kernel.Resources.ResourceCompiler();
@@ -40,7 +40,7 @@
 
             // Generate parser for FileCentralDogma
             Hime.Parsers.Grammar FileCentralDogma = (Hime.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
-            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs");
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs", null);
             FileCentralDogma.Build(Options);
             Options.Close();
 

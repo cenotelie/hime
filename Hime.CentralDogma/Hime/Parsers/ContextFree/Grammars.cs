@@ -174,6 +174,14 @@
         public abstract void Inherit(CFGrammar Parent);
         public abstract CFGrammar Clone();
 
+        protected void Export_Documentation(ParserData Data, string Directory)
+        {
+            if (!Directory.Equals("") && !System.IO.Directory.Exists(Directory))
+                System.IO.Directory.CreateDirectory(Directory);
+            Export_Resources(Directory);
+            Export_GrammarData(Directory);
+            Export_ParserData(Directory, Data);
+        }
         protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
         {
             System.Xml.XmlNode root = Document.CreateElement("CFGrammar");
@@ -186,21 +194,23 @@
         protected void Export_Resources(string directory)
         {
             System.IO.Directory.CreateDirectory(directory + "\\hime_data");
-            Kernel.Resources.ResourceAccessor.Export("Transforms.Hime.css", directory + "\\hime_data\\Hime.css");
-            Kernel.Resources.ResourceAccessor.Export("Transforms.Hime.js", directory + "\\hime_data\\Hime.js");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.button_plus.gif", directory + "\\hime_data\\button_plus.gif");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.button_minus.gif", directory + "\\hime_data\\button_minus.gif");
+            Kernel.Resources.ResourceAccessor Accessor = new Kernel.Resources.ResourceAccessor();
+            Accessor.Export("Transforms.Hime.css", directory + "\\hime_data\\Hime.css");
+            Accessor.Export("Transforms.Hime.js", directory + "\\hime_data\\Hime.js");
+            Accessor.Export("Visuals.button_plus.gif", directory + "\\hime_data\\button_plus.gif");
+            Accessor.Export("Visuals.button_minus.gif", directory + "\\hime_data\\button_minus.gif");
 
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Shift.png", directory + "\\hime_data\\Hime.Shift.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Reduce.png", directory + "\\hime_data\\Hime.Reduce.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.None.png", directory + "\\hime_data\\Hime.None.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.ShiftReduce.png", directory + "\\hime_data\\Hime.ShiftReduce.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.ReduceReduce.png", directory + "\\hime_data\\Hime.ReduceReduce.png");
+            Accessor.Export("Visuals.Hime.Shift.png", directory + "\\hime_data\\Hime.Shift.png");
+            Accessor.Export("Visuals.Hime.Reduce.png", directory + "\\hime_data\\Hime.Reduce.png");
+            Accessor.Export("Visuals.Hime.None.png", directory + "\\hime_data\\Hime.None.png");
+            Accessor.Export("Visuals.Hime.ShiftReduce.png", directory + "\\hime_data\\Hime.ShiftReduce.png");
+            Accessor.Export("Visuals.Hime.ReduceReduce.png", directory + "\\hime_data\\Hime.ReduceReduce.png");
 
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Error.png", directory + "\\hime_data\\Hime.Error.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Warning.png", directory + "\\hime_data\\Hime.Warning.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Info.png", directory + "\\hime_data\\Hime.Info.png");
-            Kernel.Resources.ResourceAccessor.Export("Visuals.Hime.Logo.png", directory + "\\hime_data\\Hime.Logo.png");
+            Accessor.Export("Visuals.Hime.Error.png", directory + "\\hime_data\\Hime.Error.png");
+            Accessor.Export("Visuals.Hime.Warning.png", directory + "\\hime_data\\Hime.Warning.png");
+            Accessor.Export("Visuals.Hime.Info.png", directory + "\\hime_data\\Hime.Info.png");
+            Accessor.Export("Visuals.Hime.Logo.png", directory + "\\hime_data\\Hime.Logo.png");
+            Accessor.Close();
         }
         protected void Export_GrammarData(string directory)
         {
@@ -211,21 +221,21 @@
             System.IO.FileInfo File = new System.IO.FileInfo(fileName);
             Doc.Save(fileName + ".xml");
 
-            Kernel.Resources.AccessorSession Session = Kernel.Resources.ResourceAccessor.CreateCheckoutSession();
-            Session.AddCheckoutFile(fileName + ".xml");
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Doc.CFGrammar.xslt", File.DirectoryName + "CFGrammar.xslt");
+            Kernel.Resources.ResourceAccessor Accessor = new Kernel.Resources.ResourceAccessor();
+            Accessor.AddCheckoutFile(fileName + ".xml");
+            Accessor.CheckOut("Transforms.Doc.CFGrammar.xslt", File.DirectoryName + "CFGrammar.xslt");
 
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(File.DirectoryName + "CFGrammar.xslt");
             Transform.Transform(fileName + ".xml", fileName + ".html");
 
-            Session.Close();
+            Accessor.Close();
         }
         protected void Export_ParserData(string directory, ParserData data)
         {
             System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-            Kernel.Resources.AccessorSession Session = Kernel.Resources.ResourceAccessor.CreateCheckoutSession();
-            Kernel.Resources.ResourceAccessor.CheckOut(Session, "Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
+            Kernel.Resources.ResourceAccessor Accessor = new Kernel.Resources.ResourceAccessor();
+            Accessor.CheckOut("Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(directory + "\\LRParserData.xslt");
             System.Collections.Generic.List<System.Xml.XmlNode> nodes = new System.Collections.Generic.List<System.Xml.XmlNode>();
@@ -239,10 +249,10 @@
                 Doc.AppendChild(child);
                 System.IO.FileInfo File = new System.IO.FileInfo(fileName);
                 Doc.Save(fileName + ".xml");
-                Session.AddCheckoutFile(fileName + ".xml");
+                Accessor.AddCheckoutFile(fileName + ".xml");
                 Transform.Transform(fileName + ".xml", fileName + ".html");
             }
-            Session.Close();
+            Accessor.Close();
         }
 
         protected bool Prepare_AddRealAxiom(Hime.Kernel.Reporting.Reporter Log)
@@ -414,13 +424,8 @@
             Options.Reporter.EndSection();
 
             //Output data
-            if (Options.DocumentationDirectory != null)
-            {
-                System.IO.Directory.CreateDirectory(Options.DocumentationDirectory);
-                Export_Resources(Options.DocumentationDirectory);
-                Export_GrammarData(Options.DocumentationDirectory);
-                Export_ParserData(Options.DocumentationDirectory, Data);
-            }
+            if (Options.DocumentationDir != null)
+                Export_Documentation(Data, Options.DocumentationDir);
             return result;
         }
     }
@@ -492,13 +497,8 @@
             Options.Reporter.EndSection();
             
             //Output data
-            if (Options.DocumentationDirectory != null)
-            {
-                System.IO.Directory.CreateDirectory(Options.DocumentationDirectory);
-                Export_Resources(Options.DocumentationDirectory);
-                Export_GrammarData(Options.DocumentationDirectory);
-                Export_ParserData(Options.DocumentationDirectory, Data);
-            }
+            if (Options.DocumentationDir != null)
+                Export_Documentation(Data, Options.DocumentationDir);
             return result;
         }
     }

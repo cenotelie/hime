@@ -115,6 +115,7 @@
     public class Reporter
     {
         protected Report p_Report;
+        protected Section p_TopSection;
         protected Section p_CurrentSection;
         protected log4net.ILog p_Log;
 
@@ -144,32 +145,47 @@
 
         public void Info(string component, string message)
         {
-            p_CurrentSection.AddEntry(new BaseEntry(Level.Info, component, message));
+            AddEntry(new BaseEntry(Level.Info, component, message));
             p_Log.Info(component + ": " + message);
         }
         public void Warn(string component, string message)
         {
-            p_CurrentSection.AddEntry(new BaseEntry(Level.Warning, component, message));
+            AddEntry(new BaseEntry(Level.Warning, component, message));
             p_Log.Warn(component + ": " + message);
         }
         public void Error(string component, string message)
         {
-            p_CurrentSection.AddEntry(new BaseEntry(Level.Error, component, message));
+            AddEntry(new BaseEntry(Level.Error, component, message));
             p_Log.Error(component + ": " + message);
         }
         public void Fatal(string component, string message)
         {
-            p_CurrentSection.AddEntry(new BaseEntry(Level.Error, component, message));
-            p_Log.Error(component + ": " + message);
+            AddEntry(new BaseEntry(Level.Error, component, message));
+            p_Log.Fatal(component + ": " + message);
         }
         public void Report(Entry entry)
         {
-            p_CurrentSection.AddEntry(entry);
+            AddEntry(entry);
             switch (entry.Level)
             {
                 case Level.Info: p_Log.Info(entry.Component + ": " + entry.Message); break;
                 case Level.Warning: p_Log.Warn(entry.Component + ": " + entry.Message); break;
                 case Level.Error: p_Log.Error(entry.Component + ": " + entry.Message); break;
+            }
+        }
+
+        protected void AddEntry(Entry entry)
+        {
+            if (p_CurrentSection != null)
+                p_CurrentSection.AddEntry(entry);
+            else
+            {
+                if (p_TopSection == null)
+                {
+                    p_TopSection = new Section("global");
+                    p_Report.Sections.Insert(0, p_TopSection);
+                }
+                p_TopSection.AddEntry(entry);
             }
         }
 
@@ -181,17 +197,17 @@
             Doc.Save(fileName + ".xml");
             System.IO.Directory.CreateDirectory(File.DirectoryName + "\\hime_data");
 
-            Resources.AccessorSession Session = Resources.ResourceAccessor.CreateCheckoutSession();
+            Resources.ResourceAccessor Session = new Resources.ResourceAccessor();
             Session.AddCheckoutFile(fileName + ".xml");
-            Resources.ResourceAccessor.CheckOut(Session, "Transforms.Logs.LogXML.xslt", File.DirectoryName + "LogXML.xslt");
-            Resources.ResourceAccessor.Export("Transforms.Hime.css", File.DirectoryName + "\\hime_data\\Hime.css");
-            Resources.ResourceAccessor.Export("Transforms.Hime.js", File.DirectoryName + "\\hime_data\\Hime.js");
-            Resources.ResourceAccessor.Export("Visuals.button_plus.gif", File.DirectoryName + "\\hime_data\\button_plus.gif");
-            Resources.ResourceAccessor.Export("Visuals.button_minus.gif", File.DirectoryName + "\\hime_data\\button_minus.gif");
-            Resources.ResourceAccessor.Export("Visuals.Hime.Error.png", File.DirectoryName + "\\hime_data\\Hime.Error.png");
-            Resources.ResourceAccessor.Export("Visuals.Hime.Warning.png", File.DirectoryName + "\\hime_data\\Hime.Warning.png");
-            Resources.ResourceAccessor.Export("Visuals.Hime.Info.png", File.DirectoryName + "\\hime_data\\Hime.Info.png");
-            Resources.ResourceAccessor.Export("Visuals.Hime.Logo.png", File.DirectoryName + "\\hime_data\\Hime.Logo.png");
+            Session.CheckOut("Transforms.Logs.LogXML.xslt", File.DirectoryName + "LogXML.xslt");
+            Session.Export("Transforms.Hime.css", File.DirectoryName + "\\hime_data\\Hime.css");
+            Session.Export("Transforms.Hime.js", File.DirectoryName + "\\hime_data\\Hime.js");
+            Session.Export("Visuals.button_plus.gif", File.DirectoryName + "\\hime_data\\button_plus.gif");
+            Session.Export("Visuals.button_minus.gif", File.DirectoryName + "\\hime_data\\button_minus.gif");
+            Session.Export("Visuals.Hime.Error.png", File.DirectoryName + "\\hime_data\\Hime.Error.png");
+            Session.Export("Visuals.Hime.Warning.png", File.DirectoryName + "\\hime_data\\Hime.Warning.png");
+            Session.Export("Visuals.Hime.Info.png", File.DirectoryName + "\\hime_data\\Hime.Info.png");
+            Session.Export("Visuals.Hime.Logo.png", File.DirectoryName + "\\hime_data\\Hime.Logo.png");
 
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(File.DirectoryName + "LogXML.xslt");

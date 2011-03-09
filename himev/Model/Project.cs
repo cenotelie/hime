@@ -53,7 +53,7 @@ namespace Hime.HimeV.Model
 
         private bool Generate()
         {
-            Parsers.CompilationTask Task = new Parsers.CompilationTask(p_Files.ToArray(), p_SelectedGram.ToString(), p_Method, p_TempNamespace, p_TempFile, false, false);
+            Parsers.CompilationTask Task = Parsers.CompilationTask.Create(p_Files.ToArray(), p_SelectedGram.ToString(), p_Method, p_TempNamespace, null, p_TempFile, false, false);
             Kernel.Reporting.Report Report = Task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
                 foreach (Kernel.Reporting.Entry entry in section.Entries)

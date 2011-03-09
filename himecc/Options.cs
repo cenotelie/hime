@@ -35,6 +35,9 @@ namespace Hime.HimeCC
         [Option("l", "log", Required = false, HelpText = "True to export the generation log (HTML file)")]
         public bool ExportHTMLLog;
 
+        [Option("d", "doc", Required = false, HelpText = "True to export the parser documentation (HTML files)")]
+        public bool ExportDocumentation;
+
         [HelpOption("h", "help", HelpText = "Display this help screen.")]
         public string GetUsage()
         {
@@ -47,17 +50,6 @@ namespace Hime.HimeCC
             help.AddPreOptionsLine("Usage: himecc MyGram.gram -g MyGrammar -n Analyser -m LALR1 --parser MyGram.cs");
             help.AddOptions(this);
             return help;
-        }
-
-        public bool Check()
-        {
-            if (Inputs.Count == 0)
-                return false;
-            if (Namespace == null)
-                Namespace = System.IO.Path.GetFileNameWithoutExtension(Inputs[0]);
-            if (ParserFile == null)
-                ParserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Inputs[0]), System.IO.Path.GetFileNameWithoutExtension(Inputs[0]) + ".cs");
-            return true;
         }
     }
 }

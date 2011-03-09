@@ -1,24 +1,39 @@
 ﻿namespace Hime.Kernel.Resources
 {
-    class AccessorSession
-    {
-        private bool p_IsClosed;
+    public sealed class ResourceAccessor
+	{
+        private static System.Collections.Generic.List<ResourceAccessor> p_Accessors = new System.Collections.Generic.List<ResourceAccessor>();
+
+		private System.Reflection.Assembly p_Assembly;
+		private string p_RootNamespace;
+		private string p_DefaultPath;
         private System.Collections.Generic.List<string> p_Files;
+        private bool p_IsClosed;
 
         public bool IsOpen { get { return !p_IsClosed; } }
         public bool IsClosed { get { return p_IsClosed; } }
         public System.Collections.Generic.IEnumerable<string> Files { get { return p_Files; } }
 
-        public AccessorSession()
+        internal ResourceAccessor()
+            : this(System.Reflection.Assembly.GetExecutingAssembly(), "Hime.Resources")
+        { }
+        public ResourceAccessor(System.Reflection.Assembly assembly, string defaultPath)
         {
-            p_IsClosed = false;
+            p_Accessors.Add(this);
+            p_Assembly = assembly;
+            p_RootNamespace = p_Assembly.GetName().Name;
+            if (defaultPath == null || defaultPath == string.Empty)
+                p_DefaultPath = p_RootNamespace + ".";
+            else
+                p_DefaultPath = p_RootNamespace + "." + defaultPath + ".";
             p_Files = new System.Collections.Generic.List<string>();
+            p_IsClosed = false;
         }
 
-        public void AddCheckoutFile(string file)
+        ~ResourceAccessor()
         {
-            if (p_IsClosed) throw new AccessorSessionClosedException(this);
-            p_Files.Add(file);
+            while (p_Accessors.Count != 0)
+                p_Accessors[0].Close();
         }
 
         public void Close()
@@ -26,55 +41,33 @@
             foreach (string file in p_Files)
                 System.IO.File.Delete(file);
             p_IsClosed = true;
-        }
-    }
-
-
-	class ResourceAccessor
-	{
-		private static System.Reflection.Assembly p_Assembly;
-		private static string p_RootNamespace;
-		private static string p_DefaultPath;
-        private static System.Collections.Generic.List<AccessorSession> p_Sessions;
-
-        static ResourceAccessor()
-		{
-			p_Assembly = System.Reflection.Assembly.GetExecutingAssembly();
-			p_RootNamespace = p_Assembly.GetName().Name;
-			p_DefaultPath = p_RootNamespace + ".Hime.Resources.";
-            p_Sessions = new System.Collections.Generic.List<AccessorSession>();
-		}
-        ~ResourceAccessor()
-        {
-            foreach (AccessorSession Session in p_Sessions)
-                if (Session.IsOpen)
-                    Session.Close();
+            p_Accessors.Remove(this);
         }
 
-        public static AccessorSession CreateCheckoutSession()
+        public void AddCheckoutFile(string fileName)
         {
-            AccessorSession Session = new AccessorSession();
-            p_Sessions.Add(Session);
-            return Session;
+            if (p_IsClosed)
+                throw new AccessorClosedException(this);
+            p_Files.Add(fileName);
         }
 
-        public static void CheckOut(AccessorSession session, string resourceName, string fileName)
+        public void CheckOut(string resourceName, string fileName)
         {
-            if (!p_Sessions.Contains(session))
-                throw new UnregisteredAccessorSessionException(session);
-            if (session.IsClosed)
-                throw new AccessorSessionClosedException(session);
+            if (p_IsClosed)
+                throw new AccessorClosedException(this);
             System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
             if (Stream == null)
                 throw new ResourceNotFoundException(resourceName);
             byte[] Buffer = new byte[Stream.Length];
             int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
             System.IO.File.WriteAllBytes(fileName, Buffer);
-            session.AddCheckoutFile(fileName);
+            p_Files.Add(fileName);
         }
 
-        public static void Export(string resourceName, string fileName)
+        public void Export(string resourceName, string fileName)
         {
+            if (p_IsClosed)
+                throw new AccessorClosedException(this);
             System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
             if (Stream == null)
                 throw new ResourceNotFoundException(resourceName);
@@ -83,12 +76,14 @@
             System.IO.File.WriteAllBytes(fileName, Buffer);
         }
 
-		private static string GetAllTextFor(string Name)
+        public string GetAllTextFor(string resourceName)
 		{
+            if (p_IsClosed)
+                throw new AccessorClosedException(this);
             // Get a stream on the resource
-            System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + Name);
-			if (Stream == null)
-				return null;
+            System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
+            if (Stream == null)
+                throw new ResourceNotFoundException(resourceName);
             // Extract content to a buffer
 			byte[] Buffer = new byte[Stream.Length];
 			int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
@@ -100,6 +95,7 @@
             // Return decoded text
 			return new string(System.Text.Encoding.UTF8.GetChars(Buffer));
 		}
+        
         private static System.Text.Encoding DetectEncoding(byte[] Buffer)
         {
             if (DetectEncoding_TryEncoding(Buffer, System.Text.Encoding.UTF8))

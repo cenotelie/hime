@@ -1,0 +1,31 @@
+public grammar cf MathExp
+{
+	options
+	{
+		Axiom = "exp";
+		Separator = "SEPARATOR";
+	}
+	terminals {
+		INTEGER	-> [1-9] [0-9]* | '0' ;
+		REAL		-> INTEGER? '.' INTEGER  (('e' | 'E') ('+' | '-')? INTEGER)?
+					|  INTEGER ('e' | 'E') ('+' | '-')? INTEGER ;
+		NUMBER	-> INTEGER | REAL ;
+
+		WHITE_SPACE	-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		SEPARATOR	-> WHITE_SPACE+;
+	}
+	rules {
+		exp_atom-> NUMBER {OnNumber}
+			| '('exp ')' ;
+
+		exp_op0	-> exp_atom
+			|  exp_op0 '*' exp_atom {OnMult}
+			|  exp_op0 '/' exp_atom {OnDiv};
+		
+		exp_op1	-> exp_op0
+			|  exp_op1 '+' exp_op0 {OnPlus}
+			|  exp_op1 '-' exp_op0 {OnMinus};
+
+		exp	-> exp_op1 ;
+	}
+}

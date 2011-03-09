@@ -22,7 +22,7 @@ namespace Hime.VSTests.himecc
         public void Test001_DefaultNamespace()
         {
             HimeCC.Options options = HimeCC.Program.ParseArguments(p_DefaultCommand);
-            Assert.AreEqual(options.Namespace, "MyGram");
+            Assert.IsNull(options.Namespace);
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace Hime.VSTests.himecc
         public void Test004_DefaultParser()
         {
             HimeCC.Options options = HimeCC.Program.ParseArguments(p_DefaultCommand);
-            Assert.AreEqual(options.ParserFile, "MyGram.cs");
+            Assert.IsNull(options.ParserFile);
         }
 
         [TestMethod]
@@ -57,6 +57,7 @@ namespace Hime.VSTests.himecc
         public void Test006_DefaultDocExport()
         {
             HimeCC.Options options = HimeCC.Program.ParseArguments(p_DefaultCommand);
+            Assert.IsFalse(options.ExportDocumentation);
         }
 
         [TestMethod]

@@ -6,7 +6,7 @@ namespace Hime.HimeCC
 {
     public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Options options = ParseArguments(args);
             if (options != null)
@@ -17,20 +17,18 @@ namespace Hime.HimeCC
 
         public static Options ParseArguments(string[] args)
         {
+            if (args.Length == 0)
+                return null;
             Options options = new Options();
             CommandLine.ICommandLineParser parser = new CommandLine.CommandLineParser();
-            if (parser.ParseArguments(args, options))
-            {
-                if (!options.Check())
-                    return null;
-                return options;
-            }
-            return null;
+            if (!parser.ParseArguments(args, options))
+                return null;
+            return options;
         }
 
         public static void Execute(Options options)
         {
-            Hime.Parsers.CompilationTask Task = new Parsers.CompilationTask(options.Inputs.ToArray(), options.GrammarName, options.Method, options.Namespace, options.LexerFile, options.ParserFile, options.ExportHTMLLog, false);
+            Hime.Parsers.CompilationTask Task = Parsers.CompilationTask.Create(options.Inputs.ToArray(), options.GrammarName, options.Method, options.Namespace, options.LexerFile, options.ParserFile, options.ExportHTMLLog, options.ExportDocumentation);
             Task.Execute();
         }
     }

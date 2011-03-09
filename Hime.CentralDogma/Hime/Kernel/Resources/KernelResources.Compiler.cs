@@ -49,10 +49,13 @@
             p_PluginRegister.RegisterCompiler(new Hime.Parsers.CF.CFGrammarCompiler());
         }
 
-        public void AddInputFile(string FileName)
+        public bool AddInputFile(string FileName)
         {
-            string Data = System.IO.File.ReadAllText(FileName);
+            string Data = null;
+            try { Data = System.IO.File.ReadAllText(FileName); }
+            catch { return false; }
             p_InputNamedResources.Add(FileName, Data);
+            return true;
         }
 
         public void AddInputRawText(string Data)

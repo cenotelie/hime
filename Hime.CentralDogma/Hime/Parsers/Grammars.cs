@@ -34,12 +34,9 @@
         public ParserGenerator ParserGenerator { get { return p_Method; } }
         public System.IO.StreamWriter LexerWriter { get { return p_LexerWriter; } }
         public System.IO.StreamWriter ParserWriter { get { return p_ParserWriter; } }
-        public string DocumentationDirectory {
-            get { return p_DocumentationDir; }
-            set { p_DocumentationDir = value; }
-        }
+        public string DocumentationDir { get { return p_DocumentationDir; } }
 
-        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string File)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string File, string DocDir)
         {
             p_Namespace = Namespace;
             p_Log = Reporter;
@@ -49,8 +46,9 @@
             p_ParserWriter = p_LexerWriter;
             p_LexerWriter.WriteLine("namespace " + Namespace);
             p_LexerWriter.WriteLine("{");
+            p_DocumentationDir = DocDir;
         }
-        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string FileLexer, string FileParser)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string FileLexer, string FileParser, string DocDir)
         {
             p_Namespace = Namespace;
             p_Log = Reporter;
@@ -62,6 +60,7 @@
             p_ParserWriter = new System.IO.StreamWriter(FileParser);
             p_ParserWriter.WriteLine("namespace " + Namespace);
             p_ParserWriter.WriteLine("{");
+            p_DocumentationDir = DocDir;
         }
 
         public void Close()

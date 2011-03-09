@@ -3,7 +3,7 @@
     /// <summary>
     /// Base abstract exception for resources
     /// </summary>
-    abstract class ResourceException : System.Exception
+    public abstract class ResourceException : System.Exception
     {
         /// <summary>
         /// Initializes a new instance of the ResourceException class
@@ -25,24 +25,25 @@
     /// <summary>
     /// Represents error when interactig with an AccessorSession that has already been closed
     /// </summary>
-    class AccessorSessionClosedException : ResourceException
+    public sealed class AccessorClosedException : ResourceException
     {
         /// <summary>
         /// Rerefence to the closed session
         /// </summary>
-        private AccessorSession p_Session;
+        private ResourceAccessor p_Session;
 
         /// <summary>
         /// Get the closed session causing the error
         /// </summary>
         /// <value>The closed session causing the error</value>
-        public AccessorSession Session { get { return p_Session; } }
+        public ResourceAccessor Session { get { return p_Session; } }
 
         /// <summary>
         /// Initiliazes a new instance of the AccessorSessionClosedException class with a reference to the closed session
         /// </summary>
         /// <param name="session">The closed session causing the error</param>
-        public AccessorSessionClosedException(AccessorSession session) : base("The session is already closed")
+        public AccessorClosedException(ResourceAccessor session)
+            : base("The session is already closed")
         {
             p_Session = session;
         }
@@ -51,34 +52,7 @@
     /// <summary>
     /// Represents error when trying to checkout resources with a unregistered session
     /// </summary>
-    class UnregisteredAccessorSessionException : ResourceException
-    {
-        /// <summary>
-        /// Rerefence to the unregistered session
-        /// </summary>
-        private AccessorSession p_Session;
-
-        /// <summary>
-        /// Get the unregistered session causing the error
-        /// </summary>
-        /// <value>The unregistered session causing the error</value>
-        public AccessorSession Session { get { return p_Session; } }
-
-        /// <summary>
-        /// Initiliazes a new instance of the UnregisteredAccessorSessionException class with a reference to the unregistered session
-        /// </summary>
-        /// <param name="session">The closed session causing the error</param>
-        public UnregisteredAccessorSessionException(AccessorSession session)
-            : base("The session is unregistered")
-        {
-            p_Session = session;
-        }
-    }
-
-    /// <summary>
-    /// Represents error when trying to checkout resources with a unregistered session
-    /// </summary>
-    class ResourceNotFoundException : ResourceException
+    public sealed class ResourceNotFoundException : ResourceException
     {
         /// <summary>
         /// Name of the unknown resource
