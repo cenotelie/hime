@@ -5,7 +5,8 @@
 		Axiom = "axiom";
 	}
 	terminals {
-		COMMENT		-> '/*' .? (.{2}-'*/')* '*/' ;
+		COMMENT		-> '/*' (.* - (.* '*/' .*)) '*/' ;
+		TAB			-> '\t';
 	}
 	rules {
 		axiom -> COMMENT;

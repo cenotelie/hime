@@ -21,9 +21,9 @@
 
         static void Main(string[] args)
         {
-            //Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\MathExp.gram" }, "MathExp", Hime.Parsers.ParsingMethod.RNGLR1, "Analyser", null, "MathExp.cs", true, true);
-            //Task.Execute();
-            Parse();
+            Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Test.gram" }, "Test", Hime.Parsers.ParsingMethod.RNGLR1, "Analyser", null, "Test.cs", true, true);
+            Task.Execute();
+            //Parse();
         }
 
         class Interpreter : Analyser.MathExp_Parser.Actions

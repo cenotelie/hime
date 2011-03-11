@@ -538,5 +538,56 @@
             foreach (DFAState State in p_States)
                 State.RepackTransitions();
         }
+
+        /// <summary>
+        /// Remove non-terminal states that cannot lead to a terminal state
+        /// </summary>
+        public void Prune()
+        {
+            System.Collections.Generic.Dictionary<DFAState, System.Collections.Generic.List<DFAState>> inverses = new System.Collections.Generic.Dictionary<DFAState, System.Collections.Generic.List<DFAState>>();
+            System.Collections.Generic.List<DFAState> finals = new System.Collections.Generic.List<DFAState>();
+            foreach (DFAState state in p_States)
+            {
+                foreach (DFAState next in state.Transitions.Values)
+                {
+                    if (!inverses.ContainsKey(next))
+                        inverses.Add(next, new System.Collections.Generic.List<DFAState>());
+                    inverses[next].Add(state);
+                }
+                if (state.FinalsCount != 0)
+                    finals.Add(state);
+            }
+
+            for (int i = 0; i != finals.Count; i++)
+            {
+                DFAState state = finals[i];
+                if (inverses.ContainsKey(state))
+                    foreach (DFAState antecedent in inverses[state])
+                        if (!finals.Contains(antecedent))
+                            finals.Add(antecedent);
+            }
+
+            if (finals.Count == p_States.Count)
+                return;
+            for (int i = 0; i != p_States.Count; i++ )
+            {
+                DFAState state = p_States[i];
+                if (!finals.Contains(state))
+                {
+                    p_States.Remove(state);
+                    i--;
+                    if (inverses.ContainsKey(state))
+                    {
+                        foreach (DFAState antecedent in inverses[state])
+                        {
+                            System.Collections.Generic.List<TerminalNFACharSpan> keys = new System.Collections.Generic.List<TerminalNFACharSpan>(antecedent.Transitions.Keys);
+                            foreach (TerminalNFACharSpan key in keys)
+                                if (antecedent.Transitions[key] == state)
+                                    antecedent.Transitions.Remove(key);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

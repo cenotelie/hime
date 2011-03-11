@@ -134,7 +134,7 @@
         {
             bool IsError = false;
             Parser.FileCentralDogma_Lexer UnitLexer = new Parser.FileCentralDogma_Lexer(Data);
-            Parser.FileCentralDogma_Parser UnitParser = new Parser.FileCentralDogma_Parser(null, UnitLexer);
+            Parser.FileCentralDogma_Parser UnitParser = new Parser.FileCentralDogma_Parser(UnitLexer);
             Redist.Parsers.SyntaxTreeNode UnitRoot = null;
             try { UnitRoot = UnitParser.Analyse(); }
             catch (System.Exception e) {

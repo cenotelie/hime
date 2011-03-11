@@ -143,6 +143,19 @@
             Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(Char, Char), Final.StateExit);
             return Final;
         }
+        private string ReplaceEscapees(string value)
+        {
+            string result = value.Replace("\\\\", "\\");
+            result = result.Replace("\\0", "\0");		/*Unicode character 0*/
+			result = result.Replace("\\a", "\a");		/*Alert (character 7)*/
+			result = result.Replace("\\b", "\b");		/*Backspace (character 8)*/
+			result = result.Replace("\\f", "\f");		/*Form feed (character 12)*/
+			result = result.Replace("\\n", "\n");		/*New line (character 10)*/
+			result = result.Replace("\\r", "\r");		/*Carriage return (character 13)*/
+			result = result.Replace("\\t", "\t");		/*Horizontal tab (character 9)*/
+            result = result.Replace("\\v", "\v");	    /*Vertical quote (character 11)*/
+            return result;
+        }
         private Automata.NFA Compile_Recognize_terminal_def_atom_text(Redist.Parsers.SyntaxTreeNode Node)
         {
             Automata.NFA Final = new Hime.Parsers.Automata.NFA();
@@ -150,7 +163,7 @@
             Final.StateExit = Final.StateEntry;
             string Value = ((Redist.Parsers.SymbolTokenText)Node.Symbol).ValueText;
             Value = Value.Substring(1, Value.Length - 2);
-            Value = Value.Replace("\\'", "'").Replace("\\\\", "\\");
+            Value = ReplaceEscapees(Value).Replace("\\'", "'");
             foreach (char c in Value)
             {
                 Automata.NFAState Temp = Final.AddNewState();
@@ -166,7 +179,7 @@
             Final.StateExit = Final.AddNewState();
             string Value = ((Redist.Parsers.SymbolTokenText)Node.Symbol).ValueText;
             Value = Value.Substring(1, Value.Length - 2);
-            Value = Value.Replace("\\\\", "\\").Replace("\\[", "[").Replace("\\]", "]");
+            Value = ReplaceEscapees(Value).Replace("\\[", "[").Replace("\\]", "]");
             bool Positive = true;
             if (Value[0] == '^')
             {

@@ -460,6 +460,7 @@
 
             Final.p_StateExit.Final = TerminalDummy.Instance;
             DFA Equivalent = new DFA(Final);
+            Equivalent.Prune();
             Final = new NFA(Equivalent);
             Final.p_StateExit = Final.AddNewState();
             foreach (NFAState State in Final.p_States)
@@ -524,7 +525,7 @@
         }
 
 
-        public void Close_Normal()
+        private void Close_Normal()
         {
             for (int i = 0; i != Count; i++)
                 foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState> Transition in this[i].Transitions)

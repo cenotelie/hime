@@ -7,8 +7,17 @@
 		{
 			INTEGER					-> [1-9] [0-9]* | '0' ;
 			QUOTED_DATA				-> '"' [^"]* '"';
-			SYMBOL_TERMINAL_TEXT	-> '\'' ([^\\'] | '\\\\' | '\\\'')+ '\'';
-			SYMBOL_TERMINAL_SET		-> '[' ([^\\\[\]] | '\\\\' | '\\[' | '\\]')+ ']';
+			ESCAPEES				-> '\\\\'	/*Backslash*/
+									| '\\0'		/*Unicode character 0*/
+									| '\\a'		/*Alert (character 7)*/
+									| '\\b'		/*Backspace (character 8)*/
+									| '\\f'		/*Form feed (character 12)*/
+									| '\\n'		/*New line (character 10)*/
+									| '\\r'		/*Carriage return (character 13)*/
+									| '\\t'		/*Horizontal tab (character 9)*/
+									| '\\v';	/*Vertical quote (character 11)*/
+			SYMBOL_TERMINAL_TEXT	-> '\'' ([^\\'] | ESCAPEES | '\\\'')+ '\'';
+			SYMBOL_TERMINAL_SET		-> '[' ([^\\\[\]] | ESCAPEES | '\\[' | '\\]')+ ']';
 			SYMBOL_TERMINAL_UBLOCK	-> '\\ub' '{' NAME '}' ;
 			SYMBOL_TERMINAL_UCAT	-> '\\uc' '{' NAME '}' ;
 			

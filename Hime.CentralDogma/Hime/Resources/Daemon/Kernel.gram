@@ -11,8 +11,8 @@
 							|  0x2028 /* LS */
 							|  0x2029 /* PS */ ;
 			WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
-			COMMENT_LINE	-> '//' ((0x0000 .. 0xFFFF)* - ((0x0000 .. 0xFFFF)* NEW_LINE (0x0000 .. 0xFFFF)*)) NEW_LINE ;
-			COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
+			COMMENT_LINE	-> '//' (.* - (.* NEW_LINE .*)) NEW_LINE ;
+			COMMENT_BLOCK	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 			SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
 			
 			NAME_CHARACTER_FIRST	-> [_a-zA-Z] | \ub{IsGreek};
