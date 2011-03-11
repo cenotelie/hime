@@ -2,12 +2,12 @@
 {
     public class SPPFNode
     {
-        protected ISymbol p_Symbol;
+        protected Symbol p_Symbol;
         protected SyntaxTreeNodeAction p_Action;
         protected int p_Generation;
         protected System.Collections.Generic.List<SPPFNodeFamily> p_Families;
 
-        public ISymbol Symbol { get { return p_Symbol; } }
+        public Symbol Symbol { get { return p_Symbol; } }
         public SyntaxTreeNodeAction Action
         {
             get { return p_Action; }
@@ -16,14 +16,14 @@
         public int Generation { get { return p_Generation; } }
         public System.Collections.ObjectModel.ReadOnlyCollection<SPPFNodeFamily> Families { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SPPFNodeFamily>(p_Families); } }
 
-        public SPPFNode(ISymbol symbol, int gen)
+        public SPPFNode(Symbol symbol, int gen)
         {
             p_Symbol = symbol;
             p_Action = SyntaxTreeNodeAction.Nothing;
             p_Generation = gen;
             p_Families = new System.Collections.Generic.List<SPPFNodeFamily>();
         }
-        public SPPFNode(ISymbol symbol, int gen, SyntaxTreeNodeAction action)
+        public SPPFNode(Symbol symbol, int gen, SyntaxTreeNodeAction action)
         {
             p_Symbol = symbol;
             p_Action = action;

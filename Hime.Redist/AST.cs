@@ -13,22 +13,22 @@
         protected System.Collections.Generic.Dictionary<string, object> p_Properties;
         protected System.Collections.Generic.List<SyntaxTreeNode> p_Children;
         protected SyntaxTreeNode p_Parent;
-        protected ISymbol p_Symbol;
+        protected Symbol p_Symbol;
         protected SyntaxTreeNodeAction p_Action;
 
         public System.Collections.Generic.Dictionary<string, object> Properties { get { return p_Properties; } }
-        public ISymbol Symbol { get { return p_Symbol; } }
+        public Symbol Symbol { get { return p_Symbol; } }
         public SyntaxTreeNode Parent { get { return p_Parent; } }
         public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(p_Children); } }
 
-        public SyntaxTreeNode(ISymbol Symbol)
+        public SyntaxTreeNode(Symbol Symbol)
         {
             p_Properties = new System.Collections.Generic.Dictionary<string, object>();
             p_Children = new System.Collections.Generic.List<SyntaxTreeNode>();
             p_Symbol = Symbol;
             p_Action = SyntaxTreeNodeAction.Nothing;
         }
-        public SyntaxTreeNode(ISymbol Symbol, SyntaxTreeNodeAction Action)
+        public SyntaxTreeNode(Symbol Symbol, SyntaxTreeNodeAction Action)
         {
             p_Properties = new System.Collections.Generic.Dictionary<string, object>();
             p_Children = new System.Collections.Generic.List<SyntaxTreeNode>();

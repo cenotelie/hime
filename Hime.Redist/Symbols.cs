@@ -3,24 +3,26 @@
     /// <summary>
     /// Interface for parser symbols
     /// </summary>
-    public interface ISymbol
+    public abstract class Symbol
     {
         /// <summary>
         /// Get the symbol's unique identifier
         /// </summary>
         /// <value>Symbol's unique indentifier</value>
-        ushort SymbolID { get; }
+        public abstract ushort SymbolID { get; }
         /// <summary>
         /// Get the symbol's name
         /// </summary>
         /// <value>Symbol's name</value>
-        string Name { get; }
+        public abstract string Name { get; }
+
+        public override string ToString() { return Name; }
     }
 
     /// <summary>
     /// Base class for token symbols (data matched by a lexer)
     /// </summary>
-    public abstract class SymbolToken : ISymbol
+    public abstract class SymbolToken : Symbol
     {
         /// <summary>
         /// Token class' name
@@ -35,12 +37,12 @@
         /// Get the symbol's unique identifier
         /// </summary>
         /// <value>Symbol's unique indentifier</value>
-        public ushort SymbolID { get { return p_ClassSID; } }
+        public override ushort SymbolID { get { return p_ClassSID; } }
         /// <summary>
         /// Get the symbol's name
         /// </summary>
         /// <value>Symbol's name</value>
-        public string Name { get { return p_ClassName; } }
+        public override string Name { get { return p_ClassName; } }
         /// <summary>
         /// Get the token's matched value
         /// </summary>
@@ -294,7 +296,7 @@
     /// <summary>
     /// Virtual symbol
     /// </summary>
-    public class SymbolVirtual : ISymbol
+    public class SymbolVirtual : Symbol
     {
         /// <summary>
         /// Symbol name
@@ -305,12 +307,12 @@
         /// Get the symbol's name
         /// </summary>
         /// <value>Symbol's name</value>
-        public string Name { get { return p_Name; } }
+        public override string Name { get { return p_Name; } }
         /// <summary>
         /// Get the symbol's identifier
         /// </summary>
         /// <value>Symbol's indentifier</value>
-        public ushort SymbolID { get { return 0; } }
+        public override ushort SymbolID { get { return 0; } }
 
         /// <summary>
         /// Constructs the virtual symbol
@@ -331,7 +333,7 @@
     /// <summary>
     /// Action symbol
     /// </summary>
-    public class SymbolAction : ISymbol
+    public class SymbolAction : Symbol
     {
         public delegate void Callback(SyntaxTreeNode Subroot);
 
@@ -346,12 +348,12 @@
         /// Get the symbol's name
         /// </summary>
         /// <value>Symbol's name</value>
-        public string Name { get { return p_Name; } }
+        public override string Name { get { return p_Name; } }
         /// <summary>
         /// Get the symbol's identifier
         /// </summary>
         /// <value>Symbol's indentifier</value>
-        public ushort SymbolID { get { return 0; } }
+        public override ushort SymbolID { get { return 0; } }
 
         public Callback Action { get { return p_Callback; } }
 
@@ -378,7 +380,7 @@
     /// <summary>
     /// Variable symbol
     /// </summary>
-    public class SymbolVariable : ISymbol
+    public class SymbolVariable : Symbol
     {
         /// <summary>
         /// Symbol ID
@@ -393,12 +395,12 @@
         /// Get the symbol's name
         /// </summary>
         /// <value>Symbol's name</value>
-        public string Name { get { return p_Name; } }
+        public override string Name { get { return p_Name; } }
         /// <summary>
         /// Get the symbol's identifier
         /// </summary>
         /// <value>Symbol's indentifier</value>
-        public ushort SymbolID { get { return p_SID; } }
+        public override ushort SymbolID { get { return p_SID; } }
 
         /// <summary>
         /// Constructs the variable
