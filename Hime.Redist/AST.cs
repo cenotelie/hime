@@ -58,7 +58,7 @@
                 AppendChild(Node);
         }
 
-        public SyntaxTreeNode ApplyActions()
+        internal SyntaxTreeNode ApplyActions()
         {
             ApplyActions_DropReplace();
             return ApplyActions_Promote();

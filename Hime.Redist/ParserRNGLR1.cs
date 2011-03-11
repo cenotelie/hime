@@ -144,7 +144,7 @@
             SPPFNode match = Match();
             if (match == null)
                 return null;
-            return match.GetFirstTree();
+            return match.GetFirstTree().ApplyActions();
         }
 
         protected GSSNode GetInSet(System.Collections.Generic.List<GSSNode> StateSet, ushort label)

@@ -14,7 +14,6 @@
             foreach (Hime.Redist.Parsers.ParserError ParserError in Parser.Errors) System.Console.WriteLine(ParserError.ToString());
             if (Root != null)
             {
-                Root = Root.ApplyActions();
                 LangTest.WinTreeView Win = new LangTest.WinTreeView(Root);
                 Win.ShowDialog();
             }

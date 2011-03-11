@@ -243,7 +243,7 @@
                     continue;
                 }
                 else if (p_NextToken.SymbolID == 0x0001)
-                    return p_Nodes[0];
+                    return p_Nodes[0].ApplyActions();
                 else
                     Analyse_HandleUnexpectedToken();
             }

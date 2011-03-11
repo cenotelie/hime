@@ -31,7 +31,6 @@ namespace Hime.HimeV
             if (p_Project == null)
                 return;
             Hime.Redist.Parsers.SyntaxTreeNode result = p_Project.Parse(TestData.Text);
-            result = result.ApplyActions();
             if (result == null)
                 return;
             Forms.WinAST win = new Forms.WinAST(result);

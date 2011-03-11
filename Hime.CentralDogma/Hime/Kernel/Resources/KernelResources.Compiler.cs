@@ -160,7 +160,6 @@
             }
             else
             {
-                UnitRoot = UnitRoot.ApplyActions();
                 p_IntermediateRoot.AppendChild(UnitRoot);
             }
             return (!IsError);
