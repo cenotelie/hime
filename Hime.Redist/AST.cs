@@ -153,5 +153,13 @@
                 Node.AppendChild(Child.GetXMLNode(Doc));
             return Node;
         }
+
+        public override string ToString()
+        {
+            if (p_Symbol != null)
+                return p_Symbol.ToString();
+            else
+                return "null";
+        }
     }
 }
