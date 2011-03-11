@@ -44,7 +44,7 @@
 
     public interface IParser
     {
-        System.Collections.Generic.List<ParserError> Errors { get; }
+        System.Collections.ObjectModel.ReadOnlyCollection<ParserError> Errors { get; }
         SyntaxTreeNode Analyse();
     }
 }

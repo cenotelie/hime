@@ -130,7 +130,7 @@
         protected int p_CurrentColumn;
         protected bool p_IsDollatEmited;
 
-        public System.Collections.Generic.IEnumerable<LexerTextError> Errors { get { return p_Errors; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(p_Errors); } }
         public string InputText { get { return p_Input.GetReadText(); } }
         public int CurrentLine { get { return p_CurrentLine; } }
         public int CurrentColumn { get { return p_CurrentColumn; } }

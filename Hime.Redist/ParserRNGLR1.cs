@@ -127,11 +127,7 @@
         protected System.Collections.Generic.LinkedList<ParserShift> p_Q;
         protected System.Collections.Generic.List<SPPFNode> p_N;
 
-        public System.Collections.Generic.List<ParserError> Errors { get { return p_Errors; } }
-
-        
-        
-        
+        public System.Collections.ObjectModel.ReadOnlyCollection<ParserError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(p_Errors); } }
 
         protected abstract void setup();
 

@@ -25,7 +25,7 @@
         protected SymbolToken p_NextToken;
         protected ushort p_CurrentState;
 
-        public System.Collections.Generic.List<ParserError> Errors { get { return p_Errors; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<ParserError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(p_Errors); } }
 
         protected abstract void setup();
         protected abstract SymbolToken GetNextToken(ILexer lexer, ushort state);
