@@ -79,7 +79,8 @@
     {
         ParserGenerator Generator { get; }
         bool Export(GrammarBuildOptions Options);
-        System.Xml.XmlNode GetData(System.Xml.XmlDocument Document);
+        System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document);
+        void SerializeVisual(Kernel.Graphs.DOTSerializer Serializer);
     }
 
     public interface ParserGenerator

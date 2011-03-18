@@ -75,6 +75,8 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Hime\Kernel\Graphs\DOTSerializer.cs" />
+    <Compile Include="Hime\Kernel\Graphs\GMLSerializer.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Reductions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Items.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRConflictAnalyser.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRGraph.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRConflicts.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRSets.cs" />
@@ -115,9 +118,6 @@
     <Compile Include="Hime\Parsers\Unicode.cs" />
     <Compile Include="Hime\Parsers\Rules.cs" />
     <Compile Include="Hime\Parsers\Symbols.cs" />
-    <Compile Include="Hime\Kernel\Graph\KernelGraph.cs" />
-    <Compile Include="Hime\Kernel\Graph\KernelGraphAlgos.cs" />
-    <Compile Include="Hime\Kernel\Graph\KernelGraphVisuals.cs" />
     <Compile Include="Hime\Kernel\KernelDaemon.cs" />
     <Compile Include="Hime\Kernel\KernelNaming.cs" />
     <Compile Include="Hime\Kernel\Reporting.cs" />

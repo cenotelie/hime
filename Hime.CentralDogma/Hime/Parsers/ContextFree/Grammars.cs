@@ -181,6 +181,7 @@
             Export_Resources(Directory);
             Export_GrammarData(Directory);
             Export_ParserData(Directory, Data);
+            Export_ParserGraph(Directory, Data);
         }
         protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
         {
@@ -239,7 +240,7 @@
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(directory + "\\LRParserData.xslt");
             System.Collections.Generic.List<System.Xml.XmlNode> nodes = new System.Collections.Generic.List<System.Xml.XmlNode>();
-            foreach (System.Xml.XmlNode child in data.GetData(Doc).ChildNodes)
+            foreach (System.Xml.XmlNode child in data.SerializeXML(Doc).ChildNodes)
                 nodes.Add(child);
             foreach (System.Xml.XmlNode child in nodes)
             {
@@ -253,6 +254,12 @@
                 Transform.Transform(fileName + ".xml", fileName + ".html");
             }
             Accessor.Close();
+        }
+        protected void Export_ParserGraph(string directory, ParserData data)
+        {
+            Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
+            data.SerializeVisual(serializer);
+            serializer.Close();
         }
 
         protected bool Prepare_AddRealAxiom(Hime.Kernel.Reporting.Reporter Log)
@@ -425,7 +432,12 @@
 
             //Output data
             if (Options.DocumentationDir != null)
+            {
                 Export_Documentation(Data, Options.DocumentationDir);
+                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Lexer", Options.DocumentationDir + "\\GraphLexer.dot");
+                p_FinalDFA.SerializeGraph(serializer);
+                serializer.Close();
+            }
             return result;
         }
     }

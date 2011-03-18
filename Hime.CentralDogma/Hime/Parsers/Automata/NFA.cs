@@ -120,9 +120,38 @@
             if (p_SpanBegin > p_SpanEnd)
                 return string.Empty;
             if (p_SpanBegin == p_SpanEnd)
-                return p_SpanBegin.ToString();
-            return "[" + p_SpanBegin.ToString() + "-" + p_SpanEnd.ToString() + "]";
+                return CharToString(p_SpanBegin);
+            return "[" + CharToString(p_SpanBegin) + "-" + CharToString(p_SpanEnd) + "]";
         }
+
+        private string CharToString(char c)
+        {
+            System.Globalization.UnicodeCategory cat = char.GetUnicodeCategory(c);
+            switch (cat)
+            {
+                case System.Globalization.UnicodeCategory.ModifierLetter:
+                case System.Globalization.UnicodeCategory.NonSpacingMark:
+                case System.Globalization.UnicodeCategory.SpacingCombiningMark:
+                case System.Globalization.UnicodeCategory.EnclosingMark:
+                case System.Globalization.UnicodeCategory.SpaceSeparator:
+                case System.Globalization.UnicodeCategory.LineSeparator:
+                case System.Globalization.UnicodeCategory.ParagraphSeparator:
+                case System.Globalization.UnicodeCategory.Control:
+                case System.Globalization.UnicodeCategory.Format:
+                case System.Globalization.UnicodeCategory.Surrogate:
+                case System.Globalization.UnicodeCategory.PrivateUse:
+                case System.Globalization.UnicodeCategory.OtherNotAssigned:
+                    return CharToString_NonPrintable(c);
+                default:
+                    return c.ToString();
+            }
+        }
+        private string CharToString_NonPrintable(char c)
+        {
+            string result = "U+" + System.Convert.ToUInt16(c).ToString("X");
+            return result;
+        }
+
         /// <summary>
         /// Override the Equals function 
         /// </summary>

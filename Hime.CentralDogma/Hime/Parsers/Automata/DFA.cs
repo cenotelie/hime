@@ -589,5 +589,19 @@
                 }
             }
         }
+
+        public void SerializeGraph(Kernel.Graphs.DOTSerializer serializer)
+        {
+            foreach (DFAState state in p_States)
+            {
+                if (state.Final != null)
+                    serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.Final.LocalName, Kernel.Graphs.DOTNodeShape.ellipse);
+                else
+                    serializer.WriteNode(state.ID.ToString());
+            }
+            foreach (DFAState state in p_States)
+                foreach (TerminalNFACharSpan value in state.Transitions.Keys)
+                    serializer.WriteEdge(state.ID.ToString(), state.Transitions[value].ID.ToString(), value.ToString());
+        }
     }
 }

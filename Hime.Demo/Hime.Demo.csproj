@@ -90,7 +90,6 @@
     <None Include="Languages\Earth.CIL.CSharp.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Languages\JAudit.Java.gram" />
     <None Include="Languages\MathExp.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

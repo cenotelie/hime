@@ -174,13 +174,13 @@ namespace Hime.Parsers
             if (p_ParserFile == null)
             {
                 if (p_FileInputs.Count == 1)
-                    p_ParserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(p_FileInputs[0]), System.IO.Path.GetFileNameWithoutExtension(p_FileInputs[0]) + ".cs");
+                    p_ParserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(p_FileInputs[0]), grammar.LocalName + ".cs");
                 else
                     p_ParserFile = grammar.LocalName + ".cs";
             }
             string doc = null;
             if (p_ExportDoc)
-                doc = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(p_ParserFile));
+                doc = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(p_ParserFile)), grammar.LocalName + "_doc");
             GrammarBuildOptions Options = null;
             if (p_LexerFile != null)
                 Options = new GrammarBuildOptions(p_Reporter, p_Namespace, generator, p_LexerFile, p_ParserFile, doc);
