@@ -54,8 +54,6 @@
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Windows.Shell, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
-    <Reference Include="RibbonControlsLibrary, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -104,7 +102,7 @@
     <Compile Include="Forms\WinAST.xaml.cs">
       <DependentUpon>WinAST.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\Project.cs" />
+    <Compile Include="Model\Grammar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

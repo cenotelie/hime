@@ -17,104 +17,62 @@ namespace Hime.HimeV
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Microsoft.Windows.Controls.Ribbon.RibbonWindow
+    public partial class MainWindow
     {
-        private Model.Project p_Project;
+        private Model.Grammar p_Project;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void ButtonGo_Click(object sender, RoutedEventArgs e)
+        private void MenuFileNew_Click(object sender, RoutedEventArgs e)
         {
-            if (p_Project == null)
-                return;
-            Hime.Redist.Parsers.SyntaxTreeNode result = p_Project.Parse(TestData.Text);
-            if (result == null)
-                return;
-            Forms.WinAST win = new Forms.WinAST(result);
-            win.Show();
+
         }
 
-        private void Box_DragEnter(object sender, DragEventArgs e)
+        private void MenuFileLoad_Click(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
-        }
-
-        private void DockPanel_Drop(object sender, DragEventArgs e)
-        {
-            e.Handled = true;
-            object text = e.Data.GetData(DataFormats.FileDrop);
-            string file = ((string[])text)[0];
-            foreach (TabItem tabitem in Grammars.Items)
-                if (tabitem.Tag.Equals(file))
-                    return;
-            
-            TextBox box = new TextBox();
-            box.AcceptsReturn = true;
-            box.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-            box.Text = System.IO.File.ReadAllText(file);
-            box.PreviewDragEnter += new DragEventHandler(Box_DragEnter);
-            box.PreviewDragOver += new DragEventHandler(Box_DragEnter);
-            box.Drop += new DragEventHandler(DockPanel_Drop);
-            box.TextChanged += new TextChangedEventHandler(TextGrammar_TextChanged);
-
-            DockPanel header = new DockPanel();
-            header.LastChildFill = true;
-            Button button = new Button();
-            button.Content = "x";
-            button.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-            button.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-            button.Click += new RoutedEventHandler(TabClose_Click);
-            
-            Label label = new Label();
-            label.Content = System.IO.Path.GetFileName(file);
-            header.Children.Add(button);
-            header.Children.Add(label);
-            DockPanel.SetDock(button, Dock.Right);
-
-            TabItem item = new TabItem();
-            item.Header = header;
-            item.Tag = file;
-            item.Content = box;
-            button.Tag = item;
-            
-            Grammars.Items.Add(item);
-            Grammars.SelectedItem = item;
-        }
-
-        private void TabClose_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = (Button)sender;
-            TabItem item = (TabItem)button.Tag;
-            Grammars.Items.Remove(item);
-        }
-
-        private void Compile_Click(object sender, RoutedEventArgs e)
-        {
-            /*string selection = ((ComboBoxItem)ComboMethod.SelectedValue).Content.ToString();
-            selection = selection.Replace("(", "").Replace(")", "");
-            Hime.Parsers.ParsingMethod method = (Hime.Parsers.ParsingMethod)System.Enum.Parse(typeof(Hime.Parsers.ParsingMethod), selection);
-            p_Project = new Model.Project(TextGrammarName.Text, method);
-            foreach (TabItem tabitem in Grammars.Items)
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.CheckFileExists = true;
+            dialog.DefaultExt = "gram";
+            dialog.Multiselect = false;
+            dialog.ShowDialog(this);
+            if (dialog.FileName != null)
             {
-                string text = ((TextBox)tabitem.Content).Text;
-                string file = (string)tabitem.Tag;
-                System.IO.File.WriteAllText(file, text);
-                p_Project.AddFile(file);
+                Forms.GrammarControl control = new Forms.GrammarControl(dialog.FileName);
+
+                StackPanel header = new StackPanel();
+                header.Orientation = Orientation.Horizontal;
+                Label label = new Label();
+                label.Content = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
+                Button close = new Button();
+                close.Height = 20;
+                close.Content = "X";
+                header.Children.Add(label);
+                header.Children.Add(close);
+
+                TabItem item = new TabItem();
+                item.Header = header;
+                item.Content = control;
+                Grammars.Items.Add(item);
+                item.Focus();
             }
-            bool result = p_Project.RegenerateParser();
-            if (result)
-                TextGrammarName.Background = new SolidColorBrush(Color.FromArgb(50, 0, 255, 0));
-            else
-                TextGrammarName.Background = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));*/
         }
 
-        private void TextGrammar_TextChanged(object sender, TextChangedEventArgs e)
+        private void MenuFileSave_Click(object sender, RoutedEventArgs e)
         {
-            p_Project = null;
-            //TextGrammarName.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+
+        }
+
+        private void MenuFileSaveAs_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuFileQuit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

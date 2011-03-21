@@ -1,4 +1,4 @@
-namespace Analyser
+﻿namespace Analyser
 {
     class MathExp_Lexer : Hime.Redist.Parsers.LexerText
     {
@@ -135,7 +135,7 @@ namespace Analyser
         };
         private static State[] p_StaticStates = {
             new State(
-               new string[36] {"[_Axiom_ → • exp $, ε]", "[exp → • exp_op1, $]", "[exp_op1 → • exp_op0, $]", "[exp_op1 → • exp_op1 + exp_op0, $]", "[exp_op1 → • exp_op1 - exp_op0, $]", "[exp_op0 → • exp_atom, $]", "[exp_op0 → • exp_op0 * exp_atom, $]", "[exp_op0 → • exp_op0 / exp_atom, $]", "[exp_op1 → • exp_op0, +]", "[exp_op1 → • exp_op1 + exp_op0, +]", "[exp_op1 → • exp_op1 - exp_op0, +]", "[exp_op1 → • exp_op0, -]", "[exp_op1 → • exp_op1 + exp_op0, -]", "[exp_op1 → • exp_op1 - exp_op0, -]", "[exp_atom → • NUMBER, $]", "[exp_atom → • ( exp ), $]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
+               new string[10] {"[_Axiom_ → • exp $, ε]", "[exp → • exp_op1, $]", "[exp_op1 → • exp_op0, $/+/-]", "[exp_op1 → • exp_op1 + exp_op0, $/+/-]", "[exp_op1 → • exp_op1 - exp_op0, $/+/-]", "[exp_op0 → • exp_atom, $/*//]", "[exp_op0 → • exp_op0 * exp_atom, $/*//]", "[exp_op0 → • exp_op0 / exp_atom, $/*//]", "[exp_atom → • NUMBER, $]", "[exp_atom → • ( exp ), $]"},
                new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x5 }, { 0xc, 0x6 }},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xb, 0x1 }, { 0xa, 0x2 }, { 0x9, 0x3 }, { 0x8, 0x4 }},
@@ -147,34 +147,34 @@ namespace Analyser
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
-               new string[7] {"[exp → exp_op1 •, $]", "[exp_op1 → exp_op1 • + exp_op0, $]", "[exp_op1 → exp_op1 • - exp_op0, $]", "[exp_op1 → exp_op1 • + exp_op0, +]", "[exp_op1 → exp_op1 • - exp_op0, +]", "[exp_op1 → exp_op1 • + exp_op0, -]", "[exp_op1 → exp_op1 • - exp_op0, -]"},
-               new Terminal[3] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
+               new string[3] {"[exp → exp_op1 •, $/)]", "[exp_op1 → exp_op1 • + exp_op0, $/+/-/)]", "[exp_op1 → exp_op1 • - exp_op0, $/+/-/)]"},
+               new Terminal[4] {new Terminal("$", 0x2), new Terminal("_T[)]", 0xD), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x10, 0x8 }, { 0x11, 0x9 }},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x8], 0x1, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x8], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x8], 0x1, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[13] {"[exp_op1 → exp_op0 •, $]", "[exp_op0 → exp_op0 • * exp_atom, $]", "[exp_op0 → exp_op0 • / exp_atom, $]", "[exp_op1 → exp_op0 •, +]", "[exp_op1 → exp_op0 •, -]", "[exp_op0 → exp_op0 • * exp_atom, *]", "[exp_op0 → exp_op0 • / exp_atom, *]", "[exp_op0 → exp_op0 • * exp_atom, /]", "[exp_op0 → exp_op0 • / exp_atom, /]", "[exp_op0 → exp_op0 • * exp_atom, +]", "[exp_op0 → exp_op0 • / exp_atom, +]", "[exp_op0 → exp_op0 • * exp_atom, -]", "[exp_op0 → exp_op0 • / exp_atom, -]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
+               new string[3] {"[exp_op1 → exp_op0 •, $/+/-/)]", "[exp_op0 → exp_op0 • * exp_atom, $/*///+/-/)]", "[exp_op0 → exp_op0 • / exp_atom, $/*///+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xe, 0xA }, { 0xf, 0xB }},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[5] {"[exp_op0 → exp_atom •, $]", "[exp_op0 → exp_atom •, *]", "[exp_op0 → exp_atom •, /]", "[exp_op0 → exp_atom •, +]", "[exp_op0 → exp_atom •, -]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
+               new string[1] {"[exp_op0 → exp_atom •, $/*///+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[5] {"[exp_atom → NUMBER •, $]", "[exp_atom → NUMBER •, *]", "[exp_atom → NUMBER •, /]", "[exp_atom → NUMBER •, +]", "[exp_atom → NUMBER •, -]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
+               new string[1] {"[exp_atom → NUMBER •, $/*///+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[40] {"[exp_atom → ( • exp ), $]", "[exp_atom → ( • exp ), *]", "[exp_atom → ( • exp ), /]", "[exp_atom → ( • exp ), +]", "[exp_atom → ( • exp ), -]", "[exp → • exp_op1, )]", "[exp_op1 → • exp_op0, )]", "[exp_op1 → • exp_op1 + exp_op0, )]", "[exp_op1 → • exp_op1 - exp_op0, )]", "[exp_op0 → • exp_atom, )]", "[exp_op0 → • exp_op0 * exp_atom, )]", "[exp_op0 → • exp_op0 / exp_atom, )]", "[exp_op1 → • exp_op0, +]", "[exp_op1 → • exp_op1 + exp_op0, +]", "[exp_op1 → • exp_op1 - exp_op0, +]", "[exp_op1 → • exp_op0, -]", "[exp_op1 → • exp_op1 + exp_op0, -]", "[exp_op1 → • exp_op1 - exp_op0, -]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
+               new string[10] {"[exp_atom → ( • exp ), $/*///+/-/)]", "[exp → • exp_op1, )]", "[exp_op1 → • exp_op0, )/+/-]", "[exp_op1 → • exp_op1 + exp_op0, )/+/-]", "[exp_op1 → • exp_op1 - exp_op0, )/+/-]", "[exp_op0 → • exp_atom, )/*//]", "[exp_op0 → • exp_op0 * exp_atom, )/*//]", "[exp_op0 → • exp_op0 / exp_atom, )/*//]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]"},
                new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x10 }, { 0xc, 0x11 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xb, 0xC }, { 0xa, 0xD }, { 0x9, 0xE }, { 0x8, 0xF }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x5 }, { 0xc, 0x6 }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xb, 0xC }, { 0xa, 0x2 }, { 0x9, 0x3 }, { 0x8, 0x4 }},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
                new string[1] {"[_Axiom_ → exp $ •, ε]"},
@@ -183,155 +183,65 @@ namespace Analyser
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.List<Reduction>() {new Reduction(0x1, p_StaticRules[0x9], 0x2, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[28] {"[exp_op1 → exp_op1 + • exp_op0, $]", "[exp_op1 → exp_op1 + • exp_op0, +]", "[exp_op1 → exp_op1 + • exp_op0, -]", "[exp_op0 → • exp_atom, $]", "[exp_op0 → • exp_op0 * exp_atom, $]", "[exp_op0 → • exp_op0 / exp_atom, $]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, $]", "[exp_atom → • ( exp ), $]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]"},
+               new string[6] {"[exp_op1 → exp_op1 + • exp_op0, $/+/-/)]", "[exp_op0 → • exp_atom, $/+/-/)/*//]", "[exp_op0 → • exp_op0 * exp_atom, $/+/-/)/*//]", "[exp_op0 → • exp_op0 / exp_atom, $/+/-/)/*//]", "[exp_atom → • NUMBER, $/+/-/)]", "[exp_atom → • ( exp ), $/+/-/)]"},
                new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x5 }, { 0xc, 0x6 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x9, 0x12 }, { 0x8, 0x4 }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x9, 0xD }, { 0x8, 0x4 }},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
-               new string[28] {"[exp_op1 → exp_op1 - • exp_op0, $]", "[exp_op1 → exp_op1 - • exp_op0, +]", "[exp_op1 → exp_op1 - • exp_op0, -]", "[exp_op0 → • exp_atom, $]", "[exp_op0 → • exp_op0 * exp_atom, $]", "[exp_op0 → • exp_op0 / exp_atom, $]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, $]", "[exp_atom → • ( exp ), $]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]"},
+               new string[6] {"[exp_op1 → exp_op1 - • exp_op0, $/+/-/)]", "[exp_op0 → • exp_atom, $/+/-/)/*//]", "[exp_op0 → • exp_op0 * exp_atom, $/+/-/)/*//]", "[exp_op0 → • exp_op0 / exp_atom, $/+/-/)/*//]", "[exp_atom → • NUMBER, $/+/-/)]", "[exp_atom → • ( exp ), $/+/-/)]"},
                new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x5 }, { 0xc, 0x6 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x9, 0x13 }, { 0x8, 0x4 }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x9, 0xE }, { 0x8, 0x4 }},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
-               new string[15] {"[exp_op0 → exp_op0 * • exp_atom, $]", "[exp_op0 → exp_op0 * • exp_atom, *]", "[exp_op0 → exp_op0 * • exp_atom, /]", "[exp_op0 → exp_op0 * • exp_atom, +]", "[exp_op0 → exp_op0 * • exp_atom, -]", "[exp_atom → • NUMBER, $]", "[exp_atom → • ( exp ), $]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
+               new string[3] {"[exp_op0 → exp_op0 * • exp_atom, $/*///+/-/)]", "[exp_atom → • NUMBER, $/*///+/-/)]", "[exp_atom → • ( exp ), $/*///+/-/)]"},
                new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x5 }, { 0xc, 0x6 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x8, 0x14 }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x8, 0xF }},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
-               new string[15] {"[exp_op0 → exp_op0 / • exp_atom, $]", "[exp_op0 → exp_op0 / • exp_atom, *]", "[exp_op0 → exp_op0 / • exp_atom, /]", "[exp_op0 → exp_op0 / • exp_atom, +]", "[exp_op0 → exp_op0 / • exp_atom, -]", "[exp_atom → • NUMBER, $]", "[exp_atom → • ( exp ), $]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
+               new string[3] {"[exp_op0 → exp_op0 / • exp_atom, $/*///+/-/)]", "[exp_atom → • NUMBER, $/*///+/-/)]", "[exp_atom → • ( exp ), $/*///+/-/)]"},
                new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x5 }, { 0xc, 0x6 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x8, 0x15 }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x8, 0x10 }},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
-               new string[5] {"[exp_atom → ( exp • ), $]", "[exp_atom → ( exp • ), *]", "[exp_atom → ( exp • ), /]", "[exp_atom → ( exp • ), +]", "[exp_atom → ( exp • ), -]"},
+               new string[1] {"[exp_atom → ( exp • ), $/*///+/-/)]"},
                new Terminal[1] {new Terminal("_T[)]", 0xD)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xd, 0x16 }},
+               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xd, 0x11 }},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.List<Reduction>() {})
             , new State(
-               new string[7] {"[exp → exp_op1 •, )]", "[exp_op1 → exp_op1 • + exp_op0, )]", "[exp_op1 → exp_op1 • - exp_op0, )]", "[exp_op1 → exp_op1 • + exp_op0, +]", "[exp_op1 → exp_op1 • - exp_op0, +]", "[exp_op1 → exp_op1 • + exp_op0, -]", "[exp_op1 → exp_op1 • - exp_op0, -]"},
-               new Terminal[3] {new Terminal("_T[)]", 0xD), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x10, 0x17 }, { 0x11, 0x18 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x8], 0x1, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[13] {"[exp_op1 → exp_op0 •, )]", "[exp_op0 → exp_op0 • * exp_atom, )]", "[exp_op0 → exp_op0 • / exp_atom, )]", "[exp_op1 → exp_op0 •, +]", "[exp_op1 → exp_op0 •, -]", "[exp_op0 → exp_op0 • * exp_atom, *]", "[exp_op0 → exp_op0 • / exp_atom, *]", "[exp_op0 → exp_op0 • * exp_atom, /]", "[exp_op0 → exp_op0 • / exp_atom, /]", "[exp_op0 → exp_op0 • * exp_atom, +]", "[exp_op0 → exp_op0 • / exp_atom, +]", "[exp_op0 → exp_op0 • * exp_atom, -]", "[exp_op0 → exp_op0 • / exp_atom, -]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xe, 0x19 }, { 0xf, 0x1A }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x5], 0x1, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[5] {"[exp_op0 → exp_atom •, )]", "[exp_op0 → exp_atom •, *]", "[exp_op0 → exp_atom •, /]", "[exp_op0 → exp_atom •, +]", "[exp_op0 → exp_atom •, -]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x2], 0x1, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[5] {"[exp_atom → NUMBER •, )]", "[exp_atom → NUMBER •, *]", "[exp_atom → NUMBER •, /]", "[exp_atom → NUMBER •, +]", "[exp_atom → NUMBER •, -]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x0], 0x1, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[40] {"[exp_atom → ( • exp ), )]", "[exp_atom → ( • exp ), *]", "[exp_atom → ( • exp ), /]", "[exp_atom → ( • exp ), +]", "[exp_atom → ( • exp ), -]", "[exp → • exp_op1, )]", "[exp_op1 → • exp_op0, )]", "[exp_op1 → • exp_op1 + exp_op0, )]", "[exp_op1 → • exp_op1 - exp_op0, )]", "[exp_op0 → • exp_atom, )]", "[exp_op0 → • exp_op0 * exp_atom, )]", "[exp_op0 → • exp_op0 / exp_atom, )]", "[exp_op1 → • exp_op0, +]", "[exp_op1 → • exp_op1 + exp_op0, +]", "[exp_op1 → • exp_op1 - exp_op0, +]", "[exp_op1 → • exp_op0, -]", "[exp_op1 → • exp_op1 + exp_op0, -]", "[exp_op1 → • exp_op1 - exp_op0, -]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
-               new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x10 }, { 0xc, 0x11 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xb, 0x1B }, { 0xa, 0xD }, { 0x9, 0xE }, { 0x8, 0xF }},
-               new System.Collections.Generic.List<Reduction>() {})
-            , new State(
-               new string[13] {"[exp_op1 → exp_op1 + exp_op0 •, $]", "[exp_op1 → exp_op1 + exp_op0 •, +]", "[exp_op1 → exp_op1 + exp_op0 •, -]", "[exp_op0 → exp_op0 • * exp_atom, $]", "[exp_op0 → exp_op0 • / exp_atom, $]", "[exp_op0 → exp_op0 • * exp_atom, +]", "[exp_op0 → exp_op0 • / exp_atom, +]", "[exp_op0 → exp_op0 • * exp_atom, -]", "[exp_op0 → exp_op0 • / exp_atom, -]", "[exp_op0 → exp_op0 • * exp_atom, *]", "[exp_op0 → exp_op0 • / exp_atom, *]", "[exp_op0 → exp_op0 • * exp_atom, /]", "[exp_op0 → exp_op0 • / exp_atom, /]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
+               new string[3] {"[exp_op1 → exp_op1 + exp_op0 •, $/+/-/)]", "[exp_op0 → exp_op0 • * exp_atom, *///$/+/-/)]", "[exp_op0 → exp_op0 • / exp_atom, *///$/+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xe, 0xA }, { 0xf, 0xB }},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[13] {"[exp_op1 → exp_op1 - exp_op0 •, $]", "[exp_op1 → exp_op1 - exp_op0 •, +]", "[exp_op1 → exp_op1 - exp_op0 •, -]", "[exp_op0 → exp_op0 • * exp_atom, $]", "[exp_op0 → exp_op0 • / exp_atom, $]", "[exp_op0 → exp_op0 • * exp_atom, +]", "[exp_op0 → exp_op0 • / exp_atom, +]", "[exp_op0 → exp_op0 • * exp_atom, -]", "[exp_op0 → exp_op0 • / exp_atom, -]", "[exp_op0 → exp_op0 • * exp_atom, *]", "[exp_op0 → exp_op0 • / exp_atom, *]", "[exp_op0 → exp_op0 • * exp_atom, /]", "[exp_op0 → exp_op0 • / exp_atom, /]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
+               new string[3] {"[exp_op1 → exp_op1 - exp_op0 •, $/+/-/)]", "[exp_op0 → exp_op0 • * exp_atom, *///$/+/-/)]", "[exp_op0 → exp_op0 • / exp_atom, *///$/+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xe, 0xA }, { 0xf, 0xB }},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[5] {"[exp_op0 → exp_op0 * exp_atom •, $]", "[exp_op0 → exp_op0 * exp_atom •, *]", "[exp_op0 → exp_op0 * exp_atom •, /]", "[exp_op0 → exp_op0 * exp_atom •, +]", "[exp_op0 → exp_op0 * exp_atom •, -]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
+               new string[1] {"[exp_op0 → exp_op0 * exp_atom •, $/*///+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[5] {"[exp_op0 → exp_op0 / exp_atom •, $]", "[exp_op0 → exp_op0 / exp_atom •, *]", "[exp_op0 → exp_op0 / exp_atom •, /]", "[exp_op0 → exp_op0 / exp_atom •, +]", "[exp_op0 → exp_op0 / exp_atom •, -]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
+               new string[1] {"[exp_op0 → exp_op0 / exp_atom •, $/*///+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0])})
             , new State(
-               new string[5] {"[exp_atom → ( exp ) •, $]", "[exp_atom → ( exp ) •, *]", "[exp_atom → ( exp ) •, /]", "[exp_atom → ( exp ) •, +]", "[exp_atom → ( exp ) •, -]"},
-               new Terminal[5] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
+               new string[1] {"[exp_atom → ( exp ) •, $/*///+/-/)]"},
+               new Terminal[6] {new Terminal("$", 0x2), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[)]", 0xD)},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
                new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[28] {"[exp_op1 → exp_op1 + • exp_op0, )]", "[exp_op1 → exp_op1 + • exp_op0, +]", "[exp_op1 → exp_op1 + • exp_op0, -]", "[exp_op0 → • exp_atom, )]", "[exp_op0 → • exp_op0 * exp_atom, )]", "[exp_op0 → • exp_op0 / exp_atom, )]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]"},
-               new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x10 }, { 0xc, 0x11 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x9, 0x1C }, { 0x8, 0xF }},
-               new System.Collections.Generic.List<Reduction>() {})
-            , new State(
-               new string[28] {"[exp_op1 → exp_op1 - • exp_op0, )]", "[exp_op1 → exp_op1 - • exp_op0, +]", "[exp_op1 → exp_op1 - • exp_op0, -]", "[exp_op0 → • exp_atom, )]", "[exp_op0 → • exp_op0 * exp_atom, )]", "[exp_op0 → • exp_op0 / exp_atom, )]", "[exp_op0 → • exp_atom, +]", "[exp_op0 → • exp_op0 * exp_atom, +]", "[exp_op0 → • exp_op0 / exp_atom, +]", "[exp_op0 → • exp_atom, -]", "[exp_op0 → • exp_op0 * exp_atom, -]", "[exp_op0 → • exp_op0 / exp_atom, -]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]", "[exp_op0 → • exp_atom, *]", "[exp_op0 → • exp_op0 * exp_atom, *]", "[exp_op0 → • exp_op0 / exp_atom, *]", "[exp_op0 → • exp_atom, /]", "[exp_op0 → • exp_op0 * exp_atom, /]", "[exp_op0 → • exp_op0 / exp_atom, /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]"},
-               new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x10 }, { 0xc, 0x11 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x9, 0x1D }, { 0x8, 0xF }},
-               new System.Collections.Generic.List<Reduction>() {})
-            , new State(
-               new string[15] {"[exp_op0 → exp_op0 * • exp_atom, )]", "[exp_op0 → exp_op0 * • exp_atom, *]", "[exp_op0 → exp_op0 * • exp_atom, /]", "[exp_op0 → exp_op0 * • exp_atom, +]", "[exp_op0 → exp_op0 * • exp_atom, -]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
-               new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x10 }, { 0xc, 0x11 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x8, 0x1E }},
-               new System.Collections.Generic.List<Reduction>() {})
-            , new State(
-               new string[15] {"[exp_op0 → exp_op0 / • exp_atom, )]", "[exp_op0 → exp_op0 / • exp_atom, *]", "[exp_op0 → exp_op0 / • exp_atom, /]", "[exp_op0 → exp_op0 / • exp_atom, +]", "[exp_op0 → exp_op0 / • exp_atom, -]", "[exp_atom → • NUMBER, )]", "[exp_atom → • ( exp ), )]", "[exp_atom → • NUMBER, *]", "[exp_atom → • ( exp ), *]", "[exp_atom → • NUMBER, /]", "[exp_atom → • ( exp ), /]", "[exp_atom → • NUMBER, +]", "[exp_atom → • ( exp ), +]", "[exp_atom → • NUMBER, -]", "[exp_atom → • ( exp ), -]"},
-               new Terminal[2] {new Terminal("NUMBER", 0x5), new Terminal("_T[(]", 0xC)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x5, 0x10 }, { 0xc, 0x11 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0x8, 0x1F }},
-               new System.Collections.Generic.List<Reduction>() {})
-            , new State(
-               new string[5] {"[exp_atom → ( exp • ), )]", "[exp_atom → ( exp • ), *]", "[exp_atom → ( exp • ), /]", "[exp_atom → ( exp • ), +]", "[exp_atom → ( exp • ), -]"},
-               new Terminal[1] {new Terminal("_T[)]", 0xD)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xd, 0x20 }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {})
-            , new State(
-               new string[13] {"[exp_op1 → exp_op1 + exp_op0 •, )]", "[exp_op1 → exp_op1 + exp_op0 •, +]", "[exp_op1 → exp_op1 + exp_op0 •, -]", "[exp_op0 → exp_op0 • * exp_atom, )]", "[exp_op0 → exp_op0 • / exp_atom, )]", "[exp_op0 → exp_op0 • * exp_atom, +]", "[exp_op0 → exp_op0 • / exp_atom, +]", "[exp_op0 → exp_op0 • * exp_atom, -]", "[exp_op0 → exp_op0 • / exp_atom, -]", "[exp_op0 → exp_op0 • * exp_atom, *]", "[exp_op0 → exp_op0 • / exp_atom, *]", "[exp_op0 → exp_op0 • * exp_atom, /]", "[exp_op0 → exp_op0 • / exp_atom, /]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xe, 0x19 }, { 0xf, 0x1A }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x6], 0x3, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[13] {"[exp_op1 → exp_op1 - exp_op0 •, )]", "[exp_op1 → exp_op1 - exp_op0 •, +]", "[exp_op1 → exp_op1 - exp_op0 •, -]", "[exp_op0 → exp_op0 • * exp_atom, )]", "[exp_op0 → exp_op0 • / exp_atom, )]", "[exp_op0 → exp_op0 • * exp_atom, +]", "[exp_op0 → exp_op0 • / exp_atom, +]", "[exp_op0 → exp_op0 • * exp_atom, -]", "[exp_op0 → exp_op0 • / exp_atom, -]", "[exp_op0 → exp_op0 • * exp_atom, *]", "[exp_op0 → exp_op0 • / exp_atom, *]", "[exp_op0 → exp_op0 • * exp_atom, /]", "[exp_op0 → exp_op0 • / exp_atom, /]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {{ 0xe, 0x19 }, { 0xf, 0x1A }},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x7], 0x3, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[5] {"[exp_op0 → exp_op0 * exp_atom •, )]", "[exp_op0 → exp_op0 * exp_atom •, *]", "[exp_op0 → exp_op0 * exp_atom •, /]", "[exp_op0 → exp_op0 * exp_atom •, +]", "[exp_op0 → exp_op0 * exp_atom •, -]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x3], 0x3, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[5] {"[exp_op0 → exp_op0 / exp_atom •, )]", "[exp_op0 → exp_op0 / exp_atom •, *]", "[exp_op0 → exp_op0 / exp_atom •, /]", "[exp_op0 → exp_op0 / exp_atom •, +]", "[exp_op0 → exp_op0 / exp_atom •, -]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x4], 0x3, p_StaticNullChoicesSPPF[0x0])})
-            , new State(
-               new string[5] {"[exp_atom → ( exp ) •, )]", "[exp_atom → ( exp ) •, *]", "[exp_atom → ( exp ) •, /]", "[exp_atom → ( exp ) •, +]", "[exp_atom → ( exp ) •, -]"},
-               new Terminal[5] {new Terminal("_T[)]", 0xD), new Terminal("_T[*]", 0xE), new Terminal("_T[/]", 0xF), new Terminal("_T[+]", 0x10), new Terminal("_T[-]", 0x11)},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.Dictionary<ushort, ushort>() {},
-               new System.Collections.Generic.List<Reduction>() {new Reduction(0xd, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0])})
+               new System.Collections.Generic.List<Reduction>() {new Reduction(0x2, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xe, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xf, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x10, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0x11, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0]), new Reduction(0xd, p_StaticRules[0x1], 0x3, p_StaticNullChoicesSPPF[0x0])})
         };
         private static void BuildNullables() { 
             System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode> temp = new System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode>();

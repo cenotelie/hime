@@ -42,7 +42,7 @@
             p_Log = Reporter;
             p_Drawvisual = false;
             p_Method = Generator;
-            p_LexerWriter = new System.IO.StreamWriter(File);
+            p_LexerWriter = new System.IO.StreamWriter(File, false, System.Text.Encoding.UTF8);
             p_ParserWriter = p_LexerWriter;
             p_LexerWriter.WriteLine("namespace " + Namespace);
             p_LexerWriter.WriteLine("{");
@@ -54,10 +54,10 @@
             p_Log = Reporter;
             p_Drawvisual = false;
             p_Method = Generator;
-            p_LexerWriter = new System.IO.StreamWriter(FileLexer);
+            p_LexerWriter = new System.IO.StreamWriter(FileLexer, false, System.Text.Encoding.UTF8);
             p_LexerWriter.WriteLine("namespace " + Namespace);
-            p_LexerWriter.WriteLine("{"); 
-            p_ParserWriter = new System.IO.StreamWriter(FileParser);
+            p_LexerWriter.WriteLine("{");
+            p_ParserWriter = new System.IO.StreamWriter(FileParser, false, System.Text.Encoding.UTF8);
             p_ParserWriter.WriteLine("namespace " + Namespace);
             p_ParserWriter.WriteLine("{");
             p_DocumentationDir = DocDir;

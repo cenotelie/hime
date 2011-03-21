@@ -21,7 +21,7 @@
 
         static void Main(string[] args)
         {
-            Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Earth.CIL.CSharp.gram" }, "Hime.Earth.CIL.GrammarCSharp", Hime.Parsers.ParsingMethod.RNGLALR1, "Analyser", null, "GrammarCSharp.cs", false, true);
+            Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\MathExp.gram" }, "MathExp", Hime.Parsers.ParsingMethod.RNGLALR1, "Analyser", null, "MathExp.cs", false, true);
             Task.Execute();
             //Parse();
         }

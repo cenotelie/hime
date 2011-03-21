@@ -1,53 +1,35 @@
-﻿<my:RibbonWindow xmlns:my="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"  x:Class="Hime.HimeV.MainWindow"
+﻿<Window x:Class="Hime.HimeV.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="HimeV" Height="350" Width="525">
     <DockPanel LastChildFill="True">
-        <my:Ribbon DockPanel.Dock="Top">
-            <my:Ribbon.ApplicationMenu>
-                <my:RibbonApplicationMenu>
-                    <my:RibbonApplicationMenuItem Header="New" ImageSource="/himev;component/Resources/new.png"/>
-                    <my:RibbonApplicationMenuItem Header="Save" ImageSource="/himev;component/Resources/save.png"/>
-                    <my:RibbonApplicationMenuItem Header="Save As ..." ImageSource="/himev;component/Resources/saveas.png"/>
-                    <my:RibbonApplicationMenuItem Header="Quit" ImageSource="/himev;component/Resources/quit.png"/>
-                </my:RibbonApplicationMenu>
-            </my:Ribbon.ApplicationMenu>
-            <my:RibbonTab Header="Project">
-                <my:RibbonGroup Header="Compile">
-                    <my:RibbonTextBox></my:RibbonTextBox>
-                    <my:RibbonComboBox>
-                        <ComboBoxItem>LR(0)</ComboBoxItem>
-                        <ComboBoxItem>LR(1)</ComboBoxItem>
-                        <ComboBoxItem>LALR(1)</ComboBoxItem>
-                        <ComboBoxItem>RNGLR(1)</ComboBoxItem>
-                        <ComboBoxItem>RNGLALR(1)</ComboBoxItem>
-                    </my:RibbonComboBox>
-                    <my:RibbonButton Label="Compile" LargeImageSource="/himev;component/Resources/compile.png">
-                    </my:RibbonButton>
-                </my:RibbonGroup>
-            </my:RibbonTab>
-        </my:Ribbon>
-        <DockPanel LastChildFill="True" Drop="DockPanel_Drop">
-            <Expander Header="Console" DockPanel.Dock="Bottom" IsExpanded="False" ExpandDirection="Up">
-                <ScrollViewer>
-                    <TextBlock Name="Console">
-                    </TextBlock>
-                </ScrollViewer>
-            </Expander>
-            <Expander Header="Parser Tests" DockPanel.Dock="Bottom" IsExpanded="False" ExpandDirection="Up">
-                <Grid Name="GridTests">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Button Name="ButtonGo" Grid.Row="0" Grid.Column="0" Click="ButtonGo_Click">GO</Button>
-                    <TextBox Name="TestData" Grid.Row="0" Grid.Column="1">2 + 6</TextBox>
-                </Grid>
-            </Expander>
-            <TabControl Name="Grammars" AllowDrop="True"></TabControl>
-        </DockPanel>
+        <Menu IsMainMenu="True" DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Name="MenuFileNew" Header="New" Click="MenuFileNew_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/himev;component/Resources/new.png" Width="25" Height="25" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="MenuFileLoad" Header="Load ..." Click="MenuFileLoad_Click" />
+                <MenuItem Name="MenuFileSave" Header="Save" Click="MenuFileSave_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/himev;component/Resources/save.png" Width="25" Height="25" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="MenuFileSaveAs" Header="Save As ..." Click="MenuFileSaveAs_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/himev;component/Resources/saveas.png" Width="25" Height="25" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="MenuFileQuit" Header="Quit" Click="MenuFileQuit_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/himev;component/Resources/quit.png" Width="25" Height="25" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <TabControl Name="Grammars">
+            
+        </TabControl>
     </DockPanel>
-</my:RibbonWindow>
+</Window>
