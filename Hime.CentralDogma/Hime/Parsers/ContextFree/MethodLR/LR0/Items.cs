@@ -5,12 +5,16 @@
     /// </summary>
     class ItemLR0 : Item
     {
+        private static TerminalSet p_EmptySet = new TerminalSet();
+
         /// <summary>
         /// Construct the item from a rule, the dot position in the rule
         /// </summary>
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
         public ItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
+
+        public override TerminalSet Lookaheads { get { return p_EmptySet; } }
 
         /// <summary>
         /// Get the child of the current item

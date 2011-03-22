@@ -24,20 +24,28 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="SymbolTerminalText">
+    <span class="HimeSymbolTerminal">
+      <xsl:value-of select="@Value"/>
+    </span>
+  </xsl:template>
+
   <xsl:template match="Dot">
     <span>•</span>
   </xsl:template>
 
   <xsl:template match="Item">
     <tr class="HimeLRItem">
-      <td class="HimeData">
-        <xsl:attribute name="style">
-          <xsl:if test="position()=1">
-            <xsl:text>border-top: none; border-left: none; width: 20;</xsl:text>
-          </xsl:if>
-          <xsl:if test="position()>=2">
-            <xsl:text>border-left: none; width: 20;</xsl:text>
-          </xsl:if>
+      <td style="width:60pt">
+        <xsl:attribute name="class">
+          <xsl:choose>
+            <xsl:when test="../Item[1]=.">
+              <xsl:text>HimeDataCellTopLeft</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>HimeDataCellCenterLeft</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <img style="width: 20pt; height: 20pt;">
           <xsl:attribute name="src">
@@ -51,14 +59,16 @@
           </xsl:attribute>
         </img>
       </td>
-      <td class="HimeData">
-        <xsl:attribute name="style">
-          <xsl:if test="position()=1">
-            <xsl:text>border-top: none; width: 60pt;</xsl:text>
-          </xsl:if>
-          <xsl:if test="position()>=2">
-            <xsl:text>width: 60pt;</xsl:text>
-          </xsl:if>
+      <td style="width: 60pt;">
+        <xsl:attribute name="class">
+          <xsl:choose>
+            <xsl:when test="../Item[1]=.">
+              <xsl:text>HimeDataCellTop</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>HimeDataCellCenter</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <img style="width: 20pt; height: 20pt;">
           <xsl:attribute name="src">
@@ -82,11 +92,16 @@
           </xsl:if>
         </img>
       </td>
-      <td class="HimeData">
-        <xsl:attribute name="style">
-          <xsl:if test="position()=1">
-            <xsl:text>border-top: none;</xsl:text>
-          </xsl:if>
+      <td>
+        <xsl:attribute name="class">
+          <xsl:choose>
+            <xsl:when test="../Item[1]=.">
+              <xsl:text>HimeDataCellTop</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>HimeDataCellCenter</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <a class="HimeSymbolVariable">
           <xsl:attribute name="href">
@@ -98,16 +113,36 @@
         </a>
         →
       </td>
-      <td class="HimeData">
-        <xsl:attribute name="style">
-          <xsl:if test="position()=1">
-            <xsl:text>border-top: none; border-left: none;</xsl:text>
-          </xsl:if>
-          <xsl:if test="position()>=2">
-            <xsl:text>border-left: none;</xsl:text>
-          </xsl:if>
+      <td>
+        <xsl:attribute name="class">
+          <xsl:choose>
+            <xsl:when test="../Item[1]=.">
+              <xsl:text>HimeDataCellTop</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>HimeDataCellCenter</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <xsl:apply-templates select="Symbols"/>
+      </td>
+      <td>
+        <xsl:attribute name="class">
+          <xsl:choose>
+            <xsl:when test="../Item[1]=.">
+              <xsl:text>HimeDataCellTopRight</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>HimeDataCellCenterRight</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="count(Lookaheads/SymbolTerminalText)=0">∅</xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="Lookaheads"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </td>
     </tr>
   </xsl:template>

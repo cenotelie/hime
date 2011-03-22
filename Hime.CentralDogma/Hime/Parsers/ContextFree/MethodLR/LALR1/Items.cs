@@ -14,7 +14,7 @@
         /// Get the lookahead value
         /// </summary>
         /// <value>The lookahead value</value>
-        public TerminalSet Lookaheads { get { return p_Lookaheads; } }
+        public override TerminalSet Lookaheads { get { return p_Lookaheads; } }
 
         /// <summary>
         /// Construct the item from a rule, the dot position in the rule and the lookahead value

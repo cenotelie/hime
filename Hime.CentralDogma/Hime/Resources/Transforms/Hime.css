@@ -76,6 +76,76 @@
 	font-size: 10pt;
 }
 
+
+.HimeDataCellTopLeft
+{
+	border: Solid 1px Black;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	font-family: Sans-Serif;
+	font-size: 10pt;
+}
+.HimeDataCellTop
+{
+	border-top: Solid 1px Black;
+	border-bottom: Solid 1px Black;
+	border-right: Solid 1px Black;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	font-family: Sans-Serif;
+	font-size: 10pt;
+}
+.HimeDataCellTopRight
+{
+	border-top: Solid 1px Black;
+	border-bottom: Solid 1px Black;
+	border-right: Solid 1px Black;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	font-family: Sans-Serif;
+	font-size: 10pt;
+}
+.HimeDataCellCenterLeft
+{
+	border-left: Solid 1px Black;
+	border-bottom: Solid 1px Black;
+	border-right: Solid 1px Black;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	font-family: Sans-Serif;
+	font-size: 10pt;
+}
+.HimeDataCellCenter
+{
+	border-bottom: Solid 1px Black;
+	border-right: Solid 1px Black;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	font-family: Sans-Serif;
+	font-size: 10pt;
+}
+.HimeDataCellCenterRight
+{
+	border-bottom: Solid 1px Black;
+	border-right: Solid 1px Black;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	font-family: Sans-Serif;
+	font-size: 10pt;
+}
+
 .HimeSymbolVariable
 {
     padding: 1px;

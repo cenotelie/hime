@@ -9,6 +9,7 @@
         /// The values of the lookahead
         /// </summary>
         protected Terminal p_Lookahead;
+        protected TerminalSet p_Lookaheads;
 
         /// <summary>
         /// Get the lookahead value
@@ -16,13 +17,20 @@
         /// <value>The lookahead value</value>
         public Terminal Lookahead { get { return p_Lookahead; } }
 
+        public override TerminalSet Lookaheads { get { return p_Lookaheads; } }
+
         /// <summary>
         /// Construct the item from a rule, the dot position in the rule and the lookahead value
         /// </summary>
         /// <param name="Rule">The rule on which the item is based</param>
         /// <param name="DotPosition">The position of the dot in the rule</param>
         /// <param name="OnSymbol">The lookahead value</param>
-        public ItemLR1(CFRule Rule, int DotPosition, Terminal Lookahead) : base(Rule, DotPosition) { p_Lookahead = Lookahead; }
+        public ItemLR1(CFRule Rule, int DotPosition, Terminal Lookahead) : base(Rule, DotPosition)
+        {
+            p_Lookahead = Lookahead;
+            p_Lookaheads = new TerminalSet();
+            p_Lookaheads.Add(Lookahead);
+        }
 
         /// <summary>
         /// Get the child of the current item

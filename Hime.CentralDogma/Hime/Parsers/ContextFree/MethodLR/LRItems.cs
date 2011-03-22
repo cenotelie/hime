@@ -77,6 +77,8 @@
         /// <value>The choice at the dot next position</value>
         public CFRuleDefinition NextChoice { get { return p_Rule.Definition.GetChoiceAtIndex(p_DotPosition + 1); } }
 
+        public abstract TerminalSet Lookaheads { get; }
+
         /// <summary>
         /// Construct the item from a rule, the dot position in the rule
         /// </summary>

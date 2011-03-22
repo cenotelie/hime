@@ -67,7 +67,13 @@
                 symbols.AppendChild(Document.CreateElement("Dot"));
             root.AppendChild(symbols);
 
-            //System.Xml.XmlNode lookaheads = Document.CreateElement("Lookaheads");
+            System.Xml.XmlNode lookaheads = Document.CreateElement("Lookaheads");
+            foreach (Terminal terminal in Item.Lookaheads)
+            {
+                System.Xml.XmlNode lookahead = terminal.GetXMLNode(Document);
+                lookaheads.AppendChild(lookahead);
+            }
+            root.AppendChild(lookaheads);
             return root;
         }
         protected ConflictType GetXMLData_ConflictType(ItemSet Set, Item Item)

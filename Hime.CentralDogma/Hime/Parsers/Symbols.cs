@@ -87,9 +87,11 @@
             Node.Attributes.Append(Doc.CreateAttribute("SID"));
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
             Node.Attributes.Append(Doc.CreateAttribute("Priority"));
+            Node.Attributes.Append(Doc.CreateAttribute("Value"));
             Node.Attributes["SID"].Value = p_SID.ToString();
             Node.Attributes["Name"].Value = p_LocalName.Replace("\"", "\\\"");
             Node.Attributes["Priority"].Value = p_Priority.ToString();
+            Node.Attributes["Value"].Value = this.ToString();
             return Node;
         }
     }
@@ -119,11 +121,13 @@
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
             Node.Attributes.Append(Doc.CreateAttribute("Priority"));
             Node.Attributes.Append(Doc.CreateAttribute("SubGrammar"));
+            Node.Attributes.Append(Doc.CreateAttribute("Value"));
             Node.Attributes["SID"].Value = p_SID.ToString("X");
             Node.Attributes["Name"].Value = p_LocalName.Replace("\"", "\\\"");
             Node.Attributes["Priority"].Value = p_Priority.ToString();
             if (p_SubGrammar != null)
                 Node.Attributes["SubGrammar"].Value = p_SubGrammar.CompleteName.ToString('_');
+            Node.Attributes["Value"].Value = this.ToString();
             return Node;
         }
 
