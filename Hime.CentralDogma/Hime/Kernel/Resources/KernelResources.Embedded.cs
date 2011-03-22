@@ -12,7 +12,7 @@
 
         public bool IsOpen { get { return !p_IsClosed; } }
         public bool IsClosed { get { return p_IsClosed; } }
-        public System.Collections.Generic.IEnumerable<string> Files { get { return p_Files; } }
+        public System.Collections.Generic.ICollection<string> Files { get { return p_Files; } }
 
         internal ResourceAccessor()
             : this(System.Reflection.Assembly.GetExecutingAssembly(), "Hime.Resources")

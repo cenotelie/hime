@@ -273,7 +273,7 @@
         /// Get an enumeration of the states in the NFA
         /// </summary>
         /// <value>An enumeration of the states in the NFA</value>
-        public System.Collections.Generic.IEnumerable<NFAState> States { get { return p_States; } }
+        public System.Collections.Generic.ICollection<NFAState> States { get { return p_States; } }
         /// <summary>
         /// Get the number of states in the NFA
         /// </summary>
@@ -544,7 +544,7 @@
         /// Add a collection of items to the set if not already present
         /// </summary>
         /// <param name="items">The items to add</param>
-        public new void AddRange(System.Collections.Generic.IEnumerable<NFAState> items)
+        public new void AddRange(System.Collections.Generic.ICollection<NFAState> items)
         {
             foreach (NFAState item in items)
             {

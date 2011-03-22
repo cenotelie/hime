@@ -27,8 +27,8 @@ namespace Hime.Parsers
         private Kernel.Namespace p_Root;
         private Kernel.Reporting.Reporter p_Reporter;
 
-        public IEnumerable<string> InputRawData { get { return p_RawInputs; } }
-        public IEnumerable<string> InputFiles { get { return p_FileInputs; } }
+        public ICollection<string> InputRawData { get { return p_RawInputs; } }
+        public ICollection<string> InputFiles { get { return p_FileInputs; } }
         public string GrammarName { get { return p_GrammarName; } }
         public string Namespace { get { return p_Namespace; } }
         public ParsingMethod Method { get { return p_Method; } }

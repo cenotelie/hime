@@ -28,7 +28,7 @@
         /// Constructs a definition representing the given part list
         /// </summary>
         /// <param name="Parts">The parts to compose the definition</param>
-        public CFRuleDefinition(System.Collections.Generic.IEnumerable<RuleDefinitionPart> Parts) : base(Parts) { p_Firsts = new TerminalSet(); }
+        public CFRuleDefinition(System.Collections.Generic.ICollection<RuleDefinitionPart> Parts) : base(Parts) { p_Firsts = new TerminalSet(); }
         /// <summary>
         /// Constructs a definition containing a single symbol with no action
         /// </summary>

@@ -4,7 +4,7 @@
     {
         private System.Collections.Generic.Dictionary<string, IResourceCompiler> p_Compilers;
 
-        public System.Collections.Generic.IEnumerable<IResourceCompiler> Compilers { get { return p_Compilers.Values; } }
+        public System.Collections.Generic.ICollection<IResourceCompiler> Compilers { get { return p_Compilers.Values; } }
 
         public ResourceCompilerRegister()
         {

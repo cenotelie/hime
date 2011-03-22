@@ -44,13 +44,19 @@
             public System.Collections.Generic.Dictionary<ushort, ushort> ShiftsOnTerminal;
             public System.Collections.Generic.Dictionary<ushort, ushort> ShiftsOnVariable;
             public System.Collections.Generic.List<Reduction> ReducsOnTerminal;
-            public State(string[] items, Terminal[] expected, System.Collections.Generic.Dictionary<ushort, ushort> st, System.Collections.Generic.Dictionary<ushort, ushort> sv, System.Collections.Generic.List<Reduction> rt)
+            public State(string[] items, Terminal[] expected, ushort[] st_keys, ushort[] st_val, ushort[] sv_keys, ushort[] sv_val, Reduction[] rt)
             {
                 Items = items;
                 Expected = expected;
-                ShiftsOnTerminal = st;
-                ShiftsOnVariable = sv;
-                ReducsOnTerminal = rt;
+                ShiftsOnTerminal = new System.Collections.Generic.Dictionary<ushort,ushort>();
+                ShiftsOnVariable = new System.Collections.Generic.Dictionary<ushort,ushort>();
+                ReducsOnTerminal = new System.Collections.Generic.List<Reduction>(rt.Length);
+                for (int i = 0; i != st_keys.Length; i++)
+                    ShiftsOnTerminal.Add(st_keys[i], st_val[i]);
+                for (int i = 0; i != sv_keys.Length; i++)
+                    ShiftsOnVariable.Add(sv_keys[i], sv_val[i]);
+                for (int i = 0; i != rt.Length; i++)
+                    ReducsOnTerminal.Add(rt[i]);
             }
 
             public ushort GetNextByShiftOnTerminal(ushort sid)

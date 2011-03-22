@@ -176,32 +176,64 @@
                 first = false;
             }
             p_Stream.WriteLine("},");
+
+            int ShitTerminalCount = 0;
+            foreach (Symbol Symbol in State.Children.Keys)
+            {
+                if (!(Symbol is Terminal))
+                    continue;
+                ShitTerminalCount++;
+            }
+
             // Write shifts on terminal
-            p_Stream.Write("               new System.Collections.Generic.Dictionary<ushort, ushort>() {");
+            p_Stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
                 if (!first) p_Stream.Write(", ");
-                p_Stream.Write("{ 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
+                p_Stream.Write("0x" + Symbol.SID.ToString("x"));
                 first = false;
             }
             p_Stream.WriteLine("},");
+            p_Stream.Write("               new ushort[" + ShitTerminalCount + "] {");
+            first = true;
+            foreach (Symbol Symbol in State.Children.Keys)
+            {
+                if (!(Symbol is Terminal))
+                    continue;
+                if (!first) p_Stream.Write(", ");
+                p_Stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                first = false;
+            }
+            p_Stream.WriteLine("},");
+
             // Write shifts on variable
-            p_Stream.Write("               new System.Collections.Generic.Dictionary<ushort, ushort>() {");
+            p_Stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
                 if (!first) p_Stream.Write(", ");
-                p_Stream.Write("{ 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
+                p_Stream.Write("0x" + Symbol.SID.ToString("x"));
+                first = false;
+            }
+            p_Stream.WriteLine("},");
+            p_Stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            first = true;
+            foreach (Symbol Symbol in State.Children.Keys)
+            {
+                if (!(Symbol is Variable))
+                    continue;
+                if (!first) p_Stream.Write(", ");
+                p_Stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
                 first = false;
             }
             p_Stream.WriteLine("},");
             // Write reductions
-            p_Stream.Write("               new System.Collections.Generic.List<Reduction>() {");
+            p_Stream.Write("               new Reduction[" + State.Reductions.Reductions.Count + "] {");
             first = true;
             foreach (ItemSetActionRNReduce Reduction in State.Reductions.Reductions)
             {

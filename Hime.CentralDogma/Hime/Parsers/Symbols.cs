@@ -351,7 +351,7 @@
             return true;
         }
 
-        public new bool AddRange(System.Collections.Generic.IEnumerable<Terminal> collection)
+        public new bool AddRange(System.Collections.Generic.ICollection<Terminal> collection)
         {
             bool mod = false;
             foreach (Terminal item in collection)

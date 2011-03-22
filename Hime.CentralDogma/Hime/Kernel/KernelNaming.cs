@@ -412,7 +412,7 @@
         /// <summary>
         /// Get an enumeration of the children symbols
         /// </summary>
-        public System.Collections.Generic.IEnumerable<Symbol> Children { get { return p_Children.Values; } }
+        public System.Collections.Generic.ICollection<Symbol> Children { get { return p_Children.Values; } }
 
         /// <summary>
         /// Initializes a new instance of the Symbol class

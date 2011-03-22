@@ -18,11 +18,11 @@
 
         public override string LocalName { get { return p_Name; } }
         public int NextSID { get { return p_NextSID; } }
-        public System.Collections.Generic.IEnumerable<string> Options { get { return p_Options.Keys; } }
-        public System.Collections.Generic.IEnumerable<Terminal> Terminals { get { return p_Terminals.Values; } }
-        public System.Collections.Generic.IEnumerable<CFVariable> Variables { get { return p_Variables.Values; } }
-        public System.Collections.Generic.IEnumerable<Virtual> Virtuals { get { return p_Virtuals.Values; } }
-        public System.Collections.Generic.IEnumerable<Action> Actions { get { return p_Actions.Values; } }
+        public System.Collections.Generic.ICollection<string> Options { get { return p_Options.Keys; } }
+        public System.Collections.Generic.ICollection<Terminal> Terminals { get { return p_Terminals.Values; } }
+        public System.Collections.Generic.ICollection<CFVariable> Variables { get { return p_Variables.Values; } }
+        public System.Collections.Generic.ICollection<Virtual> Virtuals { get { return p_Virtuals.Values; } }
+        public System.Collections.Generic.ICollection<Action> Actions { get { return p_Actions.Values; } }
         public System.Collections.Generic.List<CFRule> Rules
         {
             get
@@ -34,7 +34,7 @@
                 return p_Rules;
             }
         }
-        internal System.Collections.Generic.IEnumerable<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
+        internal System.Collections.Generic.ICollection<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
 
         public CFGrammar(string Name) : base()
         {

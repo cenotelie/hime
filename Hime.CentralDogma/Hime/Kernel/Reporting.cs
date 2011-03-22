@@ -37,7 +37,7 @@
         protected System.Collections.Generic.List<Entry> p_Entries;
         protected string p_Name;
 
-        public System.Collections.Generic.IEnumerable<Entry> Entries { get { return p_Entries; } }
+        public System.Collections.Generic.ICollection<Entry> Entries { get { return p_Entries; } }
         public string Name { get { return p_Name; } }
 
         public Section(string name)

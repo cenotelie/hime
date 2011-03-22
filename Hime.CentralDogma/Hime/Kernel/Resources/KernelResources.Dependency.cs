@@ -38,7 +38,7 @@
     {
         private System.Collections.Generic.Dictionary<Symbol, Resource> p_Resources;
 
-        public System.Collections.Generic.IEnumerable<Resource> Resources { get { return p_Resources.Values; } }
+        public System.Collections.Generic.ICollection<Resource> Resources { get { return p_Resources.Values; } }
 
         public ResourceGraph()
         {

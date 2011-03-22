@@ -19,7 +19,7 @@
         /// Get an enumeration of the kernel items
         /// </summary>
         /// <value>An enumeration of the kernel items</value>
-        public System.Collections.Generic.IEnumerable<Item> Items { get { return p_Items; } }
+        public System.Collections.Generic.ICollection<Item> Items { get { return p_Items; } }
 
         /// <summary>
         /// Construct the kernel
@@ -221,11 +221,11 @@
         /// Get an enumeration of the conflicts within the set
         /// </summary>
         /// <value>An enumeration of the conflicts within the set</value>
-        public System.Collections.Generic.IEnumerable<Conflict> Conflicts { get { return p_Conflicts; } }
+        public System.Collections.Generic.ICollection<Conflict> Conflicts { get { return p_Conflicts; } }
 
         public ItemSetReductions() { p_Conflicts = new System.Collections.Generic.List<Conflict>(); }
 
-        public abstract System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions { get; }
+        public abstract System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions { get; }
         public abstract TerminalSet ExpectedTerminals { get; }
 
         public abstract void Build(ItemSet Set);
@@ -281,7 +281,7 @@
         /// Get the items in the current set
         /// </summary>
         /// <value>An enumeration of the items in the set</value>
-        public System.Collections.Generic.IList<Item> Items { get { return p_Items; } }
+        public System.Collections.Generic.ICollection<Item> Items { get { return p_Items; } }
         /// <summary>
         /// Get a dictionnary representing transitions
         /// </summary>
@@ -291,7 +291,7 @@
         /// Get an enumeration of the conflicts within the set
         /// </summary>
         /// <value>An enumeration of the conflicts within the set</value>
-        public System.Collections.Generic.IEnumerable<Conflict> Conflicts { get { return p_Reductions.Conflicts; } }
+        public System.Collections.Generic.ICollection<Conflict> Conflicts { get { return p_Reductions.Conflicts; } }
         
         /// <summary>
         /// Constructs the set from its kernel and a list of items

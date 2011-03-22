@@ -182,7 +182,7 @@
         /// Constructs a definition representing the given part list
         /// </summary>
         /// <param name="Parts">The parts to compose the definition</param>
-        public RuleDefinition(System.Collections.Generic.IEnumerable<RuleDefinitionPart> Parts)
+        public RuleDefinition(System.Collections.Generic.ICollection<RuleDefinitionPart> Parts)
         {
             p_Parts = new System.Collections.Generic.List<RuleDefinitionPart>();
             p_Parts.AddRange(Parts);

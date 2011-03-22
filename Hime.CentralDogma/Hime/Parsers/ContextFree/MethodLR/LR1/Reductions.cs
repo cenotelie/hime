@@ -10,7 +10,7 @@
         /// </summary>
         private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions
+        public override System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions
         {
             get
             {

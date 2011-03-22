@@ -129,7 +129,7 @@
     class CFGrammarTemplateRuleParameters : System.Collections.Generic.List<Symbol>
     {
         public CFGrammarTemplateRuleParameters() : base() { }
-        public CFGrammarTemplateRuleParameters(System.Collections.Generic.IEnumerable<Symbol> Symbols) : base(Symbols) { }
+        public CFGrammarTemplateRuleParameters(System.Collections.Generic.ICollection<Symbol> Symbols) : base(Symbols) { }
     }
 
     class CFGrammarCompilerContext

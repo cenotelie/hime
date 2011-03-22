@@ -153,7 +153,7 @@
         protected System.Collections.Generic.List<UnicodeSpan> p_Spans;
 
         public string Name { get { return p_Name; } }
-        public System.Collections.Generic.IEnumerable<UnicodeSpan> Spans { get { return p_Spans; } }
+        public System.Collections.Generic.ICollection<UnicodeSpan> Spans { get { return p_Spans; } }
 
         protected UnicodeCategory(string name)
         {

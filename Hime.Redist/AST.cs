@@ -51,7 +51,7 @@
             Node.p_Action = Action;
             p_Children.Add(Node);
         }
-        public void AppendRange(System.Collections.Generic.IEnumerable<SyntaxTreeNode> Nodes)
+        public void AppendRange(System.Collections.Generic.ICollection<SyntaxTreeNode> Nodes)
         {
             System.Collections.Generic.List<SyntaxTreeNode> Temp = new System.Collections.Generic.List<SyntaxTreeNode>(Nodes);
             foreach (SyntaxTreeNode Node in Temp)

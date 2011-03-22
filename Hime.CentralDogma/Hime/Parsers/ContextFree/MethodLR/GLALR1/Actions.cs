@@ -10,7 +10,7 @@
         /// </summary>
         private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.IEnumerable<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
+        public override System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
         public override TerminalSet ExpectedTerminals
         {
             get

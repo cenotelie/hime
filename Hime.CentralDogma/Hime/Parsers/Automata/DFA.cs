@@ -86,7 +86,7 @@
         /// Add the given terminals as a finals for this state
         /// </summary>
         /// <param name="items">The terminals to add</param>
-        public void AddFinals(System.Collections.Generic.IEnumerable<Terminal> items)
+        public void AddFinals(System.Collections.Generic.ICollection<Terminal> items)
         {
             foreach (Terminal item in items)
                 AddFinal(item);
@@ -152,7 +152,7 @@
         /// </summary>
         private System.Collections.Generic.List<DFAState> p_States;
 
-        public System.Collections.Generic.IEnumerable<DFAState> States { get { return p_States; } }
+        public System.Collections.Generic.ICollection<DFAState> States { get { return p_States; } }
 
         /// <summary>
         /// Get the DFA state representative of the current group
@@ -444,7 +444,7 @@
         /// Get an enumeration of the DFA states
         /// </summary>
         /// <value>An enumeration of the DFA states</value>
-        public System.Collections.Generic.IEnumerable<DFAState> States { get { return p_States; } }
+        public System.Collections.Generic.ICollection<DFAState> States { get { return p_States; } }
         /// <summary>
         /// Get the entry state for the DFA
         /// </summary>
