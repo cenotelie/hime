@@ -2,59 +2,23 @@
 
 namespace Hime.Parsers.Automata
 {
-    /// <summary>
-    /// Represents a span of characters used as a transition in a terminal automaton.
-    /// </summary>
     public struct TerminalNFACharSpan
     {
-        /// <summary>
-        /// Beginning of the span
-        /// </summary>
         private char p_SpanBegin;
-        /// <summary>
-        /// End of the span
-        /// </summary>
         private char p_SpanEnd;
 
-        /// <summary>
-        /// Defines the null value for a span.
-        /// </summary>
         public static TerminalNFACharSpan Null = new TerminalNFACharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
 
-        /// <summary>
-        /// Get the span's begin
-        /// </summary>
-        /// <value>Span's begin</value>
         public char Begin { get { return p_SpanBegin; } }
-        /// <summary>
-        /// Get the span's end
-        /// </summary>
-        /// <value>The span's end</value>
         public char End { get { return p_SpanEnd; } }
-        /// <summary>
-        /// Get the span's length
-        /// </summary>
-        /// <value>The number of characters in the span.</value>
-        /// <remarks>This value is 0 for the null span.</remarks>
         public int Length { get { return p_SpanEnd - p_SpanBegin + 1; } }
 
-        /// <summary>
-        /// Creates and initialize a new span
-        /// </summary>
-        /// <param name="Begin">The span's beginning character</param>
-        /// <param name="End">The span's end character</param>
         public TerminalNFACharSpan(char Begin, char End)
         {
             p_SpanBegin = Begin;
             p_SpanEnd = End;
         }
 
-        /// <summary>
-        /// Get the intersection between two spans
-        /// </summary>
-        /// <param name="Left">The left span</param>
-        /// <param name="Right">The right span</param>
-        /// <returns>Returns the intersection span that may be the Null span value if the two spans do not intersect</returns>
         public static TerminalNFACharSpan Intersect(TerminalNFACharSpan Left, TerminalNFACharSpan Right)
         {
             if (Left.p_SpanBegin < Right.p_SpanBegin)
@@ -75,19 +39,6 @@ namespace Hime.Parsers.Automata
             }
         }
 
-        /// <summary>
-        /// Split the Original span into 1 or 2 pieces according to the Splitter span
-        /// </summary>
-        /// <param name="Original">The span to split</param>
-        /// <param name="Splitter">The splitter span</param>
-        /// <param name="Rest">The possibly second piece</param>
-        /// <returns>Returns the first piece that is contained by the Original</returns>
-        /// <remarks>
-        /// The function assumes that the Splitter span is contained by the Original span.
-        /// The function will returns two pieces P1 and P2, so that: P1 + Splitter + P2 = Original.
-        /// P1 and P2 my be empty. Note that if P1 is empty, P2 is empty and Splitter = Original.
-        /// P1 is the value returned by the function and P2 is the out parameter Rest.
-        /// </remarks>
         public static TerminalNFACharSpan Split(TerminalNFACharSpan Original, TerminalNFACharSpan Splitter, out TerminalNFACharSpan Rest)
         {
             if (Original.p_SpanBegin == Splitter.p_SpanBegin)
@@ -105,18 +56,8 @@ namespace Hime.Parsers.Automata
             return new TerminalNFACharSpan(Original.p_SpanBegin, System.Convert.ToChar(Splitter.p_SpanBegin - 1));
         }
 
-        /// <summary>
-        /// Compare two spans according to their respective beginning's values
-        /// </summary>
-        /// <param name="Left">The left span</param>
-        /// <param name="Right">The right span</param>
-        /// <returns>Returns the comparison value between the two beginning characters.</returns>
         public static int Compare(TerminalNFACharSpan Left, TerminalNFACharSpan Right) { return Left.p_SpanBegin.CompareTo(Right.p_SpanBegin); }
 
-        /// <summary>
-        /// Override the ToString function
-        /// </summary>
-        /// <returns>Returns a string of the form [B-E] where B is the beginning character and E the end character</returns>
         public override string ToString()
         {
             if (p_SpanBegin > p_SpanEnd)
@@ -154,11 +95,6 @@ namespace Hime.Parsers.Automata
             return result;
         }
 
-        /// <summary>
-        /// Override the Equals function 
-        /// </summary>
-        /// <param name="obj">The object to compare</param>
-        /// <returns>Returns true of obj is a span and is equal to the current one, returns false otherwise</returns>
         public override bool Equals(object obj)
         {
             if (obj is TerminalNFACharSpan)
@@ -168,66 +104,30 @@ namespace Hime.Parsers.Automata
             }
             return false;
         }
-        /// <summary>
-        /// Override the GetHashCode function
-        /// </summary>
-        /// <returns>Returns the value from the base's function</returns>
         public override int GetHashCode() { return base.GetHashCode(); }
     }
 
 
 
 
-    /// <summary>
-    /// Represents a NFA state for a terminal automata
-    /// </summary>
     public sealed class NFAState
     {
-        /// <summary>
-        /// List of the transitions from the current state
-        /// </summary>
-        /// <remarks>A transition is a couple (span, state) where the span is the transition value and the state the target state at the end of the transition</remarks>
         private List<KeyValuePair<TerminalNFACharSpan, NFAState>> p_Transitions;
-        /// <summary>
-        /// Terminal symbol that may be recognize at this state
-        /// null meaning the state is not final
-        /// </summary>
         private Terminal p_Final;
-        /// <summary>
-        /// Mark for the state
-        /// 0 meaning the state is not marked
-        /// </summary>
         private int p_Mark;
 
-        /// <summary>
-        /// List of the transitions from the current state
-        /// </summary>
-        /// <remarks>A transition is a couple (span, state) where the span is the transition value and the state the target state at the end of the transition</remarks>
         public List<KeyValuePair<TerminalNFACharSpan, NFAState>> Transitions { get { return p_Transitions; } }
-        /// <summary>
-        /// Get or set the terminal symbol that may be recognize at this state
-        /// null meaning the state is not final
-        /// </summary>
-        /// <value>Terminal symbol that may be recognize at this state</value>
         public Terminal Final
         {
             get { return p_Final; }
             set { p_Final = value; }
         }
-        /// <summary>
-        /// Get or set the mark for the state
-        /// 0 meaning the state is not marked
-        /// </summary>
-        /// <value>The mark for the state</value>
         public int Mark
         {
             get { return p_Mark; }
             set { p_Mark = value; }
         }
 
-        /// <summary>
-        /// Construct the state
-        /// </summary>
         public NFAState()
         {
             p_Transitions = new List<KeyValuePair<TerminalNFACharSpan, NFAState>>();
@@ -235,74 +135,32 @@ namespace Hime.Parsers.Automata
             p_Mark = 0;
         }
 
-        /// <summary>
-        /// Add a new transition from this state
-        /// </summary>
-        /// <param name="Value">The value of the transition</param>
-        /// <param name="Next">The target for the transition</param>
         public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { p_Transitions.Add(new KeyValuePair<TerminalNFACharSpan, NFAState>(Value, Next)); }
-        /// <summary>
-        /// Remove all transitions from the state
-        /// </summary>
         public void ClearTransitions() { p_Transitions.Clear(); }
     }
 
 
-    /// <summary>
-    /// Represents a terminal NFA
-    /// </summary>
     public sealed class NFA
     {
-        /// <summary>
-        /// Collection of NFA states
-        /// </summary>
         private List<NFAState> p_States;
-        /// <summary>
-        /// Entry state for the NFA
-        /// </summary>
         private NFAState p_StateEntry;
-        /// <summary>
-        /// Exist state for the NFA
-        /// </summary>
         private NFAState p_StateExit;
 
 
-        /// <summary>
-        /// Epsilon value for the ε-transitions
-        /// </summary>
         public static readonly TerminalNFACharSpan Epsilon = new TerminalNFACharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
-        /// <summary>
-        /// Get an enumeration of the states in the NFA
-        /// </summary>
-        /// <value>An enumeration of the states in the NFA</value>
         public ICollection<NFAState> States { get { return p_States; } }
-        /// <summary>
-        /// Get the number of states in the NFA
-        /// </summary>
-        /// <value>The number of states in the NFA</value>
         public int StatesCount { get { return p_States.Count; } }
-        /// <summary>
-        /// Get or set the entry state for the NFA
-        /// </summary>
-        /// <value>The entry state for the NFA</value>
         public NFAState StateEntry
         {
             get { return p_StateEntry; }
             set { p_StateEntry = value; }
         }
-        /// <summary>
-        /// Get or set the exit state for the NFA
-        /// </summary>
-        /// <value>The exit state for the NFA</value>
         public NFAState StateExit
         {
             get { return p_StateExit; }
             set { p_StateExit = value; }
         }
 
-        /// <summary>
-        /// Construct an empty NFA
-        /// </summary>
         public NFA()
         {
             p_States = new List<NFAState>();
@@ -323,10 +181,6 @@ namespace Hime.Parsers.Automata
             p_StateEntry = p_States[0];
         }
 
-        /// <summary>
-        /// Create a new state in the NFA and return it
-        /// </summary>
-        /// <returns>Returns the new state</returns>
         public NFAState AddNewState()
         {
             NFAState State = new NFAState();
@@ -334,16 +188,7 @@ namespace Hime.Parsers.Automata
             return State;
         }
 
-        /// <summary>
-        /// Clone the current NFA and return the clone keeping the final informations
-        /// </summary>
-        /// <returns>Returns the clone</returns>
         public NFA Clone() { return Clone(true); }
-        /// <summary>
-        /// Clone the current NFA
-        /// </summary>
-        /// <param name="KeepFinals">Keep the final information</param>
-        /// <returns>Returns the clone</returns>
         public NFA Clone(bool KeepFinals)
         {
             NFA Copy = new NFA();
@@ -527,25 +372,13 @@ namespace Hime.Parsers.Automata
     }
 
 
-    /// <summary>
-    /// Represents a set of NFA states.
-    /// </summary>
-    /// <remarks>This is used to build a DFA equivalent to a NFA</remarks>
     public sealed class NFAStateSet : List<NFAState>
     {
-        /// <summary>
-        /// Add the given item to the set if not already present
-        /// </summary>
-        /// <param name="item">The item to add</param>
         public new void Add(NFAState item)
         {
             if (!base.Contains(item))
                 base.Add(item);
         }
-        /// <summary>
-        /// Add a collection of items to the set if not already present
-        /// </summary>
-        /// <param name="items">The items to add</param>
         public new void AddRange(IEnumerable<NFAState> items)
         {
             foreach (NFAState item in items)
@@ -581,16 +414,6 @@ namespace Hime.Parsers.Automata
                         this.Remove(T.Value);
         }
 
-        /// <summary>
-        /// Normalize the current set
-        /// </summary>
-        /// <remarks>
-        /// Ensure that:
-        /// for each couple of transition (t1, t2), t1 and t2 are two different transitions from any NFA states in the set
-        /// -> t1's span == t2's span
-        ///     or
-        /// -> Intersection(t1's span, t2's span) == Empty.
-        /// </remarks>
         public void Normalize()
         {
             // Trace if modification has occured
@@ -649,10 +472,6 @@ namespace Hime.Parsers.Automata
             }
         }
 
-        /// <summary>
-        /// Compute the children and transition table for the current set
-        /// </summary>
-        /// <returns>Returns the transition table</returns>
         public Dictionary<TerminalNFACharSpan, NFAStateSet> GetTransitions()
         {
             Dictionary<TerminalNFACharSpan, NFAStateSet> Transitions = new Dictionary<TerminalNFACharSpan, NFAStateSet>();
@@ -683,10 +502,6 @@ namespace Hime.Parsers.Automata
             return Transitions;
         }
 
-        /// <summary>
-        /// Get the list of the terminal symbols in the current set
-        /// </summary>
-        /// <returns>The list of the terminal symbols in the current set</returns>
         public List<Terminal> GetFinals()
         {
             List<Terminal> Finals = new List<Terminal>();
@@ -696,12 +511,6 @@ namespace Hime.Parsers.Automata
             return Finals;
         }
 
-        /// <summary>
-        /// Define equality between two sets
-        /// </summary>
-        /// <param name="Left">Left operand</param>
-        /// <param name="Right">Right operand</param>
-        /// <returns>Returns true if the two operand have the same NFA states within, false otherwise</returns>
         public static bool operator ==(NFAStateSet Left, NFAStateSet Right)
         {
             if (Left.Count != Right.Count)
@@ -713,12 +522,6 @@ namespace Hime.Parsers.Automata
             }
             return true;
         }
-        /// <summary>
-        /// Define difference between two sets
-        /// </summary>
-        /// <param name="Left">Left operand</param>
-        /// <param name="Right">Right operand</param>
-        /// <returns>Returns false if the two operand have the same NFA states within, true otherwise</returns>
         public static bool operator !=(NFAStateSet Left, NFAStateSet Right)
         {
             if (Left.Count != Right.Count)
@@ -730,11 +533,6 @@ namespace Hime.Parsers.Automata
             }
             return true;
         }
-        /// <summary>
-        /// Override equality between objects
-        /// </summary>
-        /// <param name="obj">The object to test</param>
-        /// <returns>Returns true if obj is a NFA state set and is equal to the current one</returns>
         public override bool Equals(object obj)
         {
             if (obj is NFAStateSet)

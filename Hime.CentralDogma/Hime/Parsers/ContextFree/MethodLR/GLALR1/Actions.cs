@@ -2,14 +2,8 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents the actions for a GLALR(1) set
-    /// </summary>
     class ItemSetActionsGLALR1 : ItemSetReductions
     {
-        /// <summary>
-        /// Reduction actions
-        /// </summary>
         private List<ItemSetActionReduce> p_ActionReductions;
 
         public override ICollection<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
@@ -24,18 +18,11 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Constructs the actions
-        /// </summary>
         public ItemSetActionsGLALR1() : base()
         {
             p_ActionReductions = new List<ItemSetActionReduce>();
         }
 
-        /// <summary>
-        /// Build the actions for the given set of items
-        /// </summary>
-        /// <param name="Set">The set of items</param>
         public override void Build(ItemSet Set)
         {
             // Build shift actions

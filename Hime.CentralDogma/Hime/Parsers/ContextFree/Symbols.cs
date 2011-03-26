@@ -2,9 +2,6 @@
 
 namespace Hime.Parsers.CF
 {
-    /// <summary>
-    /// Represents a variable in a context-free grammar
-    /// </summary>
     public sealed class CFVariable : Variable
     {
         private List<CFRule> p_Rules;

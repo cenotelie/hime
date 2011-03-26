@@ -2,16 +2,10 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Implements the LALR(1) parsing method
-    /// </summary>
     class MethodLALR1 : CFParserGenerator
     {
         public string Name { get { return "LALR(1)"; } }
 
-        /// <summary>
-        /// Construct the method
-        /// </summary>
         public MethodLALR1() { }
 
         public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
@@ -35,12 +29,6 @@ namespace Hime.Parsers.CF.LR
             return new LR1ParserData(this, Grammar, Graph);
         }
 
-        /// <summary>
-        /// Constructs a LR Graph for the given grammar
-        /// </summary>
-        /// <param name="Grammar">The original grammar</param>
-        /// <param name="Log">Log for output</param>
-        /// <returns>Returns the constructed LR graph</returns>
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             Graph GraphLR0 = MethodLR0.ConstructGraph(Grammar, Log);

@@ -2,74 +2,30 @@
 
 namespace Hime.Parsers.Automata
 {
-    /// <summary>
-    /// Represents a terminal DFA state
-    /// </summary>
     public sealed class DFAState
     {
-        /// <summary>
-        /// The transitions from the current state
-        /// </summary>
         private Dictionary<TerminalNFACharSpan, DFAState> p_Transitions;
-        /// <summary>
-        /// The symbol recognized at this state with maximal priority
-        /// </summary>
         private Terminal p_Final;
-        /// <summary>
-        /// The list of the terminal symbols recognized at this state
-        /// </summary>
         private List<Terminal> p_Finals;
-        /// <summary>
-        /// The ID of the state
-        /// </summary>
         private int p_ID;
 
-        /// <summary>
-        /// Get the terminal recognized at this state with the maximal priority
-        /// </summary>
         public Terminal Final { get { return p_Final; } }
-        /// <summary>
-        /// Get the list of the terminal recognized at this state
-        /// </summary>
         public List<Terminal> Finals { get { return p_Finals; } }
-        /// <summary>
-        /// Get the transitions for the current state
-        /// </summary>
-        /// <value>The transitions from the current state</value>
         public Dictionary<TerminalNFACharSpan, DFAState> Transitions { get { return p_Transitions; } }
-        /// <summary>
-        /// Get the number of finals for this state
-        /// </summary>
-        /// <value>The number of terminal symbols recognized at this state</value>
         public int FinalsCount { get { return p_Finals.Count; } }
-        /// <summary>
-        /// Get the number of transitions
-        /// </summary>
-        /// <value>The number of transition from this state</value>
         public int TransitionsCount { get { return p_Transitions.Count; } }
-        /// <summary>
-        /// Get or set the state's ID
-        /// </summary>
-        /// <value>The state's ID</value>
         public int ID
         {
             get { return p_ID; }
             set { p_ID = value; }
         }
 
-        /// <summary>
-        /// Construct the state
-        /// </summary>
         public DFAState()
         {
             p_Finals = new List<Terminal>();
             p_Transitions = new Dictionary<TerminalNFACharSpan, DFAState>();
         }
 
-        /// <summary>
-        /// Add the given terminal as a final for this state
-        /// </summary>
-        /// <param name="item">The terminal to add</param>
         public void AddFinal(Terminal item)
         {
             if (!p_Finals.Contains(item))
@@ -84,29 +40,14 @@ namespace Hime.Parsers.Automata
                 }
             }
         }
-        /// <summary>
-        /// Add the given terminals as a finals for this state
-        /// </summary>
-        /// <param name="items">The terminals to add</param>
         public void AddFinals(ICollection<Terminal> items)
         {
             foreach (Terminal item in items)
                 AddFinal(item);
         }
-        /// <summary>
-        /// Remove all finals for the current set
-        /// </summary>
         public void ClearFinals() { p_Finals.Clear(); p_Final = null; }
 
-        /// <summary>
-        /// Add a new transition from this state
-        /// </summary>
-        /// <param name="Value">The transition value</param>
-        /// <param name="Next">The target of the transition</param>
         public void AddTransition(TerminalNFACharSpan Value, DFAState Next) { p_Transitions.Add(Value, Next); }
-        /// <summary>
-        /// Remove all transitions for the state
-        /// </summary>
         public void ClearTransitions() { p_Transitions.Clear(); }
 
         public void RepackTransitions()
@@ -144,45 +85,22 @@ namespace Hime.Parsers.Automata
         }
     }
 
-    /// <summary>
-    /// Represents a set of DFA states
-    /// </summary>
     public sealed class DFAStateGroup
     {
-        /// <summary>
-        /// The list of states in the current group
-        /// </summary>
         private List<DFAState> p_States;
 
         public ICollection<DFAState> States { get { return p_States; } }
 
-        /// <summary>
-        /// Get the DFA state representative of the current group
-        /// </summary>
-        /// <value>The DFA state representative of the current group</value>
         public DFAState Representative { get { return p_States[0]; } }
 
-        /// <summary>
-        /// Construct the group with the given state as reprentant
-        /// </summary>
-        /// <param name="Init">The initial state for the group</param>
         public DFAStateGroup(DFAState Init)
         {
             p_States = new List<DFAState>();
             p_States.Add(Init);
         }
 
-        /// <summary>
-        /// Add a new state in the group
-        /// </summary>
-        /// <param name="State">The state to add</param>
         public void AddState(DFAState State) { p_States.Add(State); }
 
-        /// <summary>
-        /// Split the group according to the current partition
-        /// </summary>
-        /// <param name="Current">the current partition</param>
-        /// <returns>Returns the list of the resulting groups as a partition</returns>
         public DFAPartition Split(DFAPartition Current)
         {
             DFAPartition Partition = new DFAPartition();
@@ -191,42 +109,20 @@ namespace Hime.Parsers.Automata
             return Partition;
         }
 
-        /// <summary>
-        /// Determine if the given state is in the group
-        /// </summary>
-        /// <param name="State">State to test</param>
-        /// <returns>Returns true if the state is in the group, false otherwise</returns>
         public bool Contains(DFAState State) { return p_States.Contains(State); }
     }
 
 
-    /// <summary>
-    /// Represents a partition of a DFA. A partition is a set of DFA state groups
-    /// </summary>
     public sealed class DFAPartition
     {
-        /// <summary>
-        /// List of the partition's groups
-        /// </summary>
         private List<DFAStateGroup> p_Groups;
 
-        /// <summary>
-        /// Get the number of groups in the partition
-        /// </summary>
-        /// <value>The number of groups in the partition</value>
         public int GroupCount { get { return p_Groups.Count; } }
 
-        /// <summary>
-        /// Construct an empty partition
-        /// </summary>
         public DFAPartition()
         {
             p_Groups = new List<DFAStateGroup>();
         }
-        /// <summary>
-        /// Construct the partition from the given DFA
-        /// </summary>
-        /// <param name="DFA">The original DFA</param>
         public DFAPartition(DFA DFA)
         {
             p_Groups = new List<DFAStateGroup>();
@@ -270,12 +166,6 @@ namespace Hime.Parsers.Automata
                 p_Groups.Insert(0, NonFinals);
         }
 
-        /// <summary>
-        /// Determine of two states have the same finals
-        /// </summary>
-        /// <param name="Left">Left operand</param>
-        /// <param name="Right">Right operand</param>
-        /// <returns>Returns true if the two states have the same finals, false otherwise</returns>
         public bool DFAPartition_SameFinals(DFAState Left, DFAState Right)
         {
             if (Left.FinalsCount != Right.FinalsCount)
@@ -288,10 +178,6 @@ namespace Hime.Parsers.Automata
             return true;
         }
 
-        /// <summary>
-        /// Refine the current partition
-        /// </summary>
-        /// <returns></returns>
         public DFAPartition Refine()
         {
             DFAPartition New = new DFAPartition();
@@ -302,15 +188,6 @@ namespace Hime.Parsers.Automata
             return New;
         }
 
-        /// <summary>
-        /// Add the state to the current partition
-        /// </summary>
-        /// <param name="State">The state to insert</param>
-        /// <param name="Old">The old partition</param>
-        /// <remarks>
-        /// This function is used to split a group.
-        /// The current partition is a set of group resulting from the splitting of a group.
-        /// </remarks>
         public void AddState(DFAState State, DFAPartition Old)
         {
             bool Added = false;
@@ -330,18 +207,6 @@ namespace Hime.Parsers.Automata
                 p_Groups.Add(new DFAStateGroup(State));
         }
 
-        /// <summary>
-        /// Determine if two state have to be in the same group in a new partition
-        /// </summary>
-        /// <param name="S1">State 1</param>
-        /// <param name="S2">State 2</param>
-        /// <param name="Old">the old partition</param>
-        /// <returns>Returns true if the two states have to be in the same group</returns>
-        /// <remarks>
-        /// Two states have to be in the same group if they have the same transitions to the same groups in the old partition.
-        /// This function is used to split a group.
-        /// The current partition is a set of group resulting from the splitting of a group.
-        /// </remarks>
         private static bool AddState_SameGroup(DFAState S1, DFAState S2, DFAPartition Old)
         {
             if (S1.Transitions.Count != S2.Transitions.Count)
@@ -360,11 +225,6 @@ namespace Hime.Parsers.Automata
             return true;
         }
 
-        /// <summary>
-        /// Get the group in the partition of the given state
-        /// </summary>
-        /// <param name="State">The state to look for</param>
-        /// <returns>The group containing the state or null if not found</returns>
         private DFAStateGroup AddState_GetGroupOf(DFAState State)
         {
             foreach (DFAStateGroup Group in p_Groups)
@@ -373,10 +233,6 @@ namespace Hime.Parsers.Automata
             return null;
         }
 
-        /// <summary>
-        /// Get the DFA states resulting from the current partition
-        /// </summary>
-        /// <returns>The DFA corresponding to the groups in the partition</returns>
         public List<DFAState> GetDFAStates()
         {
             // For each group in the partition
@@ -417,11 +273,6 @@ namespace Hime.Parsers.Automata
             return States;
         }
 
-        /// <summary>
-        /// Get the group index in the partition of the given state
-        /// </summary>
-        /// <param name="State">The state to look for</param>
-        /// <returns>The index of the group containing the state or -1 if not found</returns>
         private int GetDFAStates_GetGroupIndexOf(DFAState State)
         {
             for (int i = 0; i != p_Groups.Count; i++)
@@ -432,35 +283,14 @@ namespace Hime.Parsers.Automata
     }
 
 
-    /// <summary>
-    /// Represent a terminal DFA
-    /// </summary>
     public sealed class DFA
     {
-        /// <summary>
-        /// List of the DFA states
-        /// </summary>
         private List<DFAState> p_States;
 
-        /// <summary>
-        /// Get an enumeration of the DFA states
-        /// </summary>
-        /// <value>An enumeration of the DFA states</value>
         public ICollection<DFAState> States { get { return p_States; } }
-        /// <summary>
-        /// Get the entry state for the DFA
-        /// </summary>
         public DFAState Entry { get { return p_States[0]; } }
 
-        /// <summary>
-        /// Construct the DFA form the given states
-        /// </summary>
-        /// <param name="States">The states for the DFA</param>
         private DFA(List<DFAState> States) { p_States = States; }
-        /// <summary>
-        /// Construct the DFA from the given NFA
-        /// </summary>
-        /// <param name="NFA">The original equivalent NFA</param>
         public DFA(NFA NFA)
         {
             p_States = new List<DFAState>();
@@ -519,10 +349,6 @@ namespace Hime.Parsers.Automata
             }
         }
 
-        /// <summary>
-        /// Create a new minimum DFA equivalent to the current one
-        /// </summary>
-        /// <returns>Return the minimum equivalent DFA</returns>
         public DFA Minimize()
         {
             DFAPartition Current = new DFAPartition(this);
@@ -541,9 +367,6 @@ namespace Hime.Parsers.Automata
                 State.RepackTransitions();
         }
 
-        /// <summary>
-        /// Remove non-terminal states that cannot lead to a terminal state
-        /// </summary>
         public void Prune()
         {
             Dictionary<DFAState, List<DFAState>> inverses = new Dictionary<DFAState, List<DFAState>>();

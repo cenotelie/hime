@@ -2,14 +2,8 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents the actions for a RNGLR(1) set
-    /// </summary>
     class ItemSetReductionsRNGLR1 : ItemSetReductions
     {
-        /// <summary>
-        /// Reduction actions
-        /// </summary>
         private List<ItemSetActionRNReduce> p_ActionReductions;
 
         public override ICollection<ItemSetActionReduce> Reductions
@@ -33,18 +27,11 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Constructs the actions
-        /// </summary>
         public ItemSetReductionsRNGLR1()
         {
             p_ActionReductions = new List<ItemSetActionRNReduce>();
         }
 
-        /// <summary>
-        /// Build the actions for the given set of items
-        /// </summary>
-        /// <param name="Set">The set of items</param>
         public override void Build(ItemSet Set)
         {
             // Build shift actions

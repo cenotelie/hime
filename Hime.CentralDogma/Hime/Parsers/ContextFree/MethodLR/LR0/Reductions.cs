@@ -2,14 +2,8 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents the actions for a LR(0) set
-    /// </summary>
     class ItemSetReductionsLR0 : ItemSetReductions
     {
-        /// <summary>
-        /// Reduction action (possibly empty)
-        /// </summary>
         private ItemSetActionReduce p_ActionReduce;
 
         public override ICollection<ItemSetActionReduce> Reductions
@@ -32,15 +26,8 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Constructs the actions
-        /// </summary>
         public ItemSetReductionsLR0() : base() { }
 
-        /// <summary>
-        /// Build the actions for the given set of items
-        /// </summary>
-        /// <param name="Set">The set of items</param>
         public override void Build(ItemSet Set)
         {
             Item Reduce = null;

@@ -2,40 +2,15 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents a graph of LALR(1) kernels based on a LR(0) graph
-    /// </summary>
     class KernelGraph
     {
-        /// <summary>
-        /// The LR(0) graph
-        /// </summary>
         private Graph p_GraphLR0;
-        /// <summary>
-        /// The LALR(1) graph
-        /// </summary>
         private Graph p_GraphLALR1;
-        /// <summary>
-        /// Dictionnary associating LR(0) sets to LALR(1) kernels
-        /// </summary>
         private Dictionary<ItemSetKernel, ItemSet> p_KernelsToLR0;
-        /// <summary>
-        /// Reverse-dictionnary associating LALR(1) kernels to LR(0) sets
-        /// </summary>
         private Dictionary<ItemSet, ItemSetKernel> p_LR0ToKernels;
-        /// <summary>
-        /// Lookaheads propagation table : source LALR(1) items
-        /// </summary>
         private List<ItemLALR1> p_PropagOrigins;
-        /// <summary>
-        /// Lookaheads propagation table : destination LALR(1) items
-        /// </summary>
         private List<ItemLALR1> p_PropagTargets;
 
-        /// <summary>
-        /// Constructs the graph from the given LR(0) graph
-        /// </summary>
-        /// <param name="GraphLR0">LR(0) graph</param>
         public KernelGraph(Graph GraphLR0)
         {
             p_GraphLR0 = GraphLR0;
@@ -45,9 +20,6 @@ namespace Hime.Parsers.CF.LR
             p_PropagTargets = new List<ItemLALR1>();
         }
 
-        /// <summary>
-        /// Create the LALR(1) kernels from the LR(0) sets
-        /// </summary>
         private void BuildKernels()
         {
             for (int i = 0; i != p_GraphLR0.Sets.Count; i++)
@@ -66,9 +38,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Build the propagation table
-        /// </summary>
         private void BuildPropagationTable()
         {
             foreach (ItemSetKernel KernelLALR1 in p_KernelsToLR0.Keys)
@@ -120,12 +89,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Get the child in the given kernel equals to the given copy
-        /// </summary>
-        /// <param name="Kernel">The kernel to search in</param>
-        /// <param name="Equivalent">The searched value</param>
-        /// <returns>Returns the item if found, null otherwise</returns>
         private static Item GetEquivalentInSet(ItemSetKernel Kernel, Item Equivalent)
         {
             foreach (Item Potential in Kernel.Items)
@@ -134,9 +97,6 @@ namespace Hime.Parsers.CF.LR
             return null;
         }
 
-        /// <summary>
-        /// Propagate lookaheads in LALR(1) items using the propagation table
-        /// </summary>
         private void BuildPropagate()
         {
             // Propagation table is built
@@ -156,9 +116,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Build the final LALR(1) sets and graph from the LALR(1) kernels
-        /// </summary>
         private void BuildGraphLALR1()
         {
             // Build sets
@@ -183,10 +140,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Get the final LALR(1) graph
-        /// </summary>
-        /// <returns>Returns the LALR(1) graph</returns>
         public Graph GetGraphLALR1()
         {
             BuildKernels();

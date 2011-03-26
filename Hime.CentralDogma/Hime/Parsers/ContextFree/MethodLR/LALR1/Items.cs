@@ -2,49 +2,20 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents a LALR(1) item
-    /// </summary>
     class ItemLALR1 : Item
     {
-        /// <summary>
-        /// The values of the lookahead
-        /// </summary>
         protected TerminalSet p_Lookaheads;
 
-        /// <summary>
-        /// Get the lookahead value
-        /// </summary>
-        /// <value>The lookahead value</value>
         public override TerminalSet Lookaheads { get { return p_Lookaheads; } }
 
-        /// <summary>
-        /// Construct the item from a rule, the dot position in the rule and the lookahead value
-        /// </summary>
-        /// <param name="Rule">The rule on which the item is based</param>
-        /// <param name="DotPosition">The position of the dot in the rule</param>
-        /// <param name="Lookaheads">The lookaheads values</param>
         public ItemLALR1(CFRule Rule, int DotPosition, TerminalSet Lookaheads) : base(Rule, DotPosition) { p_Lookaheads = new TerminalSet(Lookaheads); }
-        /// <summary>
-        /// Constructs the item from another item
-        /// </summary>
-        /// <param name="Copied">The copied item</param>
-        /// <remarks>The lookaheads are left empty</remarks>
         public ItemLALR1(Item Copied) : base(Copied.BaseRule, Copied.DotPosition) { p_Lookaheads = new TerminalSet(); }
 
-        /// <summary>
-        /// Get the child of the current item
-        /// </summary>
-        /// <returns>Returns the child item or null if the item's action is Reduce</returns>
         public override Item GetChild()
         {
             if (Action == ItemAction.Reduce) return null;
             return new ItemLALR1(p_Rule, p_DotPosition + 1, new TerminalSet(p_Lookaheads));
         }
-        /// <summary>
-        /// Compute the closure for this item and add it to given list
-        /// </summary>
-        /// <param name="Closure">The closure of items being computed</param>
         public override void CloseTo(List<Item> Closure)
         {
             // Get the next symbol in the item
@@ -95,11 +66,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Test if lookaheads are the same
-        /// </summary>
-        /// <param name="Item">The item to test</param>
-        /// <returns>Returns true if the lookaheads are equals, false otherwise</returns>
         protected bool Equals_Lookaheads(ItemLALR1 Item)
         {
             if (p_Lookaheads.Count != Item.p_Lookaheads.Count)
@@ -111,14 +77,6 @@ namespace Hime.Parsers.CF.LR
             }
             return true;
         }
-        /// <summary>
-        /// Test if two objects are equals in a general meaning
-        /// </summary>
-        /// <param name="obj">The object to test</param>
-        /// <returns>
-        /// If obj is not of the same type as this, returns false;
-        /// If obj is of the same type as this, returns true if the two items are equivalent, false otherwise
-        /// </returns>
         public override bool Equals(object obj)
         {
             if (obj is ItemLALR1)
@@ -131,16 +89,7 @@ namespace Hime.Parsers.CF.LR
         }
         public override int GetHashCode() { return base.GetHashCode(); }
 
-        /// <summary>
-        /// Returns a string representing the item
-        /// </summary>
-        /// <returns>A string represeting the item</returns>
         public override string ToString() { return ToString(false); }
-        /// <summary>
-        /// Returns a string representing the item with decoration
-        /// </summary>
-        /// <param name="ShowDecoration">True to show the decoration (lookaheads and watermarks)</param>
-        /// <returns>A string represeting the item</returns>
         public override string ToString(bool ShowDecoration)
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");

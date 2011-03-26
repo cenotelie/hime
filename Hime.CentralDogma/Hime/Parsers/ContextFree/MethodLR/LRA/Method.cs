@@ -2,16 +2,10 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Implements the LR(Automata) parsing method
-    /// </summary>
     class MethodLRA : CFParserGenerator
     {
         public string Name { get { return "LR(Automata)"; } }
 
-        /// <summary>
-        /// Construct the method
-        /// </summary>
         public MethodLRA() { }
 
         public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }

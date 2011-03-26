@@ -2,31 +2,15 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents a LR(1) item
-    /// </summary>
     class ItemLR1 : Item
     {
-        /// <summary>
-        /// The values of the lookahead
-        /// </summary>
         protected Terminal p_Lookahead;
         protected TerminalSet p_Lookaheads;
 
-        /// <summary>
-        /// Get the lookahead value
-        /// </summary>
-        /// <value>The lookahead value</value>
         public Terminal Lookahead { get { return p_Lookahead; } }
 
         public override TerminalSet Lookaheads { get { return p_Lookaheads; } }
 
-        /// <summary>
-        /// Construct the item from a rule, the dot position in the rule and the lookahead value
-        /// </summary>
-        /// <param name="Rule">The rule on which the item is based</param>
-        /// <param name="DotPosition">The position of the dot in the rule</param>
-        /// <param name="OnSymbol">The lookahead value</param>
         public ItemLR1(CFRule Rule, int DotPosition, Terminal Lookahead) : base(Rule, DotPosition)
         {
             p_Lookahead = Lookahead;
@@ -34,19 +18,11 @@ namespace Hime.Parsers.CF.LR
             p_Lookaheads.Add(Lookahead);
         }
 
-        /// <summary>
-        /// Get the child of the current item
-        /// </summary>
-        /// <returns>Returns the child item or null if the item's action is Reduce</returns>
         public override Item GetChild()
         {
             if (Action == ItemAction.Reduce) return null;
             return new ItemLR1(p_Rule, p_DotPosition + 1, p_Lookahead);
         }
-        /// <summary>
-        /// Compute the closure for this item and add it to given list
-        /// </summary>
-        /// <param name="Closure">The closure of items being computed</param>
         public override void CloseTo(List<Item> Closure)
         {
             // Get the next symbol in the item
@@ -95,14 +71,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Test if two objects are equals in a general meaning
-        /// </summary>
-        /// <param name="obj">The object to test</param>
-        /// <returns>
-        /// If obj is not of the same type as this, returns false;
-        /// If obj is of the same type as this, returns true if the two items are equivalent, false otherwise
-        /// </returns>
         public override bool Equals(object obj)
         {
             if (obj is ItemLR1)
@@ -115,16 +83,7 @@ namespace Hime.Parsers.CF.LR
         }
         public override int GetHashCode() { return base.GetHashCode(); }
 
-        /// <summary>
-        /// Returns a string representing the item
-        /// </summary>
-        /// <returns>A string represeting the item</returns>
         public override string ToString() { return ToString(false); }
-        /// <summary>
-        /// Returns a string representing the item with decoration
-        /// </summary>
-        /// <param name="ShowDecoration">True to show the decoration (lookaheads and watermarks)</param>
-        /// <returns>A string represeting the item</returns>
         public override string ToString(bool ShowDecoration)
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");

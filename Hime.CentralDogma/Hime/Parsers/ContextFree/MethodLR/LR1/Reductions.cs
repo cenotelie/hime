@@ -2,14 +2,8 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    /// <summary>
-    /// Represents the actions for a LR(1) set
-    /// </summary>
     class ItemSetReductionsLR1 : ItemSetReductions
     {
-        /// <summary>
-        /// Reduction actions
-        /// </summary>
         private List<ItemSetActionReduce> p_ActionReductions;
 
         public override ICollection<ItemSetActionReduce> Reductions
@@ -33,18 +27,11 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Constructs the actions
-        /// </summary>
         public ItemSetReductionsLR1() : base()
         {
             p_ActionReductions = new List<ItemSetActionReduce>();
         }
 
-        /// <summary>
-        /// Build the actions for the given set of items
-        /// </summary>
-        /// <param name="Set">The set of items</param>
         public override void Build(ItemSet Set)
         {
             // Recutions dictionnary for the given set
@@ -66,13 +53,6 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        /// <summary>
-        /// Handle a LR(1) Shift/Reduce conflict
-        /// </summary>
-        /// <param name="Conflicts">List of the previous conflicts</param>
-        /// <param name="ConflictuousItem">New conflictuous item</param>
-        /// <param name="Set">Set containing the conflictuous items</param>
-        /// <param name="OnSymbol">OnSymbol provoking the conflict</param>
         public static void HandleConflict_ShiftReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, ItemSet Set, Terminal Lookahead)
         {
             // Look for previous conflict
@@ -94,14 +74,6 @@ namespace Hime.Parsers.CF.LR
             Conflicts.Add(Conflict);
         }
 
-        /// <summary>
-        /// Handle a LR(1) Reduce/Reduce conflict
-        /// </summary>
-        /// <param name="Conflicts">List of the previous conflicts</param>
-        /// <param name="ConflictuousItem">New conflictuous item</param>
-        /// <param name="PreviousItem">Previous item with the reduction action</param>
-        /// <param name="Set">Set containing the conflictuous items</param>
-        /// <param name="OnSymbol">OnSymbol provoking the conflict</param>
         public static void HandleConflict_ReduceReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, ItemSet Set, Terminal Lookahead)
         {
             // Look for previous conflict
