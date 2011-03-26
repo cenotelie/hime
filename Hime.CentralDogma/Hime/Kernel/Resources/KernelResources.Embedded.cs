@@ -23,13 +23,13 @@ namespace Hime.Kernel.Resources
         {
             accessors.Add(this);
             this.assembly = assembly;
-            rootNamespace = assembly.GetName().Name;
+            this.rootNamespace = assembly.GetName().Name;
             if (defaultPath == null || defaultPath == string.Empty)
-                defaultPath = rootNamespace + ".";
+                this.defaultPath = rootNamespace + ".";
             else
-                defaultPath = rootNamespace + "." + defaultPath + ".";
-            files = new List<string>();
-            isClosed = false;
+                this.defaultPath = rootNamespace + "." + defaultPath + ".";
+            this.files = new List<string>();
+            this.isClosed = false;
         }
 
         public void Close()
