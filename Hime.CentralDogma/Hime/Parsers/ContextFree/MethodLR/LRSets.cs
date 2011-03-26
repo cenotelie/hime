@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents the kernel items for a set of items
@@ -8,7 +10,7 @@
         /// <summary>
         /// List of LR items
         /// </summary>
-        private System.Collections.Generic.List<Item> p_Items;
+        private List<Item> p_Items;
 
         /// <summary>
         /// Get the kernel size
@@ -19,14 +21,14 @@
         /// Get an enumeration of the kernel items
         /// </summary>
         /// <value>An enumeration of the kernel items</value>
-        public System.Collections.Generic.ICollection<Item> Items { get { return p_Items; } }
+        public ICollection<Item> Items { get { return p_Items; } }
 
         /// <summary>
         /// Construct the kernel
         /// </summary>
         public ItemSetKernel()
         {
-            p_Items = new System.Collections.Generic.List<Item>();
+            p_Items = new List<Item>();
         }
 
         /// <summary>
@@ -53,7 +55,7 @@
         public ItemSet GetClosure()
         {
             // The set's items
-            System.Collections.Generic.List<Item> Closure = new System.Collections.Generic.List<Item>(p_Items);
+            List<Item> Closure = new List<Item>(p_Items);
             // Close the set
             for (int i = 0; i != Closure.Count; i++)
                 Closure[i].CloseTo(Closure);
@@ -215,17 +217,17 @@
         /// <summary>
         /// List of the conflicts within the set
         /// </summary>
-        protected System.Collections.Generic.List<Conflict> p_Conflicts;
+        protected List<Conflict> p_Conflicts;
 
         /// <summary>
         /// Get an enumeration of the conflicts within the set
         /// </summary>
         /// <value>An enumeration of the conflicts within the set</value>
-        public System.Collections.Generic.ICollection<Conflict> Conflicts { get { return p_Conflicts; } }
+        public ICollection<Conflict> Conflicts { get { return p_Conflicts; } }
 
-        public ItemSetReductions() { p_Conflicts = new System.Collections.Generic.List<Conflict>(); }
+        public ItemSetReductions() { p_Conflicts = new List<Conflict>(); }
 
-        public abstract System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions { get; }
+        public abstract ICollection<ItemSetActionReduce> Reductions { get; }
         public abstract TerminalSet ExpectedTerminals { get; }
 
         public abstract void Build(ItemSet Set);
@@ -248,11 +250,11 @@
         /// <summary>
         /// List of the contained items
         /// </summary>
-        protected System.Collections.Generic.List<Item> p_Items;
+        protected List<Item> p_Items;
         /// <summary>
         /// Dictionnary associating children sets to symbols : represents transitions in the graph
         /// </summary>
-        protected System.Collections.Generic.Dictionary<Symbol, ItemSet> p_Children;
+        protected Dictionary<Symbol, ItemSet> p_Children;
         /// <summary>
         /// Actions for the current set
         /// </summary>
@@ -281,28 +283,28 @@
         /// Get the items in the current set
         /// </summary>
         /// <value>An enumeration of the items in the set</value>
-        public System.Collections.Generic.ICollection<Item> Items { get { return p_Items; } }
+        public ICollection<Item> Items { get { return p_Items; } }
         /// <summary>
         /// Get a dictionnary representing transitions
         /// </summary>
         /// <value>A dictionnary representing the transitions</value>
-        public System.Collections.Generic.Dictionary<Symbol, ItemSet> Children { get { return p_Children; } }
+        public Dictionary<Symbol, ItemSet> Children { get { return p_Children; } }
         /// <summary>
         /// Get an enumeration of the conflicts within the set
         /// </summary>
         /// <value>An enumeration of the conflicts within the set</value>
-        public System.Collections.Generic.ICollection<Conflict> Conflicts { get { return p_Reductions.Conflicts; } }
+        public ICollection<Conflict> Conflicts { get { return p_Reductions.Conflicts; } }
         
         /// <summary>
         /// Constructs the set from its kernel and a list of items
         /// </summary>
         /// <param name="Kernel">Set's kernel</param>
         /// <param name="Items">Set's items</param>
-        public ItemSet(ItemSetKernel Kernel, System.Collections.Generic.List<Item> Items)
+        public ItemSet(ItemSetKernel Kernel, List<Item> Items)
         {
             p_Kernel = Kernel;
             p_Items = Items;
-            p_Children = new System.Collections.Generic.Dictionary<Symbol, ItemSet>();
+            p_Children = new Dictionary<Symbol, ItemSet>();
         }
 
         /// <summary>
@@ -313,7 +315,7 @@
         public void BuildGraph(Graph Graph)
         {
             // Shift dictionnary for the current set
-            System.Collections.Generic.Dictionary<Symbol, ItemSetKernel> Shifts = new System.Collections.Generic.Dictionary<Symbol, ItemSetKernel>();
+            Dictionary<Symbol, ItemSetKernel> Shifts = new Dictionary<Symbol, ItemSetKernel>();
             // Build the children kernels from the shift actions
             foreach (Item Item in p_Items)
             {

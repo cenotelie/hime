@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// LR conflict type
@@ -39,7 +41,7 @@
         /// <summary>
         /// The conflictuous items
         /// </summary>
-        private System.Collections.Generic.List<Item> p_Items;
+        private List<Item> p_Items;
 
         public Hime.Kernel.Reporting.Level Level {
             get
@@ -85,13 +87,13 @@
             p_MethodType = MethodType;
             p_Type = Type;
             p_Lookahead = Lookahead;
-            p_Items = new System.Collections.Generic.List<Item>();
+            p_Items = new List<Item>();
         }
         public Conflict(System.Type MethodType, ConflictType Type)
         {
             p_MethodType = MethodType;
             p_Type = Type;
-            p_Items = new System.Collections.Generic.List<Item>();
+            p_Items = new List<Item>();
         }
 
         /// <summary>

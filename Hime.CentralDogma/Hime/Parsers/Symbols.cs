@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers
 {
     /// <summary>
     /// Base class for grammar symbols
@@ -342,7 +344,7 @@
 
 
 
-    public sealed class TerminalSet : System.Collections.Generic.List<Terminal>
+    public sealed class TerminalSet : List<Terminal>
     {
         public TerminalSet() : base() { }
         public TerminalSet(TerminalSet Copied) : base(Copied) { }
@@ -355,7 +357,7 @@
             return true;
         }
 
-        public new bool AddRange(System.Collections.Generic.IEnumerable<Terminal> collection)
+        public new bool AddRange(IEnumerable<Terminal> collection)
         {
             bool mod = false;
             foreach (Terminal item in collection)

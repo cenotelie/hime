@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Implements the LR(Automata) parsing method
@@ -18,7 +20,7 @@
             Reporter.Info("LR(Automata)", "LR(Automata) data ...");
             Graph graph = MethodLALR1.ConstructGraph(Grammar, Reporter);
             ConflictAnalyser analyser = new ConflictAnalyser(graph);
-            System.Collections.Generic.Dictionary<ItemSet, DeciderGraph> deciders = new System.Collections.Generic.Dictionary<ItemSet, DeciderGraph>();
+            Dictionary<ItemSet, DeciderGraph> deciders = new Dictionary<ItemSet, DeciderGraph>();
             // Output conflicts
             foreach (ItemSet Set in graph.Sets)
             {

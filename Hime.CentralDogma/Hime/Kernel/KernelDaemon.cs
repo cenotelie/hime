@@ -1,4 +1,6 @@
-﻿namespace Hime.Kernel
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel
 {
     /// <summary>
     /// Daemon static class
@@ -52,12 +54,12 @@
         public static void BuildUnicode(string File)
         {
             string[] classes = { "Lu", "Ll", "Lt", "Lm", "Lo", "L", "Mn", "Mc", "Me", "M", "Nd", "Nl", "No", "N", "Pc", "Pd", "Ps", "Pe", "Pi", "Pf", "Po", "P", "Sm", "Sc", "Sk", "So", "S", "Zs", "Zl", "Zp", "Z", "Cc", "Cf", "Cs", "Co", "Cn", "C" };
-            System.Collections.Generic.List<string> code = new System.Collections.Generic.List<string>();
+            List<string> code = new List<string>();
             for (int i = 0; i != classes.Length; i++)
                 BuildUnicode_Class(classes[i], code);
             System.IO.File.WriteAllLines(File, code.ToArray());
         }
-        private static void BuildUnicode_Class(string name, System.Collections.Generic.List<string> code)
+        private static void BuildUnicode_Class(string name, List<string> code)
         {
             System.Net.WebClient client = new System.Net.WebClient();
             string content = null;
@@ -69,7 +71,7 @@
             }
             System.Text.RegularExpressions.Regex exp = new System.Text.RegularExpressions.Regex("U\\+[0-9A-Za-z]+");
             System.Text.RegularExpressions.MatchCollection matches = exp.Matches(content);
-            System.Collections.Generic.List<System.UInt16> results = new System.Collections.Generic.List<System.UInt16>();
+            List<System.UInt16> results = new List<System.UInt16>();
             foreach (System.Text.RegularExpressions.Match match in matches)
             {
                 string temp = match.Value.Substring(2);

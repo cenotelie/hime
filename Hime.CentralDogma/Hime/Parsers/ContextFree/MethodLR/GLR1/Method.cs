@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Implements the GLR(1) parsing method

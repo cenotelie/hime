@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     class LR1ParserData : LRParserData
     {
@@ -74,7 +76,7 @@
         }
         protected void Export_Actions()
         {
-            System.Collections.Generic.List<string> Names = new System.Collections.Generic.List<string>();
+            List<string> Names = new List<string>();
             foreach (Action action in p_Grammar.Actions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
@@ -92,11 +94,11 @@
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLR1Parser parser, System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)");
+            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLR1Parser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)");
             p_Stream.WriteLine("        {");
             if (ParserLength != "0")
             {
-                p_Stream.WriteLine("            System.Collections.Generic.List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
+                p_Stream.WriteLine("            List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
                 p_Stream.WriteLine("            nodes.RemoveRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
             }
             p_Stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")");

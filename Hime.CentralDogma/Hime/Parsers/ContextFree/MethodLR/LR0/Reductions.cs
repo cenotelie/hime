@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents the actions for a LR(0) set
@@ -10,11 +12,11 @@
         /// </summary>
         private ItemSetActionReduce p_ActionReduce;
 
-        public override System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions
+        public override ICollection<ItemSetActionReduce> Reductions
         {
             get
             {
-                System.Collections.Generic.List<ItemSetActionReduce> Result = new System.Collections.Generic.List<ItemSetActionReduce>();
+                List<ItemSetActionReduce> Result = new List<ItemSetActionReduce>();
                 Result.Add(p_ActionReduce);
                 return Result;
             }

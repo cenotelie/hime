@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents the actions for a LALR(1) set
@@ -8,9 +10,9 @@
         /// <summary>
         /// Reduction actions
         /// </summary>
-        private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
+        private List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
+        public override ICollection<ItemSetActionReduce> Reductions { get { return p_ActionReductions; } }
         public override TerminalSet ExpectedTerminals
         {
             get
@@ -27,7 +29,7 @@
         /// </summary>
         public ItemSetReductionsLALR1() : base()
         {
-            p_ActionReductions = new System.Collections.Generic.List<ItemSetActionReduce>();
+            p_ActionReductions = new List<ItemSetActionReduce>();
         }
 
         /// <summary>
@@ -37,7 +39,7 @@
         public override void Build(ItemSet Set)
         {
             // Recutions dictionnary for the given set
-            System.Collections.Generic.Dictionary<Terminal, ItemLALR1> Reductions = new System.Collections.Generic.Dictionary<Terminal, ItemLALR1>();
+            Dictionary<Terminal, ItemLALR1> Reductions = new Dictionary<Terminal, ItemLALR1>();
             // Construct reductions
             foreach (ItemLALR1 Item in Set.Items)
             {

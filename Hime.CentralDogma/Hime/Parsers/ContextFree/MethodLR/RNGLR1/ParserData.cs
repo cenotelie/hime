@@ -1,16 +1,18 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     class RNGLR1ParserData : LRParserData
     {
         protected System.IO.StreamWriter p_Stream;
-        protected System.Collections.Generic.List<CFVariable> p_NullableVars;
-        protected System.Collections.Generic.List<CFRuleDefinition> p_NullableChoices;
+        protected List<CFVariable> p_NullableVars;
+        protected List<CFRuleDefinition> p_NullableChoices;
 
         public RNGLR1ParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
             : base(generator, gram, graph)
         {
-            p_NullableVars = new System.Collections.Generic.List<CFVariable>();
-            p_NullableChoices = new System.Collections.Generic.List<CFRuleDefinition>();
+            p_NullableVars = new List<CFVariable>();
+            p_NullableChoices = new List<CFRuleDefinition>();
         }
 
         protected void DetermineNullables()
@@ -88,7 +90,7 @@
         }
         protected void Export_Actions()
         {
-            System.Collections.Generic.List<string> Names = new System.Collections.Generic.List<string>();
+            List<string> Names = new List<string>();
             foreach (Action action in p_Grammar.Actions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
@@ -106,7 +108,7 @@
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, Hime.Redist.Parsers.SPPFNode root, System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode> nodes)");
+            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, Hime.Redist.Parsers.SPPFNode root, List<Hime.Redist.Parsers.SPPFNode> nodes)");
             p_Stream.WriteLine("        {");
             if (Rule.ReplaceOnProduction)
                 p_Stream.WriteLine("            root.Action = Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace;");
@@ -299,7 +301,7 @@
         protected void Export_NullBuilders()
         {
             p_Stream.WriteLine("        private static void BuildNullables() { ");
-            p_Stream.WriteLine("            System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode> temp = new System.Collections.Generic.List<Hime.Redist.Parsers.SPPFNode>();");
+            p_Stream.WriteLine("            List<Hime.Redist.Parsers.SPPFNode> temp = new List<Hime.Redist.Parsers.SPPFNode>();");
             for (int i=0; i!=p_NullableChoices.Count; i++)
             {
                 CFRuleDefinition definition = p_NullableChoices[i];

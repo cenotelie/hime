@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents a graph of LALR(1) kernels based on a LR(0) graph
@@ -16,19 +18,19 @@
         /// <summary>
         /// Dictionnary associating LR(0) sets to LALR(1) kernels
         /// </summary>
-        private System.Collections.Generic.Dictionary<ItemSetKernel, ItemSet> p_KernelsToLR0;
+        private Dictionary<ItemSetKernel, ItemSet> p_KernelsToLR0;
         /// <summary>
         /// Reverse-dictionnary associating LALR(1) kernels to LR(0) sets
         /// </summary>
-        private System.Collections.Generic.Dictionary<ItemSet, ItemSetKernel> p_LR0ToKernels;
+        private Dictionary<ItemSet, ItemSetKernel> p_LR0ToKernels;
         /// <summary>
         /// Lookaheads propagation table : source LALR(1) items
         /// </summary>
-        private System.Collections.Generic.List<ItemLALR1> p_PropagOrigins;
+        private List<ItemLALR1> p_PropagOrigins;
         /// <summary>
         /// Lookaheads propagation table : destination LALR(1) items
         /// </summary>
-        private System.Collections.Generic.List<ItemLALR1> p_PropagTargets;
+        private List<ItemLALR1> p_PropagTargets;
 
         /// <summary>
         /// Constructs the graph from the given LR(0) graph
@@ -37,10 +39,10 @@
         public KernelGraph(Graph GraphLR0)
         {
             p_GraphLR0 = GraphLR0;
-            p_KernelsToLR0 = new System.Collections.Generic.Dictionary<ItemSetKernel, ItemSet>();
-            p_LR0ToKernels = new System.Collections.Generic.Dictionary<ItemSet, ItemSetKernel>();
-            p_PropagOrigins = new System.Collections.Generic.List<ItemLALR1>();
-            p_PropagTargets = new System.Collections.Generic.List<ItemLALR1>();
+            p_KernelsToLR0 = new Dictionary<ItemSetKernel, ItemSet>();
+            p_LR0ToKernels = new Dictionary<ItemSet, ItemSetKernel>();
+            p_PropagOrigins = new List<ItemLALR1>();
+            p_PropagTargets = new List<ItemLALR1>();
         }
 
         /// <summary>

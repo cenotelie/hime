@@ -1,4 +1,6 @@
-﻿namespace Hime.Kernel.Reporting
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel.Reporting
 {
     public enum Level
     {
@@ -34,16 +36,16 @@
 
     public class Section
     {
-        protected System.Collections.Generic.List<Entry> p_Entries;
+        protected List<Entry> p_Entries;
         protected string p_Name;
 
-        public System.Collections.Generic.ICollection<Entry> Entries { get { return p_Entries; } }
+        public ICollection<Entry> Entries { get { return p_Entries; } }
         public string Name { get { return p_Name; } }
 
         public Section(string name)
         {
             p_Name = name;
-            p_Entries = new System.Collections.Generic.List<Entry>();
+            p_Entries = new List<Entry>();
         }
 
         public void AddEntry(Entry entry)
@@ -82,12 +84,12 @@
 
     public class Report
     {
-        protected System.Collections.Generic.List<Section> p_Sections;
-        public System.Collections.Generic.List<Section> Sections { get { return p_Sections; } }
+        protected List<Section> p_Sections;
+        public List<Section> Sections { get { return p_Sections; } }
 
         public Report()
         {
-            p_Sections = new System.Collections.Generic.List<Section>();
+            p_Sections = new List<Section>();
         }
 
         public Section AddSection(string name)

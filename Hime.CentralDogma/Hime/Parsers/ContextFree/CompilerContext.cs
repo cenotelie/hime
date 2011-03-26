@@ -1,10 +1,12 @@
-﻿namespace Hime.Parsers.CF
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF
 {
     class CFGrammarTemplateRule
     {
         private string p_HeadName;
-        private System.Collections.Generic.List<string> p_Parameters;
-        private System.Collections.Generic.List<CFGrammarTemplateRuleInstance> p_Instances;
+        private List<string> p_Parameters;
+        private List<CFGrammarTemplateRuleInstance> p_Instances;
         private CFGrammar p_Grammar;
         private CFGrammarCompiler p_Compiler;
         private Redist.Parsers.SyntaxTreeNode p_RuleNode;
@@ -12,7 +14,7 @@
 
         public string HeadName { get { return p_HeadName; } }
         public int ParametersCount { get { return p_Parameters.Count; } }
-        public System.Collections.Generic.List<string> Parameters { get { return p_Parameters; } }
+        public List<string> Parameters { get { return p_Parameters; } }
         public CFGrammarCompiler Compiler { get { return p_Compiler; } }
         public Redist.Parsers.SyntaxTreeNode RuleNode { get { return p_RuleNode; } }
         public Redist.Parsers.SyntaxTreeNode DefinitionNode { get { return p_DefinitionNode; } }
@@ -20,8 +22,8 @@
         public CFGrammarTemplateRule(CFGrammar Grammar, CFGrammarCompiler Compiler, Redist.Parsers.SyntaxTreeNode RuleNode)
         {
             p_HeadName = ((Redist.Parsers.SymbolTokenText)RuleNode.Children[0].Symbol).ValueText;
-            p_Parameters = new System.Collections.Generic.List<string>();
-            p_Instances = new System.Collections.Generic.List<CFGrammarTemplateRuleInstance>();
+            p_Parameters = new List<string>();
+            p_Instances = new List<CFGrammarTemplateRuleInstance>();
             p_Grammar = Grammar;
             p_Compiler = Compiler;
             p_RuleNode = RuleNode;
@@ -33,8 +35,8 @@
         public CFGrammarTemplateRule(CFGrammarTemplateRule Copied, CFGrammar Data)
         {
             p_HeadName = Copied.p_HeadName;
-            p_Parameters = new System.Collections.Generic.List<string>(Copied.p_Parameters);
-            p_Instances = new System.Collections.Generic.List<CFGrammarTemplateRuleInstance>();
+            p_Parameters = new List<string>(Copied.p_Parameters);
+            p_Instances = new List<CFGrammarTemplateRuleInstance>();
             p_Grammar = Data;
             p_Compiler = Copied.p_Compiler;
             p_RuleNode = Copied.p_RuleNode;
@@ -126,32 +128,32 @@
         }
     }
 
-    class CFGrammarTemplateRuleParameters : System.Collections.Generic.List<Symbol>
+    class CFGrammarTemplateRuleParameters : List<Symbol>
     {
         public CFGrammarTemplateRuleParameters() : base() { }
-        public CFGrammarTemplateRuleParameters(System.Collections.Generic.ICollection<Symbol> Symbols) : base(Symbols) { }
+        public CFGrammarTemplateRuleParameters(ICollection<Symbol> Symbols) : base(Symbols) { }
     }
 
     class CFGrammarCompilerContext
     {
         private CFGrammarCompiler p_Compiler;
-        private System.Collections.Generic.List<CFGrammarTemplateRule> p_TemplateRules;
-        private System.Collections.Generic.Dictionary<string, Symbol> p_References;
+        private List<CFGrammarTemplateRule> p_TemplateRules;
+        private Dictionary<string, Symbol> p_References;
 
         public CFGrammarCompiler Compiler { get { return p_Compiler; } }
 
         public CFGrammarCompilerContext(CFGrammarCompiler Compiler)
         {
             p_Compiler = Compiler;
-            p_TemplateRules = new System.Collections.Generic.List<CFGrammarTemplateRule>();
-            p_References = new System.Collections.Generic.Dictionary<string, Symbol>();
+            p_TemplateRules = new List<CFGrammarTemplateRule>();
+            p_References = new Dictionary<string, Symbol>();
         }
 
         public CFGrammarCompilerContext(CFGrammarCompilerContext Copied)
         {
             p_Compiler = Copied.Compiler;
-            p_TemplateRules = new System.Collections.Generic.List<CFGrammarTemplateRule>(Copied.p_TemplateRules);
-            p_References = new System.Collections.Generic.Dictionary<string, Symbol>();
+            p_TemplateRules = new List<CFGrammarTemplateRule>(Copied.p_TemplateRules);
+            p_References = new Dictionary<string, Symbol>();
         }
 
         public void AddTemplateRule(CFGrammarTemplateRule TemplateRule) { p_TemplateRules.Add(TemplateRule); }

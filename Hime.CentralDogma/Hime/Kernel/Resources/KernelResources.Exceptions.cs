@@ -1,4 +1,6 @@
-﻿namespace Hime.Kernel.Resources
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel.Resources
 {
     /// <summary>
     /// Base abstract exception for resources

@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.Automata
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.Automata
 {
     /// <summary>
     /// Represents a terminal DFA state
@@ -8,7 +10,7 @@
         /// <summary>
         /// The transitions from the current state
         /// </summary>
-        private System.Collections.Generic.Dictionary<TerminalNFACharSpan, DFAState> p_Transitions;
+        private Dictionary<TerminalNFACharSpan, DFAState> p_Transitions;
         /// <summary>
         /// The symbol recognized at this state with maximal priority
         /// </summary>
@@ -16,7 +18,7 @@
         /// <summary>
         /// The list of the terminal symbols recognized at this state
         /// </summary>
-        private System.Collections.Generic.List<Terminal> p_Finals;
+        private List<Terminal> p_Finals;
         /// <summary>
         /// The ID of the state
         /// </summary>
@@ -29,12 +31,12 @@
         /// <summary>
         /// Get the list of the terminal recognized at this state
         /// </summary>
-        public System.Collections.Generic.List<Terminal> Finals { get { return p_Finals; } }
+        public List<Terminal> Finals { get { return p_Finals; } }
         /// <summary>
         /// Get the transitions for the current state
         /// </summary>
         /// <value>The transitions from the current state</value>
-        public System.Collections.Generic.Dictionary<TerminalNFACharSpan, DFAState> Transitions { get { return p_Transitions; } }
+        public Dictionary<TerminalNFACharSpan, DFAState> Transitions { get { return p_Transitions; } }
         /// <summary>
         /// Get the number of finals for this state
         /// </summary>
@@ -60,8 +62,8 @@
         /// </summary>
         public DFAState()
         {
-            p_Finals = new System.Collections.Generic.List<Terminal>();
-            p_Transitions = new System.Collections.Generic.Dictionary<TerminalNFACharSpan, DFAState>();
+            p_Finals = new List<Terminal>();
+            p_Transitions = new Dictionary<TerminalNFACharSpan, DFAState>();
         }
 
         /// <summary>
@@ -86,7 +88,7 @@
         /// Add the given terminals as a finals for this state
         /// </summary>
         /// <param name="items">The terminals to add</param>
-        public void AddFinals(System.Collections.Generic.ICollection<Terminal> items)
+        public void AddFinals(ICollection<Terminal> items)
         {
             foreach (Terminal item in items)
                 AddFinal(item);
@@ -109,17 +111,17 @@
 
         public void RepackTransitions()
         {
-            System.Collections.Generic.Dictionary<DFAState, System.Collections.Generic.List<TerminalNFACharSpan>> Inverse = new System.Collections.Generic.Dictionary<DFAState, System.Collections.Generic.List<TerminalNFACharSpan>>();
-            foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, DFAState> Transition in p_Transitions)
+            Dictionary<DFAState, List<TerminalNFACharSpan>> Inverse = new Dictionary<DFAState, List<TerminalNFACharSpan>>();
+            foreach (KeyValuePair<TerminalNFACharSpan, DFAState> Transition in p_Transitions)
             {
                 if (!Inverse.ContainsKey(Transition.Value))
-                    Inverse.Add(Transition.Value, new System.Collections.Generic.List<TerminalNFACharSpan>());
+                    Inverse.Add(Transition.Value, new List<TerminalNFACharSpan>());
                 Inverse[Transition.Value].Add(Transition.Key);
             }
             p_Transitions.Clear();
             foreach (DFAState Child in Inverse.Keys)
             {
-                System.Collections.Generic.List<TerminalNFACharSpan> Keys = Inverse[Child];
+                List<TerminalNFACharSpan> Keys = Inverse[Child];
                 Keys.Sort(new System.Comparison<Automata.TerminalNFACharSpan>(Automata.TerminalNFACharSpan.Compare));
                 for (int i = 0; i != Keys.Count; i++)
                 {
@@ -150,9 +152,9 @@
         /// <summary>
         /// The list of states in the current group
         /// </summary>
-        private System.Collections.Generic.List<DFAState> p_States;
+        private List<DFAState> p_States;
 
-        public System.Collections.Generic.ICollection<DFAState> States { get { return p_States; } }
+        public ICollection<DFAState> States { get { return p_States; } }
 
         /// <summary>
         /// Get the DFA state representative of the current group
@@ -166,7 +168,7 @@
         /// <param name="Init">The initial state for the group</param>
         public DFAStateGroup(DFAState Init)
         {
-            p_States = new System.Collections.Generic.List<DFAState>();
+            p_States = new List<DFAState>();
             p_States.Add(Init);
         }
 
@@ -206,7 +208,7 @@
         /// <summary>
         /// List of the partition's groups
         /// </summary>
-        private System.Collections.Generic.List<DFAStateGroup> p_Groups;
+        private List<DFAStateGroup> p_Groups;
 
         /// <summary>
         /// Get the number of groups in the partition
@@ -219,7 +221,7 @@
         /// </summary>
         public DFAPartition()
         {
-            p_Groups = new System.Collections.Generic.List<DFAStateGroup>();
+            p_Groups = new List<DFAStateGroup>();
         }
         /// <summary>
         /// Construct the partition from the given DFA
@@ -227,7 +229,7 @@
         /// <param name="DFA">The original DFA</param>
         public DFAPartition(DFA DFA)
         {
-            p_Groups = new System.Collections.Generic.List<DFAStateGroup>();
+            p_Groups = new List<DFAStateGroup>();
             // Partition the DFA states between final and non-finals
             DFAStateGroup NonFinals = null;
             // For each state in the DFA
@@ -375,7 +377,7 @@
         /// Get the DFA states resulting from the current partition
         /// </summary>
         /// <returns>The DFA corresponding to the groups in the partition</returns>
-        public System.Collections.Generic.List<DFAState> GetDFAStates()
+        public List<DFAState> GetDFAStates()
         {
             // For each group in the partition
             foreach (DFAStateGroup Group in p_Groups)
@@ -394,7 +396,7 @@
                 if (Found) break;
             }
 
-            System.Collections.Generic.List<DFAState> States = new System.Collections.Generic.List<DFAState>();
+            List<DFAState> States = new List<DFAState>();
             // For each group in the partition
             // Create the coresponding state and add the finals
             foreach (DFAStateGroup Group in p_Groups)
@@ -438,13 +440,13 @@
         /// <summary>
         /// List of the DFA states
         /// </summary>
-        private System.Collections.Generic.List<DFAState> p_States;
+        private List<DFAState> p_States;
 
         /// <summary>
         /// Get an enumeration of the DFA states
         /// </summary>
         /// <value>An enumeration of the DFA states</value>
-        public System.Collections.Generic.ICollection<DFAState> States { get { return p_States; } }
+        public ICollection<DFAState> States { get { return p_States; } }
         /// <summary>
         /// Get the entry state for the DFA
         /// </summary>
@@ -454,16 +456,16 @@
         /// Construct the DFA form the given states
         /// </summary>
         /// <param name="States">The states for the DFA</param>
-        private DFA(System.Collections.Generic.List<DFAState> States) { p_States = States; }
+        private DFA(List<DFAState> States) { p_States = States; }
         /// <summary>
         /// Construct the DFA from the given NFA
         /// </summary>
         /// <param name="NFA">The original equivalent NFA</param>
         public DFA(NFA NFA)
         {
-            p_States = new System.Collections.Generic.List<DFAState>();
+            p_States = new List<DFAState>();
 
-            System.Collections.Generic.List<NFAStateSet> p_NFAStateSets = new System.Collections.Generic.List<NFAStateSet>();
+            List<NFAStateSet> p_NFAStateSets = new List<NFAStateSet>();
             // Create the first NFA set, add the entry and close it
             NFAStateSet NFAInit = new NFAStateSet();
             p_NFAStateSets.Add(NFAInit);
@@ -481,7 +483,7 @@
                 p_NFAStateSets[i].Normalize();
 
                 // Get the transitions for the set
-                System.Collections.Generic.Dictionary<TerminalNFACharSpan, NFAStateSet> Transitions = p_NFAStateSets[i].GetTransitions();
+                Dictionary<TerminalNFACharSpan, NFAStateSet> Transitions = p_NFAStateSets[i].GetTransitions();
                 // For each transition
                 foreach (TerminalNFACharSpan Value in Transitions.Keys)
                 {
@@ -544,14 +546,14 @@
         /// </summary>
         public void Prune()
         {
-            System.Collections.Generic.Dictionary<DFAState, System.Collections.Generic.List<DFAState>> inverses = new System.Collections.Generic.Dictionary<DFAState, System.Collections.Generic.List<DFAState>>();
-            System.Collections.Generic.List<DFAState> finals = new System.Collections.Generic.List<DFAState>();
+            Dictionary<DFAState, List<DFAState>> inverses = new Dictionary<DFAState, List<DFAState>>();
+            List<DFAState> finals = new List<DFAState>();
             foreach (DFAState state in p_States)
             {
                 foreach (DFAState next in state.Transitions.Values)
                 {
                     if (!inverses.ContainsKey(next))
-                        inverses.Add(next, new System.Collections.Generic.List<DFAState>());
+                        inverses.Add(next, new List<DFAState>());
                     inverses[next].Add(state);
                 }
                 if (state.FinalsCount != 0)
@@ -580,7 +582,7 @@
                     {
                         foreach (DFAState antecedent in inverses[state])
                         {
-                            System.Collections.Generic.List<TerminalNFACharSpan> keys = new System.Collections.Generic.List<TerminalNFACharSpan>(antecedent.Transitions.Keys);
+                            List<TerminalNFACharSpan> keys = new List<TerminalNFACharSpan>(antecedent.Transitions.Keys);
                             foreach (TerminalNFACharSpan key in keys)
                                 if (antecedent.Transitions[key] == state)
                                     antecedent.Transitions.Remove(key);

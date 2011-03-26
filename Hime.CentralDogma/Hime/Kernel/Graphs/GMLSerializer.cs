@@ -1,4 +1,6 @@
-﻿namespace Hime.Kernel.Graphs
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel.Graphs
 {
     public sealed class GMLSerializer
     {

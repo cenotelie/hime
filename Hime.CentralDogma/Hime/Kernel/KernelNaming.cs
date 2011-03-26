@@ -1,4 +1,6 @@
-﻿namespace Hime.Kernel
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel
 {
     /// <summary>
     /// Base abstract class representing a naming exception
@@ -231,7 +233,7 @@
         /// <summary>
         /// Complete path for the name
         /// </summary>
-        private System.Collections.Generic.List<string> p_Path;
+        private List<string> p_Path;
 
         /// <summary>
         /// Get the separator used to separate local names in a path
@@ -280,14 +282,14 @@
         /// <param name="Name">Local name</param>
         public QualifiedName(string name)
         {
-            p_Path = new System.Collections.Generic.List<string>();
+            p_Path = new List<string>();
             p_Path.Add(name);
         }
         /// <summary>
         /// Initializes a new instance of the QualifiedName class with a path
         /// </summary>
         /// <param name="Path">Path</param>
-        public QualifiedName(System.Collections.Generic.List<string> path) { p_Path = path; }
+        public QualifiedName(List<string> path) { p_Path = path; }
 
         /// <summary>
         /// Creates a new qualified name from a string representation
@@ -296,7 +298,7 @@
         /// <returns>Returns the qualified name</returns>
         public static QualifiedName ParseName(string completeName)
         {
-            System.Collections.Generic.List<string> Path = new System.Collections.Generic.List<string>();
+            List<string> Path = new List<string>();
             int Begin = 0;
             int End = 0;
             while (End != completeName.Length)
@@ -345,7 +347,7 @@
         /// <returns>Returns a qualified name</returns>
         public static QualifiedName operator +(QualifiedName prefix, string localName)
         {
-            System.Collections.Generic.List<string> Path = new System.Collections.Generic.List<string>();
+            List<string> Path = new List<string>();
             Path.AddRange(prefix.p_Path);
             Path.Add(localName);
             return new QualifiedName(Path);
@@ -387,7 +389,7 @@
         /// <summary>
         /// Children symbols' dictionary
         /// </summary>
-        protected System.Collections.Generic.Dictionary<string, Symbol> p_Children;
+        protected Dictionary<string, Symbol> p_Children;
 
         /// <summary>
         /// Get the parent symbol
@@ -412,14 +414,14 @@
         /// <summary>
         /// Get an enumeration of the children symbols
         /// </summary>
-        public System.Collections.Generic.ICollection<Symbol> Children { get { return p_Children.Values; } }
+        public ICollection<Symbol> Children { get { return p_Children.Values; } }
 
         /// <summary>
         /// Initializes a new instance of the Symbol class
         /// </summary>
         public Symbol()
         {
-            p_Children = new System.Collections.Generic.Dictionary<string, Symbol>();
+            p_Children = new Dictionary<string, Symbol>();
             p_Access = SymbolAccess.Public;
         }
 
@@ -513,7 +515,7 @@
         /// <summary>
         /// Children namespaces
         /// </summary>
-        private System.Collections.Generic.Dictionary<string, Namespace> p_Namespaces;
+        private Dictionary<string, Namespace> p_Namespaces;
 
         /// <summary>
         /// Get the parent symbol
@@ -541,10 +543,10 @@
             p_Parent = parent;
             p_LocalName = name;
             if (p_Parent == null)
-                p_CompleteName = new QualifiedName(new System.Collections.Generic.List<string>());
+                p_CompleteName = new QualifiedName(new List<string>());
             else
                 p_CompleteName = p_Parent.p_CompleteName + p_LocalName;
-            p_Namespaces = new System.Collections.Generic.Dictionary<string, Namespace>();
+            p_Namespaces = new Dictionary<string, Namespace>();
         }
 
         /// <summary>

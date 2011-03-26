@@ -1,21 +1,23 @@
-﻿namespace Hime.Parsers.CF
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF
 {
     /// <summary>
     /// Represents a variable in a context-free grammar
     /// </summary>
     public sealed class CFVariable : Variable
     {
-        private System.Collections.Generic.List<CFRule> p_Rules;
+        private List<CFRule> p_Rules;
         private TerminalSet p_Firsts;
         private TerminalSet p_Followers;
 
-        public System.Collections.Generic.List<CFRule> Rules { get { return p_Rules; } }
+        public List<CFRule> Rules { get { return p_Rules; } }
         public TerminalSet Firsts { get { return p_Firsts; } }
         public TerminalSet Followers { get { return p_Followers; } }
 
         public CFVariable(Grammar Parent, ushort SID, string Name) : base(Parent, SID, Name)
         {
-            p_Rules = new System.Collections.Generic.List<CFRule>();
+            p_Rules = new List<CFRule>();
             p_Firsts = new TerminalSet();
             p_Followers = new TerminalSet();
         }

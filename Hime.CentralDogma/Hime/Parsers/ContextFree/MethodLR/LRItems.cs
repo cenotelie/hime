@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// The action to be taken for a LR item
@@ -113,7 +115,7 @@
         /// Compute the closure for this item and add it to given list
         /// </summary>
         /// <param name="Closure">The closure of items being computed</param>
-        public abstract void CloseTo(System.Collections.Generic.List<Item> Closure);
+        public abstract void CloseTo(List<Item> Closure);
 
         /// <summary>
         /// Test if two objects are equals in a general meaning

@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers
 {
     /// <summary>
     /// Define the possible action fot the associated symbol on rule production during the parsing process
@@ -160,7 +162,7 @@
         /// <summary>
         /// List of the parts composing the definition
         /// </summary>
-        protected System.Collections.Generic.List<RuleDefinitionPart> p_Parts;
+        protected List<RuleDefinitionPart> p_Parts;
 
         /// <summary>
         /// Get the length of the definition
@@ -171,20 +173,20 @@
         /// Get a list of the parts composing the definition
         /// </summary>
         /// <value>List of the parts</value>
-        public System.Collections.Generic.List<RuleDefinitionPart> Parts { get { return p_Parts; } }
+        public List<RuleDefinitionPart> Parts { get { return p_Parts; } }
 
 
         /// <summary>
         /// Constructs an empty definition
         /// </summary>
-        public RuleDefinition() { p_Parts = new System.Collections.Generic.List<RuleDefinitionPart>(); }
+        public RuleDefinition() { p_Parts = new List<RuleDefinitionPart>(); }
         /// <summary>
         /// Constructs a definition representing the given part list
         /// </summary>
         /// <param name="Parts">The parts to compose the definition</param>
-        public RuleDefinition(System.Collections.Generic.ICollection<RuleDefinitionPart> Parts)
+        public RuleDefinition(ICollection<RuleDefinitionPart> Parts)
         {
-            p_Parts = new System.Collections.Generic.List<RuleDefinitionPart>();
+            p_Parts = new List<RuleDefinitionPart>();
             p_Parts.AddRange(Parts);
         }
         /// <summary>
@@ -193,7 +195,7 @@
         /// <param name="UniqueSymbol">The unique symbol of the definition</param>
         public RuleDefinition(Symbol UniqueSymbol)
         {
-            p_Parts = new System.Collections.Generic.List<RuleDefinitionPart>();
+            p_Parts = new List<RuleDefinitionPart>();
             p_Parts.Add(new RuleDefinitionPart(UniqueSymbol, RuleDefinitionPartAction.Nothing));
         }
 

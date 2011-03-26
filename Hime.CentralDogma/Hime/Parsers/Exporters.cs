@@ -1,9 +1,11 @@
-﻿namespace Hime.Parsers.Exporters
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.Exporters
 {
     class TextLexerExporter
     {
-        private System.Collections.Generic.List<Terminal> p_Symbols;
-        private System.Collections.Generic.List<int> p_Indices;
+        private List<Terminal> p_Symbols;
+        private List<int> p_Indices;
         private Automata.DFA p_FinalDFA;
         private Terminal p_Separator;
         private string p_Namespace;
@@ -17,8 +19,8 @@
             p_Namespace = Namespace;
             p_Name = Name;
             p_Separator = Separator;
-            p_Symbols = new System.Collections.Generic.List<Terminal>();
-            p_Indices = new System.Collections.Generic.List<int>();
+            p_Symbols = new List<Terminal>();
+            p_Indices = new List<int>();
             foreach (Automata.DFAState State in p_FinalDFA.States)
             {
                 if (State.Final != null)
@@ -73,7 +75,7 @@
             p_Stream.WriteLine("        protected override void setup() {");
             p_Stream.WriteLine("            p_SymbolsSID = p_StaticSymbolsSID;");
             p_Stream.WriteLine("            p_SymbolsName = p_StaticSymbolsName;");
-            p_Stream.WriteLine("            p_SymbolsSubGrammars = new System.Collections.Generic.Dictionary<ushort, MatchSubGrammar>();");
+            p_Stream.WriteLine("            p_SymbolsSubGrammars = new Dictionary<ushort, MatchSubGrammar>();");
             p_Stream.WriteLine("            p_Transitions = p_StaticTransitions;");
             p_Stream.WriteLine("            p_Finals = p_StaticFinals;");
             if (p_Separator != null)

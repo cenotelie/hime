@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF
 {
     class CFGrammarCompiler : Kernel.Resources.IResourceCompiler
     {
@@ -53,7 +55,7 @@
                         if (Symbol is Grammar)
                         {
                             bool Found = false;
-                            foreach (System.Collections.Generic.KeyValuePair<string, Kernel.Resources.Resource> D in Resource.Dependencies)
+                            foreach (KeyValuePair<string, Kernel.Resources.Resource> D in Resource.Dependencies)
                             {
                                 if (D.Value.Symbol == Symbol)
                                 {
@@ -186,7 +188,7 @@
                 Value = Value.Substring(1);
                 Positive = false;
             }
-            System.Collections.Generic.List<Automata.TerminalNFACharSpan> Spans = new System.Collections.Generic.List<Automata.TerminalNFACharSpan>();
+            List<Automata.TerminalNFACharSpan> Spans = new List<Automata.TerminalNFACharSpan>();
             for (int i = 0; i != Value.Length; i++)
             {
                 if ((i != Value.Length - 1) && (Value[i + 1] == '-'))

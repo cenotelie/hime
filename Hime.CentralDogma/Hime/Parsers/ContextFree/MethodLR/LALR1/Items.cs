@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents a LALR(1) item
@@ -43,7 +45,7 @@
         /// Compute the closure for this item and add it to given list
         /// </summary>
         /// <param name="Closure">The closure of items being computed</param>
-        public override void CloseTo(System.Collections.Generic.List<Item> Closure)
+        public override void CloseTo(List<Item> Closure)
         {
             // Get the next symbol in the item
             Symbol Next = NextSymbol;

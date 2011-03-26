@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.Automata
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.Automata
 {
     /// <summary>
     /// Represents a span of characters used as a transition in a terminal automaton.
@@ -185,7 +187,7 @@
         /// List of the transitions from the current state
         /// </summary>
         /// <remarks>A transition is a couple (span, state) where the span is the transition value and the state the target state at the end of the transition</remarks>
-        private System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState>> p_Transitions;
+        private List<KeyValuePair<TerminalNFACharSpan, NFAState>> p_Transitions;
         /// <summary>
         /// Terminal symbol that may be recognize at this state
         /// null meaning the state is not final
@@ -201,7 +203,7 @@
         /// List of the transitions from the current state
         /// </summary>
         /// <remarks>A transition is a couple (span, state) where the span is the transition value and the state the target state at the end of the transition</remarks>
-        public System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState>> Transitions { get { return p_Transitions; } }
+        public List<KeyValuePair<TerminalNFACharSpan, NFAState>> Transitions { get { return p_Transitions; } }
         /// <summary>
         /// Get or set the terminal symbol that may be recognize at this state
         /// null meaning the state is not final
@@ -228,7 +230,7 @@
         /// </summary>
         public NFAState()
         {
-            p_Transitions = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState>>();
+            p_Transitions = new List<KeyValuePair<TerminalNFACharSpan, NFAState>>();
             p_Final = null;
             p_Mark = 0;
         }
@@ -238,7 +240,7 @@
         /// </summary>
         /// <param name="Value">The value of the transition</param>
         /// <param name="Next">The target for the transition</param>
-        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { p_Transitions.Add(new System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState>(Value, Next)); }
+        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { p_Transitions.Add(new KeyValuePair<TerminalNFACharSpan, NFAState>(Value, Next)); }
         /// <summary>
         /// Remove all transitions from the state
         /// </summary>
@@ -254,7 +256,7 @@
         /// <summary>
         /// Collection of NFA states
         /// </summary>
-        private System.Collections.Generic.List<NFAState> p_States;
+        private List<NFAState> p_States;
         /// <summary>
         /// Entry state for the NFA
         /// </summary>
@@ -273,7 +275,7 @@
         /// Get an enumeration of the states in the NFA
         /// </summary>
         /// <value>An enumeration of the states in the NFA</value>
-        public System.Collections.Generic.ICollection<NFAState> States { get { return p_States; } }
+        public ICollection<NFAState> States { get { return p_States; } }
         /// <summary>
         /// Get the number of states in the NFA
         /// </summary>
@@ -303,13 +305,13 @@
         /// </summary>
         public NFA()
         {
-            p_States = new System.Collections.Generic.List<NFAState>();
+            p_States = new List<NFAState>();
         }
 
         public NFA(DFA DFA)
         {
-            p_States = new System.Collections.Generic.List<NFAState>();
-            System.Collections.Generic.List<DFAState> DFAStates = new System.Collections.Generic.List<DFAState>(DFA.States);
+            p_States = new List<NFAState>();
+            List<DFAState> DFAStates = new List<DFAState>(DFA.States);
             foreach (DFAState State in DFAStates)
                 p_States.Add(new NFAState());
             for (int i = 0; i != DFAStates.Count; i++)
@@ -358,7 +360,7 @@
             // Make linkage
             for (int i = 0; i != p_States.Count; i++)
             {
-                foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState> Transition in p_States[i].Transitions)
+                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in p_States[i].Transitions)
                     Copy.p_States[i].AddTransition(Transition.Key, Copy.p_States[p_States.IndexOf(Transition.Value)]);
             }
             if (p_StateEntry != null)
@@ -529,7 +531,7 @@
     /// Represents a set of NFA states.
     /// </summary>
     /// <remarks>This is used to build a DFA equivalent to a NFA</remarks>
-    public sealed class NFAStateSet : System.Collections.Generic.List<NFAState>
+    public sealed class NFAStateSet : List<NFAState>
     {
         /// <summary>
         /// Add the given item to the set if not already present
@@ -544,7 +546,7 @@
         /// Add a collection of items to the set if not already present
         /// </summary>
         /// <param name="items">The items to add</param>
-        public new void AddRange(System.Collections.Generic.IEnumerable<NFAState> items)
+        public new void AddRange(IEnumerable<NFAState> items)
         {
             foreach (NFAState item in items)
             {
@@ -557,7 +559,7 @@
         private void Close_Normal()
         {
             for (int i = 0; i != Count; i++)
-                foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState> Transition in this[i].Transitions)
+                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in this[i].Transitions)
                     if (Transition.Key.Equals(NFA.Epsilon))
                         this.Add(Transition.Value);
         }
@@ -574,7 +576,7 @@
                 if (State.Mark < 0) StateNegative = State;
             }
             if (StatePositive != null && StateNegative != null)
-                foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState> T in StatePositive.Transitions)
+                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> T in StatePositive.Transitions)
                     if (T.Key.Equals(NFA.Epsilon))
                         this.Remove(T.Value);
         }
@@ -629,13 +631,13 @@
                                     TerminalNFACharSpan Part1;
                                     TerminalNFACharSpan Part2;
                                     Part1 = TerminalNFACharSpan.Split(this[s1].Transitions[t1].Key, Inter, out Part2);
-                                    this[s1].Transitions[t1] = new System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState>(Inter, this[s1].Transitions[t1].Value);
+                                    this[s1].Transitions[t1] = new KeyValuePair<TerminalNFACharSpan, NFAState>(Inter, this[s1].Transitions[t1].Value);
                                     if (Part1.Length != 0) this[s1].AddTransition(Part1, this[s1].Transitions[t1].Value);
                                     if (Part2.Length != 0) this[s1].AddTransition(Part2, this[s1].Transitions[t1].Value);
 
                                     // Split transition2 in 1, 2 or 3 transitions and modifiy the states accordingly
                                     Part1 = TerminalNFACharSpan.Split(this[s2].Transitions[t2].Key, Inter, out Part2);
-                                    this[s2].Transitions[t2] = new System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState>(Inter, this[s2].Transitions[t2].Value);
+                                    this[s2].Transitions[t2] = new KeyValuePair<TerminalNFACharSpan, NFAState>(Inter, this[s2].Transitions[t2].Value);
                                     if (Part1.Length != 0) this[s2].AddTransition(Part1, this[s2].Transitions[t2].Value);
                                     if (Part2.Length != 0) this[s2].AddTransition(Part2, this[s2].Transitions[t2].Value);
                                     Modify = true;
@@ -651,14 +653,14 @@
         /// Compute the children and transition table for the current set
         /// </summary>
         /// <returns>Returns the transition table</returns>
-        public System.Collections.Generic.Dictionary<TerminalNFACharSpan, NFAStateSet> GetTransitions()
+        public Dictionary<TerminalNFACharSpan, NFAStateSet> GetTransitions()
         {
-            System.Collections.Generic.Dictionary<TerminalNFACharSpan, NFAStateSet> Transitions = new System.Collections.Generic.Dictionary<TerminalNFACharSpan, NFAStateSet>();
+            Dictionary<TerminalNFACharSpan, NFAStateSet> Transitions = new Dictionary<TerminalNFACharSpan, NFAStateSet>();
             // For each state
             foreach (NFAState State in this)
             {
                 // For each transition
-                foreach (System.Collections.Generic.KeyValuePair<TerminalNFACharSpan, NFAState> Transition in State.Transitions)
+                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in State.Transitions)
                 {
                     // If this is an ε-transition : pass
                     if (Transition.Key.Equals(NFA.Epsilon))
@@ -685,9 +687,9 @@
         /// Get the list of the terminal symbols in the current set
         /// </summary>
         /// <returns>The list of the terminal symbols in the current set</returns>
-        public System.Collections.Generic.List<Terminal> GetFinals()
+        public List<Terminal> GetFinals()
         {
-            System.Collections.Generic.List<Terminal> Finals = new System.Collections.Generic.List<Terminal>();
+            List<Terminal> Finals = new List<Terminal>();
             foreach (NFAState State in this)
                 if (State.Final != null)
                     Finals.Add(State.Final);

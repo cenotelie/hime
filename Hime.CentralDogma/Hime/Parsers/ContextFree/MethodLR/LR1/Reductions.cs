@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents the actions for a LR(1) set
@@ -8,13 +10,13 @@
         /// <summary>
         /// Reduction actions
         /// </summary>
-        private System.Collections.Generic.List<ItemSetActionReduce> p_ActionReductions;
+        private List<ItemSetActionReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions
+        public override ICollection<ItemSetActionReduce> Reductions
         {
             get
             {
-                System.Collections.Generic.List<ItemSetActionReduce> Result = new System.Collections.Generic.List<ItemSetActionReduce>();
+                List<ItemSetActionReduce> Result = new List<ItemSetActionReduce>();
                 foreach (ItemSetActionReduce action in p_ActionReductions)
                     Result.Add(action);
                 return Result;
@@ -36,7 +38,7 @@
         /// </summary>
         public ItemSetReductionsLR1() : base()
         {
-            p_ActionReductions = new System.Collections.Generic.List<ItemSetActionReduce>();
+            p_ActionReductions = new List<ItemSetActionReduce>();
         }
 
         /// <summary>
@@ -46,7 +48,7 @@
         public override void Build(ItemSet Set)
         {
             // Recutions dictionnary for the given set
-            System.Collections.Generic.Dictionary<Terminal, ItemLR1> Reductions = new System.Collections.Generic.Dictionary<Terminal, ItemLR1>();
+            Dictionary<Terminal, ItemLR1> Reductions = new Dictionary<Terminal, ItemLR1>();
             // Construct reductions
             foreach (ItemLR1 Item in Set.Items)
             {
@@ -71,7 +73,7 @@
         /// <param name="ConflictuousItem">New conflictuous item</param>
         /// <param name="Set">Set containing the conflictuous items</param>
         /// <param name="OnSymbol">OnSymbol provoking the conflict</param>
-        public static void HandleConflict_ShiftReduce(System.Type MethodType, System.Collections.Generic.List<Conflict> Conflicts, Item ConflictuousItem, ItemSet Set, Terminal Lookahead)
+        public static void HandleConflict_ShiftReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, ItemSet Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)
@@ -100,7 +102,7 @@
         /// <param name="PreviousItem">Previous item with the reduction action</param>
         /// <param name="Set">Set containing the conflictuous items</param>
         /// <param name="OnSymbol">OnSymbol provoking the conflict</param>
-        public static void HandleConflict_ReduceReduce(System.Type MethodType, System.Collections.Generic.List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, ItemSet Set, Terminal Lookahead)
+        public static void HandleConflict_ReduceReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, ItemSet Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)

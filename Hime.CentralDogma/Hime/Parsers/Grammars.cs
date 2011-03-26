@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers
 {
     /// <summary>
     /// Common interface for grammars

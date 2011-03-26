@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF
 {
     public interface CFParserGenerator : ParserGenerator
     {
@@ -9,41 +11,41 @@
     {
         protected string p_Name;
         protected ushort p_NextSID;
-        protected System.Collections.Generic.Dictionary<string, string> p_Options;
-        protected System.Collections.Generic.Dictionary<string, Terminal> p_Terminals;
-        protected System.Collections.Generic.Dictionary<string, CFVariable> p_Variables;
-        protected System.Collections.Generic.Dictionary<string, Virtual> p_Virtuals;
-        protected System.Collections.Generic.Dictionary<string, Action> p_Actions;
-        internal System.Collections.Generic.List<CFGrammarTemplateRule> p_TemplateRules;
+        protected Dictionary<string, string> p_Options;
+        protected Dictionary<string, Terminal> p_Terminals;
+        protected Dictionary<string, CFVariable> p_Variables;
+        protected Dictionary<string, Virtual> p_Virtuals;
+        protected Dictionary<string, Action> p_Actions;
+        internal List<CFGrammarTemplateRule> p_TemplateRules;
 
         public override string LocalName { get { return p_Name; } }
         public int NextSID { get { return p_NextSID; } }
-        public System.Collections.Generic.ICollection<string> Options { get { return p_Options.Keys; } }
-        public System.Collections.Generic.ICollection<Terminal> Terminals { get { return p_Terminals.Values; } }
-        public System.Collections.Generic.ICollection<CFVariable> Variables { get { return p_Variables.Values; } }
-        public System.Collections.Generic.ICollection<Virtual> Virtuals { get { return p_Virtuals.Values; } }
-        public System.Collections.Generic.ICollection<Action> Actions { get { return p_Actions.Values; } }
-        public System.Collections.Generic.List<CFRule> Rules
+        public ICollection<string> Options { get { return p_Options.Keys; } }
+        public ICollection<Terminal> Terminals { get { return p_Terminals.Values; } }
+        public ICollection<CFVariable> Variables { get { return p_Variables.Values; } }
+        public ICollection<Virtual> Virtuals { get { return p_Virtuals.Values; } }
+        public ICollection<Action> Actions { get { return p_Actions.Values; } }
+        public List<CFRule> Rules
         {
             get
             {
-                System.Collections.Generic.List<CFRule> p_Rules = new System.Collections.Generic.List<CFRule>();
+                List<CFRule> p_Rules = new List<CFRule>();
                 foreach (CFVariable Variable in p_Variables.Values)
                     foreach (CFRule Rule in Variable.Rules)
                         p_Rules.Add(Rule);
                 return p_Rules;
             }
         }
-        internal System.Collections.Generic.ICollection<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
+        internal ICollection<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
 
         public CFGrammar(string Name) : base()
         {
-            p_Options = new System.Collections.Generic.Dictionary<string, string>();
-            p_Terminals = new System.Collections.Generic.Dictionary<string, Terminal>();
-            p_Variables = new System.Collections.Generic.Dictionary<string, CFVariable>();
-            p_Virtuals = new System.Collections.Generic.Dictionary<string, Virtual>();
-            p_Actions = new System.Collections.Generic.Dictionary<string, Action>();
-            p_TemplateRules = new System.Collections.Generic.List<CFGrammarTemplateRule>();
+            p_Options = new Dictionary<string, string>();
+            p_Terminals = new Dictionary<string, Terminal>();
+            p_Variables = new Dictionary<string, CFVariable>();
+            p_Virtuals = new Dictionary<string, Virtual>();
+            p_Actions = new Dictionary<string, Action>();
+            p_TemplateRules = new List<CFGrammarTemplateRule>();
             p_Name = Name;
             p_NextSID = 3;
         }
@@ -239,7 +241,7 @@
             Accessor.CheckOut("Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(directory + "\\LRParserData.xslt");
-            System.Collections.Generic.List<System.Xml.XmlNode> nodes = new System.Collections.Generic.List<System.Xml.XmlNode>();
+            List<System.Xml.XmlNode> nodes = new List<System.Xml.XmlNode>();
             foreach (System.Xml.XmlNode child in data.SerializeXML(Doc).ChildNodes)
                 nodes.Add(child);
             foreach (System.Xml.XmlNode child in nodes)
@@ -282,7 +284,7 @@
 
             // Create the real axiom rule variable and rule
             CFVariable Axiom = AddVariable("_Axiom_");
-            System.Collections.Generic.List<RuleDefinitionPart> Parts = new System.Collections.Generic.List<RuleDefinitionPart>();
+            List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
             Parts.Add(new RuleDefinitionPart(p_Variables[name], RuleDefinitionPartAction.Promote));
             Parts.Add(new RuleDefinitionPart(TerminalDollar.Instance, RuleDefinitionPartAction.Drop));
             Axiom.AddRule(new CFRule(Axiom, new CFRuleDefinition(Parts), false));
@@ -358,7 +360,7 @@
                 CFVariable Clone = p_Variables[Variable.LocalName];
                 foreach (CFRule R in Variable.Rules)
                 {
-                    System.Collections.Generic.List<RuleDefinitionPart> Parts = new System.Collections.Generic.List<RuleDefinitionPart>();
+                    List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
                     CFRuleDefinition Def = new CFRuleDefinition();
                     foreach (RuleDefinitionPart Part in R.Definition.Parts)
                     {
@@ -465,7 +467,7 @@
                 CFVariable Clone = p_Variables[Variable.LocalName];
                 foreach (CFRule R in Variable.Rules)
                 {
-                    System.Collections.Generic.List<RuleDefinitionPart> Parts = new System.Collections.Generic.List<RuleDefinitionPart>();
+                    List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
                     CFRuleDefinition Def = new CFRuleDefinition();
                     foreach (RuleDefinitionPart Part in R.Definition.Parts)
                     {

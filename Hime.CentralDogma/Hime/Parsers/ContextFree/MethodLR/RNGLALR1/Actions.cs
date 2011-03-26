@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents the actions for a RNGLALR(1) set
@@ -8,13 +10,13 @@
         /// <summary>
         /// Reduction actions
         /// </summary>
-        private System.Collections.Generic.List<ItemSetActionRNReduce> p_ActionReductions;
+        private List<ItemSetActionRNReduce> p_ActionReductions;
 
-        public override System.Collections.Generic.ICollection<ItemSetActionReduce> Reductions
+        public override ICollection<ItemSetActionReduce> Reductions
         {
             get
             {
-                System.Collections.Generic.List<ItemSetActionReduce> Temp = new System.Collections.Generic.List<ItemSetActionReduce>();
+                List<ItemSetActionReduce> Temp = new List<ItemSetActionReduce>();
                 foreach (ItemSetActionRNReduce action in p_ActionReductions)
                     Temp.Add(action);
                 return Temp;
@@ -36,7 +38,7 @@
         /// </summary>
         public ItemSetReductionsRNGLALR1() : base()
         {
-            p_ActionReductions = new System.Collections.Generic.List<ItemSetActionRNReduce>();
+            p_ActionReductions = new List<ItemSetActionRNReduce>();
         }
 
         /// <summary>
@@ -48,12 +50,12 @@
             // Build shift actions
             foreach (Symbol Next in Set.Children.Keys)
             {
-                System.Collections.Generic.List<ItemSetAction> Actions = new System.Collections.Generic.List<ItemSetAction>();
+                List<ItemSetAction> Actions = new List<ItemSetAction>();
                 Actions.Add(new ItemSetActionShift(Next, Set.Children[Next]));
             }
 
             // Redutions dictionnary for the given set
-            System.Collections.Generic.Dictionary<Terminal, ItemLALR1> Reductions = new System.Collections.Generic.Dictionary<Terminal, ItemLALR1>();
+            Dictionary<Terminal, ItemLALR1> Reductions = new Dictionary<Terminal, ItemLALR1>();
             // Construct reductions
             foreach (ItemLALR1 Item in Set.Items)
             {

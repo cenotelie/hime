@@ -1,14 +1,16 @@
-﻿namespace Hime.Kernel.Resources
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel.Resources
 {
     class ResourceCompilerRegister
     {
-        private System.Collections.Generic.Dictionary<string, IResourceCompiler> p_Compilers;
+        private Dictionary<string, IResourceCompiler> p_Compilers;
 
-        public System.Collections.Generic.ICollection<IResourceCompiler> Compilers { get { return p_Compilers.Values; } }
+        public ICollection<IResourceCompiler> Compilers { get { return p_Compilers.Values; } }
 
         public ResourceCompilerRegister()
         {
-            p_Compilers = new System.Collections.Generic.Dictionary<string, IResourceCompiler>();
+            p_Compilers = new Dictionary<string, IResourceCompiler>();
         }
 
         public void RegisterCompiler(IResourceCompiler Compiler)
@@ -24,9 +26,9 @@
 
     class ResourceCompiler
     {
-        private System.Collections.Generic.Dictionary<string, string> p_InputNamedResources;
-        private System.Collections.Generic.List<string> p_InputRawResources;
-        private System.Collections.Generic.List<CompilerError> p_OutputErrors;
+        private Dictionary<string, string> p_InputNamedResources;
+        private List<string> p_InputRawResources;
+        private List<CompilerError> p_OutputErrors;
         private Namespace p_OutputRootNamespace;
         private Hime.Kernel.Reporting.Reporter p_OutputLog;
         private Redist.Parsers.SyntaxTreeNode p_IntermediateRoot;
@@ -40,9 +42,9 @@
 
         public ResourceCompiler()
         {
-            p_InputNamedResources = new System.Collections.Generic.Dictionary<string, string>();
-            p_InputRawResources = new System.Collections.Generic.List<string>();
-            p_OutputErrors = new System.Collections.Generic.List<CompilerError>();
+            p_InputNamedResources = new Dictionary<string, string>();
+            p_InputRawResources = new List<string>();
+            p_OutputErrors = new List<CompilerError>();
             p_IntermediateRoot = new Redist.Parsers.SyntaxTreeNode(null);
             p_IntermediateResources = new ResourceGraph();
             p_PluginRegister = new ResourceCompilerRegister();
@@ -115,7 +117,7 @@
 
         public static QualifiedName CompileQualifiedName(Redist.Parsers.SyntaxTreeNode Node)
         {
-            System.Collections.Generic.List<string> Path = new System.Collections.Generic.List<string>();
+            List<string> Path = new List<string>();
             foreach (Redist.Parsers.SyntaxTreeNode Child in Node.Children)
                 Path.Add(((Redist.Parsers.SymbolTokenText)Child.Symbol).ValueText);
             return new QualifiedName(Path);

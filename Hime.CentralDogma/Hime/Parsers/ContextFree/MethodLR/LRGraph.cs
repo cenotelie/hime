@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers.CF.LR
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers.CF.LR
 {
     /// <summary>
     /// Represents a LR graph
@@ -8,20 +10,20 @@
         /// <summary>
         /// List of the sets in the graph
         /// </summary>
-        private System.Collections.Generic.List<ItemSet> p_Sets;
+        private List<ItemSet> p_Sets;
 
         /// <summary>
         /// Get a list of the sets
         /// </summary>
         /// <value>A list of the sets</value>
-        public System.Collections.Generic.List<ItemSet> Sets { get { return p_Sets; } }
+        public List<ItemSet> Sets { get { return p_Sets; } }
 
         /// <summary>
         /// Constructs an empty graph
         /// </summary>
         public Graph()
         {
-            p_Sets = new System.Collections.Generic.List<ItemSet>();
+            p_Sets = new List<ItemSet>();
         }
 
         /// <summary>

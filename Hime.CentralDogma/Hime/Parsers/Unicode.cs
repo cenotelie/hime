@@ -1,4 +1,6 @@
-﻿namespace Hime.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Parsers
 {
     class UnicodeSpan
     {
@@ -25,10 +27,10 @@
             p_Name = name;
         }
 
-        protected static System.Collections.Generic.Dictionary<string, UnicodeBlock> p_Categories = null;
+        protected static Dictionary<string, UnicodeBlock> p_Categories = null;
         protected static void BuildCategories()
         {
-            p_Categories = new System.Collections.Generic.Dictionary<string, UnicodeBlock>();
+            p_Categories = new Dictionary<string, UnicodeBlock>();
             BuildCategories_Cat(new UnicodeBlock(0x0000, 0x007F, "IsBasicLatin"));
             BuildCategories_Cat(new UnicodeBlock(0x0080, 0x00FF, "IsLatin-1Supplement"));
             BuildCategories_Cat(new UnicodeBlock(0x0100, 0x017F, "IsLatinExtended-A"));
@@ -136,7 +138,7 @@
             BuildCategories_Cat(new UnicodeBlock(0xFFF0, 0xFFFF, "IsSpecials"));
         }
         protected static void BuildCategories_Cat(UnicodeBlock cat) { p_Categories.Add(cat.p_Name, cat); }
-        public static System.Collections.Generic.Dictionary<string, UnicodeBlock> Categories
+        public static Dictionary<string, UnicodeBlock> Categories
         {
             get
             {
@@ -150,21 +152,21 @@
     class UnicodeCategory
     {
         protected string p_Name;
-        protected System.Collections.Generic.List<UnicodeSpan> p_Spans;
+        protected List<UnicodeSpan> p_Spans;
 
         public string Name { get { return p_Name; } }
-        public System.Collections.Generic.ICollection<UnicodeSpan> Spans { get { return p_Spans; } }
+        public ICollection<UnicodeSpan> Spans { get { return p_Spans; } }
 
         protected UnicodeCategory(string name)
         {
             p_Name = name;
-            p_Spans = new System.Collections.Generic.List<UnicodeSpan>();
+            p_Spans = new List<UnicodeSpan>();
         }
 
-        protected static System.Collections.Generic.Dictionary<string, UnicodeCategory> p_Classes = null;
+        protected static Dictionary<string, UnicodeCategory> p_Classes = null;
         protected static void BuildClasses()
         {
-            p_Classes = new System.Collections.Generic.Dictionary<string, UnicodeCategory>();
+            p_Classes = new Dictionary<string, UnicodeCategory>();
             UnicodeCategory c_Lu = new UnicodeCategory("Lu");
             c_Lu.p_Spans.Add(new UnicodeSpan(0x41, 0x5A));
             c_Lu.p_Spans.Add(new UnicodeSpan(0xC0, 0xD6));
@@ -2618,7 +2620,7 @@
             BuildClasses_Class(c_Co);
         }
         protected static void BuildClasses_Class(UnicodeCategory c) { p_Classes.Add(c.p_Name, c); }
-        public static System.Collections.Generic.Dictionary<string, UnicodeCategory> Classes
+        public static Dictionary<string, UnicodeCategory> Classes
         {
             get
             {

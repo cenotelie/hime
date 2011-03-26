@@ -1,18 +1,20 @@
-﻿namespace Hime.Kernel.Resources
+﻿using System.Collections.Generic;
+
+namespace Hime.Kernel.Resources
 {
     public sealed class ResourceAccessor
 	{
-        private static System.Collections.Generic.List<ResourceAccessor> p_Accessors = new System.Collections.Generic.List<ResourceAccessor>();
+        private static List<ResourceAccessor> p_Accessors = new List<ResourceAccessor>();
 
 		private System.Reflection.Assembly p_Assembly;
 		private string p_RootNamespace;
 		private string p_DefaultPath;
-        private System.Collections.Generic.List<string> p_Files;
+        private List<string> p_Files;
         private bool p_IsClosed;
 
         public bool IsOpen { get { return !p_IsClosed; } }
         public bool IsClosed { get { return p_IsClosed; } }
-        public System.Collections.Generic.ICollection<string> Files { get { return p_Files; } }
+        public ICollection<string> Files { get { return p_Files; } }
 
         internal ResourceAccessor()
             : this(System.Reflection.Assembly.GetExecutingAssembly(), "Hime.Resources")
@@ -26,7 +28,7 @@
                 p_DefaultPath = p_RootNamespace + ".";
             else
                 p_DefaultPath = p_RootNamespace + "." + defaultPath + ".";
-            p_Files = new System.Collections.Generic.List<string>();
+            p_Files = new List<string>();
             p_IsClosed = false;
         }
 
