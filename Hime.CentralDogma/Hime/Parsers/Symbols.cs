@@ -2,47 +2,16 @@
 
 namespace Hime.Parsers
 {
-    /// <summary>
-    /// Base class for grammar symbols
-    /// </summary>
     public abstract class Symbol : Hime.Kernel.Symbol
     {
-        /// <summary>
-        /// Parent symbol grammar
-        /// </summary>
         protected Grammar p_Parent;
-        /// <summary>
-        /// Symbol unique identifier
-        /// </summary>
         protected ushort p_SID;
-        /// <summary>
-        /// Symbol local name
-        /// </summary>
         protected string p_LocalName;
-        /// <summary>
-        /// Symbol complete name
-        /// </summary>
         protected Hime.Kernel.QualifiedName p_CompleteName;
 
-        /// <summary>
-        /// Get the SID
-        /// </summary>
-        /// <value>The symbol unique ID</value>
         public ushort SID { get { return p_SID; } }
-        /// <summary>
-        /// Get the parent symbol
-        /// </summary>
-        /// <value>The symbol containing the current symbol</value>
         public override Hime.Kernel.Symbol Parent { get { return p_Parent; } }
-        /// <summary>
-        /// Get the local (naked) name
-        /// </summary>
-        /// <value>The symbol local name</value>
         public override string LocalName { get { return p_LocalName; } }
-        /// <summary>
-        /// Get the complete (fully qualified) name
-        /// </summary>
-        /// <value>The symbol complete name</value>
         public override Hime.Kernel.QualifiedName CompleteName { get { return p_CompleteName; } }
 
         public Symbol(Grammar Parent, ushort SID, string Name) : base()

@@ -2,9 +2,6 @@
 
 namespace Hime.Kernel
 {
-    /// <summary>
-    /// Daemon static class
-    /// </summary>
     public static class KernelDaemon
     {
         public static void GenerateNextStep(string Path)

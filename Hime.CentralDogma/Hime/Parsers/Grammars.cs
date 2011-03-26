@@ -2,9 +2,6 @@
 
 namespace Hime.Parsers
 {
-    /// <summary>
-    /// Common interface for grammars
-    /// </summary>
     public abstract class Grammar : Hime.Kernel.Symbol
     {
         protected Hime.Kernel.Symbol p_Parent;
@@ -46,6 +43,8 @@ namespace Hime.Parsers
             p_Method = Generator;
             p_LexerWriter = new System.IO.StreamWriter(File, false, System.Text.Encoding.UTF8);
             p_ParserWriter = p_LexerWriter;
+            p_LexerWriter.WriteLine("using System.Collections.Generic;");
+            p_LexerWriter.WriteLine("");
             p_LexerWriter.WriteLine("namespace " + Namespace);
             p_LexerWriter.WriteLine("{");
             p_DocumentationDir = DocDir;
@@ -57,9 +56,13 @@ namespace Hime.Parsers
             p_Drawvisual = false;
             p_Method = Generator;
             p_LexerWriter = new System.IO.StreamWriter(FileLexer, false, System.Text.Encoding.UTF8);
+            p_LexerWriter.WriteLine("using System.Collections.Generic;");
+            p_LexerWriter.WriteLine("");
             p_LexerWriter.WriteLine("namespace " + Namespace);
             p_LexerWriter.WriteLine("{");
             p_ParserWriter = new System.IO.StreamWriter(FileParser, false, System.Text.Encoding.UTF8);
+            p_ParserWriter.WriteLine("using System.Collections.Generic;");
+            p_ParserWriter.WriteLine("");
             p_ParserWriter.WriteLine("namespace " + Namespace);
             p_ParserWriter.WriteLine("{");
             p_DocumentationDir = DocDir;
