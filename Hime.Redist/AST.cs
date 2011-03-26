@@ -12,46 +12,46 @@ namespace Hime.Redist.Parsers
 
     public class SyntaxTreeNode
     {
-        protected Dictionary<string, object> p_Properties;
-        protected List<SyntaxTreeNode> p_Children;
-        protected SyntaxTreeNode p_Parent;
-        protected Symbol p_Symbol;
-        protected SyntaxTreeNodeAction p_Action;
+        protected Dictionary<string, object> properties;
+        protected List<SyntaxTreeNode> children;
+        protected SyntaxTreeNode parent;
+        protected Symbol symbol;
+        protected SyntaxTreeNodeAction action;
 
-        public Dictionary<string, object> Properties { get { return p_Properties; } }
-        public Symbol Symbol { get { return p_Symbol; } }
-        public SyntaxTreeNode Parent { get { return p_Parent; } }
-        public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(p_Children); } }
+        public Dictionary<string, object> Properties { get { return properties; } }
+        public Symbol Symbol { get { return symbol; } }
+        public SyntaxTreeNode Parent { get { return parent; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(children); } }
 
         public SyntaxTreeNode(Symbol Symbol)
         {
-            p_Properties = new Dictionary<string, object>();
-            p_Children = new List<SyntaxTreeNode>();
-            p_Symbol = Symbol;
-            p_Action = SyntaxTreeNodeAction.Nothing;
+            properties = new Dictionary<string, object>();
+            children = new List<SyntaxTreeNode>();
+            symbol = Symbol;
+            action = SyntaxTreeNodeAction.Nothing;
         }
         public SyntaxTreeNode(Symbol Symbol, SyntaxTreeNodeAction Action)
         {
-            p_Properties = new Dictionary<string, object>();
-            p_Children = new List<SyntaxTreeNode>();
-            p_Symbol = Symbol;
-            p_Action = Action;
+            properties = new Dictionary<string, object>();
+            children = new List<SyntaxTreeNode>();
+            symbol = Symbol;
+            action = Action;
         }
 
         public void AppendChild(SyntaxTreeNode Node)
         {
-            if (Node.p_Parent != null)
-                Node.p_Parent.p_Children.Remove(Node);
-            Node.p_Parent = this;
-            p_Children.Add(Node);
+            if (Node.parent != null)
+                Node.parent.children.Remove(Node);
+            Node.parent = this;
+            children.Add(Node);
         }
         public void AppendChild(SyntaxTreeNode Node, SyntaxTreeNodeAction Action)
         {
-            if (Node.p_Parent != null)
-                Node.p_Parent.p_Children.Remove(Node);
-            Node.p_Parent = this;
-            Node.p_Action = Action;
-            p_Children.Add(Node);
+            if (Node.parent != null)
+                Node.parent.children.Remove(Node);
+            Node.parent = this;
+            Node.action = Action;
+            children.Add(Node);
         }
         public void AppendRange(ICollection<SyntaxTreeNode> Nodes)
         {
@@ -68,30 +68,30 @@ namespace Hime.Redist.Parsers
 
         private void ApplyActions_DropReplace()
         {
-            for (int i = 0; i != p_Children.Count; i++)
+            for (int i = 0; i != children.Count; i++)
             {
-                if (p_Children[i].p_Action == SyntaxTreeNodeAction.Drop)
+                if (children[i].action == SyntaxTreeNodeAction.Drop)
                 {
-                    p_Children.RemoveAt(i);
+                    children.RemoveAt(i);
                     i--;
                     continue;
                 }
-                if (p_Children[i].p_Symbol is SymbolTokenText)
+                if (children[i].symbol is SymbolTokenText)
                 {
-                    SymbolTokenText TokenText = (SymbolTokenText)p_Children[i].p_Symbol;
+                    SymbolTokenText TokenText = (SymbolTokenText)children[i].symbol;
                     if (TokenText.SubGrammarRoot != null)
-                        p_Children[i] = TokenText.SubGrammarRoot;
+                        children[i] = TokenText.SubGrammarRoot;
                 }
 
-                p_Children[i].ApplyActions_DropReplace();
+                children[i].ApplyActions_DropReplace();
 
-                if (p_Children[i].p_Action == SyntaxTreeNodeAction.Replace)
+                if (children[i].action == SyntaxTreeNodeAction.Replace)
                 {
-                    List<SyntaxTreeNode> NewChildren = p_Children[i].p_Children;
+                    List<SyntaxTreeNode> NewChildren = children[i].children;
                     foreach (SyntaxTreeNode Child in NewChildren)
-                        Child.p_Parent = this;
-                    p_Children.RemoveAt(i);
-                    p_Children.InsertRange(i, NewChildren);
+                        Child.parent = this;
+                    children.RemoveAt(i);
+                    children.InsertRange(i, NewChildren);
                     i += NewChildren.Count - 1;
                 }
             }
@@ -101,65 +101,65 @@ namespace Hime.Redist.Parsers
         {
             SyntaxTreeNode NewRoot = null;
 
-            for (int i = 0; i != p_Children.Count; i++)
-                p_Children[i] = p_Children[i].ApplyActions_Promote();
+            for (int i = 0; i != children.Count; i++)
+                children[i] = children[i].ApplyActions_Promote();
 
-            for (int i = 0; i != p_Children.Count; i++)
+            for (int i = 0; i != children.Count; i++)
             {
-                if (p_Children[i].p_Action == SyntaxTreeNodeAction.Promote)
+                if (children[i].action == SyntaxTreeNodeAction.Promote)
                 {
                     if (NewRoot == null)
                     {
-                        NewRoot = p_Children[i];
-                        NewRoot.p_Children.InsertRange(0, p_Children.GetRange(0, i));
-                        if (i != p_Children.Count - 1)
-                            NewRoot.p_Children.AddRange(p_Children.GetRange(i + 1, p_Children.Count - i - 1));
+                        NewRoot = children[i];
+                        NewRoot.children.InsertRange(0, children.GetRange(0, i));
+                        if (i != children.Count - 1)
+                            NewRoot.children.AddRange(children.GetRange(i + 1, children.Count - i - 1));
                     }
                     else
                     {
-                        int CountOnRight = p_Children.Count - i - 1;
-                        int Index = NewRoot.p_Children.Count - CountOnRight - 1;
-                        p_Children[i].p_Children.Insert(0, NewRoot);
-                        p_Children[i].p_Children.AddRange(NewRoot.p_Children.GetRange(Index + 1, CountOnRight));
-                        NewRoot.p_Children.RemoveRange(Index, CountOnRight + 1);
-                        NewRoot = p_Children[i];
+                        int CountOnRight = children.Count - i - 1;
+                        int Index = NewRoot.children.Count - CountOnRight - 1;
+                        children[i].children.Insert(0, NewRoot);
+                        children[i].children.AddRange(NewRoot.children.GetRange(Index + 1, CountOnRight));
+                        NewRoot.children.RemoveRange(Index, CountOnRight + 1);
+                        NewRoot = children[i];
                     }
                     // Relink
-                    foreach (SyntaxTreeNode Child in NewRoot.p_Children)
-                        Child.p_Parent = NewRoot;
-                    NewRoot.p_Action = SyntaxTreeNodeAction.Nothing;
+                    foreach (SyntaxTreeNode Child in NewRoot.children)
+                        Child.parent = NewRoot;
+                    NewRoot.action = SyntaxTreeNodeAction.Nothing;
                 }
             }
 
             if (NewRoot == null)
                 return this;
-            NewRoot.p_Action = this.p_Action;
+            NewRoot.action = this.action;
             return NewRoot;
         }
 
         public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
         {
-            System.Xml.XmlNode Node = Doc.CreateElement(p_Symbol.Name);
-            if (p_Symbol is SymbolToken)
+            System.Xml.XmlNode Node = Doc.CreateElement(symbol.Name);
+            if (symbol is SymbolToken)
             {
-                SymbolToken Token = (SymbolToken)p_Symbol;
+                SymbolToken Token = (SymbolToken)symbol;
                 Node.AppendChild(Doc.CreateTextNode(Token.ToString()));
             }
-            foreach (string Property in p_Properties.Keys)
+            foreach (string Property in properties.Keys)
             {
                 System.Xml.XmlAttribute Attribute = Doc.CreateAttribute(Property);
-                Attribute.Value = p_Properties[Property].ToString();
+                Attribute.Value = properties[Property].ToString();
                 Node.Attributes.Append(Attribute);
             }
-            foreach (SyntaxTreeNode Child in p_Children)
+            foreach (SyntaxTreeNode Child in children)
                 Node.AppendChild(Child.GetXMLNode(Doc));
             return Node;
         }
 
         public override string ToString()
         {
-            if (p_Symbol != null)
-                return p_Symbol.ToString();
+            if (symbol != null)
+                return symbol.ToString();
             else
                 return "null";
         }

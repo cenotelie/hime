@@ -4,57 +4,57 @@ namespace Hime.Redist.Parsers
 {
     public class SPPFNode
     {
-        protected Symbol p_Symbol;
-        protected SyntaxTreeNodeAction p_Action;
-        protected int p_Generation;
-        protected List<SPPFNodeFamily> p_Families;
+        protected Symbol symbol;
+        protected SyntaxTreeNodeAction action;
+        protected int generation;
+        protected List<SPPFNodeFamily> families;
 
-        public Symbol Symbol { get { return p_Symbol; } }
+        public Symbol Symbol { get { return symbol; } }
         public SyntaxTreeNodeAction Action
         {
-            get { return p_Action; }
-            set { p_Action = value; }
+            get { return action; }
+            set { action = value; }
         }
-        public int Generation { get { return p_Generation; } }
-        public System.Collections.ObjectModel.ReadOnlyCollection<SPPFNodeFamily> Families { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SPPFNodeFamily>(p_Families); } }
+        public int Generation { get { return generation; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<SPPFNodeFamily> Families { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SPPFNodeFamily>(families); } }
 
         public SPPFNode(Symbol symbol, int gen)
         {
-            p_Symbol = symbol;
-            p_Action = SyntaxTreeNodeAction.Nothing;
-            p_Generation = gen;
-            p_Families = new List<SPPFNodeFamily>();
+            this.symbol = symbol;
+            this.action = SyntaxTreeNodeAction.Nothing;
+            this.generation = gen;
+            this.families = new List<SPPFNodeFamily>();
         }
         public SPPFNode(Symbol symbol, int gen, SyntaxTreeNodeAction action)
         {
-            p_Symbol = symbol;
-            p_Action = action;
-            p_Generation = gen;
-            p_Families = new List<SPPFNodeFamily>();
+            this.symbol = symbol;
+            this.action = action;
+            this.generation = gen;
+            this.families = new List<SPPFNodeFamily>();
         }
 
-        public void AddFamily(SPPFNodeFamily family) { p_Families.Add(family); }
-        public void AddFamily(List<SPPFNode> nodes) { p_Families.Add(new SPPFNodeFamily(this, nodes)); }
+        public void AddFamily(SPPFNodeFamily family) { families.Add(family); }
+        public void AddFamily(List<SPPFNode> nodes) { families.Add(new SPPFNodeFamily(this, nodes)); }
 
         public bool EquivalentTo(SPPFNode node)
         {
-            if (this.p_Symbol == null)
+            if (this.symbol == null)
             {
-                if (node.p_Symbol != null)
+                if (node.symbol != null)
                     return false;
-                return (this.p_Generation == node.p_Generation);
+                return (this.generation == node.generation);
             }
             else
             {
-                if (!this.p_Symbol.Equals(node.p_Symbol))
+                if (!this.symbol.Equals(node.symbol))
                     return false;
-                return (this.p_Generation == node.p_Generation);
+                return (this.generation == node.generation);
             }
         }
 
         public bool HasEquivalentFamily(SPPFNodeFamily family)
         {
-            foreach (SPPFNodeFamily potential in p_Families)
+            foreach (SPPFNodeFamily potential in families)
                 if (potential.EquivalentTo(family))
                     return true;
             return false;
@@ -62,10 +62,10 @@ namespace Hime.Redist.Parsers
 
         public SyntaxTreeNode GetFirstTree()
         {
-            SyntaxTreeNode me = new SyntaxTreeNode(p_Symbol, p_Action);
-            if (p_Families.Count == 1)
+            SyntaxTreeNode me = new SyntaxTreeNode(symbol, action);
+            if (families.Count == 1)
             {
-                foreach (SPPFNode child in p_Families[0].Children)
+                foreach (SPPFNode child in families[0].Children)
                 {
                     if (child.Symbol is SymbolAction)
                         ((SymbolAction)child.Symbol).Action.Invoke(me);
@@ -73,9 +73,9 @@ namespace Hime.Redist.Parsers
                         me.AppendChild(child.GetFirstTree());
                 }
             }
-            else if (p_Families.Count >= 1)
+            else if (families.Count >= 1)
             {
-                foreach (SPPFNodeFamily family in p_Families)
+                foreach (SPPFNodeFamily family in families)
                 {
                     SyntaxTreeNode subroot = new SyntaxTreeNode(null, SyntaxTreeNodeAction.Nothing);
                     me.AppendChild(subroot);
@@ -87,31 +87,31 @@ namespace Hime.Redist.Parsers
 
     public class SPPFNodeFamily
     {
-        protected SPPFNode p_Parent;
-        protected List<SPPFNode> p_Children;
+        protected SPPFNode parent;
+        protected List<SPPFNode> children;
 
-        protected SPPFNode Parent { get { return p_Parent; } }
-        public System.Collections.ObjectModel.ReadOnlyCollection<SPPFNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SPPFNode>(p_Children); } }
+        protected SPPFNode Parent { get { return parent; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<SPPFNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SPPFNode>(children); } }
 
         public SPPFNodeFamily(SPPFNode parent)
         {
-            p_Parent = parent;
-            p_Children = new List<SPPFNode>();
+            this.parent = parent;
+            this.children = new List<SPPFNode>();
         }
         public SPPFNodeFamily(SPPFNode parent, List<SPPFNode> nodes)
         {
-            p_Parent = parent;
-            p_Children = new List<SPPFNode>(nodes);
+            this.parent = parent;
+            this.children = new List<SPPFNode>(nodes);
         }
 
-        public void AddChild(SPPFNode child) { p_Children.Add(child); }
+        public void AddChild(SPPFNode child) { children.Add(child); }
 
         public bool EquivalentTo(SPPFNodeFamily family)
         {
-            if (p_Children.Count != family.p_Children.Count)
+            if (children.Count != family.children.Count)
                 return false;
-            for (int i = 0; i != p_Children.Count; i++)
-                if (!p_Children[i].EquivalentTo(family.p_Children[i]))
+            for (int i = 0; i != children.Count; i++)
+                if (!children[i].EquivalentTo(family.children[i]))
                     return false;
             return true;
         }

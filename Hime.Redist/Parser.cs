@@ -15,30 +15,30 @@ namespace Hime.Redist.Parsers
     }
     public class ParserErrorUnexpectedToken : ParserError
     {
-        private SymbolToken p_Token;
-        private System.Collections.ObjectModel.Collection<string> p_Expected;
-        private System.Collections.ObjectModel.ReadOnlyCollection<string> p_ReadOnlyExpected;
-        private string p_Message;
+        private SymbolToken token;
+        private System.Collections.ObjectModel.Collection<string> expected;
+        private System.Collections.ObjectModel.ReadOnlyCollection<string> readOnlyExpected;
+        private string message;
 
-        public SymbolToken UnexpectedToken { get { return p_Token; } }
-        public System.Collections.ObjectModel.ReadOnlyCollection<string> ExpectedTokens { get { return p_ReadOnlyExpected; } }
-        public string Message { get { return p_Message; } }
+        public SymbolToken UnexpectedToken { get { return token; } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<string> ExpectedTokens { get { return readOnlyExpected; } }
+        public string Message { get { return message; } }
 
         public ParserErrorUnexpectedToken(SymbolToken Token, string[] Expected)
         {
-            p_Token = Token;
-            p_Expected = new System.Collections.ObjectModel.Collection<string>(Expected);
-            p_ReadOnlyExpected = new System.Collections.ObjectModel.ReadOnlyCollection<string>(p_Expected);
+            token = Token;
+            expected = new System.Collections.ObjectModel.Collection<string>(Expected);
+            readOnlyExpected = new System.Collections.ObjectModel.ReadOnlyCollection<string>(expected);
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("Unexpected token ");
-            Builder.Append(p_Token.Value.ToString());
+            Builder.Append(token.Value.ToString());
             Builder.Append(", expected : { ");
-            for (int i = 0; i != p_Expected.Count; i++)
+            for (int i = 0; i != expected.Count; i++)
             {
                 if (i != 0) Builder.Append(", ");
-                Builder.Append(p_Expected[i]);
+                Builder.Append(expected[i]);
             }
             Builder.Append(" }.");
-            p_Message = Builder.ToString();
+            message = Builder.ToString();
         }
         public override string ToString() { return "Parser Error : unexpected token"; }
     }

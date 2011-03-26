@@ -17,18 +17,18 @@ namespace Hime.Redist.Parsers
     }
     public abstract class LexerTextError : LexerError
     {
-        protected int p_Line;
-        protected int p_Column;
+        protected int line;
+        protected int column;
 
-        public int Line { get { return p_Line; } }
-        public int Column { get { return p_Column; } }
+        public int Line { get { return line; } }
+        public int Column { get { return column; } }
 
         public abstract string Message { get; }
 
         protected LexerTextError(int line, int column)
         {
-            p_Line = line;
-            p_Column = column;
+            this.line = line;
+            this.column = column;
         }
 
         public abstract override string ToString();
@@ -36,24 +36,24 @@ namespace Hime.Redist.Parsers
 
     public class LexerTextErrorDiscardedChar : LexerTextError
     {
-        protected char p_Discarded;
-        protected string p_Message;
+        protected char discarded;
+        protected string message;
 
-        public char Discarded { get { return p_Discarded; } }
-        public override string Message { get { return p_Message; } }
+        public char Discarded { get { return discarded; } }
+        public override string Message { get { return message; } }
 
         public LexerTextErrorDiscardedChar(char Discarded, int Line, int Column)
             : base(Line, Column)
         {
-            p_Discarded = Discarded;
+            discarded = Discarded;
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("Unrecognized character '");
-            Builder.Append(p_Discarded.ToString());
+            Builder.Append(discarded.ToString());
             Builder.Append("' (0x");
-            Builder.Append(System.Convert.ToInt32(p_Discarded).ToString("X"));
+            Builder.Append(System.Convert.ToInt32(discarded).ToString("X"));
             Builder.Append(")");
-            p_Message = Builder.ToString();
+            message = Builder.ToString();
         }
-        public override string ToString() { return p_Message; }
+        public override string ToString() { return message; }
     }
 
 
@@ -74,25 +74,25 @@ namespace Hime.Redist.Parsers
         protected delegate SyntaxTreeNode MatchSubGrammar(string TokenValue);
 
         // Lexer DFA data to setup on construction
-        protected ushort[] p_SymbolsSID;
-        protected string[] p_SymbolsName;
-        protected Dictionary<ushort, MatchSubGrammar> p_SymbolsSubGrammars;
-        protected ushort[][][] p_Transitions;
-        protected int[] p_Finals;
-        protected ushort p_SeparatorID;
+        protected ushort[] symbolsSID;
+        protected string[] symbolsName;
+        protected Dictionary<ushort, MatchSubGrammar> symbolsSubGrammars;
+        protected ushort[][][] transitions;
+        protected int[] finals;
+        protected ushort separatorID;
 
         // Lexer state data
-        protected List<LexerTextError> p_Errors;
-        protected BufferedTextReader p_Input;
-        protected int p_CurrentLine;
-        protected int p_CurrentColumn;
-        protected bool p_IsDollatEmited;
+        protected List<LexerTextError> errors;
+        protected BufferedTextReader input;
+        protected int currentLine;
+        protected int currentColumn;
+        protected bool isDollatEmited;
 
-        public System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(p_Errors); } }
-        public string InputText { get { return p_Input.GetReadText(); } }
-        public int CurrentLine { get { return p_CurrentLine; } }
-        public int CurrentColumn { get { return p_CurrentColumn; } }
-        public bool IsAtEnd { get { return p_Input.AtEnd(); } }
+        public System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(errors); } }
+        public string InputText { get { return input.GetReadText(); } }
+        public int CurrentLine { get { return currentLine; } }
+        public int CurrentColumn { get { return currentColumn; } }
+        public bool IsAtEnd { get { return input.AtEnd(); } }
 
         protected abstract void setup();
         public abstract ILexer Clone();
@@ -100,28 +100,28 @@ namespace Hime.Redist.Parsers
         protected LexerText(System.IO.TextReader input)
         {
             setup();
-            p_Errors = new List<LexerTextError>();
-            p_Input = new BufferedTextReader(input);
-            p_CurrentLine = 1;
-            p_CurrentColumn = 1;
-            p_IsDollatEmited = false;
+            errors = new List<LexerTextError>();
+            this.input = new BufferedTextReader(input);
+            currentLine = 1;
+            currentColumn = 1;
+            isDollatEmited = false;
         }
         protected LexerText(LexerText original)
         {
             setup();
-            p_Errors = new List<LexerTextError>(original.p_Errors);
-            p_Input = original.p_Input.Clone();
-            p_CurrentLine = original.p_CurrentLine;
-            p_CurrentColumn = original.p_CurrentColumn;
-            p_IsDollatEmited = original.p_IsDollatEmited;
+            errors = new List<LexerTextError>(original.errors);
+            input = original.input.Clone();
+            currentLine = original.currentLine;
+            currentColumn = original.currentColumn;
+            isDollatEmited = original.isDollatEmited;
         }
 
         public string GetSymbolName(ushort SID)
         {
-            for (int i = 0; i != p_SymbolsSID.Length; i++)
+            for (int i = 0; i != symbolsSID.Length; i++)
             {
-                if (p_SymbolsSID[i] == SID)
-                    return p_SymbolsName[i];
+                if (symbolsSID[i] == SID)
+                    return symbolsName[i];
             }
             return null;
         }
@@ -129,36 +129,36 @@ namespace Hime.Redist.Parsers
         public SymbolToken GetNextToken(ushort[] IDs) { throw new LexerException("Text lexer does not support this method."); }
         public SymbolToken GetNextToken()
         {
-            if (p_Input.AtEnd())
+            if (input.AtEnd())
             {
-                if (p_IsDollatEmited)
+                if (isDollatEmited)
                     return new SymbolTokenEpsilon();
-                p_IsDollatEmited = true;
+                isDollatEmited = true;
                 return new SymbolTokenDollar();
             }
 
             while (true)
             {
-                if (p_Input.AtEnd())
+                if (input.AtEnd())
                 {
-                    p_IsDollatEmited = true;
+                    isDollatEmited = true;
                     return new SymbolTokenDollar();
                 }
                 SymbolTokenText Token = GetNextToken_DFA();
                 if (Token == null)
                 {
                     bool atend = false;
-                    char c = p_Input.Read(out atend);
-                    p_Errors.Add(new LexerTextErrorDiscardedChar(c, p_CurrentLine, p_CurrentColumn));
+                    char c = input.Read(out atend);
+                    errors.Add(new LexerTextErrorDiscardedChar(c, currentLine, currentColumn));
                     AdvanceStats(c.ToString());
                 }
                 else
                 {
                     AdvanceStats(Token.ValueText);
-                    if (Token.SymbolID != p_SeparatorID)
+                    if (Token.SymbolID != separatorID)
                     {
-                        if (p_SymbolsSubGrammars.ContainsKey(Token.SymbolID))
-                            Token.SubGrammarRoot = p_SymbolsSubGrammars[Token.SymbolID](Token.ValueText);
+                        if (symbolsSubGrammars.ContainsKey(Token.SymbolID))
+                            Token.SubGrammarRoot = symbolsSubGrammars[Token.SymbolID](Token.ValueText);
                         return Token;
                     }
                 }
@@ -171,11 +171,11 @@ namespace Hime.Redist.Parsers
             {
                 if (c == '\n')
                 {
-                    p_CurrentLine++;
-                    p_CurrentColumn = 1;
+                    currentLine++;
+                    currentColumn = 1;
                 }
                 else
-                    p_CurrentColumn++;
+                    currentColumn++;
             }
         }
 
@@ -188,31 +188,31 @@ namespace Hime.Redist.Parsers
 
             while (true)
             {
-                if (p_Finals[State] != -1)
+                if (finals[State] != -1)
                 {
                     string Value = Builder.ToString();
-                    MatchedTokens.Add(new SymbolTokenText(p_SymbolsName[p_Finals[State]], p_SymbolsSID[p_Finals[State]], Value, p_CurrentLine));
+                    MatchedTokens.Add(new SymbolTokenText(symbolsName[finals[State]], symbolsSID[finals[State]], Value, currentLine));
                 }
                 bool atend = false;
-                char c = p_Input.Peek(out atend);
+                char c = input.Peek(out atend);
                 if (atend)
                     break;
                 ushort UCV = System.Convert.ToUInt16(c);
                 ushort NextState = 0xFFFF;
-                for (int i = 0; i != p_Transitions[State].Length; i++)
+                for (int i = 0; i != transitions[State].Length; i++)
                 {
-                    if (UCV >= p_Transitions[State][i][0] && UCV <= p_Transitions[State][i][1])
-                        NextState = p_Transitions[State][i][2];
+                    if (UCV >= transitions[State][i][0] && UCV <= transitions[State][i][1])
+                        NextState = transitions[State][i][2];
                 }
                 if (NextState == 0xFFFF)
                     break;
                 State = NextState;
-                Builder.Append(p_Input.Read(out atend));
+                Builder.Append(input.Read(out atend));
                 count++;
             }
             if (MatchedTokens.Count == 0)
             {
-                p_Input.Rewind(count);
+                input.Rewind(count);
                 return null;
             }
             return MatchedTokens[MatchedTokens.Count - 1];
@@ -223,23 +223,23 @@ namespace Hime.Redist.Parsers
     {
         protected delegate SymbolToken ApplyGetNextToken();
 
-        protected static byte p_Flag1 = 0x01;
-        protected static byte p_Flag2 = 0x03;
-        protected static byte p_Flag3 = 0x07;
-        protected static byte p_Flag4 = 0x0F;
-        protected static byte p_Flag5 = 0x1F;
-        protected static byte p_Flag6 = 0x3F;
-        protected static byte p_Flag7 = 0x7F;
-        protected static byte p_Flag8 = 0xFF;
-        protected static byte[] p_Flags = { 0x00, p_Flag1, p_Flag2, p_Flag3, p_Flag4, p_Flag5, p_Flag6, p_Flag7, p_Flag8 };
+        protected static byte flag1 = 0x01;
+        protected static byte flag2 = 0x03;
+        protected static byte flag3 = 0x07;
+        protected static byte flag4 = 0x0F;
+        protected static byte flag5 = 0x1F;
+        protected static byte flag6 = 0x3F;
+        protected static byte flag7 = 0x7F;
+        protected static byte flag8 = 0xFF;
+        protected static byte[] flags = { 0x00, flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8 };
 
-        protected Dictionary<ushort, ApplyGetNextToken> p_GetNextTokens;
-        protected Binary.DataInput p_Input;
-        protected int p_CurrentBitLeft;
-        protected bool p_DollarEmitted;
+        protected Dictionary<ushort, ApplyGetNextToken> getNextTokens;
+        protected Binary.DataInput input;
+        protected int currentBitLeft;
+        protected bool dollarEmitted;
 
         public int CurrentLine { get { return 0; } }
-        public int InputLength { get { return p_Input.Length; } }
+        public int InputLength { get { return input.Length; } }
 
         protected abstract void setup();
         public abstract ILexer Clone();
@@ -247,19 +247,19 @@ namespace Hime.Redist.Parsers
         protected LexerBinary(Binary.DataInput input)
         {
             setup();
-            p_Input = input;
-            p_CurrentBitLeft = 8;
+            this.input = input;
+            this.currentBitLeft = 8;
         }
 
         public SymbolToken GetNextToken() { throw new LexerException("Binary lexer cannot match a token without an expected tokens list."); }
 
         public SymbolToken GetNextToken(ushort[] IDs)
         {
-            if (p_DollarEmitted)
+            if (dollarEmitted)
                 return new SymbolTokenEpsilon();
-            if (p_Input.IsAtEnd && p_CurrentBitLeft == 8)
+            if (input.IsAtEnd && currentBitLeft == 8)
             {
-                p_DollarEmitted = true;
+                dollarEmitted = true;
                 return new SymbolTokenDollar();
             }
 
@@ -268,66 +268,66 @@ namespace Hime.Redist.Parsers
                 SymbolToken Temp = GetNextToken_Apply(ID);
                 if (Temp != null) return Temp;
             }
-            p_DollarEmitted = true;
+            dollarEmitted = true;
             return new SymbolTokenDollar();
         }
 
         protected SymbolToken GetNextToken_Apply(ushort ID)
         {
-            if (!p_GetNextTokens.ContainsKey(ID)) return null;
-            return p_GetNextTokens[ID]();
+            if (!getNextTokens.ContainsKey(ID)) return null;
+            return getNextTokens[ID]();
         }
 
 
 
         protected SymbolToken GetNextToken_Apply_NB(ushort sid, string name, byte value, int length)
         {
-            if (p_CurrentBitLeft < length) return null;
-            if (((p_Input.ReadByte() >> (p_CurrentBitLeft - length)) & p_Flags[length]) != value) return null;
-            p_CurrentBitLeft -= length;
-            if (p_CurrentBitLeft == 0) { p_CurrentBitLeft = 8; p_Input.ReadAndAdvanceByte(); }
+            if (currentBitLeft < length) return null;
+            if (((input.ReadByte() >> (currentBitLeft - length)) & flags[length]) != value) return null;
+            currentBitLeft -= length;
+            if (currentBitLeft == 0) { currentBitLeft = 8; input.ReadAndAdvanceByte(); }
             return new SymbolTokenBits(name, sid, value);
         }
         protected SymbolToken GetNextToken_Apply_N8(ushort sid, string name, byte value)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(1)) return null;
-            if (p_Input.ReadByte() == value)
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(1)) return null;
+            if (input.ReadByte() == value)
             {
-                p_Input.ReadAndAdvanceByte();
+                input.ReadAndAdvanceByte();
                 return new SymbolTokenUInt8(name, sid, value);
             }
             return null;
         }
         protected SymbolToken GetNextToken_Apply_N16(ushort sid, string name, byte value)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(2)) return null;
-            if (p_Input.ReadByte() == value)
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(2)) return null;
+            if (input.ReadByte() == value)
             {
-                p_Input.ReadAndAdvanceUInt16();
+                input.ReadAndAdvanceUInt16();
                 return new SymbolTokenUInt16(name, sid, value);
             }
             return null;
         }
         protected SymbolToken GetNextToken_Apply_N32(ushort sid, string name, byte value)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(4)) return null;
-            if (p_Input.ReadByte() == value)
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(4)) return null;
+            if (input.ReadByte() == value)
             {
-                p_Input.ReadAndAdvanceUInt32();
+                input.ReadAndAdvanceUInt32();
                 return new SymbolTokenUInt32(name, sid, value);
             }
             return null;
         }
         protected SymbolToken GetNextToken_Apply_N64(ushort sid, string name, byte value)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(8)) return null;
-            if (p_Input.ReadByte() == value)
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(8)) return null;
+            if (input.ReadByte() == value)
             {
-                p_Input.ReadAndAdvanceUInt64();
+                input.ReadAndAdvanceUInt64();
                 return new SymbolTokenUInt64(name, sid, value);
             }
             return null;
@@ -335,35 +335,35 @@ namespace Hime.Redist.Parsers
 
         protected SymbolToken GetNextToken_Apply_JB(ushort sid, string name, int length)
         {
-            if (p_CurrentBitLeft < length) return null;
-            SymbolToken Temp = new SymbolTokenBits(name, sid, (byte)((p_Input.ReadByte() >> (p_CurrentBitLeft - length)) & length));
-            p_CurrentBitLeft -= length;
-            if (p_CurrentBitLeft == 0) { p_CurrentBitLeft = 8; p_Input.ReadAndAdvanceByte(); }
+            if (currentBitLeft < length) return null;
+            SymbolToken Temp = new SymbolTokenBits(name, sid, (byte)((input.ReadByte() >> (currentBitLeft - length)) & length));
+            currentBitLeft -= length;
+            if (currentBitLeft == 0) { currentBitLeft = 8; input.ReadAndAdvanceByte(); }
             return Temp;
         }
         protected SymbolToken GetNextToken_Apply_J8(ushort sid, string name)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(1)) return null;
-            return new SymbolTokenUInt8(name, sid, p_Input.ReadAndAdvanceByte());
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(1)) return null;
+            return new SymbolTokenUInt8(name, sid, input.ReadAndAdvanceByte());
         }
         protected SymbolToken GetNextToken_Apply_J16(ushort sid, string name)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(2)) return null;
-            return new SymbolTokenUInt16(name, sid, p_Input.ReadAndAdvanceByte());
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(2)) return null;
+            return new SymbolTokenUInt16(name, sid, input.ReadAndAdvanceByte());
         }
         protected SymbolToken GetNextToken_Apply_J32(ushort sid, string name)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(4)) return null;
-            return new SymbolTokenUInt32(name, sid, p_Input.ReadAndAdvanceByte());
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(4)) return null;
+            return new SymbolTokenUInt32(name, sid, input.ReadAndAdvanceByte());
         }
         protected SymbolToken GetNextToken_Apply_J64(ushort sid, string name)
         {
-            if (p_CurrentBitLeft != 8) return null;
-            if (!p_Input.CanRead(8)) return null;
-            return new SymbolTokenUInt64(name, sid, p_Input.ReadAndAdvanceByte());
+            if (currentBitLeft != 8) return null;
+            if (!input.CanRead(8)) return null;
+            return new SymbolTokenUInt64(name, sid, input.ReadAndAdvanceByte());
         }
     }
 }

@@ -12,16 +12,16 @@ namespace Hime.Redist.Parsers
 
     public abstract class SymbolToken : Symbol
     {
-        private string p_ClassName;
-        private ushort p_ClassSID;
+        private string className;
+        private ushort classSID;
 
-        public override ushort SymbolID { get { return p_ClassSID; } }
-        public override string Name { get { return p_ClassName; } }
+        public override ushort SymbolID { get { return classSID; } }
+        public override string Name { get { return className; } }
         public abstract object Value { get; }
         public SymbolToken(string ClassName, ushort ClassSID)
         {
-            p_ClassName = ClassName;
-            p_ClassSID = ClassSID;
+            className = ClassName;
+            classSID = ClassSID;
         }
 
         public override int GetHashCode() { return base.GetHashCode(); }
@@ -30,31 +30,31 @@ namespace Hime.Redist.Parsers
             if (!(obj is SymbolToken))
                 return false;
             SymbolToken other = (SymbolToken)obj;
-            return (this.p_ClassSID == other.p_ClassSID);
+            return (this.classSID == other.classSID);
         }
     }
 
     public class SymbolTokenText : SymbolToken
     {
-        private string p_Value;
-        private int p_Line;
-        private SyntaxTreeNode p_SubGrammarRoot;
+        private string value;
+        private int line;
+        private SyntaxTreeNode subGrammarRoot;
 
-        public override object Value { get { return p_Value; } }
-        public string ValueText { get { return p_Value; } }
-        public int Line { get { return p_Line; } }
+        public override object Value { get { return value; } }
+        public string ValueText { get { return value; } }
+        public int Line { get { return line; } }
         public SyntaxTreeNode SubGrammarRoot
         {
-            get { return p_SubGrammarRoot; }
-            set { p_SubGrammarRoot = value; }
+            get { return subGrammarRoot; }
+            set { subGrammarRoot = value; }
         }
 
         public SymbolTokenText(string ClassName, ushort ClassSID, string Value, int Line)
             : base(ClassName, ClassSID)
         {
-            p_Value = Value;
-            p_Line = Line;
-            p_SubGrammarRoot = null;
+            value = Value;
+            line = Line;
+            subGrammarRoot = null;
         }
     }
     public class SymbolTokenEpsilon : SymbolToken
@@ -70,48 +70,48 @@ namespace Hime.Redist.Parsers
 
     public class SymbolTokenBits : SymbolToken
     {
-        private byte p_Value;
-        public override object Value { get { return p_Value; } }
-        public byte ValueBits { get { return p_Value; } }
-        public SymbolTokenBits(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { p_Value = Value; }
+        private byte value;
+        public override object Value { get { return value; } }
+        public byte ValueBits { get { return value; } }
+        public SymbolTokenBits(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { value = Value; }
     }
     public class SymbolTokenUInt8 : SymbolToken
     {
-        private byte p_Value;
-        public override object Value { get { return p_Value; } }
-        public byte ValueUInt8 { get { return p_Value; } }
-        public SymbolTokenUInt8(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { p_Value = Value; }
+        private byte value;
+        public override object Value { get { return value; } }
+        public byte ValueUInt8 { get { return value; } }
+        public SymbolTokenUInt8(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { value = Value; }
     }
     public class SymbolTokenUInt16 : SymbolToken
     {
-        private ushort p_Value;
-        public override object Value { get { return p_Value; } }
-        public ushort ValueUInt16 { get { return p_Value; } }
-        public SymbolTokenUInt16(string ClassName, ushort ClassSID, ushort Value) : base(ClassName, ClassSID) { p_Value = Value; }
+        private ushort value;
+        public override object Value { get { return value; } }
+        public ushort ValueUInt16 { get { return value; } }
+        public SymbolTokenUInt16(string ClassName, ushort ClassSID, ushort Value) : base(ClassName, ClassSID) { value = Value; }
     }
     public class SymbolTokenUInt32 : SymbolToken
     {
-        private uint p_Value;
-        public override object Value { get { return p_Value; } }
-        public uint ValueUInt32 { get { return p_Value; } }
-        public SymbolTokenUInt32(string ClassName, ushort ClassSID, uint Value) : base(ClassName, ClassSID) { p_Value = Value; }
+        private uint value;
+        public override object Value { get { return value; } }
+        public uint ValueUInt32 { get { return value; } }
+        public SymbolTokenUInt32(string ClassName, ushort ClassSID, uint Value) : base(ClassName, ClassSID) { value = Value; }
     }
     public class SymbolTokenUInt64 : SymbolToken
     {
-        private ulong p_Value;
-        public override object Value { get { return p_Value; } }
-        public ulong ValueUInt64 { get { return p_Value; } }
-        public SymbolTokenUInt64(string ClassName, ushort ClassSID, ulong Value) : base(ClassName, ClassSID) { p_Value = Value; }
+        private ulong value;
+        public override object Value { get { return value; } }
+        public ulong ValueUInt64 { get { return value; } }
+        public SymbolTokenUInt64(string ClassName, ushort ClassSID, ulong Value) : base(ClassName, ClassSID) { value = Value; }
     }
 
     public class SymbolVirtual : Symbol
     {
-        private string p_Name;
+        private string name;
 
-        public override string Name { get { return p_Name; } }
+        public override string Name { get { return name; } }
         public override ushort SymbolID { get { return 0; } }
 
-        public SymbolVirtual(string Name) { p_Name = Name; }
+        public SymbolVirtual(string Name) { name = Name; }
 
         public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj)
@@ -119,7 +119,7 @@ namespace Hime.Redist.Parsers
             if (!(obj is SymbolVirtual))
                 return false;
             SymbolVirtual other = (SymbolVirtual)obj;
-            return (this.p_Name == other.p_Name);
+            return (this.name == other.name);
         }
     }
 
@@ -127,19 +127,19 @@ namespace Hime.Redist.Parsers
     {
         public delegate void Callback(SyntaxTreeNode Subroot);
 
-        private string p_Name;
+        private string name;
 
-        private Callback p_Callback;
+        private Callback callback;
 
-        public override string Name { get { return p_Name; } }
+        public override string Name { get { return name; } }
         public override ushort SymbolID { get { return 0; } }
 
-        public Callback Action { get { return p_Callback; } }
+        public Callback Action { get { return callback; } }
 
         public SymbolAction(string Name, Callback callback)
         {
-            p_Name = Name;
-            p_Callback = callback;
+            this.name = Name;
+            this.callback = callback;
         }
 
         public override int GetHashCode() { return base.GetHashCode(); }
@@ -148,22 +148,22 @@ namespace Hime.Redist.Parsers
             if (!(obj is SymbolAction))
                 return false;
             SymbolAction other = (SymbolAction)obj;
-            return (this.p_Name == other.p_Name);
+            return (this.name == other.name);
         }
     }
     
     public class SymbolVariable : Symbol
     {
-        private ushort p_SID;
-        private string p_Name;
+        private ushort sID;
+        private string name;
 
-        public override string Name { get { return p_Name; } }
-        public override ushort SymbolID { get { return p_SID; } }
+        public override string Name { get { return name; } }
+        public override ushort SymbolID { get { return sID; } }
 
         public SymbolVariable(ushort SID, string Name)
         {
-            p_SID = SID;
-            p_Name = Name;
+            sID = SID;
+            name = Name;
         }
 
         public override int GetHashCode() { return base.GetHashCode(); }
@@ -172,7 +172,7 @@ namespace Hime.Redist.Parsers
             if (!(obj is SymbolVariable))
                 return false;
             SymbolVariable other = (SymbolVariable)obj;
-            return (this.p_SID == other.p_SID);
+            return (this.sID == other.sID);
         }
     }
 }

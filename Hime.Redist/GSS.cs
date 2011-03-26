@@ -4,21 +4,21 @@ namespace Hime.Redist.Parsers
 {
     public class GSSNode
     {
-        private int p_Generation;
-        private ushort p_DFAState;
-        private Dictionary<GSSNode, SPPFNode> p_Edges;
+        private int generation;
+        private ushort dFAState;
+        private Dictionary<GSSNode, SPPFNode> edges;
 
-        public int Generation { get { return p_Generation; } }
-        public ushort DFAState { get { return p_DFAState; } }
-        public Dictionary<GSSNode, SPPFNode> Edges { get { return p_Edges; } }
+        public int Generation { get { return generation; } }
+        public ushort DFAState { get { return dFAState; } }
+        public Dictionary<GSSNode, SPPFNode> Edges { get { return edges; } }
 
-        public void AddEdge(GSSNode state, SPPFNode label) { p_Edges.Add(state, label); }
+        public void AddEdge(GSSNode state, SPPFNode label) { edges.Add(state, label); }
 
         public GSSNode(ushort label, int generation)
         {
-            p_Generation = generation;
-            p_DFAState = label;
-            p_Edges = new Dictionary<GSSNode, SPPFNode>();
+            this.generation = generation;
+            this.dFAState = label;
+            this.edges = new Dictionary<GSSNode, SPPFNode>();
         }
 
         public List<GSSNode> NodesAt(int length)
@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
             {
                 List<GSSNode> nexts = new List<GSSNode>();
                 foreach (GSSNode current in nodes)
-                    foreach (GSSNode next in current.p_Edges.Keys)
+                    foreach (GSSNode next in current.edges.Keys)
                         if (!nexts.Contains(next))
                             nexts.Add(next);
                 nodes = nexts;
@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
                 foreach (List<GSSNode> path in paths)
                 {
                     GSSNode last = path[path.Count - 1];
-                    foreach (GSSNode next in last.p_Edges.Keys)
+                    foreach (GSSNode next in last.edges.Keys)
                     {
                         List<GSSNode> newPath = new List<GSSNode>(path);
                         newPath.Add(next);

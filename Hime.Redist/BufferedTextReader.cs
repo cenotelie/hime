@@ -6,50 +6,50 @@ namespace Hime.Redist.Parsers
 {
     public sealed class BufferedTextReader
     {
-        private System.IO.TextReader p_Reader;
-        private LinkedList<char> p_ReadInput;
-        private LinkedListNode<char> p_CurrentNode;
+        private System.IO.TextReader reader;
+        private LinkedList<char> readInput;
+        private LinkedListNode<char> currentNode;
 
         public BufferedTextReader(System.IO.TextReader inner)
         {
-            p_Reader = inner;
-            p_ReadInput = new LinkedList<char>();
+            reader = inner;
+            readInput = new LinkedList<char>();
         }
         private BufferedTextReader(BufferedTextReader original)
         {
-            p_Reader = original.p_Reader;
-            p_ReadInput = original.p_ReadInput;
-            p_CurrentNode = original.p_CurrentNode;
+            reader = original.reader;
+            readInput = original.readInput;
+            currentNode = original.currentNode;
         }
 
         public bool AtEnd()
         {
-            if (p_CurrentNode == null || p_CurrentNode.Next == null)
-                return (p_Reader.Peek() == -1);
+            if (currentNode == null || currentNode.Next == null)
+                return (reader.Peek() == -1);
             return false;
         }
 
         public string GetReadText()
         {
-            if (p_ReadInput.Count == 0)
+            if (readInput.Count == 0)
                 return string.Empty;
             StringBuilder builder = new StringBuilder();
-            LinkedListNode<char> node = p_ReadInput.First;
-            while (node != p_CurrentNode)
+            LinkedListNode<char> node = readInput.First;
+            while (node != currentNode)
             {
                 builder.Append(node.Value);
                 node = node.Next;
             }
-            builder.Append(p_CurrentNode.Value);
+            builder.Append(currentNode.Value);
             return builder.ToString();
         }
 
         public char Peek(out bool AtEnd)
         {
             AtEnd = false;
-            if (p_CurrentNode == null || p_CurrentNode.Next == null)
+            if (currentNode == null || currentNode.Next == null)
             {
-                int value = p_Reader.Peek();
+                int value = reader.Peek();
                 if (value == -1)
                 {
                     AtEnd = true;
@@ -58,15 +58,15 @@ namespace Hime.Redist.Parsers
                 else
                     return System.Convert.ToChar(value);
             }
-            return p_CurrentNode.Value;
+            return currentNode.Value;
         }
 
         public char Read(out bool AtEnd)
         {
             AtEnd = false;
-            if (p_CurrentNode == null || p_CurrentNode.Next == null)
+            if (currentNode == null || currentNode.Next == null)
             {
-                int value = p_Reader.Read();
+                int value = reader.Read();
                 if (value == -1)
                 {
                     AtEnd = true;
@@ -75,19 +75,19 @@ namespace Hime.Redist.Parsers
                 else
                 {
                     char c = System.Convert.ToChar(value);
-                    p_CurrentNode = p_ReadInput.AddLast(c);
+                    currentNode = readInput.AddLast(c);
                     return c;
                 }
             }
-            p_CurrentNode = p_CurrentNode.Next;
-            return p_CurrentNode.Value;
+            currentNode = currentNode.Next;
+            return currentNode.Value;
         }
 
         public void Rewind(int length)
         {
             while (length != 0)
             {
-                p_CurrentNode = p_CurrentNode.Previous;
+                currentNode = currentNode.Previous;
                 length--;
             }
         }
