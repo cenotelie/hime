@@ -12,42 +12,42 @@ namespace Hime.Parsers.CF.LR
 
     abstract class Item
     {
-        protected const string p_Arrow = "→";
-        protected const string p_Dot = "•";
+        protected const string arrow = "→";
+        protected const string dot = "•";
 
-        protected CFRule p_Rule;
-        protected CFRuleDefinition p_Definition;
-        protected int p_DotPosition;
+        protected CFRule rule;
+        protected CFRuleDefinition definition;
+        protected int dotPosition;
 
-        public CFRule BaseRule { get { return p_Rule; } }
-        public int DotPosition { get { return p_DotPosition; } }
+        public CFRule BaseRule { get { return rule; } }
+        public int DotPosition { get { return dotPosition; } }
         public ItemAction Action
         {
             get
             {
-                if (p_DotPosition != p_Definition.Length)
+                if (dotPosition != definition.Length)
                     return ItemAction.Shift;
                 return ItemAction.Reduce;
             }
         }
         
-        public Symbol NextSymbol { get { return p_Definition.GetSymbolAtIndex(p_DotPosition); } }
-        public CFRuleDefinition NextChoice { get { return p_Rule.Definition.GetChoiceAtIndex(p_DotPosition + 1); } }
+        public Symbol NextSymbol { get { return definition.GetSymbolAtIndex(dotPosition); } }
+        public CFRuleDefinition NextChoice { get { return rule.Definition.GetChoiceAtIndex(dotPosition + 1); } }
 
         public abstract TerminalSet Lookaheads { get; }
 
         public Item(CFRule Rule, int DotPosition)
         {
-            p_Rule = Rule;
-            p_Definition = p_Rule.Definition.GetChoiceAtIndex(0);
-            p_DotPosition = DotPosition;
+            rule = Rule;
+            definition = rule.Definition.GetChoiceAtIndex(0);
+            dotPosition = DotPosition;
         }
 
         public bool Equals_Base(Item Item)
         {
-            if (p_Rule != Item.p_Rule)
+            if (rule != Item.rule)
                 return false;
-            return (p_DotPosition == Item.p_DotPosition);
+            return (dotPosition == Item.dotPosition);
         }
 
         public abstract Item GetChild();

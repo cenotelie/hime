@@ -4,29 +4,29 @@ namespace Hime.Parsers.CF.LR
 {
     abstract class LRParserData : ParserData
     {
-        protected ParserGenerator p_Generator;
-        protected CFGrammar p_Grammar;
-        protected Graph p_Graph;
+        protected ParserGenerator generator;
+        protected CFGrammar grammar;
+        protected Graph graph;
 
-        public CFGrammar Grammar { get { return p_Grammar; } }
-        public Graph Graph { get { return p_Graph; } }
-        public ParserGenerator Generator { get { return p_Generator; } }
+        public CFGrammar Grammar { get { return grammar; } }
+        public Graph Graph { get { return graph; } }
+        public ParserGenerator Generator { get { return generator; } }
 
         public LRParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
         {
-            p_Grammar = gram;
-            p_Graph = graph;
-            p_Generator = generator;
+            this.grammar = gram;
+            this.graph = graph;
+            this.generator = generator;
         }
 
         public abstract bool Export(GrammarBuildOptions Options);
 
         public System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document)
         {
-            System.Xml.XmlNode graph = Document.CreateElement("LRGraph");
-            foreach (ItemSet set in p_Graph.Sets)
-                graph.AppendChild(GetXMLData_Set(Document, set));
-            return graph;
+            System.Xml.XmlNode nodegraph = Document.CreateElement("LRGraph");
+            foreach (ItemSet set in graph.Sets)
+                nodegraph.AppendChild(GetXMLData_Set(Document, set));
+            return nodegraph;
         }
         protected System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument Document, ItemSet Set)
         {
@@ -88,9 +88,9 @@ namespace Hime.Parsers.CF.LR
 
         public void SerializeVisual(Kernel.Graphs.DOTSerializer Serializer)
         {
-            foreach (ItemSet set in p_Graph.Sets)
+            foreach (ItemSet set in graph.Sets)
                 Serializer.WriteNode(set.ID.ToString());
-            foreach (ItemSet set in p_Graph.Sets)
+            foreach (ItemSet set in graph.Sets)
                 foreach (Symbol symbol in set.Children.Keys)
                     Serializer.WriteEdge(set.ID.ToString(), set.Children[symbol].ID.ToString(), symbol.LocalName);
         }

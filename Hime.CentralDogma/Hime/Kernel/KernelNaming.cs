@@ -11,79 +11,79 @@ namespace Hime.Kernel
 
     public class NameResolutionException : NamingException
     {
-        private Symbol p_Origin;
-        private QualifiedName p_Name;
+        private Symbol origin;
+        private QualifiedName name;
 
-        public Symbol Origin { get { return p_Origin; } }
-        public QualifiedName Name { get { return p_Name; } }
+        public Symbol Origin { get { return origin; } }
+        public QualifiedName Name { get { return name; } }
 
         public NameResolutionException(Symbol origin, QualifiedName name) : base("Cannot resolve name " + name.ToString() + " from symbol " + origin.CompleteName.ToString())
         {
-            p_Origin = origin;
-            p_Name = name;
+            this.origin = origin;
+            this.name = name;
         }
     }
 
     public class AmbiguousNameException : NamingException
     {
-        private Symbol p_Origin;
-        private QualifiedName p_Name;
+        private Symbol origin;
+        private QualifiedName name;
 
-        public Symbol Origin { get { return p_Origin; } }
-        public QualifiedName Name { get { return p_Name; } }
+        public Symbol Origin { get { return origin; } }
+        public QualifiedName Name { get { return name; } }
 
         public AmbiguousNameException(Symbol origin, QualifiedName name) : base("Ambiguous name " + name.ToString() + " from symbol " + origin.CompleteName.ToString())
         {
-            p_Origin = origin;
-            p_Name = name;
+            this.origin = origin;
+            this.name = name;
         }
     }
 
     public class NameCollisionException : NamingException
     {
-        private Symbol p_Container;
-        private string p_Name;
+        private Symbol container;
+        private string name;
 
-        public Symbol Container { get { return p_Container; } }
-        public string Name { get { return p_Name; } }
+        public Symbol Container { get { return container; } }
+        public string Name { get { return name; } }
 
         public NameCollisionException(Symbol container, string name) : base("Name collision in symbol " + container.CompleteName.ToString() + " for " + name)
         {
-            p_Container = container;
-            p_Name = name;
+            this.container = container;
+            this.name = name;
         }
     }
 
     public class WrongParentSymbolException : NamingException
     {
-        private Symbol p_Current;
-        private System.Type p_GivenType;
-        private System.Type p_ExpectedType;
+        private Symbol current;
+        private System.Type givenType;
+        private System.Type expectedType;
 
-        public Symbol CurrentSymbol { get { return p_Current; } }
-        public System.Type GivenType { get { return p_GivenType; } }
-        public System.Type ExpectedType { get { return p_ExpectedType; } }
+        public Symbol CurrentSymbol { get { return current; } }
+        public System.Type GivenType { get { return givenType; } }
+        public System.Type ExpectedType { get { return expectedType; } }
 
         public WrongParentSymbolException(Symbol current, System.Type givenType, System.Type expectedType) : base("Wrong parent type for " + current.CompleteName.ToString() + "; expected " + expectedType.Name)
         {
-            p_Current = current;
-            p_GivenType = givenType;
-            p_ExpectedType = expectedType;
+            this.current = current;
+            this.givenType = givenType;
+            this.expectedType = expectedType;
         }
     }
 
     public class CannotAddChildException : NamingException
     {
-        private Symbol p_Parent;
-        private Symbol p_Child;
+        private Symbol parent;
+        private Symbol child;
 
-        public Symbol ParentSymbol { get { return p_Parent; } }
-        public Symbol ChildSymbol { get { return p_Child; } }
+        public Symbol ParentSymbol { get { return parent; } }
+        public Symbol ChildSymbol { get { return child; } }
 
         public CannotAddChildException(Symbol parent, Symbol child) : base("Cannot add " + child.LocalName + " in symbol " + parent.CompleteName.ToString())
         {
-            p_Parent = parent;
-            p_Child = child;
+            this.parent = parent;
+            this.child = child;
         }
     }
     
@@ -91,24 +91,24 @@ namespace Hime.Kernel
 
     public class QualifiedName
     {
-        private static char p_SeparatorChar = '.';
-        private List<string> p_Path;
+        private static char separatorChar = '.';
+        private List<string> path;
 
-        public static char Separator { get { return p_SeparatorChar; } }
-        public string PrefixOrder0 { get { return p_Path[0]; } }
-        public string NakedName { get { return p_Path[p_Path.Count - 1]; } }
-        public QualifiedName Prefix { get { return new QualifiedName(p_Path.GetRange(0, p_Path.Count - 1)); } }
-        public QualifiedName SubName { get { return new QualifiedName(p_Path.GetRange(1, p_Path.Count - 1)); } }
-        public bool IsEmpty { get { return (p_Path.Count == 0); } }
-        public bool HasPrefix { get { return (p_Path.Count > 1); } }
-        public bool IsNaked { get { return (p_Path.Count == 1); } }
+        public static char Separator { get { return separatorChar; } }
+        public string PrefixOrder0 { get { return path[0]; } }
+        public string NakedName { get { return path[path.Count - 1]; } }
+        public QualifiedName Prefix { get { return new QualifiedName(path.GetRange(0, path.Count - 1)); } }
+        public QualifiedName SubName { get { return new QualifiedName(path.GetRange(1, path.Count - 1)); } }
+        public bool IsEmpty { get { return (path.Count == 0); } }
+        public bool HasPrefix { get { return (path.Count > 1); } }
+        public bool IsNaked { get { return (path.Count == 1); } }
 
         public QualifiedName(string name)
         {
-            p_Path = new List<string>();
-            p_Path.Add(name);
+            path = new List<string>();
+            path.Add(name);
         }
-        public QualifiedName(List<string> path) { p_Path = path; }
+        public QualifiedName(List<string> path) { this.path = path; }
 
         public static QualifiedName ParseName(string completeName)
         {
@@ -117,7 +117,7 @@ namespace Hime.Kernel
             int End = 0;
             while (End != completeName.Length)
             {
-                if (completeName[End] == p_SeparatorChar)
+                if (completeName[End] == separatorChar)
                 {
                     Path.Add(completeName.Substring(Begin, End - Begin));
                     Begin = End + 1;
@@ -130,16 +130,16 @@ namespace Hime.Kernel
             return new QualifiedName(Path);
         }
 
-        public override string ToString() { return ToString(p_SeparatorChar); }
+        public override string ToString() { return ToString(separatorChar); }
         public string ToString(char separator)
         {
-            if (p_Path.Count == 0)
+            if (path.Count == 0)
                 return string.Empty;
-            System.Text.StringBuilder Builder = new System.Text.StringBuilder(p_Path[0]);
-            for (int i = 1; i != p_Path.Count; i++)
+            System.Text.StringBuilder Builder = new System.Text.StringBuilder(path[0]);
+            for (int i = 1; i != path.Count; i++)
             {
                 Builder.Append(separator);
-                Builder.Append(p_Path[i]);
+                Builder.Append(path[i]);
             }
             return Builder.ToString();
         }
@@ -147,7 +147,7 @@ namespace Hime.Kernel
         public static QualifiedName operator +(QualifiedName prefix, string localName)
         {
             List<string> Path = new List<string>();
-            Path.AddRange(prefix.p_Path);
+            Path.AddRange(prefix.path);
             Path.Add(localName);
             return new QualifiedName(Path);
         }
@@ -163,23 +163,23 @@ namespace Hime.Kernel
 
     public abstract class Symbol
     {
-        protected SymbolAccess p_Access;
-        protected Dictionary<string, Symbol> p_Children;
+        protected SymbolAccess access;
+        protected Dictionary<string, Symbol> children;
 
         public abstract Symbol Parent { get; }
         public abstract string LocalName { get; }
         public abstract QualifiedName CompleteName { get; }
         public SymbolAccess Access
         {
-            get { return p_Access; }
-            set { p_Access = value; }
+            get { return access; }
+            set { access = value; }
         }
-        public ICollection<Symbol> Children { get { return p_Children.Values; } }
+        public ICollection<Symbol> Children { get { return children.Values; } }
 
         public Symbol()
         {
-            p_Children = new Dictionary<string, Symbol>();
-            p_Access = SymbolAccess.Public;
+            children = new Dictionary<string, Symbol>();
+            access = SymbolAccess.Public;
         }
 
         protected abstract void SymbolSetParent(Symbol symbol);
@@ -187,11 +187,11 @@ namespace Hime.Kernel
 
         public virtual void SymbolAddChild(Symbol child)
         {
-            if (p_Children.ContainsKey(child.LocalName))
+            if (children.ContainsKey(child.LocalName))
                 throw new NameCollisionException(this, child.LocalName);
             child.SymbolSetParent(this);
             child.SymbolSetCompleteName(CompleteName + child.LocalName);
-            p_Children.Add(child.LocalName, child);
+            children.Add(child.LocalName, child);
         }
 
         public Symbol ResolveName(QualifiedName name)
@@ -217,8 +217,8 @@ namespace Hime.Kernel
         {
             if (name.IsEmpty)
                 return this;
-            if (p_Children.ContainsKey(name.PrefixOrder0))
-                return p_Children[name.PrefixOrder0].ResolveName_DeepCheck(name.SubName);
+            if (children.ContainsKey(name.PrefixOrder0))
+                return children[name.PrefixOrder0].ResolveName_DeepCheck(name.SubName);
             return null;
         }
 
@@ -227,24 +227,24 @@ namespace Hime.Kernel
 
     public class Namespace : Symbol
     {
-        private Namespace p_Parent;
-        private string p_LocalName;
-        private QualifiedName p_CompleteName;
-        private Dictionary<string, Namespace> p_Namespaces;
+        private Namespace parent;
+        private string localName;
+        private QualifiedName completeName;
+        private Dictionary<string, Namespace> namespaces;
 
-        public override Symbol Parent { get { return p_Parent; } }
-        public override string LocalName { get { return p_LocalName; } }
-        public override QualifiedName CompleteName { get { return p_CompleteName; } }
+        public override Symbol Parent { get { return parent; } }
+        public override string LocalName { get { return localName; } }
+        public override QualifiedName CompleteName { get { return completeName; } }
 
         public Namespace(Namespace parent, string name) : base()
         {
-            p_Parent = parent;
-            p_LocalName = name;
-            if (p_Parent == null)
-                p_CompleteName = new QualifiedName(new List<string>());
+            this.parent = parent;
+            localName = name;
+            if (parent == null)
+                completeName = new QualifiedName(new List<string>());
             else
-                p_CompleteName = p_Parent.p_CompleteName + p_LocalName;
-            p_Namespaces = new Dictionary<string, Namespace>();
+                completeName = parent.completeName + localName;
+            namespaces = new Dictionary<string, Namespace>();
         }
 
         public static Namespace CreateRoot()
@@ -256,7 +256,7 @@ namespace Hime.Kernel
         {
             base.SymbolAddChild(child);
             if (child is Namespace)
-                p_Namespaces.Add(child.LocalName, (Namespace)child);
+                namespaces.Add(child.LocalName, (Namespace)child);
         }
         protected override void SymbolSetParent(Symbol symbol)
         {
@@ -264,21 +264,21 @@ namespace Hime.Kernel
             {
                 throw new WrongParentSymbolException(this, symbol.GetType(),typeof(Namespace));
             }
-            this.p_Parent = (Namespace)symbol;
+            this.parent = (Namespace)symbol;
         }
-        protected override void SymbolSetCompleteName(QualifiedName name) { p_CompleteName = name; }
+        protected override void SymbolSetCompleteName(QualifiedName name) { completeName = name; }
 
         public Namespace AddSubNamespace(QualifiedName name)
         {
-            if (!p_Children.ContainsKey(name.PrefixOrder0))
+            if (!children.ContainsKey(name.PrefixOrder0))
             {
                 Namespace New = new Namespace(this, name.PrefixOrder0);
-                p_Children.Add(name.PrefixOrder0, New);
-                p_Namespaces.Add(name.PrefixOrder0, New);
+                children.Add(name.PrefixOrder0, New);
+                namespaces.Add(name.PrefixOrder0, New);
             }
             if (name.HasPrefix)
-                return p_Namespaces[name.PrefixOrder0].AddSubNamespace(name.SubName);
-            return p_Namespaces[name.PrefixOrder0];
+                return namespaces[name.PrefixOrder0].AddSubNamespace(name.SubName);
+            return namespaces[name.PrefixOrder0];
         }
     }
 }

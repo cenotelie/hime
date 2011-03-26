@@ -4,16 +4,16 @@ namespace Hime.Parsers.CF
 {
     class CFGrammarCompiler : Kernel.Resources.IResourceCompiler
     {
-        private static string[] p_ResourcesNames = new string[] { "cf_grammar_text", "cf_grammar_bin" };
-        private const string p_SubruleHeadRadical = "";
-        private const string p_SubruleHeadRadicalMultiplicity = p_SubruleHeadRadical + "_m";
-        private const string p_SubruleHeadRadicalRestrict = p_SubruleHeadRadical + "_r";
-        private Hime.Kernel.Reporting.Reporter p_Log;
+        private static string[] resourcesNames = new string[] { "cf_grammar_text", "cf_grammar_bin" };
+        private const string subruleHeadRadical = "";
+        private const string subruleHeadRadicalMultiplicity = subruleHeadRadical + "_m";
+        private const string subruleHeadRadicalRestrict = subruleHeadRadical + "_r";
+        private Hime.Kernel.Reporting.Reporter log;
 
         public string CompilerName { get { return "HimeSystems.CentralDogma.ContextFreeGrammarCompiler"; } }
         public int CompilerVersionMajor { get { return 1; } }
         public int CompilerVersionMinor { get { return 0; } }
-        public string[] ResourceNames { get { return p_ResourcesNames; } }
+        public string[] ResourceNames { get { return resourcesNames; } }
 
         public CFGrammarCompiler() { }
 
@@ -89,7 +89,7 @@ namespace Hime.Parsers.CF
         }
         public void Compile(Kernel.Resources.Resource Resource, Hime.Kernel.Reporting.Reporter Log)
         {
-            p_Log = Log;
+            log = Log;
             if (Resource.Symbol is CFGrammarText)
             {
                 Compile_Recognize_grammar_text((CFGrammar)Resource.Symbol, Resource.SyntaxNode);
@@ -273,7 +273,7 @@ namespace Hime.Parsers.CF
             Terminal Ref = Data.GetTerminal(Token.ValueText);
             if (Ref == null)
             {
-                p_Log.Error("Compiler", "Cannot find terminal " + Token.ValueText);
+                log.Error("Compiler", "Cannot find terminal " + Token.ValueText);
                 Automata.NFA Final = new Hime.Parsers.Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -474,7 +474,7 @@ namespace Hime.Parsers.CF
                     Defs.Add(new CFRuleDefinition(Symbol));
                 else
                 {
-                    p_Log.Error("Compiler", "Unrecognized symbol " + Token.ValueText + " in rule definition");
+                    log.Error("Compiler", "Unrecognized symbol " + Token.ValueText + " in rule definition");
                     Defs.Add(new CFRuleDefinition());
                 }
             }
@@ -490,7 +490,7 @@ namespace Hime.Parsers.CF
             // check for meta-rule existence
             if (!Context.IsTemplateRule(Name, ParamCount))
             {
-                p_Log.Error("Compiler", "Meta-rule " + Name + " does not exist with " + ParamCount.ToString() + " parameters");
+                log.Error("Compiler", "Meta-rule " + Name + " does not exist with " + ParamCount.ToString() + " parameters");
                 Defs.Add(new CFRuleDefinition());
                 return Defs;
             }
@@ -535,7 +535,7 @@ namespace Hime.Parsers.CF
                 else if (Token.ValueText == "*")
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
-                    CFVariable SubVar = Data.AddVariable(p_SubruleHeadRadicalMultiplicity + Data.NextSID.ToString());
+                    CFVariable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
                     CFRuleDefinitionSet SetVar = new CFRuleDefinitionSet();
                     SetVar.Add(new CFRuleDefinition(SubVar));
                     SetVar = SetInner * SetVar;
@@ -549,7 +549,7 @@ namespace Hime.Parsers.CF
                 else if (Token.ValueText == "+")
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
-                    CFVariable SubVar = Data.AddVariable(p_SubruleHeadRadicalMultiplicity + Data.NextSID.ToString());
+                    CFVariable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
                     CFRuleDefinitionSet SetVar = new CFRuleDefinitionSet();
                     SetVar.Add(new CFRuleDefinition(SubVar));
                     SetVar = SetInner * SetVar;
@@ -580,7 +580,7 @@ namespace Hime.Parsers.CF
                 {
                     CFRuleDefinitionSet SetLeft = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
                     CFRuleDefinitionSet SetRight = Compile_Recognize_rule_definition(Data, Context, Node.Children[1]);
-                    CFVariable SubVar = Data.AddVariable(p_SubruleHeadRadicalRestrict + Data.NextSID.ToString());
+                    CFVariable SubVar = Data.AddVariable(subruleHeadRadicalRestrict + Data.NextSID.ToString());
                     foreach (CFRuleDefinition Def in SetLeft)
                         SubVar.AddRule(new CFRule(SubVar, Def, true, SubVar.SID));
                     foreach (CFRuleDefinition Def in SetRight)
@@ -655,16 +655,16 @@ namespace Hime.Parsers.CF
 
         private void Compile_Recognize_grammar_text(CFGrammar Data, Redist.Parsers.SyntaxTreeNode GrammarNode)
         {
-            p_Log.Info("Compiler", "Compiling grammar " + Data.LocalName);
-            p_Log.Info("Compiler", "Grammar takes text as input");
+            log.Info("Compiler", "Compiling grammar " + Data.LocalName);
+            log.Info("Compiler", "Grammar takes text as input");
             Compile_Recognize_grammar_options(Data, GrammarNode.Children[3]);
             Compile_Recognize_grammar_terminals(Data, GrammarNode.Children[4]);
             Compile_Recognize_grammar_rules(Data, GrammarNode.Children[5]);
         }
         private void Compile_Recognize_grammar_bin(CFGrammar Data, Redist.Parsers.SyntaxTreeNode GrammarNode)
         {
-            p_Log.Info("Compiler", "Compiling grammar " + Data.LocalName);
-            p_Log.Info("Compiler", "Grammar takes binary as input");
+            log.Info("Compiler", "Compiling grammar " + Data.LocalName);
+            log.Info("Compiler", "Grammar takes binary as input");
             Compile_Recognize_grammar_options(Data, GrammarNode.Children[3]);
             Compile_Recognize_grammar_rules(Data, GrammarNode.Children[4]);
         }

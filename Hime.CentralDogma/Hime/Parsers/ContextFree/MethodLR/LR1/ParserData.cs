@@ -4,27 +4,27 @@ namespace Hime.Parsers.CF.LR
 {
     class LR1ParserData : LRParserData
     {
-        protected System.IO.StreamWriter p_Stream;
+        protected System.IO.StreamWriter stream;
 
         public LR1ParserData(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
 
 
         public override bool Export(GrammarBuildOptions Options)
         {
-            p_Stream = Options.ParserWriter;
-            p_Stream.Write("    class " + p_Grammar.LocalName + "_Parser : ");
-            if (p_Grammar is CFGrammarText)
-                p_Stream.WriteLine("Hime.Redist.Parsers.LR1TextParser");
+            stream = Options.ParserWriter;
+            stream.Write("    class " + grammar.LocalName + "_Parser : ");
+            if (grammar is CFGrammarText)
+                stream.WriteLine("Hime.Redist.Parsers.LR1TextParser");
             else
-                p_Stream.WriteLine("Hime.Redist.Parsers.LR1BinaryParser");
-            p_Stream.WriteLine("    {");
-            foreach (CFRule rule in p_Grammar.Rules)
+                stream.WriteLine("Hime.Redist.Parsers.LR1BinaryParser");
+            stream.WriteLine("    {");
+            foreach (CFRule rule in grammar.Rules)
                 Export_Production(rule);
             Export_Rules();
             Export_RulesHeadID();
             Export_RulesName();
             Export_RulesParserLength();
-            foreach (ItemSet set in p_Graph.Sets)
+            foreach (ItemSet set in graph.Sets)
             {
                 Export_State_Expected(set);
                 Export_State_Items(set);
@@ -41,71 +41,71 @@ namespace Hime.Parsers.CF.LR
             Export_Actions();
             Export_Setup();
             Export_Constructor();
-            p_Stream.WriteLine("    }");
+            stream.WriteLine("    }");
             return true;
         }
         protected void Export_Setup()
         {
-            p_Stream.WriteLine("        protected override void setup()");
-            p_Stream.WriteLine("        {");
-            p_Stream.WriteLine("            p_Rules = p_StaticRules;");
-            p_Stream.WriteLine("            p_RulesHeadID = p_StaticRulesHeadID;");
-            p_Stream.WriteLine("            p_RulesHeadName = p_StaticRulesHeadName;");
-            p_Stream.WriteLine("            p_RulesParserLength = p_StaticRulesParserLength;");
+            stream.WriteLine("        protected override void setup()");
+            stream.WriteLine("        {");
+            stream.WriteLine("            rules = staticRules;");
+            stream.WriteLine("            rulesHeadID = staticRulesHeadID;");
+            stream.WriteLine("            rulesHeadName = staticRulesHeadName;");
+            stream.WriteLine("            rulesParserLength = staticRulesParserLength;");
 
-            p_Stream.WriteLine("            p_StateExpectedIDs = p_StaticStateExpectedIDs;");
-            p_Stream.WriteLine("            p_StateExpectedNames = p_StaticStateExpectedNames;");
-            p_Stream.WriteLine("            p_StateItems = p_StaticStateItems;");
-            p_Stream.WriteLine("            p_StateShiftsOnTerminal = p_StaticStateShiftsOnTerminal;");
-            p_Stream.WriteLine("            p_StateShiftsOnVariable = p_StaticStateShiftsOnVariable;");
-            p_Stream.WriteLine("            p_StateReducsOnTerminal = p_StaticStateReducsOnTerminal;");
-            p_Stream.WriteLine("            p_ErrorSimulationLength = 3;");
-            p_Stream.WriteLine("        }");
+            stream.WriteLine("            stateExpectedIDs = staticStateExpectedIDs;");
+            stream.WriteLine("            stateExpectedNames = staticStateExpectedNames;");
+            stream.WriteLine("            stateItems = staticStateItems;");
+            stream.WriteLine("            stateShiftsOnTerminal = staticStateShiftsOnTerminal;");
+            stream.WriteLine("            stateShiftsOnVariable = staticStateShiftsOnVariable;");
+            stream.WriteLine("            stateReducsOnTerminal = staticStateReducsOnTerminal;");
+            stream.WriteLine("            errorSimulationLength = 3;");
+            stream.WriteLine("        }");
         }
         protected void Export_Constructor()
         {
-            if (p_Grammar.Actions.GetEnumerator().MoveNext())
+            if (grammar.Actions.GetEnumerator().MoveNext())
             {
-                p_Stream.WriteLine("        private Actions p_Actions;");
-                p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { p_Actions = actions; }");
+                stream.WriteLine("        private Actions actions;");
+                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { actions = actions; }");
             }
             else
             {
-                p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
+                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
             }
         }
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in p_Grammar.Actions)
+            foreach (Action action in grammar.Actions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
             if (Names.Count != 0)
             {
-                p_Stream.WriteLine("        public interface Actions");
-                p_Stream.WriteLine("        {");
+                stream.WriteLine("        public interface Actions");
+                stream.WriteLine("        {");
                 foreach (string name in Names)
-                    p_Stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
-                p_Stream.WriteLine("        }");
+                    stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+                stream.WriteLine("        }");
             }
         }
         protected void Export_Production(CFRule Rule)
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLR1Parser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)");
-            p_Stream.WriteLine("        {");
+            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLR1Parser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)");
+            stream.WriteLine("        {");
             if (ParserLength != "0")
             {
-                p_Stream.WriteLine("            List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
-                p_Stream.WriteLine("            nodes.RemoveRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
+                stream.WriteLine("            List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
+                stream.WriteLine("            nodes.RemoveRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
             }
-            p_Stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")");
+            stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")");
             if (Rule.ReplaceOnProduction)
-                p_Stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);");
+                stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);");
             else
-                p_Stream.WriteLine(");");
+                stream.WriteLine(");");
 
             int i = 0;
             foreach (RuleDefinitionPart Part in Rule.Definition.Parts)
@@ -113,70 +113,70 @@ namespace Hime.Parsers.CF.LR
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    p_Stream.WriteLine("            ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.LocalName + "(SubRoot);");
+                    stream.WriteLine("            ((" + grammar.LocalName + "_Parser)parser).actions." + action.LocalName + "(SubRoot);");
                 }
                 else if (Part.Symbol is Virtual)
-                    p_Stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
+                    stream.WriteLine("            SubRoot.AppendChild(new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + Part.Symbol.LocalName + "\"), Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
-                    p_Stream.Write("            SubRoot.AppendChild(Definition[" + i.ToString() + "]");
+                    stream.Write("            SubRoot.AppendChild(Definition[" + i.ToString() + "]");
                     if (Part.Action != RuleDefinitionPartAction.Nothing)
-                        p_Stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
+                        stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ");");
                     else
-                        p_Stream.WriteLine(");");
+                        stream.WriteLine(");");
                     i++;
                 }
             }
-            p_Stream.WriteLine("            nodes.Add(SubRoot);");
-            p_Stream.WriteLine("        }");
+            stream.WriteLine("            nodes.Add(SubRoot);");
+            stream.WriteLine("        }");
         }
         protected void Export_Rules()
         {
-            p_Stream.Write("        private static Production[] p_StaticRules = { ");
+            stream.Write("        private static Production[] staticRules = { ");
             bool first = true;
-            foreach (CFRule Rule in p_Grammar.Rules)
+            foreach (CFRule Rule in grammar.Rules)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_RulesHeadID()
         {
-            p_Stream.Write("        private static ushort[] p_StaticRulesHeadID = { ");
+            stream.Write("        private static ushort[] staticRulesHeadID = { ");
             bool first = true;
-            foreach (CFRule Rule in p_Grammar.Rules)
+            foreach (CFRule Rule in grammar.Rules)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + Rule.Variable.SID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + Rule.Variable.SID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_RulesName()
         {
-            p_Stream.Write("        private static string[] p_StaticRulesHeadName = { ");
+            stream.Write("        private static string[] staticRulesHeadName = { ");
             bool first = true;
-            foreach (CFRule Rule in p_Grammar.Rules)
+            foreach (CFRule Rule in grammar.Rules)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("\"" + Rule.Variable.LocalName + "\"");
+                if (!first) stream.Write(", ");
+                stream.Write("\"" + Rule.Variable.LocalName + "\"");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_RulesParserLength()
         {
-            p_Stream.Write("        private static ushort[] p_StaticRulesParserLength = { ");
+            stream.Write("        private static ushort[] staticRulesParserLength = { ");
             bool first = true;
-            foreach (CFRule Rule in p_Grammar.Rules)
+            foreach (CFRule Rule in grammar.Rules)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + Rule.Definition.GetChoiceAtIndex(0).Length.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + Rule.Definition.GetChoiceAtIndex(0).Length.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_State_Expected(ItemSet State)
         {
@@ -187,149 +187,149 @@ namespace Hime.Parsers.CF.LR
                     Terminals.Add((Terminal)Symbol);
             }
 
-            p_Stream.Write("        private static ushort[] p_StateExpectedIDs_" + State.ID.ToString("X") + " = { ");
+            stream.Write("        private static ushort[] stateExpectedIDs_" + State.ID.ToString("X") + " = { ");
             bool first = true;
             foreach (Terminal Terminal in Terminals)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + Terminal.SID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + Terminal.SID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
 
-            p_Stream.Write("        private static string[] p_StateExpectedNames_" + State.ID.ToString("X") + " = { ");
+            stream.Write("        private static string[] stateExpectedNames_" + State.ID.ToString("X") + " = { ");
             first = true;
             foreach (Terminal Terminal in Terminals)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("\"" + Terminal.LocalName + "\"");
+                if (!first) stream.Write(", ");
+                stream.Write("\"" + Terminal.LocalName + "\"");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_State_Items(ItemSet State)
         {
-            p_Stream.Write("        private static string[] p_StateItems_" + State.ID.ToString("X") + " = { ");
+            stream.Write("        private static string[] stateItems_" + State.ID.ToString("X") + " = { ");
             bool first = true;
             foreach (Item item in State.Items)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("\"" + item.ToString() + "\"");
+                if (!first) stream.Write(", ");
+                stream.Write("\"" + item.ToString() + "\"");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_State_ShiftOnTerminals(ItemSet State)
         {
-            p_Stream.Write("        private static ushort[][] p_StateShiftsOnTerminal_" + State.ID.ToString("X") + " = { ");
+            stream.Write("        private static ushort[][] stateShiftsOnTerminal_" + State.ID.ToString("X") + " = { ");
             bool first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new ushort[2] { 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
+                if (!first) stream.Write(", ");
+                stream.Write("new ushort[2] { 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_State_ShiftOnVariables(ItemSet State)
         {
-            p_Stream.Write("        private static ushort[][] p_StateShiftsOnVariable_" + State.ID.ToString("X") + " = { ");
+            stream.Write("        private static ushort[][] stateShiftsOnVariable_" + State.ID.ToString("X") + " = { ");
             bool first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new ushort[2] { 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
+                if (!first) stream.Write(", ");
+                stream.Write("new ushort[2] { 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_State_ReducsOnTerminal(ItemSet State)
         {
-            p_Stream.Write("        private static ushort[][] p_StateReducsOnTerminal_" + State.ID.ToString("X") + " = { ");
+            stream.Write("        private static ushort[][] stateReducsOnTerminal_" + State.ID.ToString("X") + " = { ");
             bool first = true;
             foreach (ItemSetActionReduce Reduction in State.Reductions.Reductions)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new ushort[2] { 0x" + Reduction.OnSymbol.SID.ToString("x") + ", 0x" + p_Grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + " }");
+                if (!first) stream.Write(", ");
+                stream.Write("new ushort[2] { 0x" + Reduction.OnSymbol.SID.ToString("x") + ", 0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + " }");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_StateExpectedIDs()
         {
-            p_Stream.Write("        private static ushort[][] p_StaticStateExpectedIDs = { ");
+            stream.Write("        private static ushort[][] staticStateExpectedIDs = { ");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("p_StateExpectedIDs_" + State.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("stateExpectedIDs_" + State.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_StateExpectedNames()
         {
-            p_Stream.Write("        private static string[][] p_StaticStateExpectedNames = { ");
+            stream.Write("        private static string[][] staticStateExpectedNames = { ");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("p_StateExpectedNames_" + State.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("stateExpectedNames_" + State.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_StateItems()
         {
-            p_Stream.Write("        private static string[][] p_StaticStateItems = { ");
+            stream.Write("        private static string[][] staticStateItems = { ");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("p_StateItems_" + State.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("stateItems_" + State.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_StateShiftsOnTerminal()
         {
-            p_Stream.Write("        private static ushort[][][] p_StaticStateShiftsOnTerminal = { ");
+            stream.Write("        private static ushort[][][] staticStateShiftsOnTerminal = { ");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("p_StateShiftsOnTerminal_" + State.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("stateShiftsOnTerminal_" + State.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_StateShiftsOnVariable()
         {
-            p_Stream.Write("        private static ushort[][][] p_StaticStateShiftsOnVariable = { ");
+            stream.Write("        private static ushort[][][] staticStateShiftsOnVariable = { ");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("p_StateShiftsOnVariable_" + State.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("stateShiftsOnVariable_" + State.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_StateReducsOnTerminal()
         {
-            p_Stream.Write("        private static ushort[][][] p_StaticStateReducsOnTerminal = { ");
+            stream.Write("        private static ushort[][][] staticStateReducsOnTerminal = { ");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("p_StateReducsOnTerminal_" + State.ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("stateReducsOnTerminal_" + State.ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
     }
 }

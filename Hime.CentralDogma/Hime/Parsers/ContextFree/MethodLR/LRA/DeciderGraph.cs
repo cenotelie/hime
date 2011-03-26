@@ -4,18 +4,18 @@ namespace Hime.Parsers.CF.LR
 {
     class DeciderGraph
     {
-        private List<DeciderState> p_States;
+        private List<DeciderState> states;
 
         public DeciderGraph()
         {
-            p_States = new List<DeciderState>();
+            states = new List<DeciderState>();
         }
 
         public void Build(GLRSimulator simulator)
         {
-            for (int i = 0; i != p_States.Count; i++)
+            for (int i = 0; i != states.Count; i++)
             {
-                DeciderState current = p_States[i];
+                DeciderState current = states[i];
                 Dictionary<Terminal, DeciderState> dic = current.ComputeNexts(simulator);
                 foreach (Terminal terminal in dic.Keys)
                 {
@@ -28,27 +28,27 @@ namespace Hime.Parsers.CF.LR
 
         public DeciderState AddUnique(DeciderState candidate)
         {
-            foreach (DeciderState potential in p_States)
+            foreach (DeciderState potential in states)
                 if (potential.Equals(candidate))
                     return potential;
-            p_States.Add(candidate);
+            states.Add(candidate);
             return candidate;
         }
     }
 
 	class DeciderState
 	{
-        private List<List<ItemSet>> p_Choices;
-        private List<TerminalSet> p_Decisions;
-        private Dictionary<Terminal, DeciderState> p_Transitions;
+        private List<List<ItemSet>> choices;
+        private List<TerminalSet> decisions;
+        private Dictionary<Terminal, DeciderState> transitions;
 
-        public void AddTransition(Terminal terminal, DeciderState state) { p_Transitions.Add(terminal, state); }
+        public void AddTransition(Terminal terminal, DeciderState state) { transitions.Add(terminal, state); }
 
         public DeciderState()
         {
-            p_Choices = new List<List<ItemSet>>();
-            p_Decisions = new List<TerminalSet>();
-            p_Transitions = new Dictionary<Terminal, DeciderState>();
+            choices = new List<List<ItemSet>>();
+            decisions = new List<TerminalSet>();
+            transitions = new Dictionary<Terminal, DeciderState>();
         }
 
         public Dictionary<Terminal, DeciderState> ComputeNexts(GLRSimulator simulator)
@@ -60,7 +60,7 @@ namespace Hime.Parsers.CF.LR
         private TerminalSet ComputeFollowers()
         {
             List<TerminalSet> followers = new List<TerminalSet>();
-            foreach (List<ItemSet> choice in p_Choices)
+            foreach (List<ItemSet> choice in choices)
                 followers.Add(ComputeFollowers(choice));
             TerminalSet common = new TerminalSet();
             
@@ -87,19 +87,19 @@ namespace Hime.Parsers.CF.LR
             if (!(obj is DeciderState))
                 return false;
             DeciderState right = (DeciderState)obj;
-            if (this.p_Choices.Count != right.p_Choices.Count)
+            if (this.choices.Count != right.choices.Count)
                 return false;
-            for (int i = 0; i != this.p_Choices.Count; i++)
+            for (int i = 0; i != this.choices.Count; i++)
             {
-                List<ItemSet> l1 = this.p_Choices[i];
-                List<ItemSet> l2 = right.p_Choices[i];
+                List<ItemSet> l1 = this.choices[i];
+                List<ItemSet> l2 = right.choices[i];
                 if (l1.Count != l2.Count)
                     return false;
                 foreach (ItemSet set in l1)
                     if (!l2.Contains(set))
                         return false;
-                /*TerminalSet s1 = this.p_Decisions[i];
-                TerminalSet s2 = right.p_Decisions[i];
+                /*TerminalSet s1 = this.decisions[i];
+                TerminalSet s2 = right.decisions[i];
                 if (s1.Count != s2.Count)
                     return false;
                 foreach (Terminal t in s1)

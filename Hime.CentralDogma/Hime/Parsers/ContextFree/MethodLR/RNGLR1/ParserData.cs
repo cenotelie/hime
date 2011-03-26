@@ -4,24 +4,24 @@ namespace Hime.Parsers.CF.LR
 {
     class RNGLR1ParserData : LRParserData
     {
-        protected System.IO.StreamWriter p_Stream;
-        protected List<CFVariable> p_NullableVars;
-        protected List<CFRuleDefinition> p_NullableChoices;
+        protected System.IO.StreamWriter stream;
+        protected List<CFVariable> nullableVars;
+        protected List<CFRuleDefinition> nullableChoices;
 
         public RNGLR1ParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
             : base(generator, gram, graph)
         {
-            p_NullableVars = new List<CFVariable>();
-            p_NullableChoices = new List<CFRuleDefinition>();
+            nullableVars = new List<CFVariable>();
+            nullableChoices = new List<CFRuleDefinition>();
         }
 
         protected void DetermineNullables()
         {
-            p_NullableChoices.Add(new CFRuleDefinition());
-            foreach (CFVariable var in p_Grammar.Variables)
+            nullableChoices.Add(new CFRuleDefinition());
+            foreach (CFVariable var in grammar.Variables)
             {
                 if (var.Firsts.Contains(TerminalEpsilon.Instance))
-                    p_NullableVars.Add(var);
+                    nullableVars.Add(var);
                 foreach (CFRule rule in var.Rules)
                 {
                     int length = rule.Definition.GetChoiceAtIndex(0).Length;
@@ -29,7 +29,7 @@ namespace Hime.Parsers.CF.LR
                     {
                         CFRuleDefinition choice = rule.Definition.GetChoiceAtIndex(i);
                         if (choice.Firsts.Contains(TerminalEpsilon.Instance))
-                            p_NullableChoices.Add(choice);
+                            nullableChoices.Add(choice);
                     }
                 }
             }
@@ -38,13 +38,13 @@ namespace Hime.Parsers.CF.LR
         public override bool Export(GrammarBuildOptions Options)
         {
             DetermineNullables();
-            p_Stream = Options.ParserWriter;
-            p_Stream.WriteLine("    class " + p_Grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
-            p_Stream.WriteLine("    {");
+            stream = Options.ParserWriter;
+            stream.WriteLine("    class " + grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
+            stream.WriteLine("    {");
 
             Export_NullVars();
             Export_NullChoices();
-            foreach (CFRule rule in p_Grammar.Rules)
+            foreach (CFRule rule in grammar.Rules)
                 Export_Production(rule);
             Export_Rules();
             Export_States();
@@ -53,101 +53,101 @@ namespace Hime.Parsers.CF.LR
             Export_Setup();
             Export_StaticConstructor();
             Export_Constructor();
-            p_Stream.WriteLine("    }");
+            stream.WriteLine("    }");
             return true;
         }
         protected void Export_StaticConstructor()
         {
-            p_Stream.WriteLine("        static " + p_Grammar.LocalName + "_Parser()");
-            p_Stream.WriteLine("        {");
-            p_Stream.WriteLine("            BuildNullables();");
-            p_Stream.WriteLine("        }");
+            stream.WriteLine("        static " + grammar.LocalName + "_Parser()");
+            stream.WriteLine("        {");
+            stream.WriteLine("            BuildNullables();");
+            stream.WriteLine("        }");
         }
         protected void Export_Setup()
         {
-            p_Stream.WriteLine("        protected override void setup()");
-            p_Stream.WriteLine("        {");
-            p_Stream.WriteLine("            p_NullVarsSPPF = p_StaticNullVarsSPPF;");
-            p_Stream.WriteLine("            p_NullChoicesSPPF = p_StaticNullChoicesSPPF;");
-            p_Stream.WriteLine("            p_Rules = p_StaticRules;");
-            p_Stream.WriteLine("            p_States = p_StaticStates;");
-            p_Stream.WriteLine("            p_AxiomID = 0x" + p_Grammar.GetVariable(p_Grammar.GetOption("Axiom")).SID.ToString("X") + ";");
-            p_Stream.WriteLine("            p_AxiomNullSPPF = 0x" + p_Grammar.GetVariable(p_Grammar.GetOption("Axiom")).SID.ToString("X") + ";");
-            p_Stream.WriteLine("            p_AxiomPrimeID = 0x" + p_Grammar.GetVariable("_Axiom_").SID.ToString("X") + ";");
-            p_Stream.WriteLine("        }");
+            stream.WriteLine("        protected override void setup()");
+            stream.WriteLine("        {");
+            stream.WriteLine("            nullVarsSPPF = staticNullVarsSPPF;");
+            stream.WriteLine("            nullChoicesSPPF = staticNullChoicesSPPF;");
+            stream.WriteLine("            rules = staticRules;");
+            stream.WriteLine("            states = staticStates;");
+            stream.WriteLine("            axiomID = 0x" + grammar.GetVariable(grammar.GetOption("Axiom")).SID.ToString("X") + ";");
+            stream.WriteLine("            axiomNullSPPF = 0x" + grammar.GetVariable(grammar.GetOption("Axiom")).SID.ToString("X") + ";");
+            stream.WriteLine("            axiomPrimeID = 0x" + grammar.GetVariable("_Axiom_").SID.ToString("X") + ";");
+            stream.WriteLine("        }");
         }
         protected void Export_Constructor()
         {
-            if (p_Grammar.Actions.GetEnumerator().MoveNext())
+            if (grammar.Actions.GetEnumerator().MoveNext())
             {
-                p_Stream.WriteLine("        private Actions p_Actions;");
-                p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { p_Actions = actions; }");
+                stream.WriteLine("        private Actions actions;");
+                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { actions = actions; }");
             }
             else
             {
-                p_Stream.WriteLine("        public " + p_Grammar.LocalName + "_Parser(" + p_Grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
+                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
             }
         }
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in p_Grammar.Actions)
+            foreach (Action action in grammar.Actions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
             if (Names.Count != 0)
             {
-                p_Stream.WriteLine("        public interface Actions");
-                p_Stream.WriteLine("        {");
+                stream.WriteLine("        public interface Actions");
+                stream.WriteLine("        {");
                 foreach (string name in Names)
-                    p_Stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
-                p_Stream.WriteLine("        }");
+                    stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+                stream.WriteLine("        }");
             }
         }
         protected void Export_Production(CFRule Rule)
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            p_Stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, Hime.Redist.Parsers.SPPFNode root, List<Hime.Redist.Parsers.SPPFNode> nodes)");
-            p_Stream.WriteLine("        {");
+            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, Hime.Redist.Parsers.SPPFNode root, List<Hime.Redist.Parsers.SPPFNode> nodes)");
+            stream.WriteLine("        {");
             if (Rule.ReplaceOnProduction)
-                p_Stream.WriteLine("            root.Action = Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace;");
-            p_Stream.WriteLine("            Hime.Redist.Parsers.SPPFNodeFamily family = new Hime.Redist.Parsers.SPPFNodeFamily(root);");
+                stream.WriteLine("            root.Action = Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace;");
+            stream.WriteLine("            Hime.Redist.Parsers.SPPFNodeFamily family = new Hime.Redist.Parsers.SPPFNodeFamily(root);");
             int i = 0;
             foreach (RuleDefinitionPart Part in Rule.Definition.Parts)
             {
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.LocalName + "\", ((" + p_Grammar.LocalName + "_Parser)parser).p_Actions." + action.LocalName + "), 0));");
+                    stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.LocalName + "\", ((" + grammar.LocalName + "_Parser)parser).actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
-                    p_Stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0));");
+                    stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
                     if (Part.Action != RuleDefinitionPartAction.Nothing)
-                        p_Stream.WriteLine("            nodes[" + i.ToString() + "].Action = Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
-                    p_Stream.WriteLine("            family.AddChild(nodes[" + i.ToString() + "]);");
+                        stream.WriteLine("            nodes[" + i.ToString() + "].Action = Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
+                    stream.WriteLine("            family.AddChild(nodes[" + i.ToString() + "]);");
                     i++;
                 }
             }
-            p_Stream.WriteLine("            if (!root.HasEquivalentFamily(family)) root.AddFamily(family);");
-            p_Stream.WriteLine("        }");
+            stream.WriteLine("            if (!root.HasEquivalentFamily(family)) root.AddFamily(family);");
+            stream.WriteLine("        }");
         }
         protected void Export_Rules()
         {
-            p_Stream.WriteLine("        private static Rule[] p_StaticRules = {");
+            stream.WriteLine("        private static Rule[] staticRules = {");
             bool first = true;
-            foreach (CFRule Rule in p_Grammar.Rules)
+            foreach (CFRule Rule in grammar.Rules)
             {
-                p_Stream.Write("           ");
-                if (!first) p_Stream.Write(", ");
+                stream.Write("           ");
+                if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
                 string head = "new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")";
-                p_Stream.WriteLine("new Rule(" + production + ", " + head + ")");
+                stream.WriteLine("new Rule(" + production + ", " + head + ")");
                 first = false;
             }
-            p_Stream.WriteLine("        };");
+            stream.WriteLine("        };");
         }
         protected void Export_State(ItemSet State)
         {
@@ -157,27 +157,27 @@ namespace Hime.Parsers.CF.LR
                 if (Symbol is Terminal)
                     Terminals.Add((Terminal)Symbol);
             }
-            p_Stream.WriteLine("new State(");
+            stream.WriteLine("new State(");
             // Write items
-            p_Stream.Write("               new string[" + State.Items.Count + "] {");
+            stream.Write("               new string[" + State.Items.Count + "] {");
             bool first = true;
             foreach (Item item in State.Items)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("\"" + item.ToString(true) + "\"");
+                if (!first) stream.Write(", ");
+                stream.Write("\"" + item.ToString(true) + "\"");
                 first = false;
             }
-            p_Stream.WriteLine("},");
+            stream.WriteLine("},");
             // Write terminals
-            p_Stream.Write("               new Terminal[" + Terminals.Count + "] {");
+            stream.Write("               new Terminal[" + Terminals.Count + "] {");
             first = true;
             foreach (Terminal terminal in Terminals)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new Terminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
+                if (!first) stream.Write(", ");
+                stream.Write("new Terminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
                 first = false;
             }
-            p_Stream.WriteLine("},");
+            stream.WriteLine("},");
 
             int ShitTerminalCount = 0;
             foreach (Symbol Symbol in State.Children.Keys)
@@ -188,88 +188,88 @@ namespace Hime.Parsers.CF.LR
             }
 
             // Write shifts on terminal
-            p_Stream.Write("               new ushort[" + ShitTerminalCount + "] {");
+            stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + Symbol.SID.ToString("x"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + Symbol.SID.ToString("x"));
                 first = false;
             }
-            p_Stream.WriteLine("},");
-            p_Stream.Write("               new ushort[" + ShitTerminalCount + "] {");
+            stream.WriteLine("},");
+            stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine("},");
+            stream.WriteLine("},");
 
             // Write shifts on variable
-            p_Stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + Symbol.SID.ToString("x"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + Symbol.SID.ToString("x"));
                 first = false;
             }
-            p_Stream.WriteLine("},");
-            p_Stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            stream.WriteLine("},");
+            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
                 first = false;
             }
-            p_Stream.WriteLine("},");
+            stream.WriteLine("},");
             // Write reductions
-            p_Stream.Write("               new Reduction[" + State.Reductions.Reductions.Count + "] {");
+            stream.Write("               new Reduction[" + State.Reductions.Reductions.Count + "] {");
             first = true;
             foreach (ItemSetActionRNReduce Reduction in State.Reductions.Reductions)
             {
-                if (!first) p_Stream.Write(", ");
+                if (!first) stream.Write(", ");
                 int index = 0;
                 if (Reduction.ToReduceRule.Definition.GetChoiceAtIndex(0).Length != Reduction.ReduceLength)
                 {
                     CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAtIndex(Reduction.ReduceLength);
-                    index = p_NullableChoices.IndexOf(def);
+                    index = nullableChoices.IndexOf(def);
                 }
-                p_Stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", p_StaticRules[0x" + p_Grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", p_StaticNullChoicesSPPF[0x" + index.ToString("X") + "])");
+                stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
                 first = false;
             }
-            p_Stream.WriteLine("})");
+            stream.WriteLine("})");
         }
         protected void Export_States()
         {
-            p_Stream.WriteLine("        private static State[] p_StaticStates = {");
+            stream.WriteLine("        private static State[] staticStates = {");
             bool first = true;
-            foreach (ItemSet State in p_Graph.Sets)
+            foreach (ItemSet State in graph.Sets)
             {
-                p_Stream.Write("            ");
-                if (!first) p_Stream.Write(", ");
+                stream.Write("            ");
+                if (!first) stream.Write(", ");
                 Export_State(State);
                 first = false;
             }
-            p_Stream.WriteLine("        };");
+            stream.WriteLine("        };");
         }
         
         protected void Export_NullVars()
         {
-            p_Stream.Write("        private static Hime.Redist.Parsers.SPPFNode[] p_StaticNullVarsSPPF = { ");
+            stream.Write("        private static Hime.Redist.Parsers.SPPFNode[] staticNullVarsSPPF = { ");
             bool first = true;
-            foreach (CFVariable var in p_NullableVars)
+            foreach (CFVariable var in nullableVars)
             {
                 string action = ", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace";
                 foreach (CFRule rule in var.Rules)
@@ -280,52 +280,52 @@ namespace Hime.Parsers.CF.LR
                         break;
                     }
                 }
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\"), 0" + action + ")");
+                if (!first) stream.Write(", ");
+                stream.Write("new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\"), 0" + action + ")");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_NullChoices()
         {
-            p_Stream.Write("        private static Hime.Redist.Parsers.SPPFNode[] p_StaticNullChoicesSPPF = { ");
+            stream.Write("        private static Hime.Redist.Parsers.SPPFNode[] staticNullChoicesSPPF = { ");
             bool first = true;
-            foreach (CFRuleDefinition definition in p_NullableChoices)
+            foreach (CFRuleDefinition definition in nullableChoices)
             {
-                if (!first) p_Stream.Write(", ");
-                p_Stream.Write("new Hime.Redist.Parsers.SPPFNode(null, 0, Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace)");
+                if (!first) stream.Write(", ");
+                stream.Write("new Hime.Redist.Parsers.SPPFNode(null, 0, Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace)");
                 first = false;
             }
-            p_Stream.WriteLine(" };");
+            stream.WriteLine(" };");
         }
         protected void Export_NullBuilders()
         {
-            p_Stream.WriteLine("        private static void BuildNullables() { ");
-            p_Stream.WriteLine("            List<Hime.Redist.Parsers.SPPFNode> temp = new List<Hime.Redist.Parsers.SPPFNode>();");
-            for (int i=0; i!=p_NullableChoices.Count; i++)
+            stream.WriteLine("        private static void BuildNullables() { ");
+            stream.WriteLine("            List<Hime.Redist.Parsers.SPPFNode> temp = new List<Hime.Redist.Parsers.SPPFNode>();");
+            for (int i=0; i!=nullableChoices.Count; i++)
             {
-                CFRuleDefinition definition = p_NullableChoices[i];
+                CFRuleDefinition definition = nullableChoices[i];
                 foreach (RuleDefinitionPart part in definition.Parts)
-                    p_Stream.WriteLine("            temp.Add(p_StaticNullVarsSPPF[" + p_NullableVars.IndexOf((CFVariable)part.Symbol) + "]);");
-                p_Stream.WriteLine("            p_StaticNullChoicesSPPF[" + i + "].AddFamily(temp);");
-                p_Stream.WriteLine("            temp.Clear();");
+                    stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((CFVariable)part.Symbol) + "]);");
+                stream.WriteLine("            staticNullChoicesSPPF[" + i + "].AddFamily(temp);");
+                stream.WriteLine("            temp.Clear();");
             }
-            for (int i = 0; i != p_NullableVars.Count; i++)
+            for (int i = 0; i != nullableVars.Count; i++)
             {
-                CFVariable var = p_NullableVars[i];
+                CFVariable var = nullableVars[i];
                 foreach (CFRule rule in var.Rules)
                 {
                     CFRuleDefinition definition = rule.Definition.GetChoiceAtIndex(0);
                     if (definition.Firsts.Contains(TerminalEpsilon.Instance))
                     {
                         foreach (RuleDefinitionPart part in definition.Parts)
-                            p_Stream.WriteLine("            temp.Add(p_StaticNullVarsSPPF[" + p_NullableVars.IndexOf((CFVariable)part.Symbol) + "]);");
-                        p_Stream.WriteLine("            p_StaticNullVarsSPPF[" + i + "].AddFamily(temp);");
-                        p_Stream.WriteLine("            temp.Clear();");
+                            stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((CFVariable)part.Symbol) + "]);");
+                        stream.WriteLine("            staticNullVarsSPPF[" + i + "].AddFamily(temp);");
+                        stream.WriteLine("            temp.Clear();");
                     }
                 }
             }
-            p_Stream.WriteLine("        }");
+            stream.WriteLine("        }");
         }
     }
 }

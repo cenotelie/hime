@@ -4,14 +4,14 @@ namespace Hime.Parsers.CF.LR
 {
     class ItemSetReductionsLR0 : ItemSetReductions
     {
-        private ItemSetActionReduce p_ActionReduce;
+        private ItemSetActionReduce actionReduce;
 
         public override ICollection<ItemSetActionReduce> Reductions
         {
             get
             {
                 List<ItemSetActionReduce> Result = new List<ItemSetActionReduce>();
-                Result.Add(p_ActionReduce);
+                Result.Add(actionReduce);
                 return Result;
             }
         }
@@ -20,8 +20,8 @@ namespace Hime.Parsers.CF.LR
             get
             {
                 TerminalSet Set = new TerminalSet();
-                if (p_ActionReduce != null)
-                    Set.Add(p_ActionReduce.Lookahead);
+                if (actionReduce != null)
+                    Set.Add(actionReduce.Lookahead);
                 return Set;
             }
         }
@@ -42,7 +42,7 @@ namespace Hime.Parsers.CF.LR
                     // Conflict Shift/Reduce
                     Conflict Conflict = new Conflict(typeof(MethodLR0), ConflictType.ShiftReduce);
                     Conflict.AddItem(Item);
-                    p_Conflicts.Add(Conflict);
+                    conflicts.Add(Conflict);
                 }
                 if (Reduce != null)
                 {
@@ -50,11 +50,11 @@ namespace Hime.Parsers.CF.LR
                     Conflict Conflict = new Conflict(typeof(MethodLR0), ConflictType.ReduceReduce);
                     Conflict.AddItem(Item);
                     Conflict.AddItem(Reduce);
-                    p_Conflicts.Add(Conflict);
+                    conflicts.Add(Conflict);
                 }
                 else
                 {
-                    p_ActionReduce = new ItemSetActionReduce(null, Item.BaseRule);
+                    actionReduce = new ItemSetActionReduce(null, Item.BaseRule);
                     Reduce = Item;
                 }
             }

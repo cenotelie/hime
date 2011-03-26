@@ -4,26 +4,26 @@ namespace Hime.Parsers.CF.LR
 {
     class GLRSimulator
     {
-        private Graph p_Graph;
-        private Dictionary<ItemSet, Dictionary<Symbol, List<ItemSet>>> p_InverseGraph;
+        private Graph graph;
+        private Dictionary<ItemSet, Dictionary<Symbol, List<ItemSet>>> inverseGraph;
 
         public GLRSimulator(Graph graph)
         {
-            p_Graph = graph;
-            p_InverseGraph = new Dictionary<ItemSet, Dictionary<Symbol, List<ItemSet>>>();
+            this.graph = graph;
+            this.inverseGraph = new Dictionary<ItemSet, Dictionary<Symbol, List<ItemSet>>>();
             BuildInverse();
         }
 
         private void BuildInverse()
         {
-            foreach (ItemSet set in p_Graph.Sets)
+            foreach (ItemSet set in graph.Sets)
             {
                 foreach (Symbol symbol in set.Children.Keys)
                 {
                     ItemSet child = set.Children[symbol];
-                    if (!p_InverseGraph.ContainsKey(child))
-                        p_InverseGraph.Add(child, new Dictionary<Symbol, List<ItemSet>>());
-                    Dictionary<Symbol, List<ItemSet>> inverses = p_InverseGraph[child];
+                    if (!inverseGraph.ContainsKey(child))
+                        inverseGraph.Add(child, new Dictionary<Symbol, List<ItemSet>>());
+                    Dictionary<Symbol, List<ItemSet>> inverses = inverseGraph[child];
                     if (!inverses.ContainsKey(symbol))
                         inverses.Add(symbol, new List<ItemSet>());
                     List<ItemSet> parents = inverses[symbol];
@@ -93,7 +93,7 @@ namespace Hime.Parsers.CF.LR
                 List<ItemSet> temp = new List<ItemSet>();
                 foreach (ItemSet next in result)
                 {
-                    foreach (ItemSet previous in p_InverseGraph[next][symbol])
+                    foreach (ItemSet previous in inverseGraph[next][symbol])
                     {
                         if (!temp.Contains(previous))
                             temp.Add(previous);

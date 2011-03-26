@@ -18,39 +18,39 @@ namespace Hime.Kernel.Reporting
 
     public class BaseEntry : Entry
     {
-        protected Level p_Level;
-        protected string p_Component;
-        protected string p_Message;
+        protected Level level;
+        protected string component;
+        protected string message;
 
-        public Level Level { get { return p_Level; } }
-        public string Component { get { return p_Component; } }
-        public string Message { get { return p_Message; } }
+        public Level Level { get { return level; } }
+        public string Component { get { return component; } }
+        public string Message { get { return message; } }
 
         public BaseEntry(Level level, string component, string message)
         {
-            p_Level = level;
-            p_Component = component;
-            p_Message = message;
+            this.level = level;
+            this.component = component;
+            this.message = message;
         }
     }
 
     public class Section
     {
-        protected List<Entry> p_Entries;
-        protected string p_Name;
+        protected List<Entry> entries;
+        protected string name;
 
-        public ICollection<Entry> Entries { get { return p_Entries; } }
-        public string Name { get { return p_Name; } }
+        public ICollection<Entry> Entries { get { return entries; } }
+        public string Name { get { return name; } }
 
         public Section(string name)
         {
-            p_Name = name;
-            p_Entries = new List<Entry>();
+            this.name = name;
+            this.entries = new List<Entry>();
         }
 
         public void AddEntry(Entry entry)
         {
-            p_Entries.Add(entry);
+            this.entries.Add(entry);
         }
 
 
@@ -61,7 +61,7 @@ namespace Hime.Kernel.Reporting
             node.Attributes.Append(Doc.CreateAttribute("name"));
             node.Attributes["id"].Value = "section" + GetHashCode().ToString("X");
             node.Attributes["name"].Value = Name;
-            foreach (Entry entry in p_Entries)
+            foreach (Entry entry in entries)
                 node.AppendChild(GetXMLNode_Entry(Doc, entry));
             return node;
         }
@@ -84,18 +84,18 @@ namespace Hime.Kernel.Reporting
 
     public class Report
     {
-        protected List<Section> p_Sections;
-        public List<Section> Sections { get { return p_Sections; } }
+        protected List<Section> sections;
+        public List<Section> Sections { get { return sections; } }
 
         public Report()
         {
-            p_Sections = new List<Section>();
+            sections = new List<Section>();
         }
 
         public Section AddSection(string name)
         {
             Section section = new Section(name);
-            p_Sections.Add(section);
+            sections.Add(section);
             return section;
         }
 
@@ -106,7 +106,7 @@ namespace Hime.Kernel.Reporting
             Doc.AppendChild(Doc.CreateElement("Log"));
             Doc.ChildNodes[1].Attributes.Append(Doc.CreateAttribute("title"));
             Doc.ChildNodes[1].Attributes["title"].Value = title;
-            foreach (Section section in p_Sections)
+            foreach (Section section in sections)
                 Doc.ChildNodes[1].AppendChild(section.GetXMLNode(Doc));
             return Doc;
         }
@@ -116,84 +116,84 @@ namespace Hime.Kernel.Reporting
 
     public class Reporter
     {
-        protected Report p_Report;
-        protected Section p_TopSection;
-        protected Section p_CurrentSection;
-        protected log4net.ILog p_Log;
+        protected Report report;
+        protected Section topSection;
+        protected Section currentSection;
+        protected log4net.ILog log;
 
-        public Report Result { get { return p_Report; } }
+        public Report Result { get { return report; } }
 
-        private static bool p_Configured = false;
+        private static bool configured = false;
         private static void Configure()
         {
-            if (p_Configured)
+            if (configured)
                 return;
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout("%-5p: %m%n");
             log4net.Appender.ConsoleAppender appender = new log4net.Appender.ConsoleAppender();
             appender.Layout = layout;
             log4net.Config.BasicConfigurator.Configure(appender);
-            p_Configured = true;
+            configured = true;
         }
 
         public Reporter(System.Type type)
         {
             Configure();
-            p_Log = log4net.LogManager.GetLogger(type);
-            p_Report = new Report();
+            log = log4net.LogManager.GetLogger(type);
+            report = new Report();
         }
 
-        public void BeginSection(string name) { p_CurrentSection = p_Report.AddSection(name); }
-        public void EndSection() { p_CurrentSection = null; }
+        public void BeginSection(string name) { currentSection = report.AddSection(name); }
+        public void EndSection() { currentSection = null; }
 
         public void Info(string component, string message)
         {
             AddEntry(new BaseEntry(Level.Info, component, message));
-            p_Log.Info(component + ": " + message);
+            log.Info(component + ": " + message);
         }
         public void Warn(string component, string message)
         {
             AddEntry(new BaseEntry(Level.Warning, component, message));
-            p_Log.Warn(component + ": " + message);
+            log.Warn(component + ": " + message);
         }
         public void Error(string component, string message)
         {
             AddEntry(new BaseEntry(Level.Error, component, message));
-            p_Log.Error(component + ": " + message);
+            log.Error(component + ": " + message);
         }
         public void Fatal(string component, string message)
         {
             AddEntry(new BaseEntry(Level.Error, component, message));
-            p_Log.Fatal(component + ": " + message);
+            log.Fatal(component + ": " + message);
         }
         public void Report(Entry entry)
         {
             AddEntry(entry);
             switch (entry.Level)
             {
-                case Level.Info: p_Log.Info(entry.Component + ": " + entry.Message); break;
-                case Level.Warning: p_Log.Warn(entry.Component + ": " + entry.Message); break;
-                case Level.Error: p_Log.Error(entry.Component + ": " + entry.Message); break;
+                case Level.Info: log.Info(entry.Component + ": " + entry.Message); break;
+                case Level.Warning: log.Warn(entry.Component + ": " + entry.Message); break;
+                case Level.Error: log.Error(entry.Component + ": " + entry.Message); break;
             }
         }
 
         protected void AddEntry(Entry entry)
         {
-            if (p_CurrentSection != null)
-                p_CurrentSection.AddEntry(entry);
+            if (currentSection != null)
+                currentSection.AddEntry(entry);
             else
             {
-                if (p_TopSection == null)
+                if (topSection == null)
                 {
-                    p_TopSection = new Section("global");
-                    p_Report.Sections.Insert(0, p_TopSection);
+                    topSection = new Section("global");
+                    report.Sections.Insert(0, topSection);
                 }
-                p_TopSection.AddEntry(entry);
+                topSection.AddEntry(entry);
             }
         }
 
         public void ExportHTML(string fileName, string title)
         {
-            System.Xml.XmlDocument Doc = p_Report.GetXML(title);
+            System.Xml.XmlDocument Doc = report.GetXML(title);
             System.IO.FileInfo File = new System.IO.FileInfo(fileName);
             Doc.ChildNodes[1].Attributes["title"].Value = title;
             Doc.Save(fileName + ".xml");

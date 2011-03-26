@@ -4,52 +4,52 @@ namespace Hime.Parsers
 {
     public abstract class Symbol : Hime.Kernel.Symbol
     {
-        protected Grammar p_Parent;
-        protected ushort p_SID;
-        protected string p_LocalName;
-        protected Hime.Kernel.QualifiedName p_CompleteName;
+        protected Grammar parent;
+        protected ushort sID;
+        protected string localName;
+        protected Hime.Kernel.QualifiedName completeName;
 
-        public ushort SID { get { return p_SID; } }
-        public override Hime.Kernel.Symbol Parent { get { return p_Parent; } }
-        public override string LocalName { get { return p_LocalName; } }
-        public override Hime.Kernel.QualifiedName CompleteName { get { return p_CompleteName; } }
+        public ushort SID { get { return sID; } }
+        public override Hime.Kernel.Symbol Parent { get { return parent; } }
+        public override string LocalName { get { return localName; } }
+        public override Hime.Kernel.QualifiedName CompleteName { get { return completeName; } }
 
         public Symbol(Grammar Parent, ushort SID, string Name) : base()
         {
-            p_Parent = Parent;
-            p_SID = SID;
-            p_LocalName = Name;
+            parent = Parent;
+            sID = SID;
+            localName = Name;
             if (Parent == null)
-                p_CompleteName = new Hime.Kernel.QualifiedName(p_LocalName);
+                completeName = new Hime.Kernel.QualifiedName(localName);
             else
-                p_CompleteName = Parent.CompleteName + p_LocalName;
+                completeName = Parent.CompleteName + localName;
         }
 
         protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol)
         {
             if (Symbol is Grammar)
-                p_Parent = (Grammar)Symbol;
+                parent = (Grammar)Symbol;
             else
                 throw new Kernel.WrongParentSymbolException(this, Symbol.GetType(), typeof(Grammar));
         }
-        protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { p_CompleteName = Name; }
+        protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { completeName = Name; }
         public override void SymbolAddChild(Hime.Kernel.Symbol Symbol) { throw new Kernel.CannotAddChildException(this, Symbol); }
         public abstract System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc);
     }
 
     public abstract class Terminal : Symbol
     {
-        protected int p_Priority;
+        protected int priority;
 
         public int Priority
         {
-            get { return p_Priority; }
-            set { p_Priority = value; }
+            get { return priority; }
+            set { priority = value; }
         }
 
         public Terminal(Grammar Parent, ushort SID, string Name, int Priority) : base(Parent, SID, Name)
         {
-            p_Priority = Priority;
+            priority = Priority;
         }
 
         public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
@@ -59,9 +59,9 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
             Node.Attributes.Append(Doc.CreateAttribute("Priority"));
             Node.Attributes.Append(Doc.CreateAttribute("Value"));
-            Node.Attributes["SID"].Value = p_SID.ToString();
-            Node.Attributes["Name"].Value = p_LocalName.Replace("\"", "\\\"");
-            Node.Attributes["Priority"].Value = p_Priority.ToString();
+            Node.Attributes["SID"].Value = sID.ToString();
+            Node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
+            Node.Attributes["Priority"].Value = priority.ToString();
             Node.Attributes["Value"].Value = this.ToString();
             return Node;
         }
@@ -69,21 +69,21 @@ namespace Hime.Parsers
 
     public sealed class TerminalText : Terminal
     {
-        private Automata.NFA p_NFA;
-        private Grammar p_SubGrammar;
+        private Automata.NFA nFA;
+        private Grammar subGrammar;
 
         public Automata.NFA NFA
         {
-            get { return p_NFA; }
-            set { p_NFA = value; }
+            get { return nFA; }
+            set { nFA = value; }
         }
         public Grammar SubGrammar
         {
-            get { return p_SubGrammar; }
-            set { p_SubGrammar = value; }
+            get { return subGrammar; }
+            set { subGrammar = value; }
         }
 
-        public TerminalText(Grammar Parent, ushort SID, string Name, int Priority, Automata.NFA NFA, Grammar SubGrammar) : base(Parent, SID, Name, Priority) { p_NFA = NFA; p_SubGrammar = SubGrammar; }
+        public TerminalText(Grammar Parent, ushort SID, string Name, int Priority, Automata.NFA NFA, Grammar SubGrammar) : base(Parent, SID, Name, Priority) { nFA = NFA; subGrammar = SubGrammar; }
 
         public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
         {
@@ -93,18 +93,18 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("Priority"));
             Node.Attributes.Append(Doc.CreateAttribute("SubGrammar"));
             Node.Attributes.Append(Doc.CreateAttribute("Value"));
-            Node.Attributes["SID"].Value = p_SID.ToString("X");
-            Node.Attributes["Name"].Value = p_LocalName.Replace("\"", "\\\"");
-            Node.Attributes["Priority"].Value = p_Priority.ToString();
-            if (p_SubGrammar != null)
-                Node.Attributes["SubGrammar"].Value = p_SubGrammar.CompleteName.ToString('_');
+            Node.Attributes["SID"].Value = sID.ToString("X");
+            Node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
+            Node.Attributes["Priority"].Value = priority.ToString();
+            if (subGrammar != null)
+                Node.Attributes["SubGrammar"].Value = subGrammar.CompleteName.ToString('_');
             Node.Attributes["Value"].Value = this.ToString();
             return Node;
         }
 
         public override string ToString()
         {
-            string name = p_LocalName;
+            string name = localName;
             if (name.StartsWith("_T["))
                 name = name.Substring(3, name.Length - 4);
             return name;
@@ -133,25 +133,25 @@ namespace Hime.Parsers
 
     public sealed class TerminalBin : Terminal
     {
-        private TerminalBinType p_Type;
-        private string p_Value;
+        private TerminalBinType type;
+        private string value;
 
         public TerminalBinType Type
         {
-            get { return p_Type; }
-            set { p_Type = value; }
+            get { return type; }
+            set { type = value; }
         }
         public string Value
         {
-            get { return p_Value; }
-            set { p_Value = value; }
+            get { return value; }
+            set { this.value = value; }
         }
 
         public TerminalBin(Grammar Parent, ushort SID, string Name, int Priority, TerminalBinType Type, string Value)
             : base(Parent, SID, Name, Priority)
         {
-            p_Type = Type;
-            p_Value = Value;
+            type = Type;
+            value = Value;
         }
         public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
         {
@@ -162,20 +162,20 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("LengthByte"));
             Node.Attributes.Append(Doc.CreateAttribute("LengthBit"));
 
-            Node.Attributes["SID"].Value = p_SID.ToString("X");
-            Node.Attributes["Name"].Value = p_LocalName;
+            Node.Attributes["SID"].Value = sID.ToString("X");
+            Node.Attributes["Name"].Value = localName;
 
-            if ((p_Type & TerminalBinType.FLAG_BINARY) == TerminalBinType.FLAG_BINARY)
+            if ((type & TerminalBinType.FLAG_BINARY) == TerminalBinType.FLAG_BINARY)
             {
                 Node.Attributes["LengthByte"].Value = "0";
-                Node.Attributes["LengthBit"].Value = p_Value.Length.ToString();
-                if ((p_Type & TerminalBinType.FLAG_JOKER) == TerminalBinType.FLAG_JOKER)
+                Node.Attributes["LengthBit"].Value = value.Length.ToString();
+                if ((type & TerminalBinType.FLAG_JOKER) == TerminalBinType.FLAG_JOKER)
                 {
                     Node.Attributes["Joker"].Value = "True";
                 }
                 else
                 {
-                    uint Val = System.Convert.ToUInt32(p_Value, 2);
+                    uint Val = System.Convert.ToUInt32(value, 2);
                     Node.Attributes["Joker"].Value = "False";
                     Node.Attributes.Append(Doc.CreateAttribute("Value"));
                     Node.Attributes["Value"].Value = "0x" + Val.ToString("X");
@@ -183,9 +183,9 @@ namespace Hime.Parsers
             }
             else
             {
-                Node.Attributes["LengthByte"].Value = ((int)(p_Value.Length / 2)).ToString();
+                Node.Attributes["LengthByte"].Value = ((int)(value.Length / 2)).ToString();
                 Node.Attributes["LengthBit"].Value = "0";
-                if ((p_Type & TerminalBinType.FLAG_JOKER) == TerminalBinType.FLAG_JOKER)
+                if ((type & TerminalBinType.FLAG_JOKER) == TerminalBinType.FLAG_JOKER)
                 {
                     Node.Attributes["Joker"].Value = "True";
                 }
@@ -193,7 +193,7 @@ namespace Hime.Parsers
                 {
                     Node.Attributes["Joker"].Value = "False";
                     Node.Attributes.Append(Doc.CreateAttribute("Value"));
-                    Node.Attributes["Value"].Value = p_LocalName;
+                    Node.Attributes["Value"].Value = localName;
                 }
             }
             return Node;
@@ -202,19 +202,19 @@ namespace Hime.Parsers
 
     public sealed class TerminalEpsilon : Terminal
     {
-        private static TerminalEpsilon p_Instance;
-        private static readonly object p_Lock = new object();
+        private static TerminalEpsilon instance;
+        private static readonly object _lock = new object();
         private TerminalEpsilon() : base(null, 1, "ε", 0) { }
 
         public static TerminalEpsilon Instance
         {
             get
             {
-                lock (p_Lock)
+                lock (_lock)
                 {
-                    if (p_Instance == null)
-                        p_Instance = new TerminalEpsilon();
-                    return p_Instance;
+                    if (instance == null)
+                        instance = new TerminalEpsilon();
+                    return instance;
                 }
             }
         }
@@ -224,19 +224,19 @@ namespace Hime.Parsers
 
     public sealed class TerminalDollar : Terminal
     {
-        private static TerminalDollar p_Instance;
-        private static readonly object p_Lock = new object();
+        private static TerminalDollar instance;
+        private static readonly object _lock = new object();
         private TerminalDollar() : base(null, 2, "$", 0) { }
 
         public static TerminalDollar Instance
         {
             get
             {
-                lock (p_Lock)
+                lock (_lock)
                 {
-                    if (p_Instance == null)
-                        p_Instance = new TerminalDollar();
-                    return p_Instance;
+                    if (instance == null)
+                        instance = new TerminalDollar();
+                    return instance;
                 }
             }
         }
@@ -246,19 +246,19 @@ namespace Hime.Parsers
 
     public sealed class TerminalDummy : Terminal
     {
-        private static TerminalDummy p_Instance;
-        private static readonly object p_Lock = new object();
+        private static TerminalDummy instance;
+        private static readonly object _lock = new object();
         private TerminalDummy() : base(null, 0xFFFF, "#", -1) { }
 
         public static TerminalDummy Instance
         {
             get
             {
-                lock (p_Lock)
+                lock (_lock)
                 {
-                    if (p_Instance == null)
-                        p_Instance = new TerminalDummy();
-                    return p_Instance;
+                    if (instance == null)
+                        instance = new TerminalDummy();
+                    return instance;
                 }
             }
         }
@@ -274,11 +274,11 @@ namespace Hime.Parsers
         {
             System.Xml.XmlNode Node = Doc.CreateElement("SymbolVirtual");
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
-            Node.Attributes["Name"].Value = p_LocalName;
+            Node.Attributes["Name"].Value = localName;
             return Node;
         }
 
-        public override string ToString() { return "\"" + p_LocalName + "\""; }
+        public override string ToString() { return "\"" + localName + "\""; }
     }
 
     public sealed class Action : Symbol
@@ -289,11 +289,11 @@ namespace Hime.Parsers
         {
             System.Xml.XmlNode Node = Doc.CreateElement("SymbolAction");
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
-            Node.Attributes["Name"].Value = p_LocalName;
+            Node.Attributes["Name"].Value = localName;
             return Node;
         }
 
-        public override string ToString() { return "{" + p_LocalName + "}"; }
+        public override string ToString() { return "{" + localName + "}"; }
     }
 
     public abstract class Variable : Symbol
@@ -305,8 +305,8 @@ namespace Hime.Parsers
             System.Xml.XmlNode Node = Doc.CreateElement("SymbolVariable");
             Node.Attributes.Append(Doc.CreateAttribute("SID"));
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
-            Node.Attributes["SID"].Value = p_SID.ToString("X");
-            Node.Attributes["Name"].Value = p_LocalName;
+            Node.Attributes["SID"].Value = sID.ToString("X");
+            Node.Attributes["Name"].Value = localName;
             return Node;
         }
     }

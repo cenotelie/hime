@@ -16,58 +16,58 @@ namespace Hime.Parsers
 
     public sealed class CompilationTask
     {
-        private List<string> p_RawInputs;
-        private List<string> p_FileInputs;
-        private string p_GrammarName;
-        private string p_Namespace;
-        private ParsingMethod p_Method;
-        private string p_LexerFile;
-        private string p_ParserFile;
-        private bool p_ExportLog;
-        private bool p_ExportDoc;
-        private Kernel.Namespace p_Root;
-        private Kernel.Reporting.Reporter p_Reporter;
+        private List<string> rawInputs;
+        private List<string> fileInputs;
+        private string grammarName;
+        private string _namespace;
+        private ParsingMethod method;
+        private string lexerFile;
+        private string parserFile;
+        private bool exportLog;
+        private bool exportDoc;
+        private Kernel.Namespace root;
+        private Kernel.Reporting.Reporter reporter;
 
-        public ICollection<string> InputRawData { get { return p_RawInputs; } }
-        public ICollection<string> InputFiles { get { return p_FileInputs; } }
-        public string GrammarName { get { return p_GrammarName; } }
-        public string Namespace { get { return p_Namespace; } }
-        public ParsingMethod Method { get { return p_Method; } }
-        public string LexerFile { get { return p_LexerFile; } }
-        public string ParserFile { get { return p_ParserFile; } }
-        public bool ExportLog { get { return p_ExportLog; } }
-        public bool ExportDoc { get { return p_ExportDoc; } }
+        public ICollection<string> InputRawData { get { return rawInputs; } }
+        public ICollection<string> InputFiles { get { return fileInputs; } }
+        public string GrammarName { get { return grammarName; } }
+        public string Namespace { get { return _namespace; } }
+        public ParsingMethod Method { get { return method; } }
+        public string LexerFile { get { return lexerFile; } }
+        public string ParserFile { get { return parserFile; } }
+        public bool ExportLog { get { return exportLog; } }
+        public bool ExportDoc { get { return exportDoc; } }
         
-        public Kernel.Namespace Root { get { return p_Root; } }
-        public Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)p_Root.ResolveName(Hime.Kernel.QualifiedName.ParseName(p_GrammarName)); } }
+        public Kernel.Namespace Root { get { return root; } }
+        public Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); } }
 
 
 
         public static CompilationTask Create(string data, string grammar, ParsingMethod method, string genNamespace, string lexer, string parser, bool outLog, bool outDoc)
         {
             CompilationTask task = new CompilationTask(grammar, method, genNamespace, lexer, parser, outLog, outDoc);
-            task.p_RawInputs.Add(data);
+            task.rawInputs.Add(data);
             return task;
         }
         public static CompilationTask Create(string[] files, string grammar, ParsingMethod method, string genNamespace, string lexer, string parser, bool outLog, bool outDoc)
         {
             CompilationTask task = new CompilationTask(grammar, method, genNamespace, lexer, parser, outLog, outDoc);
             for (int i = 0; i != files.Length; i++)
-                task.p_FileInputs.Add(files[i]);
+                task.fileInputs.Add(files[i]);
             return task;
         }
 
         private CompilationTask(string grammar, ParsingMethod method, string genNamespace, string lexer, string parser, bool outLog, bool outDoc)
         {
-            p_RawInputs = new List<string>();
-            p_FileInputs = new List<string>();
-            p_GrammarName = grammar;
-            p_Method = method;
-            p_Namespace = genNamespace;
-            p_LexerFile = lexer;
-            p_ParserFile = parser;
-            p_ExportLog = outLog;
-            p_ExportDoc = outDoc;
+            rawInputs = new List<string>();
+            fileInputs = new List<string>();
+            grammarName = grammar;
+            this.method = method;
+            _namespace = genNamespace;
+            lexerFile = lexer;
+            parserFile = parser;
+            exportLog = outLog;
+            exportDoc = outDoc;
         }
 
 
@@ -76,62 +76,62 @@ namespace Hime.Parsers
         public Hime.Kernel.Reporting.Report Execute()
         {
             if (!Execute_LoadData())
-                return p_Reporter.Result;
+                return reporter.Result;
             
             Hime.Parsers.Grammar grammar = Execute_GetGrammar();
             if (grammar == null)
-                return p_Reporter.Result;
+                return reporter.Result;
             
             Hime.Parsers.CF.CFParserGenerator generator = Execute_GetGenerator();
             if (generator == null)
-                return p_Reporter.Result;
+                return reporter.Result;
 
 
             GrammarBuildOptions Options = Execute_GetBuildOptions(grammar, generator);
             grammar.Build(Options);
             Options.Close();
-            if (p_ExportLog)
+            if (exportLog)
             {
-                string file = p_ParserFile.Replace(".cs", ".html");
-                p_Reporter.ExportHTML(file, "Grammar Log");
+                string file = parserFile.Replace(".cs", ".html");
+                reporter.ExportHTML(file, "Grammar Log");
                 System.Diagnostics.Process.Start(file);
             }
-            return p_Reporter.Result;
+            return reporter.Result;
         }
 
         private bool Execute_LoadData()
         {
-            p_Reporter = new Hime.Kernel.Reporting.Reporter(typeof(CompilationTask));
-            if (p_FileInputs.Count == 0 && p_RawInputs.Count == 0)
+            reporter = new Hime.Kernel.Reporting.Reporter(typeof(CompilationTask));
+            if (fileInputs.Count == 0 && rawInputs.Count == 0)
             {
-                p_Reporter.Error("Compiler", "No input!");
+                reporter.Error("Compiler", "No input!");
                 return false;
             }
-            p_Root = Hime.Kernel.Namespace.CreateRoot();
+            root = Hime.Kernel.Namespace.CreateRoot();
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            foreach (string file in p_FileInputs)
+            foreach (string file in fileInputs)
             {
                 if (!compiler.AddInputFile(file))
-                    p_Reporter.Error("Compiler", "Cannot access file: " + file);
+                    reporter.Error("Compiler", "Cannot access file: " + file);
             }
-            foreach (string data in p_RawInputs)
+            foreach (string data in rawInputs)
                 compiler.AddInputRawText(data);
-            compiler.Compile(p_Root, p_Reporter);
+            compiler.Compile(root, reporter);
             return true;
         }
         private Grammar Execute_GetGrammar()
         {
             Hime.Parsers.Grammar grammar = null;
-            if (p_GrammarName != null)
+            if (grammarName != null)
             {
-                try { grammar = (Hime.Parsers.Grammar)p_Root.ResolveName(Hime.Kernel.QualifiedName.ParseName(p_GrammarName)); }
-                catch { p_Reporter.Error("Compiler", "Cannot find grammar: " + p_GrammarName); }
+                try { grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); }
+                catch { reporter.Error("Compiler", "Cannot find grammar: " + grammarName); }
                 return grammar;
             }
-            grammar = Execute_FindGrammar(p_Root);
+            grammar = Execute_FindGrammar(root);
             if (grammar != null)
                 return grammar;
-            p_Reporter.Error("Compiler", "Cannot find any grammar");
+            reporter.Error("Compiler", "Cannot find any grammar");
             return null;
         }
         private Grammar Execute_FindGrammar(Hime.Kernel.Symbol symbol)
@@ -152,7 +152,7 @@ namespace Hime.Parsers
         }
         private CF.CFParserGenerator Execute_GetGenerator()
         {
-            switch (p_Method)
+            switch (method)
             {
                 case ParsingMethod.LR0:
                     return new Hime.Parsers.CF.LR.MethodLR0();
@@ -165,28 +165,28 @@ namespace Hime.Parsers
                 case ParsingMethod.RNGLALR1:
                     return new Hime.Parsers.CF.LR.MethodRNGLALR1();
             }
-            p_Reporter.Error("Compiler", "Unsupported parsing method: " + p_Method.ToString());
+            reporter.Error("Compiler", "Unsupported parsing method: " + method.ToString());
             return null;
         }
         private GrammarBuildOptions Execute_GetBuildOptions(Grammar grammar, CF.CFParserGenerator generator)
         {
-            if (p_Namespace == null)
-                p_Namespace = grammar.CompleteName.ToString();
-            if (p_ParserFile == null)
+            if (_namespace == null)
+                _namespace = grammar.CompleteName.ToString();
+            if (parserFile == null)
             {
-                if (p_FileInputs.Count == 1)
-                    p_ParserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(p_FileInputs[0]), grammar.LocalName + ".cs");
+                if (fileInputs.Count == 1)
+                    parserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(fileInputs[0]), grammar.LocalName + ".cs");
                 else
-                    p_ParserFile = grammar.LocalName + ".cs";
+                    parserFile = grammar.LocalName + ".cs";
             }
             string doc = null;
-            if (p_ExportDoc)
-                doc = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(p_ParserFile)), grammar.LocalName + "_doc");
+            if (exportDoc)
+                doc = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(parserFile)), grammar.LocalName + "_doc");
             GrammarBuildOptions Options = null;
-            if (p_LexerFile != null)
-                Options = new GrammarBuildOptions(p_Reporter, p_Namespace, generator, p_LexerFile, p_ParserFile, doc);
+            if (lexerFile != null)
+                Options = new GrammarBuildOptions(reporter, _namespace, generator, lexerFile, parserFile, doc);
             else
-                Options = new GrammarBuildOptions(p_Reporter, p_Namespace, generator, p_ParserFile, doc);
+                Options = new GrammarBuildOptions(reporter, _namespace, generator, parserFile, doc);
             return Options;
         }
     }

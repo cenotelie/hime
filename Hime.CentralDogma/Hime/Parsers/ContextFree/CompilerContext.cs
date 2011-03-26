@@ -4,75 +4,75 @@ namespace Hime.Parsers.CF
 {
     class CFGrammarTemplateRule
     {
-        private string p_HeadName;
-        private List<string> p_Parameters;
-        private List<CFGrammarTemplateRuleInstance> p_Instances;
-        private CFGrammar p_Grammar;
-        private CFGrammarCompiler p_Compiler;
-        private Redist.Parsers.SyntaxTreeNode p_RuleNode;
-        private Redist.Parsers.SyntaxTreeNode p_DefinitionNode;
+        private string headName;
+        private List<string> parameters;
+        private List<CFGrammarTemplateRuleInstance> instances;
+        private CFGrammar grammar;
+        private CFGrammarCompiler compiler;
+        private Redist.Parsers.SyntaxTreeNode ruleNode;
+        private Redist.Parsers.SyntaxTreeNode definitionNode;
 
-        public string HeadName { get { return p_HeadName; } }
-        public int ParametersCount { get { return p_Parameters.Count; } }
-        public List<string> Parameters { get { return p_Parameters; } }
-        public CFGrammarCompiler Compiler { get { return p_Compiler; } }
-        public Redist.Parsers.SyntaxTreeNode RuleNode { get { return p_RuleNode; } }
-        public Redist.Parsers.SyntaxTreeNode DefinitionNode { get { return p_DefinitionNode; } }
+        public string HeadName { get { return headName; } }
+        public int ParametersCount { get { return parameters.Count; } }
+        public List<string> Parameters { get { return parameters; } }
+        public CFGrammarCompiler Compiler { get { return compiler; } }
+        public Redist.Parsers.SyntaxTreeNode RuleNode { get { return ruleNode; } }
+        public Redist.Parsers.SyntaxTreeNode DefinitionNode { get { return definitionNode; } }
 
         public CFGrammarTemplateRule(CFGrammar Grammar, CFGrammarCompiler Compiler, Redist.Parsers.SyntaxTreeNode RuleNode)
         {
-            p_HeadName = ((Redist.Parsers.SymbolTokenText)RuleNode.Children[0].Symbol).ValueText;
-            p_Parameters = new List<string>();
-            p_Instances = new List<CFGrammarTemplateRuleInstance>();
-            p_Grammar = Grammar;
-            p_Compiler = Compiler;
-            p_RuleNode = RuleNode;
-            p_DefinitionNode = RuleNode.Children[2];
+            headName = ((Redist.Parsers.SymbolTokenText)RuleNode.Children[0].Symbol).ValueText;
+            parameters = new List<string>();
+            instances = new List<CFGrammarTemplateRuleInstance>();
+            grammar = Grammar;
+            compiler = Compiler;
+            ruleNode = RuleNode;
+            definitionNode = RuleNode.Children[2];
             foreach (Redist.Parsers.SyntaxTreeNode Node in RuleNode.Children[1].Children)
-                p_Parameters.Add(((Redist.Parsers.SymbolTokenText)Node.Symbol).ValueText);
+                parameters.Add(((Redist.Parsers.SymbolTokenText)Node.Symbol).ValueText);
         }
 
         public CFGrammarTemplateRule(CFGrammarTemplateRule Copied, CFGrammar Data)
         {
-            p_HeadName = Copied.p_HeadName;
-            p_Parameters = new List<string>(Copied.p_Parameters);
-            p_Instances = new List<CFGrammarTemplateRuleInstance>();
-            p_Grammar = Data;
-            p_Compiler = Copied.p_Compiler;
-            p_RuleNode = Copied.p_RuleNode;
-            p_DefinitionNode = Copied.p_DefinitionNode;
-            foreach (CFGrammarTemplateRuleInstance Instance in Copied.p_Instances)
+            headName = Copied.headName;
+            parameters = new List<string>(Copied.parameters);
+            instances = new List<CFGrammarTemplateRuleInstance>();
+            grammar = Data;
+            compiler = Copied.compiler;
+            ruleNode = Copied.ruleNode;
+            definitionNode = Copied.definitionNode;
+            foreach (CFGrammarTemplateRuleInstance Instance in Copied.instances)
             {
                 CFVariable HeadVar = Data.GetVariable(Instance.HeadVariable.LocalName);
                 CFGrammarTemplateRuleParameters Params = new CFGrammarTemplateRuleParameters();
                 foreach (Symbol Symbol in Instance.Parameters)
                     Params.Add(Data.GetSymbol(Symbol.LocalName));
-                p_Instances.Add(new CFGrammarTemplateRuleInstance(this, Params, HeadVar));
+                instances.Add(new CFGrammarTemplateRuleInstance(this, Params, HeadVar));
             }
         }
 
         public CFVariable GetVariable(CFGrammarCompilerContext Context, CFGrammarTemplateRuleParameters Parameters)
         {
-            foreach (CFGrammarTemplateRuleInstance Instance in p_Instances)
+            foreach (CFGrammarTemplateRuleInstance Instance in instances)
             {
                 if (Instance.MatchParameters(Parameters))
                     return Instance.HeadVariable;
             }
-            CFGrammarTemplateRuleInstance NewInstance = new CFGrammarTemplateRuleInstance(this, Parameters, p_Grammar);
-            p_Instances.Add(NewInstance);
-            NewInstance.Compile(p_Grammar, Context);
+            CFGrammarTemplateRuleInstance NewInstance = new CFGrammarTemplateRuleInstance(this, Parameters, grammar);
+            instances.Add(NewInstance);
+            NewInstance.Compile(grammar, Context);
             return NewInstance.HeadVariable;
         }
     }
 
     class CFGrammarTemplateRuleInstance
     {
-        private CFGrammarTemplateRule p_TemplateRule;
-        private CFVariable p_Variable;
-        private CFGrammarTemplateRuleParameters p_Parameters;
+        private CFGrammarTemplateRule templateRule;
+        private CFVariable variable;
+        private CFGrammarTemplateRuleParameters parameters;
 
-        public CFVariable HeadVariable { get { return p_Variable; } }
-        public CFGrammarTemplateRuleParameters Parameters { get { return p_Parameters; } }
+        public CFVariable HeadVariable { get { return variable; } }
+        public CFGrammarTemplateRuleParameters Parameters { get { return parameters; } }
 
         public CFGrammarTemplateRuleInstance(CFGrammarTemplateRule TemplateRule, CFGrammarTemplateRuleParameters Parameters, CFGrammar Data)
         {
@@ -88,17 +88,17 @@ namespace Hime.Parsers.CF
             Builder.Append(">");
             string Name = Builder.ToString();
             // Create and add the variable to the grammar
-            p_Variable = Data.AddVariable(Name);
+            variable = Data.AddVariable(Name);
             // Copy parameters
-            p_Parameters = new CFGrammarTemplateRuleParameters(Parameters);
+            parameters = new CFGrammarTemplateRuleParameters(Parameters);
             // Set parent template rule
-            p_TemplateRule = TemplateRule;
+            templateRule = TemplateRule;
         }
         public CFGrammarTemplateRuleInstance(CFGrammarTemplateRule TemplateRule, CFGrammarTemplateRuleParameters Parameters, CFVariable Variable)
         {
-            p_TemplateRule = TemplateRule;
-            p_Parameters = Parameters;
-            p_Variable = Variable;
+            templateRule = TemplateRule;
+            parameters = Parameters;
+            variable = Variable;
         }
 
         public void Compile(CFGrammar Data, CFGrammarCompilerContext Context)
@@ -106,22 +106,22 @@ namespace Hime.Parsers.CF
             // Create a new context for recognizing the rule
             CFGrammarCompilerContext NewContext = new CFGrammarCompilerContext(Context);
             // Add the parameters as references in the new context
-            for (int i = 0; i != p_Parameters.Count; i++)
-                NewContext.AddReference(p_TemplateRule.Parameters[i], p_Parameters[i]);
+            for (int i = 0; i != parameters.Count; i++)
+                NewContext.AddReference(templateRule.Parameters[i], parameters[i]);
             // Recognize the rule with the new context
-            CFRuleDefinitionSet Set = NewContext.Compiler.Compile_Recognize_rule_definition(Data, NewContext, p_TemplateRule.DefinitionNode);
+            CFRuleDefinitionSet Set = NewContext.Compiler.Compile_Recognize_rule_definition(Data, NewContext, templateRule.DefinitionNode);
             // Add recognized rules to the variable
             foreach (CFRuleDefinition Def in Set)
-                p_Variable.AddRule(new CFRule(p_Variable, Def, false));
+                variable.AddRule(new CFRule(variable, Def, false));
         }
 
         public bool MatchParameters(CFGrammarTemplateRuleParameters Parameters)
         {
-            if (p_Parameters.Count != Parameters.Count)
+            if (parameters.Count != Parameters.Count)
                 return false;
-            for (int i = 0; i != p_Parameters.Count; i++)
+            for (int i = 0; i != parameters.Count; i++)
             {
-                if (p_Parameters[i].SID != Parameters[i].SID)
+                if (parameters[i].SID != Parameters[i].SID)
                     return false;
             }
             return true;
@@ -136,31 +136,31 @@ namespace Hime.Parsers.CF
 
     class CFGrammarCompilerContext
     {
-        private CFGrammarCompiler p_Compiler;
-        private List<CFGrammarTemplateRule> p_TemplateRules;
-        private Dictionary<string, Symbol> p_References;
+        private CFGrammarCompiler compiler;
+        private List<CFGrammarTemplateRule> templateRules;
+        private Dictionary<string, Symbol> references;
 
-        public CFGrammarCompiler Compiler { get { return p_Compiler; } }
+        public CFGrammarCompiler Compiler { get { return compiler; } }
 
         public CFGrammarCompilerContext(CFGrammarCompiler Compiler)
         {
-            p_Compiler = Compiler;
-            p_TemplateRules = new List<CFGrammarTemplateRule>();
-            p_References = new Dictionary<string, Symbol>();
+            compiler = Compiler;
+            templateRules = new List<CFGrammarTemplateRule>();
+            references = new Dictionary<string, Symbol>();
         }
 
         public CFGrammarCompilerContext(CFGrammarCompilerContext Copied)
         {
-            p_Compiler = Copied.Compiler;
-            p_TemplateRules = new List<CFGrammarTemplateRule>(Copied.p_TemplateRules);
-            p_References = new Dictionary<string, Symbol>();
+            compiler = Copied.Compiler;
+            templateRules = new List<CFGrammarTemplateRule>(Copied.templateRules);
+            references = new Dictionary<string, Symbol>();
         }
 
-        public void AddTemplateRule(CFGrammarTemplateRule TemplateRule) { p_TemplateRules.Add(TemplateRule); }
+        public void AddTemplateRule(CFGrammarTemplateRule TemplateRule) { templateRules.Add(TemplateRule); }
 
         public bool IsTemplateRule(string Name, int ParamCount)
         {
-            foreach (CFGrammarTemplateRule TemplateRule in p_TemplateRules)
+            foreach (CFGrammarTemplateRule TemplateRule in templateRules)
                 if ((TemplateRule.HeadName == Name) && (TemplateRule.ParametersCount == ParamCount))
                     return true;
             return false;
@@ -168,7 +168,7 @@ namespace Hime.Parsers.CF
 
         public CFVariable GetVariableFromMetaRule(string Name, CFGrammarTemplateRuleParameters Parameters, CFGrammarCompilerContext Context)
         {
-            foreach (CFGrammarTemplateRule TemplateRule in p_TemplateRules)
+            foreach (CFGrammarTemplateRule TemplateRule in templateRules)
             {
                 if ((TemplateRule.HeadName == Name) && (TemplateRule.ParametersCount == Parameters.Count))
                     return TemplateRule.GetVariable(Context, Parameters);
@@ -176,12 +176,12 @@ namespace Hime.Parsers.CF
             return null;
         }
 
-        public void AddReference(string Name, Symbol Symbol) { p_References.Add(Name, Symbol); }
-        public bool IsReference(string Name) { return p_References.ContainsKey(Name); }
+        public void AddReference(string Name, Symbol Symbol) { references.Add(Name, Symbol); }
+        public bool IsReference(string Name) { return references.ContainsKey(Name); }
         public Symbol GetReference(string Name)
         {
-            if (p_References.ContainsKey(Name))
-                return p_References[Name];
+            if (references.ContainsKey(Name))
+                return references[Name];
             return null;
         }
     }

@@ -4,24 +4,24 @@ namespace Hime.Parsers.CF.LR
 {
     class ItemLR1 : Item
     {
-        protected Terminal p_Lookahead;
-        protected TerminalSet p_Lookaheads;
+        protected Terminal lookahead;
+        protected TerminalSet lookaheads;
 
-        public Terminal Lookahead { get { return p_Lookahead; } }
+        public Terminal Lookahead { get { return lookahead; } }
 
-        public override TerminalSet Lookaheads { get { return p_Lookaheads; } }
+        public override TerminalSet Lookaheads { get { return lookaheads; } }
 
         public ItemLR1(CFRule Rule, int DotPosition, Terminal Lookahead) : base(Rule, DotPosition)
         {
-            p_Lookahead = Lookahead;
-            p_Lookaheads = new TerminalSet();
-            p_Lookaheads.Add(Lookahead);
+            lookahead = Lookahead;
+            lookaheads = new TerminalSet();
+            lookaheads.Add(Lookahead);
         }
 
         public override Item GetChild()
         {
             if (Action == ItemAction.Reduce) return null;
-            return new ItemLR1(p_Rule, p_DotPosition + 1, p_Lookahead);
+            return new ItemLR1(rule, dotPosition + 1, lookahead);
         }
         public override void CloseTo(List<Item> Closure)
         {
@@ -46,7 +46,7 @@ namespace Hime.Parsers.CF.LR
                     // Remove ε
                     Firsts.Remove(TerminalEpsilon.Instance);
                     // Add the item's lookahead as possible symbol for firsts
-                    Firsts.Add(p_Lookahead);
+                    Firsts.Add(lookahead);
                 }
                 // For each rule that has Next as a head variable :
                 foreach (CFRule R in NextVar.Rules)
@@ -77,7 +77,7 @@ namespace Hime.Parsers.CF.LR
             {
                 ItemLR1 Tested = (ItemLR1)obj;
                 if (!Equals_Base(Tested)) return false;
-                return (Tested.p_Lookahead.SID == p_Lookahead.SID);
+                return (Tested.lookahead.SID == lookahead.SID);
             }
             return false;
         }
@@ -87,23 +87,23 @@ namespace Hime.Parsers.CF.LR
         public override string ToString(bool ShowDecoration)
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");
-            Builder.Append(p_Rule.Variable.ToString());
-            Builder.Append(" " + p_Arrow);
+            Builder.Append(rule.Variable.ToString());
+            Builder.Append(" " + arrow);
             int i = 0;
-            foreach (RuleDefinitionPart Part in p_Definition.Parts)
+            foreach (RuleDefinitionPart Part in definition.Parts)
             {
-                if (i == p_DotPosition)
-                    Builder.Append(" " + p_Dot);
+                if (i == dotPosition)
+                    Builder.Append(" " + dot);
                 Builder.Append(" ");
                 Builder.Append(Part.ToString());
                 i++;
             }
-            if (i == p_DotPosition)
-                Builder.Append(" " + p_Dot);
+            if (i == dotPosition)
+                Builder.Append(" " + dot);
             if (ShowDecoration)
             {
                 Builder.Append(", ");
-                Builder.Append(p_Lookahead.ToString());
+                Builder.Append(lookahead.ToString());
             }
             Builder.Append("]");
             return Builder.ToString();

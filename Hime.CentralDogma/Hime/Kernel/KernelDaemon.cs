@@ -92,12 +92,12 @@ namespace Hime.Kernel
                     end = current;
                     continue;
                 }
-                string range = "c_" + name + ".p_Spans.Add(new UnicodeSpan(0x" + begin.ToString("X") + ", 0x" + end.ToString("X") + "));";
+                string range = "c_" + name + ".spans.Add(new UnicodeSpan(0x" + begin.ToString("X") + ", 0x" + end.ToString("X") + "));";
                 code.Add(range);
                 begin = current;
                 end = current;
             }
-            string r = "c_" + name + ".p_Spans.Add(new UnicodeSpan(0x" + begin.ToString("X") + ", 0x" + end.ToString("X") + "));";
+            string r = "c_" + name + ".spans.Add(new UnicodeSpan(0x" + begin.ToString("X") + ", 0x" + end.ToString("X") + "));";
             code.Add(r);
             code.Add("BuildClasses_Class(c_" + name + ");");
         }

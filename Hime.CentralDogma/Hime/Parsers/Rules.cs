@@ -13,20 +13,20 @@ namespace Hime.Parsers
 
     public sealed class RuleDefinitionPart
     {
-        private Symbol p_Symbol;
-        private RuleDefinitionPartAction p_Action;
+        private Symbol symbol;
+        private RuleDefinitionPartAction action;
 
-        public Symbol Symbol { get { return p_Symbol; } }
+        public Symbol Symbol { get { return symbol; } }
         public RuleDefinitionPartAction Action
         {
-            get { return p_Action; }
-            set { p_Action = value; }
+            get { return action; }
+            set { action = value; }
         }
 
         public RuleDefinitionPart(Symbol Sym, RuleDefinitionPartAction Action)
         {
-            p_Symbol = Sym;
-            p_Action = Action;
+            symbol = Sym;
+            action = Action;
         }
 
         public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
@@ -39,33 +39,33 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("SymbolValue"));
             Node.Attributes.Append(Doc.CreateAttribute("ParserIndex"));
 
-            Node.Attributes["Action"].Value = p_Action.ToString();
-            Node.Attributes["SymbolID"].Value = p_Symbol.SID.ToString("X");
-            Node.Attributes["SymbolName"].Value = p_Symbol.LocalName;
-            Node.Attributes["SymbolValue"].Value = p_Symbol.ToString();
+            Node.Attributes["Action"].Value = action.ToString();
+            Node.Attributes["SymbolID"].Value = symbol.SID.ToString("X");
+            Node.Attributes["SymbolName"].Value = symbol.LocalName;
+            Node.Attributes["SymbolValue"].Value = symbol.ToString();
 
-            if (p_Symbol is Terminal)
+            if (symbol is Terminal)
                 Node.Attributes["SymbolType"].Value = "Terminal";
-            else if (p_Symbol is Variable)
+            else if (symbol is Variable)
                 Node.Attributes["SymbolType"].Value = "Variable";
-            else if (p_Symbol is Virtual)
+            else if (symbol is Virtual)
                 Node.Attributes["SymbolType"].Value = "Virtual";
-            else if (p_Symbol is Action)
+            else if (symbol is Action)
                 Node.Attributes["SymbolType"].Value = "Action";
             return Node;
         }
 
         public static bool operator ==(RuleDefinitionPart Left, RuleDefinitionPart Right)
         {
-            if (Left.p_Symbol != Right.p_Symbol)
+            if (Left.symbol != Right.symbol)
                 return false;
-            return (Left.p_Action == Right.p_Action);
+            return (Left.action == Right.action);
         }
         public static bool operator !=(RuleDefinitionPart Left, RuleDefinitionPart Right)
         {
-            if (Left.p_Symbol != Right.p_Symbol)
+            if (Left.symbol != Right.symbol)
                 return true;
-            return (Left.p_Action != Right.p_Action);
+            return (Left.action != Right.action);
         }
 
         public override bool Equals(object obj)
@@ -78,10 +78,10 @@ namespace Hime.Parsers
         public override int GetHashCode() { return base.GetHashCode(); }
         public override string ToString()
         {
-            string s = p_Symbol.ToString();
-            if (p_Action == RuleDefinitionPartAction.Promote)
+            string s = symbol.ToString();
+            if (action == RuleDefinitionPartAction.Promote)
                 return (s + "^");
-            else if (p_Action == RuleDefinitionPartAction.Drop)
+            else if (action == RuleDefinitionPartAction.Drop)
                 return (s + "!");
             else
                 return s;
@@ -93,22 +93,22 @@ namespace Hime.Parsers
 
     public abstract class RuleDefinition
     {
-        protected List<RuleDefinitionPart> p_Parts;
+        protected List<RuleDefinitionPart> parts;
 
-        public int Length { get { return p_Parts.Count; } }
-        public List<RuleDefinitionPart> Parts { get { return p_Parts; } }
+        public int Length { get { return parts.Count; } }
+        public List<RuleDefinitionPart> Parts { get { return parts; } }
 
 
-        public RuleDefinition() { p_Parts = new List<RuleDefinitionPart>(); }
+        public RuleDefinition() { parts = new List<RuleDefinitionPart>(); }
         public RuleDefinition(ICollection<RuleDefinitionPart> Parts)
         {
-            p_Parts = new List<RuleDefinitionPart>();
-            p_Parts.AddRange(Parts);
+            parts = new List<RuleDefinitionPart>();
+            parts.AddRange(Parts);
         }
         public RuleDefinition(Symbol UniqueSymbol)
         {
-            p_Parts = new List<RuleDefinitionPart>();
-            p_Parts.Add(new RuleDefinitionPart(UniqueSymbol, RuleDefinitionPartAction.Nothing));
+            parts = new List<RuleDefinitionPart>();
+            parts.Add(new RuleDefinitionPart(UniqueSymbol, RuleDefinitionPartAction.Nothing));
         }
 
         public abstract Symbol GetSymbolAtIndex(int Index);
@@ -118,7 +118,7 @@ namespace Hime.Parsers
         public override string ToString()
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder();
-            foreach (RuleDefinitionPart Part in p_Parts)
+            foreach (RuleDefinitionPart Part in parts)
             {
                 Builder.Append(" ");
                 Builder.Append(Part.ToString());

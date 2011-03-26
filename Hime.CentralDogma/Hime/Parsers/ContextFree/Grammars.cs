@@ -9,167 +9,167 @@ namespace Hime.Parsers.CF
 
     public abstract class CFGrammar : Grammar
     {
-        protected string p_Name;
-        protected ushort p_NextSID;
-        protected Dictionary<string, string> p_Options;
-        protected Dictionary<string, Terminal> p_Terminals;
-        protected Dictionary<string, CFVariable> p_Variables;
-        protected Dictionary<string, Virtual> p_Virtuals;
-        protected Dictionary<string, Action> p_Actions;
-        internal List<CFGrammarTemplateRule> p_TemplateRules;
+        protected string name;
+        protected ushort nextSID;
+        protected Dictionary<string, string> options;
+        protected Dictionary<string, Terminal> terminals;
+        protected Dictionary<string, CFVariable> variables;
+        protected Dictionary<string, Virtual> virtuals;
+        protected Dictionary<string, Action> actions;
+        internal List<CFGrammarTemplateRule> templateRules;
 
-        public override string LocalName { get { return p_Name; } }
-        public int NextSID { get { return p_NextSID; } }
-        public ICollection<string> Options { get { return p_Options.Keys; } }
-        public ICollection<Terminal> Terminals { get { return p_Terminals.Values; } }
-        public ICollection<CFVariable> Variables { get { return p_Variables.Values; } }
-        public ICollection<Virtual> Virtuals { get { return p_Virtuals.Values; } }
-        public ICollection<Action> Actions { get { return p_Actions.Values; } }
+        public override string LocalName { get { return name; } }
+        public int NextSID { get { return nextSID; } }
+        public ICollection<string> Options { get { return options.Keys; } }
+        public ICollection<Terminal> Terminals { get { return terminals.Values; } }
+        public ICollection<CFVariable> Variables { get { return variables.Values; } }
+        public ICollection<Virtual> Virtuals { get { return virtuals.Values; } }
+        public ICollection<Action> Actions { get { return actions.Values; } }
         public List<CFRule> Rules
         {
             get
             {
-                List<CFRule> p_Rules = new List<CFRule>();
-                foreach (CFVariable Variable in p_Variables.Values)
+                List<CFRule> rules = new List<CFRule>();
+                foreach (CFVariable Variable in variables.Values)
                     foreach (CFRule Rule in Variable.Rules)
-                        p_Rules.Add(Rule);
-                return p_Rules;
+                        rules.Add(Rule);
+                return rules;
             }
         }
-        internal ICollection<CFGrammarTemplateRule> TemplateRules { get { return p_TemplateRules; } }
+        internal ICollection<CFGrammarTemplateRule> TemplateRules { get { return templateRules; } }
 
         public CFGrammar(string Name) : base()
         {
-            p_Options = new Dictionary<string, string>();
-            p_Terminals = new Dictionary<string, Terminal>();
-            p_Variables = new Dictionary<string, CFVariable>();
-            p_Virtuals = new Dictionary<string, Virtual>();
-            p_Actions = new Dictionary<string, Action>();
-            p_TemplateRules = new List<CFGrammarTemplateRule>();
-            p_Name = Name;
-            p_NextSID = 3;
+            options = new Dictionary<string, string>();
+            terminals = new Dictionary<string, Terminal>();
+            variables = new Dictionary<string, CFVariable>();
+            virtuals = new Dictionary<string, Virtual>();
+            actions = new Dictionary<string, Action>();
+            templateRules = new List<CFGrammarTemplateRule>();
+            name = Name;
+            nextSID = 3;
         }
 
         public void AddOption(string Name, string Value)
         {
-            if (p_Options.ContainsKey(Name))
-                p_Options[Name] = Value;
+            if (options.ContainsKey(Name))
+                options[Name] = Value;
             else
-                p_Options.Add(Name, Value);
+                options.Add(Name, Value);
         }
         public string GetOption(string Name)
         {
-            if (!p_Options.ContainsKey(Name))
+            if (!options.ContainsKey(Name))
                 return null;
-            return p_Options[Name];
+            return options[Name];
         }
 
         public Symbol GetSymbol(string Name)
         {
-            if (p_Terminals.ContainsKey(Name)) return p_Terminals[Name];
-            if (p_Variables.ContainsKey(Name)) return p_Variables[Name];
-            if (p_Virtuals.ContainsKey(Name)) return p_Virtuals[Name];
-            if (p_Actions.ContainsKey(Name)) return p_Actions[Name];
+            if (terminals.ContainsKey(Name)) return terminals[Name];
+            if (variables.ContainsKey(Name)) return variables[Name];
+            if (virtuals.ContainsKey(Name)) return virtuals[Name];
+            if (actions.ContainsKey(Name)) return actions[Name];
             return null;
         }
 
         public TerminalText AddTerminalText(string Name, Automata.NFA NFA, Grammar SubGrammar)
         {
-            if (p_Children.ContainsKey(Name) && p_Terminals.ContainsKey(Name))
+            if (children.ContainsKey(Name) && terminals.ContainsKey(Name))
             {
-                TerminalText Terminal = (TerminalText)p_Terminals[Name];
-                Terminal.Priority = p_NextSID;
+                TerminalText Terminal = (TerminalText)terminals[Name];
+                Terminal.Priority = nextSID;
                 Terminal.NFA = NFA;
                 Terminal.SubGrammar = SubGrammar;
-                p_NextSID++;
+                nextSID++;
                 return Terminal;
             }
             else
             {
-                TerminalText Terminal = new TerminalText(this, p_NextSID, Name, p_NextSID, NFA, SubGrammar);
-                p_Children.Add(Name, Terminal);
-                p_Terminals.Add(Name, Terminal);
-                p_NextSID++;
+                TerminalText Terminal = new TerminalText(this, nextSID, Name, nextSID, NFA, SubGrammar);
+                children.Add(Name, Terminal);
+                terminals.Add(Name, Terminal);
+                nextSID++;
                 return Terminal;
             }
         }
         public TerminalBin AddTerminalBin(TerminalBinType Type, string Value)
         {
-            if (p_Children.ContainsKey(Value) && p_Terminals.ContainsKey(Value))
+            if (children.ContainsKey(Value) && terminals.ContainsKey(Value))
             {
-                TerminalBin Terminal = (TerminalBin)p_Terminals[Value];
+                TerminalBin Terminal = (TerminalBin)terminals[Value];
                 Terminal.Type = Type;
                 Terminal.Value = Value;
-                p_NextSID++;
+                nextSID++;
                 return Terminal;
             }
             else
             {
-                TerminalBin Terminal = new TerminalBin(this, p_NextSID, Value, p_NextSID, Type, Value.Substring(2, Value.Length - 2));
-                p_Children.Add(Value, Terminal);
-                p_Terminals.Add(Value, Terminal);
-                p_NextSID++;
+                TerminalBin Terminal = new TerminalBin(this, nextSID, Value, nextSID, Type, Value.Substring(2, Value.Length - 2));
+                children.Add(Value, Terminal);
+                terminals.Add(Value, Terminal);
+                nextSID++;
                 return Terminal;
             }
         }
         public Terminal GetTerminal(string Name)
         {
-            if (!p_Terminals.ContainsKey(Name))
+            if (!terminals.ContainsKey(Name))
                 return null;
-            return p_Terminals[Name];
+            return terminals[Name];
         }
 
         public CFVariable AddVariable(string Name)
         {
-            if (p_Variables.ContainsKey(Name))
-                return p_Variables[Name];
-            CFVariable Var = new CFVariable(this, p_NextSID, Name);
-            p_Children.Add(Name, Var);
-            p_Variables.Add(Name, Var);
-            p_NextSID++;
+            if (variables.ContainsKey(Name))
+                return variables[Name];
+            CFVariable Var = new CFVariable(this, nextSID, Name);
+            children.Add(Name, Var);
+            variables.Add(Name, Var);
+            nextSID++;
             return Var;
         }
         public CFVariable GetVariable(string Name)
         {
-            if (!p_Variables.ContainsKey(Name))
+            if (!variables.ContainsKey(Name))
                 return null;
-            return p_Variables[Name];
+            return variables[Name];
         }
 
         public Virtual AddVirtual(string Name)
         {
-            if (p_Virtuals.ContainsKey(Name))
-                return p_Virtuals[Name];
+            if (virtuals.ContainsKey(Name))
+                return virtuals[Name];
             Virtual Virtual = new Virtual(this, Name);
-            p_Children.Add(Name, Virtual);
-            p_Virtuals.Add(Name, Virtual);
+            children.Add(Name, Virtual);
+            virtuals.Add(Name, Virtual);
             return Virtual;
         }
         public Virtual GetVirtual(string Name)
         {
-            if (!p_Virtuals.ContainsKey(Name))
+            if (!virtuals.ContainsKey(Name))
                 return null;
-            return p_Virtuals[Name];
+            return virtuals[Name];
         }
 
         public Action AddAction(string Name)
         {
             Action Action = new Action(this, Name);
-            p_Children.Add(Name, Action);
-            p_Actions.Add(Name, Action);
+            children.Add(Name, Action);
+            actions.Add(Name, Action);
             return Action;
         }
         public Action GetAction(string Name)
         {
-            if (!p_Actions.ContainsKey(Name))
+            if (!actions.ContainsKey(Name))
                 return null;
-            return p_Actions[Name];
+            return actions[Name];
         }
 
         internal CFGrammarTemplateRule AddTemplateRule(Redist.Parsers.SyntaxTreeNode RuleNode, CFGrammarCompiler Compiler)
         {
             CFGrammarTemplateRule Rule = new CFGrammarTemplateRule(this, Compiler, RuleNode);
-            p_TemplateRules.Add(Rule);
+            templateRules.Add(Rule);
             return Rule;
         }
 
@@ -189,8 +189,8 @@ namespace Hime.Parsers.CF
         {
             System.Xml.XmlNode root = Document.CreateElement("CFGrammar");
             root.Attributes.Append(Document.CreateAttribute("Name"));
-            root.Attributes["Name"].Value = p_Name;
-            foreach (CFVariable var in p_Variables.Values)
+            root.Attributes["Name"].Value = name;
+            foreach (CFVariable var in variables.Values)
                 root.AppendChild(var.GetXMLNode(Document));
             return root;
         }
@@ -269,14 +269,14 @@ namespace Hime.Parsers.CF
             Log.Info("Grammar", "Creating axiom ...");
 
             // Search for Axiom option
-            if (!p_Options.ContainsKey("Axiom"))
+            if (!options.ContainsKey("Axiom"))
             {
                 Log.Error("Grammar", "Axiom option is undefined");
                 return false;
             }
             // Search for the variable specified as the Axiom
-            string name = p_Options["Axiom"];
-            if (!p_Variables.ContainsKey(name))
+            string name = options["Axiom"];
+            if (!variables.ContainsKey(name))
             {
                 Log.Error("Grammar", "Cannot find axiom variable " + name);
                 return false;
@@ -285,7 +285,7 @@ namespace Hime.Parsers.CF
             // Create the real axiom rule variable and rule
             CFVariable Axiom = AddVariable("_Axiom_");
             List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
-            Parts.Add(new RuleDefinitionPart(p_Variables[name], RuleDefinitionPartAction.Promote));
+            Parts.Add(new RuleDefinitionPart(variables[name], RuleDefinitionPartAction.Promote));
             Parts.Add(new RuleDefinitionPart(TerminalDollar.Instance, RuleDefinitionPartAction.Drop));
             Axiom.AddRule(new CFRule(Axiom, new CFRuleDefinition(Parts), false));
 
@@ -301,7 +301,7 @@ namespace Hime.Parsers.CF
             while (mod)
             {
                 mod = false;
-                foreach (CFVariable Var in p_Variables.Values)
+                foreach (CFVariable Var in variables.Values)
                     if (Var.ComputeFirsts())
                         mod = true;
             }
@@ -315,13 +315,13 @@ namespace Hime.Parsers.CF
 
             bool mod = true;
             // Apply step 1 to each variable
-            foreach (CFVariable Var in p_Variables.Values)
+            foreach (CFVariable Var in variables.Values)
                 Var.ComputeFollowers_Step1();
             // Apply step 2 and 3 while some modification has occured
             while (mod)
             {
                 mod = false;
-                foreach (CFVariable Var in p_Variables.Values)
+                foreach (CFVariable Var in variables.Values)
                     if (Var.ComputeFollowers_Step23())
                         mod = true;
             }
@@ -334,7 +334,7 @@ namespace Hime.Parsers.CF
 
     public sealed class CFGrammarText : CFGrammar
     {
-        private Automata.DFA p_FinalDFA;
+        private Automata.DFA finalDFA;
 
         public CFGrammarText(string Name) : base(Name) { }
 
@@ -354,10 +354,10 @@ namespace Hime.Parsers.CF
             foreach (Action Action in Parent.Actions)
                 AddAction(Action.LocalName);
             foreach (CFGrammarTemplateRule TemplateRule in Parent.TemplateRules)
-                p_TemplateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
+                templateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
             foreach (CFVariable Variable in Parent.Variables)
             {
-                CFVariable Clone = p_Variables[Variable.LocalName];
+                CFVariable Clone = variables[Variable.LocalName];
                 foreach (CFRule R in Variable.Rules)
                 {
                     List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
@@ -366,13 +366,13 @@ namespace Hime.Parsers.CF
                     {
                         Symbol S = null;
                         if (Part.Symbol is CFVariable)
-                            S = p_Variables[Part.Symbol.LocalName];
+                            S = variables[Part.Symbol.LocalName];
                         else if (Part.Symbol is Terminal)
-                            S = p_Terminals[Part.Symbol.LocalName];
+                            S = terminals[Part.Symbol.LocalName];
                         else if (Part.Symbol is Virtual)
-                            S = p_Virtuals[Part.Symbol.LocalName];
+                            S = virtuals[Part.Symbol.LocalName];
                         else if (Part.Symbol is Action)
-                            S = p_Actions[Part.Symbol.LocalName];
+                            S = actions[Part.Symbol.LocalName];
                         Parts.Add(new RuleDefinitionPart(S, Part.Action));
                     }
                     Clone.AddRule(new CFRule(Clone, new CFRuleDefinition(Parts), R.ReplaceOnProduction));
@@ -381,7 +381,7 @@ namespace Hime.Parsers.CF
         }
         public override CFGrammar Clone()
         {
-            CFGrammar Result = new CFGrammarText(p_Name);
+            CFGrammar Result = new CFGrammarText(name);
             Result.Inherit(this);
             return Result;
         }
@@ -393,16 +393,16 @@ namespace Hime.Parsers.CF
             // Construct a global NFA for all the terminals
             Automata.NFA Final = new Automata.NFA();
             Final.StateEntry = Final.AddNewState();
-            foreach (TerminalText Terminal in p_Terminals.Values)
+            foreach (TerminalText Terminal in terminals.Values)
             {
                 Automata.NFA Sub = Terminal.NFA.Clone();
                 Final.InsertSubNFA(Sub);
                 Final.StateEntry.AddTransition(Automata.NFA.Epsilon, Sub.StateEntry);
             }
             // Construct the equivalent DFA and minimize it
-            p_FinalDFA = new Automata.DFA(Final);
-            p_FinalDFA = p_FinalDFA.Minimize();
-            p_FinalDFA.RepackTransitions();
+            finalDFA = new Automata.DFA(Final);
+            finalDFA = finalDFA.Minimize();
+            finalDFA.RepackTransitions();
 
             Log.Info("Grammar", "Done !");
             return true;
@@ -410,7 +410,7 @@ namespace Hime.Parsers.CF
 
         public override bool Build(GrammarBuildOptions Options)
         {
-            Options.Reporter.BeginSection(p_Name + " parser data generation");
+            Options.Reporter.BeginSection(name + " parser data generation");
             if (!Prepare_AddRealAxiom(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
             if (!Prepare_ComputeFirsts(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
             if (!Prepare_ComputeFollowers(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
@@ -418,11 +418,11 @@ namespace Hime.Parsers.CF
             Options.Reporter.Info("Grammar", "Lexer DFA generated");
 
             Terminal Separator = null;
-            if (p_Options.ContainsKey("Separator"))
-                Separator = p_Terminals[p_Options["Separator"]];
+            if (options.ContainsKey("Separator"))
+                Separator = terminals[options["Separator"]];
 
             //Generate lexer
-            Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(Options.LexerWriter, Options.Namespace, p_Name, p_FinalDFA, Separator);
+            Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(Options.LexerWriter, Options.Namespace, name, finalDFA, Separator);
             LexerExporter.Export();
 
             //Generate parser
@@ -437,7 +437,7 @@ namespace Hime.Parsers.CF
             {
                 Export_Documentation(Data, Options.DocumentationDir);
                 Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Lexer", Options.DocumentationDir + "\\GraphLexer.dot");
-                p_FinalDFA.SerializeGraph(serializer);
+                finalDFA.SerializeGraph(serializer);
                 serializer.Close();
             }
             return result;
@@ -461,10 +461,10 @@ namespace Hime.Parsers.CF
             foreach (Action Action in Parent.Actions)
                 AddAction(Action.LocalName);
             foreach (CFGrammarTemplateRule TemplateRule in Parent.TemplateRules)
-                p_TemplateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
+                templateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
             foreach (CFVariable Variable in Parent.Variables)
             {
-                CFVariable Clone = p_Variables[Variable.LocalName];
+                CFVariable Clone = variables[Variable.LocalName];
                 foreach (CFRule R in Variable.Rules)
                 {
                     List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
@@ -473,13 +473,13 @@ namespace Hime.Parsers.CF
                     {
                         Symbol S = null;
                         if (Part.Symbol is CFVariable)
-                            S = p_Variables[Part.Symbol.LocalName];
+                            S = variables[Part.Symbol.LocalName];
                         else if (Part.Symbol is Terminal)
-                            S = p_Terminals[Part.Symbol.LocalName];
+                            S = terminals[Part.Symbol.LocalName];
                         else if (Part.Symbol is Virtual)
-                            S = p_Virtuals[Part.Symbol.LocalName];
+                            S = virtuals[Part.Symbol.LocalName];
                         else if (Part.Symbol is Action)
-                            S = p_Actions[Part.Symbol.LocalName];
+                            S = actions[Part.Symbol.LocalName];
                         Parts.Add(new RuleDefinitionPart(S, Part.Action));
                     }
                     Clone.AddRule(new CFRule(Clone, new CFRuleDefinition(Parts), R.ReplaceOnProduction));
@@ -488,14 +488,14 @@ namespace Hime.Parsers.CF
         }
         public override CFGrammar Clone()
         {
-            CFGrammar Result = new CFGrammarBinary(p_Name);
+            CFGrammar Result = new CFGrammarBinary(name);
             Result.Inherit(this);
             return Result;
         }
 
         public override bool Build(GrammarBuildOptions Options)
         {
-            Options.Reporter.BeginSection(p_Name + " parser data generation");
+            Options.Reporter.BeginSection(name + " parser data generation");
             if (!Prepare_AddRealAxiom(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
             if (!Prepare_ComputeFirsts(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
             if (!Prepare_ComputeFollowers(Options.Reporter)) { Options.Reporter.EndSection(); return false; }

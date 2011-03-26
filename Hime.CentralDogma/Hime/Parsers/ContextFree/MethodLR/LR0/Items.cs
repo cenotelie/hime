@@ -4,16 +4,16 @@ namespace Hime.Parsers.CF.LR
 {
     class ItemLR0 : Item
     {
-        private static TerminalSet p_EmptySet = new TerminalSet();
+        private static TerminalSet emptySet = new TerminalSet();
 
         public ItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
 
-        public override TerminalSet Lookaheads { get { return p_EmptySet; } }
+        public override TerminalSet Lookaheads { get { return emptySet; } }
 
         public override Item GetChild()
         {
             if (Action == ItemAction.Reduce) return null;
-            return new ItemLR0(p_Rule, p_DotPosition + 1);
+            return new ItemLR0(rule, dotPosition + 1);
         }
         public override void CloseTo(List<Item> Closure)
         {
@@ -55,19 +55,19 @@ namespace Hime.Parsers.CF.LR
         public override string ToString(bool ShowDecoration)
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");
-            Builder.Append(p_Rule.Variable.ToString());
-            Builder.Append(" " + p_Arrow);
+            Builder.Append(rule.Variable.ToString());
+            Builder.Append(" " + arrow);
             int i = 0;
-            foreach (RuleDefinitionPart Part in p_Definition.Parts)
+            foreach (RuleDefinitionPart Part in definition.Parts)
             {
-                if (i == p_DotPosition)
-                    Builder.Append(" " + p_Dot);
+                if (i == dotPosition)
+                    Builder.Append(" " + dot);
                 Builder.Append(" ");
                 Builder.Append(Part.ToString());
                 i++;
             }
-            if (i == p_DotPosition)
-                Builder.Append(" " + p_Dot);
+            if (i == dotPosition)
+                Builder.Append(" " + dot);
             Builder.Append("]");
             return Builder.ToString();
         }

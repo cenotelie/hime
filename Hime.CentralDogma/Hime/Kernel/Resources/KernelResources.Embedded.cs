@@ -4,67 +4,67 @@ namespace Hime.Kernel.Resources
 {
     public sealed class ResourceAccessor
 	{
-        private static List<ResourceAccessor> p_Accessors = new List<ResourceAccessor>();
+        private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
-		private System.Reflection.Assembly p_Assembly;
-		private string p_RootNamespace;
-		private string p_DefaultPath;
-        private List<string> p_Files;
-        private bool p_IsClosed;
+		private System.Reflection.Assembly assembly;
+		private string rootNamespace;
+		private string defaultPath;
+        private List<string> files;
+        private bool isClosed;
 
-        public bool IsOpen { get { return !p_IsClosed; } }
-        public bool IsClosed { get { return p_IsClosed; } }
-        public ICollection<string> Files { get { return p_Files; } }
+        public bool IsOpen { get { return !isClosed; } }
+        public bool IsClosed { get { return isClosed; } }
+        public ICollection<string> Files { get { return files; } }
 
         internal ResourceAccessor()
             : this(System.Reflection.Assembly.GetExecutingAssembly(), "Hime.Resources")
         { }
         public ResourceAccessor(System.Reflection.Assembly assembly, string defaultPath)
         {
-            p_Accessors.Add(this);
-            p_Assembly = assembly;
-            p_RootNamespace = p_Assembly.GetName().Name;
+            accessors.Add(this);
+            this.assembly = assembly;
+            rootNamespace = assembly.GetName().Name;
             if (defaultPath == null || defaultPath == string.Empty)
-                p_DefaultPath = p_RootNamespace + ".";
+                defaultPath = rootNamespace + ".";
             else
-                p_DefaultPath = p_RootNamespace + "." + defaultPath + ".";
-            p_Files = new List<string>();
-            p_IsClosed = false;
+                defaultPath = rootNamespace + "." + defaultPath + ".";
+            files = new List<string>();
+            isClosed = false;
         }
 
         public void Close()
         {
-            foreach (string file in p_Files)
+            foreach (string file in files)
                 System.IO.File.Delete(file);
-            p_IsClosed = true;
-            p_Accessors.Remove(this);
+            isClosed = true;
+            accessors.Remove(this);
         }
 
         public void AddCheckoutFile(string fileName)
         {
-            if (p_IsClosed)
+            if (isClosed)
                 throw new AccessorClosedException(this);
-            p_Files.Add(fileName);
+            files.Add(fileName);
         }
 
         public void CheckOut(string resourceName, string fileName)
         {
-            if (p_IsClosed)
+            if (isClosed)
                 throw new AccessorClosedException(this);
-            System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
+            System.IO.Stream Stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (Stream == null)
                 throw new ResourceNotFoundException(resourceName);
             byte[] Buffer = new byte[Stream.Length];
             int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
             System.IO.File.WriteAllBytes(fileName, Buffer);
-            p_Files.Add(fileName);
+            files.Add(fileName);
         }
 
         public void Export(string resourceName, string fileName)
         {
-            if (p_IsClosed)
+            if (isClosed)
                 throw new AccessorClosedException(this);
-            System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
+            System.IO.Stream Stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (Stream == null)
                 throw new ResourceNotFoundException(resourceName);
             byte[] Buffer = new byte[Stream.Length];
@@ -74,10 +74,10 @@ namespace Hime.Kernel.Resources
 
         public string GetAllTextFor(string resourceName)
 		{
-            if (p_IsClosed)
+            if (isClosed)
                 throw new AccessorClosedException(this);
             // Get a stream on the resource
-            System.IO.Stream Stream = p_Assembly.GetManifestResourceStream(p_DefaultPath + resourceName);
+            System.IO.Stream Stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (Stream == null)
                 throw new ResourceNotFoundException(resourceName);
             // Extract content to a buffer

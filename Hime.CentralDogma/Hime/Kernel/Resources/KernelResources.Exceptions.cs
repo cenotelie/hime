@@ -11,27 +11,27 @@ namespace Hime.Kernel.Resources
 
     public sealed class AccessorClosedException : ResourceException
     {
-        private ResourceAccessor p_Session;
+        private ResourceAccessor session;
 
-        public ResourceAccessor Session { get { return p_Session; } }
+        public ResourceAccessor Session { get { return session; } }
 
         public AccessorClosedException(ResourceAccessor session)
             : base("The session is already closed")
         {
-            p_Session = session;
+            this.session = session;
         }
     }
 
     public sealed class ResourceNotFoundException : ResourceException
     {
-        private string p_ResourceName;
+        private string resourceName;
 
-        public string ResourceName { get { return p_ResourceName; } }
+        public string ResourceName { get { return resourceName; } }
 
         public ResourceNotFoundException(string name)
             : base("No resource with name " + name + " found")
         {
-            p_ResourceName = name;
+            resourceName = name;
         }
     }
 }

@@ -4,14 +4,14 @@ namespace Hime.Parsers.CF.LR
 {
     class ItemSetReductionsRNGLR1 : ItemSetReductions
     {
-        private List<ItemSetActionRNReduce> p_ActionReductions;
+        private List<ItemSetActionRNReduce> actionReductions;
 
         public override ICollection<ItemSetActionReduce> Reductions
         {
             get
             {
                 List<ItemSetActionReduce> Temp = new List<ItemSetActionReduce>();
-                foreach (ItemSetActionRNReduce action in p_ActionReductions)
+                foreach (ItemSetActionRNReduce action in actionReductions)
                     Temp.Add(action);
                 return Temp;
             }
@@ -21,7 +21,7 @@ namespace Hime.Parsers.CF.LR
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (ItemSetActionReduce Reduction in p_ActionReductions)
+                foreach (ItemSetActionReduce Reduction in actionReductions)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
@@ -29,7 +29,7 @@ namespace Hime.Parsers.CF.LR
 
         public ItemSetReductionsRNGLR1()
         {
-            p_ActionReductions = new List<ItemSetActionRNReduce>();
+            actionReductions = new List<ItemSetActionRNReduce>();
         }
 
         public override void Build(ItemSet Set)
@@ -53,16 +53,16 @@ namespace Hime.Parsers.CF.LR
                 // There is already a shift action for the lookahead => conflict
                 if (Set.Children.ContainsKey(Item.Lookahead))
                 {
-                    ItemSetReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodRNGLR1), p_Conflicts, Item, Set, Item.Lookahead);
+                    ItemSetReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodRNGLR1), conflicts, Item, Set, Item.Lookahead);
                     ItemSetActionRNReduce Reduction = new ItemSetActionRNReduce(Item.Lookahead, Item.BaseRule, Item.DotPosition);
-                    p_ActionReductions.Add(Reduction);
+                    actionReductions.Add(Reduction);
                 }
                 // There is already a reduction action for the lookahead => conflict
                 else if (Reductions.ContainsKey(Item.Lookahead))
                 {
-                    ItemSetReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodRNGLR1), p_Conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
+                    ItemSetReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodRNGLR1), conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
                     ItemSetActionRNReduce Reduction = new ItemSetActionRNReduce(Item.Lookahead, Item.BaseRule, Item.DotPosition);
-                    p_ActionReductions.Add(Reduction);
+                    actionReductions.Add(Reduction);
                 }
                 else // No conflict
                 {
@@ -70,7 +70,7 @@ namespace Hime.Parsers.CF.LR
                     if (!rightnulled)
                         Reductions.Add(Item.Lookahead, Item);
                     ItemSetActionRNReduce Reduction = new ItemSetActionRNReduce(Item.Lookahead, Item.BaseRule, Item.DotPosition);
-                    p_ActionReductions.Add(Reduction);
+                    actionReductions.Add(Reduction);
                 }
             }
         }

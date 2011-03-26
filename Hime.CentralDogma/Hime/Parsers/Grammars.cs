@@ -4,14 +4,14 @@ namespace Hime.Parsers
 {
     public abstract class Grammar : Hime.Kernel.Symbol
     {
-        protected Hime.Kernel.Symbol p_Parent;
-        protected Hime.Kernel.QualifiedName p_CompleteName;
+        protected Hime.Kernel.Symbol parent;
+        protected Hime.Kernel.QualifiedName completeName;
 
-        public override Hime.Kernel.Symbol Parent { get { return p_Parent; } }
-        public override Hime.Kernel.QualifiedName CompleteName { get { return p_CompleteName; } }
+        public override Hime.Kernel.Symbol Parent { get { return parent; } }
+        public override Hime.Kernel.QualifiedName CompleteName { get { return completeName; } }
 
-        protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol){ p_Parent = Symbol; }
-        protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { p_CompleteName = Name; }
+        protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol){ parent = Symbol; }
+        protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { completeName = Name; }
 
         public abstract bool Build(GrammarBuildOptions Options);
     }
@@ -19,63 +19,63 @@ namespace Hime.Parsers
 
     public sealed class GrammarBuildOptions
     {
-        private string p_Namespace;
-        private Hime.Kernel.Reporting.Reporter p_Log;
-        private bool p_Drawvisual;
-        private ParserGenerator p_Method;
-        private System.IO.StreamWriter p_LexerWriter;
-        private System.IO.StreamWriter p_ParserWriter;
-        private string p_DocumentationDir;
+        private string _namespace;
+        private Hime.Kernel.Reporting.Reporter log;
+        private bool drawvisual;
+        private ParserGenerator method;
+        private System.IO.StreamWriter lexerWriter;
+        private System.IO.StreamWriter parserWriter;
+        private string documentationDir;
 
-        public string Namespace { get { return p_Namespace; } }
-        public Hime.Kernel.Reporting.Reporter Reporter { get { return p_Log; } }
-        public bool DrawVisual { get { return p_Drawvisual; } }
-        public ParserGenerator ParserGenerator { get { return p_Method; } }
-        public System.IO.StreamWriter LexerWriter { get { return p_LexerWriter; } }
-        public System.IO.StreamWriter ParserWriter { get { return p_ParserWriter; } }
-        public string DocumentationDir { get { return p_DocumentationDir; } }
+        public string Namespace { get { return _namespace; } }
+        public Hime.Kernel.Reporting.Reporter Reporter { get { return log; } }
+        public bool DrawVisual { get { return drawvisual; } }
+        public ParserGenerator ParserGenerator { get { return method; } }
+        public System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
+        public System.IO.StreamWriter ParserWriter { get { return parserWriter; } }
+        public string DocumentationDir { get { return documentationDir; } }
 
         public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string File, string DocDir)
         {
-            p_Namespace = Namespace;
-            p_Log = Reporter;
-            p_Drawvisual = false;
-            p_Method = Generator;
-            p_LexerWriter = new System.IO.StreamWriter(File, false, System.Text.Encoding.UTF8);
-            p_ParserWriter = p_LexerWriter;
-            p_LexerWriter.WriteLine("using System.Collections.Generic;");
-            p_LexerWriter.WriteLine("");
-            p_LexerWriter.WriteLine("namespace " + Namespace);
-            p_LexerWriter.WriteLine("{");
-            p_DocumentationDir = DocDir;
+            _namespace = Namespace;
+            log = Reporter;
+            drawvisual = false;
+            method = Generator;
+            lexerWriter = new System.IO.StreamWriter(File, false, System.Text.Encoding.UTF8);
+            parserWriter = lexerWriter;
+            lexerWriter.WriteLine("using System.Collections.Generic;");
+            lexerWriter.WriteLine("");
+            lexerWriter.WriteLine("namespace " + Namespace);
+            lexerWriter.WriteLine("{");
+            documentationDir = DocDir;
         }
         public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string FileLexer, string FileParser, string DocDir)
         {
-            p_Namespace = Namespace;
-            p_Log = Reporter;
-            p_Drawvisual = false;
-            p_Method = Generator;
-            p_LexerWriter = new System.IO.StreamWriter(FileLexer, false, System.Text.Encoding.UTF8);
-            p_LexerWriter.WriteLine("using System.Collections.Generic;");
-            p_LexerWriter.WriteLine("");
-            p_LexerWriter.WriteLine("namespace " + Namespace);
-            p_LexerWriter.WriteLine("{");
-            p_ParserWriter = new System.IO.StreamWriter(FileParser, false, System.Text.Encoding.UTF8);
-            p_ParserWriter.WriteLine("using System.Collections.Generic;");
-            p_ParserWriter.WriteLine("");
-            p_ParserWriter.WriteLine("namespace " + Namespace);
-            p_ParserWriter.WriteLine("{");
-            p_DocumentationDir = DocDir;
+            _namespace = Namespace;
+            log = Reporter;
+            drawvisual = false;
+            method = Generator;
+            lexerWriter = new System.IO.StreamWriter(FileLexer, false, System.Text.Encoding.UTF8);
+            lexerWriter.WriteLine("using System.Collections.Generic;");
+            lexerWriter.WriteLine("");
+            lexerWriter.WriteLine("namespace " + Namespace);
+            lexerWriter.WriteLine("{");
+            parserWriter = new System.IO.StreamWriter(FileParser, false, System.Text.Encoding.UTF8);
+            parserWriter.WriteLine("using System.Collections.Generic;");
+            parserWriter.WriteLine("");
+            parserWriter.WriteLine("namespace " + Namespace);
+            parserWriter.WriteLine("{");
+            documentationDir = DocDir;
         }
 
         public void Close()
         {
-            p_LexerWriter.WriteLine("}");
-            p_LexerWriter.Close();
-            if (p_ParserWriter != p_LexerWriter)
+            lexerWriter.WriteLine("}");
+            lexerWriter.Close();
+            if (parserWriter != lexerWriter)
             {
-                p_ParserWriter.WriteLine("}");
-                p_ParserWriter.Close();
+                parserWriter.WriteLine("}");
+                parserWriter.Close();
             }
         }
     }

@@ -4,11 +4,11 @@ namespace Hime.Parsers.CF.LR
 {
     class ConflictAnalyser
     {
-        private GLRSimulator p_Simulator;
+        private GLRSimulator simulator;
 
         public ConflictAnalyser(Graph graph)
         {
-            p_Simulator = new GLRSimulator(graph);
+            simulator = new GLRSimulator(graph);
         }
 
         public DeciderGraph Analyse(ItemSet lrset, Item item1, Item item2)
@@ -16,7 +16,7 @@ namespace Hime.Parsers.CF.LR
             DeciderGraph graph = new DeciderGraph();
             // Add first state
             
-            graph.Build(p_Simulator);
+            graph.Build(simulator);
             return graph;
         }
 
@@ -54,7 +54,7 @@ namespace Hime.Parsers.CF.LR
 			List<DeciderState> result = new List<DeciderState>();
 			foreach (Terminal commonLookahead in currentState.Lookaheads)
 			{
-				DeciderState successor = currentState.SimulateOnLookahead(lookahead, p_InverseGraph);
+				DeciderState successor = currentState.SimulateOnLookahead(lookahead, inverseGraph);
 				result.Add(successor);
 			}
 		}*/

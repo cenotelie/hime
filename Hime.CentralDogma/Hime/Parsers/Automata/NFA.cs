@@ -4,67 +4,67 @@ namespace Hime.Parsers.Automata
 {
     public struct TerminalNFACharSpan
     {
-        private char p_SpanBegin;
-        private char p_SpanEnd;
+        private char spanBegin;
+        private char spanEnd;
 
         public static TerminalNFACharSpan Null = new TerminalNFACharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
 
-        public char Begin { get { return p_SpanBegin; } }
-        public char End { get { return p_SpanEnd; } }
-        public int Length { get { return p_SpanEnd - p_SpanBegin + 1; } }
+        public char Begin { get { return spanBegin; } }
+        public char End { get { return spanEnd; } }
+        public int Length { get { return spanEnd - spanBegin + 1; } }
 
         public TerminalNFACharSpan(char Begin, char End)
         {
-            p_SpanBegin = Begin;
-            p_SpanEnd = End;
+            spanBegin = Begin;
+            spanEnd = End;
         }
 
         public static TerminalNFACharSpan Intersect(TerminalNFACharSpan Left, TerminalNFACharSpan Right)
         {
-            if (Left.p_SpanBegin < Right.p_SpanBegin)
+            if (Left.spanBegin < Right.spanBegin)
             {
-                if (Left.p_SpanEnd < Right.p_SpanBegin)
+                if (Left.spanEnd < Right.spanBegin)
                     return Null;
-                if (Left.p_SpanEnd < Right.p_SpanEnd)
-                    return new TerminalNFACharSpan(Right.p_SpanBegin, Left.p_SpanEnd);
-                return new TerminalNFACharSpan(Right.p_SpanBegin, Right.p_SpanEnd);
+                if (Left.spanEnd < Right.spanEnd)
+                    return new TerminalNFACharSpan(Right.spanBegin, Left.spanEnd);
+                return new TerminalNFACharSpan(Right.spanBegin, Right.spanEnd);
             }
             else
             {
-                if (Right.p_SpanEnd < Left.p_SpanBegin)
+                if (Right.spanEnd < Left.spanBegin)
                     return Null;
-                if (Right.p_SpanEnd < Left.p_SpanEnd)
-                    return new TerminalNFACharSpan(Left.p_SpanBegin, Right.p_SpanEnd);
-                return new TerminalNFACharSpan(Left.p_SpanBegin, Left.p_SpanEnd);
+                if (Right.spanEnd < Left.spanEnd)
+                    return new TerminalNFACharSpan(Left.spanBegin, Right.spanEnd);
+                return new TerminalNFACharSpan(Left.spanBegin, Left.spanEnd);
             }
         }
 
         public static TerminalNFACharSpan Split(TerminalNFACharSpan Original, TerminalNFACharSpan Splitter, out TerminalNFACharSpan Rest)
         {
-            if (Original.p_SpanBegin == Splitter.p_SpanBegin)
+            if (Original.spanBegin == Splitter.spanBegin)
             {
                 Rest = Null;
-                if (Original.p_SpanEnd == Splitter.p_SpanEnd) return Null;
-                return new TerminalNFACharSpan(System.Convert.ToChar(Splitter.p_SpanEnd + 1), Original.p_SpanEnd);
+                if (Original.spanEnd == Splitter.spanEnd) return Null;
+                return new TerminalNFACharSpan(System.Convert.ToChar(Splitter.spanEnd + 1), Original.spanEnd);
             }
-            if (Original.p_SpanEnd == Splitter.p_SpanEnd)
+            if (Original.spanEnd == Splitter.spanEnd)
             {
                 Rest = Null;
-                return new TerminalNFACharSpan(Original.p_SpanBegin, System.Convert.ToChar(Splitter.p_SpanBegin - 1));
+                return new TerminalNFACharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
             }
-            Rest = new TerminalNFACharSpan(System.Convert.ToChar(Splitter.p_SpanEnd + 1), Original.p_SpanEnd);
-            return new TerminalNFACharSpan(Original.p_SpanBegin, System.Convert.ToChar(Splitter.p_SpanBegin - 1));
+            Rest = new TerminalNFACharSpan(System.Convert.ToChar(Splitter.spanEnd + 1), Original.spanEnd);
+            return new TerminalNFACharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
         }
 
-        public static int Compare(TerminalNFACharSpan Left, TerminalNFACharSpan Right) { return Left.p_SpanBegin.CompareTo(Right.p_SpanBegin); }
+        public static int Compare(TerminalNFACharSpan Left, TerminalNFACharSpan Right) { return Left.spanBegin.CompareTo(Right.spanBegin); }
 
         public override string ToString()
         {
-            if (p_SpanBegin > p_SpanEnd)
+            if (spanBegin > spanEnd)
                 return string.Empty;
-            if (p_SpanBegin == p_SpanEnd)
-                return CharToString(p_SpanBegin);
-            return "[" + CharToString(p_SpanBegin) + "-" + CharToString(p_SpanEnd) + "]";
+            if (spanBegin == spanEnd)
+                return CharToString(spanBegin);
+            return "[" + CharToString(spanBegin) + "-" + CharToString(spanEnd) + "]";
         }
 
         private string CharToString(char c)
@@ -100,7 +100,7 @@ namespace Hime.Parsers.Automata
             if (obj is TerminalNFACharSpan)
             {
                 TerminalNFACharSpan Span = (TerminalNFACharSpan)obj;
-                return ((p_SpanBegin == Span.p_SpanBegin) && (p_SpanEnd == Span.p_SpanEnd));
+                return ((spanBegin == Span.spanBegin) && (spanEnd == Span.spanEnd));
             }
             return false;
         }
@@ -112,79 +112,79 @@ namespace Hime.Parsers.Automata
 
     public sealed class NFAState
     {
-        private List<KeyValuePair<TerminalNFACharSpan, NFAState>> p_Transitions;
-        private Terminal p_Final;
-        private int p_Mark;
+        private List<KeyValuePair<TerminalNFACharSpan, NFAState>> transitions;
+        private Terminal final;
+        private int mark;
 
-        public List<KeyValuePair<TerminalNFACharSpan, NFAState>> Transitions { get { return p_Transitions; } }
+        public List<KeyValuePair<TerminalNFACharSpan, NFAState>> Transitions { get { return transitions; } }
         public Terminal Final
         {
-            get { return p_Final; }
-            set { p_Final = value; }
+            get { return final; }
+            set { final = value; }
         }
         public int Mark
         {
-            get { return p_Mark; }
-            set { p_Mark = value; }
+            get { return mark; }
+            set { mark = value; }
         }
 
         public NFAState()
         {
-            p_Transitions = new List<KeyValuePair<TerminalNFACharSpan, NFAState>>();
-            p_Final = null;
-            p_Mark = 0;
+            transitions = new List<KeyValuePair<TerminalNFACharSpan, NFAState>>();
+            final = null;
+            mark = 0;
         }
 
-        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { p_Transitions.Add(new KeyValuePair<TerminalNFACharSpan, NFAState>(Value, Next)); }
-        public void ClearTransitions() { p_Transitions.Clear(); }
+        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { transitions.Add(new KeyValuePair<TerminalNFACharSpan, NFAState>(Value, Next)); }
+        public void ClearTransitions() { transitions.Clear(); }
     }
 
 
     public sealed class NFA
     {
-        private List<NFAState> p_States;
-        private NFAState p_StateEntry;
-        private NFAState p_StateExit;
+        private List<NFAState> states;
+        private NFAState stateEntry;
+        private NFAState stateExit;
 
 
         public static readonly TerminalNFACharSpan Epsilon = new TerminalNFACharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
-        public ICollection<NFAState> States { get { return p_States; } }
-        public int StatesCount { get { return p_States.Count; } }
+        public ICollection<NFAState> States { get { return states; } }
+        public int StatesCount { get { return states.Count; } }
         public NFAState StateEntry
         {
-            get { return p_StateEntry; }
-            set { p_StateEntry = value; }
+            get { return stateEntry; }
+            set { stateEntry = value; }
         }
         public NFAState StateExit
         {
-            get { return p_StateExit; }
-            set { p_StateExit = value; }
+            get { return stateExit; }
+            set { stateExit = value; }
         }
 
         public NFA()
         {
-            p_States = new List<NFAState>();
+            states = new List<NFAState>();
         }
 
         public NFA(DFA DFA)
         {
-            p_States = new List<NFAState>();
+            states = new List<NFAState>();
             List<DFAState> DFAStates = new List<DFAState>(DFA.States);
             foreach (DFAState State in DFAStates)
-                p_States.Add(new NFAState());
+                states.Add(new NFAState());
             for (int i = 0; i != DFAStates.Count; i++)
             {
-                p_States[i].Final = DFAStates[i].Final;
+                states[i].Final = DFAStates[i].Final;
                 foreach (TerminalNFACharSpan Transition in DFAStates[i].Transitions.Keys)
-                    p_States[i].AddTransition(Transition, p_States[DFAStates.IndexOf(DFAStates[i].Transitions[Transition])]);
+                    states[i].AddTransition(Transition, states[DFAStates.IndexOf(DFAStates[i].Transitions[Transition])]);
             }
-            p_StateEntry = p_States[0];
+            stateEntry = states[0];
         }
 
         public NFAState AddNewState()
         {
             NFAState State = new NFAState();
-            p_States.Add(State);
+            states.Add(State);
             return State;
         }
 
@@ -194,106 +194,106 @@ namespace Hime.Parsers.Automata
             NFA Copy = new NFA();
 
             // Create new states for copy, add marks and copy finals if required
-            for (int i = 0; i != p_States.Count; i++)
+            for (int i = 0; i != states.Count; i++)
             {
                 NFAState State = new NFAState();
-                State.Mark = p_States[i].Mark;
+                State.Mark = states[i].Mark;
                 if (KeepFinals)
-                    State.Final = p_States[i].Final;
-                Copy.p_States.Add(State);
+                    State.Final = states[i].Final;
+                Copy.states.Add(State);
             }
             // Make linkage
-            for (int i = 0; i != p_States.Count; i++)
+            for (int i = 0; i != states.Count; i++)
             {
-                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in p_States[i].Transitions)
-                    Copy.p_States[i].AddTransition(Transition.Key, Copy.p_States[p_States.IndexOf(Transition.Value)]);
+                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in states[i].Transitions)
+                    Copy.states[i].AddTransition(Transition.Key, Copy.states[states.IndexOf(Transition.Value)]);
             }
-            if (p_StateEntry != null)
-                Copy.p_StateEntry = Copy.p_States[p_States.IndexOf(p_StateEntry)];
-            if (p_StateExit != null)
-                Copy.p_StateExit = Copy.p_States[p_States.IndexOf(p_StateExit)];
+            if (stateEntry != null)
+                Copy.stateEntry = Copy.states[states.IndexOf(stateEntry)];
+            if (stateExit != null)
+                Copy.stateExit = Copy.states[states.IndexOf(stateExit)];
             return Copy;
         }
 
         public void InsertSubNFA(NFA Sub)
         {
-            p_States.AddRange(Sub.p_States);
+            states.AddRange(Sub.states);
         }
 
 
         public static NFA OperatorOption(NFA Sub, bool UseClones)
         {
             NFA Final = new NFA();
-            Final.p_StateEntry = new NFAState();
-            Final.p_StateExit = new NFAState();
-            Final.p_States.Add(Final.p_StateEntry);
+            Final.stateEntry = new NFAState();
+            Final.stateExit = new NFAState();
+            Final.states.Add(Final.stateEntry);
             if (UseClones)
                 Sub = Sub.Clone();
-            Final.p_States.AddRange(Sub.p_States);
-            Final.p_States.Add(Final.p_StateExit);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Sub.p_StateEntry);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Final.p_StateExit);
-            Sub.p_StateExit.AddTransition(NFA.Epsilon, Final.p_StateExit);
+            Final.states.AddRange(Sub.states);
+            Final.states.Add(Final.stateExit);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Sub.stateEntry);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Final.stateExit);
+            Sub.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
             return Final;
         }
         public static NFA OperatorStar(NFA Sub, bool UseClones)
         {
             NFA Final = new NFA();
-            Final.p_StateEntry = new NFAState();
-            Final.p_StateExit = new NFAState();
-            Final.p_States.Add(Final.p_StateEntry);
+            Final.stateEntry = new NFAState();
+            Final.stateExit = new NFAState();
+            Final.states.Add(Final.stateEntry);
             if (UseClones)
                 Sub = Sub.Clone();
-            Final.p_States.AddRange(Sub.p_States);
-            Final.p_States.Add(Final.p_StateExit);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Sub.p_StateEntry);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Final.p_StateExit);
-            Sub.p_StateExit.AddTransition(NFA.Epsilon, Final.p_StateExit);
-            Final.p_StateExit.AddTransition(NFA.Epsilon, Sub.p_StateEntry);
+            Final.states.AddRange(Sub.states);
+            Final.states.Add(Final.stateExit);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Sub.stateEntry);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Final.stateExit);
+            Sub.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
+            Final.stateExit.AddTransition(NFA.Epsilon, Sub.stateEntry);
             return Final;
         }
         public static NFA OperatorPlus(NFA Sub, bool UseClones)
         {
             NFA Final = new NFA();
-            Final.p_StateEntry = new NFAState();
-            Final.p_StateExit = new NFAState();
-            Final.p_States.Add(Final.p_StateEntry);
+            Final.stateEntry = new NFAState();
+            Final.stateExit = new NFAState();
+            Final.states.Add(Final.stateEntry);
             if (UseClones)
                 Sub = Sub.Clone();
-            Final.p_States.AddRange(Sub.p_States);
-            Final.p_States.Add(Final.p_StateExit);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Sub.p_StateEntry);
-            Sub.p_StateExit.AddTransition(NFA.Epsilon, Final.p_StateExit);
-            Final.p_StateExit.AddTransition(NFA.Epsilon, Sub.p_StateEntry);
+            Final.states.AddRange(Sub.states);
+            Final.states.Add(Final.stateExit);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Sub.stateEntry);
+            Sub.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
+            Final.stateExit.AddTransition(NFA.Epsilon, Sub.stateEntry);
             return Final;
         }
         public static NFA OperatorRange(NFA Sub, bool UseClones, uint Min, uint Max)
         {
             NFA Final = new NFA();
-            Final.p_StateEntry = new NFAState();
-            Final.p_StateExit = new NFAState();
-            Final.p_States.Add(Final.p_StateEntry);
+            Final.stateEntry = new NFAState();
+            Final.stateExit = new NFAState();
+            Final.states.Add(Final.stateEntry);
 
-            NFAState Last = Final.p_StateEntry;
+            NFAState Last = Final.stateEntry;
             for (uint i = 0; i != Min; i++)
             {
                 NFA Inner = Sub.Clone();
-                Final.p_States.AddRange(Inner.p_States);
-                Last.AddTransition(NFA.Epsilon, Inner.p_StateEntry);
-                Last = Inner.p_StateExit;
+                Final.states.AddRange(Inner.states);
+                Last.AddTransition(NFA.Epsilon, Inner.stateEntry);
+                Last = Inner.stateExit;
             }
             for (uint i = Min; i != Max; i++)
             {
                 NFA Inner = OperatorOption(Sub, true);
-                Final.p_States.AddRange(Inner.p_States);
-                Last.AddTransition(NFA.Epsilon, Inner.p_StateEntry);
-                Last = Inner.p_StateExit;
+                Final.states.AddRange(Inner.states);
+                Last.AddTransition(NFA.Epsilon, Inner.stateEntry);
+                Last = Inner.stateExit;
             }
-            Final.p_States.Add(Final.p_StateExit);
-            Last.AddTransition(NFA.Epsilon, Final.p_StateExit);
+            Final.states.Add(Final.stateExit);
+            Last.AddTransition(NFA.Epsilon, Final.stateExit);
             
             if (Min == 0)
-                Final.p_StateEntry.AddTransition(NFA.Epsilon, Final.p_StateExit);
+                Final.stateEntry.AddTransition(NFA.Epsilon, Final.stateExit);
             return Final;
         }
         public static NFA OperatorConcat(NFA Left, NFA Right, bool UseClones)
@@ -304,18 +304,18 @@ namespace Hime.Parsers.Automata
                 Left = Left.Clone(true);
                 Right = Right.Clone(true);
             }
-            Final.p_States.AddRange(Left.p_States);
-            Final.p_States.AddRange(Right.p_States);
-            Final.p_StateEntry = Left.p_StateEntry;
-            Final.p_StateExit = Right.p_StateExit;
-            Left.p_StateExit.AddTransition(NFA.Epsilon, Right.p_StateEntry);
+            Final.states.AddRange(Left.states);
+            Final.states.AddRange(Right.states);
+            Final.stateEntry = Left.stateEntry;
+            Final.stateExit = Right.stateExit;
+            Left.stateExit.AddTransition(NFA.Epsilon, Right.stateEntry);
             return Final;
         }
         public static NFA OperatorDifference(NFA Left, NFA Right, bool UseClones)
         {
             NFA Final = new NFA();
-            Final.p_StateEntry = Final.AddNewState();
-            Final.p_StateExit = Final.AddNewState();
+            Final.stateEntry = Final.AddNewState();
+            Final.stateExit = Final.AddNewState();
             NFAState StatePositive = Final.AddNewState();
             NFAState StateNegative = Final.AddNewState();
             StatePositive.Mark = 1;
@@ -326,25 +326,25 @@ namespace Hime.Parsers.Automata
                 Left = Left.Clone(true);
                 Right = Right.Clone(true);
             }
-            Final.p_States.AddRange(Left.p_States);
-            Final.p_States.AddRange(Right.p_States);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Left.p_StateEntry);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Right.p_StateEntry);
-            Left.p_StateExit.AddTransition(NFA.Epsilon, StatePositive);
-            Right.p_StateExit.AddTransition(NFA.Epsilon, StateNegative);
-            StatePositive.AddTransition(NFA.Epsilon, Final.p_StateExit);
+            Final.states.AddRange(Left.states);
+            Final.states.AddRange(Right.states);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Left.stateEntry);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Right.stateEntry);
+            Left.stateExit.AddTransition(NFA.Epsilon, StatePositive);
+            Right.stateExit.AddTransition(NFA.Epsilon, StateNegative);
+            StatePositive.AddTransition(NFA.Epsilon, Final.stateExit);
 
-            Final.p_StateExit.Final = TerminalDummy.Instance;
+            Final.stateExit.Final = TerminalDummy.Instance;
             DFA Equivalent = new DFA(Final);
             Equivalent.Prune();
             Final = new NFA(Equivalent);
-            Final.p_StateExit = Final.AddNewState();
-            foreach (NFAState State in Final.p_States)
+            Final.stateExit = Final.AddNewState();
+            foreach (NFAState State in Final.states)
             {
                 if (State.Final == TerminalDummy.Instance)
                 {
                     State.Final = null;
-                    State.AddTransition(NFA.Epsilon, Final.p_StateExit);
+                    State.AddTransition(NFA.Epsilon, Final.stateExit);
                 }
             }
             return Final;
@@ -352,21 +352,21 @@ namespace Hime.Parsers.Automata
         public static NFA OperatorUnion(NFA Left, NFA Right, bool UseClones)
         {
             NFA Final = new NFA();
-            Final.p_StateEntry = new NFAState();
-            Final.p_StateExit = new NFAState();
-            Final.p_States.Add(Final.p_StateEntry);
+            Final.stateEntry = new NFAState();
+            Final.stateExit = new NFAState();
+            Final.states.Add(Final.stateEntry);
             if (UseClones)
             {
                 Left = Left.Clone(true);
                 Right = Right.Clone(true);
             }
-            Final.p_States.AddRange(Left.p_States);
-            Final.p_States.AddRange(Right.p_States);
-            Final.p_States.Add(Final.p_StateExit);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Left.p_StateEntry);
-            Final.p_StateEntry.AddTransition(NFA.Epsilon, Right.p_StateEntry);
-            Left.p_StateExit.AddTransition(NFA.Epsilon, Final.p_StateExit);
-            Right.p_StateExit.AddTransition(NFA.Epsilon, Final.p_StateExit);
+            Final.states.AddRange(Left.states);
+            Final.states.AddRange(Right.states);
+            Final.states.Add(Final.stateExit);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Left.stateEntry);
+            Final.stateEntry.AddTransition(NFA.Epsilon, Right.stateEntry);
+            Left.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
+            Right.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
             return Final;
         }
     }

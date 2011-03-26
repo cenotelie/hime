@@ -11,60 +11,60 @@ namespace Hime.Parsers.CF.LR
 
     class Conflict : Hime.Kernel.Reporting.Entry
     {
-        protected System.Type p_MethodType;
-        protected ConflictType p_Type;
-        private Terminal p_Lookahead;
-        private List<Item> p_Items;
+        protected System.Type methodType;
+        protected ConflictType type;
+        private Terminal lookahead;
+        private List<Item> items;
 
         public Hime.Kernel.Reporting.Level Level {
             get
             {
-                if (p_MethodType == typeof(MethodLR0)) return Hime.Kernel.Reporting.Level.Error;
-                if (p_MethodType == typeof(MethodLR1)) return Hime.Kernel.Reporting.Level.Error;
-                if (p_MethodType == typeof(MethodLALR1)) return Hime.Kernel.Reporting.Level.Error;
+                if (methodType == typeof(MethodLR0)) return Hime.Kernel.Reporting.Level.Error;
+                if (methodType == typeof(MethodLR1)) return Hime.Kernel.Reporting.Level.Error;
+                if (methodType == typeof(MethodLALR1)) return Hime.Kernel.Reporting.Level.Error;
                 return Hime.Kernel.Reporting.Level.Warning;
             }
         }
-        public string Component { get { return p_MethodType.Name; } }
+        public string Component { get { return methodType.Name; } }
         public string Message { get { return ToString(); } }
 
-        public System.Type MethodType { get { return p_MethodType; } }
-        public ConflictType ConflictType { get { return p_Type; } }
-        public Terminal ConflictSymbol { get { return p_Lookahead; } }
+        public System.Type MethodType { get { return methodType; } }
+        public ConflictType ConflictType { get { return type; } }
+        public Terminal ConflictSymbol { get { return lookahead; } }
 
-        public void AddItem(Item Item) { p_Items.Add(Item); }
+        public void AddItem(Item Item) { items.Add(Item); }
 
         public Conflict(System.Type MethodType, ConflictType Type, Terminal Lookahead)
         {
-            p_MethodType = MethodType;
-            p_Type = Type;
-            p_Lookahead = Lookahead;
-            p_Items = new List<Item>();
+            methodType = MethodType;
+            type = Type;
+            lookahead = Lookahead;
+            items = new List<Item>();
         }
         public Conflict(System.Type MethodType, ConflictType Type)
         {
-            p_MethodType = MethodType;
-            p_Type = Type;
-            p_Items = new List<Item>();
+            methodType = MethodType;
+            type = Type;
+            items = new List<Item>();
         }
 
-        public bool ContainsItem(Item Item) { return p_Items.Contains(Item); }
+        public bool ContainsItem(Item Item) { return items.Contains(Item); }
 
         public override string ToString()
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("Conflict ");
-            if (p_Type == ConflictType.ShiftReduce)
+            if (type == ConflictType.ShiftReduce)
                 Builder.Append("Shift/Reduce");
             else
                 Builder.Append("Reduce/Reduce");
-            if (p_Lookahead != null)
+            if (lookahead != null)
             {
                 Builder.Append(" on terminal '");
-                Builder.Append(p_Lookahead.ToString());
+                Builder.Append(lookahead.ToString());
                 Builder.Append("'");
             }
             Builder.Append(" for items {");
-            foreach (Item Item in p_Items)
+            foreach (Item Item in items)
             {
                 Builder.Append(" ");
                 Builder.Append(Item.ToString());
