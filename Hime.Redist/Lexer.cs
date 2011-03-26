@@ -1,78 +1,36 @@
-﻿namespace Hime.Redist.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Redist.Parsers
 {
-    /// <summary>
-    /// Exception thrown by lexers
-    /// </summary>
     [System.Serializable]
     public class LexerException : System.Exception
     {
-        /// <summary>
-        /// Constructs empty exception
-        /// </summary>
         public LexerException() : base() { }
-        /// <summary>
-        /// Constructs exception from the message
-        /// </summary>
-        /// <param name="message">Exception message</param>
         public LexerException(string message) : base(message) { }
-        /// <summary>
-        /// Constructs exception from the message and the given inner exception
-        /// </summary>
-        /// <param name="message">Exception message</param>
-        /// <param name="innerException">Inner exception</param>
         public LexerException(string message, System.Exception innerException) : base(message, innerException) { }
         protected LexerException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
-    /// <summary>
-    /// Interface for lexer errors
-    /// </summary>
     public interface LexerError
     {
         string Message { get; }
     }
-    /// <summary>
-    /// Text lexer error
-    /// </summary>
     public abstract class LexerTextError : LexerError
     {
-        /// <summary>
-        /// Line of the error
-        /// </summary>
         protected int p_Line;
-        /// <summary>
-        /// Column of the error
-        /// </summary>
         protected int p_Column;
 
-        /// <summary>
-        /// Get the line of the error
-        /// </summary>
-        /// <value>The line of the error</value>
         public int Line { get { return p_Line; } }
-        /// <summary>
-        /// Get the column of the error
-        /// </summary>
-        /// <value>The column of the error</value>
         public int Column { get { return p_Column; } }
 
         public abstract string Message { get; }
 
-        /// <summary>
-        /// Constructs the lexer error
-        /// </summary>
-        /// <param name="line">Error line</param>
-        /// <param name="column">Error column</param>
         protected LexerTextError(int line, int column)
         {
             p_Line = line;
             p_Column = column;
         }
 
-        /// <summary>
-        /// Get a string representation of the error
-        /// </summary>
-        /// <returns>Returns a string representation of the error</returns>
         public abstract override string ToString();
     }
 
@@ -118,13 +76,13 @@
         // Lexer DFA data to setup on construction
         protected ushort[] p_SymbolsSID;
         protected string[] p_SymbolsName;
-        protected System.Collections.Generic.Dictionary<ushort, MatchSubGrammar> p_SymbolsSubGrammars;
+        protected Dictionary<ushort, MatchSubGrammar> p_SymbolsSubGrammars;
         protected ushort[][][] p_Transitions;
         protected int[] p_Finals;
         protected ushort p_SeparatorID;
 
         // Lexer state data
-        protected System.Collections.Generic.List<LexerTextError> p_Errors;
+        protected List<LexerTextError> p_Errors;
         protected BufferedTextReader p_Input;
         protected int p_CurrentLine;
         protected int p_CurrentColumn;
@@ -142,7 +100,7 @@
         protected LexerText(System.IO.TextReader input)
         {
             setup();
-            p_Errors = new System.Collections.Generic.List<LexerTextError>();
+            p_Errors = new List<LexerTextError>();
             p_Input = new BufferedTextReader(input);
             p_CurrentLine = 1;
             p_CurrentColumn = 1;
@@ -151,7 +109,7 @@
         protected LexerText(LexerText original)
         {
             setup();
-            p_Errors = new System.Collections.Generic.List<LexerTextError>(original.p_Errors);
+            p_Errors = new List<LexerTextError>(original.p_Errors);
             p_Input = original.p_Input.Clone();
             p_CurrentLine = original.p_CurrentLine;
             p_CurrentColumn = original.p_CurrentColumn;
@@ -223,7 +181,7 @@
 
         private SymbolTokenText GetNextToken_DFA()
         {
-            System.Collections.Generic.List<SymbolTokenText> MatchedTokens = new System.Collections.Generic.List<SymbolTokenText>();
+            List<SymbolTokenText> MatchedTokens = new List<SymbolTokenText>();
             System.Text.StringBuilder Builder = new System.Text.StringBuilder();
             int count = 0;
             ushort State = 0;
@@ -275,7 +233,7 @@
         protected static byte p_Flag8 = 0xFF;
         protected static byte[] p_Flags = { 0x00, p_Flag1, p_Flag2, p_Flag3, p_Flag4, p_Flag5, p_Flag6, p_Flag7, p_Flag8 };
 
-        protected System.Collections.Generic.Dictionary<ushort, ApplyGetNextToken> p_GetNextTokens;
+        protected Dictionary<ushort, ApplyGetNextToken> p_GetNextTokens;
         protected Binary.DataInput p_Input;
         protected int p_CurrentBitLeft;
         protected bool p_DollarEmitted;

@@ -1,4 +1,6 @@
-﻿namespace Hime.Redist.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Redist.Parsers
 {
     public enum SyntaxTreeNodeAction
     {
@@ -10,28 +12,28 @@
 
     public class SyntaxTreeNode
     {
-        protected System.Collections.Generic.Dictionary<string, object> p_Properties;
-        protected System.Collections.Generic.List<SyntaxTreeNode> p_Children;
+        protected Dictionary<string, object> p_Properties;
+        protected List<SyntaxTreeNode> p_Children;
         protected SyntaxTreeNode p_Parent;
         protected Symbol p_Symbol;
         protected SyntaxTreeNodeAction p_Action;
 
-        public System.Collections.Generic.Dictionary<string, object> Properties { get { return p_Properties; } }
+        public Dictionary<string, object> Properties { get { return p_Properties; } }
         public Symbol Symbol { get { return p_Symbol; } }
         public SyntaxTreeNode Parent { get { return p_Parent; } }
         public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(p_Children); } }
 
         public SyntaxTreeNode(Symbol Symbol)
         {
-            p_Properties = new System.Collections.Generic.Dictionary<string, object>();
-            p_Children = new System.Collections.Generic.List<SyntaxTreeNode>();
+            p_Properties = new Dictionary<string, object>();
+            p_Children = new List<SyntaxTreeNode>();
             p_Symbol = Symbol;
             p_Action = SyntaxTreeNodeAction.Nothing;
         }
         public SyntaxTreeNode(Symbol Symbol, SyntaxTreeNodeAction Action)
         {
-            p_Properties = new System.Collections.Generic.Dictionary<string, object>();
-            p_Children = new System.Collections.Generic.List<SyntaxTreeNode>();
+            p_Properties = new Dictionary<string, object>();
+            p_Children = new List<SyntaxTreeNode>();
             p_Symbol = Symbol;
             p_Action = Action;
         }
@@ -51,9 +53,9 @@
             Node.p_Action = Action;
             p_Children.Add(Node);
         }
-        public void AppendRange(System.Collections.Generic.ICollection<SyntaxTreeNode> Nodes)
+        public void AppendRange(ICollection<SyntaxTreeNode> Nodes)
         {
-            System.Collections.Generic.List<SyntaxTreeNode> Temp = new System.Collections.Generic.List<SyntaxTreeNode>(Nodes);
+            List<SyntaxTreeNode> Temp = new List<SyntaxTreeNode>(Nodes);
             foreach (SyntaxTreeNode Node in Temp)
                 AppendChild(Node);
         }
@@ -85,7 +87,7 @@
 
                 if (p_Children[i].p_Action == SyntaxTreeNodeAction.Replace)
                 {
-                    System.Collections.Generic.List<SyntaxTreeNode> NewChildren = p_Children[i].p_Children;
+                    List<SyntaxTreeNode> NewChildren = p_Children[i].p_Children;
                     foreach (SyntaxTreeNode Child in NewChildren)
                         Child.p_Parent = this;
                     p_Children.RemoveAt(i);

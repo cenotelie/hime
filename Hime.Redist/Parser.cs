@@ -1,4 +1,6 @@
-﻿namespace Hime.Redist.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Redist.Parsers
 {
     public class ParserException : System.Exception
     {

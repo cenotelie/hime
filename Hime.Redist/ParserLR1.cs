@@ -1,8 +1,10 @@
-﻿namespace Hime.Redist.Parsers
+﻿using System.Collections.Generic;
+
+namespace Hime.Redist.Parsers
 {
     public abstract class BaseLR1Parser : IParser
     {
-        protected delegate void Production(BaseLR1Parser parser, System.Collections.Generic.List<SyntaxTreeNode> nodes);
+        protected delegate void Production(BaseLR1Parser parser, List<SyntaxTreeNode> nodes);
 
         // Parser automata data
         protected Production[] p_Rules;
@@ -18,10 +20,10 @@
         protected int p_ErrorSimulationLength;
 
         // Parser state data
-        protected System.Collections.Generic.List<ParserError> p_Errors;
+        protected List<ParserError> p_Errors;
         protected ILexer p_Lexer;
-        protected System.Collections.Generic.List<SyntaxTreeNode> p_Nodes;
-        protected System.Collections.Generic.Stack<ushort> p_Stack;
+        protected List<SyntaxTreeNode> p_Nodes;
+        protected Stack<ushort> p_Stack;
         protected SymbolToken p_NextToken;
         protected ushort p_CurrentState;
 
@@ -33,10 +35,10 @@
         public BaseLR1Parser(ILexer input)
         {
             setup();
-            p_Errors = new System.Collections.Generic.List<ParserError>();
+            p_Errors = new List<ParserError>();
             p_Lexer = input;
-            p_Nodes = new System.Collections.Generic.List<SyntaxTreeNode>();
-            p_Stack = new System.Collections.Generic.Stack<ushort>();
+            p_Nodes = new List<SyntaxTreeNode>();
+            p_Stack = new Stack<ushort>();
             p_CurrentState = 0x0;
             p_NextToken = null;
         }
@@ -89,9 +91,9 @@
         protected bool Analyse_HandleUnexpectedToken_SimpleRecovery_RemoveUnexpected()
         {
             ILexer TestLexer = p_Lexer.Clone();
-            System.Collections.Generic.List<ushort> TempStack = new System.Collections.Generic.List<ushort>(p_Stack);
+            List<ushort> TempStack = new List<ushort>(p_Stack);
             TempStack.Reverse();
-            System.Collections.Generic.Stack<ushort> TestStack = new System.Collections.Generic.Stack<ushort>(TempStack);
+            Stack<ushort> TestStack = new Stack<ushort>(TempStack);
             if (Analyse_Simulate(TestStack, TestLexer))
             {
                 p_NextToken = GetNextToken(p_Lexer, p_CurrentState);
@@ -104,10 +106,10 @@
             for (int i = 0; i != p_StateExpectedIDs[p_CurrentState].Length; i++)
             {
                 LexerText TestLexer = (LexerText)p_Lexer.Clone();
-                System.Collections.Generic.List<ushort> TempStack = new System.Collections.Generic.List<ushort>(p_Stack);
+                List<ushort> TempStack = new List<ushort>(p_Stack);
                 TempStack.Reverse();
-                System.Collections.Generic.Stack<ushort> TestStack = new System.Collections.Generic.Stack<ushort>(TempStack);
-                System.Collections.Generic.List<SymbolToken> Inserted = new System.Collections.Generic.List<SymbolToken>();
+                Stack<ushort> TestStack = new Stack<ushort>(TempStack);
+                List<SymbolToken> Inserted = new List<SymbolToken>();
                 Inserted.Add(new SymbolTokenText(p_StateExpectedNames[p_CurrentState][i], p_StateExpectedIDs[p_CurrentState][i], string.Empty, p_Lexer.CurrentLine));
                 Inserted.Add(p_NextToken);
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
@@ -125,10 +127,10 @@
             for (int i = 0; i != p_StateExpectedIDs[p_CurrentState].Length; i++)
             {
                 LexerText TestLexer = (LexerText)p_Lexer.Clone();
-                System.Collections.Generic.List<ushort> TempStack = new System.Collections.Generic.List<ushort>(p_Stack);
+                List<ushort> TempStack = new List<ushort>(p_Stack);
                 TempStack.Reverse();
-                System.Collections.Generic.Stack<ushort> TestStack = new System.Collections.Generic.Stack<ushort>(TempStack);
-                System.Collections.Generic.List<SymbolToken> Inserted = new System.Collections.Generic.List<SymbolToken>();
+                Stack<ushort> TestStack = new Stack<ushort>(TempStack);
+                List<SymbolToken> Inserted = new List<SymbolToken>();
                 Inserted.Add(new SymbolTokenText(p_StateExpectedNames[p_CurrentState][i], p_StateExpectedIDs[p_CurrentState][i], string.Empty, p_Lexer.CurrentLine));
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
@@ -140,7 +142,7 @@
             return false;
         }
 
-        protected bool Analyse_Simulate(System.Collections.Generic.Stack<ushort> stack, ILexer lexer, System.Collections.Generic.List<SymbolToken> inserted)
+        protected bool Analyse_Simulate(Stack<ushort> stack, ILexer lexer, List<SymbolToken> inserted)
         {
             int InsertedIndex = 0;
             ushort CurrentState = stack.Peek();
@@ -193,9 +195,9 @@
             }
             return true;
         }
-        protected bool Analyse_Simulate(System.Collections.Generic.Stack<ushort> stack, ILexer lexer)
+        protected bool Analyse_Simulate(Stack<ushort> stack, ILexer lexer)
         {
-            return Analyse_Simulate(stack, lexer, new System.Collections.Generic.List<SymbolToken>());
+            return Analyse_Simulate(stack, lexer, new List<SymbolToken>());
         }
 
         protected bool Analyse_RunForToken(SymbolToken token)
