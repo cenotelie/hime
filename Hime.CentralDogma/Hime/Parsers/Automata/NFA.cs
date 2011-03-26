@@ -544,7 +544,7 @@
         /// Add a collection of items to the set if not already present
         /// </summary>
         /// <param name="items">The items to add</param>
-        public new void AddRange(System.Collections.Generic.ICollection<NFAState> items)
+        public new void AddRange(System.Collections.Generic.IEnumerable<NFAState> items)
         {
             foreach (NFAState item in items)
             {

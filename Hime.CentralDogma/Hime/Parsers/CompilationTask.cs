@@ -10,7 +10,8 @@ namespace Hime.Parsers
         LR1 = 2,
         LALR1 = 3,
         RNGLR1 = 4,
-        RNGLALR1 = 0
+        RNGLALR1 = 0,
+        LRA = 5
     }
 
     public sealed class CompilationTask

@@ -5,7 +5,7 @@
     /// </summary>
     class MethodLALR1 : CFParserGenerator
     {
-        public string Name { get { return "LALR1"; } }
+        public string Name { get { return "LALR(1)"; } }
 
         /// <summary>
         /// Construct the method
