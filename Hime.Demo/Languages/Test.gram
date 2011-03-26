@@ -2,13 +2,20 @@
 {
 	options
 	{
-		Axiom = "axiom";
+		Axiom = "e";
 	}
-	terminals {
-		COMMENT		-> '/*' (.* - (.* '*/' .*)) '*/' ;
-		TAB			-> '\t';
-	}
+	terminals { }
 	rules {
-		axiom -> COMMENT;
+		e0	-> 'x' ;
+		e0	-> e0 '.' 'x' ;
+		
+		e ->  '(' e ')'
+			| '(' t ')' e
+			| e0
+			;
+		
+		t ->  'x'
+			| t '.' 'x'
+			;
 	}
 }

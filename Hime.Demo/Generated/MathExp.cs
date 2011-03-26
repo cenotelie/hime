@@ -25,12 +25,12 @@
         private static ushort[][][] p_StaticTransitions = { p_StaticTransitions0, p_StaticTransitions1, p_StaticTransitions2, p_StaticTransitions3, p_StaticTransitions4, p_StaticTransitions5, p_StaticTransitions6, p_StaticTransitions7, p_StaticTransitions8, p_StaticTransitions9, p_StaticTransitionsA, p_StaticTransitionsB, p_StaticTransitionsC, p_StaticTransitionsD, p_StaticTransitionsE, p_StaticTransitionsF, p_StaticTransitions10, p_StaticTransitions11 };
         private static int[] p_StaticFinals = { -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 6, 7, 7, 6, 6, 6, 6 };
         protected override void setup() {
-            p_SymbolsSID = p_StaticSymbolsSID;
-            p_SymbolsName = p_StaticSymbolsName;
-            p_SymbolsSubGrammars = new System.Collections.Generic.Dictionary<ushort, MatchSubGrammar>();
-            p_Transitions = p_StaticTransitions;
-            p_Finals = p_StaticFinals;
-            p_SeparatorID = 0x7;
+            symbolsSID = p_StaticSymbolsSID;
+            symbolsName = p_StaticSymbolsName;
+            symbolsSubGrammars = new System.Collections.Generic.Dictionary<ushort, MatchSubGrammar>();
+            transitions = p_StaticTransitions;
+            finals = p_StaticFinals;
+            separatorID = 0x7;
         }
         public override Hime.Redist.Parsers.ILexer Clone() {
             return new MathExp_Lexer(this);
@@ -294,13 +294,13 @@
         }
         protected override void setup()
         {
-            p_NullVarsSPPF = p_StaticNullVarsSPPF;
-            p_NullChoicesSPPF = p_StaticNullChoicesSPPF;
-            p_Rules = p_StaticRules;
-            p_States = p_StaticStates;
-            p_AxiomID = 0xB;
-            p_AxiomNullSPPF = 0xB;
-            p_AxiomPrimeID = 0x12;
+            nullVarsSPPF = p_StaticNullVarsSPPF;
+            nullChoicesSPPF = p_StaticNullChoicesSPPF;
+            rules = p_StaticRules;
+            states = p_StaticStates;
+            axiomID = 0xB;
+            axiomNullSPPF = 0xB;
+            axiomPrimeID = 0x12;
         }
         static MathExp_Parser()
         {
