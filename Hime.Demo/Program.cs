@@ -21,7 +21,7 @@
 
         static void Main(string[] args)
         {
-            Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Test.gram" }, "Test", Hime.Parsers.ParsingMethod.RNGLALR1, "Analyser", null, "Test.cs", true, true);
+            Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Test.gram" }, "Test", Hime.Parsers.ParsingMethod.LRA, "Analyser", null, "Test.cs", true, true);
             Task.Execute();
             //Parse();
         }

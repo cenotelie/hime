@@ -5,12 +5,18 @@ namespace Hime.Parsers.CF.LR
     class DeciderGraph
     {
         private GLRSimulator simulator;
+        private Terminal lookahead;
         private List<Item> conflictuous;
         private List<DeciderState> states;
+
+        public Terminal Lookahead { get { return lookahead; } }
+        public ICollection<Item> Conflictuous { get { return conflictuous; } }
+        public ICollection<DeciderState> States { get { return states; } }
 
         public DeciderGraph(State set, Terminal lookahead, GLRSimulator simulator)
         {
             this.simulator = simulator;
+            this.lookahead = lookahead;
             states = new List<DeciderState>();
             conflictuous = new List<Item>();
             foreach (Conflict conflict in set.Conflicts)
@@ -29,6 +35,7 @@ namespace Hime.Parsers.CF.LR
             for (int i = 0; i != states.Count; i++)
             {
                 DeciderState current = states[i];
+                current.ID = i;
                 Dictionary<Terminal, DeciderState> dic = current.ComputeNexts(simulator);
                 foreach (Terminal terminal in dic.Keys)
                 {
@@ -51,9 +58,19 @@ namespace Hime.Parsers.CF.LR
 
 	class DeciderState
 	{
+        private int id;
         private Dictionary<Item, List<State>> choices;
         private Dictionary<Item, TerminalSet> decisions;
         private Dictionary<Terminal, DeciderState> transitions;
+
+        public int ID
+        {
+            get { return id; }
+            set { id = value; }
+        }
+        public Dictionary<Item, List<State>> Choices { get { return choices; } }
+        public Dictionary<Item, TerminalSet> Decisions { get { return decisions; } }
+        public Dictionary<Terminal, DeciderState> Transitions { get { return transitions; } }
 
         public void AddTransition(Terminal terminal, DeciderState state) { transitions.Add(terminal, state); }
 

@@ -21,26 +21,26 @@ namespace Hime.Kernel.Graphs
 
         public DOTSerializer(string name, string file)
         {
-            writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.ASCII);
+            writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
             writer.WriteLine("digraph " + name + " {");
         }
 
         public void WriteNode(string id)
         {
-            writer.WriteLine("    " + id + ";");
+            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(id) + "\"];");
         }
         public void WriteNode(string id, string label)
         {
-            writer.WriteLine("    " + id + " [label=\"" + SanitizeString(label) + "\"];");
+            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\"];");
         }
         public void WriteNode(string id, string label, DOTNodeShape shape)
         {
-            writer.WriteLine("    " + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
+            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
         }
 
         public void WriteEdge(string tail, string head, string label)
         {
-            writer.WriteLine("    " + tail + " -> " + head + " [label=\"" + label + "\"];");
+            writer.WriteLine("    _" + tail + " -> _" + head + " [label=\"" + label + "\"];");
         }
 
         public void Close()
