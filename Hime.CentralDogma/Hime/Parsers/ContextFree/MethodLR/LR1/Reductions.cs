@@ -2,16 +2,16 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class ItemSetReductionsLR1 : ItemSetReductions
+    class StateReductionsLR1 : StateReductions
     {
-        private List<ItemSetActionReduce> actionReductions;
+        private List<StateActionReduce> actionReductions;
 
-        public override ICollection<ItemSetActionReduce> Reductions
+        public override ICollection<StateActionReduce> Reductions
         {
             get
             {
-                List<ItemSetActionReduce> Result = new List<ItemSetActionReduce>();
-                foreach (ItemSetActionReduce action in actionReductions)
+                List<StateActionReduce> Result = new List<StateActionReduce>();
+                foreach (StateActionReduce action in actionReductions)
                     Result.Add(action);
                 return Result;
             }
@@ -21,18 +21,18 @@ namespace Hime.Parsers.CF.LR
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (ItemSetActionReduce Reduction in actionReductions)
+                foreach (StateActionReduce Reduction in actionReductions)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
         }
 
-        public ItemSetReductionsLR1() : base()
+        public StateReductionsLR1() : base()
         {
-            actionReductions = new List<ItemSetActionReduce>();
+            actionReductions = new List<StateActionReduce>();
         }
 
-        public override void Build(ItemSet Set)
+        public override void Build(State Set)
         {
             // Recutions dictionnary for the given set
             Dictionary<Terminal, ItemLR1> Reductions = new Dictionary<Terminal, ItemLR1>();
@@ -48,12 +48,12 @@ namespace Hime.Parsers.CF.LR
                 else // No conflict
                 {
                     Reductions.Add(Item.Lookahead, Item);
-                    actionReductions.Add(new ItemSetActionReduce(Item.Lookahead, Item.BaseRule));
+                    actionReductions.Add(new StateActionReduce(Item.Lookahead, Item.BaseRule));
                 }
             }
         }
 
-        public static void HandleConflict_ShiftReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, ItemSet Set, Terminal Lookahead)
+        public static void HandleConflict_ShiftReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, State Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)
@@ -74,7 +74,7 @@ namespace Hime.Parsers.CF.LR
             Conflicts.Add(Conflict);
         }
 
-        public static void HandleConflict_ReduceReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, ItemSet Set, Terminal Lookahead)
+        public static void HandleConflict_ReduceReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, State Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)

@@ -2,15 +2,15 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class ItemSetReductionsLR0 : ItemSetReductions
+    class StateReductionsLR0 : StateReductions
     {
-        private ItemSetActionReduce actionReduce;
+        private StateActionReduce actionReduce;
 
-        public override ICollection<ItemSetActionReduce> Reductions
+        public override ICollection<StateActionReduce> Reductions
         {
             get
             {
-                List<ItemSetActionReduce> Result = new List<ItemSetActionReduce>();
+                List<StateActionReduce> Result = new List<StateActionReduce>();
                 Result.Add(actionReduce);
                 return Result;
             }
@@ -26,9 +26,9 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        public ItemSetReductionsLR0() : base() { }
+        public StateReductionsLR0() : base() { }
 
-        public override void Build(ItemSet Set)
+        public override void Build(State Set)
         {
             Item Reduce = null;
             // Look for Reduce actions
@@ -54,7 +54,7 @@ namespace Hime.Parsers.CF.LR
                 }
                 else
                 {
-                    actionReduce = new ItemSetActionReduce(null, Item.BaseRule);
+                    actionReduce = new StateActionReduce(null, Item.BaseRule);
                     Reduce = Item;
                 }
             }

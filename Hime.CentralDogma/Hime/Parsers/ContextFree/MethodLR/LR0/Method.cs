@@ -15,7 +15,7 @@ namespace Hime.Parsers.CF.LR
             Graph Graph = ConstructGraph(Grammar, Reporter);
             // Output conflicts
             bool Error = false;
-            foreach (ItemSet Set in Graph.Sets)
+            foreach (State Set in Graph.Sets)
             {
                 foreach (Conflict Conflict in Set.Conflicts)
                 {
@@ -26,7 +26,7 @@ namespace Hime.Parsers.CF.LR
             Reporter.Info("LR(0)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LR(0)", "Done !");
             if (Error) return null;
-            return new LR1ParserData(this, Grammar, Graph);
+            return new ParserDataLR1(this, Grammar, Graph);
         }
 
 
@@ -35,9 +35,9 @@ namespace Hime.Parsers.CF.LR
             // Create the first set
             CFVariable AxiomVar = Grammar.GetVariable("_Axiom_");
             ItemLR0 AxiomItem = new ItemLR0(AxiomVar.Rules[0], 0);
-            ItemSetKernel AxiomKernel = new ItemSetKernel();
+            StateKernel AxiomKernel = new StateKernel();
             AxiomKernel.AddItem(AxiomItem);
-            ItemSet AxiomSet = AxiomKernel.GetClosure();
+            State AxiomSet = AxiomKernel.GetClosure();
             Graph Graph = new Graph();
             // Construct the graph
             Graph.Sets.Add(AxiomSet);
@@ -46,8 +46,8 @@ namespace Hime.Parsers.CF.LR
                 Graph.Sets[i].BuildGraph(Graph);
                 Graph.Sets[i].ID = i;
             }
-            foreach (ItemSet Set in Graph.Sets)
-                Set.BuildReductions(new ItemSetReductionsLR0());
+            foreach (State Set in Graph.Sets)
+                Set.BuildReductions(new StateReductionsLR0());
             return Graph;
         }
     }

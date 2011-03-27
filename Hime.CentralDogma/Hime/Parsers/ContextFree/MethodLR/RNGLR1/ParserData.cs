@@ -2,13 +2,13 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class RNGLR1ParserData : LRParserData
+    class ParserDataRNGLR1 : ParserDataLR
     {
         protected System.IO.StreamWriter stream;
         protected List<CFVariable> nullableVars;
         protected List<CFRuleDefinition> nullableChoices;
 
-        public RNGLR1ParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
+        public ParserDataRNGLR1(ParserGenerator generator, CFGrammar gram, Graph graph)
             : base(generator, gram, graph)
         {
             nullableVars = new List<CFVariable>();
@@ -149,7 +149,7 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine("        };");
         }
-        protected void Export_State(ItemSet State)
+        protected void Export_State(State State)
         {
             TerminalSet Terminals = State.Reductions.ExpectedTerminals;
             foreach (Symbol Symbol in State.Children.Keys)
@@ -237,7 +237,7 @@ namespace Hime.Parsers.CF.LR
             // Write reductions
             stream.Write("               new Reduction[" + State.Reductions.Reductions.Count + "] {");
             first = true;
-            foreach (ItemSetActionRNReduce Reduction in State.Reductions.Reductions)
+            foreach (StateActionRNReduce Reduction in State.Reductions.Reductions)
             {
                 if (!first) stream.Write(", ");
                 int index = 0;
@@ -255,7 +255,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.WriteLine("        private static State[] staticStates = {");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 stream.Write("            ");
                 if (!first) stream.Write(", ");

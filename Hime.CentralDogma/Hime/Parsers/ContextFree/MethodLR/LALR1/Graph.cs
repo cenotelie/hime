@@ -6,16 +6,16 @@ namespace Hime.Parsers.CF.LR
     {
         private Graph graphLR0;
         private Graph graphLALR1;
-        private Dictionary<ItemSetKernel, ItemSet> kernelsToLR0;
-        private Dictionary<ItemSet, ItemSetKernel> lR0ToKernels;
+        private Dictionary<StateKernel, State> kernelsToLR0;
+        private Dictionary<State, StateKernel> lR0ToKernels;
         private List<ItemLALR1> propagOrigins;
         private List<ItemLALR1> propagTargets;
 
         public KernelGraph(Graph GraphLR0)
         {
             graphLR0 = GraphLR0;
-            kernelsToLR0 = new Dictionary<ItemSetKernel, ItemSet>();
-            lR0ToKernels = new Dictionary<ItemSet, ItemSetKernel>();
+            kernelsToLR0 = new Dictionary<StateKernel, State>();
+            lR0ToKernels = new Dictionary<State, StateKernel>();
             propagOrigins = new List<ItemLALR1>();
             propagTargets = new List<ItemLALR1>();
         }
@@ -24,8 +24,8 @@ namespace Hime.Parsers.CF.LR
         {
             for (int i = 0; i != graphLR0.Sets.Count; i++)
             {
-                ItemSet SetLR0 = graphLR0.Sets[i];
-                ItemSetKernel KernelLALR1 = new ItemSetKernel();
+                State SetLR0 = graphLR0.Sets[i];
+                StateKernel KernelLALR1 = new StateKernel();
                 foreach (Item Item in SetLR0.Kernel.Items)
                 {
                     ItemLALR1 ItemLALR1 = new ItemLALR1(Item);
@@ -40,9 +40,9 @@ namespace Hime.Parsers.CF.LR
 
         private void BuildPropagationTable()
         {
-            foreach (ItemSetKernel KernelLALR1 in kernelsToLR0.Keys)
+            foreach (StateKernel KernelLALR1 in kernelsToLR0.Keys)
             {
-                ItemSet SetLR0 = kernelsToLR0[KernelLALR1];
+                State SetLR0 = kernelsToLR0[KernelLALR1];
                 // For each LALR(1) item in the kernel
                 // Only the kernel needs to be examined as the other items will be discovered and treated
                 // with the dummy closures
@@ -57,9 +57,9 @@ namespace Hime.Parsers.CF.LR
                     // Create the corresponding dummy item : [A -> alpha . beta, dummy]
                     // This item is used to detect lookahead propagation
                     ItemLR1 DummyItem = new ItemLR1(ItemLALR1.BaseRule, ItemLALR1.DotPosition, TerminalDummy.Instance);
-                    ItemSetKernel DummyKernel = new ItemSetKernel();
+                    StateKernel DummyKernel = new StateKernel();
                     DummyKernel.AddItem(DummyItem);
-                    ItemSet DummySet = DummyKernel.GetClosure();
+                    State DummySet = DummyKernel.GetClosure();
                     // For each item in the closure of the dummy item
                     foreach (ItemLR1 Item in DummySet.Items)
                     {
@@ -89,7 +89,7 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        private static Item GetEquivalentInSet(ItemSetKernel Kernel, Item Equivalent)
+        private static Item GetEquivalentInSet(StateKernel Kernel, Item Equivalent)
         {
             foreach (Item Potential in Kernel.Items)
                 if (Potential.Equals_Base(Equivalent))
@@ -120,23 +120,23 @@ namespace Hime.Parsers.CF.LR
         {
             // Build sets
             graphLALR1 = new Graph();
-            foreach (ItemSetKernel KernelLALR1 in kernelsToLR0.Keys)
+            foreach (StateKernel KernelLALR1 in kernelsToLR0.Keys)
                 graphLALR1.Add(KernelLALR1.GetClosure());
             // Link and build actions for each LALR(1) set
             for (int i = 0; i != graphLALR1.Sets.Count; i++)
             {
-                ItemSet SetLALR1 = graphLALR1.Sets[i];
-                ItemSet SetLR0 = graphLR0.Sets[i];
+                State SetLALR1 = graphLALR1.Sets[i];
+                State SetLR0 = graphLR0.Sets[i];
                 // Set ID
                 SetLALR1.ID = i;
                 // Link
                 foreach (Symbol Symbol in SetLR0.Children.Keys)
                 {
-                    ItemSet ChildLALR1 = graphLALR1.Sets[graphLR0.Sets.IndexOf(SetLR0.Children[Symbol])];
+                    State ChildLALR1 = graphLALR1.Sets[graphLR0.Sets.IndexOf(SetLR0.Children[Symbol])];
                     SetLALR1.Children.Add(Symbol, ChildLALR1);
                 }
                 // Build
-                SetLALR1.BuildReductions(new ItemSetReductionsLALR1());
+                SetLALR1.BuildReductions(new StateReductionsLALR1());
             }
         }
 

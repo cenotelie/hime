@@ -313,32 +313,75 @@ namespace Hime.Parsers
 
 
 
-    public sealed class TerminalSet : List<Terminal>
+    public sealed class TerminalSet : IList<Terminal>
     {
-        public TerminalSet() : base() { }
-        public TerminalSet(TerminalSet Copied) : base(Copied) { }
+        private SortedList<ushort, Terminal> content;
 
-        public new bool Add(Terminal item)
+        public TerminalSet()
         {
-            if (Contains(item))
+            content = new SortedList<ushort, Terminal>();
+        }
+        public TerminalSet(TerminalSet copied)
+        {
+            content = new SortedList<ushort, Terminal>(copied.content);
+        }
+
+        public bool Add(Terminal item)
+        {
+            if (content.ContainsKey(item.SID))
                 return false;
-            base.Add(item);
+            content.Add(item.SID, item);
             return true;
         }
 
-        public new bool AddRange(IEnumerable<Terminal> collection)
+        public bool AddRange(IEnumerable<Terminal> collection)
         {
             bool mod = false;
             foreach (Terminal item in collection)
             {
-                if (!Contains(item))
+                if (!content.ContainsKey(item.SID))
                 {
                     mod = true;
-                    base.Add(item);
+                    content.Add(item.SID, item);
                 }
             }
             return mod;
         }
+
+        public int IndexOf(Terminal item) { return content.IndexOfKey(item.SID); }
+        
+        public void Insert(int index, Terminal item) { throw new System.NotImplementedException(); }
+        
+        public void RemoveAt(int index) { content.RemoveAt(index); }
+
+        public Terminal this[int index]
+        {
+            get { return content.Values[index]; }
+            set { throw new System.NotImplementedException(); }
+        }
+
+        void ICollection<Terminal>.Add(Terminal item)
+        {
+            if (content.ContainsKey(item.SID))
+                return;
+            content.Add(item.SID, item);
+        }
+
+        public void Clear() { content.Clear(); }
+
+        public bool Contains(Terminal item) { return content.ContainsKey(item.SID); }
+
+        public void CopyTo(Terminal[] array, int arrayIndex) { throw new System.NotImplementedException(); }
+
+        public int Count { get { return content.Count; } }
+
+        public bool IsReadOnly {  get { return false; } }
+
+        public bool Remove(Terminal item) { return content.Remove(item.SID); }
+
+        public IEnumerator<Terminal> GetEnumerator() { return content.Values.GetEnumerator(); }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return content.Values.GetEnumerator(); }
 
         public override string ToString()
         {

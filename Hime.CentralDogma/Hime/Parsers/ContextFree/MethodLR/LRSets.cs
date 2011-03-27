@@ -2,14 +2,14 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class ItemSetKernel
+    class StateKernel
     {
         private List<Item> items;
 
         public int Size { get { return items.Count; } }
         public ICollection<Item> Items { get { return items; } }
 
-        public ItemSetKernel()
+        public StateKernel()
         {
             items = new List<Item>();
         }
@@ -21,17 +21,17 @@ namespace Hime.Parsers.CF.LR
         }
         public bool ContainsItem(Item Item) { return items.Contains(Item); }
 
-        public ItemSet GetClosure()
+        public State GetClosure()
         {
             // The set's items
             List<Item> Closure = new List<Item>(items);
             // Close the set
             for (int i = 0; i != Closure.Count; i++)
                 Closure[i].CloseTo(Closure);
-            return new ItemSet(this, Closure);
+            return new State(this, Closure);
         }
 
-        public bool Equals(ItemSetKernel Kernel)
+        public bool Equals(StateKernel Kernel)
         {
             if (items.Count != Kernel.items.Count)
                 return false;
@@ -44,40 +44,37 @@ namespace Hime.Parsers.CF.LR
         }
         public override bool Equals(object obj)
         {
-            if (obj is ItemSetKernel)
-                return Equals((ItemSetKernel)obj);
+            if (obj is StateKernel)
+                return Equals((StateKernel)obj);
             return false;
         }
         public override int GetHashCode() { return base.GetHashCode(); }
     }
 
 
-
-
-
-    interface ItemSetAction
+    interface StateAction
     {
         ItemAction ActionType { get; }
         Symbol OnSymbol { get; }
     }
     
-    class ItemSetActionShift : ItemSetAction
+    class StateActionShift : StateAction
     {
         private Symbol symbol;
-        private ItemSet childSet;
+        private State childSet;
 
         public ItemAction ActionType { get { return ItemAction.Shift; } }
         public Symbol OnSymbol { get { return symbol; } }
-        public ItemSet ChildSet { get { return childSet; } }
+        public State ChildSet { get { return childSet; } }
 
-        public ItemSetActionShift(Symbol Lookahead, ItemSet ChildSet)
+        public StateActionShift(Symbol Lookahead, State ChildSet)
         {
             symbol = Lookahead;
             childSet = ChildSet;
         }
     }
 
-    class ItemSetActionReduce : ItemSetAction
+    class StateActionReduce : StateAction
     {
         protected Terminal lookahead;
         protected CFRule toReduce;
@@ -87,61 +84,57 @@ namespace Hime.Parsers.CF.LR
         public Terminal Lookahead { get { return lookahead; } }
         public CFRule ToReduceRule { get { return toReduce; } }
 
-        public ItemSetActionReduce(Terminal Lookahead, CFRule ToReduce)
+        public StateActionReduce(Terminal Lookahead, CFRule ToReduce)
         {
             lookahead = Lookahead;
             toReduce = ToReduce;
         }
     }
 
-    
-
-
-    abstract class ItemSetReductions
+    abstract class StateReductions
     {
         protected List<Conflict> conflicts;
 
         public ICollection<Conflict> Conflicts { get { return conflicts; } }
 
-        public ItemSetReductions() { conflicts = new List<Conflict>(); }
+        public StateReductions() { conflicts = new List<Conflict>(); }
 
-        public abstract ICollection<ItemSetActionReduce> Reductions { get; }
+        public abstract ICollection<StateActionReduce> Reductions { get; }
         public abstract TerminalSet ExpectedTerminals { get; }
 
-        public abstract void Build(ItemSet Set);
+        public abstract void Build(State Set);
     }
-
     
-    class ItemSet
+    class State
     {
         protected int iD;
-        protected ItemSetKernel kernel;
+        protected StateKernel kernel;
         protected List<Item> items;
-        protected Dictionary<Symbol, ItemSet> children;
-        protected ItemSetReductions reductions;
+        protected Dictionary<Symbol, State> children;
+        protected StateReductions reductions;
         
         public int ID
         {
             get { return iD; }
             set { iD = value; }
         }
-        public ItemSetKernel Kernel { get { return kernel; } }
-        public ItemSetReductions Reductions { get { return reductions; } }
+        public StateKernel Kernel { get { return kernel; } }
+        public StateReductions Reductions { get { return reductions; } }
         public ICollection<Item> Items { get { return items; } }
-        public Dictionary<Symbol, ItemSet> Children { get { return children; } }
+        public Dictionary<Symbol, State> Children { get { return children; } }
         public ICollection<Conflict> Conflicts { get { return reductions.Conflicts; } }
         
-        public ItemSet(ItemSetKernel Kernel, List<Item> Items)
+        public State(StateKernel Kernel, List<Item> Items)
         {
             kernel = Kernel;
             items = Items;
-            children = new Dictionary<Symbol, ItemSet>();
+            children = new Dictionary<Symbol, State>();
         }
 
         public void BuildGraph(Graph Graph)
         {
             // Shift dictionnary for the current set
-            Dictionary<Symbol, ItemSetKernel> Shifts = new Dictionary<Symbol, ItemSetKernel>();
+            Dictionary<Symbol, StateKernel> Shifts = new Dictionary<Symbol, StateKernel>();
             // Build the children kernels from the shift actions
             foreach (Item Item in items)
             {
@@ -153,7 +146,7 @@ namespace Hime.Parsers.CF.LR
                     Shifts[Item.NextSymbol].AddItem(Item.GetChild());
                 else
                 {
-                    ItemSetKernel Kernel = new ItemSetKernel();
+                    StateKernel Kernel = new StateKernel();
                     Kernel.AddItem(Item.GetChild());
                     Shifts.Add(Item.NextSymbol, Kernel);
                 }
@@ -161,8 +154,8 @@ namespace Hime.Parsers.CF.LR
             // Close the children and add them to the graph
             foreach (Symbol Next in Shifts.Keys)
             {
-                ItemSetKernel Kernel = Shifts[Next];
-                ItemSet Child = Graph.ContainsSet(Kernel);
+                StateKernel Kernel = Shifts[Next];
+                State Child = Graph.ContainsSet(Kernel);
                 if (Child == null)
                 {
                     Child = Kernel.GetClosure();
@@ -171,21 +164,21 @@ namespace Hime.Parsers.CF.LR
                 children.Add(Next, Child);
             }
         }
-        public void BuildReductions(ItemSetReductions Reductions)
+        public void BuildReductions(StateReductions Reductions)
         {
             reductions = Reductions;
             reductions.Build(this);
         }
         
 
-        public bool Equals(ItemSet Set)
+        public bool Equals(State Set)
         {
             return (kernel.Equals(Set.kernel));
         }
         public override bool Equals(object obj)
         {
-            if (obj is ItemSet)
-                return Equals((ItemSet)obj);
+            if (obj is State)
+                return Equals((State)obj);
             return false;
         }
         public override int GetHashCode() { return base.GetHashCode(); }

@@ -31,8 +31,7 @@ namespace Hime.Parsers.CF.LR
         public System.Type MethodType { get { return methodType; } }
         public ConflictType ConflictType { get { return type; } }
         public Terminal ConflictSymbol { get { return lookahead; } }
-
-        public void AddItem(Item Item) { items.Add(Item); }
+        public ICollection<Item> Items { get { return items; } }
 
         public Conflict(System.Type MethodType, ConflictType Type, Terminal Lookahead)
         {
@@ -48,6 +47,7 @@ namespace Hime.Parsers.CF.LR
             items = new List<Item>();
         }
 
+        public void AddItem(Item Item) { items.Add(Item); }
         public bool ContainsItem(Item Item) { return items.Contains(Item); }
 
         public override string ToString()

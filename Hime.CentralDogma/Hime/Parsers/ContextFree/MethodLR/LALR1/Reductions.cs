@@ -2,28 +2,28 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class ItemSetReductionsLALR1 : ItemSetReductions
+    class StateReductionsLALR1 : StateReductions
     {
-        private List<ItemSetActionReduce> actionReductions;
+        private List<StateActionReduce> actionReductions;
 
-        public override ICollection<ItemSetActionReduce> Reductions { get { return actionReductions; } }
+        public override ICollection<StateActionReduce> Reductions { get { return actionReductions; } }
         public override TerminalSet ExpectedTerminals
         {
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (ItemSetActionReduce Reduction in actionReductions)
+                foreach (StateActionReduce Reduction in actionReductions)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
         }
 
-        public ItemSetReductionsLALR1() : base()
+        public StateReductionsLALR1() : base()
         {
-            actionReductions = new List<ItemSetActionReduce>();
+            actionReductions = new List<StateActionReduce>();
         }
 
-        public override void Build(ItemSet Set)
+        public override void Build(State Set)
         {
             // Recutions dictionnary for the given set
             Dictionary<Terminal, ItemLALR1> Reductions = new Dictionary<Terminal, ItemLALR1>();
@@ -36,14 +36,14 @@ namespace Hime.Parsers.CF.LR
                 {
                     // There is already a shift action for the lookahead => conflict
                     if (Set.Children.ContainsKey(Lookahead))
-                        ItemSetReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodLALR1), conflicts, Item, Set, Lookahead);
+                        StateReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodLALR1), conflicts, Item, Set, Lookahead);
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(Lookahead))
-                        ItemSetReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodLALR1), conflicts, Item, Reductions[Lookahead], Set, Lookahead);
+                        StateReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodLALR1), conflicts, Item, Reductions[Lookahead], Set, Lookahead);
                     else // No conflict
                     {
                         Reductions.Add(Lookahead, Item);
-                        actionReductions.Add(new ItemSetActionReduce(Lookahead, Item.BaseRule));
+                        actionReductions.Add(new StateActionReduce(Lookahead, Item.BaseRule));
                     }
                 }
             }

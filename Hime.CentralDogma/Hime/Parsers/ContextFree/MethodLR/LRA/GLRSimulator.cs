@@ -5,65 +5,65 @@ namespace Hime.Parsers.CF.LR
     class GLRSimulator
     {
         private Graph graph;
-        private Dictionary<ItemSet, Dictionary<Symbol, List<ItemSet>>> inverseGraph;
+        private Dictionary<State, Dictionary<Symbol, List<State>>> inverseGraph;
 
         public GLRSimulator(Graph graph)
         {
             this.graph = graph;
-            this.inverseGraph = new Dictionary<ItemSet, Dictionary<Symbol, List<ItemSet>>>();
+            this.inverseGraph = new Dictionary<State, Dictionary<Symbol, List<State>>>();
             BuildInverse();
         }
 
         private void BuildInverse()
         {
-            foreach (ItemSet set in graph.Sets)
+            foreach (State set in graph.Sets)
             {
                 foreach (Symbol symbol in set.Children.Keys)
                 {
-                    ItemSet child = set.Children[symbol];
+                    State child = set.Children[symbol];
                     if (!inverseGraph.ContainsKey(child))
-                        inverseGraph.Add(child, new Dictionary<Symbol, List<ItemSet>>());
-                    Dictionary<Symbol, List<ItemSet>> inverses = inverseGraph[child];
+                        inverseGraph.Add(child, new Dictionary<Symbol, List<State>>());
+                    Dictionary<Symbol, List<State>> inverses = inverseGraph[child];
                     if (!inverses.ContainsKey(symbol))
-                        inverses.Add(symbol, new List<ItemSet>());
-                    List<ItemSet> parents = inverses[symbol];
+                        inverses.Add(symbol, new List<State>());
+                    List<State> parents = inverses[symbol];
                     parents.Add(set);
                 }
             }
         }
 
-        public List<ItemSet> Simulate(List<ItemSet> sets, Terminal lookahead)
+        public List<State> Simulate(List<State> sets, Terminal lookahead)
         {
-            List<ItemSet> result = new List<ItemSet>();
-            foreach (ItemSet set in sets)
+            List<State> result = new List<State>();
+            foreach (State set in sets)
             {
-                List<ItemSet> temp = Simulate(set, lookahead);
-                foreach (ItemSet final in temp)
+                List<State> temp = Simulate(set, lookahead);
+                foreach (State final in temp)
                     if (!result.Contains(final))
                         result.Add(final);
             }
             return result;
         }
 
-        private List<ItemSet> Simulate(ItemSet set, Terminal lookahead)
+        public List<State> Simulate(State set, Terminal lookahead)
         {
             // Sets before reductions
-            List<ItemSet> before = new List<ItemSet>();
+            List<State> before = new List<State>();
             before.Add(set);
             // Reduce
             for (int i = 0; i != before.Count; i++)
             {
-                ItemSet current = before[i];
-                foreach (ItemSetActionReduce reduction in set.Reductions.Reductions)
+                State current = before[i];
+                foreach (StateActionReduce reduction in set.Reductions.Reductions)
                 {
                     if (reduction.Lookahead == lookahead)
                     {
-                        List<ItemSet> origins = GetOrigins(set, reduction.ToReduceRule.Definition.GetChoiceAtIndex(0));
-                        foreach (ItemSet origin in origins)
+                        List<State> origins = GetOrigins(set, reduction.ToReduceRule.Definition.GetChoiceAtIndex(0));
+                        foreach (State origin in origins)
                         {
                             if (origin.Children.ContainsKey(reduction.ToReduceRule.Variable))
                             {
-                                ItemSet next = origin.Children[reduction.ToReduceRule.Variable];
+                                State next = origin.Children[reduction.ToReduceRule.Variable];
                                 if (!before.Contains(next))
                                     before.Add(next);
                             }
@@ -72,8 +72,8 @@ namespace Hime.Parsers.CF.LR
                 }
             }
             // Shifts
-            List<ItemSet> result = new List<ItemSet>();
-            foreach (ItemSet s in before)
+            List<State> result = new List<State>();
+            foreach (State s in before)
             {
                 if (s.Children.ContainsKey(lookahead))
                     if (!result.Contains(s.Children[lookahead]))
@@ -82,18 +82,18 @@ namespace Hime.Parsers.CF.LR
             return result;
         }
 
-        private List<ItemSet> GetOrigins(ItemSet target, CFRuleDefinition definition)
+        private List<State> GetOrigins(State target, CFRuleDefinition definition)
         {
-            List<ItemSet> result = new List<ItemSet>();
+            List<State> result = new List<State>();
             result.Add(target);
             int index = definition.Length - 1;
             while (index != -1)
             {
                 Symbol symbol = definition.Parts[index].Symbol;
-                List<ItemSet> temp = new List<ItemSet>();
-                foreach (ItemSet next in result)
+                List<State> temp = new List<State>();
+                foreach (State next in result)
                 {
-                    foreach (ItemSet previous in inverseGraph[next][symbol])
+                    foreach (State previous in inverseGraph[next][symbol])
                     {
                         if (!temp.Contains(previous))
                             temp.Add(previous);

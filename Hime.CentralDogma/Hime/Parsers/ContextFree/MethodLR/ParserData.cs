@@ -2,7 +2,7 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    abstract class LRParserData : ParserData
+    abstract class ParserDataLR : ParserData
     {
         protected ParserGenerator generator;
         protected CFGrammar grammar;
@@ -12,7 +12,7 @@ namespace Hime.Parsers.CF.LR
         public Graph Graph { get { return graph; } }
         public ParserGenerator Generator { get { return generator; } }
 
-        public LRParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
+        public ParserDataLR(ParserGenerator generator, CFGrammar gram, Graph graph)
         {
             this.grammar = gram;
             this.graph = graph;
@@ -24,11 +24,11 @@ namespace Hime.Parsers.CF.LR
         public System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document)
         {
             System.Xml.XmlNode nodegraph = Document.CreateElement("LRGraph");
-            foreach (ItemSet set in graph.Sets)
+            foreach (State set in graph.Sets)
                 nodegraph.AppendChild(GetXMLData_Set(Document, set));
             return nodegraph;
         }
-        protected System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument Document, ItemSet Set)
+        protected System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument Document, State Set)
         {
             System.Xml.XmlNode root = Document.CreateElement("ItemSet");
             root.Attributes.Append(Document.CreateAttribute("SetID"));
@@ -37,7 +37,7 @@ namespace Hime.Parsers.CF.LR
                 root.AppendChild(GetXMLData_Item(Document, Set, item));
             return root;
         }
-        protected System.Xml.XmlNode GetXMLData_Item(System.Xml.XmlDocument Document, ItemSet Set, Item Item)
+        protected System.Xml.XmlNode GetXMLData_Item(System.Xml.XmlDocument Document, State Set, Item Item)
         {
             System.Xml.XmlNode root = Document.CreateElement("Item");
             root.Attributes.Append(Document.CreateAttribute("HeadName"));
@@ -78,7 +78,7 @@ namespace Hime.Parsers.CF.LR
             root.AppendChild(lookaheads);
             return root;
         }
-        protected ConflictType GetXMLData_ConflictType(ItemSet Set, Item Item)
+        protected ConflictType GetXMLData_ConflictType(State Set, Item Item)
         {
             foreach (Conflict conflict in Set.Conflicts)
                 if (conflict.ContainsItem(Item))
@@ -88,9 +88,9 @@ namespace Hime.Parsers.CF.LR
 
         public void SerializeVisual(Kernel.Graphs.DOTSerializer Serializer)
         {
-            foreach (ItemSet set in graph.Sets)
+            foreach (State set in graph.Sets)
                 Serializer.WriteNode(set.ID.ToString());
-            foreach (ItemSet set in graph.Sets)
+            foreach (State set in graph.Sets)
                 foreach (Symbol symbol in set.Children.Keys)
                     Serializer.WriteEdge(set.ID.ToString(), set.Children[symbol].ID.ToString(), symbol.LocalName);
         }

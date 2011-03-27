@@ -4,26 +4,26 @@ namespace Hime.Parsers.CF.LR
 {
     class Graph
     {
-        private List<ItemSet> sets;
+        private List<State> sets;
 
-        public List<ItemSet> Sets { get { return sets; } }
+        public List<State> Sets { get { return sets; } }
 
         public Graph()
         {
-            sets = new List<ItemSet>();
+            sets = new List<State>();
         }
 
-        public ItemSet ContainsSet(ItemSetKernel Kernel)
+        public State ContainsSet(StateKernel Kernel)
         {
-            foreach (ItemSet Potential in sets)
+            foreach (State Potential in sets)
                 if (Potential.Kernel.Equals(Kernel))
                     return Potential;
             return null;
         }
 
-        public ItemSet AddUnique(ItemSet Set)
+        public State AddUnique(State Set)
         {
-            foreach (ItemSet Potential in sets)
+            foreach (State Potential in sets)
             {
                 // If same kernel : return the set
                 if (Potential.Equals(Set))
@@ -33,7 +33,7 @@ namespace Hime.Parsers.CF.LR
             return Set;
         }
 
-        public void Add(ItemSet Set)
+        public void Add(State Set)
         {
             sets.Add(Set);
         }

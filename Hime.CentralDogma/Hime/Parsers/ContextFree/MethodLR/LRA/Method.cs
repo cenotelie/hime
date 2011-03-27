@@ -14,9 +14,9 @@ namespace Hime.Parsers.CF.LR
             Reporter.Info("LR(Automata)", "LR(Automata) data ...");
             Graph graph = MethodLALR1.ConstructGraph(Grammar, Reporter);
             ConflictAnalyser analyser = new ConflictAnalyser(graph);
-            Dictionary<ItemSet, DeciderGraph> deciders = new Dictionary<ItemSet, DeciderGraph>();
+            Dictionary<State, DeciderGraph> deciders = new Dictionary<State, DeciderGraph>();
             // Output conflicts
-            foreach (ItemSet Set in graph.Sets)
+            foreach (State Set in graph.Sets)
             {
                 foreach (Conflict Conflict in Set.Conflicts)
                 {
@@ -27,7 +27,7 @@ namespace Hime.Parsers.CF.LR
 
             Reporter.Info("LR(Automata)", graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LR(Automata)", "Done !");
-            return new RNGLR1ParserData(this, Grammar, graph);
+            return new ParserDataRNGLR1(this, Grammar, graph);
         }
     }
 }

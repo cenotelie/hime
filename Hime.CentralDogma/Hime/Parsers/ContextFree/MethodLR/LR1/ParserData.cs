@@ -2,11 +2,11 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class LR1ParserData : LRParserData
+    class ParserDataLR1 : ParserDataLR
     {
         protected System.IO.StreamWriter stream;
 
-        public LR1ParserData(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
+        public ParserDataLR1(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
 
 
         public override bool Export(GrammarBuildOptions Options)
@@ -24,7 +24,7 @@ namespace Hime.Parsers.CF.LR
             Export_RulesHeadID();
             Export_RulesName();
             Export_RulesParserLength();
-            foreach (ItemSet set in graph.Sets)
+            foreach (State set in graph.Sets)
             {
                 Export_State_Expected(set);
                 Export_State_Items(set);
@@ -178,7 +178,7 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_State_Expected(ItemSet State)
+        protected void Export_State_Expected(State State)
         {
             TerminalSet Terminals = State.Reductions.ExpectedTerminals;
             foreach (Symbol Symbol in State.Children.Keys)
@@ -207,7 +207,7 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_State_Items(ItemSet State)
+        protected void Export_State_Items(State State)
         {
             stream.Write("        private static string[] stateItems_" + State.ID.ToString("X") + " = { ");
             bool first = true;
@@ -219,7 +219,7 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_State_ShiftOnTerminals(ItemSet State)
+        protected void Export_State_ShiftOnTerminals(State State)
         {
             stream.Write("        private static ushort[][] stateShiftsOnTerminal_" + State.ID.ToString("X") + " = { ");
             bool first = true;
@@ -233,7 +233,7 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_State_ShiftOnVariables(ItemSet State)
+        protected void Export_State_ShiftOnVariables(State State)
         {
             stream.Write("        private static ushort[][] stateShiftsOnVariable_" + State.ID.ToString("X") + " = { ");
             bool first = true;
@@ -247,11 +247,11 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_State_ReducsOnTerminal(ItemSet State)
+        protected void Export_State_ReducsOnTerminal(State State)
         {
             stream.Write("        private static ushort[][] stateReducsOnTerminal_" + State.ID.ToString("X") + " = { ");
             bool first = true;
-            foreach (ItemSetActionReduce Reduction in State.Reductions.Reductions)
+            foreach (StateActionReduce Reduction in State.Reductions.Reductions)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("new ushort[2] { 0x" + Reduction.OnSymbol.SID.ToString("x") + ", 0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + " }");
@@ -263,7 +263,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static ushort[][] staticStateExpectedIDs = { ");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("stateExpectedIDs_" + State.ID.ToString("X"));
@@ -275,7 +275,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static string[][] staticStateExpectedNames = { ");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("stateExpectedNames_" + State.ID.ToString("X"));
@@ -287,7 +287,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static string[][] staticStateItems = { ");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("stateItems_" + State.ID.ToString("X"));
@@ -299,7 +299,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static ushort[][][] staticStateShiftsOnTerminal = { ");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("stateShiftsOnTerminal_" + State.ID.ToString("X"));
@@ -311,7 +311,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static ushort[][][] staticStateShiftsOnVariable = { ");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("stateShiftsOnVariable_" + State.ID.ToString("X"));
@@ -323,7 +323,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static ushort[][][] staticStateReducsOnTerminal = { ");
             bool first = true;
-            foreach (ItemSet State in graph.Sets)
+            foreach (State State in graph.Sets)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("stateReducsOnTerminal_" + State.ID.ToString("X"));
