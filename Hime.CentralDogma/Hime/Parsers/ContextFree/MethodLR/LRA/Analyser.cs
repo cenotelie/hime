@@ -11,10 +11,10 @@ namespace Hime.Parsers.CF.LR
             simulator = new GLRSimulator(graph);
         }
 
-        public DeciderGraph Analyse(State lrset, Conflict conflict)
+        public DeciderGraph Analyse(State lrset, Terminal lookahead)
         {
-            DeciderGraph graph = new DeciderGraph(lrset, conflict);
-            graph.Build(simulator);
+            DeciderGraph graph = new DeciderGraph(lrset, lookahead, simulator);
+            graph.Build();
             return graph;
         }
     }

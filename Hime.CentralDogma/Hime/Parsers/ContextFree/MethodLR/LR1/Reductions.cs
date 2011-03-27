@@ -4,33 +4,18 @@ namespace Hime.Parsers.CF.LR
 {
     class StateReductionsLR1 : StateReductions
     {
-        private List<StateActionReduce> actionReductions;
-
-        public override ICollection<StateActionReduce> Reductions
-        {
-            get
-            {
-                List<StateActionReduce> Result = new List<StateActionReduce>();
-                foreach (StateActionReduce action in actionReductions)
-                    Result.Add(action);
-                return Result;
-            }
-        }
         public override TerminalSet ExpectedTerminals
         {
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (StateActionReduce Reduction in actionReductions)
+                foreach (StateActionReduce Reduction in this)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
         }
 
-        public StateReductionsLR1() : base()
-        {
-            actionReductions = new List<StateActionReduce>();
-        }
+        public StateReductionsLR1() : base() { }
 
         public override void Build(State Set)
         {
@@ -48,7 +33,7 @@ namespace Hime.Parsers.CF.LR
                 else // No conflict
                 {
                     Reductions.Add(Item.Lookahead, Item);
-                    actionReductions.Add(new StateActionReduce(Item.Lookahead, Item.BaseRule));
+                    this.Add(new StateActionReduce(Item.Lookahead, Item.BaseRule));
                 }
             }
         }

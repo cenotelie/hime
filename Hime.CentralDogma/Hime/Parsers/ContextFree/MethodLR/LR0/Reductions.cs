@@ -4,24 +4,13 @@ namespace Hime.Parsers.CF.LR
 {
     class StateReductionsLR0 : StateReductions
     {
-        private StateActionReduce actionReduce;
-
-        public override ICollection<StateActionReduce> Reductions
-        {
-            get
-            {
-                List<StateActionReduce> Result = new List<StateActionReduce>();
-                Result.Add(actionReduce);
-                return Result;
-            }
-        }
         public override TerminalSet ExpectedTerminals
         {
             get
             {
                 TerminalSet Set = new TerminalSet();
-                if (actionReduce != null)
-                    Set.Add(actionReduce.Lookahead);
+                if (this.Count != 0)
+                    Set.Add(this[0].Lookahead);
                 return Set;
             }
         }
@@ -54,7 +43,7 @@ namespace Hime.Parsers.CF.LR
                 }
                 else
                 {
-                    actionReduce = new StateActionReduce(null, Item.BaseRule);
+                    this.Add(new StateActionReduce(null, Item.BaseRule));
                     Reduce = Item;
                 }
             }

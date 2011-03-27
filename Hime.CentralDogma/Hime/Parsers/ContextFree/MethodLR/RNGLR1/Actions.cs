@@ -4,33 +4,18 @@ namespace Hime.Parsers.CF.LR
 {
     class StateReductionsRNGLR1 : StateReductions
     {
-        private List<StateActionRNReduce> actionReductions;
-
-        public override ICollection<StateActionReduce> Reductions
-        {
-            get
-            {
-                List<StateActionReduce> Temp = new List<StateActionReduce>();
-                foreach (StateActionRNReduce action in actionReductions)
-                    Temp.Add(action);
-                return Temp;
-            }
-        }
         public override TerminalSet ExpectedTerminals
         {
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (StateActionReduce Reduction in actionReductions)
+                foreach (StateActionReduce Reduction in this)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
         }
 
-        public StateReductionsRNGLR1()
-        {
-            actionReductions = new List<StateActionRNReduce>();
-        }
+        public StateReductionsRNGLR1() { }
 
         public override void Build(State Set)
         {
@@ -55,14 +40,14 @@ namespace Hime.Parsers.CF.LR
                 {
                     StateReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodRNGLR1), conflicts, Item, Set, Item.Lookahead);
                     StateActionRNReduce Reduction = new StateActionRNReduce(Item.Lookahead, Item.BaseRule, Item.DotPosition);
-                    actionReductions.Add(Reduction);
+                    this.Add(Reduction);
                 }
                 // There is already a reduction action for the lookahead => conflict
                 else if (Reductions.ContainsKey(Item.Lookahead))
                 {
                     StateReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodRNGLR1), conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
                     StateActionRNReduce Reduction = new StateActionRNReduce(Item.Lookahead, Item.BaseRule, Item.DotPosition);
-                    actionReductions.Add(Reduction);
+                    this.Add(Reduction);
                 }
                 else // No conflict
                 {
@@ -70,7 +55,7 @@ namespace Hime.Parsers.CF.LR
                     if (!rightnulled)
                         Reductions.Add(Item.Lookahead, Item);
                     StateActionRNReduce Reduction = new StateActionRNReduce(Item.Lookahead, Item.BaseRule, Item.DotPosition);
-                    actionReductions.Add(Reduction);
+                    this.Add(Reduction);
                 }
             }
         }

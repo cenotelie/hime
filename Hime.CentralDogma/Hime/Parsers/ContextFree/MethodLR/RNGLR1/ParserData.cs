@@ -235,9 +235,9 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine("},");
             // Write reductions
-            stream.Write("               new Reduction[" + State.Reductions.Reductions.Count + "] {");
+            stream.Write("               new Reduction[" + State.Reductions.Count + "] {");
             first = true;
-            foreach (StateActionRNReduce Reduction in State.Reductions.Reductions)
+            foreach (StateActionRNReduce Reduction in State.Reductions)
             {
                 if (!first) stream.Write(", ");
                 int index = 0;

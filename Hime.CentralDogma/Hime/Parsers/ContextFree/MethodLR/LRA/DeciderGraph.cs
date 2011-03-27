@@ -4,15 +4,27 @@ namespace Hime.Parsers.CF.LR
 {
     class DeciderGraph
     {
+        private GLRSimulator simulator;
+        private List<Item> conflictuous;
         private List<DeciderState> states;
 
-        public DeciderGraph(State set, Conflict conflict)
+        public DeciderGraph(State set, Terminal lookahead, GLRSimulator simulator)
         {
+            this.simulator = simulator;
             states = new List<DeciderState>();
-            
+            conflictuous = new List<Item>();
+            foreach (Conflict conflict in set.Conflicts)
+                if (conflict.ConflictSymbol == lookahead)
+                    foreach (Item item in conflict.Items)
+                        if (!conflictuous.Contains(item))
+                            conflictuous.Add(item);
+            Dictionary<Item, List<State>> init = new Dictionary<Item, List<State>>();
+            foreach (Item item in conflictuous)
+                init.Add(item, simulator.Simulate(set, item, lookahead));
+            states.Add(new DeciderState(init));
         }
 
-        public void Build(GLRSimulator simulator)
+        public void Build()
         {
             for (int i = 0; i != states.Count; i++)
             {
@@ -39,25 +51,31 @@ namespace Hime.Parsers.CF.LR
 
 	class DeciderState
 	{
-        private List<List<State>> choices;
-        private List<TerminalSet> decisions;
+        private Dictionary<Item, List<State>> choices;
+        private Dictionary<Item, TerminalSet> decisions;
         private Dictionary<Terminal, DeciderState> transitions;
 
         public void AddTransition(Terminal terminal, DeciderState state) { transitions.Add(terminal, state); }
 
-        public DeciderState(State set, Conflict conflict)
+        public DeciderState(Dictionary<Item, List<State>> init)
         {
-            choices = new List<List<State>>();
-            decisions = new List<TerminalSet>();
+            choices = init;
+            decisions = new Dictionary<Item, TerminalSet>();
             transitions = new Dictionary<Terminal, DeciderState>();
-
         }
 
         private DeciderState()
         {
-            choices = new List<List<State>>();
-            decisions = new List<TerminalSet>();
+            choices = new Dictionary<Item, List<State>>();
+            decisions = new Dictionary<Item, TerminalSet>();
             transitions = new Dictionary<Terminal, DeciderState>();
+        }
+
+        private void AddDecision(Item item, Terminal t)
+        {
+            if (!decisions.ContainsKey(item))
+                decisions.Add(item, new TerminalSet());
+            decisions[item].Add(t);
         }
 
         public Dictionary<Terminal, DeciderState> ComputeNexts(GLRSimulator simulator)
@@ -72,23 +90,31 @@ namespace Hime.Parsers.CF.LR
         private DeciderState ComputeNext(GLRSimulator simulator, Terminal lookahead)
         {
             DeciderState next = new DeciderState();
-            foreach (List<State> choice in this.choices)
-                next.choices.Add(simulator.Simulate(choice, lookahead));
+            foreach (Item item in choices.Keys)
+                next.choices.Add(item, simulator.Simulate(choices[item], lookahead));
             return next;
         }
 
         private TerminalSet ComputeFollowers()
         {
-            List<TerminalSet> followers = new List<TerminalSet>();
-            foreach (List<State> choice in choices)
-                followers.Add(ComputeFollowers(choice));
+            Dictionary<Item, TerminalSet> followers = new Dictionary<Item, TerminalSet>();
+            foreach (Item item in choices.Keys)
+                followers.Add(item, ComputeFollowers(choices[item]));
             TerminalSet common = new TerminalSet();
-            foreach (Terminal t in followers[0])
+            Item firstKey = null;
+            foreach (Item item in followers.Keys)
+            {
+                firstKey = item;
+                break;
+            }
+            foreach (Terminal t in followers[firstKey])
             {
                 bool iscommon = true;
-                for (int i = 1; i != followers.Count; i++)
+                foreach (Item item in followers.Keys)
                 {
-                    if (!followers[i].Contains(t))
+                    if (item == firstKey)
+                        continue;
+                    if (!followers[item].Contains(t))
                     {
                         iscommon = false;
                         break;
@@ -97,14 +123,16 @@ namespace Hime.Parsers.CF.LR
                 if (iscommon)
                     common.Add(t);
                 else
-                    decisions[0].Add(t);
+                    AddDecision(firstKey, t);
             }
 
-            for (int i = 1; i != followers.Count; i++)
+            foreach (Item item in followers.Keys)
             {
-                foreach (Terminal t in followers[i])
+                if (item == firstKey)
+                    continue;
+                foreach (Terminal t in followers[item])
                     if (!common.Contains(t))
-                        decisions[i].Add(t);
+                        AddDecision(item, t);
             }
             return common;
         }
@@ -129,22 +157,17 @@ namespace Hime.Parsers.CF.LR
             DeciderState right = (DeciderState)obj;
             if (this.choices.Count != right.choices.Count)
                 return false;
-            for (int i = 0; i != this.choices.Count; i++)
+            foreach (Item key in this.choices.Keys)
             {
-                List<State> l1 = this.choices[i];
-                List<State> l2 = right.choices[i];
+                if (!right.choices.ContainsKey(key))
+                    return false;
+                List<State> l1 = this.choices[key];
+                List<State> l2 = right.choices[key];
                 if (l1.Count != l2.Count)
                     return false;
                 foreach (State set in l1)
                     if (!l2.Contains(set))
                         return false;
-                /*TerminalSet s1 = this.decisions[i];
-                TerminalSet s2 = right.decisions[i];
-                if (s1.Count != s2.Count)
-                    return false;
-                foreach (Terminal t in s1)
-                    if (!s2.Contains(t))
-                        return false;*/
             }
             return true;
         }

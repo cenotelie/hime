@@ -251,7 +251,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static ushort[][] stateReducsOnTerminal_" + State.ID.ToString("X") + " = { ");
             bool first = true;
-            foreach (StateActionReduce Reduction in State.Reductions.Reductions)
+            foreach (StateActionReduce Reduction in State.Reductions)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("new ushort[2] { 0x" + Reduction.OnSymbol.SID.ToString("x") + ", 0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + " }");

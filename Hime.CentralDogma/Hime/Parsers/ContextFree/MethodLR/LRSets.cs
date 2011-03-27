@@ -91,17 +91,14 @@ namespace Hime.Parsers.CF.LR
         }
     }
 
-    abstract class StateReductions
+    abstract class StateReductions : List<StateActionReduce>
     {
         protected List<Conflict> conflicts;
-
         public ICollection<Conflict> Conflicts { get { return conflicts; } }
 
         public StateReductions() { conflicts = new List<Conflict>(); }
 
-        public abstract ICollection<StateActionReduce> Reductions { get; }
         public abstract TerminalSet ExpectedTerminals { get; }
-
         public abstract void Build(State Set);
     }
     

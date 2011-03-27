@@ -45,20 +45,20 @@ namespace Hime.Parsers.CF.LR
             return result;
         }
 
-        public List<State> Simulate(State set, Terminal lookahead)
+        public List<State> Simulate(State state, Terminal lookahead)
         {
             // Sets before reductions
             List<State> before = new List<State>();
-            before.Add(set);
+            before.Add(state);
             // Reduce
             for (int i = 0; i != before.Count; i++)
             {
                 State current = before[i];
-                foreach (StateActionReduce reduction in set.Reductions.Reductions)
+                foreach (StateActionReduce reduction in current.Reductions)
                 {
                     if (reduction.Lookahead == lookahead)
                     {
-                        List<State> origins = GetOrigins(set, reduction.ToReduceRule.Definition.GetChoiceAtIndex(0));
+                        List<State> origins = GetOrigins(current, reduction.ToReduceRule.Definition.GetChoiceAtIndex(0));
                         foreach (State origin in origins)
                         {
                             if (origin.Children.ContainsKey(reduction.ToReduceRule.Variable))
@@ -82,6 +82,58 @@ namespace Hime.Parsers.CF.LR
             return result;
         }
 
+        public List<State> Simulate(State state, Item item, Terminal lookahead)
+        {
+            List<State> result = new List<State>();
+            if (item.Action == ItemAction.Shift)
+            {
+                result.Add(state.Children[item.NextSymbol]);
+                return result;
+            }
+            
+            List<State> before = new List<State>();
+            // First reduction
+            List<State> origins = GetOrigins(state, item.BaseRule.Definition.GetChoiceAtIndex(0));
+            foreach (State origin in origins)
+            {
+                if (origin.Children.ContainsKey(item.BaseRule.Variable))
+                {
+                    State next = origin.Children[item.BaseRule.Variable];
+                    if (!before.Contains(next))
+                        before.Add(next);
+                }
+            }
+            // Reduce
+            for (int i = 0; i != before.Count; i++)
+            {
+                State current = before[i];
+                foreach (StateActionReduce reduction in current.Reductions)
+                {
+                    if (reduction.Lookahead == lookahead)
+                    {
+                        origins = GetOrigins(current, reduction.ToReduceRule.Definition.GetChoiceAtIndex(0));
+                        foreach (State origin in origins)
+                        {
+                            if (origin.Children.ContainsKey(reduction.ToReduceRule.Variable))
+                            {
+                                State next = origin.Children[reduction.ToReduceRule.Variable];
+                                if (!before.Contains(next))
+                                    before.Add(next);
+                            }
+                        }
+                    }
+                }
+            }
+            // Shifts
+            foreach (State s in before)
+            {
+                if (s.Children.ContainsKey(lookahead))
+                    if (!result.Contains(s.Children[lookahead]))
+                        result.Add(s.Children[lookahead]);
+            }
+            return result;
+        }
+
         private List<State> GetOrigins(State target, CFRuleDefinition definition)
         {
             List<State> result = new List<State>();
@@ -93,13 +145,19 @@ namespace Hime.Parsers.CF.LR
                 List<State> temp = new List<State>();
                 foreach (State next in result)
                 {
-                    foreach (State previous in inverseGraph[next][symbol])
+                    if (!inverseGraph.ContainsKey(next))
+                        continue;
+                    Dictionary<Symbol, List<State>> inverses = inverseGraph[next];
+                    if (!inverses.ContainsKey(symbol))
+                        continue;
+                    foreach (State previous in inverses[symbol])
                     {
                         if (!temp.Contains(previous))
                             temp.Add(previous);
                     }
                 }
                 result = temp;
+                index--;
             }
             return result;
         }

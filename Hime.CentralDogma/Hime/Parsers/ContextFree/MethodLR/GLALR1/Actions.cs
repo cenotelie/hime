@@ -4,24 +4,18 @@ namespace Hime.Parsers.CF.LR
 {
     class StateReductionsGLALR1 : StateReductions
     {
-        private List<StateActionReduce> actionReductions;
-
-        public override ICollection<StateActionReduce> Reductions { get { return actionReductions; } }
         public override TerminalSet ExpectedTerminals
         {
             get
             {
                 TerminalSet Set = new TerminalSet();
-                foreach (StateActionReduce Reduction in actionReductions)
+                foreach (StateActionReduce Reduction in this)
                     Set.Add(Reduction.Lookahead);
                 return Set;
             }
         }
 
-        public StateReductionsGLALR1() : base()
-        {
-            actionReductions = new List<StateActionReduce>();
-        }
+        public StateReductionsGLALR1() : base() { }
 
         public override void Build(State Set)
         {
@@ -46,21 +40,21 @@ namespace Hime.Parsers.CF.LR
                     {
                         StateReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodGLALR1), conflicts, Item, Set, Lookahead);
                         StateActionReduce Reduction = new StateActionReduce(Lookahead, Item.BaseRule);
-                        actionReductions.Add(Reduction);
+                        this.Add(Reduction);
                     }
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(Lookahead))
                     {
                         StateReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodGLALR1), conflicts, Item, Reductions[Lookahead], Set, Lookahead);
                         StateActionReduce Reduction = new StateActionReduce(Lookahead, Item.BaseRule);
-                        actionReductions.Add(Reduction);
+                        this.Add(Reduction);
                     }
                     // No conflict
                     else
                     {
                         Reductions.Add(Lookahead, Item);
                         StateActionReduce Reduction = new StateActionReduce(Lookahead, Item.BaseRule);
-                        actionReductions.Add(Reduction);
+                        this.Add(Reduction);
                     }
                 }
             }

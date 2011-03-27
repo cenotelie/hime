@@ -160,6 +160,8 @@ namespace Hime.Parsers
                     return new Hime.Parsers.CF.LR.MethodLR1();
                 case ParsingMethod.LALR1:
                     return new Hime.Parsers.CF.LR.MethodLALR1();
+                case ParsingMethod.LRA:
+                    return new Hime.Parsers.CF.LR.MethodLRA();
                 case ParsingMethod.RNGLR1:
                     return new Hime.Parsers.CF.LR.MethodRNGLR1();
                 case ParsingMethod.RNGLALR1:
