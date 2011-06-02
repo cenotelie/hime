@@ -2,7 +2,7 @@
 {
     public class Program
     {        
-        static void Parse()
+        static void Parse_MathExp()
         {
             Interpreter interpreter = new Interpreter();
             Analyser.MathExp_Lexer Lex = new Analyser.MathExp_Lexer("5 + 6");
@@ -19,11 +19,26 @@
             }
         }
 
+        static void Parse_Test()
+        {
+            Analyser.Test_Lexer Lex = new Analyser.Test_Lexer("(x.x)x.x");
+            Analyser.Test_Parser Parser = new Analyser.Test_Parser(Lex);
+            Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+
+            foreach (Hime.Redist.Parsers.LexerError LexerError in Lex.Errors) System.Console.WriteLine(LexerError.ToString());
+            foreach (Hime.Redist.Parsers.ParserError ParserError in Parser.Errors) System.Console.WriteLine(ParserError.ToString());
+            if (Root != null)
+            {
+                LangTest.WinTreeView Win = new LangTest.WinTreeView(Root);
+                Win.ShowDialog();
+            }
+        }
+
         static void Main(string[] args)
         {
-            //Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\MathExp.gram" }, "MathExp", Hime.Parsers.ParsingMethod.LR1, "Analyser", null, "MathExp.cs", true, true);
+            //Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Test.gram" }, "Test", Hime.Parsers.ParsingMethod.LRA, "Analyser", null, "Test.cs", true, true);
             //Task.Execute();
-            Parse();
+            Parse_Test();
         }
 
         class Interpreter : Analyser.MathExp_Parser.Actions
