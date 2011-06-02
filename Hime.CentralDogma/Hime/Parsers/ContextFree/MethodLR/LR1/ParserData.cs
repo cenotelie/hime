@@ -21,23 +21,7 @@ namespace Hime.Parsers.CF.LR
             foreach (CFRule rule in grammar.Rules)
                 Export_Production(rule);
             Export_Rules();
-            Export_RulesHeadID();
-            Export_RulesName();
-            Export_RulesParserLength();
-            foreach (State set in graph.Sets)
-            {
-                Export_State_Expected(set);
-                Export_State_Items(set);
-                Export_State_ShiftOnTerminals(set);
-                Export_State_ShiftOnVariables(set);
-                Export_State_ReducsOnTerminal(set);
-            }
-            Export_StateExpectedIDs();
-            Export_StateExpectedNames();
-            Export_StateItems();
-            Export_StateShiftsOnTerminal();
-            Export_StateShiftsOnVariable();
-            Export_StateReducsOnTerminal();
+            Export_States();
             Export_Actions();
             Export_Setup();
             Export_Constructor();
@@ -49,16 +33,7 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine("        protected override void setup()");
             stream.WriteLine("        {");
             stream.WriteLine("            rules = staticRules;");
-            stream.WriteLine("            rulesHeadID = staticRulesHeadID;");
-            stream.WriteLine("            rulesHeadName = staticRulesHeadName;");
-            stream.WriteLine("            rulesParserLength = staticRulesParserLength;");
-
-            stream.WriteLine("            stateExpectedIDs = staticStateExpectedIDs;");
-            stream.WriteLine("            stateExpectedNames = staticStateExpectedNames;");
-            stream.WriteLine("            stateItems = staticStateItems;");
-            stream.WriteLine("            stateShiftsOnTerminal = staticStateShiftsOnTerminal;");
-            stream.WriteLine("            stateShiftsOnVariable = staticStateShiftsOnVariable;");
-            stream.WriteLine("            stateReducsOnTerminal = staticStateReducsOnTerminal;");
+            stream.WriteLine("            states = staticStates;");
             stream.WriteLine("            errorSimulationLength = 3;");
             stream.WriteLine("        }");
         }
@@ -67,7 +42,7 @@ namespace Hime.Parsers.CF.LR
             if (grammar.Actions.GetEnumerator().MoveNext())
             {
                 stream.WriteLine("        private Actions actions;");
-                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { actions = actions; }");
+                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
             }
             else
             {
@@ -132,53 +107,20 @@ namespace Hime.Parsers.CF.LR
         }
         protected void Export_Rules()
         {
-            stream.Write("        private static Production[] staticRules = { ");
+            stream.WriteLine("        private static Rule[] staticRules = {");
             bool first = true;
             foreach (CFRule Rule in grammar.Rules)
             {
+                stream.Write("           ");
                 if (!first) stream.Write(", ");
-                stream.Write("Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X"));
+                string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
+                string head = "new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")";
+                stream.WriteLine("new Rule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAtIndex(0).Length + ")");
                 first = false;
             }
-            stream.WriteLine(" };");
+            stream.WriteLine("        };");
         }
-        protected void Export_RulesHeadID()
-        {
-            stream.Write("        private static ushort[] staticRulesHeadID = { ");
-            bool first = true;
-            foreach (CFRule Rule in grammar.Rules)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + Rule.Variable.SID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_RulesName()
-        {
-            stream.Write("        private static string[] staticRulesHeadName = { ");
-            bool first = true;
-            foreach (CFRule Rule in grammar.Rules)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("\"" + Rule.Variable.LocalName + "\"");
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_RulesParserLength()
-        {
-            stream.Write("        private static ushort[] staticRulesParserLength = { ");
-            bool first = true;
-            foreach (CFRule Rule in grammar.Rules)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + Rule.Definition.GetChoiceAtIndex(0).Length.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_State_Expected(State State)
+        protected void Export_State(State State)
         {
             TerminalSet Terminals = State.Reductions.ExpectedTerminals;
             foreach (Symbol Symbol in State.Children.Keys)
@@ -186,150 +128,106 @@ namespace Hime.Parsers.CF.LR
                 if (Symbol is Terminal)
                     Terminals.Add((Terminal)Symbol);
             }
-
-            stream.Write("        private static ushort[] stateExpectedIDs_" + State.ID.ToString("X") + " = { ");
-            bool first = true;
-            foreach (Terminal Terminal in Terminals)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + Terminal.SID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-
-            stream.Write("        private static string[] stateExpectedNames_" + State.ID.ToString("X") + " = { ");
-            first = true;
-            foreach (Terminal Terminal in Terminals)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("\"" + Terminal.LocalName + "\"");
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_State_Items(State State)
-        {
-            stream.Write("        private static string[] stateItems_" + State.ID.ToString("X") + " = { ");
+            stream.WriteLine("new State(");
+            // Write items
+            stream.Write("               new string[" + State.Items.Count + "] {");
             bool first = true;
             foreach (Item item in State.Items)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("\"" + item.ToString() + "\"");
+                stream.Write("\"" + item.ToString(true) + "\"");
                 first = false;
             }
-            stream.WriteLine(" };");
-        }
-        protected void Export_State_ShiftOnTerminals(State State)
-        {
-            stream.Write("        private static ushort[][] stateShiftsOnTerminal_" + State.ID.ToString("X") + " = { ");
-            bool first = true;
+            stream.WriteLine("},");
+            // Write terminals
+            stream.Write("               new Terminal[" + Terminals.Count + "] {");
+            first = true;
+            foreach (Terminal terminal in Terminals)
+            {
+                if (!first) stream.Write(", ");
+                stream.Write("new Terminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
+                first = false;
+            }
+            stream.WriteLine("},");
+
+            int ShitTerminalCount = 0;
+            foreach (Symbol Symbol in State.Children.Keys)
+            {
+                if (!(Symbol is Terminal))
+                    continue;
+                ShitTerminalCount++;
+            }
+
+            // Write shifts on terminal
+            stream.Write("               new ushort[" + ShitTerminalCount + "] {");
+            first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
                 if (!first) stream.Write(", ");
-                stream.Write("new ushort[2] { 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
+                stream.Write("0x" + Symbol.SID.ToString("x"));
                 first = false;
             }
-            stream.WriteLine(" };");
-        }
-        protected void Export_State_ShiftOnVariables(State State)
-        {
-            stream.Write("        private static ushort[][] stateShiftsOnVariable_" + State.ID.ToString("X") + " = { ");
-            bool first = true;
+            stream.WriteLine("},");
+            stream.Write("               new ushort[" + ShitTerminalCount + "] {");
+            first = true;
+            foreach (Symbol Symbol in State.Children.Keys)
+            {
+                if (!(Symbol is Terminal))
+                    continue;
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                first = false;
+            }
+            stream.WriteLine("},");
+
+            // Write shifts on variable
+            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            first = true;
             foreach (Symbol Symbol in State.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
                 if (!first) stream.Write(", ");
-                stream.Write("new ushort[2] { 0x" + Symbol.SID.ToString("x") + ", 0x" + State.Children[Symbol].ID.ToString("X") + " }");
+                stream.Write("0x" + Symbol.SID.ToString("x"));
                 first = false;
             }
-            stream.WriteLine(" };");
-        }
-        protected void Export_State_ReducsOnTerminal(State State)
-        {
-            stream.Write("        private static ushort[][] stateReducsOnTerminal_" + State.ID.ToString("X") + " = { ");
-            bool first = true;
+            stream.WriteLine("},");
+            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            first = true;
+            foreach (Symbol Symbol in State.Children.Keys)
+            {
+                if (!(Symbol is Variable))
+                    continue;
+                if (!first) stream.Write(", ");
+                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                first = false;
+            }
+            stream.WriteLine("},");
+            // Write reductions
+            stream.Write("               new Reduction[" + State.Reductions.Count + "] {");
+            first = true;
             foreach (StateActionReduce Reduction in State.Reductions)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("new ushort[2] { 0x" + Reduction.OnSymbol.SID.ToString("x") + ", 0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + " }");
+                stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "])");
                 first = false;
             }
-            stream.WriteLine(" };");
+            stream.WriteLine("})");
         }
-        protected void Export_StateExpectedIDs()
+        protected void Export_States()
         {
-            stream.Write("        private static ushort[][] staticStateExpectedIDs = { ");
+            stream.WriteLine("        private static State[] staticStates = {");
             bool first = true;
             foreach (State State in graph.Sets)
             {
+                stream.Write("            ");
                 if (!first) stream.Write(", ");
-                stream.Write("stateExpectedIDs_" + State.ID.ToString("X"));
+                Export_State(State);
                 first = false;
             }
-            stream.WriteLine(" };");
-        }
-        protected void Export_StateExpectedNames()
-        {
-            stream.Write("        private static string[][] staticStateExpectedNames = { ");
-            bool first = true;
-            foreach (State State in graph.Sets)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("stateExpectedNames_" + State.ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_StateItems()
-        {
-            stream.Write("        private static string[][] staticStateItems = { ");
-            bool first = true;
-            foreach (State State in graph.Sets)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("stateItems_" + State.ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_StateShiftsOnTerminal()
-        {
-            stream.Write("        private static ushort[][][] staticStateShiftsOnTerminal = { ");
-            bool first = true;
-            foreach (State State in graph.Sets)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("stateShiftsOnTerminal_" + State.ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_StateShiftsOnVariable()
-        {
-            stream.Write("        private static ushort[][][] staticStateShiftsOnVariable = { ");
-            bool first = true;
-            foreach (State State in graph.Sets)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("stateShiftsOnVariable_" + State.ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_StateReducsOnTerminal()
-        {
-            stream.Write("        private static ushort[][][] staticStateReducsOnTerminal = { ");
-            bool first = true;
-            foreach (State State in graph.Sets)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("stateReducsOnTerminal_" + State.ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
+            stream.WriteLine("        };");
         }
     }
 }

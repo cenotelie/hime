@@ -24,16 +24,13 @@ namespace Hime.Parsers.CF.LR
                 {
                     DeciderGraph dg =  analyser.Analyse(Set, Conflict.ConflictSymbol);
                     deciders[Set].Add(Conflict.ConflictSymbol, dg);
-                    Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Decider", "Decider" + Set.ID.ToString() + "_" + Conflict.ConflictSymbol.ToString() + ".dot");
-                    Serialize(dg, serializer);
-                    serializer.Close();
                     Reporter.Report(Conflict);
                 }
             }
 
             Reporter.Info("LR(Automata)", graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LR(Automata)", "Done !");
-            return new ParserDataLRA(this, Grammar, graph);
+            return new ParserDataLRA(this, Grammar, graph, deciders);
         }
 
         private void Serialize(DeciderGraph graph, Kernel.Graphs.DOTSerializer serializer)

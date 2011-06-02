@@ -81,7 +81,7 @@ namespace Hime.Parsers.CF.LR
             if (grammar.Actions.GetEnumerator().MoveNext())
             {
                 stream.WriteLine("        private Actions actions;");
-                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { actions = actions; }");
+                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
             }
             else
             {
@@ -122,7 +122,7 @@ namespace Hime.Parsers.CF.LR
                     stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.LocalName + "\", ((" + grammar.LocalName + "_Parser)parser).actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
-                    stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0));");
+                    stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0, Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
                     if (Part.Action != RuleDefinitionPartAction.Nothing)
@@ -240,13 +240,22 @@ namespace Hime.Parsers.CF.LR
             foreach (StateActionRNReduce Reduction in State.Reductions)
             {
                 if (!first) stream.Write(", ");
-                int index = 0;
-                if (Reduction.ToReduceRule.Definition.GetChoiceAtIndex(0).Length != Reduction.ReduceLength)
+                if (Reduction.ReduceLength == 0)
                 {
-                    CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAtIndex(Reduction.ReduceLength);
-                    index = nullableChoices.IndexOf(def);
+                    int index = 0;
+                    index = nullableVars.IndexOf(Reduction.ToReduceRule.Variable);
+                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullVarsSPPF[0x" + index.ToString("X") + "])");
                 }
-                stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
+                else
+                {
+                    int index = 0;
+                    if (Reduction.ToReduceRule.Definition.GetChoiceAtIndex(0).Length != Reduction.ReduceLength)
+                    {
+                        CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAtIndex(Reduction.ReduceLength);
+                        index = nullableChoices.IndexOf(def);
+                    }
+                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
+                }
                 first = false;
             }
             stream.WriteLine("})");
