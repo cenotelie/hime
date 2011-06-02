@@ -14,49 +14,64 @@ namespace Hime.Parsers.CF.LR
             Reporter.Info("LR(Automata)", "LR(Automata) data ...");
             Graph graph = MethodLALR1.ConstructGraph(Grammar, Reporter);
             ConflictAnalyser analyser = new ConflictAnalyser(graph);
-            Dictionary<State, Dictionary<Terminal, DeciderGraph>> deciders = new Dictionary<State, Dictionary<Terminal, DeciderGraph>>();
+            Dictionary<State, SubMachine> submachines = new Dictionary<State, SubMachine>();
             // Output conflicts
             foreach (State Set in graph.Sets)
             {
-                if (Set.Conflicts.Count != 0)
-                    deciders.Add(Set, new Dictionary<Terminal, DeciderGraph>());
-                foreach (Conflict Conflict in Set.Conflicts)
+                SubMachine machine = new SubMachine();
+                List<Terminal> conflictous = new List<Terminal>();
+                foreach (Conflict conflict in Set.Conflicts)
                 {
-                    DeciderGraph dg =  analyser.Analyse(Set, Conflict.ConflictSymbol);
-                    deciders[Set].Add(Conflict.ConflictSymbol, dg);
-                    Reporter.Report(Conflict);
+                    conflictous.Add(conflict.ConflictSymbol);
+                    DeciderGraph dg = analyser.Analyse(Set, conflict.ConflictSymbol);
+                    machine.AddDeciderGraph(dg);
+                    Reporter.Report(conflict);
                 }
+                foreach (Item item in Set.Items)
+                {
+                    if (item.Action == ItemAction.Reduce)
+                    {
+                        foreach (Terminal t in item.Lookaheads)
+                            if (!conflictous.Contains(t))
+                                machine.AddDecision(t, item.BaseRule);
+                    }
+                }
+                foreach (Symbol symbol in Set.Children.Keys)
+                {
+                    if (symbol is Terminal)
+                    {
+                        Terminal terminal = (Terminal)symbol;
+                        if (!conflictous.Contains(terminal))
+                            machine.AddDecision(terminal, Set.Children[symbol]);
+                    }
+                }
+                machine.Close();
+                submachines.Add(Set, machine);
+                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State" + Set.ID.ToString(), "State" + Set.ID.ToString() + ".dot");
+                Serialize(machine, serializer);
+                serializer.Close();
             }
 
             Reporter.Info("LR(Automata)", graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LR(Automata)", "Done !");
-            return new ParserDataLRA(this, Grammar, graph, deciders);
+            return new ParserDataLRA(this, Grammar, graph, submachines);
         }
 
-        private void Serialize(DeciderGraph graph, Kernel.Graphs.DOTSerializer serializer)
+        private void Serialize(SubMachine machine, Kernel.Graphs.DOTSerializer serializer)
         {
-            foreach (DeciderState state in graph.States)
+            foreach (SubState state in machine.States)
             {
-                serializer.WriteNode(state.ID.ToString());
-                int i = 0;
-                foreach (Item item in state.Decisions.Keys)
-                {
-                    serializer.WriteNode(state.ID.ToString() + "_" + i.ToString(), item.ToString(), Kernel.Graphs.DOTNodeShape.ellipse);
-                    i++;
-                }
+                string id = state.ID.ToString();
+                string label = id;
+                if (state.ShiftDecision != null)
+                    label = "SHIFT: " + state.ShiftDecision.ID.ToString();
+                else if (state.RuleDecision != null)
+                    label = state.RuleDecision.ToString();
+                serializer.WriteNode(id, label);
             }
-            foreach (DeciderState state in graph.States)
-            {
-                int i = 0;
-                foreach (Item item in state.Decisions.Keys)
-                {
-                    foreach (Terminal t in state.Decisions[item])
-                        serializer.WriteEdge(state.ID.ToString(), state.ID.ToString() + "_" + i.ToString(), t.ToString());
-                    i++;
-                }
+            foreach (SubState state in machine.States)
                 foreach (Terminal t in state.Transitions.Keys)
                     serializer.WriteEdge(state.ID.ToString(), state.Transitions[t].ID.ToString(), t.ToString());
-            }
         }
     }
 }

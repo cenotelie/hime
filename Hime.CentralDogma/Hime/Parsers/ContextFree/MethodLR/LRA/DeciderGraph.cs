@@ -5,17 +5,20 @@ namespace Hime.Parsers.CF.LR
     class DeciderGraph
     {
         private GLRSimulator simulator;
+        private State set;
         private Terminal lookahead;
         private List<Item> conflictuous;
         private List<DeciderState> states;
 
+        public State Set { get { return set; } }
         public Terminal Lookahead { get { return lookahead; } }
-        public ICollection<Item> Conflictuous { get { return conflictuous; } }
-        public ICollection<DeciderState> States { get { return states; } }
+        public IList<Item> Conflictuous { get { return conflictuous; } }
+        public IList<DeciderState> States { get { return states; } }
 
         public DeciderGraph(State set, Terminal lookahead, GLRSimulator simulator)
         {
             this.simulator = simulator;
+            this.set = set;
             this.lookahead = lookahead;
             states = new List<DeciderState>();
             conflictuous = new List<Item>();

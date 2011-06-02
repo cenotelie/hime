@@ -103,6 +103,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\Analyser.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\ParserData.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\Submachine.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRGraph.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRConflicts.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRSets.cs" />

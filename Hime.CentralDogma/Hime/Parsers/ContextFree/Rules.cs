@@ -291,6 +291,10 @@ namespace Hime.Parsers.CF
 
         public static bool operator ==(CFRule Left, CFRule Right)
         {
+            if (((object)Left) == null)
+                return (((object)Right) == null);
+            if (((object)Right) == null)
+                return false;
             if (Left.variable != Right.variable)
                 return false;
             if (Left.replaceOnProduction != Right.replaceOnProduction)
@@ -300,6 +304,10 @@ namespace Hime.Parsers.CF
 
         public static bool operator !=(CFRule Left, CFRule Right)
         {
+            if (((object)Left) == null)
+                return (((object)Right) != null);
+            if (((object)Right) == null)
+                return true;
             if (Left.variable != Right.variable)
                 return true;
             if (Left.replaceOnProduction != Right.replaceOnProduction)
