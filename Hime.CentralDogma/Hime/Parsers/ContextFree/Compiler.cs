@@ -147,16 +147,31 @@ namespace Hime.Parsers.CF
         }
         private string ReplaceEscapees(string value)
         {
-            string result = value.Replace("\\\\", "\\");
-            result = result.Replace("\\0", "\0");		/*Unicode character 0*/
-			result = result.Replace("\\a", "\a");		/*Alert (character 7)*/
-			result = result.Replace("\\b", "\b");		/*Backspace (character 8)*/
-			result = result.Replace("\\f", "\f");		/*Form feed (character 12)*/
-			result = result.Replace("\\n", "\n");		/*New line (character 10)*/
-			result = result.Replace("\\r", "\r");		/*Carriage return (character 13)*/
-			result = result.Replace("\\t", "\t");		/*Horizontal tab (character 9)*/
-            result = result.Replace("\\v", "\v");	    /*Vertical quote (character 11)*/
-            return result;
+            if (!value.Contains("\\"))
+                return value;
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            for (int i = 0; i != value.Length; i++)
+            {
+                char c = value[i];
+                if (c != '\\')
+                {
+                    builder.Append(c);
+                    continue;
+                }
+                i++;
+                char next = value[i];
+                if (next == '\\') builder.Append(next);
+                else if (next == '0') builder.Append('\0'); /*Unicode character 0*/
+                else if (next == 'a') builder.Append('\a'); /*Alert (character 7)*/
+                else if (next == 'b') builder.Append('\b'); /*Backspace (character 8)*/
+                else if (next == 'f') builder.Append('\f'); /*Form feed (character 12)*/
+                else if (next == 'n') builder.Append('\n'); /*New line (character 10)*/
+                else if (next == 'r') builder.Append('\r'); /*Carriage return (character 13)*/
+                else if (next == 't') builder.Append('\t'); /*Horizontal tab (character 9)*/
+                else if (next == 'v') builder.Append('\v'); /*Vertical quote (character 11)*/
+                else builder.Append("\\" + next);
+            }
+            return builder.ToString();
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_text(Redist.Parsers.SyntaxTreeNode Node)
         {
