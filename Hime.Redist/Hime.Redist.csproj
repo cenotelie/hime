@@ -46,9 +46,11 @@
     <Compile Include="AST.cs" />
     <Compile Include="BaseBinary.cs" />
     <Compile Include="BufferedTextReader.cs" />
+    <Compile Include="BufferedTokenReader.cs" />
     <Compile Include="GSS.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="ParserLRA.cs" />
     <Compile Include="ParserRNGLR1.cs" />
     <Compile Include="ParserLR1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
