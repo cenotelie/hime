@@ -75,6 +75,7 @@ namespace Hime.Redist.Parsers
             }
             else if (families.Count >= 1)
             {
+                // More than one solution => this is an error
                 foreach (SPPFNodeFamily family in families)
                 {
                     SyntaxTreeNode subroot = new SyntaxTreeNode(null, SyntaxTreeNodeAction.Nothing);

@@ -5,21 +5,97 @@ namespace Hime.Redist.Parsers
     public abstract class BaseLR1Parser : IParser
     {
         protected delegate void Production(BaseLR1Parser parser, List<SyntaxTreeNode> nodes);
+        protected struct Rule
+        {
+            public Production OnReduction;
+            public SymbolVariable Head;
+            public ushort Length;
+            public Rule(Production prod, SymbolVariable head, ushort length)
+            {
+                OnReduction = prod;
+                Head = head;
+                Length = length;
+            }
+        }
+        protected struct Terminal
+        {
+            public string Name;
+            public ushort SID;
+            public Terminal(string name, ushort sid)
+            {
+                Name = name;
+                SID = sid;
+            }
+        }
+        protected struct Reduction
+        {
+            public ushort Lookahead;
+            public Rule ToReduce;
+            public Reduction(ushort lookahead, Rule rule)
+            {
+                Lookahead = lookahead;
+                ToReduce = rule;
+            }
+        }
+        protected struct State
+        {
+            public string[] Items;
+            public Terminal[] Expected;
+            public Dictionary<ushort, ushort> ShiftsOnTerminal;
+            public Dictionary<ushort, ushort> ShiftsOnVariable;
+            public Dictionary<ushort, Reduction> ReducsOnTerminal;
+            public State(string[] items, Terminal[] expected, ushort[] st_keys, ushort[] st_val, ushort[] sv_keys, ushort[] sv_val, Reduction[] rt)
+            {
+                Items = items;
+                Expected = expected;
+                ShiftsOnTerminal = new Dictionary<ushort, ushort>();
+                ShiftsOnVariable = new Dictionary<ushort, ushort>();
+                ReducsOnTerminal = new Dictionary<ushort, Reduction>();
+                for (int i = 0; i != st_keys.Length; i++)
+                    ShiftsOnTerminal.Add(st_keys[i], st_val[i]);
+                for (int i = 0; i != sv_keys.Length; i++)
+                    ShiftsOnVariable.Add(sv_keys[i], sv_val[i]);
+                for (int i = 0; i != rt.Length; i++)
+                    ReducsOnTerminal.Add(rt[i].Lookahead, rt[i]);
+            }
+            public ushort[] GetExpectedIDs()
+            {
+                ushort[] results = new ushort[Expected.Length];
+                for (int i = 0; i != Expected.Length; i++)
+                    results[i] = Expected[i].SID;
+                return results;
+            }
+            public string[] GetExpectedNames()
+            {
+                string[] results = new string[Expected.Length];
+                for (int i = 0; i != Expected.Length; i++)
+                    results[i] = Expected[i].Name;
+                return results;
+            }
+            public ushort GetNextByShiftOnTerminal(ushort sid)
+            {
+                if (!ShiftsOnTerminal.ContainsKey(sid))
+                    return 0xFFFF;
+                return ShiftsOnTerminal[sid];
+            }
+            public ushort GetNextByShiftOnVariable(ushort sid)
+            {
+                if (!ShiftsOnVariable.ContainsKey(sid))
+                    return 0xFFFF;
+                return ShiftsOnVariable[sid];
+            }
+            public bool HasReductionOnTerminal(ushort sid) { return ReducsOnTerminal.ContainsKey(sid); }
+            public Reduction GetReductionOnTerminal(ushort sid) { return ReducsOnTerminal[sid]; }
+        }
+
 
         // Parser automata data
-        protected Production[] rules;
-        protected ushort[] rulesHeadID;
-        protected string[] rulesHeadName;
-        protected ushort[] rulesParserLength;
-        protected ushort[][] stateExpectedIDs;
-        protected string[][] stateExpectedNames;
-        protected string[][] stateItems;
-        protected ushort[][][] stateShiftsOnTerminal;
-        protected ushort[][][] stateShiftsOnVariable;
-        protected ushort[][][] stateReducsOnTerminal;
+        protected Rule[] rules;
+        protected State[] states;
         protected int errorSimulationLength;
 
         // Parser state data
+        protected int maxErrorCount;
         protected List<ParserError> errors;
         protected ILexer lexer;
         protected List<SyntaxTreeNode> nodes;
@@ -35,6 +111,7 @@ namespace Hime.Redist.Parsers
         public BaseLR1Parser(ILexer input)
         {
             setup();
+            maxErrorCount = 100;
             errors = new List<ParserError>();
             lexer = input;
             nodes = new List<SyntaxTreeNode>();
@@ -43,39 +120,10 @@ namespace Hime.Redist.Parsers
             nextToken = null;
         }
 
-        protected ushort Analyse_GetNextByShiftOnTerminal(ushort state, ushort sid)
-        {
-            for (int i = 0; i != stateShiftsOnTerminal[state].Length; i++)
-            {
-                if (stateShiftsOnTerminal[state][i][0] == sid)
-                    return stateShiftsOnTerminal[state][i][1];
-            }
-            return 0xFFFF;
-        }
-        protected ushort Analyse_GetNextByShiftOnVariable(ushort state, ushort sid)
-        {
-            for (int i = 0; i != stateShiftsOnVariable[state].Length; i++)
-            {
-                if (stateShiftsOnVariable[state][i][0] == sid)
-                    return stateShiftsOnVariable[state][i][1];
-            }
-            return 0xFFFF;
-        }
-        protected ushort Analyse_GetProductionOnTerminal(ushort state, ushort sid)
-        {
-            for (int i = 0; i != stateReducsOnTerminal[state].Length; i++)
-            {
-                if (stateReducsOnTerminal[state][i][0] == sid)
-                    return stateReducsOnTerminal[state][i][1];
-            }
-            return 0xFFFF;
-        }
-
         protected void Analyse_HandleUnexpectedToken()
         {
-            errors.Add(new ParserErrorUnexpectedToken(nextToken, stateExpectedNames[currentState]));
-
-            if (errors.Count >= 100)
+            errors.Add(new ParserErrorUnexpectedToken(nextToken, states[currentState].GetExpectedNames()));
+            if (errors.Count >= maxErrorCount)
                 throw new ParserException("Too much errors, parsing stopped.");
 
             if (Analyse_HandleUnexpectedToken_SimpleRecovery()) return;
@@ -103,14 +151,14 @@ namespace Hime.Redist.Parsers
         }
         protected bool Analyse_HandleUnexpectedToken_SimpleRecovery_InsertExpected()
         {
-            for (int i = 0; i != stateExpectedIDs[currentState].Length; i++)
+            for (int i = 0; i != states[currentState].Expected.Length; i++)
             {
                 LexerText TestLexer = (LexerText)lexer.Clone();
                 List<ushort> TempStack = new List<ushort>(stack);
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
-                Inserted.Add(new SymbolTokenText(stateExpectedNames[currentState][i], stateExpectedIDs[currentState][i], string.Empty, lexer.CurrentLine));
+                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SID, string.Empty, lexer.CurrentLine));
                 Inserted.Add(nextToken);
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
@@ -124,14 +172,14 @@ namespace Hime.Redist.Parsers
         }
         protected bool Analyse_HandleUnexpectedToken_SimpleRecovery_ReplaceUnexpectedByExpected()
         {
-            for (int i = 0; i != stateExpectedIDs[currentState].Length; i++)
+            for (int i = 0; i != states[currentState].Expected.Length; i++)
             {
                 LexerText TestLexer = (LexerText)lexer.Clone();
                 List<ushort> TempStack = new List<ushort>(stack);
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
-                Inserted.Add(new SymbolTokenText(stateExpectedNames[currentState][i], stateExpectedIDs[currentState][i], string.Empty, lexer.CurrentLine));
+                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SID, string.Empty, lexer.CurrentLine));
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
                     Analyse_RunForToken(Inserted[0]);
@@ -157,7 +205,7 @@ namespace Hime.Redist.Parsers
 
             for (int i = 0; i != errorSimulationLength + inserted.Count; i++)
             {
-                ushort NextState = Analyse_GetNextByShiftOnTerminal(CurrentState, NextToken.SymbolID);
+                ushort NextState = states[CurrentState].GetNextByShiftOnTerminal(NextToken.SymbolID);
                 if (NextState != 0xFFFF)
                 {
                     CurrentState = NextState;
@@ -171,18 +219,18 @@ namespace Hime.Redist.Parsers
                         NextToken = GetNextToken(lexer, CurrentState);
                     continue;
                 }
-                ushort ReductionIndex = Analyse_GetProductionOnTerminal(CurrentState, NextToken.SymbolID);
-                if (ReductionIndex != 0xFFFF)
+                if (states[CurrentState].HasReductionOnTerminal(NextToken.SymbolID))
                 {
-                    Production Reduce = rules[ReductionIndex];
-                    ushort HeadID = rulesHeadID[ReductionIndex];
-                    for (ushort j = 0; j != rulesParserLength[ReductionIndex]; j++)
+                    Reduction reduction = states[CurrentState].GetReductionOnTerminal(NextToken.SymbolID);
+                    Production Reduce = reduction.ToReduce.OnReduction;
+                    ushort HeadID = reduction.ToReduce.Head.SymbolID;
+                    for (ushort j = 0; j != reduction.ToReduce.Length; j++)
                         stack.Pop();
-                    // If next symbol is ε (after $) : return
+                    // If next symbol is e (after $) : return
                     if (NextToken.SymbolID == 0x1)
                         return true;
                     // Shift to next state on the reduce variable
-                    NextState = Analyse_GetNextByShiftOnVariable(stack.Peek(), HeadID);
+                    NextState = states[stack.Peek()].GetNextByShiftOnVariable(HeadID);
                     // Handle error here : no transition for symbol HeadID
                     if (NextState == 0xFFFF)
                         return false;
@@ -204,7 +252,7 @@ namespace Hime.Redist.Parsers
         {
             while (true)
             {
-                ushort NextState = Analyse_GetNextByShiftOnTerminal(currentState, token.SymbolID);
+                ushort NextState = states[currentState].GetNextByShiftOnTerminal(token.SymbolID);
                 if (NextState != 0xFFFF)
                 {
                     nodes.Add(new SyntaxTreeNode(token));
@@ -212,16 +260,16 @@ namespace Hime.Redist.Parsers
                     stack.Push(currentState);
                     return true;
                 }
-                ushort ReductionIndex = Analyse_GetProductionOnTerminal(currentState, token.SymbolID);
-                if (ReductionIndex != 0xFFFF)
+                if (states[currentState].HasReductionOnTerminal(token.SymbolID))
                 {
-                    Production Reduce = rules[ReductionIndex];
-                    ushort HeadID = rulesHeadID[ReductionIndex];
+                    Reduction reduction = states[currentState].GetReductionOnTerminal(token.SymbolID);
+                    Production Reduce = reduction.ToReduce.OnReduction;
+                    ushort HeadID = reduction.ToReduce.Head.SymbolID;
                     Reduce(this, nodes);
-                    for (ushort j = 0; j != rulesParserLength[ReductionIndex]; j++)
+                    for (ushort j = 0; j != reduction.ToReduce.Length; j++)
                         stack.Pop();
                     // Shift to next state on the reduce variable
-                    NextState = Analyse_GetNextByShiftOnVariable(stack.Peek(), HeadID);
+                    NextState = states[stack.Peek()].GetNextByShiftOnVariable(HeadID);
                     if (NextState == 0xFFFF)
                         return false;
                     currentState = NextState;
@@ -264,6 +312,6 @@ namespace Hime.Redist.Parsers
     public abstract class LR1BinaryParser : BaseLR1Parser
     {
         protected LR1BinaryParser(LexerBinary lexer) : base(lexer) { }
-        protected override SymbolToken GetNextToken(ILexer lexer, ushort state) { return lexer.GetNextToken(stateExpectedIDs[state]); }
+        protected override SymbolToken GetNextToken(ILexer lexer, ushort state) { return lexer.GetNextToken(states[state].GetExpectedIDs()); }
     }
 }

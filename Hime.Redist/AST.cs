@@ -20,6 +20,7 @@ namespace Hime.Redist.Parsers
 
         public Dictionary<string, object> Properties { get { return properties; } }
         public Symbol Symbol { get { return symbol; } }
+        public SyntaxTreeNodeAction Action { get { return action; } }
         public SyntaxTreeNode Parent { get { return parent; } }
         public System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> Children { get { return new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(children); } }
 
