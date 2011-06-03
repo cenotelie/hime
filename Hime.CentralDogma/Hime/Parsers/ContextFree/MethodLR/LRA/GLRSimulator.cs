@@ -5,12 +5,12 @@ namespace Hime.Parsers.CF.LR
     class GLRSimulator
     {
         private Graph graph;
-        private Dictionary<State, Dictionary<Symbol, List<State>>> inverseGraph;
+        private Dictionary<int, Dictionary<Symbol, List<State>>> inverseGraph;
 
         public GLRSimulator(Graph graph)
         {
             this.graph = graph;
-            this.inverseGraph = new Dictionary<State, Dictionary<Symbol, List<State>>>();
+            this.inverseGraph = new Dictionary<int, Dictionary<Symbol, List<State>>>();
             BuildInverse();
         }
 
@@ -21,9 +21,9 @@ namespace Hime.Parsers.CF.LR
                 foreach (Symbol symbol in set.Children.Keys)
                 {
                     State child = set.Children[symbol];
-                    if (!inverseGraph.ContainsKey(child))
-                        inverseGraph.Add(child, new Dictionary<Symbol, List<State>>());
-                    Dictionary<Symbol, List<State>> inverses = inverseGraph[child];
+                    if (!inverseGraph.ContainsKey(child.ID))
+                        inverseGraph.Add(child.ID, new Dictionary<Symbol, List<State>>());
+                    Dictionary<Symbol, List<State>> inverses = inverseGraph[child.ID];
                     if (!inverses.ContainsKey(symbol))
                         inverses.Add(symbol, new List<State>());
                     List<State> parents = inverses[symbol];
@@ -34,22 +34,30 @@ namespace Hime.Parsers.CF.LR
 
         public List<State> Simulate(List<State> sets, Terminal lookahead)
         {
-            List<State> result = new List<State>();
+            List<State> results = new List<State>();
+            List<int> result_ids = new List<int>();
             foreach (State set in sets)
             {
                 List<State> temp = Simulate(set, lookahead);
                 foreach (State final in temp)
-                    if (!result.Contains(final))
-                        result.Add(final);
+                {
+                    if (!result_ids.Contains(final.ID))
+                    {
+                        results.Add(final);
+                        result_ids.Add(final.ID);
+                    }
+                }
             }
-            return result;
+            return results;
         }
 
         public List<State> Simulate(State state, Terminal lookahead)
         {
             // Sets before reductions
             List<State> before = new List<State>();
+            List<int> before_ids = new List<int>();
             before.Add(state);
+            before_ids.Add(state.ID);
             // Reduce
             for (int i = 0; i != before.Count; i++)
             {
@@ -64,34 +72,46 @@ namespace Hime.Parsers.CF.LR
                             if (origin.Children.ContainsKey(reduction.ToReduceRule.Variable))
                             {
                                 State next = origin.Children[reduction.ToReduceRule.Variable];
-                                if (!before.Contains(next))
+                                if (!before_ids.Contains(next.ID))
+                                {
                                     before.Add(next);
+                                    before_ids.Add(next.ID);
+                                }
                             }
                         }
                     }
                 }
             }
             // Shifts
-            List<State> result = new List<State>();
+            List<State> results = new List<State>();
+            List<int> results_ids = new List<int>();
             foreach (State s in before)
             {
                 if (s.Children.ContainsKey(lookahead))
-                    if (!result.Contains(s.Children[lookahead]))
-                        result.Add(s.Children[lookahead]);
+                {
+                    State child = s.Children[lookahead];
+                    if (!results_ids.Contains(child.ID))
+                    {
+                        results.Add(child);
+                        results_ids.Add(child.ID);
+                    }
+                }
             }
-            return result;
+            return results;
         }
 
         public List<State> Simulate(State state, Item item, Terminal lookahead)
         {
-            List<State> result = new List<State>();
+            List<State> results = new List<State>();
+            List<int> results_ids = new List<int>();
             if (item.Action == ItemAction.Shift)
             {
-                result.Add(state.Children[item.NextSymbol]);
-                return result;
+                results.Add(state.Children[item.NextSymbol]);
+                return results;
             }
             
             List<State> before = new List<State>();
+            List<int> before_ids = new List<int>();
             // First reduction
             List<State> origins = GetOrigins(state, item.BaseRule.Definition.GetChoiceAtIndex(0));
             foreach (State origin in origins)
@@ -99,8 +119,11 @@ namespace Hime.Parsers.CF.LR
                 if (origin.Children.ContainsKey(item.BaseRule.Variable))
                 {
                     State next = origin.Children[item.BaseRule.Variable];
-                    if (!before.Contains(next))
+                    if (!before_ids.Contains(next.ID))
+                    {
                         before.Add(next);
+                        before_ids.Add(next.ID);
+                    }
                 }
             }
             // Reduce
@@ -117,8 +140,11 @@ namespace Hime.Parsers.CF.LR
                             if (origin.Children.ContainsKey(reduction.ToReduceRule.Variable))
                             {
                                 State next = origin.Children[reduction.ToReduceRule.Variable];
-                                if (!before.Contains(next))
+                                if (!before_ids.Contains(next.ID))
+                                {
                                     before.Add(next);
+                                    before_ids.Add(next.ID);
+                                }
                             }
                         }
                     }
@@ -128,10 +154,16 @@ namespace Hime.Parsers.CF.LR
             foreach (State s in before)
             {
                 if (s.Children.ContainsKey(lookahead))
-                    if (!result.Contains(s.Children[lookahead]))
-                        result.Add(s.Children[lookahead]);
+                {
+                    State child = s.Children[lookahead];
+                    if (!results_ids.Contains(child.ID))
+                    {
+                        results.Add(child);
+                        results_ids.Add(child.ID);
+                    }
+                }
             }
-            return result;
+            return results;
         }
 
         private List<State> GetOrigins(State target, CFRuleDefinition definition)
@@ -143,17 +175,21 @@ namespace Hime.Parsers.CF.LR
             {
                 Symbol symbol = definition.Parts[index].Symbol;
                 List<State> temp = new List<State>();
+                List<int> temp_ids = new List<int>();
                 foreach (State next in result)
                 {
-                    if (!inverseGraph.ContainsKey(next))
+                    if (!inverseGraph.ContainsKey(next.ID))
                         continue;
-                    Dictionary<Symbol, List<State>> inverses = inverseGraph[next];
+                    Dictionary<Symbol, List<State>> inverses = inverseGraph[next.ID];
                     if (!inverses.ContainsKey(symbol))
                         continue;
                     foreach (State previous in inverses[symbol])
                     {
-                        if (!temp.Contains(previous))
+                        if (!temp_ids.Contains(previous.ID))
+                        {
                             temp.Add(previous);
+                            temp_ids.Add(previous.ID);
+                        }
                     }
                 }
                 result = temp;

@@ -4,13 +4,13 @@ namespace Hime.Parsers.CF.LR
 {
     class ParserDataLRA : ParserDataLR
     {
-        private Dictionary<State, SubMachine> submachines;
+        private Dictionary<State, Decider> deciders;
         private System.IO.StreamWriter stream;
 
-        public ParserDataLRA(ParserGenerator generator, CFGrammar gram, Graph graph, Dictionary<State, SubMachine> submachines)
+        public ParserDataLRA(ParserGenerator generator, CFGrammar gram, Graph graph, Dictionary<State, Decider> deciders)
             : base(generator, gram, graph)
         {
-            this.submachines = submachines;
+            this.deciders = deciders;
         }
 
         public override bool Export(GrammarBuildOptions Options)
@@ -123,7 +123,7 @@ namespace Hime.Parsers.CF.LR
         }
 
 
-        protected void Export_DeciderState(SubState state)
+        protected void Export_DeciderState(Decider decider, DeciderState state)
         {
             stream.WriteLine("new DeciderState(");
             // write transitions
@@ -140,7 +140,7 @@ namespace Hime.Parsers.CF.LR
             first = true;
             foreach (Terminal t in state.Transitions.Keys)
             {
-                SubState child = state.Transitions[t];
+                DeciderState child = state.Transitions[t];
                 if (!first) stream.Write(", ");
                 stream.Write("0x" + child.ID.ToString("X"));
                 first = false;
@@ -148,15 +148,16 @@ namespace Hime.Parsers.CF.LR
             stream.Write("}");
 
             // write shift decision
-            if (state.ShiftDecision != null)
-                stream.Write(", 0x" + state.ShiftDecision.ID.ToString("X"));
+            if (state.Decision != -1)
+            {
+                Item item = decider.GetItem(state.Decision);
+                if (item.Action == ItemAction.Shift)
+                    stream.Write(", 0x" + decider.LRState.Children[item.NextSymbol].ID.ToString("X") + ", new Rule()");
+                else
+                    stream.Write(", 0xFFFF, staticRules[0x" + grammar.Rules.IndexOf(item.BaseRule).ToString("X") + "]");
+            }
             else
-                stream.Write(", 0xFFFF");
-            // Write rule decision
-            if (state.RuleDecision != null)
-                stream.Write(", staticRules[0x" + grammar.Rules.IndexOf(state.RuleDecision).ToString("X") + "]");
-            else
-                stream.Write(", new Rule()");
+                stream.Write(", 0xFFFF, new Rule()");
             stream.WriteLine(")");
         }
         
@@ -198,13 +199,13 @@ namespace Hime.Parsers.CF.LR
                 ShitTerminalCount++;
             }
             // write submachine
-            stream.WriteLine("               new DeciderState[" + submachines[State].States.Count + "] {");
+            stream.WriteLine("               new DeciderState[" + deciders[State].States.Count + "] {");
             first = true;
-            foreach (SubState sub in submachines[State].States)
+            foreach (DeciderState sub in deciders[State].States)
             {
                 stream.Write("                   ");
                 if (!first) stream.Write(", ");
-                Export_DeciderState(sub);
+                Export_DeciderState(deciders[State], sub);
                 first = false;
             }
             stream.WriteLine("               },");
