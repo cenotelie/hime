@@ -45,7 +45,7 @@ namespace Hime.Kernel
 
             // Export log
             Reporter.ExportHTML(Path + "DaemonLog.html", "Daemon Log");
-            System.Diagnostics.Process.Start(Path + "DaemonLog.html");
+            System.Diagnostics.Process.Start(Path + "DaemonLog.mht");
         }
 
         public static void BuildUnicode(string File)

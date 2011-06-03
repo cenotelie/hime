@@ -92,7 +92,7 @@ namespace Hime.Parsers
             Options.Close();
             if (exportLog)
             {
-                string file = parserFile.Replace(".cs", ".html");
+                string file = parserFile.Replace(".cs", "_log.mht");
                 reporter.ExportHTML(file, "Grammar Log");
                 System.Diagnostics.Process.Start(file);
             }

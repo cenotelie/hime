@@ -185,6 +185,20 @@ namespace Hime.Parsers.CF
             Export_ParserData(directory, data);
             Export_ParserGraph(directory, data);
             Export_Others(directory, data);
+
+            Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
+            compiler.Title = "Grammar " + name;
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", directory + "\\Grammar.html"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/css", "utf-8", "hime_data/Hime.css", directory + "\\hime_data\\Hime.css"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/javascript", "utf-8", "hime_data/Hime.js", directory + "\\hime_data\\Hime.js"));
+
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/gif", "hime_data/button_plus.gif", directory + "\\hime_data\\button_plus.gif"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/gif", "hime_data/button_minus.gif", directory + "\\hime_data\\button_minus.gif"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Logo.png", directory + "\\hime_data\\Hime.Logo.png"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Info.png", directory + "\\hime_data\\Hime.Info.png"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Warning.png", directory + "\\hime_data\\Hime.Warning.png"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Error.png", directory + "\\hime_data\\Hime.Error.png"));
+            compiler.CompileTo(directory + "\\Grammar.mht");
         }
         protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
         {

@@ -10,6 +10,7 @@ namespace Hime.Kernel.Resources
 		private string rootNamespace;
 		private string defaultPath;
         private List<string> files;
+        private List<System.IO.Stream> streams;
         private bool isClosed;
 
         public bool IsOpen { get { return !isClosed; } }
@@ -29,6 +30,7 @@ namespace Hime.Kernel.Resources
             else
                 this.defaultPath = rootNamespace + "." + defaultPath + ".";
             this.files = new List<string>();
+            this.streams = new List<System.IO.Stream>();
             this.isClosed = false;
         }
 
@@ -36,6 +38,8 @@ namespace Hime.Kernel.Resources
         {
             foreach (string file in files)
                 System.IO.File.Delete(file);
+            foreach (System.IO.Stream stream in streams)
+                stream.Close();
             isClosed = true;
             accessors.Remove(this);
         }
@@ -70,6 +74,17 @@ namespace Hime.Kernel.Resources
             byte[] Buffer = new byte[Stream.Length];
             int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
             System.IO.File.WriteAllBytes(fileName, Buffer);
+        }
+
+        public System.IO.Stream GetStreamFor(string resourceName)
+        {
+            if (isClosed)
+                throw new AccessorClosedException(this);
+            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            if (stream == null)
+                throw new ResourceNotFoundException(resourceName);
+            streams.Add(stream);
+            return stream;
         }
 
         public string GetAllTextFor(string resourceName)

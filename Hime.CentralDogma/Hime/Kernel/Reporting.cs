@@ -197,23 +197,29 @@ namespace Hime.Kernel.Reporting
             System.IO.FileInfo File = new System.IO.FileInfo(fileName);
             Doc.ChildNodes[1].Attributes["title"].Value = title;
             Doc.Save(fileName + ".xml");
-            System.IO.Directory.CreateDirectory(File.DirectoryName + "\\hime_data");
 
             Resources.ResourceAccessor Session = new Resources.ResourceAccessor();
             Session.AddCheckoutFile(fileName + ".xml");
             Session.CheckOut("Transforms.Logs.LogXML.xslt", File.DirectoryName + "LogXML.xslt");
-            Session.Export("Transforms.Hime.css", File.DirectoryName + "\\hime_data\\Hime.css");
-            Session.Export("Transforms.Hime.js", File.DirectoryName + "\\hime_data\\Hime.js");
-            Session.Export("Visuals.button_plus.gif", File.DirectoryName + "\\hime_data\\button_plus.gif");
-            Session.Export("Visuals.button_minus.gif", File.DirectoryName + "\\hime_data\\button_minus.gif");
-            Session.Export("Visuals.Hime.Error.png", File.DirectoryName + "\\hime_data\\Hime.Error.png");
-            Session.Export("Visuals.Hime.Warning.png", File.DirectoryName + "\\hime_data\\Hime.Warning.png");
-            Session.Export("Visuals.Hime.Info.png", File.DirectoryName + "\\hime_data\\Hime.Info.png");
-            Session.Export("Visuals.Hime.Logo.png", File.DirectoryName + "\\hime_data\\Hime.Logo.png");
 
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(File.DirectoryName + "LogXML.xslt");
-            Transform.Transform(fileName + ".xml", fileName);
+            Transform.Transform(fileName + ".xml", fileName + ".html");
+            Session.AddCheckoutFile(fileName + ".html");
+
+            Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
+            compiler.Title = title;
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", fileName + ".html"));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Hime.css", Session.GetStreamFor("Transforms.Hime.css")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", Session.GetStreamFor("Transforms.Hime.js")));
+
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", Session.GetStreamFor("Visuals.button_plus.gif")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_minus.gif", Session.GetStreamFor("Visuals.button_minus.gif")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Logo.png", Session.GetStreamFor("Visuals.Hime.Logo.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Info.png", Session.GetStreamFor("Visuals.Hime.Info.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Warning.png", Session.GetStreamFor("Visuals.Hime.Warning.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", Session.GetStreamFor("Visuals.Hime.Error.png")));
+            compiler.CompileTo(fileName);
 
             Session.Close();
         }
