@@ -4,12 +4,7 @@
 
   <xsl:template match="Symbol">
     <xsl:if test="@SymbolType='Variable'">
-      <a class="HimeSymbolVariable">
-        <xsl:attribute name="href">
-          <xsl:text>Grammar.html#</xsl:text>
-          <xsl:value-of select="@SymbolID"/>
-          <xsl:text>_0</xsl:text>
-        </xsl:attribute>
+      <a class="HimeSymbolVariable" href="grammar.html">
         <xsl:value-of select="@SymbolValue"/>
       </a>
     </xsl:if>
@@ -103,12 +98,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        <a class="HimeSymbolVariable">
-          <xsl:attribute name="href">
-            <xsl:text>Grammar.html#</xsl:text>
-            <xsl:value-of select="@HeadSID"/>
-            <xsl:text>_0</xsl:text>
-          </xsl:attribute>
+        <a class="HimeSymbolVariable" href="grammar.html">
           <xsl:value-of select="@HeadName"/>
         </a>
         →
@@ -158,11 +148,10 @@
         <script src="hime_data/Hime.js" type="text/javascript">aaa</script>
       </head>
       <body>
-        <div id="HimeXHTMLHeader" class="HimeHeader">
-          <img src="hime_data/Hime.Logo.png" class="HimeLogo" alt="Hime Systems Logo" />
-          <span class="HimeDocumentTitle">
+        <div>
+          <h1>
             Set <xsl:value-of select="@SetID"/>
-          </span>
+          </h1>
         </div>
         <div class="HimeBody">
           <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">

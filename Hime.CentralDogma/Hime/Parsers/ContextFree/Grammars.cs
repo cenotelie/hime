@@ -180,25 +180,86 @@ namespace Hime.Parsers.CF
         {
             if (!directory.Equals("") && !System.IO.Directory.Exists(directory))
                 System.IO.Directory.CreateDirectory(directory);
-            Export_Resources(directory);
-            Export_GrammarData(directory);
-            Export_ParserData(directory, data);
-            Export_ParserGraph(directory, data);
-            Export_Others(directory, data);
-
+            string fileName = directory + "\\" + name;
+            
+            Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor();
             Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
-            compiler.Title = "Grammar " + name;
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", directory + "\\Grammar.html"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/css", "utf-8", "hime_data/Hime.css", directory + "\\hime_data\\Hime.css"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/javascript", "utf-8", "hime_data/Hime.js", directory + "\\hime_data\\Hime.js"));
+            compiler.Title = "Documentation " + name;
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/html", "utf-8", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", accessor.GetStreamFor("Visuals.button_plus.gif")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_minus.gif", accessor.GetStreamFor("Visuals.button_minus.gif")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Logo.png", accessor.GetStreamFor("Visuals.Hime.Logo.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Info.png", accessor.GetStreamFor("Visuals.Hime.Info.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Warning.png", accessor.GetStreamFor("Visuals.Hime.Warning.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", accessor.GetStreamFor("Visuals.Hime.Error.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Shift.png", accessor.GetStreamFor("Visuals.Hime.Shift.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Reduce.png", accessor.GetStreamFor("Visuals.Hime.Reduce.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.None.png", accessor.GetStreamFor("Visuals.Hime.None.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.ShiftReduce.png", accessor.GetStreamFor("Visuals.Hime.ShiftReduce.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.ReduceReduce.png", accessor.GetStreamFor("Visuals.Hime.ReduceReduce.png")));
 
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/gif", "hime_data/button_plus.gif", directory + "\\hime_data\\button_plus.gif"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/gif", "hime_data/button_minus.gif", directory + "\\hime_data\\button_minus.gif"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Logo.png", directory + "\\hime_data\\Hime.Logo.png"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Info.png", directory + "\\hime_data\\Hime.Info.png"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Warning.png", directory + "\\hime_data\\Hime.Warning.png"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/png", "hime_data/Hime.Error.png", directory + "\\hime_data\\Hime.Error.png"));
-            compiler.CompileTo(directory + "\\Grammar.mht");
+            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
+            Doc.AppendChild(Export_GetData(Doc));
+            Doc.Save(fileName + ".xml");
+            accessor.AddCheckoutFile(fileName + ".xml");
+            
+            // generate header
+            accessor.CheckOut("Transforms.Doc.Header.xslt", directory + "\\Header.xslt");
+            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(directory + "\\Header.xslt");
+            Transform.Transform(fileName + ".xml", directory + "\\header.html");
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "header.html", directory + "\\header.html"));
+            accessor.AddCheckoutFile(directory + "\\header.html");
+            // generate grammar
+            accessor.CheckOut("Transforms.Doc.Grammar.xslt", directory + "\\Grammar.xslt");
+            Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(directory + "\\Grammar.xslt");
+            Transform.Transform(fileName + ".xml", directory + "\\grammar.html");
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "grammar.html", directory + "\\grammar.html"));
+            accessor.AddCheckoutFile(directory + "\\grammar.html");
+
+            Doc = new System.Xml.XmlDocument();
+            List<System.Xml.XmlNode> nodes = new List<System.Xml.XmlNode>();
+            System.Xml.XmlNode nodeGraph = data.SerializeXML(Doc);
+            foreach (System.Xml.XmlNode child in nodeGraph.ChildNodes)
+                nodes.Add(child);
+
+            // generate sets
+            accessor.CheckOut("Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
+            Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(directory + "\\LRParserData.xslt");
+            foreach (System.Xml.XmlNode child in nodes)
+            {
+                string temp = directory + "\\Set_" + child.Attributes["SetID"].Value;
+                while (Doc.HasChildNodes)
+                    Doc.RemoveChild(Doc.FirstChild);
+                Doc.AppendChild(child);
+                Doc.Save(temp + ".xml");
+                accessor.AddCheckoutFile(temp + ".xml");
+                Transform.Transform(temp + ".xml", temp + ".html");
+                compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
+                accessor.AddCheckoutFile(temp + ".html");
+            }
+
+            while (Doc.HasChildNodes)
+                Doc.RemoveChild(Doc.FirstChild);
+            Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "utf-8", null));
+            Doc.AppendChild(nodeGraph);
+            foreach (System.Xml.XmlNode child in nodes)
+                nodeGraph.AppendChild(child);
+            Doc.Save(fileName + ".xml");
+            // generate menu
+            accessor.CheckOut("Transforms.Doc.Menu.xslt", directory + "\\Menu.xslt");
+            Transform = new System.Xml.Xsl.XslCompiledTransform();
+            Transform.Load(directory + "\\Menu.xslt");
+            Transform.Transform(fileName + ".xml", directory + "\\menu.html");
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "menu.html", directory + "\\menu.html"));
+            accessor.AddCheckoutFile(directory + "\\menu.html");
+
+            compiler.CompileTo(fileName + ".mht");
+            accessor.Close();
         }
         protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
         {
@@ -208,69 +269,6 @@ namespace Hime.Parsers.CF
             foreach (CFVariable var in variables.Values)
                 root.AppendChild(var.GetXMLNode(Document));
             return root;
-        }
-        protected void Export_Resources(string directory)
-        {
-            System.IO.Directory.CreateDirectory(directory + "\\hime_data");
-            Kernel.Resources.ResourceAccessor Accessor = new Kernel.Resources.ResourceAccessor();
-            Accessor.Export("Transforms.Hime.css", directory + "\\hime_data\\Hime.css");
-            Accessor.Export("Transforms.Hime.js", directory + "\\hime_data\\Hime.js");
-            Accessor.Export("Visuals.button_plus.gif", directory + "\\hime_data\\button_plus.gif");
-            Accessor.Export("Visuals.button_minus.gif", directory + "\\hime_data\\button_minus.gif");
-
-            Accessor.Export("Visuals.Hime.Shift.png", directory + "\\hime_data\\Hime.Shift.png");
-            Accessor.Export("Visuals.Hime.Reduce.png", directory + "\\hime_data\\Hime.Reduce.png");
-            Accessor.Export("Visuals.Hime.None.png", directory + "\\hime_data\\Hime.None.png");
-            Accessor.Export("Visuals.Hime.ShiftReduce.png", directory + "\\hime_data\\Hime.ShiftReduce.png");
-            Accessor.Export("Visuals.Hime.ReduceReduce.png", directory + "\\hime_data\\Hime.ReduceReduce.png");
-
-            Accessor.Export("Visuals.Hime.Error.png", directory + "\\hime_data\\Hime.Error.png");
-            Accessor.Export("Visuals.Hime.Warning.png", directory + "\\hime_data\\Hime.Warning.png");
-            Accessor.Export("Visuals.Hime.Info.png", directory + "\\hime_data\\Hime.Info.png");
-            Accessor.Export("Visuals.Hime.Logo.png", directory + "\\hime_data\\Hime.Logo.png");
-            Accessor.Close();
-        }
-        protected void Export_GrammarData(string directory)
-        {
-            string fileName = directory + "\\Grammar";
-            
-            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-            Doc.AppendChild(Export_GetData(Doc));
-            System.IO.FileInfo File = new System.IO.FileInfo(fileName);
-            Doc.Save(fileName + ".xml");
-
-            Kernel.Resources.ResourceAccessor Accessor = new Kernel.Resources.ResourceAccessor();
-            Accessor.AddCheckoutFile(fileName + ".xml");
-            Accessor.CheckOut("Transforms.Doc.CFGrammar.xslt", File.DirectoryName + "CFGrammar.xslt");
-
-            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(File.DirectoryName + "CFGrammar.xslt");
-            Transform.Transform(fileName + ".xml", fileName + ".html");
-
-            Accessor.Close();
-        }
-        protected void Export_ParserData(string directory, ParserData data)
-        {
-            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-            Kernel.Resources.ResourceAccessor Accessor = new Kernel.Resources.ResourceAccessor();
-            Accessor.CheckOut("Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
-            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(directory + "\\LRParserData.xslt");
-            List<System.Xml.XmlNode> nodes = new List<System.Xml.XmlNode>();
-            foreach (System.Xml.XmlNode child in data.SerializeXML(Doc).ChildNodes)
-                nodes.Add(child);
-            foreach (System.Xml.XmlNode child in nodes)
-            {
-                string fileName = directory + "\\Set_" + child.Attributes["SetID"].Value;
-                while (Doc.HasChildNodes)
-                    Doc.RemoveChild(Doc.FirstChild);
-                Doc.AppendChild(child);
-                System.IO.FileInfo File = new System.IO.FileInfo(fileName);
-                Doc.Save(fileName + ".xml");
-                Accessor.AddCheckoutFile(fileName + ".xml");
-                Transform.Transform(fileName + ".xml", fileName + ".html");
-            }
-            Accessor.Close();
         }
         protected void Export_ParserGraph(string directory, ParserData data)
         {

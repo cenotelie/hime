@@ -167,6 +167,9 @@
     <EmbeddedResource Include="Hime\Resources\Visuals\button_plus.gif" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Header.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Index.html" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Menu.xslt" />
     <Content Include="Libraries\log4net\log4net.dll" />
     <Content Include="Libraries\log4net\log4net.xml" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.None.png" />
@@ -177,7 +180,7 @@
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.ShiftReduce.png" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Reduce.png" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Shift.png" />
-    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.CFGrammar.xslt">
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Grammar.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Hime\Resources\Transforms\Hime.js" />

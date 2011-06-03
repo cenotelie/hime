@@ -11,3 +11,7 @@
         btn.src = "hime_data/button_plus.gif";
     }
 }
+
+function display(uri) {
+    document.getElementById('myContent').innerHTML = "<iframe frameborder='yes' width='80%' height='80%' src='" + uri + "'/>";
+}

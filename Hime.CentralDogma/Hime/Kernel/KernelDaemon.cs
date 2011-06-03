@@ -44,7 +44,7 @@ namespace Hime.Kernel
             Options.Close();
 
             // Export log
-            Reporter.ExportHTML(Path + "DaemonLog.html", "Daemon Log");
+            Reporter.ExportMHTML(Path + "DaemonLog.html", "Daemon Log");
             System.Diagnostics.Process.Start(Path + "DaemonLog.mht");
         }
 

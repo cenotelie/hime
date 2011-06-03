@@ -191,7 +191,7 @@ namespace Hime.Kernel.Reporting
             }
         }
 
-        public void ExportHTML(string fileName, string title)
+        public void ExportMHTML(string fileName, string title)
         {
             System.Xml.XmlDocument Doc = report.GetXML(title);
             System.IO.FileInfo File = new System.IO.FileInfo(fileName);
