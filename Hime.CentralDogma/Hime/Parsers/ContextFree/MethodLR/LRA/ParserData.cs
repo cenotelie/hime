@@ -246,5 +246,38 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine("        };");
         }
+
+
+
+        public override void SerializeOthers(string directory)
+        {
+            foreach (State state in deciders.Keys)
+            {
+                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State " + state.ID.ToString(), directory + "\\Set_" + state.ID.ToString("X") + ".dot");
+                Serialize_Deciders(deciders[state], serializer);
+                serializer.Close();
+            }
+        }
+
+        private void Serialize_Deciders(Decider machine, Kernel.Graphs.DOTSerializer serializer)
+        {
+            foreach (DeciderState state in machine.States)
+            {
+                string id = state.ID.ToString();
+                string label = id;
+                if (state.Decision != -1)
+                {
+                    Item item = machine.GetItem(state.Decision);
+                    if (item.Action == ItemAction.Shift)
+                        label = "SHIFT: " + machine.LRState.Children[item.NextSymbol].ID.ToString();
+                    else
+                        label = item.BaseRule.ToString();
+                }
+                serializer.WriteNode(id, label);
+            }
+            foreach (DeciderState state in machine.States)
+                foreach (Terminal t in state.Transitions.Keys)
+                    serializer.WriteEdge(state.ID.ToString(), state.Transitions[t].ID.ToString(), t.ToString());
+        }
     }
 }

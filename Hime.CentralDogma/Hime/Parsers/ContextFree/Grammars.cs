@@ -176,14 +176,15 @@ namespace Hime.Parsers.CF
         public abstract void Inherit(CFGrammar Parent);
         public abstract CFGrammar Clone();
 
-        protected void Export_Documentation(ParserData Data, string Directory)
+        protected void Export_Documentation(ParserData data, string directory)
         {
-            if (!Directory.Equals("") && !System.IO.Directory.Exists(Directory))
-                System.IO.Directory.CreateDirectory(Directory);
-            Export_Resources(Directory);
-            Export_GrammarData(Directory);
-            Export_ParserData(Directory, Data);
-            Export_ParserGraph(Directory, Data);
+            if (!directory.Equals("") && !System.IO.Directory.Exists(directory))
+                System.IO.Directory.CreateDirectory(directory);
+            Export_Resources(directory);
+            Export_GrammarData(directory);
+            Export_ParserData(directory, data);
+            Export_ParserGraph(directory, data);
+            Export_Others(directory, data);
         }
         protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
         {
@@ -262,6 +263,10 @@ namespace Hime.Parsers.CF
             Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
             data.SerializeVisual(serializer);
             serializer.Close();
+        }
+        protected void Export_Others(string directory, ParserData data)
+        {
+            data.SerializeOthers(directory);
         }
 
         protected bool Prepare_AddRealAxiom(Hime.Kernel.Reporting.Reporter Log)

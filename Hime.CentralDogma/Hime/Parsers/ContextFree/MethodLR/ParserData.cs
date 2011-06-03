@@ -94,5 +94,7 @@ namespace Hime.Parsers.CF.LR
                 foreach (Symbol symbol in set.Children.Keys)
                     Serializer.WriteEdge(set.ID.ToString(), set.Children[symbol].ID.ToString(), symbol.LocalName);
         }
+
+        public virtual void SerializeOthers(string directory) { }
     }
 }

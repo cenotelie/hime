@@ -17,40 +17,16 @@ namespace Hime.Parsers.CF.LR
             GLRSimulator simulator = new GLRSimulator(graph);
             Dictionary<State, Decider> deciders = new Dictionary<State, Decider>();
             // Output conflicts
-            foreach (State Set in graph.Sets)
+            foreach (State state in graph.Sets)
             {
-                foreach (Conflict conflict in Set.Conflicts)
+                foreach (Conflict conflict in state.Conflicts)
                     Reporter.Report(conflict);
-                Decider decider = new Decider(Set);
+                Decider decider = new Decider(state);
                 decider.Build(simulator);
-                deciders.Add(Set, decider);
-                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State" + Set.ID.ToString(), "State" + Set.ID.ToString() + ".dot");
-                Serialize(decider, serializer);
-                serializer.Close();
+                deciders.Add(state, decider);
             }
             Reporter.Info("LR(Automata)", "Done !");
             return new ParserDataLRA(this, Grammar, graph, deciders);
-        }
-
-        private void Serialize(Decider machine, Kernel.Graphs.DOTSerializer serializer)
-        {
-            foreach (DeciderState state in machine.States)
-            {
-                string id = state.ID.ToString();
-                string label = id;
-                if (state.Decision != -1)
-                {
-                    Item item = machine.GetItem(state.Decision);
-                    if (item.Action == ItemAction.Shift)
-                        label = "SHIFT: " + machine.LRState.Children[item.NextSymbol].ID.ToString();
-                    else
-                        label = item.BaseRule.ToString();
-                }
-                serializer.WriteNode(id, label);
-            }
-            foreach (DeciderState state in machine.States)
-                foreach (Terminal t in state.Transitions.Keys)
-                    serializer.WriteEdge(state.ID.ToString(), state.Transitions[t].ID.ToString(), t.ToString());
         }
     }
 }

@@ -34,30 +34,11 @@ namespace Hime.Parsers.CF.LR
 
         public List<State> Simulate(List<State> sets, Terminal lookahead)
         {
-            List<State> results = new List<State>();
-            List<int> result_ids = new List<int>();
-            foreach (State set in sets)
-            {
-                List<State> temp = Simulate(set, lookahead);
-                foreach (State final in temp)
-                {
-                    if (!result_ids.Contains(final.ID))
-                    {
-                        results.Add(final);
-                        result_ids.Add(final.ID);
-                    }
-                }
-            }
-            return results;
-        }
-
-        public List<State> Simulate(State state, Terminal lookahead)
-        {
             // Sets before reductions
-            List<State> before = new List<State>();
+            List<State> before = new List<State>(sets);
             List<int> before_ids = new List<int>();
-            before.Add(state);
-            before_ids.Add(state.ID);
+            foreach (State set in before)
+                before_ids.Add(set.ID);
             // Reduce
             for (int i = 0; i != before.Count; i++)
             {

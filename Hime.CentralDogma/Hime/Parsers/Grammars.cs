@@ -86,6 +86,7 @@ namespace Hime.Parsers
         bool Export(GrammarBuildOptions Options);
         System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document);
         void SerializeVisual(Kernel.Graphs.DOTSerializer Serializer);
+        void SerializeOthers(string directory);
     }
 
     public interface ParserGenerator
