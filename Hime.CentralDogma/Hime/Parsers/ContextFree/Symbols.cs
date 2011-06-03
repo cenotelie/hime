@@ -21,9 +21,8 @@ namespace Hime.Parsers.CF
 
         public void AddRule(CFRule Rule)
         {
-            foreach (CFRule R in rules)
-                if (R == Rule)
-                    return;
+            if (rules.Contains(Rule))
+                return;
             int ID = rules.Count;
             Rule.ID = ID;
             rules.Add(Rule);

@@ -73,13 +73,10 @@ namespace Hime.Parsers.CF.LR
 
         public override bool Equals(object obj)
         {
-            if (obj is ItemLR1)
-            {
-                ItemLR1 Tested = (ItemLR1)obj;
-                if (!Equals_Base(Tested)) return false;
-                return (Tested.lookahead.SID == lookahead.SID);
-            }
-            return false;
+            ItemLR1 tested = (ItemLR1)obj;
+            if (tested.lookahead.SID != lookahead.SID)
+                return false;
+            return Equals_Base(tested);
         }
         public override int GetHashCode() { return base.GetHashCode(); }
 

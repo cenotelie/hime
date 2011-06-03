@@ -27,7 +27,6 @@ namespace Hime.Parsers.CF.LR
                 Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State" + Set.ID.ToString(), "State" + Set.ID.ToString() + ".dot");
                 Serialize(decider, serializer);
                 serializer.Close();
-                Reporter.Info("LR(Automata)", "Submachine for state " + Set.ID.ToString() + " constructed: " + decider.States.Count.ToString());
             }
             Reporter.Info("LR(Automata)", "Done !");
             return new ParserDataLRA(this, Grammar, graph, deciders);

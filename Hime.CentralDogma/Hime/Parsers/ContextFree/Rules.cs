@@ -166,40 +166,6 @@ namespace Hime.Parsers.CF
             Result.parts.AddRange(Right.parts);
             return Result;
         }
-
-        public static bool operator ==(CFRuleDefinition Left, CFRuleDefinition Right)
-        {
-            if (Left.parts.Count != Right.parts.Count)
-                return false;
-            for (int i = 0; i != Left.parts.Count; i++)
-            {
-                if (Left.parts[i] != Right.parts[i])
-                    return false;
-            }
-            return true;
-        }
-
-        public static bool operator !=(CFRuleDefinition Left, CFRuleDefinition Right)
-        {
-            if (Left.parts.Count != Right.parts.Count)
-                return true;
-            for (int i = 0; i != Left.parts.Count; i++)
-            {
-                if (Left.parts[i] != Right.parts[i])
-                    return true;
-            }
-            return false;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is CFRuleDefinition))
-                return false;
-            CFRuleDefinition right = (CFRuleDefinition)obj;
-            return (this == right);
-        }
-
-        public override int GetHashCode() { return base.GetHashCode(); }
     }
 
 
@@ -288,42 +254,6 @@ namespace Hime.Parsers.CF
             Node.AppendChild(definition.GetXMLNode(Doc));
             return Node;
         }
-
-        public static bool operator ==(CFRule Left, CFRule Right)
-        {
-            if (((object)Left) == null)
-                return (((object)Right) == null);
-            if (((object)Right) == null)
-                return false;
-            if (Left.variable != Right.variable)
-                return false;
-            if (Left.replaceOnProduction != Right.replaceOnProduction)
-                return false;
-            return (Left.definition == Right.definition);
-        }
-
-        public static bool operator !=(CFRule Left, CFRule Right)
-        {
-            if (((object)Left) == null)
-                return (((object)Right) != null);
-            if (((object)Right) == null)
-                return true;
-            if (Left.variable != Right.variable)
-                return true;
-            if (Left.replaceOnProduction != Right.replaceOnProduction)
-                return true;
-            return (Left.definition != Right.definition);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is CFRule))
-                return false;
-            CFRule right = (CFRule)obj;
-            return (this == right);
-        }
-
-        public override int GetHashCode() { return base.GetHashCode(); }
 
         public override string ToString()
         {

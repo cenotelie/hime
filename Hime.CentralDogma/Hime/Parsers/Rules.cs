@@ -55,27 +55,6 @@ namespace Hime.Parsers
             return Node;
         }
 
-        public static bool operator ==(RuleDefinitionPart Left, RuleDefinitionPart Right)
-        {
-            if (Left.symbol != Right.symbol)
-                return false;
-            return (Left.action == Right.action);
-        }
-        public static bool operator !=(RuleDefinitionPart Left, RuleDefinitionPart Right)
-        {
-            if (Left.symbol != Right.symbol)
-                return true;
-            return (Left.action != Right.action);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is RuleDefinitionPart))
-                return false;
-            RuleDefinitionPart right = (RuleDefinitionPart)obj;
-            return (this == right);
-        }
-        public override int GetHashCode() { return base.GetHashCode(); }
         public override string ToString()
         {
             string s = symbol.ToString();
