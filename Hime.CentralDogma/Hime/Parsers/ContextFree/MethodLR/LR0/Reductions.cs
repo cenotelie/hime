@@ -29,14 +29,14 @@ namespace Hime.Parsers.CF.LR
                 if (Set.Children.Count != 0)
                 {
                     // Conflict Shift/Reduce
-                    Conflict Conflict = new Conflict(typeof(MethodLR0), ConflictType.ShiftReduce);
+                    Conflict Conflict = new Conflict("MethodLR0", Set, ConflictType.ShiftReduce);
                     Conflict.AddItem(Item);
                     conflicts.Add(Conflict);
                 }
                 if (Reduce != null)
                 {
                     // Conflict Reduce/Reduce
-                    Conflict Conflict = new Conflict(typeof(MethodLR0), ConflictType.ReduceReduce);
+                    Conflict Conflict = new Conflict("MethodLR0", Set, ConflictType.ReduceReduce);
                     Conflict.AddItem(Item);
                     Conflict.AddItem(Reduce);
                     conflicts.Add(Conflict);

@@ -27,9 +27,9 @@ namespace Hime.Parsers.CF.LR
                 if (Item.Action == ItemAction.Shift)
                     continue;
                 // There is already a shift action for the lookahead => conflict
-                if (Set.Children.ContainsKey(Item.Lookahead)) HandleConflict_ShiftReduce(typeof(MethodLR1), conflicts, Item, Set, Item.Lookahead);
+                if (Set.Children.ContainsKey(Item.Lookahead)) HandleConflict_ShiftReduce("MethodLR1", conflicts, Item, Set, Item.Lookahead);
                 // There is already a reduction action for the lookahead => conflict
-                else if (Reductions.ContainsKey(Item.Lookahead)) HandleConflict_ReduceReduce(typeof(MethodLR1), conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
+                else if (Reductions.ContainsKey(Item.Lookahead)) HandleConflict_ReduceReduce("MethodLR1", conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
                 else // No conflict
                 {
                     Reductions.Add(Item.Lookahead, Item);
@@ -38,7 +38,7 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        public static void HandleConflict_ShiftReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, State Set, Terminal Lookahead)
+        public static void HandleConflict_ShiftReduce(string component, List<Conflict> Conflicts, Item ConflictuousItem, State Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)
@@ -51,7 +51,7 @@ namespace Hime.Parsers.CF.LR
                 }
             }
             // No previous conflict was found
-            Conflict Conflict = new Conflict(MethodType, ConflictType.ShiftReduce, Lookahead);
+            Conflict Conflict = new Conflict(component, Set, ConflictType.ShiftReduce, Lookahead);
             foreach (Item Item in Set.Items)
                 if (Item.Action == ItemAction.Shift && Item.NextSymbol.SID == Lookahead.SID)
                     Conflict.AddItem(Item);
@@ -59,7 +59,7 @@ namespace Hime.Parsers.CF.LR
             Conflicts.Add(Conflict);
         }
 
-        public static void HandleConflict_ReduceReduce(System.Type MethodType, List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, State Set, Terminal Lookahead)
+        public static void HandleConflict_ReduceReduce(string component, List<Conflict> Conflicts, Item ConflictuousItem, Item PreviousItem, State Set, Terminal Lookahead)
         {
             // Look for previous conflict
             foreach (Conflict Previous in Conflicts)
@@ -72,7 +72,7 @@ namespace Hime.Parsers.CF.LR
                 }
             }
             // No previous conflict was found
-            Conflict Conflict = new Conflict(MethodType, ConflictType.ReduceReduce, Lookahead);
+            Conflict Conflict = new Conflict(component, Set, ConflictType.ReduceReduce, Lookahead);
             Conflict.AddItem(PreviousItem);
             Conflict.AddItem(ConflictuousItem);
             Conflicts.Add(Conflict);

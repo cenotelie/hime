@@ -38,14 +38,14 @@ namespace Hime.Parsers.CF.LR
                     // There is already a shift action for the lookahead => conflict
                     if (Set.Children.ContainsKey(Lookahead))
                     {
-                        StateReductionsLR1.HandleConflict_ShiftReduce(typeof(MethodGLALR1), conflicts, Item, Set, Lookahead);
+                        StateReductionsLR1.HandleConflict_ShiftReduce("MethodGLALR1", conflicts, Item, Set, Lookahead);
                         StateActionReduce Reduction = new StateActionReduce(Lookahead, Item.BaseRule);
                         this.Add(Reduction);
                     }
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(Lookahead))
                     {
-                        StateReductionsLR1.HandleConflict_ReduceReduce(typeof(MethodGLALR1), conflicts, Item, Reductions[Lookahead], Set, Lookahead);
+                        StateReductionsLR1.HandleConflict_ReduceReduce("MethodGLALR1", conflicts, Item, Reductions[Lookahead], Set, Lookahead);
                         StateActionReduce Reduction = new StateActionReduce(Lookahead, Item.BaseRule);
                         this.Add(Reduction);
                     }

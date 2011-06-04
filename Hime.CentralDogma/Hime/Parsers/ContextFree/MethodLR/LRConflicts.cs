@@ -11,7 +11,8 @@ namespace Hime.Parsers.CF.LR
 
     class Conflict : Hime.Kernel.Reporting.Entry
     {
-        protected System.Type methodType;
+        protected string component;
+        protected State state;
         protected ConflictType type;
         private Terminal lookahead;
         private List<Item> items;
@@ -19,31 +20,33 @@ namespace Hime.Parsers.CF.LR
         public Hime.Kernel.Reporting.Level Level {
             get
             {
-                if (methodType == typeof(MethodLR0)) return Hime.Kernel.Reporting.Level.Error;
-                if (methodType == typeof(MethodLR1)) return Hime.Kernel.Reporting.Level.Error;
-                if (methodType == typeof(MethodLALR1)) return Hime.Kernel.Reporting.Level.Error;
+                if (component == "MethodLR0") return Hime.Kernel.Reporting.Level.Error;
+                if (component == "MethodLR1") return Hime.Kernel.Reporting.Level.Error;
+                if (component == "MethodLALR1") return Hime.Kernel.Reporting.Level.Error;
                 return Hime.Kernel.Reporting.Level.Warning;
             }
         }
-        public string Component { get { return methodType.Name; } }
+        public string Component { get { return component; } }
+        public State State { get { return state; } }
         public string Message { get { return ToString(); } }
 
-        public System.Type MethodType { get { return methodType; } }
         public ConflictType ConflictType { get { return type; } }
         public Terminal ConflictSymbol { get { return lookahead; } }
         public ICollection<Item> Items { get { return items; } }
 
-        public Conflict(System.Type MethodType, ConflictType Type, Terminal Lookahead)
+        public Conflict(string component, State state, ConflictType type, Terminal lookahead)
         {
-            methodType = MethodType;
-            type = Type;
-            lookahead = Lookahead;
+            this.component = component;
+            this.state = state;
+            this.type = type;
+            this.lookahead = lookahead;
             items = new List<Item>();
         }
-        public Conflict(System.Type MethodType, ConflictType Type)
+        public Conflict(string component, State state, ConflictType type)
         {
-            methodType = MethodType;
-            type = Type;
+            this.component = component;
+            this.state = state;
+            this.type = type;
             items = new List<Item>();
         }
 
@@ -57,6 +60,8 @@ namespace Hime.Parsers.CF.LR
                 Builder.Append("Shift/Reduce");
             else
                 Builder.Append("Reduce/Reduce");
+            Builder.Append(" in ");
+            Builder.Append(state.ID.ToString("X"));
             if (lookahead != null)
             {
                 Builder.Append(" on terminal '");
