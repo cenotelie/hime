@@ -84,9 +84,9 @@
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Compiler.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Grammars.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\Decider.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\GLRSimulator.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\Method.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Decider.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\GLRSimulator.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLR1\Actions.cs" />
@@ -103,7 +103,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Reductions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Items.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR1\Method.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRA\ParserData.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\ParserData.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRGraph.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRConflicts.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRSets.cs" />

@@ -11,7 +11,8 @@ namespace Hime.Parsers
         LALR1 = 3,
         RNGLR1 = 4,
         RNGLALR1 = 0,
-        LRA = 5
+        LRStar = 5,
+        LRAutomata = 6
     }
 
     public sealed class CompilationTask
@@ -159,8 +160,8 @@ namespace Hime.Parsers
                     return new Hime.Parsers.CF.LR.MethodLR1();
                 case ParsingMethod.LALR1:
                     return new Hime.Parsers.CF.LR.MethodLALR1();
-                case ParsingMethod.LRA:
-                    return new Hime.Parsers.CF.LR.MethodLRA();
+                case ParsingMethod.LRStar:
+                    return new Hime.Parsers.CF.LR.MethodLRStar();
                 case ParsingMethod.RNGLR1:
                     return new Hime.Parsers.CF.LR.MethodRNGLR1();
                 case ParsingMethod.RNGLALR1:
