@@ -170,6 +170,8 @@
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Header.xslt" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Index.html" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Menu.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Visuals\Hime.GoTo.png" />
+    <Content Include="Hime\Resources\Visuals\svg\Hime.GoTo.svg" />
     <Content Include="Libraries\log4net\log4net.dll" />
     <Content Include="Libraries\log4net\log4net.xml" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.None.png" />

@@ -76,6 +76,11 @@
         <script src="hime_data/Hime.js" type="text/javascript">aaa</script>
       </head>
       <body>
+        <div>
+          <h1>
+            Grammar Rules
+          </h1>
+        </div>
         <div class="HimeBody">
           <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
             <xsl:apply-templates/>
