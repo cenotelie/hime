@@ -248,15 +248,17 @@ namespace Hime.Parsers.CF.LR
         }
 
 
-
-        public override void SerializeOthers(string directory)
+        public override List<string> SerializeVisuals(string directory)
         {
+            List<string> files = base.SerializeVisuals(directory);
             foreach (State state in deciders.Keys)
             {
                 Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State " + state.ID.ToString(), directory + "\\Set_" + state.ID.ToString("X") + ".dot");
                 Serialize_Deciders(deciders[state], serializer);
                 serializer.Close();
+                files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".dot");
             }
+            return files;
         }
 
         private void Serialize_Deciders(Decider machine, Kernel.Graphs.DOTSerializer serializer)

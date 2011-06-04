@@ -259,6 +259,15 @@ namespace Hime.Parsers.CF
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "menu.html", directory + "\\menu.html"));
             accessor.AddCheckoutFile(directory + "\\menu.html");
 
+            // export parser data
+            List<string> files = data.SerializeVisuals(directory);
+            foreach (string file in files)
+            {
+                System.IO.FileInfo info = new System.IO.FileInfo(file);
+                compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/plain", "utf-8", info.Name, file));
+                accessor.AddCheckoutFile(file);
+            }
+
             compiler.CompileTo(fileName + ".mht");
             accessor.Close();
         }
@@ -270,16 +279,6 @@ namespace Hime.Parsers.CF
             foreach (CFVariable var in variables.Values)
                 root.AppendChild(var.GetXMLNode(Document));
             return root;
-        }
-        protected void Export_ParserGraph(string directory, ParserData data)
-        {
-            Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
-            data.SerializeVisual(serializer);
-            serializer.Close();
-        }
-        protected void Export_Others(string directory, ParserData data)
-        {
-            data.SerializeOthers(directory);
         }
 
         protected bool Prepare_AddRealAxiom(Hime.Kernel.Reporting.Reporter Log)

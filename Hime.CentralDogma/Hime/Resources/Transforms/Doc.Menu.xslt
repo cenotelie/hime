@@ -20,6 +20,15 @@
                 </xsl:attribute>
               </img>
             </td>
+            <td style="width: 20px; height: 20px">
+              <img src="hime_data/Hime.GoTo.png" alt="Go to" style="width: 20px; height: 20px; cursor: pointer;">
+                <xsl:attribute name="onclick">
+                  <xsl:text>display('Set_</xsl:text>
+                  <xsl:value-of select="@SetID"/>
+                  <xsl:text>.dot')</xsl:text>
+                </xsl:attribute>
+              </img>
+            </td>
           </tr>
         </table>
       </td>

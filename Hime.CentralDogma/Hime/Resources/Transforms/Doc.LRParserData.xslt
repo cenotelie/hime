@@ -24,6 +24,11 @@
       <xsl:value-of select="@Value"/>
     </span>
   </xsl:template>
+  <xsl:template match="SymbolTerminal">
+    <span class="HimeSymbolTerminal">
+      <xsl:value-of select="@Value"/>
+    </span>
+  </xsl:template>
 
   <xsl:template match="Dot">
     <span>•</span>

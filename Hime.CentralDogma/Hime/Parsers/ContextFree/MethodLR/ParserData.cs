@@ -86,15 +86,18 @@ namespace Hime.Parsers.CF.LR
             return ConflictType.None;
         }
 
-        public void SerializeVisual(Kernel.Graphs.DOTSerializer Serializer)
+        public virtual List<string> SerializeVisuals(string directory)
         {
+            Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
             foreach (State set in graph.Sets)
-                Serializer.WriteNode(set.ID.ToString());
+                serializer.WriteNode(set.ID.ToString());
             foreach (State set in graph.Sets)
                 foreach (Symbol symbol in set.Children.Keys)
-                    Serializer.WriteEdge(set.ID.ToString(), set.Children[symbol].ID.ToString(), symbol.LocalName);
+                    serializer.WriteEdge(set.ID.ToString(), set.Children[symbol].ID.ToString(), symbol.LocalName);
+            serializer.Close();
+            List<string> files = new List<string>();
+            files.Add(directory + "\\GraphParser.dot");
+            return files;
         }
-
-        public virtual void SerializeOthers(string directory) { }
     }
 }

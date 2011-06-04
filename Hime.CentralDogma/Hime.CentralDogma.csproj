@@ -75,6 +75,7 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Hime\Kernel\Documentation\Builder.cs" />
     <Compile Include="Hime\Kernel\Documentation\MHTML.cs" />
     <Compile Include="Hime\Kernel\Graphs\DOTSerializer.cs" />
     <Compile Include="Hime\Kernel\Graphs\GMLSerializer.cs" />
