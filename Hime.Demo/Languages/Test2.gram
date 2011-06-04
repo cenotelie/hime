@@ -1,0 +1,189 @@
+﻿public grammar cf Test2
+{
+	options
+	{
+		Axiom = "expression";
+		Separator = "SEPARATOR";
+	}
+	terminals
+	{
+		NEW_LINE		-> 0x000D /* CR */
+						|  0x000A /* LF */
+						|  0x000D 0x000A /* CR LF */
+						|  0x2028 /* LS */
+						|  0x2029 /* PS */ ;
+		WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		COMMENT_LINE	-> '//' (0x0000 .. 0xFFFF - NEW_LINE) NEW_LINE ;
+		COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
+		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
+			
+		NULL_LITTERAL				-> 'null' ;
+		BOOLEAN_LITTERAL_TRUE		-> 'true' ;
+		BOOLEAN_LITTERAL_FALSE		-> 'false' ;
+		INTEGER_LITTERAL_SUFFIX		-> 'U' | 'u' | 'L' | 'l' | 'UL' | 'Ul' | 'uL' | 'ul' | 'LU' | 'Lu' | 'lU' | 'lu' ;
+		INTEGER_LITTERAL_DECIMAL	-> [1-9] [0-9]* | '0' INTEGER_LITTERAL_SUFFIX? ;
+		INTEGER_LITTERAL_HEXA		-> '0' ('x' | 'X') [a-fA-F0-9]+ INTEGER_LITTERAL_SUFFIX? ;
+		REAL_LITTERAL_SUFFIX		-> 'F' | 'f' | 'D' | 'd' | 'M' | 'm' ;
+		REAL_LITTERAL				-> INTEGER_LITTERAL_DECIMAL? '.' INTEGER_LITTERAL_DECIMAL  (('e' | 'E') ('+' | '-')? INTEGER_LITTERAL_DECIMAL)? REAL_LITTERAL_SUFFIX?
+									|  INTEGER_LITTERAL_DECIMAL ('e' | 'E') ('+' | '-')? INTEGER_LITTERAL_DECIMAL REAL_LITTERAL_SUFFIX?
+									|  INTEGER_LITTERAL_DECIMAL REAL_LITTERAL_SUFFIX ;
+		CHARACTER_LITTERAL			-> '\'' ( (0x0000 .. 0xFFFF - ('\'' | '\\' | NEW_LINE))
+											| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
+											| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
+											| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
+										) '\'' ;
+		STRING_LITTERAL_REGULAR		-> '"'  ( (0x0000 .. 0xFFFF - ('"' | '\\' | NEW_LINE))
+											| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
+											| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
+											| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
+										)* '"' ;
+		STRING_LITTERAL_VERBATIM	-> '@' '"' ([^"] | '""')* '"' ;
+			
+		IDENTIFIER		-> '@'? [a-zA-Z] [a-zA-Z0-9_]* ;
+	}
+	rules
+	{
+		qualified_name		-> IDENTIFIER ('.' IDENTIFIER)* ;
+			
+		/* Types grammar */
+		type					-> type_non_array
+								|  type_array ;
+		type_non_array			-> type_object
+								|  type_simple ;
+		type_object				-> 'object'
+								|  'string'
+								|  qualified_name ;
+		type_simple				-> 'bool'
+								|  'decimal'
+								|  type_simple_integral
+								|  type_simple_float ;
+		type_simple_integral	-> 'sbyte'
+								|  'byte'
+								|  'short'
+								|  'ushort'
+								|  'int'
+								|  'uint'
+								|  'long'
+								|  'ulong'
+								|  'char' ;
+		type_simple_float		-> 'float' | 'double' ;
+		type_array				-> type_non_array type_array_rank+ ;
+		type_array_rank			-> '[' type_array_rank_dim ']' ;
+		type_array_rank_dim		-> ','* ;
+		type_predefined			-> 'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int' | 'long'
+								|  'object' | 'sbyte' | 'short' | 'string' | 'uint' | 'ulong' | 'ushort' ;
+		type_return				-> 'void' | type ;
+			
+			
+		/* Expressions grammar */
+		exp_atom				-> NULL_LITTERAL
+								|  BOOLEAN_LITTERAL_TRUE
+								|  BOOLEAN_LITTERAL_FALSE
+								|  INTEGER_LITTERAL_DECIMAL
+								|  INTEGER_LITTERAL_HEXA
+								|  REAL_LITTERAL
+								|  CHARACTER_LITTERAL
+								|  STRING_LITTERAL_REGULAR
+								|  STRING_LITTERAL_VERBATIM
+								|  IDENTIFIER
+								|  'this'
+								|  'base'
+								|  '(' expression ')' ;
+			
+		exp_op0_invoke			-> exp_op0 '(' exp_argument_list? ')' ;
+		exp_op0_obj_creation	-> 'new' type '(' exp_argument_list? ')' ;
+		exp_op0_post_increment	-> exp_op0 '++' ;
+		exp_op0_post_decrement	-> exp_op0 '--' ;
+		exp_op0_member_access	-> exp_op0 '.' IDENTIFIER
+								|  type_predefined '.' IDENTIFIER ;
+		exp_op0_element_access	-> exp_op0_no_array '[' exp_expression_list? ']' ;
+		exp_op0_typeof			-> 'typeof' '(' type_return ')' ;
+		exp_op0_checked			-> 'checked' '(' expression ')' ;
+		exp_op0_unchecked		-> 'unchecked' '(' expression ')' ;
+		exp_op0_array_creation	-> 'new' type_non_array '[' exp_expression_list ']' type_array_rank?  array_initializer?
+								|  'new' type_array array_initializer ;
+		exp_op0_no_array		-> exp_atom
+								|  exp_op0_invoke
+								|  exp_op0_obj_creation
+								|  exp_op0_post_increment
+								|  exp_op0_post_decrement
+								|  exp_op0_member_access
+								|  exp_op0_typeof
+								|  exp_op0_checked
+								|  exp_op0_unchecked ;
+		exp_op0					-> exp_op0_no_array
+								|  exp_op0_array_creation ;
+			
+		exp_op1_pre_increment	-> '++' exp_op1 ;
+		exp_op1_pre_decrement	-> '--' exp_op1 ;
+		exp_op1_cast			-> '(' type ')' exp_op1 ;
+		exp_op1					-> exp_op0
+								|  '+' exp_op1
+								|  '-' exp_op1
+								|  '!' exp_op1
+								|  '~' exp_op1
+								|  exp_op1_pre_increment
+								|  exp_op1_pre_decrement
+								|  exp_op1_cast ;
+			
+		exp_op2					-> exp_op1
+								|  exp_op2 '*' exp_op1
+								|  exp_op2 '/' exp_op1
+								|  exp_op2 '%' exp_op1 ;
+		exp_op3					-> exp_op2
+								|  exp_op3 '+' exp_op2
+								|  exp_op3 '-' exp_op2 ;
+		exp_op4					-> exp_op3
+								|  exp_op4 '<<' exp_op3
+								|  exp_op4 '>>' exp_op3 ;
+		exp_op5					-> exp_op4
+								|  exp_op5 '<' exp_op4
+								|  exp_op5 '<=' exp_op4
+								|  exp_op5 '>' exp_op4
+								|  exp_op5 '>=' exp_op4
+								|  exp_op5 'is' exp_op4
+								|  exp_op5 'as' exp_op4 ;
+		exp_op6					-> exp_op5
+								|  exp_op6 '==' exp_op5
+								|  exp_op6 '!=' exp_op5 ;
+		exp_op7					-> exp_op6
+								|  exp_op7 '&' exp_op6 ;
+		exp_op8					-> exp_op7
+								|  exp_op8 '^' exp_op7 ;
+		exp_op9					-> exp_op8
+								|  exp_op9 '|' exp_op8 ;
+		exp_op10				-> exp_op9
+								|  exp_op10 '&&' exp_op9 ;
+		exp_op11				-> exp_op10
+								|  exp_op11 '||' exp_op10 ;
+			
+		exp_op12_conditional	-> exp_op11
+								|  exp_op11 '?' expression ':' expression ;
+		exp_op13_assigment		-> exp_op1 '=' expression
+								|  exp_op1 '+=' expression
+								|  exp_op1 '-=' expression
+								|  exp_op1 '*=' expression
+								|  exp_op1 '/=' expression
+								|  exp_op1 '%=' expression
+								|  exp_op1 '&=' expression
+								|  exp_op1 '|=' expression
+								|  exp_op1 '^=' expression
+								|  exp_op1 '<<=' expression
+								|  exp_op1 '>>=' expression ;
+			
+		expression				-> exp_op12_conditional
+								|  exp_op13_assigment ;
+		exp_expression_list		-> expression
+								|  exp_expression_list ',' expression ;
+		exp_argument_list		-> exp_argument
+								|  exp_argument_list ',' exp_argument ;
+		exp_argument			-> expression
+								|  'ref' expression
+								|  'out' expression ;
+
+		array_initializer			-> '{' variable_initializer_list '}' ;
+		variable_initializer		-> expression
+									|  array_initializer ;
+		variable_initializer_list	-> (variable_initializer (',' variable_initializer)*)? ;
+	}
+}

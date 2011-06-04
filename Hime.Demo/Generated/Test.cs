@@ -233,28 +233,25 @@ namespace Analyser
             , new State(
                new string[2] {"[t → x •, ./)]", "[e0 → x •, ./)]"},
                new Terminal[2] {new Terminal("_T[.]", 0x7), new Terminal("_T[)]", 0xA)},
-               new DeciderState[7] {
+               new DeciderState[6] {
                    new DeciderState(
                    new ushort[2] {0x7, 0xA},
-                   new ushort[2] {0x3, 0x6}, 0xFFFF, new Rule())
+                   new ushort[2] {0x1, 0x2}, 0xFFFF, new Rule())
                    , new DeciderState(
-                   new ushort[0] {},
-                   new ushort[0] {}, 0xFFFF, staticRules[0x0])
+                   new ushort[1] {0x6},
+                   new ushort[1] {0x3}, 0xFFFF, new Rule())
+                   , new DeciderState(
+                   new ushort[4] {0x9, 0x6, 0x2, 0xA},
+                   new ushort[4] {0x4, 0x4, 0x5, 0x5}, 0xFFFF, new Rule())
+                   , new DeciderState(
+                   new ushort[3] {0x2, 0x7, 0xA},
+                   new ushort[3] {0x5, 0x1, 0x2}, 0xFFFF, new Rule())
                    , new DeciderState(
                    new ushort[0] {},
                    new ushort[0] {}, 0xFFFF, staticRules[0x5])
                    , new DeciderState(
-                   new ushort[1] {0x6},
-                   new ushort[1] {0x4}, 0xFFFF, new Rule())
-                   , new DeciderState(
-                   new ushort[3] {0x2, 0x7, 0xA},
-                   new ushort[3] {0x1, 0x3, 0x5}, 0xFFFF, new Rule())
-                   , new DeciderState(
-                   new ushort[4] {0x6, 0x9, 0x2, 0xA},
-                   new ushort[4] {0x2, 0x2, 0x1, 0x1}, 0xFFFF, new Rule())
-                   , new DeciderState(
-                   new ushort[4] {0x6, 0x9, 0x2, 0xA},
-                   new ushort[4] {0x2, 0x2, 0x1, 0x1}, 0xFFFF, new Rule())
+                   new ushort[0] {},
+                   new ushort[0] {}, 0xFFFF, staticRules[0x0])
                },
                new ushort[0] {},
                new ushort[0] {})

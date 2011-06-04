@@ -21,8 +21,8 @@
 
         static void Parse_Test()
         {
-            Analyser.Test_Lexer Lex = new Analyser.Test_Lexer("(x.x)x.x");
-            Analyser.Test_Parser Parser = new Analyser.Test_Parser(Lex);
+            Analyser.Test2_Lexer Lex = new Analyser.Test2_Lexer("(x)");
+            Analyser.Test2_Parser Parser = new Analyser.Test2_Parser(Lex);
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
 
             foreach (Hime.Redist.Parsers.LexerError LexerError in Lex.Errors) System.Console.WriteLine(LexerError.ToString());
@@ -36,9 +36,10 @@
 
         static void Main(string[] args)
         {
-            //Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Test.gram" }, "Test", Hime.Parsers.ParsingMethod.LRA, "Analyser", null, "Test.cs", true, true);
-            //Task.Execute();
-            Parse_Test();
+            //Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Earth.CIL.CSharp.gram" }, "Hime.Earth.CIL.GrammarCSharp", Hime.Parsers.ParsingMethod.LALR1, "Analyser", null, "GrammarCSharp.cs", true, true);
+            Hime.Parsers.CompilationTask Task = Hime.Parsers.CompilationTask.Create(new string[] { "Languages\\Test2.gram" }, "Test2", Hime.Parsers.ParsingMethod.LRStar, "Analyser", null, "Test2.cs", true, true);
+            Task.Execute();
+            //Parse_Test();
         }
 
         class Interpreter : Analyser.MathExp_Parser.Actions

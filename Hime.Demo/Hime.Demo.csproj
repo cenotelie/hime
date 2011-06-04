@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Generated\MathExp.cs" />
     <Compile Include="Generated\Test.cs" />
+    <Compile Include="Generated\Test2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WinTreeView.cs">
@@ -95,6 +96,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Languages\Test.gram">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Languages\Test2.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />
