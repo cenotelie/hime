@@ -50,7 +50,7 @@
     <Compile Include="GSS.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="ParserLRA.cs" />
+    <Compile Include="ParserLRStar.cs" />
     <Compile Include="ParserRNGLR1.cs" />
     <Compile Include="ParserLR1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
