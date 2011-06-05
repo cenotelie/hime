@@ -23,7 +23,7 @@ namespace Hime.HimeCC
         [Option("n", "namespace", Required = false, HelpText = "Namespace for the generated Lexer and Parser classes")]
         public string Namespace;
 
-        [Option("m", "method", Required = false, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1")]
+        [Option("m", "method", Required = false, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1|LRStar")]
         public Parsers.ParsingMethod Method;
 
         [Option(null, "lexer", Required = false, HelpText = "Path and name of the file for the generated lexer")]
