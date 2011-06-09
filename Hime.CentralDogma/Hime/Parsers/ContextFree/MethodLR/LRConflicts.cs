@@ -11,28 +11,31 @@ namespace Hime.Parsers.CF.LR
 
     class Conflict : Hime.Kernel.Reporting.Entry
     {
-        protected string component;
-        protected State state;
-        protected ConflictType type;
+        private string component;
+        private State state;
+        private ConflictType type;
         private Terminal lookahead;
         private List<Item> items;
+        private bool isError;
 
         public Hime.Kernel.Reporting.Level Level {
             get
             {
-                if (component == "MethodLR0") return Hime.Kernel.Reporting.Level.Error;
-                if (component == "MethodLR1") return Hime.Kernel.Reporting.Level.Error;
-                if (component == "MethodLALR1") return Hime.Kernel.Reporting.Level.Error;
-                return Hime.Kernel.Reporting.Level.Warning;
+                if (isError) return Kernel.Reporting.Level.Error;
+                return Kernel.Reporting.Level.Warning;
             }
         }
         public string Component { get { return component; } }
         public State State { get { return state; } }
         public string Message { get { return ToString(); } }
-
         public ConflictType ConflictType { get { return type; } }
         public Terminal ConflictSymbol { get { return lookahead; } }
         public ICollection<Item> Items { get { return items; } }
+        public bool IsError
+        {
+            get { return isError; }
+            set { isError = value; }
+        }
 
         public Conflict(string component, State state, ConflictType type, Terminal lookahead)
         {
@@ -40,6 +43,7 @@ namespace Hime.Parsers.CF.LR
             this.state = state;
             this.type = type;
             this.lookahead = lookahead;
+            this.isError = true;
             items = new List<Item>();
         }
         public Conflict(string component, State state, ConflictType type)
@@ -47,6 +51,7 @@ namespace Hime.Parsers.CF.LR
             this.component = component;
             this.state = state;
             this.type = type;
+            this.isError = true;
             items = new List<Item>();
         }
 

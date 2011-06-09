@@ -253,10 +253,13 @@ namespace Hime.Parsers.CF.LR
             List<string> files = base.SerializeVisuals(directory);
             foreach (State state in deciders.Keys)
             {
-                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State " + state.ID.ToString(), directory + "\\Set_" + state.ID.ToString("X") + ".dot");
+                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State_" + state.ID.ToString(), directory + "\\Set_" + state.ID.ToString("X") + ".dot");
                 Serialize_Deciders(deciders[state], serializer);
                 serializer.Close();
-                files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".dot");
+                Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
+                layout.Render(directory + "\\Set_" + state.ID.ToString("X") + ".dot", directory + "\\Set_" + state.ID.ToString("X") + ".svg");
+                System.IO.File.Delete(directory + "\\Set_" + state.ID.ToString("X") + ".dot");
+                files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".svg");
             }
             return files;
         }

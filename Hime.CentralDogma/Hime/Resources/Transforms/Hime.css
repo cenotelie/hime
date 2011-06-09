@@ -174,3 +174,9 @@
     margin: 2px;
     background-color: #CCFFFF;
 }
+
+.maximize
+{
+    width: 100%;
+    height: 100%;
+}

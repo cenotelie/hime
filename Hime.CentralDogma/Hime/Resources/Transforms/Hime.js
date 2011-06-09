@@ -13,5 +13,5 @@
 }
 
 function display(uri) {
-    document.getElementById('myContent').innerHTML = "<iframe frameborder='yes' width='100%' height='100%' src='" + uri + "'/>";
+    document.getElementById('myContent').innerHTML = "<iframe frameborder='yes' src='" + uri + "'  class='maximize'/>";
 }

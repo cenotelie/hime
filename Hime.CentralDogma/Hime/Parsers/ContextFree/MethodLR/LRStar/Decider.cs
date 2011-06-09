@@ -7,15 +7,22 @@ namespace Hime.Parsers.CF.LR
         private State lrstate;
         private List<Item> items;
         private List<DeciderStateLRStar> states;
+        private Dictionary<Conflict, DeciderStateLRStar> origins;
+        private Dictionary<Conflict, bool> isResolved;
 
         public State LRState { get { return lrstate; } }
         public ICollection<DeciderStateLRStar> States { get { return states; } }
+        public ICollection<Conflict> Conflicts { get { return isResolved.Keys; } }
+
+        public bool IsResolved(Conflict conflict) { return isResolved[conflict]; }
 
         public DeciderLRStar(State state)
         {
             lrstate = state;
             items = new List<Item>(lrstate.Items);
             states = new List<DeciderStateLRStar>();
+            origins = new Dictionary<Conflict, DeciderStateLRStar>();
+            isResolved = new Dictionary<Conflict, bool>();
         }
 
         public Item GetItem(int decision) { return items[decision]; }
@@ -40,6 +47,7 @@ namespace Hime.Parsers.CF.LR
             foreach (Conflict c in lrstate.Conflicts)
                 BuildFirst_Conflict(first, c, simulator);
             Close(simulator);
+            CheckConflicts();
         }
         private void BuildFirst_Shift(DeciderStateLRStar first, Item item, int index, List<Terminal> conflicts)
         {
@@ -64,16 +72,17 @@ namespace Hime.Parsers.CF.LR
         }
         private void BuildFirst_Conflict(DeciderStateLRStar first, Conflict conflict, GLRSimulator simulator)
         {
-            Dictionary<int, List<State>> data = new Dictionary<int, List<State>>();
+            Dictionary<int, GLRSimulatorState> data = new Dictionary<int, GLRSimulatorState>();
             foreach (Item item in conflict.Items)
             {
                 int index = items.IndexOf(item);
-                List<State> finals = simulator.Simulate(lrstate, item, conflict.ConflictSymbol);
+                GLRSimulatorState finals = simulator.Simulate(lrstate, item, conflict.ConflictSymbol);
                 data.Add(index, finals);
             }
             DeciderStateLRStar next = new DeciderStateLRStar(this, data);
             states.Add(next);
             first.Transitions.Add(conflict.ConflictSymbol, next);
+            origins.Add(conflict, next);
         }
 
         private void Close(GLRSimulator simulator)
@@ -89,9 +98,41 @@ namespace Hime.Parsers.CF.LR
                 {
                     DeciderStateLRStar next = nexts[t];
                     next = AddUnique(next);
-                    current.Transitions.Add(t, next);
+                    current.AddTransition(t, next);
                 }
             }
+        }
+
+        private void CheckConflicts()
+        {
+            foreach (Conflict conflict in origins.Keys)
+                isResolved.Add(conflict, CheckConflict(conflict));
+        }
+        private bool CheckConflict(Conflict conflict)
+        {
+            List<DeciderStateLRStar> children = new List<DeciderStateLRStar>();
+            List<int> children_ids = new List<int>();
+            children.Add(origins[conflict]);
+            children_ids.Add(origins[conflict].ID);
+            for (int i = 0; i != children.Count; i++)
+            {
+                DeciderStateLRStar current = children[i];
+                foreach (Terminal t in current.Transitions.Keys)
+                {
+                    DeciderStateLRStar next = current.Transitions[t];
+                    if (t == TerminalDollar.Instance)
+                    {
+                        if (next.Decision == -1)
+                            return false;
+                    }
+                    if (!children_ids.Contains(next.ID))
+                    {
+                        children.Add(next);
+                        children_ids.Add(next.ID);
+                    }
+                }
+            }
+            return true;
         }
 
         public DeciderStateLRStar AddUnique(DeciderStateLRStar candidate)
@@ -109,8 +150,9 @@ namespace Hime.Parsers.CF.LR
         private int id;
         private DeciderLRStar decider;
         private int decision;
-        private Dictionary<int, List<State>> choices; // Item |> {State}
+        private Dictionary<int, GLRSimulatorState> choices; // Item |> {State}
         private Dictionary<Terminal, DeciderStateLRStar> transitions;
+        private Dictionary<Terminal, List<DeciderStateLRStar>> incomings;
 
         public int ID
         {
@@ -119,30 +161,34 @@ namespace Hime.Parsers.CF.LR
         }
         public int Decision { get { return decision; } }
         public Dictionary<Terminal, DeciderStateLRStar> Transitions { get { return transitions; } }
+        public Dictionary<Terminal, List<DeciderStateLRStar>> Incomings { get { return incomings; } }
 
         public DeciderStateLRStar(DeciderLRStar decider)
         {
             id = 0;
             this.decider = decider;
             decision = -1;
-            choices = new Dictionary<int, List<State>>();
+            choices = new Dictionary<int, GLRSimulatorState>();
             transitions = new Dictionary<Terminal, DeciderStateLRStar>();
+            incomings = new Dictionary<Terminal, List<DeciderStateLRStar>>();
         }
 
-        public DeciderStateLRStar(DeciderLRStar decider, Dictionary<int, List<State>> data)
+        public DeciderStateLRStar(DeciderLRStar decider, Dictionary<int, GLRSimulatorState> data)
         {
             id = 0;
             this.decider = decider;
             decision = -1;
             choices = data;
             transitions = new Dictionary<Terminal, DeciderStateLRStar>();
+            incomings = new Dictionary<Terminal, List<DeciderStateLRStar>>();
         }
         public DeciderStateLRStar(DeciderLRStar decider, int decision) {
             id = 0;
             this.decider = decider;
             this.decision = decision;
-            choices = new Dictionary<int, List<State>>();
+            choices = new Dictionary<int, GLRSimulatorState>();
             transitions = new Dictionary<Terminal, DeciderStateLRStar>();
+            incomings = new Dictionary<Terminal, List<DeciderStateLRStar>>();
         }
 
 
@@ -152,11 +198,11 @@ namespace Hime.Parsers.CF.LR
             Dictionary<Terminal, DeciderStateLRStar> results = new Dictionary<Terminal, DeciderStateLRStar>();
             foreach (Terminal conflict in conflictuous.Keys)
             {
-                Dictionary<int, List<State>> data = new Dictionary<int, List<State>>();
+                Dictionary<int, GLRSimulatorState> data = new Dictionary<int, GLRSimulatorState>();
                 foreach (int item in conflictuous[conflict])
                 {
-                    List<State> origins = choices[item];
-                    List<State> finals = simulator.Simulate(origins, conflict);
+                    GLRSimulatorState origins = choices[item];
+                    GLRSimulatorState finals = simulator.Simulate(origins, conflict);
                     data.Add(item, finals);
                 }
                 results.Add(conflict, new DeciderStateLRStar(decider, data));
@@ -211,11 +257,22 @@ namespace Hime.Parsers.CF.LR
             transitions.Add(t, decider.AddUnique(decision));
         }
 
-        private List<Terminal> ComputeFollowers(List<State> choice)
+        public void AddTransition(Terminal t, DeciderStateLRStar next)
+        {
+            if (transitions.ContainsKey(t))
+                return;
+            transitions.Add(t, next);
+            if (!next.incomings.ContainsKey(t))
+                next.incomings.Add(t, new List<DeciderStateLRStar>());
+            next.incomings[t].Add(this);
+        }
+
+        private List<Terminal> ComputeFollowers(GLRSimulatorState choice)
         {
             List<Terminal> result = new List<Terminal>();
-            foreach (State state in choice)
+            foreach (GLRStackNode node in choice.Nodes)
             {
+                State state = node.State;
                 foreach (Symbol s in state.Children.Keys)
                 {
                     if (!(s is Terminal))
@@ -252,16 +309,16 @@ namespace Hime.Parsers.CF.LR
             {
                 if (!right.choices.ContainsKey(item))
                     return false;
-                List<State> l1 = this.choices[item];
-                List<State> l2 = right.choices[item];
+                List<GLRStackNode> l1 = this.choices[item].Nodes;
+                List<GLRStackNode> l2 = right.choices[item].Nodes;
                 if (l1.Count != l2.Count)
                     return false;
                 List<int> ids1 = new List<int>();
                 List<int> ids2 = new List<int>();
                 for (int i = 0; i != l1.Count; i++)
                 {
-                    ids1.Add(l1[i].ID);
-                    ids2.Add(l2[i].ID);
+                    ids1.Add(l1[i].State.ID);
+                    ids2.Add(l2[i].State.ID);
                 }
                 foreach (int id in ids1)
                     if (!ids2.Contains(id))

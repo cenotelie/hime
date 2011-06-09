@@ -162,6 +162,13 @@
           <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
             <xsl:apply-templates/>
           </table>
+          <embed type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/">
+            <xsl:attribute name="src">
+              <xsl:text>Set_</xsl:text>
+              <xsl:value-of select="@SetID"/>
+              <xsl:text>.svg</xsl:text>
+            </xsl:attribute>
+          </embed>
         </div>
       </body>
     </html>

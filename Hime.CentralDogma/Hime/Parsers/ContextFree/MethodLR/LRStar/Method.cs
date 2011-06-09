@@ -19,11 +19,15 @@ namespace Hime.Parsers.CF.LR
             // Output conflicts
             foreach (State state in graph.Sets)
             {
-                foreach (Conflict conflict in state.Conflicts)
-                    Reporter.Report(conflict);
                 DeciderLRStar decider = new DeciderLRStar(state);
                 decider.Build(simulator);
                 deciders.Add(state, decider);
+
+                foreach (Conflict conflict in state.Conflicts)
+                {
+                    if (!decider.IsResolved(conflict))
+                        Reporter.Report(conflict);
+                }
             }
             Reporter.Info("LR(*)", "Done !");
             return new ParserDataLRStar(this, Grammar, graph, deciders);

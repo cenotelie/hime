@@ -181,8 +181,8 @@ namespace Hime.Parsers.CF.LR
         public override int GetHashCode() { return base.GetHashCode(); }
         public override string ToString()
         {
-            System.Text.StringBuilder Builder = new System.Text.StringBuilder("I");
-            Builder.Append(iD.ToString());
+            System.Text.StringBuilder Builder = new System.Text.StringBuilder("S ");
+            Builder.Append(iD.ToString("X"));
             Builder.Append(" = {");
             foreach (Item Item in items)
             {
