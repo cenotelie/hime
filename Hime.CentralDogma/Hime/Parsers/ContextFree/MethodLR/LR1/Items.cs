@@ -85,7 +85,7 @@ namespace Hime.Parsers.CF.LR
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");
             Builder.Append(rule.Variable.ToString());
-            Builder.Append(" " + arrow);
+            Builder.Append(" " + CFRule.arrow);
             int i = 0;
             foreach (RuleDefinitionPart Part in definition.Parts)
             {

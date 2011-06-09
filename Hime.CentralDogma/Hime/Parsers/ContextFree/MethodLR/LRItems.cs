@@ -12,7 +12,6 @@ namespace Hime.Parsers.CF.LR
 
     abstract class Item
     {
-        protected const string arrow = "→";
         protected const string dot = "•";
 
         protected CFRule rule;

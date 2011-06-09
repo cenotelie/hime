@@ -53,6 +53,20 @@
                       </table>
                     </td>
                   </tr>
+                  <tr class="HimeEntry">
+                    <td class="HimeData" style="border-left: none;">
+                      <table>
+                        <tr>
+                          <td>
+                            LR Graph
+                          </td>
+                          <td style="width: 20px; height: 20px">
+                            <img src="hime_data/Hime.GoTo.png" alt="Go to" style="width: 20px; height: 20px; cursor: pointer;" onclick="display('GraphParser.html')"/>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
                   <xsl:apply-templates/>
                 </table>
               </div>

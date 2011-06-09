@@ -209,6 +209,8 @@ namespace Hime.Parsers.CF
 
     public sealed class CFRule
     {
+        public const string arrow = "→";
+
         private CFVariable variable;
         private CFRuleDefinition definition;
         private bool replaceOnProduction;
@@ -259,7 +261,8 @@ namespace Hime.Parsers.CF
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder();
             Builder.Append(variable.LocalName);
-            Builder.Append(" ->");
+            Builder.Append(" ");
+            Builder.Append(arrow);
             Builder.Append(definition.ToString());
             return Builder.ToString();
         }

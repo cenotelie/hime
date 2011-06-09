@@ -33,9 +33,17 @@ namespace Hime.Kernel.Graphs
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\"];");
         }
+        public void WriteNode(string id, string label, string url)
+        {
+            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\", URL=\"" + url + "\"];");
+        }
         public void WriteNode(string id, string label, DOTNodeShape shape)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
+        }
+        public void WriteNode(string id, string label, DOTNodeShape shape, string url)
+        {
+            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\", URL=\"" + url + "\",shape=" + shape.ToString() + "];");
         }
 
         public void WriteEdge(string tail, string head, string label)

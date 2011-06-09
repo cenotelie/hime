@@ -90,13 +90,16 @@ namespace Hime.Parsers.CF.LR
         {
             Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
             foreach (State set in graph.Sets)
-                serializer.WriteNode(set.ID.ToString());
+                serializer.WriteNode(set.ID.ToString("X"), set.ID.ToString("X"), "Set_" + set.ID.ToString("X") + ".html");
             foreach (State set in graph.Sets)
                 foreach (Symbol symbol in set.Children.Keys)
-                    serializer.WriteEdge(set.ID.ToString(), set.Children[symbol].ID.ToString(), symbol.LocalName);
+                    serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.LocalName);
             serializer.Close();
             List<string> files = new List<string>();
-            files.Add(directory + "\\GraphParser.dot");
+            Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
+            layout.Render(directory + "\\GraphParser.dot", directory + "\\GraphParser.svg");
+            System.IO.File.Delete(directory + "\\GraphParser.dot");
+            files.Add(directory + "\\GraphParser.svg");
             return files;
         }
     }
