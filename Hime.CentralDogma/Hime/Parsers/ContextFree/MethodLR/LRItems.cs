@@ -48,11 +48,12 @@ namespace Hime.Parsers.CF.LR
                 return false;
             return (dotPosition == Item.dotPosition);
         }
+        public abstract bool ItemEquals(Item item);
 
         public abstract Item GetChild();
         public abstract void CloseTo(List<Item> Closure);
 
-        public abstract override bool Equals(object obj);
+        public override bool Equals(object obj) { return ItemEquals((Item)obj); }
         public override int GetHashCode() { return base.GetHashCode(); }
         public abstract override string ToString();
         public abstract string ToString(bool ShowDecoration);

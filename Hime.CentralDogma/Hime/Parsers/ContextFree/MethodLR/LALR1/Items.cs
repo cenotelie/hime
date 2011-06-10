@@ -51,7 +51,7 @@ namespace Hime.Parsers.CF.LR
                     // For all items in Closure that are equal with the new child in the LR(0) way :
                     foreach (ItemLALR1 Previous in Closure)
                     {
-                        if (Previous.Equals_Base(New))
+                        if (New.Equals_Base(Previous))
                         {
                             // Same item => Add new lookaheads
                             Previous.Lookaheads.AddRange(Firsts);
@@ -77,15 +77,11 @@ namespace Hime.Parsers.CF.LR
             }
             return true;
         }
-        public override bool Equals(object obj)
+        public override bool ItemEquals(Item item)
         {
-            if (obj is ItemLALR1)
-            {
-                ItemLALR1 Tested = (ItemLALR1)obj;
-                if (!Equals_Base(Tested)) return false;
-                return Equals_Lookaheads(Tested);
-            }
-            return false;
+            ItemLALR1 Tested = (ItemLALR1)item;
+            if (!Equals_Base(Tested)) return false;
+            return Equals_Lookaheads(Tested);
         }
         public override int GetHashCode() { return base.GetHashCode(); }
 

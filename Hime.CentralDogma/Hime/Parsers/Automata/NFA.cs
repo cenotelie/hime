@@ -112,11 +112,22 @@ namespace Hime.Parsers.Automata
 
     public sealed class NFAState
     {
-        private List<KeyValuePair<TerminalNFACharSpan, NFAState>> transitions;
+        public class Transition
+        {
+            public TerminalNFACharSpan span;
+            public NFAState next;
+            public Transition(TerminalNFACharSpan span, NFAState next)
+            {
+                this.span = span;
+                this.next = next;
+            }
+        }
+
+        private List<Transition> transitions;
         private Terminal final;
         private int mark;
 
-        public List<KeyValuePair<TerminalNFACharSpan, NFAState>> Transitions { get { return transitions; } }
+        public List<Transition> Transitions { get { return transitions; } }
         public Terminal Final
         {
             get { return final; }
@@ -130,12 +141,12 @@ namespace Hime.Parsers.Automata
 
         public NFAState()
         {
-            transitions = new List<KeyValuePair<TerminalNFACharSpan, NFAState>>();
+            transitions = new List<Transition>();
             final = null;
             mark = 0;
         }
 
-        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { transitions.Add(new KeyValuePair<TerminalNFACharSpan, NFAState>(Value, Next)); }
+        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { transitions.Add(new Transition(Value, Next)); }
         public void ClearTransitions() { transitions.Clear(); }
     }
 
@@ -205,8 +216,8 @@ namespace Hime.Parsers.Automata
             // Make linkage
             for (int i = 0; i != states.Count; i++)
             {
-                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in states[i].Transitions)
-                    Copy.states[i].AddTransition(Transition.Key, Copy.states[states.IndexOf(Transition.Value)]);
+                foreach (NFAState.Transition transition in states[i].Transitions)
+                    Copy.states[i].AddTransition(transition.span, Copy.states[states.IndexOf(transition.next)]);
             }
             if (stateEntry != null)
                 Copy.stateEntry = Copy.states[states.IndexOf(stateEntry)];
@@ -392,9 +403,9 @@ namespace Hime.Parsers.Automata
         private void Close_Normal()
         {
             for (int i = 0; i != Count; i++)
-                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in this[i].Transitions)
-                    if (Transition.Key.Equals(NFA.Epsilon))
-                        this.Add(Transition.Value);
+                foreach (NFAState.Transition transition in this[i].Transitions)
+                    if (transition.span.Equals(NFA.Epsilon))
+                        this.Add(transition.next);
         }
         public void Close()
         {
@@ -409,9 +420,9 @@ namespace Hime.Parsers.Automata
                 if (State.Mark < 0) StateNegative = State;
             }
             if (StatePositive != null && StateNegative != null)
-                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> T in StatePositive.Transitions)
-                    if (T.Key.Equals(NFA.Epsilon))
-                        this.Remove(T.Value);
+                foreach (NFAState.Transition transition in StatePositive.Transitions)
+                    if (transition.span.Equals(NFA.Epsilon))
+                        this.Remove(transition.next);
         }
 
         public void Normalize()
@@ -429,23 +440,23 @@ namespace Hime.Parsers.Automata
                     for (int t1 = 0; t1 != this[s1].Transitions.Count; t1++)
                     {
                         // If this is an ε transition, go to next transition
-                        if (this[s1].Transitions[t1].Key.Equals(NFA.Epsilon))
+                        if (this[s1].Transitions[t1].span.Equals(NFA.Epsilon))
                             continue;
                         //Confront to each transition in each NFA state of the set
                         for (int s2 = 0; s2 != this.Count; s2++)
                         {
                             for (int t2 = 0; t2 != this[s2].Transitions.Count; t2++)
                             {
-                                if (this[s2].Transitions[t2].Key.Equals(NFA.Epsilon))
+                                if (this[s2].Transitions[t2].span.Equals(NFA.Epsilon))
                                     continue;
                                 // If these are not the same transitions of the same state
                                 if ((s1 != s2) || (t1 != t2))
                                 {
                                     // If the two transition are equal : do nothing
-                                    if (this[s1].Transitions[t1].Key.Equals(this[s2].Transitions[t2].Key))
+                                    if (this[s1].Transitions[t1].span.Equals(this[s2].Transitions[t2].span))
                                         continue;
                                     // Get the intersection of the two spans
-                                    TerminalNFACharSpan Inter = TerminalNFACharSpan.Intersect(this[s1].Transitions[t1].Key, this[s2].Transitions[t2].Key);
+                                    TerminalNFACharSpan Inter = TerminalNFACharSpan.Intersect(this[s1].Transitions[t1].span, this[s2].Transitions[t2].span);
                                     // If no intersection : do nothing
                                     if (Inter.Length == 0)
                                         continue;
@@ -453,16 +464,16 @@ namespace Hime.Parsers.Automata
                                     // Split transition1 in 1, 2 or 3 transitions and modifiy the states accordingly
                                     TerminalNFACharSpan Part1;
                                     TerminalNFACharSpan Part2;
-                                    Part1 = TerminalNFACharSpan.Split(this[s1].Transitions[t1].Key, Inter, out Part2);
-                                    this[s1].Transitions[t1] = new KeyValuePair<TerminalNFACharSpan, NFAState>(Inter, this[s1].Transitions[t1].Value);
-                                    if (Part1.Length != 0) this[s1].AddTransition(Part1, this[s1].Transitions[t1].Value);
-                                    if (Part2.Length != 0) this[s1].AddTransition(Part2, this[s1].Transitions[t1].Value);
+                                    Part1 = TerminalNFACharSpan.Split(this[s1].Transitions[t1].span, Inter, out Part2);
+                                    this[s1].Transitions[t1] = new NFAState.Transition(Inter, this[s1].Transitions[t1].next);
+                                    if (Part1.Length != 0) this[s1].AddTransition(Part1, this[s1].Transitions[t1].next);
+                                    if (Part2.Length != 0) this[s1].AddTransition(Part2, this[s1].Transitions[t1].next);
 
                                     // Split transition2 in 1, 2 or 3 transitions and modifiy the states accordingly
-                                    Part1 = TerminalNFACharSpan.Split(this[s2].Transitions[t2].Key, Inter, out Part2);
-                                    this[s2].Transitions[t2] = new KeyValuePair<TerminalNFACharSpan, NFAState>(Inter, this[s2].Transitions[t2].Value);
-                                    if (Part1.Length != 0) this[s2].AddTransition(Part1, this[s2].Transitions[t2].Value);
-                                    if (Part2.Length != 0) this[s2].AddTransition(Part2, this[s2].Transitions[t2].Value);
+                                    Part1 = TerminalNFACharSpan.Split(this[s2].Transitions[t2].span, Inter, out Part2);
+                                    this[s2].Transitions[t2] = new NFAState.Transition(Inter, this[s2].Transitions[t2].next);
+                                    if (Part1.Length != 0) this[s2].AddTransition(Part1, this[s2].Transitions[t2].next);
+                                    if (Part2.Length != 0) this[s2].AddTransition(Part2, this[s2].Transitions[t2].next);
                                     Modify = true;
                                 }
                             }
@@ -479,20 +490,20 @@ namespace Hime.Parsers.Automata
             foreach (NFAState State in this)
             {
                 // For each transition
-                foreach (KeyValuePair<TerminalNFACharSpan, NFAState> Transition in State.Transitions)
+                foreach (NFAState.Transition transition in State.Transitions)
                 {
                     // If this is an ε-transition : pass
-                    if (Transition.Key.Equals(NFA.Epsilon))
+                    if (transition.span.Equals(NFA.Epsilon))
                         continue;
                     // Add the transition's target to set's transitions dictionnary
-                    if (Transitions.ContainsKey(Transition.Key))
-                        Transitions[Transition.Key].Add(Transition.Value);
+                    if (Transitions.ContainsKey(transition.span))
+                        Transitions[transition.span].Add(transition.next);
                     else
                     {
                         // Create a new child
                         NFAStateSet Set = new NFAStateSet();
-                        Set.Add(Transition.Value);
-                        Transitions.Add(Transition.Key, Set);
+                        Set.Add(transition.next);
+                        Transitions.Add(transition.span, Set);
                     }
                 }
             }

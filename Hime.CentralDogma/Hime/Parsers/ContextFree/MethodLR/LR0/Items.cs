@@ -40,15 +40,7 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is ItemLR0)
-            {
-                ItemLR0 Tested = (ItemLR0)obj;
-                return Equals_Base(Tested);
-            }
-            return false;
-        }
+        public override bool ItemEquals(Item item) { return Equals_Base(item); }
         public override int GetHashCode() { return base.GetHashCode(); }
 
         public override string ToString() { return ToString(false); }
