@@ -172,8 +172,11 @@ namespace Hime.Parsers.CF.LR
             foreach (GLRStackNode node in current.Nodes)
             {
                 if (node.Previous.ContainsKey(symbol))
+                {
                     foreach (GLRStackNode previous in node.Previous[symbol])
                         result.Add(previous);
+                    continue;
+                }
                 if (!inverseGraph.ContainsKey(node.State.ID))
                     continue;
                 Dictionary<Symbol, List<State>> inverses = inverseGraph[node.State.ID];
