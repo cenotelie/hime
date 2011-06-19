@@ -5,49 +5,96 @@ namespace Hime.Parsers.CF.LR
     class GLRStackNode
     {
         private State state;
-        private Dictionary<Symbol, List<GLRStackNode>> previous;
+        private Dictionary<Symbol, Dictionary<int, GLRStackNode>> previous;
 
         public State State { get { return state; } }
-        public Dictionary<Symbol, List<GLRStackNode>> Previous { get { return previous; } }
+        public Dictionary<Symbol, Dictionary<int, GLRStackNode>> Previous { get { return previous; } }
 
         public GLRStackNode(State state)
         {
             this.state = state;
-            this.previous = new Dictionary<Symbol, List<GLRStackNode>>();
+            this.previous = new Dictionary<Symbol, Dictionary<int, GLRStackNode>>();
         }
 
         public void AddPrevious(Symbol symbol, GLRStackNode node)
         {
+            int id = node.GetHashCode();
             if (!previous.ContainsKey(symbol))
-                previous.Add(symbol, new List<GLRStackNode>());
-            List<GLRStackNode> nodes = previous[symbol];
-            if (nodes.Contains(node))
-                return;
-            nodes.Add(node);
+            {
+                Dictionary<int, GLRStackNode> nodes = new Dictionary<int, GLRStackNode>();
+                nodes.Add(id, node);
+                previous.Add(symbol, nodes);
+            }
+            else
+            {
+                Dictionary<int, GLRStackNode> nodes = previous[symbol];
+                if (nodes.ContainsKey(id))
+                    return;
+                nodes.Add(id, node);
+            }
         }
     }
 
     class GLRSimulatorState
     {
-        private List<GLRStackNode> nodes;
-        public List<GLRStackNode> Nodes { get { return nodes; } }
-        public GLRSimulatorState() { nodes = new List<GLRStackNode>(); }
+        private IList<GLRStackNode> nodes;
+        private Dictionary<int, Dictionary<int, GLRStackNode>> map;
+        public IList<GLRStackNode> Nodes { get { return nodes; } }
+
+        public GLRSimulatorState()
+        {
+            nodes = new List<GLRStackNode>();
+            map = new Dictionary<int, Dictionary<int, GLRStackNode>>();
+        }
+        public GLRSimulatorState(ICollection<GLRStackNode> nodes)
+        {
+            this.nodes = new List<GLRStackNode>();
+            this.map = new Dictionary<int, Dictionary<int, GLRStackNode>>();
+            foreach (GLRStackNode node in nodes)
+                Add(node);
+        }
+        
         public GLRStackNode Add(State state)
         {
-            foreach (GLRStackNode potential in nodes)
+            int stateID = state.ID;
+            if (!map.ContainsKey(stateID))
             {
-                if (potential.State.ID == state.ID)
-                    return potential;
+                GLRStackNode node = new GLRStackNode(state);
+                Dictionary<int, GLRStackNode> temp = new Dictionary<int, GLRStackNode>();
+                int id = node.GetHashCode();
+                temp.Add(id, node);
+                map.Add(stateID, temp);
+                nodes.Add(node);
+                return node;
             }
-            GLRStackNode node = new GLRStackNode(state);
-            nodes.Add(node);
-            return node;
+            else
+            {
+                Dictionary<int, GLRStackNode> temp = map[stateID];
+                foreach (GLRStackNode node in temp.Values)
+                    return node;
+                return null;
+            }
         }
         public GLRStackNode Add(GLRStackNode node)
         {
-            if (nodes.Contains(node))
-                return node;
-            nodes.Add(node);
+            int stateID = node.State.ID;
+            int id = node.GetHashCode();
+            if (!map.ContainsKey(stateID))
+            {
+                Dictionary<int, GLRStackNode> temp = new Dictionary<int, GLRStackNode>();
+                temp.Add(id, node);
+                map.Add(stateID, temp);
+                nodes.Add(node);
+            }
+            else
+            {
+                Dictionary<int, GLRStackNode> temp = map[stateID];
+                if (!temp.ContainsKey(id))
+                {
+                    temp.Add(id, node);
+                    nodes.Add(node);
+                }
+            }
             return node;
         }
     }
@@ -86,8 +133,7 @@ namespace Hime.Parsers.CF.LR
         public GLRSimulatorState Simulate(GLRSimulatorState origin, Terminal lookahead)
         {
             // Nodes before reductions
-            GLRSimulatorState before = new GLRSimulatorState();
-            before.Nodes.AddRange(origin.Nodes);
+            GLRSimulatorState before = new GLRSimulatorState(origin.Nodes);
 
             // Apply reductions
             for (int i = 0; i != before.Nodes.Count; i++)
@@ -175,7 +221,7 @@ namespace Hime.Parsers.CF.LR
             {
                 if (node.Previous.ContainsKey(symbol))
                 {
-                    foreach (GLRStackNode previous in node.Previous[symbol])
+                    foreach (GLRStackNode previous in node.Previous[symbol].Values)
                         result.Add(previous);
                     continue;
                 }

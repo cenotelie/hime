@@ -309,8 +309,8 @@ namespace Hime.Parsers.CF.LR
             {
                 if (!right.choices.ContainsKey(item))
                     return false;
-                List<GLRStackNode> l1 = this.choices[item].Nodes;
-                List<GLRStackNode> l2 = right.choices[item].Nodes;
+                IList<GLRStackNode> l1 = this.choices[item].Nodes;
+                IList<GLRStackNode> l2 = right.choices[item].Nodes;
                 if (l1.Count != l2.Count)
                     return false;
                 List<int> ids1 = new List<int>();
