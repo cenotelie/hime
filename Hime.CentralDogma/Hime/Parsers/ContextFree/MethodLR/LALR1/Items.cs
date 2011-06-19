@@ -41,7 +41,7 @@ namespace Hime.Parsers.CF.LR
                 firsts.AddRange(lookaheads);
             }
             // For each rule that has Next as a head variable :
-            foreach (CFRule Rule in nextVar.Rules)
+            foreach (CFRule rule in nextVar.Rules)
             {
                 if (!map.ContainsKey(rule))
                     map.Add(rule, new Dictionary<int, List<Item>>());
@@ -56,7 +56,7 @@ namespace Hime.Parsers.CF.LR
                 {
                     List<Item> items = new List<Item>();
                     sub.Add(0, items);
-                    ItemLALR1 New = new ItemLALR1(Rule, 0, firsts);
+                    ItemLALR1 New = new ItemLALR1(rule, 0, firsts);
                     closure.Add(New);
                     items.Add(New);
                 }
