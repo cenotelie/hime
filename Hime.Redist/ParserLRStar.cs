@@ -2,9 +2,9 @@
 
 namespace Hime.Redist.Parsers
 {
-    public abstract class BaseLRAParser : IParser
+    public abstract class BaseLRStarParser : IParser
     {
-        protected delegate void Production(BaseLRAParser parser, List<SyntaxTreeNode> nodes);
+        protected delegate void Production(BaseLRStarParser parser, List<SyntaxTreeNode> nodes);
         protected struct Rule
         {
             public Production OnReduction;
@@ -97,7 +97,7 @@ namespace Hime.Redist.Parsers
 
         protected abstract void setup();
 
-        public BaseLRAParser(ILexer input)
+        public BaseLRStarParser(ILexer input)
         {
             setup();
             maxErrorCount = 100;
