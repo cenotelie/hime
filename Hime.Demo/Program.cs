@@ -2,7 +2,7 @@
 {
     public class Program
     {        
-        /*static void Parse_MathExp()
+        static void Parse_MathExp()
         {
             Interpreter interpreter = new Interpreter();
             Analyser.MathExp_Lexer Lex = new Analyser.MathExp_Lexer("5 + 6");
@@ -33,20 +33,20 @@
                 Win.ShowDialog();
             }
         }
-        */
+        
         static void Main(string[] args)
         {
             Hime.Kernel.Graphs.DOTExternalLayoutManager.executable = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.InputFiles.Add("Languages\\MathExp.gram");
-            task.ParserFile = "MathExp.cs";
+            task.InputFiles.Add("Languages\\Test2.gram");
+            task.ParserFile = "Test2.cs";
             task.Execute();
             //Parse_Test();
         }
 
-        /*class Interpreter : Analyser.MathExp_Parser.Actions
+        class Interpreter : Analyser.MathExp_Parser.Actions
         {
             private System.Collections.Generic.Stack<float> p_Stack;
 
@@ -89,6 +89,6 @@
                 float left = p_Stack.Pop();
                 p_Stack.Push(left - right);
             }
-        }*/
+        }
     }
 }
