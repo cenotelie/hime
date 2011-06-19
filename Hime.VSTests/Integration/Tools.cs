@@ -9,7 +9,7 @@ namespace Hime.VSTests.Integration
     {
         public static bool BuildRawText(string text, Hime.Parsers.ParsingMethod method)
         {
-            Parsers.CompilationTask Task = Parsers.CompilationTask.Create(text, "Test", method, "Analyzer", null, "TestAnalyze.cs", false, false);
+            Parsers.CompilationTask Task = Parsers.CompilationTask.Create(text, "Test", method, "Analyzer", null, "TestAnalyze.cs", false, false, false);
             Kernel.Reporting.Report Report = Task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
                 foreach (Kernel.Reporting.Entry entry in section.Entries)
@@ -19,7 +19,7 @@ namespace Hime.VSTests.Integration
         }
         public static bool BuildResource(string file, string name, Hime.Parsers.ParsingMethod method)
         {
-            Parsers.CompilationTask Task = Parsers.CompilationTask.Create(GetAllTextFor(file), name, method, "Analyzer", null, "TestAnalyze.cs", false, false);
+            Parsers.CompilationTask Task = Parsers.CompilationTask.Create(GetAllTextFor(file), name, method, "Analyzer", null, "TestAnalyze.cs", false, false, false);
             Kernel.Reporting.Report Report = Task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
                 foreach (Kernel.Reporting.Entry entry in section.Entries)
