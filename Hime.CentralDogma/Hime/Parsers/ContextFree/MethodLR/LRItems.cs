@@ -51,8 +51,7 @@ namespace Hime.Parsers.CF.LR
         public abstract bool ItemEquals(Item item);
 
         public abstract Item GetChild();
-        public abstract void CloseTo(List<Item> closure);
-        public virtual void CloseTo(List<Item> closure, Dictionary<CFRule, Dictionary<int, List<Item>>> map) { CloseTo(closure); }
+        public abstract void CloseTo(List<Item> closure, Dictionary<CFRule, Dictionary<int, List<Item>>> map);
 
         public override bool Equals(object obj) { return ItemEquals(obj as Item); }
         public override int GetHashCode() { return base.GetHashCode(); }

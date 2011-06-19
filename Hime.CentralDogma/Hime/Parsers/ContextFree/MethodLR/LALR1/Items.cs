@@ -16,52 +16,49 @@ namespace Hime.Parsers.CF.LR
             if (Action == ItemAction.Reduce) return null;
             return new ItemLALR1(rule, dotPosition + 1, new TerminalSet(lookaheads));
         }
-        public override void CloseTo(List<Item> Closure)
+        public override void CloseTo(List<Item> closure, Dictionary<CFRule, Dictionary<int, List<Item>>> map)
         {
             // Get the next symbol in the item
-            Symbol Next = NextSymbol;
+            Symbol next = NextSymbol;
             // No next symbol, the item was of the form [Var -> alpha .] (reduction)
             // => return
-            if (Next == null)
-                return;
+            if (next == null) return;
             // Here the item is of the form [Var -> alpha . Next beta]
             // If the next symbol is not a variable : do nothing
             // If the next symbol is a variable :
-            if (Next is CFVariable)
+            CFVariable nextVar = next as CFVariable;
+            if (nextVar == null) return;
+            // Firsts is a copy of the Firsts set for beta (next choice)
+            // Firsts will contains symbols that may follow Next
+            // Firsts will therefore be the lookahead for child items
+            TerminalSet firsts = new TerminalSet(NextChoice.Firsts);
+            // If beta is nullifiable (contains ε) :
+            if (firsts.Contains(TerminalEpsilon.Instance))
             {
-                CFVariable NextVar = (CFVariable)Next;
-                // Firsts is a copy of the Firsts set for beta (next choice)
-                // Firsts will contains symbols that may follow Next
-                // Firsts will therefore be the lookahead for child items
-                TerminalSet Firsts = new TerminalSet(NextChoice.Firsts);
-                // If beta is nullifiable (contains ε) :
-                if (Firsts.Contains(TerminalEpsilon.Instance))
+                // Remove ε
+                firsts.Remove(TerminalEpsilon.Instance);
+                // Add the item's lookaheads
+                firsts.AddRange(lookaheads);
+            }
+            // For each rule that has Next as a head variable :
+            foreach (CFRule Rule in nextVar.Rules)
+            {
+                if (!map.ContainsKey(rule))
+                    map.Add(rule, new Dictionary<int, List<Item>>());
+                Dictionary<int, List<Item>> sub = map[rule];
+                if (sub.ContainsKey(0))
                 {
-                    // Remove ε
-                    Firsts.Remove(TerminalEpsilon.Instance);
-                    // Add the item's lookaheads
-                    Firsts.AddRange(lookaheads);
+                    List<Item> previouses = sub[0];
+                    ItemLALR1 previous = previouses[0] as ItemLALR1;
+                    previous.Lookaheads.AddRange(firsts);
                 }
-                // For each rule that has Next as a head variable :
-                foreach (CFRule Rule in NextVar.Rules)
+                else
                 {
-                    ItemLALR1 New = new ItemLALR1(Rule, 0, Firsts);
-                    // Tell if a previous item was found with same rule and dot position
-                    bool FoundPrevious = false;
-                    // For all items in Closure that are equal with the new child in the LR(0) way :
-                    foreach (ItemLALR1 Previous in Closure)
-                    {
-                        if (New.Equals_Base(Previous))
-                        {
-                            // Same item => Add new lookaheads
-                            Previous.Lookaheads.AddRange(Firsts);
-                            FoundPrevious = true;
-                            break;
-                        }
-                    }
-                    // If no previous was found => add new item
-                    if (!FoundPrevious)
-                        Closure.Add(New);
+                    List<Item> items = new List<Item>();
+                    sub.Add(0, items);
+                    ItemLALR1 New = new ItemLALR1(Rule, 0, firsts);
+                    closure.Add(New);
+                    items.Add(New);
                 }
             }
         }

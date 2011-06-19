@@ -15,28 +15,26 @@ namespace Hime.Parsers.CF.LR
             if (Action == ItemAction.Reduce) return null;
             return new ItemLR0(rule, dotPosition + 1);
         }
-        public override void CloseTo(List<Item> Closure)
+        public override void CloseTo(List<Item> closure, Dictionary<CFRule, Dictionary<int, List<Item>>> map)
         {
-            Symbol Next = NextSymbol;
-            if (Next == null)
+            Symbol next = NextSymbol;
+            if (next == null)
                 return;
-            if (Next is CFVariable)
+            CFVariable nextVar = next as CFVariable;
+            if (nextVar == null) return;
+            foreach (CFRule rule in nextVar.Rules)
             {
-                CFVariable Var = (CFVariable)Next;
-                foreach (CFRule R in Var.Rules)
-                {
-                    ItemLR0 New = new ItemLR0(R, 0);
-                    bool Found = false;
-                    foreach (Item Previous in Closure)
-                    {
-                        if (Previous.Equals(New))
-                        {
-                            Found = true;
-                            break;
-                        }
-                    }
-                    if (!Found) Closure.Add(New);
-                }
+                if (!map.ContainsKey(rule))
+                    map.Add(rule, new Dictionary<int, List<Item>>());
+                Dictionary<int, List<Item>> sub = map[rule];
+                if (sub.ContainsKey(0))
+                    continue;
+                List<Item> list = new List<Item>();
+                sub.Add(0, list);
+
+                ItemLR0 New = new ItemLR0(rule, 0);
+                closure.Add(New);
+                list.Add(New);
             }
         }
 
