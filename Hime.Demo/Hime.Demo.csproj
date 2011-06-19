@@ -8,8 +8,8 @@
     <ProjectGuid>{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LanguagesTechs.Test</RootNamespace>
-    <AssemblyName>LanguagesTechs.Test</AssemblyName>
+    <RootNamespace>Hime.Demo</RootNamespace>
+    <AssemblyName>Hime.Demo</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -69,6 +69,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Hime.Demo.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

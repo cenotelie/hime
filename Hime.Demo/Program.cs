@@ -1,4 +1,4 @@
-﻿namespace LangTest
+﻿namespace Hime.Demo
 {
     public class Program
     {        
