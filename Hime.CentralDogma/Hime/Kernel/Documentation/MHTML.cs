@@ -149,7 +149,7 @@ namespace Hime.Kernel.Documentation
             writer.WriteLine("MIME-Version: 1.0");
             writer.WriteLine("Content-Type: multipart/related;");
             writer.WriteLine("\ttype=\"text/html\";");
-            writer.WriteLine("\tboundary=\"----=_NextPart_000_0000_01CC2201.CF84F290\"");
+            writer.WriteLine("\tboundary=\"" + boundary + "\"");
 
             foreach (MHTMLSource source in sources)
             {

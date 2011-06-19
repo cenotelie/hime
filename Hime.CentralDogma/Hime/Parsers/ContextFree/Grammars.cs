@@ -176,11 +176,10 @@ namespace Hime.Parsers.CF
         public abstract void Inherit(CFGrammar Parent);
         public abstract CFGrammar Clone();
 
-        protected void Export_Documentation(ParserData data, string directory)
+        protected void Export_Documentation(ParserData data, string fileName, bool doLayout)
         {
-            if (!directory.Equals("") && !System.IO.Directory.Exists(directory))
-                System.IO.Directory.CreateDirectory(directory);
-            string fileName = directory + "\\" + name;
+            string directory = fileName + "_temp";
+            System.IO.Directory.CreateDirectory(directory);
             
             Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor();
             Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
@@ -204,21 +203,21 @@ namespace Hime.Parsers.CF
 
             System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
             Doc.AppendChild(Export_GetData(Doc));
-            Doc.Save(fileName + ".xml");
-            accessor.AddCheckoutFile(fileName + ".xml");
+            Doc.Save(directory + "\\data.xml");
+            accessor.AddCheckoutFile(directory + "\\data.xml");
             
             // generate header
             accessor.CheckOut("Transforms.Doc.Header.xslt", directory + "\\Header.xslt");
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(directory + "\\Header.xslt");
-            Transform.Transform(fileName + ".xml", directory + "\\header.html");
+            Transform.Transform(directory + "\\data.xml", directory + "\\header.html");
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "header.html", directory + "\\header.html"));
             accessor.AddCheckoutFile(directory + "\\header.html");
             // generate grammar
             accessor.CheckOut("Transforms.Doc.Grammar.xslt", directory + "\\Grammar.xslt");
             Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(directory + "\\Grammar.xslt");
-            Transform.Transform(fileName + ".xml", directory + "\\grammar.html");
+            Transform.Transform(directory + "\\data.xml", directory + "\\grammar.html");
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "grammar.html", directory + "\\grammar.html"));
             accessor.AddCheckoutFile(directory + "\\grammar.html");
 
@@ -251,26 +250,30 @@ namespace Hime.Parsers.CF
             Doc.AppendChild(nodeGraph);
             foreach (System.Xml.XmlNode child in nodes)
                 nodeGraph.AppendChild(child);
-            Doc.Save(fileName + ".xml");
+            Doc.Save(directory + "\\data.xml");
             // generate menu
             accessor.CheckOut("Transforms.Doc.Menu.xslt", directory + "\\Menu.xslt");
             Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(directory + "\\Menu.xslt");
-            Transform.Transform(fileName + ".xml", directory + "\\menu.html");
+            Transform.Transform(directory + "\\data.xml", directory + "\\menu.html");
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "menu.html", directory + "\\menu.html"));
             accessor.AddCheckoutFile(directory + "\\menu.html");
 
             // export parser data
-            List<string> files = data.SerializeVisuals(directory);
+            List<string> files = data.SerializeVisuals(directory, doLayout);
             foreach (string file in files)
             {
                 System.IO.FileInfo info = new System.IO.FileInfo(file);
-                compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/plain", "utf-8", info.Name, file));
+                if (file.EndsWith(".svg"))
+                    compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileImage("image/svg+xml", info.Name, file));
+                else
+                    compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/plain", "utf-8", info.Name, file));
                 accessor.AddCheckoutFile(file);
             }
 
-            compiler.CompileTo(fileName + ".mht");
+            compiler.CompileTo(fileName);
             accessor.Close();
+            System.IO.Directory.Delete(directory, true);
         }
         protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
         {
@@ -426,37 +429,37 @@ namespace Hime.Parsers.CF
             return true;
         }
 
-        public override bool Build(GrammarBuildOptions Options)
+        public override bool Build(GrammarBuildOptions options)
         {
-            Options.Reporter.BeginSection(name + " parser data generation");
-            if (!Prepare_AddRealAxiom(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            if (!Prepare_ComputeFirsts(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            if (!Prepare_ComputeFollowers(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            if (!Prepare_DFA(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            Options.Reporter.Info("Grammar", "Lexer DFA generated");
+            options.Reporter.BeginSection(name + " parser data generation");
+            if (!Prepare_AddRealAxiom(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFirsts(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFollowers(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            if (!Prepare_DFA(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            options.Reporter.Info("Grammar", "Lexer DFA generated");
 
             Terminal Separator = null;
-            if (options.ContainsKey("Separator"))
-                Separator = terminals[options["Separator"]];
+            if (this.options.ContainsKey("Separator"))
+                Separator = terminals[this.options["Separator"]];
 
             //Generate lexer
-            Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(Options.LexerWriter, Options.Namespace, name, finalDFA, Separator);
+            Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(options.LexerWriter, options.Namespace, name, finalDFA, Separator);
             LexerExporter.Export();
 
             //Generate parser
-            Options.Reporter.Info("Grammar", "Parsing method is " + Options.ParserGenerator.Name);
-            ParserData Data = Options.ParserGenerator.Build(this, Options.Reporter);
-            if (Data == null) { Options.Reporter.EndSection(); return false; }
-            bool result = Data.Export(Options);
-            Options.Reporter.EndSection();
+            options.Reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
+            ParserData Data = options.ParserGenerator.Build(this, options.Reporter);
+            if (Data == null) { options.Reporter.EndSection(); return false; }
+            bool result = Data.Export(options);
+            options.Reporter.EndSection();
 
             //Output data
-            if (Options.DocumentationDir != null)
+            if (options.Documentation != null)
             {
-                Export_Documentation(Data, Options.DocumentationDir);
-                Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Lexer", Options.DocumentationDir + "\\GraphLexer.dot");
-                finalDFA.SerializeGraph(serializer);
-                serializer.Close();
+                Export_Documentation(Data, options.Documentation, options.BuildVisuals);
+                //Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Lexer", Options.DocumentationDir + "\\GraphLexer.dot");
+                //finalDFA.SerializeGraph(serializer);
+                //serializer.Close();
             }
             return result;
         }
@@ -511,26 +514,26 @@ namespace Hime.Parsers.CF
             return Result;
         }
 
-        public override bool Build(GrammarBuildOptions Options)
+        public override bool Build(GrammarBuildOptions options)
         {
-            Options.Reporter.BeginSection(name + " parser data generation");
-            if (!Prepare_AddRealAxiom(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            if (!Prepare_ComputeFirsts(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            if (!Prepare_ComputeFollowers(Options.Reporter)) { Options.Reporter.EndSection(); return false; }
-            Options.Reporter.Info("Grammar", "Lexer DFA generated");
+            options.Reporter.BeginSection(name + " parser data generation");
+            if (!Prepare_AddRealAxiom(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFirsts(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFollowers(options.Reporter)) { options.Reporter.EndSection(); return false; }
+            options.Reporter.Info("Grammar", "Lexer DFA generated");
 
             //Generate lexer
 
             //Generate parser
-            Options.Reporter.Info("Grammar", "Parsing method is " + Options.ParserGenerator.Name);
-            ParserData Data = Options.ParserGenerator.Build(this, Options.Reporter);
-            if (Data == null) { Options.Reporter.EndSection(); return false; }
-            bool result = Data.Export(Options);
-            Options.Reporter.EndSection();
+            options.Reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
+            ParserData Data = options.ParserGenerator.Build(this, options.Reporter);
+            if (Data == null) { options.Reporter.EndSection(); return false; }
+            bool result = Data.Export(options);
+            options.Reporter.EndSection();
             
             //Output data
-            if (Options.DocumentationDir != null)
-                Export_Documentation(Data, Options.DocumentationDir);
+            if (options.Documentation != null)
+                Export_Documentation(Data, options.Documentation, options.BuildVisuals);
             return result;
         }
     }

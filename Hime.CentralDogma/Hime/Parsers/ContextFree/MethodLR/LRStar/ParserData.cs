@@ -17,7 +17,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream = Options.ParserWriter;
             stream.Write("    class " + grammar.LocalName + "_Parser : ");
-            stream.WriteLine("Hime.Redist.Parsers.BaseLRAParser");
+            stream.WriteLine("Hime.Redist.Parsers.BaseLRStarParser");
             stream.WriteLine("    {");
             foreach (CFRule rule in grammar.Rules)
                 Export_Production(rule);
@@ -248,18 +248,21 @@ namespace Hime.Parsers.CF.LR
         }
 
 
-        public override List<string> SerializeVisuals(string directory)
+        public override List<string> SerializeVisuals(string directory, bool doVisualLayout)
         {
-            List<string> files = base.SerializeVisuals(directory);
+            List<string> files = base.SerializeVisuals(directory, doVisualLayout);
             foreach (State state in deciders.Keys)
             {
                 Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State_" + state.ID.ToString(), directory + "\\Set_" + state.ID.ToString("X") + ".dot");
                 Serialize_Deciders(deciders[state], serializer);
                 serializer.Close();
-                Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
-                layout.Render(directory + "\\Set_" + state.ID.ToString("X") + ".dot", directory + "\\Set_" + state.ID.ToString("X") + ".svg");
-                System.IO.File.Delete(directory + "\\Set_" + state.ID.ToString("X") + ".dot");
-                files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".svg");
+                files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".dot");
+                if (doVisualLayout)
+                {
+                    Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
+                    layout.Render(directory + "\\Set_" + state.ID.ToString("X") + ".dot", directory + "\\Set_" + state.ID.ToString("X") + ".svg");
+                    files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".svg");
+                }
             }
             return files;
         }

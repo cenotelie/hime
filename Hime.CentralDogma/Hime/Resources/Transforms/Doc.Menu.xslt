@@ -27,8 +27,9 @@
   </xsl:template>
   
   <xsl:template match="LRGraph">
-    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://www.w3.org/MarkUp/SCHEMA/xhtml11.xsd" xml:lang="en">
+    <html>
       <head>
+        <meta charset="utf-8"/>
         <title>Menu</title>
         <link rel="stylesheet" type="text/css" href="hime_data/Hime.css" />
         <script src="hime_data/Hime.js" type="text/javascript">aaa</script>

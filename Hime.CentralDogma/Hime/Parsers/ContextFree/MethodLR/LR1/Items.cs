@@ -73,8 +73,8 @@ namespace Hime.Parsers.CF.LR
 
         public override bool ItemEquals(Item item)
         {
-            ItemLR1 tested = (ItemLR1)item;
-            if (tested.lookahead.SID != lookahead.SID)
+            ItemLR1 tested = item as ItemLR1;
+            if (this.lookahead.SID != tested.lookahead.SID)
                 return false;
             return Equals_Base(tested);
         }

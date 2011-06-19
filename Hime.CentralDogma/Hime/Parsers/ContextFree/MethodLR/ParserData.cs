@@ -86,7 +86,7 @@ namespace Hime.Parsers.CF.LR
             return ConflictType.None;
         }
 
-        public virtual List<string> SerializeVisuals(string directory)
+        public virtual List<string> SerializeVisuals(string directory, bool doVisualLayout)
         {
             Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
             foreach (State set in graph.Sets)
@@ -96,10 +96,13 @@ namespace Hime.Parsers.CF.LR
                     serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.LocalName);
             serializer.Close();
             List<string> files = new List<string>();
-            Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
-            layout.Render(directory + "\\GraphParser.dot", directory + "\\GraphParser.svg");
-            System.IO.File.Delete(directory + "\\GraphParser.dot");
-            files.Add(directory + "\\GraphParser.svg");
+            files.Add(directory + "\\GraphParser.dot");
+            if (doVisualLayout)
+            {
+                Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
+                layout.Render(directory + "\\GraphParser.dot", directory + "\\GraphParser.svg");
+                files.Add(directory + "\\GraphParser.svg");
+            }
             return files;
         }
     }

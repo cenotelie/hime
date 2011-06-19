@@ -144,8 +144,9 @@
 
 
   <xsl:template match="ItemSet">
-    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://www.w3.org/MarkUp/SCHEMA/xhtml11.xsd" xml:lang="en">
+    <html>
       <head>
+        <meta charset="utf-8"/>
         <title>
           Set <xsl:value-of select="@SetID"/>
         </title>
@@ -162,7 +163,18 @@
           <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
             <xsl:apply-templates/>
           </table>
-          <embed type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/">
+          <br/>
+          <br/>
+          <iframe frameborder="no" class="maximize">
+            <xsl:attribute name="src">
+              <xsl:text>Set_</xsl:text>
+              <xsl:value-of select="@SetID"/>
+              <xsl:text>.dot</xsl:text>
+            </xsl:attribute>
+          </iframe>
+          <br/>
+          <br/>
+          <embed type="image/svg+xml" class="maximize">
             <xsl:attribute name="src">
               <xsl:text>Set_</xsl:text>
               <xsl:value-of select="@SetID"/>

@@ -19,53 +19,53 @@ namespace Hime.Parsers
 
     public sealed class GrammarBuildOptions
     {
-        private string _namespace;
         private Hime.Kernel.Reporting.Reporter log;
-        private bool drawvisual;
+        private string _namespace;
         private ParserGenerator method;
         private System.IO.StreamWriter lexerWriter;
         private System.IO.StreamWriter parserWriter;
-        private string documentationDir;
+        private string documentation;
+        private bool doVisuals;
 
-        public string Namespace { get { return _namespace; } }
         public Hime.Kernel.Reporting.Reporter Reporter { get { return log; } }
-        public bool DrawVisual { get { return drawvisual; } }
+        public string Namespace { get { return _namespace; } }
         public ParserGenerator ParserGenerator { get { return method; } }
         public System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
         public System.IO.StreamWriter ParserWriter { get { return parserWriter; } }
-        public string DocumentationDir { get { return documentationDir; } }
+        public string Documentation { get { return documentation; } }
+        public bool BuildVisuals { get { return doVisuals; } }
 
-        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string File, string DocDir)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter reporter, string nmspace, ParserGenerator generator, string file, string doc, bool visuals)
         {
-            _namespace = Namespace;
-            log = Reporter;
-            drawvisual = false;
-            method = Generator;
-            lexerWriter = new System.IO.StreamWriter(File, false, System.Text.Encoding.UTF8);
+            _namespace = nmspace;
+            log = reporter;
+            method = generator;
+            lexerWriter = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
             parserWriter = lexerWriter;
             lexerWriter.WriteLine("using System.Collections.Generic;");
             lexerWriter.WriteLine("");
             lexerWriter.WriteLine("namespace " + Namespace);
             lexerWriter.WriteLine("{");
-            documentationDir = DocDir;
+            documentation = doc;
+            doVisuals = visuals;
         }
-        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter Reporter, string Namespace, ParserGenerator Generator, string FileLexer, string FileParser, string DocDir)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter reporter, string nmspace, ParserGenerator generator, string fileLexer, string fileParser, string doc, bool visuals)
         {
-            _namespace = Namespace;
-            log = Reporter;
-            drawvisual = false;
-            method = Generator;
-            lexerWriter = new System.IO.StreamWriter(FileLexer, false, System.Text.Encoding.UTF8);
+            _namespace = nmspace;
+            log = reporter;
+            method = generator;
+            lexerWriter = new System.IO.StreamWriter(fileLexer, false, System.Text.Encoding.UTF8);
             lexerWriter.WriteLine("using System.Collections.Generic;");
             lexerWriter.WriteLine("");
             lexerWriter.WriteLine("namespace " + Namespace);
             lexerWriter.WriteLine("{");
-            parserWriter = new System.IO.StreamWriter(FileParser, false, System.Text.Encoding.UTF8);
+            parserWriter = new System.IO.StreamWriter(fileParser, false, System.Text.Encoding.UTF8);
             parserWriter.WriteLine("using System.Collections.Generic;");
             parserWriter.WriteLine("");
             parserWriter.WriteLine("namespace " + Namespace);
             parserWriter.WriteLine("{");
-            documentationDir = DocDir;
+            documentation = doc;
+            doVisuals = visuals;
         }
 
         public void Close()
@@ -85,7 +85,7 @@ namespace Hime.Parsers
         ParserGenerator Generator { get; }
         bool Export(GrammarBuildOptions Options);
         System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document);
-        List<string> SerializeVisuals(string directory);
+        List<string> SerializeVisuals(string directory, bool doVisualLayout);
     }
 
     public interface ParserGenerator

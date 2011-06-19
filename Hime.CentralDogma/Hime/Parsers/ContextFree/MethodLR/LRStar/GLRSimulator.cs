@@ -95,6 +95,8 @@ namespace Hime.Parsers.CF.LR
                 GLRStackNode node = before.Nodes[i];
                 foreach (StateActionReduce reduce in node.State.Reductions)
                 {
+                    if (reduce.Lookahead.SID != lookahead.SID)
+                        continue;
                     GLRSimulatorState reduceOrigin = GetOrigin(node, reduce.ToReduceRule.Definition.GetChoiceAtIndex(0));
                     foreach (GLRStackNode nOrigin in reduceOrigin.Nodes)
                     {
