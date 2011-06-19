@@ -27,9 +27,9 @@ namespace Analyser
         public Test_Lexer(System.IO.TextReader input) : base(input) {}
         public Test_Lexer(Test_Lexer original) : base(original) {}
     }
-    class Test_Parser : Hime.Redist.Parsers.BaseLRAParser
+    class Test_Parser : Hime.Redist.Parsers.BaseLRStarParser
     {
-        private static void Production_3_0 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_3_0 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -37,7 +37,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_3_1 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_3_1 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -47,7 +47,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_4_0 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_4_0 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -57,7 +57,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_4_1 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_4_1 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 4, 4);
             nodes.RemoveRange(nodes.Count - 4, 4);
@@ -68,7 +68,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[3]);
             nodes.Add(SubRoot);
         }
-        private static void Production_4_2 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_4_2 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -76,7 +76,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_5_0 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_5_0 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 1, 1);
             nodes.RemoveRange(nodes.Count - 1, 1);
@@ -84,7 +84,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[0]);
             nodes.Add(SubRoot);
         }
-        private static void Production_5_1 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_5_1 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 3, 3);
             nodes.RemoveRange(nodes.Count - 3, 3);
@@ -94,7 +94,7 @@ namespace Analyser
             SubRoot.AppendChild(Definition[2]);
             nodes.Add(SubRoot);
         }
-        private static void Production_10_0 (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
+        private static void Production_10_0 (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)
         {
             List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - 2, 2);
             nodes.RemoveRange(nodes.Count - 2, 2);
