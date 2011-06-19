@@ -17,16 +17,6 @@ namespace Hime.Redist.Parsers
                 Length = length;
             }
         }
-        protected struct Terminal
-        {
-            public string Name;
-            public ushort SID;
-            public Terminal(string name, ushort sid)
-            {
-                Name = name;
-                SID = sid;
-            }
-        }
         protected struct DeciderState
         {
             public Dictionary<ushort, ushort> Transitions;
@@ -44,10 +34,10 @@ namespace Hime.Redist.Parsers
         protected struct State
         {
             public string[] Items;
-            public Terminal[] Expected;
+            public SymbolTerminal[] Expected;
             public DeciderState[] Decider;
             public Dictionary<ushort, ushort> ShiftsOnVariable;
-            public State(string[] items, Terminal[] expected, DeciderState[] decider, ushort[] sv_keys, ushort[] sv_val)
+            public State(string[] items, SymbolTerminal[] expected, DeciderState[] decider, ushort[] sv_keys, ushort[] sv_val)
             {
                 Items = items;
                 Expected = expected;
@@ -60,7 +50,7 @@ namespace Hime.Redist.Parsers
             {
                 ushort[] results = new ushort[Expected.Length];
                 for (int i = 0; i != Expected.Length; i++)
-                    results[i] = Expected[i].SID;
+                    results[i] = Expected[i].SymbolID;
                 return results;
             }
             public string[] GetExpectedNames()

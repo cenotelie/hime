@@ -24,6 +24,7 @@ namespace Hime.Parsers
         private ParsingMethod method;
         private string lexerFile;
         private string parserFile;
+        private bool exportDebug;
         private bool exportLog;
         private bool exportDoc;
         private bool exportVisuals;
@@ -32,50 +33,65 @@ namespace Hime.Parsers
 
         public ICollection<string> InputRawData { get { return rawInputs; } }
         public ICollection<string> InputFiles { get { return fileInputs; } }
-        public string GrammarName { get { return grammarName; } }
-        public string Namespace { get { return _namespace; } }
-        public ParsingMethod Method { get { return method; } }
-        public string LexerFile { get { return lexerFile; } }
-        public string ParserFile { get { return parserFile; } }
-        public bool ExportLog { get { return exportLog; } }
-        public bool ExportDoc { get { return exportDoc; } }
-        public bool ExportVisuals { get { return exportVisuals; } }
-        
+        public string GrammarName
+        {
+            get { return grammarName; }
+            set { grammarName = value; }
+        }
+        public string Namespace
+        {
+            get { return _namespace; }
+            set { _namespace = value; }
+        }
+        public ParsingMethod Method
+        {
+            get { return method; }
+            set { method = value; }
+        }
+        public string LexerFile
+        {
+            get { return lexerFile; }
+            set { lexerFile = value; }
+        }
+        public string ParserFile
+        {
+            get { return parserFile; }
+            set { parserFile = value; }
+        }
+        public bool ExportDebug
+        {
+            get { return exportDebug; }
+            set { exportDebug = value; }
+        }
+        public bool ExportLog
+        {
+            get { return exportLog; }
+            set { exportLog = value; }
+        }
+        public bool ExportDoc
+        {
+            get { return exportDoc; }
+            set { exportDoc = value; }
+        }
+        public bool ExportVisuals
+        {
+            get { return exportVisuals; }
+            set { exportVisuals = value; }
+        }
         public Kernel.Namespace Root { get { return root; } }
         public Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); } }
 
-
-
-        public static CompilationTask Create(string data, string grammar, ParsingMethod method, string genNamespace, string lexer, string parser, bool outLog, bool outDoc, bool outVisuals)
-        {
-            CompilationTask task = new CompilationTask(grammar, method, genNamespace, lexer, parser, outLog, outDoc, outVisuals);
-            task.rawInputs.Add(data);
-            return task;
-        }
-        public static CompilationTask Create(string[] files, string grammar, ParsingMethod method, string genNamespace, string lexer, string parser, bool outLog, bool outDoc, bool outVisuals)
-        {
-            CompilationTask task = new CompilationTask(grammar, method, genNamespace, lexer, parser, outLog, outDoc, outVisuals);
-            for (int i = 0; i != files.Length; i++)
-                task.fileInputs.Add(files[i]);
-            return task;
-        }
-
-        private CompilationTask(string grammar, ParsingMethod method, string genNamespace, string lexer, string parser, bool outLog, bool outDoc, bool outVisuals)
+        public CompilationTask()
         {
             rawInputs = new List<string>();
             fileInputs = new List<string>();
-            grammarName = grammar;
-            this.method = method;
-            _namespace = genNamespace;
-            lexerFile = lexer;
-            parserFile = parser;
-            exportLog = outLog;
-            exportDoc = outDoc;
-            exportVisuals = outVisuals;
+            method = ParsingMethod.RNGLALR1;
+            exportDebug = false;
+            exportLog = false;
+            exportDoc = false;
+            exportVisuals = false;
         }
 
-
-        
 
         public Hime.Kernel.Reporting.Report Execute()
         {
@@ -189,9 +205,9 @@ namespace Hime.Parsers
                 doc = parserFile.Replace(".cs", "_doc.mht");
             GrammarBuildOptions options = null;
             if (lexerFile != null)
-                options = new GrammarBuildOptions(reporter, _namespace, generator, lexerFile, parserFile, doc, exportVisuals);
+                options = new GrammarBuildOptions(reporter, _namespace, generator, lexerFile, parserFile, exportDebug, doc, exportVisuals);
             else
-                options = new GrammarBuildOptions(reporter, _namespace, generator, parserFile, doc, exportVisuals);
+                options = new GrammarBuildOptions(reporter, _namespace, generator, parserFile, exportDebug, doc, exportVisuals);
             return options;
         }
     }

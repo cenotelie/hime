@@ -35,13 +35,16 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        public override bool Export(GrammarBuildOptions Options)
+        public override bool Export(GrammarBuildOptions options)
         {
+            this.debug = options.OutputDebugInfo;
             DetermineNullables();
-            stream = Options.ParserWriter;
+            stream = options.ParserWriter;
             stream.WriteLine("    class " + grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
+            Export_Terminals(stream);
+            Export_Variables(stream);
             Export_NullVars();
             Export_NullChoices();
             foreach (CFRule rule in grammar.Rules)
@@ -143,7 +146,7 @@ namespace Hime.Parsers.CF.LR
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")";
+                string head = "staticVariables[" + this.variables.IndexOf(Rule.Variable) + "]";
                 stream.WriteLine("new Rule(" + production + ", " + head + ")");
                 first = false;
             }
@@ -157,27 +160,42 @@ namespace Hime.Parsers.CF.LR
                 if (Symbol is Terminal)
                     Terminals.Add((Terminal)Symbol);
             }
+            bool first = true;
             stream.WriteLine("new State(");
             // Write items
-            stream.Write("               new string[" + State.Items.Count + "] {");
-            bool first = true;
-            foreach (Item item in State.Items)
+            if (debug)
             {
-                if (!first) stream.Write(", ");
-                stream.Write("\"" + item.ToString(true) + "\"");
-                first = false;
+                stream.Write("               new string[" + State.Items.Count + "] {");
+                first = true;
+                foreach (Item item in State.Items)
+                {
+                    if (!first) stream.Write(", ");
+                    stream.Write("\"" + item.ToString(true) + "\"");
+                    first = false;
+                }
+                stream.WriteLine("},");
             }
-            stream.WriteLine("},");
+            else
+            {
+                stream.WriteLine("               null,");
+            }
             // Write terminals
-            stream.Write("               new Terminal[" + Terminals.Count + "] {");
-            first = true;
-            foreach (Terminal terminal in Terminals)
+            if (debug)
             {
-                if (!first) stream.Write(", ");
-                stream.Write("new Terminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
-                first = false;
+                stream.Write("               new Hime.Redist.Parsers.SymbolTerminal[" + Terminals.Count + "] {");
+                first = true;
+                foreach (Terminal terminal in Terminals)
+                {
+                    if (!first) stream.Write(", ");
+                    stream.Write("staticTerminals[" + terminals.IndexOf(terminal) + "]");
+                    first = false;
+                }
+                stream.WriteLine("},");
             }
-            stream.WriteLine("},");
+            else
+            {
+                stream.WriteLine("               null,");
+            }
 
             int ShitTerminalCount = 0;
             foreach (Symbol Symbol in State.Children.Keys)
@@ -290,7 +308,7 @@ namespace Hime.Parsers.CF.LR
                     }
                 }
                 if (!first) stream.Write(", ");
-                stream.Write("new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\"), 0" + action + ")");
+                stream.Write("new Hime.Redist.Parsers.SPPFNode(staticVariables[" + variables.IndexOf(var) + "], 0" + action + ")");
                 first = false;
             }
             stream.WriteLine(" };");

@@ -13,7 +13,7 @@ namespace Hime.Redist.Parsers
     {
         string Message { get; }
     }
-    public class ParserErrorUnexpectedToken : ParserError
+    public sealed class ParserErrorUnexpectedToken : ParserError
     {
         private SymbolToken token;
         private System.Collections.ObjectModel.Collection<string> expected;

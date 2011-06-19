@@ -4,37 +4,34 @@ namespace Hime.Redist.Parsers
 {
     public abstract class Symbol
     {
-        public abstract ushort SymbolID { get; }
-        public abstract string Name { get; }
+        protected ushort sid;
+        protected string name;
 
-        public override string ToString() { return Name; }
+        public ushort SymbolID { get { return sid; } }
+        public string Name { get { return name; } }
+
+        public override string ToString() { return name; }
+        public override int GetHashCode() { return base.GetHashCode(); }
+        public override bool Equals(object obj)
+        {
+            Symbol symbol = obj as Symbol;
+            if (symbol == null)
+                return false;
+            return this.sid == symbol.sid;
+        }
     }
 
     public abstract class SymbolToken : Symbol
     {
-        private string className;
-        private ushort classSID;
-
-        public override ushort SymbolID { get { return classSID; } }
-        public override string Name { get { return className; } }
         public abstract object Value { get; }
-        public SymbolToken(string ClassName, ushort ClassSID)
+        public SymbolToken(string name, ushort sid)
         {
-            className = ClassName;
-            classSID = ClassSID;
-        }
-
-        public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj)
-        {
-            if (!(obj is SymbolToken))
-                return false;
-            SymbolToken other = (SymbolToken)obj;
-            return (this.classSID == other.classSID);
+            this.sid = sid;
+            this.name = name;
         }
     }
 
-    public class SymbolTokenText : SymbolToken
+    public sealed class SymbolTokenText : SymbolToken
     {
         private string value;
         private int line;
@@ -49,54 +46,58 @@ namespace Hime.Redist.Parsers
             set { subGrammarRoot = value; }
         }
 
-        public SymbolTokenText(string ClassName, ushort ClassSID, string Value, int Line)
-            : base(ClassName, ClassSID)
+        public SymbolTokenText(string name, ushort sid, string value, int line)
+            : base(name, sid)
         {
-            value = Value;
-            line = Line;
-            subGrammarRoot = null;
+            this.value = value;
+            this.line = line;
+            this.subGrammarRoot = null;
         }
     }
-    public class SymbolTokenEpsilon : SymbolToken
+    public sealed class SymbolTokenEpsilon : SymbolToken
     {
+        private static SymbolTokenEpsilon instance = new SymbolTokenEpsilon();
+        public static SymbolTokenEpsilon Instance { get { return instance; } }
         public override object Value { get { return string.Empty; } }
         public SymbolTokenEpsilon() : base("ε", 1) { }
     }
-    public class SymbolTokenDollar : SymbolToken
+    public sealed class SymbolTokenDollar : SymbolToken
     {
+        private static SymbolTokenDollar instance = new SymbolTokenDollar();
+        public static SymbolTokenDollar Instance { get { return instance; } }
         public override object Value { get { return "$"; } }
-        public SymbolTokenDollar() : base("Dollar", 2) { }
+        public SymbolTokenDollar() : base("$", 2) { }
     }
 
-    public class SymbolTokenBits : SymbolToken
+    public sealed class SymbolTokenBits : SymbolToken
     {
         private byte value;
         public override object Value { get { return value; } }
         public byte ValueBits { get { return value; } }
         public SymbolTokenBits(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { value = Value; }
     }
-    public class SymbolTokenUInt8 : SymbolToken
+    public sealed class SymbolTokenUInt8 : SymbolToken
     {
         private byte value;
         public override object Value { get { return value; } }
         public byte ValueUInt8 { get { return value; } }
         public SymbolTokenUInt8(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { value = Value; }
     }
-    public class SymbolTokenUInt16 : SymbolToken
+    public sealed class SymbolTokenUInt16 : SymbolToken
     {
         private ushort value;
         public override object Value { get { return value; } }
         public ushort ValueUInt16 { get { return value; } }
         public SymbolTokenUInt16(string ClassName, ushort ClassSID, ushort Value) : base(ClassName, ClassSID) { value = Value; }
     }
-    public class SymbolTokenUInt32 : SymbolToken
+    public sealed class SymbolTokenUInt32 : SymbolToken
     {
         private uint value;
         public override object Value { get { return value; } }
         public uint ValueUInt32 { get { return value; } }
         public SymbolTokenUInt32(string ClassName, ushort ClassSID, uint Value) : base(ClassName, ClassSID) { value = Value; }
     }
-    public class SymbolTokenUInt64 : SymbolToken
+    public sealed class SymbolTokenUInt64 : SymbolToken
     {
         private ulong value;
         public override object Value { get { return value; } }
@@ -104,75 +105,61 @@ namespace Hime.Redist.Parsers
         public SymbolTokenUInt64(string ClassName, ushort ClassSID, ulong Value) : base(ClassName, ClassSID) { value = Value; }
     }
 
-    public class SymbolVirtual : Symbol
+    public sealed class SymbolVirtual : Symbol
     {
-        private string name;
-
-        public override string Name { get { return name; } }
-        public override ushort SymbolID { get { return 0; } }
-
-        public SymbolVirtual(string Name) { name = Name; }
-
-        public override int GetHashCode() { return base.GetHashCode(); }
+        public SymbolVirtual(string name)
+        {
+            this.name = name;
+            this.sid = 0;
+        }
         public override bool Equals(object obj)
         {
-            if (!(obj is SymbolVirtual))
+            SymbolVirtual other = obj as SymbolVirtual;
+            if (other == null)
                 return false;
-            SymbolVirtual other = (SymbolVirtual)obj;
             return (this.name == other.name);
         }
     }
 
-    public class SymbolAction : Symbol
+    public sealed class SymbolAction : Symbol
     {
         public delegate void Callback(SyntaxTreeNode Subroot);
 
-        private string name;
-
         private Callback callback;
-
-        public override string Name { get { return name; } }
-        public override ushort SymbolID { get { return 0; } }
 
         public Callback Action { get { return callback; } }
 
-        public SymbolAction(string Name, Callback callback)
+        public SymbolAction(string name, Callback callback)
         {
-            this.name = Name;
+            this.name = name;
+            this.sid = 0;
             this.callback = callback;
         }
 
-        public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj)
         {
-            if (!(obj is SymbolAction))
+            SymbolAction other = obj as SymbolAction;
+            if (other == null)
                 return false;
-            SymbolAction other = (SymbolAction)obj;
             return (this.name == other.name);
         }
     }
     
-    public class SymbolVariable : Symbol
+    public sealed class SymbolVariable : Symbol
     {
-        private ushort sID;
-        private string name;
-
-        public override string Name { get { return name; } }
-        public override ushort SymbolID { get { return sID; } }
-
-        public SymbolVariable(ushort SID, string Name)
+        public SymbolVariable(ushort sid, string name)
         {
-            sID = SID;
-            name = Name;
+            this.sid = sid;
+            this.name = name;
         }
+    }
 
-        public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj)
+    public sealed class SymbolTerminal : Symbol
+    {
+        public SymbolTerminal(string name, ushort sid)
         {
-            if (!(obj is SymbolVariable))
-                return false;
-            SymbolVariable other = (SymbolVariable)obj;
-            return (this.sID == other.sID);
+            this.sid = sid;
+            this.name = name;
         }
     }
 }

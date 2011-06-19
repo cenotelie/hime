@@ -13,12 +13,15 @@ namespace Hime.Parsers.CF.LR
             this.deciders = deciders;
         }
 
-        public override bool Export(GrammarBuildOptions Options)
+        public override bool Export(GrammarBuildOptions options)
         {
-            stream = Options.ParserWriter;
+            this.debug = options.OutputDebugInfo;
+            stream = options.ParserWriter;
             stream.Write("    class " + grammar.LocalName + "_Parser : ");
             stream.WriteLine("Hime.Redist.Parsers.BaseLRStarParser");
             stream.WriteLine("    {");
+            Export_Terminals(stream);
+            Export_Variables(stream);
             foreach (CFRule rule in grammar.Rules)
                 Export_Production(rule);
             Export_Rules();
@@ -70,14 +73,14 @@ namespace Hime.Parsers.CF.LR
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLRAParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)");
+            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseLRStarParser parser, List<Hime.Redist.Parsers.SyntaxTreeNode> nodes)");
             stream.WriteLine("        {");
             if (ParserLength != "0")
             {
                 stream.WriteLine("            List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
                 stream.WriteLine("            nodes.RemoveRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
             }
-            stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")");
+            stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(staticVariables[" + this.variables.IndexOf(Rule.Variable) + "]");
             if (Rule.ReplaceOnProduction)
                 stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);");
             else
@@ -115,7 +118,7 @@ namespace Hime.Parsers.CF.LR
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "new Hime.Redist.Parsers.SymbolVariable(0x" + Rule.Variable.SID.ToString("X") + ", \"" + Rule.Variable.LocalName + "\")";
+                string head = "staticVariables[" + this.variables.IndexOf(Rule.Variable) + "]";
                 stream.WriteLine("new Rule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAtIndex(0).Length + ")");
                 first = false;
             }
@@ -169,24 +172,32 @@ namespace Hime.Parsers.CF.LR
                 if (Symbol is Terminal)
                     Terminals.Add((Terminal)Symbol);
             }
+            bool first = true;
             stream.WriteLine("new State(");
             // Write items
-            stream.Write("               new string[" + State.Items.Count + "] {");
-            bool first = true;
-            foreach (Item item in State.Items)
+            if (debug)
             {
-                if (!first) stream.Write(", ");
-                stream.Write("\"" + item.ToString(true) + "\"");
-                first = false;
+                stream.Write("               new string[" + State.Items.Count + "] {");
+                first = true;
+                foreach (Item item in State.Items)
+                {
+                    if (!first) stream.Write(", ");
+                    stream.Write("\"" + item.ToString(true) + "\"");
+                    first = false;
+                }
+                stream.WriteLine("},");
             }
-            stream.WriteLine("},");
+            else
+            {
+                stream.WriteLine("               null,");
+            }
             // Write terminals
-            stream.Write("               new Terminal[" + Terminals.Count + "] {");
+            stream.Write("               new Hime.Redist.Parsers.SymbolTerminal[" + Terminals.Count + "] {");
             first = true;
             foreach (Terminal terminal in Terminals)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("new Terminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
+                stream.Write("staticTerminals[" + terminals.IndexOf(terminal) + "]");
                 first = false;
             }
             stream.WriteLine("},");

@@ -10,13 +10,13 @@ namespace Hime.Redist.Parsers
         Nothing
     }
 
-    public class SyntaxTreeNode
+    public sealed class SyntaxTreeNode
     {
-        protected Dictionary<string, object> properties;
-        protected List<SyntaxTreeNode> children;
-        protected SyntaxTreeNode parent;
-        protected Symbol symbol;
-        protected SyntaxTreeNodeAction action;
+        private Dictionary<string, object> properties;
+        private List<SyntaxTreeNode> children;
+        private SyntaxTreeNode parent;
+        private Symbol symbol;
+        private SyntaxTreeNodeAction action;
 
         public Dictionary<string, object> Properties { get { return properties; } }
         public Symbol Symbol { get { return symbol; } }

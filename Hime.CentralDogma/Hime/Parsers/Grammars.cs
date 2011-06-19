@@ -24,6 +24,7 @@ namespace Hime.Parsers
         private ParserGenerator method;
         private System.IO.StreamWriter lexerWriter;
         private System.IO.StreamWriter parserWriter;
+        private bool debugInfo;
         private string documentation;
         private bool doVisuals;
 
@@ -32,10 +33,11 @@ namespace Hime.Parsers
         public ParserGenerator ParserGenerator { get { return method; } }
         public System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
         public System.IO.StreamWriter ParserWriter { get { return parserWriter; } }
+        public bool OutputDebugInfo { get { return debugInfo; } }
         public string Documentation { get { return documentation; } }
         public bool BuildVisuals { get { return doVisuals; } }
 
-        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter reporter, string nmspace, ParserGenerator generator, string file, string doc, bool visuals)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter reporter, string nmspace, ParserGenerator generator, string file, bool debug, string doc, bool visuals)
         {
             _namespace = nmspace;
             log = reporter;
@@ -46,10 +48,11 @@ namespace Hime.Parsers
             lexerWriter.WriteLine("");
             lexerWriter.WriteLine("namespace " + Namespace);
             lexerWriter.WriteLine("{");
+            debugInfo = debug;
             documentation = doc;
             doVisuals = visuals;
         }
-        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter reporter, string nmspace, ParserGenerator generator, string fileLexer, string fileParser, string doc, bool visuals)
+        public GrammarBuildOptions(Hime.Kernel.Reporting.Reporter reporter, string nmspace, ParserGenerator generator, string fileLexer, string fileParser, bool debug, string doc, bool visuals)
         {
             _namespace = nmspace;
             log = reporter;
@@ -64,6 +67,7 @@ namespace Hime.Parsers
             parserWriter.WriteLine("");
             parserWriter.WriteLine("namespace " + Namespace);
             parserWriter.WriteLine("{");
+            debugInfo = debug;
             documentation = doc;
             doVisuals = visuals;
         }

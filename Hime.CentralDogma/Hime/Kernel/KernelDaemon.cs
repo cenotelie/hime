@@ -39,7 +39,7 @@ namespace Hime.Kernel
 
             // Generate parser for FileCentralDogma
             Hime.Parsers.Grammar FileCentralDogma = (Hime.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
-            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs", null, false);
+            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs", false, null, false);
             FileCentralDogma.Build(Options);
             Options.Close();
 

@@ -7,6 +7,9 @@ namespace Hime.Parsers.CF.LR
         protected ParserGenerator generator;
         protected CFGrammar grammar;
         protected Graph graph;
+        protected List<Terminal> terminals;
+        protected List<CFVariable> variables;
+        protected bool debug;
 
         public CFGrammar Grammar { get { return grammar; } }
         public Graph Graph { get { return graph; } }
@@ -17,6 +20,11 @@ namespace Hime.Parsers.CF.LR
             this.grammar = gram;
             this.graph = graph;
             this.generator = generator;
+            this.terminals = new List<Terminal>();
+            this.terminals.Add(TerminalEpsilon.Instance);
+            this.terminals.Add(TerminalDollar.Instance);
+            this.terminals.AddRange(gram.Terminals);
+            this.variables = new List<CFVariable>(gram.Variables);
         }
 
         public abstract bool Export(GrammarBuildOptions Options);
@@ -28,7 +36,7 @@ namespace Hime.Parsers.CF.LR
                 nodegraph.AppendChild(GetXMLData_Set(Document, set));
             return nodegraph;
         }
-        protected System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument Document, State Set)
+        private System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument Document, State Set)
         {
             System.Xml.XmlNode root = Document.CreateElement("ItemSet");
             root.Attributes.Append(Document.CreateAttribute("SetID"));
@@ -37,7 +45,7 @@ namespace Hime.Parsers.CF.LR
                 root.AppendChild(GetXMLData_Item(Document, Set, item));
             return root;
         }
-        protected System.Xml.XmlNode GetXMLData_Item(System.Xml.XmlDocument Document, State Set, Item Item)
+        private System.Xml.XmlNode GetXMLData_Item(System.Xml.XmlDocument Document, State Set, Item Item)
         {
             System.Xml.XmlNode root = Document.CreateElement("Item");
             root.Attributes.Append(Document.CreateAttribute("HeadName"));
@@ -78,12 +86,39 @@ namespace Hime.Parsers.CF.LR
             root.AppendChild(lookaheads);
             return root;
         }
-        protected ConflictType GetXMLData_ConflictType(State Set, Item Item)
+        private ConflictType GetXMLData_ConflictType(State Set, Item Item)
         {
             foreach (Conflict conflict in Set.Conflicts)
                 if (conflict.ContainsItem(Item))
                     return conflict.ConflictType;
             return ConflictType.None;
+        }
+
+        protected void Export_Terminals(System.IO.StreamWriter stream)
+        {
+            stream.WriteLine("        private static Hime.Redist.Parsers.SymbolTerminal[] staticTerminals = {");
+            bool first = true;
+            foreach (Terminal terminal in terminals)
+            {
+                stream.Write("            ");
+                if (!first) stream.Write(", ");
+                stream.WriteLine("new Hime.Redist.Parsers.SymbolTerminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
+                first = false;
+            }
+            stream.WriteLine("        };");
+        }
+        protected void Export_Variables(System.IO.StreamWriter stream)
+        {
+            stream.WriteLine("        private static Hime.Redist.Parsers.SymbolVariable[] staticVariables = {");
+            bool first = true;
+            foreach (CFVariable var in variables)
+            {
+                stream.Write("            ");
+                if (!first) stream.Write(", ");
+                stream.WriteLine("new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\")");
+                first = false;
+            }
+            stream.WriteLine("        };");
         }
 
         public virtual List<string> SerializeVisuals(string directory, bool doVisualLayout)

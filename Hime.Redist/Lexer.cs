@@ -34,10 +34,10 @@ namespace Hime.Redist.Parsers
         public abstract override string ToString();
     }
 
-    public class LexerTextErrorDiscardedChar : LexerTextError
+    public sealed class LexerTextErrorDiscardedChar : LexerTextError
     {
-        protected char discarded;
-        protected string message;
+        private char discarded;
+        private string message;
 
         public char Discarded { get { return discarded; } }
         public override string Message { get { return message; } }

@@ -17,16 +17,6 @@ namespace Hime.Redist.Parsers
                 Length = length;
             }
         }
-        protected struct Terminal
-        {
-            public string Name;
-            public ushort SID;
-            public Terminal(string name, ushort sid)
-            {
-                Name = name;
-                SID = sid;
-            }
-        }
         protected struct Reduction
         {
             public ushort Lookahead;
@@ -40,11 +30,11 @@ namespace Hime.Redist.Parsers
         protected struct State
         {
             public string[] Items;
-            public Terminal[] Expected;
+            public SymbolTerminal[] Expected;
             public Dictionary<ushort, ushort> ShiftsOnTerminal;
             public Dictionary<ushort, ushort> ShiftsOnVariable;
             public Dictionary<ushort, Reduction> ReducsOnTerminal;
-            public State(string[] items, Terminal[] expected, ushort[] st_keys, ushort[] st_val, ushort[] sv_keys, ushort[] sv_val, Reduction[] rt)
+            public State(string[] items, SymbolTerminal[] expected, ushort[] st_keys, ushort[] st_val, ushort[] sv_keys, ushort[] sv_val, Reduction[] rt)
             {
                 Items = items;
                 Expected = expected;
@@ -62,7 +52,7 @@ namespace Hime.Redist.Parsers
             {
                 ushort[] results = new ushort[Expected.Length];
                 for (int i = 0; i != Expected.Length; i++)
-                    results[i] = Expected[i].SID;
+                    results[i] = Expected[i].SymbolID;
                 return results;
             }
             public string[] GetExpectedNames()
@@ -158,7 +148,7 @@ namespace Hime.Redist.Parsers
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
-                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SID, string.Empty, lexer.CurrentLine));
+                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SymbolID, string.Empty, lexer.CurrentLine));
                 Inserted.Add(nextToken);
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
@@ -179,7 +169,7 @@ namespace Hime.Redist.Parsers
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
-                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SID, string.Empty, lexer.CurrentLine));
+                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SymbolID, string.Empty, lexer.CurrentLine));
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
                     Analyse_RunForToken(Inserted[0]);

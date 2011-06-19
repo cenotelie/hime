@@ -15,16 +15,6 @@ namespace Hime.Redist.Parsers
                 Head = head;
             }
         }
-        protected struct Terminal
-        {
-            public string Name;
-            public ushort SID;
-            public Terminal(string name, ushort sid)
-            {
-                Name = name;
-                SID = sid;
-            }
-        }
         protected struct Reduction
         {
             public ushort Lookahead;
@@ -42,11 +32,11 @@ namespace Hime.Redist.Parsers
         protected struct State
         {
             public string[] Items;
-            public Terminal[] Expected;
+            public SymbolTerminal[] Expected;
             public Dictionary<ushort, ushort> ShiftsOnTerminal;
             public Dictionary<ushort, ushort> ShiftsOnVariable;
             public List<Reduction> ReducsOnTerminal;
-            public State(string[] items, Terminal[] expected, ushort[] st_keys, ushort[] st_val, ushort[] sv_keys, ushort[] sv_val, Reduction[] rt)
+            public State(string[] items, SymbolTerminal[] expected, ushort[] st_keys, ushort[] st_val, ushort[] sv_keys, ushort[] sv_val, Reduction[] rt)
             {
                 Items = items;
                 Expected = expected;
