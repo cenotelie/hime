@@ -28,7 +28,7 @@ namespace Hime.HimeCC
 
         public static void Execute(Options options)
         {
-            Hime.Parsers.CompilationTask Task = Parsers.CompilationTask.Create(options.Inputs.ToArray(), options.GrammarName, options.Method, options.Namespace, options.LexerFile, options.ParserFile, options.ExportHTMLLog, options.ExportDocumentation);
+            Hime.Parsers.CompilationTask Task = Parsers.CompilationTask.Create(options.Inputs.ToArray(), options.GrammarName, options.Method, options.Namespace, options.LexerFile, options.ParserFile, options.ExportHTMLLog, options.ExportDocumentation, options.ExportDocumentation);
             Task.Execute();
         }
     }
