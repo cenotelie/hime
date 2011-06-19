@@ -24,11 +24,21 @@ namespace Hime.Parsers.CF.LR
         public State GetClosure()
         {
             // The set's items
-            List<Item> Closure = new List<Item>(items);
+            Dictionary<CFRule, Dictionary<int, List<Item>>> map = new Dictionary<CFRule, Dictionary<int, List<Item>>>();
+            foreach (Item item in items)
+            {
+                if (!map.ContainsKey(item.BaseRule))
+                    map.Add(item.BaseRule, new Dictionary<int, List<Item>>());
+                Dictionary<int, List<Item>> sub = map[item.BaseRule];
+                if (!sub.ContainsKey(item.DotPosition))
+                    sub.Add(item.DotPosition, new List<Item>());
+                sub[item.DotPosition].Add(item);
+            }
+            List<Item> closure = new List<Item>(items);
             // Close the set
-            for (int i = 0; i != Closure.Count; i++)
-                Closure[i].CloseTo(Closure);
-            return new State(this, Closure);
+            for (int i = 0; i != closure.Count; i++)
+                closure[i].CloseTo(closure, map);
+            return new State(this, closure);
         }
 
         public bool Equals(StateKernel Kernel)
