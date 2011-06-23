@@ -165,15 +165,6 @@
           </table>
           <br/>
           <br/>
-          <iframe frameborder="no" class="maximize">
-            <xsl:attribute name="src">
-              <xsl:text>Set_</xsl:text>
-              <xsl:value-of select="@SetID"/>
-              <xsl:text>.dot</xsl:text>
-            </xsl:attribute>
-          </iframe>
-          <br/>
-          <br/>
           <embed type="image/svg+xml" class="maximize">
             <xsl:attribute name="src">
               <xsl:text>Set_</xsl:text>
@@ -181,6 +172,15 @@
               <xsl:text>.svg</xsl:text>
             </xsl:attribute>
           </embed>
+          <br/>
+          <br/>
+          <iframe frameborder="no" class="maximize">
+            <xsl:attribute name="src">
+              <xsl:text>Set_</xsl:text>
+              <xsl:value-of select="@SetID"/>
+              <xsl:text>.dot</xsl:text>
+            </xsl:attribute>
+          </iframe>
         </div>
       </body>
     </html>

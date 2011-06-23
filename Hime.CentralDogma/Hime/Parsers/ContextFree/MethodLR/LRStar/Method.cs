@@ -14,21 +14,8 @@ namespace Hime.Parsers.CF.LR
             Reporter.Info("LR(*)", "LR(*) data ...");
             Graph graph = MethodLALR1.ConstructGraph(Grammar, Reporter);
             Reporter.Info("LR(*)", graph.Sets.Count.ToString() + " LALR(1) states constructed.");
-            GLRSimulator simulator = new GLRSimulator(graph);
-            Dictionary<State, DeciderLRStar> deciders = new Dictionary<State, DeciderLRStar>();
-            // Output conflicts
-            foreach (State state in graph.Sets)
-            {
-                DeciderLRStar decider = new DeciderLRStar(state);
-                decider.Build(simulator);
-                deciders.Add(state, decider);
-
-                foreach (Conflict conflict in state.Conflicts)
-                {
-                    if (!decider.IsResolved(conflict))
-                        Reporter.Report(conflict);
-                }
-            }
+            DecidersBuilder builder = new DecidersBuilder(graph, Reporter);
+            Dictionary<State, DeciderLRStar> deciders = builder.Build(4);
             Reporter.Info("LR(*)", "Done !");
             return new ParserDataLRStar(this, Grammar, graph, deciders);
         }
