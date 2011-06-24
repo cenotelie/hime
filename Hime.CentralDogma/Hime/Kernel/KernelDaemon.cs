@@ -4,48 +4,34 @@ namespace Hime.Kernel
 {
     public static class KernelDaemon
     {
-        public static void GenerateNextStep(string Path)
+        public static void GenerateNextStep(string path)
         {
-            // Initialise logs
-            Hime.Kernel.Reporting.Reporter Reporter = new Reporting.Reporter(typeof(KernelDaemon));
-
             // Test path
-            Path += "\\Daemon\\";
-            if (System.IO.Directory.Exists(Path))
-                System.IO.Directory.Delete(Path, true);
-            System.IO.Directory.CreateDirectory(Path);
-
-            Reporter.BeginSection("Daemon");
-            Reporter.Info("Daemon", "Hime Systems Daemon");
-            Reporter.Info("Daemon", "output at : " + Path);
-            Reporter.EndSection();
+            path += "\\Daemon\\";
+            if (System.IO.Directory.Exists(path))
+                System.IO.Directory.Delete(path, true);
+            System.IO.Directory.CreateDirectory(path);
 
             // Checkout resources
-            Resources.ResourceAccessor Session = new Resources.ResourceAccessor();
-            Session.CheckOut("Daemon.Kernel.gram", Path + "Kernel.gram");
-            Session.CheckOut("Daemon.Generators.ContextFreeGrammars.gram", Path + "Generators.ContextFreeGrammars.gram");
-            Session.CheckOut("Daemon.Generators.ContextSensitiveGrammars.gram", Path + "Generators.ContextSensitiveGrammars.gram");
+            Resources.ResourceAccessor session = new Resources.ResourceAccessor();
+            session.CheckOut("Daemon.Kernel.gram", path + "Kernel.gram");
+            session.CheckOut("Daemon.Generators.ContextFreeGrammars.gram", path + "Generators.ContextFreeGrammars.gram");
+            session.CheckOut("Daemon.Generators.ContextSensitiveGrammars.gram", path + "Generators.ContextSensitiveGrammars.gram");
 
             // Compile
-            Resources.ResourceCompiler Compiler = new Hime.Kernel.Resources.ResourceCompiler();
-            Compiler.AddInputFile(Path + "Kernel.gram");
-            Compiler.AddInputFile(Path + "Generators.ContextFreeGrammars.gram");
-            Compiler.AddInputFile(Path + "Generators.ContextSensitiveGrammars.gram");
-            Namespace DaemonRoot = new Namespace(null, "global");
-            Compiler.Compile(DaemonRoot, Reporter);
-
+            Hime.Parsers.CompilationTask task = new Parsers.CompilationTask();
+            task.InputFiles.Add(path + "Kernel.gram");
+            task.InputFiles.Add(path + "Generators.ContextFreeGrammars.gram");
+            task.InputFiles.Add(path + "Generators.ContextSensitiveGrammars.gram");
+            task.GrammarName = "Hime.Kernel.FileCentralDogma";
+            task.Namespace = "Hime.Kernel.Resources.Parser";
+            task.Method = Parsers.ParsingMethod.LALR1;
+            task.ParserFile = path + "KernelResources.Parser.cs";
+            task.ExportLog = true;
+            task.Execute();
+            
             // Close session
-            Session.Close();
-
-            // Generate parser for FileCentralDogma
-            Hime.Parsers.Grammar FileCentralDogma = (Hime.Parsers.Grammar)DaemonRoot.ResolveName(QualifiedName.ParseName("Hime.Kernel.FileCentralDogma"));
-            Hime.Parsers.GrammarBuildOptions Options = new Hime.Parsers.GrammarBuildOptions(Reporter, "Hime.Kernel.Resources.Parser", new Hime.Parsers.CF.LR.MethodLALR1(), Path + "KernelResources.Parser.cs", false, null, false);
-            FileCentralDogma.Build(Options);
-            Options.Close();
-
-            // Export log
-            Reporter.ExportMHTML(Path + "DaemonLog.html", "Daemon Log");
-            System.Diagnostics.Process.Start(Path + "DaemonLog.mht");
+            session.Close();
         }
 
         public static void BuildUnicode(string File)

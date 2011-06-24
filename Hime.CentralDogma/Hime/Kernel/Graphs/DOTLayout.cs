@@ -9,7 +9,12 @@ namespace Hime.Kernel.Graphs
 
     public class DOTExternalLayoutManager : DOTLayoutManager
     {
-        public static string executable;
+        private string executable;
+
+        public DOTExternalLayoutManager(string binary)
+        {
+            executable = binary;
+        }
 
         public void Render(string dotFile, string svgFile)
         {

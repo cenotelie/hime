@@ -17,6 +17,7 @@ namespace Hime.Parsers
 
     public sealed class CompilationTask
     {
+        // parameters
         private List<string> rawInputs;
         private List<string> fileInputs;
         private string grammarName;
@@ -28,8 +29,8 @@ namespace Hime.Parsers
         private bool exportLog;
         private bool exportDoc;
         private bool exportVisuals;
-        private Kernel.Namespace root;
-        private Kernel.Reporting.Reporter reporter;
+        private string dotBinary;
+        private bool multithreaded;
 
         public ICollection<string> InputRawData { get { return rawInputs; } }
         public ICollection<string> InputFiles { get { return fileInputs; } }
@@ -78,8 +79,32 @@ namespace Hime.Parsers
             get { return exportVisuals; }
             set { exportVisuals = value; }
         }
-        public Kernel.Namespace Root { get { return root; } }
-        public Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); } }
+        public string DOTBinary
+        {
+            get { return dotBinary; }
+            set { dotBinary = value; }
+        }
+        public bool Multithreaded
+        {
+            get { return multithreaded; }
+            set { multithreaded = value; }
+        }
+
+        // internal data
+        private Kernel.Namespace root;
+        private Kernel.Reporting.Reporter reporter;
+        private ParserGenerator generator;
+        private System.IO.StreamWriter lexerWriter;
+        private System.IO.StreamWriter parserWriter;
+        private string docFile;
+
+        internal Kernel.Namespace Root { get { return root; } }
+        internal Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); } }
+        internal Kernel.Reporting.Reporter Reporter { get { return reporter; } }
+        internal ParserGenerator ParserGenerator { get { return generator; } }
+        internal System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
+        internal System.IO.StreamWriter ParserWriter { get { return parserWriter; } }
+        internal string Documentation { get { return docFile; } }
 
         public CompilationTask()
         {
@@ -90,6 +115,7 @@ namespace Hime.Parsers
             exportLog = false;
             exportDoc = false;
             exportVisuals = false;
+            multithreaded = true;
         }
 
 
@@ -101,15 +127,15 @@ namespace Hime.Parsers
             Hime.Parsers.Grammar grammar = Execute_GetGrammar();
             if (grammar == null)
                 return reporter.Result;
-            
-            Hime.Parsers.CF.CFParserGenerator generator = Execute_GetGenerator();
+
+            Execute_BuildGenerator();
             if (generator == null)
                 return reporter.Result;
 
-
-            GrammarBuildOptions Options = Execute_GetBuildOptions(grammar, generator);
-            grammar.Build(Options);
-            Options.Close();
+            Execute_BuildData(grammar);
+            Execute_OpenOutput();
+            grammar.Build(this);
+            Execute_Close();
             if (exportLog)
             {
                 string file = parserFile.Replace(".cs", "_log.mht");
@@ -169,27 +195,32 @@ namespace Hime.Parsers
             }
             return null;
         }
-        private CF.CFParserGenerator Execute_GetGenerator()
+        private void Execute_BuildGenerator()
         {
             switch (method)
             {
                 case ParsingMethod.LR0:
-                    return new Hime.Parsers.CF.LR.MethodLR0();
+                    generator = new Hime.Parsers.CF.LR.MethodLR0();
+                    return;
                 case ParsingMethod.LR1:
-                    return new Hime.Parsers.CF.LR.MethodLR1();
+                    generator = new Hime.Parsers.CF.LR.MethodLR1();
+                    return;
                 case ParsingMethod.LALR1:
-                    return new Hime.Parsers.CF.LR.MethodLALR1();
+                    generator = new Hime.Parsers.CF.LR.MethodLALR1();
+                    return;
                 case ParsingMethod.LRStar:
-                    return new Hime.Parsers.CF.LR.MethodLRStar();
+                    generator = new Hime.Parsers.CF.LR.MethodLRStar();
+                    return;
                 case ParsingMethod.RNGLR1:
-                    return new Hime.Parsers.CF.LR.MethodRNGLR1();
+                    generator = new Hime.Parsers.CF.LR.MethodRNGLR1();
+                    return;
                 case ParsingMethod.RNGLALR1:
-                    return new Hime.Parsers.CF.LR.MethodRNGLALR1();
+                    generator = new Hime.Parsers.CF.LR.MethodRNGLALR1();
+                    return;
             }
             reporter.Error("Compiler", "Unsupported parsing method: " + method.ToString());
-            return null;
         }
-        private GrammarBuildOptions Execute_GetBuildOptions(Grammar grammar, CF.CFParserGenerator generator)
+        private void Execute_BuildData(Grammar grammar)
         {
             if (_namespace == null)
                 _namespace = grammar.CompleteName.ToString();
@@ -200,15 +231,44 @@ namespace Hime.Parsers
                 else
                     parserFile = grammar.LocalName + ".cs";
             }
-            string doc = null;
+            docFile = null;
             if (exportDoc)
-                doc = parserFile.Replace(".cs", "_doc.mht");
-            GrammarBuildOptions options = null;
-            if (lexerFile != null)
-                options = new GrammarBuildOptions(reporter, _namespace, generator, lexerFile, parserFile, exportDebug, doc, exportVisuals);
+                docFile = parserFile.Replace(".cs", "_doc.mht");
+        }
+        private void Execute_OpenOutput()
+        {
+            if (lexerFile == null)
+            {
+                lexerWriter = new System.IO.StreamWriter(parserFile, false, System.Text.Encoding.UTF8);
+                parserWriter = lexerWriter;
+                lexerWriter.WriteLine("using System.Collections.Generic;");
+                lexerWriter.WriteLine("");
+                lexerWriter.WriteLine("namespace " + Namespace);
+                lexerWriter.WriteLine("{");
+            }
             else
-                options = new GrammarBuildOptions(reporter, _namespace, generator, parserFile, exportDebug, doc, exportVisuals);
-            return options;
+            {
+                lexerWriter = new System.IO.StreamWriter(lexerFile, false, System.Text.Encoding.UTF8);
+                lexerWriter.WriteLine("using System.Collections.Generic;");
+                lexerWriter.WriteLine("");
+                lexerWriter.WriteLine("namespace " + Namespace);
+                lexerWriter.WriteLine("{");
+                parserWriter = new System.IO.StreamWriter(parserFile, false, System.Text.Encoding.UTF8);
+                parserWriter.WriteLine("using System.Collections.Generic;");
+                parserWriter.WriteLine("");
+                parserWriter.WriteLine("namespace " + Namespace);
+                parserWriter.WriteLine("{");
+            }
+        }
+        private void Execute_Close()
+        {
+            lexerWriter.WriteLine("}");
+            lexerWriter.Close();
+            if (parserWriter != lexerWriter)
+            {
+                parserWriter.WriteLine("}");
+                parserWriter.Close();
+            }
         }
     }
 }

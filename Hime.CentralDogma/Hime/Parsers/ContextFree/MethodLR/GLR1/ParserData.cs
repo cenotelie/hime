@@ -8,6 +8,6 @@ namespace Hime.Parsers.CF.LR
 
         public ParserDataGLR1(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
 
-        public override bool Export(GrammarBuildOptions Options) { return false; }
+        public override bool Export(CompilationTask options) { return false; }
     }
 }

@@ -13,9 +13,9 @@ namespace Hime.Parsers.CF.LR
             this.deciders = deciders;
         }
 
-        public override bool Export(GrammarBuildOptions options)
+        public override bool Export(CompilationTask options)
         {
-            this.debug = options.OutputDebugInfo;
+            this.debug = options.ExportDebug;
             stream = options.ParserWriter;
             stream.Write("    class " + grammar.LocalName + "_Parser : ");
             stream.WriteLine("Hime.Redist.Parsers.BaseLRStarParser");
@@ -259,18 +259,18 @@ namespace Hime.Parsers.CF.LR
         }
 
 
-        public override List<string> SerializeVisuals(string directory, bool doVisualLayout)
+        public override List<string> SerializeVisuals(string directory, CompilationTask options)
         {
-            List<string> files = base.SerializeVisuals(directory, doVisualLayout);
+            List<string> files = base.SerializeVisuals(directory, options);
             foreach (State state in deciders.Keys)
             {
                 Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("State_" + state.ID.ToString(), directory + "\\Set_" + state.ID.ToString("X") + ".dot");
                 Serialize_Deciders(deciders[state], serializer);
                 serializer.Close();
                 files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".dot");
-                if (doVisualLayout)
+                if (options.ExportVisuals)
                 {
-                    Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
+                    Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager(options.DOTBinary);
                     layout.Render(directory + "\\Set_" + state.ID.ToString("X") + ".dot", directory + "\\Set_" + state.ID.ToString("X") + ".svg");
                     files.Add(directory + "\\Set_" + state.ID.ToString("X") + ".svg");
                 }

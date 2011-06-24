@@ -9,9 +9,9 @@ namespace Hime.Parsers.CF.LR
         public ParserDataLR1(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
 
 
-        public override bool Export(GrammarBuildOptions options)
+        public override bool Export(CompilationTask options)
         {
-            this.debug = options.OutputDebugInfo;
+            this.debug = options.ExportDebug;
             stream = options.ParserWriter;
             stream.Write("    class " + grammar.LocalName + "_Parser : ");
             if (grammar is CFGrammarText)

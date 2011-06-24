@@ -27,7 +27,7 @@ namespace Hime.Parsers.CF.LR
             this.variables = new List<CFVariable>(gram.Variables);
         }
 
-        public abstract bool Export(GrammarBuildOptions Options);
+        public abstract bool Export(CompilationTask options);
 
         public System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document)
         {
@@ -121,7 +121,7 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine("        };");
         }
 
-        public virtual List<string> SerializeVisuals(string directory, bool doVisualLayout)
+        public virtual List<string> SerializeVisuals(string directory, CompilationTask options)
         {
             Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
             foreach (State set in graph.Sets)
@@ -132,9 +132,9 @@ namespace Hime.Parsers.CF.LR
             serializer.Close();
             List<string> files = new List<string>();
             files.Add(directory + "\\GraphParser.dot");
-            if (doVisualLayout)
+            if (options.ExportVisuals)
             {
-                Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager();
+                Kernel.Graphs.DOTLayoutManager layout = new Kernel.Graphs.DOTExternalLayoutManager(options.DOTBinary);
                 layout.Render(directory + "\\GraphParser.dot", directory + "\\GraphParser.svg");
                 files.Add(directory + "\\GraphParser.svg");
             }

@@ -35,9 +35,9 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        public override bool Export(GrammarBuildOptions options)
+        public override bool Export(CompilationTask options)
         {
-            this.debug = options.OutputDebugInfo;
+            this.debug = options.ExportDebug;
             DetermineNullables();
             stream = options.ParserWriter;
             stream.WriteLine("    class " + grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");

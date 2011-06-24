@@ -176,9 +176,9 @@ namespace Hime.Parsers.CF
         public abstract void Inherit(CFGrammar Parent);
         public abstract CFGrammar Clone();
 
-        protected void Export_Documentation(ParserData data, string fileName, bool doLayout)
+        protected void Export_Documentation(ParserData data, CompilationTask options)
         {
-            string directory = fileName + "_temp";
+            string directory = options.Documentation + "_temp";
             System.IO.Directory.CreateDirectory(directory);
             
             Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor();
@@ -260,7 +260,7 @@ namespace Hime.Parsers.CF
             accessor.AddCheckoutFile(directory + "\\menu.html");
 
             // export parser data
-            List<string> files = data.SerializeVisuals(directory, doLayout);
+            List<string> files = data.SerializeVisuals(directory, options);
             foreach (string file in files)
             {
                 System.IO.FileInfo info = new System.IO.FileInfo(file);
@@ -271,7 +271,7 @@ namespace Hime.Parsers.CF
                 accessor.AddCheckoutFile(file);
             }
 
-            compiler.CompileTo(fileName);
+            compiler.CompileTo(options.Documentation);
             accessor.Close();
             System.IO.Directory.Delete(directory, true);
         }
@@ -429,7 +429,7 @@ namespace Hime.Parsers.CF
             return true;
         }
 
-        public override bool Build(GrammarBuildOptions options)
+        public override bool Build(CompilationTask options)
         {
             options.Reporter.BeginSection(name + " parser data generation");
             if (!Prepare_AddRealAxiom(options.Reporter)) { options.Reporter.EndSection(); return false; }
@@ -455,12 +455,7 @@ namespace Hime.Parsers.CF
 
             //Output data
             if (options.Documentation != null)
-            {
-                Export_Documentation(Data, options.Documentation, options.BuildVisuals);
-                //Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Lexer", Options.DocumentationDir + "\\GraphLexer.dot");
-                //finalDFA.SerializeGraph(serializer);
-                //serializer.Close();
-            }
+                Export_Documentation(Data, options);
             return result;
         }
     }
@@ -514,7 +509,7 @@ namespace Hime.Parsers.CF
             return Result;
         }
 
-        public override bool Build(GrammarBuildOptions options)
+        public override bool Build(CompilationTask options)
         {
             options.Reporter.BeginSection(name + " parser data generation");
             if (!Prepare_AddRealAxiom(options.Reporter)) { options.Reporter.EndSection(); return false; }
@@ -533,7 +528,7 @@ namespace Hime.Parsers.CF
             
             //Output data
             if (options.Documentation != null)
-                Export_Documentation(Data, options.Documentation, options.BuildVisuals);
+                Export_Documentation(Data, options);
             return result;
         }
     }
