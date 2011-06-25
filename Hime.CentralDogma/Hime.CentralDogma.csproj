@@ -86,7 +86,6 @@
     <Compile Include="Hime\Parsers\ContextFree\Compiler.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Grammars.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Decider.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\DecidersBuilder.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\GLRSimulator.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Actions.cs" />
