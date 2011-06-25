@@ -23,28 +23,18 @@ namespace LangTest
             foreach (Hime.Redist.Parsers.SyntaxTreeNode Child in SNode.Children)
             {
                 TreeNode VChild = null;
-                string action = "◌";
-                if (Child.Action == Hime.Redist.Parsers.SyntaxTreeNodeAction.Promote)
-                    action = "↑";
-                else if (Child.Action == Hime.Redist.Parsers.SyntaxTreeNodeAction.Drop)
-                    action = "↓";
-                else if (Child.Action == Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace)
-                    action = "≡";
-
                 if (Child.Symbol != null)
                 {
                     string name = Child.Symbol.Name;
                     string value = "";
                     if (Child.Symbol is Hime.Redist.Parsers.SymbolToken)
                         value = "\": " + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"";
-
-                    string header = action + " " + name + value;
-
+                    string header = name + value;
                     VChild = VNode.Nodes.Add(header);
                 }
                 else
                 {
-                    VChild = VNode.Nodes.Add(action + " /!\\ null");
+                    VChild = VNode.Nodes.Add("∅");
                 }
                 AddSubTree(VChild, Child);
             }

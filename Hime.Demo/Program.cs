@@ -21,7 +21,19 @@
 
         static void Parse_Test()
         {
-            Analyser.Test2_Lexer Lex = new Analyser.Test2_Lexer("(x)");
+            // generate file
+            /*System.IO.StreamWriter writer = new System.IO.StreamWriter("Test2.txt");
+            for (int i = 0; i != 1000; i++)
+            {
+                writer.Write("(x.x.x.x)|");
+                writer.Write("(x.x.x.x).x.x.x|");
+                writer.Write("(x.x.x.x)x.x.x.x|");
+            }
+            writer.Write("(x.x.x.x)");
+            writer.Close();*/
+            
+
+            Analyser.Test2_Lexer Lex = new Analyser.Test2_Lexer(new System.IO.StreamReader("Test2.txt"));
             Analyser.Test2_Parser Parser = new Analyser.Test2_Parser(Lex);
             Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
 
@@ -36,13 +48,17 @@
         
         static void Main(string[] args)
         {
-            Hime.Kernel.Graphs.DOTExternalLayoutManager.executable = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
+            //task.ExportDoc = true;
+            //task.ExportVisuals = true;
             task.InputFiles.Add("Languages\\Test2.gram");
             task.ParserFile = "Test2.cs";
+            task.Method = Parsers.ParsingMethod.LRStar;
+            task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
+            
             //Parse_Test();
         }
 
