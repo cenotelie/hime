@@ -88,6 +88,10 @@ namespace Hime.Redist.Parsers
         protected int currentColumn;
         protected bool isDollatEmited;
 
+        // Lexer DFA runtime data
+        private char[] buffer;
+        private int bufferSize;
+
         public System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(errors); } }
         public string InputText { get { return input.GetReadText(); } }
         public int CurrentLine { get { return currentLine; } }
@@ -105,6 +109,8 @@ namespace Hime.Redist.Parsers
             currentLine = 1;
             currentColumn = 1;
             isDollatEmited = false;
+            bufferSize = 100;
+            buffer = new char[bufferSize];
         }
         protected LexerText(LexerText original)
         {
@@ -114,6 +120,8 @@ namespace Hime.Redist.Parsers
             currentLine = original.currentLine;
             currentColumn = original.currentColumn;
             isDollatEmited = original.isDollatEmited;
+            bufferSize = 100;
+            buffer = new char[bufferSize];
         }
 
         public string GetSymbolName(ushort SID)
@@ -181,41 +189,54 @@ namespace Hime.Redist.Parsers
 
         private SymbolTokenText GetNextToken_DFA()
         {
-            List<SymbolTokenText> MatchedTokens = new List<SymbolTokenText>();
-            System.Text.StringBuilder Builder = new System.Text.StringBuilder();
+            int matchedIndex = -1;
+            int matchedLength = 0;
             int count = 0;
-            ushort State = 0;
+            ushort state = 0;
 
             while (true)
             {
-                if (finals[State] != -1)
+                int final = finals[state];
+                if (final != -1)
                 {
-                    string Value = Builder.ToString();
-                    MatchedTokens.Add(new SymbolTokenText(symbolsName[finals[State]], symbolsSID[finals[State]], Value, currentLine));
+                    matchedIndex = final;
+                    matchedLength = count;
                 }
                 bool atend = false;
                 char c = input.Peek(out atend);
                 if (atend)
                     break;
                 ushort UCV = System.Convert.ToUInt16(c);
-                ushort NextState = 0xFFFF;
-                for (int i = 0; i != transitions[State].Length; i++)
+                ushort nextState = 0xFFFF;
+                ushort[][] stateTransitions = transitions[state];
+                for (int i = 0; i != stateTransitions.Length; i++)
                 {
-                    if (UCV >= transitions[State][i][0] && UCV <= transitions[State][i][1])
-                        NextState = transitions[State][i][2];
+                    ushort[] transition = stateTransitions[i];
+                    if (UCV >= transition[0] && UCV <= transition[1])
+                        nextState = transition[2];
                 }
-                if (NextState == 0xFFFF)
+                if (nextState == 0xFFFF)
                     break;
-                State = NextState;
-                Builder.Append(input.Read(out atend));
+                state = nextState;
+                c = input.Read(out atend);
+                if (count >= bufferSize)
+                {
+                    // buffer is too small, create larger buffer
+                    bufferSize *= 2;
+                    char[] temp = new char[bufferSize];
+                    System.Array.Copy(buffer, temp, count);
+                    buffer = temp;
+                }
+                buffer[count] = c;
                 count++;
             }
-            if (MatchedTokens.Count == 0)
+
+            if (matchedIndex == -1)
             {
                 input.Rewind(count);
                 return null;
             }
-            return MatchedTokens[MatchedTokens.Count - 1];
+            return new SymbolTokenText(symbolsName[matchedIndex], symbolsSID[matchedIndex], new string(buffer, 0, matchedLength), currentLine);
         }
     }
 

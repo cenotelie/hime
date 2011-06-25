@@ -103,11 +103,12 @@ namespace Hime.Redist.Parsers
         {
             int depth = 0;
             reduction = new Rule();
-            DeciderState ds = states[currentState].Decider[0];
+            State state = states[currentState];
+            DeciderState ds = state.Decider[0];
             ushort token = first;
             if (!ds.Transitions.ContainsKey(token)) // Unexpected token !
                 return 0xFFFF;
-            ds = states[currentState].Decider[ds.Transitions[token]];
+            ds = state.Decider[ds.Transitions[token]];
             while (true)
             {
                 if (ds.Shift != 0xFFFF)
@@ -130,7 +131,7 @@ namespace Hime.Redist.Parsers
                     reader.Rewind(depth);
                     return 0xFFFF;
                 }
-                ds = states[currentState].Decider[ds.Transitions[token]];
+                ds = state.Decider[ds.Transitions[token]];
             }
         }
 

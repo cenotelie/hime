@@ -44,15 +44,15 @@ namespace Hime.Redist.Parsers
             return builder.ToString();
         }
 
-        public char Peek(out bool AtEnd)
+        public char Peek(out bool atEnd)
         {
-            AtEnd = false;
+            atEnd = false;
             if (currentNode == null || currentNode.Next == null)
             {
                 int value = reader.Peek();
                 if (value == -1)
                 {
-                    AtEnd = true;
+                    atEnd = true;
                     return char.MinValue;
                 }
                 else
@@ -61,15 +61,15 @@ namespace Hime.Redist.Parsers
             return currentNode.Value;
         }
 
-        public char Read(out bool AtEnd)
+        public char Read(out bool atEnd)
         {
-            AtEnd = false;
+            atEnd = false;
             if (currentNode == null || currentNode.Next == null)
             {
                 int value = reader.Read();
                 if (value == -1)
                 {
-                    AtEnd = true;
+                    atEnd = true;
                     return char.MinValue;
                 }
                 else
