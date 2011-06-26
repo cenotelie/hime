@@ -17,6 +17,14 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public Symbol Symbol { get { return symbol; } }
         /// <summary>
+        /// Gets or sets the action for this node
+        /// </summary>
+        public SyntaxTreeNodeAction Action
+        {
+            get { return action; }
+            set { action = value; }
+        }
+        /// <summary>
         /// Gets the generation of this node
         /// </summary>
         public int Generation { get { return generation; } }
