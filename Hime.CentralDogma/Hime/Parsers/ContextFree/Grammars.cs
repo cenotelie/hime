@@ -444,13 +444,13 @@ namespace Hime.Parsers.CF
 
             //Generate lexer
             Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(options.LexerWriter, options.Namespace, name, finalDFA, Separator);
-            LexerExporter.Export();
+            List<Terminal> expected = LexerExporter.Export();
 
             //Generate parser
             options.Reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
             ParserData Data = options.ParserGenerator.Build(this, options.Reporter);
             if (Data == null) { options.Reporter.EndSection(); return false; }
-            bool result = Data.Export(options);
+            bool result = Data.Export(expected, options);
             options.Reporter.EndSection();
 
             //Output data
@@ -523,7 +523,7 @@ namespace Hime.Parsers.CF
             options.Reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
             ParserData Data = options.ParserGenerator.Build(this, options.Reporter);
             if (Data == null) { options.Reporter.EndSection(); return false; }
-            bool result = Data.Export(options);
+            bool result = Data.Export(new List<Terminal>(terminals.Values), options);
             options.Reporter.EndSection();
             
             //Output data

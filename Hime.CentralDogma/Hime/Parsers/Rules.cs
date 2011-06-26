@@ -55,6 +55,14 @@ namespace Hime.Parsers
             return Node;
         }
 
+        public override int GetHashCode() { return base.GetHashCode(); }
+        public override bool Equals(object obj)
+        {
+            RuleDefinitionPart part = obj as RuleDefinitionPart;
+            if (this.symbol.SID != part.symbol.SID)
+                return false;
+            return (this.action == part.action);
+        }
         public override string ToString()
         {
             string s = symbol.ToString();
@@ -92,8 +100,18 @@ namespace Hime.Parsers
 
         public abstract Symbol GetSymbolAtIndex(int Index);
 
-        
 
+        public override int GetHashCode() { return base.GetHashCode(); }
+        public override bool Equals(object obj)
+        {
+            RuleDefinition def = obj as RuleDefinition;
+            if (this.parts.Count != def.parts.Count)
+                return false;
+            for (int i = 0; i != this.parts.Count; i++)
+                if (!this.parts[i].Equals(def.parts[i]))
+                    return false;
+            return true;
+        }
         public override string ToString()
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder();

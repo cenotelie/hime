@@ -257,6 +257,16 @@ namespace Hime.Parsers.CF
             return Node;
         }
 
+        public override int GetHashCode() { return base.GetHashCode(); }
+        public override bool Equals(object obj)
+        {
+            CFRule rule = obj as CFRule;
+            if (this.variable.SID != rule.variable.SID)
+                return false;
+            if (this.replaceOnProduction != rule.replaceOnProduction)
+                return false;
+            return this.definition.Equals(rule.definition);
+        }
         public override string ToString()
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder();

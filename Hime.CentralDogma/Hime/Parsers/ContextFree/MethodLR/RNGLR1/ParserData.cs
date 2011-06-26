@@ -5,6 +5,7 @@ namespace Hime.Parsers.CF.LR
     class ParserDataRNGLR1 : ParserDataLR
     {
         protected System.IO.StreamWriter stream;
+        protected string terminalsAccessor;
         protected List<CFVariable> nullableVars;
         protected List<CFRuleDefinition> nullableChoices;
 
@@ -35,15 +36,16 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        public override bool Export(CompilationTask options)
+        public override bool Export(IList<Terminal> expected, CompilationTask options)
         {
-            this.debug = options.ExportDebug;
+            terminals = new List<Terminal>(expected);
+            debug = options.ExportDebug;
+            terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
             DetermineNullables();
             stream = options.ParserWriter;
             stream.WriteLine("    class " + grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
-            Export_Terminals(stream);
             Export_Variables(stream);
             Export_NullVars();
             Export_NullChoices();
@@ -146,7 +148,7 @@ namespace Hime.Parsers.CF.LR
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "staticVariables[" + this.variables.IndexOf(Rule.Variable) + "]";
+                string head = "variables[" + this.variables.IndexOf(Rule.Variable) + "]";
                 stream.WriteLine("new Rule(" + production + ", " + head + ")");
                 first = false;
             }
@@ -187,7 +189,7 @@ namespace Hime.Parsers.CF.LR
                 foreach (Terminal terminal in Terminals)
                 {
                     if (!first) stream.Write(", ");
-                    stream.Write("staticTerminals[" + terminals.IndexOf(terminal) + "]");
+                    stream.Write(terminalsAccessor + "[" + terminals.IndexOf(terminal) + "]");
                     first = false;
                 }
                 stream.WriteLine("},");
@@ -308,7 +310,7 @@ namespace Hime.Parsers.CF.LR
                     }
                 }
                 if (!first) stream.Write(", ");
-                stream.Write("new Hime.Redist.Parsers.SPPFNode(staticVariables[" + variables.IndexOf(var) + "], 0" + action + ")");
+                stream.Write("new Hime.Redist.Parsers.SPPFNode(variables[" + variables.IndexOf(var) + "], 0" + action + ")");
                 first = false;
             }
             stream.WriteLine(" };");

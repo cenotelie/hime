@@ -6,6 +6,7 @@ namespace Hime.Parsers.CF.LR
     {
         private Dictionary<State, DeciderLRStar> deciders;
         private System.IO.StreamWriter stream;
+        protected string terminalsAccessor;
 
         public ParserDataLRStar(ParserGenerator generator, CFGrammar gram, Graph graph, Dictionary<State, DeciderLRStar> deciders)
             : base(generator, gram, graph)
@@ -13,14 +14,15 @@ namespace Hime.Parsers.CF.LR
             this.deciders = deciders;
         }
 
-        public override bool Export(CompilationTask options)
+        public override bool Export(IList<Terminal> expected, CompilationTask options)
         {
-            this.debug = options.ExportDebug;
+            terminals = new List<Terminal>(expected);
+            debug = options.ExportDebug;
+            terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
             stream = options.ParserWriter;
             stream.Write("    class " + grammar.LocalName + "_Parser : ");
             stream.WriteLine("Hime.Redist.Parsers.BaseLRStarParser");
             stream.WriteLine("    {");
-            Export_Terminals(stream);
             Export_Variables(stream);
             foreach (CFRule rule in grammar.Rules)
                 Export_Production(rule);
@@ -80,7 +82,7 @@ namespace Hime.Parsers.CF.LR
                 stream.WriteLine("            List<Hime.Redist.Parsers.SyntaxTreeNode> Definition = nodes.GetRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
                 stream.WriteLine("            nodes.RemoveRange(nodes.Count - " + ParserLength + ", " + ParserLength + ");");
             }
-            stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(staticVariables[" + this.variables.IndexOf(Rule.Variable) + "]");
+            stream.Write("            Hime.Redist.Parsers.SyntaxTreeNode SubRoot = new Hime.Redist.Parsers.SyntaxTreeNode(variables[" + this.variables.IndexOf(Rule.Variable) + "]");
             if (Rule.ReplaceOnProduction)
                 stream.WriteLine(", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace);");
             else
@@ -118,7 +120,7 @@ namespace Hime.Parsers.CF.LR
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "staticVariables[" + this.variables.IndexOf(Rule.Variable) + "]";
+                string head = "variables[" + this.variables.IndexOf(Rule.Variable) + "]";
                 stream.WriteLine("new Rule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAtIndex(0).Length + ")");
                 first = false;
             }
@@ -197,7 +199,7 @@ namespace Hime.Parsers.CF.LR
             foreach (Terminal terminal in Terminals)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("staticTerminals[" + terminals.IndexOf(terminal) + "]");
+                stream.Write(terminalsAccessor + "[" + terminals.IndexOf(terminal) + "]");
                 first = false;
             }
             stream.WriteLine("},");

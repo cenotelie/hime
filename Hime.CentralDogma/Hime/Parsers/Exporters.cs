@@ -4,9 +4,8 @@ namespace Hime.Parsers.Exporters
 {
     class TextLexerExporter
     {
-        private List<Terminal> symbols;
-        private List<int> indices;
         private Automata.DFA finalDFA;
+        private List<Terminal> terminals;
         private Terminal separator;
         private string _namespace;
         private System.IO.StreamWriter stream;
@@ -16,46 +15,31 @@ namespace Hime.Parsers.Exporters
         {
             stream = Stream;
             finalDFA = DFA;
+            terminals = new List<Terminal>();
             _namespace = Namespace;
             name = Name;
             separator = Separator;
-            symbols = new List<Terminal>();
-            indices = new List<int>();
-            foreach (Automata.DFAState State in finalDFA.States)
+            terminals.Add(TerminalEpsilon.Instance);
+            terminals.Add(TerminalDollar.Instance);
+            foreach (Automata.DFAState state in finalDFA.States)
             {
-                if (State.Final != null)
-                {
-                    if (symbols.Contains(State.Final))
-                    {
-                        indices.Add(symbols.IndexOf(State.Final));
-                    }
-                    else
-                    {
-                        indices.Add(symbols.Count);
-                        symbols.Add(State.Final);
-                    }
-                }
-                else
-                {
-                    indices.Add(-1);
-                }
+                if (state.Final != null)
+                    if (!terminals.Contains(state.Final))
+                        terminals.Add(state.Final);
             }
         }
 
-        public void Export()
+        public List<Terminal> Export()
         {
             stream.WriteLine("    class " + name + "_Lexer : Hime.Redist.Parsers.LexerText");
             stream.WriteLine("    {");
-            Export_SymbolIDs();
-            Export_SymbolNames();
-            foreach (Automata.DFAState State in finalDFA.States)
-                Export_Transition_State(State);
-            Export_Transitions();
-            Export_Finals();
+            Export_Terminals();
+            Export_States();
             Export_Setup();
             Export_Clone();
             Export_Constructor();
             stream.WriteLine("    }");
+            return terminals;
         }
 
         private void Export_Constructor()
@@ -73,74 +57,65 @@ namespace Hime.Parsers.Exporters
         private void Export_Setup()
         {
             stream.WriteLine("        protected override void setup() {");
-            stream.WriteLine("            symbolsSID = staticSymbolsSID;");
-            stream.WriteLine("            symbolsName = staticSymbolsName;");
-            stream.WriteLine("            symbolsSubGrammars = new Dictionary<ushort, MatchSubGrammar>();");
-            stream.WriteLine("            transitions = staticTransitions;");
-            stream.WriteLine("            finals = staticFinals;");
+            stream.WriteLine("            states = staticStates;");
+            stream.WriteLine("            subGrammars = new Dictionary<ushort, MatchSubGrammar>();");
             if (separator != null)
                 stream.WriteLine("            separatorID = 0x" + separator.SID.ToString("X") + ";");
             stream.WriteLine("        }");
         }
-        private void Export_SymbolIDs()
+        protected void Export_Terminals()
         {
-            stream.Write("        private static ushort[] staticSymbolsSID = { ");
+            stream.WriteLine("        public static readonly Hime.Redist.Parsers.SymbolTerminal[] terminals = {");
             bool first = true;
-            foreach (Terminal terminal in symbols)
+            foreach (Terminal terminal in terminals)
             {
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + terminal.SID.ToString("X"));
+                if (!first) stream.WriteLine(",");
+                stream.Write("            ");
+                stream.Write("new Hime.Redist.Parsers.SymbolTerminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
                 first = false;
             }
             stream.WriteLine(" };");
         }
-        private void Export_SymbolNames()
+        private void Export_State(Automata.DFAState state)
         {
-            stream.Write("        private static string[] staticSymbolsName = { ");
-            bool first = true;
-            foreach (Terminal terminal in symbols)
+            stream.Write("            ");
+            if (state.Transitions.Count == 0)
             {
-                if (!first) stream.Write(", ");
-                stream.Write("\"" + terminal.LocalName.Replace("\"", "\\\"") + "\"");
-                first = false;
+                stream.Write("new State(new ushort[][] {}, ");
+                if (state.Final == null)
+                    stream.Write("null)");
+                else
+                    stream.Write("terminals[0x" + terminals.IndexOf(state.Final).ToString("X") + "])");
             }
-            stream.WriteLine(" };");
-        }
-        private void Export_Transition_State(Automata.DFAState State)
-        {
-            stream.Write("        private static ushort[][] staticTransitions" + State.ID.ToString("X") + " = { ");
-            bool first = true;
-            foreach (Automata.TerminalNFACharSpan Span in State.Transitions.Keys)
+            else
             {
-                string begin = System.Convert.ToUInt16(Span.Begin).ToString("X");
-                string end = System.Convert.ToUInt16(Span.End).ToString("X");
-                string next = State.Transitions[Span].ID.ToString("X");
-                if (!first) stream.Write(", ");
-                stream.Write("new ushort[3] { 0x" + begin + ", 0x" + end + ", 0x" + next + " }");
-                first = false;
+                stream.WriteLine("new State(new ushort[][] {");
+                bool first = true;
+                foreach (Automata.TerminalNFACharSpan span in state.Transitions.Keys)
+                {
+                    string begin = System.Convert.ToUInt16(span.Begin).ToString("X");
+                    string end = System.Convert.ToUInt16(span.End).ToString("X");
+                    string next = state.Transitions[span].ID.ToString("X");
+                    if (!first) stream.WriteLine(",");
+                    stream.Write("                ");
+                    stream.Write("new ushort[3] { 0x" + begin + ", 0x" + end + ", 0x" + next + " }");
+                    first = false;
+                }
+                stream.WriteLine("},");
+                if (state.Final == null)
+                    stream.Write("                null)");
+                else
+                    stream.Write("                terminals[0x" + terminals.IndexOf(state.Final).ToString("X") + "])");
             }
-            stream.WriteLine(" };");
         }
-        private void Export_Transitions()
+        private void Export_States()
         {
-            stream.Write("        private static ushort[][][] staticTransitions = { ");
+            stream.WriteLine("        private static State[] staticStates = { ");
             bool first = true;
             foreach (Automata.DFAState State in finalDFA.States)
             {
-                if (!first) stream.Write(", ");
-                stream.Write("staticTransitions" + State.ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        private void Export_Finals()
-        {
-            stream.Write("        private static int[] staticFinals = { ");
-            bool first = true;
-            foreach (int index in indices)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write(index);
+                if (!first) stream.WriteLine(",");
+                Export_State(State);
                 first = false;
             }
             stream.WriteLine(" };");

@@ -19,7 +19,7 @@ namespace Hime.Parsers
     public interface ParserData
     {
         ParserGenerator Generator { get; }
-        bool Export(CompilationTask options);
+        bool Export(IList<Terminal> expected, CompilationTask options);
         System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document);
         List<string> SerializeVisuals(string directory, CompilationTask options);
     }

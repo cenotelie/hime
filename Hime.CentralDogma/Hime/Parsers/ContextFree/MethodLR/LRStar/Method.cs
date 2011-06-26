@@ -41,7 +41,7 @@ namespace Hime.Parsers.CF.LR
             reporter.Info("LR(*)", "Spawning " + threadCount + " thread(s) to build deciders");
             while (threadCount != 0)
             {
-                CreateWorker(threadCount);
+                SpawnWorker(threadCount);
                 threadCount--;
             }
             foreach (System.Threading.Thread thread in workers)
@@ -73,10 +73,10 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        private void CreateWorker(int id)
+        private void SpawnWorker(int id)
         {
             System.Threading.Thread thread = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(worker));
-            thread.Name = "LR(*) Decider Builder Thread " + id.ToString();
+            thread.Name = "LR(*) Decider Builder " + id.ToString();
             workers.Add(thread);
             thread.Start();
         }

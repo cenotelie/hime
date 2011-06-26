@@ -20,14 +20,10 @@ namespace Hime.Parsers.CF.LR
             this.grammar = gram;
             this.graph = graph;
             this.generator = generator;
-            this.terminals = new List<Terminal>();
-            this.terminals.Add(TerminalEpsilon.Instance);
-            this.terminals.Add(TerminalDollar.Instance);
-            this.terminals.AddRange(gram.Terminals);
             this.variables = new List<CFVariable>(gram.Variables);
         }
 
-        public abstract bool Export(CompilationTask options);
+        public abstract bool Export(IList<Terminal> expected, CompilationTask options);
 
         public System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document)
         {
@@ -94,31 +90,18 @@ namespace Hime.Parsers.CF.LR
             return ConflictType.None;
         }
 
-        protected void Export_Terminals(System.IO.StreamWriter stream)
-        {
-            stream.WriteLine("        private static Hime.Redist.Parsers.SymbolTerminal[] staticTerminals = {");
-            bool first = true;
-            foreach (Terminal terminal in terminals)
-            {
-                stream.Write("            ");
-                if (!first) stream.Write(", ");
-                stream.WriteLine("new Hime.Redist.Parsers.SymbolTerminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
-                first = false;
-            }
-            stream.WriteLine("        };");
-        }
         protected void Export_Variables(System.IO.StreamWriter stream)
         {
-            stream.WriteLine("        private static Hime.Redist.Parsers.SymbolVariable[] staticVariables = {");
+            stream.WriteLine("        public static readonly Hime.Redist.Parsers.SymbolVariable[] variables = {");
             bool first = true;
             foreach (CFVariable var in variables)
             {
+                if (!first) stream.WriteLine(", ");
                 stream.Write("            ");
-                if (!first) stream.Write(", ");
-                stream.WriteLine("new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\")");
+                stream.Write("new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\")");
                 first = false;
             }
-            stream.WriteLine("        };");
+            stream.WriteLine(" };");
         }
 
         public virtual List<string> SerializeVisuals(string directory, CompilationTask options)
