@@ -5,49 +5,60 @@
         static void Parse_MathExp()
         {
             Interpreter interpreter = new Interpreter();
-            Analyser.MathExp_Lexer Lex = new Analyser.MathExp_Lexer("5 + 6");
-            Analyser.MathExp_Parser Parser = new Analyser.MathExp_Parser(Lex, interpreter);
-            Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+            Analyser.MathExp_Lexer lexer = new Analyser.MathExp_Lexer("5 + 6");
+            Analyser.MathExp_Parser parser = new Analyser.MathExp_Parser(lexer, interpreter);
+            Hime.Redist.Parsers.SyntaxTreeNode root = parser.Analyse();
             System.Console.Write(interpreter.Value);
-            
-            foreach (Hime.Redist.Parsers.LexerError LexerError in Lex.Errors) System.Console.WriteLine(LexerError.ToString());
-            foreach (Hime.Redist.Parsers.ParserError ParserError in Parser.Errors) System.Console.WriteLine(ParserError.ToString());
-            if (Root != null)
+
+            foreach (Hime.Redist.Parsers.LexerError error in lexer.Errors) System.Console.WriteLine(error.ToString());
+            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors) System.Console.WriteLine(error.ToString());
+            if (root != null)
             {
-                LangTest.WinTreeView Win = new LangTest.WinTreeView(Root);
-                Win.ShowDialog();
+                LangTest.WinTreeView window = new LangTest.WinTreeView(root);
+                window.ShowDialog();
             }
         }
 
         static void Parse_Test()
         {
-            Analyser.Test2_Lexer Lex = new Analyser.Test2_Lexer("(x.x).x.x");
-            Analyser.Test2_Parser Parser = new Analyser.Test2_Parser(Lex);
-            Hime.Redist.Parsers.SyntaxTreeNode Root = Parser.Analyse();
+            /*System.IO.StreamWriter stream = new System.IO.StreamWriter("Test2.txt");
+            stream.Write("((x.x)x.x).x");
+            for (int i = 0; i != 100000; i++)
+                stream.Write("|((x.x)x.x).x");
+            stream.Close();*/
+
+            Analyser.Test2_Lexer lexer = new Analyser.Test2_Lexer(new System.IO.StreamReader("Test2.txt"));
+            //Analyser.Test2_Lexer lexer = new Analyser.Test2_Lexer("((x.x)x.x).x");
+            Analyser.Test2_Parser parser = new Analyser.Test2_Parser(lexer);
+            Hime.Redist.Parsers.SyntaxTreeNode root = parser.Analyse();
             
-            foreach (Hime.Redist.Parsers.LexerError LexerError in Lex.Errors) System.Console.WriteLine(LexerError.ToString());
-            foreach (Hime.Redist.Parsers.ParserError ParserError in Parser.Errors) System.Console.WriteLine(ParserError.ToString());
-            if (Root != null)
+            /*foreach (Hime.Redist.Parsers.LexerError error in lexer.Errors) System.Console.WriteLine(error.ToString());
+            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors) System.Console.WriteLine(error.ToString());
+            if (root != null)
             {
-                LangTest.WinTreeView Win = new LangTest.WinTreeView(Root);
-                Win.ShowDialog();
-            }
+                LangTest.WinTreeView window = new LangTest.WinTreeView(root);
+                window.ShowDialog();
+            }*/
         }
-        
-        static void Main(string[] args)
+
+        static void Compile()
         {
             Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDoc = true;
+            //task.ExportDoc = true;
             //task.ExportVisuals = true;
-            task.InputFiles.Add("Languages\\Earth.CIL.CSharp.gram");
-            task.ParserFile = "Earth.CIL.CSharp.cs";
-            task.Method = Parsers.ParsingMethod.LRStar;
+            task.InputFiles.Add("Languages\\MathExp.gram");
+            task.ParserFile = "MathExp.cs";
+            task.Method = Parsers.ParsingMethod.LALR1;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
+        }
 
-            //Parse_Test();
+        static void Main(string[] args)
+        {
+            //Compile();
+            Parse_Test();
             //Parse_MathExp();
         }
 

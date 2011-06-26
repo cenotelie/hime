@@ -2,20 +2,22 @@
 {
 	options
 	{
-		Axiom = "e";
+		Axiom = "unit";
 	}
 	terminals { }
 	rules {
-		e0	-> 'x' ;
-		e0	-> e0 '.' 'x' ;
-		e0	-> '(' e ')' ;
-		e0	-> 'typeof' '(' t ')' ;
+		e0	-> 'x'^ ;
+		e0	-> e0 '.'! "member_access"^ 'x' ;
+		e0	-> '('! e^ ')'! ;
+		e0	-> 'typeof'^ '('! t ')'! ;
 
-		e	-> e0
-			| '(' t ')' e ;
+		e	-> e0^
+			| "cast"^ '('! t ')'! e ;
 
-		t ->  'x'
-			| t '.' 'x'
+		t ->  'x'^
+			| t '.'! "name_qualification"^ 'x'
 			;
+
+		unit -> e ('|'! e)* ;
 	}
 }
