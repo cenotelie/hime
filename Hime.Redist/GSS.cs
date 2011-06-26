@@ -5,7 +5,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a node in a graph structured stack
     /// </summary>
-    public class GSSNode
+    public sealed class GSSNode
     {
         private int generation;
         private ushort dFAState;

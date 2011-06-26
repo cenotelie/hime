@@ -4,7 +4,7 @@ namespace Hime.Redist.Parsers
 {
     public abstract class BaseLRStarParser : IParser
     {
-        protected delegate void Production(BaseLRStarParser parser, List<SyntaxTreeNode> nodes);
+        protected delegate SyntaxTreeNode Production(BaseLRStarParser parser);
         protected struct Rule
         {
             public Production OnReduction;
@@ -79,7 +79,7 @@ namespace Hime.Redist.Parsers
         protected List<ParserError> errors;
         protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
         protected BufferedTokenReader reader;
-        protected List<SyntaxTreeNode> nodes;
+        protected LinkedList<SyntaxTreeNode> nodes;
         protected Stack<ushort> stack;
         protected SymbolToken nextToken;
         protected ushort currentState;
@@ -95,7 +95,7 @@ namespace Hime.Redist.Parsers
             errors = new List<ParserError>();
             readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             reader = new BufferedTokenReader(input);
-            nodes = new List<SyntaxTreeNode>();
+            nodes = new LinkedList<SyntaxTreeNode>();
             stack = new Stack<ushort>();
             currentState = 0x0;
             nextToken = null;
@@ -145,7 +145,7 @@ namespace Hime.Redist.Parsers
                 ushort NextState = Analyze_RunDecider(token.SymbolID, out reduction);
                 if (NextState != 0xFFFF)
                 {
-                    nodes.Add(new SyntaxTreeNode(token));
+                    nodes.AddLast(new SyntaxTreeNode(token));
                     currentState = NextState;
                     stack.Push(currentState);
                     return true;
@@ -154,7 +154,7 @@ namespace Hime.Redist.Parsers
                 {
                     Production Reduce = reduction.OnReduction;
                     ushort HeadID = reduction.Head.SymbolID;
-                    Reduce(this, nodes);
+                    nodes.AddLast(Reduce(this));
                     for (ushort j = 0; j != reduction.Length; j++)
                         stack.Pop();
                     // Shift to next state on the reduce variable
@@ -182,7 +182,7 @@ namespace Hime.Redist.Parsers
                     continue;
                 }
                 else if (nextToken.SymbolID == 0x0001)
-                    return nodes[0].ApplyActions();
+                    return nodes.First.Value.ApplyActions();
                 else
                     // Unexpected token
                     return null;

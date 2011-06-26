@@ -127,49 +127,82 @@ namespace Hime.Redist.Parsers
                 AppendChild(Node);
         }
 
+        private class StackNode
+        {
+            public SyntaxTreeNode astNode;
+            public bool visited;
+            public StackNode parentNode;
+            public StackNode(SyntaxTreeNode ast, StackNode parent)
+            {
+                this.astNode = ast;
+                this.visited = false;
+                this.parentNode = parent;
+            }
+        }
+
         /// <summary>
         /// Apply actions to this node and all its children
         /// </summary>
         /// <returns>The new root</returns>
         internal SyntaxTreeNode ApplyActions()
         {
-            Visit_DropReplace();
-            return Visit_Promote();
-        }
+            LinkedList<StackNode> stack = new LinkedList<StackNode>();
+            stack.AddLast(new StackNode(this, null));
+            StackNode current = null;
 
-        private void Visit_DropReplace()
-        {
-            Stack<SyntaxTreeNode> nodes = new Stack<SyntaxTreeNode>();
-            Stack<bool> visited = new Stack<bool>();
-            nodes.Push(this);
-            visited.Push(false);
-
-            while (nodes.Count != 0)
+            while (stack.Count != 0)
             {
-                SyntaxTreeNode current = nodes.Pop();
-                bool isVisisted = visited.Pop();
-                if (isVisisted)
+                current = stack.Last.Value;
+                if (current.visited)
                 {
+                    stack.RemoveLast();
                     // post-order
                     // Drop replaced node
-                    if (current.action != SyntaxTreeNodeAction.Replace)
+                    if (current.astNode.action == SyntaxTreeNodeAction.Replace)
+                        continue;
+                    if (current.astNode.action == SyntaxTreeNodeAction.Promote)
                     {
-                        // Redo binding by adding the children
-                        if (current.parent != null)
-                            current.parent.children.Add(current);
+                        StackNode parentNode = current.parentNode;
+                        SyntaxTreeNode oldParent = parentNode.astNode;
+                        current.astNode.action = oldParent.action;
+                        if (current.astNode.parent == oldParent)
+                        {
+                            current.astNode.parent = oldParent.parent;
+                            foreach (SyntaxTreeNode left in oldParent.children)
+                                left.parent = current.astNode;
+                            current.astNode.children.InsertRange(0, oldParent.children);
+                        }
+                        else
+                        {
+                            current.astNode.parent = oldParent.parent;
+                            current.astNode.children.Insert(0, oldParent);
+                            oldParent.parent = current.astNode;
+                        }
+                        parentNode.astNode = current.astNode;
+                    }
+                    else
+                    {
+                        if (current.parentNode != null)
+                        {
+                            current.astNode.parent = current.parentNode.astNode;
+                            current.astNode.parent.children.Add(current.astNode);
+                        }
                     }
                 }
                 else
                 {
-                    nodes.Push(current);
-                    visited.Push(true);
+                    current.visited = true;
                     // Pre-order
-                    for (int i = current.children.Count - 1; i != -1; i--)
+                    for (int i = current.astNode.children.Count - 1; i != -1; i--)
                     {
-                        SyntaxTreeNode child = current.children[i];
+                        StackNode parentToPush = current;
+                        SyntaxTreeNode child = current.astNode.children[i];
                         // prepare replace => setup parency
-                        if (current.action == SyntaxTreeNodeAction.Replace)
-                            child.parent = current.parent;
+                        if (current.astNode.action == SyntaxTreeNodeAction.Replace)
+                        {
+                            child.parent = current.astNode.parent;
+                            parentToPush = current.parentNode;
+                        }
                         // if action is drop => drop the child now by not adding it to the stack
                         if (child.action == SyntaxTreeNodeAction.Drop)
                             continue;
@@ -180,84 +213,18 @@ namespace Hime.Redist.Parsers
                             {
                                 // there is a subgrammar => build parency and add to the stack
                                 child = TokenText.SubGrammarRoot;
-                                child.parent = current;
+                                child.parent = current.astNode;
                             }
                         }
-                        nodes.Push(child);
-                        visited.Push(false);
+                        stack.AddLast(new StackNode(child, parentToPush));
                     }
                     // clear the children => rebuild in postorder
-                    current.children.Clear();
+                    current.astNode.children.Clear();
                 }
             }
+            return current.astNode;
         }
 
-        private SyntaxTreeNode Visit_Promote()
-        {
-            LinkedList<SyntaxTreeNode> nodes = new LinkedList<SyntaxTreeNode>();
-            LinkedList<bool> visited = new LinkedList<bool>();
-            LinkedList<LinkedListNode<SyntaxTreeNode>> parents = new LinkedList<LinkedListNode<SyntaxTreeNode>>();
-            
-            nodes.AddLast(this);
-            visited.AddLast(false);
-            parents.AddLast(new LinkedListNode<SyntaxTreeNode>(null));
-            SyntaxTreeNode current = null;
-
-            while (nodes.Count != 0)
-            {
-                current = nodes.Last.Value;
-                bool isVisisted = visited.Last.Value;
-                if (isVisisted)
-                {
-                    LinkedListNode<SyntaxTreeNode> parentNode = parents.Last.Value;
-                    SyntaxTreeNode oldParent = parentNode.Value;
-                    nodes.RemoveLast();
-                    visited.RemoveLast();
-                    parents.RemoveLast();
-                    // post-order
-                    if (current.action == SyntaxTreeNodeAction.Promote)
-                    {
-                        current.action = oldParent.action;
-                        if (current.parent == oldParent)
-                        {
-                            current.parent = oldParent.parent;
-                            foreach (SyntaxTreeNode left in oldParent.children)
-                                left.parent = current;
-                            current.children.InsertRange(0, oldParent.children);
-                        }
-                        else
-                        {
-                            current.parent = oldParent.parent;
-                            current.children.Insert(0, oldParent);
-                            oldParent.parent = current;
-                        }
-                        parentNode.Value = current;
-                    }
-                    else
-                    {
-                        current.parent = oldParent;
-                        if (oldParent != null)
-                            current.parent.children.Add(current);
-                    }
-                }
-                else
-                {
-                    LinkedListNode<SyntaxTreeNode> currentNode = nodes.Last;
-                    visited.RemoveLast();
-                    visited.AddLast(true);
-                    // Pre-order
-                    for (int i = current.children.Count - 1; i != -1; i--)
-                    {
-                        SyntaxTreeNode child = current.children[i];
-                        nodes.AddLast(child);
-                        visited.AddLast(false);
-                        parents.AddLast(currentNode);
-                    }
-                    current.children.Clear();
-                }
-            }
-            return current;
-        }
 
         /// <summary>
         /// Builds an XML node representing this node in the context of the given XML document

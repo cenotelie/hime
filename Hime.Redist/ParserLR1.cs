@@ -2,14 +2,40 @@
 
 namespace Hime.Redist.Parsers
 {
+    /// <summary>
+    /// Represents a base for LR(1) parsers
+    /// </summary>
     public abstract class BaseLR1Parser : IParser
     {
-        protected delegate void Production(BaseLR1Parser parser, List<SyntaxTreeNode> nodes);
+        /// <summary>
+        /// Callback for rule productions
+        /// </summary>
+        /// <param name="parser">The reducing parser</param>
+        protected delegate SyntaxTreeNode Production(BaseLR1Parser parser);
+
+        /// <summary>
+        /// Represents a LR(1) parser rule
+        /// </summary>
         protected struct Rule
         {
+            /// <summary>
+            /// Callback to invoke when reducing this rule
+            /// </summary>
             public Production OnReduction;
+            /// <summary>
+            /// The rule's head variable
+            /// </summary>
             public SymbolVariable Head;
+            /// <summary>
+            /// The rule's length
+            /// </summary>
             public ushort Length;
+            /// <summary>
+            /// Initializes a new instance of the Rule structure with the given callback, variable and length
+            /// </summary>
+            /// <param name="prod">The callback for reductions</param>
+            /// <param name="head">The head variable</param>
+            /// <param name="length">The rule's length</param>
             public Rule(Production prod, SymbolVariable head, ushort length)
             {
                 OnReduction = prod;
@@ -17,6 +43,7 @@ namespace Hime.Redist.Parsers
                 Length = length;
             }
         }
+
         protected struct Reduction
         {
             public ushort Lookahead;
@@ -89,7 +116,7 @@ namespace Hime.Redist.Parsers
         protected List<ParserError> errors;
         protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
         protected ILexer lexer;
-        protected List<SyntaxTreeNode> nodes;
+        protected LinkedList<SyntaxTreeNode> nodes;
         protected Stack<ushort> stack;
         protected SymbolToken nextToken;
         protected ushort currentState;
@@ -106,7 +133,7 @@ namespace Hime.Redist.Parsers
             errors = new List<ParserError>();
             readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             lexer = input;
-            nodes = new List<SyntaxTreeNode>();
+            nodes = new LinkedList<SyntaxTreeNode>();
             stack = new Stack<ushort>();
             currentState = 0x0;
             nextToken = null;
@@ -247,7 +274,7 @@ namespace Hime.Redist.Parsers
                 ushort NextState = states[currentState].GetNextByShiftOnTerminal(token.SymbolID);
                 if (NextState != 0xFFFF)
                 {
-                    nodes.Add(new SyntaxTreeNode(token));
+                    nodes.AddLast(new SyntaxTreeNode(token));
                     currentState = NextState;
                     stack.Push(currentState);
                     return true;
@@ -257,7 +284,7 @@ namespace Hime.Redist.Parsers
                     Reduction reduction = states[currentState].GetReductionOnTerminal(token.SymbolID);
                     Production Reduce = reduction.ToReduce.OnReduction;
                     ushort HeadID = reduction.ToReduce.Head.SymbolID;
-                    Reduce(this, nodes);
+                    nodes.AddLast(Reduce(this));
                     for (ushort j = 0; j != reduction.ToReduce.Length; j++)
                         stack.Pop();
                     // Shift to next state on the reduce variable
@@ -285,7 +312,7 @@ namespace Hime.Redist.Parsers
                     continue;
                 }
                 else if (nextToken.SymbolID == 0x0001)
-                    return nodes[0].ApplyActions();
+                    return nodes.First.Value.ApplyActions();
                 else
                     Analyse_HandleUnexpectedToken();
             }
