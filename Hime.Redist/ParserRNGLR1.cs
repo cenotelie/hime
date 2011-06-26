@@ -119,13 +119,14 @@ namespace Hime.Redist.Parsers
 
         // Parser state data
         protected List<ParserError> errors;
+        protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
         protected ILexer lexer;
         protected SymbolToken nextToken;
         protected LinkedList<ParserReduction> reductions;
         protected LinkedList<ParserShift> q;
         protected List<SPPFNode> n;
 
-        public System.Collections.ObjectModel.ReadOnlyCollection<ParserError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors); } }
+        public ICollection<ParserError> Errors { get { return readonlyErrors; } }
 
         protected abstract void setup();
 
@@ -133,6 +134,7 @@ namespace Hime.Redist.Parsers
         {
             setup();
             errors = new List<ParserError>();
+            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             lexer = input;
             nextToken = null;
         }

@@ -2,29 +2,74 @@
 
 namespace Hime.Redist.Parsers
 {
+    /// <summary>
+    /// Represents an exception in a lexer
+    /// </summary>
     [System.Serializable]
     public class LexerException : System.Exception
     {
+        /// <summary>
+        /// Initializes a new instance of the LexerException class
+        /// </summary>
         public LexerException() : base() { }
+        /// <summary>
+        /// Initializes a new instance of the LexerException class with the given message
+        /// </summary>
+        /// <param name="message">The message conveyed by this exception</param>
         public LexerException(string message) : base(message) { }
+        /// <summary>
+        /// Initializes a new instance of the LexerException class with the given message and exception
+        /// </summary>
+        /// <param name="message">The message conveyed by this exception</param>
+        /// <param name="innerException">The inner catched exception</param>
         public LexerException(string message, System.Exception innerException) : base(message, innerException) { }
         protected LexerException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
+    /// <summary>
+    /// Represents an error in a lexer
+    /// </summary>
     public interface LexerError
     {
+        /// <summary>
+        /// Gets the error's message
+        /// </summary>
         string Message { get; }
     }
+
+    /// <summary>
+    /// Represents an error in the input stream of a lexer
+    /// </summary>
     public abstract class LexerTextError : LexerError
     {
+        /// <summary>
+        /// Error's line number
+        /// </summary>
         protected int line;
+        /// <summary>
+        /// Error's column
+        /// </summary>
         protected int column;
 
+        /// <summary>
+        /// Gets the line number of the error
+        /// </summary>
         public int Line { get { return line; } }
+        /// <summary>
+        /// Gets the column number of the error
+        /// </summary>
         public int Column { get { return column; } }
 
+        /// <summary>
+        /// Gets the error's message
+        /// </summary>
         public abstract string Message { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the LexerTextError class at the given line and column number
+        /// </summary>
+        /// <param name="line">The line number of the error</param>
+        /// <param name="column">The column number of the error</param>
         protected LexerTextError(int line, int column)
         {
             this.line = line;
@@ -34,18 +79,33 @@ namespace Hime.Redist.Parsers
         public abstract override string ToString();
     }
 
+    /// <summary>
+    /// Represents an unexpected character error in the input stream of a lexer
+    /// </summary>
     public sealed class LexerTextErrorDiscardedChar : LexerTextError
     {
         private char discarded;
         private string message;
 
+        /// <summary>
+        /// Gets the character that caused the error
+        /// </summary>
         public char Discarded { get { return discarded; } }
+        /// <summary>
+        /// Gets the error's message
+        /// </summary>
         public override string Message { get { return message; } }
 
-        public LexerTextErrorDiscardedChar(char Discarded, int Line, int Column)
-            : base(Line, Column)
+        /// <summary>
+        /// Initializes a new instance of the LexerTextErrorDiscardedChar class for the given character at the given line and column number
+        /// </summary>
+        /// <param name="discarded">The errorneous character</param>
+        /// <param name="line">The line number of the character</param>
+        /// <param name="column">The column number of the character</param>
+        public LexerTextErrorDiscardedChar(char discarded, int line, int column)
+            : base(line, column)
         {
-            discarded = Discarded;
+            this.discarded = discarded;
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("Unrecognized character '");
             Builder.Append(discarded.ToString());
             Builder.Append("' (0x");
@@ -60,51 +120,157 @@ namespace Hime.Redist.Parsers
 
 
 
-
+    /// <summary>
+    /// Represents a lexer
+    /// </summary>
     public interface ILexer
     {
+        /// <summary>
+        /// Gets the current line number in the input
+        /// </summary>
         int CurrentLine { get; }
+        /// <summary>
+        /// Gets a clone of this lexer
+        /// </summary>
+        /// <returns>A clone of this lexer</returns>
         ILexer Clone();
+        /// <summary>
+        /// Gets the next token in the input
+        /// </summary>
+        /// <returns>The next token in the input</returns>
         SymbolToken GetNextToken();
+        /// <summary>
+        /// Get the next token in the input that has is of one of the provided IDs
+        /// </summary>
+        /// <param name="ids">The possible IDs of the next expected token</param>
+        /// <returns>The next token in the input</returns>
         SymbolToken GetNextToken(ushort[] ids);
     }
 
+    /// <summary>
+    /// Represents a lexer for a text stream
+    /// </summary>
     public abstract class LexerText : ILexer
     {
-        protected delegate SyntaxTreeNode MatchSubGrammar(string TokenValue);
+        /// <summary>
+        /// Represents a callback for matching the content of a token to a grammar
+        /// </summary>
+        /// <param name="value">The text value of a token</param>
+        /// <returns>The abstract syntax tree node representing the result of parsing the value of the token</returns>
+        protected delegate SyntaxTreeNode MatchSubGrammar(string value);
 
-        // Lexer DFA data to setup on construction
-        protected ushort[] symbolsSID;
-        protected string[] symbolsName;
-        protected Dictionary<ushort, MatchSubGrammar> symbolsSubGrammars;
-        protected ushort[][][] transitions;
-        protected int[] finals;
+        /// <summary>
+        /// Represents a state of the DFA
+        /// </summary>
+        protected struct State
+        {
+            /// <summary>
+            /// State's transitions
+            /// </summary>
+            public ushort[][] transitions;
+            /// <summary>
+            /// Terminal recognized at this state, or null if none is recognized
+            /// </summary>
+            public SymbolTerminal terminal;
+            /// <summary>
+            /// Initializes a new instance of the State structure with transitions and a terminal
+            /// </summary>
+            /// <param name="transitions">The transitions for the state</param>
+            /// <param name="terminal">The terminal recognized at this state</param>
+            public State(ushort[][] transitions, SymbolTerminal terminal)
+            {
+                this.transitions = transitions;
+                this.terminal = terminal;
+            }
+        }
+
+        /// <summary>
+        /// States of the DFA
+        /// </summary>
+        protected State[] states;
+        /// <summary>
+        /// Map associating a callback to symbol ids
+        /// </summary>
+        protected Dictionary<ushort, MatchSubGrammar> subGrammars;
+        /// <summary>
+        /// ID of the separator
+        /// </summary>
         protected ushort separatorID;
 
         // Lexer state data
+        /// <summary>
+        /// Lexer's errors
+        /// </summary>
         protected List<LexerTextError> errors;
+        /// <summary>
+        /// Exposed read-only list of lexer's errors
+        /// </summary>
+        protected System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> readonlyErrors;
+        /// <summary>
+        /// Lexer's input
+        /// </summary>
         protected BufferedTextReader input;
+        /// <summary>
+        /// Current line number
+        /// </summary>
         protected int currentLine;
+        /// <summary>
+        /// Current column number
+        /// </summary>
         protected int currentColumn;
+        /// <summary>
+        /// True if the end of the input has been reached and the dollar token has been emited
+        /// </summary>
         protected bool isDollatEmited;
+        /// <summary>
+        /// Buffer for currently read text
+        /// </summary>
+        protected char[] buffer;
+        /// <summary>
+        /// Size of the buffer
+        /// </summary>
+        protected int bufferSize;
 
-        // Lexer DFA runtime data
-        private char[] buffer;
-        private int bufferSize;
-
-        public System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(errors); } }
+        /// <summary>
+        /// Gets the errors encountered by the lexer
+        /// </summary>
+        public ICollection<LexerTextError> Errors { get { return readonlyErrors; } }
+        /// <summary>
+        /// Gets the text of the input that has already been read
+        /// </summary>
         public string InputText { get { return input.GetReadText(); } }
+        /// <summary>
+        /// Gets the current line number
+        /// </summary>
         public int CurrentLine { get { return currentLine; } }
+        /// <summary>
+        /// Gets the current column number
+        /// </summary>
         public int CurrentColumn { get { return currentColumn; } }
+        /// <summary>
+        /// True if the lexer is at the end of the input
+        /// </summary>
         public bool IsAtEnd { get { return input.AtEnd(); } }
 
+        /// <summary>
+        /// Sets up the inner data of the lexer
+        /// </summary>
         protected abstract void setup();
+        /// <summary>
+        /// Gets a clone of this lexer
+        /// </summary>
+        /// <returns>A clone of this lexer</returns>
         public abstract ILexer Clone();
 
+        /// <summary>
+        /// Initializes a new instance of the LexerText class with the given input
+        /// </summary>
+        /// <param name="input">The input as a text reader</param>
         protected LexerText(System.IO.TextReader input)
         {
             setup();
             errors = new List<LexerTextError>();
+            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(errors);
             this.input = new BufferedTextReader(input);
             currentLine = 1;
             currentColumn = 1;
@@ -112,6 +278,10 @@ namespace Hime.Redist.Parsers
             bufferSize = 100;
             buffer = new char[bufferSize];
         }
+        /// <summary>
+        /// Initializes a new instance of the LexerText class as a copy of the given lexer
+        /// </summary>
+        /// <param name="original">The lexer to copy</param>
         protected LexerText(LexerText original)
         {
             setup();
@@ -124,17 +294,17 @@ namespace Hime.Redist.Parsers
             buffer = new char[bufferSize];
         }
 
-        public string GetSymbolName(ushort SID)
-        {
-            for (int i = 0; i != symbolsSID.Length; i++)
-            {
-                if (symbolsSID[i] == SID)
-                    return symbolsName[i];
-            }
-            return null;
-        }
-
+        /// <summary>
+        /// Get the next token in the input that has is of one of the provided IDs
+        /// </summary>
+        /// <param name="ids">The possible IDs of the next expected token</param>
+        /// <returns>The next token in the input</returns>
         public SymbolToken GetNextToken(ushort[] IDs) { throw new LexerException("Text lexer does not support this method."); }
+
+        /// <summary>
+        /// Gets the next token in the input
+        /// </summary>
+        /// <returns>The next token in the input</returns>
         public SymbolToken GetNextToken()
         {
             if (input.AtEnd())
@@ -165,8 +335,8 @@ namespace Hime.Redist.Parsers
                     AdvanceStats(Token.ValueText);
                     if (Token.SymbolID != separatorID)
                     {
-                        if (symbolsSubGrammars.ContainsKey(Token.SymbolID))
-                            Token.SubGrammarRoot = symbolsSubGrammars[Token.SymbolID](Token.ValueText);
+                        if (subGrammars.ContainsKey(Token.SymbolID))
+                            Token.SubGrammarRoot = subGrammars[Token.SymbolID](Token.ValueText);
                         return Token;
                     }
                 }
@@ -189,17 +359,16 @@ namespace Hime.Redist.Parsers
 
         private SymbolTokenText GetNextToken_DFA()
         {
-            int matchedIndex = -1;
+            SymbolTerminal matched = null;
             int matchedLength = 0;
             int count = 0;
-            ushort state = 0;
+            State state = states[0];
 
             while (true)
             {
-                int final = finals[state];
-                if (final != -1)
+                if (state.terminal != null)
                 {
-                    matchedIndex = final;
+                    matched = state.terminal;
                     matchedLength = count;
                 }
                 bool atend = false;
@@ -208,16 +377,15 @@ namespace Hime.Redist.Parsers
                     break;
                 ushort UCV = System.Convert.ToUInt16(c);
                 ushort nextState = 0xFFFF;
-                ushort[][] stateTransitions = transitions[state];
-                for (int i = 0; i != stateTransitions.Length; i++)
+                for (int i = 0; i != state.transitions.Length; i++)
                 {
-                    ushort[] transition = stateTransitions[i];
+                    ushort[] transition = state.transitions[i];
                     if (UCV >= transition[0] && UCV <= transition[1])
                         nextState = transition[2];
                 }
                 if (nextState == 0xFFFF)
                     break;
-                state = nextState;
+                state = states[nextState];
                 c = input.Read(out atend);
                 if (count >= bufferSize)
                 {
@@ -231,15 +399,18 @@ namespace Hime.Redist.Parsers
                 count++;
             }
 
-            if (matchedIndex == -1)
+            if (matched == null)
             {
                 input.Rewind(count);
                 return null;
             }
-            return new SymbolTokenText(symbolsName[matchedIndex], symbolsSID[matchedIndex], new string(buffer, 0, matchedLength), currentLine);
+            return new SymbolTokenText(matched.Name, matched.SymbolID, new string(buffer, 0, matchedLength), currentLine);
         }
     }
 
+    /// <summary>
+    /// Represents a lexer for a binary stream
+    /// </summary>
     public abstract class LexerBinary : ILexer
     {
         protected delegate SymbolToken ApplyGetNextToken();

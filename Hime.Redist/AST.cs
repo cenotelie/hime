@@ -2,14 +2,32 @@
 
 namespace Hime.Redist.Parsers
 {
+    /// <summary>
+    /// Specifies the tree action for a given node
+    /// </summary>
     public enum SyntaxTreeNodeAction
     {
+        /// <summary>
+        /// Promote the node to the immediately upper level in the tree
+        /// </summary>
         Promote,
+        /// <summary>
+        /// Drop the node and all the children from the tree
+        /// </summary>
         Drop,
+        /// <summary>
+        /// Replace the node by its children
+        /// </summary>
         Replace,
+        /// <summary>
+        /// Default action for a node, do nothing
+        /// </summary>
         Nothing
     }
 
+    /// <summary>
+    /// Represents an abstract syntax tree node
+    /// </summary>
     public sealed class SyntaxTreeNode
     {
         private Dictionary<string, object> properties;
@@ -19,6 +37,9 @@ namespace Hime.Redist.Parsers
         private SyntaxTreeNodeAction action;
         private System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode> readonlyChildren;
 
+        /// <summary>
+        /// Gets a dictionary of user properties attached to this node
+        /// </summary>
         public Dictionary<string, object> Properties
         {
             get
@@ -28,8 +49,17 @@ namespace Hime.Redist.Parsers
                 return properties;
             }
         }
+        /// <summary>
+        /// Gets the symbol attached to this node
+        /// </summary>
         public Symbol Symbol { get { return symbol; } }
+        /// <summary>
+        /// Gets the parent node
+        /// </summary>
         public SyntaxTreeNode Parent { get { return parent; } }
+        /// <summary>
+        /// Gets a read-only list of the children nodes
+        /// </summary>
         public IList<SyntaxTreeNode> Children
         {
             get
@@ -40,43 +70,67 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        public SyntaxTreeNode(Symbol Symbol)
+        /// <summary>
+        /// Initilizes a new instance of the SyntaxTreeNode class with the given symbol
+        /// </summary>
+        /// <param name="symbol">The symbol to attach to this node</param>
+        public SyntaxTreeNode(Symbol symbol)
         {
-            children = new List<SyntaxTreeNode>();
-            symbol = Symbol;
-            action = SyntaxTreeNodeAction.Nothing;
+            this.children = new List<SyntaxTreeNode>();
+            this.symbol = symbol;
+            this.action = SyntaxTreeNodeAction.Nothing;
         }
-        public SyntaxTreeNode(Symbol Symbol, SyntaxTreeNodeAction Action)
+        /// <summary>
+        /// Initilizes a new instance of the SyntaxTreeNode class with the given symbol and action
+        /// </summary>
+        /// <param name="symbol">The symbol to attach to this node</param>
+        /// <param name="action">The action for this node</param>
+        public SyntaxTreeNode(Symbol symbol, SyntaxTreeNodeAction action)
         {
-            properties = new Dictionary<string, object>();
-            children = new List<SyntaxTreeNode>();
-            symbol = Symbol;
-            action = Action;
-            readonlyChildren = new System.Collections.ObjectModel.ReadOnlyCollection<SyntaxTreeNode>(children);
+            this.children = new List<SyntaxTreeNode>();
+            this.symbol = symbol;
+            this.action = action;
         }
 
-        public void AppendChild(SyntaxTreeNode Node)
+        /// <summary>
+        /// Adds a node as a child after removing it from its original tree if needed
+        /// </summary>
+        /// <param name="node">The node to append</param>
+        public void AppendChild(SyntaxTreeNode node)
         {
-            if (Node.parent != null)
-                Node.parent.children.Remove(Node);
-            Node.parent = this;
-            children.Add(Node);
+            if (node.parent != null)
+                node.parent.children.Remove(node);
+            node.parent = this;
+            children.Add(node);
         }
-        public void AppendChild(SyntaxTreeNode Node, SyntaxTreeNodeAction Action)
+        /// <summary>
+        /// Adds a node as a child with the given action after removing it from its original tree if needed
+        /// </summary>
+        /// <param name="node">The node to append</param>
+        /// <param name="action">The action for the node</param>
+        public void AppendChild(SyntaxTreeNode node, SyntaxTreeNodeAction action)
         {
-            if (Node.parent != null)
-                Node.parent.children.Remove(Node);
-            Node.parent = this;
-            Node.action = Action;
-            children.Add(Node);
+            if (node.parent != null)
+                node.parent.children.Remove(node);
+            node.parent = this;
+            node.action = action;
+            children.Add(node);
         }
-        public void AppendRange(ICollection<SyntaxTreeNode> Nodes)
+        /// <summary>
+        /// Adds a range of nodes as children
+        /// </summary>
+        /// <param name="nodes">The nodes to append</param>
+        public void AppendRange(ICollection<SyntaxTreeNode> nodes)
         {
-            List<SyntaxTreeNode> Temp = new List<SyntaxTreeNode>(Nodes);
+            List<SyntaxTreeNode> Temp = new List<SyntaxTreeNode>(nodes);
             foreach (SyntaxTreeNode Node in Temp)
                 AppendChild(Node);
         }
 
+        /// <summary>
+        /// Apply actions to this node and all its children
+        /// </summary>
+        /// <returns>The new root</returns>
         internal SyntaxTreeNode ApplyActions()
         {
             Visit_DropReplace();
@@ -205,22 +259,27 @@ namespace Hime.Redist.Parsers
             return current;
         }
 
-        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
+        /// <summary>
+        /// Builds an XML node representing this node in the context of the given XML document
+        /// </summary>
+        /// <param name="doc">The document that will own the XML node</param>
+        /// <returns>The XML node representing this node</returns>
+        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument doc)
         {
-            System.Xml.XmlNode Node = Doc.CreateElement(symbol.Name);
+            System.Xml.XmlNode Node = doc.CreateElement(symbol.Name);
             if (symbol is SymbolToken)
             {
                 SymbolToken Token = (SymbolToken)symbol;
-                Node.AppendChild(Doc.CreateTextNode(Token.ToString()));
+                Node.AppendChild(doc.CreateTextNode(Token.ToString()));
             }
             foreach (string Property in properties.Keys)
             {
-                System.Xml.XmlAttribute Attribute = Doc.CreateAttribute(Property);
+                System.Xml.XmlAttribute Attribute = doc.CreateAttribute(Property);
                 Attribute.Value = properties[Property].ToString();
                 Node.Attributes.Append(Attribute);
             }
             foreach (SyntaxTreeNode Child in children)
-                Node.AppendChild(Child.GetXMLNode(Doc));
+                Node.AppendChild(Child.GetXMLNode(doc));
             return Node;
         }
 

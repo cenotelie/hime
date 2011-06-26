@@ -77,13 +77,14 @@ namespace Hime.Redist.Parsers
         // Parser state data
         protected int maxErrorCount;
         protected List<ParserError> errors;
+        protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
         protected BufferedTokenReader reader;
         protected List<SyntaxTreeNode> nodes;
         protected Stack<ushort> stack;
         protected SymbolToken nextToken;
         protected ushort currentState;
 
-        public System.Collections.ObjectModel.ReadOnlyCollection<ParserError> Errors { get { return new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors); } }
+        public ICollection<ParserError> Errors { get { return readonlyErrors; } }
 
         protected abstract void setup();
 
@@ -92,6 +93,7 @@ namespace Hime.Redist.Parsers
             setup();
             maxErrorCount = 100;
             errors = new List<ParserError>();
+            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             reader = new BufferedTokenReader(input);
             nodes = new List<SyntaxTreeNode>();
             stack = new Stack<ushort>();
