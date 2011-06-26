@@ -242,6 +242,7 @@ namespace Hime.Parsers
                 lexerWriter = new System.IO.StreamWriter(parserFile, false, System.Text.Encoding.UTF8);
                 parserWriter = lexerWriter;
                 lexerWriter.WriteLine("using System.Collections.Generic;");
+                lexerWriter.WriteLine("using Hime.Redist.Parsers;");
                 lexerWriter.WriteLine("");
                 lexerWriter.WriteLine("namespace " + Namespace);
                 lexerWriter.WriteLine("{");
@@ -250,11 +251,13 @@ namespace Hime.Parsers
             {
                 lexerWriter = new System.IO.StreamWriter(lexerFile, false, System.Text.Encoding.UTF8);
                 lexerWriter.WriteLine("using System.Collections.Generic;");
+                lexerWriter.WriteLine("using Hime.Redist.Parsers;");
                 lexerWriter.WriteLine("");
                 lexerWriter.WriteLine("namespace " + Namespace);
                 lexerWriter.WriteLine("{");
                 parserWriter = new System.IO.StreamWriter(parserFile, false, System.Text.Encoding.UTF8);
                 parserWriter.WriteLine("using System.Collections.Generic;");
+                parserWriter.WriteLine("using Hime.Redist.Parsers;");
                 parserWriter.WriteLine("");
                 parserWriter.WriteLine("namespace " + Namespace);
                 parserWriter.WriteLine("{");

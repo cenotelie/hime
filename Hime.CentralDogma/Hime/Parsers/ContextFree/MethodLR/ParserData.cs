@@ -92,13 +92,13 @@ namespace Hime.Parsers.CF.LR
 
         protected void Export_Variables(System.IO.StreamWriter stream)
         {
-            stream.WriteLine("        public static readonly Hime.Redist.Parsers.SymbolVariable[] variables = {");
+            stream.WriteLine("        public static readonly SymbolVariable[] variables = {");
             bool first = true;
             foreach (CFVariable var in variables)
             {
                 if (!first) stream.WriteLine(", ");
                 stream.Write("            ");
-                stream.Write("new Hime.Redist.Parsers.SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\")");
+                stream.Write("new SymbolVariable(0x" + var.SID.ToString("X") + ", \"" + var.LocalName + "\")");
                 first = false;
             }
             stream.WriteLine(" };");

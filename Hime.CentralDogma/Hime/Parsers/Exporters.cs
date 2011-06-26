@@ -31,7 +31,7 @@ namespace Hime.Parsers.Exporters
 
         public List<Terminal> Export()
         {
-            stream.WriteLine("    class " + name + "_Lexer : Hime.Redist.Parsers.LexerText");
+            stream.WriteLine("    class " + name + "_Lexer : LexerText");
             stream.WriteLine("    {");
             Export_Terminals();
             Export_States();
@@ -50,7 +50,7 @@ namespace Hime.Parsers.Exporters
         }
         private void Export_Clone()
         {
-            stream.WriteLine("        public override Hime.Redist.Parsers.ILexer Clone() {");
+            stream.WriteLine("        public override ILexer Clone() {");
             stream.WriteLine("            return new " + name + "_Lexer(this);");
             stream.WriteLine("        }");
         }
@@ -65,13 +65,13 @@ namespace Hime.Parsers.Exporters
         }
         protected void Export_Terminals()
         {
-            stream.WriteLine("        public static readonly Hime.Redist.Parsers.SymbolTerminal[] terminals = {");
+            stream.WriteLine("        public static readonly SymbolTerminal[] terminals = {");
             bool first = true;
             foreach (Terminal terminal in terminals)
             {
                 if (!first) stream.WriteLine(",");
                 stream.Write("            ");
-                stream.Write("new Hime.Redist.Parsers.SymbolTerminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
+                stream.Write("new SymbolTerminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
                 first = false;
             }
             stream.WriteLine(" };");

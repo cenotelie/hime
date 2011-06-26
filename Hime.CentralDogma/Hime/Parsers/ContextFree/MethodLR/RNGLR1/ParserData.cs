@@ -43,7 +43,7 @@ namespace Hime.Parsers.CF.LR
             terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
             DetermineNullables();
             stream = options.ParserWriter;
-            stream.WriteLine("    class " + grammar.LocalName + "_Parser : Hime.Redist.Parsers.BaseRNGLR1Parser");
+            stream.WriteLine("    class " + grammar.LocalName + "_Parser : BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
             Export_Variables(stream);
@@ -105,7 +105,7 @@ namespace Hime.Parsers.CF.LR
                 stream.WriteLine("        public interface Actions");
                 stream.WriteLine("        {");
                 foreach (string name in Names)
-                    stream.WriteLine("            void " + name + "(Hime.Redist.Parsers.SyntaxTreeNode SubRoot);");
+                    stream.WriteLine("            void " + name + "(SyntaxTreeNode SubRoot);");
                 stream.WriteLine("        }");
             }
         }
@@ -113,25 +113,25 @@ namespace Hime.Parsers.CF.LR
         {
             string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
 
-            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (Hime.Redist.Parsers.BaseRNGLR1Parser parser, Hime.Redist.Parsers.SPPFNode root, List<Hime.Redist.Parsers.SPPFNode> nodes)");
+            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
             stream.WriteLine("        {");
             if (Rule.ReplaceOnProduction)
-                stream.WriteLine("            root.Action = Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace;");
-            stream.WriteLine("            Hime.Redist.Parsers.SPPFNodeFamily family = new Hime.Redist.Parsers.SPPFNodeFamily(root);");
+                stream.WriteLine("            root.Action = SyntaxTreeNodeAction.Replace;");
+            stream.WriteLine("            SPPFNodeFamily family = new SPPFNodeFamily(root);");
             int i = 0;
             foreach (RuleDefinitionPart Part in Rule.Definition.Parts)
             {
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolAction(\"" + action.LocalName + "\", ((" + grammar.LocalName + "_Parser)parser).actions." + action.LocalName + "), 0));");
+                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + grammar.LocalName + "_Parser)parser).actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
-                    stream.WriteLine("            family.AddChild(new Hime.Redist.Parsers.SPPFNode(new Hime.Redist.Parsers.SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0, Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
+                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0, SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
                     if (Part.Action != RuleDefinitionPartAction.Nothing)
-                        stream.WriteLine("            nodes[" + i.ToString() + "].Action = Hime.Redist.Parsers.SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
+                        stream.WriteLine("            nodes[" + i.ToString() + "].Action = SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
                     stream.WriteLine("            family.AddChild(nodes[" + i.ToString() + "]);");
                     i++;
                 }
@@ -184,7 +184,7 @@ namespace Hime.Parsers.CF.LR
             // Write terminals
             if (debug)
             {
-                stream.Write("               new Hime.Redist.Parsers.SymbolTerminal[" + Terminals.Count + "] {");
+                stream.Write("               new SymbolTerminal[" + Terminals.Count + "] {");
                 first = true;
                 foreach (Terminal terminal in Terminals)
                 {
@@ -296,11 +296,11 @@ namespace Hime.Parsers.CF.LR
         
         protected void Export_NullVars()
         {
-            stream.Write("        private static Hime.Redist.Parsers.SPPFNode[] staticNullVarsSPPF = { ");
+            stream.Write("        private static SPPFNode[] staticNullVarsSPPF = { ");
             bool first = true;
             foreach (CFVariable var in nullableVars)
             {
-                string action = ", Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace";
+                string action = ", SyntaxTreeNodeAction.Replace";
                 foreach (CFRule rule in var.Rules)
                 {
                     if (!rule.ReplaceOnProduction)
@@ -310,19 +310,19 @@ namespace Hime.Parsers.CF.LR
                     }
                 }
                 if (!first) stream.Write(", ");
-                stream.Write("new Hime.Redist.Parsers.SPPFNode(variables[" + variables.IndexOf(var) + "], 0" + action + ")");
+                stream.Write("new SPPFNode(variables[" + variables.IndexOf(var) + "], 0" + action + ")");
                 first = false;
             }
             stream.WriteLine(" };");
         }
         protected void Export_NullChoices()
         {
-            stream.Write("        private static Hime.Redist.Parsers.SPPFNode[] staticNullChoicesSPPF = { ");
+            stream.Write("        private static SPPFNode[] staticNullChoicesSPPF = { ");
             bool first = true;
             foreach (CFRuleDefinition definition in nullableChoices)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("new Hime.Redist.Parsers.SPPFNode(null, 0, Hime.Redist.Parsers.SyntaxTreeNodeAction.Replace)");
+                stream.Write("new SPPFNode(null, 0, SyntaxTreeNodeAction.Replace)");
                 first = false;
             }
             stream.WriteLine(" };");
@@ -330,7 +330,7 @@ namespace Hime.Parsers.CF.LR
         protected void Export_NullBuilders()
         {
             stream.WriteLine("        private static void BuildNullables() { ");
-            stream.WriteLine("            List<Hime.Redist.Parsers.SPPFNode> temp = new List<Hime.Redist.Parsers.SPPFNode>();");
+            stream.WriteLine("            List<SPPFNode> temp = new List<SPPFNode>();");
             for (int i=0; i!=nullableChoices.Count; i++)
             {
                 CFRuleDefinition definition = nullableChoices[i];
