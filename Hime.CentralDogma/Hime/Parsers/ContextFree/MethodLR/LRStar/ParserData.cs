@@ -4,9 +4,10 @@ namespace Hime.Parsers.CF.LR
 {
     class ParserDataLRStar : ParserDataLR
     {
+        private Kernel.Reporting.Reporter reporter;
         private Dictionary<State, DeciderLRStar> deciders;
         private System.IO.StreamWriter stream;
-        protected string terminalsAccessor;
+        private string terminalsAccessor;
 
         public ParserDataLRStar(ParserGenerator generator, CFGrammar gram, Graph graph, Dictionary<State, DeciderLRStar> deciders)
             : base(generator, gram, graph)
@@ -16,6 +17,7 @@ namespace Hime.Parsers.CF.LR
 
         public override bool Export(IList<Terminal> expected, CompilationTask options)
         {
+            reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
             debug = options.ExportDebug;
             terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
@@ -172,22 +174,22 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine(")");
         }
         
-        protected void Export_State(State State)
+        protected void Export_State(State state)
         {
-            TerminalSet Terminals = State.Reductions.ExpectedTerminals;
-            foreach (Symbol Symbol in State.Children.Keys)
+            TerminalSet expected = state.Reductions.ExpectedTerminals;
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (Symbol is Terminal)
-                    Terminals.Add((Terminal)Symbol);
+                    expected.Add((Terminal)Symbol);
             }
             bool first = true;
             stream.WriteLine("new State(");
             // Write items
             if (debug)
             {
-                stream.Write("               new string[" + State.Items.Count + "] {");
+                stream.Write("               new string[" + state.Items.Count + "] {");
                 first = true;
-                foreach (Item item in State.Items)
+                foreach (Item item in state.Items)
                 {
                     if (!first) stream.Write(", ");
                     stream.Write("\"" + item.ToString(true) + "\"");
@@ -200,38 +202,41 @@ namespace Hime.Parsers.CF.LR
                 stream.WriteLine("               null,");
             }
             // Write terminals
-            stream.Write("               new SymbolTerminal[" + Terminals.Count + "] {");
+            stream.Write("               new SymbolTerminal[" + expected.Count + "] {");
             first = true;
-            foreach (Terminal terminal in Terminals)
+            foreach (Terminal terminal in expected)
             {
+                int index = terminals.IndexOf(terminal);
+                if (index == -1)
+                    reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the parser. Check the regular expressions.");
                 if (!first) stream.Write(", ");
-                stream.Write(terminalsAccessor + "[" + terminals.IndexOf(terminal) + "]");
+                stream.Write(terminalsAccessor + "[" + index + "]");
                 first = false;
             }
             stream.WriteLine("},");
 
             int ShitTerminalCount = 0;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
                 ShitTerminalCount++;
             }
             // write submachine
-            stream.WriteLine("               new DeciderState[" + deciders[State].States.Count + "] {");
+            stream.WriteLine("               new DeciderState[" + deciders[state].States.Count + "] {");
             first = true;
-            foreach (DeciderStateLRStar sub in deciders[State].States)
+            foreach (DeciderStateLRStar sub in deciders[state].States)
             {
                 stream.Write("                   ");
                 if (!first) stream.Write(", ");
-                Export_DeciderState(deciders[State], sub);
+                Export_DeciderState(deciders[state], sub);
                 first = false;
             }
             stream.WriteLine("               },");
             // Write shifts on variable
-            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
@@ -240,14 +245,14 @@ namespace Hime.Parsers.CF.LR
                 first = false;
             }
             stream.WriteLine("},");
-            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
                 if (!first) stream.Write(", ");
-                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                stream.Write("0x" + state.Children[Symbol].ID.ToString("X"));
                 first = false;
             }
             stream.WriteLine("})");

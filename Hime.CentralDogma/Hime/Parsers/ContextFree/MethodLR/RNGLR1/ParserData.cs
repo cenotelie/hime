@@ -4,6 +4,7 @@ namespace Hime.Parsers.CF.LR
 {
     class ParserDataRNGLR1 : ParserDataLR
     {
+        protected Kernel.Reporting.Reporter reporter;
         protected System.IO.StreamWriter stream;
         protected string terminalsAccessor;
         protected List<CFVariable> nullableVars;
@@ -38,6 +39,7 @@ namespace Hime.Parsers.CF.LR
 
         public override bool Export(IList<Terminal> expected, CompilationTask options)
         {
+            reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
             debug = options.ExportDebug;
             terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
@@ -154,22 +156,22 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine("        };");
         }
-        protected void Export_State(State State)
+        protected void Export_State(State state)
         {
-            TerminalSet Terminals = State.Reductions.ExpectedTerminals;
-            foreach (Symbol Symbol in State.Children.Keys)
+            TerminalSet expected = state.Reductions.ExpectedTerminals;
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (Symbol is Terminal)
-                    Terminals.Add((Terminal)Symbol);
+                    expected.Add((Terminal)Symbol);
             }
             bool first = true;
             stream.WriteLine("new State(");
             // Write items
             if (debug)
             {
-                stream.Write("               new string[" + State.Items.Count + "] {");
+                stream.Write("               new string[" + state.Items.Count + "] {");
                 first = true;
-                foreach (Item item in State.Items)
+                foreach (Item item in state.Items)
                 {
                     if (!first) stream.Write(", ");
                     stream.Write("\"" + item.ToString(true) + "\"");
@@ -184,12 +186,15 @@ namespace Hime.Parsers.CF.LR
             // Write terminals
             if (debug)
             {
-                stream.Write("               new SymbolTerminal[" + Terminals.Count + "] {");
+                stream.Write("               new SymbolTerminal[" + expected.Count + "] {");
                 first = true;
-                foreach (Terminal terminal in Terminals)
+                foreach (Terminal terminal in expected)
                 {
+                    int index = terminals.IndexOf(terminal);
+                    if (index == -1)
+                        reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the parser. Check the regular expressions.");
                     if (!first) stream.Write(", ");
-                    stream.Write(terminalsAccessor + "[" + terminals.IndexOf(terminal) + "]");
+                    stream.Write(terminalsAccessor + "[" + index + "]");
                     first = false;
                 }
                 stream.WriteLine("},");
@@ -200,7 +205,7 @@ namespace Hime.Parsers.CF.LR
             }
 
             int ShitTerminalCount = 0;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -210,7 +215,7 @@ namespace Hime.Parsers.CF.LR
             // Write shifts on terminal
             stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -221,20 +226,20 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine("},");
             stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
                 if (!first) stream.Write(", ");
-                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                stream.Write("0x" + state.Children[Symbol].ID.ToString("X"));
                 first = false;
             }
             stream.WriteLine("},");
 
             // Write shifts on variable
-            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
@@ -243,21 +248,21 @@ namespace Hime.Parsers.CF.LR
                 first = false;
             }
             stream.WriteLine("},");
-            stream.Write("               new ushort[" + (State.Children.Count - ShitTerminalCount).ToString() + "] {");
+            stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in State.Children.Keys)
+            foreach (Symbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
                 if (!first) stream.Write(", ");
-                stream.Write("0x" + State.Children[Symbol].ID.ToString("X"));
+                stream.Write("0x" + state.Children[Symbol].ID.ToString("X"));
                 first = false;
             }
             stream.WriteLine("},");
             // Write reductions
-            stream.Write("               new Reduction[" + State.Reductions.Count + "] {");
+            stream.Write("               new Reduction[" + state.Reductions.Count + "] {");
             first = true;
-            foreach (StateActionRNReduce Reduction in State.Reductions)
+            foreach (StateActionRNReduce Reduction in state.Reductions)
             {
                 if (!first) stream.Write(", ");
                 if (Reduction.ReduceLength == 0)
