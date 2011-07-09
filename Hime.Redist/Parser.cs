@@ -60,7 +60,7 @@ namespace Hime.Redist.Parsers
         public string Message { get { return message; } }
 
         /// <summary>
-        /// initializes a new instance of the ParserErrorUnexpectedToken class with a token and an array of expected names
+        /// Initializes a new instance of the ParserErrorUnexpectedToken class with a token and an array of expected names
         /// </summary>
         /// <param name="Token">The unexpected token</param>
         /// <param name="Expected">The array of expected tokens' names</param>
