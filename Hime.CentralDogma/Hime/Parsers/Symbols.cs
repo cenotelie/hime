@@ -83,7 +83,12 @@ namespace Hime.Parsers
             set { subGrammar = value; }
         }
 
-        public TerminalText(Grammar Parent, ushort SID, string Name, int Priority, Automata.NFA NFA, Grammar SubGrammar) : base(Parent, SID, Name, Priority) { nFA = NFA; subGrammar = SubGrammar; }
+        public TerminalText(Grammar parent, ushort sid, string name, int priority, Automata.NFA nfa, Grammar subGrammar)
+            : base(parent, sid, name, priority)
+        {
+            this.nFA = nfa;
+            this.subGrammar = subGrammar;
+        }
 
         public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
         {
@@ -102,13 +107,7 @@ namespace Hime.Parsers
             return Node;
         }
 
-        public override string ToString()
-        {
-            string name = localName;
-            if (name.StartsWith("_T["))
-                name = name.Substring(3, name.Length - 4);
-            return name;
-        }
+        public override string ToString() { return localName; }
     }
 
     [System.FlagsAttribute]

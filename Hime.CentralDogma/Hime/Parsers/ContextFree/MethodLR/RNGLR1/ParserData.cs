@@ -184,25 +184,18 @@ namespace Hime.Parsers.CF.LR
                 stream.WriteLine("               null,");
             }
             // Write terminals
-            if (debug)
+            stream.Write("               new SymbolTerminal[" + expected.Count + "] {");
+            first = true;
+            foreach (Terminal terminal in expected)
             {
-                stream.Write("               new SymbolTerminal[" + expected.Count + "] {");
-                first = true;
-                foreach (Terminal terminal in expected)
-                {
-                    int index = terminals.IndexOf(terminal);
-                    if (index == -1)
-                        reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the parser. Check the regular expressions.");
-                    if (!first) stream.Write(", ");
-                    stream.Write(terminalsAccessor + "[" + index + "]");
-                    first = false;
-                }
-                stream.WriteLine("},");
+                int index = terminals.IndexOf(terminal);
+                if (index == -1)
+                    reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the parser. Check the regular expressions.");
+                if (!first) stream.Write(", ");
+                stream.Write(terminalsAccessor + "[" + index + "]");
+                first = false;
             }
-            else
-            {
-                stream.WriteLine("               null,");
-            }
+            stream.WriteLine("},");
 
             int ShitTerminalCount = 0;
             foreach (Symbol Symbol in state.Children.Keys)

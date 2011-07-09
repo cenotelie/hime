@@ -73,22 +73,22 @@ namespace Hime.Parsers.CF
             return null;
         }
 
-        public TerminalText AddTerminalText(string Name, Automata.NFA NFA, Grammar SubGrammar)
+        public TerminalText AddTerminalText(string name, Automata.NFA nfa, Grammar subGrammar)
         {
-            if (children.ContainsKey(Name) && terminals.ContainsKey(Name))
+            if (children.ContainsKey(name) && terminals.ContainsKey(name))
             {
-                TerminalText Terminal = (TerminalText)terminals[Name];
+                TerminalText Terminal = (TerminalText)terminals[name];
                 Terminal.Priority = nextSID;
-                Terminal.NFA = NFA;
-                Terminal.SubGrammar = SubGrammar;
+                Terminal.NFA = nfa;
+                Terminal.SubGrammar = subGrammar;
                 nextSID++;
                 return Terminal;
             }
             else
             {
-                TerminalText Terminal = new TerminalText(this, nextSID, Name, nextSID, NFA, SubGrammar);
-                children.Add(Name, Terminal);
-                terminals.Add(Name, Terminal);
+                TerminalText Terminal = new TerminalText(this, nextSID, name, nextSID, nfa, subGrammar);
+                children.Add(name, Terminal);
+                terminals.Add(name, Terminal);
                 nextSID++;
                 return Terminal;
             }

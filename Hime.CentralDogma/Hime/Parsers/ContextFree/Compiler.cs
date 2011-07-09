@@ -443,7 +443,7 @@ namespace Hime.Parsers.CF
             {
                 // Create the terminal
                 Automata.NFA NFA = Compile_Recognize_terminal_def_atom_text(Node.Children[0]);
-                Terminal = Data.AddTerminalText("_T[" + Value + "]", NFA, null);
+                Terminal = Data.AddTerminalText(Value, NFA, null);
                 NFA.StateExit.Final = Terminal;
             }
             // Create the definition set
