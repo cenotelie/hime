@@ -25,8 +25,21 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public string Name { get { return name; } }
 
+        /// <summary>
+        /// Returns the name of the symbol
+        /// </summary>
+        /// <returns>The name of the symbol</returns>
         public override string ToString() { return name; }
+        /// <summary>
+        /// Serves as a hash function for a particular type
+        /// </summary>
+        /// <returns>A hash code for the current symbol</returns>
         public override int GetHashCode() { return base.GetHashCode(); }
+        /// <summary>
+        /// Determines whether the specified symbol is equal to the current symbol
+        /// </summary>
+        /// <param name="obj">The symbol to compare with the current symbol</param>
+        /// <returns>true if the specified symbol is equal to the current symbol; otherwise, false</returns>
         public override bool Equals(object obj)
         {
             Symbol symbol = obj as Symbol;
@@ -109,9 +122,15 @@ namespace Hime.Redist.Parsers
     sealed class SymbolTokenEpsilon : SymbolToken
     {
         private static SymbolTokenEpsilon instance = new SymbolTokenEpsilon();
+        private SymbolTokenEpsilon() : base("ε", 1) { }
+        /// <summary>
+        /// Gets the epsilon token
+        /// </summary>
         public static SymbolTokenEpsilon Instance { get { return instance; } }
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return string.Empty; } }
-        public SymbolTokenEpsilon() : base("ε", 1) { }
     }
     /// <summary>
     /// Represents a special token for the end of data stream
@@ -119,9 +138,15 @@ namespace Hime.Redist.Parsers
     sealed class SymbolTokenDollar : SymbolToken
     {
         private static SymbolTokenDollar instance = new SymbolTokenDollar();
+        private SymbolTokenDollar() : base("$", 2) { }
+        /// <summary>
+        /// Gets the dollar token
+        /// </summary>
         public static SymbolTokenDollar Instance { get { return instance; } }
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return "$"; } }
-        public SymbolTokenDollar() : base("$", 2) { }
     }
 
     /// <summary>
@@ -130,8 +155,20 @@ namespace Hime.Redist.Parsers
     public sealed class SymbolTokenBits : SymbolToken
     {
         private byte value;
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return value; } }
+        /// <summary>
+        /// Get the binary data represented by this token
+        /// </summary>
         public byte ValueBits { get { return value; } }
+        /// <summary>
+        /// Initializes a new instance of the SymbolTokenBits class
+        /// </summary>
+        /// <param name="ClassName">Token's class name</param>
+        /// <param name="ClassSID">Token's class ID</param>
+        /// <param name="Value">Token binary value</param>
         public SymbolTokenBits(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { value = Value; }
     }
     /// <summary>
@@ -140,8 +177,20 @@ namespace Hime.Redist.Parsers
     public sealed class SymbolTokenUInt8 : SymbolToken
     {
         private byte value;
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return value; } }
+        /// <summary>
+        /// Get the binary data represented by this token
+        /// </summary>
         public byte ValueUInt8 { get { return value; } }
+        /// <summary>
+        /// Initializes a new instance of the SymbolTokenUInt8 class
+        /// </summary>
+        /// <param name="ClassName">Token's class name</param>
+        /// <param name="ClassSID">Token's class ID</param>
+        /// <param name="Value">Token binary value</param>
         public SymbolTokenUInt8(string ClassName, ushort ClassSID, byte Value) : base(ClassName, ClassSID) { value = Value; }
     }
     /// <summary>
@@ -150,8 +199,20 @@ namespace Hime.Redist.Parsers
     public sealed class SymbolTokenUInt16 : SymbolToken
     {
         private ushort value;
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return value; } }
+        /// <summary>
+        /// Get the binary data represented by this token
+        /// </summary>
         public ushort ValueUInt16 { get { return value; } }
+        /// <summary>
+        /// Initializes a new instance of the SymbolTokenUInt16 class
+        /// </summary>
+        /// <param name="ClassName">Token's class name</param>
+        /// <param name="ClassSID">Token's class ID</param>
+        /// <param name="Value">Token binary value</param>
         public SymbolTokenUInt16(string ClassName, ushort ClassSID, ushort Value) : base(ClassName, ClassSID) { value = Value; }
     }
     /// <summary>
@@ -160,8 +221,20 @@ namespace Hime.Redist.Parsers
     public sealed class SymbolTokenUInt32 : SymbolToken
     {
         private uint value;
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return value; } }
+        /// <summary>
+        /// Get the binary data represented by this token
+        /// </summary>
         public uint ValueUInt32 { get { return value; } }
+        /// <summary>
+        /// Initializes a new instance of the SymbolTokenUInt32 class
+        /// </summary>
+        /// <param name="ClassName">Token's class name</param>
+        /// <param name="ClassSID">Token's class ID</param>
+        /// <param name="Value">Token binary value</param>
         public SymbolTokenUInt32(string ClassName, ushort ClassSID, uint Value) : base(ClassName, ClassSID) { value = Value; }
     }
     /// <summary>
@@ -170,8 +243,20 @@ namespace Hime.Redist.Parsers
     public sealed class SymbolTokenUInt64 : SymbolToken
     {
         private ulong value;
+        /// <summary>
+        /// Gets the data represented by this symbol
+        /// </summary>
         public override object Value { get { return value; } }
+        /// <summary>
+        /// Get the binary data represented by this token
+        /// </summary>
         public ulong ValueUInt64 { get { return value; } }
+        /// <summary>
+        /// Initializes a new instance of the SymbolTokenUInt64 class
+        /// </summary>
+        /// <param name="ClassName">Token's class name</param>
+        /// <param name="ClassSID">Token's class ID</param>
+        /// <param name="Value">Token binary value</param>
         public SymbolTokenUInt64(string ClassName, ushort ClassSID, ulong Value) : base(ClassName, ClassSID) { value = Value; }
     }
 
@@ -189,7 +274,16 @@ namespace Hime.Redist.Parsers
             this.name = name;
             this.sid = 0;
         }
+        /// <summary>
+        /// Serves as a hash function for a particular type
+        /// </summary>
+        /// <returns>A hash code for the current symbol</returns>
         public override int GetHashCode() { return base.GetHashCode(); }
+        /// <summary>
+        /// Determines whether the specified symbol is equal to the current symbol
+        /// </summary>
+        /// <param name="obj">The symbol to compare with the current symbol</param>
+        /// <returns>true if the specified symbol is equal to the current symbol; otherwise, false</returns>
         public override bool Equals(object obj)
         {
             SymbolVirtual other = obj as SymbolVirtual;
@@ -207,7 +301,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Represents the method to call for executing the action
         /// </summary>
-        /// <param name="Subroot">The syntax tree node on which the action is executed</param>
+        /// <param name="subroot">The syntax tree node on which the action is executed</param>
         public delegate void Callback(SyntaxTreeNode subroot);
 
         private Callback callback;
@@ -229,7 +323,16 @@ namespace Hime.Redist.Parsers
             this.callback = callback;
         }
 
+        /// <summary>
+        /// Serves as a hash function for a particular type
+        /// </summary>
+        /// <returns>A hash code for the current symbol</returns>
         public override int GetHashCode() { return base.GetHashCode(); }
+        /// <summary>
+        /// Determines whether the specified symbol is equal to the current symbol
+        /// </summary>
+        /// <param name="obj">The symbol to compare with the current symbol</param>
+        /// <returns>true if the specified symbol is equal to the current symbol; otherwise, false</returns>
         public override bool Equals(object obj)
         {
             SymbolAction other = obj as SymbolAction;

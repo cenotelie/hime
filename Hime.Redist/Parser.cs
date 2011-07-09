@@ -22,7 +22,6 @@ namespace Hime.Redist.Parsers
         /// <param name="message">The message conveyed by this exception</param>
         /// <param name="innerException">The inner catched exception</param>
         public ParserException(string message, System.Exception innerException) : base(message, innerException) { }
-        protected ParserException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     /// <summary>
@@ -80,6 +79,11 @@ namespace Hime.Redist.Parsers
             Builder.Append(" }.");
             message = Builder.ToString();
         }
+
+        /// <summary>
+        /// Returns the string representation of this error
+        /// </summary>
+        /// <returns>The string representation of this error</returns>
         public override string ToString() { return "Parser Error : unexpected token"; }
     }
 

@@ -23,7 +23,6 @@ namespace Hime.Redist.Parsers
         /// <param name="message">The message conveyed by this exception</param>
         /// <param name="innerException">The inner catched exception</param>
         public LexerException(string message, System.Exception innerException) : base(message, innerException) { }
-        protected LexerException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     /// <summary>
@@ -76,6 +75,10 @@ namespace Hime.Redist.Parsers
             this.column = column;
         }
 
+        /// <summary>
+        /// Returns the string representation of this error
+        /// </summary>
+        /// <returns>The string representation of this error</returns>
         public abstract override string ToString();
     }
 
@@ -113,6 +116,11 @@ namespace Hime.Redist.Parsers
             Builder.Append(")");
             message = Builder.ToString();
         }
+
+        /// <summary>
+        /// Returns the string representation of this error
+        /// </summary>
+        /// <returns>The string representation of this error</returns>
         public override string ToString() { return message; }
     }
 
@@ -299,7 +307,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="ids">The possible IDs of the next expected token</param>
         /// <returns>The next token in the input</returns>
-        public SymbolToken GetNextToken(ushort[] IDs) { throw new LexerException("Text lexer does not support this method."); }
+        public SymbolToken GetNextToken(ushort[] ids) { throw new LexerException("Text lexer does not support this method."); }
 
         /// <summary>
         /// Gets the next token in the input
@@ -310,9 +318,9 @@ namespace Hime.Redist.Parsers
             if (input.AtEnd())
             {
                 if (isDollatEmited)
-                    return new SymbolTokenEpsilon();
+                    return SymbolTokenEpsilon.Instance;
                 isDollatEmited = true;
-                return new SymbolTokenDollar();
+                return SymbolTokenDollar.Instance;
             }
 
             while (true)
@@ -320,7 +328,7 @@ namespace Hime.Redist.Parsers
                 if (input.AtEnd())
                 {
                     isDollatEmited = true;
-                    return new SymbolTokenDollar();
+                    return SymbolTokenDollar.Instance;
                 }
                 SymbolTokenText Token = GetNextToken_DFA();
                 if (Token == null)
@@ -413,16 +421,23 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public abstract class LexerBinary : ILexer
     {
+        /// <summary>
+        /// Callback for reading a specific terminal
+        /// </summary>
+        /// <returns></returns>
         protected delegate SymbolToken ApplyGetNextToken();
 
-        protected static byte flag1 = 0x01;
-        protected static byte flag2 = 0x03;
-        protected static byte flag3 = 0x07;
-        protected static byte flag4 = 0x0F;
-        protected static byte flag5 = 0x1F;
-        protected static byte flag6 = 0x3F;
-        protected static byte flag7 = 0x7F;
-        protected static byte flag8 = 0xFF;
+        private static byte flag1 = 0x01;
+        private static byte flag2 = 0x03;
+        private static byte flag3 = 0x07;
+        private static byte flag4 = 0x0F;
+        private static byte flag5 = 0x1F;
+        private static byte flag6 = 0x3F;
+        private static byte flag7 = 0x7F;
+        private static byte flag8 = 0xFF;
+        /// <summary>
+        /// Bit flags
+        /// </summary>
         protected static byte[] flags = { 0x00, flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8 };
 
         protected Dictionary<ushort, ApplyGetNextToken> getNextTokens;
@@ -448,11 +463,11 @@ namespace Hime.Redist.Parsers
         public SymbolToken GetNextToken(ushort[] IDs)
         {
             if (dollarEmitted)
-                return new SymbolTokenEpsilon();
+                return SymbolTokenEpsilon.Instance;
             if (input.IsAtEnd && currentBitLeft == 8)
             {
                 dollarEmitted = true;
-                return new SymbolTokenDollar();
+                return SymbolTokenDollar.Instance;
             }
 
             foreach (ushort ID in IDs)
@@ -461,7 +476,7 @@ namespace Hime.Redist.Parsers
                 if (Temp != null) return Temp;
             }
             dollarEmitted = true;
-            return new SymbolTokenDollar();
+            return SymbolTokenDollar.Instance;
         }
 
         protected SymbolToken GetNextToken_Apply(ushort ID)
