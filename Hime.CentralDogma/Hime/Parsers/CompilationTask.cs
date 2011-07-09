@@ -121,6 +121,7 @@ namespace Hime.Parsers
 
         public Hime.Kernel.Reporting.Report Execute()
         {
+            reporter = new Hime.Kernel.Reporting.Reporter(typeof(CompilationTask));
             if (!Execute_LoadData())
                 return reporter.Result;
             
@@ -146,7 +147,6 @@ namespace Hime.Parsers
 
         private bool Execute_LoadData()
         {
-            reporter = new Hime.Kernel.Reporting.Reporter(typeof(CompilationTask));
             if (fileInputs.Count == 0 && rawInputs.Count == 0)
             {
                 reporter.Error("Compiler", "No input!");
