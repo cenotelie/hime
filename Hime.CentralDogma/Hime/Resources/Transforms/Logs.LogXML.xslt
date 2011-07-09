@@ -9,8 +9,17 @@
           <xsl:text>border-top: none;</xsl:text>
         </xsl:if>
       </xsl:attribute>
-      <xsl:value-of select="."/>
+      <table border="0" cellpadding="0" cellspacing="0">
+        <xsl:apply-templates select="Line"/>
+      </table>
     </td>
+  </xsl:template>
+  <xsl:template match="Line">
+    <tr>
+      <td>
+        <xsl:value-of select="."/>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="Entry">

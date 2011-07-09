@@ -12,14 +12,23 @@ namespace Hime.Parsers.CF.LR
         public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
         {
             Reporter.Info("LALR(1)", "Constructing LALR(1) data ...");
-            Graph Graph = ConstructGraph(Grammar, Reporter);
+            Graph graph = ConstructGraph(Grammar, Reporter);
             // Output conflicts
-            foreach (State set in Graph.Sets)
+            ConflictExamplifier analyzer = new ConflictExamplifier(graph);
+            foreach (State set in graph.Sets)
+            {
+                List<Terminal> example = null;
+                if (set.Conflicts.Count != 0)
+                    example = analyzer.GetExample(set);
                 foreach (Conflict conflict in set.Conflicts)
+                {
+                    conflict.InputSample = example;
                     Reporter.Report(conflict);
-            Reporter.Info("LALR(1)", Graph.Sets.Count.ToString() + " states explored.");
+                }
+            }
+            Reporter.Info("LALR(1)", graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LALR(1)", "Done !");
-            return new ParserDataLR1(this, Grammar, Graph);
+            return new ParserDataLR1(this, Grammar, graph);
         }
 
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)

@@ -72,11 +72,19 @@ namespace Hime.Kernel.Reporting
             node.Attributes["mark"].Value = Entry.Level.ToString();
 
             System.Xml.XmlNode Node1 = Doc.CreateElement("Data");
-            Node1.InnerText = Entry.Component;
+            System.Xml.XmlNode line = Doc.CreateElement("Line");
+            line.InnerText = Entry.Component;
+            Node1.AppendChild(line);
             node.AppendChild(Node1);
 
             System.Xml.XmlNode Node2 = Doc.CreateElement("Data");
-            Node2.InnerText = Entry.Message;
+            string[] parts = Entry.Message.Split(new char[] { '\n' });
+            for (int i = 0; i != parts.Length; i++)
+            {
+                line = Doc.CreateElement("Line");
+                line.InnerText = parts[i];
+                Node2.AppendChild(line);
+            }
             node.AppendChild(Node2);
             return node;
         }
