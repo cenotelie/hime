@@ -91,6 +91,7 @@
     <Compile Include="WinTreeView.Designer.cs">
       <DependentUpon>WinTreeView.cs</DependentUpon>
     </Compile>
+    <None Include="Languages\Clojure.gram" />
     <None Include="Languages\Earth.CIL.CSharp.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

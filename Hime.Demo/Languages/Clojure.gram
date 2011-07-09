@@ -1,0 +1,81 @@
+﻿public grammar cf Clojure {
+	options {
+		Axiom = "unit";
+		Separator = "SEPARATOR";
+	}
+	terminals {
+		NEW_LINE		-> 0x000D /* CR */
+						|  0x000A /* LF */
+						|  0x000D 0x000A /* CR LF */
+						|  0x2028 /* LS */
+						|  0x2029 /* PS */ ;
+		WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		COMMENT_LINE	-> ';' (.* - (.* NEW_LINE .*)) NEW_LINE ;
+		COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
+		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
+
+		NAME			-> ([a-zA-Z*+!_?] | '-') ([0-9a-zA-Z*+!_?] | '-')* ;
+		QNAME			-> NAME ('.' NAME)* ;
+		IDENTIFIER		-> QNAME ('/' QNAME)? ;
+
+		KEYWORD			-> ':' ':'? NAME ('/' NAME)? ;
+
+		LITERAL_NIL			-> 'nil' ;
+		LITERAL_TRUE		-> 'true' ;
+		LITERAL_FALSE		-> 'false' ;
+
+		INTEGER_LITERAL_SUFFIX	-> 'U' | 'u' | 'L' | 'l' | 'UL' | 'Ul' | 'uL' | 'ul' | 'LU' | 'Lu' | 'lU' | 'lu' ;
+		LITERAL_INTEGER			-> [1-9] [0-9]* | '0' INTEGER_LITERAL_SUFFIX? ;
+		REAL_LITERAL_SUFFIX		-> 'F' | 'f' | 'D' | 'd' | 'M' | 'm' ;
+		LITERAL_REAL			-> LITERAL_INTEGER? '.' LITERAL_INTEGER  (('e' | 'E') ('+' | '-')? LITERAL_INTEGER)? REAL_LITERAL_SUFFIX?
+									|  LITERAL_INTEGER ('e' | 'E') ('+' | '-')? LITERAL_INTEGER REAL_LITERAL_SUFFIX?
+									|  LITERAL_INTEGER REAL_LITERAL_SUFFIX ;
+		
+		LITERAL_CHAR			-> '\\' (. | 'newline' | 'space' | 'tab') ;
+
+		LITERAL_STRING			-> '"'  ( (0x0000 .. 0xFFFF - ('"' | '\\' | NEW_LINE))
+									| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
+									| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
+									| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
+								)* '"' ;
+		
+		LITERAL_REGEXP			-> '#' LITERAL_STRING ;
+	}
+	rules {
+		atom	-> metadata IDENTIFIER
+				|  metadata KEYWORD
+				|  '~' | '~@'
+				|  LITERAL_NIL
+				|  LITERAL_TRUE
+				|  LITERAL_FALSE
+				|  LITERAL_INTEGER
+				|  LITERAL_REAL
+				|  LITERAL_CHAR
+				|  LITERAL_STRING
+				|  LITERAL_REGEXP ;
+
+		exp0	-> atom
+				|  '\'' form
+				|  '@' form
+				|  '#\'' form
+				|  '#_' form
+				|  '`' form ;
+
+		metadata	-> ('^' (set | IDENTIFIER))? ;
+		form		-> exp0
+					| metadata list
+					| metadata vector
+					| metadata map
+					| metadata set
+					| metadata anonymous ;
+
+		list		-> '(' form* ')' ;
+		vector		-> '[' form* ']' ;
+		map_item	-> KEYWORD form ;
+		map			-> '{' map_item (','? map_item)* '}' ;
+		set			-> '#{' form* '}' ;
+		anonymous	-> '#(' form* ')' ;
+
+		unit		-> form* ;
+	}
+}

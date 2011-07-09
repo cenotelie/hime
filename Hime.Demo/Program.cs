@@ -46,19 +46,20 @@
             Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            //task.ExportDoc = true;
-            //task.ExportVisuals = true;
-            task.InputFiles.Add("Languages\\MathExp.gram");
-            task.ParserFile = "MathExp.cs";
-            task.Method = Parsers.ParsingMethod.LALR1;
+            task.ExportDoc = true;
+            task.ExportVisuals = false;
+            task.InputFiles.Add("Languages\\Test.gram");
+            task.GrammarName = "Test";
+            task.ParserFile = "Test.cs";
+            task.Method = Parsers.ParsingMethod.LRStar;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
         }
 
         static void Main(string[] args)
         {
-            //Compile();
-            Parse_Test();
+            Compile();
+            //Parse_Test();
             //Parse_MathExp();
         }
 

@@ -2,20 +2,10 @@
 {
 	options
 	{
-		Axiom = "e";
+		Axiom = "S";
 	}
 	terminals { }
 	rules {
-		e0	-> 'x' ;
-		e0	-> e0 '.' 'x' ;
-		
-		e ->  '(' e ')'
-			| '(' t ')' e
-			| e0
-			;
-		
-		t ->  'x'
-			| t '.' 'x'
-			;
+		S -> 'x' S 'x' | 'x' ;
 	}
 }
