@@ -174,11 +174,17 @@
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Menu.xslt" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.GoTo.png" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.Parser.html" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.ParserData_LR1.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.ParserData_LRStarSVG.xslt">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Content Include="Hime\Resources\Visuals\svg\Hime.GoTo.svg" />
     <Content Include="Libraries\log4net\log4net.dll" />
     <Content Include="Libraries\log4net\log4net.xml" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.None.png" />
-    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.LRParserData.xslt">
+    <EmbeddedResource Include="Hime\Resources\Transforms\Doc.ParserData_LRStarDOT.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.ReduceReduce.png" />

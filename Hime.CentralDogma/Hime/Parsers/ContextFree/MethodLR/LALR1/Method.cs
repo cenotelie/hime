@@ -25,7 +25,6 @@ namespace Hime.Parsers.CF.LR
             }
             Reporter.Info("LALR(1)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LALR(1)", "Done !");
-            if (Error) return null;
             return new ParserDataLR1(this, Grammar, Graph);
         }
 

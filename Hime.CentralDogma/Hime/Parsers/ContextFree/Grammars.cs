@@ -201,61 +201,67 @@ namespace Hime.Parsers.CF
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.ShiftReduce.png", accessor.GetStreamFor("Visuals.Hime.ShiftReduce.png")));
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.ReduceReduce.png", accessor.GetStreamFor("Visuals.Hime.ReduceReduce.png")));
 
-            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-            Doc.AppendChild(Export_GetData(Doc));
-            Doc.Save(directory + "\\data.xml");
+            System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            doc.AppendChild(Export_GetData(doc));
+            doc.Save(directory + "\\data.xml");
             accessor.AddCheckoutFile(directory + "\\data.xml");
             
             // generate header
             accessor.CheckOut("Transforms.Doc.Header.xslt", directory + "\\Header.xslt");
-            System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(directory + "\\Header.xslt");
-            Transform.Transform(directory + "\\data.xml", directory + "\\header.html");
+            System.Xml.Xsl.XslCompiledTransform transform = new System.Xml.Xsl.XslCompiledTransform();
+            transform.Load(directory + "\\Header.xslt");
+            transform.Transform(directory + "\\data.xml", directory + "\\header.html");
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "header.html", directory + "\\header.html"));
             accessor.AddCheckoutFile(directory + "\\header.html");
             // generate grammar
             accessor.CheckOut("Transforms.Doc.Grammar.xslt", directory + "\\Grammar.xslt");
-            Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(directory + "\\Grammar.xslt");
-            Transform.Transform(directory + "\\data.xml", directory + "\\grammar.html");
+            transform = new System.Xml.Xsl.XslCompiledTransform();
+            transform.Load(directory + "\\Grammar.xslt");
+            transform.Transform(directory + "\\data.xml", directory + "\\grammar.html");
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "grammar.html", directory + "\\grammar.html"));
             accessor.AddCheckoutFile(directory + "\\grammar.html");
 
-            Doc = new System.Xml.XmlDocument();
+            doc = new System.Xml.XmlDocument();
             List<System.Xml.XmlNode> nodes = new List<System.Xml.XmlNode>();
-            System.Xml.XmlNode nodeGraph = data.SerializeXML(Doc);
+            System.Xml.XmlNode nodeGraph = data.SerializeXML(doc);
             foreach (System.Xml.XmlNode child in nodeGraph.ChildNodes)
                 nodes.Add(child);
 
             // generate sets
-            accessor.CheckOut("Transforms.Doc.LRParserData.xslt", directory + "\\LRParserData.xslt");
-            Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(directory + "\\LRParserData.xslt");
+            string tfile = "ParserData_LR1";
+            if (data is LR.ParserDataLRStar)
+            {
+                if (options.ExportVisuals) tfile = "ParserData_LRStarSVG";
+                else tfile = "ParserData_LRStarDOT";
+            }
+            accessor.CheckOut("Transforms.Doc." + tfile + ".xslt", directory + "\\" + tfile + ".xslt");
+            transform = new System.Xml.Xsl.XslCompiledTransform();
+            transform.Load(directory + "\\" + tfile + ".xslt");
             foreach (System.Xml.XmlNode child in nodes)
             {
                 string temp = directory + "\\Set_" + child.Attributes["SetID"].Value;
-                while (Doc.HasChildNodes)
-                    Doc.RemoveChild(Doc.FirstChild);
-                Doc.AppendChild(child);
-                Doc.Save(temp + ".xml");
+                while (doc.HasChildNodes)
+                    doc.RemoveChild(doc.FirstChild);
+                doc.AppendChild(child);
+                doc.Save(temp + ".xml");
                 accessor.AddCheckoutFile(temp + ".xml");
-                Transform.Transform(temp + ".xml", temp + ".html");
+                transform.Transform(temp + ".xml", temp + ".html");
                 compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
                 accessor.AddCheckoutFile(temp + ".html");
             }
 
-            while (Doc.HasChildNodes)
-                Doc.RemoveChild(Doc.FirstChild);
-            Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "utf-8", null));
-            Doc.AppendChild(nodeGraph);
+            while (doc.HasChildNodes)
+                doc.RemoveChild(doc.FirstChild);
+            doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
+            doc.AppendChild(nodeGraph);
             foreach (System.Xml.XmlNode child in nodes)
                 nodeGraph.AppendChild(child);
-            Doc.Save(directory + "\\data.xml");
+            doc.Save(directory + "\\data.xml");
             // generate menu
             accessor.CheckOut("Transforms.Doc.Menu.xslt", directory + "\\Menu.xslt");
-            Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(directory + "\\Menu.xslt");
-            Transform.Transform(directory + "\\data.xml", directory + "\\menu.html");
+            transform = new System.Xml.Xsl.XslCompiledTransform();
+            transform.Load(directory + "\\Menu.xslt");
+            transform.Transform(directory + "\\data.xml", directory + "\\menu.html");
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "menu.html", directory + "\\menu.html"));
             accessor.AddCheckoutFile(directory + "\\menu.html");
 
