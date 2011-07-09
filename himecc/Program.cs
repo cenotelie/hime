@@ -42,7 +42,6 @@ namespace Hime.HimeCC
                 task.ParserFile = options.ParserFile;
             task.ExportLog = options.ExportHTMLLog;
             task.ExportDoc = options.ExportDocumentation;
-            task.ExportVisuals = options.ExportDocumentation;
             task.Execute();
         }
     }
