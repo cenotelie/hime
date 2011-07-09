@@ -14,15 +14,9 @@ namespace Hime.Parsers.CF.LR
             Reporter.Info("LR(0)", "Constructing LR(0) data ...");
             Graph Graph = ConstructGraph(Grammar, Reporter);
             // Output conflicts
-            bool Error = false;
-            foreach (State Set in Graph.Sets)
-            {
-                foreach (Conflict Conflict in Set.Conflicts)
-                {
-                    Reporter.Report(Conflict);
-                    Error = true;
-                }
-            }
+            foreach (State set in Graph.Sets)
+                foreach (Conflict conflict in set.Conflicts)
+                    Reporter.Report(conflict);
             Reporter.Info("LR(0)", Graph.Sets.Count.ToString() + " states explored.");
             Reporter.Info("LR(0)", "Done !");
             return new ParserDataLR1(this, Grammar, Graph);
