@@ -2,29 +2,28 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class MethodRNGLR1 : CFParserGenerator
+    class MethodRNGLR1 : BaseMethod, CFParserGenerator
     {
         public string Name { get { return "RNGLR(1)"; } }
 
         public MethodRNGLR1() { }
 
-        public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
-        public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
+        protected override void OnState(State state)
         {
-            Reporter.Info("RNGLR(1)", "Constructing RNGLR(1) data ...");
-            Graph Graph = ConstructGraph(Grammar, Reporter);
-            // Output conflicts
-            foreach (State set in Graph.Sets)
-            {
-                foreach (Conflict conflict in set.Conflicts)
-                {
-                    conflict.IsError = false;
-                    Reporter.Report(conflict);
-                }
-            }
-            Reporter.Info("RNGLR(1)", Graph.Sets.Count.ToString() + " states explored.");
-            Reporter.Info("RNGLR(1)", "Done !");
-            return new ParserDataRNGLR1(this, Grammar, Graph);
+            foreach (Conflict conflict in state.Conflicts)
+                conflict.IsError = false;
+        }
+
+        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        {
+            this.reporter = reporter;
+            reporter.Info("RNGLR(1)", "Constructing RNGLR(1) data ...");
+            graph = ConstructGraph(grammar, reporter);
+            Close();
+            reporter.Info("RNGLR(1)", graph.Sets.Count.ToString() + " states explored.");
+            reporter.Info("RNGLR(1)", "Done !");
+            return new ParserDataRNGLR1(this, grammar, graph);
         }
 
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)

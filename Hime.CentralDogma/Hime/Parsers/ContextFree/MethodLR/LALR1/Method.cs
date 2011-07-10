@@ -2,33 +2,22 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class MethodLALR1 : CFParserGenerator
+    class MethodLALR1 : BaseMethod, CFParserGenerator
     {
         public string Name { get { return "LALR(1)"; } }
 
         public MethodLALR1() { }
 
-        public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
-        public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
+        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            Reporter.Info("LALR(1)", "Constructing LALR(1) data ...");
-            Graph graph = ConstructGraph(Grammar, Reporter);
-            // Output conflicts
-            ConflictExamplifier analyzer = new ConflictExamplifier(graph);
-            foreach (State set in graph.Sets)
-            {
-                List<Terminal> example = null;
-                if (set.Conflicts.Count != 0)
-                    example = analyzer.GetExample(set);
-                foreach (Conflict conflict in set.Conflicts)
-                {
-                    conflict.InputSample = example;
-                    Reporter.Report(conflict);
-                }
-            }
-            Reporter.Info("LALR(1)", graph.Sets.Count.ToString() + " states explored.");
-            Reporter.Info("LALR(1)", "Done !");
-            return new ParserDataLR1(this, Grammar, graph);
+            this.reporter = reporter;
+            reporter.Info("LALR(1)", "Constructing LALR(1) data ...");
+            graph = ConstructGraph(grammar, reporter);
+            Close();
+            reporter.Info("LALR(1)", graph.Sets.Count.ToString() + " states explored.");
+            reporter.Info("LALR(1)", "Done !");
+            return new ParserDataLR1(this, grammar, graph);
         }
 
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)

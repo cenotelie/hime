@@ -2,101 +2,38 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class MethodLRStar : CFParserGenerator
+    class MethodLRStar : BaseMethod, CFParserGenerator
     {
-        private List<System.Threading.Thread> workers;
-        private Hime.Kernel.Reporting.Reporter reporter;
-        private GLRSimulator simulator;
         private Dictionary<State, DeciderLRStar> deciders;
-        private List<State>.Enumerator enumerator;
-        private object _lock;
-
 
         public string Name { get { return "LR(*)"; } }
 
         public MethodLRStar() { }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        protected override void OnState(State state)
         {
-            reporter.Info("LR(*)", "LR(*) data ...");
-            Graph graph = MethodLALR1.ConstructGraph(grammar, reporter);
-            reporter.Info("LR(*)", graph.Sets.Count.ToString() + " LALR(1) states constructed.");
-
-            workers = new List<System.Threading.Thread>();
-            this.reporter = reporter;
-            simulator = new GLRSimulator(graph);
-            deciders = new Dictionary<State, DeciderLRStar>();
-            enumerator = graph.Sets.GetEnumerator();
-            _lock = new object();
-            BuildDeciders(System.Environment.ProcessorCount);
-
-            reporter.Info("LR(*)", "Done !");
-            return new ParserDataLRStar(this, grammar, graph, deciders);
-        }
-
-
-        private Dictionary<State, DeciderLRStar> BuildDeciders(int threadCount)
-        {
-            reporter.Info("LR(*)", "Spawning " + threadCount + " thread(s) to build deciders");
-            while (threadCount != 0)
-            {
-                SpawnWorker(threadCount);
-                threadCount--;
-            }
-            foreach (System.Threading.Thread thread in workers)
-                thread.Join();
-            return deciders;
-        }
-
-        private State GetNextState()
-        {
-            lock (_lock)
-            {
-                if (!enumerator.MoveNext())
-                    return null;
-                return enumerator.Current;
-            }
-        }
-        private void AddDecider(State state, DeciderLRStar decider)
-        {
+            DeciderLRStar decider = new DeciderLRStar(state);
+            decider.Build(simulator);
             lock (deciders)
             {
                 deciders.Add(state, decider);
             }
-        }
-        private void Report(Hime.Kernel.Reporting.Entry entry)
-        {
-            lock (reporter)
-            {
-                reporter.Report(entry);
-            }
+            foreach (Conflict conflict in state.Conflicts)
+                if (decider.IsResolved(conflict))
+                    conflict.IsResolved = true;
         }
 
-        private void SpawnWorker(int id)
+        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            System.Threading.Thread thread = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(worker));
-            thread.Name = "LR(*) Decider Builder " + id.ToString();
-            workers.Add(thread);
-            thread.Start();
-        }
-
-        private void worker(object param)
-        {
-            State state = GetNextState();
-            while (state != null)
-            {
-                DeciderLRStar decider = new DeciderLRStar(state);
-                decider.Build(simulator);
-                AddDecider(state, decider);
-
-                foreach (Conflict conflict in state.Conflicts)
-                {
-                    if (!decider.IsResolved(conflict))
-                        Report(conflict);
-                }
-                state = GetNextState();
-            }
+            this.reporter = reporter;
+            reporter.Info("LR(*)", "LR(*) data ...");
+            graph = MethodLALR1.ConstructGraph(grammar, reporter);
+            deciders = new Dictionary<State, DeciderLRStar>();
+            Close();
+            reporter.Info("LR(*)", graph.Sets.Count.ToString() + " LALR(1) states constructed.");
+            reporter.Info("LR(*)", "Done !");
+            return new ParserDataLRStar(this, grammar, graph, deciders);
         }
     }
 }

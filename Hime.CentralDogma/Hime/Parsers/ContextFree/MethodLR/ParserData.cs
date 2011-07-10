@@ -32,63 +32,16 @@ namespace Hime.Parsers.CF.LR
                 nodegraph.AppendChild(GetXMLData_Set(Document, set));
             return nodegraph;
         }
-        private System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument Document, State Set)
+        private System.Xml.XmlNode GetXMLData_Set(System.Xml.XmlDocument document, State set)
         {
-            System.Xml.XmlNode root = Document.CreateElement("ItemSet");
-            root.Attributes.Append(Document.CreateAttribute("SetID"));
-            root.Attributes["SetID"].Value = Set.ID.ToString("X");
-            foreach (Item item in Set.Items)
-                root.AppendChild(GetXMLData_Item(Document, Set, item));
+            System.Xml.XmlNode root = document.CreateElement("ItemSet");
+            root.Attributes.Append(document.CreateAttribute("SetID"));
+            root.Attributes["SetID"].Value = set.ID.ToString("X");
+            foreach (Item item in set.Items)
+                root.AppendChild(item.GetXMLNode(document, set));
             return root;
         }
-        private System.Xml.XmlNode GetXMLData_Item(System.Xml.XmlDocument Document, State Set, Item Item)
-        {
-            System.Xml.XmlNode root = Document.CreateElement("Item");
-            root.Attributes.Append(Document.CreateAttribute("HeadName"));
-            root.Attributes.Append(Document.CreateAttribute("HeadSID"));
-            root.Attributes.Append(Document.CreateAttribute("Conflict"));
-            root.Attributes["HeadName"].Value = Item.BaseRule.Variable.LocalName;
-            root.Attributes["HeadSID"].Value = Item.BaseRule.Variable.SID.ToString("X");
-            root.Attributes["Conflict"].Value = GetXMLData_ConflictType(Set, Item).ToString();
-
-            System.Xml.XmlNode action = Document.CreateElement("Action");
-            action.Attributes.Append(Document.CreateAttribute("Type"));
-            action.Attributes["Type"].Value = Item.Action.ToString();
-            if (Item.Action == ItemAction.Shift)
-                action.InnerText = Set.Children[Item.NextSymbol].ID.ToString("X");
-            else
-                action.InnerText = Item.BaseRule.ID.ToString("X");
-            root.AppendChild(action);
-
-            System.Xml.XmlNode symbols = Document.CreateElement("Symbols");
-            int i = 0;
-            foreach (RuleDefinitionPart Part in Item.BaseRule.Definition.GetChoiceAtIndex(0).Parts)
-            {
-                if (i == Item.DotPosition)
-                    symbols.AppendChild(Document.CreateElement("Dot"));
-                symbols.AppendChild(Part.GetXMLNode(Document));
-                i++;
-            }
-            if (i == Item.DotPosition)
-                symbols.AppendChild(Document.CreateElement("Dot"));
-            root.AppendChild(symbols);
-
-            System.Xml.XmlNode lookaheads = Document.CreateElement("Lookaheads");
-            foreach (Terminal terminal in Item.Lookaheads)
-            {
-                System.Xml.XmlNode lookahead = terminal.GetXMLNode(Document);
-                lookaheads.AppendChild(lookahead);
-            }
-            root.AppendChild(lookaheads);
-            return root;
-        }
-        private ConflictType GetXMLData_ConflictType(State Set, Item Item)
-        {
-            foreach (Conflict conflict in Set.Conflicts)
-                if (conflict.ContainsItem(Item))
-                    return conflict.ConflictType;
-            return ConflictType.None;
-        }
+        
 
         protected void Export_Variables(System.IO.StreamWriter stream)
         {
@@ -111,7 +64,7 @@ namespace Hime.Parsers.CF.LR
                 serializer.WriteNode(set.ID.ToString("X"), set.ID.ToString("X"), "Set_" + set.ID.ToString("X") + ".html");
             foreach (State set in graph.Sets)
                 foreach (Symbol symbol in set.Children.Keys)
-                    serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.LocalName);
+                    serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.ToString().Replace("\"", "\\\""));
             serializer.Close();
             List<string> files = new List<string>();
             files.Add(directory + "\\GraphParser.dot");

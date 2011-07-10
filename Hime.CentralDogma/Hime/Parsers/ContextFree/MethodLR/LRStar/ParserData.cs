@@ -309,7 +309,7 @@ namespace Hime.Parsers.CF.LR
             }
             foreach (DeciderStateLRStar state in machine.States)
                 foreach (Terminal t in state.Transitions.Keys)
-                    serializer.WriteEdge(state.ID.ToString(), state.Transitions[t].ID.ToString(), t.ToString());
+                    serializer.WriteEdge(state.ID.ToString(), state.Transitions[t].ID.ToString(), t.ToString().Replace("\"", "\\\""));
         }
     }
 }

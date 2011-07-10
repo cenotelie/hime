@@ -436,7 +436,7 @@ namespace Hime.Parsers.CF
             // Construct the terminal name
             string Value = ((Redist.Parsers.SymbolTokenText)Node.Children[0].Symbol).ValueText;
             Value = Value.Substring(1, Value.Length - 2);
-            Value = Value.Replace("\\'", "'").Replace("\\\\", "\\");
+            Value = "@\"" + Value.Replace("\\'", "'").Replace("\\\\", "\\") + "\"";
             // Check for previous instance in the grammar's data
             Terminal Terminal = Data.GetTerminal(Value);
             if (Terminal == null)

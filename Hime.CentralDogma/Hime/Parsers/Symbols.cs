@@ -71,6 +71,7 @@ namespace Hime.Parsers
     {
         private Automata.NFA nFA;
         private Grammar subGrammar;
+        private string value;
 
         public Automata.NFA NFA
         {
@@ -82,12 +83,16 @@ namespace Hime.Parsers
             get { return subGrammar; }
             set { subGrammar = value; }
         }
+        public string Value { get { return value; } }
 
         public TerminalText(Grammar parent, ushort sid, string name, int priority, Automata.NFA nfa, Grammar subGrammar)
             : base(parent, sid, name, priority)
         {
             this.nFA = nfa;
             this.subGrammar = subGrammar;
+            this.value = name;
+            if (this.value.StartsWith("@\""))
+                this.value = this.value.Substring(2, this.value.Length - 3);
         }
 
         public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
@@ -103,11 +108,11 @@ namespace Hime.Parsers
             Node.Attributes["Priority"].Value = priority.ToString();
             if (subGrammar != null)
                 Node.Attributes["SubGrammar"].Value = subGrammar.CompleteName.ToString('_');
-            Node.Attributes["Value"].Value = this.ToString();
+            Node.Attributes["Value"].Value = value;
             return Node;
         }
 
-        public override string ToString() { return localName; }
+        public override string ToString() { return value; }
     }
 
     [System.FlagsAttribute]

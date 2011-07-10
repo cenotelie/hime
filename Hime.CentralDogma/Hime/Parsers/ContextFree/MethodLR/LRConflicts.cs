@@ -18,6 +18,7 @@ namespace Hime.Parsers.CF.LR
         private List<Item> items;
         private List<Terminal> inputSample;
         private bool isError;
+        private bool isResolved;
 
         public Hime.Kernel.Reporting.Level Level {
             get
@@ -42,6 +43,11 @@ namespace Hime.Parsers.CF.LR
             get { return isError; }
             set { isError = value; }
         }
+        public bool IsResolved
+        {
+            get { return isResolved; }
+            set { isResolved = value; }
+        }
 
         public Conflict(string component, State state, ConflictType type, Terminal lookahead)
         {
@@ -50,6 +56,7 @@ namespace Hime.Parsers.CF.LR
             this.type = type;
             this.lookahead = lookahead;
             this.isError = true;
+            this.isResolved = false;
             items = new List<Item>();
         }
         public Conflict(string component, State state, ConflictType type)
@@ -58,11 +65,41 @@ namespace Hime.Parsers.CF.LR
             this.state = state;
             this.type = type;
             this.isError = true;
+            this.isResolved = false;
             items = new List<Item>();
         }
 
         public void AddItem(Item Item) { items.Add(Item); }
         public bool ContainsItem(Item Item) { return items.Contains(Item); }
+
+        public System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc)
+        {
+            System.Xml.XmlNode element = doc.CreateElement("Conflict");
+
+            System.Xml.XmlNode header = doc.CreateElement("Header");
+            header.Attributes.Append(doc.CreateAttribute("type"));
+            header.Attributes.Append(doc.CreateAttribute("set"));
+            header.Attributes["type"].Value = type.ToString();
+            header.Attributes["set"].Value = state.ID.ToString("X");
+            header.AppendChild(lookahead.GetXMLNode(doc));
+            element.AppendChild(header);
+
+            System.Xml.XmlNode nodeItems = doc.CreateElement("Items");
+            foreach (Item item in items)
+                nodeItems.AppendChild(item.GetXMLNode(doc, state));
+            element.AppendChild(nodeItems);
+
+            if (inputSample != null)
+            {
+                System.Xml.XmlNode example = doc.CreateElement("Example");
+                foreach (Terminal t in inputSample)
+                    example.AppendChild(t.GetXMLNode(doc));
+                example.AppendChild(doc.CreateElement("Dot"));
+                example.AppendChild(lookahead.GetXMLNode(doc));
+                element.AppendChild(example);
+            }
+            return element;
+        }
 
         public override string ToString()
         {
@@ -101,135 +138,6 @@ namespace Hime.Parsers.CF.LR
                 Builder.Append(lookahead.ToString());
             }
             return Builder.ToString();
-        }
-    }
-
-
-    class ConflictExamplifier
-    {
-        private Graph graph;
-        private Dictionary<int, Dictionary<Symbol, List<State>>> inverseGraph;
-
-        public ConflictExamplifier(Graph graph)
-        {
-            this.graph = graph;
-            this.inverseGraph = new Dictionary<int, Dictionary<Symbol, List<State>>>();
-            BuildInverse();
-        }
-
-        private void BuildInverse()
-        {
-            foreach (State set in graph.Sets)
-            {
-                foreach (Symbol symbol in set.Children.Keys)
-                {
-                    State child = set.Children[symbol];
-                    if (!inverseGraph.ContainsKey(child.ID))
-                        inverseGraph.Add(child.ID, new Dictionary<Symbol, List<State>>());
-                    Dictionary<Symbol, List<State>> inverses = inverseGraph[child.ID];
-                    if (!inverses.ContainsKey(symbol))
-                        inverses.Add(symbol, new List<State>());
-                    List<State> parents = inverses[symbol];
-                    parents.Add(set);
-                }
-            }
-        }
-
-        
-
-        public List<Terminal> GetExample(State state)
-        {
-            ICollection<Symbol> path = GetPath(state);
-            List<Terminal> sample = new List<Terminal>();
-            foreach (Symbol s in path)
-            {
-                if (s is Terminal)
-                    sample.Add(s as Terminal);
-                else
-                    BuildSample(sample, s as CFVariable, new Stack<CFRuleDefinition>());
-            }
-            return sample;
-        }
-
-        private void BuildSample(List<Terminal> sample, CFVariable var, Stack<CFRuleDefinition> stack)
-        {
-            if (var.Firsts.Contains(TerminalEpsilon.Instance))
-                return;
-            List<CFRuleDefinition> definitions = new List<CFRuleDefinition>();
-            foreach (CFRule rule in var.Rules)
-                definitions.Add(rule.Definition.GetChoiceAtIndex(0));
-            //definitions.Sort(new System.Comparison<CFRuleDefinition>(CompareDefinition));
-            CFRuleDefinition def = null;
-            foreach (CFRuleDefinition d in definitions)
-            {
-                if (!stack.Contains(d))
-                {
-                    def = d;
-                    break;
-                }
-            }
-            if (def == null)
-                def = definitions[0];
-            stack.Push(def);
-            foreach (RuleDefinitionPart part in def.Parts)
-            {
-                if (part.Symbol is Terminal)
-                    sample.Add(part.Symbol as Terminal);
-                else
-                    BuildSample(sample, part.Symbol as CFVariable, stack);
-            }
-            stack.Pop();
-        }
-
-        private int CompareDefinition(CFRuleDefinition left, CFRuleDefinition right) { return left.Length - right.Length; }
-
-
-        private class ENode
-        {
-            public State state;
-            public ENode next;
-            public Symbol transition;
-            public ENode(State state, ENode next, Symbol transition)
-            {
-                this.state = state;
-                this.next = next;
-                this.transition = transition;
-            }
-        }
-
-        private ICollection<Symbol> GetPath(State state)
-        {
-            LinkedList<ENode> queue = new LinkedList<ENode>();
-            queue.AddFirst(new ENode(state, null, null));
-            ENode goal = null;
-            while (goal == null)
-            {
-                ENode current = queue.First.Value;
-                queue.RemoveFirst();
-                if (!inverseGraph.ContainsKey(current.state.ID))
-                    continue;
-                Dictionary<Symbol, List<State>> transitions = inverseGraph[current.state.ID];
-                foreach (Symbol s in transitions.Keys)
-                {
-                    foreach (State previous in transitions[s])
-                    {
-                        if (previous.ID == 0)
-                        {
-                            goal = new ENode(previous, current, s);
-                            break;
-                        }
-                        else
-                            queue.AddLast(new ENode(previous, current, s));
-                    }
-                }
-            }
-            LinkedList<Symbol> result = new LinkedList<Symbol>();
-            while (goal.next != null)
-            {
-                result.AddLast(goal.transition);
-                goal = goal.next;
-            }
-            return result;
         }
     }
 }

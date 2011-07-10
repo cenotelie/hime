@@ -36,7 +36,7 @@ namespace Hime.Parsers.CF.LR
                 // There is already a shift action for the lookahead => conflict
                 if (Set.Children.ContainsKey(Item.Lookahead))
                 {
-                    StateReductionsLR1.HandleConflict_ShiftReduce("MethodGLR1", conflicts, Item, Set, Item.Lookahead);
+                    StateReductionsLR1.HandleConflict_ShiftReduce("GLR(1)", conflicts, Item, Set, Item.Lookahead);
                     Reductions.Add(Item.Lookahead, Item);
                     StateActionReduce Reduction = new StateActionReduce(Item.Lookahead, Item.BaseRule);
                     this.Add(Reduction);
@@ -44,7 +44,7 @@ namespace Hime.Parsers.CF.LR
                 // There is already a reduction action for the lookahead => conflict
                 else if (Reductions.ContainsKey(Item.Lookahead))
                 {
-                    StateReductionsLR1.HandleConflict_ReduceReduce("MethodGLR1", conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
+                    StateReductionsLR1.HandleConflict_ReduceReduce("GLR(1)", conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
                     Reductions.Add(Item.Lookahead, Item);
                     StateActionReduce Reduction = new StateActionReduce(Item.Lookahead, Item.BaseRule);
                     this.Add(Reduction);

@@ -71,7 +71,7 @@ namespace Hime.Parsers.Exporters
             {
                 if (!first) stream.WriteLine(",");
                 stream.Write("            ");
-                stream.Write("new SymbolTerminal(\"" + terminal.LocalName + "\", 0x" + terminal.SID.ToString("X") + ")");
+                stream.Write("new SymbolTerminal(\"" + terminal.ToString().Replace("\"", "\\\"") + "\", 0x" + terminal.SID.ToString("X") + ")");
                 first = false;
             }
             stream.WriteLine(" };");

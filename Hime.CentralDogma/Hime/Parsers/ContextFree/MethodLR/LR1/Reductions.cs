@@ -27,9 +27,9 @@ namespace Hime.Parsers.CF.LR
                 if (Item.Action == ItemAction.Shift)
                     continue;
                 // There is already a shift action for the lookahead => conflict
-                if (Set.Children.ContainsKey(Item.Lookahead)) HandleConflict_ShiftReduce("MethodLR1", conflicts, Item, Set, Item.Lookahead);
+                if (Set.Children.ContainsKey(Item.Lookahead)) HandleConflict_ShiftReduce("LR(1)", conflicts, Item, Set, Item.Lookahead);
                 // There is already a reduction action for the lookahead => conflict
-                else if (Reductions.ContainsKey(Item.Lookahead)) HandleConflict_ReduceReduce("MethodLR1", conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
+                else if (Reductions.ContainsKey(Item.Lookahead)) HandleConflict_ReduceReduce("LR(1)", conflicts, Item, Reductions[Item.Lookahead], Set, Item.Lookahead);
                 else // No conflict
                 {
                     Reductions.Add(Item.Lookahead, Item);

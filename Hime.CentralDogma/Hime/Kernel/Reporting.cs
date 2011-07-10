@@ -14,6 +14,8 @@ namespace Hime.Kernel.Reporting
         Level Level { get; }
         string Component { get; }
         string Message { get; }
+
+        System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc);
     }
 
     public class BaseEntry : Entry
@@ -31,6 +33,13 @@ namespace Hime.Kernel.Reporting
             this.level = level;
             this.component = component;
             this.message = message;
+        }
+
+        public System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc)
+        {
+            System.Xml.XmlNode element = doc.CreateElement("Message");
+            element.InnerText = message;
+            return element;
         }
     }
 
@@ -54,38 +63,26 @@ namespace Hime.Kernel.Reporting
         }
 
 
-        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
+        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument doc)
         {
-            System.Xml.XmlNode node = Doc.CreateElement("Section");
-            node.Attributes.Append(Doc.CreateAttribute("id"));
-            node.Attributes.Append(Doc.CreateAttribute("name"));
+            System.Xml.XmlNode node = doc.CreateElement("Section");
+            node.Attributes.Append(doc.CreateAttribute("id"));
+            node.Attributes.Append(doc.CreateAttribute("name"));
             node.Attributes["id"].Value = "section" + GetHashCode().ToString("X");
             node.Attributes["name"].Value = Name;
             foreach (Entry entry in entries)
-                node.AppendChild(GetXMLNode_Entry(Doc, entry));
+                node.AppendChild(GetXMLNode_Entry(doc, entry));
             return node;
         }
-        private System.Xml.XmlNode GetXMLNode_Entry(System.Xml.XmlDocument Doc, Entry Entry)
+        private System.Xml.XmlNode GetXMLNode_Entry(System.Xml.XmlDocument doc, Entry entry)
         {
-            System.Xml.XmlNode node = Doc.CreateElement("Entry");
-            node.Attributes.Append(Doc.CreateAttribute("mark"));
-            node.Attributes["mark"].Value = Entry.Level.ToString();
-
-            System.Xml.XmlNode Node1 = Doc.CreateElement("Data");
-            System.Xml.XmlNode line = Doc.CreateElement("Line");
-            line.InnerText = Entry.Component;
-            Node1.AppendChild(line);
-            node.AppendChild(Node1);
-
-            System.Xml.XmlNode Node2 = Doc.CreateElement("Data");
-            string[] parts = Entry.Message.Split(new char[] { '\n' });
-            for (int i = 0; i != parts.Length; i++)
-            {
-                line = Doc.CreateElement("Line");
-                line.InnerText = parts[i];
-                Node2.AppendChild(line);
-            }
-            node.AppendChild(Node2);
+            System.Xml.XmlNode node = doc.CreateElement("Entry");
+            node.Attributes.Append(doc.CreateAttribute("mark"));
+            node.Attributes["mark"].Value = entry.Level.ToString();
+            System.Xml.XmlNode nodeComponent = doc.CreateElement("Component");
+            nodeComponent.InnerText = entry.Component;
+            node.AppendChild(nodeComponent);
+            node.AppendChild(entry.GetMessageNode(doc));
             return node;
         }
     }
@@ -208,17 +205,17 @@ namespace Hime.Kernel.Reporting
 
             Resources.ResourceAccessor Session = new Resources.ResourceAccessor();
             Session.AddCheckoutFile(fileName + ".xml");
-            Session.CheckOut("Transforms.Logs.LogXML.xslt", File.DirectoryName + "LogXML.xslt");
+            Session.CheckOut("Transforms.Logs.xslt", File.DirectoryName + "Logs.xslt");
 
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
-            Transform.Load(File.DirectoryName + "LogXML.xslt");
+            Transform.Load(File.DirectoryName + "Logs.xslt");
             Transform.Transform(fileName + ".xml", fileName + ".html");
             Session.AddCheckoutFile(fileName + ".html");
 
             Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
             compiler.Title = title;
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", fileName + ".html"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Hime.css", Session.GetStreamFor("Transforms.Hime.css")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", Session.GetStreamFor("Transforms.Logs.css")));
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", Session.GetStreamFor("Transforms.Hime.js")));
 
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", Session.GetStreamFor("Visuals.button_plus.gif")));

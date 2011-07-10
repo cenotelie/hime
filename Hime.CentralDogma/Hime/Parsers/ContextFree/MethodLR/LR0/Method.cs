@@ -2,24 +2,22 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class MethodLR0 : CFParserGenerator
+    class MethodLR0 : BaseMethod, CFParserGenerator
     {
         public string Name { get { return "LR(0)"; } }
 
         public MethodLR0() { }
 
-        public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
-        public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
+        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            Reporter.Info("LR(0)", "Constructing LR(0) data ...");
-            Graph Graph = ConstructGraph(Grammar, Reporter);
-            // Output conflicts
-            foreach (State set in Graph.Sets)
-                foreach (Conflict conflict in set.Conflicts)
-                    Reporter.Report(conflict);
-            Reporter.Info("LR(0)", Graph.Sets.Count.ToString() + " states explored.");
-            Reporter.Info("LR(0)", "Done !");
-            return new ParserDataLR1(this, Grammar, Graph);
+            this.reporter = reporter;
+            reporter.Info("LR(0)", "Constructing LR(0) data ...");
+            graph = ConstructGraph(grammar, reporter);
+            Close();
+            reporter.Info("LR(0)", graph.Sets.Count.ToString() + " states explored.");
+            reporter.Info("LR(0)", "Done !");
+            return new ParserDataLR1(this, grammar, graph);
         }
 
 

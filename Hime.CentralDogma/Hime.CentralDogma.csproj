@@ -86,7 +86,7 @@
     <Compile Include="Hime\Parsers\ContextFree\Compiler.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Grammars.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Decider.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\GLRSimulator.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLRSimulator.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLALR1\Method.cs" />
@@ -109,6 +109,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRConflicts.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRSets.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRItems.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\BaseMethod.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\ParserData.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLALR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLALR1\Method.cs" />
@@ -180,6 +181,7 @@
     <EmbeddedResource Include="Hime\Resources\Transforms\Doc.ParserData_LRStarSVG.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Hime\Resources\Transforms\Logs.css" />
     <Content Include="Hime\Resources\Visuals\svg\Hime.GoTo.svg" />
     <Content Include="Libraries\log4net\log4net.dll" />
     <Content Include="Libraries\log4net\log4net.xml" />
@@ -197,7 +199,7 @@
     <EmbeddedResource Include="Hime\Resources\Transforms\Hime.js" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Hime.css" />
     <EmbeddedResource Include="Hime\Resources\Transforms\Generators.Lexers.xslt" />
-    <EmbeddedResource Include="Hime\Resources\Transforms\Logs.LogXML.xslt" />
+    <EmbeddedResource Include="Hime\Resources\Transforms\Logs.xslt" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Error.png" />
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Info.png" />
     <Content Include="Hime.Logo.ico" />
