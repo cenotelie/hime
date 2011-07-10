@@ -23,8 +23,13 @@
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
-  
-  
+
+  <xsl:template match="Exception">
+    <td class="HimeData">
+      <xsl:value-of select="Message"/>
+    </td>
+  </xsl:template>
+
   <xsl:template match="Conflict">
     <td class="HimeData">
       <xsl:attribute name="style">
@@ -53,19 +58,41 @@
           <xsl:text>)</xsl:text>
         </xsl:attribute>
       </img>
-      Conflict <xsl:value-of select="./Header/@type"/> in state <xsl:value-of select="./Header/@set"/> on
+      Conflict
+      <xsl:value-of select="./Header/@type"/>
+      in state
+      <span class="HimeLRState">
+        <xsl:value-of select="./Header/@set"/>
+      </span>
+      on
       <xsl:apply-templates select="Header"/>
-      for items:
-      <table border="0" cellpadding="0" cellspacing="0" style="display: none;">
+      :
+      <div style="display: none;">
         <xsl:attribute name="id">
           <xsl:text>conflict_</xsl:text>
           <xsl:value-of select="./Header/@set"/>
           <xsl:text>_</xsl:text>
           <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
         </xsl:attribute>
-        <xsl:apply-templates select="Items"/>
-        <xsl:apply-templates select="Example"/>
-      </table>
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="HimeDataLine">Items:</td>
+            <td>
+              <table border="0" cellpadding="0" cellspacing="0" style="margin-left: 10px; border-left: Solid 2px black;">
+                <xsl:apply-templates select="Items"/>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="HimeDataLine">Input example:</td>
+            <td class="HimeDataLine">
+              <xsl:apply-templates select="Example"/>
+            </td>
+          </tr>
+        </table>
+      </div>
     </td>
   </xsl:template>
 
@@ -107,15 +134,6 @@
         </span>
         →
         <xsl:apply-templates select="Symbols"/>
-      </td>
-    </tr>
-  </xsl:template>
-
-  <xsl:template match="Example">
-    <tr>
-      <td class="HimeDataLine">
-        Input sample: 
-        <xsl:apply-templates/>
       </td>
     </tr>
   </xsl:template>

@@ -122,21 +122,34 @@ namespace Hime.Parsers
         public Hime.Kernel.Reporting.Report Execute()
         {
             reporter = new Hime.Kernel.Reporting.Reporter(typeof(CompilationTask));
-            if (!Execute_LoadData())
-                return reporter.Result;
-            
-            Hime.Parsers.Grammar grammar = Execute_GetGrammar();
-            if (grammar == null)
-                return reporter.Result;
 
-            Execute_BuildGenerator();
-            if (generator == null)
-                return reporter.Result;
+            try
+            {
+                if (!Execute_LoadData())
+                    return Execute_Exit();
 
-            Execute_BuildData(grammar);
-            Execute_OpenOutput();
-            grammar.Build(this);
-            Execute_Close();
+                Hime.Parsers.Grammar grammar = Execute_GetGrammar();
+                if (grammar == null)
+                    return Execute_Exit();
+
+                Execute_BuildGenerator();
+                if (generator == null)
+                    return Execute_Exit();
+
+                Execute_BuildData(grammar);
+                Execute_OpenOutput();
+                grammar.Build(this);
+                Execute_Close();
+            }
+            catch (Exception ex)
+            {
+                reporter.Report(ex);   
+            }
+
+            return Execute_Exit();
+        }
+        private Hime.Kernel.Reporting.Report Execute_Exit()
+        {
             if (exportLog)
             {
                 string file = parserFile.Replace(".cs", "_log.mht");

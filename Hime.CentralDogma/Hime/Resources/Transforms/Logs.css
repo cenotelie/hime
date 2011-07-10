@@ -76,6 +76,15 @@
 	padding-bottom: 3px;
 }
 
+.HimeLRState
+{
+    padding: 1px;
+    margin: 2px;
+    background-color: #FFFF00;
+    border: 1px solid #FF0000;
+    color: Black;
+    text-decoration: none;
+}
 .HimeSymbolVariable
 {
     padding: 1px;
