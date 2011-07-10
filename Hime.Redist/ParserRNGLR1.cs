@@ -168,12 +168,13 @@ namespace Hime.Redist.Parsers
             nextToken = lexer.GetNextToken();
             if (nextToken.SymbolID == 2)
             {
-                // Dollar token
+                // Dollar token => empty input
                 if (states[0].HasReduction(2, axiomID, 0))
                     return nullVarsSPPF[axiomNullSPPF];
                 else
-                    return null;
+                    return null; //Grammar do not support empty input
             }
+
             GSSNode v0 = new GSSNode(0, 0);
             List<GSSNode> Ui = new List<GSSNode>();
             Ui.Add(v0);
@@ -188,28 +189,49 @@ namespace Hime.Redist.Parsers
                 reductions.AddLast(new ParserReduction(v0, reduction.ToReduce, 0, reduction.Rest, nullChoicesSPPF[0]));
 
             int generation = 0;
-            while (nextToken.SymbolID != 1)
+            while (nextToken.SymbolID != 1) // Wait for ε token
             {
                 n.Clear();
                 while (reductions.Count != 0)
                     Reducer(Ui, generation);
                 SymbolToken oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
-                Ui = Shifter(Ui, oldtoken, generation);
+                List<GSSNode> Uj = Shifter(Ui, oldtoken, generation);
                 generation++;
-                if (Ui.Count == 0)
+                if (Uj.Count == 0)
+                {
+                    // Generation is empty !
+                    List<ushort> present = new List<ushort>();
+                    List<string> expected = new List<string>();
+                    foreach (GSSNode node in Ui)
+                    {
+                        foreach (SymbolTerminal terminal in states[node.DFAState].Expected)
+                        {
+                            if (!present.Contains(terminal.SymbolID))
+                            {
+                                expected.Add(terminal.Name);
+                                present.Add(terminal.SymbolID);
+                            }
+                        }
+                    }
+                    errors.Add(new ParserErrorUnexpectedToken(oldtoken, expected.ToArray()));
                     return null;
+                }
+                Ui = Uj;
             }
+
             foreach (GSSNode state in Ui)
             {
                 if (states[state.DFAState].HasReduction(1, axiomPrimeID, 2))
                 {
+                    // Has reduction _Axiom_ -> axiom $ . on ε
                     List<List<GSSNode>> paths = state.GetPaths(2);
                     List<GSSNode> path = paths[0];
                     SPPFNode root = path[path.Count - 2].Edges[path[path.Count - 1]];
                     return root;
                 }
             }
+            // At end of input but was still waiting for tokens
             return null;
         }
 

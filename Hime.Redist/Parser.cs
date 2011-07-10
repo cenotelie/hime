@@ -41,7 +41,7 @@ namespace Hime.Redist.Parsers
     public sealed class ParserErrorUnexpectedToken : ParserError
     {
         private SymbolToken token;
-        private System.Collections.ObjectModel.Collection<string> expected;
+        private List<string> expected;
         private System.Collections.ObjectModel.ReadOnlyCollection<string> readOnlyExpected;
         private string message;
 
@@ -61,20 +61,29 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes a new instance of the ParserErrorUnexpectedToken class with a token and an array of expected names
         /// </summary>
-        /// <param name="Token">The unexpected token</param>
-        /// <param name="Expected">The array of expected tokens' names</param>
-        public ParserErrorUnexpectedToken(SymbolToken Token, string[] Expected)
+        /// <param name="token">The unexpected token</param>
+        /// <param name="expected">The array of expected tokens' names</param>
+        public ParserErrorUnexpectedToken(SymbolToken token, string[] expected)
         {
-            token = Token;
-            expected = new System.Collections.ObjectModel.Collection<string>(Expected);
-            readOnlyExpected = new System.Collections.ObjectModel.ReadOnlyCollection<string>(expected);
+            this.token = token;
+            this.expected = new List<string>(expected);
+            readOnlyExpected = new System.Collections.ObjectModel.ReadOnlyCollection<string>(this.expected);
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("Unexpected token ");
+            if (token is SymbolTokenText)
+            {
+                SymbolTokenText tt = token as SymbolTokenText;
+                Builder.Append("@");
+                Builder.Append(tt.Line);
+                Builder.Append(" ");
+            }
+            Builder.Append(token.Name);
+            Builder.Append(": ");
             Builder.Append(token.Value.ToString());
-            Builder.Append(", expected : { ");
-            for (int i = 0; i != expected.Count; i++)
+            Builder.Append("; expected: { ");
+            for (int i = 0; i != this.expected.Count; i++)
             {
                 if (i != 0) Builder.Append(", ");
-                Builder.Append(expected[i]);
+                Builder.Append(this.expected[i]);
             }
             Builder.Append(" }.");
             message = Builder.ToString();
@@ -84,7 +93,7 @@ namespace Hime.Redist.Parsers
         /// Returns the string representation of this error
         /// </summary>
         /// <returns>The string representation of this error</returns>
-        public override string ToString() { return "Parser Error : unexpected token"; }
+        public override string ToString() { return message; }
     }
 
     /// <summary>
