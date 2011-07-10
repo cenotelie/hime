@@ -90,13 +90,13 @@ namespace Hime.Parsers.CF.LR
                 symbols.AppendChild(document.CreateElement("Dot"));
             root.AppendChild(symbols);
 
-            System.Xml.XmlNode lookaheads = document.CreateElement("Lookaheads");
-            foreach (Terminal terminal in lookaheads)
+            System.Xml.XmlNode lnode = document.CreateElement("Lookaheads");
+            foreach (Terminal terminal in Lookaheads)
             {
                 System.Xml.XmlNode lookahead = terminal.GetXMLNode(document);
-                lookaheads.AppendChild(lookahead);
+                lnode.AppendChild(lookahead);
             }
-            root.AppendChild(lookaheads);
+            root.AppendChild(lnode);
             return root;
         }
         private ConflictType GetXMLNode_Conflict(State set, Item item)
