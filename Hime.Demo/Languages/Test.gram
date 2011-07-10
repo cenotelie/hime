@@ -2,10 +2,20 @@
 {
 	options
 	{
-		Axiom = "S";
+		Axiom = "e";
 	}
 	terminals { }
 	rules {
-		S -> 'x' S 'x' | 'x' ;
+		e0	-> 'x'^ ;
+		e0	-> e0 '.'! "member_access"^ 'x' ;
+		e0	-> '('! e^ ')'! ;
+		e0	-> 'typeof'^ '('! t ')'! ;
+
+		e	-> e0^
+			| "cast"^ '('! t ')'! e ;
+
+		t ->  'x'^
+			| t '.'! "name_qualification"^ 'x'
+			;
 	}
 }

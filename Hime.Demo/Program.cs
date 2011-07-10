@@ -41,6 +41,21 @@
             }*/
         }
 
+        static void Parse_ANSI_C()
+        {
+            Analyser.ANSI_C_Lexer lexer = new Analyser.ANSI_C_Lexer(new System.IO.StreamReader("test.c"));
+            Analyser.ANSI_C_Parser parser = new Analyser.ANSI_C_Parser(lexer);
+            Hime.Redist.Parsers.SyntaxTreeNode root = parser.Analyse();
+
+            foreach (Hime.Redist.Parsers.LexerError error in lexer.Errors) System.Console.WriteLine(error.ToString());
+            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors) System.Console.WriteLine(error.ToString());
+            if (root != null)
+            {
+                LangTest.WinTreeView window = new LangTest.WinTreeView(root);
+                window.ShowDialog();
+            }
+        }
+
         static void Compile()
         {
             Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
@@ -48,10 +63,9 @@
             task.ExportLog = true;
             task.ExportDoc = true;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\Test.gram");
-            task.GrammarName = "Test";
-            task.ParserFile = "Test.cs";
-            task.Method = Parsers.ParsingMethod.LRStar;
+            task.InputFiles.Add("Languages\\ECMAScript.gram");
+            task.ParserFile = "ECMAScript.cs";
+            task.Method = Parsers.ParsingMethod.LALR1;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
         }
@@ -59,7 +73,7 @@
         static void Main(string[] args)
         {
             Compile();
-            //Parse_Test();
+            //Parse_ANSI_C();
             //Parse_MathExp();
         }
 

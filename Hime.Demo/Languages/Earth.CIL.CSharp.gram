@@ -19,6 +19,8 @@
 			COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
 			SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
 			
+			IDENTIFIER		-> '@'? [a-zA-Z] [a-zA-Z0-9_]* ;
+
 			NULL_LITTERAL				-> 'null' ;
 			BOOLEAN_LITTERAL_TRUE		-> 'true' ;
 			BOOLEAN_LITTERAL_FALSE		-> 'false' ;
@@ -40,8 +42,6 @@
 												| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
 											)* '"' ;
 			STRING_LITTERAL_VERBATIM	-> '@' '"' ([^"] | '""')* '"' ;
-			
-			IDENTIFIER		-> '@'? [a-zA-Z] [a-zA-Z0-9_]* ;
 		}
 		rules
 		{
@@ -330,7 +330,7 @@
 			obj_operator_modifier			-> 'public' | 'static' | 'extern' ;
 			obj_operator_modifiers			-> obj_operator_modifier* ;
 			obj_operator_binary				-> '+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | '<<' | '>>' | '==' | '!=' | '>' | '<' | '>=' | '<=' ;
-			obj_operator_unary				-> '+' | '-' | '!' | '~' | '++' | '--' | 'true' | 'false' ;
+			obj_operator_unary				-> '+' | '-' | '!' | '~' | '++' | '--' | BOOLEAN_LITTERAL_TRUE | BOOLEAN_LITTERAL_FALSE ;
 			obj_operator_body				-> ';' | stmt_block ;
 			obj_operator_binary_declarator	-> type 'operator' obj_operator_binary '(' type IDENTIFIER ',' type IDENTIFIER ')' ;
 			obj_operator_unary_declarator	-> type 'operator' obj_operator_unary '(' type IDENTIFIER ')' ;

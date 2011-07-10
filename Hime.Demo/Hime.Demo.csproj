@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generated\ANSI_C.cs" />
     <Compile Include="Generated\MathExp.cs" />
     <Compile Include="Generated\Test2.cs" />
     <Compile Include="Program.cs" />
@@ -91,20 +92,19 @@
     <Compile Include="WinTreeView.Designer.cs">
       <DependentUpon>WinTreeView.cs</DependentUpon>
     </Compile>
-    <None Include="Languages\Clojure.gram" />
+    <None Include="Languages\ANSI_C.gram">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Languages\Earth.CIL.CSharp.gram">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Languages\ECMAScript.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Languages\MathExp.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Languages\Test.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Languages\Test2.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Languages\Test3.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />
