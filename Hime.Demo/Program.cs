@@ -63,9 +63,9 @@
             task.ExportLog = true;
             task.ExportDoc = true;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\ECMAScript.gram");
-            task.ParserFile = "ECMAScript.cs";
-            task.Method = Parsers.ParsingMethod.LALR1;
+            task.InputFiles.Add("Languages\\ANSI_C.gram");
+            task.ParserFile = "ANSI_C.cs";
+            task.Method = Parsers.ParsingMethod.LRStar;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
         }
