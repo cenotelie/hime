@@ -32,20 +32,41 @@
           <xsl:text>border-top: none;</xsl:text>
         </xsl:if>
       </xsl:attribute>
-      <table border="0" cellpadding="0" cellspacing="0">
-        <xsl:apply-templates/>
+      <img src="hime_data/button_plus.gif">
+        <xsl:attribute name="id">
+          <xsl:text>button_</xsl:text>
+          <xsl:value-of select="./Header/@set"/>
+          <xsl:text>_</xsl:text>
+          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+        </xsl:attribute>
+        <xsl:attribute name="onclick">
+          <xsl:text>toggle(</xsl:text>
+          <xsl:text>button_</xsl:text>
+          <xsl:value-of select="./Header/@set"/>
+          <xsl:text>_</xsl:text>
+          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+          <xsl:text>,</xsl:text>
+          <xsl:text>conflict_</xsl:text>
+          <xsl:value-of select="./Header/@set"/>
+          <xsl:text>_</xsl:text>
+          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+          <xsl:text>)</xsl:text>
+        </xsl:attribute>
+      </img>
+      Conflict <xsl:value-of select="./Header/@type"/> in state <xsl:value-of select="./Header/@set"/> on
+      <xsl:apply-templates select="Header"/>
+      for items:
+      <table border="0" cellpadding="0" cellspacing="0" style="display: none;">
+        <xsl:attribute name="id">
+          <xsl:text>conflict_</xsl:text>
+          <xsl:value-of select="./Header/@set"/>
+          <xsl:text>_</xsl:text>
+          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+        </xsl:attribute>
+        <xsl:apply-templates select="Items"/>
+        <xsl:apply-templates select="Example"/>
       </table>
     </td>
-  </xsl:template>
-
-  <xsl:template match="Header">
-    <tr>
-      <td class="HimeDataLine">
-        Conflict <xsl:value-of select="@type"/> in state <xsl:value-of select="@set"/> on 
-        <xsl:apply-templates/>
-        for items:
-      </td>
-    </tr>
   </xsl:template>
 
   <xsl:template match="Symbol">
