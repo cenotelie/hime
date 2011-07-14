@@ -240,21 +240,25 @@ namespace Hime.Parsers.CF.LR
         }
 
 
-        public List<Terminal> GetExample(State state)
+        public List<List<Terminal>> GetInputsFor(State state)
         {
-            ICollection<Symbol> path = GetPath(state);
-            List<Terminal> sample = new List<Terminal>();
-            foreach (Symbol s in path)
+            List<List<Terminal>> result = new List<List<Terminal>>();
+            foreach (ICollection<Symbol> path in GetPaths(state))
             {
-                if (s is Terminal)
-                    sample.Add(s as Terminal);
-                else
-                    BuildSample(sample, s as CFVariable, new Stack<CFRuleDefinition>());
+                List<Terminal> input = new List<Terminal>();
+                foreach (Symbol s in path)
+                {
+                    if (s is Terminal)
+                        input.Add(s as Terminal);
+                    else
+                        BuildInput(input, s as CFVariable, new Stack<CFRuleDefinition>());
+                }
+                result.Add(input);
             }
-            return sample;
+            return result;
         }
 
-        private void BuildSample(List<Terminal> sample, CFVariable var, Stack<CFRuleDefinition> stack)
+        private void BuildInput(List<Terminal> sample, CFVariable var, Stack<CFRuleDefinition> stack)
         {
             if (var.Firsts.Contains(TerminalEpsilon.Instance))
                 return;
@@ -278,7 +282,7 @@ namespace Hime.Parsers.CF.LR
                 if (part.Symbol is Terminal)
                     sample.Add(part.Symbol as Terminal);
                 else
-                    BuildSample(sample, part.Symbol as CFVariable, stack);
+                    BuildInput(sample, part.Symbol as CFVariable, stack);
             }
             stack.Pop();
         }
@@ -296,12 +300,14 @@ namespace Hime.Parsers.CF.LR
             }
         }
 
-        private ICollection<Symbol> GetPath(State state)
+        private List<ICollection<Symbol>> GetPaths(State state)
         {
+            Dictionary<int, SortedList<ushort, ENode>> visited = new Dictionary<int, SortedList<ushort, ENode>>();
             LinkedList<ENode> queue = new LinkedList<ENode>();
+            List<ENode> goals = new List<ENode>();
             queue.AddFirst(new ENode(state, null, null));
-            ENode goal = null;
-            while (goal == null)
+            
+            while (queue.Count != 0)
             {
                 ENode current = queue.First.Value;
                 queue.RemoveFirst();
@@ -312,23 +318,36 @@ namespace Hime.Parsers.CF.LR
                 {
                     foreach (State previous in transitions[s])
                     {
-                        if (previous.ID == 0)
+                        if (visited.ContainsKey(previous.ID))
                         {
-                            goal = new ENode(previous, current, s);
-                            break;
+                            if (visited[previous.ID].ContainsKey(s.SID))
+                                continue;
                         }
                         else
-                            queue.AddLast(new ENode(previous, current, s));
+                            visited.Add(previous.ID, new SortedList<ushort, ENode>());
+                        ENode pnode = new ENode(previous, current, s);
+                        visited[previous.ID].Add(s.SID, pnode);
+                        if (previous.ID == 0)
+                            goals.Add(pnode);
+                        else
+                            queue.AddLast(pnode);
                     }
                 }
             }
-            LinkedList<Symbol> result = new LinkedList<Symbol>();
-            while (goal.next != null)
+
+            List<ICollection<Symbol>> paths = new List<ICollection<Symbol>>();
+            foreach (ENode start in goals)
             {
-                result.AddLast(goal.transition);
-                goal = goal.next;
+                ENode node = start;
+                LinkedList<Symbol> path = new LinkedList<Symbol>();
+                while (node.next != null)
+                {
+                    path.AddLast(node.transition);
+                    node = node.next;
+                }
+                paths.Add(path);
             }
-            return result;
+            return paths;
         }
     }
 }

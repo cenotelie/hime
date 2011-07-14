@@ -8,7 +8,7 @@ namespace Hime.Parsers.CF.LR
 
         public MethodRNGLALR1() { }
 
-        protected override void OnState(State state)
+        protected override void OnBeginState(State state)
         {
             foreach (Conflict conflict in state.Conflicts)
                 conflict.IsError = false;

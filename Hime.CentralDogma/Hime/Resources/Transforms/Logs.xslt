@@ -3,23 +3,13 @@
   <xsl:output method="xml" indent="yes"/>
 
   <xsl:template match="Component">
-    <td class="HimeData">
-      <xsl:attribute name="style">
-        <xsl:if test="count(parent::*/preceding-sibling::*)=0">
-          <xsl:text>border-top: none;</xsl:text>
-        </xsl:if>
-      </xsl:attribute>
+    <td class="HimeData" style="width: 75;">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
 
   <xsl:template match="Message">
     <td class="HimeData">
-      <xsl:attribute name="style">
-        <xsl:if test="count(parent::*/preceding-sibling::*)=0">
-          <xsl:text>border-top: none;</xsl:text>
-        </xsl:if>
-      </xsl:attribute>
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
@@ -32,11 +22,6 @@
 
   <xsl:template match="Conflict">
     <td class="HimeData">
-      <xsl:attribute name="style">
-        <xsl:if test="count(parent::*/preceding-sibling::*)=0">
-          <xsl:text>border-top: none;</xsl:text>
-        </xsl:if>
-      </xsl:attribute>
       <img src="hime_data/button_plus.gif">
         <xsl:attribute name="id">
           <xsl:text>button_</xsl:text>
@@ -74,21 +59,25 @@
           <xsl:text>_</xsl:text>
           <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
         </xsl:attribute>
+        <br/>
         <table border="0" cellpadding="0" cellspacing="0">
           <tr>
             <td class="HimeDataLine">Items:</td>
             <td>
-              <table border="0" cellpadding="0" cellspacing="0" style="margin-left: 10px; border-left: Solid 2px black;">
+              <table cellpadding="0" cellspacing="0" border="1" rules="all" frame="box">
                 <xsl:apply-templates select="Items"/>
               </table>
             </td>
           </tr>
         </table>
-        <table border="0" cellpadding="0" cellspacing="0">
+        <br/>
+        <table boder="0" cellpadding="0" cellspacing="0">
           <tr>
-            <td class="HimeDataLine">Input example:</td>
-            <td class="HimeDataLine">
-              <xsl:apply-templates select="Example"/>
+            <td class="HimeDataLine">Input examples:</td>
+            <td>
+              <table cellpadding="0" cellspacing="0" border="1" rules="all" frame="box">
+                <xsl:apply-templates select="Examples"/>
+              </table>
             </td>
           </tr>
         </table>
@@ -126,29 +115,57 @@
     <span>•</span>
   </xsl:template>
 
+  <xsl:template match="Example">
+    <tr>
+      <td class="HimeDataLine">
+        <xsl:attribute name="style">
+          <xsl:text>background-color: </xsl:text>
+          <xsl:choose>
+            <xsl:when test="(position() mod 4)=0">
+              <xsl:text>#FFFFFF</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>#DDDDDD</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>;</xsl:text>
+        </xsl:attribute>
+        <div style="margin: 3px;">
+          <xsl:apply-templates/>
+        </div>
+      </td>
+    </tr>
+  </xsl:template>
+  
   <xsl:template match="Item">
     <tr class="HimeLRItem">
       <td class="HimeDataLine">
-        <span class="HimeSymbolVariable">
-          <xsl:value-of select="@HeadName"/>
-        </span>
-        →
-        <xsl:apply-templates select="Symbols"/>
+        <xsl:attribute name="style">
+          <xsl:text>background-color: </xsl:text>
+          <xsl:choose>
+            <xsl:when test="(position() mod 4)=0">
+              <xsl:text>#FFFFFF</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>#DDDDDD</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>;</xsl:text>
+        </xsl:attribute>
+        <div style="margin: 3px;">
+          <span class="HimeSymbolVariable">
+            <xsl:value-of select="@HeadName"/>
+          </span>
+          →
+          <xsl:apply-templates select="Symbols"/>
+        </div>
       </td>
     </tr>
   </xsl:template>
 
   <xsl:template match="Entry">
-    <tr class="HimeEntry">
-      <td class="HimeData">
-        <xsl:attribute name="style">
-          <xsl:if test="position()=1">
-            <xsl:text>border-top: none; border-left: none; width: 15;</xsl:text>
-          </xsl:if>
-          <xsl:if test="position()>=2">
-            <xsl:text>border-left: none; width: 15;</xsl:text>
-          </xsl:if>
-        </xsl:attribute>
+    <tr>
+      <td class="HimeData" style="width: 20;">
         <xsl:if test="@mark='Info'">
           <img src="hime_data/Hime.Info.png" alt="Information" style="width: 15pt; height: 15pt;" />
         </xsl:if>
@@ -188,7 +205,7 @@
           <xsl:value-of select="@id"/>
           <xsl:text>_content</xsl:text>
         </xsl:attribute>
-        <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <table cellspacing="0" cellpadding="0" style="width: 100%;" border="1px" rules="all" frame="void" bordercolor="gray">
           <xsl:apply-templates select="Entry" />
         </table>
       </div>

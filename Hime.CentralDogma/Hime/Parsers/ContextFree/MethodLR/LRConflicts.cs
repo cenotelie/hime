@@ -9,6 +9,35 @@ namespace Hime.Parsers.CF.LR
         None
     }
 
+    class ConflictExample
+    {
+        private List<Terminal> input;
+        private Terminal lookahead;
+        private List<Terminal> rest;
+
+        public List<Terminal> Input { get { return input; } }
+        public List<Terminal> Rest { get { return rest; } }
+
+        public ConflictExample(Terminal l1)
+        {
+            input = new List<Terminal>();
+            rest = new List<Terminal>();
+            lookahead = l1;
+        }
+
+        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument doc)
+        {
+            System.Xml.XmlNode node = doc.CreateElement("Example");
+            foreach (Terminal t in input)
+                node.AppendChild(t.GetXMLNode(doc));
+            node.AppendChild(doc.CreateElement("Dot"));
+            node.AppendChild(lookahead.GetXMLNode(doc));
+            foreach (Terminal t in rest)
+                node.AppendChild(t.GetXMLNode(doc));
+            return node;
+        }
+    }
+
     class Conflict : Hime.Kernel.Reporting.Entry
     {
         private string component;
@@ -16,7 +45,7 @@ namespace Hime.Parsers.CF.LR
         private ConflictType type;
         private Terminal lookahead;
         private List<Item> items;
-        private List<Terminal> inputSample;
+        private List<ConflictExample> examples;
         private bool isError;
         private bool isResolved;
 
@@ -33,11 +62,7 @@ namespace Hime.Parsers.CF.LR
         public ConflictType ConflictType { get { return type; } }
         public Terminal ConflictSymbol { get { return lookahead; } }
         public ICollection<Item> Items { get { return items; } }
-        public List<Terminal> InputSample
-        {
-            get { return inputSample; }
-            set { inputSample = value; }
-        }
+        public List<ConflictExample> Examples { get { return examples; } }
         public bool IsError
         {
             get { return isError; }
@@ -58,6 +83,7 @@ namespace Hime.Parsers.CF.LR
             this.isError = true;
             this.isResolved = false;
             items = new List<Item>();
+            examples = new List<ConflictExample>();
         }
         public Conflict(string component, State state, ConflictType type)
         {
@@ -67,6 +93,7 @@ namespace Hime.Parsers.CF.LR
             this.isError = true;
             this.isResolved = false;
             items = new List<Item>();
+            examples = new List<ConflictExample>();
         }
 
         public void AddItem(Item Item) { items.Add(Item); }
@@ -89,15 +116,11 @@ namespace Hime.Parsers.CF.LR
                 nodeItems.AppendChild(item.GetXMLNode(doc, state));
             element.AppendChild(nodeItems);
 
-            if (inputSample != null)
-            {
-                System.Xml.XmlNode example = doc.CreateElement("Example");
-                foreach (Terminal t in inputSample)
-                    example.AppendChild(t.GetXMLNode(doc));
-                example.AppendChild(doc.CreateElement("Dot"));
-                example.AppendChild(lookahead.GetXMLNode(doc));
-                element.AppendChild(example);
-            }
+
+            System.Xml.XmlNode nexs = doc.CreateElement("Examples");
+            foreach (ConflictExample example in examples)
+                nexs.AppendChild(example.GetXMLNode(doc));
+            element.AppendChild(nexs);
             return element;
         }
 
@@ -124,19 +147,6 @@ namespace Hime.Parsers.CF.LR
                 Builder.Append(" ");
             }
             Builder.Append("}");
-            if (inputSample != null)
-            {
-                Builder.Append("\nInput example:");
-                foreach (Terminal t in inputSample)
-                {
-                    Builder.Append(" ");
-                    Builder.Append(t.ToString());
-                }
-                Builder.Append(" ");
-                Builder.Append(Item.dot);
-                Builder.Append(" ");
-                Builder.Append(lookahead.ToString());
-            }
             return Builder.ToString();
         }
     }

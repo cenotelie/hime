@@ -12,7 +12,8 @@ namespace Hime.Parsers.CF.LR
         protected Hime.Kernel.Reporting.Reporter reporter;
         protected Graph graph;
 
-        protected virtual void OnState(State state) { }
+        protected virtual void OnBeginState(State state) { }
+        protected virtual void OnConflictTreated(State state, Conflict conflict) { }
 
         protected void Close()
         {
@@ -22,6 +23,7 @@ namespace Hime.Parsers.CF.LR
             _lock = new object();
 
             int threadCount = System.Environment.ProcessorCount;
+            reporter.Info("Compiler", "Spawning " + threadCount + " threads for data building");
             while (threadCount != 0)
             {
                 SpawnWorker(threadCount);
@@ -61,17 +63,23 @@ namespace Hime.Parsers.CF.LR
             State state = GetNextState();
             while (state != null)
             {
-                OnState(state);
+                OnBeginState(state);
                 List<Conflict> unresolved = new List<Conflict>();
                 foreach (Conflict conflict in state.Conflicts)
                     if (!conflict.IsResolved)
                         unresolved.Add(conflict);
                 if (unresolved.Count != 0)
                 {
-                    List<Terminal> example = simulator.GetExample(state);
+                    List<List<Terminal>> inputs = simulator.GetInputsFor(state);
                     foreach (Conflict conflict in unresolved)
                     {
-                        conflict.InputSample = example;
+                        foreach (List<Terminal> input in inputs)
+                        {
+                            ConflictExample example = new ConflictExample(conflict.ConflictSymbol);
+                            example.Input.AddRange(input);
+                            conflict.Examples.Add(example);
+                        }
+                        OnConflictTreated(state, conflict);
                         Report(conflict);
                     }
                 }

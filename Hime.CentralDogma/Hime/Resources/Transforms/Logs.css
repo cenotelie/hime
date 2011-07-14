@@ -55,12 +55,8 @@
 	border: Solid 3px #C8C8FF;
 	border-top-style: none;
 }
-.HimeEntry
-{ }
 .HimeData
 {
-	border-top: Solid 1px Black;
-	border-left: Solid 1px Black;
 	padding-left: 5px;
 	padding-right: 5px;
 	padding-top: 3px;
@@ -100,16 +96,4 @@
     margin: 2px;
     border: 1px Solid #FF6600;
     background-color: #FFDD88;
-}
-.HimeSymbolVirtual
-{
-    padding: 1px;
-    margin: 2px;
-    background-color: #DDDDDD;
-}
-.HimeSymbolAction
-{
-    padding: 1px;
-    margin: 2px;
-    background-color: #CCFFFF;
 }

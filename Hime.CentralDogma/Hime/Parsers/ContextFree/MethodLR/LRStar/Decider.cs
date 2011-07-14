@@ -81,7 +81,7 @@ namespace Hime.Parsers.CF.LR
             }
             DeciderStateLRStar next = new DeciderStateLRStar(this, data);
             states.Add(next);
-            first.Transitions.Add(conflict.ConflictSymbol, next);
+            first.AddTransition(conflict.ConflictSymbol, next);
             origins.Add(conflict, next);
         }
 
@@ -142,6 +142,89 @@ namespace Hime.Parsers.CF.LR
                     return potential;
             states.Add(candidate);
             return candidate;
+        }
+
+        public List<ICollection<Terminal>> GetUnsolvedPaths()
+        {
+            List<DeciderStateLRStar> visited = new List<DeciderStateLRStar>();
+            List<ICollection<Terminal>> result = new List<ICollection<Terminal>>();
+            for (int i = states.Count - 1; i != -1; i--)
+            {
+                DeciderStateLRStar current = states[i];
+                foreach (Terminal terminal in current.Transitions.Keys)
+                {
+                    DeciderStateLRStar next = current.Transitions[terminal];
+                    if (terminal == TerminalDollar.Instance)
+                    {
+                        if (next.Decision == -1 && !visited.Contains(next))
+                        {
+                            visited.Add(next);
+                            result.AddRange(GetPaths(next));
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        private class ENode
+        {
+            public DeciderStateLRStar state;
+            public ENode next;
+            public Terminal transition;
+            public ENode(DeciderStateLRStar state, ENode next, Terminal transition)
+            {
+                this.state = state;
+                this.next = next;
+                this.transition = transition;
+            }
+        }
+
+        private List<ICollection<Terminal>> GetPaths(DeciderStateLRStar state)
+        {
+            Dictionary<int, SortedList<ushort, ENode>> visited = new Dictionary<int, SortedList<ushort, ENode>>();
+            LinkedList<ENode> queue = new LinkedList<ENode>();
+            List<ENode> goals = new List<ENode>();
+            queue.AddFirst(new ENode(state, null, null));
+
+            while (queue.Count != 0)
+            {
+                ENode current = queue.First.Value;
+                queue.RemoveFirst();
+                foreach (Terminal s in current.state.Incomings.Keys)
+                {
+                    foreach (DeciderStateLRStar previous in current.state.Incomings[s])
+                    {
+                        if (visited.ContainsKey(previous.ID))
+                        {
+                            if (visited[previous.ID].ContainsKey(s.SID))
+                                continue;
+                        }
+                        else
+                            visited.Add(previous.ID, new SortedList<ushort, ENode>());
+                        ENode pnode = new ENode(previous, current, s);
+                        visited[previous.ID].Add(s.SID, pnode);
+                        if (previous.ID == 0)
+                            goals.Add(pnode);
+                        else
+                            queue.AddLast(pnode);
+                    }
+                }
+            }
+
+            List<ICollection<Terminal>> paths = new List<ICollection<Terminal>>();
+            foreach (ENode start in goals)
+            {
+                ENode node = start;
+                LinkedList<Terminal> path = new LinkedList<Terminal>();
+                while (node.next != null)
+                {
+                    path.AddLast(node.transition);
+                    node = node.next;
+                }
+                paths.Add(path);
+            }
+            return paths;
         }
     }
 

@@ -544,20 +544,22 @@ namespace Hime.Parsers.CF
                 if (Token.ValueText == "?")
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
-                    SetInner.Add(new CFRuleDefinition());
+                    SetInner.Insert(0, new CFRuleDefinition());
                     return SetInner;
                 }
                 else if (Token.ValueText == "*")
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
                     CFVariable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
+                    foreach (CFRuleDefinition Def in SetInner)
+                        SubVar.AddRule(new CFRule(SubVar, Def, true));
                     CFRuleDefinitionSet SetVar = new CFRuleDefinitionSet();
                     SetVar.Add(new CFRuleDefinition(SubVar));
-                    SetVar = SetInner * SetVar;
+                    SetVar = SetVar * SetInner;
                     foreach (CFRuleDefinition Def in SetVar)
                         SubVar.AddRule(new CFRule(SubVar, Def, true));
-                    SubVar.AddRule(new CFRule(SubVar, new CFRuleDefinition(), true));
                     SetVar = new CFRuleDefinitionSet();
+                    SetVar.Add(new CFRuleDefinition());
                     SetVar.Add(new CFRuleDefinition(SubVar));
                     return SetVar;
                 }
@@ -565,12 +567,15 @@ namespace Hime.Parsers.CF
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
                     CFVariable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
+                    foreach (CFRuleDefinition Def in SetInner)
+                        SubVar.AddRule(new CFRule(SubVar, Def, true));
                     CFRuleDefinitionSet SetVar = new CFRuleDefinitionSet();
                     SetVar.Add(new CFRuleDefinition(SubVar));
-                    SetVar = SetInner * SetVar;
+                    SetVar = SetVar * SetInner;
                     foreach (CFRuleDefinition Def in SetVar)
                         SubVar.AddRule(new CFRule(SubVar, Def, true));
-                    SubVar.AddRule(new CFRule(SubVar, new CFRuleDefinition(), true));
+                    SetVar = new CFRuleDefinitionSet();
+                    SetVar.Add(new CFRuleDefinition(SubVar));
                     return SetVar;
                 }
                 else if (Token.ValueText == "^")
