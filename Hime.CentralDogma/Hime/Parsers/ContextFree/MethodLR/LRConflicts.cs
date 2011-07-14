@@ -56,7 +56,11 @@ namespace Hime.Parsers.CF.LR
                 return Kernel.Reporting.Level.Warning;
             }
         }
-        public string Component { get { return component; } }
+        public string Component
+        {
+            get { return component; }
+            set { component = value; }
+        }
         public State State { get { return state; } }
         public string Message { get { return ToString(); } }
         public ConflictType ConflictType { get { return type; } }

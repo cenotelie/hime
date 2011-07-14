@@ -55,6 +55,7 @@ namespace Hime.Parsers.CF.LR
                     example.Rest.AddRange(rest);
                 }
             }
+            conflict.Component = "LR(*)";
         }
 
         private int CompareLookaheads(ICollection<Terminal> left, ICollection<Terminal> right)
