@@ -164,7 +164,7 @@ namespace Hime.Parsers.CF.LR
         {
             kernel = Kernel;
             items = Items;
-            children = new Dictionary<Symbol, State>();
+            children = new Dictionary<Symbol, State>(Symbol.Comparer.Instance);
         }
 
         public void BuildGraph(Graph Graph)

@@ -35,6 +35,15 @@ namespace Hime.Parsers
         protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { completeName = Name; }
         public override void SymbolAddChild(Hime.Kernel.Symbol Symbol) { throw new Kernel.CannotAddChildException(this, Symbol); }
         public abstract System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc);
+
+        internal class Comparer : IEqualityComparer<Symbol>
+        {
+            public bool Equals(Symbol x, Symbol y) { return (x.sID == y.sID); }
+            public int GetHashCode(Symbol obj) { return obj.sID; }
+            private Comparer() { }
+            private static Comparer instance = new Comparer();
+            public static Comparer Instance { get { return instance; } }
+        }
     }
 
     public abstract class Terminal : Symbol

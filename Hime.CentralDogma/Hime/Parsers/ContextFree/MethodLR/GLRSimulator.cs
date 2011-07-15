@@ -4,39 +4,42 @@ namespace Hime.Parsers.CF.LR
 {
     class GLRStackNode
     {
+        private int id;
         private State state;
         private Dictionary<Symbol, Dictionary<int, GLRStackNode>> previous;
 
+        public int ID { get { return id; } }
         public State State { get { return state; } }
         public Dictionary<Symbol, Dictionary<int, GLRStackNode>> Previous { get { return previous; } }
 
         public GLRStackNode(State state)
         {
+            this.id = GetHashCode();
             this.state = state;
-            this.previous = new Dictionary<Symbol, Dictionary<int, GLRStackNode>>();
+            this.previous = new Dictionary<Symbol, Dictionary<int, GLRStackNode>>(Symbol.Comparer.Instance);
         }
 
         public void AddPrevious(Symbol symbol, GLRStackNode node)
         {
-            int id = node.GetHashCode();
             if (!previous.ContainsKey(symbol))
             {
                 Dictionary<int, GLRStackNode> nodes = new Dictionary<int, GLRStackNode>();
-                nodes.Add(id, node);
+                nodes.Add(node.id, node);
                 previous.Add(symbol, nodes);
             }
             else
             {
                 Dictionary<int, GLRStackNode> nodes = previous[symbol];
-                if (nodes.ContainsKey(id))
+                if (nodes.ContainsKey(node.id))
                     return;
-                nodes.Add(id, node);
+                nodes.Add(node.id, node);
             }
         }
     }
 
     class GLRSimulatorState
     {
+
         private IList<GLRStackNode> nodes;
         private Dictionary<int, Dictionary<int, GLRStackNode>> map;
         public IList<GLRStackNode> Nodes { get { return nodes; } }
@@ -61,8 +64,7 @@ namespace Hime.Parsers.CF.LR
             {
                 GLRStackNode node = new GLRStackNode(state);
                 Dictionary<int, GLRStackNode> temp = new Dictionary<int, GLRStackNode>();
-                int id = node.GetHashCode();
-                temp.Add(id, node);
+                temp.Add(node.ID, node);
                 map.Add(stateID, temp);
                 nodes.Add(node);
                 return node;
@@ -78,7 +80,7 @@ namespace Hime.Parsers.CF.LR
         public GLRStackNode Add(GLRStackNode node)
         {
             int stateID = node.State.ID;
-            int id = node.GetHashCode();
+            int id = node.ID;
             if (!map.ContainsKey(stateID))
             {
                 Dictionary<int, GLRStackNode> temp = new Dictionary<int, GLRStackNode>();
