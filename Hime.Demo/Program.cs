@@ -61,10 +61,10 @@
             Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDoc = true;
+            task.ExportDoc = false;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\ANSI_C.gram");
-            task.ParserFile = "ANSI_C.cs";
+            task.InputFiles.Add("Languages\\CSharp4.gram");
+            task.ParserFile = "CSharp.cs";
             task.Method = Parsers.ParsingMethod.LRStar;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();

@@ -95,10 +95,7 @@
     <None Include="Languages\ANSI_C.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Languages\Earth.CIL.CSharp.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Languages\ECMAScript.gram">
+    <None Include="Languages\CSharp4.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Languages\MathExp.gram">
