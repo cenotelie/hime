@@ -12,7 +12,7 @@ namespace Hime.Kernel.Resources
         void CreateResource(Symbol Container, Redist.Parsers.SyntaxTreeNode SyntaxNode, ResourceGraph Graph, Hime.Kernel.Reporting.Reporter Log);
         void CreateDependencies(Resource Resource, ResourceGraph Graph, Hime.Kernel.Reporting.Reporter Log);
         int CompileSolveDependencies(Resource Resource, Hime.Kernel.Reporting.Reporter Log);
-        void Compile(Resource Resource, Hime.Kernel.Reporting.Reporter Log);
+        bool Compile(Resource Resource, Hime.Kernel.Reporting.Reporter Log);
         string ToString();
     }
 }

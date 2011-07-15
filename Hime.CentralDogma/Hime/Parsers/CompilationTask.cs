@@ -174,8 +174,7 @@ namespace Hime.Parsers
             }
             foreach (string data in rawInputs)
                 compiler.AddInputRawText(data);
-            compiler.Compile(root, reporter);
-            return true;
+            return compiler.Compile(root, reporter);
         }
         private Grammar Execute_GetGrammar()
         {

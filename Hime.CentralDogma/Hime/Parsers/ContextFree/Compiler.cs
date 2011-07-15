@@ -9,6 +9,7 @@ namespace Hime.Parsers.CF
         private const string subruleHeadRadicalMultiplicity = subruleHeadRadical + "_m";
         private const string subruleHeadRadicalRestrict = subruleHeadRadical + "_r";
         private Hime.Kernel.Reporting.Reporter log;
+        private bool hasErrors;
 
         public string CompilerName { get { return "HimeSystems.CentralDogma.ContextFreeGrammarCompiler"; } }
         public int CompilerVersionMajor { get { return 1; } }
@@ -17,45 +18,45 @@ namespace Hime.Parsers.CF
 
         public CFGrammarCompiler() { }
 
-        public void CreateResource(Kernel.Symbol Container, Redist.Parsers.SyntaxTreeNode SyntaxNode, Kernel.Resources.ResourceGraph Graph, Hime.Kernel.Reporting.Reporter Log)
+        public void CreateResource(Kernel.Symbol container, Redist.Parsers.SyntaxTreeNode syntaxNode, Kernel.Resources.ResourceGraph graph, Hime.Kernel.Reporting.Reporter log)
         {
-            Kernel.SymbolAccess Access = Kernel.Resources.ResourceCompiler.CompileSymbolAccess(SyntaxNode.Children[0]);
-            string Name = ((Redist.Parsers.SymbolTokenText)SyntaxNode.Children[1].Symbol).ValueText;
+            Kernel.SymbolAccess Access = Kernel.Resources.ResourceCompiler.CompileSymbolAccess(syntaxNode.Children[0]);
+            string Name = ((Redist.Parsers.SymbolTokenText)syntaxNode.Children[1].Symbol).ValueText;
             CFGrammar Grammar = null;
             Kernel.Resources.Resource Resource = null;
             
-            if (SyntaxNode.Symbol.Name == "cf_grammar_text")
+            if (syntaxNode.Symbol.Name == "cf_grammar_text")
                 Grammar = new CFGrammarText(Name);
-            else if (SyntaxNode.Symbol.Name == "cf_grammar_bin")
+            else if (syntaxNode.Symbol.Name == "cf_grammar_bin")
                 Grammar = new CFGrammarBinary(Name);
             Grammar.Access = Access;
-            Resource = new Hime.Kernel.Resources.Resource(Grammar, SyntaxNode, this);
-            Container.SymbolAddChild(Grammar);
-            Graph.AddResource(Resource);
+            Resource = new Hime.Kernel.Resources.Resource(Grammar, syntaxNode, this);
+            container.SymbolAddChild(Grammar);
+            graph.AddResource(Resource);
         }
-        public void CreateDependencies(Kernel.Resources.Resource Resource, Kernel.Resources.ResourceGraph Graph, Hime.Kernel.Reporting.Reporter Log)
+        public void CreateDependencies(Kernel.Resources.Resource resource, Kernel.Resources.ResourceGraph graph, Hime.Kernel.Reporting.Reporter log)
         {
-            foreach (Redist.Parsers.SyntaxTreeNode Parent in Resource.SyntaxNode.Children[2].Children)
+            foreach (Redist.Parsers.SyntaxTreeNode Parent in resource.SyntaxNode.Children[2].Children)
             {
                 Kernel.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Parent);
-                Kernel.Symbol Symbol = Resource.Symbol.ResolveName(Name);
-                if (Resource.Symbol is CFGrammarText && Symbol is CFGrammarText)
-                    Resource.AddDependency("parent", Graph.GetResource(Symbol));
-                else if (Resource.Symbol is CFGrammarBinary && Symbol is CFGrammarBinary)
-                    Resource.AddDependency("parent", Graph.GetResource(Symbol));
+                Kernel.Symbol Symbol = resource.Symbol.ResolveName(Name);
+                if (resource.Symbol is CFGrammarText && Symbol is CFGrammarText)
+                    resource.AddDependency("parent", graph.GetResource(Symbol));
+                else if (resource.Symbol is CFGrammarBinary && Symbol is CFGrammarBinary)
+                    resource.AddDependency("parent", graph.GetResource(Symbol));
             }
-            if (Resource.Symbol is CFGrammarText)
+            if (resource.Symbol is CFGrammarText)
             {
-                foreach (Redist.Parsers.SyntaxTreeNode Terminal in Resource.SyntaxNode.Children[4].Children)
+                foreach (Redist.Parsers.SyntaxTreeNode Terminal in resource.SyntaxNode.Children[4].Children)
                 {
                     if (Terminal.Children[2].Children.Count == 1)
                     {
                         Kernel.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Terminal.Children[2].Children[0]);
-                        Kernel.Symbol Symbol = Resource.Symbol.ResolveName(Name);
+                        Kernel.Symbol Symbol = resource.Symbol.ResolveName(Name);
                         if (Symbol is Grammar)
                         {
                             bool Found = false;
-                            foreach (KeyValuePair<string, Kernel.Resources.Resource> D in Resource.Dependencies)
+                            foreach (KeyValuePair<string, Kernel.Resources.Resource> D in resource.Dependencies)
                             {
                                 if (D.Value.Symbol == Symbol)
                                 {
@@ -64,42 +65,44 @@ namespace Hime.Parsers.CF
                                 }
                             }
                             if (!Found)
-                                Resource.AddDependency("subgrammar", Graph.GetResource(Symbol));
+                                resource.AddDependency("subgrammar", graph.GetResource(Symbol));
                         }
                     }
                 }
             }
         }
-        public int CompileSolveDependencies(Kernel.Resources.Resource Resource, Hime.Kernel.Reporting.Reporter Log)
+        public int CompileSolveDependencies(Kernel.Resources.Resource resource, Hime.Kernel.Reporting.Reporter log)
         {
-            CFGrammar Grammar = (CFGrammar)Resource.Symbol;
+            CFGrammar grammar = resource.Symbol as CFGrammar;
             int Solved = 0;
-            for (int i = 0; i != Resource.Dependencies.Count; i++)
+            for (int i = 0; i != resource.Dependencies.Count; i++)
             {
-                if (Resource.Dependencies[i].Value.IsCompiled)
+                if (resource.Dependencies[i].Value.IsCompiled)
                 {
-                    if (Resource.Dependencies[i].Key == "parent")
-                        Grammar.Inherit((CFGrammar)Resource.Dependencies[i].Value.Symbol);
-                    Resource.Dependencies.RemoveAt(i);
+                    if (resource.Dependencies[i].Key == "parent")
+                        grammar.Inherit((CFGrammar)resource.Dependencies[i].Value.Symbol);
+                    resource.Dependencies.RemoveAt(i);
                     i--;
                     Solved++;
                 }
             }
             return Solved;
         }
-        public void Compile(Kernel.Resources.Resource Resource, Hime.Kernel.Reporting.Reporter Log)
+        public bool Compile(Kernel.Resources.Resource resource, Hime.Kernel.Reporting.Reporter log)
         {
-            log = Log;
-            if (Resource.Symbol is CFGrammarText)
+            this.log = log;
+            this.hasErrors = false;
+            if (resource.Symbol is CFGrammarText)
             {
-                Compile_Recognize_grammar_text((CFGrammar)Resource.Symbol, Resource.SyntaxNode);
-                Resource.IsCompiled = true;
+                Compile_Recognize_grammar_text((CFGrammar)resource.Symbol, resource.SyntaxNode);
+                resource.IsCompiled = true;
             }
-            else if (Resource.Symbol is CFGrammarBinary)
+            else if (resource.Symbol is CFGrammarBinary)
             {
-                Compile_Recognize_grammar_bin((CFGrammar)Resource.Symbol, Resource.SyntaxNode);
-                Resource.IsCompiled = true;
+                Compile_Recognize_grammar_bin((CFGrammar)resource.Symbol, resource.SyntaxNode);
+                resource.IsCompiled = true;
             }
+            return (!hasErrors);
         }
         public override string ToString()
         {
@@ -282,13 +285,14 @@ namespace Hime.Parsers.CF
             Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(System.Convert.ToChar(SpanBegin), System.Convert.ToChar(SpanEnd)), Final.StateExit);
             return Final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_name(CFGrammar Data, Redist.Parsers.SyntaxTreeNode Node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_name(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
-            Redist.Parsers.SymbolTokenText Token = (Redist.Parsers.SymbolTokenText)Node.Symbol;
-            Terminal Ref = Data.GetTerminal(Token.ValueText);
+            Redist.Parsers.SymbolTokenText token = (Redist.Parsers.SymbolTokenText)node.Symbol;
+            Terminal Ref = data.GetTerminal(token.ValueText);
             if (Ref == null)
             {
-                log.Error("Compiler", "Cannot find terminal " + Token.ValueText);
+                log.Error("Compiler", "@" + token.Line + " Cannot find terminal " + token.ValueText);
+                hasErrors = true;
                 Automata.NFA Final = new Hime.Parsers.Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -474,22 +478,23 @@ namespace Hime.Parsers.CF
             Set.Add(new CFRuleDefinition(Virtual));
             return Set;
         }
-        private CFRuleDefinitionSet Compile_Recognize_rule_sym_ref_simple(CFGrammar Data, CFGrammarCompilerContext Context, Redist.Parsers.SyntaxTreeNode Node)
+        private CFRuleDefinitionSet Compile_Recognize_rule_sym_ref_simple(CFGrammar data, CFGrammarCompilerContext context, Redist.Parsers.SyntaxTreeNode node)
         {
-            Redist.Parsers.SymbolTokenText Token = ((Redist.Parsers.SymbolTokenText)Node.Children[0].Symbol);
+            Redist.Parsers.SymbolTokenText token = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol);
             CFRuleDefinitionSet Defs = new CFRuleDefinitionSet();
-            if (Token.ValueText == "ε")
+            if (token.ValueText == "ε")
             {
                 Defs.Add(new CFRuleDefinition());
             }
             else
             {
-                Symbol Symbol = Compile_Tool_NameToSymbol(Token.ValueText, Data, Context);
+                Symbol Symbol = Compile_Tool_NameToSymbol(token.ValueText, data, context);
                 if (Symbol != null)
                     Defs.Add(new CFRuleDefinition(Symbol));
                 else
                 {
-                    log.Error("Compiler", "Unrecognized symbol " + Token.ValueText + " in rule definition");
+                    log.Error("Compiler", "@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
+                    hasErrors = true;
                     Defs.Add(new CFRuleDefinition());
                 }
             }

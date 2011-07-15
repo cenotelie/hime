@@ -65,10 +65,11 @@ namespace Hime.Kernel.Resources
             inputRawResources.Add(Data);
         }
 
-        public void Compile(Namespace RootNamespace, Hime.Kernel.Reporting.Reporter Log)
+        public bool Compile(Namespace root, Hime.Kernel.Reporting.Reporter log)
         {
-            outputRootNamespace = RootNamespace;
-            outputLog = Log;
+            bool hasErrors = false;
+            outputRootNamespace = root;
+            outputLog = log;
 
             outputLog.BeginSection("Compiler " + CompilerName);
             outputLog.Info("Compiler", CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString());
@@ -105,12 +106,14 @@ namespace Hime.Kernel.Resources
                     Solved += R.Compiler.CompileSolveDependencies(R, outputLog);
                     Unsolved += R.Dependencies.Count;
                     if (R.Dependencies.Count == 0)
-                        R.Compiler.Compile(R, outputLog);
+                        if (!R.Compiler.Compile(R, outputLog))
+                            hasErrors = true;
                 }
                 if (Solved == 0)
                 {  }
             }
             outputLog.EndSection();
+            return (!hasErrors);
         }
 
 

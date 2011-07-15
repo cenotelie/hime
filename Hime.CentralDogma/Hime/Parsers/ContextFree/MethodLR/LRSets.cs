@@ -4,6 +4,7 @@ namespace Hime.Parsers.CF.LR
 {
     class StateKernel
     {
+        private Dictionary<CFRule, Dictionary<int, List<Item>>> dictItems;
         private List<Item> items;
 
         public int Size { get { return items.Count; } }
@@ -11,28 +12,43 @@ namespace Hime.Parsers.CF.LR
 
         public StateKernel()
         {
+            dictItems = new Dictionary<CFRule, Dictionary<int, List<Item>>>(CFRule.Comparer.Instance);
             items = new List<Item>();
         }
 
-        public void AddItem(Item Item)
+        public void AddItem(Item item)
         {
-            if (!items.Contains(Item))
-                items.Add(Item);
+            if (!dictItems.ContainsKey(item.BaseRule))
+                dictItems.Add(item.BaseRule, new Dictionary<int, List<Item>>());
+            Dictionary<int, List<Item>> sub = dictItems[item.BaseRule];
+            if (!sub.ContainsKey(item.DotPosition))
+                sub.Add(item.DotPosition, new List<Item>());
+            sub[item.DotPosition].Add(item);
+            items.Add(item);
         }
-        public bool ContainsItem(Item Item) { return items.Contains(Item); }
+        public bool ContainsItem(Item item) {
+            if (!dictItems.ContainsKey(item.BaseRule))
+                return false;
+            Dictionary<int, List<Item>> sub = dictItems[item.BaseRule];
+            if (!sub.ContainsKey(item.DotPosition))
+                return false;
+            return sub[item.DotPosition].Contains(item);
+        }
 
         public State GetClosure()
         {
             // The set's items
-            Dictionary<CFRule, Dictionary<int, List<Item>>> map = new Dictionary<CFRule, Dictionary<int, List<Item>>>();
-            foreach (Item item in items)
+            Dictionary<CFRule, Dictionary<int, List<Item>>> map = new Dictionary<CFRule, Dictionary<int, List<Item>>>(CFRule.Comparer.Instance);
+            foreach (CFRule rule in dictItems.Keys)
             {
-                if (!map.ContainsKey(item.BaseRule))
-                    map.Add(item.BaseRule, new Dictionary<int, List<Item>>());
-                Dictionary<int, List<Item>> sub = map[item.BaseRule];
-                if (!sub.ContainsKey(item.DotPosition))
-                    sub.Add(item.DotPosition, new List<Item>());
-                sub[item.DotPosition].Add(item);
+                Dictionary<int, List<Item>> clone = new Dictionary<int, List<Item>>();
+                Dictionary<int, List<Item>> original = dictItems[rule];
+                map.Add(rule, clone);
+                foreach (int position in original.Keys)
+                {
+                    List<Item> list = new List<Item>(original[position]);
+                    clone.Add(position, list);
+                }
             }
             List<Item> closure = new List<Item>(items);
             // Close the set
@@ -41,23 +57,36 @@ namespace Hime.Parsers.CF.LR
             return new State(this, closure);
         }
 
-        public bool Equals(StateKernel Kernel)
+        public bool Equals(StateKernel kernel)
         {
-            if (items.Count != Kernel.items.Count)
+            if (this.items.Count != kernel.items.Count)
                 return false;
-            foreach (Item Item in items)
+            if (this.dictItems.Count != kernel.dictItems.Count)
+                return false;
+            foreach (CFRule rule in this.dictItems.Keys)
             {
-                if (!Kernel.items.Contains(Item))
+                if (!kernel.dictItems.ContainsKey(rule))
                     return false;
+                Dictionary<int, List<Item>> left = this.dictItems[rule];
+                Dictionary<int, List<Item>> right = kernel.dictItems[rule];
+                if (left.Count != right.Count)
+                    return false;
+                foreach (int position in left.Keys)
+                {
+                    if (!right.ContainsKey(position))
+                        return false;
+                    List<Item> l1 = left[position];
+                    List<Item> l2 = right[position];
+                    if (l1.Count != l2.Count)
+                        return false;
+                    foreach (Item item in l1)
+                        if (!l2.Contains(item))
+                            return false;
+                }
             }
             return true;
         }
-        public override bool Equals(object obj)
-        {
-            if (obj is StateKernel)
-                return Equals((StateKernel)obj);
-            return false;
-        }
+        public override bool Equals(object obj) { return Equals(obj as StateKernel); }
         public override int GetHashCode() { return base.GetHashCode(); }
     }
 
@@ -178,16 +207,8 @@ namespace Hime.Parsers.CF.LR
         }
         
 
-        public bool Equals(State Set)
-        {
-            return (kernel.Equals(Set.kernel));
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj is State)
-                return Equals((State)obj);
-            return false;
-        }
+        public bool Equals(State Set) { return (kernel.Equals(Set.kernel)); }
+        public override bool Equals(object obj) { return Equals(obj as State); }
         public override int GetHashCode() { return base.GetHashCode(); }
         public override string ToString()
         {

@@ -276,5 +276,18 @@ namespace Hime.Parsers.CF
             Builder.Append(definition.ToString());
             return Builder.ToString();
         }
+
+        internal class Comparer : IEqualityComparer<CFRule>
+        {
+            public bool Equals(CFRule x, CFRule y)
+            {
+                if (x.variable.SID != y.variable.SID) return false;
+                return (x.iD == y.iD);
+            }
+            public int GetHashCode(CFRule obj) { return ((obj.variable.SID << 16) + obj.iD); }
+            private Comparer() { }
+            private static Comparer instance = new Comparer();
+            public static Comparer Instance { get { return instance; } }
+        }
     }
 }

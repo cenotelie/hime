@@ -6,83 +6,81 @@ namespace Hime.Parsers.CF.LR
     {
         private Graph graphLR0;
         private Graph graphLALR1;
-        private Dictionary<StateKernel, State> kernelsToLR0;
-        private Dictionary<State, StateKernel> lR0ToKernels;
+        private List<StateKernel> kernels;
         private List<ItemLALR1> propagOrigins;
         private List<ItemLALR1> propagTargets;
 
-        public KernelGraph(Graph GraphLR0)
+        public KernelGraph(Graph graphLR0)
         {
-            graphLR0 = GraphLR0;
-            kernelsToLR0 = new Dictionary<StateKernel, State>();
-            lR0ToKernels = new Dictionary<State, StateKernel>();
-            propagOrigins = new List<ItemLALR1>();
-            propagTargets = new List<ItemLALR1>();
+            this.graphLR0 = graphLR0;
+            this.kernels = new List<StateKernel>();
+            this.propagOrigins = new List<ItemLALR1>();
+            this.propagTargets = new List<ItemLALR1>();
         }
 
         private void BuildKernels()
         {
             for (int i = 0; i != graphLR0.Sets.Count; i++)
             {
-                State SetLR0 = graphLR0.Sets[i];
-                StateKernel KernelLALR1 = new StateKernel();
-                foreach (Item Item in SetLR0.Kernel.Items)
+                State setLR0 = graphLR0.Sets[i];
+                StateKernel kernelLALR1 = new StateKernel();
+                foreach (Item itemLR0 in setLR0.Kernel.Items)
                 {
-                    ItemLALR1 ItemLALR1 = new ItemLALR1(Item);
+                    ItemLALR1 itemLALR1 = new ItemLALR1(itemLR0);
                     if (i == 0)
-                        ItemLALR1.Lookaheads.Add(TerminalEpsilon.Instance);
-                    KernelLALR1.AddItem(ItemLALR1);
+                        itemLALR1.Lookaheads.Add(TerminalEpsilon.Instance);
+                    kernelLALR1.AddItem(itemLALR1);
                 }
-                kernelsToLR0.Add(KernelLALR1, SetLR0);
-                lR0ToKernels.Add(SetLR0, KernelLALR1);
+                kernels.Add(kernelLALR1);
             }
         }
 
         private void BuildPropagationTable()
         {
-            foreach (StateKernel KernelLALR1 in kernelsToLR0.Keys)
+            for (int i = 0; i != kernels.Count; i++)
             {
-                State SetLR0 = kernelsToLR0[KernelLALR1];
+                StateKernel kernelLALR1 = kernels[i];
+                State setLR0 = graphLR0.Sets[i];
                 // For each LALR(1) item in the kernel
                 // Only the kernel needs to be examined as the other items will be discovered and treated
                 // with the dummy closures
-                foreach (ItemLALR1 ItemLALR1 in KernelLALR1.Items)
+                foreach (ItemLALR1 itemLALR1 in kernelLALR1.Items)
                 {
                     // If ItemLALR1 is of the form [A -> alpha .]
                     // => The closure will only contain the item itself
                     // => Cannot be used to generate or propagate lookaheads
-                    if (ItemLALR1.Action == ItemAction.Reduce)
+                    if (itemLALR1.Action == ItemAction.Reduce)
                         continue;
                     // Item here is of the form [A -> alpha . beta]
                     // Create the corresponding dummy item : [A -> alpha . beta, dummy]
                     // This item is used to detect lookahead propagation
-                    ItemLR1 DummyItem = new ItemLR1(ItemLALR1.BaseRule, ItemLALR1.DotPosition, TerminalDummy.Instance);
-                    StateKernel DummyKernel = new StateKernel();
-                    DummyKernel.AddItem(DummyItem);
-                    State DummySet = DummyKernel.GetClosure();
+                    ItemLR1 dummyItem = new ItemLR1(itemLALR1.BaseRule, itemLALR1.DotPosition, TerminalDummy.Instance);
+                    StateKernel dummyKernel = new StateKernel();
+                    dummyKernel.AddItem(dummyItem);
+                    State dummySet = dummyKernel.GetClosure();
                     // For each item in the closure of the dummy item
-                    foreach (ItemLR1 Item in DummySet.Items)
+                    foreach (ItemLR1 item in dummySet.Items)
                     {
                         // If the item action is a reduction
                         // => OnSymbol for this item will be created by the LALR(1) closure
                         // => Do nothing
-                        if (Item.Action == ItemAction.Reduce)
+                        if (item.Action == ItemAction.Reduce)
                             continue;
                         // Get the child item in the child LALR(1) kernel
-                        // SetLR0.Children[Item.NextSymbol] is the child LR(0) set by a Item.NextSymbol transition
-                        // lR0ToKernels[SetLR0.Children[Item.NextSymbol]] is then the associated LALR(1) kernel
-                        ItemLALR1 ChildLALR1 = (ItemLALR1)GetEquivalentInSet(lR0ToKernels[SetLR0.Children[Item.NextSymbol]], Item.GetChild());
+                        State childLR0 = setLR0.Children[item.NextSymbol];
+                        StateKernel childKernel = kernels[childLR0.ID];
+                        ItemLALR1 childLALR1 = (ItemLALR1)GetEquivalentInSet(childKernel, item.GetChild());
                         // If the lookaheads of the item in the dummy set contains the dummy terminal
-                        if (Item.Lookahead == TerminalDummy.Instance)
+                        if (item.Lookahead == TerminalDummy.Instance)
                         {
                             // => Propagation from the parent item to the child
-                            propagOrigins.Add(ItemLALR1);
-                            propagTargets.Add(ChildLALR1);
+                            propagOrigins.Add(itemLALR1);
+                            propagTargets.Add(childLALR1);
                         }
                         else
                         {
                             // => Spontaneous generation of lookaheads
-                            ChildLALR1.Lookaheads.Add(Item.Lookahead);
+                            childLALR1.Lookaheads.Add(item.Lookahead);
                         }
                     }
                 }
@@ -120,23 +118,23 @@ namespace Hime.Parsers.CF.LR
         {
             // Build sets
             graphLALR1 = new Graph();
-            foreach (StateKernel KernelLALR1 in kernelsToLR0.Keys)
-                graphLALR1.Add(KernelLALR1.GetClosure());
+            foreach (StateKernel kernelLALR1 in kernels)
+                graphLALR1.Add(kernelLALR1.GetClosure());
             // Link and build actions for each LALR(1) set
             for (int i = 0; i != graphLALR1.Sets.Count; i++)
             {
-                State SetLALR1 = graphLALR1.Sets[i];
-                State SetLR0 = graphLR0.Sets[i];
+                State setLALR1 = graphLALR1.Sets[i];
+                State setLR0 = graphLR0.Sets[i];
                 // Set ID
-                SetLALR1.ID = i;
+                setLALR1.ID = i;
                 // Link
-                foreach (Symbol Symbol in SetLR0.Children.Keys)
+                foreach (Symbol symbol in setLR0.Children.Keys)
                 {
-                    State ChildLALR1 = graphLALR1.Sets[graphLR0.Sets.IndexOf(SetLR0.Children[Symbol])];
-                    SetLALR1.Children.Add(Symbol, ChildLALR1);
+                    State childLALR1 = graphLALR1.Sets[setLR0.Children[symbol].ID];
+                    setLALR1.Children.Add(symbol, childLALR1);
                 }
                 // Build
-                SetLALR1.BuildReductions(new StateReductionsLALR1());
+                setLALR1.BuildReductions(new StateReductionsLALR1());
             }
         }
 
