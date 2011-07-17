@@ -18,7 +18,7 @@ namespace Hime.NUnit.himecc
             if (System.IO.Directory.Exists(p_Directory))
                 System.IO.Directory.Delete(p_Directory, true);
             System.IO.Directory.CreateDirectory(p_Directory);
-            Integration.Tools.Export(System.IO.Path.GetFileName(command[0]), command[0]);
+            new Tools().Export(System.IO.Path.GetFileName(command[0]), command[0]);
             HimeCC.Options options = HimeCC.Program.ParseArguments(command);
             HimeCC.Program.Execute(options);
         }
@@ -40,6 +40,8 @@ namespace Hime.NUnit.himecc
             return assembly;
         }
 
+        // TODO: factor all calls to new Tools (inherit from Tools and call this TestTemplate)
+        // TODO: or move the code in Tools into real classes
         [Test]
         public void Test000_Generate_ShouldNotFailBecauseResourceIsNotEmbedded()
         {
@@ -48,7 +50,7 @@ namespace Hime.NUnit.himecc
             System.IO.Directory.CreateDirectory(p_Directory);
             string fileName = "MathExp.gram";
             string command = p_Directory + "\\" + fileName;
-            Tools.Export(fileName, command);
+            new Tools().Export(fileName, command);
         }
         
         [Test]
