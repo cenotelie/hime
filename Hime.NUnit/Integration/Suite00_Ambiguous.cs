@@ -74,11 +74,22 @@ namespace Hime.NUnit.Integration
         // TODO: fix this bug
         [Ignore]
         [Test]
-        public void Test009_FindsAmbiguousGrammarLR1_Item418()
+        public void Test009_ShouldAcceptWhenNoTerminalsArePresent_Item415()
+        {
+        	string grammar = 
+        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	Assert.IsTrue(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+        }
+
+        // TODO: fix this bug
+        [Ignore]
+        [Test]
+        public void Test010_FindsAmbiguousGrammarLR1_Item418()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
         	Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
         }
+        
     }
 }
