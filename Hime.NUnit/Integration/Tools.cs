@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Hime.Parsers;
 
 namespace Hime.NUnit.Integration
 {
     static class Tools
     {
-        public static bool BuildRawText(string text, Hime.Parsers.ParsingMethod method)
+        public static bool BuildRawText(string text, ParsingMethod method)
         {
-            Parsers.CompilationTask Task = new Parsers.CompilationTask();
-            Task.InputRawData.Add(text);
-            Task.GrammarName = "Test";
-            Task.Method = method;
-            Task.Namespace = "Analyze";
-            Task.ParserFile = "TestAnalyze.cs";
-            Kernel.Reporting.Report Report = Task.Execute();
+            CompilationTask task = new Parsers.CompilationTask();
+            task.InputRawData.Add(text);
+            task.GrammarName = "Test";
+            task.Method = method;
+            task.Namespace = "Analyze";
+            task.ParserFile = "TestAnalyze.cs";
+            Kernel.Reporting.Report Report = task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
                 foreach (Kernel.Reporting.Entry entry in section.Entries)
                     if (entry.Level == Kernel.Reporting.Level.Error)
