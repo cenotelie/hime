@@ -122,7 +122,7 @@ namespace Hime.Parsers
 
         public Report Execute()
         {
-            reporter = new Reporter(typeof(CompilationTask));
+            reporter = new Reporter();
 
             try
             {
