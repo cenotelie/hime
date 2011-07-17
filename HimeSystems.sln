@@ -1,6 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
+# SharpDevelop 4.0.0.7070
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D7D1950-1B9C-48B1-B673-8171077BF7B7}"
+	ProjectSection(SolutionItems) = preProject
+		HimeSystems.vsmdi = HimeSystems.vsmdi
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+		VersionInfo.cs = VersionInfo.cs
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Demo", "Hime.Demo\Hime.Demo.csproj", "{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.CentralDogma", "Hime.CentralDogma\Hime.CentralDogma.csproj", "{BA0D93DF-9EA3-4643-A18C-E463376AADA7}"
@@ -9,17 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Redist", "Hime.Redist\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himecc", "himecc\himecc.csproj", "{7A05384E-959E-4D54-B23A-D357AC0153B5}"
 EndProject
-Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "himev", "himev\himev.csproj", "{BE838A71-2603-4AAB-841D-98C49C3B95D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himev", "himev\himev.csproj", "{BE838A71-2603-4AAB-841D-98C49C3B95D7}"
 EndProject
-Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "Hime.VSTests", "Hime.VSTests\Hime.VSTests.csproj", "{09732942-C652-4EDC-B5E0-6556517359AF}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D7D1950-1B9C-48B1-B673-8171077BF7B7}"
-	ProjectSection(SolutionItems) = preProject
-		HimeSystems.vsmdi = HimeSystems.vsmdi
-		Local.testsettings = Local.testsettings
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-		VersionInfo.cs = VersionInfo.cs
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.VSTests", "Hime.VSTests\Hime.VSTests.csproj", "{09732942-C652-4EDC-B5E0-6556517359AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.NUnit", "Hime.NUnit\Hime.NUnit.csproj", "{30BE2190-7AA2-431C-A993-8E61501ED0FF}"
 EndProject
@@ -115,8 +116,10 @@ Global
 		{BE838A71-2603-4AAB-841D-98C49C3B95D7}.Release|Any CPU.ActiveCfg = Release|x86
 		{BE838A71-2603-4AAB-841D-98C49C3B95D7}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{BE838A71-2603-4AAB-841D-98C49C3B95D7}.Release|x86.ActiveCfg = Release|x86
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
+		{09732942-C652-4EDC-B5E0-6556517359AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09732942-C652-4EDC-B5E0-6556517359AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE838A71-2603-4AAB-841D-98C49C3B95D7}.Debug|x86.Build.0 = Debug|x86
+		{BE838A71-2603-4AAB-841D-98C49C3B95D7}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Hime.Demo\Hime.Demo.csproj

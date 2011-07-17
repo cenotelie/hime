@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,10 +31,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Suite00_DefaultOptions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77" />
+    <Compile Include="himecc\Suite00_DefaultOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\himecc\himecc.csproj">
@@ -45,5 +42,14 @@
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
       <Name>Hime.CentralDogma</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="himecc" />
+    <Folder Include="Libraries" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>Libraries\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
