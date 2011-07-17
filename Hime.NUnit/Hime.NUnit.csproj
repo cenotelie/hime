@@ -9,7 +9,9 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Hime.NUnit</RootNamespace>
     <AssemblyName>Hime.NUnit</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <SourceAnalysisOverrideSettingsFile>C:\Users\Charles\AppData\Roaming\ICSharpCode/SharpDevelop4.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,10 +34,15 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="himecc\Suite00_DefaultOptions.cs" />
+    <Compile Include="himecc\Suite01_Compile.cs" />
     <Compile Include="Integration\Suite00_Ambiguous.cs" />
     <Compile Include="Integration\Tools.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
+      <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
+      <Name>Hime.Redist</Name>
+    </ProjectReference>
     <ProjectReference Include="..\himecc\himecc.csproj">
       <Project>{7A05384E-959E-4D54-B23A-D357AC0153B5}</Project>
       <Name>himecc</Name>
@@ -46,13 +53,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="himecc" />
-    <Folder Include="Libraries" />
-    <Folder Include="Integration" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework">
+    <Reference Include="nunit.framework, Version=2.5.3.9345, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <HintPath>Libraries\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MathExp.gram" />
   </ItemGroup>
 </Project>
