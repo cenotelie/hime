@@ -62,6 +62,9 @@
     <Folder Include="Resources" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\MathExp.gram" />
+    <EmbeddedResource Include="Resources\MathExp.gram" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Empty.gram" />
   </ItemGroup>
 </Project>

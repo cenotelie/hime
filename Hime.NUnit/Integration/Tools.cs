@@ -37,7 +37,6 @@ namespace Hime.NUnit.Integration
             return true;
         }
 
-
         public static void Export(string resourceName, string fileName)
         {
             System.Reflection.Assembly p_Assembly = System.Reflection.Assembly.GetExecutingAssembly();
