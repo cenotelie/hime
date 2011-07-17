@@ -45,7 +45,6 @@ namespace Hime.NUnit.Integration
             task.Execute();
         }
 
-        [Ignore]
         [Test]
         public void Test005_FindsShiftReduceForLALR1()
         {
@@ -53,8 +52,6 @@ namespace Hime.NUnit.Integration
             Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
         }
 
-        // TODO: this test seems to fail because of a stack overflow!
-        [Ignore]
         [Test]
         public void Test006_FindsShiftReduceForLR1()
         {
