@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Hime.Parsers;
 
 namespace Hime.HimeV.Model
 {
@@ -68,7 +69,7 @@ namespace Hime.HimeV.Model
         private bool Generate()
         {
             string location = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            Parsers.CompilationTask Task = new Parsers.CompilationTask();
+            CompilationTask Task = new CompilationTask();
             //TODO: complete
             //Parsers.CompilationTask.Create(p_Data, null, p_Method, p_TempNamespace, null, p_TempFile, false, false, false);
             Kernel.Reporting.Report Report = Task.Execute();

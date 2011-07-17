@@ -8,10 +8,10 @@ namespace Hime.NUnit.Integration
 {
     static class Tools
     {
-        public static bool BuildRawText(string text, ParsingMethod method)
+        public static bool BuildRawText(string grammar, ParsingMethod method)
         {
-            CompilationTask task = new Parsers.CompilationTask();
-            task.InputRawData.Add(text);
+            CompilationTask task = new CompilationTask();
+            task.InputRawData.Add(grammar);
             task.GrammarName = "Test";
             task.Method = method;
             task.Namespace = "Analyze";
@@ -23,14 +23,18 @@ namespace Hime.NUnit.Integration
                         return false;
             return true;
         }
+        
+        // TODO: try to factor all calls to new CompilationTask
+        // TODO: remove all static methods
         public static bool BuildResource(string file, string name, Hime.Parsers.ParsingMethod method)
         {
-            Parsers.CompilationTask Task = new Parsers.CompilationTask();
-            Task.InputFiles.Add(file);
-            Task.GrammarName = "Test";
-            Task.Method = method;
-            Task.Namespace = "Analyze";
-            Task.ParserFile = "TestAnalyze.cs"; Kernel.Reporting.Report Report = Task.Execute();
+            CompilationTask task = new CompilationTask();
+            task.InputFiles.Add(file);
+            task.GrammarName = "Test";
+            task.Method = method;
+            task.Namespace = "Analyze";
+            task.ParserFile = "TestAnalyze.cs"; 
+            Kernel.Reporting.Report Report = task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
                 foreach (Kernel.Reporting.Entry entry in section.Entries)
                     if (entry.Level == Kernel.Reporting.Level.Error)

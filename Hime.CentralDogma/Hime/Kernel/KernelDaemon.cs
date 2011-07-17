@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Hime.Parsers;
 
 namespace Hime.Kernel
 {
@@ -19,7 +20,7 @@ namespace Hime.Kernel
             session.CheckOut("Daemon.Generators.ContextSensitiveGrammars.gram", path + "Generators.ContextSensitiveGrammars.gram");
 
             // Compile
-            Hime.Parsers.CompilationTask task = new Parsers.CompilationTask();
+            CompilationTask task = new CompilationTask();
             task.InputFiles.Add(path + "Kernel.gram");
             task.InputFiles.Add(path + "Generators.ContextFreeGrammars.gram");
             task.InputFiles.Add(path + "Generators.ContextSensitiveGrammars.gram");

@@ -1,4 +1,6 @@
-﻿namespace Hime.Demo
+﻿using Hime.Parsers;
+
+namespace Hime.Demo
 {
     public class Program
     {        
@@ -56,9 +58,10 @@
             }
         }
 
+        // TODO: remove all static methods!!!
         static void Compile()
         {
-            Hime.Parsers.CompilationTask task = new Hime.Parsers.CompilationTask();
+        	CompilationTask task = new CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
             task.ExportDoc = false;

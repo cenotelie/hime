@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Hime.Parsers;
 
 namespace Hime.HimeCC
 {
@@ -26,9 +27,10 @@ namespace Hime.HimeCC
             return options;
         }
 
+        // TODO: remove all static methods
         public static void Execute(Options options)
         {
-            Hime.Parsers.CompilationTask task = new Parsers.CompilationTask();
+            CompilationTask task = new CompilationTask();
             foreach (string input in options.Inputs)
                 task.InputFiles.Add(input);
             task.Method = options.Method;

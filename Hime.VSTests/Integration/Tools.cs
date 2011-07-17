@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Hime.Parsers;
 
 namespace Hime.VSTests.Integration
 {
     static class Tools
     {
+    	// TODO: remove all static methods
+    	// TODO: factor calls to new CompilationTask
         public static bool BuildRawText(string text, Hime.Parsers.ParsingMethod method)
         {
-            Parsers.CompilationTask Task = new Parsers.CompilationTask();
+            CompilationTask Task = new CompilationTask();
             Task.InputRawData.Add(text);
             Task.GrammarName = "Test";
             Task.Method = method;
@@ -22,9 +25,11 @@ namespace Hime.VSTests.Integration
                         return false;
             return true;
         }
+        
+        // TODO: remove all static methods
         public static bool BuildResource(string file, string name, Hime.Parsers.ParsingMethod method)
         {
-            Parsers.CompilationTask Task = new Parsers.CompilationTask();
+            CompilationTask Task = new CompilationTask();
             Task.InputFiles.Add(file);
             Task.GrammarName = "Test";
             Task.Method = method;
