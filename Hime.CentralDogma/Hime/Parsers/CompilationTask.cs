@@ -122,42 +122,42 @@ namespace Hime.Parsers
 
         public Report Execute()
         {
-            reporter = new Reporter();
+            this.reporter = new Reporter();
 
             try
             {
-                if (!Execute_LoadData())
-                    return Execute_Exit();
-
-                Hime.Parsers.Grammar grammar = Execute_GetGrammar();
-                if (grammar == null)
-                    return Execute_Exit();
-
-                Execute_BuildGenerator();
-                if (generator == null)
-                    return Execute_Exit();
-
-                Execute_BuildData(grammar);
-                Execute_OpenOutput();
-                grammar.Build(this);
-                Execute_Close();
+            	this.ExecuteBody();
             }
             catch (Exception ex)
             {
-                reporter.Report(ex);   
+                this.reporter.Report(ex);   
             }
 
-            return Execute_Exit();
+            this.ExecuteExportLog();
+            return reporter.Result;
         }
         
-        private Hime.Kernel.Reporting.Report Execute_Exit()
+        private void ExecuteBody()
         {
-            if (exportLog)
-            {
-                string file = parserFile.Replace(".cs", "_log.mht");
-                reporter.ExportMHTML(file, "Grammar Log");
-            }
-            return reporter.Result;
+        	if (!Execute_LoadData()) return;
+
+            Grammar grammar = Execute_GetGrammar();
+            if (grammar == null) return;
+
+            Execute_BuildGenerator();
+            if (generator == null) return;
+
+            Execute_BuildData(grammar);
+            Execute_OpenOutput();
+            grammar.Build(this);
+            Execute_Close();
+        }
+        
+        private void ExecuteExportLog()
+        {
+            if (!exportLog) return;
+            string file = parserFile.Replace(".cs", "_log.mht");
+            reporter.ExportMHTML(file, "Grammar Log");
         }
 
         private bool Execute_LoadData()
@@ -181,7 +181,7 @@ namespace Hime.Parsers
         
         private Grammar Execute_GetGrammar()
         {
-            Hime.Parsers.Grammar grammar = null;
+            Grammar grammar = null;
             // TODO: think about it, what if GrammarName is null => do a test
             if (this.GrammarName != null)
             {
@@ -190,10 +190,11 @@ namespace Hime.Parsers
                 return grammar;
             }
             grammar = Execute_FindGrammar(root);
-            if (grammar != null)
-                return grammar;
-            reporter.Error("Compiler", "Cannot find any grammar");
-            return null;
+            if (grammar == null)
+            {
+	            reporter.Error("Compiler", "Cannot find any grammar");
+            }
+            return grammar;
         }
         
         private Grammar Execute_FindGrammar(Hime.Kernel.Symbol symbol)
