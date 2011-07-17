@@ -32,6 +32,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="himecc\Suite00_DefaultOptions.cs" />
+    <Compile Include="Integration\Suite00_Ambiguous.cs" />
+    <Compile Include="Integration\Tools.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\himecc\himecc.csproj">
@@ -46,6 +48,7 @@
   <ItemGroup>
     <Folder Include="himecc" />
     <Folder Include="Libraries" />
+    <Folder Include="Integration" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
