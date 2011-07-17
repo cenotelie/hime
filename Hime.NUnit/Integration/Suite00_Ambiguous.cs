@@ -70,5 +70,15 @@ namespace Hime.NUnit.Integration
         {
             Assert.IsFalse(Tools.BuildResource("LALR1-ambiguous.gram", "AmbiguousLALR1", Parsers.ParsingMethod.LR1));
         }
+        
+        // TODO: fix this bug
+        [Ignore]
+        [Test]
+        public void Test009_FindsAmbiguousGrammarLR1_Item418()
+        {
+        	string grammar = 
+        		"public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
+        	Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+        }
     }
 }
