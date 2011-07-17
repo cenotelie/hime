@@ -21,7 +21,6 @@ namespace Hime.Parsers
         // parameters
         private List<string> rawInputs;
         private List<string> fileInputs;
-        private string grammarName;
         private string _namespace;
         private ParsingMethod method;
         private string lexerFile;
@@ -35,10 +34,11 @@ namespace Hime.Parsers
 
         public ICollection<string> InputRawData { get { return rawInputs; } }
         public ICollection<string> InputFiles { get { return fileInputs; } }
+        // TODO: should never be null and should put setter as private
         public string GrammarName
         {
-            get { return grammarName; }
-            set { grammarName = value; }
+            private get; 
+            set;
         }
         public string Namespace
         {
@@ -100,7 +100,7 @@ namespace Hime.Parsers
         private string docFile;
 
         internal Kernel.Namespace Root { get { return root; } }
-        internal Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); } }
+        internal Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(this.GrammarName)); } }
         internal Kernel.Reporting.Reporter Reporter { get { return reporter; } }
         internal ParserGenerator ParserGenerator { get { return generator; } }
         internal System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
@@ -178,13 +178,15 @@ namespace Hime.Parsers
                 compiler.AddInputRawText(data);
             return compiler.Compile(root, reporter);
         }
+        
         private Grammar Execute_GetGrammar()
         {
             Hime.Parsers.Grammar grammar = null;
-            if (grammarName != null)
+            // TODO: think about it, what if GrammarName is null => do a test
+            if (this.GrammarName != null)
             {
-                try { grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(grammarName)); }
-                catch { reporter.Error("Compiler", "Cannot find grammar: " + grammarName); }
+                try { grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(this.GrammarName)); }
+                catch { reporter.Error("Compiler", "Cannot find grammar: " + this.GrammarName); }
                 return grammar;
             }
             grammar = Execute_FindGrammar(root);
@@ -193,6 +195,7 @@ namespace Hime.Parsers
             reporter.Error("Compiler", "Cannot find any grammar");
             return null;
         }
+        
         private Grammar Execute_FindGrammar(Hime.Kernel.Symbol symbol)
         {
             if (symbol is Hime.Parsers.Grammar)
