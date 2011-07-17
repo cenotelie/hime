@@ -260,6 +260,7 @@ namespace Hime.Parsers.CF.LR
             return result;
         }
 
+        // TODO: there is a bug in this method, it may call itself forever
         private void BuildInput(List<Terminal> sample, CFVariable var, Stack<CFRuleDefinition> stack)
         {
             if (var.Firsts.Contains(TerminalEpsilon.Instance))
@@ -278,13 +279,33 @@ namespace Hime.Parsers.CF.LR
             }
             if (def == null)
                 def = definitions[0];
+            CFRuleDefinition[] stackElements = stack.ToArray();
             stack.Push(def);
             foreach (RuleDefinitionPart part in def.Parts)
             {
                 if (part.Symbol is Terminal)
+                {
                     sample.Add(part.Symbol as Terminal);
+                }
                 else
-                    BuildInput(sample, part.Symbol as CFVariable, stack);
+                {
+                	bool symbolFound = false;
+                	// TODO: cleanup this code, this is really not a nice patch!!
+                	// TODO: this is surely ineficient, but I don't understand the algorithm to do better yet
+                	// The idea is to try and avoid infinite recursive call by checking the symbol was not already processed before
+                	foreach (CFRuleDefinition definition in stackElements)
+                	{
+                		foreach (RuleDefinitionPart definitionPart in definition.Parts)
+                		{
+                			if (definitionPart.Symbol.Equals(part.Symbol))
+                			{
+                				symbolFound = true;
+                			}
+                		}
+                	}
+	                // if part.Symbol is not the same as another part.symbol found in a previous definition
+                	if (!symbolFound) BuildInput(sample, part.Symbol as CFVariable, stack);
+                }
             }
             stack.Pop();
         }

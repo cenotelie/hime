@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers
 {
@@ -119,9 +120,9 @@ namespace Hime.Parsers
         }
 
 
-        public Hime.Kernel.Reporting.Report Execute()
+        public Report Execute()
         {
-            reporter = new Hime.Kernel.Reporting.Reporter(typeof(CompilationTask));
+            reporter = new Reporter(typeof(CompilationTask));
 
             try
             {
@@ -148,6 +149,7 @@ namespace Hime.Parsers
 
             return Execute_Exit();
         }
+        
         private Hime.Kernel.Reporting.Report Execute_Exit()
         {
             if (exportLog)

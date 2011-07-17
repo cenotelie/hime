@@ -32,8 +32,6 @@ namespace Hime.NUnit.Integration
             Assert.IsTrue(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
         }
 
-        // TODO: shoult not stack overflow!!
-        [Ignore]
         [Test]
         public void Test004_ShouldNotStackOverflow()
         {
