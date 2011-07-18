@@ -34,7 +34,8 @@ namespace Hime.VSTests.Integration
             Task.GrammarName = "Test";
             Task.Method = method;
             Task.Namespace = "Analyze";
-            Task.ParserFile = "TestAnalyze.cs"; Kernel.Reporting.Report Report = Task.Execute();
+            Task.ParserFile = "TestAnalyze.cs"; 
+            Kernel.Reporting.Report Report = Task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
                 foreach (Kernel.Reporting.Entry entry in section.Entries)
                     if (entry.Level == Kernel.Reporting.Level.Error)

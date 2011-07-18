@@ -117,13 +117,12 @@ namespace Hime.Parsers
             exportDoc = false;
             exportVisuals = false;
             multithreaded = true;
-        }
+            this.reporter = new Reporter();
+       }
 
 
         public Report Execute()
         {
-            this.reporter = new Reporter();
-
             try
             {
             	this.ExecuteBody();
@@ -137,7 +136,9 @@ namespace Hime.Parsers
             return reporter.Result;
         }
         
-        private void ExecuteBody()
+        // TODO: this method should really be private or internal, but this is just so nicer to test
+        // TODO: think about it, it is a sign there is a small architectural problem there
+        public void ExecuteBody()
         {
         	if (!Execute_LoadData()) return;
 
