@@ -174,7 +174,12 @@ namespace Hime.Parsers.CF
             return Rule;
         }
 
-        public abstract void Inherit(CFGrammar Parent);
+        public virtual void Inherit(CFGrammar Parent)
+        {
+            foreach (string Option in Parent.Options)
+                AddOption(Option, Parent.GetOption(Option));
+        }
+        
         public abstract CFGrammar Clone();
 
         protected void Export_Documentation(ParserData data, CompilationTask options)
@@ -368,8 +373,7 @@ namespace Hime.Parsers.CF
 
         public override void Inherit(CFGrammar Parent)
         {
-            foreach (string Option in Parent.Options)
-                AddOption(Option, Parent.GetOption(Option));
+        	base.Inherit(Parent);
             foreach (TerminalText Terminal in Parent.Terminals)
             {
                 TerminalText Clone = AddTerminalText(Terminal.LocalName, Terminal.NFA.Clone(false), Terminal.SubGrammar);
@@ -409,9 +413,9 @@ namespace Hime.Parsers.CF
         }
         public override CFGrammar Clone()
         {
-            CFGrammar Result = new CFGrammarText(name);
-            Result.Inherit(this);
-            return Result;
+            CFGrammar result = new CFGrammarText(name);
+            result.Inherit(this);
+            return result;
         }
 
         private bool Prepare_DFA(Hime.Kernel.Reporting.Reporter Log)
@@ -474,8 +478,7 @@ namespace Hime.Parsers.CF
 
         public override void Inherit(CFGrammar Parent)
         {
-            foreach (string Option in Parent.Options)
-                AddOption(Option, Parent.GetOption(Option));
+        	base.Inherit(Parent);
             foreach (TerminalBin Terminal in Parent.Terminals)
                 AddTerminalBin(Terminal.Type, Terminal.LocalName);
             foreach (CFVariable Variable in Parent.Variables)
@@ -510,6 +513,7 @@ namespace Hime.Parsers.CF
                 }
             }
         }
+        // TODO: factor code with CFGrammarText
         public override CFGrammar Clone()
         {
             CFGrammar Result = new CFGrammarBinary(name);
