@@ -34,6 +34,8 @@ namespace Hime.HimeCC
             foreach (string input in options.Inputs)
                 task.InputFiles.Add(input);
             task.Method = options.Method;
+            // TODO: this test is probably not necessary, as options.GrammarName is already equal to null
+            // TODO: remove this test
             if (options.GrammarName != null)
                 task.GrammarName = options.GrammarName;
             if (options.Namespace != null)

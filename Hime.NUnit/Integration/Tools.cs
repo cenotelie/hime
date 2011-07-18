@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Hime.Parsers;
+using Hime.Kernel.Reporting;
 
 namespace Hime.NUnit.Integration
 {
@@ -17,7 +18,7 @@ namespace Hime.NUnit.Integration
         
         // TODO: try to factor all calls to new CompilationTask
         // TODO: remove all static methods
-        public bool BuildResource(string file, string name, ParsingMethod method)
+        public bool BuildResource(string file, ParsingMethod method)
         {
             CompilationTask task = new CompilationTask();
             task.InputFiles.Add(file);
@@ -28,17 +29,8 @@ namespace Hime.NUnit.Integration
         {
             task.GrammarName = "Test";
             task.Method = method;
-            task.Namespace = "Analyze";
-            task.ParserFile = "TestAnalyze.cs"; 
-            Kernel.Reporting.Report Report = task.Execute();
-            foreach (Kernel.Reporting.Section section in Report.Sections)
-            {
-                foreach (Kernel.Reporting.Entry entry in section.Entries)
-                {
-                    if (entry.Level == Kernel.Reporting.Level.Error) return false;
-                }
-            }
-            return true;        	
+            Report report = task.Execute();
+            return !report.HasErrors();
         }
 
         public void Export(string resourceName, string fileName)

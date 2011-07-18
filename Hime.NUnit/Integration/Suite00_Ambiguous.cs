@@ -63,13 +63,13 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test007_FindsAmbigousGrammarLALR1()
         {
-            Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", "AmbiguousLALR1", Parsers.ParsingMethod.LALR1));
+            Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LALR1));
         }
 
         [Test]
         public void Test008_FindsAmbigousGrammarLR1()
         {
-            Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", "AmbiguousLALR1", Parsers.ParsingMethod.LR1));
+            Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LR1));
         }
         
         // TODO: fix this bug

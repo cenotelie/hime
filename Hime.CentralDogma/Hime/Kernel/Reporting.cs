@@ -120,34 +120,4 @@ namespace Hime.Kernel.Reporting
             return node;
         }
     }
-
-    public class Report
-    {
-        protected List<Section> sections;
-        public List<Section> Sections { get { return sections; } }
-
-        public Report()
-        {
-            sections = new List<Section>();
-        }
-
-        public Section AddSection(string name)
-        {
-            Section section = new Section(name);
-            sections.Add(section);
-            return section;
-        }
-
-        public System.Xml.XmlDocument GetXML(string title)
-        {
-            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-            Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "utf-8", "yes"));
-            Doc.AppendChild(Doc.CreateElement("Log"));
-            Doc.ChildNodes[1].Attributes.Append(Doc.CreateAttribute("title"));
-            Doc.ChildNodes[1].Attributes["title"].Value = title;
-            foreach (Section section in sections)
-                Doc.ChildNodes[1].AppendChild(section.GetXMLNode(Doc));
-            return Doc;
-        }
-    }
 }

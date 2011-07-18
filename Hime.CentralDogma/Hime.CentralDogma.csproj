@@ -75,6 +75,7 @@
     <Compile Include="Hime\Kernel\Graphs\DOTLayout.cs" />
     <Compile Include="Hime\Kernel\Graphs\DOTSerializer.cs" />
     <Compile Include="Hime\Kernel\Graphs\GMLSerializer.cs" />
+    <Compile Include="Hime\Kernel\Report.cs" />
     <Compile Include="Hime\Kernel\Reporter.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
