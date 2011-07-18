@@ -79,6 +79,7 @@
     <Compile Include="Hime\Kernel\Reporter.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFGrammarBinary.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CFGrammarText.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Compiler.cs" />

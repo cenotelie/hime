@@ -26,6 +26,8 @@ namespace Hime.NUnit.Integration
             Assert.IsFalse(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
         }
 
+        // TODO: think about it, but it seems this test sometimes fails, but not always!!!
+        // do this test inside a loop
         [Test]
         public void Test003_FindsLALR1AmbiguousAndLR1NonAmbiguous()
         {
