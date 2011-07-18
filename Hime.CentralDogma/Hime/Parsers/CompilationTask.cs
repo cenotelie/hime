@@ -144,8 +144,7 @@ namespace Hime.Parsers
             Grammar grammar = Execute_GetGrammar();
             if (grammar == null) return;
 
-            Execute_BuildGenerator();
-            if (generator == null) return;
+            this.InitializeGenerator();
 
             Execute_BuildData(grammar);
             Execute_OpenOutput();
@@ -213,31 +212,34 @@ namespace Hime.Parsers
             }
             return null;
         }
-        private void Execute_BuildGenerator()
+        
+        private void InitializeGenerator()
         {
             switch (method)
             {
                 case ParsingMethod.LR0:
-                    generator = new Hime.Parsers.CF.LR.MethodLR0();
+                    this.generator = new Hime.Parsers.CF.LR.MethodLR0();
                     return;
                 case ParsingMethod.LR1:
-                    generator = new Hime.Parsers.CF.LR.MethodLR1();
+                    this.generator = new Hime.Parsers.CF.LR.MethodLR1();
                     return;
                 case ParsingMethod.LALR1:
-                    generator = new Hime.Parsers.CF.LR.MethodLALR1();
+                    this.generator = new Hime.Parsers.CF.LR.MethodLALR1();
                     return;
                 case ParsingMethod.LRStar:
-                    generator = new Hime.Parsers.CF.LR.MethodLRStar();
+                    this.generator = new Hime.Parsers.CF.LR.MethodLRStar();
                     return;
                 case ParsingMethod.RNGLR1:
-                    generator = new Hime.Parsers.CF.LR.MethodRNGLR1();
+                    this.generator = new Hime.Parsers.CF.LR.MethodRNGLR1();
                     return;
                 case ParsingMethod.RNGLALR1:
-                    generator = new Hime.Parsers.CF.LR.MethodRNGLALR1();
+                    this.generator = new Hime.Parsers.CF.LR.MethodRNGLALR1();
                     return;
             }
             reporter.Error("Compiler", "Unsupported parsing method: " + method.ToString());
+            throw new ArgumentException("Unsupported parsing method: " + method.ToString());
         }
+        
         private void Execute_BuildData(Grammar grammar)
         {
             if (_namespace == null)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.CF
 {
@@ -437,12 +438,13 @@ namespace Hime.Parsers.CF
 
         public override bool Build(CompilationTask options)
         {
-            options.Reporter.BeginSection(name + " parser data generation");
-            if (!Prepare_AddRealAxiom(options.Reporter)) { options.Reporter.EndSection(); return false; }
-            if (!Prepare_ComputeFirsts(options.Reporter)) { options.Reporter.EndSection(); return false; }
-            if (!Prepare_ComputeFollowers(options.Reporter)) { options.Reporter.EndSection(); return false; }
-            if (!Prepare_DFA(options.Reporter)) { options.Reporter.EndSection(); return false; }
-            options.Reporter.Info("Grammar", "Lexer DFA generated");
+        	Reporter reporter = options.Reporter;
+            reporter.BeginSection(name + " parser data generation");
+            if (!Prepare_AddRealAxiom(reporter)) { reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFirsts(reporter)) { reporter.EndSection(); return false; }
+            if (!Prepare_ComputeFollowers(reporter)) { reporter.EndSection(); return false; }
+            if (!Prepare_DFA(options.Reporter)) { reporter.EndSection(); return false; }
+            reporter.Info("Grammar", "Lexer DFA generated");
 
             Terminal Separator = null;
             if (this.options.ContainsKey("Separator"))
@@ -453,8 +455,8 @@ namespace Hime.Parsers.CF
             List<Terminal> expected = LexerExporter.Export();
 
             //Generate parser
-            options.Reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
-            ParserData Data = options.ParserGenerator.Build(this, options.Reporter);
+            reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
+            ParserData Data = options.ParserGenerator.Build(this,reporter);
             if (Data == null) { options.Reporter.EndSection(); return false; }
             bool result = Data.Export(expected, options);
             options.Reporter.EndSection();
