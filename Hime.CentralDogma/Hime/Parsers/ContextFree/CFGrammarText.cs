@@ -22,8 +22,8 @@ namespace Hime.Parsers.CF
         	base.Inherit(Parent);
             foreach (TerminalText Terminal in Parent.Terminals)
             {
-                TerminalText Clone = AddTerminalText(Terminal.LocalName, Terminal.NFA.Clone(false), Terminal.SubGrammar);
-                Clone.NFA.StateExit.Final = Clone;
+                TerminalText clone = AddTerminalText(Terminal.LocalName, Terminal.NFA.Clone(false), Terminal.SubGrammar);
+                clone.NFA.StateExit.Final = clone;
             }
             foreach (CFVariable Variable in Parent.Variables)
                 AddVariable(Variable.LocalName);

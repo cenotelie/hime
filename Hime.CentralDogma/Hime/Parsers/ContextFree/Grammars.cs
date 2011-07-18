@@ -76,24 +76,24 @@ namespace Hime.Parsers.CF
 
         public TerminalText AddTerminalText(string name, Automata.NFA nfa, Grammar subGrammar)
         {
+        	TerminalText terminal;
             if (children.ContainsKey(name) && terminals.ContainsKey(name))
             {
-                TerminalText Terminal = (TerminalText)terminals[name];
-                Terminal.Priority = nextSID;
-                Terminal.NFA = nfa;
-                Terminal.SubGrammar = subGrammar;
-                nextSID++;
-                return Terminal;
+                terminal = (TerminalText)terminals[name];
+                terminal.Priority = nextSID;
+                terminal.NFA = nfa;
+                terminal.SubGrammar = subGrammar;
             }
             else
             {
-                TerminalText Terminal = new TerminalText(this, nextSID, name, nextSID, nfa, subGrammar);
-                children.Add(name, Terminal);
-                terminals.Add(name, Terminal);
-                nextSID++;
-                return Terminal;
+                terminal = new TerminalText(this, nextSID, name, nextSID, nfa, subGrammar);
+                children.Add(name, terminal);
+                terminals.Add(name, terminal);
             }
+            nextSID++;
+            return terminal;
         }
+        
         public TerminalBin AddTerminalBin(TerminalBinType Type, string Value)
         {
             if (children.ContainsKey(Value) && terminals.ContainsKey(Value))
