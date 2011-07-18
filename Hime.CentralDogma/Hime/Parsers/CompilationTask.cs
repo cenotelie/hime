@@ -255,6 +255,7 @@ namespace Hime.Parsers
             if (exportDoc)
                 docFile = parserFile.Replace(".cs", "_doc.mht");
         }
+        
         private void Execute_OpenOutput()
         {
             if (lexerFile == null)

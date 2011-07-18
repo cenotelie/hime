@@ -72,10 +72,18 @@ namespace Hime.NUnit.Integration
             Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LR1));
         }
         
-        // TODO: fix this bug
         [Ignore]
         [Test]
         public void Test009_ShouldAcceptWhenNoTerminalsArePresent_Item415()
+        {
+        	string grammar = 
+        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	Assert.IsTrue(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR0));
+        }
+
+        [Ignore]
+        [Test]
+        public void Test010_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
@@ -85,7 +93,7 @@ namespace Hime.NUnit.Integration
         // TODO: fix this bug
         [Ignore]
         [Test]
-        public void Test010_FindsAmbiguousGrammarLR1_Item418()
+        public void Test011_FindsAmbiguousGrammarLR1_Item418()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
