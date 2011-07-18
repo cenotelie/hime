@@ -4,19 +4,17 @@ namespace Hime.Parsers
 {
     public abstract class Symbol : Hime.Kernel.Symbol
     {
-        protected Grammar parent;
         protected ushort sID;
         protected string localName;
         protected Hime.Kernel.QualifiedName completeName;
 
         public ushort SID { get { return sID; } }
-        public override Hime.Kernel.Symbol Parent { get { return parent; } }
         public override string LocalName { get { return localName; } }
         public override Hime.Kernel.QualifiedName CompleteName { get { return completeName; } }
 
-        public Symbol(Grammar Parent, ushort SID, string Name) : base()
+        public Symbol(Grammar parent, ushort SID, string Name) : base()
         {
-            parent = Parent;
+            this.Parent = parent;
             sID = SID;
             localName = Name;
             if (Parent == null)
@@ -28,7 +26,7 @@ namespace Hime.Parsers
         protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol)
         {
             if (Symbol is Grammar)
-                parent = (Grammar)Symbol;
+                this.Parent = (Grammar)Symbol;
             else
                 throw new Kernel.WrongParentSymbolException(this, Symbol.GetType(), typeof(Grammar));
         }

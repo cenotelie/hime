@@ -166,7 +166,7 @@ namespace Hime.Kernel
         protected SymbolAccess access;
         protected Dictionary<string, Symbol> children;
 
-        public abstract Symbol Parent { get; }
+        public Symbol Parent { get; protected set; }
         public abstract string LocalName { get; }
         public abstract QualifiedName CompleteName { get; }
         public SymbolAccess Access
@@ -227,18 +227,16 @@ namespace Hime.Kernel
 
     public class Namespace : Symbol
     {
-        private Namespace parent;
         private string localName;
         private QualifiedName completeName;
         private Dictionary<string, Namespace> namespaces;
 
-        public override Symbol Parent { get { return parent; } }
         public override string LocalName { get { return localName; } }
         public override QualifiedName CompleteName { get { return completeName; } }
 
         public Namespace(Namespace parent, string name) : base()
         {
-            this.parent = parent;
+            this.Parent = parent;
             localName = name;
             if (parent == null)
                 completeName = new QualifiedName(new List<string>());
@@ -264,7 +262,7 @@ namespace Hime.Kernel
             {
                 throw new WrongParentSymbolException(this, symbol.GetType(),typeof(Namespace));
             }
-            this.parent = (Namespace)symbol;
+            this.Parent = (Namespace)symbol;
         }
         protected override void SymbolSetCompleteName(QualifiedName name) { completeName = name; }
 
