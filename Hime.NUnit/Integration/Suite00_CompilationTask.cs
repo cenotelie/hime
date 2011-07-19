@@ -14,7 +14,6 @@ namespace Hime.NUnit.Integration
 	[TestFixture]
 	public class Suite00_CompilationTask
 	{
-		[Ignore]
 		[Test]
         public void Test000_ExecuteBody_LR0_ShouldNotFailOnSimpleGrammar()
         {
