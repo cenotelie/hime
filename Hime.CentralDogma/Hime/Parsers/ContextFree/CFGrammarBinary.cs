@@ -70,14 +70,14 @@ namespace Hime.Parsers.CF
 
             //Generate parser
             options.Reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
-            ParserData Data = options.ParserGenerator.Build(this, options.Reporter);
-            if (Data == null) { options.Reporter.EndSection(); return false; }
-            bool result = Data.Export(new List<Terminal>(terminals.Values), options);
+            ParserData data = options.ParserGenerator.Build(this, options.Reporter);
+            if (data == null) { options.Reporter.EndSection(); return false; }
+            bool result = data.Export(new List<Terminal>(this.Terminals), options);
             options.Reporter.EndSection();
             
             //Output data
             if (options.Documentation != null)
-                Export_Documentation(Data, options);
+                Export_Documentation(data, options);
             return result;
         }
     }

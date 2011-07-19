@@ -9,8 +9,9 @@ namespace Hime.Parsers.CF.LR
             get
             {
                 TerminalSet Set = new TerminalSet();
-                if (this.Count != 0)
+                if (this.Count != 0) {
                     Set.Add(this[0].Lookahead);
+                }
                 return Set;
             }
         }

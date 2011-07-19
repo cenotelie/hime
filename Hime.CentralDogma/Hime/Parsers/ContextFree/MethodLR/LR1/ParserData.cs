@@ -133,6 +133,7 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine("        };");
         }
+        
         protected void Export_State(State state)
         {
             TerminalSet expected = state.Reductions.ExpectedTerminals;

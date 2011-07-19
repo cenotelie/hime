@@ -121,6 +121,7 @@
     <Compile Include="Hime\Parsers\Automata\DFA.cs" />
     <Compile Include="Hime\Parsers\Exporters.cs" />
     <Compile Include="Hime\Parsers\Grammars.cs" />
+    <Compile Include="Hime\Parsers\Terminal.cs" />
     <Compile Include="Hime\Parsers\TerminalSet.cs" />
     <Compile Include="Hime\Parsers\Unicode.cs" />
     <Compile Include="Hime\Parsers\Rules.cs" />
