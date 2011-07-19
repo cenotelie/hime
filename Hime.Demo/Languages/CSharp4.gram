@@ -551,8 +551,8 @@
 										|  '~'
 										|  '++'
 										|  '--'
-										|  'true'
-										|  'false' ;
+										|  BOOLEAN_LITTERAL_TRUE
+										|  BOOLEAN_LITTERAL_FALSE ;
 		class_operator_decl_binary		-> type 'operator' overload_op_binary
 											'(' type IDENTIFIER ',' type IDENTIFIER ')' ;
 		overload_op_binary				-> '+'

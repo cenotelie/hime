@@ -10,11 +10,11 @@
 						|  0x2028 /* LS */
 						|  0x2029 /* PS */ ;
 		WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
-		COMMENT_LINE	-> '//' (0x0000 .. 0xFFFF - NEW_LINE) NEW_LINE ;
-		COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
+		COMMENT_LINE	-> '//' (.* - (.* NEW_LINE .*)) NEW_LINE ;
+		COMMENT_BLOCK	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
 		
-		IDENTIFIER		-> '@'? [a-zA-Z] [a-zA-Z0-9_]* ;
+		IDENTIFIER		-> [a-zA-Z_] [a-zA-Z0-9_]* ;
 		
 		NULL_LITTERAL				-> 'null' ;
 		BOOLEAN_LITTERAL_TRUE		-> 'true' ;
@@ -38,6 +38,8 @@
 								)* '"' ;
 	}
 	rules {
+		/* A.2.1 Expressions */
+		
 		primary_expression -> IDENTIFIER
 			| NULL_LITTERAL
 			| BOOLEAN_LITTERAL_TRUE
@@ -47,37 +49,29 @@
 			| REAL_LITTERAL
 			| CHARACTER_LITTERAL
 			| STRING_LITERAL
-			| '(' expression ')'
-			;
+			| '(' expression ')' ;
 
 		postfix_expression -> primary_expression
 			| postfix_expression '[' expression ']'
-			| postfix_expression '(' ')'
-			| postfix_expression '(' argument_expression_list ')'
+			| postfix_expression '(' argument_expression_list? ')'
 			| postfix_expression '.' IDENTIFIER
 			| postfix_expression '->' IDENTIFIER
 			| postfix_expression '++'
-			| postfix_expression '--'
-			;
+			| postfix_expression '--' ;
 
-		argument_expression_list -> assignment_expression
-			| argument_expression_list ',' assignment_expression
-			;
+		argument_expression_list -> assignment_expression (',' assignment_expression)* ;
 
 		unary_expression -> postfix_expression
 			| '++' unary_expression
 			| '--' unary_expression
-			| unary_operator cast_expression
+			| '&' cast_expression
+			| '*' cast_expression
+			| '+' cast_expression
+			| '-' cast_expression
+			| '~' cast_expression
+			| '!' cast_expression
 			| 'sizeof' unary_expression
 			| 'sizeof' '(' type_name ')'
-			;
-
-		unary_operator -> '&'
-			| '*'
-			| '+'
-			| '-'
-			| '~'
-			| '!'
 			;
 
 		cast_expression -> unary_expression
@@ -137,20 +131,17 @@
 			;
 
 		assignment_expression -> conditional_expression
-			| unary_expression assignment_operator assignment_expression
-			;
-
-		assignment_operator -> '='
-			| '*='
-			| '/='
-			| '%='
-			| '+='
-			| '-='
-			| '<<='
-			| '>>='
-			| '&='
-			| '^='
-			| '|='
+			| unary_expression '=' assignment_expression
+			| unary_expression '*=' assignment_expression
+			| unary_expression '/=' assignment_expression
+			| unary_expression '%=' assignment_expression
+			| unary_expression '+=' assignment_expression
+			| unary_expression '-=' assignment_expression
+			| unary_expression '<<=' assignment_expression
+			| unary_expression '>>=' assignment_expression
+			| unary_expression '&=' assignment_expression
+			| unary_expression '^=' assignment_expression
+			| unary_expression '|=' assignment_expression
 			;
 
 		expression -> assignment_expression
@@ -160,17 +151,16 @@
 		constant_expression -> conditional_expression
 			;
 
-		declaration -> declaration_specifiers ';'
-			| declaration_specifiers init_declarator_list ';'
-			;
+			
+			
+		/* A.2.2 Declarations */
+		
+		declaration -> declaration_specifiers init_declarator_list? ';' ;
 
-		declaration_specifiers -> storage_class_specifier
-			| storage_class_specifier declaration_specifiers
-			| type_specifier
-			| type_specifier declaration_specifiers
-			| type_qualifier
-			| type_qualifier declaration_specifiers
-			;
+		declaration_specifiers -> storage_class_specifier declaration_specifiers?
+								| type_specifier declaration_specifiers?
+								| type_qualifier declaration_specifiers?
+								;
 
 		init_declarator_list -> init_declarator
 			| init_declarator_list ',' init_declarator
@@ -188,18 +178,17 @@
 			;
 
 		type_specifier -> 'void'
-			| 'char'
-			| 'short'
-			| 'int'
-			| 'long'
-			| 'float'
-			| 'double'
-			| 'signed'
-			| 'unsigned'
-			| struct_or_union_specifier
-			| enum_specifier
-			| IDENTIFIER
-			;
+						| 'char'
+						| 'short'
+						| 'int'
+						| 'long'
+						| 'float'
+						| 'double'
+						| 'signed'
+						| 'unsigned'
+						| struct_or_union_specifier
+						| enum_specifier
+						| IDENTIFIER ;
 
 		struct_or_union_specifier -> struct_or_union IDENTIFIER '{' struct_declaration_list '}'
 			| struct_or_union '{' struct_declaration_list '}'
