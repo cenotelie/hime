@@ -23,6 +23,9 @@ namespace Hime.Parsers
             content = new SortedList<ushort, Terminal>(copied.content);
         }
 
+        /**
+         * Assumes item is not null.
+         * */
         public bool Add(Terminal item)
         {
             if (content.ContainsKey(item.SID))

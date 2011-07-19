@@ -16,7 +16,7 @@ namespace Hime.NUnit.Integration
 	{
 		[Ignore]
 		[Test]
-        public void Test000_ShouldNotFailWhenSectionTerminalsIsNotPresent()
+        public void Test000_ExecuteBody_LR0_ShouldNotFailOnSimpleGrammar()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";

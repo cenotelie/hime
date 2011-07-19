@@ -8,11 +8,16 @@ namespace Hime.Parsers.CF.LR
         {
             get
             {
-                TerminalSet Set = new TerminalSet();
-                if (this.Count != 0) {
-                    Set.Add(this[0].Lookahead);
-                }
-                return Set;
+                TerminalSet result = new TerminalSet();
+                if (this.Count == 0) return result;
+                /* ???
+                // This is really a bit of a hack, but otherwise, seems not to work in LR0
+                // maybe this is always the case that it is null
+                // TODO: should really think about this, not nice
+                if (this[0].Lookahead == null) return result;
+                */
+                result.Add(this[0].Lookahead);
+                return result;
             }
         }
 
