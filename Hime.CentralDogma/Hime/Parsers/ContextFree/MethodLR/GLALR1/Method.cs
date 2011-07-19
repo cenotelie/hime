@@ -14,10 +14,10 @@ namespace Hime.Parsers.CF.LR
             Reporter.Info("GLALR(1)", "Constructing GLALR(1) data ...");
             Graph Graph = ConstructGraph(Grammar, Reporter);
             // Output conflicts
-            foreach (State Set in Graph.Sets)
+            foreach (State Set in Graph.States)
                 foreach (Conflict Conflict in Set.Conflicts)
                     Reporter.Report(Conflict);
-            Reporter.Info("GLALR(1)", Graph.Sets.Count.ToString() + " states explored.");
+            Reporter.Info("GLALR(1)", Graph.States.Count.ToString() + " states explored.");
             Reporter.Info("GLALR(1)", "Done !");
             return new ParserDataGLR1(this, Grammar, Graph);
         }
@@ -25,7 +25,7 @@ namespace Hime.Parsers.CF.LR
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             Graph GraphLALR1 = MethodLALR1.ConstructGraph(Grammar, Log);
-            foreach (State Set in GraphLALR1.Sets)
+            foreach (State Set in GraphLALR1.States)
                 Set.BuildReductions(new StateReductionsGLALR1());
             return GraphLALR1;
         }

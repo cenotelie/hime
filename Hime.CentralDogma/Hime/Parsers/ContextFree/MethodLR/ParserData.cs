@@ -28,7 +28,7 @@ namespace Hime.Parsers.CF.LR
         public System.Xml.XmlNode SerializeXML(System.Xml.XmlDocument Document)
         {
             System.Xml.XmlNode nodegraph = Document.CreateElement("LRGraph");
-            foreach (State set in graph.Sets)
+            foreach (State set in graph.States)
                 nodegraph.AppendChild(GetXMLData_Set(Document, set));
             return nodegraph;
         }
@@ -60,9 +60,9 @@ namespace Hime.Parsers.CF.LR
         public virtual List<string> SerializeVisuals(string directory, CompilationTask options)
         {
             Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
-            foreach (State set in graph.Sets)
+            foreach (State set in graph.States)
                 serializer.WriteNode(set.ID.ToString("X"), set.ID.ToString("X"), "Set_" + set.ID.ToString("X") + ".html");
-            foreach (State set in graph.Sets)
+            foreach (State set in graph.States)
                 foreach (Symbol symbol in set.Children.Keys)
                     serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.ToString().Replace("\"", "\\\""));
             serializer.Close();

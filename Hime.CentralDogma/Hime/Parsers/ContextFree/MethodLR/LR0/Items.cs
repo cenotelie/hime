@@ -4,11 +4,11 @@ namespace Hime.Parsers.CF.LR
 {
     class ItemLR0 : Item
     {
-        private static TerminalSet emptySet = new TerminalSet();
+        internal static TerminalSet EmptySet = new TerminalSet();
 
         public ItemLR0(CFRule Rule, int DotPosition) : base(Rule, DotPosition) { }
 
-        public override TerminalSet Lookaheads { get { return emptySet; } }
+        public override TerminalSet Lookaheads { get { return EmptySet; } }
 
         public override Item GetChild()
         {

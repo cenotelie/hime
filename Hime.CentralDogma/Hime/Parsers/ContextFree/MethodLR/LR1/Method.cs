@@ -15,7 +15,7 @@ namespace Hime.Parsers.CF.LR
             reporter.Info("LR(1)", "Constructing LR(1) data ...");
             graph = ConstructGraph(grammar, reporter);
             Close();
-            reporter.Info("LR(1)", graph.Sets.Count.ToString() + " states explored.");
+            reporter.Info("LR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("LR(1)", "Done !");
             return new ParserDataLR1(this, grammar, graph);
         }
@@ -30,13 +30,13 @@ namespace Hime.Parsers.CF.LR
             State AxiomSet = AxiomKernel.GetClosure();
             Graph Graph = new Graph();
             // Construct the graph
-            Graph.Sets.Add(AxiomSet);
-            for (int i = 0; i != Graph.Sets.Count; i++)
+            Graph.States.Add(AxiomSet);
+            for (int i = 0; i != Graph.States.Count; i++)
             {
-                Graph.Sets[i].BuildGraph(Graph);
-                Graph.Sets[i].ID = i;
+                Graph.States[i].BuildGraph(Graph);
+                Graph.States[i].ID = i;
             }
-            foreach (State Set in Graph.Sets)
+            foreach (State Set in Graph.States)
                 Set.BuildReductions(new StateReductionsLR1());
             return Graph;
         }

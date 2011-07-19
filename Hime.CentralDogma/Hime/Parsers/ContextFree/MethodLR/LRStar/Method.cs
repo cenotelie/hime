@@ -72,7 +72,7 @@ namespace Hime.Parsers.CF.LR
             deciders = new Dictionary<State, DeciderLRStar>();
             lookaheads = new Dictionary<State, List<ICollection<Terminal>>>();
             Close();
-            reporter.Info("LR(*)", graph.Sets.Count.ToString() + " LALR(1) states constructed.");
+            reporter.Info("LR(*)", graph.States.Count.ToString() + " LALR(1) states constructed.");
             reporter.Info("LR(*)", "Done !");
             return new ParserDataLRStar(this, grammar, graph, deciders);
         }

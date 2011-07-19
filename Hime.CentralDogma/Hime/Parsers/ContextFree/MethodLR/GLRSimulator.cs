@@ -116,7 +116,7 @@ namespace Hime.Parsers.CF.LR
 
         private void BuildInverse()
         {
-            foreach (State set in graph.Sets)
+            foreach (State set in graph.States)
             {
                 foreach (Symbol symbol in set.Children.Keys)
                 {

@@ -21,7 +21,7 @@ namespace Hime.Parsers.CF.LR
             reporter.Info("RNGLR(1)", "Constructing RNGLR(1) data ...");
             graph = ConstructGraph(grammar, reporter);
             Close();
-            reporter.Info("RNGLR(1)", graph.Sets.Count.ToString() + " states explored.");
+            reporter.Info("RNGLR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("RNGLR(1)", "Done !");
             return new ParserDataRNGLR1(this, grammar, graph);
         }
@@ -29,7 +29,7 @@ namespace Hime.Parsers.CF.LR
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             Graph GraphLR1 = MethodLR1.ConstructGraph(Grammar, Log);
-            foreach (State Set in GraphLR1.Sets)
+            foreach (State Set in GraphLR1.States)
                 Set.BuildReductions(new StateReductionsRNGLR1());
             return GraphLR1;
         }

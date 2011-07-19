@@ -6,7 +6,7 @@ namespace Hime.Parsers.CF.LR
     {
         private List<State> sets;
 
-        public List<State> Sets { get { return sets; } }
+        public List<State> States { get { return sets; } }
 
         public Graph()
         {

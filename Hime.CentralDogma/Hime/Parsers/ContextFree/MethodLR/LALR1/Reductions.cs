@@ -17,27 +17,27 @@ namespace Hime.Parsers.CF.LR
 
         public StateReductionsLALR1() : base() { }
 
-        public override void Build(State Set)
+        public override void Build(State set)
         {
             // Recutions dictionnary for the given set
             Dictionary<Terminal, ItemLALR1> Reductions = new Dictionary<Terminal, ItemLALR1>();
             // Construct reductions
-            foreach (ItemLALR1 Item in Set.Items)
+            foreach (ItemLALR1 item in set.Items)
             {
-                if (Item.Action == ItemAction.Shift)
+                if (item.Action == ItemAction.Shift)
                     continue;
-                foreach (Terminal Lookahead in Item.Lookaheads)
+                foreach (Terminal lookahead in item.Lookaheads)
                 {
                     // There is already a shift action for the lookahead => conflict
-                    if (Set.Children.ContainsKey(Lookahead))
-                        StateReductionsLR1.HandleConflict_ShiftReduce("LALR(1)", conflicts, Item, Set, Lookahead);
+                    if (set.Children.ContainsKey(lookahead))
+                        StateReductionsLR1.HandleConflict_ShiftReduce("LALR(1)", conflicts, item, set, lookahead);
                     // There is already a reduction action for the lookahead => conflict
-                    else if (Reductions.ContainsKey(Lookahead))
-                        StateReductionsLR1.HandleConflict_ReduceReduce("LALR(1)", conflicts, Item, Reductions[Lookahead], Set, Lookahead);
+                    else if (Reductions.ContainsKey(lookahead))
+                        StateReductionsLR1.HandleConflict_ReduceReduce("LALR(1)", conflicts, item, Reductions[lookahead], set, lookahead);
                     else // No conflict
                     {
-                        Reductions.Add(Lookahead, Item);
-                        this.Add(new StateActionReduce(Lookahead, Item.BaseRule));
+                        Reductions.Add(lookahead, item);
+                        this.Add(new StateActionReduce(lookahead, item.BaseRule));
                     }
                 }
             }

@@ -19,7 +19,7 @@ namespace Hime.Parsers.CF.LR
         {
             simulator = new GLRSimulator(graph);
             workers = new List<System.Threading.Thread>();
-            enumerator = graph.Sets.GetEnumerator();
+            enumerator = graph.States.GetEnumerator();
             _lock = new object();
 
             int threadCount = System.Environment.ProcessorCount;

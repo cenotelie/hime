@@ -20,9 +20,7 @@ namespace Hime.Parsers.CF.LR
 
         public StateActionReduce(Terminal Lookahead, CFRule ToReduce)
         {
-        	// the assumption is most probably that the Lookahead should be non-null
-//        	if (lookahead == null) throw new NotSupportedException();
-            lookahead = Lookahead;
+        	lookahead = Lookahead;
             toReduce = ToReduce;
         }
     }

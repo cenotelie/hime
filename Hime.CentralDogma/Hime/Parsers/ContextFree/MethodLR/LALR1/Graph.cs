@@ -20,9 +20,9 @@ namespace Hime.Parsers.CF.LR
 
         private void BuildKernels()
         {
-            for (int i = 0; i != graphLR0.Sets.Count; i++)
+            for (int i = 0; i != graphLR0.States.Count; i++)
             {
-                State setLR0 = graphLR0.Sets[i];
+                State setLR0 = graphLR0.States[i];
                 StateKernel kernelLALR1 = new StateKernel();
                 foreach (Item itemLR0 in setLR0.Kernel.Items)
                 {
@@ -40,7 +40,7 @@ namespace Hime.Parsers.CF.LR
             for (int i = 0; i != kernels.Count; i++)
             {
                 StateKernel kernelLALR1 = kernels[i];
-                State setLR0 = graphLR0.Sets[i];
+                State setLR0 = graphLR0.States[i];
                 // For each LALR(1) item in the kernel
                 // Only the kernel needs to be examined as the other items will be discovered and treated
                 // with the dummy closures
@@ -121,16 +121,16 @@ namespace Hime.Parsers.CF.LR
             foreach (StateKernel kernelLALR1 in kernels)
                 graphLALR1.Add(kernelLALR1.GetClosure());
             // Link and build actions for each LALR(1) set
-            for (int i = 0; i != graphLALR1.Sets.Count; i++)
+            for (int i = 0; i != graphLALR1.States.Count; i++)
             {
-                State setLALR1 = graphLALR1.Sets[i];
-                State setLR0 = graphLR0.Sets[i];
+                State setLALR1 = graphLALR1.States[i];
+                State setLR0 = graphLR0.States[i];
                 // Set ID
                 setLALR1.ID = i;
                 // Link
                 foreach (Symbol symbol in setLR0.Children.Keys)
                 {
-                    State childLALR1 = graphLALR1.Sets[setLR0.Children[symbol].ID];
+                    State childLALR1 = graphLALR1.States[setLR0.Children[symbol].ID];
                     setLALR1.Children.Add(symbol, childLALR1);
                 }
                 // Build

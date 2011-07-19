@@ -15,7 +15,7 @@ namespace Hime.Parsers.CF.LR
             reporter.Info("LALR(1)", "Constructing LALR(1) data ...");
             graph = ConstructGraph(grammar, reporter);
             Close();
-            reporter.Info("LALR(1)", graph.Sets.Count.ToString() + " states explored.");
+            reporter.Info("LALR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("LALR(1)", "Done !");
             return new ParserDataLR1(this, grammar, graph);
         }

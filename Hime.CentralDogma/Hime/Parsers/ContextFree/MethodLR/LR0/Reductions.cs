@@ -6,52 +6,39 @@ namespace Hime.Parsers.CF.LR
     {
         public override TerminalSet ExpectedTerminals
         {
-            get
-            {
-                TerminalSet result = new TerminalSet();
-                if (this.Count == 0) return result;
-                /* ???
-                // This is really a bit of a hack, but otherwise, seems not to work in LR0
-                // maybe this is always the case that it is null
-                // TODO: should really think about this, not nice
-                if (this[0].Lookahead == null) return result;
-                */
-                result.Add(this[0].Lookahead);
-                return new TerminalSet();
-            }
+            get { return ItemLR0.EmptySet; }
         }
 
         public StateReductionsLR0() : base() { }
 
         public override void Build(State Set)
         {
-            Item Reduce = null;
+            Item reduce = null;
             // Look for Reduce actions
-            foreach (Item Item in Set.Items)
+            foreach (Item item in Set.Items)
             {
                 // Ignore Shift actions
-                if (Item.Action == ItemAction.Shift)
+                if (item.Action == ItemAction.Shift)
                     continue;
                 if (Set.Children.Count != 0)
                 {
                     // Conflict Shift/Reduce
-                    Conflict Conflict = new Conflict("MethodLR0", Set, ConflictType.ShiftReduce);
-                    Conflict.AddItem(Item);
+                    Conflict Conflict = new Conflict("LR(0)", Set, ConflictType.ShiftReduce);
+                    Conflict.AddItem(item);
                     conflicts.Add(Conflict);
                 }
-                if (Reduce != null)
+                if (reduce != null)
                 {
                     // Conflict Reduce/Reduce
-                    Conflict Conflict = new Conflict("MethodLR0", Set, ConflictType.ReduceReduce);
-                    Conflict.AddItem(Item);
-                    Conflict.AddItem(Reduce);
+                    Conflict Conflict = new Conflict("LR(0)", Set, ConflictType.ReduceReduce);
+                    Conflict.AddItem(item);
+                    Conflict.AddItem(reduce);
                     conflicts.Add(Conflict);
                 }
                 else
                 {
-                	// all problems seem to stem from the fact that the first argument here is null
-                    this.Add(new StateActionReduce(null, Item.BaseRule));
-                    Reduce = Item;
+                	this.Add(new StateActionReduce(null, item.BaseRule));
+                    reduce = item;
                 }
             }
         }

@@ -282,7 +282,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.WriteLine("        private static State[] staticStates = {");
             bool first = true;
-            foreach (State State in graph.Sets)
+            foreach (State State in graph.States)
             {
                 stream.Write("            ");
                 if (!first) stream.Write(", ");
