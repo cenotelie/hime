@@ -17,7 +17,7 @@ namespace Hime.Parsers.CF.LR
                 if (this[0].Lookahead == null) return result;
                 */
                 result.Add(this[0].Lookahead);
-                return result;
+                return new TerminalSet();
             }
         }
 
@@ -49,6 +49,7 @@ namespace Hime.Parsers.CF.LR
                 }
                 else
                 {
+                	// all problems seem to stem from the fact that the first argument here is null
                     this.Add(new StateActionReduce(null, Item.BaseRule));
                     Reduce = Item;
                 }

@@ -116,6 +116,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\LRSets.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\ParserData.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateActionReduce.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Rules.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Symbols.cs" />
     <Compile Include="Hime\Parsers\Automata\DFA.cs" />
