@@ -67,6 +67,9 @@
     <Compile Include="Parsers\Lexers\LexerText.cs" />
     <Compile Include="Parsers\Lexers\LexerTextError.cs" />
     <Compile Include="Parsers\Lexers\LexerTextErrorDiscardedChar.cs" />
+    <Compile Include="Parsers\ParserError.cs" />
+    <Compile Include="Parsers\ParserErrorUnexpectedToken.cs" />
+    <Compile Include="Parsers\ParserException.cs" />
     <Compile Include="Parsers\Symbols\SymbolAction.cs" />
     <Compile Include="Parsers\Symbols\SymbolTerminal.cs" />
     <Compile Include="Parsers\Symbols\SymbolToken.cs" />
@@ -86,7 +89,7 @@
     <Compile Include="Parsers\Lexers\BufferedTextReader.cs" />
     <Compile Include="Parsers\Lexers\BufferedTokenReader.cs" />
     <Compile Include="Parsers\LR\RNGLR1\GSS.cs" />
-    <Compile Include="Parsers\Parser.cs" />
+    <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Parsers\LR\LR0\ParserLR0.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
     <Compile Include="Parsers\LR\RNGLR1\ParserRNGLR1.cs" />
