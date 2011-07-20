@@ -98,8 +98,8 @@ namespace Analyser
             new SymbolTerminal(0x92, "volatile"),
             new SymbolTerminal(0x9D, "continue"),
             new SymbolTerminal(0x8B, "unsigned") };
-        private static State[] staticStates = { 
-            new State(new ushort[][] {
+        private static LexerDFAState[] staticStates = { 
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x2B },
                 new ushort[3] { 0x6E, 0x6E, 0x2C },
                 new ushort[3] { 0x74, 0x74, 0x2D },
@@ -164,7 +164,7 @@ namespace Analyser
                 new ushort[3] { 0x55, 0x55, 0xBC },
                 new ushort[3] { 0xD, 0xD, 0xC0 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x5C, 0x5C, 0xC },
                 new ushort[3] { 0x0, 0x9, 0xE },
                 new ushort[3] { 0xB, 0xC, 0xE },
@@ -173,7 +173,7 @@ namespace Analyser
                 new ushort[3] { 0x5D, 0x2027, 0xE },
                 new ushort[3] { 0x202A, 0xFFFF, 0xE }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x5C, 0x5C, 0xD },
                 new ushort[3] { 0x22, 0x22, 0xCB },
                 new ushort[3] { 0x0, 0x9, 0x2 },
@@ -183,52 +183,52 @@ namespace Analyser
                 new ushort[3] { 0x5D, 0x2027, 0x2 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x9, 0x11 },
                 new ushort[3] { 0xB, 0xC, 0x11 },
                 new ushort[3] { 0xE, 0x2027, 0x11 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x11 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x9, 0x2A },
                 new ushort[3] { 0xB, 0xC, 0x2A },
                 new ushort[3] { 0xE, 0x2027, 0x2A },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2A }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x29, 0x6 },
                 new ushort[3] { 0x2B, 0xFFFF, 0x6 },
                 new ushort[3] { 0x2A, 0x2A, 0x12 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x29, 0x7 },
                 new ushort[3] { 0x2B, 0xFFFF, 0x7 },
                 new ushort[3] { 0x2A, 0x2A, 0x29 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xE2 },
                 new ushort[3] { 0x41, 0x46, 0xE2 },
                 new ushort[3] { 0x61, 0x66, 0xE2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2B, 0x2B, 0xB },
                 new ushort[3] { 0x2D, 0x2D, 0xB },
                 new ushort[3] { 0x31, 0x39, 0xC7 },
                 new ushort[3] { 0x30, 0x30, 0xC8 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x31, 0x39, 0xC5 },
                 new ushort[3] { 0x30, 0x30, 0xC6 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x31, 0x39, 0xC7 },
                 new ushort[3] { 0x30, 0x30, 0xC8 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x78, 0x78, 0x13 },
                 new ushort[3] { 0x55, 0x55, 0x15 },
                 new ushort[3] { 0x75, 0x75, 0x15 },
@@ -243,7 +243,7 @@ namespace Analyser
                 new ushort[3] { 0x74, 0x74, 0xE },
                 new ushort[3] { 0x76, 0x76, 0xE }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x78, 0x78, 0x1D },
                 new ushort[3] { 0x55, 0x55, 0x16 },
                 new ushort[3] { 0x75, 0x75, 0x16 },
@@ -258,116 +258,116 @@ namespace Analyser
                 new ushort[3] { 0x74, 0x74, 0x2 },
                 new ushort[3] { 0x76, 0x76, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x27, 0x27, 0xE4 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2E, 0x2E, 0xE5 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x7 },
                 new ushort[3] { 0x2F, 0x2F, 0x5 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0xA, 0xA, 0xE9 },
                 new ushort[3] { 0x2028, 0x2029, 0xE9 },
                 new ushort[3] { 0xD, 0xD, 0xEA }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0xEB },
                 new ushort[3] { 0x0, 0x2E, 0x6 },
                 new ushort[3] { 0x30, 0xFFFF, 0x6 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x20 },
                 new ushort[3] { 0x41, 0x46, 0x20 },
                 new ushort[3] { 0x61, 0x66, 0x20 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x23 },
                 new ushort[3] { 0x41, 0x46, 0x23 },
                 new ushort[3] { 0x61, 0x66, 0x23 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x17 },
                 new ushort[3] { 0x41, 0x46, 0x17 },
                 new ushort[3] { 0x61, 0x66, 0x17 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x18 },
                 new ushort[3] { 0x41, 0x46, 0x18 },
                 new ushort[3] { 0x61, 0x66, 0x18 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1A },
                 new ushort[3] { 0x41, 0x46, 0x1A },
                 new ushort[3] { 0x61, 0x66, 0x1A }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1B },
                 new ushort[3] { 0x41, 0x46, 0x1B },
                 new ushort[3] { 0x61, 0x66, 0x1B }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1C },
                 new ushort[3] { 0x41, 0x46, 0x1C },
                 new ushort[3] { 0x61, 0x66, 0x1C }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x14 },
                 new ushort[3] { 0x41, 0x46, 0x14 },
                 new ushort[3] { 0x61, 0x66, 0x14 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1E },
                 new ushort[3] { 0x41, 0x46, 0x1E },
                 new ushort[3] { 0x61, 0x66, 0x1E }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1F },
                 new ushort[3] { 0x41, 0x46, 0x1F },
                 new ushort[3] { 0x61, 0x66, 0x1F }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x24 },
                 new ushort[3] { 0x41, 0x46, 0x24 },
                 new ushort[3] { 0x61, 0x66, 0x24 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x25 },
                 new ushort[3] { 0x41, 0x46, 0x25 },
                 new ushort[3] { 0x61, 0x66, 0x25 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xE },
                 new ushort[3] { 0x41, 0x46, 0xE },
                 new ushort[3] { 0x61, 0x66, 0xE }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x21 },
                 new ushort[3] { 0x41, 0x46, 0x21 },
                 new ushort[3] { 0x61, 0x66, 0x21 },
                 new ushort[3] { 0x27, 0x27, 0xE4 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x22 },
                 new ushort[3] { 0x41, 0x46, 0x22 },
                 new ushort[3] { 0x61, 0x66, 0x22 },
                 new ushort[3] { 0x27, 0x27, 0xE4 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xE },
                 new ushort[3] { 0x41, 0x46, 0xE },
                 new ushort[3] { 0x61, 0x66, 0xE },
                 new ushort[3] { 0x27, 0x27, 0xE4 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x19 },
                 new ushort[3] { 0x41, 0x46, 0x19 },
                 new ushort[3] { 0x61, 0x66, 0x19 },
                 new ushort[3] { 0x27, 0x27, 0xE4 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x26 },
                 new ushort[3] { 0x41, 0x46, 0x26 },
                 new ushort[3] { 0x61, 0x66, 0x26 },
@@ -383,7 +383,7 @@ namespace Analyser
                 new ushort[3] { 0x67, 0x2027, 0x2 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x24 },
                 new ushort[3] { 0x41, 0x46, 0x24 },
                 new ushort[3] { 0x61, 0x66, 0x24 },
@@ -399,7 +399,7 @@ namespace Analyser
                 new ushort[3] { 0x67, 0x2027, 0x2 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x27 },
                 new ushort[3] { 0x41, 0x46, 0x27 },
                 new ushort[3] { 0x61, 0x66, 0x27 },
@@ -415,7 +415,7 @@ namespace Analyser
                 new ushort[3] { 0x67, 0x2027, 0x2 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x28 },
                 new ushort[3] { 0x41, 0x46, 0x28 },
                 new ushort[3] { 0x61, 0x66, 0x28 },
@@ -431,7 +431,7 @@ namespace Analyser
                 new ushort[3] { 0x67, 0x2027, 0x2 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x22, 0x22, 0xCB },
                 new ushort[3] { 0x5C, 0x5C, 0xD },
                 new ushort[3] { 0x0, 0x9, 0x2 },
@@ -441,22 +441,22 @@ namespace Analyser
                 new ushort[3] { 0x5D, 0x2027, 0x2 },
                 new ushort[3] { 0x202A, 0xFFFF, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0xE0 },
                 new ushort[3] { 0x0, 0x2E, 0x7 },
                 new ushort[3] { 0x30, 0xFFFF, 0x7 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0xA, 0xA, 0xE0 },
                 new ushort[3] { 0xD, 0xD, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x4 },
                 new ushort[3] { 0x2A, 0x2A, 0x6 },
                 new ushort[3] { 0x3D, 0x3D, 0xC2 }},
                 terminals[0x2]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x3A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -464,7 +464,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x3B },
                 new ushort[3] { 0x79, 0x79, 0x3C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -474,7 +474,7 @@ namespace Analyser
                 new ushort[3] { 0x73, 0x78, 0x39 },
                 new ushort[3] { 0x7A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x40 },
                 new ushort[3] { 0x74, 0x74, 0x41 },
                 new ushort[3] { 0x68, 0x68, 0x3F },
@@ -487,7 +487,7 @@ namespace Analyser
                 new ushort[3] { 0x75, 0x76, 0x39 },
                 new ushort[3] { 0x78, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x78, 0x78, 0x43 },
                 new ushort[3] { 0x6E, 0x6E, 0x44 },
                 new ushort[3] { 0x6C, 0x6C, 0x45 },
@@ -499,7 +499,7 @@ namespace Analyser
                 new ushort[3] { 0x6F, 0x77, 0x39 },
                 new ushort[3] { 0x79, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x46 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -507,7 +507,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x47 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -515,7 +515,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x48 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -523,7 +523,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x68, 0x68, 0x49 },
                 new ushort[3] { 0x6F, 0x6F, 0x4A },
                 new ushort[3] { 0x61, 0x61, 0x4B },
@@ -534,7 +534,7 @@ namespace Analyser
                 new ushort[3] { 0x69, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x5F },
                 new ushort[3] { 0x66, 0x66, 0xDE },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -544,7 +544,7 @@ namespace Analyser
                 new ushort[3] { 0x67, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0xDF },
                 new ushort[3] { 0x65, 0x65, 0x4D },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -554,7 +554,7 @@ namespace Analyser
                 new ushort[3] { 0x66, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x68, 0x68, 0x4F },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -562,7 +562,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x67, 0x39 },
                 new ushort[3] { 0x69, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x51 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -570,7 +570,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x52 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -578,13 +578,13 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x60 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -592,7 +592,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x61 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -600,7 +600,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x70, 0x70, 0x53 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -608,7 +608,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6F, 0x39 },
                 new ushort[3] { 0x71, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x56 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -616,7 +616,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x57 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -624,7 +624,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x5D },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -632,7 +632,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x7A, 0x7A, 0x54 },
                 new ushort[3] { 0x67, 0x67, 0x58 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -641,7 +641,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x66, 0x39 },
                 new ushort[3] { 0x68, 0x79, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x59 },
                 new ushort[3] { 0x72, 0x72, 0x5B },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -650,7 +650,7 @@ namespace Analyser
                 new ushort[3] { 0x62, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x5A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -658,7 +658,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x55 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -666,7 +666,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x62 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -674,7 +674,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x63 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -682,7 +682,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x72, 0x39 },
                 new ushort[3] { 0x74, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x64 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -690,7 +690,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x67, 0x67, 0x50 },
                 new ushort[3] { 0x74, 0x74, 0x5C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -700,7 +700,7 @@ namespace Analyser
                 new ushort[3] { 0x68, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x65 },
                 new ushort[3] { 0x6C, 0x6C, 0x66 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -710,14 +710,14 @@ namespace Analyser
                 new ushort[3] { 0x6A, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x68 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x62, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x67 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -725,7 +725,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x69 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -733,7 +733,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x72, 0x39 },
                 new ushort[3] { 0x74, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x6A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -741,7 +741,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x66, 0x66, 0x6C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -749,7 +749,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x65, 0x39 },
                 new ushort[3] { 0x67, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x6D },
                 new ushort[3] { 0x69, 0x69, 0x6E },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -759,7 +759,7 @@ namespace Analyser
                 new ushort[3] { 0x6A, 0x72, 0x39 },
                 new ushort[3] { 0x74, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x6F },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -767,7 +767,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x78 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -775,7 +775,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x7F },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -783,7 +783,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x70 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -791,7 +791,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x71 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -799,7 +799,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x72 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -807,7 +807,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x77 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -815,7 +815,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x80 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -823,14 +823,14 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x72, 0x39 },
                 new ushort[3] { 0x74, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x81 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x62, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x73 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -838,7 +838,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x74 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -846,7 +846,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x76 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -854,7 +854,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x75 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -862,7 +862,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x79 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -870,7 +870,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x82 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -878,7 +878,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0xE1 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -886,7 +886,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0xE8 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -894,7 +894,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0xEC },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -902,7 +902,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xED },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -910,7 +910,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6D, 0x6D, 0xEE },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -918,7 +918,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6C, 0x39 },
                 new ushort[3] { 0x6E, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xEF },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -926,7 +926,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0xF0 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -934,7 +934,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x64, 0x64, 0xF1 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -942,14 +942,14 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x63, 0x39 },
                 new ushort[3] { 0x65, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x7A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x62, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x83 },
                 new ushort[3] { 0x74, 0x74, 0x7B },
                 new ushort[3] { 0x30, 0x39, 0x39 },
@@ -958,7 +958,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x72, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0xF2 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -966,7 +966,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xF3 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -974,7 +974,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x67, 0x67, 0xF4 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -982,7 +982,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x66, 0x39 },
                 new ushort[3] { 0x68, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x62, 0x62, 0x7C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -990,14 +990,14 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x61, 0x39 },
                 new ushort[3] { 0x63, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x7D },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x62, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x7E },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1005,7 +1005,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x84 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1013,7 +1013,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x85 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1021,14 +1021,14 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x86 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x62, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x64, 0x64, 0x87 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1036,7 +1036,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x63, 0x39 },
                 new ushort[3] { 0x65, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x91 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1044,7 +1044,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x92 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1052,7 +1052,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x93 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1060,7 +1060,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x63, 0x63, 0x94 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1068,7 +1068,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x62, 0x39 },
                 new ushort[3] { 0x64, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x63, 0x63, 0x95 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1076,7 +1076,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x62, 0x39 },
                 new ushort[3] { 0x64, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x96 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1084,7 +1084,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x88 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1092,7 +1092,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x72, 0x39 },
                 new ushort[3] { 0x74, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x97 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1100,7 +1100,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x89 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1108,7 +1108,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x8A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1116,7 +1116,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x98 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1124,7 +1124,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x8C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1132,7 +1132,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x67, 0x67, 0x8B },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1140,7 +1140,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x66, 0x39 },
                 new ushort[3] { 0x68, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0xF5 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1148,7 +1148,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xF6 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1156,7 +1156,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0xF7 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1164,7 +1164,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0xF8 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1172,7 +1172,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0xF9 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1180,7 +1180,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0xFA },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1188,7 +1188,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xFB },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1196,7 +1196,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6B, 0x6B, 0xFC },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1204,7 +1204,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6A, 0x39 },
                 new ushort[3] { 0x6C, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x99 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1212,7 +1212,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x8D },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1220,7 +1220,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x8E },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1228,7 +1228,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x68, 0x39 },
                 new ushort[3] { 0x6A, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x8F },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1236,7 +1236,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x90 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1244,7 +1244,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x9A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1252,7 +1252,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x9B },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1260,7 +1260,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x9C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1268,7 +1268,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6B, 0x39 },
                 new ushort[3] { 0x6D, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x9D },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1276,7 +1276,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x9E },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1284,7 +1284,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x66, 0x66, 0xFD },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1292,7 +1292,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x65, 0x39 },
                 new ushort[3] { 0x67, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x64, 0x64, 0xFE },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1300,7 +1300,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x63, 0x39 },
                 new ushort[3] { 0x65, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x63, 0x63, 0xFF },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1308,7 +1308,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x62, 0x39 },
                 new ushort[3] { 0x64, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x100 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1316,7 +1316,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x68, 0x68, 0x101 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1324,7 +1324,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x67, 0x39 },
                 new ushort[3] { 0x69, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x102 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1332,7 +1332,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x103 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1340,7 +1340,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x104 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1348,7 +1348,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x66, 0x66, 0x105 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1356,7 +1356,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x65, 0x39 },
                 new ushort[3] { 0x67, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x106 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1364,7 +1364,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x73, 0x39 },
                 new ushort[3] { 0x75, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x107 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1372,7 +1372,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x71, 0x39 },
                 new ushort[3] { 0x73, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x108 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1380,7 +1380,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x109 },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1388,7 +1388,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x64, 0x39 },
                 new ushort[3] { 0x66, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x64, 0x64, 0x10A },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1396,7 +1396,7 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x63, 0x39 },
                 new ushort[3] { 0x65, 0x7A, 0x39 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x3D },
                 new ushort[3] { 0x6C, 0x6C, 0x3E },
                 new ushort[3] { 0x6F, 0x6F, 0x5E },
@@ -1407,13 +1407,13 @@ namespace Analyser
                 new ushort[3] { 0x6D, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x4]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x8 },
                 new ushort[3] { 0x78, 0x78, 0x8 },
                 new ushort[3] { 0x4C, 0x4C, 0xC3 },
@@ -1426,7 +1426,7 @@ namespace Analyser
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 }},
                 terminals[0x5]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xA2 },
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x4C, 0x4C, 0xC4 },
@@ -1436,7 +1436,7 @@ namespace Analyser
                 new ushort[3] { 0x65, 0x65, 0x9 },
                 new ushort[3] { 0x2E, 0x2E, 0xA }},
                 terminals[0x5]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x4C, 0x4C, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 },
@@ -1445,61 +1445,61 @@ namespace Analyser
                 new ushort[3] { 0x65, 0x65, 0x9 },
                 new ushort[3] { 0x2E, 0x2E, 0xA }},
                 terminals[0x5]),
-            new State(new ushort[][] {}, terminals[0x6]),
-            new State(new ushort[][] {}, terminals[0x7]),
-            new State(new ushort[][] {}, terminals[0x8]),
-            new State(new ushort[][] {}, terminals[0x9]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x6]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x7]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x8]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x9]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2E, 0x2E, 0xF },
                 new ushort[3] { 0x31, 0x39, 0xC5 },
                 new ushort[3] { 0x30, 0x30, 0xC6 }},
                 terminals[0xA]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3E, 0x3E, 0xCC },
                 new ushort[3] { 0x2D, 0x2D, 0xCD },
                 new ushort[3] { 0x3D, 0x3D, 0xCE }},
                 terminals[0xB]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2B, 0x2B, 0xCF },
                 new ushort[3] { 0x3D, 0x3D, 0xD0 }},
                 terminals[0xC]),
-            new State(new ushort[][] {}, terminals[0xD]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0xD]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x26, 0x26, 0xD1 },
                 new ushort[3] { 0x3D, 0x3D, 0xD2 }},
                 terminals[0xE]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xD3 }},
                 terminals[0xF]),
-            new State(new ushort[][] {}, terminals[0x10]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x10]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xD4 }},
                 terminals[0x11]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xD5 }},
                 terminals[0x12]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3C, 0x3C, 0xD6 },
                 new ushort[3] { 0x3D, 0x3D, 0xD7 }},
                 terminals[0x13]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3E, 0x3E, 0xD8 },
                 new ushort[3] { 0x3D, 0x3D, 0xD9 }},
                 terminals[0x14]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xDA }},
                 terminals[0x15]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xDB }},
                 terminals[0x16]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x7C, 0x7C, 0xDC },
                 new ushort[3] { 0x3D, 0x3D, 0xDD }},
                 terminals[0x17]),
-            new State(new ushort[][] {}, terminals[0x18]),
-            new State(new ushort[][] {}, terminals[0x19]),
-            new State(new ushort[][] {}, terminals[0x1A]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x18]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x19]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x1A]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x4C },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1507,13 +1507,13 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6E, 0x39 },
                 new ushort[3] { 0x70, 0x7A, 0x39 }},
                 terminals[0x4]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x4E },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1521,21 +1521,21 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x6D, 0x39 },
                 new ushort[3] { 0x6F, 0x7A, 0x39 }},
                 terminals[0x1B]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x1B]),
-            new State(new ushort[][] {}, terminals[0x1C]),
-            new State(new ushort[][] {}, terminals[0x1D]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x1C]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x1D]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0xD, 0xE0 },
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0xA, 0xA, 0xBF },
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0x9, 0xE0 },
@@ -1543,14 +1543,14 @@ namespace Analyser
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0xD, 0xE0 },
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {}, terminals[0x1F]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x1F]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x4C, 0x4C, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 },
@@ -1559,8 +1559,8 @@ namespace Analyser
                 new ushort[3] { 0x65, 0x65, 0x9 },
                 new ushort[3] { 0x2E, 0x2E, 0xA }},
                 terminals[0x20]),
-            new State(new ushort[][] {}, terminals[0x20]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x20]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xC5 },
                 new ushort[3] { 0x45, 0x45, 0x9 },
                 new ushort[3] { 0x65, 0x65, 0x9 },
@@ -1569,7 +1569,7 @@ namespace Analyser
                 new ushort[3] { 0x66, 0x66, 0xC4 },
                 new ushort[3] { 0x6C, 0x6C, 0xC4 }},
                 terminals[0x20]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x4C, 0x4C, 0xC9 },
                 new ushort[3] { 0x55, 0x55, 0xC9 },
                 new ushort[3] { 0x6C, 0x6C, 0xC9 },
@@ -1579,14 +1579,14 @@ namespace Analyser
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 }},
                 terminals[0x20]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xC7 },
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x4C, 0x4C, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 },
                 new ushort[3] { 0x6C, 0x6C, 0xC4 }},
                 terminals[0x20]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x4C, 0x4C, 0xCA },
                 new ushort[3] { 0x55, 0x55, 0xCA },
                 new ushort[3] { 0x6C, 0x6C, 0xCA },
@@ -1594,7 +1594,7 @@ namespace Analyser
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 }},
                 terminals[0x20]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x45, 0x45, 0x9 },
                 new ushort[3] { 0x65, 0x65, 0x9 },
                 new ushort[3] { 0x46, 0x46, 0xC4 },
@@ -1602,42 +1602,42 @@ namespace Analyser
                 new ushort[3] { 0x66, 0x66, 0xC4 },
                 new ushort[3] { 0x6C, 0x6C, 0xC4 }},
                 terminals[0x20]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x46, 0x46, 0xC4 },
                 new ushort[3] { 0x4C, 0x4C, 0xC4 },
                 new ushort[3] { 0x66, 0x66, 0xC4 },
                 new ushort[3] { 0x6C, 0x6C, 0xC4 }},
                 terminals[0x20]),
-            new State(new ushort[][] {}, terminals[0x21]),
-            new State(new ushort[][] {}, terminals[0x22]),
-            new State(new ushort[][] {}, terminals[0x23]),
-            new State(new ushort[][] {}, terminals[0x24]),
-            new State(new ushort[][] {}, terminals[0x25]),
-            new State(new ushort[][] {}, terminals[0x26]),
-            new State(new ushort[][] {}, terminals[0x27]),
-            new State(new ushort[][] {}, terminals[0x28]),
-            new State(new ushort[][] {}, terminals[0x29]),
-            new State(new ushort[][] {}, terminals[0x2A]),
-            new State(new ushort[][] {}, terminals[0x2B]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x21]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x22]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x23]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x24]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x25]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x26]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x27]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x28]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x29]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x2A]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x2B]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xE6 }},
                 terminals[0x2C]),
-            new State(new ushort[][] {}, terminals[0x2D]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x2D]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3D, 0x3D, 0xE7 }},
                 terminals[0x2E]),
-            new State(new ushort[][] {}, terminals[0x2F]),
-            new State(new ushort[][] {}, terminals[0x30]),
-            new State(new ushort[][] {}, terminals[0x31]),
-            new State(new ushort[][] {}, terminals[0x32]),
-            new State(new ushort[][] {}, terminals[0x33]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x2F]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x30]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x31]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x32]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x33]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x34]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x6B },
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
@@ -1645,19 +1645,19 @@ namespace Analyser
                 new ushort[3] { 0x61, 0x74, 0x39 },
                 new ushort[3] { 0x76, 0x7A, 0x39 }},
                 terminals[0x35]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0xD, 0xE0 },
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x36]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xE2 },
                 new ushort[3] { 0x41, 0x46, 0xE2 },
                 new ushort[3] { 0x61, 0x66, 0xE2 },
@@ -1666,24 +1666,24 @@ namespace Analyser
                 new ushort[3] { 0x6C, 0x6C, 0xE3 },
                 new ushort[3] { 0x75, 0x75, 0xE3 }},
                 terminals[0x37]),
-            new State(new ushort[][] {}, terminals[0x37]),
-            new State(new ushort[][] {}, terminals[0x38]),
-            new State(new ushort[][] {}, terminals[0x39]),
-            new State(new ushort[][] {}, terminals[0x3A]),
-            new State(new ushort[][] {}, terminals[0x3B]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x37]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x38]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x39]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x3A]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x3B]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x3C]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0xD, 0xE0 },
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0xA, 0xA, 0xE9 },
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0x9, 0xE0 },
@@ -1691,193 +1691,193 @@ namespace Analyser
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x10 },
                 new ushort[3] { 0x9, 0xD, 0xE0 },
                 new ushort[3] { 0x20, 0x20, 0xE0 },
                 new ushort[3] { 0x2028, 0x2029, 0xE0 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x3D]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x3E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x3F]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x40]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x41]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x42]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x43]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x44]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x45]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x46]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x47]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x48]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x49]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4A]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4B]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4C]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4D]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x4F]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x50]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x51]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x52]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x53]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x54]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x55]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x56]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x57]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x58]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x59]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },
                 new ushort[3] { 0x61, 0x7A, 0x39 }},
                 terminals[0x5A]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x39 },
                 new ushort[3] { 0x41, 0x5A, 0x39 },
                 new ushort[3] { 0x5F, 0x5F, 0x39 },

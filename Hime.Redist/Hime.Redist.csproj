@@ -59,6 +59,14 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Parsers\Lexers\ILexer.cs" />
+    <Compile Include="Parsers\Lexers\LexerBinary.cs" />
+    <Compile Include="Parsers\Lexers\LexerDFAState.cs" />
+    <Compile Include="Parsers\Lexers\LexerError.cs" />
+    <Compile Include="Parsers\Lexers\LexerException.cs" />
+    <Compile Include="Parsers\Lexers\LexerText.cs" />
+    <Compile Include="Parsers\Lexers\LexerTextError.cs" />
+    <Compile Include="Parsers\Lexers\LexerTextErrorDiscardedChar.cs" />
     <Compile Include="Parsers\Symbols\SymbolAction.cs" />
     <Compile Include="Parsers\Symbols\SymbolTerminal.cs" />
     <Compile Include="Parsers\Symbols\SymbolToken.cs" />
@@ -78,7 +86,6 @@
     <Compile Include="Parsers\Lexers\BufferedTextReader.cs" />
     <Compile Include="Parsers\Lexers\BufferedTokenReader.cs" />
     <Compile Include="Parsers\LR\RNGLR1\GSS.cs" />
-    <Compile Include="Parsers\Lexers\Lexer.cs" />
     <Compile Include="Parsers\Parser.cs" />
     <Compile Include="Parsers\LR\LR0\ParserLR0.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />

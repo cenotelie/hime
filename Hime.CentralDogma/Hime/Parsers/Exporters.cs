@@ -81,7 +81,7 @@ namespace Hime.Parsers.Exporters
             stream.Write("            ");
             if (state.Transitions.Count == 0)
             {
-                stream.Write("new State(new ushort[][] {}, ");
+                stream.Write("new LexerDFAState(new ushort[][] {}, ");
                 if (state.Final == null)
                     stream.Write("null)");
                 else
@@ -89,7 +89,7 @@ namespace Hime.Parsers.Exporters
             }
             else
             {
-                stream.WriteLine("new State(new ushort[][] {");
+                stream.WriteLine("new LexerDFAState(new ushort[][] {");
                 bool first = true;
                 foreach (Automata.TerminalNFACharSpan span in state.Transitions.Keys)
                 {
@@ -110,7 +110,7 @@ namespace Hime.Parsers.Exporters
         }
         private void Export_States()
         {
-            stream.WriteLine("        private static State[] staticStates = { ");
+            stream.WriteLine("        private static LexerDFAState[] staticStates = { ");
             bool first = true;
             foreach (Automata.DFAState State in finalDFA.States)
             {

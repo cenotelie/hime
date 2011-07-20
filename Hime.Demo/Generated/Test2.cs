@@ -14,8 +14,8 @@ namespace Analyser
             new SymbolTerminal(0xB, "_T[)]"),
             new SymbolTerminal(0x14, "_T[|]"),
             new SymbolTerminal(0xC, "_T[typeof]") };
-        private static State[] staticStates = { 
-            new State(new ushort[][] {
+        private static LexerDFAState[] staticStates = { 
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x78, 0x78, 0x6 },
                 new ushort[3] { 0x2E, 0x2E, 0x7 },
                 new ushort[3] { 0x28, 0x28, 0x8 },
@@ -23,27 +23,27 @@ namespace Analyser
                 new ushort[3] { 0x74, 0x74, 0x1 },
                 new ushort[3] { 0x7C, 0x7C, 0xA }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x79, 0x79, 0x2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x70, 0x70, 0x3 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x4 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x5 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x66, 0x66, 0xB }},
                 null),
-            new State(new ushort[][] {}, terminals[0x2]),
-            new State(new ushort[][] {}, terminals[0x3]),
-            new State(new ushort[][] {}, terminals[0x4]),
-            new State(new ushort[][] {}, terminals[0x5]),
-            new State(new ushort[][] {}, terminals[0x6]),
-            new State(new ushort[][] {}, terminals[0x7]) };
+            new LexerDFAState(new ushort[][] {}, terminals[0x2]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x3]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x4]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x5]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x6]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x7]) };
         protected override void setup() {
             states = staticStates;
             subGrammars = new Dictionary<ushort, MatchSubGrammar>();

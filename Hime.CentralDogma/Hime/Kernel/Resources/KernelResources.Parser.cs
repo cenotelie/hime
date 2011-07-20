@@ -63,8 +63,8 @@ namespace Hime.Kernel.Resources.Parser
             new SymbolTerminal(0x3D, "SYMBOL_JOKER_UINT64"),
             new SymbolTerminal(0x38, "SYMBOL_VALUE_UINT128"),
             new SymbolTerminal(0x3E, "SYMBOL_JOKER_UINT128") };
-        private static State[] staticStates = { 
-            new State(new ushort[][] {
+        private static LexerDFAState[] staticStates = { 
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x1 },
                 new ushort[3] { 0x2E, 0x2E, 0x54 },
                 new ushort[3] { 0x70, 0x70, 0x55 },
@@ -117,26 +117,26 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x40, 0x40, 0x6 },
                 new ushort[3] { 0xD, 0xD, 0x74 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x7 },
                 new ushort[3] { 0x2A, 0x2A, 0x8 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x9 },
                 new ushort[3] { 0x2F, 0x2F, 0x18 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x21, 0x3 },
                 new ushort[3] { 0x23, 0xFFFF, 0x3 },
                 new ushort[3] { 0x22, 0x22, 0xA9 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x5C, 0x5C, 0xA },
                 new ushort[3] { 0x0, 0x26, 0xB },
                 new ushort[3] { 0x28, 0x5B, 0xB },
                 new ushort[3] { 0x5D, 0xFFFF, 0xB }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0xE },
                 new ushort[3] { 0x30, 0x30, 0xAA },
                 new ushort[3] { 0x5C, 0x5C, 0xAA },
@@ -147,13 +147,13 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x74, 0xAA },
                 new ushort[3] { 0x76, 0x76, 0xAA }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x41, 0x5A, 0x81 },
                 new ushort[3] { 0x5F, 0x5F, 0x81 },
                 new ushort[3] { 0x61, 0x7A, 0x81 },
                 new ushort[3] { 0x370, 0x3FF, 0x81 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x9, 0x7 },
                 new ushort[3] { 0xB, 0xC, 0x7 },
                 new ushort[3] { 0xE, 0x2027, 0x7 },
@@ -162,17 +162,17 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x2028, 0x2029, 0xB1 },
                 new ushort[3] { 0xD, 0xD, 0xB2 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x11 },
                 new ushort[3] { 0x0, 0x29, 0x12 },
                 new ushort[3] { 0x2B, 0xFFFF, 0x12 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x1B },
                 new ushort[3] { 0x0, 0x29, 0x13 },
                 new ushort[3] { 0x2B, 0xFFFF, 0x13 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x27, 0x27, 0xB },
                 new ushort[3] { 0x30, 0x30, 0xB },
                 new ushort[3] { 0x5C, 0x5C, 0xB },
@@ -183,14 +183,14 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x74, 0xB },
                 new ushort[3] { 0x76, 0x76, 0xB }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x27, 0x27, 0xB3 },
                 new ushort[3] { 0x5C, 0x5C, 0xA },
                 new ushort[3] { 0x0, 0x26, 0xB },
                 new ushort[3] { 0x28, 0x5B, 0xB },
                 new ushort[3] { 0x5D, 0xFFFF, 0xB }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x30, 0xD },
                 new ushort[3] { 0x5B, 0x5D, 0xD },
                 new ushort[3] { 0x61, 0x62, 0xD },
@@ -200,58 +200,58 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x74, 0xD },
                 new ushort[3] { 0x76, 0x76, 0xD }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x5D, 0x5D, 0xB4 },
                 new ushort[3] { 0x5C, 0x5C, 0xC },
                 new ushort[3] { 0x0, 0x5A, 0xD },
                 new ushort[3] { 0x5E, 0xFFFF, 0xD }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x62, 0x62, 0x14 },
                 new ushort[3] { 0x63, 0x63, 0x15 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x16 },
                 new ushort[3] { 0x41, 0x46, 0x16 },
                 new ushort[3] { 0x61, 0x66, 0x16 },
                 new ushort[3] { 0x58, 0x58, 0x17 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x31, 0xB5 },
                 new ushort[3] { 0x42, 0x42, 0xB6 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x11 },
                 new ushort[3] { 0x0, 0x29, 0x12 },
                 new ushort[3] { 0x2B, 0x2E, 0x12 },
                 new ushort[3] { 0x30, 0xFFFF, 0x12 },
                 new ushort[3] { 0x2F, 0x2F, 0xB7 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x11 },
                 new ushort[3] { 0x0, 0x29, 0x12 },
                 new ushort[3] { 0x2B, 0xFFFF, 0x12 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x1B },
                 new ushort[3] { 0x0, 0x29, 0x13 },
                 new ushort[3] { 0x2B, 0xFFFF, 0x13 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x7B, 0x7B, 0x19 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x7B, 0x7B, 0x1A }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xB8 },
                 new ushort[3] { 0x41, 0x46, 0xB8 },
                 new ushort[3] { 0x61, 0x66, 0xB8 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0xB9 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x0, 0x9, 0x18 },
                 new ushort[3] { 0xB, 0xC, 0x18 },
                 new ushort[3] { 0xE, 0x2027, 0x18 },
@@ -260,40 +260,40 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0xD, 0xD, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x40, 0x40, 0x1C },
                 new ushort[3] { 0x41, 0x5A, 0x1E },
                 new ushort[3] { 0x5F, 0x5F, 0x1E },
                 new ushort[3] { 0x61, 0x7A, 0x1E },
                 new ushort[3] { 0x370, 0x3FF, 0x1E }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x40, 0x40, 0x1D },
                 new ushort[3] { 0x41, 0x5A, 0x1F },
                 new ushort[3] { 0x5F, 0x5F, 0x1F },
                 new ushort[3] { 0x61, 0x7A, 0x1F },
                 new ushort[3] { 0x370, 0x3FF, 0x1F }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2A, 0x2A, 0x1B },
                 new ushort[3] { 0x0, 0x29, 0x13 },
                 new ushort[3] { 0x2B, 0x2E, 0x13 },
                 new ushort[3] { 0x30, 0xFFFF, 0x13 },
                 new ushort[3] { 0x2F, 0x2F, 0xAF }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x41, 0x5A, 0x1E },
                 new ushort[3] { 0x5F, 0x5F, 0x1E },
                 new ushort[3] { 0x61, 0x7A, 0x1E },
                 new ushort[3] { 0x370, 0x3FF, 0x1E }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x41, 0x5A, 0x1F },
                 new ushort[3] { 0x5F, 0x5F, 0x1F },
                 new ushort[3] { 0x61, 0x7A, 0x1F },
                 new ushort[3] { 0x370, 0x3FF, 0x1F }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1E },
                 new ushort[3] { 0x41, 0x5A, 0x1E },
                 new ushort[3] { 0x5F, 0x5F, 0x1E },
@@ -301,7 +301,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x370, 0x3FF, 0x1E },
                 new ushort[3] { 0x7D, 0x7D, 0xBC }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x1F },
                 new ushort[3] { 0x41, 0x5A, 0x1F },
                 new ushort[3] { 0x5F, 0x5F, 0x1F },
@@ -309,218 +309,218 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x370, 0x3FF, 0x1F },
                 new ushort[3] { 0x7D, 0x7D, 0xBD }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xBE },
                 new ushort[3] { 0x41, 0x46, 0xBE },
                 new ushort[3] { 0x61, 0x66, 0xBE }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0xBF }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x35 },
                 new ushort[3] { 0x41, 0x46, 0x35 },
                 new ushort[3] { 0x61, 0x66, 0x35 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x2D },
                 new ushort[3] { 0x41, 0x46, 0x2D },
                 new ushort[3] { 0x61, 0x66, 0x2D }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x25 },
                 new ushort[3] { 0x41, 0x46, 0x25 },
                 new ushort[3] { 0x61, 0x66, 0x25 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x26 },
                 new ushort[3] { 0x41, 0x46, 0x26 },
                 new ushort[3] { 0x61, 0x66, 0x26 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x27 },
                 new ushort[3] { 0x41, 0x46, 0x27 },
                 new ushort[3] { 0x61, 0x66, 0x27 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x28 },
                 new ushort[3] { 0x41, 0x46, 0x28 },
                 new ushort[3] { 0x61, 0x66, 0x28 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x29 },
                 new ushort[3] { 0x41, 0x46, 0x29 },
                 new ushort[3] { 0x61, 0x66, 0x29 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x2A },
                 new ushort[3] { 0x41, 0x46, 0x2A },
                 new ushort[3] { 0x61, 0x66, 0x2A }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x2B },
                 new ushort[3] { 0x41, 0x46, 0x2B },
                 new ushort[3] { 0x61, 0x66, 0x2B }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x2C },
                 new ushort[3] { 0x41, 0x46, 0x2C },
                 new ushort[3] { 0x61, 0x66, 0x2C }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x2E },
                 new ushort[3] { 0x41, 0x46, 0x2E },
                 new ushort[3] { 0x61, 0x66, 0x2E }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x2F },
                 new ushort[3] { 0x41, 0x46, 0x2F },
                 new ushort[3] { 0x61, 0x66, 0x2F }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x30 },
                 new ushort[3] { 0x41, 0x46, 0x30 },
                 new ushort[3] { 0x61, 0x66, 0x30 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x31 },
                 new ushort[3] { 0x41, 0x46, 0x31 },
                 new ushort[3] { 0x61, 0x66, 0x31 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x32 },
                 new ushort[3] { 0x41, 0x46, 0x32 },
                 new ushort[3] { 0x61, 0x66, 0x32 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x33 },
                 new ushort[3] { 0x41, 0x46, 0x33 },
                 new ushort[3] { 0x61, 0x66, 0x33 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x34 },
                 new ushort[3] { 0x41, 0x46, 0x34 },
                 new ushort[3] { 0x61, 0x66, 0x34 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x36 },
                 new ushort[3] { 0x41, 0x46, 0x36 },
                 new ushort[3] { 0x61, 0x66, 0x36 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x37 },
                 new ushort[3] { 0x41, 0x46, 0x37 },
                 new ushort[3] { 0x61, 0x66, 0x37 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x4E },
                 new ushort[3] { 0x41, 0x46, 0x4E },
                 new ushort[3] { 0x61, 0x66, 0x4E }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x50 },
                 new ushort[3] { 0x41, 0x46, 0x50 },
                 new ushort[3] { 0x61, 0x66, 0x50 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x52 },
                 new ushort[3] { 0x41, 0x46, 0x52 },
                 new ushort[3] { 0x61, 0x66, 0x52 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x4B }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x43 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x3B }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x3C }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x3D }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x3E }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x3F }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x40 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x41 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x42 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x44 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x45 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x46 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x47 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x48 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x49 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x4A }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x4C }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x4D }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x4F }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x51 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x53 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xC7 },
                 new ushort[3] { 0x41, 0x46, 0xC7 },
                 new ushort[3] { 0x61, 0x66, 0xC7 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0xC8 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xC9 },
                 new ushort[3] { 0x41, 0x46, 0xC9 },
                 new ushort[3] { 0x61, 0x66, 0xC9 }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0xCA }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xCB },
                 new ushort[3] { 0x41, 0x46, 0xCB },
                 new ushort[3] { 0x61, 0x66, 0xCB }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0xCC }},
                 null),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2E, 0x2E, 0x76 }},
                 terminals[0x2]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x77 },
                 new ushort[3] { 0x72, 0x72, 0x78 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
@@ -531,7 +531,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x76, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x7A },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -540,7 +540,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6F, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x7B },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -548,7 +548,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x70, 0x70, 0x7C },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -557,7 +557,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x71, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x7D },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -566,7 +566,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x7E },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -575,7 +575,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x73, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x66, 0x66, 0xAD },
                 new ushort[3] { 0x73, 0x73, 0xAE },
                 new ushort[3] { 0x30, 0x39, 0x79 },
@@ -586,7 +586,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x75, 0x75, 0x7F },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -595,54 +595,54 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x76, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {}, terminals[0x4]),
-            new State(new ushort[][] {}, terminals[0x5]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x4]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x5]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x5C, 0x5C, 0xC },
                 new ushort[3] { 0x0, 0x5A, 0xD },
                 new ushort[3] { 0x5E, 0xFFFF, 0xD }},
                 terminals[0x6]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x78, 0x78, 0xF },
                 new ushort[3] { 0x62, 0x62, 0x10 }},
                 terminals[0x7]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xB0 }},
                 terminals[0x7]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3E, 0x3E, 0xAB }},
                 terminals[0x8]),
-            new State(new ushort[][] {}, terminals[0x9]),
-            new State(new ushort[][] {}, terminals[0xA]),
-            new State(new ushort[][] {}, terminals[0xB]),
-            new State(new ushort[][] {}, terminals[0xC]),
-            new State(new ushort[][] {}, terminals[0xD]),
-            new State(new ushort[][] {}, terminals[0xE]),
-            new State(new ushort[][] {}, terminals[0xF]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x9]),
+            new LexerDFAState(new ushort[][] {}, terminals[0xA]),
+            new LexerDFAState(new ushort[][] {}, terminals[0xB]),
+            new LexerDFAState(new ushort[][] {}, terminals[0xC]),
+            new LexerDFAState(new ushort[][] {}, terminals[0xD]),
+            new LexerDFAState(new ushort[][] {}, terminals[0xE]),
+            new LexerDFAState(new ushort[][] {}, terminals[0xF]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x3E, 0x3E, 0xAC }},
                 terminals[0x10]),
-            new State(new ushort[][] {}, terminals[0x11]),
-            new State(new ushort[][] {}, terminals[0x12]),
-            new State(new ushort[][] {}, terminals[0x13]),
-            new State(new ushort[][] {}, terminals[0x14]),
-            new State(new ushort[][] {}, terminals[0x15]),
-            new State(new ushort[][] {}, terminals[0x16]),
-            new State(new ushort[][] {}, terminals[0x17]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x11]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x12]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x13]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x14]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x15]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x16]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x17]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0xD, 0xAF },
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0xA, 0xA, 0x73 },
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0x9, 0xAF },
@@ -650,14 +650,14 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0xD, 0xAF },
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {}, terminals[0x19]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x19]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x62, 0x62, 0x80 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -666,7 +666,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x63, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x82 },
                 new ushort[3] { 0x6F, 0x6F, 0x83 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
@@ -677,14 +677,14 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x70, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x84 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -693,7 +693,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x75, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6D, 0x6D, 0x85 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -702,7 +702,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6E, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x86 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -711,7 +711,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x75, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x87 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -720,7 +720,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x73, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x88 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -728,7 +728,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x89 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -737,7 +737,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6D, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0x8A },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -746,14 +746,14 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6D, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x76, 0x76, 0x8B },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -762,7 +762,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x77, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x8C },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -771,7 +771,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x75, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x8D },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -780,7 +780,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x8E },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -789,7 +789,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x8F },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -798,7 +798,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6A, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6D, 0x6D, 0x90 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -807,7 +807,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6E, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6D, 0x6D, 0x91 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -816,7 +816,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6E, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x92 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -825,7 +825,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x93 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -834,7 +834,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6A, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0x94 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -842,7 +842,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0x95 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -851,7 +851,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0x96 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -860,7 +860,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x73, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0x98 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -869,7 +869,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6F, 0x6F, 0x99 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -878,7 +878,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x70, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x69, 0x69, 0x97 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -887,7 +887,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6A, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6D, 0x6D, 0x9A },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -896,7 +896,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6E, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0xBA },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -905,7 +905,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x63, 0x63, 0xBB },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -914,7 +914,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x64, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0xA2 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -923,7 +923,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x75, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x63, 0x63, 0x9B },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -932,7 +932,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x64, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x9C },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -941,7 +941,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6F, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0x9E },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -950,7 +950,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6F, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x70, 0x70, 0x9D },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -959,7 +959,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x71, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6E, 0x6E, 0xA3 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -968,7 +968,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6F, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0xA4 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -976,7 +976,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x74, 0x74, 0x9F },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -985,7 +985,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x75, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0xA5 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -993,7 +993,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0xA0 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1001,7 +1001,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x61, 0x61, 0xA1 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1009,7 +1009,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x62, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xA6 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1018,7 +1018,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x63, 0x63, 0xA7 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1027,7 +1027,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x64, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0xA8 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1036,7 +1036,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6D, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xC0 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1045,7 +1045,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0xC1 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1054,7 +1054,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x72, 0x72, 0xC2 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1063,7 +1063,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x73, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x6C, 0x6C, 0xC3 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1072,7 +1072,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x6D, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x64, 0x64, 0xC4 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1081,7 +1081,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x65, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x65, 0x65, 0xC5 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1090,7 +1090,7 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x66, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x73, 0x73, 0xC6 },
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
@@ -1099,40 +1099,40 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x74, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x3]),
-            new State(new ushort[][] {}, terminals[0x1A]),
-            new State(new ushort[][] {}, terminals[0x1B]),
-            new State(new ushort[][] {}, terminals[0x1C]),
-            new State(new ushort[][] {}, terminals[0x1D]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x1A]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x1B]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x1C]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x1D]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x1E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x1F]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0xD, 0xAF },
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0xB0 }},
                 terminals[0x7]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0xD, 0xAF },
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0xA, 0xA, 0xB1 },
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0x9, 0xAF },
@@ -1140,119 +1140,119 @@ namespace Hime.Kernel.Resources.Parser
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {}, terminals[0x20]),
-            new State(new ushort[][] {}, terminals[0x21]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x20]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x21]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x31, 0xB5 }},
                 terminals[0x22]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x42, 0x42, 0xB6 }},
                 terminals[0x23]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x2F, 0x2F, 0x2 },
                 new ushort[3] { 0x9, 0xD, 0xAF },
                 new ushort[3] { 0x20, 0x20, 0xAF },
                 new ushort[3] { 0x2028, 0x2029, 0xAF }},
                 terminals[0x18]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x20 },
                 new ushort[3] { 0x41, 0x46, 0x20 },
                 new ushort[3] { 0x61, 0x66, 0x20 }},
                 terminals[0x24]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x21 }},
                 terminals[0x25]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x26]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x27]),
-            new State(new ushort[][] {}, terminals[0x28]),
-            new State(new ushort[][] {}, terminals[0x29]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {}, terminals[0x28]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x29]),
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x22 },
                 new ushort[3] { 0x41, 0x46, 0x22 },
                 new ushort[3] { 0x61, 0x66, 0x22 }},
                 terminals[0x2A]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x38 }},
                 terminals[0x2B]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x2C]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x2D]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x2E]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x2F]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x30]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x31]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x79 },
                 new ushort[3] { 0x41, 0x5A, 0x79 },
                 new ushort[3] { 0x5F, 0x5F, 0x79 },
                 new ushort[3] { 0x61, 0x7A, 0x79 },
                 new ushort[3] { 0x370, 0x3FF, 0x79 }},
                 terminals[0x32]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x23 },
                 new ushort[3] { 0x41, 0x46, 0x23 },
                 new ushort[3] { 0x61, 0x66, 0x23 }},
                 terminals[0x33]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x39 }},
                 terminals[0x34]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x30, 0x39, 0x24 },
                 new ushort[3] { 0x41, 0x46, 0x24 },
                 new ushort[3] { 0x61, 0x66, 0x24 }},
                 terminals[0x35]),
-            new State(new ushort[][] {
+            new LexerDFAState(new ushort[][] {
                 new ushort[3] { 0x58, 0x58, 0x3A }},
                 terminals[0x36]),
-            new State(new ushort[][] {}, terminals[0x37]),
-            new State(new ushort[][] {}, terminals[0x38]) };
+            new LexerDFAState(new ushort[][] {}, terminals[0x37]),
+            new LexerDFAState(new ushort[][] {}, terminals[0x38]) };
         protected override void setup() {
             states = staticStates;
             subGrammars = new Dictionary<ushort, MatchSubGrammar>();
