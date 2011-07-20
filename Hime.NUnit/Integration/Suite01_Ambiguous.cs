@@ -7,22 +7,20 @@ using Hime.Parsers;
 namespace Hime.NUnit.Integration
 {
     [TestFixture]
-    public class Suite01_Ambiguous
+    public class Suite01_Ambiguous : BaseTestSuite
     {
-    	private Tools tools = new Tools();
-    	
-        [Test]
-        public void Test001_ReturnsFalseOnConflictuousGrammar_LALR1()
+    	[Test]
+        public void Test001_ConflictuousGrammar_LALR1()
         {
             string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
-            Assert.IsFalse(tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
+            Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors());
         }
 
         [Test]
-        public void Test002_ReturnsFalseOnConflictuousGrammar_LR1()
+        public void Test002_ConflictuousGrammar_LR1()
         {
             string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
-            Assert.IsFalse(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+            Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
 
         // TODO: think about it, but it seems this test sometimes fails, but not always!!!
@@ -31,47 +29,41 @@ namespace Hime.NUnit.Integration
         public void Test003_FindsLALR1AmbiguousAndLR1NonAmbiguous()
         {
             string grammar = "public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
-            Assert.IsFalse(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
-            Assert.IsTrue(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+            Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors());
+            Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
 
         [Test]
         public void Test004_ShouldNotStackOverflow()
         {
             string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X -> X; } }";
-            CompilationTask task = new CompilationTask();
-            task.InputRawData.Add(grammar);
-            task.GrammarName = "Test";
-            task.Method = Parsers.ParsingMethod.LALR1;
-            task.Namespace = "Analyze";
-            task.ParserFile = "TestAnalyze.cs";
-            task.Execute();
+            Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors());
         }
 
         [Test]
         public void Test005_FindsShiftReduceForLALR1()
         {
             string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
-            Assert.IsFalse(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
+            Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors());
         }
 
         [Test]
         public void Test006_FindsShiftReduceForLR1()
         {
             string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
-            Assert.IsFalse(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+            Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
 
         [Test]
         public void Test007_FindsAmbigousGrammarLALR1()
         {
-            Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LALR1));
+            Assert.IsTrue(CompileResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LALR1).HasErrors());
         }
 
         [Test]
         public void Test008_FindsAmbigousGrammarLR1()
         {
-            Assert.IsFalse(this.tools.BuildResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LR1));
+            Assert.IsTrue(CompileResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LR1).HasErrors());
         }
         
         [Ignore]
@@ -80,7 +72,7 @@ namespace Hime.NUnit.Integration
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-        	Assert.IsTrue(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR0));
+            Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR0).HasErrors());
         }
 
         [Ignore]
@@ -89,17 +81,16 @@ namespace Hime.NUnit.Integration
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-        	Assert.IsTrue(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+            Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
 
         // TODO: fix this bug
-        [Ignore]
         [Test]
         public void Test011_FindsAmbiguousGrammarLR1_Item418()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
-        	Assert.IsFalse(this.tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
+            Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
         
     }
