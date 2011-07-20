@@ -301,7 +301,7 @@ namespace Hime.Redist.Parsers
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
-                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SymbolID, string.Empty, lexer.CurrentLine));
+                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].SymbolID, states[currentState].Expected[i].Name, string.Empty, lexer.CurrentLine));
                 Inserted.Add(nextToken);
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
@@ -322,7 +322,7 @@ namespace Hime.Redist.Parsers
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
-                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].Name, states[currentState].Expected[i].SymbolID, string.Empty, lexer.CurrentLine));
+                Inserted.Add(new SymbolTokenText(states[currentState].Expected[i].SymbolID, states[currentState].Expected[i].Name, string.Empty, lexer.CurrentLine));
                 if (Analyse_Simulate(TestStack, TestLexer, Inserted))
                 {
                     Analyse_RunForToken(Inserted[0]);

@@ -412,7 +412,7 @@ namespace Hime.Redist.Parsers
                 input.Rewind(count);
                 return null;
             }
-            return new SymbolTokenText(matched.Name, matched.SymbolID, new string(buffer, 0, matchedLength), currentLine);
+            return new SymbolTokenText(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine);
         }
     }
 

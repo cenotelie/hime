@@ -6,14 +6,14 @@ namespace Analyser
     class Test2_Lexer : LexerText
     {
         public static readonly SymbolTerminal[] terminals = {
-            new SymbolTerminal("ε", 0x1),
-            new SymbolTerminal("$", 0x2),
-            new SymbolTerminal("_T[x]", 0x7),
-            new SymbolTerminal("_T[.]", 0x8),
-            new SymbolTerminal("_T[(]", 0xA),
-            new SymbolTerminal("_T[)]", 0xB),
-            new SymbolTerminal("_T[|]", 0x14),
-            new SymbolTerminal("_T[typeof]", 0xC) };
+            new SymbolTerminal(0x1, "ε"),
+            new SymbolTerminal(0x2, "$"),
+            new SymbolTerminal(0x7, "_T[x]"),
+            new SymbolTerminal(0x8, "_T[.]"),
+            new SymbolTerminal(0xA, "_T[(]"),
+            new SymbolTerminal(0xB, "_T[)]"),
+            new SymbolTerminal(0x14, "_T[|]"),
+            new SymbolTerminal(0xC, "_T[typeof]") };
         private static State[] staticStates = { 
             new State(new ushort[][] {
                 new ushort[3] { 0x78, 0x78, 0x6 },

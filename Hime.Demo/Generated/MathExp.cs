@@ -6,16 +6,16 @@ namespace Analyser
     class MathExp_Lexer : LexerText
     {
         public static readonly SymbolTerminal[] terminals = {
-            new SymbolTerminal("ε", 0x1),
-            new SymbolTerminal("$", 0x2),
-            new SymbolTerminal("_T[(]", 0xC),
-            new SymbolTerminal("_T[)]", 0xD),
-            new SymbolTerminal("_T[*]", 0xE),
-            new SymbolTerminal("_T[/]", 0xF),
-            new SymbolTerminal("_T[+]", 0x10),
-            new SymbolTerminal("_T[-]", 0x11),
-            new SymbolTerminal("NUMBER", 0x5),
-            new SymbolTerminal("SEPARATOR", 0x7) };
+            new SymbolTerminal(0x1, "ε"),
+            new SymbolTerminal(0x2, "$"),
+            new SymbolTerminal(0xC, "_T[(]"),
+            new SymbolTerminal(0xD, "_T[)]"),
+            new SymbolTerminal(0xE, "_T[*]"),
+            new SymbolTerminal(0xF, "_T[/]"),
+            new SymbolTerminal(0x10, "_T[+]"),
+            new SymbolTerminal(0x11, "_T[-]"),
+            new SymbolTerminal(0x5, "NUMBER"),
+            new SymbolTerminal(0x7, "SEPARATOR") };
         private static State[] staticStates = { 
             new State(new ushort[][] {
                 new ushort[3] { 0x28, 0x28, 0x4 },
