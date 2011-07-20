@@ -59,7 +59,7 @@ namespace Hime.NUnit
             return results.CompiledAssembly;
         }
 
-        protected SyntaxTreeNode Parse(Assembly assembly, string input)
+        protected SyntaxTreeNode Parse(Assembly assembly, string input, out bool errors)
         {
             Type lexerType = null;
             Type parserType = null;
@@ -91,7 +91,9 @@ namespace Hime.NUnit
                 parser = parserConstructor.Invoke(new object[] { lexer }) as IParser;
             else
                 parser = parserConstructor.Invoke(new object[] { lexer, null }) as IParser;
-            return parser.Analyse();
+            SyntaxTreeNode root = parser.Analyse();
+            errors = (parser.Errors.Count != 0);
+            return root;
         }
     }
 }

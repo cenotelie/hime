@@ -12,33 +12,41 @@ namespace Hime.NUnit.Integration
     [TestFixture]
     public class Suite02_Parse : BaseTestSuite
     {
+        private const string grammar0 = "public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'S'b'T|'c'T|'d'; T->'a'T|'b'S|'c'; } }";
         private const string grammar1 = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'x'*; } }";
 
-        private void TestGrammar1(ParsingMethod method, string input)
+        private void TestGrammar(string grammar, ParsingMethod method, string input)
         {
-            Assert.IsFalse(CompileRaw(grammar1, method).HasErrors());
+            Assert.IsFalse(CompileRaw(grammar, method).HasErrors(), "Grammar compilation failed!");
             Assembly assembly = Build();
-            SyntaxTreeNode node = Parse(assembly, input);
-            Assert.NotNull(node);
-            Assert.AreEqual(node.Children.Count, input.Length);
+            bool errors = false;
+            SyntaxTreeNode node = Parse(assembly, input, out errors);
+            Assert.NotNull(node, "Failed to parse input!");
+            Assert.IsFalse(errors, "Parsing errors!");
         }
 
         [Test]
-        public void Test001_SimpleList_LR1()
+        public void Test001_SimpleGrammar_LR0()
         {
-            TestGrammar1(ParsingMethod.LR1, "xxx");
+            TestGrammar(grammar0, ParsingMethod.LR0, "adbc");
         }
 
         [Test]
-        public void Test002_SimpleList_LALR1()
+        public void Test002_SimpleList_LR1()
         {
-            TestGrammar1(ParsingMethod.LALR1, "xxx");
+            TestGrammar(grammar1, ParsingMethod.LR1, "xxx");
         }
 
         [Test]
-        public void Test003_SimpleList_LRStar()
+        public void Test003_SimpleList_LALR1()
         {
-            TestGrammar1(ParsingMethod.LRStar, "xxx");
+            TestGrammar(grammar1, ParsingMethod.LALR1, "xxx");
+        }
+
+        [Test]
+        public void Test004_SimpleList_LRStar()
+        {
+            TestGrammar(grammar1, ParsingMethod.LRStar, "xxx");
         }
     }
 }
