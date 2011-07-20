@@ -59,20 +59,20 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="AST.cs" />
-    <Compile Include="BaseBinary.cs" />
-    <Compile Include="BufferedTextReader.cs" />
-    <Compile Include="BufferedTokenReader.cs" />
-    <Compile Include="GSS.cs" />
-    <Compile Include="Lexer.cs" />
-    <Compile Include="Parser.cs" />
-    <Compile Include="ParserLR0.cs" />
-    <Compile Include="ParserLRStar.cs" />
-    <Compile Include="ParserRNGLR1.cs" />
-    <Compile Include="ParserLR1.cs" />
+    <Compile Include="Parsers\SyntaxNodes\AST.cs" />
+    <Compile Include="Binary\BaseBinary.cs" />
+    <Compile Include="Parsers\Lexers\BufferedTextReader.cs" />
+    <Compile Include="Parsers\Lexers\BufferedTokenReader.cs" />
+    <Compile Include="Parsers\LR\RNGLR1\GSS.cs" />
+    <Compile Include="Parsers\Lexers\Lexer.cs" />
+    <Compile Include="Parsers\Parser.cs" />
+    <Compile Include="Parsers\LR\LR0\ParserLR0.cs" />
+    <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
+    <Compile Include="Parsers\LR\RNGLR1\ParserRNGLR1.cs" />
+    <Compile Include="Parsers\LR\LR1\ParserLR1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SPPF.cs" />
-    <Compile Include="Symbols.cs" />
+    <Compile Include="Parsers\SyntaxNodes\SPPF.cs" />
+    <Compile Include="Parsers\Symbols\Symbols.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
