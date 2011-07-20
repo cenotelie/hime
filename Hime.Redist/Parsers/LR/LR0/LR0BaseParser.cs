@@ -22,14 +22,15 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Acts when an unexpected token is encountered
         /// </summary>
-        /// <returns>true if the unexpected token is handled, false otherwise</returns>
-        protected override bool OnUnexpectedToken() { return false; }
+        /// <param name="token">Current token</param>
+        /// <returns>The new next token if the error is resolved, null otherwise</returns>
+        protected override SymbolToken OnUnexpectedToken(SymbolToken nextToken) { return null; }
 
         /// <summary>
         /// Runs the parser for the given state and token
         /// </summary>
         /// <param name="token">Current token</param>
-        /// <returns></returns>
+        /// <returns>true if the parser is able to consume the token, false otherwise</returns>
         protected override bool RunForToken(SymbolToken token)
         {
             while (true)

@@ -75,7 +75,7 @@ namespace Hime.Parsers.CF.LR
         protected void Export_Production(CFRule rule)
         {
             int length = rule.Definition.GetChoiceAtIndex(0).Length;
-            stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Variable.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (BaseLR1Parser baseParser)");
+            stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Variable.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
             stream.WriteLine("        {");
             stream.WriteLine("            " + grammar.LocalName + "_Parser parser = baseParser as " + grammar.LocalName + "_Parser;");
             if (length != 0)
@@ -120,7 +120,7 @@ namespace Hime.Parsers.CF.LR
         }
         protected void Export_Rules()
         {
-            stream.WriteLine("        private static Rule[] staticRules = {");
+            stream.WriteLine("        private static LRRule[] staticRules = {");
             bool first = true;
             foreach (CFRule Rule in grammar.Rules)
             {
@@ -128,7 +128,7 @@ namespace Hime.Parsers.CF.LR
                 if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
                 string head = "variables[" + this.variables.IndexOf(Rule.Variable) + "]";
-                stream.WriteLine("new Rule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAtIndex(0).Length + ")");
+                stream.WriteLine("new LRRule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAtIndex(0).Length + ")");
                 first = false;
             }
             stream.WriteLine("        };");
@@ -143,7 +143,7 @@ namespace Hime.Parsers.CF.LR
                     expected.Add((Terminal)Symbol);
             }
             bool first = true;
-            stream.WriteLine("new State(");
+            stream.WriteLine("new LR1State(");
             // Write items
             if (debug)
             {
@@ -231,19 +231,19 @@ namespace Hime.Parsers.CF.LR
             }
             stream.WriteLine("},");
             // Write reductions
-            stream.Write("               new Reduction[" + state.Reductions.Count + "] {");
+            stream.Write("               new LRReduction[" + state.Reductions.Count + "] {");
             first = true;
             foreach (StateActionReduce Reduction in state.Reductions)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "])");
+                stream.Write("new LRReduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "])");
                 first = false;
             }
             stream.WriteLine("})");
         }
         protected void Export_States()
         {
-            stream.WriteLine("        private static State[] staticStates = {");
+            stream.WriteLine("        private static LR1State[] staticStates = {");
             bool first = true;
             foreach (State State in graph.States)
             {

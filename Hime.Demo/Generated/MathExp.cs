@@ -105,7 +105,7 @@ namespace Analyser
             new SymbolVariable(0xA, "exp_op1"), 
             new SymbolVariable(0xB, "exp"), 
             new SymbolVariable(0x12, "_Axiom_") };
-        private static SyntaxTreeNode Production_8_0 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_8_0 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -118,7 +118,7 @@ namespace Analyser
             parser.actions.OnNumber(root);
             return root;
         }
-        private static SyntaxTreeNode Production_8_1 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_8_1 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -140,7 +140,7 @@ namespace Analyser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_9_0 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_9_0 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -152,7 +152,7 @@ namespace Analyser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_9_1 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_9_1 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -175,7 +175,7 @@ namespace Analyser
             parser.actions.OnMult(root);
             return root;
         }
-        private static SyntaxTreeNode Production_9_2 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_9_2 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -198,7 +198,7 @@ namespace Analyser
             parser.actions.OnDiv(root);
             return root;
         }
-        private static SyntaxTreeNode Production_A_0 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_A_0 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -210,7 +210,7 @@ namespace Analyser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_A_1 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_A_1 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -233,7 +233,7 @@ namespace Analyser
             parser.actions.OnPlus(root);
             return root;
         }
-        private static SyntaxTreeNode Production_A_2 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_A_2 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -256,7 +256,7 @@ namespace Analyser
             parser.actions.OnMinus(root);
             return root;
         }
-        private static SyntaxTreeNode Production_B_0 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_B_0 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -268,7 +268,7 @@ namespace Analyser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_12_0 (BaseLR1Parser baseParser)
+        private static SyntaxTreeNode Production_12_0 (LRParser baseParser)
         {
             MathExp_Parser parser = baseParser as MathExp_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -284,163 +284,163 @@ namespace Analyser
             current = temp;
             return root;
         }
-        private static Rule[] staticRules = {
-           new Rule(Production_8_0, variables[0], 1)
-           , new Rule(Production_8_1, variables[0], 3)
-           , new Rule(Production_9_0, variables[1], 1)
-           , new Rule(Production_9_1, variables[1], 3)
-           , new Rule(Production_9_2, variables[1], 3)
-           , new Rule(Production_A_0, variables[2], 1)
-           , new Rule(Production_A_1, variables[2], 3)
-           , new Rule(Production_A_2, variables[2], 3)
-           , new Rule(Production_B_0, variables[3], 1)
-           , new Rule(Production_12_0, variables[4], 2)
+        private static LRRule[] staticRules = {
+           new LRRule(Production_8_0, variables[0], 1)
+           , new LRRule(Production_8_1, variables[0], 3)
+           , new LRRule(Production_9_0, variables[1], 1)
+           , new LRRule(Production_9_1, variables[1], 3)
+           , new LRRule(Production_9_2, variables[1], 3)
+           , new LRRule(Production_A_0, variables[2], 1)
+           , new LRRule(Production_A_1, variables[2], 3)
+           , new LRRule(Production_A_2, variables[2], 3)
+           , new LRRule(Production_B_0, variables[3], 1)
+           , new LRRule(Production_12_0, variables[4], 2)
         };
-        private static State[] staticStates = {
-            new State(
+        private static LR1State[] staticStates = {
+            new LR1State(
                null,
                new SymbolTerminal[2] {MathExp_Lexer.terminals[8], MathExp_Lexer.terminals[2]},
                new ushort[2] {0x5, 0xc},
                new ushort[2] {0x5, 0x6},
                new ushort[4] {0xb, 0xa, 0x9, 0x8},
                new ushort[4] {0x1, 0x2, 0x3, 0x4},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[1] {MathExp_Lexer.terminals[1]},
                new ushort[1] {0x2},
                new ushort[1] {0x7},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[4] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[2] {0x10, 0x11},
                new ushort[2] {0x8, 0x9},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[2] {new Reduction(0x2, staticRules[0x8]), new Reduction(0xd, staticRules[0x8])})
-            , new State(
+               new LRReduction[2] {new LRReduction(0x2, staticRules[0x8]), new LRReduction(0xd, staticRules[0x8])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[2] {0xe, 0xf},
                new ushort[2] {0xA, 0xB},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[4] {new Reduction(0x2, staticRules[0x5]), new Reduction(0xd, staticRules[0x5]), new Reduction(0x10, staticRules[0x5]), new Reduction(0x11, staticRules[0x5])})
-            , new State(
+               new LRReduction[4] {new LRReduction(0x2, staticRules[0x5]), new LRReduction(0xd, staticRules[0x5]), new LRReduction(0x10, staticRules[0x5]), new LRReduction(0x11, staticRules[0x5])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[6] {new Reduction(0x2, staticRules[0x2]), new Reduction(0xd, staticRules[0x2]), new Reduction(0xe, staticRules[0x2]), new Reduction(0xf, staticRules[0x2]), new Reduction(0x10, staticRules[0x2]), new Reduction(0x11, staticRules[0x2])})
-            , new State(
+               new LRReduction[6] {new LRReduction(0x2, staticRules[0x2]), new LRReduction(0xd, staticRules[0x2]), new LRReduction(0xe, staticRules[0x2]), new LRReduction(0xf, staticRules[0x2]), new LRReduction(0x10, staticRules[0x2]), new LRReduction(0x11, staticRules[0x2])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[6] {new Reduction(0x2, staticRules[0x0]), new Reduction(0xd, staticRules[0x0]), new Reduction(0xe, staticRules[0x0]), new Reduction(0xf, staticRules[0x0]), new Reduction(0x10, staticRules[0x0]), new Reduction(0x11, staticRules[0x0])})
-            , new State(
+               new LRReduction[6] {new LRReduction(0x2, staticRules[0x0]), new LRReduction(0xd, staticRules[0x0]), new LRReduction(0xe, staticRules[0x0]), new LRReduction(0xf, staticRules[0x0]), new LRReduction(0x10, staticRules[0x0]), new LRReduction(0x11, staticRules[0x0])})
+            , new LR1State(
                null,
                new SymbolTerminal[2] {MathExp_Lexer.terminals[8], MathExp_Lexer.terminals[2]},
                new ushort[2] {0x5, 0xc},
                new ushort[2] {0x5, 0x6},
                new ushort[4] {0xb, 0xa, 0x9, 0x8},
                new ushort[4] {0xC, 0x2, 0x3, 0x4},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[1] {MathExp_Lexer.terminals[0]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[1] {new Reduction(0x1, staticRules[0x9])})
-            , new State(
+               new LRReduction[1] {new LRReduction(0x1, staticRules[0x9])})
+            , new LR1State(
                null,
                new SymbolTerminal[2] {MathExp_Lexer.terminals[8], MathExp_Lexer.terminals[2]},
                new ushort[2] {0x5, 0xc},
                new ushort[2] {0x5, 0x6},
                new ushort[2] {0x9, 0x8},
                new ushort[2] {0xD, 0x4},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[2] {MathExp_Lexer.terminals[8], MathExp_Lexer.terminals[2]},
                new ushort[2] {0x5, 0xc},
                new ushort[2] {0x5, 0x6},
                new ushort[2] {0x9, 0x8},
                new ushort[2] {0xE, 0x4},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[2] {MathExp_Lexer.terminals[8], MathExp_Lexer.terminals[2]},
                new ushort[2] {0x5, 0xc},
                new ushort[2] {0x5, 0x6},
                new ushort[1] {0x8},
                new ushort[1] {0xF},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[2] {MathExp_Lexer.terminals[8], MathExp_Lexer.terminals[2]},
                new ushort[2] {0x5, 0xc},
                new ushort[2] {0x5, 0x6},
                new ushort[1] {0x8},
                new ushort[1] {0x10},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[1] {MathExp_Lexer.terminals[3]},
                new ushort[1] {0xd},
                new ushort[1] {0x11},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[0] {})
-            , new State(
+               new LRReduction[0] {})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[2] {0xe, 0xf},
                new ushort[2] {0xA, 0xB},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[4] {new Reduction(0x2, staticRules[0x6]), new Reduction(0xd, staticRules[0x6]), new Reduction(0x10, staticRules[0x6]), new Reduction(0x11, staticRules[0x6])})
-            , new State(
+               new LRReduction[4] {new LRReduction(0x2, staticRules[0x6]), new LRReduction(0xd, staticRules[0x6]), new LRReduction(0x10, staticRules[0x6]), new LRReduction(0x11, staticRules[0x6])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[2] {0xe, 0xf},
                new ushort[2] {0xA, 0xB},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[4] {new Reduction(0x2, staticRules[0x7]), new Reduction(0xd, staticRules[0x7]), new Reduction(0x10, staticRules[0x7]), new Reduction(0x11, staticRules[0x7])})
-            , new State(
+               new LRReduction[4] {new LRReduction(0x2, staticRules[0x7]), new LRReduction(0xd, staticRules[0x7]), new LRReduction(0x10, staticRules[0x7]), new LRReduction(0x11, staticRules[0x7])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[6] {new Reduction(0x2, staticRules[0x3]), new Reduction(0xd, staticRules[0x3]), new Reduction(0xe, staticRules[0x3]), new Reduction(0xf, staticRules[0x3]), new Reduction(0x10, staticRules[0x3]), new Reduction(0x11, staticRules[0x3])})
-            , new State(
+               new LRReduction[6] {new LRReduction(0x2, staticRules[0x3]), new LRReduction(0xd, staticRules[0x3]), new LRReduction(0xe, staticRules[0x3]), new LRReduction(0xf, staticRules[0x3]), new LRReduction(0x10, staticRules[0x3]), new LRReduction(0x11, staticRules[0x3])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[6] {new Reduction(0x2, staticRules[0x4]), new Reduction(0xd, staticRules[0x4]), new Reduction(0xe, staticRules[0x4]), new Reduction(0xf, staticRules[0x4]), new Reduction(0x10, staticRules[0x4]), new Reduction(0x11, staticRules[0x4])})
-            , new State(
+               new LRReduction[6] {new LRReduction(0x2, staticRules[0x4]), new LRReduction(0xd, staticRules[0x4]), new LRReduction(0xe, staticRules[0x4]), new LRReduction(0xf, staticRules[0x4]), new LRReduction(0x10, staticRules[0x4]), new LRReduction(0x11, staticRules[0x4])})
+            , new LR1State(
                null,
                new SymbolTerminal[6] {MathExp_Lexer.terminals[1], MathExp_Lexer.terminals[3], MathExp_Lexer.terminals[4], MathExp_Lexer.terminals[5], MathExp_Lexer.terminals[6], MathExp_Lexer.terminals[7]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new Reduction[6] {new Reduction(0x2, staticRules[0x1]), new Reduction(0xd, staticRules[0x1]), new Reduction(0xe, staticRules[0x1]), new Reduction(0xf, staticRules[0x1]), new Reduction(0x10, staticRules[0x1]), new Reduction(0x11, staticRules[0x1])})
+               new LRReduction[6] {new LRReduction(0x2, staticRules[0x1]), new LRReduction(0xd, staticRules[0x1]), new LRReduction(0xe, staticRules[0x1]), new LRReduction(0xf, staticRules[0x1]), new LRReduction(0x10, staticRules[0x1]), new LRReduction(0x11, staticRules[0x1])})
         };
         public interface Actions
         {

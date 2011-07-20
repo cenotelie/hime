@@ -84,14 +84,15 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Acts when an unexpected token is encountered
         /// </summary>
-        /// <returns>true if the unexpected token is handled, false otherwise</returns>
-        protected abstract bool OnUnexpectedToken();
+        /// <param name="token">Current token</param>
+        /// <returns>The new next token if the error is resolved, null otherwise</returns>
+        protected abstract SymbolToken OnUnexpectedToken(SymbolToken nextToken);
 
         /// <summary>
         /// Runs the parser for the given state and token
         /// </summary>
         /// <param name="token">Current token</param>
-        /// <returns></returns>
+        /// <returns>true if the parser is able to consume the token, false otherwise</returns>
         protected abstract bool RunForToken(SymbolToken token);
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace Hime.Redist.Parsers
 
             while (true)
             {
-                if (RunForToken( nextToken))
+                if (RunForToken(nextToken))
                 {
                     nextToken = GetNextToken(lexer, state);
                     continue;
@@ -132,8 +133,11 @@ namespace Hime.Redist.Parsers
                 else
                 {
                     errors.Add(new ParserErrorUnexpectedToken(nextToken, GetState(state).GetExpectedNames()));
-                    if (!OnUnexpectedToken())
-                        return null;
+                    if (errors.Count >= maxErrorCount)
+                        throw new ParserException("Too much errors, parsing stopped.");
+                    nextToken = OnUnexpectedToken(nextToken);
+                    if (nextToken == null)
+                        throw new ParserException("Unrecoverable error encountered");
                 }
             }
         }

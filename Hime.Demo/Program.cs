@@ -75,9 +75,9 @@ namespace Hime.Demo
 
         static void Main(string[] args)
         {
-            Compile();
+            //Compile();
             //Parse_ANSI_C();
-            //Parse_MathExp();
+            Parse_MathExp();
         }
 
         class Interpreter : Analyser.MathExp_Parser.Actions
