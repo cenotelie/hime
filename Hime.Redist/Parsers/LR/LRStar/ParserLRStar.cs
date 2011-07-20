@@ -2,155 +2,90 @@
 
 namespace Hime.Redist.Parsers
 {
-    public abstract class BaseLRStarParser : IParser
+    public abstract class LRStarBaseParser : LRParser
     {
-        protected delegate SyntaxTreeNode Production(BaseLRStarParser parser);
-        protected struct Rule
-        {
-            public Production OnReduction;
-            public SymbolVariable Head;
-            public ushort Length;
-            public Rule(Production prod, SymbolVariable head, ushort length)
-            {
-                OnReduction = prod;
-                Head = head;
-                Length = length;
-            }
-        }
-        protected struct DeciderState
-        {
-            public Dictionary<ushort, ushort> Transitions;
-            public ushort Shift;
-            public Rule Reduction;
-            public DeciderState(ushort[] t_keys, ushort[] t_val, ushort shift, Rule reduction)
-            {
-                Transitions = new Dictionary<ushort, ushort>();
-                for (int i = 0; i != t_keys.Length; i++)
-                    Transitions.Add(t_keys[i], t_val[i]);
-                Shift = shift;
-                Reduction = reduction;
-            }
-        }
-        protected struct State
-        {
-            public string[] Items;
-            public SymbolTerminal[] Expected;
-            public DeciderState[] Decider;
-            public Dictionary<ushort, ushort> ShiftsOnVariable;
-            public State(string[] items, SymbolTerminal[] expected, DeciderState[] decider, ushort[] sv_keys, ushort[] sv_val)
-            {
-                Items = items;
-                Expected = expected;
-                Decider = decider;
-                ShiftsOnVariable = new Dictionary<ushort, ushort>();
-                for (int i = 0; i != sv_keys.Length; i++)
-                    ShiftsOnVariable.Add(sv_keys[i], sv_val[i]);
-            }
-            public ushort[] GetExpectedIDs()
-            {
-                ushort[] results = new ushort[Expected.Length];
-                for (int i = 0; i != Expected.Length; i++)
-                    results[i] = Expected[i].SymbolID;
-                return results;
-            }
-            public string[] GetExpectedNames()
-            {
-                string[] results = new string[Expected.Length];
-                for (int i = 0; i != Expected.Length; i++)
-                    results[i] = Expected[i].Name;
-                return results;
-            }
-            public ushort GetNextByShiftOnVariable(ushort sid)
-            {
-                if (!ShiftsOnVariable.ContainsKey(sid))
-                    return 0xFFFF;
-                return ShiftsOnVariable[sid];
-            }
-        }
-
-
-        // Parser automata data
-        protected Rule[] rules;
-        protected State[] states;
-        protected int errorSimulationLength;
-
-        // Parser state data
-        protected int maxErrorCount;
-        protected List<ParserError> errors;
-        protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
+        protected LRStarState[] states;
         protected BufferedTokenReader reader;
-        protected LinkedList<SyntaxTreeNode> nodes;
-        protected Stack<ushort> stack;
-        protected SymbolToken nextToken;
-        protected ushort currentState;
 
-        public ICollection<ParserError> Errors { get { return readonlyErrors; } }
+        /// <summary>
+        /// Gets the automaton's state with the given id
+        /// </summary>
+        /// <param name="id">State's id</param>
+        /// <returns>The automaton's state which has the given id, or null if no state with the given id is found</returns>
+        protected override LRState GetState(int id) { return states[id]; }
 
-        protected abstract void setup();
+        /// <summary>
+        /// Acts when an unexpected token is encountered
+        /// </summary>
+        /// <param name="token">Current token</param>
+        /// <returns>The new next token if the error is resolved, null otherwise</returns>
+        protected override SymbolToken OnUnexpectedToken(SymbolToken nextToken) { return null; }
 
-        public BaseLRStarParser(ILexer input)
-        {
-            setup();
-            maxErrorCount = 100;
-            errors = new List<ParserError>();
-            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
-            reader = new BufferedTokenReader(input);
-            nodes = new LinkedList<SyntaxTreeNode>();
-            stack = new Stack<ushort>();
-            currentState = 0x0;
-            nextToken = null;
-        }
+        /// <summary>
+        /// Gets the next token in the input
+        /// </summary>
+        /// <param name="lexer">Base lexer for reading tokens</param>
+        /// <param name="state">Parser's current state</param>
+        /// <returns>The next token in the input</returns>
+        protected override SymbolToken GetNextToken(ILexer lexer, ushort state) { return lexer.GetNextToken(); }
 
-        protected ushort Analyze_RunDecider(ushort first, out Rule reduction)
+        public LRStarBaseParser(ILexer input) : base(input) { reader = new BufferedTokenReader(input); }
+
+        protected ushort RunDecider(ushort first, out LRRule reduction)
         {
             int depth = 0;
-            reduction = new Rule();
-            State state = states[currentState];
-            DeciderState ds = state.Decider[0];
+            reduction = null;
+            LRStarState lrState = states[state];
+            DeciderState ds = lrState.decider[0];
             ushort token = first;
-            if (!ds.Transitions.ContainsKey(token)) // Unexpected token !
+            if (!ds.transitions.ContainsKey(token)) // Unexpected token !
                 return 0xFFFF;
-            ds = state.Decider[ds.Transitions[token]];
+            ds = lrState.decider[ds.transitions[token]];
             while (true)
             {
-                if (ds.Shift != 0xFFFF)
+                if (ds.shift != 0xFFFF)
                 {
                     reader.Rewind(depth);
-                    return ds.Shift;
+                    return ds.shift;
                 }
-                if (ds.Reduction.Head != null)
+                if (ds.reduction.Head != null)
                 {
-                    reduction = ds.Reduction;
+                    reduction = ds.reduction;
                     reader.Rewind(depth);
                     return 0xFFFF;
                 }
                 // go to new state
                 token = reader.Read().SymbolID;
                 depth++;
-                if (!ds.Transitions.ContainsKey(token))
+                if (!ds.transitions.ContainsKey(token))
                 {
                     // Unexpected token !
                     reader.Rewind(depth);
                     return 0xFFFF;
                 }
-                ds = state.Decider[ds.Transitions[token]];
+                ds = lrState.decider[ds.transitions[token]];
             }
         }
 
-        protected bool Analyse_RunForToken(SymbolToken token)
+        /// <summary>
+        /// Runs the parser for the given state and token
+        /// </summary>
+        /// <param name="token">Current token</param>
+        /// <returns>true if the parser is able to consume the token, false otherwise</returns>
+        protected override bool RunForToken(SymbolToken token)
         {
             while (true)
             {
-                Rule reduction;
-                ushort NextState = Analyze_RunDecider(token.SymbolID, out reduction);
-                if (NextState != 0xFFFF)
+                LRRule reduction = null;
+                ushort nextState = RunDecider(token.SymbolID, out reduction);
+                if (nextState != 0xFFFF)
                 {
                     nodes.AddLast(new SyntaxTreeNode(token));
-                    currentState = NextState;
-                    stack.Push(currentState);
+                    state = nextState;
+                    stack.Push(state);
                     return true;
                 }
-                if (reduction.Head != null)
+                if (reduction != null)
                 {
                     Production Reduce = reduction.OnReduction;
                     ushort HeadID = reduction.Head.SymbolID;
@@ -158,34 +93,14 @@ namespace Hime.Redist.Parsers
                     for (ushort j = 0; j != reduction.Length; j++)
                         stack.Pop();
                     // Shift to next state on the reduce variable
-                    NextState = states[stack.Peek()].GetNextByShiftOnVariable(HeadID);
-                    if (NextState == 0xFFFF)
+                    nextState = states[stack.Peek()].GetNextByShiftOnVariable(HeadID);
+                    if (nextState == 0xFFFF)
                         return false;
-                    currentState = NextState;
-                    stack.Push(currentState);
+                    state = nextState;
+                    stack.Push(state);
                     continue;
                 }
                 return false;
-            }
-        }
-
-        public SyntaxTreeNode Analyse()
-        {
-            stack.Push(currentState);
-            nextToken = reader.Read();
-
-            while (true)
-            {
-                if (Analyse_RunForToken(nextToken))
-                {
-                    nextToken = reader.Read();
-                    continue;
-                }
-                else if (nextToken.SymbolID == 0x0001)
-                    return nodes.First.Value.ApplyActions();
-                else
-                    // Unexpected token
-                    return null;
             }
         }
     }

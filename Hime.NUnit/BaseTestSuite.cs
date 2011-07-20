@@ -74,7 +74,7 @@ namespace Hime.NUnit
                     parserType = types[i];
                 else if (types[i].BaseType == typeof(BaseRNGLR1Parser))
                     parserType = types[i];
-                else if (types[i].BaseType == typeof(BaseLRStarParser))
+                else if (types[i].BaseType == typeof(LRStarBaseParser))
                     parserType = types[i];
             }
             Type actionType = parserType.GetNestedType("Actions");
