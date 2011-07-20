@@ -7,7 +7,7 @@ using Hime.Parsers;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 
-namespace Hime.NUnit
+namespace Hime.NUnit.Integration
 {
     [TestFixture]
     public class Suite02_Parse : BaseTestSuite
