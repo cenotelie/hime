@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using NUnit.Framework;
-using System.Reflection;
-using Hime.NUnit.Integration;
+using Hime.Parsers;
+using Hime.Kernel.Reporting;
+using Hime.Redist.Parsers;
 
 namespace Hime.NUnit
 {
     public class BaseTestSuite
     {
-        public string GetAllTextFor(string resourceName)
+        protected string GetAllTextFor(string resourceName)
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            Assembly assembly = Assembly.GetExecutingAssembly();
             string defaultPath = "Resources";
             Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor(assembly, defaultPath);
             string data = accessor.GetAllTextFor(resourceName);
@@ -19,72 +21,76 @@ namespace Hime.NUnit
             return data;
         }
 
-        protected Hime.Kernel.Reporting.Report CompileResource(string resource, Hime.Parsers.ParsingMethod method)
+        protected Report CompileResource(string resource, ParsingMethod method)
         {
-            Hime.Parsers.CompilationTask task = new Parsers.CompilationTask();
+            CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(GetAllTextFor(resource));
             task.Method = method;
             task.ParserFile = "Test.cs";
-            Hime.Kernel.Reporting.Report report = task.Execute();
+            Report report = task.Execute();
             return report;
         }
 
-        protected Hime.Kernel.Reporting.Report CompileRaw(string rawInput, Hime.Parsers.ParsingMethod method)
+        protected Report CompileRaw(string rawInput, ParsingMethod method)
         {
-            Hime.Parsers.CompilationTask task = new Parsers.CompilationTask();
+            CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(rawInput);
             task.Method = method;
             task.ParserFile = "Test.cs";
-            Hime.Kernel.Reporting.Report report = task.Execute();
+            Report report = task.Execute();
             return report;
         }
 
         protected Assembly Build()
         {
             string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
-            System.IO.File.Copy(redist, "Hime.Redist.dll");
+            System.IO.File.Copy(redist, "Hime.Redist.dll", true);
             string code = System.IO.File.ReadAllText("Test.cs");
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
             compilerparams.GenerateExecutable = false;
             compilerparams.GenerateInMemory = true;
+            compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
+            compilerparams.ReferencedAssemblies.Add("System.dll");
             compilerparams.ReferencedAssemblies.Add("Hime.Redist.dll");
             System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromSource(compilerparams, code);
+            if (results.Errors.Count != 0)
+                Assert.Fail(results.Errors[0].ToString());
             return results.CompiledAssembly;
         }
 
-        protected Hime.Redist.Parsers.SyntaxTreeNode Parse(Assembly assembly, string input)
+        protected SyntaxTreeNode Parse(Assembly assembly, string input)
         {
             Type lexerType = null;
             Type parserType = null;
             Type[] types = assembly.GetTypes();
             for (int i = 0; i != types.Length; i++)
             {
-                if (types[i].BaseType == typeof(Hime.Redist.Parsers.LexerText))
+                if (types[i].BaseType == typeof(LexerText))
                     lexerType = types[i];
-                else if (types[i].BaseType == typeof(Hime.Redist.Parsers.LR0TextParser))
+                else if (types[i].BaseType == typeof(LR0TextParser))
                     parserType = types[i];
-                else if (types[i].BaseType == typeof(Hime.Redist.Parsers.LR1TextParser))
+                else if (types[i].BaseType == typeof(LR1TextParser))
                     parserType = types[i];
-                else if (types[i].BaseType == typeof(Hime.Redist.Parsers.BaseRNGLR1Parser))
+                else if (types[i].BaseType == typeof(BaseRNGLR1Parser))
                     parserType = types[i];
-                else if (types[i].BaseType == typeof(Hime.Redist.Parsers.BaseLRStarParser))
+                else if (types[i].BaseType == typeof(BaseLRStarParser))
                     parserType = types[i];
             }
             Type actionType = parserType.GetNestedType("Actions");
-            System.Reflection.ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(string) });
-            System.Reflection.ConstructorInfo parserConstructor = null;
+            ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(string) });
+            ConstructorInfo parserConstructor = null;
             if (actionType == null)
                 parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
             else
                 parserConstructor = parserType.GetConstructor(new Type[] { lexerType, actionType });
 
             object lexer = lexerConstructor.Invoke(new object[] { input });
-            Hime.Redist.Parsers.IParser parser = null;
+            IParser parser = null;
             if (actionType == null)
-                parser = parserConstructor.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
+                parser = parserConstructor.Invoke(new object[] { lexer }) as IParser;
             else
-                parser = parserConstructor.Invoke(new object[] { lexer, null }) as Hime.Redist.Parsers.IParser;
+                parser = parserConstructor.Invoke(new object[] { lexer, null }) as IParser;
             return parser.Analyse();
         }
     }

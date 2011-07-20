@@ -55,6 +55,7 @@
     <Compile Include="himecc\Suite01_Compile.cs" />
     <Compile Include="Integration\Suite00_CompilationTask.cs" />
     <Compile Include="Integration\Suite01_Ambiguous.cs" />
+    <Compile Include="Integration\Suite02_Parse.cs" />
     <Compile Include="Integration\Tools.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,5 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Empty.gram" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AmbiguousLR1.gram" />
   </ItemGroup>
 </Project>

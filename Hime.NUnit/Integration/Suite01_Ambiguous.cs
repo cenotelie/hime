@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Hime.Parsers;
+using Hime.Kernel.Reporting;
+using Hime.Redist.Parsers;
 
 namespace Hime.NUnit.Integration
 {
@@ -57,21 +60,20 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test007_FindsAmbigousGrammarLALR1()
         {
-            Assert.IsTrue(CompileResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LALR1).HasErrors());
+            Assert.IsTrue(CompileResource("AmbiguousLR1.gram", Parsers.ParsingMethod.LALR1).HasErrors());
         }
 
         [Test]
         public void Test008_FindsAmbigousGrammarLR1()
         {
-            Assert.IsTrue(CompileResource("LALR1-ambiguous.gram", Parsers.ParsingMethod.LR1).HasErrors());
+            Assert.IsTrue(CompileResource("AmbiguousLR1.gram", Parsers.ParsingMethod.LR1).HasErrors());
         }
         
         [Ignore]
         [Test]
         public void Test009_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {
-        	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	string grammar = "public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR0).HasErrors());
         }
 
@@ -79,8 +81,7 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test010_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {
-        	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	string grammar = "public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
 
@@ -88,10 +89,8 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test011_FindsAmbiguousGrammarLR1_Item418()
         {
-        	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
+        	string grammar = "public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors());
         }
-        
     }
 }
