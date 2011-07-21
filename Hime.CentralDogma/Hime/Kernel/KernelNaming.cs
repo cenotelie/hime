@@ -244,7 +244,8 @@ namespace Hime.Kernel
                 completeName = parent.completeName + localName;
             namespaces = new Dictionary<string, Namespace>();
         }
-
+        
+        // TODO: remove all static methods
         public static Namespace CreateRoot()
         {
             return new Namespace(null, "global");

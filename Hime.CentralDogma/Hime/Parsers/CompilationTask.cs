@@ -93,7 +93,7 @@ namespace Hime.Parsers
 
         // internal data
         private Kernel.Namespace root;
-        private Kernel.Reporting.Reporter reporter;
+        public Reporter reporter;
         private ParserGenerator generator;
         private System.IO.StreamWriter lexerWriter;
         private System.IO.StreamWriter parserWriter;
@@ -106,6 +106,8 @@ namespace Hime.Parsers
         internal System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
         internal System.IO.StreamWriter ParserWriter { get { return parserWriter; } }
         internal string Documentation { get { return docFile; } }
+        
+        public Report Result { get { return this.reporter.Result; } }
 
         public CompilationTask()
         {
@@ -120,7 +122,6 @@ namespace Hime.Parsers
             this.reporter = new Reporter();
        }
 
-
         public Report Execute()
         {
             try
@@ -133,14 +134,14 @@ namespace Hime.Parsers
             }
 
             this.ExecuteExportLog();
-            return reporter.Result;
+            return this.Result;
         }
         
         // TODO: this method should really be private or internal, but this is just so nicer to test
         // TODO: think about it, it is a sign there is a small architectural problem there
         public void ExecuteBody()
         {
-        	if (!Execute_LoadData()) return;
+        	if (!ExecuteLoadData()) return;
 
             Grammar grammar = Execute_GetGrammar();
             if (grammar == null) return;
@@ -160,7 +161,9 @@ namespace Hime.Parsers
             reporter.ExportMHTML(file, "Grammar Log");
         }
 
-        private bool Execute_LoadData()
+        // TODO: this method should really be private or internal, but this is just so nicer to test
+        // TODO: think about it, it is a sign there is a small architectural problem there
+        public bool ExecuteLoadData()
         {
             if (fileInputs.Count == 0 && rawInputs.Count == 0)
             {
@@ -175,7 +178,9 @@ namespace Hime.Parsers
                     reporter.Error("Compiler", "Cannot access file: " + file);
             }
             foreach (string data in rawInputs)
+            {
                 compiler.AddInputRawText(data);
+            }
             return compiler.Compile(root, reporter);
         }
         
