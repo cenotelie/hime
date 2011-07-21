@@ -245,12 +245,6 @@ namespace Hime.Kernel
             namespaces = new Dictionary<string, Namespace>();
         }
         
-        // TODO: remove all static methods
-        public static Namespace CreateRoot()
-        {
-            return new Namespace(null, "global");
-        }
-
         public override void SymbolAddChild(Symbol child)
         {
             base.SymbolAddChild(child);

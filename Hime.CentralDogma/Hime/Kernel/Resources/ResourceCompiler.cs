@@ -16,18 +16,18 @@ namespace Hime.Kernel.Resources
         private Dictionary<string, string> inputNamedResources;
         private List<string> inputRawResources;
         private List<CompilerError> outputErrors;
-        private Namespace outputRootNamespace;
         private Reporter outputLog;
         private SyntaxTreeNode intermediateRoot;
         private ResourceGraph intermediateResources;
         private ResourceCompilerRegister pluginRegister;
 
+        public Namespace OutputRootNamespace { get; private set; }
         public string CompilerName { get { return "HimeSystems.CentralDogma Compiler"; } }
         public int CompilerVersionMajor { get { return 1; } }
         public int CompilerVersionMinor { get { return 0; } }
         ResourceCompilerRegister PluginRegister { get { return pluginRegister; } }
 
-        public ResourceCompiler()
+        public ResourceCompiler(Reporter outputLog)
         {
             inputNamedResources = new Dictionary<string, string>();
             inputRawResources = new List<string>();
@@ -36,6 +36,8 @@ namespace Hime.Kernel.Resources
             intermediateResources = new ResourceGraph();
             pluginRegister = new ResourceCompilerRegister();
             pluginRegister.RegisterCompiler(new Hime.Parsers.CF.CFGrammarCompiler());
+            this.OutputRootNamespace = new Namespace(null, "global");
+            this.outputLog = outputLog;
         }
 
         public bool AddInputFile(string FileName)
@@ -46,6 +48,7 @@ namespace Hime.Kernel.Resources
             inputNamedResources.Add(FileName, Data);
             return true;
         }
+        
 		// TODO: instead of having AddInputRawText and AddInputFile, should have only one method
 		// on a generic input (a stream??)
         public void AddInputRawText(string Data)
@@ -53,11 +56,10 @@ namespace Hime.Kernel.Resources
             inputRawResources.Add(Data);
         }
 
-        public bool Compile(Namespace root, Hime.Kernel.Reporting.Reporter log)
+        public bool Compile()
         {
+        	// TODO: simplify: this is not really necessary because of the reporter?
             bool hasErrors = false;
-            outputRootNamespace = root;
-            outputLog = log;
 
             outputLog.BeginSection("Compiler " + CompilerName);
             outputLog.Info("Compiler", CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString());
@@ -164,13 +166,13 @@ namespace Hime.Kernel.Resources
             foreach (Redist.Parsers.SyntaxTreeNode Child in Node.Children)
             {
                 if (Child.Symbol.Name == "Namespace")
-                    Compile_namespace(Child, outputRootNamespace);
+                    Compile_namespace(Child, this.OutputRootNamespace);
                 else
                 {
                     IResourceCompiler Compiler = pluginRegister.GetCompilerFor(Child.Symbol.Name);
                     if (Compiler == null)
                         throw new NoResourceCompilerFoundException("Missing compiler for resource " + Child.Symbol.Name);
-                    Compiler.CreateResource(outputRootNamespace, Child, intermediateResources, outputLog);
+                    Compiler.CreateResource(this.OutputRootNamespace, Child, intermediateResources, outputLog);
                 }
             }
         }

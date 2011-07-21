@@ -99,8 +99,6 @@ namespace Hime.Parsers
         private System.IO.StreamWriter parserWriter;
         private string docFile;
 
-        internal Kernel.Namespace Root { get { return root; } }
-        internal Parsers.Grammar Grammar { get { return (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(this.GrammarName)); } }
         internal Kernel.Reporting.Reporter Reporter { get { return reporter; } }
         internal ParserGenerator ParserGenerator { get { return generator; } }
         internal System.IO.StreamWriter LexerWriter { get { return lexerWriter; } }
@@ -170,8 +168,7 @@ namespace Hime.Parsers
                 reporter.Error("Compiler", "No input!");
                 return false;
             }
-            root = Hime.Kernel.Namespace.CreateRoot();
-            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler();
+            Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler(this.reporter);
             foreach (string file in fileInputs)
             {
                 if (!compiler.AddInputFile(file))
@@ -181,7 +178,9 @@ namespace Hime.Parsers
             {
                 compiler.AddInputRawText(data);
             }
-            return compiler.Compile(root, reporter);
+            bool result = compiler.Compile();
+            this.root = compiler.OutputRootNamespace;
+            return result;
         }
         
         private Grammar Execute_GetGrammar()

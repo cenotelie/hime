@@ -24,10 +24,9 @@ namespace Hime.NUnit.Integration
         		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
-        	Namespace root = Namespace.CreateRoot();
-        	ResourceCompiler compiler = new ResourceCompiler();
+        	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	compiler.AddInputRawText(grammar);
-        	compiler.Compile(root, reporter);
+        	compiler.Compile();
             Assert.IsFalse(reporter.Result.HasErrors());
         }
 	}
