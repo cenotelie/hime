@@ -59,6 +59,7 @@ namespace Hime.Kernel.Resources
         public bool Compile()
         {
         	// TODO: simplify: this is not really necessary because of the reporter?
+        	// TODO: make a test for the case where hasErrors and reporter.HasErrors do not coincide
             bool hasErrors = false;
 
             outputLog.BeginSection("Compiler " + CompilerName);
@@ -71,10 +72,13 @@ namespace Hime.Kernel.Resources
                 outputLog.Info("Compiler", "Compilation unit " + inputRawResources.Count.ToString() + " raw resources");
 
             // Parse
+            // TODO: find a way to merge these two lines
             foreach (string ResourceName in inputNamedResources.Keys)
                 CompileData(inputNamedResources[ResourceName]);
-            foreach (string Data in inputRawResources)
-                CompileData(Data);
+            foreach (string data in inputRawResources)
+            {
+                CompileData(data);
+            }
 
             // Build resources
             foreach (Redist.Parsers.SyntaxTreeNode file in intermediateRoot.Children)
@@ -124,12 +128,13 @@ namespace Hime.Kernel.Resources
             return SymbolAccess.Public;
         }
 
-
-        private bool CompileData(string Data)
+		// TODO: made this method public for test, but maybe this is a sign of not optimal architecture, think about it
+        public bool CompileData(string Data)
         {
             bool IsError = false;
             Parser.FileCentralDogma_Lexer UnitLexer = new Parser.FileCentralDogma_Lexer(Data);
             Parser.FileCentralDogma_Parser UnitParser = new Parser.FileCentralDogma_Parser(UnitLexer);
+            // TODO: rewrite this code, it is a bit strange
             Redist.Parsers.SyntaxTreeNode UnitRoot = null;
             try { UnitRoot = UnitParser.Analyse(); }
             catch (System.Exception e) {
