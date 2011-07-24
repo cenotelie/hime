@@ -101,8 +101,8 @@ namespace Hime.Parsers.CF
                 Separator = terminals[this.options["Separator"]];
 
             //Generate lexer
-            Exporters.TextLexerExporter LexerExporter = new Exporters.TextLexerExporter(options.LexerWriter, options.Namespace, name, finalDFA, Separator);
-            List<Terminal> expected = LexerExporter.Export();
+            Exporters.TextLexerExporter lexerExporter = new Exporters.TextLexerExporter(options.LexerWriter, options.Namespace, name, finalDFA, Separator);
+            List<Terminal> expected = lexerExporter.Export();
 
             //Generate parser
             reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);

@@ -63,7 +63,7 @@ namespace Hime.Parsers.Exporters
                 stream.WriteLine("            separatorID = 0x" + separator.SID.ToString("X") + ";");
             stream.WriteLine("        }");
         }
-        protected void Export_Terminals()
+        private void Export_Terminals()
         {
             stream.WriteLine("        public static readonly SymbolTerminal[] terminals = {");
             bool first = true;
@@ -120,9 +120,5 @@ namespace Hime.Parsers.Exporters
             }
             stream.WriteLine(" };");
         }
-    }
-
-    class BinaryLexerExporter
-    {
     }
 }
