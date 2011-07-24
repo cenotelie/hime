@@ -16,9 +16,21 @@ namespace Hime.NUnit.Integration
 	[TestFixture]
 	public class Suite00_Compiler
 	{	
+		[Test]
+        public void Test000_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
+        {
+        	string grammar = 
+        		"public grammar cf Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
+        	
+        	Reporter reporter = new Reporter();
+        	ResourceCompiler compiler = new ResourceCompiler(reporter);
+			compiler.CompileData(grammar);
+            Assert.IsTrue(reporter.Result.HasErrors());
+        }
+        
 		[Ignore]
         [Test]
-        public void Test000_CompileData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
+        public void Test001_CompileData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
@@ -31,7 +43,7 @@ namespace Hime.NUnit.Integration
 
         [Ignore]
         [Test]
-        public void Test001_Compile_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
+        public void Test002_Compile_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
         		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";

@@ -127,11 +127,10 @@ namespace Hime.Kernel.Resources
             else if (Node.Symbol.Name == "access_private") return SymbolAccess.Private;
             return SymbolAccess.Public;
         }
-
+        
 		// TODO: made this method public for test, but maybe this is a sign of not optimal architecture, think about it
-        public bool CompileData(string Data)
+        public void CompileData(string Data)
         {
-            bool IsError = false;
             Parser.FileCentralDogma_Lexer UnitLexer = new Parser.FileCentralDogma_Lexer(Data);
             Parser.FileCentralDogma_Parser UnitParser = new Parser.FileCentralDogma_Parser(UnitLexer);
             // TODO: rewrite this code, it is a bit strange
@@ -139,30 +138,24 @@ namespace Hime.Kernel.Resources
             try { UnitRoot = UnitParser.Analyse(); }
             catch (System.Exception e) {
                 outputLog.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
-                return false;
+                return;
             }
 
             foreach (Redist.Parsers.LexerTextError Error in UnitLexer.Errors)
             {
                 outputLog.Report(new Reporting.BaseEntry(Reporting.Level.Error, "Lexer", Error.Message));
-                IsError = true;
             }
             foreach (Redist.Parsers.ParserError Error in UnitParser.Errors)
             {
                 outputLog.Report(new Reporting.BaseEntry(Reporting.Level.Error, "Parser", Error.Message));
-                IsError = true;
             }
 
             if (UnitRoot == null)
             {
                 outputLog.Error("Parser", "encountered an unrecoverable error.");
-                IsError = true;
+                return;
             }
-            else
-            {
-                intermediateRoot.AppendChild(UnitRoot);
-            }
-            return (!IsError);
+            intermediateRoot.AppendChild(UnitRoot);
         }
 
 
