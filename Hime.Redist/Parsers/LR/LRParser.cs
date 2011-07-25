@@ -134,10 +134,10 @@ namespace Hime.Redist.Parsers
                 {
                     errors.Add(new ParserErrorUnexpectedToken(nextToken, GetState(state).GetExpectedNames()));
                     if (errors.Count >= maxErrorCount)
-                        throw new ParserException("Too much errors, parsing stopped.");
+                        throw new ParserException("Too many errors, parsing stopped.");
                     nextToken = OnUnexpectedToken(nextToken);
                     if (nextToken == null)
-                        throw new ParserException("Unrecoverable error encountered");
+                    	return null;
                 }
             }
         }
