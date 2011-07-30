@@ -7,6 +7,7 @@
 using System;
 using NUnit.Framework;
 using Hime.Kernel.Resources.Parser;
+using Hime.Redist.Parsers;
 
 namespace Hime.NUnit.Integration
 {
@@ -32,6 +33,19 @@ namespace Hime.NUnit.Integration
         	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
             FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);
             parser.Analyse();
+        }
+		
+		[Ignore]
+		[Test]
+		public void Test002_Analyse_ShouldAcceptMissingSectionTerminal()
+        {
+        	string grammar = 
+        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	
+        	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
+            FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);
+            parser.Analyse();
+            Assert.AreEqual(0, parser.Errors.Count);
         }
 	}
 }

@@ -13,16 +13,17 @@ namespace Hime.Kernel
                 System.IO.Directory.Delete(path, true);
             System.IO.Directory.CreateDirectory(path);
 
+            string contextFreeGrammar = "Generators.ContextFreeGrammars.gram";
             // Checkout resources
             Resources.ResourceAccessor session = new Resources.ResourceAccessor();
             session.CheckOut("Daemon.Kernel.gram", path + "Kernel.gram");
-            session.CheckOut("Daemon.Generators.ContextFreeGrammars.gram", path + "Generators.ContextFreeGrammars.gram");
+            session.CheckOut("Daemon." + contextFreeGrammar, path + contextFreeGrammar);
             session.CheckOut("Daemon.Generators.ContextSensitiveGrammars.gram", path + "Generators.ContextSensitiveGrammars.gram");
 
             // Compile
             CompilationTask task = new CompilationTask();
             task.InputFiles.Add(path + "Kernel.gram");
-            task.InputFiles.Add(path + "Generators.ContextFreeGrammars.gram");
+            task.InputFiles.Add(path + contextFreeGrammar);
             task.InputFiles.Add(path + "Generators.ContextSensitiveGrammars.gram");
             task.GrammarName = "Hime.Kernel.FileCentralDogma";
             task.Namespace = "Hime.Kernel.Resources.Parser";
