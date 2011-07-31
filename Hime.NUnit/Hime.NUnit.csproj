@@ -53,12 +53,13 @@
     <Compile Include="BaseTestSuite.cs" />
     <Compile Include="himecc\Suite00_DefaultOptions.cs" />
     <Compile Include="himecc\Suite01_Compile.cs" />
-    <Compile Include="Integration\Suite01_Compiler.cs" />
+    <Compile Include="Integration\Suite01_Resource.cs" />
+    <Compile Include="Integration\Suite02_Compiler.cs" />
     <Compile Include="Integration\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Integration\Suite02_CompilationTask.cs" />
-    <Compile Include="Integration\Suite03_Ambiguous.cs" />
-    <Compile Include="Integration\Suite04_Parse.cs" />
-    <Compile Include="Integration\Suite05_KernelDaemon.cs" />
+    <Compile Include="Integration\Suite03_CompilationTask.cs" />
+    <Compile Include="Integration\Suite04_Ambiguous.cs" />
+    <Compile Include="Integration\Suite05_Parse.cs" />
+    <Compile Include="Integration\Suite06_KernelDaemon.cs" />
     <Compile Include="Integration\Tools.cs" />
   </ItemGroup>
   <ItemGroup>

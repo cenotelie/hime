@@ -79,13 +79,14 @@
     <Compile Include="Hime\Kernel\Graphs\GMLSerializer.cs" />
     <Compile Include="Hime\Kernel\Report.cs" />
     <Compile Include="Hime\Kernel\Reporter.cs" />
+    <Compile Include="Hime\Kernel\Resources\Resource.cs" />
     <Compile Include="Hime\Kernel\Resources\ResourceCompiler.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CFGrammarBinary.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CFGrammarText.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\Compiler.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFGrammarCompiler.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Grammars.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR0\ParserData.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Decider.cs" />
@@ -135,7 +136,7 @@
     <Compile Include="Hime\Kernel\KernelNaming.cs" />
     <Compile Include="Hime\Kernel\Reporting.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Embedded.cs" />
-    <Compile Include="Hime\Kernel\Resources\KernelResources.Compiler.cs" />
+    <Compile Include="Hime\Kernel\Resources\ResourceCompilerRegister.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.CompilerErrors.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Dependency.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Exceptions.cs" />
