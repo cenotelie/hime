@@ -66,8 +66,8 @@ namespace Hime.Demo
             task.ExportLog = true;
             task.ExportDoc = false;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\CSharp4.gram");
-            task.ParserFile = "CSharp.cs";
+            task.InputFiles.Add("Languages\\Test.gram");
+            task.ParserFile = "Test.cs";
             task.Method = Parsers.ParsingMethod.LRStar;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
@@ -75,9 +75,10 @@ namespace Hime.Demo
 
         static void Main(string[] args)
         {
+            Hime.Kernel.KernelDaemon.GenerateNextStep("D:\\Data\\VisualStudioProjects");
             //Compile();
             //Parse_ANSI_C();
-            Parse_MathExp();
+            //Parse_MathExp();
         }
 
         class Interpreter : Analyser.MathExp_Parser.Actions

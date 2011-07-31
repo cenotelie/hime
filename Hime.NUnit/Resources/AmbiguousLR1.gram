@@ -1,4 +1,4 @@
-﻿public grammar cf Test
+﻿public cf text grammar Test
 {
 	options
 	{

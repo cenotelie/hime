@@ -1,6 +1,6 @@
 ﻿namespace Hime.Earth.Java
 {
-	public grammar cf GrammarJavaBytecode
+	public cf text grammar GrammarJavaBytecode
 	{
 		options
 		{

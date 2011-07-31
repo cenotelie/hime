@@ -18,7 +18,7 @@ namespace Hime.NUnit.Integration
         public void Test000_ExecuteBody_LR0_ShouldNotFailOnSimpleGrammar()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
@@ -31,7 +31,7 @@ namespace Hime.NUnit.Integration
         public void Test001_ExecuteLoadData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
@@ -46,7 +46,7 @@ namespace Hime.NUnit.Integration
         public void Test002_Execute_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";

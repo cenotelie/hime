@@ -25,6 +25,7 @@ namespace Hime.Parsers
         private ParsingMethod method;
         private string lexerFile;
         private string parserFile;
+        private AccessModifier modifier;
         private bool exportDebug;
         private bool exportLog;
         private bool exportDoc;
@@ -59,6 +60,11 @@ namespace Hime.Parsers
         {
             get { return parserFile; }
             set { parserFile = value; }
+        }
+        public AccessModifier GeneratedCodeModifier
+        {
+            get { return modifier; }
+            set { modifier = value; }
         }
         public bool ExportDebug
         {
@@ -111,6 +117,7 @@ namespace Hime.Parsers
         {
             rawInputs = new List<string>();
             fileInputs = new List<string>();
+            modifier = AccessModifier.Public;
             method = ParsingMethod.RNGLALR1;
             exportDebug = false;
             exportLog = false;
@@ -118,17 +125,17 @@ namespace Hime.Parsers
             exportVisuals = false;
             multithreaded = true;
             this.reporter = new Reporter();
-       }
+        }
 
         public Report Execute()
         {
             try
             {
-            	this.ExecuteBody();
+                this.ExecuteBody();
             }
             catch (Exception ex)
             {
-                this.reporter.Report(ex);   
+                this.reporter.Report(ex);
             }
 
             this.ExecuteExportLog();

@@ -1,6 +1,6 @@
 ﻿namespace Hime.Earth.Asm
 {
-	public grammar cf GrammarAsmx86
+	public cf text grammar GrammarAsmx86
 	{
 		options
 		{

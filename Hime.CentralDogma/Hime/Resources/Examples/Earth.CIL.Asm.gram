@@ -1,6 +1,6 @@
 ﻿namespace Hime.Earth.CIL
 {
-	public grammar cf GrammarCILBinary : Hime.Kernel.Library.GrammarLibFlag
+	public cf text grammar GrammarCILBinary : Hime.Kernel.Library.GrammarLibFlag
 	{
 		options
 		{
@@ -40,7 +40,7 @@
 		}
 	}
 	
-	public grammar cf GrammarCILAsm
+	public cf text grammar GrammarCILAsm
 	{
 		options
 		{ }

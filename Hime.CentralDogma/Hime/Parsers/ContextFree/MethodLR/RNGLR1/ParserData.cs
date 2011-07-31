@@ -45,7 +45,7 @@ namespace Hime.Parsers.CF.LR
             terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
             DetermineNullables();
             stream = options.ParserWriter;
-            stream.WriteLine("    class " + grammar.LocalName + "_Parser : BaseRNGLR1Parser");
+            stream.WriteLine("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + grammar.LocalName + "_Parser : BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
             Export_Variables(stream);

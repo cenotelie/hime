@@ -18,7 +18,7 @@ namespace Hime.Parsers.CF.LR
             debug = options.ExportDebug;
             terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
             stream = options.ParserWriter;
-            stream.Write("    class " + grammar.LocalName + "_Parser : ");
+            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + grammar.LocalName + "_Parser : ");
             if (grammar is CFGrammarText)
                 stream.WriteLine("LR1TextParser");
             else

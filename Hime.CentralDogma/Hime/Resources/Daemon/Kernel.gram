@@ -1,6 +1,6 @@
 ﻿namespace Hime.Kernel
 {
-	public grammar cf GrammarKernel
+	public cf text grammar GrammarKernel
 	{
 		options {}
 		terminals
@@ -36,7 +36,7 @@
 	
 	
 	
-	public grammar cf FileCentralDogma : GrammarKernel, Hime.Parsers.GrammarContextFree, Hime.Parsers.GrammarContextSensitive
+	public cf text grammar FileCentralDogma : GrammarKernel, Hime.Parsers.GrammarContextFree, Hime.Parsers.GrammarContextSensitive
 	{
 		options
 		{

@@ -1,4 +1,4 @@
-﻿public grammar cf CSharp4
+﻿public cf text grammar CSharp4
 {
 	options
 	{

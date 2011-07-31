@@ -22,7 +22,7 @@ namespace Hime.Parsers.CF.LR
             debug = options.ExportDebug;
             terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
             stream = options.ParserWriter;
-            stream.Write("    class " + grammar.LocalName + "_Parser : ");
+            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + grammar.LocalName + "_Parser : ");
             stream.WriteLine("LRStarBaseParser");
             stream.WriteLine("    {");
             Export_Variables(stream);

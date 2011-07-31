@@ -81,6 +81,7 @@
     <Compile Include="Hime\Kernel\Reporter.cs" />
     <Compile Include="Hime\Kernel\Resources\Resource.cs" />
     <Compile Include="Hime\Kernel\Resources\ResourceCompiler.cs" />
+    <Compile Include="Hime\Parsers\AccessModifier.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CFGrammarBinary.cs" />
@@ -157,7 +158,7 @@
     <None Include="Hime\Resources\Visuals\svg\Hime.Warning.svg" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Asm.PE.format" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.PE.format" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.Library.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\BinLibrary.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.Asm.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.B.gram">
     </EmbeddedResource>
@@ -165,9 +166,9 @@
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Asm.x86_32.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Java.Bytecode.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.Formats.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.ContextSensitiveGrammars.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\Generators.ContextFreeGrammars.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\Formats.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\CSGrammars.gram" />
+    <EmbeddedResource Include="Hime\Resources\Daemon\CFGrammars.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Java.ClassFile.format" />
   </ItemGroup>
   <ItemGroup>

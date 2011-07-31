@@ -678,20 +678,33 @@ namespace Hime.Parsers.CF
             }
         }
 
-        private void Compile_Recognize_grammar_text(CFGrammar Data, Redist.Parsers.SyntaxTreeNode GrammarNode)
+        private void Compile_Recognize_grammar_text(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode node)
         {
-            log.Info("Compiler", "Compiling grammar " + Data.LocalName);
+            log.Info("Compiler", "Compiling grammar " + grammar.LocalName);
             log.Info("Compiler", "Grammar takes text as input");
-            Compile_Recognize_grammar_options(Data, GrammarNode.Children[3]);
-            Compile_Recognize_grammar_terminals(Data, GrammarNode.Children[4]);
-            Compile_Recognize_grammar_rules(Data, GrammarNode.Children[5]);
+            for (int i = 3; i < node.Children.Count; i++)
+            {
+                Redist.Parsers.SyntaxTreeNode child = node.Children[i];
+                if (child.Symbol.Name == "options")
+                    Compile_Recognize_grammar_options(grammar, child);
+                else if (child.Symbol.Name == "terminals")
+                    Compile_Recognize_grammar_terminals(grammar, child);
+                else if (child.Symbol.Name == "rules")
+                    Compile_Recognize_grammar_rules(grammar, child);
+            }
         }
-        private void Compile_Recognize_grammar_bin(CFGrammar Data, Redist.Parsers.SyntaxTreeNode GrammarNode)
+        private void Compile_Recognize_grammar_bin(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode node)
         {
-            log.Info("Compiler", "Compiling grammar " + Data.LocalName);
+            log.Info("Compiler", "Compiling grammar " + grammar.LocalName);
             log.Info("Compiler", "Grammar takes binary as input");
-            Compile_Recognize_grammar_options(Data, GrammarNode.Children[3]);
-            Compile_Recognize_grammar_rules(Data, GrammarNode.Children[4]);
+            for (int i = 3; i < node.Children.Count; i++)
+            {
+                Redist.Parsers.SyntaxTreeNode child = node.Children[i];
+                if (child.Symbol.Name == "options")
+                    Compile_Recognize_grammar_options(grammar, child);
+                else if (child.Symbol.Name == "rules")
+                    Compile_Recognize_grammar_rules(grammar, child);
+            }
         }
     }
 }

@@ -12,21 +12,21 @@ namespace Hime.VSTests.Integration
         [TestMethod]
         public void Test001_ReturnsFalseOnConflictuousGrammar_LALR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
             Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
         }
 
         [TestMethod]
         public void Test002_ReturnsFalseOnConflictuousGrammar_LR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
             Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
         }
 
         [TestMethod]
         public void Test003_FindsLALR1AmbiguousAndLR1NonAmbiguous()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
             Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
             Assert.IsTrue(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
         }
@@ -34,14 +34,14 @@ namespace Hime.VSTests.Integration
         [TestMethod]
         public void Test004_FindsShiftReduceForLALR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
             Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LALR1));
         }
 
         [TestMethod]
         public void Test005_FindsShiftReduceForLR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
             Assert.IsFalse(Tools.BuildRawText(grammar, Parsers.ParsingMethod.LR1));
         }
 

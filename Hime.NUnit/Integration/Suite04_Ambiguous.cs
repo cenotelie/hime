@@ -15,14 +15,14 @@ namespace Hime.NUnit.Integration
     	[Test]
         public void Test001_ConflictuousGrammar_LALR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
             Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
         public void Test002_ConflictuousGrammar_LR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
             Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors);
         }
 
@@ -31,7 +31,7 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test003_FindsLALR1AmbiguousAndLR1NonAmbiguous()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
             Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors);
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors);
         }
@@ -39,21 +39,21 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test004_ShouldNotStackOverflow()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X -> X; } }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X -> X; } }";
             Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
         public void Test005_FindsShiftReduceForLALR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
             Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
         public void Test006_FindsShiftReduceForLR1()
         {
-            string grammar = "public grammar cf Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
+            string grammar = "public cf text grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
             Assert.IsTrue(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors);
         }
 
@@ -73,7 +73,7 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test009_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {
-        	string grammar = "public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	string grammar = "public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR0).HasErrors);
         }
 
@@ -81,7 +81,7 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test010_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {
-        	string grammar = "public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        	string grammar = "public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors);
         }
 
@@ -89,7 +89,7 @@ namespace Hime.NUnit.Integration
         [Test]
         public void Test011_FindsAmbiguousGrammarLR1_Item418()
         {
-        	string grammar = "public grammar cf Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
+        	string grammar = "public cf text grammar Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR1).HasErrors);
         }
     }

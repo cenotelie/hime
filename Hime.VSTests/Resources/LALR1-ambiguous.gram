@@ -1,4 +1,4 @@
-﻿public grammar cf AmbiguousLALR1
+﻿public cf text grammar AmbiguousLALR1
 {
 	options
 	{

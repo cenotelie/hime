@@ -1,4 +1,4 @@
-﻿public grammar cf ANSI_C {
+﻿public cf text grammar ANSI_C {
 	options {
 		Axiom = "translation_unit";
 		Separator = "SEPARATOR";

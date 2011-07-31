@@ -1,6 +1,6 @@
 ﻿namespace jp.cit.langrid
 {
-	public grammar cf SentenceFR
+	public cf text grammar SentenceFR
 	{
 		options { }
 		terminals
@@ -112,7 +112,7 @@
 		}
 	}
 	
-	public grammar cf SentenceEN
+	public cf text grammar SentenceEN
 	{
 		options { }
 		terminals
@@ -227,7 +227,7 @@
 	
 	
 	
-	public grammar cf EUParliamentFR : SentenceFR
+	public cf text grammar EUParliamentFR : SentenceFR
 	{
 		options
 		{
@@ -254,7 +254,7 @@
 		}
 	}
 	
-	public grammar cf EUParliamentEN : SentenceEN
+	public cf text grammar EUParliamentEN : SentenceEN
 	{
 		options
 		{

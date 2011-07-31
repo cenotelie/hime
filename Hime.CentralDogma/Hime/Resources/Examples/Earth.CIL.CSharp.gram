@@ -1,6 +1,6 @@
 ﻿namespace Hime.Earth.CIL
 {
-	public grammar cf GrammarCSharp
+	public cf text grammar GrammarCSharp
 	{
 		options
 		{

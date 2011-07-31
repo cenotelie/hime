@@ -28,7 +28,7 @@ namespace Hime.NUnit.Integration
 		public void Test001_Analyse_ShouldNotThrowExceptionWhenSemiColonIsMissing()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
         	
         	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
             FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);
@@ -39,7 +39,7 @@ namespace Hime.NUnit.Integration
 		public void Test002_Analyse_ShouldAcceptMissingSectionTerminal()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
             FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);

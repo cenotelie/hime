@@ -1,6 +1,6 @@
 namespace Hime.Earth.B
 {
-	public grammar cf GrammarB
+	public cf text grammar GrammarB
 	{
 		options
 		{

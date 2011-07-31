@@ -12,8 +12,8 @@ namespace Hime.NUnit.Integration
     [TestFixture]
     public class Suite05_Parse : BaseTestSuite
     {
-        private const string grammar0 = "public grammar cf Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'S'b'T|'c'T|'d'; T->'a'T|'b'S|'c'; } }";
-        private const string grammar1 = "public grammar cf Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'x'*; } }";
+        private const string grammar0 = "public cf text grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'S'b'T|'c'T|'d'; T->'a'T|'b'S|'c'; } }";
+        private const string grammar1 = "public cf text grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'x'*; } }";
 
         private void TestGrammar(string grammar, ParsingMethod method, string input)
         {

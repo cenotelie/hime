@@ -102,7 +102,7 @@ namespace Hime.Parsers.CF
 
             //Generate lexer
             Exporters.TextLexerExporter lexerExporter = new Exporters.TextLexerExporter(options.LexerWriter, options.Namespace, name, finalDFA, Separator);
-            List<Terminal> expected = lexerExporter.Export();
+            List<Terminal> expected = lexerExporter.Export(options.GeneratedCodeModifier);
 
             //Generate parser
             reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
