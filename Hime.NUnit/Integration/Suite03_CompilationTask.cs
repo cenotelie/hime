@@ -26,7 +26,6 @@ namespace Hime.NUnit.Integration
             task.ExecuteBody();
         }
 
-        [Ignore]
         [Test]
         public void Test001_ExecuteLoadData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
@@ -41,7 +40,6 @@ namespace Hime.NUnit.Integration
         }
         
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
-        [Ignore]
         [Test]
         public void Test002_Execute_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {

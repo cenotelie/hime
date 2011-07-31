@@ -176,12 +176,23 @@ namespace Hime.Parsers
                 return false;
             }
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler(this.reporter);
+            List<System.IO.TextReader> readers = new List<System.IO.TextReader>();
             foreach (string file in fileInputs)
-                compiler.AddInput(new System.IO.StreamReader(file), file);
+            {
+                System.IO.TextReader reader = new System.IO.StreamReader(file);
+                readers.Add(reader);
+                compiler.AddInput(reader, file);
+            }
             foreach (string data in rawInputs)
-                compiler.AddInput(new System.IO.StringReader(data));
+            {
+                System.IO.TextReader reader = new System.IO.StringReader(data);
+                readers.Add(reader);
+                compiler.AddInput(reader);
+            }
             bool result = compiler.Compile();
             this.root = compiler.OutputRootNamespace;
+            foreach (System.IO.TextReader reader in readers)
+                reader.Close();
             return result;
         }
         

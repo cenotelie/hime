@@ -47,25 +47,32 @@ namespace Hime.Parsers.CF
             }
             if (resource.Symbol is CFGrammarText)
             {
-                foreach (Redist.Parsers.SyntaxTreeNode Terminal in resource.SyntaxNode.Children[4].Children)
+                for (int i = 3; i < resource.SyntaxNode.Children.Count; i++)
                 {
-                    if (Terminal.Children[2].Children.Count == 1)
+                    Redist.Parsers.SyntaxTreeNode node = resource.SyntaxNode.Children[i];
+                    if (node.Symbol.Name == "terminals")
                     {
-                        Kernel.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Terminal.Children[2].Children[0]);
-                        Kernel.Symbol Symbol = resource.Symbol.ResolveName(Name);
-                        if (Symbol is Grammar)
+                        foreach (Redist.Parsers.SyntaxTreeNode Terminal in node.Children)
                         {
-                            bool Found = false;
-                            foreach (KeyValuePair<string, Kernel.Resources.Resource> D in resource.Dependencies)
+                            if (Terminal.Children[2].Children.Count == 1)
                             {
-                                if (D.Value.Symbol == Symbol)
+                                Kernel.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Terminal.Children[2].Children[0]);
+                                Kernel.Symbol Symbol = resource.Symbol.ResolveName(Name);
+                                if (Symbol is Grammar)
                                 {
-                                    Found = true;
-                                    break;
+                                    bool Found = false;
+                                    foreach (KeyValuePair<string, Kernel.Resources.Resource> D in resource.Dependencies)
+                                    {
+                                        if (D.Value.Symbol == Symbol)
+                                        {
+                                            Found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!Found)
+                                        resource.AddDependency("subgrammar", graph.GetResource(Symbol));
                                 }
                             }
-                            if (!Found)
-                                resource.AddDependency("subgrammar", graph.GetResource(Symbol));
                         }
                     }
                 }

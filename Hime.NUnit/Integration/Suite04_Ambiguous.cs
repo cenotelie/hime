@@ -69,7 +69,6 @@ namespace Hime.NUnit.Integration
             Assert.IsTrue(CompileResource("AmbiguousLR1.gram", Parsers.ParsingMethod.LR1).HasErrors);
         }
         
-        [Ignore]
         [Test]
         public void Test009_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {
@@ -77,7 +76,6 @@ namespace Hime.NUnit.Integration
             Assert.IsFalse(CompileRaw(grammar, Parsers.ParsingMethod.LR0).HasErrors);
         }
 
-        [Ignore]
         [Test]
         public void Test010_ShouldAcceptWhenNoTerminalsArePresent_Item415()
         {

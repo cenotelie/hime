@@ -21,11 +21,13 @@ namespace Hime.NUnit.Integration
         public void Test000_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
-        	compiler.CompileData(new StringReader(grammar));
+            StringReader reader = new StringReader(grammar);
+            compiler.CompileData(reader);
+            reader.Close();
             Assert.IsTrue(reporter.Result.HasErrors);
         }
         
@@ -33,42 +35,46 @@ namespace Hime.NUnit.Integration
         public void Test001_CompileData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
-        	compiler.CompileData(new StringReader(grammar));
+            StringReader reader = new StringReader(grammar);
+            compiler.CompileData(reader);
+            reader.Close();
             Assert.IsFalse(reporter.Result.HasErrors);
         }
 
         // TODO:
-        [Ignore]
         [Test]
         public void Test002_Compile_ShouldNotThrowExceptionWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	// TODO: this is a bit strange, think about it
-        	compiler.AddInput(new StringReader(grammar));
-        	compiler.Compile();
+            StringReader reader = new StringReader(grammar);
+            compiler.AddInput(reader);
+            compiler.Compile();
+            reader.Close();
         }
         
         // TODO:
-        [Ignore]
         [Test]
         public void Test003_Compile_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public grammar cf Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	// TODO: this is a bit strange, think about it
-        	compiler.AddInput(new StringReader(grammar));
-        	compiler.Compile();
+            StringReader reader = new StringReader(grammar);
+            compiler.AddInput(reader);
+            compiler.Compile();
+            reader.Close();
             Assert.IsFalse(reporter.Result.HasErrors);
         }
         
