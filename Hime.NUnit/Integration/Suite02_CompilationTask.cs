@@ -37,7 +37,7 @@ namespace Hime.NUnit.Integration
 			task.GrammarName = "Test";
             task.Method = Parsers.ParsingMethod.LR0;
             task.ExecuteLoadData();
-            Assert.IsFalse(task.Result.HasErrors());
+            Assert.IsFalse(task.Result.HasErrors);
         }
         
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
@@ -52,7 +52,7 @@ namespace Hime.NUnit.Integration
 			task.GrammarName = "Test";
             task.Method = Parsers.ParsingMethod.LR0;
             Report result = task.Execute();
-            Assert.IsFalse(result.HasErrors());
+            Assert.IsFalse(result.HasErrors);
         }
 	}
 }

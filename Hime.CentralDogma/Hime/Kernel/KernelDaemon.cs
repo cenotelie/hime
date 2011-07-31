@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using Hime.Parsers;
+using Hime.Kernel.Reporting;
+using System.IO;
 
 namespace Hime.Kernel
 {
     public static class KernelDaemon
     {
-        public static void GenerateNextStep(string path)
+        public static bool GenerateNextStep(string path)
         {
             // Test path
             path += "\\Daemon\\";
-            if (System.IO.Directory.Exists(path))
-                System.IO.Directory.Delete(path, true);
-            System.IO.Directory.CreateDirectory(path);
+            if (Directory.Exists(path)) Directory.Delete(path, true);
+            DirectoryInfo directory = Directory.CreateDirectory(path);
+            System.Console.WriteLine(directory.FullName);
 
             string contextFreeGrammar = "Generators.ContextFreeGrammars.gram";
             // Checkout resources
@@ -30,10 +32,11 @@ namespace Hime.Kernel
             task.Method = Parsers.ParsingMethod.LALR1;
             task.ParserFile = path + "KernelResources.Parser.cs";
             task.ExportLog = true;
-            task.Execute();
+            Report result = task.Execute();
             
             // Close session
             session.Close();
+            return !result.HasErrors;
         }
 
         public static void BuildUnicode(string File)

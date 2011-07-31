@@ -41,16 +41,18 @@ namespace Hime.Kernel.Reporting
             return Doc;
         }
         
-        public bool HasErrors()
+        public bool HasErrors
         {
-        	foreach (Section section in this.Sections)
-            {
-                foreach (Entry entry in section.Entries)
-                {
-                    if (entry.Level == Level.Error) return true;
-                }
-            }
-            return false;
+        	get {
+	        	foreach (Section section in this.Sections)
+	            {
+	                foreach (Entry entry in section.Entries)
+	                {
+	                    if (entry.Level == Level.Error) return true;
+	                }
+	            }
+	            return false;
+        	}
         }
 	}
 }

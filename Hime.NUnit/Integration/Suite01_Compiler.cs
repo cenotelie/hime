@@ -25,7 +25,7 @@ namespace Hime.NUnit.Integration
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
 			compiler.CompileData(grammar);
-            Assert.IsTrue(reporter.Result.HasErrors());
+            Assert.IsTrue(reporter.Result.HasErrors);
         }
         
 		[Ignore]
@@ -38,7 +38,7 @@ namespace Hime.NUnit.Integration
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	compiler.CompileData(grammar);
-            Assert.IsFalse(reporter.Result.HasErrors());
+            Assert.IsFalse(reporter.Result.HasErrors);
         }
 
         [Ignore]
@@ -53,7 +53,7 @@ namespace Hime.NUnit.Integration
         	// TODO: this is a bit strange, think about it
         	compiler.AddInputRawText(grammar);
         	compiler.Compile();
-            Assert.IsFalse(reporter.Result.HasErrors());
+            Assert.IsFalse(reporter.Result.HasErrors);
         }
         
         // TODO: do a test with incorrect syntax but for which Compile returns false (saying it has no errors) even though errors are dumped

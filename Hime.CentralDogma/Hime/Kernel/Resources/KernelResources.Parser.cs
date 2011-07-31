@@ -8,55 +8,55 @@ namespace Hime.Kernel.Resources.Parser
         public static readonly SymbolTerminal[] terminals = {
             new SymbolTerminal(0x1, "ε"),
             new SymbolTerminal(0x2, "$"),
-            new SymbolTerminal(0xB, "_T[.]"),
+            new SymbolTerminal(0xB, "."),
             new SymbolTerminal(0xA, "NAME"),
-            new SymbolTerminal(0x11, "_T[{]"),
-            new SymbolTerminal(0x12, "_T[}]"),
-            new SymbolTerminal(0xDA, "_T[[]"),
+            new SymbolTerminal(0x11, "{"),
+            new SymbolTerminal(0x12, "}"),
+            new SymbolTerminal(0xDA, "["),
             new SymbolTerminal(0x2D, "INTEGER"),
-            new SymbolTerminal(0x40, "_T[=]"),
-            new SymbolTerminal(0x41, "_T[;]"),
-            new SymbolTerminal(0x43, "_T[(]"),
-            new SymbolTerminal(0x44, "_T[)]"),
-            new SymbolTerminal(0x45, "_T[*]"),
-            new SymbolTerminal(0x46, "_T[+]"),
-            new SymbolTerminal(0x47, "_T[?]"),
-            new SymbolTerminal(0x48, "_T[,]"),
-            new SymbolTerminal(0x49, "_T[-]"),
-            new SymbolTerminal(0x4A, "_T[|]"),
-            new SymbolTerminal(0x4D, "_T[<]"),
-            new SymbolTerminal(0x4E, "_T[>]"),
-            new SymbolTerminal(0x51, "_T[:]"),
-            new SymbolTerminal(0x55, "_T[^]"),
-            new SymbolTerminal(0x56, "_T[!]"),
-            new SymbolTerminal(0xDB, "_T[]]"),
+            new SymbolTerminal(0x40, "="),
+            new SymbolTerminal(0x41, ";"),
+            new SymbolTerminal(0x43, "("),
+            new SymbolTerminal(0x44, ")"),
+            new SymbolTerminal(0x45, "*"),
+            new SymbolTerminal(0x46, "+"),
+            new SymbolTerminal(0x47, "?"),
+            new SymbolTerminal(0x48, ","),
+            new SymbolTerminal(0x49, "-"),
+            new SymbolTerminal(0x4A, "|"),
+            new SymbolTerminal(0x4D, "<"),
+            new SymbolTerminal(0x4E, ">"),
+            new SymbolTerminal(0x51, ":"),
+            new SymbolTerminal(0x55, "^"),
+            new SymbolTerminal(0x56, "!"),
+            new SymbolTerminal(0xDB, "]"),
             new SymbolTerminal(0x7, "SEPARATOR"),
-            new SymbolTerminal(0x42, "_T[..]"),
+            new SymbolTerminal(0x42, ".."),
             new SymbolTerminal(0x2E, "QUOTED_DATA"),
             new SymbolTerminal(0x2F, "ESCAPEES"),
-            new SymbolTerminal(0x4B, "_T[=>]"),
-            new SymbolTerminal(0x4C, "_T[->]"),
-            new SymbolTerminal(0x53, "_T[cf]"),
-            new SymbolTerminal(0xD9, "_T[cs]"),
+            new SymbolTerminal(0x4B, "=>"),
+            new SymbolTerminal(0x4C, "->"),
+            new SymbolTerminal(0x53, "cf"),
+            new SymbolTerminal(0xD9, "cs"),
             new SymbolTerminal(0x30, "SYMBOL_TERMINAL_TEXT"),
             new SymbolTerminal(0x31, "SYMBOL_TERMINAL_SET"),
             new SymbolTerminal(0x39, "SYMBOL_VALUE_BINARY"),
             new SymbolTerminal(0x3F, "SYMBOL_JOKER_BINARY"),
             new SymbolTerminal(0x34, "SYMBOL_VALUE_UINT8"),
             new SymbolTerminal(0x3A, "SYMBOL_JOKER_UINT8"),
-            new SymbolTerminal(0x54, "_T[rules]"),
-            new SymbolTerminal(0xC, "_T[public]"),
+            new SymbolTerminal(0x54, "rules"),
+            new SymbolTerminal(0xC, "public"),
             new SymbolTerminal(0x32, "SYMBOL_TERMINAL_UBLOCK"),
             new SymbolTerminal(0x33, "SYMBOL_TERMINAL_UCAT"),
             new SymbolTerminal(0x35, "SYMBOL_VALUE_UINT16"),
             new SymbolTerminal(0x3B, "SYMBOL_JOKER_UINT16"),
-            new SymbolTerminal(0xD, "_T[private]"),
-            new SymbolTerminal(0x4F, "_T[options]"),
-            new SymbolTerminal(0x52, "_T[grammar]"),
-            new SymbolTerminal(0xF, "_T[internal]"),
-            new SymbolTerminal(0xE, "_T[protected]"),
-            new SymbolTerminal(0x10, "_T[namespace]"),
-            new SymbolTerminal(0x50, "_T[terminals]"),
+            new SymbolTerminal(0xD, "private"),
+            new SymbolTerminal(0x4F, "options"),
+            new SymbolTerminal(0x52, "grammar"),
+            new SymbolTerminal(0xF, "internal"),
+            new SymbolTerminal(0xE, "protected"),
+            new SymbolTerminal(0x10, "namespace"),
+            new SymbolTerminal(0x50, "terminals"),
             new SymbolTerminal(0x36, "SYMBOL_VALUE_UINT32"),
             new SymbolTerminal(0x3C, "SYMBOL_JOKER_UINT32"),
             new SymbolTerminal(0x37, "SYMBOL_VALUE_UINT64"),
@@ -1307,13 +1307,13 @@ namespace Hime.Kernel.Resources.Parser
             new SymbolVariable(0x71, "grammar_access"), 
             new SymbolVariable(0x72, "cf_grammar_text"), 
             new SymbolVariable(0x73, "cf_grammar_bin"), 
-            new SymbolVariable(0x74, "_m89"), 
-            new SymbolVariable(0x75, "_m91"), 
-            new SymbolVariable(0x76, "_m93"), 
-            new SymbolVariable(0x77, "_m101"), 
-            new SymbolVariable(0x78, "_m105"), 
-            new SymbolVariable(0x79, "_m109"), 
-            new SymbolVariable(0x7A, "_m113"), 
+            new SymbolVariable(0x74, "_m86"), 
+            new SymbolVariable(0x75, "_m88"), 
+            new SymbolVariable(0x76, "_m90"), 
+            new SymbolVariable(0x77, "_m94"), 
+            new SymbolVariable(0x78, "_m97"), 
+            new SymbolVariable(0x79, "_m99"), 
+            new SymbolVariable(0x7A, "_m101"), 
             new SymbolVariable(0x7B, "grammar_cf_rules<grammar_text_terminal>"), 
             new SymbolVariable(0x7C, "cf_rule_simple<grammar_text_terminal>"), 
             new SymbolVariable(0x7D, "rule_definition<grammar_text_terminal>"), 
@@ -1326,12 +1326,12 @@ namespace Hime.Kernel.Resources.Parser
             new SymbolVariable(0x84, "rule_def_atom<grammar_text_terminal>"), 
             new SymbolVariable(0x85, "rule_sym_ref_template<grammar_text_terminal>"), 
             new SymbolVariable(0x86, "rule_sym_ref_params<grammar_text_terminal>"), 
-            new SymbolVariable(0x87, "_m134"), 
-            new SymbolVariable(0x88, "_m143"), 
-            new SymbolVariable(0x89, "_m145"), 
-            new SymbolVariable(0x8A, "_m147"), 
+            new SymbolVariable(0x87, "_m117"), 
+            new SymbolVariable(0x88, "_m120"), 
+            new SymbolVariable(0x89, "_m121"), 
+            new SymbolVariable(0x8A, "_m122"), 
             new SymbolVariable(0x8B, "cf_rule_template<grammar_text_terminal>"), 
-            new SymbolVariable(0x8C, "_m152"), 
+            new SymbolVariable(0x8C, "_m124"), 
             new SymbolVariable(0x8D, "grammar_cf_rules<grammar_bin_terminal>"), 
             new SymbolVariable(0x8E, "cf_rule_simple<grammar_bin_terminal>"), 
             new SymbolVariable(0x8F, "rule_definition<grammar_bin_terminal>"), 
@@ -1344,29 +1344,41 @@ namespace Hime.Kernel.Resources.Parser
             new SymbolVariable(0x96, "rule_def_atom<grammar_bin_terminal>"), 
             new SymbolVariable(0x97, "rule_sym_ref_template<grammar_bin_terminal>"), 
             new SymbolVariable(0x98, "rule_sym_ref_params<grammar_bin_terminal>"), 
-            new SymbolVariable(0x99, "_m175"), 
-            new SymbolVariable(0x9A, "_m184"), 
-            new SymbolVariable(0x9B, "_m186"), 
-            new SymbolVariable(0x9C, "_m188"), 
+            new SymbolVariable(0x99, "_m137"), 
+            new SymbolVariable(0x9A, "_m138"), 
+            new SymbolVariable(0x9B, "_m139"), 
+            new SymbolVariable(0x9C, "_m140"), 
             new SymbolVariable(0x9D, "cf_rule_template<grammar_bin_terminal>"), 
-            new SymbolVariable(0x9E, "_m193"), 
+            new SymbolVariable(0x9E, "_m142"), 
             new SymbolVariable(0xDC, "cs_grammar_text"), 
             new SymbolVariable(0xDD, "cs_grammar_bin"), 
             new SymbolVariable(0xDE, "grammar_cs_rules<grammar_text_terminal>"), 
             new SymbolVariable(0xDF, "cs_rule_simple<grammar_text_terminal>"), 
             new SymbolVariable(0xE0, "cs_rule_context<grammar_text_terminal>"), 
             new SymbolVariable(0xE1, "cs_rule_template<grammar_text_terminal>"), 
-            new SymbolVariable(0xE2, "_m160"), 
+            new SymbolVariable(0xE2, "_m152"), 
             new SymbolVariable(0xE3, "grammar_cs_rules<grammar_bin_terminal>"), 
             new SymbolVariable(0xE4, "cs_rule_simple<grammar_bin_terminal>"), 
             new SymbolVariable(0xE5, "cs_rule_context<grammar_bin_terminal>"), 
             new SymbolVariable(0xE6, "cs_rule_template<grammar_bin_terminal>"), 
-            new SymbolVariable(0xE7, "_m178"), 
+            new SymbolVariable(0xE7, "_m157"), 
             new SymbolVariable(0xE8, "file_item"), 
             new SymbolVariable(0xE9, "file"), 
             new SymbolVariable(0xEA, "_m234"), 
             new SymbolVariable(0xEB, "_Axiom_") };
         private static SyntaxTreeNode Production_13_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[0]);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_13_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -1494,6 +1506,12 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_19_0 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[6]);
+            return root;
+        }
+        private static SyntaxTreeNode Production_19_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[6]);
@@ -1538,12 +1556,7 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[8], SyntaxTreeNodeAction.Replace);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -1556,10 +1569,37 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_1B_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[8], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_1C_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[9], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_1C_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -1574,12 +1614,6 @@ namespace Hime.Kernel.Resources.Parser
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
-            return root;
-        }
-        private static SyntaxTreeNode Production_1C_1 (LRParser baseParser)
-        {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[9], SyntaxTreeNodeAction.Replace);
             return root;
         }
         private static SyntaxTreeNode Production_57_0 (LRParser baseParser)
@@ -1884,17 +1918,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             current = current.Previous;
-            current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[20]);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("range"), SyntaxTreeNodeAction.Promote));
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -1914,8 +1939,17 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             current = current.Previous;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[20]);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("range"), SyntaxTreeNodeAction.Promote));
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -1933,6 +1967,18 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[21]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_62_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[21]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -1945,19 +1991,19 @@ namespace Hime.Kernel.Resources.Parser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_62_1 (LRParser baseParser)
+        private static SyntaxTreeNode Production_63_0 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[21]);
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[22]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_63_0 (LRParser baseParser)
+        private static SyntaxTreeNode Production_63_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -1979,6 +2025,18 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[23]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_64_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[23]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -1992,6 +2050,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_65_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[24]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_65_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -2011,6 +2081,12 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_66_0 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[25]);
+            return root;
+        }
+        private static SyntaxTreeNode Production_66_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
@@ -2022,12 +2098,6 @@ namespace Hime.Kernel.Resources.Parser
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
-            return root;
-        }
-        private static SyntaxTreeNode Production_66_1 (LRParser baseParser)
-        {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[25]);
             return root;
         }
         private static SyntaxTreeNode Production_67_0 (LRParser baseParser)
@@ -2105,6 +2175,26 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_6B_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[30]);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_6B_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -2292,6 +2382,25 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[33]);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_6E_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[33]);
             temp = current.Next;
@@ -2310,6 +2419,26 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_6F_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[34]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_6F_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -2337,6 +2466,28 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_70_0 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[35]);
+            return root;
+        }
+        private static SyntaxTreeNode Production_70_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[35]);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_70_2 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
@@ -2353,12 +2504,6 @@ namespace Hime.Kernel.Resources.Parser
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
-            return root;
-        }
-        private static SyntaxTreeNode Production_70_1 (LRParser baseParser)
-        {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[35]);
             return root;
         }
         private static SyntaxTreeNode Production_71_0 (LRParser baseParser)
@@ -2515,13 +2660,8 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[39], SyntaxTreeNodeAction.Replace);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("concat"), SyntaxTreeNodeAction.Promote));
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -2531,7 +2671,19 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_74_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[39], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("concat"), SyntaxTreeNodeAction.Promote));
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_75_0 (LRParser baseParser)
@@ -2540,13 +2692,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[40], SyntaxTreeNodeAction.Replace);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -2559,7 +2706,23 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_75_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[40], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_76_0 (LRParser baseParser)
@@ -2568,13 +2731,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[41], SyntaxTreeNodeAction.Replace);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -2587,7 +2745,23 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_76_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[41], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_77_0 (LRParser baseParser)
@@ -2596,12 +2770,7 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[42], SyntaxTreeNodeAction.Replace);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -2614,7 +2783,22 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_77_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[42], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_78_0 (LRParser baseParser)
@@ -2622,12 +2806,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[43], SyntaxTreeNodeAction.Replace);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -2637,7 +2816,18 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_78_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[43], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_79_0 (LRParser baseParser)
@@ -2645,12 +2835,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[44], SyntaxTreeNodeAction.Replace);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -2660,7 +2845,18 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_79_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[44], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_7A_0 (LRParser baseParser)
@@ -2669,12 +2865,7 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[45], SyntaxTreeNodeAction.Replace);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -2687,10 +2878,45 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_7A_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[45], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_7B_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[46]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_7B_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -2745,6 +2971,18 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[48]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_7D_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[48]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -2781,6 +3019,18 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[50]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_7F_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[50]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -2794,6 +3044,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_80_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[51]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_80_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -2815,12 +3077,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[52]);
-            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -2866,7 +3123,12 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[52]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -2878,12 +3140,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[53]);
-            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -2912,7 +3169,12 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[53]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3035,6 +3297,26 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[57]);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_86_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[57]);
             temp = current.Next;
@@ -3059,12 +3341,7 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[58], SyntaxTreeNodeAction.Replace);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -3077,7 +3354,22 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_87_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[58], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_88_0 (LRParser baseParser)
@@ -3085,13 +3377,8 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[59], SyntaxTreeNodeAction.Replace);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("concat"), SyntaxTreeNodeAction.Promote));
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3101,7 +3388,19 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_88_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[59], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("concat"), SyntaxTreeNodeAction.Promote));
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_89_0 (LRParser baseParser)
@@ -3110,13 +3409,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[60], SyntaxTreeNodeAction.Replace);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -3129,7 +3423,23 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_89_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[60], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_8A_0 (LRParser baseParser)
@@ -3138,13 +3448,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[61], SyntaxTreeNodeAction.Replace);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -3157,7 +3462,23 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_8A_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[61], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_8B_0 (LRParser baseParser)
@@ -3195,12 +3516,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[63], SyntaxTreeNodeAction.Replace);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3208,6 +3524,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_8C_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[63], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_8C_2 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -3224,13 +3552,44 @@ namespace Hime.Kernel.Resources.Parser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_8C_2 (LRParser baseParser)
+        private static SyntaxTreeNode Production_8C_3 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[63], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_8D_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[64]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_8D_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -3285,6 +3644,18 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[66]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_8F_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[66]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -3321,6 +3692,18 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[68]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_91_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[68]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -3334,6 +3717,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_92_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[69]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_92_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -3355,12 +3750,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[70]);
-            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3406,7 +3796,12 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[70]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3418,12 +3813,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[71]);
-            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3452,7 +3842,12 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[71]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3575,6 +3970,26 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[75]);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_98_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[75]);
             temp = current.Next;
@@ -3599,12 +4014,7 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[76], SyntaxTreeNodeAction.Replace);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -3617,7 +4027,22 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_99_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[76], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_9A_0 (LRParser baseParser)
@@ -3625,13 +4050,8 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[77], SyntaxTreeNodeAction.Replace);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("concat"), SyntaxTreeNodeAction.Promote));
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3641,7 +4061,19 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_9A_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[77], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("concat"), SyntaxTreeNodeAction.Promote));
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_9B_0 (LRParser baseParser)
@@ -3650,13 +4082,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[78], SyntaxTreeNodeAction.Replace);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -3669,7 +4096,23 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_9B_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[78], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_9C_0 (LRParser baseParser)
@@ -3678,13 +4121,8 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[79], SyntaxTreeNodeAction.Replace);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
-            root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
@@ -3697,7 +4135,23 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_9C_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[79], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_9D_0 (LRParser baseParser)
@@ -3735,12 +4189,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[81], SyntaxTreeNodeAction.Replace);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -3748,6 +4197,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_9E_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[81], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_9E_2 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -3764,10 +4225,21 @@ namespace Hime.Kernel.Resources.Parser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_9E_2 (LRParser baseParser)
+        private static SyntaxTreeNode Production_9E_3 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[81], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_DC_0 (LRParser baseParser)
@@ -3868,6 +4340,26 @@ namespace Hime.Kernel.Resources.Parser
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
             current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[84]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_DE_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
             current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[84]);
             root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
@@ -3924,6 +4416,12 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_E0_0 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[86]);
+            return root;
+        }
+        private static SyntaxTreeNode Production_E0_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
@@ -3939,12 +4437,6 @@ namespace Hime.Kernel.Resources.Parser
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
-            return root;
-        }
-        private static SyntaxTreeNode Production_E0_1 (LRParser baseParser)
-        {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[86]);
             return root;
         }
         private static SyntaxTreeNode Production_E1_0 (LRParser baseParser)
@@ -3992,12 +4484,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[88], SyntaxTreeNodeAction.Replace);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -4005,6 +4492,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_E2_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[88], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_E2_2 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -4021,13 +4520,44 @@ namespace Hime.Kernel.Resources.Parser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_E2_2 (LRParser baseParser)
+        private static SyntaxTreeNode Production_E2_3 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[88], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_E3_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
+            current = current.Previous;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[89]);
+            root.AppendChild(current.Value, SyntaxTreeNodeAction.Promote);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_E3_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -4090,6 +4620,12 @@ namespace Hime.Kernel.Resources.Parser
         private static SyntaxTreeNode Production_E5_0 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[91]);
+            return root;
+        }
+        private static SyntaxTreeNode Production_E5_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
             current = current.Previous;
@@ -4105,12 +4641,6 @@ namespace Hime.Kernel.Resources.Parser
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
-            return root;
-        }
-        private static SyntaxTreeNode Production_E5_1 (LRParser baseParser)
-        {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[91]);
             return root;
         }
         private static SyntaxTreeNode Production_E6_0 (LRParser baseParser)
@@ -4158,12 +4688,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[93], SyntaxTreeNodeAction.Replace);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -4171,6 +4696,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_E7_1 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[93], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_E7_2 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -4187,10 +4724,21 @@ namespace Hime.Kernel.Resources.Parser
             current = temp;
             return root;
         }
-        private static SyntaxTreeNode Production_E7_2 (LRParser baseParser)
+        private static SyntaxTreeNode Production_E7_3 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[93], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
             return root;
         }
         private static SyntaxTreeNode Production_E8_0 (LRParser baseParser)
@@ -4210,12 +4758,7 @@ namespace Hime.Kernel.Resources.Parser
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
             LinkedListNode<SyntaxTreeNode> temp = null;
-            current = current.Previous;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[95]);
-            root.AppendChild(current.Value);
-            temp = current.Next;
-            parser.nodes.Remove(current);
-            current = temp;
             root.AppendChild(current.Value);
             temp = current.Next;
             parser.nodes.Remove(current);
@@ -4223,6 +4766,18 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static SyntaxTreeNode Production_EA_0 (LRParser baseParser)
+        {
+            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
+            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
+            LinkedListNode<SyntaxTreeNode> temp = null;
+            SyntaxTreeNode root = new SyntaxTreeNode(variables[96], SyntaxTreeNodeAction.Replace);
+            root.AppendChild(current.Value);
+            temp = current.Next;
+            parser.nodes.Remove(current);
+            current = temp;
+            return root;
+        }
+        private static SyntaxTreeNode Production_EA_1 (LRParser baseParser)
         {
             FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;
@@ -4237,12 +4792,6 @@ namespace Hime.Kernel.Resources.Parser
             temp = current.Next;
             parser.nodes.Remove(current);
             current = temp;
-            return root;
-        }
-        private static SyntaxTreeNode Production_EA_1 (LRParser baseParser)
-        {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[96], SyntaxTreeNodeAction.Replace);
             return root;
         }
         private static SyntaxTreeNode Production_EB_0 (LRParser baseParser)
@@ -4262,7 +4811,8 @@ namespace Hime.Kernel.Resources.Parser
             return root;
         }
         private static LRRule[] staticRules = {
-           new LRRule(Production_13_0, variables[0], 2)
+           new LRRule(Production_13_0, variables[0], 1)
+           , new LRRule(Production_13_1, variables[0], 2)
            , new LRRule(Production_14_0, variables[1], 1)
            , new LRRule(Production_15_0, variables[2], 1)
            , new LRRule(Production_16_0, variables[3], 1)
@@ -4272,12 +4822,13 @@ namespace Hime.Kernel.Resources.Parser
            , new LRRule(Production_18_2, variables[5], 1)
            , new LRRule(Production_18_3, variables[5], 1)
            , new LRRule(Production_18_4, variables[5], 1)
-           , new LRRule(Production_19_0, variables[6], 1)
+           , new LRRule(Production_19_0, variables[6], 0)
+           , new LRRule(Production_19_1, variables[6], 1)
            , new LRRule(Production_1A_0, variables[7], 5)
-           , new LRRule(Production_1B_0, variables[8], 3)
-           , new LRRule(Production_1B_1, variables[8], 0)
-           , new LRRule(Production_1C_0, variables[9], 2)
-           , new LRRule(Production_1C_1, variables[9], 0)
+           , new LRRule(Production_1B_0, variables[8], 2)
+           , new LRRule(Production_1B_1, variables[8], 3)
+           , new LRRule(Production_1C_0, variables[9], 1)
+           , new LRRule(Production_1C_1, variables[9], 2)
            , new LRRule(Production_57_0, variables[10], 4)
            , new LRRule(Production_58_0, variables[11], 1)
            , new LRRule(Production_59_0, variables[12], 1)
@@ -4300,20 +4851,24 @@ namespace Hime.Kernel.Resources.Parser
            , new LRRule(Production_61_0, variables[20], 1)
            , new LRRule(Production_61_1, variables[20], 1)
            , new LRRule(Production_61_2, variables[20], 1)
-           , new LRRule(Production_61_3, variables[20], 5)
-           , new LRRule(Production_61_4, variables[20], 3)
-           , new LRRule(Production_62_0, variables[21], 2)
-           , new LRRule(Production_62_1, variables[21], 1)
-           , new LRRule(Production_63_0, variables[22], 2)
-           , new LRRule(Production_64_0, variables[23], 2)
-           , new LRRule(Production_65_0, variables[24], 2)
-           , new LRRule(Production_66_0, variables[25], 2)
-           , new LRRule(Production_66_1, variables[25], 0)
+           , new LRRule(Production_61_3, variables[20], 3)
+           , new LRRule(Production_61_4, variables[20], 5)
+           , new LRRule(Production_62_0, variables[21], 1)
+           , new LRRule(Production_62_1, variables[21], 2)
+           , new LRRule(Production_63_0, variables[22], 1)
+           , new LRRule(Production_63_1, variables[22], 2)
+           , new LRRule(Production_64_0, variables[23], 1)
+           , new LRRule(Production_64_1, variables[23], 2)
+           , new LRRule(Production_65_0, variables[24], 1)
+           , new LRRule(Production_65_1, variables[24], 2)
+           , new LRRule(Production_66_0, variables[25], 0)
+           , new LRRule(Production_66_1, variables[25], 2)
            , new LRRule(Production_67_0, variables[26], 5)
            , new LRRule(Production_68_0, variables[27], 3)
            , new LRRule(Production_69_0, variables[28], 1)
            , new LRRule(Production_6A_0, variables[29], 1)
-           , new LRRule(Production_6B_0, variables[30], 4)
+           , new LRRule(Production_6B_0, variables[30], 3)
+           , new LRRule(Production_6B_1, variables[30], 4)
            , new LRRule(Production_6C_0, variables[31], 1)
            , new LRRule(Production_6C_1, variables[31], 1)
            , new LRRule(Production_6C_2, variables[31], 1)
@@ -4327,44 +4882,51 @@ namespace Hime.Kernel.Resources.Parser
            , new LRRule(Production_6C_A, variables[31], 1)
            , new LRRule(Production_6C_B, variables[31], 1)
            , new LRRule(Production_6D_0, variables[32], 1)
-           , new LRRule(Production_6E_0, variables[33], 4)
-           , new LRRule(Production_6F_0, variables[34], 4)
-           , new LRRule(Production_70_0, variables[35], 3)
-           , new LRRule(Production_70_1, variables[35], 0)
+           , new LRRule(Production_6E_0, variables[33], 3)
+           , new LRRule(Production_6E_1, variables[33], 4)
+           , new LRRule(Production_6F_0, variables[34], 3)
+           , new LRRule(Production_6F_1, variables[34], 4)
+           , new LRRule(Production_70_0, variables[35], 0)
+           , new LRRule(Production_70_1, variables[35], 2)
+           , new LRRule(Production_70_2, variables[35], 3)
            , new LRRule(Production_71_0, variables[36], 1)
            , new LRRule(Production_71_1, variables[36], 1)
            , new LRRule(Production_71_2, variables[36], 1)
            , new LRRule(Production_71_3, variables[36], 1)
            , new LRRule(Production_72_0, variables[37], 10)
            , new LRRule(Production_73_0, variables[38], 9)
-           , new LRRule(Production_74_0, variables[39], 2)
-           , new LRRule(Production_74_1, variables[39], 0)
-           , new LRRule(Production_75_0, variables[40], 3)
-           , new LRRule(Production_75_1, variables[40], 0)
-           , new LRRule(Production_76_0, variables[41], 3)
-           , new LRRule(Production_76_1, variables[41], 0)
-           , new LRRule(Production_77_0, variables[42], 3)
-           , new LRRule(Production_77_1, variables[42], 0)
-           , new LRRule(Production_78_0, variables[43], 2)
-           , new LRRule(Production_78_1, variables[43], 0)
-           , new LRRule(Production_79_0, variables[44], 2)
-           , new LRRule(Production_79_1, variables[44], 0)
-           , new LRRule(Production_7A_0, variables[45], 3)
-           , new LRRule(Production_7A_1, variables[45], 0)
-           , new LRRule(Production_7B_0, variables[46], 4)
+           , new LRRule(Production_74_0, variables[39], 1)
+           , new LRRule(Production_74_1, variables[39], 2)
+           , new LRRule(Production_75_0, variables[40], 2)
+           , new LRRule(Production_75_1, variables[40], 3)
+           , new LRRule(Production_76_0, variables[41], 2)
+           , new LRRule(Production_76_1, variables[41], 3)
+           , new LRRule(Production_77_0, variables[42], 2)
+           , new LRRule(Production_77_1, variables[42], 3)
+           , new LRRule(Production_78_0, variables[43], 1)
+           , new LRRule(Production_78_1, variables[43], 2)
+           , new LRRule(Production_79_0, variables[44], 1)
+           , new LRRule(Production_79_1, variables[44], 2)
+           , new LRRule(Production_7A_0, variables[45], 2)
+           , new LRRule(Production_7A_1, variables[45], 3)
+           , new LRRule(Production_7B_0, variables[46], 3)
+           , new LRRule(Production_7B_1, variables[46], 4)
            , new LRRule(Production_7C_0, variables[47], 4)
-           , new LRRule(Production_7D_0, variables[48], 2)
+           , new LRRule(Production_7D_0, variables[48], 1)
+           , new LRRule(Production_7D_1, variables[48], 2)
            , new LRRule(Production_7E_0, variables[49], 1)
            , new LRRule(Production_7E_1, variables[49], 0)
-           , new LRRule(Production_7F_0, variables[50], 2)
-           , new LRRule(Production_80_0, variables[51], 2)
-           , new LRRule(Production_81_0, variables[52], 2)
+           , new LRRule(Production_7F_0, variables[50], 1)
+           , new LRRule(Production_7F_1, variables[50], 2)
+           , new LRRule(Production_80_0, variables[51], 1)
+           , new LRRule(Production_80_1, variables[51], 2)
+           , new LRRule(Production_81_0, variables[52], 1)
            , new LRRule(Production_81_1, variables[52], 2)
            , new LRRule(Production_81_2, variables[52], 2)
-           , new LRRule(Production_81_3, variables[52], 1)
-           , new LRRule(Production_82_0, variables[53], 2)
+           , new LRRule(Production_81_3, variables[52], 2)
+           , new LRRule(Production_82_0, variables[53], 1)
            , new LRRule(Production_82_1, variables[53], 2)
-           , new LRRule(Production_82_2, variables[53], 1)
+           , new LRRule(Production_82_2, variables[53], 2)
            , new LRRule(Production_83_0, variables[54], 1)
            , new LRRule(Production_83_1, variables[54], 3)
            , new LRRule(Production_84_0, variables[55], 1)
@@ -4373,33 +4935,39 @@ namespace Hime.Kernel.Resources.Parser
            , new LRRule(Production_84_3, variables[55], 1)
            , new LRRule(Production_84_4, variables[55], 1)
            , new LRRule(Production_85_0, variables[56], 2)
-           , new LRRule(Production_86_0, variables[57], 4)
-           , new LRRule(Production_87_0, variables[58], 3)
-           , new LRRule(Production_87_1, variables[58], 0)
-           , new LRRule(Production_88_0, variables[59], 2)
-           , new LRRule(Production_88_1, variables[59], 0)
-           , new LRRule(Production_89_0, variables[60], 3)
-           , new LRRule(Production_89_1, variables[60], 0)
-           , new LRRule(Production_8A_0, variables[61], 3)
-           , new LRRule(Production_8A_1, variables[61], 0)
+           , new LRRule(Production_86_0, variables[57], 3)
+           , new LRRule(Production_86_1, variables[57], 4)
+           , new LRRule(Production_87_0, variables[58], 2)
+           , new LRRule(Production_87_1, variables[58], 3)
+           , new LRRule(Production_88_0, variables[59], 1)
+           , new LRRule(Production_88_1, variables[59], 2)
+           , new LRRule(Production_89_0, variables[60], 2)
+           , new LRRule(Production_89_1, variables[60], 3)
+           , new LRRule(Production_8A_0, variables[61], 2)
+           , new LRRule(Production_8A_1, variables[61], 3)
            , new LRRule(Production_8B_0, variables[62], 5)
-           , new LRRule(Production_8C_0, variables[63], 2)
-           , new LRRule(Production_8C_1, variables[63], 2)
-           , new LRRule(Production_8C_2, variables[63], 0)
-           , new LRRule(Production_8D_0, variables[64], 4)
+           , new LRRule(Production_8C_0, variables[63], 1)
+           , new LRRule(Production_8C_1, variables[63], 1)
+           , new LRRule(Production_8C_2, variables[63], 2)
+           , new LRRule(Production_8C_3, variables[63], 2)
+           , new LRRule(Production_8D_0, variables[64], 3)
+           , new LRRule(Production_8D_1, variables[64], 4)
            , new LRRule(Production_8E_0, variables[65], 4)
-           , new LRRule(Production_8F_0, variables[66], 2)
+           , new LRRule(Production_8F_0, variables[66], 1)
+           , new LRRule(Production_8F_1, variables[66], 2)
            , new LRRule(Production_90_0, variables[67], 1)
            , new LRRule(Production_90_1, variables[67], 0)
-           , new LRRule(Production_91_0, variables[68], 2)
-           , new LRRule(Production_92_0, variables[69], 2)
-           , new LRRule(Production_93_0, variables[70], 2)
+           , new LRRule(Production_91_0, variables[68], 1)
+           , new LRRule(Production_91_1, variables[68], 2)
+           , new LRRule(Production_92_0, variables[69], 1)
+           , new LRRule(Production_92_1, variables[69], 2)
+           , new LRRule(Production_93_0, variables[70], 1)
            , new LRRule(Production_93_1, variables[70], 2)
            , new LRRule(Production_93_2, variables[70], 2)
-           , new LRRule(Production_93_3, variables[70], 1)
-           , new LRRule(Production_94_0, variables[71], 2)
+           , new LRRule(Production_93_3, variables[70], 2)
+           , new LRRule(Production_94_0, variables[71], 1)
            , new LRRule(Production_94_1, variables[71], 2)
-           , new LRRule(Production_94_2, variables[71], 1)
+           , new LRRule(Production_94_2, variables[71], 2)
            , new LRRule(Production_95_0, variables[72], 1)
            , new LRRule(Production_95_1, variables[72], 3)
            , new LRRule(Production_96_0, variables[73], 1)
@@ -4408,41 +4976,47 @@ namespace Hime.Kernel.Resources.Parser
            , new LRRule(Production_96_3, variables[73], 1)
            , new LRRule(Production_96_4, variables[73], 1)
            , new LRRule(Production_97_0, variables[74], 2)
-           , new LRRule(Production_98_0, variables[75], 4)
-           , new LRRule(Production_99_0, variables[76], 3)
-           , new LRRule(Production_99_1, variables[76], 0)
-           , new LRRule(Production_9A_0, variables[77], 2)
-           , new LRRule(Production_9A_1, variables[77], 0)
-           , new LRRule(Production_9B_0, variables[78], 3)
-           , new LRRule(Production_9B_1, variables[78], 0)
-           , new LRRule(Production_9C_0, variables[79], 3)
-           , new LRRule(Production_9C_1, variables[79], 0)
+           , new LRRule(Production_98_0, variables[75], 3)
+           , new LRRule(Production_98_1, variables[75], 4)
+           , new LRRule(Production_99_0, variables[76], 2)
+           , new LRRule(Production_99_1, variables[76], 3)
+           , new LRRule(Production_9A_0, variables[77], 1)
+           , new LRRule(Production_9A_1, variables[77], 2)
+           , new LRRule(Production_9B_0, variables[78], 2)
+           , new LRRule(Production_9B_1, variables[78], 3)
+           , new LRRule(Production_9C_0, variables[79], 2)
+           , new LRRule(Production_9C_1, variables[79], 3)
            , new LRRule(Production_9D_0, variables[80], 5)
-           , new LRRule(Production_9E_0, variables[81], 2)
-           , new LRRule(Production_9E_1, variables[81], 2)
-           , new LRRule(Production_9E_2, variables[81], 0)
+           , new LRRule(Production_9E_0, variables[81], 1)
+           , new LRRule(Production_9E_1, variables[81], 1)
+           , new LRRule(Production_9E_2, variables[81], 2)
+           , new LRRule(Production_9E_3, variables[81], 2)
            , new LRRule(Production_DC_0, variables[82], 9)
            , new LRRule(Production_DD_0, variables[83], 8)
-           , new LRRule(Production_DE_0, variables[84], 4)
+           , new LRRule(Production_DE_0, variables[84], 3)
+           , new LRRule(Production_DE_1, variables[84], 4)
            , new LRRule(Production_DF_0, variables[85], 6)
-           , new LRRule(Production_E0_0, variables[86], 3)
-           , new LRRule(Production_E0_1, variables[86], 0)
+           , new LRRule(Production_E0_0, variables[86], 0)
+           , new LRRule(Production_E0_1, variables[86], 3)
            , new LRRule(Production_E1_0, variables[87], 7)
-           , new LRRule(Production_E2_0, variables[88], 2)
-           , new LRRule(Production_E2_1, variables[88], 2)
-           , new LRRule(Production_E2_2, variables[88], 0)
-           , new LRRule(Production_E3_0, variables[89], 4)
+           , new LRRule(Production_E2_0, variables[88], 1)
+           , new LRRule(Production_E2_1, variables[88], 1)
+           , new LRRule(Production_E2_2, variables[88], 2)
+           , new LRRule(Production_E2_3, variables[88], 2)
+           , new LRRule(Production_E3_0, variables[89], 3)
+           , new LRRule(Production_E3_1, variables[89], 4)
            , new LRRule(Production_E4_0, variables[90], 6)
-           , new LRRule(Production_E5_0, variables[91], 3)
-           , new LRRule(Production_E5_1, variables[91], 0)
+           , new LRRule(Production_E5_0, variables[91], 0)
+           , new LRRule(Production_E5_1, variables[91], 3)
            , new LRRule(Production_E6_0, variables[92], 7)
-           , new LRRule(Production_E7_0, variables[93], 2)
-           , new LRRule(Production_E7_1, variables[93], 2)
-           , new LRRule(Production_E7_2, variables[93], 0)
+           , new LRRule(Production_E7_0, variables[93], 1)
+           , new LRRule(Production_E7_1, variables[93], 1)
+           , new LRRule(Production_E7_2, variables[93], 2)
+           , new LRRule(Production_E7_3, variables[93], 2)
            , new LRRule(Production_E8_0, variables[94], 1)
-           , new LRRule(Production_E9_0, variables[95], 2)
-           , new LRRule(Production_EA_0, variables[96], 2)
-           , new LRRule(Production_EA_1, variables[96], 0)
+           , new LRRule(Production_E9_0, variables[95], 1)
+           , new LRRule(Production_EA_0, variables[96], 1)
+           , new LRRule(Production_EA_1, variables[96], 2)
            , new LRRule(Production_EB_0, variables[97], 2)
         };
         private static LR1State[] staticStates = {
@@ -4450,15 +5024,15 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[6] {FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[46]},
                new ushort[6] {0x10, 0x52, 0xc, 0xd, 0xe, 0xf},
-               new ushort[6] {0x9, 0xB, 0x10, 0x11, 0x12, 0x13},
-               new ushort[13] {0xe9, 0xe8, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
-               new ushort[13] {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0xA, 0xC, 0xD, 0xE, 0xF},
+               new ushort[6] {0xA, 0xC, 0x11, 0x12, 0x13, 0x14},
+               new ushort[14] {0xe9, 0xea, 0xe8, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
+               new ushort[14] {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xB, 0xD, 0xE, 0xF, 0x10},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[1]},
                new ushort[1] {0x2},
-               new ushort[1] {0x14},
+               new ushort[1] {0x15},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -4466,10 +5040,10 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[46]},
                new ushort[6] {0x10, 0x52, 0xc, 0xd, 0xe, 0xf},
-               new ushort[6] {0x9, 0xB, 0x10, 0x11, 0x12, 0x13},
-               new ushort[13] {0xea, 0xe8, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
-               new ushort[13] {0x15, 0x16, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0xA, 0xC, 0xD, 0xE, 0xF},
-               new LRReduction[1] {new LRReduction(0x2, staticRules[0xB4])})
+               new ushort[6] {0xA, 0xC, 0x11, 0x12, 0x13, 0x14},
+               new ushort[12] {0xe8, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
+               new ushort[12] {0x16, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xB, 0xD, 0xE, 0xF, 0x10},
+               new LRReduction[1] {new LRReduction(0x2, staticRules[0xCB])})
             , new LR1State(
                null,
                new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[46]},
@@ -4477,15 +5051,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[7] {new LRReduction(0x2, staticRules[0xB1]), new LRReduction(0xc, staticRules[0xB1]), new LRReduction(0xd, staticRules[0xB1]), new LRReduction(0xe, staticRules[0xB1]), new LRReduction(0xf, staticRules[0xB1]), new LRReduction(0x10, staticRules[0xB1]), new LRReduction(0x52, staticRules[0xB1])})
+               new LRReduction[7] {new LRReduction(0x2, staticRules[0xCC]), new LRReduction(0xc, staticRules[0xCC]), new LRReduction(0xd, staticRules[0xCC]), new LRReduction(0xe, staticRules[0xCC]), new LRReduction(0xf, staticRules[0xCC]), new LRReduction(0x10, staticRules[0xCC]), new LRReduction(0x52, staticRules[0xCC])})
             , new LR1State(
                null,
-               new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[46]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[8] {new LRReduction(0x2, staticRules[0x5]), new LRReduction(0xc, staticRules[0x5]), new LRReduction(0xd, staticRules[0x5]), new LRReduction(0xe, staticRules[0x5]), new LRReduction(0xf, staticRules[0x5]), new LRReduction(0x10, staticRules[0x5]), new LRReduction(0x12, staticRules[0x5]), new LRReduction(0x52, staticRules[0x5])})
+               new LRReduction[7] {new LRReduction(0x2, staticRules[0xCA]), new LRReduction(0xc, staticRules[0xCA]), new LRReduction(0xd, staticRules[0xCA]), new LRReduction(0xe, staticRules[0xCA]), new LRReduction(0xf, staticRules[0xCA]), new LRReduction(0x10, staticRules[0xCA]), new LRReduction(0x52, staticRules[0xCA])})
             , new LR1State(
                null,
                new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
@@ -4520,6 +5094,14 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[8] {new LRReduction(0x2, staticRules[0x9]), new LRReduction(0xc, staticRules[0x9]), new LRReduction(0xd, staticRules[0x9]), new LRReduction(0xe, staticRules[0x9]), new LRReduction(0xf, staticRules[0x9]), new LRReduction(0x10, staticRules[0x9]), new LRReduction(0x12, staticRules[0x9]), new LRReduction(0x52, staticRules[0x9])})
             , new LR1State(
                null,
+               new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[8] {new LRReduction(0x2, staticRules[0xA]), new LRReduction(0xc, staticRules[0xA]), new LRReduction(0xd, staticRules[0xA]), new LRReduction(0xe, staticRules[0xA]), new LRReduction(0xf, staticRules[0xA]), new LRReduction(0x10, staticRules[0xA]), new LRReduction(0x12, staticRules[0xA]), new LRReduction(0x52, staticRules[0xA])})
+            , new LR1State(
+               null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
                new ushort[1] {0xa},
                new ushort[1] {0x18},
@@ -4549,7 +5131,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x52, staticRules[0x45])})
+               new LRReduction[1] {new LRReduction(0x52, staticRules[0x4E])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[46]},
@@ -4557,7 +5139,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x52, staticRules[0x46])})
+               new LRReduction[1] {new LRReduction(0x52, staticRules[0x4F])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[46]},
@@ -4565,7 +5147,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x52, staticRules[0x47])})
+               new LRReduction[1] {new LRReduction(0x52, staticRules[0x50])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[46]},
@@ -4573,15 +5155,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x52, staticRules[0x48])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[46]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x52, staticRules[0x1])})
+               new LRReduction[1] {new LRReduction(0x52, staticRules[0x51])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[46]},
@@ -4608,33 +5182,33 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[1] {new LRReduction(0x52, staticRules[0x4])})
             , new LR1State(
                null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[46]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x52, staticRules[0x5])})
+            , new LR1State(
+               null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[0]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x1, staticRules[0xB5])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[1]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x2, staticRules[0xB2])})
+               new LRReduction[1] {new LRReduction(0x1, staticRules[0xCE])})
             , new LR1State(
                null,
                new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[46]},
-               new ushort[6] {0x10, 0x52, 0xc, 0xd, 0xe, 0xf},
-               new ushort[6] {0x9, 0xB, 0x10, 0x11, 0x12, 0x13},
-               new ushort[13] {0xea, 0xe8, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
-               new ushort[13] {0x1B, 0x16, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0xA, 0xC, 0xD, 0xE, 0xF},
-               new LRReduction[1] {new LRReduction(0x2, staticRules[0xB4])})
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[7] {new LRReduction(0x2, staticRules[0xCD]), new LRReduction(0xc, staticRules[0xCD]), new LRReduction(0xd, staticRules[0xCD]), new LRReduction(0xe, staticRules[0xCD]), new LRReduction(0xf, staticRules[0xCD]), new LRReduction(0x10, staticRules[0xCD]), new LRReduction(0x52, staticRules[0xCD])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
                new ushort[1] {0x11},
-               new ushort[1] {0x1C},
+               new ushort[1] {0x1B},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -4642,15 +5216,15 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[15]},
                new ushort[1] {0xb},
-               new ushort[1] {0x1E},
-               new ushort[1] {0x1b},
                new ushort[1] {0x1D},
-               new LRReduction[3] {new LRReduction(0x11, staticRules[0xD]), new LRReduction(0x41, staticRules[0xD]), new LRReduction(0x48, staticRules[0xD])})
+               new ushort[1] {0x1b},
+               new ushort[1] {0x1C},
+               new LRReduction[3] {new LRReduction(0x11, staticRules[0x0]), new LRReduction(0x41, staticRules[0x0]), new LRReduction(0x48, staticRules[0x0])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[30]},
                new ushort[1] {0x53},
-               new ushort[1] {0x1F},
+               new ushort[1] {0x1E},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -4658,34 +5232,26 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
                new ushort[1] {0xa},
-               new ushort[1] {0x20},
+               new ushort[1] {0x1F},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[1]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x2, staticRules[0xB3])})
-            , new LR1State(
-               null,
                new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
                new ushort[6] {0x10, 0x52, 0xc, 0xd, 0xe, 0xf},
-               new ushort[6] {0x9, 0xB, 0x10, 0x11, 0x12, 0x13},
+               new ushort[6] {0xA, 0xC, 0x11, 0x12, 0x13, 0x14},
                new ushort[13] {0x19, 0x1c, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
-               new ushort[13] {0x21, 0x22, 0x23, 0x4, 0x5, 0x6, 0x7, 0x8, 0xA, 0xC, 0xD, 0xE, 0xF},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xF])})
+               new ushort[13] {0x20, 0x21, 0x22, 0x5, 0x6, 0x7, 0x8, 0x9, 0xB, 0xD, 0xE, 0xF, 0x10},
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0xB])})
             , new LR1State(
                null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[15]},
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[15]},
+               new ushort[1] {0xb},
+               new ushort[1] {0x23},
                new ushort[0] {},
                new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x11, staticRules[0x0]), new LRReduction(0x41, staticRules[0x0]), new LRReduction(0x48, staticRules[0x0])})
+               new LRReduction[3] {new LRReduction(0x11, staticRules[0x1]), new LRReduction(0x41, staticRules[0x1]), new LRReduction(0x48, staticRules[0x1])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
@@ -4709,7 +5275,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[1] {0x27},
                new ushort[1] {0x70},
                new ushort[1] {0x26},
-               new LRReduction[1] {new LRReduction(0x11, staticRules[0x44])})
+               new LRReduction[1] {new LRReduction(0x11, staticRules[0x4B])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
@@ -4720,28 +5286,36 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xA])})
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
+               new ushort[6] {0x10, 0x52, 0xc, 0xd, 0xe, 0xf},
+               new ushort[6] {0xA, 0xC, 0x11, 0x12, 0x13, 0x14},
+               new ushort[11] {0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
+               new ushort[11] {0x29, 0x5, 0x6, 0x7, 0x8, 0x9, 0xB, 0xD, 0xE, 0xF, 0x10},
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0xC])})
             , new LR1State(
                null,
                new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
-               new ushort[6] {0x10, 0x52, 0xc, 0xd, 0xe, 0xf},
-               new ushort[6] {0x9, 0xB, 0x10, 0x11, 0x12, 0x13},
-               new ushort[12] {0x1c, 0x18, 0x1a, 0x72, 0x73, 0xdc, 0xdd, 0x71, 0x14, 0x15, 0x16, 0x17},
-               new ushort[12] {0x29, 0x23, 0x4, 0x5, 0x6, 0x7, 0x8, 0xA, 0xC, 0xD, 0xE, 0xF},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xF])})
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[7] {new LRReduction(0xc, staticRules[0x10]), new LRReduction(0xd, staticRules[0x10]), new LRReduction(0xe, staticRules[0x10]), new LRReduction(0xf, staticRules[0x10]), new LRReduction(0x10, staticRules[0x10]), new LRReduction(0x12, staticRules[0x10]), new LRReduction(0x52, staticRules[0x10])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x2A},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[15]},
-               new ushort[1] {0xb},
-               new ushort[1] {0x1E},
-               new ushort[1] {0x1b},
-               new ushort[1] {0x2A},
-               new LRReduction[3] {new LRReduction(0x11, staticRules[0xD]), new LRReduction(0x41, staticRules[0xD]), new LRReduction(0x48, staticRules[0xD])})
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0xb, staticRules[0xE]), new LRReduction(0x11, staticRules[0xE]), new LRReduction(0x41, staticRules[0xE]), new LRReduction(0x48, staticRules[0xE])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[20]},
@@ -4749,7 +5323,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[1] {0x27},
                new ushort[1] {0x70},
                new ushort[1] {0x2B},
-               new LRReduction[1] {new LRReduction(0x11, staticRules[0x44])})
+               new LRReduction[1] {new LRReduction(0x11, staticRules[0x4B])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
@@ -4773,23 +5347,23 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[8] {new LRReduction(0x2, staticRules[0xB]), new LRReduction(0xc, staticRules[0xB]), new LRReduction(0xd, staticRules[0xB]), new LRReduction(0xe, staticRules[0xB]), new LRReduction(0xf, staticRules[0xB]), new LRReduction(0x10, staticRules[0xB]), new LRReduction(0x12, staticRules[0xB]), new LRReduction(0x52, staticRules[0xB])})
+               new LRReduction[8] {new LRReduction(0x2, staticRules[0xD]), new LRReduction(0xc, staticRules[0xD]), new LRReduction(0xd, staticRules[0xD]), new LRReduction(0xe, staticRules[0xD]), new LRReduction(0xf, staticRules[0xD]), new LRReduction(0x10, staticRules[0xD]), new LRReduction(0x12, staticRules[0xD]), new LRReduction(0x52, staticRules[0xD])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xE])})
+               new LRReduction[7] {new LRReduction(0xc, staticRules[0x11]), new LRReduction(0xd, staticRules[0x11]), new LRReduction(0xe, staticRules[0x11]), new LRReduction(0xf, staticRules[0x11]), new LRReduction(0x10, staticRules[0x11]), new LRReduction(0x12, staticRules[0x11]), new LRReduction(0x52, staticRules[0x11])})
             , new LR1State(
                null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[15]},
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[15]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x11, staticRules[0xC]), new LRReduction(0x41, staticRules[0xC]), new LRReduction(0x48, staticRules[0xC])})
+               new LRReduction[4] {new LRReduction(0xb, staticRules[0xF]), new LRReduction(0x11, staticRules[0xF]), new LRReduction(0x41, staticRules[0xF]), new LRReduction(0x48, staticRules[0xF])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
@@ -4813,7 +5387,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[1] {0x32},
                new ushort[1] {0x7a},
                new ushort[1] {0x31},
-               new LRReduction[1] {new LRReduction(0x11, staticRules[0x58])})
+               new LRReduction[1] {new LRReduction(0x11, staticRules[0x4C])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[45]},
@@ -4840,48 +5414,40 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[15]},
+               new ushort[1] {0x48},
+               new ushort[1] {0x39},
                new ushort[0] {},
                new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x11, staticRules[0x43])})
+               new LRReduction[1] {new LRReduction(0x11, staticRules[0x4D])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
                new ushort[1] {0xa},
                new ushort[1] {0x18},
                new ushort[1] {0x13},
-               new ushort[1] {0x39},
+               new ushort[1] {0x3A},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[50], FileCentralDogma_Lexer.terminals[38]},
                new ushort[2] {0x50, 0x54},
-               new ushort[2] {0x36, 0x3C},
+               new ushort[2] {0x36, 0x3D},
                new ushort[2] {0x6f, 0x8d},
-               new ushort[2] {0x3A, 0x3B},
+               new ushort[2] {0x3B, 0x3C},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[38]},
                new ushort[1] {0x54},
-               new ushort[1] {0x3E},
+               new ushort[1] {0x3F},
                new ushort[1] {0xde},
-               new ushort[1] {0x3D},
+               new ushort[1] {0x3E},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
                new ushort[1] {0x12},
-               new ushort[1] {0x3F},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
-               new ushort[1] {0x11},
                new ushort[1] {0x40},
                new ushort[0] {},
                new ushort[0] {},
@@ -4896,43 +5462,43 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[0] {})
             , new LR1State(
                null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
+               new ushort[1] {0x11},
+               new ushort[1] {0x42},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x44},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x43, 0x46},
                new ushort[2] {0x78, 0x57},
-               new ushort[2] {0x42, 0x43},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x54])})
+               new ushort[2] {0x44, 0x45},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x18},
+               new ushort[1] {0x13},
+               new ushort[1] {0x47},
+               new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[15]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x32},
-               new ushort[1] {0x7a},
-               new ushort[1] {0x45},
-               new LRReduction[1] {new LRReduction(0x11, staticRules[0x58])})
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x11, staticRules[0x60]), new LRReduction(0x48, staticRules[0x60])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[38]},
                new ushort[1] {0x54},
-               new ushort[1] {0x47},
-               new ushort[1] {0x7b},
-               new ushort[1] {0x46},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x48},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
-               new ushort[1] {0x11},
                new ushort[1] {0x49},
-               new ushort[0] {},
-               new ushort[0] {},
+               new ushort[1] {0x7b},
+               new ushort[1] {0x48},
                new LRReduction[0] {})
             , new LR1State(
                null,
@@ -4952,65 +5518,9 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[8] {new LRReduction(0x2, staticRules[0xA0]), new LRReduction(0xc, staticRules[0xA0]), new LRReduction(0xd, staticRules[0xA0]), new LRReduction(0xe, staticRules[0xA0]), new LRReduction(0xf, staticRules[0xA0]), new LRReduction(0x10, staticRules[0xA0]), new LRReduction(0x12, staticRules[0xA0]), new LRReduction(0x52, staticRules[0xA0])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x4E},
-               new ushort[2] {0x79, 0x67},
-               new ushort[2] {0x4C, 0x4D},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x56])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[1] {0xda},
-               new ushort[1] {0x53},
-               new ushort[4] {0xe7, 0xe4, 0xe6, 0xe5},
-               new ushort[4] {0x4F, 0x50, 0x51, 0x52},
-               new LRReduction[2] {new LRReduction(0x12, staticRules[0xB0]), new LRReduction(0xa, staticRules[0xAC])})
-            , new LR1State(
-               null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
                new ushort[1] {0x12},
-               new ushort[1] {0x54},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x44},
-               new ushort[2] {0x78, 0x57},
-               new ushort[2] {0x55, 0x43},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x54])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[8]},
-               new ushort[1] {0x40},
-               new ushort[1] {0x56},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x11, staticRules[0x57])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x57},
+               new ushort[1] {0x4C},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5018,7 +5528,7 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
                new ushort[1] {0x11},
-               new ushort[1] {0x58},
+               new ushort[1] {0x4D},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5029,95 +5539,23 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[8] {new LRReduction(0x2, staticRules[0x4A]), new LRReduction(0xc, staticRules[0x4A]), new LRReduction(0xd, staticRules[0x4A]), new LRReduction(0xe, staticRules[0x4A]), new LRReduction(0xf, staticRules[0x4A]), new LRReduction(0x10, staticRules[0x4A]), new LRReduction(0x12, staticRules[0x4A]), new LRReduction(0x52, staticRules[0x4A])})
+               new LRReduction[8] {new LRReduction(0x2, staticRules[0xB5]), new LRReduction(0xc, staticRules[0xB5]), new LRReduction(0xd, staticRules[0xB5]), new LRReduction(0xe, staticRules[0xB5]), new LRReduction(0xf, staticRules[0xB5]), new LRReduction(0x10, staticRules[0xB5]), new LRReduction(0x12, staticRules[0xB5]), new LRReduction(0x52, staticRules[0xB5])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x5C},
-               new ushort[3] {0x9e, 0x8e, 0x9d},
-               new ushort[3] {0x59, 0x5A, 0x5B},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x9E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[8] {new LRReduction(0x2, staticRules[0x9F]), new LRReduction(0xc, staticRules[0x9F]), new LRReduction(0xd, staticRules[0x9F]), new LRReduction(0xe, staticRules[0x9F]), new LRReduction(0xf, staticRules[0x9F]), new LRReduction(0x10, staticRules[0x9F]), new LRReduction(0x12, staticRules[0x9F]), new LRReduction(0x52, staticRules[0x9F])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[1] {0xda},
-               new ushort[1] {0x61},
-               new ushort[4] {0xe2, 0xdf, 0xe1, 0xe0},
-               new ushort[4] {0x5D, 0x5E, 0x5F, 0x60},
-               new LRReduction[2] {new LRReduction(0x12, staticRules[0xA8]), new LRReduction(0xa, staticRules[0xA4])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x62},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x4E},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x4E, 0x51},
                new ushort[2] {0x79, 0x67},
-               new ushort[2] {0x63, 0x4D},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x56])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
-               new ushort[1] {0x4c},
-               new ushort[1] {0x64},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x65},
-               new ushort[0] {},
-               new ushort[0] {},
+               new ushort[2] {0x4F, 0x50},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[1] {0xda},
-               new ushort[1] {0x53},
+               new ushort[2] {0x12, 0xda},
+               new ushort[2] {0x52, 0x57},
                new ushort[4] {0xe7, 0xe4, 0xe6, 0xe5},
-               new ushort[4] {0x66, 0x50, 0x51, 0x52},
-               new LRReduction[2] {new LRReduction(0x12, staticRules[0xB0]), new LRReduction(0xa, staticRules[0xAC])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[1] {0xda},
-               new ushort[1] {0x53},
-               new ushort[4] {0xe7, 0xe4, 0xe6, 0xe5},
-               new ushort[4] {0x67, 0x50, 0x51, 0x52},
-               new LRReduction[2] {new LRReduction(0x12, staticRules[0xB0]), new LRReduction(0xa, staticRules[0xAC])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x68},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[13] {0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[2] {new LRReduction(0x4a, staticRules[0x80]), new LRReduction(0xdb, staticRules[0x80])})
+               new ushort[4] {0x53, 0x54, 0x55, 0x56},
+               new LRReduction[1] {new LRReduction(0xa, staticRules[0xC3])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[50], FileCentralDogma_Lexer.terminals[38]},
@@ -5125,20 +5563,52 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0x50, staticRules[0x41]), new LRReduction(0x54, staticRules[0x41])})
+               new LRReduction[2] {new LRReduction(0x50, staticRules[0x47]), new LRReduction(0x54, staticRules[0x47])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x58, 0x46},
+               new ushort[1] {0x57},
+               new ushort[1] {0x59},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x5C]), new LRReduction(0x12, staticRules[0x5C])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[8]},
+               new ushort[1] {0x40},
+               new ushort[1] {0x5A},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[15]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x11, staticRules[0x61]), new LRReduction(0x48, staticRules[0x61])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new ushort[1] {0x12},
+               new ushort[1] {0x5B},
                new ushort[0] {},
                new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x53])})
+               new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[26]},
-               new ushort[1] {0x2e},
-               new ushort[1] {0x86},
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[4]},
+               new ushort[1] {0x11},
+               new ushort[1] {0x5C},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5149,87 +5619,31 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[8] {new LRReduction(0x2, staticRules[0x49]), new LRReduction(0xc, staticRules[0x49]), new LRReduction(0xd, staticRules[0x49]), new LRReduction(0xe, staticRules[0x49]), new LRReduction(0xf, staticRules[0x49]), new LRReduction(0x10, staticRules[0x49]), new LRReduction(0x12, staticRules[0x49]), new LRReduction(0x52, staticRules[0x49])})
+               new LRReduction[8] {new LRReduction(0x2, staticRules[0x53]), new LRReduction(0xc, staticRules[0x53]), new LRReduction(0xd, staticRules[0x53]), new LRReduction(0xe, staticRules[0x53]), new LRReduction(0xf, staticRules[0x53]), new LRReduction(0x10, staticRules[0x53]), new LRReduction(0x12, staticRules[0x53]), new LRReduction(0x52, staticRules[0x53])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x8A},
-               new ushort[3] {0x8c, 0x7c, 0x8b},
-               new ushort[3] {0x87, 0x88, 0x89},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x7B])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x8B},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x5C},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x5D, 0x61},
                new ushort[3] {0x9e, 0x8e, 0x9d},
-               new ushort[3] {0x8C, 0x5A, 0x5B},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x9E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x5C},
-               new ushort[3] {0x9e, 0x8e, 0x9d},
-               new ushort[3] {0x8D, 0x5A, 0x5B},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x9E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
-               new ushort[2] {0x4c, 0x4d},
-               new ushort[2] {0x8E, 0x90},
-               new ushort[1] {0x6b},
-               new ushort[1] {0x8F},
+               new ushort[3] {0x5E, 0x5F, 0x60},
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x91},
+               new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[0] {})
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[8] {new LRReduction(0x2, staticRules[0xB4]), new LRReduction(0xc, staticRules[0xB4]), new LRReduction(0xd, staticRules[0xB4]), new LRReduction(0xe, staticRules[0xB4]), new LRReduction(0xf, staticRules[0xB4]), new LRReduction(0x10, staticRules[0xB4]), new LRReduction(0x12, staticRules[0xB4]), new LRReduction(0x52, staticRules[0xB4])})
             , new LR1State(
                null,
                new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[1] {0xda},
-               new ushort[1] {0x61},
+               new ushort[2] {0x12, 0xda},
+               new ushort[2] {0x62, 0x67},
                new ushort[4] {0xe2, 0xdf, 0xe1, 0xe0},
-               new ushort[4] {0x92, 0x5E, 0x5F, 0x60},
-               new LRReduction[2] {new LRReduction(0x12, staticRules[0xA8]), new LRReduction(0xa, staticRules[0xA4])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[1] {0xda},
-               new ushort[1] {0x61},
-               new ushort[4] {0xe2, 0xdf, 0xe1, 0xe0},
-               new ushort[4] {0x93, 0x5E, 0x5F, 0x60},
-               new LRReduction[2] {new LRReduction(0x12, staticRules[0xA8]), new LRReduction(0xa, staticRules[0xA4])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x94},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[14] {0x95, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[2] {new LRReduction(0x4a, staticRules[0x5D]), new LRReduction(0xdb, staticRules[0x5D])})
+               new ushort[4] {0x63, 0x64, 0x65, 0x66},
+               new LRReduction[1] {new LRReduction(0xa, staticRules[0xB9])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[38]},
@@ -5237,22 +5651,30 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x54, staticRules[0x42])})
+               new LRReduction[1] {new LRReduction(0x54, staticRules[0x49])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x55])})
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x68, 0x51},
+               new ushort[1] {0x67},
+               new ushort[1] {0x69},
+               new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
-               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
-               new ushort[9] {0xAC, 0xB4, 0xB5, 0xB6, 0xB7, 0xA5, 0xB8, 0xB9, 0xBA},
-               new ushort[13] {0x65, 0x64, 0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
-               new ushort[13] {0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3},
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x5E]), new LRReduction(0x12, staticRules[0x5E])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
+               new ushort[1] {0x4c},
+               new ushort[1] {0x6A},
+               new ushort[0] {},
+               new ushort[0] {},
                new LRReduction[0] {})
             , new LR1State(
                null,
@@ -5261,7 +5683,87 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xA9])})
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0xC0])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[2] {0x12, 0xda},
+               new ushort[2] {0x6B, 0x57},
+               new ushort[3] {0xe4, 0xe6, 0xe5},
+               new ushort[3] {0x6C, 0x6D, 0x56},
+               new LRReduction[1] {new LRReduction(0xa, staticRules[0xC3])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC6]), new LRReduction(0x12, staticRules[0xC6]), new LRReduction(0xda, staticRules[0xC6])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC7]), new LRReduction(0x12, staticRules[0xC7]), new LRReduction(0xda, staticRules[0xC7])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x6E},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[13] {0x6F, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[2] {new LRReduction(0x4a, staticRules[0x91]), new LRReduction(0xdb, staticRules[0x91])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[50], FileCentralDogma_Lexer.terminals[38]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x50, staticRules[0x48]), new LRReduction(0x54, staticRules[0x48])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x5D]), new LRReduction(0x12, staticRules[0x5D])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[26]},
+               new ushort[1] {0x2e},
+               new ushort[1] {0x8C},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[8] {FileCentralDogma_Lexer.terminals[1], FileCentralDogma_Lexer.terminals[39], FileCentralDogma_Lexer.terminals[44], FileCentralDogma_Lexer.terminals[48], FileCentralDogma_Lexer.terminals[47], FileCentralDogma_Lexer.terminals[49], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[46]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[8] {new LRReduction(0x2, staticRules[0x52]), new LRReduction(0xc, staticRules[0x52]), new LRReduction(0xd, staticRules[0x52]), new LRReduction(0xe, staticRules[0x52]), new LRReduction(0xf, staticRules[0x52]), new LRReduction(0x10, staticRules[0x52]), new LRReduction(0x12, staticRules[0x52]), new LRReduction(0x52, staticRules[0x52])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x8D, 0x91},
+               new ushort[3] {0x8c, 0x7c, 0x8b},
+               new ushort[3] {0x8E, 0x8F, 0x90},
+               new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
@@ -5269,7 +5771,39 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xAE])})
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0x8B])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0x92, 0x61},
+               new ushort[2] {0x8e, 0x9d},
+               new ushort[2] {0x93, 0x94},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0xB0]), new LRReduction(0x12, staticRules[0xB0])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0xB1]), new LRReduction(0x12, staticRules[0xB1])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
+               new ushort[2] {0x4c, 0x4d},
+               new ushort[2] {0x95, 0x97},
+               new ushort[1] {0x6b},
+               new ushort[1] {0x96},
+               new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
@@ -5277,20 +5811,108 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xAF])})
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0xB6])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[2] {0x12, 0xda},
+               new ushort[2] {0x98, 0x67},
+               new ushort[3] {0xdf, 0xe1, 0xe0},
+               new ushort[3] {0x99, 0x9A, 0x66},
+               new LRReduction[1] {new LRReduction(0xa, staticRules[0xB9])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xBC]), new LRReduction(0x12, staticRules[0xBC]), new LRReduction(0xda, staticRules[0xBC])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xBD]), new LRReduction(0x12, staticRules[0xBD]), new LRReduction(0xda, staticRules[0xBD])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x9B},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[14] {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[2] {new LRReduction(0x4a, staticRules[0x68]), new LRReduction(0xdb, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[38]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x54, staticRules[0x4A])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x5F]), new LRReduction(0x12, staticRules[0x5F])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
+               new ushort[13] {0x65, 0x64, 0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
+               new ushort[13] {0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0xC1])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC8]), new LRReduction(0x12, staticRules[0xC8]), new LRReduction(0xda, staticRules[0xC8])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC9]), new LRReduction(0x12, staticRules[0xC9]), new LRReduction(0xda, staticRules[0xC9])})
             , new LR1State(
                null,
                new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18], FileCentralDogma_Lexer.terminals[6]},
                new ushort[1] {0xda},
-               new ushort[1] {0x53},
+               new ushort[1] {0x57},
                new ushort[1] {0xe5},
-               new ushort[1] {0xBB},
-               new LRReduction[2] {new LRReduction(0x4c, staticRules[0xAC]), new LRReduction(0x4d, staticRules[0xAC])})
+               new ushort[1] {0xC2},
+               new LRReduction[2] {new LRReduction(0x4c, staticRules[0xC3]), new LRReduction(0x4d, staticRules[0xC3])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0xdb},
-               new ushort[1] {0xBC},
+               new ushort[1] {0xC3},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5298,10 +5920,10 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0x4a},
-               new ushort[1] {0xBE},
+               new ushort[1] {0xC5},
                new ushort[1] {0x9c},
-               new ushort[1] {0xBD},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x9A]), new LRReduction(0x44, staticRules[0x9A]), new LRReduction(0xdb, staticRules[0x9A])})
+               new ushort[1] {0xC4},
+               new LRReduction[3] {new LRReduction(0x41, staticRules[0x8E]), new LRReduction(0x44, staticRules[0x8E]), new LRReduction(0xdb, staticRules[0x8E])})
             , new LR1State(
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
@@ -5309,39 +5931,39 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x7F]), new LRReduction(0x44, staticRules[0x7F]), new LRReduction(0x4a, staticRules[0x7F]), new LRReduction(0xdb, staticRules[0x7F])})
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x90]), new LRReduction(0x44, staticRules[0x90]), new LRReduction(0x4a, staticRules[0x90]), new LRReduction(0xdb, staticRules[0x90])})
             , new LR1State(
                null,
                new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0x49},
-               new ushort[1] {0xC0},
+               new ushort[1] {0xC7},
                new ushort[1] {0x9b},
-               new ushort[1] {0xBF},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x98]), new LRReduction(0x44, staticRules[0x98]), new LRReduction(0x4a, staticRules[0x98]), new LRReduction(0xdb, staticRules[0x98])})
+               new ushort[1] {0xC6},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x92]), new LRReduction(0x44, staticRules[0x92]), new LRReduction(0x4a, staticRules[0x92]), new LRReduction(0xdb, staticRules[0x92])})
             , new LR1State(
                null,
                new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
                new ushort[10] {0x9a, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[10] {0xC1, 0xC2, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x96]), new LRReduction(0x44, staticRules[0x96]), new LRReduction(0x49, staticRules[0x96]), new LRReduction(0x4a, staticRules[0x96]), new LRReduction(0xdb, staticRules[0x96])})
+               new ushort[10] {0xC8, 0xC9, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x94]), new LRReduction(0x44, staticRules[0x94]), new LRReduction(0x49, staticRules[0x94]), new LRReduction(0x4a, staticRules[0x94]), new LRReduction(0xdb, staticRules[0x94])})
             , new LR1State(
                null,
                new SymbolTerminal[24] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[3] {0x45, 0x46, 0x47},
-               new ushort[3] {0xC3, 0xC4, 0xC5},
+               new ushort[3] {0xCA, 0xCB, 0xCC},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[21] {new LRReduction(0xa, staticRules[0x86]), new LRReduction(0x11, staticRules[0x86]), new LRReduction(0x2e, staticRules[0x86]), new LRReduction(0x34, staticRules[0x86]), new LRReduction(0x35, staticRules[0x86]), new LRReduction(0x36, staticRules[0x86]), new LRReduction(0x37, staticRules[0x86]), new LRReduction(0x38, staticRules[0x86]), new LRReduction(0x39, staticRules[0x86]), new LRReduction(0x3a, staticRules[0x86]), new LRReduction(0x3b, staticRules[0x86]), new LRReduction(0x3c, staticRules[0x86]), new LRReduction(0x3d, staticRules[0x86]), new LRReduction(0x3e, staticRules[0x86]), new LRReduction(0x3f, staticRules[0x86]), new LRReduction(0x41, staticRules[0x86]), new LRReduction(0x43, staticRules[0x86]), new LRReduction(0x44, staticRules[0x86]), new LRReduction(0x49, staticRules[0x86]), new LRReduction(0x4a, staticRules[0x86]), new LRReduction(0xdb, staticRules[0x86])})
+               new LRReduction[21] {new LRReduction(0xa, staticRules[0x96]), new LRReduction(0x11, staticRules[0x96]), new LRReduction(0x2e, staticRules[0x96]), new LRReduction(0x34, staticRules[0x96]), new LRReduction(0x35, staticRules[0x96]), new LRReduction(0x36, staticRules[0x96]), new LRReduction(0x37, staticRules[0x96]), new LRReduction(0x38, staticRules[0x96]), new LRReduction(0x39, staticRules[0x96]), new LRReduction(0x3a, staticRules[0x96]), new LRReduction(0x3b, staticRules[0x96]), new LRReduction(0x3c, staticRules[0x96]), new LRReduction(0x3d, staticRules[0x96]), new LRReduction(0x3e, staticRules[0x96]), new LRReduction(0x3f, staticRules[0x96]), new LRReduction(0x41, staticRules[0x96]), new LRReduction(0x43, staticRules[0x96]), new LRReduction(0x44, staticRules[0x96]), new LRReduction(0x49, staticRules[0x96]), new LRReduction(0x4a, staticRules[0x96]), new LRReduction(0xdb, staticRules[0x96])})
             , new LR1State(
                null,
                new SymbolTerminal[26] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
                new ushort[2] {0x55, 0x56},
-               new ushort[2] {0xC6, 0xC7},
+               new ushort[2] {0xCD, 0xCE},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[24] {new LRReduction(0xa, staticRules[0x89]), new LRReduction(0x11, staticRules[0x89]), new LRReduction(0x2e, staticRules[0x89]), new LRReduction(0x34, staticRules[0x89]), new LRReduction(0x35, staticRules[0x89]), new LRReduction(0x36, staticRules[0x89]), new LRReduction(0x37, staticRules[0x89]), new LRReduction(0x38, staticRules[0x89]), new LRReduction(0x39, staticRules[0x89]), new LRReduction(0x3a, staticRules[0x89]), new LRReduction(0x3b, staticRules[0x89]), new LRReduction(0x3c, staticRules[0x89]), new LRReduction(0x3d, staticRules[0x89]), new LRReduction(0x3e, staticRules[0x89]), new LRReduction(0x3f, staticRules[0x89]), new LRReduction(0x41, staticRules[0x89]), new LRReduction(0x43, staticRules[0x89]), new LRReduction(0x44, staticRules[0x89]), new LRReduction(0x45, staticRules[0x89]), new LRReduction(0x46, staticRules[0x89]), new LRReduction(0x47, staticRules[0x89]), new LRReduction(0x49, staticRules[0x89]), new LRReduction(0x4a, staticRules[0x89]), new LRReduction(0xdb, staticRules[0x89])})
+               new LRReduction[24] {new LRReduction(0xa, staticRules[0x9A]), new LRReduction(0x11, staticRules[0x9A]), new LRReduction(0x2e, staticRules[0x9A]), new LRReduction(0x34, staticRules[0x9A]), new LRReduction(0x35, staticRules[0x9A]), new LRReduction(0x36, staticRules[0x9A]), new LRReduction(0x37, staticRules[0x9A]), new LRReduction(0x38, staticRules[0x9A]), new LRReduction(0x39, staticRules[0x9A]), new LRReduction(0x3a, staticRules[0x9A]), new LRReduction(0x3b, staticRules[0x9A]), new LRReduction(0x3c, staticRules[0x9A]), new LRReduction(0x3d, staticRules[0x9A]), new LRReduction(0x3e, staticRules[0x9A]), new LRReduction(0x3f, staticRules[0x9A]), new LRReduction(0x41, staticRules[0x9A]), new LRReduction(0x43, staticRules[0x9A]), new LRReduction(0x44, staticRules[0x9A]), new LRReduction(0x45, staticRules[0x9A]), new LRReduction(0x46, staticRules[0x9A]), new LRReduction(0x47, staticRules[0x9A]), new LRReduction(0x49, staticRules[0x9A]), new LRReduction(0x4a, staticRules[0x9A]), new LRReduction(0xdb, staticRules[0x9A])})
             , new LR1State(
                null,
                new SymbolTerminal[26] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5349,15 +5971,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[26] {new LRReduction(0xa, staticRules[0x8A]), new LRReduction(0x11, staticRules[0x8A]), new LRReduction(0x2e, staticRules[0x8A]), new LRReduction(0x34, staticRules[0x8A]), new LRReduction(0x35, staticRules[0x8A]), new LRReduction(0x36, staticRules[0x8A]), new LRReduction(0x37, staticRules[0x8A]), new LRReduction(0x38, staticRules[0x8A]), new LRReduction(0x39, staticRules[0x8A]), new LRReduction(0x3a, staticRules[0x8A]), new LRReduction(0x3b, staticRules[0x8A]), new LRReduction(0x3c, staticRules[0x8A]), new LRReduction(0x3d, staticRules[0x8A]), new LRReduction(0x3e, staticRules[0x8A]), new LRReduction(0x3f, staticRules[0x8A]), new LRReduction(0x41, staticRules[0x8A]), new LRReduction(0x43, staticRules[0x8A]), new LRReduction(0x44, staticRules[0x8A]), new LRReduction(0x45, staticRules[0x8A]), new LRReduction(0x46, staticRules[0x8A]), new LRReduction(0x47, staticRules[0x8A]), new LRReduction(0x49, staticRules[0x8A]), new LRReduction(0x4a, staticRules[0x8A]), new LRReduction(0x55, staticRules[0x8A]), new LRReduction(0x56, staticRules[0x8A]), new LRReduction(0xdb, staticRules[0x8A])})
+               new LRReduction[26] {new LRReduction(0xa, staticRules[0x9D]), new LRReduction(0x11, staticRules[0x9D]), new LRReduction(0x2e, staticRules[0x9D]), new LRReduction(0x34, staticRules[0x9D]), new LRReduction(0x35, staticRules[0x9D]), new LRReduction(0x36, staticRules[0x9D]), new LRReduction(0x37, staticRules[0x9D]), new LRReduction(0x38, staticRules[0x9D]), new LRReduction(0x39, staticRules[0x9D]), new LRReduction(0x3a, staticRules[0x9D]), new LRReduction(0x3b, staticRules[0x9D]), new LRReduction(0x3c, staticRules[0x9D]), new LRReduction(0x3d, staticRules[0x9D]), new LRReduction(0x3e, staticRules[0x9D]), new LRReduction(0x3f, staticRules[0x9D]), new LRReduction(0x41, staticRules[0x9D]), new LRReduction(0x43, staticRules[0x9D]), new LRReduction(0x44, staticRules[0x9D]), new LRReduction(0x45, staticRules[0x9D]), new LRReduction(0x46, staticRules[0x9D]), new LRReduction(0x47, staticRules[0x9D]), new LRReduction(0x49, staticRules[0x9D]), new LRReduction(0x4a, staticRules[0x9D]), new LRReduction(0x55, staticRules[0x9D]), new LRReduction(0x56, staticRules[0x9D]), new LRReduction(0xdb, staticRules[0x9D])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17]},
                new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
                new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[13] {0xC8, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[2] {new LRReduction(0x44, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80])})
+               new ushort[13] {0xCF, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[2] {new LRReduction(0x44, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91])})
             , new LR1State(
                null,
                new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5365,7 +5987,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x8C]), new LRReduction(0x11, staticRules[0x8C]), new LRReduction(0x2e, staticRules[0x8C]), new LRReduction(0x34, staticRules[0x8C]), new LRReduction(0x35, staticRules[0x8C]), new LRReduction(0x36, staticRules[0x8C]), new LRReduction(0x37, staticRules[0x8C]), new LRReduction(0x38, staticRules[0x8C]), new LRReduction(0x39, staticRules[0x8C]), new LRReduction(0x3a, staticRules[0x8C]), new LRReduction(0x3b, staticRules[0x8C]), new LRReduction(0x3c, staticRules[0x8C]), new LRReduction(0x3d, staticRules[0x8C]), new LRReduction(0x3e, staticRules[0x8C]), new LRReduction(0x3f, staticRules[0x8C]), new LRReduction(0x41, staticRules[0x8C]), new LRReduction(0x43, staticRules[0x8C]), new LRReduction(0x44, staticRules[0x8C]), new LRReduction(0x45, staticRules[0x8C]), new LRReduction(0x46, staticRules[0x8C]), new LRReduction(0x47, staticRules[0x8C]), new LRReduction(0x48, staticRules[0x8C]), new LRReduction(0x49, staticRules[0x8C]), new LRReduction(0x4a, staticRules[0x8C]), new LRReduction(0x4e, staticRules[0x8C]), new LRReduction(0x55, staticRules[0x8C]), new LRReduction(0x56, staticRules[0x8C]), new LRReduction(0xdb, staticRules[0x8C])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x9F]), new LRReduction(0x11, staticRules[0x9F]), new LRReduction(0x2e, staticRules[0x9F]), new LRReduction(0x34, staticRules[0x9F]), new LRReduction(0x35, staticRules[0x9F]), new LRReduction(0x36, staticRules[0x9F]), new LRReduction(0x37, staticRules[0x9F]), new LRReduction(0x38, staticRules[0x9F]), new LRReduction(0x39, staticRules[0x9F]), new LRReduction(0x3a, staticRules[0x9F]), new LRReduction(0x3b, staticRules[0x9F]), new LRReduction(0x3c, staticRules[0x9F]), new LRReduction(0x3d, staticRules[0x9F]), new LRReduction(0x3e, staticRules[0x9F]), new LRReduction(0x3f, staticRules[0x9F]), new LRReduction(0x41, staticRules[0x9F]), new LRReduction(0x43, staticRules[0x9F]), new LRReduction(0x44, staticRules[0x9F]), new LRReduction(0x45, staticRules[0x9F]), new LRReduction(0x46, staticRules[0x9F]), new LRReduction(0x47, staticRules[0x9F]), new LRReduction(0x48, staticRules[0x9F]), new LRReduction(0x49, staticRules[0x9F]), new LRReduction(0x4a, staticRules[0x9F]), new LRReduction(0x4e, staticRules[0x9F]), new LRReduction(0x55, staticRules[0x9F]), new LRReduction(0x56, staticRules[0x9F]), new LRReduction(0xdb, staticRules[0x9F])})
             , new LR1State(
                null,
                new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5373,7 +5995,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x8D]), new LRReduction(0x11, staticRules[0x8D]), new LRReduction(0x2e, staticRules[0x8D]), new LRReduction(0x34, staticRules[0x8D]), new LRReduction(0x35, staticRules[0x8D]), new LRReduction(0x36, staticRules[0x8D]), new LRReduction(0x37, staticRules[0x8D]), new LRReduction(0x38, staticRules[0x8D]), new LRReduction(0x39, staticRules[0x8D]), new LRReduction(0x3a, staticRules[0x8D]), new LRReduction(0x3b, staticRules[0x8D]), new LRReduction(0x3c, staticRules[0x8D]), new LRReduction(0x3d, staticRules[0x8D]), new LRReduction(0x3e, staticRules[0x8D]), new LRReduction(0x3f, staticRules[0x8D]), new LRReduction(0x41, staticRules[0x8D]), new LRReduction(0x43, staticRules[0x8D]), new LRReduction(0x44, staticRules[0x8D]), new LRReduction(0x45, staticRules[0x8D]), new LRReduction(0x46, staticRules[0x8D]), new LRReduction(0x47, staticRules[0x8D]), new LRReduction(0x48, staticRules[0x8D]), new LRReduction(0x49, staticRules[0x8D]), new LRReduction(0x4a, staticRules[0x8D]), new LRReduction(0x4e, staticRules[0x8D]), new LRReduction(0x55, staticRules[0x8D]), new LRReduction(0x56, staticRules[0x8D]), new LRReduction(0xdb, staticRules[0x8D])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA0]), new LRReduction(0x11, staticRules[0xA0]), new LRReduction(0x2e, staticRules[0xA0]), new LRReduction(0x34, staticRules[0xA0]), new LRReduction(0x35, staticRules[0xA0]), new LRReduction(0x36, staticRules[0xA0]), new LRReduction(0x37, staticRules[0xA0]), new LRReduction(0x38, staticRules[0xA0]), new LRReduction(0x39, staticRules[0xA0]), new LRReduction(0x3a, staticRules[0xA0]), new LRReduction(0x3b, staticRules[0xA0]), new LRReduction(0x3c, staticRules[0xA0]), new LRReduction(0x3d, staticRules[0xA0]), new LRReduction(0x3e, staticRules[0xA0]), new LRReduction(0x3f, staticRules[0xA0]), new LRReduction(0x41, staticRules[0xA0]), new LRReduction(0x43, staticRules[0xA0]), new LRReduction(0x44, staticRules[0xA0]), new LRReduction(0x45, staticRules[0xA0]), new LRReduction(0x46, staticRules[0xA0]), new LRReduction(0x47, staticRules[0xA0]), new LRReduction(0x48, staticRules[0xA0]), new LRReduction(0x49, staticRules[0xA0]), new LRReduction(0x4a, staticRules[0xA0]), new LRReduction(0x4e, staticRules[0xA0]), new LRReduction(0x55, staticRules[0xA0]), new LRReduction(0x56, staticRules[0xA0]), new LRReduction(0xdb, staticRules[0xA0])})
             , new LR1State(
                null,
                new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5381,7 +6003,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x8E]), new LRReduction(0x11, staticRules[0x8E]), new LRReduction(0x2e, staticRules[0x8E]), new LRReduction(0x34, staticRules[0x8E]), new LRReduction(0x35, staticRules[0x8E]), new LRReduction(0x36, staticRules[0x8E]), new LRReduction(0x37, staticRules[0x8E]), new LRReduction(0x38, staticRules[0x8E]), new LRReduction(0x39, staticRules[0x8E]), new LRReduction(0x3a, staticRules[0x8E]), new LRReduction(0x3b, staticRules[0x8E]), new LRReduction(0x3c, staticRules[0x8E]), new LRReduction(0x3d, staticRules[0x8E]), new LRReduction(0x3e, staticRules[0x8E]), new LRReduction(0x3f, staticRules[0x8E]), new LRReduction(0x41, staticRules[0x8E]), new LRReduction(0x43, staticRules[0x8E]), new LRReduction(0x44, staticRules[0x8E]), new LRReduction(0x45, staticRules[0x8E]), new LRReduction(0x46, staticRules[0x8E]), new LRReduction(0x47, staticRules[0x8E]), new LRReduction(0x48, staticRules[0x8E]), new LRReduction(0x49, staticRules[0x8E]), new LRReduction(0x4a, staticRules[0x8E]), new LRReduction(0x4e, staticRules[0x8E]), new LRReduction(0x55, staticRules[0x8E]), new LRReduction(0x56, staticRules[0x8E]), new LRReduction(0xdb, staticRules[0x8E])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA1]), new LRReduction(0x11, staticRules[0xA1]), new LRReduction(0x2e, staticRules[0xA1]), new LRReduction(0x34, staticRules[0xA1]), new LRReduction(0x35, staticRules[0xA1]), new LRReduction(0x36, staticRules[0xA1]), new LRReduction(0x37, staticRules[0xA1]), new LRReduction(0x38, staticRules[0xA1]), new LRReduction(0x39, staticRules[0xA1]), new LRReduction(0x3a, staticRules[0xA1]), new LRReduction(0x3b, staticRules[0xA1]), new LRReduction(0x3c, staticRules[0xA1]), new LRReduction(0x3d, staticRules[0xA1]), new LRReduction(0x3e, staticRules[0xA1]), new LRReduction(0x3f, staticRules[0xA1]), new LRReduction(0x41, staticRules[0xA1]), new LRReduction(0x43, staticRules[0xA1]), new LRReduction(0x44, staticRules[0xA1]), new LRReduction(0x45, staticRules[0xA1]), new LRReduction(0x46, staticRules[0xA1]), new LRReduction(0x47, staticRules[0xA1]), new LRReduction(0x48, staticRules[0xA1]), new LRReduction(0x49, staticRules[0xA1]), new LRReduction(0x4a, staticRules[0xA1]), new LRReduction(0x4e, staticRules[0xA1]), new LRReduction(0x55, staticRules[0xA1]), new LRReduction(0x56, staticRules[0xA1]), new LRReduction(0xdb, staticRules[0xA1])})
             , new LR1State(
                null,
                new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5389,7 +6011,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x8F]), new LRReduction(0x11, staticRules[0x8F]), new LRReduction(0x2e, staticRules[0x8F]), new LRReduction(0x34, staticRules[0x8F]), new LRReduction(0x35, staticRules[0x8F]), new LRReduction(0x36, staticRules[0x8F]), new LRReduction(0x37, staticRules[0x8F]), new LRReduction(0x38, staticRules[0x8F]), new LRReduction(0x39, staticRules[0x8F]), new LRReduction(0x3a, staticRules[0x8F]), new LRReduction(0x3b, staticRules[0x8F]), new LRReduction(0x3c, staticRules[0x8F]), new LRReduction(0x3d, staticRules[0x8F]), new LRReduction(0x3e, staticRules[0x8F]), new LRReduction(0x3f, staticRules[0x8F]), new LRReduction(0x41, staticRules[0x8F]), new LRReduction(0x43, staticRules[0x8F]), new LRReduction(0x44, staticRules[0x8F]), new LRReduction(0x45, staticRules[0x8F]), new LRReduction(0x46, staticRules[0x8F]), new LRReduction(0x47, staticRules[0x8F]), new LRReduction(0x48, staticRules[0x8F]), new LRReduction(0x49, staticRules[0x8F]), new LRReduction(0x4a, staticRules[0x8F]), new LRReduction(0x4e, staticRules[0x8F]), new LRReduction(0x55, staticRules[0x8F]), new LRReduction(0x56, staticRules[0x8F]), new LRReduction(0xdb, staticRules[0x8F])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA2]), new LRReduction(0x11, staticRules[0xA2]), new LRReduction(0x2e, staticRules[0xA2]), new LRReduction(0x34, staticRules[0xA2]), new LRReduction(0x35, staticRules[0xA2]), new LRReduction(0x36, staticRules[0xA2]), new LRReduction(0x37, staticRules[0xA2]), new LRReduction(0x38, staticRules[0xA2]), new LRReduction(0x39, staticRules[0xA2]), new LRReduction(0x3a, staticRules[0xA2]), new LRReduction(0x3b, staticRules[0xA2]), new LRReduction(0x3c, staticRules[0xA2]), new LRReduction(0x3d, staticRules[0xA2]), new LRReduction(0x3e, staticRules[0xA2]), new LRReduction(0x3f, staticRules[0xA2]), new LRReduction(0x41, staticRules[0xA2]), new LRReduction(0x43, staticRules[0xA2]), new LRReduction(0x44, staticRules[0xA2]), new LRReduction(0x45, staticRules[0xA2]), new LRReduction(0x46, staticRules[0xA2]), new LRReduction(0x47, staticRules[0xA2]), new LRReduction(0x48, staticRules[0xA2]), new LRReduction(0x49, staticRules[0xA2]), new LRReduction(0x4a, staticRules[0xA2]), new LRReduction(0x4e, staticRules[0xA2]), new LRReduction(0x55, staticRules[0xA2]), new LRReduction(0x56, staticRules[0xA2]), new LRReduction(0xdb, staticRules[0xA2])})
             , new LR1State(
                null,
                new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5397,12 +6019,12 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x90]), new LRReduction(0x11, staticRules[0x90]), new LRReduction(0x2e, staticRules[0x90]), new LRReduction(0x34, staticRules[0x90]), new LRReduction(0x35, staticRules[0x90]), new LRReduction(0x36, staticRules[0x90]), new LRReduction(0x37, staticRules[0x90]), new LRReduction(0x38, staticRules[0x90]), new LRReduction(0x39, staticRules[0x90]), new LRReduction(0x3a, staticRules[0x90]), new LRReduction(0x3b, staticRules[0x90]), new LRReduction(0x3c, staticRules[0x90]), new LRReduction(0x3d, staticRules[0x90]), new LRReduction(0x3e, staticRules[0x90]), new LRReduction(0x3f, staticRules[0x90]), new LRReduction(0x41, staticRules[0x90]), new LRReduction(0x43, staticRules[0x90]), new LRReduction(0x44, staticRules[0x90]), new LRReduction(0x45, staticRules[0x90]), new LRReduction(0x46, staticRules[0x90]), new LRReduction(0x47, staticRules[0x90]), new LRReduction(0x48, staticRules[0x90]), new LRReduction(0x49, staticRules[0x90]), new LRReduction(0x4a, staticRules[0x90]), new LRReduction(0x4e, staticRules[0x90]), new LRReduction(0x55, staticRules[0x90]), new LRReduction(0x56, staticRules[0x90]), new LRReduction(0xdb, staticRules[0x90])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA3]), new LRReduction(0x11, staticRules[0xA3]), new LRReduction(0x2e, staticRules[0xA3]), new LRReduction(0x34, staticRules[0xA3]), new LRReduction(0x35, staticRules[0xA3]), new LRReduction(0x36, staticRules[0xA3]), new LRReduction(0x37, staticRules[0xA3]), new LRReduction(0x38, staticRules[0xA3]), new LRReduction(0x39, staticRules[0xA3]), new LRReduction(0x3a, staticRules[0xA3]), new LRReduction(0x3b, staticRules[0xA3]), new LRReduction(0x3c, staticRules[0xA3]), new LRReduction(0x3d, staticRules[0xA3]), new LRReduction(0x3e, staticRules[0xA3]), new LRReduction(0x3f, staticRules[0xA3]), new LRReduction(0x41, staticRules[0xA3]), new LRReduction(0x43, staticRules[0xA3]), new LRReduction(0x44, staticRules[0xA3]), new LRReduction(0x45, staticRules[0xA3]), new LRReduction(0x46, staticRules[0xA3]), new LRReduction(0x47, staticRules[0xA3]), new LRReduction(0x48, staticRules[0xA3]), new LRReduction(0x49, staticRules[0xA3]), new LRReduction(0x4a, staticRules[0xA3]), new LRReduction(0x4e, staticRules[0xA3]), new LRReduction(0x55, staticRules[0xA3]), new LRReduction(0x56, staticRules[0xA3]), new LRReduction(0xdb, staticRules[0xA3])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
                new ushort[1] {0xa},
-               new ushort[1] {0xC9},
+               new ushort[1] {0xD0},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5413,63 +6035,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[29] {new LRReduction(0xa, staticRules[0x31]), new LRReduction(0x11, staticRules[0x31]), new LRReduction(0x2e, staticRules[0x31]), new LRReduction(0x30, staticRules[0x31]), new LRReduction(0x34, staticRules[0x31]), new LRReduction(0x35, staticRules[0x31]), new LRReduction(0x36, staticRules[0x31]), new LRReduction(0x37, staticRules[0x31]), new LRReduction(0x38, staticRules[0x31]), new LRReduction(0x39, staticRules[0x31]), new LRReduction(0x3a, staticRules[0x31]), new LRReduction(0x3b, staticRules[0x31]), new LRReduction(0x3c, staticRules[0x31]), new LRReduction(0x3d, staticRules[0x31]), new LRReduction(0x3e, staticRules[0x31]), new LRReduction(0x3f, staticRules[0x31]), new LRReduction(0x41, staticRules[0x31]), new LRReduction(0x43, staticRules[0x31]), new LRReduction(0x44, staticRules[0x31]), new LRReduction(0x45, staticRules[0x31]), new LRReduction(0x46, staticRules[0x31]), new LRReduction(0x47, staticRules[0x31]), new LRReduction(0x48, staticRules[0x31]), new LRReduction(0x49, staticRules[0x31]), new LRReduction(0x4a, staticRules[0x31]), new LRReduction(0x4e, staticRules[0x31]), new LRReduction(0x55, staticRules[0x31]), new LRReduction(0x56, staticRules[0x31]), new LRReduction(0xdb, staticRules[0x31])})
+               new LRReduction[29] {new LRReduction(0xa, staticRules[0x36]), new LRReduction(0x11, staticRules[0x36]), new LRReduction(0x2e, staticRules[0x36]), new LRReduction(0x30, staticRules[0x36]), new LRReduction(0x34, staticRules[0x36]), new LRReduction(0x35, staticRules[0x36]), new LRReduction(0x36, staticRules[0x36]), new LRReduction(0x37, staticRules[0x36]), new LRReduction(0x38, staticRules[0x36]), new LRReduction(0x39, staticRules[0x36]), new LRReduction(0x3a, staticRules[0x36]), new LRReduction(0x3b, staticRules[0x36]), new LRReduction(0x3c, staticRules[0x36]), new LRReduction(0x3d, staticRules[0x36]), new LRReduction(0x3e, staticRules[0x36]), new LRReduction(0x3f, staticRules[0x36]), new LRReduction(0x41, staticRules[0x36]), new LRReduction(0x43, staticRules[0x36]), new LRReduction(0x44, staticRules[0x36]), new LRReduction(0x45, staticRules[0x36]), new LRReduction(0x46, staticRules[0x36]), new LRReduction(0x47, staticRules[0x36]), new LRReduction(0x48, staticRules[0x36]), new LRReduction(0x49, staticRules[0x36]), new LRReduction(0x4a, staticRules[0x36]), new LRReduction(0x4e, staticRules[0x36]), new LRReduction(0x55, staticRules[0x36]), new LRReduction(0x56, staticRules[0x36]), new LRReduction(0xdb, staticRules[0x36])})
             , new LR1State(
                null,
                new SymbolTerminal[29] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[18], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0x4d},
-               new ushort[1] {0xCB},
+               new ushort[1] {0xD2},
                new ushort[1] {0x98},
-               new ushort[1] {0xCA},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x32]), new LRReduction(0x11, staticRules[0x32]), new LRReduction(0x2e, staticRules[0x32]), new LRReduction(0x34, staticRules[0x32]), new LRReduction(0x35, staticRules[0x32]), new LRReduction(0x36, staticRules[0x32]), new LRReduction(0x37, staticRules[0x32]), new LRReduction(0x38, staticRules[0x32]), new LRReduction(0x39, staticRules[0x32]), new LRReduction(0x3a, staticRules[0x32]), new LRReduction(0x3b, staticRules[0x32]), new LRReduction(0x3c, staticRules[0x32]), new LRReduction(0x3d, staticRules[0x32]), new LRReduction(0x3e, staticRules[0x32]), new LRReduction(0x3f, staticRules[0x32]), new LRReduction(0x41, staticRules[0x32]), new LRReduction(0x43, staticRules[0x32]), new LRReduction(0x44, staticRules[0x32]), new LRReduction(0x45, staticRules[0x32]), new LRReduction(0x46, staticRules[0x32]), new LRReduction(0x47, staticRules[0x32]), new LRReduction(0x48, staticRules[0x32]), new LRReduction(0x49, staticRules[0x32]), new LRReduction(0x4a, staticRules[0x32]), new LRReduction(0x4e, staticRules[0x32]), new LRReduction(0x55, staticRules[0x32]), new LRReduction(0x56, staticRules[0x32]), new LRReduction(0xdb, staticRules[0x32])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x34]), new LRReduction(0x11, staticRules[0x34]), new LRReduction(0x2e, staticRules[0x34]), new LRReduction(0x34, staticRules[0x34]), new LRReduction(0x35, staticRules[0x34]), new LRReduction(0x36, staticRules[0x34]), new LRReduction(0x37, staticRules[0x34]), new LRReduction(0x38, staticRules[0x34]), new LRReduction(0x39, staticRules[0x34]), new LRReduction(0x3a, staticRules[0x34]), new LRReduction(0x3b, staticRules[0x34]), new LRReduction(0x3c, staticRules[0x34]), new LRReduction(0x3d, staticRules[0x34]), new LRReduction(0x3e, staticRules[0x34]), new LRReduction(0x3f, staticRules[0x34]), new LRReduction(0x41, staticRules[0x34]), new LRReduction(0x43, staticRules[0x34]), new LRReduction(0x44, staticRules[0x34]), new LRReduction(0x45, staticRules[0x34]), new LRReduction(0x46, staticRules[0x34]), new LRReduction(0x47, staticRules[0x34]), new LRReduction(0x48, staticRules[0x34]), new LRReduction(0x49, staticRules[0x34]), new LRReduction(0x4a, staticRules[0x34]), new LRReduction(0x4e, staticRules[0x34]), new LRReduction(0x55, staticRules[0x34]), new LRReduction(0x56, staticRules[0x34]), new LRReduction(0xdb, staticRules[0x34])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x35]), new LRReduction(0x11, staticRules[0x35]), new LRReduction(0x2e, staticRules[0x35]), new LRReduction(0x34, staticRules[0x35]), new LRReduction(0x35, staticRules[0x35]), new LRReduction(0x36, staticRules[0x35]), new LRReduction(0x37, staticRules[0x35]), new LRReduction(0x38, staticRules[0x35]), new LRReduction(0x39, staticRules[0x35]), new LRReduction(0x3a, staticRules[0x35]), new LRReduction(0x3b, staticRules[0x35]), new LRReduction(0x3c, staticRules[0x35]), new LRReduction(0x3d, staticRules[0x35]), new LRReduction(0x3e, staticRules[0x35]), new LRReduction(0x3f, staticRules[0x35]), new LRReduction(0x41, staticRules[0x35]), new LRReduction(0x43, staticRules[0x35]), new LRReduction(0x44, staticRules[0x35]), new LRReduction(0x45, staticRules[0x35]), new LRReduction(0x46, staticRules[0x35]), new LRReduction(0x47, staticRules[0x35]), new LRReduction(0x48, staticRules[0x35]), new LRReduction(0x49, staticRules[0x35]), new LRReduction(0x4a, staticRules[0x35]), new LRReduction(0x4e, staticRules[0x35]), new LRReduction(0x55, staticRules[0x35]), new LRReduction(0x56, staticRules[0x35]), new LRReduction(0xdb, staticRules[0x35])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x36]), new LRReduction(0x11, staticRules[0x36]), new LRReduction(0x2e, staticRules[0x36]), new LRReduction(0x34, staticRules[0x36]), new LRReduction(0x35, staticRules[0x36]), new LRReduction(0x36, staticRules[0x36]), new LRReduction(0x37, staticRules[0x36]), new LRReduction(0x38, staticRules[0x36]), new LRReduction(0x39, staticRules[0x36]), new LRReduction(0x3a, staticRules[0x36]), new LRReduction(0x3b, staticRules[0x36]), new LRReduction(0x3c, staticRules[0x36]), new LRReduction(0x3d, staticRules[0x36]), new LRReduction(0x3e, staticRules[0x36]), new LRReduction(0x3f, staticRules[0x36]), new LRReduction(0x41, staticRules[0x36]), new LRReduction(0x43, staticRules[0x36]), new LRReduction(0x44, staticRules[0x36]), new LRReduction(0x45, staticRules[0x36]), new LRReduction(0x46, staticRules[0x36]), new LRReduction(0x47, staticRules[0x36]), new LRReduction(0x48, staticRules[0x36]), new LRReduction(0x49, staticRules[0x36]), new LRReduction(0x4a, staticRules[0x36]), new LRReduction(0x4e, staticRules[0x36]), new LRReduction(0x55, staticRules[0x36]), new LRReduction(0x56, staticRules[0x36]), new LRReduction(0xdb, staticRules[0x36])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
+               new ushort[1] {0xD1},
                new LRReduction[28] {new LRReduction(0xa, staticRules[0x37]), new LRReduction(0x11, staticRules[0x37]), new LRReduction(0x2e, staticRules[0x37]), new LRReduction(0x34, staticRules[0x37]), new LRReduction(0x35, staticRules[0x37]), new LRReduction(0x36, staticRules[0x37]), new LRReduction(0x37, staticRules[0x37]), new LRReduction(0x38, staticRules[0x37]), new LRReduction(0x39, staticRules[0x37]), new LRReduction(0x3a, staticRules[0x37]), new LRReduction(0x3b, staticRules[0x37]), new LRReduction(0x3c, staticRules[0x37]), new LRReduction(0x3d, staticRules[0x37]), new LRReduction(0x3e, staticRules[0x37]), new LRReduction(0x3f, staticRules[0x37]), new LRReduction(0x41, staticRules[0x37]), new LRReduction(0x43, staticRules[0x37]), new LRReduction(0x44, staticRules[0x37]), new LRReduction(0x45, staticRules[0x37]), new LRReduction(0x46, staticRules[0x37]), new LRReduction(0x47, staticRules[0x37]), new LRReduction(0x48, staticRules[0x37]), new LRReduction(0x49, staticRules[0x37]), new LRReduction(0x4a, staticRules[0x37]), new LRReduction(0x4e, staticRules[0x37]), new LRReduction(0x55, staticRules[0x37]), new LRReduction(0x56, staticRules[0x37]), new LRReduction(0xdb, staticRules[0x37])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x38]), new LRReduction(0x11, staticRules[0x38]), new LRReduction(0x2e, staticRules[0x38]), new LRReduction(0x34, staticRules[0x38]), new LRReduction(0x35, staticRules[0x38]), new LRReduction(0x36, staticRules[0x38]), new LRReduction(0x37, staticRules[0x38]), new LRReduction(0x38, staticRules[0x38]), new LRReduction(0x39, staticRules[0x38]), new LRReduction(0x3a, staticRules[0x38]), new LRReduction(0x3b, staticRules[0x38]), new LRReduction(0x3c, staticRules[0x38]), new LRReduction(0x3d, staticRules[0x38]), new LRReduction(0x3e, staticRules[0x38]), new LRReduction(0x3f, staticRules[0x38]), new LRReduction(0x41, staticRules[0x38]), new LRReduction(0x43, staticRules[0x38]), new LRReduction(0x44, staticRules[0x38]), new LRReduction(0x45, staticRules[0x38]), new LRReduction(0x46, staticRules[0x38]), new LRReduction(0x47, staticRules[0x38]), new LRReduction(0x48, staticRules[0x38]), new LRReduction(0x49, staticRules[0x38]), new LRReduction(0x4a, staticRules[0x38]), new LRReduction(0x4e, staticRules[0x38]), new LRReduction(0x55, staticRules[0x38]), new LRReduction(0x56, staticRules[0x38]), new LRReduction(0xdb, staticRules[0x38])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x39]), new LRReduction(0x11, staticRules[0x39]), new LRReduction(0x2e, staticRules[0x39]), new LRReduction(0x34, staticRules[0x39]), new LRReduction(0x35, staticRules[0x39]), new LRReduction(0x36, staticRules[0x39]), new LRReduction(0x37, staticRules[0x39]), new LRReduction(0x38, staticRules[0x39]), new LRReduction(0x39, staticRules[0x39]), new LRReduction(0x3a, staticRules[0x39]), new LRReduction(0x3b, staticRules[0x39]), new LRReduction(0x3c, staticRules[0x39]), new LRReduction(0x3d, staticRules[0x39]), new LRReduction(0x3e, staticRules[0x39]), new LRReduction(0x3f, staticRules[0x39]), new LRReduction(0x41, staticRules[0x39]), new LRReduction(0x43, staticRules[0x39]), new LRReduction(0x44, staticRules[0x39]), new LRReduction(0x45, staticRules[0x39]), new LRReduction(0x46, staticRules[0x39]), new LRReduction(0x47, staticRules[0x39]), new LRReduction(0x48, staticRules[0x39]), new LRReduction(0x49, staticRules[0x39]), new LRReduction(0x4a, staticRules[0x39]), new LRReduction(0x4e, staticRules[0x39]), new LRReduction(0x55, staticRules[0x39]), new LRReduction(0x56, staticRules[0x39]), new LRReduction(0xdb, staticRules[0x39])})
             , new LR1State(
                null,
                new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5520,43 +6094,99 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[28] {new LRReduction(0xa, staticRules[0x3F]), new LRReduction(0x11, staticRules[0x3F]), new LRReduction(0x2e, staticRules[0x3F]), new LRReduction(0x34, staticRules[0x3F]), new LRReduction(0x35, staticRules[0x3F]), new LRReduction(0x36, staticRules[0x3F]), new LRReduction(0x37, staticRules[0x3F]), new LRReduction(0x38, staticRules[0x3F]), new LRReduction(0x39, staticRules[0x3F]), new LRReduction(0x3a, staticRules[0x3F]), new LRReduction(0x3b, staticRules[0x3F]), new LRReduction(0x3c, staticRules[0x3F]), new LRReduction(0x3d, staticRules[0x3F]), new LRReduction(0x3e, staticRules[0x3F]), new LRReduction(0x3f, staticRules[0x3F]), new LRReduction(0x41, staticRules[0x3F]), new LRReduction(0x43, staticRules[0x3F]), new LRReduction(0x44, staticRules[0x3F]), new LRReduction(0x45, staticRules[0x3F]), new LRReduction(0x46, staticRules[0x3F]), new LRReduction(0x47, staticRules[0x3F]), new LRReduction(0x48, staticRules[0x3F]), new LRReduction(0x49, staticRules[0x3F]), new LRReduction(0x4a, staticRules[0x3F]), new LRReduction(0x4e, staticRules[0x3F]), new LRReduction(0x55, staticRules[0x3F]), new LRReduction(0x56, staticRules[0x3F]), new LRReduction(0xdb, staticRules[0x3F])})
             , new LR1State(
                null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x40]), new LRReduction(0x11, staticRules[0x40]), new LRReduction(0x2e, staticRules[0x40]), new LRReduction(0x34, staticRules[0x40]), new LRReduction(0x35, staticRules[0x40]), new LRReduction(0x36, staticRules[0x40]), new LRReduction(0x37, staticRules[0x40]), new LRReduction(0x38, staticRules[0x40]), new LRReduction(0x39, staticRules[0x40]), new LRReduction(0x3a, staticRules[0x40]), new LRReduction(0x3b, staticRules[0x40]), new LRReduction(0x3c, staticRules[0x40]), new LRReduction(0x3d, staticRules[0x40]), new LRReduction(0x3e, staticRules[0x40]), new LRReduction(0x3f, staticRules[0x40]), new LRReduction(0x41, staticRules[0x40]), new LRReduction(0x43, staticRules[0x40]), new LRReduction(0x44, staticRules[0x40]), new LRReduction(0x45, staticRules[0x40]), new LRReduction(0x46, staticRules[0x40]), new LRReduction(0x47, staticRules[0x40]), new LRReduction(0x48, staticRules[0x40]), new LRReduction(0x49, staticRules[0x40]), new LRReduction(0x4a, staticRules[0x40]), new LRReduction(0x4e, staticRules[0x40]), new LRReduction(0x55, staticRules[0x40]), new LRReduction(0x56, staticRules[0x40]), new LRReduction(0xdb, staticRules[0x40])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x41]), new LRReduction(0x11, staticRules[0x41]), new LRReduction(0x2e, staticRules[0x41]), new LRReduction(0x34, staticRules[0x41]), new LRReduction(0x35, staticRules[0x41]), new LRReduction(0x36, staticRules[0x41]), new LRReduction(0x37, staticRules[0x41]), new LRReduction(0x38, staticRules[0x41]), new LRReduction(0x39, staticRules[0x41]), new LRReduction(0x3a, staticRules[0x41]), new LRReduction(0x3b, staticRules[0x41]), new LRReduction(0x3c, staticRules[0x41]), new LRReduction(0x3d, staticRules[0x41]), new LRReduction(0x3e, staticRules[0x41]), new LRReduction(0x3f, staticRules[0x41]), new LRReduction(0x41, staticRules[0x41]), new LRReduction(0x43, staticRules[0x41]), new LRReduction(0x44, staticRules[0x41]), new LRReduction(0x45, staticRules[0x41]), new LRReduction(0x46, staticRules[0x41]), new LRReduction(0x47, staticRules[0x41]), new LRReduction(0x48, staticRules[0x41]), new LRReduction(0x49, staticRules[0x41]), new LRReduction(0x4a, staticRules[0x41]), new LRReduction(0x4e, staticRules[0x41]), new LRReduction(0x55, staticRules[0x41]), new LRReduction(0x56, staticRules[0x41]), new LRReduction(0xdb, staticRules[0x41])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x42]), new LRReduction(0x11, staticRules[0x42]), new LRReduction(0x2e, staticRules[0x42]), new LRReduction(0x34, staticRules[0x42]), new LRReduction(0x35, staticRules[0x42]), new LRReduction(0x36, staticRules[0x42]), new LRReduction(0x37, staticRules[0x42]), new LRReduction(0x38, staticRules[0x42]), new LRReduction(0x39, staticRules[0x42]), new LRReduction(0x3a, staticRules[0x42]), new LRReduction(0x3b, staticRules[0x42]), new LRReduction(0x3c, staticRules[0x42]), new LRReduction(0x3d, staticRules[0x42]), new LRReduction(0x3e, staticRules[0x42]), new LRReduction(0x3f, staticRules[0x42]), new LRReduction(0x41, staticRules[0x42]), new LRReduction(0x43, staticRules[0x42]), new LRReduction(0x44, staticRules[0x42]), new LRReduction(0x45, staticRules[0x42]), new LRReduction(0x46, staticRules[0x42]), new LRReduction(0x47, staticRules[0x42]), new LRReduction(0x48, staticRules[0x42]), new LRReduction(0x49, staticRules[0x42]), new LRReduction(0x4a, staticRules[0x42]), new LRReduction(0x4e, staticRules[0x42]), new LRReduction(0x55, staticRules[0x42]), new LRReduction(0x56, staticRules[0x42]), new LRReduction(0xdb, staticRules[0x42])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x43]), new LRReduction(0x11, staticRules[0x43]), new LRReduction(0x2e, staticRules[0x43]), new LRReduction(0x34, staticRules[0x43]), new LRReduction(0x35, staticRules[0x43]), new LRReduction(0x36, staticRules[0x43]), new LRReduction(0x37, staticRules[0x43]), new LRReduction(0x38, staticRules[0x43]), new LRReduction(0x39, staticRules[0x43]), new LRReduction(0x3a, staticRules[0x43]), new LRReduction(0x3b, staticRules[0x43]), new LRReduction(0x3c, staticRules[0x43]), new LRReduction(0x3d, staticRules[0x43]), new LRReduction(0x3e, staticRules[0x43]), new LRReduction(0x3f, staticRules[0x43]), new LRReduction(0x41, staticRules[0x43]), new LRReduction(0x43, staticRules[0x43]), new LRReduction(0x44, staticRules[0x43]), new LRReduction(0x45, staticRules[0x43]), new LRReduction(0x46, staticRules[0x43]), new LRReduction(0x47, staticRules[0x43]), new LRReduction(0x48, staticRules[0x43]), new LRReduction(0x49, staticRules[0x43]), new LRReduction(0x4a, staticRules[0x43]), new LRReduction(0x4e, staticRules[0x43]), new LRReduction(0x55, staticRules[0x43]), new LRReduction(0x56, staticRules[0x43]), new LRReduction(0xdb, staticRules[0x43])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x44]), new LRReduction(0x11, staticRules[0x44]), new LRReduction(0x2e, staticRules[0x44]), new LRReduction(0x34, staticRules[0x44]), new LRReduction(0x35, staticRules[0x44]), new LRReduction(0x36, staticRules[0x44]), new LRReduction(0x37, staticRules[0x44]), new LRReduction(0x38, staticRules[0x44]), new LRReduction(0x39, staticRules[0x44]), new LRReduction(0x3a, staticRules[0x44]), new LRReduction(0x3b, staticRules[0x44]), new LRReduction(0x3c, staticRules[0x44]), new LRReduction(0x3d, staticRules[0x44]), new LRReduction(0x3e, staticRules[0x44]), new LRReduction(0x3f, staticRules[0x44]), new LRReduction(0x41, staticRules[0x44]), new LRReduction(0x43, staticRules[0x44]), new LRReduction(0x44, staticRules[0x44]), new LRReduction(0x45, staticRules[0x44]), new LRReduction(0x46, staticRules[0x44]), new LRReduction(0x47, staticRules[0x44]), new LRReduction(0x48, staticRules[0x44]), new LRReduction(0x49, staticRules[0x44]), new LRReduction(0x4a, staticRules[0x44]), new LRReduction(0x4e, staticRules[0x44]), new LRReduction(0x55, staticRules[0x44]), new LRReduction(0x56, staticRules[0x44]), new LRReduction(0xdb, staticRules[0x44])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0x45]), new LRReduction(0x11, staticRules[0x45]), new LRReduction(0x2e, staticRules[0x45]), new LRReduction(0x34, staticRules[0x45]), new LRReduction(0x35, staticRules[0x45]), new LRReduction(0x36, staticRules[0x45]), new LRReduction(0x37, staticRules[0x45]), new LRReduction(0x38, staticRules[0x45]), new LRReduction(0x39, staticRules[0x45]), new LRReduction(0x3a, staticRules[0x45]), new LRReduction(0x3b, staticRules[0x45]), new LRReduction(0x3c, staticRules[0x45]), new LRReduction(0x3d, staticRules[0x45]), new LRReduction(0x3e, staticRules[0x45]), new LRReduction(0x3f, staticRules[0x45]), new LRReduction(0x41, staticRules[0x45]), new LRReduction(0x43, staticRules[0x45]), new LRReduction(0x44, staticRules[0x45]), new LRReduction(0x45, staticRules[0x45]), new LRReduction(0x46, staticRules[0x45]), new LRReduction(0x47, staticRules[0x45]), new LRReduction(0x48, staticRules[0x45]), new LRReduction(0x49, staticRules[0x45]), new LRReduction(0x4a, staticRules[0x45]), new LRReduction(0x4e, staticRules[0x45]), new LRReduction(0x55, staticRules[0x45]), new LRReduction(0x56, staticRules[0x45]), new LRReduction(0xdb, staticRules[0x45])})
+            , new LR1State(
+               null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
                new ushort[1] {0x41},
-               new ushort[1] {0xCC},
+               new ushort[1] {0xD3},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0xCD},
                new ushort[0] {},
                new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0x62])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[2] {0x12, 0xa},
+               new ushort[2] {0xD4, 0x91},
+               new ushort[2] {0x7c, 0x8b},
+               new ushort[2] {0xD5, 0xD6},
                new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x8A},
-               new ushort[3] {0x8c, 0x7c, 0x8b},
-               new ushort[3] {0xCE, 0x88, 0x89},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x7B])})
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x87]), new LRReduction(0x12, staticRules[0x87])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x8A},
-               new ushort[3] {0x8c, 0x7c, 0x8b},
-               new ushort[3] {0xCF, 0x88, 0x89},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x7B])})
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x88]), new LRReduction(0x12, staticRules[0x88])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
                new ushort[2] {0x4c, 0x4d},
-               new ushort[2] {0xD0, 0x90},
+               new ushort[2] {0xD7, 0x97},
                new ushort[1] {0x6b},
-               new ushort[1] {0xD1},
+               new ushort[1] {0xD8},
                new LRReduction[0] {})
             , new LR1State(
                null,
@@ -5565,36 +6195,36 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x7C])})
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0x8C])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x9C])})
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0xB2]), new LRReduction(0x12, staticRules[0xB2])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x9D])})
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0xB3]), new LRReduction(0x12, staticRules[0xB3])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
                new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
                new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[13] {0xD2, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80])})
+               new ushort[13] {0xD9, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
                new ushort[1] {0x4c},
-               new ushort[1] {0xD3},
+               new ushort[1] {0xDA},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5602,7 +6232,7 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
                new ushort[1] {0xa},
-               new ushort[1] {0xD4},
+               new ushort[1] {0xDB},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5613,36 +6243,36 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xA1])})
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0xB7])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xA6])})
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xBE]), new LRReduction(0x12, staticRules[0xBE]), new LRReduction(0xda, staticRules[0xBE])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0xA7])})
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xBF]), new LRReduction(0x12, staticRules[0xBF]), new LRReduction(0xda, staticRules[0xBF])})
             , new LR1State(
                null,
                new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18], FileCentralDogma_Lexer.terminals[6]},
                new ushort[1] {0xda},
-               new ushort[1] {0x61},
+               new ushort[1] {0x67},
                new ushort[1] {0xe0},
-               new ushort[1] {0xD5},
-               new LRReduction[2] {new LRReduction(0x4c, staticRules[0xA4]), new LRReduction(0x4d, staticRules[0xA4])})
+               new ushort[1] {0xDC},
+               new LRReduction[2] {new LRReduction(0x4c, staticRules[0xB9]), new LRReduction(0x4d, staticRules[0xB9])})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0xdb},
-               new ushort[1] {0xD6},
+               new ushort[1] {0xDD},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -5650,10 +6280,10 @@ namespace Hime.Kernel.Resources.Parser
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0x4a},
-               new ushort[1] {0xD8},
+               new ushort[1] {0xDF},
                new ushort[1] {0x8a},
-               new ushort[1] {0xD7},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x77]), new LRReduction(0x44, staticRules[0x77]), new LRReduction(0xdb, staticRules[0x77])})
+               new ushort[1] {0xDE},
+               new LRReduction[3] {new LRReduction(0x41, staticRules[0x65]), new LRReduction(0x44, staticRules[0x65]), new LRReduction(0xdb, staticRules[0x65])})
             , new LR1State(
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
@@ -5661,39 +6291,39 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x5C]), new LRReduction(0x44, staticRules[0x5C]), new LRReduction(0x4a, staticRules[0x5C]), new LRReduction(0xdb, staticRules[0x5C])})
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x67]), new LRReduction(0x44, staticRules[0x67]), new LRReduction(0x4a, staticRules[0x67]), new LRReduction(0xdb, staticRules[0x67])})
             , new LR1State(
                null,
                new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0x49},
-               new ushort[1] {0xDA},
+               new ushort[1] {0xE1},
                new ushort[1] {0x89},
-               new ushort[1] {0xD9},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x75]), new LRReduction(0x44, staticRules[0x75]), new LRReduction(0x4a, staticRules[0x75]), new LRReduction(0xdb, staticRules[0x75])})
+               new ushort[1] {0xE0},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x69]), new LRReduction(0x44, staticRules[0x69]), new LRReduction(0x4a, staticRules[0x69]), new LRReduction(0xdb, staticRules[0x69])})
             , new LR1State(
                null,
                new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
                new ushort[11] {0x88, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[11] {0xDB, 0xDC, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x73]), new LRReduction(0x44, staticRules[0x73]), new LRReduction(0x49, staticRules[0x73]), new LRReduction(0x4a, staticRules[0x73]), new LRReduction(0xdb, staticRules[0x73])})
+               new ushort[11] {0xE2, 0xE3, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x6B]), new LRReduction(0x44, staticRules[0x6B]), new LRReduction(0x49, staticRules[0x6B]), new LRReduction(0x4a, staticRules[0x6B]), new LRReduction(0xdb, staticRules[0x6B])})
             , new LR1State(
                null,
                new SymbolTerminal[13] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[3] {0x45, 0x46, 0x47},
-               new ushort[3] {0xDD, 0xDE, 0xDF},
+               new ushort[3] {0xE4, 0xE5, 0xE6},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[10] {new LRReduction(0xa, staticRules[0x63]), new LRReduction(0x11, staticRules[0x63]), new LRReduction(0x2e, staticRules[0x63]), new LRReduction(0x30, staticRules[0x63]), new LRReduction(0x41, staticRules[0x63]), new LRReduction(0x43, staticRules[0x63]), new LRReduction(0x44, staticRules[0x63]), new LRReduction(0x49, staticRules[0x63]), new LRReduction(0x4a, staticRules[0x63]), new LRReduction(0xdb, staticRules[0x63])})
+               new LRReduction[10] {new LRReduction(0xa, staticRules[0x6D]), new LRReduction(0x11, staticRules[0x6D]), new LRReduction(0x2e, staticRules[0x6D]), new LRReduction(0x30, staticRules[0x6D]), new LRReduction(0x41, staticRules[0x6D]), new LRReduction(0x43, staticRules[0x6D]), new LRReduction(0x44, staticRules[0x6D]), new LRReduction(0x49, staticRules[0x6D]), new LRReduction(0x4a, staticRules[0x6D]), new LRReduction(0xdb, staticRules[0x6D])})
             , new LR1State(
                null,
                new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
                new ushort[2] {0x55, 0x56},
-               new ushort[2] {0xE0, 0xE1},
+               new ushort[2] {0xE7, 0xE8},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[13] {new LRReduction(0xa, staticRules[0x66]), new LRReduction(0x11, staticRules[0x66]), new LRReduction(0x2e, staticRules[0x66]), new LRReduction(0x30, staticRules[0x66]), new LRReduction(0x41, staticRules[0x66]), new LRReduction(0x43, staticRules[0x66]), new LRReduction(0x44, staticRules[0x66]), new LRReduction(0x45, staticRules[0x66]), new LRReduction(0x46, staticRules[0x66]), new LRReduction(0x47, staticRules[0x66]), new LRReduction(0x49, staticRules[0x66]), new LRReduction(0x4a, staticRules[0x66]), new LRReduction(0xdb, staticRules[0x66])})
+               new LRReduction[13] {new LRReduction(0xa, staticRules[0x71]), new LRReduction(0x11, staticRules[0x71]), new LRReduction(0x2e, staticRules[0x71]), new LRReduction(0x30, staticRules[0x71]), new LRReduction(0x41, staticRules[0x71]), new LRReduction(0x43, staticRules[0x71]), new LRReduction(0x44, staticRules[0x71]), new LRReduction(0x45, staticRules[0x71]), new LRReduction(0x46, staticRules[0x71]), new LRReduction(0x47, staticRules[0x71]), new LRReduction(0x49, staticRules[0x71]), new LRReduction(0x4a, staticRules[0x71]), new LRReduction(0xdb, staticRules[0x71])})
             , new LR1State(
                null,
                new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5701,15 +6331,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[15] {new LRReduction(0xa, staticRules[0x67]), new LRReduction(0x11, staticRules[0x67]), new LRReduction(0x2e, staticRules[0x67]), new LRReduction(0x30, staticRules[0x67]), new LRReduction(0x41, staticRules[0x67]), new LRReduction(0x43, staticRules[0x67]), new LRReduction(0x44, staticRules[0x67]), new LRReduction(0x45, staticRules[0x67]), new LRReduction(0x46, staticRules[0x67]), new LRReduction(0x47, staticRules[0x67]), new LRReduction(0x49, staticRules[0x67]), new LRReduction(0x4a, staticRules[0x67]), new LRReduction(0x55, staticRules[0x67]), new LRReduction(0x56, staticRules[0x67]), new LRReduction(0xdb, staticRules[0x67])})
+               new LRReduction[15] {new LRReduction(0xa, staticRules[0x74]), new LRReduction(0x11, staticRules[0x74]), new LRReduction(0x2e, staticRules[0x74]), new LRReduction(0x30, staticRules[0x74]), new LRReduction(0x41, staticRules[0x74]), new LRReduction(0x43, staticRules[0x74]), new LRReduction(0x44, staticRules[0x74]), new LRReduction(0x45, staticRules[0x74]), new LRReduction(0x46, staticRules[0x74]), new LRReduction(0x47, staticRules[0x74]), new LRReduction(0x49, staticRules[0x74]), new LRReduction(0x4a, staticRules[0x74]), new LRReduction(0x55, staticRules[0x74]), new LRReduction(0x56, staticRules[0x74]), new LRReduction(0xdb, staticRules[0x74])})
             , new LR1State(
                null,
                new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17]},
                new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
                new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[14] {0xE2, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[2] {new LRReduction(0x44, staticRules[0x5D]), new LRReduction(0x4a, staticRules[0x5D])})
+               new ushort[14] {0xE9, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[2] {new LRReduction(0x44, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68])})
             , new LR1State(
                null,
                new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5717,7 +6347,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x69]), new LRReduction(0x11, staticRules[0x69]), new LRReduction(0x2e, staticRules[0x69]), new LRReduction(0x30, staticRules[0x69]), new LRReduction(0x41, staticRules[0x69]), new LRReduction(0x43, staticRules[0x69]), new LRReduction(0x44, staticRules[0x69]), new LRReduction(0x45, staticRules[0x69]), new LRReduction(0x46, staticRules[0x69]), new LRReduction(0x47, staticRules[0x69]), new LRReduction(0x48, staticRules[0x69]), new LRReduction(0x49, staticRules[0x69]), new LRReduction(0x4a, staticRules[0x69]), new LRReduction(0x4e, staticRules[0x69]), new LRReduction(0x55, staticRules[0x69]), new LRReduction(0x56, staticRules[0x69]), new LRReduction(0xdb, staticRules[0x69])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x76]), new LRReduction(0x11, staticRules[0x76]), new LRReduction(0x2e, staticRules[0x76]), new LRReduction(0x30, staticRules[0x76]), new LRReduction(0x41, staticRules[0x76]), new LRReduction(0x43, staticRules[0x76]), new LRReduction(0x44, staticRules[0x76]), new LRReduction(0x45, staticRules[0x76]), new LRReduction(0x46, staticRules[0x76]), new LRReduction(0x47, staticRules[0x76]), new LRReduction(0x48, staticRules[0x76]), new LRReduction(0x49, staticRules[0x76]), new LRReduction(0x4a, staticRules[0x76]), new LRReduction(0x4e, staticRules[0x76]), new LRReduction(0x55, staticRules[0x76]), new LRReduction(0x56, staticRules[0x76]), new LRReduction(0xdb, staticRules[0x76])})
             , new LR1State(
                null,
                new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5725,7 +6355,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x6A]), new LRReduction(0x11, staticRules[0x6A]), new LRReduction(0x2e, staticRules[0x6A]), new LRReduction(0x30, staticRules[0x6A]), new LRReduction(0x41, staticRules[0x6A]), new LRReduction(0x43, staticRules[0x6A]), new LRReduction(0x44, staticRules[0x6A]), new LRReduction(0x45, staticRules[0x6A]), new LRReduction(0x46, staticRules[0x6A]), new LRReduction(0x47, staticRules[0x6A]), new LRReduction(0x48, staticRules[0x6A]), new LRReduction(0x49, staticRules[0x6A]), new LRReduction(0x4a, staticRules[0x6A]), new LRReduction(0x4e, staticRules[0x6A]), new LRReduction(0x55, staticRules[0x6A]), new LRReduction(0x56, staticRules[0x6A]), new LRReduction(0xdb, staticRules[0x6A])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x77]), new LRReduction(0x11, staticRules[0x77]), new LRReduction(0x2e, staticRules[0x77]), new LRReduction(0x30, staticRules[0x77]), new LRReduction(0x41, staticRules[0x77]), new LRReduction(0x43, staticRules[0x77]), new LRReduction(0x44, staticRules[0x77]), new LRReduction(0x45, staticRules[0x77]), new LRReduction(0x46, staticRules[0x77]), new LRReduction(0x47, staticRules[0x77]), new LRReduction(0x48, staticRules[0x77]), new LRReduction(0x49, staticRules[0x77]), new LRReduction(0x4a, staticRules[0x77]), new LRReduction(0x4e, staticRules[0x77]), new LRReduction(0x55, staticRules[0x77]), new LRReduction(0x56, staticRules[0x77]), new LRReduction(0xdb, staticRules[0x77])})
             , new LR1State(
                null,
                new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5733,7 +6363,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x6B]), new LRReduction(0x11, staticRules[0x6B]), new LRReduction(0x2e, staticRules[0x6B]), new LRReduction(0x30, staticRules[0x6B]), new LRReduction(0x41, staticRules[0x6B]), new LRReduction(0x43, staticRules[0x6B]), new LRReduction(0x44, staticRules[0x6B]), new LRReduction(0x45, staticRules[0x6B]), new LRReduction(0x46, staticRules[0x6B]), new LRReduction(0x47, staticRules[0x6B]), new LRReduction(0x48, staticRules[0x6B]), new LRReduction(0x49, staticRules[0x6B]), new LRReduction(0x4a, staticRules[0x6B]), new LRReduction(0x4e, staticRules[0x6B]), new LRReduction(0x55, staticRules[0x6B]), new LRReduction(0x56, staticRules[0x6B]), new LRReduction(0xdb, staticRules[0x6B])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x78]), new LRReduction(0x11, staticRules[0x78]), new LRReduction(0x2e, staticRules[0x78]), new LRReduction(0x30, staticRules[0x78]), new LRReduction(0x41, staticRules[0x78]), new LRReduction(0x43, staticRules[0x78]), new LRReduction(0x44, staticRules[0x78]), new LRReduction(0x45, staticRules[0x78]), new LRReduction(0x46, staticRules[0x78]), new LRReduction(0x47, staticRules[0x78]), new LRReduction(0x48, staticRules[0x78]), new LRReduction(0x49, staticRules[0x78]), new LRReduction(0x4a, staticRules[0x78]), new LRReduction(0x4e, staticRules[0x78]), new LRReduction(0x55, staticRules[0x78]), new LRReduction(0x56, staticRules[0x78]), new LRReduction(0xdb, staticRules[0x78])})
             , new LR1State(
                null,
                new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5741,7 +6371,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x6C]), new LRReduction(0x11, staticRules[0x6C]), new LRReduction(0x2e, staticRules[0x6C]), new LRReduction(0x30, staticRules[0x6C]), new LRReduction(0x41, staticRules[0x6C]), new LRReduction(0x43, staticRules[0x6C]), new LRReduction(0x44, staticRules[0x6C]), new LRReduction(0x45, staticRules[0x6C]), new LRReduction(0x46, staticRules[0x6C]), new LRReduction(0x47, staticRules[0x6C]), new LRReduction(0x48, staticRules[0x6C]), new LRReduction(0x49, staticRules[0x6C]), new LRReduction(0x4a, staticRules[0x6C]), new LRReduction(0x4e, staticRules[0x6C]), new LRReduction(0x55, staticRules[0x6C]), new LRReduction(0x56, staticRules[0x6C]), new LRReduction(0xdb, staticRules[0x6C])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x79]), new LRReduction(0x11, staticRules[0x79]), new LRReduction(0x2e, staticRules[0x79]), new LRReduction(0x30, staticRules[0x79]), new LRReduction(0x41, staticRules[0x79]), new LRReduction(0x43, staticRules[0x79]), new LRReduction(0x44, staticRules[0x79]), new LRReduction(0x45, staticRules[0x79]), new LRReduction(0x46, staticRules[0x79]), new LRReduction(0x47, staticRules[0x79]), new LRReduction(0x48, staticRules[0x79]), new LRReduction(0x49, staticRules[0x79]), new LRReduction(0x4a, staticRules[0x79]), new LRReduction(0x4e, staticRules[0x79]), new LRReduction(0x55, staticRules[0x79]), new LRReduction(0x56, staticRules[0x79]), new LRReduction(0xdb, staticRules[0x79])})
             , new LR1State(
                null,
                new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5749,15 +6379,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x6D]), new LRReduction(0x11, staticRules[0x6D]), new LRReduction(0x2e, staticRules[0x6D]), new LRReduction(0x30, staticRules[0x6D]), new LRReduction(0x41, staticRules[0x6D]), new LRReduction(0x43, staticRules[0x6D]), new LRReduction(0x44, staticRules[0x6D]), new LRReduction(0x45, staticRules[0x6D]), new LRReduction(0x46, staticRules[0x6D]), new LRReduction(0x47, staticRules[0x6D]), new LRReduction(0x48, staticRules[0x6D]), new LRReduction(0x49, staticRules[0x6D]), new LRReduction(0x4a, staticRules[0x6D]), new LRReduction(0x4e, staticRules[0x6D]), new LRReduction(0x55, staticRules[0x6D]), new LRReduction(0x56, staticRules[0x6D]), new LRReduction(0xdb, staticRules[0x6D])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x7A]), new LRReduction(0x11, staticRules[0x7A]), new LRReduction(0x2e, staticRules[0x7A]), new LRReduction(0x30, staticRules[0x7A]), new LRReduction(0x41, staticRules[0x7A]), new LRReduction(0x43, staticRules[0x7A]), new LRReduction(0x44, staticRules[0x7A]), new LRReduction(0x45, staticRules[0x7A]), new LRReduction(0x46, staticRules[0x7A]), new LRReduction(0x47, staticRules[0x7A]), new LRReduction(0x48, staticRules[0x7A]), new LRReduction(0x49, staticRules[0x7A]), new LRReduction(0x4a, staticRules[0x7A]), new LRReduction(0x4e, staticRules[0x7A]), new LRReduction(0x55, staticRules[0x7A]), new LRReduction(0x56, staticRules[0x7A]), new LRReduction(0xdb, staticRules[0x7A])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[18], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
                new ushort[1] {0x4d},
-               new ushort[1] {0xE4},
+               new ushort[1] {0xEB},
                new ushort[1] {0x86},
-               new ushort[1] {0xE3},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x32]), new LRReduction(0x11, staticRules[0x32]), new LRReduction(0x2e, staticRules[0x32]), new LRReduction(0x30, staticRules[0x32]), new LRReduction(0x41, staticRules[0x32]), new LRReduction(0x43, staticRules[0x32]), new LRReduction(0x44, staticRules[0x32]), new LRReduction(0x45, staticRules[0x32]), new LRReduction(0x46, staticRules[0x32]), new LRReduction(0x47, staticRules[0x32]), new LRReduction(0x48, staticRules[0x32]), new LRReduction(0x49, staticRules[0x32]), new LRReduction(0x4a, staticRules[0x32]), new LRReduction(0x4e, staticRules[0x32]), new LRReduction(0x55, staticRules[0x32]), new LRReduction(0x56, staticRules[0x32]), new LRReduction(0xdb, staticRules[0x32])})
+               new ushort[1] {0xEA},
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x37]), new LRReduction(0x11, staticRules[0x37]), new LRReduction(0x2e, staticRules[0x37]), new LRReduction(0x30, staticRules[0x37]), new LRReduction(0x41, staticRules[0x37]), new LRReduction(0x43, staticRules[0x37]), new LRReduction(0x44, staticRules[0x37]), new LRReduction(0x45, staticRules[0x37]), new LRReduction(0x46, staticRules[0x37]), new LRReduction(0x47, staticRules[0x37]), new LRReduction(0x48, staticRules[0x37]), new LRReduction(0x49, staticRules[0x37]), new LRReduction(0x4a, staticRules[0x37]), new LRReduction(0x4e, staticRules[0x37]), new LRReduction(0x55, staticRules[0x37]), new LRReduction(0x56, staticRules[0x37]), new LRReduction(0xdb, staticRules[0x37])})
             , new LR1State(
                null,
                new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5765,7 +6395,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x40]), new LRReduction(0x11, staticRules[0x40]), new LRReduction(0x2e, staticRules[0x40]), new LRReduction(0x30, staticRules[0x40]), new LRReduction(0x41, staticRules[0x40]), new LRReduction(0x43, staticRules[0x40]), new LRReduction(0x44, staticRules[0x40]), new LRReduction(0x45, staticRules[0x40]), new LRReduction(0x46, staticRules[0x40]), new LRReduction(0x47, staticRules[0x40]), new LRReduction(0x48, staticRules[0x40]), new LRReduction(0x49, staticRules[0x40]), new LRReduction(0x4a, staticRules[0x40]), new LRReduction(0x4e, staticRules[0x40]), new LRReduction(0x55, staticRules[0x40]), new LRReduction(0x56, staticRules[0x40]), new LRReduction(0xdb, staticRules[0x40])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x46]), new LRReduction(0x11, staticRules[0x46]), new LRReduction(0x2e, staticRules[0x46]), new LRReduction(0x30, staticRules[0x46]), new LRReduction(0x41, staticRules[0x46]), new LRReduction(0x43, staticRules[0x46]), new LRReduction(0x44, staticRules[0x46]), new LRReduction(0x45, staticRules[0x46]), new LRReduction(0x46, staticRules[0x46]), new LRReduction(0x47, staticRules[0x46]), new LRReduction(0x48, staticRules[0x46]), new LRReduction(0x49, staticRules[0x46]), new LRReduction(0x4a, staticRules[0x46]), new LRReduction(0x4e, staticRules[0x46]), new LRReduction(0x55, staticRules[0x46]), new LRReduction(0x56, staticRules[0x46]), new LRReduction(0xdb, staticRules[0x46])})
             , new LR1State(
                null,
                new SymbolTerminal[24] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
@@ -5773,47 +6403,47 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[24] {new LRReduction(0xa, staticRules[0x14]), new LRReduction(0xb, staticRules[0x14]), new LRReduction(0x11, staticRules[0x14]), new LRReduction(0x2e, staticRules[0x14]), new LRReduction(0x30, staticRules[0x14]), new LRReduction(0x31, staticRules[0x14]), new LRReduction(0x32, staticRules[0x14]), new LRReduction(0x33, staticRules[0x14]), new LRReduction(0x34, staticRules[0x14]), new LRReduction(0x35, staticRules[0x14]), new LRReduction(0x41, staticRules[0x14]), new LRReduction(0x43, staticRules[0x14]), new LRReduction(0x44, staticRules[0x14]), new LRReduction(0x45, staticRules[0x14]), new LRReduction(0x46, staticRules[0x14]), new LRReduction(0x47, staticRules[0x14]), new LRReduction(0x48, staticRules[0x14]), new LRReduction(0x49, staticRules[0x14]), new LRReduction(0x4a, staticRules[0x14]), new LRReduction(0x4b, staticRules[0x14]), new LRReduction(0x4e, staticRules[0x14]), new LRReduction(0x55, staticRules[0x14]), new LRReduction(0x56, staticRules[0x14]), new LRReduction(0xdb, staticRules[0x14])})
+               new LRReduction[24] {new LRReduction(0xa, staticRules[0x16]), new LRReduction(0xb, staticRules[0x16]), new LRReduction(0x11, staticRules[0x16]), new LRReduction(0x2e, staticRules[0x16]), new LRReduction(0x30, staticRules[0x16]), new LRReduction(0x31, staticRules[0x16]), new LRReduction(0x32, staticRules[0x16]), new LRReduction(0x33, staticRules[0x16]), new LRReduction(0x34, staticRules[0x16]), new LRReduction(0x35, staticRules[0x16]), new LRReduction(0x41, staticRules[0x16]), new LRReduction(0x43, staticRules[0x16]), new LRReduction(0x44, staticRules[0x16]), new LRReduction(0x45, staticRules[0x16]), new LRReduction(0x46, staticRules[0x16]), new LRReduction(0x47, staticRules[0x16]), new LRReduction(0x48, staticRules[0x16]), new LRReduction(0x49, staticRules[0x16]), new LRReduction(0x4a, staticRules[0x16]), new LRReduction(0x4b, staticRules[0x16]), new LRReduction(0x4e, staticRules[0x16]), new LRReduction(0x55, staticRules[0x16]), new LRReduction(0x56, staticRules[0x16]), new LRReduction(0xdb, staticRules[0x16])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[28]},
                new ushort[1] {0x4b},
-               new ushort[1] {0xE6},
+               new ushort[1] {0xED},
                new ushort[1] {0x66},
-               new ushort[1] {0xE5},
-               new LRReduction[1] {new LRReduction(0x41, staticRules[0x2E])})
+               new ushort[1] {0xEC},
+               new LRReduction[1] {new LRReduction(0x41, staticRules[0x32])})
             , new LR1State(
                null,
                new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
                new ushort[1] {0x4a},
-               new ushort[1] {0xE8},
+               new ushort[1] {0xEF},
                new ushort[1] {0x76},
-               new ushort[1] {0xE7},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x50]), new LRReduction(0x44, staticRules[0x50]), new LRReduction(0x4b, staticRules[0x50])})
+               new ushort[1] {0xEE},
+               new LRReduction[3] {new LRReduction(0x41, staticRules[0x30]), new LRReduction(0x44, staticRules[0x30]), new LRReduction(0x4b, staticRules[0x30])})
             , new LR1State(
                null,
                new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
                new ushort[1] {0x49},
-               new ushort[1] {0xEA},
+               new ushort[1] {0xF1},
                new ushort[1] {0x75},
-               new ushort[1] {0xE9},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x4E]), new LRReduction(0x44, staticRules[0x4E]), new LRReduction(0x4a, staticRules[0x4E]), new LRReduction(0x4b, staticRules[0x4E])})
+               new ushort[1] {0xF0},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x2E]), new LRReduction(0x44, staticRules[0x2E]), new LRReduction(0x4a, staticRules[0x2E]), new LRReduction(0x4b, staticRules[0x2E])})
             , new LR1State(
                null,
                new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
                new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
-               new ushort[9] {0xAC, 0xB4, 0xB5, 0xB6, 0xB7, 0xA5, 0xB8, 0xB9, 0xBA},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
                new ushort[11] {0x74, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
-               new ushort[11] {0xEB, 0xEC, 0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x4C]), new LRReduction(0x44, staticRules[0x4C]), new LRReduction(0x49, staticRules[0x4C]), new LRReduction(0x4a, staticRules[0x4C]), new LRReduction(0x4b, staticRules[0x4C])})
+               new ushort[11] {0xF2, 0xF3, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x2C]), new LRReduction(0x44, staticRules[0x2C]), new LRReduction(0x49, staticRules[0x2C]), new LRReduction(0x4a, staticRules[0x2C]), new LRReduction(0x4b, staticRules[0x2C])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
                new ushort[4] {0x45, 0x46, 0x47, 0x11},
-               new ushort[4] {0xEE, 0xEF, 0xF0, 0xF1},
+               new ushort[4] {0xF5, 0xF6, 0xF7, 0xF8},
                new ushort[1] {0x61},
-               new ushort[1] {0xED},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x29]), new LRReduction(0xb, staticRules[0x29]), new LRReduction(0x30, staticRules[0x29]), new LRReduction(0x31, staticRules[0x29]), new LRReduction(0x32, staticRules[0x29]), new LRReduction(0x33, staticRules[0x29]), new LRReduction(0x34, staticRules[0x29]), new LRReduction(0x35, staticRules[0x29]), new LRReduction(0x41, staticRules[0x29]), new LRReduction(0x43, staticRules[0x29]), new LRReduction(0x44, staticRules[0x29]), new LRReduction(0x49, staticRules[0x29]), new LRReduction(0x4a, staticRules[0x29]), new LRReduction(0x4b, staticRules[0x29])})
+               new ushort[1] {0xF4},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x2A]), new LRReduction(0xb, staticRules[0x2A]), new LRReduction(0x30, staticRules[0x2A]), new LRReduction(0x31, staticRules[0x2A]), new LRReduction(0x32, staticRules[0x2A]), new LRReduction(0x33, staticRules[0x2A]), new LRReduction(0x34, staticRules[0x2A]), new LRReduction(0x35, staticRules[0x2A]), new LRReduction(0x41, staticRules[0x2A]), new LRReduction(0x43, staticRules[0x2A]), new LRReduction(0x44, staticRules[0x2A]), new LRReduction(0x49, staticRules[0x2A]), new LRReduction(0x4a, staticRules[0x2A]), new LRReduction(0x4b, staticRules[0x2A])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
@@ -5821,31 +6451,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x21]), new LRReduction(0xb, staticRules[0x21]), new LRReduction(0x11, staticRules[0x21]), new LRReduction(0x30, staticRules[0x21]), new LRReduction(0x31, staticRules[0x21]), new LRReduction(0x32, staticRules[0x21]), new LRReduction(0x33, staticRules[0x21]), new LRReduction(0x34, staticRules[0x21]), new LRReduction(0x35, staticRules[0x21]), new LRReduction(0x41, staticRules[0x21]), new LRReduction(0x43, staticRules[0x21]), new LRReduction(0x44, staticRules[0x21]), new LRReduction(0x45, staticRules[0x21]), new LRReduction(0x46, staticRules[0x21]), new LRReduction(0x47, staticRules[0x21]), new LRReduction(0x49, staticRules[0x21]), new LRReduction(0x4a, staticRules[0x21]), new LRReduction(0x4b, staticRules[0x21])})
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x23]), new LRReduction(0xb, staticRules[0x23]), new LRReduction(0x11, staticRules[0x23]), new LRReduction(0x30, staticRules[0x23]), new LRReduction(0x31, staticRules[0x23]), new LRReduction(0x32, staticRules[0x23]), new LRReduction(0x33, staticRules[0x23]), new LRReduction(0x34, staticRules[0x23]), new LRReduction(0x35, staticRules[0x23]), new LRReduction(0x41, staticRules[0x23]), new LRReduction(0x43, staticRules[0x23]), new LRReduction(0x44, staticRules[0x23]), new LRReduction(0x45, staticRules[0x23]), new LRReduction(0x46, staticRules[0x23]), new LRReduction(0x47, staticRules[0x23]), new LRReduction(0x49, staticRules[0x23]), new LRReduction(0x4a, staticRules[0x23]), new LRReduction(0x4b, staticRules[0x23])})
             , new LR1State(
                null,
                new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
                new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
-               new ushort[9] {0xAC, 0xB4, 0xB5, 0xB6, 0xB7, 0xA5, 0xB8, 0xB9, 0xBA},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
                new ushort[13] {0x65, 0x64, 0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
-               new ushort[13] {0xF2, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3},
+               new ushort[13] {0xF9, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
                new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x19]), new LRReduction(0xb, staticRules[0x19]), new LRReduction(0x11, staticRules[0x19]), new LRReduction(0x30, staticRules[0x19]), new LRReduction(0x31, staticRules[0x19]), new LRReduction(0x32, staticRules[0x19]), new LRReduction(0x33, staticRules[0x19]), new LRReduction(0x34, staticRules[0x19]), new LRReduction(0x35, staticRules[0x19]), new LRReduction(0x41, staticRules[0x19]), new LRReduction(0x43, staticRules[0x19]), new LRReduction(0x44, staticRules[0x19]), new LRReduction(0x45, staticRules[0x19]), new LRReduction(0x46, staticRules[0x19]), new LRReduction(0x47, staticRules[0x19]), new LRReduction(0x49, staticRules[0x19]), new LRReduction(0x4a, staticRules[0x19]), new LRReduction(0x4b, staticRules[0x19])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[19] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[25], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[1] {0x42},
-               new ushort[1] {0xF3},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x1A]), new LRReduction(0xb, staticRules[0x1A]), new LRReduction(0x11, staticRules[0x1A]), new LRReduction(0x30, staticRules[0x1A]), new LRReduction(0x31, staticRules[0x1A]), new LRReduction(0x32, staticRules[0x1A]), new LRReduction(0x33, staticRules[0x1A]), new LRReduction(0x34, staticRules[0x1A]), new LRReduction(0x35, staticRules[0x1A]), new LRReduction(0x41, staticRules[0x1A]), new LRReduction(0x43, staticRules[0x1A]), new LRReduction(0x44, staticRules[0x1A]), new LRReduction(0x45, staticRules[0x1A]), new LRReduction(0x46, staticRules[0x1A]), new LRReduction(0x47, staticRules[0x1A]), new LRReduction(0x49, staticRules[0x1A]), new LRReduction(0x4a, staticRules[0x1A]), new LRReduction(0x4b, staticRules[0x1A])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
@@ -5856,9 +6470,9 @@ namespace Hime.Kernel.Resources.Parser
                new LRReduction[18] {new LRReduction(0xa, staticRules[0x1B]), new LRReduction(0xb, staticRules[0x1B]), new LRReduction(0x11, staticRules[0x1B]), new LRReduction(0x30, staticRules[0x1B]), new LRReduction(0x31, staticRules[0x1B]), new LRReduction(0x32, staticRules[0x1B]), new LRReduction(0x33, staticRules[0x1B]), new LRReduction(0x34, staticRules[0x1B]), new LRReduction(0x35, staticRules[0x1B]), new LRReduction(0x41, staticRules[0x1B]), new LRReduction(0x43, staticRules[0x1B]), new LRReduction(0x44, staticRules[0x1B]), new LRReduction(0x45, staticRules[0x1B]), new LRReduction(0x46, staticRules[0x1B]), new LRReduction(0x47, staticRules[0x1B]), new LRReduction(0x49, staticRules[0x1B]), new LRReduction(0x4a, staticRules[0x1B]), new LRReduction(0x4b, staticRules[0x1B])})
             , new LR1State(
                null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
+               new SymbolTerminal[19] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[25], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[1] {0x42},
+               new ushort[1] {0xFA},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[18] {new LRReduction(0xa, staticRules[0x1C]), new LRReduction(0xb, staticRules[0x1C]), new LRReduction(0x11, staticRules[0x1C]), new LRReduction(0x30, staticRules[0x1C]), new LRReduction(0x31, staticRules[0x1C]), new LRReduction(0x32, staticRules[0x1C]), new LRReduction(0x33, staticRules[0x1C]), new LRReduction(0x34, staticRules[0x1C]), new LRReduction(0x35, staticRules[0x1C]), new LRReduction(0x41, staticRules[0x1C]), new LRReduction(0x43, staticRules[0x1C]), new LRReduction(0x44, staticRules[0x1C]), new LRReduction(0x45, staticRules[0x1C]), new LRReduction(0x46, staticRules[0x1C]), new LRReduction(0x47, staticRules[0x1C]), new LRReduction(0x49, staticRules[0x1C]), new LRReduction(0x4a, staticRules[0x1C]), new LRReduction(0x4b, staticRules[0x1C])})
@@ -5901,719 +6515,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x11]), new LRReduction(0xb, staticRules[0x11]), new LRReduction(0x11, staticRules[0x11]), new LRReduction(0x30, staticRules[0x11]), new LRReduction(0x31, staticRules[0x11]), new LRReduction(0x32, staticRules[0x11]), new LRReduction(0x33, staticRules[0x11]), new LRReduction(0x34, staticRules[0x11]), new LRReduction(0x35, staticRules[0x11]), new LRReduction(0x41, staticRules[0x11]), new LRReduction(0x43, staticRules[0x11]), new LRReduction(0x44, staticRules[0x11]), new LRReduction(0x45, staticRules[0x11]), new LRReduction(0x46, staticRules[0x11]), new LRReduction(0x47, staticRules[0x11]), new LRReduction(0x49, staticRules[0x11]), new LRReduction(0x4a, staticRules[0x11]), new LRReduction(0x4b, staticRules[0x11])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[19] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[25], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[19] {new LRReduction(0xa, staticRules[0x12]), new LRReduction(0xb, staticRules[0x12]), new LRReduction(0x11, staticRules[0x12]), new LRReduction(0x30, staticRules[0x12]), new LRReduction(0x31, staticRules[0x12]), new LRReduction(0x32, staticRules[0x12]), new LRReduction(0x33, staticRules[0x12]), new LRReduction(0x34, staticRules[0x12]), new LRReduction(0x35, staticRules[0x12]), new LRReduction(0x41, staticRules[0x12]), new LRReduction(0x42, staticRules[0x12]), new LRReduction(0x43, staticRules[0x12]), new LRReduction(0x44, staticRules[0x12]), new LRReduction(0x45, staticRules[0x12]), new LRReduction(0x46, staticRules[0x12]), new LRReduction(0x47, staticRules[0x12]), new LRReduction(0x49, staticRules[0x12]), new LRReduction(0x4a, staticRules[0x12]), new LRReduction(0x4b, staticRules[0x12])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[19] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[25], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[19] {new LRReduction(0xa, staticRules[0x13]), new LRReduction(0xb, staticRules[0x13]), new LRReduction(0x11, staticRules[0x13]), new LRReduction(0x30, staticRules[0x13]), new LRReduction(0x31, staticRules[0x13]), new LRReduction(0x32, staticRules[0x13]), new LRReduction(0x33, staticRules[0x13]), new LRReduction(0x34, staticRules[0x13]), new LRReduction(0x35, staticRules[0x13]), new LRReduction(0x41, staticRules[0x13]), new LRReduction(0x42, staticRules[0x13]), new LRReduction(0x43, staticRules[0x13]), new LRReduction(0x44, staticRules[0x13]), new LRReduction(0x45, staticRules[0x13]), new LRReduction(0x46, staticRules[0x13]), new LRReduction(0x47, staticRules[0x13]), new LRReduction(0x49, staticRules[0x13]), new LRReduction(0x4a, staticRules[0x13]), new LRReduction(0x4b, staticRules[0x13])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x15]), new LRReduction(0xb, staticRules[0x15]), new LRReduction(0x11, staticRules[0x15]), new LRReduction(0x30, staticRules[0x15]), new LRReduction(0x31, staticRules[0x15]), new LRReduction(0x32, staticRules[0x15]), new LRReduction(0x33, staticRules[0x15]), new LRReduction(0x34, staticRules[0x15]), new LRReduction(0x35, staticRules[0x15]), new LRReduction(0x41, staticRules[0x15]), new LRReduction(0x43, staticRules[0x15]), new LRReduction(0x44, staticRules[0x15]), new LRReduction(0x45, staticRules[0x15]), new LRReduction(0x46, staticRules[0x15]), new LRReduction(0x47, staticRules[0x15]), new LRReduction(0x49, staticRules[0x15]), new LRReduction(0x4a, staticRules[0x15]), new LRReduction(0x4b, staticRules[0x15])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x17]), new LRReduction(0xb, staticRules[0x17]), new LRReduction(0x11, staticRules[0x17]), new LRReduction(0x30, staticRules[0x17]), new LRReduction(0x31, staticRules[0x17]), new LRReduction(0x32, staticRules[0x17]), new LRReduction(0x33, staticRules[0x17]), new LRReduction(0x34, staticRules[0x17]), new LRReduction(0x35, staticRules[0x17]), new LRReduction(0x41, staticRules[0x17]), new LRReduction(0x43, staticRules[0x17]), new LRReduction(0x44, staticRules[0x17]), new LRReduction(0x45, staticRules[0x17]), new LRReduction(0x46, staticRules[0x17]), new LRReduction(0x47, staticRules[0x17]), new LRReduction(0x49, staticRules[0x17]), new LRReduction(0x4a, staticRules[0x17]), new LRReduction(0x4b, staticRules[0x17])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[18] {new LRReduction(0xa, staticRules[0x16]), new LRReduction(0xb, staticRules[0x16]), new LRReduction(0x11, staticRules[0x16]), new LRReduction(0x30, staticRules[0x16]), new LRReduction(0x31, staticRules[0x16]), new LRReduction(0x32, staticRules[0x16]), new LRReduction(0x33, staticRules[0x16]), new LRReduction(0x34, staticRules[0x16]), new LRReduction(0x35, staticRules[0x16]), new LRReduction(0x41, staticRules[0x16]), new LRReduction(0x43, staticRules[0x16]), new LRReduction(0x44, staticRules[0x16]), new LRReduction(0x45, staticRules[0x16]), new LRReduction(0x46, staticRules[0x16]), new LRReduction(0x47, staticRules[0x16]), new LRReduction(0x49, staticRules[0x16]), new LRReduction(0x4a, staticRules[0x16]), new LRReduction(0x4b, staticRules[0x16])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
-               new ushort[2] {0x4c, 0x4d},
-               new ushort[2] {0xF4, 0x90},
-               new ushort[1] {0x6b},
-               new ushort[1] {0xF5},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0xa, staticRules[0xAB]), new LRReduction(0x4c, staticRules[0xAB]), new LRReduction(0x4d, staticRules[0xAB])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x7E]), new LRReduction(0x44, staticRules[0x7E]), new LRReduction(0xdb, staticRules[0x7E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[20] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[12] {0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[12] {0xF6, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x80]), new LRReduction(0x44, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80]), new LRReduction(0xdb, staticRules[0x80])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x81]), new LRReduction(0x44, staticRules[0x81]), new LRReduction(0x4a, staticRules[0x81]), new LRReduction(0xdb, staticRules[0x81])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[16] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[10]},
-               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[10] {0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[10] {0xF7, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x82]), new LRReduction(0x44, staticRules[0x82]), new LRReduction(0x49, staticRules[0x82]), new LRReduction(0x4a, staticRules[0x82]), new LRReduction(0xdb, staticRules[0x82])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[10] {0x9a, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[10] {0xF8, 0xC2, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x96]), new LRReduction(0x44, staticRules[0x96]), new LRReduction(0x49, staticRules[0x96]), new LRReduction(0x4a, staticRules[0x96]), new LRReduction(0xdb, staticRules[0x96])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[21] {new LRReduction(0xa, staticRules[0x83]), new LRReduction(0x11, staticRules[0x83]), new LRReduction(0x2e, staticRules[0x83]), new LRReduction(0x34, staticRules[0x83]), new LRReduction(0x35, staticRules[0x83]), new LRReduction(0x36, staticRules[0x83]), new LRReduction(0x37, staticRules[0x83]), new LRReduction(0x38, staticRules[0x83]), new LRReduction(0x39, staticRules[0x83]), new LRReduction(0x3a, staticRules[0x83]), new LRReduction(0x3b, staticRules[0x83]), new LRReduction(0x3c, staticRules[0x83]), new LRReduction(0x3d, staticRules[0x83]), new LRReduction(0x3e, staticRules[0x83]), new LRReduction(0x3f, staticRules[0x83]), new LRReduction(0x41, staticRules[0x83]), new LRReduction(0x43, staticRules[0x83]), new LRReduction(0x44, staticRules[0x83]), new LRReduction(0x49, staticRules[0x83]), new LRReduction(0x4a, staticRules[0x83]), new LRReduction(0xdb, staticRules[0x83])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[21] {new LRReduction(0xa, staticRules[0x84]), new LRReduction(0x11, staticRules[0x84]), new LRReduction(0x2e, staticRules[0x84]), new LRReduction(0x34, staticRules[0x84]), new LRReduction(0x35, staticRules[0x84]), new LRReduction(0x36, staticRules[0x84]), new LRReduction(0x37, staticRules[0x84]), new LRReduction(0x38, staticRules[0x84]), new LRReduction(0x39, staticRules[0x84]), new LRReduction(0x3a, staticRules[0x84]), new LRReduction(0x3b, staticRules[0x84]), new LRReduction(0x3c, staticRules[0x84]), new LRReduction(0x3d, staticRules[0x84]), new LRReduction(0x3e, staticRules[0x84]), new LRReduction(0x3f, staticRules[0x84]), new LRReduction(0x41, staticRules[0x84]), new LRReduction(0x43, staticRules[0x84]), new LRReduction(0x44, staticRules[0x84]), new LRReduction(0x49, staticRules[0x84]), new LRReduction(0x4a, staticRules[0x84]), new LRReduction(0xdb, staticRules[0x84])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[21] {new LRReduction(0xa, staticRules[0x85]), new LRReduction(0x11, staticRules[0x85]), new LRReduction(0x2e, staticRules[0x85]), new LRReduction(0x34, staticRules[0x85]), new LRReduction(0x35, staticRules[0x85]), new LRReduction(0x36, staticRules[0x85]), new LRReduction(0x37, staticRules[0x85]), new LRReduction(0x38, staticRules[0x85]), new LRReduction(0x39, staticRules[0x85]), new LRReduction(0x3a, staticRules[0x85]), new LRReduction(0x3b, staticRules[0x85]), new LRReduction(0x3c, staticRules[0x85]), new LRReduction(0x3d, staticRules[0x85]), new LRReduction(0x3e, staticRules[0x85]), new LRReduction(0x3f, staticRules[0x85]), new LRReduction(0x41, staticRules[0x85]), new LRReduction(0x43, staticRules[0x85]), new LRReduction(0x44, staticRules[0x85]), new LRReduction(0x49, staticRules[0x85]), new LRReduction(0x4a, staticRules[0x85]), new LRReduction(0xdb, staticRules[0x85])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[24] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[24] {new LRReduction(0xa, staticRules[0x87]), new LRReduction(0x11, staticRules[0x87]), new LRReduction(0x2e, staticRules[0x87]), new LRReduction(0x34, staticRules[0x87]), new LRReduction(0x35, staticRules[0x87]), new LRReduction(0x36, staticRules[0x87]), new LRReduction(0x37, staticRules[0x87]), new LRReduction(0x38, staticRules[0x87]), new LRReduction(0x39, staticRules[0x87]), new LRReduction(0x3a, staticRules[0x87]), new LRReduction(0x3b, staticRules[0x87]), new LRReduction(0x3c, staticRules[0x87]), new LRReduction(0x3d, staticRules[0x87]), new LRReduction(0x3e, staticRules[0x87]), new LRReduction(0x3f, staticRules[0x87]), new LRReduction(0x41, staticRules[0x87]), new LRReduction(0x43, staticRules[0x87]), new LRReduction(0x44, staticRules[0x87]), new LRReduction(0x45, staticRules[0x87]), new LRReduction(0x46, staticRules[0x87]), new LRReduction(0x47, staticRules[0x87]), new LRReduction(0x49, staticRules[0x87]), new LRReduction(0x4a, staticRules[0x87]), new LRReduction(0xdb, staticRules[0x87])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[24] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[24] {new LRReduction(0xa, staticRules[0x88]), new LRReduction(0x11, staticRules[0x88]), new LRReduction(0x2e, staticRules[0x88]), new LRReduction(0x34, staticRules[0x88]), new LRReduction(0x35, staticRules[0x88]), new LRReduction(0x36, staticRules[0x88]), new LRReduction(0x37, staticRules[0x88]), new LRReduction(0x38, staticRules[0x88]), new LRReduction(0x39, staticRules[0x88]), new LRReduction(0x3a, staticRules[0x88]), new LRReduction(0x3b, staticRules[0x88]), new LRReduction(0x3c, staticRules[0x88]), new LRReduction(0x3d, staticRules[0x88]), new LRReduction(0x3e, staticRules[0x88]), new LRReduction(0x3f, staticRules[0x88]), new LRReduction(0x41, staticRules[0x88]), new LRReduction(0x43, staticRules[0x88]), new LRReduction(0x44, staticRules[0x88]), new LRReduction(0x45, staticRules[0x88]), new LRReduction(0x46, staticRules[0x88]), new LRReduction(0x47, staticRules[0x88]), new LRReduction(0x49, staticRules[0x88]), new LRReduction(0x4a, staticRules[0x88]), new LRReduction(0xdb, staticRules[0x88])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[11]},
-               new ushort[1] {0x44},
-               new ushort[1] {0xF9},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0xFA},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x91]), new LRReduction(0x11, staticRules[0x91]), new LRReduction(0x2e, staticRules[0x91]), new LRReduction(0x34, staticRules[0x91]), new LRReduction(0x35, staticRules[0x91]), new LRReduction(0x36, staticRules[0x91]), new LRReduction(0x37, staticRules[0x91]), new LRReduction(0x38, staticRules[0x91]), new LRReduction(0x39, staticRules[0x91]), new LRReduction(0x3a, staticRules[0x91]), new LRReduction(0x3b, staticRules[0x91]), new LRReduction(0x3c, staticRules[0x91]), new LRReduction(0x3d, staticRules[0x91]), new LRReduction(0x3e, staticRules[0x91]), new LRReduction(0x3f, staticRules[0x91]), new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x43, staticRules[0x91]), new LRReduction(0x44, staticRules[0x91]), new LRReduction(0x45, staticRules[0x91]), new LRReduction(0x46, staticRules[0x91]), new LRReduction(0x47, staticRules[0x91]), new LRReduction(0x48, staticRules[0x91]), new LRReduction(0x49, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91]), new LRReduction(0x4e, staticRules[0x91]), new LRReduction(0x55, staticRules[0x91]), new LRReduction(0x56, staticRules[0x91]), new LRReduction(0xdb, staticRules[0x91])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35]},
-               new ushort[15] {0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[15] {0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[6] {0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[6] {0xFB, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0xa, staticRules[0x10]), new LRReduction(0x12, staticRules[0x10])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x59])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x79])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x12, staticRules[0x7A])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[14] {0xFC, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x5D]), new LRReduction(0x4a, staticRules[0x5D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
-               new ushort[1] {0x4c},
-               new ushort[1] {0xFD},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0xFE},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
-               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[13] {0xFF, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x101},
-               new ushort[1] {0x77},
-               new ushort[1] {0x100},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x52])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
-               new ushort[2] {0x4c, 0x4d},
-               new ushort[2] {0x102, 0x90},
-               new ushort[1] {0x6b},
-               new ushort[1] {0x103},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0xa, staticRules[0xA3]), new LRReduction(0x4c, staticRules[0xA3]), new LRReduction(0x4d, staticRules[0xA3])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x5B]), new LRReduction(0x44, staticRules[0x5B]), new LRReduction(0xdb, staticRules[0x5B])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[13] {0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[13] {0x104, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x5D]), new LRReduction(0x44, staticRules[0x5D]), new LRReduction(0x4a, staticRules[0x5D]), new LRReduction(0xdb, staticRules[0x5D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x5E]), new LRReduction(0x44, staticRules[0x5E]), new LRReduction(0x4a, staticRules[0x5E]), new LRReduction(0xdb, staticRules[0x5E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[10]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[11] {0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[11] {0x105, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x5F]), new LRReduction(0x44, staticRules[0x5F]), new LRReduction(0x49, staticRules[0x5F]), new LRReduction(0x4a, staticRules[0x5F]), new LRReduction(0xdb, staticRules[0x5F])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[11] {0x88, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[11] {0x106, 0xDC, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x73]), new LRReduction(0x44, staticRules[0x73]), new LRReduction(0x49, staticRules[0x73]), new LRReduction(0x4a, staticRules[0x73]), new LRReduction(0xdb, staticRules[0x73])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[10] {new LRReduction(0xa, staticRules[0x60]), new LRReduction(0x11, staticRules[0x60]), new LRReduction(0x2e, staticRules[0x60]), new LRReduction(0x30, staticRules[0x60]), new LRReduction(0x41, staticRules[0x60]), new LRReduction(0x43, staticRules[0x60]), new LRReduction(0x44, staticRules[0x60]), new LRReduction(0x49, staticRules[0x60]), new LRReduction(0x4a, staticRules[0x60]), new LRReduction(0xdb, staticRules[0x60])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[10] {new LRReduction(0xa, staticRules[0x61]), new LRReduction(0x11, staticRules[0x61]), new LRReduction(0x2e, staticRules[0x61]), new LRReduction(0x30, staticRules[0x61]), new LRReduction(0x41, staticRules[0x61]), new LRReduction(0x43, staticRules[0x61]), new LRReduction(0x44, staticRules[0x61]), new LRReduction(0x49, staticRules[0x61]), new LRReduction(0x4a, staticRules[0x61]), new LRReduction(0xdb, staticRules[0x61])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[10] {new LRReduction(0xa, staticRules[0x62]), new LRReduction(0x11, staticRules[0x62]), new LRReduction(0x2e, staticRules[0x62]), new LRReduction(0x30, staticRules[0x62]), new LRReduction(0x41, staticRules[0x62]), new LRReduction(0x43, staticRules[0x62]), new LRReduction(0x44, staticRules[0x62]), new LRReduction(0x49, staticRules[0x62]), new LRReduction(0x4a, staticRules[0x62]), new LRReduction(0xdb, staticRules[0x62])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[13] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[13] {new LRReduction(0xa, staticRules[0x64]), new LRReduction(0x11, staticRules[0x64]), new LRReduction(0x2e, staticRules[0x64]), new LRReduction(0x30, staticRules[0x64]), new LRReduction(0x41, staticRules[0x64]), new LRReduction(0x43, staticRules[0x64]), new LRReduction(0x44, staticRules[0x64]), new LRReduction(0x45, staticRules[0x64]), new LRReduction(0x46, staticRules[0x64]), new LRReduction(0x47, staticRules[0x64]), new LRReduction(0x49, staticRules[0x64]), new LRReduction(0x4a, staticRules[0x64]), new LRReduction(0xdb, staticRules[0x64])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[13] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[13] {new LRReduction(0xa, staticRules[0x65]), new LRReduction(0x11, staticRules[0x65]), new LRReduction(0x2e, staticRules[0x65]), new LRReduction(0x30, staticRules[0x65]), new LRReduction(0x41, staticRules[0x65]), new LRReduction(0x43, staticRules[0x65]), new LRReduction(0x44, staticRules[0x65]), new LRReduction(0x45, staticRules[0x65]), new LRReduction(0x46, staticRules[0x65]), new LRReduction(0x47, staticRules[0x65]), new LRReduction(0x49, staticRules[0x65]), new LRReduction(0x4a, staticRules[0x65]), new LRReduction(0xdb, staticRules[0x65])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[11]},
-               new ushort[1] {0x44},
-               new ushort[1] {0x107},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x6E]), new LRReduction(0x11, staticRules[0x6E]), new LRReduction(0x2e, staticRules[0x6E]), new LRReduction(0x30, staticRules[0x6E]), new LRReduction(0x41, staticRules[0x6E]), new LRReduction(0x43, staticRules[0x6E]), new LRReduction(0x44, staticRules[0x6E]), new LRReduction(0x45, staticRules[0x6E]), new LRReduction(0x46, staticRules[0x6E]), new LRReduction(0x47, staticRules[0x6E]), new LRReduction(0x48, staticRules[0x6E]), new LRReduction(0x49, staticRules[0x6E]), new LRReduction(0x4a, staticRules[0x6E]), new LRReduction(0x4e, staticRules[0x6E]), new LRReduction(0x55, staticRules[0x6E]), new LRReduction(0x56, staticRules[0x6E]), new LRReduction(0xdb, staticRules[0x6E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32]},
-               new ushort[4] {0x11, 0x2e, 0xa, 0x30},
-               new ushort[4] {0x77, 0x78, 0xA3, 0xA5},
-               new ushort[7] {0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[7] {0x108, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x109},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x18},
-               new ushort[1] {0x13},
-               new ushort[1] {0x10A},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x2C]), new LRReduction(0x44, staticRules[0x2C]), new LRReduction(0x4b, staticRules[0x2C])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
-               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
-               new ushort[9] {0xAC, 0xB4, 0xB5, 0xB6, 0xB7, 0xA5, 0xB8, 0xB9, 0xBA},
-               new ushort[12] {0x64, 0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
-               new ushort[12] {0x10B, 0xA8, 0xA9, 0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x2B]), new LRReduction(0x44, staticRules[0x2B]), new LRReduction(0x4a, staticRules[0x2B]), new LRReduction(0x4b, staticRules[0x2B])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
-               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
-               new ushort[9] {0xAC, 0xB4, 0xB5, 0xB6, 0xB7, 0xA5, 0xB8, 0xB9, 0xBA},
-               new ushort[11] {0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
-               new ushort[11] {0x10C, 0xA9, 0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x2A]), new LRReduction(0x44, staticRules[0x2A]), new LRReduction(0x49, staticRules[0x2A]), new LRReduction(0x4a, staticRules[0x2A]), new LRReduction(0x4b, staticRules[0x2A])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
-               new ushort[9] {0xAC, 0xB4, 0xB5, 0xB6, 0xB7, 0xA5, 0xB8, 0xB9, 0xBA},
-               new ushort[11] {0x74, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
-               new ushort[11] {0x10D, 0xEC, 0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x4C]), new LRReduction(0x44, staticRules[0x4C]), new LRReduction(0x49, staticRules[0x4C]), new LRReduction(0x4a, staticRules[0x4C]), new LRReduction(0x4b, staticRules[0x4C])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x28]), new LRReduction(0xb, staticRules[0x28]), new LRReduction(0x30, staticRules[0x28]), new LRReduction(0x31, staticRules[0x28]), new LRReduction(0x32, staticRules[0x28]), new LRReduction(0x33, staticRules[0x28]), new LRReduction(0x34, staticRules[0x28]), new LRReduction(0x35, staticRules[0x28]), new LRReduction(0x41, staticRules[0x28]), new LRReduction(0x43, staticRules[0x28]), new LRReduction(0x44, staticRules[0x28]), new LRReduction(0x49, staticRules[0x28]), new LRReduction(0x4a, staticRules[0x28]), new LRReduction(0x4b, staticRules[0x28])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x23]), new LRReduction(0xb, staticRules[0x23]), new LRReduction(0x30, staticRules[0x23]), new LRReduction(0x31, staticRules[0x23]), new LRReduction(0x32, staticRules[0x23]), new LRReduction(0x33, staticRules[0x23]), new LRReduction(0x34, staticRules[0x23]), new LRReduction(0x35, staticRules[0x23]), new LRReduction(0x41, staticRules[0x23]), new LRReduction(0x43, staticRules[0x23]), new LRReduction(0x44, staticRules[0x23]), new LRReduction(0x49, staticRules[0x23]), new LRReduction(0x4a, staticRules[0x23]), new LRReduction(0x4b, staticRules[0x23])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x24]), new LRReduction(0xb, staticRules[0x24]), new LRReduction(0x30, staticRules[0x24]), new LRReduction(0x31, staticRules[0x24]), new LRReduction(0x32, staticRules[0x24]), new LRReduction(0x33, staticRules[0x24]), new LRReduction(0x34, staticRules[0x24]), new LRReduction(0x35, staticRules[0x24]), new LRReduction(0x41, staticRules[0x24]), new LRReduction(0x43, staticRules[0x24]), new LRReduction(0x44, staticRules[0x24]), new LRReduction(0x49, staticRules[0x24]), new LRReduction(0x4a, staticRules[0x24]), new LRReduction(0x4b, staticRules[0x24])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x25]), new LRReduction(0xb, staticRules[0x25]), new LRReduction(0x30, staticRules[0x25]), new LRReduction(0x31, staticRules[0x25]), new LRReduction(0x32, staticRules[0x25]), new LRReduction(0x33, staticRules[0x25]), new LRReduction(0x34, staticRules[0x25]), new LRReduction(0x35, staticRules[0x25]), new LRReduction(0x41, staticRules[0x25]), new LRReduction(0x43, staticRules[0x25]), new LRReduction(0x44, staticRules[0x25]), new LRReduction(0x49, staticRules[0x25]), new LRReduction(0x4a, staticRules[0x25]), new LRReduction(0x4b, staticRules[0x25])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[7]},
-               new ushort[1] {0x2d},
-               new ushort[1] {0x10E},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[11]},
-               new ushort[1] {0x44},
-               new ushort[1] {0x10F},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42]},
-               new ushort[2] {0x34, 0x35},
-               new ushort[2] {0xB6, 0xB7},
-               new ushort[1] {0x59},
-               new ushort[1] {0x110},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
-               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[13] {0x111, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
-               new ushort[1] {0x4c},
-               new ushort[1] {0x112},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[1] {0x4a},
-               new ushort[1] {0xBE},
-               new ushort[1] {0x9c},
-               new ushort[1] {0x113},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x9A]), new LRReduction(0x44, staticRules[0x9A]), new LRReduction(0xdb, staticRules[0x9A])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[1] {0x49},
-               new ushort[1] {0xC0},
-               new ushort[1] {0x9b},
-               new ushort[1] {0x114},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x98]), new LRReduction(0x44, staticRules[0x98]), new LRReduction(0x4a, staticRules[0x98]), new LRReduction(0xdb, staticRules[0x98])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x95]), new LRReduction(0x44, staticRules[0x95]), new LRReduction(0x49, staticRules[0x95]), new LRReduction(0x4a, staticRules[0x95]), new LRReduction(0xdb, staticRules[0x95])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[26] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[26] {new LRReduction(0xa, staticRules[0x8B]), new LRReduction(0x11, staticRules[0x8B]), new LRReduction(0x2e, staticRules[0x8B]), new LRReduction(0x34, staticRules[0x8B]), new LRReduction(0x35, staticRules[0x8B]), new LRReduction(0x36, staticRules[0x8B]), new LRReduction(0x37, staticRules[0x8B]), new LRReduction(0x38, staticRules[0x8B]), new LRReduction(0x39, staticRules[0x8B]), new LRReduction(0x3a, staticRules[0x8B]), new LRReduction(0x3b, staticRules[0x8B]), new LRReduction(0x3c, staticRules[0x8B]), new LRReduction(0x3d, staticRules[0x8B]), new LRReduction(0x3e, staticRules[0x8B]), new LRReduction(0x3f, staticRules[0x8B]), new LRReduction(0x41, staticRules[0x8B]), new LRReduction(0x43, staticRules[0x8B]), new LRReduction(0x44, staticRules[0x8B]), new LRReduction(0x45, staticRules[0x8B]), new LRReduction(0x46, staticRules[0x8B]), new LRReduction(0x47, staticRules[0x8B]), new LRReduction(0x49, staticRules[0x8B]), new LRReduction(0x4a, staticRules[0x8B]), new LRReduction(0x55, staticRules[0x8B]), new LRReduction(0x56, staticRules[0x8B]), new LRReduction(0xdb, staticRules[0x8B])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[29] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[29] {new LRReduction(0xa, staticRules[0x30]), new LRReduction(0x11, staticRules[0x30]), new LRReduction(0x2e, staticRules[0x30]), new LRReduction(0x30, staticRules[0x30]), new LRReduction(0x34, staticRules[0x30]), new LRReduction(0x35, staticRules[0x30]), new LRReduction(0x36, staticRules[0x30]), new LRReduction(0x37, staticRules[0x30]), new LRReduction(0x38, staticRules[0x30]), new LRReduction(0x39, staticRules[0x30]), new LRReduction(0x3a, staticRules[0x30]), new LRReduction(0x3b, staticRules[0x30]), new LRReduction(0x3c, staticRules[0x30]), new LRReduction(0x3d, staticRules[0x30]), new LRReduction(0x3e, staticRules[0x30]), new LRReduction(0x3f, staticRules[0x30]), new LRReduction(0x41, staticRules[0x30]), new LRReduction(0x43, staticRules[0x30]), new LRReduction(0x44, staticRules[0x30]), new LRReduction(0x45, staticRules[0x30]), new LRReduction(0x46, staticRules[0x30]), new LRReduction(0x47, staticRules[0x30]), new LRReduction(0x48, staticRules[0x30]), new LRReduction(0x49, staticRules[0x30]), new LRReduction(0x4a, staticRules[0x30]), new LRReduction(0x4e, staticRules[0x30]), new LRReduction(0x55, staticRules[0x30]), new LRReduction(0x56, staticRules[0x30]), new LRReduction(0xdb, staticRules[0x30])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x116},
-               new ushort[1] {0x99},
-               new ushort[1] {0x115},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x94])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x117},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[14] {0x118, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x5D]), new LRReduction(0x4a, staticRules[0x5D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0xa, staticRules[0x7D]), new LRReduction(0x12, staticRules[0x7D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x119},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x4e},
-               new ushort[1] {0x11A},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
-               new ushort[1] {0xa},
-               new ushort[1] {0x11B},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[14] {0x11C, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x5D]), new LRReduction(0x4a, staticRules[0x5D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
-               new ushort[1] {0x4c},
-               new ushort[1] {0x11D},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[1] {0x4a},
-               new ushort[1] {0xD8},
-               new ushort[1] {0x8a},
-               new ushort[1] {0x11E},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x77]), new LRReduction(0x44, staticRules[0x77]), new LRReduction(0xdb, staticRules[0x77])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[1] {0x49},
-               new ushort[1] {0xDA},
-               new ushort[1] {0x89},
-               new ushort[1] {0x11F},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x75]), new LRReduction(0x44, staticRules[0x75]), new LRReduction(0x4a, staticRules[0x75]), new LRReduction(0xdb, staticRules[0x75])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x72]), new LRReduction(0x44, staticRules[0x72]), new LRReduction(0x49, staticRules[0x72]), new LRReduction(0x4a, staticRules[0x72]), new LRReduction(0xdb, staticRules[0x72])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[15] {new LRReduction(0xa, staticRules[0x68]), new LRReduction(0x11, staticRules[0x68]), new LRReduction(0x2e, staticRules[0x68]), new LRReduction(0x30, staticRules[0x68]), new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x43, staticRules[0x68]), new LRReduction(0x44, staticRules[0x68]), new LRReduction(0x45, staticRules[0x68]), new LRReduction(0x46, staticRules[0x68]), new LRReduction(0x47, staticRules[0x68]), new LRReduction(0x49, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68]), new LRReduction(0x55, staticRules[0x68]), new LRReduction(0x56, staticRules[0x68]), new LRReduction(0xdb, staticRules[0x68])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x121},
-               new ushort[1] {0x87},
-               new ushort[1] {0x120},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x71])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0xa, staticRules[0x2F]), new LRReduction(0x12, staticRules[0x2F])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x41, staticRules[0x2D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[1] {0x4a},
-               new ushort[1] {0xE8},
-               new ushort[1] {0x76},
-               new ushort[1] {0x122},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x50]), new LRReduction(0x44, staticRules[0x50]), new LRReduction(0x4b, staticRules[0x50])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[1] {0x49},
-               new ushort[1] {0xEA},
-               new ushort[1] {0x75},
-               new ushort[1] {0x123},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x4E]), new LRReduction(0x44, staticRules[0x4E]), new LRReduction(0x4a, staticRules[0x4E]), new LRReduction(0x4b, staticRules[0x4E])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[5] {new LRReduction(0x41, staticRules[0x4B]), new LRReduction(0x44, staticRules[0x4B]), new LRReduction(0x49, staticRules[0x4B]), new LRReduction(0x4a, staticRules[0x4B]), new LRReduction(0x4b, staticRules[0x4B])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[15]},
-               new ushort[2] {0x48, 0x12},
-               new ushort[2] {0x124, 0x125},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x21]), new LRReduction(0xb, staticRules[0x21]), new LRReduction(0x11, staticRules[0x21]), new LRReduction(0x30, staticRules[0x21]), new LRReduction(0x31, staticRules[0x21]), new LRReduction(0x32, staticRules[0x21]), new LRReduction(0x33, staticRules[0x21]), new LRReduction(0x34, staticRules[0x21]), new LRReduction(0x35, staticRules[0x21]), new LRReduction(0x41, staticRules[0x21]), new LRReduction(0x43, staticRules[0x21]), new LRReduction(0x44, staticRules[0x21]), new LRReduction(0x45, staticRules[0x21]), new LRReduction(0x46, staticRules[0x21]), new LRReduction(0x47, staticRules[0x21]), new LRReduction(0x49, staticRules[0x21]), new LRReduction(0x4a, staticRules[0x21]), new LRReduction(0x4b, staticRules[0x21])})
             , new LR1State(
                null,
                new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
@@ -6629,188 +6531,164 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x13]), new LRReduction(0xb, staticRules[0x13]), new LRReduction(0x11, staticRules[0x13]), new LRReduction(0x30, staticRules[0x13]), new LRReduction(0x31, staticRules[0x13]), new LRReduction(0x32, staticRules[0x13]), new LRReduction(0x33, staticRules[0x13]), new LRReduction(0x34, staticRules[0x13]), new LRReduction(0x35, staticRules[0x13]), new LRReduction(0x41, staticRules[0x13]), new LRReduction(0x43, staticRules[0x13]), new LRReduction(0x44, staticRules[0x13]), new LRReduction(0x45, staticRules[0x13]), new LRReduction(0x46, staticRules[0x13]), new LRReduction(0x47, staticRules[0x13]), new LRReduction(0x49, staticRules[0x13]), new LRReduction(0x4a, staticRules[0x13]), new LRReduction(0x4b, staticRules[0x13])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[19] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[25], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[19] {new LRReduction(0xa, staticRules[0x14]), new LRReduction(0xb, staticRules[0x14]), new LRReduction(0x11, staticRules[0x14]), new LRReduction(0x30, staticRules[0x14]), new LRReduction(0x31, staticRules[0x14]), new LRReduction(0x32, staticRules[0x14]), new LRReduction(0x33, staticRules[0x14]), new LRReduction(0x34, staticRules[0x14]), new LRReduction(0x35, staticRules[0x14]), new LRReduction(0x41, staticRules[0x14]), new LRReduction(0x42, staticRules[0x14]), new LRReduction(0x43, staticRules[0x14]), new LRReduction(0x44, staticRules[0x14]), new LRReduction(0x45, staticRules[0x14]), new LRReduction(0x46, staticRules[0x14]), new LRReduction(0x47, staticRules[0x14]), new LRReduction(0x49, staticRules[0x14]), new LRReduction(0x4a, staticRules[0x14]), new LRReduction(0x4b, staticRules[0x14])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[19] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[25], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[19] {new LRReduction(0xa, staticRules[0x15]), new LRReduction(0xb, staticRules[0x15]), new LRReduction(0x11, staticRules[0x15]), new LRReduction(0x30, staticRules[0x15]), new LRReduction(0x31, staticRules[0x15]), new LRReduction(0x32, staticRules[0x15]), new LRReduction(0x33, staticRules[0x15]), new LRReduction(0x34, staticRules[0x15]), new LRReduction(0x35, staticRules[0x15]), new LRReduction(0x41, staticRules[0x15]), new LRReduction(0x42, staticRules[0x15]), new LRReduction(0x43, staticRules[0x15]), new LRReduction(0x44, staticRules[0x15]), new LRReduction(0x45, staticRules[0x15]), new LRReduction(0x46, staticRules[0x15]), new LRReduction(0x47, staticRules[0x15]), new LRReduction(0x49, staticRules[0x15]), new LRReduction(0x4a, staticRules[0x15]), new LRReduction(0x4b, staticRules[0x15])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x17]), new LRReduction(0xb, staticRules[0x17]), new LRReduction(0x11, staticRules[0x17]), new LRReduction(0x30, staticRules[0x17]), new LRReduction(0x31, staticRules[0x17]), new LRReduction(0x32, staticRules[0x17]), new LRReduction(0x33, staticRules[0x17]), new LRReduction(0x34, staticRules[0x17]), new LRReduction(0x35, staticRules[0x17]), new LRReduction(0x41, staticRules[0x17]), new LRReduction(0x43, staticRules[0x17]), new LRReduction(0x44, staticRules[0x17]), new LRReduction(0x45, staticRules[0x17]), new LRReduction(0x46, staticRules[0x17]), new LRReduction(0x47, staticRules[0x17]), new LRReduction(0x49, staticRules[0x17]), new LRReduction(0x4a, staticRules[0x17]), new LRReduction(0x4b, staticRules[0x17])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x19]), new LRReduction(0xb, staticRules[0x19]), new LRReduction(0x11, staticRules[0x19]), new LRReduction(0x30, staticRules[0x19]), new LRReduction(0x31, staticRules[0x19]), new LRReduction(0x32, staticRules[0x19]), new LRReduction(0x33, staticRules[0x19]), new LRReduction(0x34, staticRules[0x19]), new LRReduction(0x35, staticRules[0x19]), new LRReduction(0x41, staticRules[0x19]), new LRReduction(0x43, staticRules[0x19]), new LRReduction(0x44, staticRules[0x19]), new LRReduction(0x45, staticRules[0x19]), new LRReduction(0x46, staticRules[0x19]), new LRReduction(0x47, staticRules[0x19]), new LRReduction(0x49, staticRules[0x19]), new LRReduction(0x4a, staticRules[0x19]), new LRReduction(0x4b, staticRules[0x19])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
                new LRReduction[18] {new LRReduction(0xa, staticRules[0x18]), new LRReduction(0xb, staticRules[0x18]), new LRReduction(0x11, staticRules[0x18]), new LRReduction(0x30, staticRules[0x18]), new LRReduction(0x31, staticRules[0x18]), new LRReduction(0x32, staticRules[0x18]), new LRReduction(0x33, staticRules[0x18]), new LRReduction(0x34, staticRules[0x18]), new LRReduction(0x35, staticRules[0x18]), new LRReduction(0x41, staticRules[0x18]), new LRReduction(0x43, staticRules[0x18]), new LRReduction(0x44, staticRules[0x18]), new LRReduction(0x45, staticRules[0x18]), new LRReduction(0x46, staticRules[0x18]), new LRReduction(0x47, staticRules[0x18]), new LRReduction(0x49, staticRules[0x18]), new LRReduction(0x4a, staticRules[0x18]), new LRReduction(0x4b, staticRules[0x18])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x126},
-               new ushort[0] {},
-               new ushort[0] {},
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
+               new ushort[2] {0x4c, 0x4d},
+               new ushort[2] {0xFB, 0x97},
+               new ushort[1] {0x6b},
+               new ushort[1] {0xFC},
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC4]), new LRReduction(0x4c, staticRules[0xC4]), new LRReduction(0x4d, staticRules[0xC4])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[1] {0x4a},
+               new ushort[1] {0xFD},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0x41, staticRules[0x8F]), new LRReduction(0x44, staticRules[0x8F]), new LRReduction(0xdb, staticRules[0x8F])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[20] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
                new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[16] {0x71, 0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[13] {0x127, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80])})
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[12] {0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[12] {0xFE, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x44, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91]), new LRReduction(0xdb, staticRules[0x91])})
             , new LR1State(
                null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[23]},
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[1] {0x49},
+               new ushort[1] {0xFF},
                new ushort[0] {},
                new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x99]), new LRReduction(0x44, staticRules[0x99]), new LRReduction(0xdb, staticRules[0x99])})
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x93]), new LRReduction(0x44, staticRules[0x93]), new LRReduction(0x4a, staticRules[0x93]), new LRReduction(0xdb, staticRules[0x93])})
             , new LR1State(
                null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x97]), new LRReduction(0x44, staticRules[0x97]), new LRReduction(0x4a, staticRules[0x97]), new LRReduction(0xdb, staticRules[0x97])})
+               new SymbolTerminal[16] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[10] {0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[10] {0x100, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x4e},
-               new ushort[1] {0x128},
+               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[9] {0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[9] {0x101, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x95]), new LRReduction(0x44, staticRules[0x95]), new LRReduction(0x49, staticRules[0x95]), new LRReduction(0x4a, staticRules[0x95]), new LRReduction(0xdb, staticRules[0x95])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[21] {new LRReduction(0xa, staticRules[0xA9]), new LRReduction(0x11, staticRules[0xA9]), new LRReduction(0x2e, staticRules[0xA9]), new LRReduction(0x34, staticRules[0xA9]), new LRReduction(0x35, staticRules[0xA9]), new LRReduction(0x36, staticRules[0xA9]), new LRReduction(0x37, staticRules[0xA9]), new LRReduction(0x38, staticRules[0xA9]), new LRReduction(0x39, staticRules[0xA9]), new LRReduction(0x3a, staticRules[0xA9]), new LRReduction(0x3b, staticRules[0xA9]), new LRReduction(0x3c, staticRules[0xA9]), new LRReduction(0x3d, staticRules[0xA9]), new LRReduction(0x3e, staticRules[0xA9]), new LRReduction(0x3f, staticRules[0xA9]), new LRReduction(0x41, staticRules[0xA9]), new LRReduction(0x43, staticRules[0xA9]), new LRReduction(0x44, staticRules[0xA9]), new LRReduction(0x49, staticRules[0xA9]), new LRReduction(0x4a, staticRules[0xA9]), new LRReduction(0xdb, staticRules[0xA9])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[21] {new LRReduction(0xa, staticRules[0x97]), new LRReduction(0x11, staticRules[0x97]), new LRReduction(0x2e, staticRules[0x97]), new LRReduction(0x34, staticRules[0x97]), new LRReduction(0x35, staticRules[0x97]), new LRReduction(0x36, staticRules[0x97]), new LRReduction(0x37, staticRules[0x97]), new LRReduction(0x38, staticRules[0x97]), new LRReduction(0x39, staticRules[0x97]), new LRReduction(0x3a, staticRules[0x97]), new LRReduction(0x3b, staticRules[0x97]), new LRReduction(0x3c, staticRules[0x97]), new LRReduction(0x3d, staticRules[0x97]), new LRReduction(0x3e, staticRules[0x97]), new LRReduction(0x3f, staticRules[0x97]), new LRReduction(0x41, staticRules[0x97]), new LRReduction(0x43, staticRules[0x97]), new LRReduction(0x44, staticRules[0x97]), new LRReduction(0x49, staticRules[0x97]), new LRReduction(0x4a, staticRules[0x97]), new LRReduction(0xdb, staticRules[0x97])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[21] {new LRReduction(0xa, staticRules[0x98]), new LRReduction(0x11, staticRules[0x98]), new LRReduction(0x2e, staticRules[0x98]), new LRReduction(0x34, staticRules[0x98]), new LRReduction(0x35, staticRules[0x98]), new LRReduction(0x36, staticRules[0x98]), new LRReduction(0x37, staticRules[0x98]), new LRReduction(0x38, staticRules[0x98]), new LRReduction(0x39, staticRules[0x98]), new LRReduction(0x3a, staticRules[0x98]), new LRReduction(0x3b, staticRules[0x98]), new LRReduction(0x3c, staticRules[0x98]), new LRReduction(0x3d, staticRules[0x98]), new LRReduction(0x3e, staticRules[0x98]), new LRReduction(0x3f, staticRules[0x98]), new LRReduction(0x41, staticRules[0x98]), new LRReduction(0x43, staticRules[0x98]), new LRReduction(0x44, staticRules[0x98]), new LRReduction(0x49, staticRules[0x98]), new LRReduction(0x4a, staticRules[0x98]), new LRReduction(0xdb, staticRules[0x98])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[21] {new LRReduction(0xa, staticRules[0x99]), new LRReduction(0x11, staticRules[0x99]), new LRReduction(0x2e, staticRules[0x99]), new LRReduction(0x34, staticRules[0x99]), new LRReduction(0x35, staticRules[0x99]), new LRReduction(0x36, staticRules[0x99]), new LRReduction(0x37, staticRules[0x99]), new LRReduction(0x38, staticRules[0x99]), new LRReduction(0x39, staticRules[0x99]), new LRReduction(0x3a, staticRules[0x99]), new LRReduction(0x3b, staticRules[0x99]), new LRReduction(0x3c, staticRules[0x99]), new LRReduction(0x3d, staticRules[0x99]), new LRReduction(0x3e, staticRules[0x99]), new LRReduction(0x3f, staticRules[0x99]), new LRReduction(0x41, staticRules[0x99]), new LRReduction(0x43, staticRules[0x99]), new LRReduction(0x44, staticRules[0x99]), new LRReduction(0x49, staticRules[0x99]), new LRReduction(0x4a, staticRules[0x99]), new LRReduction(0xdb, staticRules[0x99])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[24] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[24] {new LRReduction(0xa, staticRules[0x9B]), new LRReduction(0x11, staticRules[0x9B]), new LRReduction(0x2e, staticRules[0x9B]), new LRReduction(0x34, staticRules[0x9B]), new LRReduction(0x35, staticRules[0x9B]), new LRReduction(0x36, staticRules[0x9B]), new LRReduction(0x37, staticRules[0x9B]), new LRReduction(0x38, staticRules[0x9B]), new LRReduction(0x39, staticRules[0x9B]), new LRReduction(0x3a, staticRules[0x9B]), new LRReduction(0x3b, staticRules[0x9B]), new LRReduction(0x3c, staticRules[0x9B]), new LRReduction(0x3d, staticRules[0x9B]), new LRReduction(0x3e, staticRules[0x9B]), new LRReduction(0x3f, staticRules[0x9B]), new LRReduction(0x41, staticRules[0x9B]), new LRReduction(0x43, staticRules[0x9B]), new LRReduction(0x44, staticRules[0x9B]), new LRReduction(0x45, staticRules[0x9B]), new LRReduction(0x46, staticRules[0x9B]), new LRReduction(0x47, staticRules[0x9B]), new LRReduction(0x49, staticRules[0x9B]), new LRReduction(0x4a, staticRules[0x9B]), new LRReduction(0xdb, staticRules[0x9B])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[24] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[24] {new LRReduction(0xa, staticRules[0x9C]), new LRReduction(0x11, staticRules[0x9C]), new LRReduction(0x2e, staticRules[0x9C]), new LRReduction(0x34, staticRules[0x9C]), new LRReduction(0x35, staticRules[0x9C]), new LRReduction(0x36, staticRules[0x9C]), new LRReduction(0x37, staticRules[0x9C]), new LRReduction(0x38, staticRules[0x9C]), new LRReduction(0x39, staticRules[0x9C]), new LRReduction(0x3a, staticRules[0x9C]), new LRReduction(0x3b, staticRules[0x9C]), new LRReduction(0x3c, staticRules[0x9C]), new LRReduction(0x3d, staticRules[0x9C]), new LRReduction(0x3e, staticRules[0x9C]), new LRReduction(0x3f, staticRules[0x9C]), new LRReduction(0x41, staticRules[0x9C]), new LRReduction(0x43, staticRules[0x9C]), new LRReduction(0x44, staticRules[0x9C]), new LRReduction(0x45, staticRules[0x9C]), new LRReduction(0x46, staticRules[0x9C]), new LRReduction(0x47, staticRules[0x9C]), new LRReduction(0x49, staticRules[0x9C]), new LRReduction(0x4a, staticRules[0x9C]), new LRReduction(0xdb, staticRules[0x9C])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[11]},
+               new ushort[1] {0x44},
+               new ushort[1] {0x102},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35]},
-               new ushort[15] {0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
-               new ushort[15] {0x77, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85},
-               new ushort[6] {0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
-               new ushort[6] {0x129, 0x72, 0x73, 0x74, 0x75, 0x76},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0xa, staticRules[0x5A]), new LRReduction(0x12, staticRules[0x5A])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x12A},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0xa, staticRules[0x9B]), new LRReduction(0x12, staticRules[0x9B])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x4c, staticRules[0x33])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x101},
-               new ushort[1] {0x77},
-               new ushort[1] {0x12B},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x52])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x12C},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
-               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
-               new ushort[5] {0x9D, 0x77, 0x78, 0xA3, 0xA5},
-               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[14] {0x12D, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[2] {new LRReduction(0x41, staticRules[0x5D]), new LRReduction(0x4a, staticRules[0x5D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x76]), new LRReduction(0x44, staticRules[0x76]), new LRReduction(0xdb, staticRules[0x76])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x74]), new LRReduction(0x44, staticRules[0x74]), new LRReduction(0x4a, staticRules[0x74]), new LRReduction(0xdb, staticRules[0x74])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x4e},
-               new ushort[1] {0x12E},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32]},
-               new ushort[4] {0x11, 0x2e, 0xa, 0x30},
-               new ushort[4] {0x77, 0x78, 0xA3, 0xA5},
-               new ushort[7] {0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
-               new ushort[7] {0x12F, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA4},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0x41, staticRules[0x4F]), new LRReduction(0x44, staticRules[0x4F]), new LRReduction(0x4b, staticRules[0x4F])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[4] {new LRReduction(0x41, staticRules[0x4D]), new LRReduction(0x44, staticRules[0x4D]), new LRReduction(0x4a, staticRules[0x4D]), new LRReduction(0x4b, staticRules[0x4D])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[7]},
-               new ushort[1] {0x2d},
-               new ushort[1] {0x130},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[0] {})
-            , new LR1State(
-               null,
-               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x27]), new LRReduction(0xb, staticRules[0x27]), new LRReduction(0x30, staticRules[0x27]), new LRReduction(0x31, staticRules[0x27]), new LRReduction(0x32, staticRules[0x27]), new LRReduction(0x33, staticRules[0x27]), new LRReduction(0x34, staticRules[0x27]), new LRReduction(0x35, staticRules[0x27]), new LRReduction(0x41, staticRules[0x27]), new LRReduction(0x43, staticRules[0x27]), new LRReduction(0x44, staticRules[0x27]), new LRReduction(0x49, staticRules[0x27]), new LRReduction(0x4a, staticRules[0x27]), new LRReduction(0x4b, staticRules[0x27])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0xa, staticRules[0xAA]), new LRReduction(0x12, staticRules[0xAA]), new LRReduction(0xda, staticRules[0xAA])})
-            , new LR1State(
-               null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
-               new ushort[1] {0x41},
-               new ushort[1] {0x131},
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new ushort[1] {0x12},
+               new ushort[1] {0x103},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -6821,15 +6699,15 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[28] {new LRReduction(0xa, staticRules[0x92]), new LRReduction(0x11, staticRules[0x92]), new LRReduction(0x2e, staticRules[0x92]), new LRReduction(0x34, staticRules[0x92]), new LRReduction(0x35, staticRules[0x92]), new LRReduction(0x36, staticRules[0x92]), new LRReduction(0x37, staticRules[0x92]), new LRReduction(0x38, staticRules[0x92]), new LRReduction(0x39, staticRules[0x92]), new LRReduction(0x3a, staticRules[0x92]), new LRReduction(0x3b, staticRules[0x92]), new LRReduction(0x3c, staticRules[0x92]), new LRReduction(0x3d, staticRules[0x92]), new LRReduction(0x3e, staticRules[0x92]), new LRReduction(0x3f, staticRules[0x92]), new LRReduction(0x41, staticRules[0x92]), new LRReduction(0x43, staticRules[0x92]), new LRReduction(0x44, staticRules[0x92]), new LRReduction(0x45, staticRules[0x92]), new LRReduction(0x46, staticRules[0x92]), new LRReduction(0x47, staticRules[0x92]), new LRReduction(0x48, staticRules[0x92]), new LRReduction(0x49, staticRules[0x92]), new LRReduction(0x4a, staticRules[0x92]), new LRReduction(0x4e, staticRules[0x92]), new LRReduction(0x55, staticRules[0x92]), new LRReduction(0x56, staticRules[0x92]), new LRReduction(0xdb, staticRules[0x92])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA4]), new LRReduction(0x11, staticRules[0xA4]), new LRReduction(0x2e, staticRules[0xA4]), new LRReduction(0x34, staticRules[0xA4]), new LRReduction(0x35, staticRules[0xA4]), new LRReduction(0x36, staticRules[0xA4]), new LRReduction(0x37, staticRules[0xA4]), new LRReduction(0x38, staticRules[0xA4]), new LRReduction(0x39, staticRules[0xA4]), new LRReduction(0x3a, staticRules[0xA4]), new LRReduction(0x3b, staticRules[0xA4]), new LRReduction(0x3c, staticRules[0xA4]), new LRReduction(0x3d, staticRules[0xA4]), new LRReduction(0x3e, staticRules[0xA4]), new LRReduction(0x3f, staticRules[0xA4]), new LRReduction(0x41, staticRules[0xA4]), new LRReduction(0x43, staticRules[0xA4]), new LRReduction(0x44, staticRules[0xA4]), new LRReduction(0x45, staticRules[0xA4]), new LRReduction(0x46, staticRules[0xA4]), new LRReduction(0x47, staticRules[0xA4]), new LRReduction(0x48, staticRules[0xA4]), new LRReduction(0x49, staticRules[0xA4]), new LRReduction(0x4a, staticRules[0xA4]), new LRReduction(0x4e, staticRules[0xA4]), new LRReduction(0x55, staticRules[0xA4]), new LRReduction(0x56, staticRules[0xA4]), new LRReduction(0xdb, staticRules[0xA4])})
             , new LR1State(
                null,
-               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x116},
-               new ushort[1] {0x99},
-               new ushort[1] {0x132},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x94])})
+               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35]},
+               new ushort[15] {0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[15] {0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[6] {0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[6] {0x104, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
@@ -6837,28 +6715,180 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[2] {new LRReduction(0xa, staticRules[0x78]), new LRReduction(0x12, staticRules[0x78])})
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x12]), new LRReduction(0x12, staticRules[0x12])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[19]},
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x51])})
+               new LRReduction[1] {new LRReduction(0x12, staticRules[0x63])})
             , new LR1State(
                null,
-               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0xa, staticRules[0xA2]), new LRReduction(0x12, staticRules[0xA2]), new LRReduction(0xda, staticRules[0xA2])})
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x89]), new LRReduction(0x12, staticRules[0x89])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x8A]), new LRReduction(0x12, staticRules[0x8A])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[14] {0x105, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
+               new ushort[1] {0x4c},
+               new ushort[1] {0x106},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
             , new LR1State(
                null,
                new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
                new ushort[1] {0x41},
-               new ushort[1] {0x133},
+               new ushort[1] {0x107},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[13] {0x108, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[2] {0x4e, 0x48},
+               new ushort[2] {0x109, 0x10B},
+               new ushort[1] {0x77},
+               new ushort[1] {0x10A},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
+               new ushort[2] {0x4c, 0x4d},
+               new ushort[2] {0x10C, 0x97},
+               new ushort[1] {0x6b},
+               new ushort[1] {0x10D},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[29], FileCentralDogma_Lexer.terminals[18]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xBA]), new LRReduction(0x4c, staticRules[0xBA]), new LRReduction(0x4d, staticRules[0xBA])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[1] {0x4a},
+               new ushort[1] {0x10E},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0x41, staticRules[0x66]), new LRReduction(0x44, staticRules[0x66]), new LRReduction(0xdb, staticRules[0x66])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[13] {0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[13] {0x10F, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x44, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68]), new LRReduction(0xdb, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[1] {0x49},
+               new ushort[1] {0x110},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x6A]), new LRReduction(0x44, staticRules[0x6A]), new LRReduction(0x4a, staticRules[0x6A]), new LRReduction(0xdb, staticRules[0x6A])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[11] {0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[11] {0x111, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[10] {0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[10] {0x112, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x6C]), new LRReduction(0x44, staticRules[0x6C]), new LRReduction(0x49, staticRules[0x6C]), new LRReduction(0x4a, staticRules[0x6C]), new LRReduction(0xdb, staticRules[0x6C])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[10] {new LRReduction(0xa, staticRules[0x80]), new LRReduction(0x11, staticRules[0x80]), new LRReduction(0x2e, staticRules[0x80]), new LRReduction(0x30, staticRules[0x80]), new LRReduction(0x41, staticRules[0x80]), new LRReduction(0x43, staticRules[0x80]), new LRReduction(0x44, staticRules[0x80]), new LRReduction(0x49, staticRules[0x80]), new LRReduction(0x4a, staticRules[0x80]), new LRReduction(0xdb, staticRules[0x80])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[10] {new LRReduction(0xa, staticRules[0x6E]), new LRReduction(0x11, staticRules[0x6E]), new LRReduction(0x2e, staticRules[0x6E]), new LRReduction(0x30, staticRules[0x6E]), new LRReduction(0x41, staticRules[0x6E]), new LRReduction(0x43, staticRules[0x6E]), new LRReduction(0x44, staticRules[0x6E]), new LRReduction(0x49, staticRules[0x6E]), new LRReduction(0x4a, staticRules[0x6E]), new LRReduction(0xdb, staticRules[0x6E])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[10] {new LRReduction(0xa, staticRules[0x6F]), new LRReduction(0x11, staticRules[0x6F]), new LRReduction(0x2e, staticRules[0x6F]), new LRReduction(0x30, staticRules[0x6F]), new LRReduction(0x41, staticRules[0x6F]), new LRReduction(0x43, staticRules[0x6F]), new LRReduction(0x44, staticRules[0x6F]), new LRReduction(0x49, staticRules[0x6F]), new LRReduction(0x4a, staticRules[0x6F]), new LRReduction(0xdb, staticRules[0x6F])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[10] {new LRReduction(0xa, staticRules[0x70]), new LRReduction(0x11, staticRules[0x70]), new LRReduction(0x2e, staticRules[0x70]), new LRReduction(0x30, staticRules[0x70]), new LRReduction(0x41, staticRules[0x70]), new LRReduction(0x43, staticRules[0x70]), new LRReduction(0x44, staticRules[0x70]), new LRReduction(0x49, staticRules[0x70]), new LRReduction(0x4a, staticRules[0x70]), new LRReduction(0xdb, staticRules[0x70])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[13] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[13] {new LRReduction(0xa, staticRules[0x72]), new LRReduction(0x11, staticRules[0x72]), new LRReduction(0x2e, staticRules[0x72]), new LRReduction(0x30, staticRules[0x72]), new LRReduction(0x41, staticRules[0x72]), new LRReduction(0x43, staticRules[0x72]), new LRReduction(0x44, staticRules[0x72]), new LRReduction(0x45, staticRules[0x72]), new LRReduction(0x46, staticRules[0x72]), new LRReduction(0x47, staticRules[0x72]), new LRReduction(0x49, staticRules[0x72]), new LRReduction(0x4a, staticRules[0x72]), new LRReduction(0xdb, staticRules[0x72])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[13] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[13] {new LRReduction(0xa, staticRules[0x73]), new LRReduction(0x11, staticRules[0x73]), new LRReduction(0x2e, staticRules[0x73]), new LRReduction(0x30, staticRules[0x73]), new LRReduction(0x41, staticRules[0x73]), new LRReduction(0x43, staticRules[0x73]), new LRReduction(0x44, staticRules[0x73]), new LRReduction(0x45, staticRules[0x73]), new LRReduction(0x46, staticRules[0x73]), new LRReduction(0x47, staticRules[0x73]), new LRReduction(0x49, staticRules[0x73]), new LRReduction(0x4a, staticRules[0x73]), new LRReduction(0xdb, staticRules[0x73])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[11]},
+               new ushort[1] {0x44},
+               new ushort[1] {0x113},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -6869,20 +6899,612 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[17] {new LRReduction(0xa, staticRules[0x6F]), new LRReduction(0x11, staticRules[0x6F]), new LRReduction(0x2e, staticRules[0x6F]), new LRReduction(0x30, staticRules[0x6F]), new LRReduction(0x41, staticRules[0x6F]), new LRReduction(0x43, staticRules[0x6F]), new LRReduction(0x44, staticRules[0x6F]), new LRReduction(0x45, staticRules[0x6F]), new LRReduction(0x46, staticRules[0x6F]), new LRReduction(0x47, staticRules[0x6F]), new LRReduction(0x48, staticRules[0x6F]), new LRReduction(0x49, staticRules[0x6F]), new LRReduction(0x4a, staticRules[0x6F]), new LRReduction(0x4e, staticRules[0x6F]), new LRReduction(0x55, staticRules[0x6F]), new LRReduction(0x56, staticRules[0x6F]), new LRReduction(0xdb, staticRules[0x6F])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x7B]), new LRReduction(0x11, staticRules[0x7B]), new LRReduction(0x2e, staticRules[0x7B]), new LRReduction(0x30, staticRules[0x7B]), new LRReduction(0x41, staticRules[0x7B]), new LRReduction(0x43, staticRules[0x7B]), new LRReduction(0x44, staticRules[0x7B]), new LRReduction(0x45, staticRules[0x7B]), new LRReduction(0x46, staticRules[0x7B]), new LRReduction(0x47, staticRules[0x7B]), new LRReduction(0x48, staticRules[0x7B]), new LRReduction(0x49, staticRules[0x7B]), new LRReduction(0x4a, staticRules[0x7B]), new LRReduction(0x4e, staticRules[0x7B]), new LRReduction(0x55, staticRules[0x7B]), new LRReduction(0x56, staticRules[0x7B]), new LRReduction(0xdb, staticRules[0x7B])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32]},
+               new ushort[4] {0x11, 0x2e, 0xa, 0x30},
+               new ushort[4] {0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[7] {0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[7] {0x114, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x115},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x18},
+               new ushort[1] {0x13},
+               new ushort[1] {0x116},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[1] {0x4a},
+               new ushort[1] {0x117},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0x41, staticRules[0x31]), new LRReduction(0x44, staticRules[0x31]), new LRReduction(0x4b, staticRules[0x31])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
+               new ushort[12] {0x64, 0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
+               new ushort[12] {0x118, 0xAF, 0xB0, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[1] {0x49},
+               new ushort[1] {0x119},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x2F]), new LRReduction(0x44, staticRules[0x2F]), new LRReduction(0x4a, staticRules[0x2F]), new LRReduction(0x4b, staticRules[0x2F])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
+               new ushort[11] {0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
+               new ushort[11] {0x11A, 0xB0, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
+               new ushort[10] {0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
+               new ushort[10] {0x11B, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x2D]), new LRReduction(0x44, staticRules[0x2D]), new LRReduction(0x49, staticRules[0x2D]), new LRReduction(0x4a, staticRules[0x2D]), new LRReduction(0x4b, staticRules[0x2D])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x54]), new LRReduction(0xb, staticRules[0x54]), new LRReduction(0x30, staticRules[0x54]), new LRReduction(0x31, staticRules[0x54]), new LRReduction(0x32, staticRules[0x54]), new LRReduction(0x33, staticRules[0x54]), new LRReduction(0x34, staticRules[0x54]), new LRReduction(0x35, staticRules[0x54]), new LRReduction(0x41, staticRules[0x54]), new LRReduction(0x43, staticRules[0x54]), new LRReduction(0x44, staticRules[0x54]), new LRReduction(0x49, staticRules[0x54]), new LRReduction(0x4a, staticRules[0x54]), new LRReduction(0x4b, staticRules[0x54])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x2B]), new LRReduction(0xb, staticRules[0x2B]), new LRReduction(0x30, staticRules[0x2B]), new LRReduction(0x31, staticRules[0x2B]), new LRReduction(0x32, staticRules[0x2B]), new LRReduction(0x33, staticRules[0x2B]), new LRReduction(0x34, staticRules[0x2B]), new LRReduction(0x35, staticRules[0x2B]), new LRReduction(0x41, staticRules[0x2B]), new LRReduction(0x43, staticRules[0x2B]), new LRReduction(0x44, staticRules[0x2B]), new LRReduction(0x49, staticRules[0x2B]), new LRReduction(0x4a, staticRules[0x2B]), new LRReduction(0x4b, staticRules[0x2B])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x25]), new LRReduction(0xb, staticRules[0x25]), new LRReduction(0x30, staticRules[0x25]), new LRReduction(0x31, staticRules[0x25]), new LRReduction(0x32, staticRules[0x25]), new LRReduction(0x33, staticRules[0x25]), new LRReduction(0x34, staticRules[0x25]), new LRReduction(0x35, staticRules[0x25]), new LRReduction(0x41, staticRules[0x25]), new LRReduction(0x43, staticRules[0x25]), new LRReduction(0x44, staticRules[0x25]), new LRReduction(0x49, staticRules[0x25]), new LRReduction(0x4a, staticRules[0x25]), new LRReduction(0x4b, staticRules[0x25])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x26]), new LRReduction(0xb, staticRules[0x26]), new LRReduction(0x30, staticRules[0x26]), new LRReduction(0x31, staticRules[0x26]), new LRReduction(0x32, staticRules[0x26]), new LRReduction(0x33, staticRules[0x26]), new LRReduction(0x34, staticRules[0x26]), new LRReduction(0x35, staticRules[0x26]), new LRReduction(0x41, staticRules[0x26]), new LRReduction(0x43, staticRules[0x26]), new LRReduction(0x44, staticRules[0x26]), new LRReduction(0x49, staticRules[0x26]), new LRReduction(0x4a, staticRules[0x26]), new LRReduction(0x4b, staticRules[0x26])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x27]), new LRReduction(0xb, staticRules[0x27]), new LRReduction(0x30, staticRules[0x27]), new LRReduction(0x31, staticRules[0x27]), new LRReduction(0x32, staticRules[0x27]), new LRReduction(0x33, staticRules[0x27]), new LRReduction(0x34, staticRules[0x27]), new LRReduction(0x35, staticRules[0x27]), new LRReduction(0x41, staticRules[0x27]), new LRReduction(0x43, staticRules[0x27]), new LRReduction(0x44, staticRules[0x27]), new LRReduction(0x49, staticRules[0x27]), new LRReduction(0x4a, staticRules[0x27]), new LRReduction(0x4b, staticRules[0x27])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[7]},
+               new ushort[1] {0x2d},
+               new ushort[1] {0x11C},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[11]},
+               new ushort[1] {0x44},
+               new ushort[1] {0x11D},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42]},
+               new ushort[2] {0x34, 0x35},
+               new ushort[2] {0xBD, 0xBE},
+               new ushort[1] {0x59},
+               new ushort[1] {0x11E},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[13] {0x11F, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
+               new ushort[1] {0x4c},
+               new ushort[1] {0x120},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[20] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[12] {0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[12] {0x121, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x44, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91]), new LRReduction(0xdb, staticRules[0x91])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0xAD]), new LRReduction(0x44, staticRules[0xAD]), new LRReduction(0x4a, staticRules[0xAD]), new LRReduction(0xdb, staticRules[0xAD])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[16] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[10] {0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[10] {0x122, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0xAB]), new LRReduction(0x44, staticRules[0xAB]), new LRReduction(0x49, staticRules[0xAB]), new LRReduction(0x4a, staticRules[0xAB]), new LRReduction(0xdb, staticRules[0xAB])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[21] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[21] {new LRReduction(0xa, staticRules[0xAA]), new LRReduction(0x11, staticRules[0xAA]), new LRReduction(0x2e, staticRules[0xAA]), new LRReduction(0x34, staticRules[0xAA]), new LRReduction(0x35, staticRules[0xAA]), new LRReduction(0x36, staticRules[0xAA]), new LRReduction(0x37, staticRules[0xAA]), new LRReduction(0x38, staticRules[0xAA]), new LRReduction(0x39, staticRules[0xAA]), new LRReduction(0x3a, staticRules[0xAA]), new LRReduction(0x3b, staticRules[0xAA]), new LRReduction(0x3c, staticRules[0xAA]), new LRReduction(0x3d, staticRules[0xAA]), new LRReduction(0x3e, staticRules[0xAA]), new LRReduction(0x3f, staticRules[0xAA]), new LRReduction(0x41, staticRules[0xAA]), new LRReduction(0x43, staticRules[0xAA]), new LRReduction(0x44, staticRules[0xAA]), new LRReduction(0x49, staticRules[0xAA]), new LRReduction(0x4a, staticRules[0xAA]), new LRReduction(0xdb, staticRules[0xAA])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[26] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[26] {new LRReduction(0xa, staticRules[0x9E]), new LRReduction(0x11, staticRules[0x9E]), new LRReduction(0x2e, staticRules[0x9E]), new LRReduction(0x34, staticRules[0x9E]), new LRReduction(0x35, staticRules[0x9E]), new LRReduction(0x36, staticRules[0x9E]), new LRReduction(0x37, staticRules[0x9E]), new LRReduction(0x38, staticRules[0x9E]), new LRReduction(0x39, staticRules[0x9E]), new LRReduction(0x3a, staticRules[0x9E]), new LRReduction(0x3b, staticRules[0x9E]), new LRReduction(0x3c, staticRules[0x9E]), new LRReduction(0x3d, staticRules[0x9E]), new LRReduction(0x3e, staticRules[0x9E]), new LRReduction(0x3f, staticRules[0x9E]), new LRReduction(0x41, staticRules[0x9E]), new LRReduction(0x43, staticRules[0x9E]), new LRReduction(0x44, staticRules[0x9E]), new LRReduction(0x45, staticRules[0x9E]), new LRReduction(0x46, staticRules[0x9E]), new LRReduction(0x47, staticRules[0x9E]), new LRReduction(0x49, staticRules[0x9E]), new LRReduction(0x4a, staticRules[0x9E]), new LRReduction(0x55, staticRules[0x9E]), new LRReduction(0x56, staticRules[0x9E]), new LRReduction(0xdb, staticRules[0x9E])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[29] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[29] {new LRReduction(0xa, staticRules[0x35]), new LRReduction(0x11, staticRules[0x35]), new LRReduction(0x2e, staticRules[0x35]), new LRReduction(0x30, staticRules[0x35]), new LRReduction(0x34, staticRules[0x35]), new LRReduction(0x35, staticRules[0x35]), new LRReduction(0x36, staticRules[0x35]), new LRReduction(0x37, staticRules[0x35]), new LRReduction(0x38, staticRules[0x35]), new LRReduction(0x39, staticRules[0x35]), new LRReduction(0x3a, staticRules[0x35]), new LRReduction(0x3b, staticRules[0x35]), new LRReduction(0x3c, staticRules[0x35]), new LRReduction(0x3d, staticRules[0x35]), new LRReduction(0x3e, staticRules[0x35]), new LRReduction(0x3f, staticRules[0x35]), new LRReduction(0x41, staticRules[0x35]), new LRReduction(0x43, staticRules[0x35]), new LRReduction(0x44, staticRules[0x35]), new LRReduction(0x45, staticRules[0x35]), new LRReduction(0x46, staticRules[0x35]), new LRReduction(0x47, staticRules[0x35]), new LRReduction(0x48, staticRules[0x35]), new LRReduction(0x49, staticRules[0x35]), new LRReduction(0x4a, staticRules[0x35]), new LRReduction(0x4e, staticRules[0x35]), new LRReduction(0x55, staticRules[0x35]), new LRReduction(0x56, staticRules[0x35]), new LRReduction(0xdb, staticRules[0x35])})
             , new LR1State(
                null,
                new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
-               new ushort[1] {0x48},
-               new ushort[1] {0x121},
-               new ushort[1] {0x87},
-               new ushort[1] {0x134},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x71])})
+               new ushort[2] {0x4e, 0x48},
+               new ushort[2] {0x123, 0x125},
+               new ushort[1] {0x99},
+               new ushort[1] {0x124},
+               new LRReduction[0] {})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
-               new ushort[1] {0x12},
-               new ushort[1] {0x135},
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x126},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[14] {0x127, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x8D]), new LRReduction(0x12, staticRules[0x8D])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x128},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x4c, staticRules[0x38])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[2] {0x4e, 0x48},
+               new ushort[2] {0x129, 0x12A},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x12B},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[14] {0x12C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
+               new ushort[1] {0x4c},
+               new ushort[1] {0x12D},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[13] {0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[13] {0x12E, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x44, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68]), new LRReduction(0xdb, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x84]), new LRReduction(0x44, staticRules[0x84]), new LRReduction(0x4a, staticRules[0x84]), new LRReduction(0xdb, staticRules[0x84])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[11] {0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[11] {0x12F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x82]), new LRReduction(0x44, staticRules[0x82]), new LRReduction(0x49, staticRules[0x82]), new LRReduction(0x4a, staticRules[0x82]), new LRReduction(0xdb, staticRules[0x82])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[10] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[10] {new LRReduction(0xa, staticRules[0x81]), new LRReduction(0x11, staticRules[0x81]), new LRReduction(0x2e, staticRules[0x81]), new LRReduction(0x30, staticRules[0x81]), new LRReduction(0x41, staticRules[0x81]), new LRReduction(0x43, staticRules[0x81]), new LRReduction(0x44, staticRules[0x81]), new LRReduction(0x49, staticRules[0x81]), new LRReduction(0x4a, staticRules[0x81]), new LRReduction(0xdb, staticRules[0x81])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[15] {new LRReduction(0xa, staticRules[0x75]), new LRReduction(0x11, staticRules[0x75]), new LRReduction(0x2e, staticRules[0x75]), new LRReduction(0x30, staticRules[0x75]), new LRReduction(0x41, staticRules[0x75]), new LRReduction(0x43, staticRules[0x75]), new LRReduction(0x44, staticRules[0x75]), new LRReduction(0x45, staticRules[0x75]), new LRReduction(0x46, staticRules[0x75]), new LRReduction(0x47, staticRules[0x75]), new LRReduction(0x49, staticRules[0x75]), new LRReduction(0x4a, staticRules[0x75]), new LRReduction(0x55, staticRules[0x75]), new LRReduction(0x56, staticRules[0x75]), new LRReduction(0xdb, staticRules[0x75])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[2] {0x4e, 0x48},
+               new ushort[2] {0x130, 0x132},
+               new ushort[1] {0x87},
+               new ushort[1] {0x131},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x34]), new LRReduction(0x12, staticRules[0x34])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x41, staticRules[0x33])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
+               new ushort[12] {0x64, 0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
+               new ushort[12] {0x133, 0xAF, 0xB0, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x58]), new LRReduction(0x44, staticRules[0x58]), new LRReduction(0x4a, staticRules[0x58]), new LRReduction(0x4b, staticRules[0x58])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[9] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[10]},
+               new ushort[9] {0x43, 0xa, 0xb, 0x34, 0x35, 0x30, 0x31, 0x33, 0x32},
+               new ushort[9] {0xB3, 0xBB, 0xBC, 0xBD, 0xBE, 0xAC, 0xBF, 0xC0, 0xC1},
+               new ushort[11] {0x63, 0x62, 0x60, 0x5f, 0x58, 0x59, 0x5a, 0x5b, 0x5e, 0x5d, 0x5c},
+               new ushort[11] {0x134, 0xB0, 0xB1, 0xB2, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x56]), new LRReduction(0x44, staticRules[0x56]), new LRReduction(0x49, staticRules[0x56]), new LRReduction(0x4a, staticRules[0x56]), new LRReduction(0x4b, staticRules[0x56])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x55]), new LRReduction(0xb, staticRules[0x55]), new LRReduction(0x30, staticRules[0x55]), new LRReduction(0x31, staticRules[0x55]), new LRReduction(0x32, staticRules[0x55]), new LRReduction(0x33, staticRules[0x55]), new LRReduction(0x34, staticRules[0x55]), new LRReduction(0x35, staticRules[0x55]), new LRReduction(0x41, staticRules[0x55]), new LRReduction(0x43, staticRules[0x55]), new LRReduction(0x44, staticRules[0x55]), new LRReduction(0x49, staticRules[0x55]), new LRReduction(0x4a, staticRules[0x55]), new LRReduction(0x4b, staticRules[0x55])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[15]},
+               new ushort[2] {0x12, 0x48},
+               new ushort[2] {0x135, 0x136},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x24]), new LRReduction(0xb, staticRules[0x24]), new LRReduction(0x11, staticRules[0x24]), new LRReduction(0x30, staticRules[0x24]), new LRReduction(0x31, staticRules[0x24]), new LRReduction(0x32, staticRules[0x24]), new LRReduction(0x33, staticRules[0x24]), new LRReduction(0x34, staticRules[0x24]), new LRReduction(0x35, staticRules[0x24]), new LRReduction(0x41, staticRules[0x24]), new LRReduction(0x43, staticRules[0x24]), new LRReduction(0x44, staticRules[0x24]), new LRReduction(0x45, staticRules[0x24]), new LRReduction(0x46, staticRules[0x24]), new LRReduction(0x47, staticRules[0x24]), new LRReduction(0x49, staticRules[0x24]), new LRReduction(0x4a, staticRules[0x24]), new LRReduction(0x4b, staticRules[0x24])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[18] {new LRReduction(0xa, staticRules[0x1A]), new LRReduction(0xb, staticRules[0x1A]), new LRReduction(0x11, staticRules[0x1A]), new LRReduction(0x30, staticRules[0x1A]), new LRReduction(0x31, staticRules[0x1A]), new LRReduction(0x32, staticRules[0x1A]), new LRReduction(0x33, staticRules[0x1A]), new LRReduction(0x34, staticRules[0x1A]), new LRReduction(0x35, staticRules[0x1A]), new LRReduction(0x41, staticRules[0x1A]), new LRReduction(0x43, staticRules[0x1A]), new LRReduction(0x44, staticRules[0x1A]), new LRReduction(0x45, staticRules[0x1A]), new LRReduction(0x46, staticRules[0x1A]), new LRReduction(0x47, staticRules[0x1A]), new LRReduction(0x49, staticRules[0x1A]), new LRReduction(0x4a, staticRules[0x1A]), new LRReduction(0x4b, staticRules[0x1A])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x137},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[18] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[16] {0x43, 0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[16] {0x77, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[13] {0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[13] {0x138, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x91]), new LRReduction(0x4a, staticRules[0x91])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0xAE]), new LRReduction(0x44, staticRules[0xAE]), new LRReduction(0x4a, staticRules[0xAE]), new LRReduction(0xdb, staticRules[0xAE])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0xAC]), new LRReduction(0x44, staticRules[0xAC]), new LRReduction(0x49, staticRules[0xAC]), new LRReduction(0x4a, staticRules[0xAC]), new LRReduction(0xdb, staticRules[0xAC])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA5]), new LRReduction(0x11, staticRules[0xA5]), new LRReduction(0x2e, staticRules[0xA5]), new LRReduction(0x34, staticRules[0xA5]), new LRReduction(0x35, staticRules[0xA5]), new LRReduction(0x36, staticRules[0xA5]), new LRReduction(0x37, staticRules[0xA5]), new LRReduction(0x38, staticRules[0xA5]), new LRReduction(0x39, staticRules[0xA5]), new LRReduction(0x3a, staticRules[0xA5]), new LRReduction(0x3b, staticRules[0xA5]), new LRReduction(0x3c, staticRules[0xA5]), new LRReduction(0x3d, staticRules[0xA5]), new LRReduction(0x3e, staticRules[0xA5]), new LRReduction(0x3f, staticRules[0xA5]), new LRReduction(0x41, staticRules[0xA5]), new LRReduction(0x43, staticRules[0xA5]), new LRReduction(0x44, staticRules[0xA5]), new LRReduction(0x45, staticRules[0xA5]), new LRReduction(0x46, staticRules[0xA5]), new LRReduction(0x47, staticRules[0xA5]), new LRReduction(0x48, staticRules[0xA5]), new LRReduction(0x49, staticRules[0xA5]), new LRReduction(0x4a, staticRules[0xA5]), new LRReduction(0x4e, staticRules[0xA5]), new LRReduction(0x55, staticRules[0xA5]), new LRReduction(0x56, staticRules[0xA5]), new LRReduction(0xdb, staticRules[0xA5])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[2] {0x4e, 0x48},
+               new ushort[2] {0x139, 0x13A},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35]},
+               new ushort[15] {0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[15] {0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[6] {0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[6] {0x13B, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x64]), new LRReduction(0x12, staticRules[0x64])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x13C},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0xAF]), new LRReduction(0x12, staticRules[0xAF])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[29]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[1] {new LRReduction(0x4c, staticRules[0x39])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[3]},
+               new ushort[1] {0xa},
+               new ushort[1] {0x13D},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x48, staticRules[0x5A]), new LRReduction(0x4e, staticRules[0x5A])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x13E},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[7] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[17]},
+               new ushort[5] {0x43, 0x11, 0x2e, 0xa, 0x30},
+               new ushort[5] {0xA4, 0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[14] {0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[14] {0x13F, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[2] {new LRReduction(0x41, staticRules[0x68]), new LRReduction(0x4a, staticRules[0x68])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x85]), new LRReduction(0x44, staticRules[0x85]), new LRReduction(0x4a, staticRules[0x85]), new LRReduction(0xdb, staticRules[0x85])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x83]), new LRReduction(0x44, staticRules[0x83]), new LRReduction(0x49, staticRules[0x83]), new LRReduction(0x4a, staticRules[0x83]), new LRReduction(0xdb, staticRules[0x83])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x7C]), new LRReduction(0x11, staticRules[0x7C]), new LRReduction(0x2e, staticRules[0x7C]), new LRReduction(0x30, staticRules[0x7C]), new LRReduction(0x41, staticRules[0x7C]), new LRReduction(0x43, staticRules[0x7C]), new LRReduction(0x44, staticRules[0x7C]), new LRReduction(0x45, staticRules[0x7C]), new LRReduction(0x46, staticRules[0x7C]), new LRReduction(0x47, staticRules[0x7C]), new LRReduction(0x48, staticRules[0x7C]), new LRReduction(0x49, staticRules[0x7C]), new LRReduction(0x4a, staticRules[0x7C]), new LRReduction(0x4e, staticRules[0x7C]), new LRReduction(0x55, staticRules[0x7C]), new LRReduction(0x56, staticRules[0x7C]), new LRReduction(0xdb, staticRules[0x7C])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[2] {0x4e, 0x48},
+               new ushort[2] {0x140, 0x141},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32]},
+               new ushort[4] {0x11, 0x2e, 0xa, 0x30},
+               new ushort[4] {0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[7] {0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[7] {0x142, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[4] {new LRReduction(0x41, staticRules[0x59]), new LRReduction(0x44, staticRules[0x59]), new LRReduction(0x4a, staticRules[0x59]), new LRReduction(0x4b, staticRules[0x59])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[5] {FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[5] {new LRReduction(0x41, staticRules[0x57]), new LRReduction(0x44, staticRules[0x57]), new LRReduction(0x49, staticRules[0x57]), new LRReduction(0x4a, staticRules[0x57]), new LRReduction(0x4b, staticRules[0x57])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x28]), new LRReduction(0xb, staticRules[0x28]), new LRReduction(0x30, staticRules[0x28]), new LRReduction(0x31, staticRules[0x28]), new LRReduction(0x32, staticRules[0x28]), new LRReduction(0x33, staticRules[0x28]), new LRReduction(0x34, staticRules[0x28]), new LRReduction(0x35, staticRules[0x28]), new LRReduction(0x41, staticRules[0x28]), new LRReduction(0x43, staticRules[0x28]), new LRReduction(0x44, staticRules[0x28]), new LRReduction(0x49, staticRules[0x28]), new LRReduction(0x4a, staticRules[0x28]), new LRReduction(0x4b, staticRules[0x28])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[7]},
+               new ushort[1] {0x2d},
+               new ushort[1] {0x143},
                new ushort[0] {},
                new ushort[0] {},
                new LRReduction[0] {})
@@ -6893,15 +7515,55 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0xa, staticRules[0xAD]), new LRReduction(0x12, staticRules[0xAD]), new LRReduction(0xda, staticRules[0xAD])})
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC2]), new LRReduction(0x12, staticRules[0xC2]), new LRReduction(0xda, staticRules[0xC2])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[19]},
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x144},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[28] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x93])})
+               new LRReduction[28] {new LRReduction(0xa, staticRules[0xA6]), new LRReduction(0x11, staticRules[0xA6]), new LRReduction(0x2e, staticRules[0xA6]), new LRReduction(0x34, staticRules[0xA6]), new LRReduction(0x35, staticRules[0xA6]), new LRReduction(0x36, staticRules[0xA6]), new LRReduction(0x37, staticRules[0xA6]), new LRReduction(0x38, staticRules[0xA6]), new LRReduction(0x39, staticRules[0xA6]), new LRReduction(0x3a, staticRules[0xA6]), new LRReduction(0x3b, staticRules[0xA6]), new LRReduction(0x3c, staticRules[0xA6]), new LRReduction(0x3d, staticRules[0xA6]), new LRReduction(0x3e, staticRules[0xA6]), new LRReduction(0x3f, staticRules[0xA6]), new LRReduction(0x41, staticRules[0xA6]), new LRReduction(0x43, staticRules[0xA6]), new LRReduction(0x44, staticRules[0xA6]), new LRReduction(0x45, staticRules[0xA6]), new LRReduction(0x46, staticRules[0xA6]), new LRReduction(0x47, staticRules[0xA6]), new LRReduction(0x48, staticRules[0xA6]), new LRReduction(0x49, staticRules[0xA6]), new LRReduction(0x4a, staticRules[0xA6]), new LRReduction(0x4e, staticRules[0xA6]), new LRReduction(0x55, staticRules[0xA6]), new LRReduction(0x56, staticRules[0xA6]), new LRReduction(0xdb, staticRules[0xA6])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[15] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[51], FileCentralDogma_Lexer.terminals[53], FileCentralDogma_Lexer.terminals[55], FileCentralDogma_Lexer.terminals[34], FileCentralDogma_Lexer.terminals[37], FileCentralDogma_Lexer.terminals[43], FileCentralDogma_Lexer.terminals[52], FileCentralDogma_Lexer.terminals[54], FileCentralDogma_Lexer.terminals[56], FileCentralDogma_Lexer.terminals[35]},
+               new ushort[15] {0x11, 0x2e, 0xa, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f},
+               new ushort[15] {0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B},
+               new ushort[6] {0x96, 0x68, 0x69, 0x6a, 0x97, 0x6c},
+               new ushort[6] {0x145, 0x78, 0x79, 0x7A, 0x7B, 0x7C},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x48, staticRules[0xA7]), new LRReduction(0x4e, staticRules[0xA7])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0xa, staticRules[0x86]), new LRReduction(0x12, staticRules[0x86])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x48, staticRules[0x5B]), new LRReduction(0x4e, staticRules[0x5B])})
             , new LR1State(
                null,
                new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
@@ -6909,15 +7571,79 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[3] {new LRReduction(0xa, staticRules[0xA5]), new LRReduction(0x12, staticRules[0xA5]), new LRReduction(0xda, staticRules[0xA5])})
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xB8]), new LRReduction(0x12, staticRules[0xB8]), new LRReduction(0xda, staticRules[0xB8])})
             , new LR1State(
                null,
-               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[19]},
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[9]},
+               new ushort[1] {0x41},
+               new ushort[1] {0x146},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[17] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[12], FileCentralDogma_Lexer.terminals[13], FileCentralDogma_Lexer.terminals[14], FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[19], FileCentralDogma_Lexer.terminals[21], FileCentralDogma_Lexer.terminals[22], FileCentralDogma_Lexer.terminals[23]},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[1] {new LRReduction(0x4e, staticRules[0x70])})
+               new LRReduction[17] {new LRReduction(0xa, staticRules[0x7D]), new LRReduction(0x11, staticRules[0x7D]), new LRReduction(0x2e, staticRules[0x7D]), new LRReduction(0x30, staticRules[0x7D]), new LRReduction(0x41, staticRules[0x7D]), new LRReduction(0x43, staticRules[0x7D]), new LRReduction(0x44, staticRules[0x7D]), new LRReduction(0x45, staticRules[0x7D]), new LRReduction(0x46, staticRules[0x7D]), new LRReduction(0x47, staticRules[0x7D]), new LRReduction(0x48, staticRules[0x7D]), new LRReduction(0x49, staticRules[0x7D]), new LRReduction(0x4a, staticRules[0x7D]), new LRReduction(0x4e, staticRules[0x7D]), new LRReduction(0x55, staticRules[0x7D]), new LRReduction(0x56, staticRules[0x7D]), new LRReduction(0xdb, staticRules[0x7D])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[4] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[4], FileCentralDogma_Lexer.terminals[26], FileCentralDogma_Lexer.terminals[32]},
+               new ushort[4] {0x11, 0x2e, 0xa, 0x30},
+               new ushort[4] {0x7D, 0x7E, 0xAA, 0xAC},
+               new ushort[7] {0x84, 0x68, 0x69, 0x6a, 0x85, 0x6d, 0x5a},
+               new ushort[7] {0x147, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAB},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x48, staticRules[0x7E]), new LRReduction(0x4e, staticRules[0x7E])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[1] {FileCentralDogma_Lexer.terminals[5]},
+               new ushort[1] {0x12},
+               new ushort[1] {0x148},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[0] {})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xC5]), new LRReduction(0x12, staticRules[0xC5]), new LRReduction(0xda, staticRules[0xC5])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x48, staticRules[0xA8]), new LRReduction(0x4e, staticRules[0xA8])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[3] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[5], FileCentralDogma_Lexer.terminals[6]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[3] {new LRReduction(0xa, staticRules[0xBB]), new LRReduction(0x12, staticRules[0xBB]), new LRReduction(0xda, staticRules[0xBB])})
+            , new LR1State(
+               null,
+               new SymbolTerminal[2] {FileCentralDogma_Lexer.terminals[15], FileCentralDogma_Lexer.terminals[19]},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new ushort[0] {},
+               new LRReduction[2] {new LRReduction(0x48, staticRules[0x7F]), new LRReduction(0x4e, staticRules[0x7F])})
             , new LR1State(
                null,
                new SymbolTerminal[14] {FileCentralDogma_Lexer.terminals[3], FileCentralDogma_Lexer.terminals[2], FileCentralDogma_Lexer.terminals[32], FileCentralDogma_Lexer.terminals[33], FileCentralDogma_Lexer.terminals[40], FileCentralDogma_Lexer.terminals[41], FileCentralDogma_Lexer.terminals[36], FileCentralDogma_Lexer.terminals[42], FileCentralDogma_Lexer.terminals[9], FileCentralDogma_Lexer.terminals[10], FileCentralDogma_Lexer.terminals[11], FileCentralDogma_Lexer.terminals[16], FileCentralDogma_Lexer.terminals[17], FileCentralDogma_Lexer.terminals[28]},
@@ -6925,7 +7651,7 @@ namespace Hime.Kernel.Resources.Parser
                new ushort[0] {},
                new ushort[0] {},
                new ushort[0] {},
-               new LRReduction[14] {new LRReduction(0xa, staticRules[0x26]), new LRReduction(0xb, staticRules[0x26]), new LRReduction(0x30, staticRules[0x26]), new LRReduction(0x31, staticRules[0x26]), new LRReduction(0x32, staticRules[0x26]), new LRReduction(0x33, staticRules[0x26]), new LRReduction(0x34, staticRules[0x26]), new LRReduction(0x35, staticRules[0x26]), new LRReduction(0x41, staticRules[0x26]), new LRReduction(0x43, staticRules[0x26]), new LRReduction(0x44, staticRules[0x26]), new LRReduction(0x49, staticRules[0x26]), new LRReduction(0x4a, staticRules[0x26]), new LRReduction(0x4b, staticRules[0x26])})
+               new LRReduction[14] {new LRReduction(0xa, staticRules[0x29]), new LRReduction(0xb, staticRules[0x29]), new LRReduction(0x30, staticRules[0x29]), new LRReduction(0x31, staticRules[0x29]), new LRReduction(0x32, staticRules[0x29]), new LRReduction(0x33, staticRules[0x29]), new LRReduction(0x34, staticRules[0x29]), new LRReduction(0x35, staticRules[0x29]), new LRReduction(0x41, staticRules[0x29]), new LRReduction(0x43, staticRules[0x29]), new LRReduction(0x44, staticRules[0x29]), new LRReduction(0x49, staticRules[0x29]), new LRReduction(0x4a, staticRules[0x29]), new LRReduction(0x4b, staticRules[0x29])})
         };
         protected override void setup()
         {

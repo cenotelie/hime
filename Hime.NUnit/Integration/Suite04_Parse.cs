@@ -17,7 +17,7 @@ namespace Hime.NUnit.Integration
 
         private void TestGrammar(string grammar, ParsingMethod method, string input)
         {
-            Assert.IsFalse(CompileRaw(grammar, method).HasErrors(), "Grammar compilation failed!");
+            Assert.IsFalse(CompileRaw(grammar, method).HasErrors, "Grammar compilation failed!");
             Assembly assembly = Build();
             bool errors = false;
             SyntaxTreeNode node = Parse(assembly, input, out errors);

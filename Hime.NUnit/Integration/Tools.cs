@@ -29,7 +29,7 @@ namespace Hime.NUnit.Integration
             task.GrammarName = "Test";
             task.Method = method;
             Report report = task.Execute();
-            return !report.HasErrors();
+            return !report.HasErrors;
         }
 
         public void Export(string resourceName, string fileName)
