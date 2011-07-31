@@ -14,26 +14,35 @@ namespace Hime.NUnit.Integration
 	[TestFixture]
 	public class Suite05_KernelDaemon
 	{
+		private string path;
+		
+		[SetUp]
+		public void SetUp() 
+		{
+			DirectoryInfo currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+			DirectoryInfo projectRoot = currentDirectory.Parent.Parent.Parent;
+			path = Path.Combine(Path.Combine(projectRoot.FullName, "Hime.NUnit"), "bin");
+
+		}
+		
 		// TODO: should do this test without really generating (should be able to decide the output Stream instead of the path as a string)
 		[Test]
 		public void Test000_GenerateNextStep_GeneratesParserForCentralDogma()
 		{
-			DirectoryInfo currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-			DirectoryInfo projectRoot = currentDirectory.Parent.Parent.Parent;			
-			KernelDaemon.GenerateNextStep(projectRoot.FullName);
+			KernelDaemon.GenerateNextStep(this.path);
 		}
 
 		[Test]
 		public void Test001_GenerateNextStep_ShouldNotHaveErrors()
 		{
-			DirectoryInfo currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-			DirectoryInfo projectRoot = currentDirectory.Parent.Parent.Parent;			
-			bool success = KernelDaemon.GenerateNextStep(projectRoot.FullName);
+			bool success = KernelDaemon.GenerateNextStep(this.path);
 			Assert.IsTrue(success);
 		}
 		
 		// TODO: should check the lexer and parser generated are public
 		// TODO: do a test that generation does not fail
 		// TODO: make so that the generation can be directly done with one himecc command (instead of calling yet another method)
+		// TODO: does strange thing if last line of rules is commented out with //
+		// TODO: should replace all return codes with exceptions
 	}
 }

@@ -125,17 +125,17 @@
 			cf_grammar_text	-> grammar_access 'grammar'! 'cf'! NAME grammar_parency
 								'{'!
 									grammar_options
-									grammar_terminals
+									grammar_terminals?
 									grammar_cf_rules<grammar_text_terminal>
 								'}'! ;
-			cf_grammar_bin	-> grammar_access 'grammar'! 'cf'! NAME grammar_parency
+			cf_grammar_bin	-> grammar_access 'grammar'! 'cf'! 'bin' NAME grammar_parency
 								'{'!
 									grammar_options
 									grammar_cf_rules<grammar_bin_terminal>
 								'}'! ;
 			
-			Namespace_child_symbol	-> cf_grammar_text^ ;
-			Namespace_child_symbol	-> cf_grammar_bin^ ;
+			Namespace_child_symbol	-> cf_grammar_text^
+									| cf_grammar_bin^ ;
 		}
 	}
 }

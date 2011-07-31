@@ -35,7 +35,6 @@ namespace Hime.NUnit.Integration
             parser.Analyse();
         }
 		
-		[Ignore]
 		[Test]
 		public void Test002_Analyse_ShouldAcceptMissingSectionTerminal()
         {
