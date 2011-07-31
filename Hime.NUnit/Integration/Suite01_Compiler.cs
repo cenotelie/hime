@@ -28,7 +28,6 @@ namespace Hime.NUnit.Integration
             Assert.IsTrue(reporter.Result.HasErrors);
         }
         
-		[Ignore]
         [Test]
         public void Test001_CompileData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
