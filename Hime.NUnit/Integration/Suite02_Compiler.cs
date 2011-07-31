@@ -10,6 +10,7 @@ using Hime.Kernel;
 using Hime.Parsers;
 using Hime.Kernel.Resources;
 using Hime.Kernel.Reporting;
+using System.IO;
 
 namespace Hime.NUnit.Integration
 {
@@ -24,7 +25,7 @@ namespace Hime.NUnit.Integration
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
-			compiler.CompileData(grammar);
+        	compiler.CompileData(new StringReader(grammar));
             Assert.IsTrue(reporter.Result.HasErrors);
         }
         
@@ -36,7 +37,7 @@ namespace Hime.NUnit.Integration
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
-        	compiler.CompileData(grammar);
+        	compiler.CompileData(new StringReader(grammar));
             Assert.IsFalse(reporter.Result.HasErrors);
         }
 
@@ -51,7 +52,7 @@ namespace Hime.NUnit.Integration
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	// TODO: this is a bit strange, think about it
-        	compiler.AddInputRawText(grammar);
+        	compiler.AddInput(new StringReader(grammar));
         	compiler.Compile();
         }
         
@@ -66,7 +67,7 @@ namespace Hime.NUnit.Integration
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	// TODO: this is a bit strange, think about it
-        	compiler.AddInputRawText(grammar);
+        	compiler.AddInput(new StringReader(grammar));
         	compiler.Compile();
             Assert.IsFalse(reporter.Result.HasErrors);
         }
