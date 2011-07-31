@@ -170,14 +170,9 @@ namespace Hime.Parsers
             }
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler(this.reporter);
             foreach (string file in fileInputs)
-            {
-                if (!compiler.AddInputFile(file))
-                    reporter.Error("Compiler", "Cannot access file: " + file);
-            }
+                compiler.AddInput(new System.IO.StreamReader(file), file);
             foreach (string data in rawInputs)
-            {
-                compiler.AddInputRawText(data);
-            }
+                compiler.AddInput(new System.IO.StringReader(data));
             bool result = compiler.Compile();
             this.root = compiler.OutputRootNamespace;
             return result;

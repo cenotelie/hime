@@ -24,7 +24,8 @@ namespace Hime.NUnit.Integration
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
-			compiler.CompileData(grammar);
+            compiler.AddInput(new System.IO.StringReader(grammar));
+			compiler.Compile();
             Assert.IsTrue(reporter.Result.HasErrors);
         }
         
@@ -36,7 +37,8 @@ namespace Hime.NUnit.Integration
         	
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
-        	compiler.CompileData(grammar);
+            compiler.AddInput(new System.IO.StringReader(grammar));
+            compiler.Compile();
             Assert.IsFalse(reporter.Result.HasErrors);
         }
 
@@ -50,8 +52,8 @@ namespace Hime.NUnit.Integration
         	Reporter reporter = new Reporter();
         	ResourceCompiler compiler = new ResourceCompiler(reporter);
         	// TODO: this is a bit strange, think about it
-        	compiler.AddInputRawText(grammar);
-        	compiler.Compile();
+            compiler.AddInput(new System.IO.StringReader(grammar));
+            compiler.Compile();
             Assert.IsFalse(reporter.Result.HasErrors);
         }
         

@@ -39,13 +39,13 @@ namespace Hime.Kernel
             return !result.HasErrors;
         }
 
-        public static void BuildUnicode(string File)
+        public static void BuildUnicode(string file)
         {
             string[] classes = { "Lu", "Ll", "Lt", "Lm", "Lo", "L", "Mn", "Mc", "Me", "M", "Nd", "Nl", "No", "N", "Pc", "Pd", "Ps", "Pe", "Pi", "Pf", "Po", "P", "Sm", "Sc", "Sk", "So", "S", "Zs", "Zl", "Zp", "Z", "Cc", "Cf", "Cs", "Co", "Cn", "C" };
             List<string> code = new List<string>();
             for (int i = 0; i != classes.Length; i++)
                 BuildUnicode_Class(classes[i], code);
-            System.IO.File.WriteAllLines(File, code.ToArray());
+            System.IO.File.WriteAllLines(file, code.ToArray());
         }
         private static void BuildUnicode_Class(string name, List<string> code)
         {
