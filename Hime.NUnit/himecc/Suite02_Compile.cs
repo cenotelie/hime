@@ -19,9 +19,7 @@ namespace Hime.NUnit.himecc
                 System.IO.Directory.Delete(directory, true);
             System.IO.Directory.CreateDirectory(directory);
             new Tools().Export(System.IO.Path.GetFileName(command), command);
-            Program program = new Program();
-            Options options = program.ParseArguments(new string[] { command });
-            program.Execute(options);
+            Program.Main(new string[] { command });
         }
         
         private Assembly Compile(string command)
