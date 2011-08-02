@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Hime.Parsers;
+using CommandLine;
 
 namespace Hime.HimeCC
 {
@@ -9,26 +10,28 @@ namespace Hime.HimeCC
     {
         public static void Main(string[] args)
         {
-            Options options = ParseArguments(args);
-            if (options != null)
-                Execute(options);
-            else
-                System.Console.WriteLine((new Options()).GetUsage());
+        	Program program = new Program();
+        	Options options = program.ParseArguments(args);
+            if (options.Inputs.Count == 0) 
+            {
+            	System.Console.WriteLine(options.GetUsage());
+            	return;
+            }
+        	program.Execute(options);
         }
 
-        public static Options ParseArguments(string[] args)
+        public Options ParseArguments(string[] args)
         {
-            if (args.Length == 0)
-                return null;
             Options options = new Options();
-            CommandLine.ICommandLineParser parser = new CommandLine.CommandLineParser();
+            ICommandLineParser parser = new CommandLineParser();
             if (!parser.ParseArguments(args, options))
-                return null;
+            {
+            	options.Inputs = new List<string>();
+            }
             return options;
         }
 
-        // TODO: remove all static methods
-        public static void Execute(Options options)
+        public void Execute(Options options)
         {
             CompilationTask task = new CompilationTask();
             foreach (string input in options.Inputs)
@@ -50,3 +53,5 @@ namespace Hime.HimeCC
         }
     }
 }
+// TODO: apply strict coding standards
+// - remove all static methods

@@ -51,8 +51,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="BaseTestSuite.cs" />
-    <Compile Include="himecc\Suite00_DefaultOptions.cs" />
-    <Compile Include="himecc\Suite01_Compile.cs" />
+    <Compile Include="himecc\Suite01_Program.cs" />
+    <Compile Include="himecc\Suite02_Compile.cs" />
     <Compile Include="Integration\Suite01_Resource.cs" />
     <Compile Include="Integration\Suite02_Compiler.cs" />
     <Compile Include="Integration\Suite00_FileCentralDogmaParser.cs" />

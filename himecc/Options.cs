@@ -17,7 +17,7 @@ namespace Hime.HimeCC
         [ValueList(typeof(List<string>))]
         public List<string> Inputs;
 
-        [Option("g", "grammar", Required=false, HelpText="Name of the grammar for which a parser shall be generated")]
+        [Option("g", "grammar", Required = false, HelpText="Name of the grammar for which a parser shall be generated")]
         public string GrammarName;
 
         [Option("n", "namespace", Required = false, HelpText = "Namespace for the generated Lexer and Parser classes")]
