@@ -12,22 +12,22 @@ namespace Hime.NUnit.himecc
     {
         private const string directory = "Test";
 
-        private void Generate(string[] command)
+        private void Generate(string command)
         {
             if (System.IO.Directory.Exists(directory))
                 System.IO.Directory.Delete(directory, true);
             System.IO.Directory.CreateDirectory(directory);
-            new Tools().Export(System.IO.Path.GetFileName(command[0]), command[0]);
-            HimeCC.Options options = HimeCC.Program.ParseArguments(command);
+            new Tools().Export(System.IO.Path.GetFileName(command), command);
+            HimeCC.Options options = HimeCC.Program.ParseArguments(new string[] { command });
             HimeCC.Program.Execute(options);
         }
         
-        private Assembly Compile(string[] command)
+        private Assembly Compile(string command)
         {
-            Generate(command);
+        	Generate(command);
             string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
             System.IO.File.Copy(redist, directory + "\\Hime.Redist.dll");
-            string code = System.IO.File.ReadAllText(command[0].Replace(".gram", ".cs"));
+            string code = System.IO.File.ReadAllText(command.Replace(".gram", ".cs"));
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
             compilerparams.GenerateExecutable = false;
@@ -55,7 +55,7 @@ namespace Hime.NUnit.himecc
         [Test]
         public void Test001_DefaultNamespace_GeneratedLexer()
         {
-            System.Reflection.Assembly assembly = Compile(new string[] { directory + "\\MathExp.gram" });
+            System.Reflection.Assembly assembly = Compile(directory + "\\MathExp.gram");
             System.Type lexer = assembly.GetType("MathExp.MathExp_Lexer");
             Assert.IsNotNull(lexer);
         }
@@ -63,7 +63,7 @@ namespace Hime.NUnit.himecc
         [Test]
         public void Test002_DefaultNamespace_GeneratedParser()
         {
-            System.Reflection.Assembly assembly = Compile(new string[] { directory + "\\MathExp.gram" });
+            System.Reflection.Assembly assembly = Compile(directory + "\\MathExp.gram");
             System.Type parser = assembly.GetType("MathExp.MathExp_Parser");
             Assert.IsNotNull(parser);
         }
@@ -71,7 +71,7 @@ namespace Hime.NUnit.himecc
         [Test]
         public void Test003_DontCrashOnEmptyFile()
         {
-            Generate(new string[] { directory + "\\Empty.gram" });
+            Generate(directory + "\\Empty.gram");
         }
     }
 }

@@ -52,5 +52,34 @@ namespace Hime.NUnit.Integration
             Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
         }
+        
+        // TODO:
+        [Ignore]
+        [Test]
+        public void Test003_Execute_LexerFileShouldBeGrammarNameSuffixLexer_Issue198()
+        {
+        	string grammar = 
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+            CompilationTask task = new CompilationTask();
+            task.InputRawData.Add(grammar);
+			task.GrammarName = "Test";
+            task.Method = Parsers.ParsingMethod.LR0;
+            Report result = task.Execute();
+            Assert.AreEqual("TestLexer.cs", task.LexerFile);
+        }
+        
+        [Ignore]
+        [Test]
+        public void Test004_Execute_ParserFileShouldBeGrammarNameSuffixLexer_Issue198()
+        {
+        	string grammar = 
+        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+            CompilationTask task = new CompilationTask();
+            task.InputRawData.Add(grammar);
+			task.GrammarName = "Test";
+            task.Method = Parsers.ParsingMethod.LR0;
+            Report result = task.Execute();
+            Assert.AreEqual("TestParser.cs", task.ParserFile);
+        }
 	}
 }

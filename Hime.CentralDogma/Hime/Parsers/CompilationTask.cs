@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Hime.Kernel.Reporting;
+using System.IO;
 
 namespace Hime.Parsers
 {
@@ -23,8 +24,6 @@ namespace Hime.Parsers
         private List<string> fileInputs;
         private string _namespace;
         private ParsingMethod method;
-        private string lexerFile;
-        private string parserFile;
         private AccessModifier modifier;
         private bool exportDebug;
         private bool exportLog;
@@ -35,12 +34,15 @@ namespace Hime.Parsers
 
         public ICollection<string> InputRawData { get { return rawInputs; } }
         public ICollection<string> InputFiles { get { return fileInputs; } }
-        // TODO: should never be null and should put setter as private
+        
+        // TODO: should never be null
         public string GrammarName
         {
-            private get; 
+            private get;
             set;
         }
+        
+        // TODO: should use default getters in the whole solution
         public string Namespace
         {
             get { return _namespace; }
@@ -53,13 +55,13 @@ namespace Hime.Parsers
         }
         public string LexerFile
         {
-            get { return lexerFile; }
-            set { lexerFile = value; }
+            get;
+            set;
         }
         public string ParserFile
         {
-            get { return parserFile; }
-            set { parserFile = value; }
+            get;
+            set;
         }
         public AccessModifier GeneratedCodeModifier
         {
@@ -101,8 +103,8 @@ namespace Hime.Parsers
         private Kernel.Namespace root;
         public Reporter reporter;
         private ParserGenerator generator;
-        private System.IO.StreamWriter lexerWriter;
-        private System.IO.StreamWriter parserWriter;
+        private StreamWriter lexerWriter;
+        private StreamWriter parserWriter;
         private string docFile;
 
         internal Kernel.Reporting.Reporter Reporter { get { return reporter; } }
@@ -154,7 +156,7 @@ namespace Hime.Parsers
             this.InitializeGenerator();
 
             Execute_BuildData(grammar);
-            Execute_OpenOutput();
+            ExecuteOpenOutput();
             grammar.Build(this);
             Execute_Close();
         }
@@ -162,7 +164,7 @@ namespace Hime.Parsers
         private void ExecuteExportLog()
         {
             if (!exportLog) return;
-            string file = parserFile.Replace(".cs", "_log.mht");
+            string file = this.ParserFile.Replace(".cs", "_log.mht");
             reporter.ExportMHTML(file, "Grammar Log");
         }
 
@@ -177,15 +179,16 @@ namespace Hime.Parsers
             }
             Hime.Kernel.Resources.ResourceCompiler compiler = new Hime.Kernel.Resources.ResourceCompiler(this.reporter);
             List<System.IO.TextReader> readers = new List<System.IO.TextReader>();
+            // TODO: they are both streams => could be unified!!
             foreach (string file in fileInputs)
             {
-                System.IO.TextReader reader = new System.IO.StreamReader(file);
+                TextReader reader = new StreamReader(file);
                 readers.Add(reader);
                 compiler.AddInput(reader, file);
             }
             foreach (string data in rawInputs)
             {
-                System.IO.TextReader reader = new System.IO.StringReader(data);
+                TextReader reader = new StringReader(data);
                 readers.Add(reader);
                 compiler.AddInput(reader);
             }
@@ -262,36 +265,54 @@ namespace Hime.Parsers
         {
             if (_namespace == null)
                 _namespace = grammar.CompleteName.ToString();
-            if (parserFile == null)
+            if (this.ParserFile == null)
             {
                 if (fileInputs.Count == 1)
-                    parserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(fileInputs[0]), grammar.LocalName + ".cs");
+                    this.ParserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(fileInputs[0]), grammar.LocalName + ".cs");
                 else
-                    parserFile = grammar.LocalName + ".cs";
+                    this.ParserFile = grammar.LocalName + ".cs";
             }
+            if (this.LexerFile == null) 
+            {
+            	this.LexerFile = this.ParserFile;
+            }
+            /*
+            // TODO: Shouldn't this be done earlier => as soon as the grammar name is determined
+            if (this.LexerFile == null)
+            {
+            	this.LexerFile = grammar.LocalName + "Lexer.cs";
+            }
+            // TODO: think about it, but should never be null?? Shouldn't this be done erarlier
+            if (this.ParserFile == null)
+            {
+            	this.ParserFile = grammar.LocalName + "Parser.cs";
+            }
+            */
             docFile = null;
             if (exportDoc)
-                docFile = parserFile.Replace(".cs", "_doc.mht");
+                docFile = this.ParserFile.Replace(".cs", "_doc.mht");
         }
         
-        private void Execute_OpenOutput()
+        private StreamWriter OpenOutputStream(string fileName)
         {
-            String name = "Hime Parser Generator ";
-            name += System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            if (lexerFile == null)
+        	StreamWriter result = new StreamWriter(fileName, false, Encoding.UTF8);
+        	WriteHeader(result);
+        	return result;
+        }
+        
+        private void ExecuteOpenOutput()
+        {            
+            lexerWriter = OpenOutputStream(this.LexerFile);
+            if (this.ParserFile == this.LexerFile)
             {
-                lexerWriter = new System.IO.StreamWriter(parserFile, false, System.Text.Encoding.UTF8);
-                parserWriter = lexerWriter;
-                Execute_WriteHeader(lexerWriter, name);
+                this.parserWriter = this.lexerWriter;
             }
             else
             {
-                lexerWriter = new System.IO.StreamWriter(lexerFile, false, System.Text.Encoding.UTF8);
-                Execute_WriteHeader(lexerWriter, name);
-                parserWriter = new System.IO.StreamWriter(parserFile, false, System.Text.Encoding.UTF8);
-                Execute_WriteHeader(parserWriter, name);
+            	this.parserWriter = OpenOutputStream(this.ParserFile);
             }
         }
+
         private void Execute_Close()
         {
             lexerWriter.WriteLine("}");
@@ -303,8 +324,12 @@ namespace Hime.Parsers
             }
         }
 
-        private void Execute_WriteHeader(System.IO.StreamWriter writer, string name)
+        private void WriteHeader(System.IO.StreamWriter writer)
         {
+        	// TODO: maybe write a getter GetVersion for this two lines?
+            String name = "Hime Parser Generator ";
+            name += System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             writer.WriteLine("/*");
             writer.WriteLine(" * WARNING: this file has been generated by");
             writer.WriteLine(" * " + name);

@@ -29,6 +29,8 @@ namespace Hime.Kernel
             task.GrammarName = "Hime.Kernel.FileCentralDogma";
             task.Namespace = "Hime.Kernel.Resources.Parser";
             task.Method = Parsers.ParsingMethod.LALR1;
+            // TODO: this assignment is a bit strange, should not be done like that?
+            // see how it is done with options in himecc
             task.ParserFile = path + "KernelResources.Parser.cs";
             task.ExportLog = true;
             Report result = task.Execute();
