@@ -31,9 +31,7 @@ namespace Hime.Parsers.CF.LR
             Export_States();
             Export_Actions();
             Export_Setup();
-            ExportConstructor();
-            stream.WriteLine("    }");
-            return true;
+            return base.Export(expected, options);
         }
         protected void Export_Setup()
         {

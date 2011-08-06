@@ -58,9 +58,7 @@ namespace Hime.Parsers.CF.LR
             Export_Actions();
             Export_Setup();
             Export_StaticConstructor();
-            ExportConstructor();
-            stream.WriteLine("    }");
-            return true;
+            return base.Export(expected, options);
         }
         protected void Export_StaticConstructor()
         {
