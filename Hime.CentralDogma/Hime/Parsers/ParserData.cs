@@ -15,19 +15,22 @@ namespace Hime.Parsers
     public abstract class ParserData
     {
         protected ParserGenerator generator;
-        protected CFGrammar grammar;
         protected Graph graph;
         protected List<Terminal> terminals;
         protected List<CFVariable> variables;
         protected bool debug;
 
-        public CFGrammar Grammar { get { return grammar; } }
+        public CFGrammar Grammar { get; protected set; }
         public Graph Graph { get { return graph; } }
         public ParserGenerator Generator { get { return generator; } }
 
+        internal protected string GrammarName { get { return this.Grammar.LocalName; } }
+
+        internal protected List<CFRule> GrammarRules { get { return this.Grammar.Rules; } }
+
         public ParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
         {
-            this.grammar = gram;
+            this.Grammar = gram;
             this.graph = graph;
             this.generator = generator;
             this.variables = new List<CFVariable>(gram.Variables);

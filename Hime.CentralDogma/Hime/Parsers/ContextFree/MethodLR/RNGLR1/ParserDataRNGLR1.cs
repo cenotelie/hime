@@ -20,7 +20,7 @@ namespace Hime.Parsers.CF.LR
         protected void DetermineNullables()
         {
             nullableChoices.Add(new CFRuleDefinition());
-            foreach (CFVariable var in grammar.Variables)
+            foreach (CFVariable var in this.Grammar.Variables)
             {
                 if (var.Firsts.Contains(TerminalEpsilon.Instance))
                     nullableVars.Add(var);
@@ -42,16 +42,16 @@ namespace Hime.Parsers.CF.LR
             reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
             debug = options.ExportDebug;
-            terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
+            terminalsAccessor = this.GrammarName + "_Lexer.terminals";
             DetermineNullables();
             stream = options.ParserWriter;
-            stream.WriteLine("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + grammar.LocalName + "_Parser : BaseRNGLR1Parser");
+            stream.WriteLine("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.GrammarName + "_Parser : BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
             Export_Variables(stream);
             Export_NullVars();
             Export_NullChoices();
-            foreach (CFRule rule in grammar.Rules)
+            foreach (CFRule rule in this.GrammarRules)
                 Export_Production(rule);
             Export_Rules();
             Export_States();
@@ -65,7 +65,7 @@ namespace Hime.Parsers.CF.LR
         }
         protected void Export_StaticConstructor()
         {
-            stream.WriteLine("        static " + grammar.LocalName + "_Parser()");
+            stream.WriteLine("        static " + this.GrammarName + "_Parser()");
             stream.WriteLine("        {");
             stream.WriteLine("            BuildNullables();");
             stream.WriteLine("        }");
@@ -78,27 +78,27 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine("            nullChoicesSPPF = staticNullChoicesSPPF;");
             stream.WriteLine("            rules = staticRules;");
             stream.WriteLine("            states = staticStates;");
-            stream.WriteLine("            axiomID = 0x" + grammar.GetVariable(grammar.GetOption("Axiom")).SID.ToString("X") + ";");
-            stream.WriteLine("            axiomNullSPPF = 0x" + grammar.GetVariable(grammar.GetOption("Axiom")).SID.ToString("X") + ";");
-            stream.WriteLine("            axiomPrimeID = 0x" + grammar.GetVariable("_Axiom_").SID.ToString("X") + ";");
+            stream.WriteLine("            axiomID = 0x" + this.Grammar.GetVariable(this.Grammar.GetOption("Axiom")).SID.ToString("X") + ";");
+            stream.WriteLine("            axiomNullSPPF = 0x" + this.Grammar.GetVariable(this.Grammar.GetOption("Axiom")).SID.ToString("X") + ";");
+            stream.WriteLine("            axiomPrimeID = 0x" + this.Grammar.GetVariable("_Axiom_").SID.ToString("X") + ";");
             stream.WriteLine("        }");
         }
         protected void Export_Constructor()
         {
-            if (grammar.Actions.GetEnumerator().MoveNext())
+            if (this.Grammar.Actions.GetEnumerator().MoveNext())
             {
                 stream.WriteLine("        private Actions actions;");
-                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
+                stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
             }
             else
             {
-                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
+                stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer) : base (lexer) {}");
             }
         }
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in grammar.Actions)
+            foreach (Action action in this.Grammar.Actions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
@@ -126,7 +126,7 @@ namespace Hime.Parsers.CF.LR
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + grammar.LocalName + "_Parser)parser).actions." + action.LocalName + "), 0));");
+                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + this.GrammarName + "_Parser)parser).actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
                     stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0, SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
@@ -145,7 +145,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.WriteLine("        private static Rule[] staticRules = {");
             bool first = true;
-            foreach (CFRule Rule in grammar.Rules)
+            foreach (CFRule Rule in this.GrammarRules)
             {
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
@@ -262,7 +262,7 @@ namespace Hime.Parsers.CF.LR
                 {
                     int index = 0;
                     index = nullableVars.IndexOf(Reduction.ToReduceRule.Variable);
-                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullVarsSPPF[0x" + index.ToString("X") + "])");
+                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + this.GrammarRules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullVarsSPPF[0x" + index.ToString("X") + "])");
                 }
                 else
                 {
@@ -272,7 +272,7 @@ namespace Hime.Parsers.CF.LR
                         CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAtIndex(Reduction.ReduceLength);
                         index = nullableChoices.IndexOf(def);
                     }
-                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + grammar.Rules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
+                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + this.GrammarRules.IndexOf(Reduction.ToReduceRule).ToString("X") + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
                 }
                 first = false;
             }

@@ -9,20 +9,19 @@ namespace Hime.Parsers.CF.LR
         protected string terminalsAccessor;
 
         public ParserDataLR0(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
-
-
+        
         public override bool Export(IList<Terminal> expected, CompilationTask options)
         {
             reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
             debug = options.ExportDebug;
-            terminalsAccessor = grammar.LocalName + "_Lexer.terminals";
+            terminalsAccessor = this.GrammarName + "_Lexer.terminals";
             stream = options.ParserWriter;
-            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + grammar.LocalName + "_Parser : ");
+            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.GrammarName + "_Parser : ");
             stream.WriteLine("LR0TextParser");
             stream.WriteLine("    {");
             Export_Variables(stream);
-            foreach (CFRule rule in grammar.Rules)
+            foreach (CFRule rule in this.Grammar.Rules)
                 Export_Production(rule);
             Export_Rules();
             Export_States();
@@ -43,20 +42,20 @@ namespace Hime.Parsers.CF.LR
         }
         protected void Export_Constructor()
         {
-            if (grammar.Actions.GetEnumerator().MoveNext())
+            if (this.Grammar.Actions.GetEnumerator().MoveNext())
             {
                 stream.WriteLine("        private Actions actions;");
-                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
+                stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
             }
             else
             {
-                stream.WriteLine("        public " + grammar.LocalName + "_Parser(" + grammar.LocalName + "_Lexer lexer) : base (lexer) {}");
+                stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer) : base (lexer) {}");
             }
         }
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in grammar.Actions)
+            foreach (Action action in this.Grammar.Actions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
@@ -74,7 +73,7 @@ namespace Hime.Parsers.CF.LR
             int length = rule.Definition.GetChoiceAtIndex(0).Length;
             stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Variable.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
             stream.WriteLine("        {");
-            stream.WriteLine("            " + grammar.LocalName + "_Parser parser = baseParser as " + grammar.LocalName + "_Parser;");
+            stream.WriteLine("            " + this.GrammarName + "_Parser parser = baseParser as " + this.GrammarName + "_Parser;");
             if (length != 0)
             {
                 stream.WriteLine("            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;");
@@ -119,7 +118,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.WriteLine("        private static LRRule[] staticRules = {");
             bool first = true;
-            foreach (CFRule Rule in grammar.Rules)
+            foreach (CFRule Rule in this.Grammar.Rules)
             {
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
@@ -250,7 +249,7 @@ namespace Hime.Parsers.CF.LR
                 stream.WriteLine("               null,");
             }
             // Write reductions
-            stream.Write("               staticRules[0x" + grammar.Rules.IndexOf(state.Reductions[0].ToReduceRule).ToString("X") + "]");
+            stream.Write("               staticRules[0x" + this.GrammarRules.IndexOf(state.Reductions[0].ToReduceRule).ToString("X") + "]");
             stream.WriteLine(")");
         }
         
