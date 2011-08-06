@@ -6,24 +6,12 @@ using System.IO;
 
 namespace Hime.Parsers
 {
-    public enum ParsingMethod : byte
-    {
-        LR0 = 1,
-        LR1 = 2,
-        LALR1 = 3,
-        RNGLR1 = 4,
-        RNGLALR1 = 0,
-        LRStar = 5,
-        LRAutomata = 6
-    }
-
     public sealed class CompilationTask
     {
         // parameters
         private List<string> rawInputs;
         private List<string> fileInputs;
         private string _namespace;
-        private ParsingMethod method;
         private AccessModifier modifier;
         private bool exportDebug;
         private bool exportLog;
@@ -48,11 +36,13 @@ namespace Hime.Parsers
             get { return _namespace; }
             set { _namespace = value; }
         }
-        public ParsingMethod Method
+
+        public EParsingMethod Method
         {
-            get { return method; }
-            set { method = value; }
+            private get;
+            set;
         }
+        
         public string LexerFile
         {
             get;
@@ -120,7 +110,7 @@ namespace Hime.Parsers
             rawInputs = new List<string>();
             fileInputs = new List<string>();
             modifier = AccessModifier.Public;
-            method = ParsingMethod.RNGLALR1;
+            this.Method = EParsingMethod.RNGLALR1;
             exportDebug = false;
             exportLog = false;
             exportDoc = false;
@@ -236,48 +226,36 @@ namespace Hime.Parsers
         
         private void InitializeGenerator()
         {
-            switch (method)
+            switch (this.Method)
             {
-                case ParsingMethod.LR0:
+                case EParsingMethod.LR0:
                     this.generator = new Hime.Parsers.CF.LR.MethodLR0();
                     return;
-                case ParsingMethod.LR1:
+                case EParsingMethod.LR1:
                     this.generator = new Hime.Parsers.CF.LR.MethodLR1();
                     return;
-                case ParsingMethod.LALR1:
+                case EParsingMethod.LALR1:
                     this.generator = new Hime.Parsers.CF.LR.MethodLALR1();
                     return;
-                case ParsingMethod.LRStar:
+                case EParsingMethod.LRStar:
                     this.generator = new Hime.Parsers.CF.LR.MethodLRStar();
                     return;
-                case ParsingMethod.RNGLR1:
+                case EParsingMethod.RNGLR1:
                     this.generator = new Hime.Parsers.CF.LR.MethodRNGLR1();
                     return;
-                case ParsingMethod.RNGLALR1:
+                case EParsingMethod.RNGLALR1:
                     this.generator = new Hime.Parsers.CF.LR.MethodRNGLALR1();
                     return;
             }
-            reporter.Error("Compiler", "Unsupported parsing method: " + method.ToString());
-            throw new ArgumentException("Unsupported parsing method: " + method.ToString());
+            string message = "Unsupported parsing method: " + this.Method.ToString();
+            reporter.Error("Compiler", message);
+            throw new ArgumentException(message);
         }
         
         private void ExecuteBuildData(Grammar grammar)
         {
             if (_namespace == null)
                 _namespace = grammar.CompleteName.ToString();
-            /* TODO: remove this
-            if (this.ParserFile == null)
-            {
-                if (fileInputs.Count == 1)
-                    this.ParserFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(fileInputs[0]), grammar.LocalName + ".cs");
-                else
-                    this.ParserFile = grammar.LocalName + ".cs";
-            }
-            if (this.LexerFile == null) 
-            {
-            	this.LexerFile = this.ParserFile;
-            }
-            */
             // TODO: Shouldn't this be done earlier => as soon as the grammar name is determined
             if (this.LexerFile == null)
             {

@@ -22,7 +22,7 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = Parsers.ParsingMethod.LR0;
+            task.Method = EParsingMethod.LR0;
             task.ExecuteBody();
         }
 
@@ -34,7 +34,7 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = Parsers.ParsingMethod.LR0;
+            task.Method = EParsingMethod.LR0;
             task.ExecuteLoadData();
             Assert.IsFalse(task.Result.HasErrors);
         }
@@ -48,7 +48,7 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = Parsers.ParsingMethod.LR0;
+            task.Method = EParsingMethod.LR0;
             Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
         }
@@ -61,7 +61,7 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = Parsers.ParsingMethod.LR0;
+            task.Method = EParsingMethod.LR0;
             Report result = task.Execute();
             Assert.AreEqual("TestLexer.cs", task.LexerFile);
         }
@@ -74,7 +74,7 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = Parsers.ParsingMethod.LR0;
+            task.Method = EParsingMethod.LR0;
             Report result = task.Execute();
             Assert.AreEqual("TestParser.cs", task.ParserFile);
         }

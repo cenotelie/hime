@@ -21,7 +21,7 @@ namespace Hime.NUnit
             return data;
         }
 
-        protected Report CompileResource(string resource, ParsingMethod method)
+        protected Report CompileResource(string resource, EParsingMethod method)
         {
             CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(GetAllTextFor(resource));
@@ -31,7 +31,7 @@ namespace Hime.NUnit
             return report;
         }
 
-        protected Report CompileRaw(string rawInput, ParsingMethod method)
+        protected Report CompileRaw(string rawInput, EParsingMethod method)
         {
             CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(rawInput);
