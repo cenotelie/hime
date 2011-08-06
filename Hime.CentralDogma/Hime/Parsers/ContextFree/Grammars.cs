@@ -5,7 +5,7 @@ namespace Hime.Parsers.CF
 {
     public interface CFParserGenerator : ParserGenerator
     {
-        ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter);
+        IParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter);
     }
 
     public abstract class CFGrammar : Grammar
@@ -182,7 +182,7 @@ namespace Hime.Parsers.CF
         
         public abstract CFGrammar Clone();
 
-        protected void Export_Documentation(ParserData data, CompilationTask options)
+        protected void Export_Documentation(IParserData data, CompilationTask options)
         {
             string directory = options.Documentation + "_temp";
             System.IO.Directory.CreateDirectory(directory);

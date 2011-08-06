@@ -14,8 +14,8 @@ namespace Hime.Parsers.CF.LR
                 conflict.IsError = false;
         }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public IParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public IParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("RNGLALR(1)", "Constructing RNGLALR(1) data ...");

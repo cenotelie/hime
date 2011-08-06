@@ -12,7 +12,6 @@ namespace Hime.Parsers
         private List<string> rawInputs;
         private List<string> fileInputs;
         private string _namespace;
-        private AccessModifier modifier;
         private bool exportDebug;
         private bool exportLog;
         private bool exportDoc;
@@ -53,11 +52,13 @@ namespace Hime.Parsers
             get;
             set;
         }
-        public AccessModifier GeneratedCodeModifier
+        
+        internal EAccessModifier GeneratedCodeModifier
         {
-            get { return modifier; }
-            set { modifier = value; }
+            get;
+            private set;
         }
+        
         public bool ExportDebug
         {
             get { return exportDebug; }
@@ -109,7 +110,7 @@ namespace Hime.Parsers
         {
             rawInputs = new List<string>();
             fileInputs = new List<string>();
-            modifier = AccessModifier.Public;
+            this.GeneratedCodeModifier = EAccessModifier.Public;
             this.Method = EParsingMethod.RNGLALR1;
             exportDebug = false;
             exportLog = false;

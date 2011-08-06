@@ -8,8 +8,8 @@ namespace Hime.Parsers.CF.LR
 
         public MethodLR0() { }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public IParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public IParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LR(0)", "Constructing LR(0) data ...");

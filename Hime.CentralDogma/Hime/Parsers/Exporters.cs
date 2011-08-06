@@ -29,7 +29,7 @@ namespace Hime.Parsers.Exporters
             }
         }
 
-        public List<Terminal> Export(AccessModifier modifier)
+        public List<Terminal> Export(EAccessModifier modifier)
         {
             stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "_Lexer : LexerText");
             stream.WriteLine("    {");

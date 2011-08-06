@@ -8,8 +8,8 @@ namespace Hime.Parsers.CF.LR
 
         public MethodGLR1() { }
 
-        public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
-        public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
+        public IParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
+        public IParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
         {
             Reporter.Info("GLR(1)", "Constructing GLR(1) data ...");
             Graph Graph = ConstructGraph(Grammar, Reporter);
