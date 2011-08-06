@@ -2,7 +2,7 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class ParserDataLRStar : ParserDataLR
+    class ParserDataLRStar : ParserData
     {
         private Kernel.Reporting.Reporter reporter;
         private Dictionary<State, DeciderLRStar> deciders;

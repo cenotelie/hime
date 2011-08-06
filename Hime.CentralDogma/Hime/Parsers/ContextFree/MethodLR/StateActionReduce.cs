@@ -8,7 +8,7 @@ using System;
 
 namespace Hime.Parsers.CF.LR
 {
-    class StateActionReduce : StateAction
+    public class StateActionReduce : StateAction
     {
         protected Terminal lookahead;
         protected CFRule toReduce;

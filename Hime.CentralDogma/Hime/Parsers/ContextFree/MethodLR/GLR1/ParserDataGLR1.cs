@@ -2,7 +2,7 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class ParserDataGLR1 : ParserDataLR
+    class ParserDataGLR1 : ParserData
     {
         //protected System.IO.StreamWriter stream;
 

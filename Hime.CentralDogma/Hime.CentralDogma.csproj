@@ -115,13 +115,12 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRSets.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRItems.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\BaseMethod.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\ParserDataLR.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLALR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLALR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\Actions.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\LRSets.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\Method.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\ParserDatRNGLR1.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\ParserDataRNGLR1.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateActionReduce.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Rules.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Symbols.cs" />
@@ -129,7 +128,7 @@
     <Compile Include="Hime\Parsers\Exporters.cs" />
     <Compile Include="Hime\Parsers\Grammars.cs" />
     <Compile Include="Hime\Parsers\EParsingMethod.cs" />
-    <Compile Include="Hime\Parsers\IParserData.cs" />
+    <Compile Include="Hime\Parsers\ParserData.cs" />
     <Compile Include="Hime\Parsers\Terminal.cs" />
     <Compile Include="Hime\Parsers\TerminalSet.cs" />
     <Compile Include="Hime\Parsers\Unicode.cs" />

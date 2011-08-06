@@ -2,7 +2,7 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class Graph
+    public class Graph
     {
         private List<State> sets;
 

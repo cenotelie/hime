@@ -1,10 +1,18 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * Author: Charles Hymans
+ * Date: 06/08/2011
+ * Time: 23:03
+ * 
+ */
 using System.Xml;
+using System.Collections.Generic;
 using System.IO;
+using Hime.Parsers.CF;
+using Hime.Parsers.CF.LR;
 
-namespace Hime.Parsers.CF.LR
+namespace Hime.Parsers
 {
-    abstract class ParserDataLR : IParserData
+    public abstract class ParserData
     {
         protected ParserGenerator generator;
         protected CFGrammar grammar;
@@ -17,7 +25,7 @@ namespace Hime.Parsers.CF.LR
         public Graph Graph { get { return graph; } }
         public ParserGenerator Generator { get { return generator; } }
 
-        public ParserDataLR(ParserGenerator generator, CFGrammar gram, Graph graph)
+        public ParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
         {
             this.grammar = gram;
             this.graph = graph;

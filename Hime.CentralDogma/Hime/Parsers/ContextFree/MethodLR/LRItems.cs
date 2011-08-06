@@ -2,7 +2,7 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    enum ItemAction
+    public enum ItemAction
     {
         Shift,
         Reduce
@@ -10,7 +10,7 @@ namespace Hime.Parsers.CF.LR
 
 
 
-    abstract class Item
+    public abstract class Item
     {
         public const string dot = "•";
 

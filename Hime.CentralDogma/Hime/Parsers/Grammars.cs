@@ -17,6 +17,6 @@ namespace Hime.Parsers
     public interface ParserGenerator
     {
         string Name { get; }
-        IParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter);
+        ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter);
     }
 }

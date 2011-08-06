@@ -2,14 +2,14 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    enum ConflictType
+    public enum ConflictType
     {
         ShiftReduce,
         ReduceReduce,
         None
     }
 
-    class ConflictExample
+    public class ConflictExample
     {
         private List<Terminal> input;
         private Terminal lookahead;
@@ -38,7 +38,7 @@ namespace Hime.Parsers.CF.LR
         }
     }
 
-    class Conflict : Hime.Kernel.Reporting.Entry
+    public class Conflict : Hime.Kernel.Reporting.Entry
     {
         private string component;
         private State state;

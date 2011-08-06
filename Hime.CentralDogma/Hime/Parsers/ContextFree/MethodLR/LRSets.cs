@@ -2,7 +2,7 @@
 
 namespace Hime.Parsers.CF.LR
 {
-    class StateKernel
+    public class StateKernel
     {
         private Dictionary<CFRule, Dictionary<int, List<Item>>> dictItems;
         private List<Item> items;
@@ -113,7 +113,7 @@ namespace Hime.Parsers.CF.LR
         }
     }
 
-    abstract class StateReductions
+    public abstract class StateReductions
     {
     	private List<StateActionReduce> content;
         protected List<Conflict> conflicts;
@@ -146,7 +146,7 @@ namespace Hime.Parsers.CF.LR
         }
     }
     
-    class State
+    public class State
     {
         protected int iD;
         protected StateKernel kernel;

@@ -106,7 +106,7 @@ namespace Hime.Parsers.CF
 
             //Generate parser
             reporter.Info("Grammar", "Parsing method is " + options.ParserGenerator.Name);
-            IParserData Data = options.ParserGenerator.Build(this,reporter);
+            ParserData Data = options.ParserGenerator.Build(this,reporter);
             if (Data == null) { options.Reporter.EndSection(); return false; }
             bool result = Data.Export(expected, options);
             options.Reporter.EndSection();
