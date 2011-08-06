@@ -5,7 +5,6 @@ namespace Hime.Parsers.CF.LR
     class ParserDataLR1 : ParserData
     {
         protected Kernel.Reporting.Reporter reporter;
-        protected System.IO.StreamWriter stream;
         protected string terminalsAccessor;
 
         public ParserDataLR1(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
@@ -32,7 +31,7 @@ namespace Hime.Parsers.CF.LR
             Export_States();
             Export_Actions();
             Export_Setup();
-            Export_Constructor();
+            ExportConstructor();
             stream.WriteLine("    }");
             return true;
         }
@@ -45,18 +44,7 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine("            errorSimulationLength = 3;");
             stream.WriteLine("        }");
         }
-        protected void Export_Constructor()
-        {
-            if (this.Grammar.Actions.GetEnumerator().MoveNext())
-            {
-                stream.WriteLine("        private Actions actions;");
-                stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer, Actions actions) : base (lexer) { this.actions = actions; }");
-            }
-            else
-            {
-                stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer) : base (lexer) {}");
-            }
-        }
+        
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();

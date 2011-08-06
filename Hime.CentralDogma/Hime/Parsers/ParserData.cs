@@ -14,6 +14,7 @@ namespace Hime.Parsers
 {
     public abstract class ParserData
     {
+    	protected StreamWriter stream;
         protected ParserGenerator generator;
         protected Graph graph;
         protected List<Terminal> terminals;
@@ -36,7 +37,12 @@ namespace Hime.Parsers
             this.variables = new List<CFVariable>(gram.Variables);
         }
 
-        public abstract bool Export(IList<Terminal> expected, CompilationTask options);
+        public virtual bool Export(IList<Terminal> expected, CompilationTask options)
+        {
+        	ExportConstructor();
+            stream.WriteLine("    }");
+            return true;
+        }
 
         public XmlNode SerializeXML(XmlDocument Document)
         {
@@ -93,6 +99,19 @@ namespace Hime.Parsers
                 files.Add(directory + "\\GraphParser.svg");
             }
             return files;
+        }
+
+		protected void ExportConstructor()
+        {
+          	string argument = "";
+        	string body = "";
+            if (this.Grammar.Actions.GetEnumerator().MoveNext())
+            {
+                stream.WriteLine("        private Actions actions;");
+                argument = ", Actions actions";
+                body = "this.actions = actions;";
+            }
+            stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer" + argument + ") : base (lexer) { " + body + " }");
         }
     }
 }
