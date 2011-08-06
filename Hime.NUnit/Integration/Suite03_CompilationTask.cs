@@ -53,8 +53,6 @@ namespace Hime.NUnit.Integration
             Assert.IsFalse(result.HasErrors);
         }
         
-        // TODO:
-        [Ignore]
         [Test]
         public void Test003_Execute_LexerFileShouldBeGrammarNameSuffixLexer_Issue198()
         {
@@ -68,7 +66,6 @@ namespace Hime.NUnit.Integration
             Assert.AreEqual("TestLexer.cs", task.LexerFile);
         }
         
-        [Ignore]
         [Test]
         public void Test004_Execute_ParserFileShouldBeGrammarNameSuffixLexer_Issue198()
         {

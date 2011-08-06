@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.Reflection;
 using Hime.NUnit.Integration;
 using Hime.HimeCC;
+using System.IO;
 	
 namespace Hime.NUnit.himecc
 {
@@ -12,22 +13,25 @@ namespace Hime.NUnit.himecc
     public class Suite02_Compile
     {
         private const string directory = "Test";
-
-        private void Generate(string command)
+      	string source = Path.Combine(directory, "MathExp.gram");
+      	string destination = Path.Combine(directory, "MathExp.cs");
+      	
+        private void Generate(string[] command)
         {
             if (System.IO.Directory.Exists(directory))
                 System.IO.Directory.Delete(directory, true);
             System.IO.Directory.CreateDirectory(directory);
-            new Tools().Export(System.IO.Path.GetFileName(command), command);
-            Program.Main(new string[] { command });
+            new Tools().Export(Path.GetFileName(command[0]), command[0]);
+            Program.Main(command);
         }
         
-        private Assembly Compile(string command)
+        private Assembly Compile()
         {
-        	Generate(command);
+   	      	string [] command = new String[] { source, "--lexer", destination, "--parser", destination};
+	       	Generate(command);
             string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
             System.IO.File.Copy(redist, directory + "\\Hime.Redist.dll");
-            string code = System.IO.File.ReadAllText(command.Replace(".gram", ".cs"));
+            string code = File.ReadAllText(command[0].Replace(".gram", ".cs"));
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
             compilerparams.GenerateExecutable = false;
@@ -55,15 +59,23 @@ namespace Hime.NUnit.himecc
         [Test]
         public void Test001_DefaultNamespace_GeneratedLexer()
         {
-            System.Reflection.Assembly assembly = Compile(directory + "\\MathExp.gram");
+   	      	string [] command = new String[] { source, "--lexer", destination, "--parser", destination};
+        	Generate(command);
+            File.ReadAllText(destination);
+        }
+
+        [Test]
+        public void Test002_DefaultNamespace_GeneratedLexer()
+        {
+        	Assembly assembly = Compile();
             System.Type lexer = assembly.GetType("MathExp.MathExp_Lexer");
             Assert.IsNotNull(lexer);
         }
 
         [Test]
-        public void Test002_DefaultNamespace_GeneratedParser()
+        public void Test003_DefaultNamespace_GeneratedParser()
         {
-            System.Reflection.Assembly assembly = Compile(directory + "\\MathExp.gram");
+        	System.Reflection.Assembly assembly = Compile();
             Type parser = assembly.GetType("MathExp.MathExp_Parser");
             Assert.IsNotNull(parser);
         }
@@ -71,7 +83,7 @@ namespace Hime.NUnit.himecc
         [Test]
         public void Test003_DontCrashOnEmptyFile()
         {
-            Generate(directory + "\\Empty.gram");
+        	Generate(new string[] { Path.Combine(directory, "Empty.gram") });
         }
     }
 }

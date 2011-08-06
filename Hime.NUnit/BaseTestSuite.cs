@@ -36,7 +36,8 @@ namespace Hime.NUnit
             CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(rawInput);
             task.Method = method;
-            task.ParserFile = "Test.cs";
+            task.LexerFile = "Test.cs";
+            task.ParserFile = task.LexerFile;
             Report report = task.Execute();
             return report;
         }

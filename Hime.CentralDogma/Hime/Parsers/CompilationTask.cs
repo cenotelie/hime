@@ -155,7 +155,7 @@ namespace Hime.Parsers
 
             this.InitializeGenerator();
 
-            Execute_BuildData(grammar);
+            ExecuteBuildData(grammar);
             ExecuteOpenOutput();
             grammar.Build(this);
             Execute_Close();
@@ -261,10 +261,11 @@ namespace Hime.Parsers
             throw new ArgumentException("Unsupported parsing method: " + method.ToString());
         }
         
-        private void Execute_BuildData(Grammar grammar)
+        private void ExecuteBuildData(Grammar grammar)
         {
             if (_namespace == null)
                 _namespace = grammar.CompleteName.ToString();
+            /* TODO: remove this
             if (this.ParserFile == null)
             {
                 if (fileInputs.Count == 1)
@@ -276,7 +277,7 @@ namespace Hime.Parsers
             {
             	this.LexerFile = this.ParserFile;
             }
-            /*
+            */
             // TODO: Shouldn't this be done earlier => as soon as the grammar name is determined
             if (this.LexerFile == null)
             {
@@ -287,7 +288,7 @@ namespace Hime.Parsers
             {
             	this.ParserFile = grammar.LocalName + "Parser.cs";
             }
-            */
+            
             docFile = null;
             if (exportDoc)
                 docFile = this.ParserFile.Replace(".cs", "_doc.mht");
