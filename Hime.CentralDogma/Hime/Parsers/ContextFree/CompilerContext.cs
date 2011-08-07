@@ -43,7 +43,7 @@ namespace Hime.Parsers.CF
             definitionNode = Copied.definitionNode;
             foreach (CFGrammarTemplateRuleInstance Instance in Copied.instances)
             {
-                CFVariable HeadVar = Data.GetVariable(Instance.HeadVariable.LocalName);
+                Variable HeadVar = Data.GetVariable(Instance.HeadVariable.LocalName);
                 CFGrammarTemplateRuleParameters Params = new CFGrammarTemplateRuleParameters();
                 foreach (Symbol Symbol in Instance.Parameters)
                     Params.Add(Data.GetSymbol(Symbol.LocalName));
@@ -51,7 +51,7 @@ namespace Hime.Parsers.CF
             }
         }
 
-        public CFVariable GetVariable(CFGrammarCompilerContext Context, CFGrammarTemplateRuleParameters Parameters)
+        public Variable GetVariable(CFGrammarCompilerContext Context, CFGrammarTemplateRuleParameters Parameters)
         {
             foreach (CFGrammarTemplateRuleInstance Instance in instances)
             {
@@ -68,10 +68,10 @@ namespace Hime.Parsers.CF
     class CFGrammarTemplateRuleInstance
     {
         private CFGrammarTemplateRule templateRule;
-        private CFVariable variable;
+        private Variable variable;
         private CFGrammarTemplateRuleParameters parameters;
 
-        public CFVariable HeadVariable { get { return variable; } }
+        public Variable HeadVariable { get { return variable; } }
         public CFGrammarTemplateRuleParameters Parameters { get { return parameters; } }
 
         public CFGrammarTemplateRuleInstance(CFGrammarTemplateRule TemplateRule, CFGrammarTemplateRuleParameters Parameters, CFGrammar Data)
@@ -94,7 +94,7 @@ namespace Hime.Parsers.CF
             // Set parent template rule
             templateRule = TemplateRule;
         }
-        public CFGrammarTemplateRuleInstance(CFGrammarTemplateRule TemplateRule, CFGrammarTemplateRuleParameters Parameters, CFVariable Variable)
+        public CFGrammarTemplateRuleInstance(CFGrammarTemplateRule TemplateRule, CFGrammarTemplateRuleParameters Parameters, Variable Variable)
         {
             templateRule = TemplateRule;
             parameters = Parameters;
@@ -166,7 +166,7 @@ namespace Hime.Parsers.CF
             return false;
         }
 
-        public CFVariable GetVariableFromMetaRule(string Name, CFGrammarTemplateRuleParameters Parameters, CFGrammarCompilerContext Context)
+        public Variable GetVariableFromMetaRule(string Name, CFGrammarTemplateRuleParameters Parameters, CFGrammarCompilerContext Context)
         {
             foreach (CFGrammarTemplateRule TemplateRule in templateRules)
             {

@@ -18,7 +18,7 @@ namespace Hime.Parsers
         protected ParserGenerator generator;
         protected Graph graph;
         protected List<Terminal> terminals;
-        protected List<CFVariable> variables;
+        protected List<Variable> variables;
         protected bool debug;
 
         internal protected CFGrammar Grammar { get; private set; }
@@ -38,7 +38,7 @@ namespace Hime.Parsers
         
         internal protected ICollection<Action> GrammarActions { get { return this.Grammar.Actions; } }
         
-        internal protected ICollection<CFVariable> GrammarVariables { get { return this.Grammar.Variables; } }
+        internal protected ICollection<Variable> GrammarVariables { get { return this.Grammar.Variables; } }
         
         internal protected string GetVariable(string name)
         {
@@ -55,7 +55,7 @@ namespace Hime.Parsers
             this.Grammar = gram;
             this.graph = graph;
             this.generator = generator;
-            this.variables = new List<CFVariable>(gram.Variables);
+            this.variables = new List<Variable>(gram.Variables);
         }
 
         public virtual bool Export(IList<Terminal> expected, CompilationTask options)
@@ -92,7 +92,7 @@ namespace Hime.Parsers
         {
             stream.WriteLine("        public static readonly SymbolVariable[] variables = {");
             bool first = true;
-            foreach (CFVariable var in variables)
+            foreach (Variable var in variables)
             {
                 if (!first) stream.WriteLine(", ");
                 stream.Write("            ");

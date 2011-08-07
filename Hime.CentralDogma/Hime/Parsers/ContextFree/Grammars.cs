@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Hime.Kernel.Reporting;
+using System.Xml;
 
 namespace Hime.Parsers.CF
 {
@@ -14,7 +15,7 @@ namespace Hime.Parsers.CF
         protected ushort nextSID;
         protected Dictionary<string, string> options;
         protected Dictionary<string, Terminal> terminals;
-        protected Dictionary<string, CFVariable> variables;
+        protected Dictionary<string, Variable> variables;
         protected Dictionary<string, Virtual> virtuals;
         protected Dictionary<string, Action> actions;
         internal List<CFGrammarTemplateRule> templateRules;
@@ -23,7 +24,7 @@ namespace Hime.Parsers.CF
         public int NextSID { get { return nextSID; } }
         public ICollection<string> Options { get { return options.Keys; } }
         public ICollection<Terminal> Terminals { get { return terminals.Values; } }
-        public ICollection<CFVariable> Variables { get { return variables.Values; } }
+        public ICollection<Variable> Variables { get { return variables.Values; } }
         public ICollection<Virtual> Virtuals { get { return virtuals.Values; } }
         public ICollection<Action> Actions { get { return actions.Values; } }
         public List<CFRule> Rules
@@ -31,7 +32,7 @@ namespace Hime.Parsers.CF
             get
             {
                 List<CFRule> rules = new List<CFRule>();
-                foreach (CFVariable Variable in variables.Values)
+                foreach (Variable Variable in variables.Values)
                     foreach (CFRule Rule in Variable.Rules)
                         rules.Add(Rule);
                 return rules;
@@ -43,7 +44,7 @@ namespace Hime.Parsers.CF
         {
             options = new Dictionary<string, string>();
             terminals = new Dictionary<string, Terminal>();
-            variables = new Dictionary<string, CFVariable>();
+            variables = new Dictionary<string, Variable>();
             virtuals = new Dictionary<string, Virtual>();
             actions = new Dictionary<string, Action>();
             templateRules = new List<CFGrammarTemplateRule>();
@@ -120,17 +121,18 @@ namespace Hime.Parsers.CF
             return terminals[Name];
         }
 
-        public CFVariable AddVariable(string Name)
+        public Variable AddVariable(string Name)
         {
             if (variables.ContainsKey(Name))
                 return variables[Name];
-            CFVariable Var = new CFVariable(this, nextSID, Name);
+            Variable Var = new Variable(this, nextSID, Name);
             children.Add(Name, Var);
             variables.Add(Name, Var);
             nextSID++;
             return Var;
         }
-        public CFVariable GetVariable(string Name)
+        
+        public Variable GetVariable(string Name)
         {
             if (!variables.ContainsKey(Name))
                 return null;
@@ -287,13 +289,14 @@ namespace Hime.Parsers.CF
             accessor.Close();
             System.IO.Directory.Delete(directory, true);
         }
-        protected System.Xml.XmlNode Export_GetData(System.Xml.XmlDocument Document)
+        
+        protected XmlNode Export_GetData(XmlDocument document)
         {
-            System.Xml.XmlNode root = Document.CreateElement("CFGrammar");
-            root.Attributes.Append(Document.CreateAttribute("Name"));
+            XmlNode root = document.CreateElement("CFGrammar");
+            root.Attributes.Append(document.CreateAttribute("Name"));
             root.Attributes["Name"].Value = name;
-            foreach (CFVariable var in variables.Values)
-                root.AppendChild(var.GetXMLNode(Document));
+            foreach (Variable var in variables.Values)
+                root.AppendChild(var.GetXMLNode(document));
             return root;
         }
 
@@ -316,7 +319,7 @@ namespace Hime.Parsers.CF
             }
 
             // Create the real axiom rule variable and rule
-            CFVariable Axiom = AddVariable("_Axiom_");
+            Variable Axiom = AddVariable("_Axiom_");
             List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
             Parts.Add(new RuleDefinitionPart(variables[name], RuleDefinitionPartAction.Promote));
             Parts.Add(new RuleDefinitionPart(TerminalDollar.Instance, RuleDefinitionPartAction.Drop));
@@ -334,7 +337,7 @@ namespace Hime.Parsers.CF
             while (mod)
             {
                 mod = false;
-                foreach (CFVariable Var in variables.Values)
+                foreach (Variable Var in variables.Values)
                     if (Var.ComputeFirsts())
                         mod = true;
             }
@@ -342,19 +345,20 @@ namespace Hime.Parsers.CF
             Log.Info("Grammar", "Done !");
             return true;
         }
+        
         protected bool Prepare_ComputeFollowers(Hime.Kernel.Reporting.Reporter Log)
         {
             Log.Info("Grammar", "Computing Followers sets ...");
 
             bool mod = true;
             // Apply step 1 to each variable
-            foreach (CFVariable Var in variables.Values)
+            foreach (Variable Var in variables.Values)
                 Var.ComputeFollowers_Step1();
             // Apply step 2 and 3 while some modification has occured
             while (mod)
             {
                 mod = false;
-                foreach (CFVariable Var in variables.Values)
+                foreach (Variable Var in variables.Values)
                     if (Var.ComputeFollowers_Step23())
                         mod = true;
             }

@@ -526,7 +526,7 @@ namespace Hime.Parsers.CF
             foreach (Redist.Parsers.SyntaxTreeNode SymbolNode in Node.Children[1].Children)
                 Parameters.Add(Compile_Recognize_rule_def_atom(Data, Context, SymbolNode)[0].Parts[0].Symbol);
             // Get the corresponding variable
-            CFVariable Variable = Context.GetVariableFromMetaRule(Name, Parameters, Context);
+            Variable Variable = Context.GetVariableFromMetaRule(Name, Parameters, Context);
             // Create the definition
             Defs.Add(new CFRuleDefinition(Variable));
             return Defs;
@@ -562,7 +562,7 @@ namespace Hime.Parsers.CF
                 else if (Token.ValueText == "*")
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
-                    CFVariable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
+                    Variable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
                     foreach (CFRuleDefinition Def in SetInner)
                         SubVar.AddRule(new CFRule(SubVar, Def, true));
                     CFRuleDefinitionSet SetVar = new CFRuleDefinitionSet();
@@ -578,7 +578,7 @@ namespace Hime.Parsers.CF
                 else if (Token.ValueText == "+")
                 {
                     CFRuleDefinitionSet SetInner = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
-                    CFVariable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
+                    Variable SubVar = Data.AddVariable(subruleHeadRadicalMultiplicity + Data.NextSID.ToString());
                     foreach (CFRuleDefinition Def in SetInner)
                         SubVar.AddRule(new CFRule(SubVar, Def, true));
                     CFRuleDefinitionSet SetVar = new CFRuleDefinitionSet();
@@ -612,7 +612,7 @@ namespace Hime.Parsers.CF
                 {
                     CFRuleDefinitionSet SetLeft = Compile_Recognize_rule_definition(Data, Context, Node.Children[0]);
                     CFRuleDefinitionSet SetRight = Compile_Recognize_rule_definition(Data, Context, Node.Children[1]);
-                    CFVariable SubVar = Data.AddVariable(subruleHeadRadicalRestrict + Data.NextSID.ToString());
+                    Variable SubVar = Data.AddVariable(subruleHeadRadicalRestrict + Data.NextSID.ToString());
                     foreach (CFRuleDefinition Def in SetLeft)
                         SubVar.AddRule(new CFRule(SubVar, Def, true, SubVar.SID));
                     foreach (CFRuleDefinition Def in SetRight)
@@ -641,7 +641,7 @@ namespace Hime.Parsers.CF
         private void Compile_Recognize_rule(CFGrammar Data, CFGrammarCompilerContext Context, Redist.Parsers.SyntaxTreeNode Node)
         {
             string Name = ((Redist.Parsers.SymbolTokenText)Node.Children[0].Symbol).ValueText;
-            CFVariable Var = Data.GetVariable(Name);
+            Variable Var = Data.GetVariable(Name);
             CFRuleDefinitionSet Defs = Compile_Recognize_rule_definition(Data, Context, Node.Children[1]);
             foreach (CFRuleDefinition Def in Defs)
                 Var.AddRule(new CFRule(Var, Def, false));
@@ -670,7 +670,7 @@ namespace Hime.Parsers.CF
                 if (Node.Symbol.Name.StartsWith("cf_rule_simple"))
                 {
                     string Name = ((Redist.Parsers.SymbolTokenText)Node.Children[0].Symbol).ValueText;
-                    CFVariable Var = Data.GetVariable(Name);
+                    Variable Var = Data.GetVariable(Name);
                     if (Var == null)
                         Var = Data.AddVariable(Name);
                 }

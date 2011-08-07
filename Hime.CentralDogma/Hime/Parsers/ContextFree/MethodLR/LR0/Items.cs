@@ -20,7 +20,7 @@ namespace Hime.Parsers.CF.LR
             Symbol next = NextSymbol;
             if (next == null)
                 return;
-            CFVariable nextVar = next as CFVariable;
+            Variable nextVar = next as Variable;
             if (nextVar == null) return;
             foreach (CFRule rule in nextVar.Rules)
             {

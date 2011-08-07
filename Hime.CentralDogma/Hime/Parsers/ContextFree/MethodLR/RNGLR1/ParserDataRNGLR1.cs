@@ -6,20 +6,20 @@ namespace Hime.Parsers.CF.LR
     {
         protected Kernel.Reporting.Reporter reporter;
         protected string terminalsAccessor;
-        protected List<CFVariable> nullableVars;
+        protected List<Variable> nullableVars;
         protected List<CFRuleDefinition> nullableChoices;
 
         public ParserDataRNGLR1(ParserGenerator generator, CFGrammar gram, Graph graph)
             : base(generator, gram, graph)
         {
-            nullableVars = new List<CFVariable>();
+            nullableVars = new List<Variable>();
             nullableChoices = new List<CFRuleDefinition>();
         }
 
         protected void DetermineNullables()
         {
             nullableChoices.Add(new CFRuleDefinition());
-            foreach (CFVariable var in this.GrammarVariables)
+            foreach (Variable var in this.GrammarVariables)
             {
                 if (var.Firsts.Contains(TerminalEpsilon.Instance))
                     nullableVars.Add(var);
@@ -282,7 +282,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.Write("        private static SPPFNode[] staticNullVarsSPPF = { ");
             bool first = true;
-            foreach (CFVariable var in nullableVars)
+            foreach (Variable var in nullableVars)
             {
                 string action = ", SyntaxTreeNodeAction.Replace";
                 foreach (CFRule rule in var.Rules)
@@ -319,20 +319,20 @@ namespace Hime.Parsers.CF.LR
             {
                 CFRuleDefinition definition = nullableChoices[i];
                 foreach (RuleDefinitionPart part in definition.Parts)
-                    stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((CFVariable)part.Symbol) + "]);");
+                    stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((Variable)part.Symbol) + "]);");
                 stream.WriteLine("            staticNullChoicesSPPF[" + i + "].AddFamily(temp);");
                 stream.WriteLine("            temp.Clear();");
             }
             for (int i = 0; i != nullableVars.Count; i++)
             {
-                CFVariable var = nullableVars[i];
+                Variable var = nullableVars[i];
                 foreach (CFRule rule in var.Rules)
                 {
                     CFRuleDefinition definition = rule.Definition.GetChoiceAtIndex(0);
                     if (definition.Firsts.Contains(TerminalEpsilon.Instance))
                     {
                         foreach (RuleDefinitionPart part in definition.Parts)
-                            stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((CFVariable)part.Symbol) + "]);");
+                            stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((Variable)part.Symbol) + "]);");
                         stream.WriteLine("            staticNullVarsSPPF[" + i + "].AddFamily(temp);");
                         stream.WriteLine("            temp.Clear();");
                     }

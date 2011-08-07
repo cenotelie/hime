@@ -26,7 +26,7 @@ namespace Hime.Parsers.CF.LR
             // Here the item is of the form [Var -> alpha . Next beta]
             // If the next symbol is not a variable : do nothing
             // If the next symbol is a variable :
-            CFVariable nextVar = next as CFVariable;
+            Variable nextVar = next as Variable;
             if (nextVar == null) return;
             // Firsts is a copy of the Firsts set for beta (next choice)
             // Firsts will contains symbols that may follow Next

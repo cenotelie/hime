@@ -253,7 +253,7 @@ namespace Hime.Parsers.CF.LR
                     if (s is Terminal)
                         input.Add(s as Terminal);
                     else
-                        BuildInput(input, s as CFVariable, new Stack<CFRuleDefinition>());
+                        BuildInput(input, s as Variable, new Stack<CFRuleDefinition>());
                 }
                 result.Add(input);
             }
@@ -261,7 +261,7 @@ namespace Hime.Parsers.CF.LR
         }
 
         // TODO: there is a bug in this method, it may call itself forever
-        private void BuildInput(List<Terminal> sample, CFVariable var, Stack<CFRuleDefinition> stack)
+        private void BuildInput(List<Terminal> sample, Variable var, Stack<CFRuleDefinition> stack)
         {
             if (var.Firsts.Contains(TerminalEpsilon.Instance))
                 return;
@@ -304,7 +304,7 @@ namespace Hime.Parsers.CF.LR
                 		}
                 	}
 	                // if part.Symbol is not the same as another part.symbol found in a previous definition
-                	if (!symbolFound) BuildInput(sample, part.Symbol as CFVariable, stack);
+                	if (!symbolFound) BuildInput(sample, part.Symbol as Variable, stack);
                 }
             }
             stack.Pop();

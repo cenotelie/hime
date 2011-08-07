@@ -18,7 +18,7 @@ namespace Hime.Parsers.CF
         	base.Inherit(Parent);
             foreach (TerminalBin Terminal in Parent.Terminals)
                 AddTerminalBin(Terminal.Type, Terminal.LocalName);
-            foreach (CFVariable Variable in Parent.Variables)
+            foreach (Variable Variable in Parent.Variables)
                 AddVariable(Variable.LocalName);
             foreach (Virtual Virtual in Parent.Virtuals)
                 AddVirtual(Virtual.LocalName);
@@ -26,9 +26,9 @@ namespace Hime.Parsers.CF
                 AddAction(Action.LocalName);
             foreach (CFGrammarTemplateRule TemplateRule in Parent.TemplateRules)
                 templateRules.Add(new CFGrammarTemplateRule(TemplateRule, this));
-            foreach (CFVariable Variable in Parent.Variables)
+            foreach (Variable Variable in Parent.Variables)
             {
-                CFVariable Clone = variables[Variable.LocalName];
+                Variable Clone = variables[Variable.LocalName];
                 foreach (CFRule R in Variable.Rules)
                 {
                     List<RuleDefinitionPart> Parts = new List<RuleDefinitionPart>();
@@ -36,7 +36,7 @@ namespace Hime.Parsers.CF
                     foreach (RuleDefinitionPart Part in R.Definition.Parts)
                     {
                         Symbol S = null;
-                        if (Part.Symbol is CFVariable)
+                        if (Part.Symbol is Variable)
                             S = variables[Part.Symbol.LocalName];
                         else if (Part.Symbol is Terminal)
                             S = terminals[Part.Symbol.LocalName];

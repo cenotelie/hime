@@ -24,7 +24,7 @@ namespace Hime.Parsers.CF.LR
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             // Create the first set
-            CFVariable AxiomVar = Grammar.GetVariable("_Axiom_");
+            Variable AxiomVar = Grammar.GetVariable("_Axiom_");
             ItemLR0 AxiomItem = new ItemLR0(AxiomVar.Rules[0], 0);
             StateKernel AxiomKernel = new StateKernel();
             AxiomKernel.AddItem(AxiomItem);

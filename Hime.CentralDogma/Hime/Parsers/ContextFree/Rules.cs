@@ -74,7 +74,7 @@ namespace Hime.Parsers.CF
                 return Choice.firsts.Add((Terminal)Symbol);
 
             // Here the first symbol in the current choice is a variable
-            CFVariable Variable = (CFVariable)Symbol;
+            Variable Variable = (Variable)Symbol;
             bool mod = false; // keep track of modifications
             // foreach first in the Firsts set of the variable
             foreach (Terminal First in Variable.Firsts)
@@ -107,10 +107,11 @@ namespace Hime.Parsers.CF
             // For all choices but the last (empty)
             for (int i = 0; i != choices.Count - 1; i++)
             {
+            	// TODO: is and casts are not nice => try to remove all of them. They shouldn't be necessary
                 // If the first symbol of the choice is a variable
-                if (choices[i].parts[0].Symbol is CFVariable)
+                if (choices[i].parts[0].Symbol is Variable)
                 {
-                    CFVariable Var = (CFVariable)choices[i].parts[0].Symbol;
+                    Variable Var = (Variable)choices[i].parts[0].Symbol;
                     // Add the Firsts set of the next choice to the variable followers except ε
                     foreach (Terminal First in choices[i + 1].firsts)
                     {
@@ -121,16 +122,16 @@ namespace Hime.Parsers.CF
             }
         }
 
-        public bool ComputeFollowers_Step23(CFVariable RuleVar)
+        public bool ComputeFollowers_Step23(Variable RuleVar)
         {
             bool mod = false;
             // For all choices but the last (empty)
             for (int i = 0; i != choices.Count - 1; i++)
             {
                 // If the first symbol of the choice is a variable
-                if (choices[i].parts[0].Symbol is CFVariable)
+                if (choices[i].parts[0].Symbol is Variable)
                 {
-                    CFVariable Var = (CFVariable)choices[i].parts[0].Symbol;
+                    Variable Var = (Variable)choices[i].parts[0].Symbol;
                     // If the next choice Firsts set contains ε
                     // add the Followers of the head variable to the Followers of the found variable
                     if (choices[i + 1].firsts.Contains(TerminalEpsilon.Instance))
@@ -211,13 +212,13 @@ namespace Hime.Parsers.CF
     {
         public const string arrow = "→";
 
-        private CFVariable variable;
+        private Variable variable;
         private CFRuleDefinition definition;
         private bool replaceOnProduction;
         private int iD;
         private int watermark;
 
-        public CFVariable Variable { get { return variable; } }
+        public Variable Variable { get { return variable; } }
         public CFRuleDefinition Definition { get { return definition; } }
         public bool ReplaceOnProduction { get { return replaceOnProduction; } }
         public int ID
@@ -228,13 +229,13 @@ namespace Hime.Parsers.CF
         public int Watermark { get { return watermark; } }
 
 
-        public CFRule(CFVariable Variable, CFRuleDefinition Definition, bool ReplaceOnProduction)
+        public CFRule(Variable Variable, CFRuleDefinition Definition, bool ReplaceOnProduction)
         {
             variable = Variable;
             definition = Definition;
             replaceOnProduction = ReplaceOnProduction;
         }
-        public CFRule(CFVariable Variable, CFRuleDefinition Definition, bool ReplaceOnProduction, int Watermark)
+        public CFRule(Variable Variable, CFRuleDefinition Definition, bool ReplaceOnProduction, int Watermark)
         {
             variable = Variable;
             definition = Definition;
