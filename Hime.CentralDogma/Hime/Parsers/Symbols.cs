@@ -4,18 +4,17 @@ namespace Hime.Parsers
 {
     public abstract class Symbol : Hime.Kernel.Symbol
     {
-        protected ushort sID;
         protected string localName;
         protected Hime.Kernel.QualifiedName completeName;
 
-        public ushort SID { get { return sID; } }
+        internal protected ushort SID { get; private set; }
         public override string LocalName { get { return localName; } }
         public override Hime.Kernel.QualifiedName CompleteName { get { return completeName; } }
 
         public Symbol(Grammar parent, ushort SID, string Name) : base()
         {
             this.Parent = parent;
-            sID = SID;
+            this.SID = SID;
             localName = Name;
             if (Parent == null)
                 completeName = new Hime.Kernel.QualifiedName(localName);
@@ -36,8 +35,8 @@ namespace Hime.Parsers
 
         internal class Comparer : IEqualityComparer<Symbol>
         {
-            public bool Equals(Symbol x, Symbol y) { return (x.sID == y.sID); }
-            public int GetHashCode(Symbol obj) { return obj.sID; }
+            public bool Equals(Symbol x, Symbol y) { return (x.SID == y.SID); }
+            public int GetHashCode(Symbol obj) { return obj.SID; }
             private Comparer() { }
             private static Comparer instance = new Comparer();
             public static Comparer Instance { get { return instance; } }
@@ -80,7 +79,7 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("Priority"));
             Node.Attributes.Append(Doc.CreateAttribute("SubGrammar"));
             Node.Attributes.Append(Doc.CreateAttribute("Value"));
-            Node.Attributes["SID"].Value = sID.ToString("X");
+            Node.Attributes["SID"].Value = SID.ToString("X");
             Node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
             Node.Attributes["Priority"].Value = priority.ToString();
             if (subGrammar != null)
@@ -143,7 +142,7 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("LengthByte"));
             Node.Attributes.Append(Doc.CreateAttribute("LengthBit"));
 
-            Node.Attributes["SID"].Value = sID.ToString("X");
+            Node.Attributes["SID"].Value = SID.ToString("X");
             Node.Attributes["Name"].Value = localName;
 
             if ((type & TerminalBinType.FLAG_BINARY) == TerminalBinType.FLAG_BINARY)
@@ -275,20 +274,5 @@ namespace Hime.Parsers
         }
 
         public override string ToString() { return "{" + localName + "}"; }
-    }
-
-    public abstract class Variable : Symbol
-    {
-        public Variable(Grammar Parent, ushort SID, string Name) : base(Parent, SID, Name) { }
-
-        public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
-        {
-            System.Xml.XmlNode Node = Doc.CreateElement("SymbolVariable");
-            Node.Attributes.Append(Doc.CreateAttribute("SID"));
-            Node.Attributes.Append(Doc.CreateAttribute("Name"));
-            Node.Attributes["SID"].Value = sID.ToString("X");
-            Node.Attributes["Name"].Value = localName;
-            return Node;
-        }
     }
 }

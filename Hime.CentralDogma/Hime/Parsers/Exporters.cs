@@ -10,6 +10,8 @@ namespace Hime.Parsers.Exporters
         private string _namespace;
         private System.IO.StreamWriter stream;
         private string name;
+        
+        private string LexerName { get { return this.name + "_Lexer"; } }
 
         public TextLexerExporter(System.IO.StreamWriter Stream, string Namespace, string Name, Automata.DFA DFA, Terminal Separator)
         {
@@ -31,7 +33,7 @@ namespace Hime.Parsers.Exporters
 
         public List<Terminal> Export(EAccessModifier modifier)
         {
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "_Lexer : LexerText");
+            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + this.LexerName + " : LexerText");
             stream.WriteLine("    {");
             Export_Terminals();
             Export_States();
@@ -44,14 +46,14 @@ namespace Hime.Parsers.Exporters
 
         private void Export_Constructor()
         {
-            stream.WriteLine("        public " + name + "_Lexer(string input) : base(new System.IO.StringReader(input)) {}");
-            stream.WriteLine("        public " + name + "_Lexer(System.IO.TextReader input) : base(input) {}");
-            stream.WriteLine("        public " + name + "_Lexer(" + name + "_Lexer original) : base(original) {}");
+            stream.WriteLine("        public " + this.LexerName + "(string input) : base(new System.IO.StringReader(input)) {}");
+            stream.WriteLine("        public " + this.LexerName + "(System.IO.TextReader input) : base(input) {}");
+            stream.WriteLine("        public " + this.LexerName + "(" + this.LexerName + " original) : base(original) {}");
         }
         private void Export_Clone()
         {
             stream.WriteLine("        public override ILexer Clone() {");
-            stream.WriteLine("            return new " + name + "_Lexer(this);");
+            stream.WriteLine("            return new " + this.LexerName + "(this);");
             stream.WriteLine("        }");
         }
         private void Export_Setup()

@@ -123,7 +123,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\ParserDataRNGLR1.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateActionReduce.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Rules.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\Symbols.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFVariable.cs" />
     <Compile Include="Hime\Parsers\Automata\DFA.cs" />
     <Compile Include="Hime\Parsers\Exporters.cs" />
     <Compile Include="Hime\Parsers\Grammars.cs" />
@@ -144,6 +144,7 @@
     <Compile Include="Hime\Kernel\Resources\KernelResources.Exceptions.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Extensions.cs" />
     <Compile Include="Hime\Kernel\Resources\KernelResources.Parser.cs" />
+    <Compile Include="Hime\Parsers\Variable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

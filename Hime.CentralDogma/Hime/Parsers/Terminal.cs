@@ -30,7 +30,7 @@ namespace Hime.Parsers
             Node.Attributes.Append(Doc.CreateAttribute("Name"));
             Node.Attributes.Append(Doc.CreateAttribute("Priority"));
             Node.Attributes.Append(Doc.CreateAttribute("Value"));
-            Node.Attributes["SID"].Value = sID.ToString();
+            Node.Attributes["SID"].Value = SID.ToString();
             Node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
             Node.Attributes["Priority"].Value = priority.ToString();
             Node.Attributes["Value"].Value = this.ToString();
