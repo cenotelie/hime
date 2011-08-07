@@ -19,9 +19,9 @@ namespace Hime.Parsers.CF.LR
             reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
             debug = options.ExportDebug;
-            terminalsAccessor = this.GrammarName + "_Lexer.terminals";
+            terminalsAccessor = this.LexerName + ".terminals";
             stream = options.ParserWriter;
-            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.GrammarName + "_Parser : ");
+            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.ParserName + " : ");
             stream.WriteLine("LRStarBaseParser");
             stream.WriteLine("    {");
             Export_Variables(stream);
@@ -64,7 +64,7 @@ namespace Hime.Parsers.CF.LR
             int length = rule.Definition.GetChoiceAtIndex(0).Length;
             stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Variable.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
             stream.WriteLine("        {");
-            stream.WriteLine("            " + this.GrammarName + "_Parser parser = baseParser as " + this.GrammarName + "_Parser;");
+            stream.WriteLine("            " + this.ParserName + " parser = baseParser as " + this.ParserName + ";");
             if (length != 0)
             {
                 stream.WriteLine("            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;");

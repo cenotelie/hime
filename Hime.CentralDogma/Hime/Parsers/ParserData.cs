@@ -25,7 +25,9 @@ namespace Hime.Parsers
         public Graph Graph { get { return graph; } }
         public ParserGenerator Generator { get { return generator; } }
 
-        internal protected string GrammarName { get { return this.Grammar.LocalName; } }
+        private string GrammarName { get { return this.Grammar.LocalName; } }
+        internal protected string LexerName { get { return this.GrammarName + "_Lexer"; } }
+        internal protected string ParserName { get { return this.GrammarName + "_Parser"; } }
 
         internal protected ICollection<CFRule> GrammarRules { get { return this.Grammar.Rules; } }
         
@@ -130,7 +132,7 @@ namespace Hime.Parsers
                 argument = ", Actions actions";
                 body = "this.actions = actions;";
             }
-            stream.WriteLine("        public " + this.GrammarName + "_Parser(" + this.GrammarName + "_Lexer lexer" + argument + ") : base (lexer) { " + body + " }");
+            stream.WriteLine("        public " + this.ParserName + "(" + this.LexerName + " lexer" + argument + ") : base (lexer) { " + body + " }");
         }
     }
 }

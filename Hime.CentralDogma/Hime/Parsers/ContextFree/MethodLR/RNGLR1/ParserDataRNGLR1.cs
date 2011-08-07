@@ -41,10 +41,10 @@ namespace Hime.Parsers.CF.LR
             reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
             debug = options.ExportDebug;
-            terminalsAccessor = this.GrammarName + "_Lexer.terminals";
+            terminalsAccessor = this.LexerName + ".terminals";
             DetermineNullables();
             stream = options.ParserWriter;
-            stream.WriteLine("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.GrammarName + "_Parser : BaseRNGLR1Parser");
+            stream.WriteLine("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.ParserName + " : BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
             Export_Variables(stream);
@@ -62,7 +62,7 @@ namespace Hime.Parsers.CF.LR
         }
         protected void Export_StaticConstructor()
         {
-            stream.WriteLine("        static " + this.GrammarName + "_Parser()");
+            stream.WriteLine("        static " + this.ParserName + "()");
             stream.WriteLine("        {");
             stream.WriteLine("            BuildNullables();");
             stream.WriteLine("        }");
@@ -112,7 +112,7 @@ namespace Hime.Parsers.CF.LR
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + this.GrammarName + "_Parser)parser).actions." + action.LocalName + "), 0));");
+                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + this.ParserName + ")parser).actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
                     stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0, SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
