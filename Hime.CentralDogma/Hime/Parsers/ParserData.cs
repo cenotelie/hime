@@ -21,14 +21,33 @@ namespace Hime.Parsers
         protected List<CFVariable> variables;
         protected bool debug;
 
-        public CFGrammar Grammar { get; protected set; }
+        internal protected CFGrammar Grammar { get; private set; }
         public Graph Graph { get { return graph; } }
         public ParserGenerator Generator { get { return generator; } }
 
         internal protected string GrammarName { get { return this.Grammar.LocalName; } }
 
-        internal protected List<CFRule> GrammarRules { get { return this.Grammar.Rules; } }
-
+        internal protected ICollection<CFRule> GrammarRules { get { return this.Grammar.Rules; } }
+        
+        internal protected string IndexOfRule(CFRule rule)
+        {
+        	return "0x" + this.Grammar.Rules.IndexOf(rule).ToString("X");
+        }
+        
+        internal protected ICollection<Action> GrammarActions { get { return this.Grammar.Actions; } }
+        
+        internal protected ICollection<CFVariable> GrammarVariables { get { return this.Grammar.Variables; } }
+        
+        internal protected string GetVariable(string name)
+        {
+        	return "0x" + this.Grammar.GetVariable(name).SID.ToString("X");
+        }
+        
+        internal protected string GetOption(string name)
+        {
+        	return this.GetVariable(this.Grammar.GetOption(name));
+        }
+        
         public ParserData(ParserGenerator generator, CFGrammar gram, Graph graph)
         {
             this.Grammar = gram;
@@ -105,7 +124,7 @@ namespace Hime.Parsers
         {
           	string argument = "";
         	string body = "";
-            if (this.Grammar.Actions.GetEnumerator().MoveNext())
+            if (this.GrammarActions.GetEnumerator().MoveNext())
             {
                 stream.WriteLine("        private Actions actions;");
                 argument = ", Actions actions";

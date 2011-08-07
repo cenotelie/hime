@@ -125,12 +125,12 @@ namespace Hime.Parsers.CF
             return Data.GetSymbol(Name);
         }
 
-        private void Compile_Recognize_option(CFGrammar Data, Redist.Parsers.SyntaxTreeNode Node)
+        private void Compile_Recognize_option(CFGrammar data, Redist.Parsers.SyntaxTreeNode Node)
         {
             string Name = ((Redist.Parsers.SymbolTokenText)Node.Children[0].Symbol).ValueText;
             string Value = ((Redist.Parsers.SymbolTokenText)Node.Children[1].Symbol).ValueText;
             Value = Value.Substring(1, Value.Length - 2);
-            Data.AddOption(Name, Value);
+            data.AddOption(Name, Value);
         }
 
         private Automata.NFA Compile_Recognize_terminal_def_atom_any(Redist.Parsers.SyntaxTreeNode Node)

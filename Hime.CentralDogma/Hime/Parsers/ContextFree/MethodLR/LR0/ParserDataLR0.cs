@@ -20,7 +20,7 @@ namespace Hime.Parsers.CF.LR
             stream.WriteLine("LR0TextParser");
             stream.WriteLine("    {");
             Export_Variables(stream);
-            foreach (CFRule rule in this.Grammar.Rules)
+            foreach (CFRule rule in this.GrammarRules)
                 Export_Production(rule);
             Export_Rules();
             Export_States();
@@ -42,7 +42,7 @@ namespace Hime.Parsers.CF.LR
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in this.Grammar.Actions)
+            foreach (Action action in this.GrammarActions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
@@ -105,7 +105,7 @@ namespace Hime.Parsers.CF.LR
         {
             stream.WriteLine("        private static LRRule[] staticRules = {");
             bool first = true;
-            foreach (CFRule Rule in this.Grammar.Rules)
+            foreach (CFRule Rule in this.GrammarRules)
             {
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
@@ -236,7 +236,7 @@ namespace Hime.Parsers.CF.LR
                 stream.WriteLine("               null,");
             }
             // Write reductions
-            stream.Write("               staticRules[0x" + this.GrammarRules.IndexOf(state.Reductions[0].ToReduceRule).ToString("X") + "]");
+            stream.Write("               staticRules[" + this.IndexOfRule(state.Reductions[0].ToReduceRule) + "]");
             stream.WriteLine(")");
         }
         

@@ -46,7 +46,7 @@ namespace Hime.Parsers.CF.LR
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in this.Grammar.Actions)
+            foreach (Action action in this.GrammarActions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
@@ -223,7 +223,7 @@ namespace Hime.Parsers.CF.LR
             foreach (StateActionReduce Reduction in state.Reductions)
             {
                 if (!first) stream.Write(", ");
-                stream.Write("new LRReduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[0x" + this.GrammarRules.IndexOf(Reduction.ToReduceRule).ToString("X") + "])");
+                stream.Write("new LRReduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(Reduction.ToReduceRule) + "])");
                 first = false;
             }
             stream.WriteLine("})");

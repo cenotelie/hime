@@ -46,7 +46,7 @@ namespace Hime.Parsers.CF.LR
         protected void Export_Actions()
         {
             List<string> Names = new List<string>();
-            foreach (Action action in this.Grammar.Actions)
+            foreach (Action action in this.GrammarActions)
                 if (!Names.Contains(action.LocalName))
                     Names.Add(action.LocalName);
 
@@ -153,7 +153,7 @@ namespace Hime.Parsers.CF.LR
                 if (item.Action == ItemAction.Shift)
                     stream.Write(", 0x" + decider.LRState.Children[item.NextSymbol].ID.ToString("X") + ", null");
                 else
-                    stream.Write(", 0xFFFF, staticRules[0x" + this.GrammarRules.IndexOf(item.BaseRule).ToString("X") + "]");
+                    stream.Write(", 0xFFFF, staticRules[" + this.IndexOfRule(item.BaseRule) + "]");
             }
             else
                 stream.Write(", 0xFFFF, null");
