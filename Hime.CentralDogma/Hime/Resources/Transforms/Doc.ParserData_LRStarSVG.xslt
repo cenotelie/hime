@@ -31,7 +31,7 @@
   </xsl:template>
 
   <xsl:template match="Dot">
-    <span>•</span>
+    <span>●</span>
   </xsl:template>
 
   <xsl:template match="Item">

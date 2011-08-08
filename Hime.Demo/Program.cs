@@ -64,11 +64,11 @@ namespace Hime.Demo
         	CompilationTask task = new CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDoc = false;
+            task.ExportDoc = true;
             task.ExportVisuals = false;
             task.InputFiles.Add("Languages\\Test.gram");
             task.ParserFile = "Test.cs";
-            task.Method = EParsingMethod.LRStar;
+            task.Method = EParsingMethod.LALR1;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
         }

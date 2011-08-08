@@ -12,7 +12,7 @@ namespace Hime.Parsers.ContextFree.LR
 
     public abstract class Item
     {
-        public const string dot = "•";
+        public const string dot = "●";
 
         protected CFRule rule;
         protected CFRuleDefinition definition;
