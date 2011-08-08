@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Hime.Parsers.CF.LR
+namespace Hime.Parsers.ContextFree.LR
 {
     class BaseMethod
     {

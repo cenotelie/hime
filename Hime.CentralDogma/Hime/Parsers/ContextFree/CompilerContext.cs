@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Hime.Parsers.CF
+namespace Hime.Parsers.ContextFree
 {
     class CFGrammarTemplateRule
     {

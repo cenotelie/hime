@@ -2,7 +2,7 @@
 using Hime.Kernel.Reporting;
 using System.Xml;
 
-namespace Hime.Parsers.CF
+namespace Hime.Parsers.ContextFree
 {
     public interface CFParserGenerator : ParserGenerator
     {

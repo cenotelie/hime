@@ -68,7 +68,7 @@ namespace Hime.Demo
             task.ExportVisuals = false;
             task.InputFiles.Add("Languages\\Test.gram");
             task.ParserFile = "Test.cs";
-            task.Method = Parsers.ParsingMethod.LRStar;
+            task.Method = EParsingMethod.LRStar;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             task.Execute();
         }

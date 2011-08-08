@@ -36,7 +36,7 @@ namespace Hime.Kernel.Resources
             intermediateRoot = new Redist.Parsers.SyntaxTreeNode(null);
             intermediateResources = new ResourceGraph();
             pluginRegister = new ResourceCompilerRegister();
-            pluginRegister.RegisterCompiler(new Hime.Parsers.CF.CFGrammarCompiler());
+            pluginRegister.RegisterCompiler(new Hime.Parsers.ContextFree.CFGrammarCompiler());
             this.OutputRootNamespace = new Namespace(null, "global");
             this.outputLog = reporter;
         }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Hime.Parsers.CF
+namespace Hime.Parsers.ContextFree
 {
     public sealed class CFRuleDefinition : RuleDefinition
     {

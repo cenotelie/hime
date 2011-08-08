@@ -230,22 +230,22 @@ namespace Hime.Parsers
             switch (this.Method)
             {
                 case EParsingMethod.LR0:
-                    this.generator = new Hime.Parsers.CF.LR.MethodLR0();
+                    this.generator = new Hime.Parsers.ContextFree.LR.MethodLR0();
                     return;
                 case EParsingMethod.LR1:
-                    this.generator = new Hime.Parsers.CF.LR.MethodLR1();
+                    this.generator = new Hime.Parsers.ContextFree.LR.MethodLR1();
                     return;
                 case EParsingMethod.LALR1:
-                    this.generator = new Hime.Parsers.CF.LR.MethodLALR1();
+                    this.generator = new Hime.Parsers.ContextFree.LR.MethodLALR1();
                     return;
                 case EParsingMethod.LRStar:
-                    this.generator = new Hime.Parsers.CF.LR.MethodLRStar();
+                    this.generator = new Hime.Parsers.ContextFree.LR.MethodLRStar();
                     return;
                 case EParsingMethod.RNGLR1:
-                    this.generator = new Hime.Parsers.CF.LR.MethodRNGLR1();
+                    this.generator = new Hime.Parsers.ContextFree.LR.MethodRNGLR1();
                     return;
                 case EParsingMethod.RNGLALR1:
-                    this.generator = new Hime.Parsers.CF.LR.MethodRNGLALR1();
+                    this.generator = new Hime.Parsers.ContextFree.LR.MethodRNGLALR1();
                     return;
             }
             string message = "Unsupported parsing method: " + this.Method.ToString();

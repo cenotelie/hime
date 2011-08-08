@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Hime.Kernel.Reporting;
 
 // TODO: CF means ContextFree => should rename to ContextFree
-namespace Hime.Parsers.CF
+namespace Hime.Parsers.ContextFree
 {
 	public sealed class CFGrammarText : CFGrammar
     {

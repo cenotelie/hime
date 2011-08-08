@@ -7,8 +7,8 @@
 using System.Xml;
 using System.Collections.Generic;
 using System.IO;
-using Hime.Parsers.CF;
-using Hime.Parsers.CF.LR;
+using Hime.Parsers.ContextFree;
+using Hime.Parsers.ContextFree.LR;
 
 namespace Hime.Parsers
 {

@@ -6,7 +6,7 @@
  */
 using System;
 
-namespace Hime.Parsers.CF.LR
+namespace Hime.Parsers.ContextFree.LR
 {
     public class StateActionReduce : StateAction
     {
