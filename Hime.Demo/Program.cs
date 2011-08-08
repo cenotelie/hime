@@ -75,8 +75,8 @@ namespace Hime.Demo
 
         static void Main(string[] args)
         {
-            Hime.Kernel.KernelDaemon.GenerateNextStep("D:\\Data\\VisualStudioProjects");
-            //Compile();
+            //Hime.Kernel.KernelDaemon.GenerateNextStep("D:\\Data\\VisualStudioProjects");
+            Compile();
             //Parse_ANSI_C();
             //Parse_MathExp();
         }

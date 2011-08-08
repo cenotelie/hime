@@ -46,8 +46,16 @@ namespace Hime.HimeCC
             help.AdditionalNewLineAfterOption = true;
             help.AddPreOptionsLine("This is free software. You may redistribute copies of it under the terms of");
             help.AddPreOptionsLine("the LGPL License <http://www.gnu.org/licenses/lgpl.html>.");
-            help.AddPreOptionsLine("Usage: himecc MyGram.gram");
-            help.AddPreOptionsLine("Usage: himecc MyGram.gram -g MyGrammar -n Analyser -m LALR1 --parser MyGram.cs");
+            help.AddPreOptionsLine("");
+            help.AddPreOptionsLine("+- Usage:  --------------------------------------------------------+");
+            help.AddPreOptionsLine("| For a file MyGram.gram containing grammar Foo,                   |");
+            help.AddPreOptionsLine("|   > himecc MyGram.gram -g Foo -n Bar -m LALR1 --parser MyGram.cs |");
+            help.AddPreOptionsLine("| Default options:                                                 |");
+            help.AddPreOptionsLine("|   > himecc MyGram.gram                                           |");
+            help.AddPreOptionsLine("| is equivalent to                                                 |");
+            help.AddPreOptionsLine("|   > himecc MyGram.gram -g Foo -n Foo -m RNGLALR1                 |");
+            help.AddPreOptionsLine("|    --lexer FooLexer.cs --parser FooParser.cs                     |");
+            help.AddPreOptionsLine("+------------------------------------------------------------------+");
             help.AddOptions(this);
             return help;
         }
