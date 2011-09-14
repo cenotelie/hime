@@ -13,12 +13,12 @@ namespace Hime.Kernel.Resources
             compilers = new Dictionary<string, IResourceCompiler>();
         }
 
-        public void RegisterCompiler(IResourceCompiler Compiler)
+        public void RegisterCompiler(IResourceCompiler compiler)
         {
-            foreach (string Name in Compiler.ResourceNames)
-                compilers.Add(Name, Compiler);
+            foreach (string name in compiler.ResourceNames)
+                compilers.Add(name, compiler);
         }
 
-        public IResourceCompiler GetCompilerFor(string ResourceName) { return compilers[ResourceName]; }
+        public IResourceCompiler GetCompilerFor(string resourceName) { return compilers[resourceName]; }
     }
 }

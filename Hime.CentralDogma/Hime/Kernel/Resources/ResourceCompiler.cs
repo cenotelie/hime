@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Hime.Kernel.Naming;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 
@@ -22,7 +23,7 @@ namespace Hime.Kernel.Resources
         private ResourceGraph intermediateResources;
         private ResourceCompilerRegister pluginRegister;
 
-        public Naming.Namespace OutputRootNamespace { get; private set; }
+        public Namespace OutputRootNamespace { get; private set; }
         public string CompilerName { get { return "HimeSystems.CentralDogma Compiler"; } }
         public int CompilerVersionMajor { get { return 1; } }
         public int CompilerVersionMinor { get { return 0; } }
@@ -33,7 +34,7 @@ namespace Hime.Kernel.Resources
             inputNamedResources = new Dictionary<string, TextReader>();
             inputAnonResources = new List<TextReader>();
             outputErrors = new List<CompilerError>();
-            intermediateRoot = new Redist.Parsers.SyntaxTreeNode(null);
+            intermediateRoot = new SyntaxTreeNode(null);
             intermediateResources = new ResourceGraph();
             pluginRegister = new ResourceCompilerRegister();
             pluginRegister.RegisterCompiler(new Hime.Parsers.ContextFree.CFGrammarCompiler());
@@ -73,7 +74,7 @@ namespace Hime.Kernel.Resources
                 CompileData(data);
 
             // Build resources
-            foreach (Redist.Parsers.SyntaxTreeNode file in intermediateRoot.Children)
+            foreach (SyntaxTreeNode file in intermediateRoot.Children)
                 Compile_file(file);
 
             // Build dependencies
@@ -86,13 +87,13 @@ namespace Hime.Kernel.Resources
             {
                 unsolved = 0;
                 int solved = 0;
-                foreach (Resource R in intermediateResources.Resources)
+                foreach (Resource resource in intermediateResources.Resources)
                 {
-                    if (R.IsCompiled) continue;
-                    solved += R.Compiler.CompileSolveDependencies(R, outputLog);
-                    unsolved += R.Dependencies.Count;
-                    if (R.Dependencies.Count == 0)
-                        if (!R.Compiler.Compile(R, outputLog))
+                    if (resource.IsCompiled) continue;
+                    solved += resource.Compiler.CompileSolveDependencies(resource, outputLog);
+                    unsolved += resource.Dependencies.Count;
+                    if (resource.Dependencies.Count == 0)
+                        if (!resource.Compiler.Compile(resource, outputLog))
                             hasErrors = true;
                 }
                 // FIXME: what the hell is this ?
@@ -105,39 +106,39 @@ namespace Hime.Kernel.Resources
 
 
 
-        public static Naming.QualifiedName CompileQualifiedName(Redist.Parsers.SyntaxTreeNode node)
+        public static QualifiedName CompileQualifiedName(SyntaxTreeNode node)
         {
             List<string> path = new List<string>();
-            foreach (Redist.Parsers.SyntaxTreeNode Child in node.Children)
-                path.Add(((Redist.Parsers.SymbolTokenText)Child.Symbol).ValueText);
-            return new Naming.QualifiedName(path);
+            foreach (SyntaxTreeNode child in node.Children)
+                path.Add(((SymbolTokenText)child.Symbol).ValueText);
+            return new QualifiedName(path);
         }
-        public static Naming.SymbolAccess CompileSymbolAccess(Redist.Parsers.SyntaxTreeNode node)
+        public static SymbolAccess CompileSymbolAccess(SyntaxTreeNode node)
         {
-            if (node.Symbol.Name == "access_internal") return Naming.SymbolAccess.Internal;
-            else if (node.Symbol.Name == "access_public") return Naming.SymbolAccess.Public;
-            else if (node.Symbol.Name == "access_protected") return Naming.SymbolAccess.Protected;
-            else if (node.Symbol.Name == "access_private") return Naming.SymbolAccess.Private;
-            return Naming.SymbolAccess.Public;
+            if (node.Symbol.Name == "access_internal") return SymbolAccess.Internal;
+            else if (node.Symbol.Name == "access_public") return SymbolAccess.Public;
+            else if (node.Symbol.Name == "access_protected") return SymbolAccess.Protected;
+            else if (node.Symbol.Name == "access_private") return SymbolAccess.Private;
+            return SymbolAccess.Public;
         }
         
 		// TODO: made this method public for test, but maybe this is a sign of not optimal architecture, think about it
         public void CompileData(TextReader input)
         {
-            Parser.FileCentralDogma_Lexer UnitLexer = new Parser.FileCentralDogma_Lexer(input);
-            Parser.FileCentralDogma_Parser UnitParser = new Parser.FileCentralDogma_Parser(UnitLexer);
+            Parser.FileCentralDogma_Lexer lexer = new Parser.FileCentralDogma_Lexer(input);
+            Parser.FileCentralDogma_Parser parser = new Parser.FileCentralDogma_Parser(lexer);
             // TODO: rewrite this code, it is a bit strange
-            Redist.Parsers.SyntaxTreeNode root = null;
-            try { root = UnitParser.Analyse(); }
+            SyntaxTreeNode root = null;
+            try { root = parser.Analyse(); }
             catch (System.Exception e) {
                 outputLog.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
                 return;
             }
 
-            foreach (Redist.Parsers.LexerTextError Error in UnitLexer.Errors)
-                outputLog.Report(new Reporting.BaseEntry(Reporting.ELevel.Error, "Lexer", Error.Message));
-            foreach (Redist.Parsers.ParserError Error in UnitParser.Errors)
-                outputLog.Report(new Reporting.BaseEntry(Reporting.ELevel.Error, "Parser", Error.Message));
+            foreach (LexerTextError error in lexer.Errors)
+                outputLog.Report(new BaseEntry(ELevel.Error, "Lexer", error.Message));
+            foreach (ParserError error in parser.Errors)
+                outputLog.Report(new BaseEntry(ELevel.Error, "Parser", error.Message));
 
             if (root == null)
             {
@@ -148,35 +149,35 @@ namespace Hime.Kernel.Resources
         }
 
 
-        private void Compile_file(Redist.Parsers.SyntaxTreeNode node)
+        private void Compile_file(SyntaxTreeNode node)
         {
-            foreach (Redist.Parsers.SyntaxTreeNode child in node.Children)
+            foreach (SyntaxTreeNode child in node.Children)
             {
                 if (child.Symbol.Name == "Namespace")
                     Compile_namespace(child, this.OutputRootNamespace);
                 else
                 {
-                    IResourceCompiler Compiler = pluginRegister.GetCompilerFor(child.Symbol.Name);
-                    if (Compiler == null)
+                    IResourceCompiler plugin = pluginRegister.GetCompilerFor(child.Symbol.Name);
+                    if (plugin == null)
                         throw new NoResourceCompilerFoundException("Missing compiler for resource " + child.Symbol.Name);
-                    Compiler.CreateResource(this.OutputRootNamespace, child, intermediateResources, outputLog);
+                    plugin.CreateResource(this.OutputRootNamespace, child, intermediateResources, outputLog);
                 }
             }
         }
         private void Compile_namespace(Redist.Parsers.SyntaxTreeNode node, Naming.Namespace currentNamespace)
         {
-            Naming.QualifiedName Name = CompileQualifiedName(node.Children[0]);
-            currentNamespace = currentNamespace.AddSubNamespace(Name);
-            foreach (Redist.Parsers.SyntaxTreeNode Child in node.Children[1].Children)
+            QualifiedName name = CompileQualifiedName(node.Children[0]);
+            currentNamespace = currentNamespace.AddSubNamespace(name);
+            foreach (SyntaxTreeNode child in node.Children[1].Children)
             {
-                if (Child.Symbol.Name == "Namespace")
-                    Compile_namespace(Child, currentNamespace);
+                if (child.Symbol.Name == "Namespace")
+                    Compile_namespace(child, currentNamespace);
                 else
                 {
-                    IResourceCompiler Compiler = pluginRegister.GetCompilerFor(Child.Symbol.Name);
-                    if (Compiler == null)
-                        throw new NoResourceCompilerFoundException("Missing compiler for resource " + Child.Symbol.Name);
-                    Compiler.CreateResource(currentNamespace, Child, intermediateResources, outputLog);
+                    IResourceCompiler plugin = pluginRegister.GetCompilerFor(child.Symbol.Name);
+                    if (plugin == null)
+                        throw new NoResourceCompilerFoundException("Missing compiler for resource " + child.Symbol.Name);
+                    plugin.CreateResource(currentNamespace, child, intermediateResources, outputLog);
                 }
             }
         }

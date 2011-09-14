@@ -55,12 +55,12 @@ namespace Hime.Kernel.Resources
         {
             if (isClosed)
                 throw new AccessorClosedException(this);
-            System.IO.Stream Stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (Stream == null)
+            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            if (stream == null)
                 throw new ResourceNotFoundException(resourceName);
-            byte[] Buffer = new byte[Stream.Length];
-            int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
-            System.IO.File.WriteAllBytes(fileName, Buffer);
+            byte[] buffer = new byte[stream.Length];
+            int readcount = stream.Read(buffer, 0, buffer.Length);
+            System.IO.File.WriteAllBytes(fileName, buffer);
             files.Add(fileName);
         }
 
@@ -68,12 +68,12 @@ namespace Hime.Kernel.Resources
         {
             if (isClosed)
                 throw new AccessorClosedException(this);
-            System.IO.Stream Stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (Stream == null)
+            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            if (stream == null)
                 throw new ResourceNotFoundException(resourceName);
-            byte[] Buffer = new byte[Stream.Length];
-            int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
-            System.IO.File.WriteAllBytes(fileName, Buffer);
+            byte[] buffer = new byte[stream.Length];
+            int readCount = stream.Read(buffer, 0, buffer.Length);
+            System.IO.File.WriteAllBytes(fileName, buffer);
         }
 
         public System.IO.Stream GetStreamFor(string resourceName)
@@ -92,55 +92,55 @@ namespace Hime.Kernel.Resources
             if (isClosed)
                 throw new AccessorClosedException(this);
             // Get a stream on the resource
-            System.IO.Stream Stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (Stream == null)
+            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            if (stream == null)
                 throw new ResourceNotFoundException(resourceName);
             // Extract content to a buffer
-			byte[] Buffer = new byte[Stream.Length];
-			int ReadCount = Stream.Read(Buffer, 0, Buffer.Length);
-            if (ReadCount != Buffer.Length)
+			byte[] buffer = new byte[stream.Length];
+			int readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount != buffer.Length)
                 return null;
             // Detect encoding and strip encoding preambule
-            System.Text.Encoding Encoding = DetectEncoding(Buffer);
-            Buffer = StripPreambule(Buffer, Encoding);
+            System.Text.Encoding encoding = DetectEncoding(buffer);
+            buffer = StripPreambule(buffer, encoding);
             // Return decoded text
-			return new string(System.Text.Encoding.UTF8.GetChars(Buffer));
+			return new string(System.Text.Encoding.UTF8.GetChars(buffer));
 		}
         
-        private static System.Text.Encoding DetectEncoding(byte[] Buffer)
+        private static System.Text.Encoding DetectEncoding(byte[] buffer)
         {
-            if (DetectEncoding_TryEncoding(Buffer, System.Text.Encoding.UTF8))
+            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.UTF8))
                 return System.Text.Encoding.UTF8;
-            if (DetectEncoding_TryEncoding(Buffer, System.Text.Encoding.Unicode))
+            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.Unicode))
                 return System.Text.Encoding.Unicode;
-            if (DetectEncoding_TryEncoding(Buffer, System.Text.Encoding.BigEndianUnicode))
+            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.BigEndianUnicode))
                 return System.Text.Encoding.BigEndianUnicode;
-            if (DetectEncoding_TryEncoding(Buffer, System.Text.Encoding.UTF32))
+            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.UTF32))
                 return System.Text.Encoding.UTF32;
-            if (DetectEncoding_TryEncoding(Buffer, System.Text.Encoding.ASCII))
+            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.ASCII))
                 return System.Text.Encoding.ASCII;
             return System.Text.Encoding.Default;
         }
-        private static bool DetectEncoding_TryEncoding(byte[] Buffer, System.Text.Encoding Encoding)
+        private static bool DetectEncoding_TryEncoding(byte[] buffer, System.Text.Encoding encoding)
         {
-            byte[] Preambule = Encoding.GetPreamble();
-            if (Buffer.Length < Preambule.Length)
+            byte[] preambule = encoding.GetPreamble();
+            if (buffer.Length < preambule.Length)
                 return false;
-            for (int i = 0; i != Preambule.Length; i++)
+            for (int i = 0; i != preambule.Length; i++)
             {
-                if (Buffer[i] != Preambule[i])
+                if (buffer[i] != preambule[i])
                     return false;
             }
             return true;
         }
-        private static byte[] StripPreambule(byte[] Buffer, System.Text.Encoding Encoding)
+        private static byte[] StripPreambule(byte[] buffer, System.Text.Encoding encoding)
         {
-            byte[] Preambule = Encoding.GetPreamble();
-            if (Preambule.Length == 0)
-                return Buffer;
-            byte[] NewBuffer = new byte[Buffer.Length - Preambule.Length];
-            System.Array.Copy(Buffer, Preambule.Length, NewBuffer, 0, NewBuffer.Length);
-            return NewBuffer;
+            byte[] preambule = encoding.GetPreamble();
+            if (preambule.Length == 0)
+                return buffer;
+            byte[] newbuffer = new byte[buffer.Length - preambule.Length];
+            System.Array.Copy(buffer, preambule.Length, newbuffer, 0, newbuffer.Length);
+            return newbuffer;
         }
 	}
 }
