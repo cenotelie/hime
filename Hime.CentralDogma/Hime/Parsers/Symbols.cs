@@ -2,14 +2,14 @@
 
 namespace Hime.Parsers
 {
-    public abstract class Symbol : Hime.Kernel.Symbol
+    public abstract class Symbol : Hime.Kernel.Naming.Symbol
     {
         protected string localName;
-        protected Hime.Kernel.QualifiedName completeName;
+        protected Hime.Kernel.Naming.QualifiedName completeName;
 
         internal protected ushort SID { get; private set; }
         public override string LocalName { get { return localName; } }
-        public override Hime.Kernel.QualifiedName CompleteName { get { return completeName; } }
+        public override Hime.Kernel.Naming.QualifiedName CompleteName { get { return completeName; } }
 
         public Symbol(Grammar parent, ushort SID, string Name) : base()
         {
@@ -17,20 +17,20 @@ namespace Hime.Parsers
             this.SID = SID;
             localName = Name;
             if (Parent == null)
-                completeName = new Hime.Kernel.QualifiedName(localName);
+                completeName = new Hime.Kernel.Naming.QualifiedName(localName);
             else
                 completeName = Parent.CompleteName + localName;
         }
 
-        protected override void SymbolSetParent(Hime.Kernel.Symbol Symbol)
+        protected override void SymbolSetParent(Hime.Kernel.Naming.Symbol Symbol)
         {
             if (Symbol is Grammar)
                 this.Parent = (Grammar)Symbol;
             else
-                throw new Kernel.WrongParentSymbolException(this, Symbol.GetType(), typeof(Grammar));
+                throw new Kernel.Naming.WrongParentSymbolException(this, Symbol.GetType(), typeof(Grammar));
         }
-        protected override void SymbolSetCompleteName(Hime.Kernel.QualifiedName Name) { completeName = Name; }
-        public override void SymbolAddChild(Hime.Kernel.Symbol Symbol) { throw new Kernel.CannotAddChildException(this, Symbol); }
+        protected override void SymbolSetCompleteName(Hime.Kernel.Naming.QualifiedName Name) { completeName = Name; }
+        public override void SymbolAddChild(Hime.Kernel.Naming.Symbol Symbol) { throw new Kernel.Naming.CannotAddChildException(this, Symbol); }
         public abstract System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc);
 
         internal class Comparer : IEqualityComparer<Symbol>

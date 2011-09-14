@@ -22,7 +22,7 @@ namespace Hime.Kernel.Resources
         private ResourceGraph intermediateResources;
         private ResourceCompilerRegister pluginRegister;
 
-        public Namespace OutputRootNamespace { get; private set; }
+        public Naming.Namespace OutputRootNamespace { get; private set; }
         public string CompilerName { get { return "HimeSystems.CentralDogma Compiler"; } }
         public int CompilerVersionMajor { get { return 1; } }
         public int CompilerVersionMinor { get { return 0; } }
@@ -37,7 +37,7 @@ namespace Hime.Kernel.Resources
             intermediateResources = new ResourceGraph();
             pluginRegister = new ResourceCompilerRegister();
             pluginRegister.RegisterCompiler(new Hime.Parsers.ContextFree.CFGrammarCompiler());
-            this.OutputRootNamespace = new Namespace(null, "global");
+            this.OutputRootNamespace = new Naming.Namespace(null, "global");
             this.outputLog = reporter;
         }
 
@@ -105,20 +105,20 @@ namespace Hime.Kernel.Resources
 
 
 
-        public static QualifiedName CompileQualifiedName(Redist.Parsers.SyntaxTreeNode node)
+        public static Naming.QualifiedName CompileQualifiedName(Redist.Parsers.SyntaxTreeNode node)
         {
             List<string> path = new List<string>();
             foreach (Redist.Parsers.SyntaxTreeNode Child in node.Children)
                 path.Add(((Redist.Parsers.SymbolTokenText)Child.Symbol).ValueText);
-            return new QualifiedName(path);
+            return new Naming.QualifiedName(path);
         }
-        public static SymbolAccess CompileSymbolAccess(Redist.Parsers.SyntaxTreeNode node)
+        public static Naming.SymbolAccess CompileSymbolAccess(Redist.Parsers.SyntaxTreeNode node)
         {
-            if (node.Symbol.Name == "access_internal") return SymbolAccess.Internal;
-            else if (node.Symbol.Name == "access_public") return SymbolAccess.Public;
-            else if (node.Symbol.Name == "access_protected") return SymbolAccess.Protected;
-            else if (node.Symbol.Name == "access_private") return SymbolAccess.Private;
-            return SymbolAccess.Public;
+            if (node.Symbol.Name == "access_internal") return Naming.SymbolAccess.Internal;
+            else if (node.Symbol.Name == "access_public") return Naming.SymbolAccess.Public;
+            else if (node.Symbol.Name == "access_protected") return Naming.SymbolAccess.Protected;
+            else if (node.Symbol.Name == "access_private") return Naming.SymbolAccess.Private;
+            return Naming.SymbolAccess.Public;
         }
         
 		// TODO: made this method public for test, but maybe this is a sign of not optimal architecture, think about it
@@ -135,9 +135,9 @@ namespace Hime.Kernel.Resources
             }
 
             foreach (Redist.Parsers.LexerTextError Error in UnitLexer.Errors)
-                outputLog.Report(new Reporting.BaseEntry(Reporting.Level.Error, "Lexer", Error.Message));
+                outputLog.Report(new Reporting.BaseEntry(Reporting.ELevel.Error, "Lexer", Error.Message));
             foreach (Redist.Parsers.ParserError Error in UnitParser.Errors)
-                outputLog.Report(new Reporting.BaseEntry(Reporting.Level.Error, "Parser", Error.Message));
+                outputLog.Report(new Reporting.BaseEntry(Reporting.ELevel.Error, "Parser", Error.Message));
 
             if (root == null)
             {
@@ -163,9 +163,9 @@ namespace Hime.Kernel.Resources
                 }
             }
         }
-        private void Compile_namespace(Redist.Parsers.SyntaxTreeNode node, Namespace currentNamespace)
+        private void Compile_namespace(Redist.Parsers.SyntaxTreeNode node, Naming.Namespace currentNamespace)
         {
-            QualifiedName Name = CompileQualifiedName(node.Children[0]);
+            Naming.QualifiedName Name = CompileQualifiedName(node.Children[0]);
             currentNamespace = currentNamespace.AddSubNamespace(Name);
             foreach (Redist.Parsers.SyntaxTreeNode Child in node.Children[1].Children)
             {

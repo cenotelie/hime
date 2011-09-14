@@ -38,7 +38,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
     }
 
-    public class Conflict : Hime.Kernel.Reporting.Entry
+    public class Conflict : Hime.Kernel.Reporting.IEntry
     {
         private string component;
         private State state;
@@ -49,11 +49,11 @@ namespace Hime.Parsers.ContextFree.LR
         private bool isError;
         private bool isResolved;
 
-        public Hime.Kernel.Reporting.Level Level {
+        public Hime.Kernel.Reporting.ELevel Level {
             get
             {
-                if (isError) return Kernel.Reporting.Level.Error;
-                return Kernel.Reporting.Level.Warning;
+                if (isError) return Kernel.Reporting.ELevel.Error;
+                return Kernel.Reporting.ELevel.Warning;
             }
         }
         public string Component

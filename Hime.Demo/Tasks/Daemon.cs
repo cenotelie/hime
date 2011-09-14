@@ -15,7 +15,7 @@ namespace Hime.Demo.Tasks
 
         public void Execute()
         {
-            Hime.Kernel.KernelDaemon.GenerateNextStep(directory);
+            Hime.Kernel.Daemon.GenerateNextStep(directory);
         }
     }
 }

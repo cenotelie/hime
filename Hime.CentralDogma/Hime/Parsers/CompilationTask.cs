@@ -26,7 +26,7 @@ namespace Hime.Parsers
         internal EAccessModifier GeneratedCodeModifier { get; private set; }
         
         // internal data
-        private Kernel.Namespace root;
+        private Kernel.Naming.Namespace root;
 
         internal Kernel.Reporting.Reporter Reporter { get; private set; }
         internal ParserGenerator ParserGenerator { get; private set; }
@@ -126,7 +126,7 @@ namespace Hime.Parsers
             // TODO: think about it, what if GrammarName is null => do a test
             if (GrammarName != null)
             {
-                try { grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.QualifiedName.ParseName(GrammarName)); }
+                try { grammar = (Hime.Parsers.Grammar)root.ResolveName(Hime.Kernel.Naming.QualifiedName.ParseName(GrammarName)); }
                 catch { Reporter.Error("Compiler", "Cannot find grammar: " + GrammarName); }
                 return grammar;
             }
@@ -137,15 +137,15 @@ namespace Hime.Parsers
             }
             return grammar;
         }
-        
-        private Grammar Execute_FindGrammar(Hime.Kernel.Symbol symbol)
+
+        private Grammar Execute_FindGrammar(Hime.Kernel.Naming.Symbol symbol)
         {
             if (symbol is Hime.Parsers.Grammar)
                 return (Hime.Parsers.Grammar)symbol;
-            if (symbol is Kernel.Namespace)
+            if (symbol is Kernel.Naming.Namespace)
             {
-                Kernel.Namespace nmspace = (Kernel.Namespace)symbol;
-                foreach (Kernel.Symbol child in nmspace.Children)
+                Kernel.Naming.Namespace nmspace = (Kernel.Naming.Namespace)symbol;
+                foreach (Kernel.Naming.Symbol child in nmspace.Children)
                 {
                     Hime.Parsers.Grammar gram = Execute_FindGrammar(child);
                     if (gram != null)

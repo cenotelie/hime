@@ -18,9 +18,9 @@ namespace Hime.Parsers.ContextFree
 
         public CFGrammarCompiler() { }
 
-        public void CreateResource(Kernel.Symbol container, Redist.Parsers.SyntaxTreeNode syntaxNode, Kernel.Resources.ResourceGraph graph, Hime.Kernel.Reporting.Reporter log)
+        public void CreateResource(Kernel.Naming.Symbol container, Redist.Parsers.SyntaxTreeNode syntaxNode, Kernel.Resources.ResourceGraph graph, Hime.Kernel.Reporting.Reporter log)
         {
-            Kernel.SymbolAccess Access = Kernel.Resources.ResourceCompiler.CompileSymbolAccess(syntaxNode.Children[0]);
+            Kernel.Naming.SymbolAccess Access = Kernel.Resources.ResourceCompiler.CompileSymbolAccess(syntaxNode.Children[0]);
             string Name = ((Redist.Parsers.SymbolTokenText)syntaxNode.Children[1].Symbol).ValueText;
             CFGrammar Grammar = null;
             Kernel.Resources.Resource Resource = null;
@@ -38,8 +38,8 @@ namespace Hime.Parsers.ContextFree
         {
             foreach (Redist.Parsers.SyntaxTreeNode Parent in resource.SyntaxNode.Children[2].Children)
             {
-                Kernel.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Parent);
-                Kernel.Symbol Symbol = resource.Symbol.ResolveName(Name);
+                Kernel.Naming.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Parent);
+                Kernel.Naming.Symbol Symbol = resource.Symbol.ResolveName(Name);
                 if (resource.Symbol is CFGrammarText && Symbol is CFGrammarText)
                     resource.AddDependency("parent", graph.GetResource(Symbol));
                 else if (resource.Symbol is CFGrammarBinary && Symbol is CFGrammarBinary)
@@ -56,8 +56,8 @@ namespace Hime.Parsers.ContextFree
                         {
                             if (Terminal.Children[2].Children.Count == 1)
                             {
-                                Kernel.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Terminal.Children[2].Children[0]);
-                                Kernel.Symbol Symbol = resource.Symbol.ResolveName(Name);
+                                Kernel.Naming.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Terminal.Children[2].Children[0]);
+                                Kernel.Naming.Symbol Symbol = resource.Symbol.ResolveName(Name);
                                 if (Symbol is Grammar)
                                 {
                                     bool Found = false;
@@ -393,7 +393,7 @@ namespace Hime.Parsers.ContextFree
             Grammar SubGrammar = null;
             if (Node.Children[2].Children.Count == 1)
             {
-                Kernel.QualifiedName SubGrammarName = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Node.Children[2].Children[0]);
+                Kernel.Naming.QualifiedName SubGrammarName = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Node.Children[2].Children[0]);
                 SubGrammar = (Grammar)Data.ResolveName(SubGrammarName);
             }
             Terminal Terminal = Data.AddTerminalText(Name, NFA, SubGrammar);

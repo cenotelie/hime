@@ -12,13 +12,13 @@ namespace Hime.Kernel.Resources
 {
     class Resource
     {
-        private Symbol symbol;
+        private Hime.Kernel.Naming.Symbol symbol;
         private Redist.Parsers.SyntaxTreeNode syntaxNode;
         private List<KeyValuePair<string, Resource>> dependencies;
         private IResourceCompiler compiler;
         private bool isCompiled;
 
-        public Symbol Symbol { get { return symbol; } }
+        public Hime.Kernel.Naming.Symbol Symbol { get { return symbol; } }
         public Redist.Parsers.SyntaxTreeNode SyntaxNode { get { return syntaxNode; } }
         public List<KeyValuePair<string, Resource>> Dependencies { get { return dependencies; } }
         public IResourceCompiler Compiler { get { return compiler; } }
@@ -28,7 +28,7 @@ namespace Hime.Kernel.Resources
             set { isCompiled = value; }
         }
 
-        public Resource(Symbol Symbol, Redist.Parsers.SyntaxTreeNode SyntaxNode, IResourceCompiler Compiler)
+        public Resource(Naming.Symbol Symbol, Redist.Parsers.SyntaxTreeNode SyntaxNode, IResourceCompiler Compiler)
         {
             symbol = Symbol;
             syntaxNode = SyntaxNode;

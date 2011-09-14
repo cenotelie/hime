@@ -74,8 +74,8 @@ namespace Hime.HimeV.Model
             //Parsers.CompilationTask.Create(p_Data, null, p_Method, p_TempNamespace, null, p_TempFile, false, false, false);
             Kernel.Reporting.Report Report = Task.Execute();
             foreach (Kernel.Reporting.Section section in Report.Sections)
-                foreach (Kernel.Reporting.Entry entry in section.Entries)
-                    if (entry.Level == Kernel.Reporting.Level.Error)
+                foreach (Kernel.Reporting.IEntry entry in section.Entries)
+                    if (entry.Level == Kernel.Reporting.ELevel.Error)
                         return false;
             string code = System.IO.File.ReadAllText(p_TempFile);
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");

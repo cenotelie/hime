@@ -29,13 +29,13 @@ namespace Hime.NUnit.Integration
 		[Test]
 		public void Test000_GenerateNextStep_GeneratesParserForCentralDogma()
 		{
-			KernelDaemon.GenerateNextStep(this.path);
+			Daemon.GenerateNextStep(this.path);
 		}
 
 		[Test]
 		public void Test001_GenerateNextStep_ShouldNotHaveErrors()
 		{
-			bool success = KernelDaemon.GenerateNextStep(this.path);
+			bool success = Daemon.GenerateNextStep(this.path);
 			Assert.IsTrue(success);
 		}
 		

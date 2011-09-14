@@ -42,7 +42,7 @@ namespace Hime.Parsers.ContextFree.LR
                 return enumerator.Current;
             }
         }
-        private void Report(Hime.Kernel.Reporting.Entry entry)
+        private void Report(Hime.Kernel.Reporting.IEntry entry)
         {
             lock (reporter)
             {

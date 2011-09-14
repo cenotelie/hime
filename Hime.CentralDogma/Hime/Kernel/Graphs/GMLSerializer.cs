@@ -2,7 +2,7 @@
 
 namespace Hime.Kernel.Graphs
 {
-    public sealed class GMLSerializer
+    public class GMLSerializer
     {
         private string file;
         private System.Xml.XmlDocument xMLDoc;
