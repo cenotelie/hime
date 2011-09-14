@@ -18,23 +18,23 @@ namespace Hime.Parsers
             set { priority = value; }
         }
 
-        public Terminal(Grammar Parent, ushort SID, string Name, int Priority) : base(Parent, SID, Name)
+        public Terminal(Grammar parent, ushort sid, string name, int priority) : base(parent, sid, name)
         {
-            priority = Priority;
+            this.priority = priority;
         }
 
-        public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument Doc)
+        public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document)
         {
-            System.Xml.XmlNode Node = Doc.CreateElement("SymbolTerminal");
-            Node.Attributes.Append(Doc.CreateAttribute("SID"));
-            Node.Attributes.Append(Doc.CreateAttribute("Name"));
-            Node.Attributes.Append(Doc.CreateAttribute("Priority"));
-            Node.Attributes.Append(Doc.CreateAttribute("Value"));
-            Node.Attributes["SID"].Value = SID.ToString();
-            Node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
-            Node.Attributes["Priority"].Value = priority.ToString();
-            Node.Attributes["Value"].Value = this.ToString();
-            return Node;
+            System.Xml.XmlNode node = document.CreateElement("SymbolTerminal");
+            node.Attributes.Append(document.CreateAttribute("SID"));
+            node.Attributes.Append(document.CreateAttribute("Name"));
+            node.Attributes.Append(document.CreateAttribute("Priority"));
+            node.Attributes.Append(document.CreateAttribute("Value"));
+            node.Attributes["SID"].Value = SID.ToString();
+            node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
+            node.Attributes["Priority"].Value = priority.ToString();
+            node.Attributes["Value"].Value = this.ToString();
+            return node;
         }
     }
 }

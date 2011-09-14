@@ -7,8 +7,7 @@
 
 namespace Hime.Parsers
 {
-	// TODO: try to remove enums (if possible, not always possible)
-    public enum EParsingMethod : byte
+	public enum EParsingMethod : byte
     {
         LR0 = 1,
         LR1 = 2,

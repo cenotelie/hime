@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Hime.Kernel.Unicode;
 
 namespace Hime.Parsers.ContextFree
 {
@@ -140,7 +141,7 @@ namespace Hime.Parsers.ContextFree
             Final.StateExit = Final.AddNewState();
             char begin = System.Convert.ToChar(0x0000);
             char end = System.Convert.ToChar(0xFFFF);
-            Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(begin, end), Final.StateExit);
+            Final.StateEntry.AddTransition(new Automata.CharSpan(begin, end), Final.StateExit);
             return Final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(Redist.Parsers.SyntaxTreeNode Node)
@@ -152,7 +153,7 @@ namespace Hime.Parsers.ContextFree
             Value = Value.Substring(2, Value.Length - 2);
             int CharInt = System.Convert.ToInt32(Value, 16);
             char Char = System.Convert.ToChar(CharInt);
-            Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(Char, Char), Final.StateExit);
+            Final.StateEntry.AddTransition(new Automata.CharSpan(Char, Char), Final.StateExit);
             return Final;
         }
         private string ReplaceEscapees(string value)
@@ -194,7 +195,7 @@ namespace Hime.Parsers.ContextFree
             foreach (char c in Value)
             {
                 Automata.NFAState Temp = Final.AddNewState();
-                Final.StateExit.AddTransition(new Automata.TerminalNFACharSpan(c, c), Temp);
+                Final.StateExit.AddTransition(new Automata.CharSpan(c, c), Temp);
                 Final.StateExit = Temp;
             }
             return Final;
@@ -213,33 +214,33 @@ namespace Hime.Parsers.ContextFree
                 Value = Value.Substring(1);
                 Positive = false;
             }
-            List<Automata.TerminalNFACharSpan> Spans = new List<Automata.TerminalNFACharSpan>();
+            List<Automata.CharSpan> Spans = new List<Automata.CharSpan>();
             for (int i = 0; i != Value.Length; i++)
             {
                 if ((i != Value.Length - 1) && (Value[i + 1] == '-'))
                 {
-                    Spans.Add(new Automata.TerminalNFACharSpan(Value[i], Value[i + 2]));
+                    Spans.Add(new Automata.CharSpan(Value[i], Value[i + 2]));
                     i += 2;
                 }
                 else
-                    Spans.Add(new Automata.TerminalNFACharSpan(Value[i], Value[i]));
+                    Spans.Add(new Automata.CharSpan(Value[i], Value[i]));
             }
             if (Positive)
             {
-                foreach (Automata.TerminalNFACharSpan Span in Spans)
+                foreach (Automata.CharSpan Span in Spans)
                     Final.StateEntry.AddTransition(Span, Final.StateExit);
             }
             else
             {
-                Spans.Sort(new System.Comparison<Automata.TerminalNFACharSpan>(Automata.TerminalNFACharSpan.Compare));
+                Spans.Sort(new System.Comparison<Automata.CharSpan>(Automata.CharSpan.Compare));
                 char b = char.MinValue;
                 for (int i = 0; i != Spans.Count; i++)
                 {
                     if (Spans[i].Begin > b)
-                        Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(b, System.Convert.ToChar(Spans[i].Begin - 1)), Final.StateExit);
+                        Final.StateEntry.AddTransition(new Automata.CharSpan(b, System.Convert.ToChar(Spans[i].Begin - 1)), Final.StateExit);
                     b = System.Convert.ToChar(Spans[i].End + 1);
                 }
-                Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(b, char.MaxValue), Final.StateExit);
+                Final.StateEntry.AddTransition(new Automata.CharSpan(b, char.MaxValue), Final.StateExit);
             }
             return Final;
         }
@@ -250,9 +251,9 @@ namespace Hime.Parsers.ContextFree
             Final.StateExit = Final.AddNewState();
             Redist.Parsers.SymbolTokenText token = (Redist.Parsers.SymbolTokenText)Node.Symbol;
             string value = token.ValueText.Substring(4, token.ValueText.Length - 5);
-            Hime.Parsers.UnicodeBlock block = Hime.Parsers.UnicodeBlock.Categories[value];
+            UnicodeBlock block = UnicodeBlock.Categories[value];
             // Create transition and return
-            Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), Final.StateExit);
+            Final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), Final.StateExit);
             return Final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(Redist.Parsers.SyntaxTreeNode Node)
@@ -262,10 +263,10 @@ namespace Hime.Parsers.ContextFree
             Final.StateExit = Final.AddNewState();
             Redist.Parsers.SymbolTokenText token = (Redist.Parsers.SymbolTokenText)Node.Symbol;
             string value = token.ValueText.Substring(4, token.ValueText.Length - 5);
-            Hime.Parsers.UnicodeCategory category = Hime.Parsers.UnicodeCategory.Classes[value];
+            UnicodeCategory category = UnicodeCategory.Classes[value];
             // Create transitions and return
-            foreach (Hime.Parsers.UnicodeSpan span in category.Spans)
-                Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), Final.StateExit);
+            foreach (UnicodeSpan span in category.Spans)
+                Final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), Final.StateExit);
             return Final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_span(Redist.Parsers.SyntaxTreeNode Node)
@@ -289,7 +290,7 @@ namespace Hime.Parsers.ContextFree
                 SpanBegin = Temp;
             }
             // Create transition and return
-            Final.StateEntry.AddTransition(new Automata.TerminalNFACharSpan(System.Convert.ToChar(SpanBegin), System.Convert.ToChar(SpanEnd)), Final.StateExit);
+            Final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(SpanBegin), System.Convert.ToChar(SpanEnd)), Final.StateExit);
             return Final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_name(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)

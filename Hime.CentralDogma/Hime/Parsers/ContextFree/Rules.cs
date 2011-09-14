@@ -21,7 +21,7 @@ namespace Hime.Parsers.ContextFree
             return choices[Index];
         }
 
-        public override Symbol GetSymbolAtIndex(int Index)
+        public override Symbol GetSymbolAt(int Index)
         {
             // If the definition does not contains choices (it may be a choice itself)
             if (choices == null)

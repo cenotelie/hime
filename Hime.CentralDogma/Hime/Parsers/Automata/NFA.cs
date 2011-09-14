@@ -2,155 +2,6 @@
 
 namespace Hime.Parsers.Automata
 {
-    public struct TerminalNFACharSpan
-    {
-        private char spanBegin;
-        private char spanEnd;
-
-        public static TerminalNFACharSpan Null = new TerminalNFACharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
-
-        public char Begin { get { return spanBegin; } }
-        public char End { get { return spanEnd; } }
-        public int Length { get { return spanEnd - spanBegin + 1; } }
-
-        public TerminalNFACharSpan(char Begin, char End)
-        {
-            spanBegin = Begin;
-            spanEnd = End;
-        }
-
-        public static TerminalNFACharSpan Intersect(TerminalNFACharSpan Left, TerminalNFACharSpan Right)
-        {
-            if (Left.spanBegin < Right.spanBegin)
-            {
-                if (Left.spanEnd < Right.spanBegin)
-                    return Null;
-                if (Left.spanEnd < Right.spanEnd)
-                    return new TerminalNFACharSpan(Right.spanBegin, Left.spanEnd);
-                return new TerminalNFACharSpan(Right.spanBegin, Right.spanEnd);
-            }
-            else
-            {
-                if (Right.spanEnd < Left.spanBegin)
-                    return Null;
-                if (Right.spanEnd < Left.spanEnd)
-                    return new TerminalNFACharSpan(Left.spanBegin, Right.spanEnd);
-                return new TerminalNFACharSpan(Left.spanBegin, Left.spanEnd);
-            }
-        }
-
-        public static TerminalNFACharSpan Split(TerminalNFACharSpan Original, TerminalNFACharSpan Splitter, out TerminalNFACharSpan Rest)
-        {
-            if (Original.spanBegin == Splitter.spanBegin)
-            {
-                Rest = Null;
-                if (Original.spanEnd == Splitter.spanEnd) return Null;
-                return new TerminalNFACharSpan(System.Convert.ToChar(Splitter.spanEnd + 1), Original.spanEnd);
-            }
-            if (Original.spanEnd == Splitter.spanEnd)
-            {
-                Rest = Null;
-                return new TerminalNFACharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
-            }
-            Rest = new TerminalNFACharSpan(System.Convert.ToChar(Splitter.spanEnd + 1), Original.spanEnd);
-            return new TerminalNFACharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
-        }
-
-        public static int Compare(TerminalNFACharSpan Left, TerminalNFACharSpan Right) { return Left.spanBegin.CompareTo(Right.spanBegin); }
-
-        public override string ToString()
-        {
-            if (spanBegin > spanEnd)
-                return string.Empty;
-            if (spanBegin == spanEnd)
-                return CharToString(spanBegin);
-            return "[" + CharToString(spanBegin) + "-" + CharToString(spanEnd) + "]";
-        }
-
-        private string CharToString(char c)
-        {
-            System.Globalization.UnicodeCategory cat = char.GetUnicodeCategory(c);
-            switch (cat)
-            {
-                case System.Globalization.UnicodeCategory.ModifierLetter:
-                case System.Globalization.UnicodeCategory.NonSpacingMark:
-                case System.Globalization.UnicodeCategory.SpacingCombiningMark:
-                case System.Globalization.UnicodeCategory.EnclosingMark:
-                case System.Globalization.UnicodeCategory.SpaceSeparator:
-                case System.Globalization.UnicodeCategory.LineSeparator:
-                case System.Globalization.UnicodeCategory.ParagraphSeparator:
-                case System.Globalization.UnicodeCategory.Control:
-                case System.Globalization.UnicodeCategory.Format:
-                case System.Globalization.UnicodeCategory.Surrogate:
-                case System.Globalization.UnicodeCategory.PrivateUse:
-                case System.Globalization.UnicodeCategory.OtherNotAssigned:
-                    return CharToString_NonPrintable(c);
-                default:
-                    return c.ToString();
-            }
-        }
-        private string CharToString_NonPrintable(char c)
-        {
-            string result = "U+" + System.Convert.ToUInt16(c).ToString("X");
-            return result;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is TerminalNFACharSpan)
-            {
-                TerminalNFACharSpan Span = (TerminalNFACharSpan)obj;
-                return ((spanBegin == Span.spanBegin) && (spanEnd == Span.spanEnd));
-            }
-            return false;
-        }
-        public override int GetHashCode() { return base.GetHashCode(); }
-    }
-
-
-
-
-    public sealed class NFAState
-    {
-        public class Transition
-        {
-            public TerminalNFACharSpan span;
-            public NFAState next;
-            public Transition(TerminalNFACharSpan span, NFAState next)
-            {
-                this.span = span;
-                this.next = next;
-            }
-        }
-
-        private List<Transition> transitions;
-        private Terminal final;
-        private int mark;
-
-        public List<Transition> Transitions { get { return transitions; } }
-        public Terminal Final
-        {
-            get { return final; }
-            set { final = value; }
-        }
-        public int Mark
-        {
-            get { return mark; }
-            set { mark = value; }
-        }
-
-        public NFAState()
-        {
-            transitions = new List<Transition>();
-            final = null;
-            mark = 0;
-        }
-
-        public void AddTransition(TerminalNFACharSpan Value, NFAState Next) { transitions.Add(new Transition(Value, Next)); }
-        public void ClearTransitions() { transitions.Clear(); }
-    }
-
-
     public sealed class NFA
     {
         private List<NFAState> states;
@@ -158,7 +9,7 @@ namespace Hime.Parsers.Automata
         private NFAState stateExit;
 
 
-        public static readonly TerminalNFACharSpan Epsilon = new TerminalNFACharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
+        public static readonly CharSpan Epsilon = new CharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
         public ICollection<NFAState> States { get { return states; } }
         public int StatesCount { get { return states.Count; } }
         public NFAState StateEntry
@@ -177,384 +28,208 @@ namespace Hime.Parsers.Automata
             states = new List<NFAState>();
         }
 
-        public NFA(DFA DFA)
+        public NFA(DFA dfa)
         {
             states = new List<NFAState>();
-            List<DFAState> DFAStates = new List<DFAState>(DFA.States);
-            foreach (DFAState State in DFAStates)
+            List<DFAState> dfaStates = new List<DFAState>(dfa.States);
+            foreach (DFAState state in dfaStates)
                 states.Add(new NFAState());
-            for (int i = 0; i != DFAStates.Count; i++)
+            for (int i = 0; i != dfaStates.Count; i++)
             {
-                states[i].Final = DFAStates[i].Final;
-                foreach (TerminalNFACharSpan Transition in DFAStates[i].Transitions.Keys)
-                    states[i].AddTransition(Transition, states[DFAStates.IndexOf(DFAStates[i].Transitions[Transition])]);
+                states[i].Final = dfaStates[i].Final;
+                foreach (CharSpan transition in dfaStates[i].Transitions.Keys)
+                    states[i].AddTransition(transition, states[dfaStates.IndexOf(dfaStates[i].Transitions[transition])]);
             }
             stateEntry = states[0];
         }
 
         public NFAState AddNewState()
         {
-            NFAState State = new NFAState();
-            states.Add(State);
-            return State;
+            NFAState state = new NFAState();
+            states.Add(state);
+            return state;
         }
 
         public NFA Clone() { return Clone(true); }
-        public NFA Clone(bool KeepFinals)
+        public NFA Clone(bool keepFinals)
         {
-            NFA Copy = new NFA();
+            NFA copy = new NFA();
 
             // Create new states for copy, add marks and copy finals if required
             for (int i = 0; i != states.Count; i++)
             {
-                NFAState State = new NFAState();
-                State.Mark = states[i].Mark;
-                if (KeepFinals)
-                    State.Final = states[i].Final;
-                Copy.states.Add(State);
+                NFAState state = new NFAState();
+                state.Mark = states[i].Mark;
+                if (keepFinals)
+                    state.Final = states[i].Final;
+                copy.states.Add(state);
             }
             // Make linkage
             for (int i = 0; i != states.Count; i++)
             {
-                foreach (NFAState.Transition transition in states[i].Transitions)
-                    Copy.states[i].AddTransition(transition.span, Copy.states[states.IndexOf(transition.next)]);
+                foreach (NFATransition transition in states[i].Transitions)
+                    copy.states[i].AddTransition(transition.span, copy.states[states.IndexOf(transition.next)]);
             }
             if (stateEntry != null)
-                Copy.stateEntry = Copy.states[states.IndexOf(stateEntry)];
+                copy.stateEntry = copy.states[states.IndexOf(stateEntry)];
             if (stateExit != null)
-                Copy.stateExit = Copy.states[states.IndexOf(stateExit)];
-            return Copy;
+                copy.stateExit = copy.states[states.IndexOf(stateExit)];
+            return copy;
         }
 
-        public void InsertSubNFA(NFA Sub)
+        public void InsertSubNFA(NFA sub)
         {
-            states.AddRange(Sub.states);
+            states.AddRange(sub.states);
         }
 
 
-        public static NFA OperatorOption(NFA Sub, bool UseClones)
+        public static NFA OperatorOption(NFA sub, bool useClones)
         {
-            NFA Final = new NFA();
-            Final.stateEntry = new NFAState();
-            Final.stateExit = new NFAState();
-            Final.states.Add(Final.stateEntry);
-            if (UseClones)
-                Sub = Sub.Clone();
-            Final.states.AddRange(Sub.states);
-            Final.states.Add(Final.stateExit);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Sub.stateEntry);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Final.stateExit);
-            Sub.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
-            return Final;
+            NFA final = new NFA();
+            final.stateEntry = new NFAState();
+            final.stateExit = new NFAState();
+            final.states.Add(final.stateEntry);
+            if (useClones)
+                sub = sub.Clone();
+            final.states.AddRange(sub.states);
+            final.states.Add(final.stateExit);
+            final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
+            final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
+            sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+            return final;
         }
-        public static NFA OperatorStar(NFA Sub, bool UseClones)
+        public static NFA OperatorStar(NFA sub, bool useClones)
         {
-            NFA Final = new NFA();
-            Final.stateEntry = new NFAState();
-            Final.stateExit = new NFAState();
-            Final.states.Add(Final.stateEntry);
-            if (UseClones)
-                Sub = Sub.Clone();
-            Final.states.AddRange(Sub.states);
-            Final.states.Add(Final.stateExit);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Sub.stateEntry);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Final.stateExit);
-            Sub.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
-            Final.stateExit.AddTransition(NFA.Epsilon, Sub.stateEntry);
-            return Final;
+            NFA final = new NFA();
+            final.stateEntry = new NFAState();
+            final.stateExit = new NFAState();
+            final.states.Add(final.stateEntry);
+            if (useClones)
+                sub = sub.Clone();
+            final.states.AddRange(sub.states);
+            final.states.Add(final.stateExit);
+            final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
+            final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
+            sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+            final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
+            return final;
         }
-        public static NFA OperatorPlus(NFA Sub, bool UseClones)
+        public static NFA OperatorPlus(NFA sub, bool useClones)
         {
-            NFA Final = new NFA();
-            Final.stateEntry = new NFAState();
-            Final.stateExit = new NFAState();
-            Final.states.Add(Final.stateEntry);
-            if (UseClones)
-                Sub = Sub.Clone();
-            Final.states.AddRange(Sub.states);
-            Final.states.Add(Final.stateExit);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Sub.stateEntry);
-            Sub.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
-            Final.stateExit.AddTransition(NFA.Epsilon, Sub.stateEntry);
-            return Final;
+            NFA final = new NFA();
+            final.stateEntry = new NFAState();
+            final.stateExit = new NFAState();
+            final.states.Add(final.stateEntry);
+            if (useClones)
+                sub = sub.Clone();
+            final.states.AddRange(sub.states);
+            final.states.Add(final.stateExit);
+            final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
+            sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+            final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
+            return final;
         }
-        public static NFA OperatorRange(NFA Sub, bool UseClones, uint Min, uint Max)
+        public static NFA OperatorRange(NFA sub, bool useClones, uint min, uint max)
         {
-            NFA Final = new NFA();
-            Final.stateEntry = new NFAState();
-            Final.stateExit = new NFAState();
-            Final.states.Add(Final.stateEntry);
+            NFA final = new NFA();
+            final.stateEntry = new NFAState();
+            final.stateExit = new NFAState();
+            final.states.Add(final.stateEntry);
 
-            NFAState Last = Final.stateEntry;
-            for (uint i = 0; i != Min; i++)
+            NFAState last = final.stateEntry;
+            for (uint i = 0; i != min; i++)
             {
-                NFA Inner = Sub.Clone();
-                Final.states.AddRange(Inner.states);
-                Last.AddTransition(NFA.Epsilon, Inner.stateEntry);
-                Last = Inner.stateExit;
+                NFA inner = sub.Clone();
+                final.states.AddRange(inner.states);
+                last.AddTransition(NFA.Epsilon, inner.stateEntry);
+                last = inner.stateExit;
             }
-            for (uint i = Min; i != Max; i++)
+            for (uint i = min; i != max; i++)
             {
-                NFA Inner = OperatorOption(Sub, true);
-                Final.states.AddRange(Inner.states);
-                Last.AddTransition(NFA.Epsilon, Inner.stateEntry);
-                Last = Inner.stateExit;
+                NFA inner = OperatorOption(sub, true);
+                final.states.AddRange(inner.states);
+                last.AddTransition(NFA.Epsilon, inner.stateEntry);
+                last = inner.stateExit;
             }
-            Final.states.Add(Final.stateExit);
-            Last.AddTransition(NFA.Epsilon, Final.stateExit);
+            final.states.Add(final.stateExit);
+            last.AddTransition(NFA.Epsilon, final.stateExit);
             
-            if (Min == 0)
-                Final.stateEntry.AddTransition(NFA.Epsilon, Final.stateExit);
-            return Final;
+            if (min == 0)
+                final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
+            return final;
         }
-        public static NFA OperatorConcat(NFA Left, NFA Right, bool UseClones)
+        public static NFA OperatorConcat(NFA left, NFA right, bool useClones)
         {
-            NFA Final = new NFA();
-            if (UseClones)
+            NFA final = new NFA();
+            if (useClones)
             {
-                Left = Left.Clone(true);
-                Right = Right.Clone(true);
+                left = left.Clone(true);
+                right = right.Clone(true);
             }
-            Final.states.AddRange(Left.states);
-            Final.states.AddRange(Right.states);
-            Final.stateEntry = Left.stateEntry;
-            Final.stateExit = Right.stateExit;
-            Left.stateExit.AddTransition(NFA.Epsilon, Right.stateEntry);
-            return Final;
+            final.states.AddRange(left.states);
+            final.states.AddRange(right.states);
+            final.stateEntry = left.stateEntry;
+            final.stateExit = right.stateExit;
+            left.stateExit.AddTransition(NFA.Epsilon, right.stateEntry);
+            return final;
         }
-        public static NFA OperatorDifference(NFA Left, NFA Right, bool UseClones)
+        public static NFA OperatorDifference(NFA left, NFA right, bool useClones)
         {
-            NFA Final = new NFA();
-            Final.stateEntry = Final.AddNewState();
-            Final.stateExit = Final.AddNewState();
-            NFAState StatePositive = Final.AddNewState();
-            NFAState StateNegative = Final.AddNewState();
-            StatePositive.Mark = 1;
-            StateNegative.Mark = -1;
+            NFA final = new NFA();
+            final.stateEntry = final.AddNewState();
+            final.stateExit = final.AddNewState();
+            NFAState statePositive = final.AddNewState();
+            NFAState stateNegative = final.AddNewState();
+            statePositive.Mark = 1;
+            stateNegative.Mark = -1;
 
-            if (UseClones)
+            if (useClones)
             {
-                Left = Left.Clone(true);
-                Right = Right.Clone(true);
+                left = left.Clone(true);
+                right = right.Clone(true);
             }
-            Final.states.AddRange(Left.states);
-            Final.states.AddRange(Right.states);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Left.stateEntry);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Right.stateEntry);
-            Left.stateExit.AddTransition(NFA.Epsilon, StatePositive);
-            Right.stateExit.AddTransition(NFA.Epsilon, StateNegative);
-            StatePositive.AddTransition(NFA.Epsilon, Final.stateExit);
+            final.states.AddRange(left.states);
+            final.states.AddRange(right.states);
+            final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
+            final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
+            left.stateExit.AddTransition(NFA.Epsilon, statePositive);
+            right.stateExit.AddTransition(NFA.Epsilon, stateNegative);
+            statePositive.AddTransition(NFA.Epsilon, final.stateExit);
 
-            Final.stateExit.Final = TerminalDummy.Instance;
-            DFA Equivalent = new DFA(Final);
-            Equivalent.Prune();
-            Final = new NFA(Equivalent);
-            Final.stateExit = Final.AddNewState();
-            foreach (NFAState State in Final.states)
+            final.stateExit.Final = TerminalDummy.Instance;
+            DFA equivalent = new DFA(final);
+            equivalent.Prune();
+            final = new NFA(equivalent);
+            final.stateExit = final.AddNewState();
+            foreach (NFAState state in final.states)
             {
-                if (State.Final == TerminalDummy.Instance)
+                if (state.Final == TerminalDummy.Instance)
                 {
-                    State.Final = null;
-                    State.AddTransition(NFA.Epsilon, Final.stateExit);
+                    state.Final = null;
+                    state.AddTransition(NFA.Epsilon, final.stateExit);
                 }
             }
-            return Final;
+            return final;
         }
-        public static NFA OperatorUnion(NFA Left, NFA Right, bool UseClones)
+        public static NFA OperatorUnion(NFA left, NFA right, bool useClones)
         {
-            NFA Final = new NFA();
-            Final.stateEntry = new NFAState();
-            Final.stateExit = new NFAState();
-            Final.states.Add(Final.stateEntry);
-            if (UseClones)
+            NFA final = new NFA();
+            final.stateEntry = new NFAState();
+            final.stateExit = new NFAState();
+            final.states.Add(final.stateEntry);
+            if (useClones)
             {
-                Left = Left.Clone(true);
-                Right = Right.Clone(true);
+                left = left.Clone(true);
+                right = right.Clone(true);
             }
-            Final.states.AddRange(Left.states);
-            Final.states.AddRange(Right.states);
-            Final.states.Add(Final.stateExit);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Left.stateEntry);
-            Final.stateEntry.AddTransition(NFA.Epsilon, Right.stateEntry);
-            Left.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
-            Right.stateExit.AddTransition(NFA.Epsilon, Final.stateExit);
-            return Final;
+            final.states.AddRange(left.states);
+            final.states.AddRange(right.states);
+            final.states.Add(final.stateExit);
+            final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
+            final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
+            left.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+            right.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+            return final;
         }
-    }
-
-
-    public sealed class NFAStateSet : List<NFAState>
-    {
-        public new void Add(NFAState item)
-        {
-            if (!base.Contains(item))
-                base.Add(item);
-        }
-        public new void AddRange(IEnumerable<NFAState> items)
-        {
-            foreach (NFAState item in items)
-            {
-                if (!base.Contains(item))
-                    base.Add(item);
-            }
-        }
-
-
-        private void Close_Normal()
-        {
-            for (int i = 0; i != Count; i++)
-                foreach (NFAState.Transition transition in this[i].Transitions)
-                    if (transition.span.Equals(NFA.Epsilon))
-                        this.Add(transition.next);
-        }
-        public void Close()
-        {
-            // Close the set
-            Close_Normal();
-
-            NFAState StatePositive = null;
-            NFAState StateNegative = null;
-            foreach (NFAState State in this)
-            {
-                if (State.Mark > 0) StatePositive = State;
-                if (State.Mark < 0) StateNegative = State;
-            }
-            if (StatePositive != null && StateNegative != null)
-                foreach (NFAState.Transition transition in StatePositive.Transitions)
-                    if (transition.span.Equals(NFA.Epsilon))
-                        this.Remove(transition.next);
-        }
-
-        public void Normalize()
-        {
-            // Trace if modification has occured
-            bool Modify = true;
-            // Repeat while modifications occured
-            while (Modify)
-            {
-                Modify = false;
-                // For each NFA state in the set
-                for (int s1 = 0; s1 != this.Count; s1++)
-                {
-                    // For each transition in this NFA state Set[s1]
-                    for (int t1 = 0; t1 != this[s1].Transitions.Count; t1++)
-                    {
-                        // If this is an ε transition, go to next transition
-                        if (this[s1].Transitions[t1].span.Equals(NFA.Epsilon))
-                            continue;
-                        //Confront to each transition in each NFA state of the set
-                        for (int s2 = 0; s2 != this.Count; s2++)
-                        {
-                            for (int t2 = 0; t2 != this[s2].Transitions.Count; t2++)
-                            {
-                                if (this[s2].Transitions[t2].span.Equals(NFA.Epsilon))
-                                    continue;
-                                // If these are not the same transitions of the same state
-                                if ((s1 != s2) || (t1 != t2))
-                                {
-                                    // If the two transition are equal : do nothing
-                                    if (this[s1].Transitions[t1].span.Equals(this[s2].Transitions[t2].span))
-                                        continue;
-                                    // Get the intersection of the two spans
-                                    TerminalNFACharSpan Inter = TerminalNFACharSpan.Intersect(this[s1].Transitions[t1].span, this[s2].Transitions[t2].span);
-                                    // If no intersection : do nothing
-                                    if (Inter.Length == 0)
-                                        continue;
-
-                                    // Split transition1 in 1, 2 or 3 transitions and modifiy the states accordingly
-                                    TerminalNFACharSpan Part1;
-                                    TerminalNFACharSpan Part2;
-                                    Part1 = TerminalNFACharSpan.Split(this[s1].Transitions[t1].span, Inter, out Part2);
-                                    this[s1].Transitions[t1] = new NFAState.Transition(Inter, this[s1].Transitions[t1].next);
-                                    if (Part1.Length != 0) this[s1].AddTransition(Part1, this[s1].Transitions[t1].next);
-                                    if (Part2.Length != 0) this[s1].AddTransition(Part2, this[s1].Transitions[t1].next);
-
-                                    // Split transition2 in 1, 2 or 3 transitions and modifiy the states accordingly
-                                    Part1 = TerminalNFACharSpan.Split(this[s2].Transitions[t2].span, Inter, out Part2);
-                                    this[s2].Transitions[t2] = new NFAState.Transition(Inter, this[s2].Transitions[t2].next);
-                                    if (Part1.Length != 0) this[s2].AddTransition(Part1, this[s2].Transitions[t2].next);
-                                    if (Part2.Length != 0) this[s2].AddTransition(Part2, this[s2].Transitions[t2].next);
-                                    Modify = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public Dictionary<TerminalNFACharSpan, NFAStateSet> GetTransitions()
-        {
-            Dictionary<TerminalNFACharSpan, NFAStateSet> Transitions = new Dictionary<TerminalNFACharSpan, NFAStateSet>();
-            // For each state
-            foreach (NFAState State in this)
-            {
-                // For each transition
-                foreach (NFAState.Transition transition in State.Transitions)
-                {
-                    // If this is an ε-transition : pass
-                    if (transition.span.Equals(NFA.Epsilon))
-                        continue;
-                    // Add the transition's target to set's transitions dictionnary
-                    if (Transitions.ContainsKey(transition.span))
-                        Transitions[transition.span].Add(transition.next);
-                    else
-                    {
-                        // Create a new child
-                        NFAStateSet Set = new NFAStateSet();
-                        Set.Add(transition.next);
-                        Transitions.Add(transition.span, Set);
-                    }
-                }
-            }
-            // Close all children
-            foreach (NFAStateSet Set in Transitions.Values)
-                Set.Close();
-            return Transitions;
-        }
-
-        public List<Terminal> GetFinals()
-        {
-            List<Terminal> Finals = new List<Terminal>();
-            foreach (NFAState State in this)
-                if (State.Final != null)
-                    Finals.Add(State.Final);
-            return Finals;
-        }
-
-        public static bool operator ==(NFAStateSet Left, NFAStateSet Right)
-        {
-            if (Left.Count != Right.Count)
-                return false;
-            foreach (NFAState S in Left)
-            {
-                if (!Right.Contains(S))
-                    return false;
-            }
-            return true;
-        }
-        public static bool operator !=(NFAStateSet Left, NFAStateSet Right)
-        {
-            if (Left.Count != Right.Count)
-                return false;
-            foreach (NFAState S in Left)
-            {
-                if (!Right.Contains(S))
-                    return false;
-            }
-            return true;
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj is NFAStateSet)
-            {
-                NFAStateSet Set = (NFAStateSet)obj;
-                return (this == Set);
-            }
-            else
-                return false;
-        }
-
-        public override int GetHashCode() { return base.GetHashCode(); }
     }
 }

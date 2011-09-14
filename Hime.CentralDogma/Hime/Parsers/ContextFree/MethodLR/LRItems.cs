@@ -30,7 +30,7 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
         
-        public Symbol NextSymbol { get { return definition.GetSymbolAtIndex(dotPosition); } }
+        public Symbol NextSymbol { get { return definition.GetSymbolAt(dotPosition); } }
         public CFRuleDefinition NextChoice { get { return rule.Definition.GetChoiceAtIndex(dotPosition + 1); } }
 
         public abstract TerminalSet Lookaheads { get; }

@@ -108,6 +108,16 @@
     <Compile Include="Hime\Kernel\Resources\Resource.cs" />
     <Compile Include="Hime\Kernel\Resources\ResourceCompiler.cs" />
     <Compile Include="Hime\Kernel\Resources\ResourceException.cs" />
+    <Compile Include="Hime\Kernel\Unicode\UnicodeBlock.cs" />
+    <Compile Include="Hime\Kernel\Unicode\UnicodeCategory.cs" />
+    <Compile Include="Hime\Kernel\Unicode\UnicodeSpan.cs" />
+    <Compile Include="Hime\Parsers\Automata\DFAPartition.cs" />
+    <Compile Include="Hime\Parsers\Automata\DFAState.cs" />
+    <Compile Include="Hime\Parsers\Automata\DFAStateGroup.cs" />
+    <Compile Include="Hime\Parsers\Automata\NFAState.cs" />
+    <Compile Include="Hime\Parsers\Automata\NFAStateSet.cs" />
+    <Compile Include="Hime\Parsers\Automata\CharSpan.cs" />
+    <Compile Include="Hime\Parsers\Automata\NFATransition.cs" />
     <Compile Include="Hime\Parsers\EAccessModifier.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
@@ -151,15 +161,23 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateActionReduce.cs" />
     <Compile Include="Hime\Parsers\ContextFree\Rules.cs" />
     <Compile Include="Hime\Parsers\Automata\DFA.cs" />
-    <Compile Include="Hime\Parsers\Exporters.cs" />
-    <Compile Include="Hime\Parsers\Grammars.cs" />
+    <Compile Include="Hime\Parsers\Exporters\TextLexerExporter.cs" />
+    <Compile Include="Hime\Parsers\Grammar.cs" />
     <Compile Include="Hime\Parsers\EParsingMethod.cs" />
     <Compile Include="Hime\Parsers\ParserData.cs" />
+    <Compile Include="Hime\Parsers\ParserGenerator.cs" />
+    <Compile Include="Hime\Parsers\RuleDefinitionPart.cs" />
+    <Compile Include="Hime\Parsers\RuleDefinitionPartAction.cs" />
+    <Compile Include="Hime\Parsers\Symbol.cs" />
     <Compile Include="Hime\Parsers\Terminal.cs" />
+    <Compile Include="Hime\Parsers\TerminalBin.cs" />
+    <Compile Include="Hime\Parsers\TerminalBinType.cs" />
+    <Compile Include="Hime\Parsers\TerminalDollar.cs" />
+    <Compile Include="Hime\Parsers\TerminalDummy.cs" />
+    <Compile Include="Hime\Parsers\TerminalEpsilon.cs" />
     <Compile Include="Hime\Parsers\TerminalSet.cs" />
-    <Compile Include="Hime\Parsers\Unicode.cs" />
-    <Compile Include="Hime\Parsers\Rules.cs" />
-    <Compile Include="Hime\Parsers\Symbols.cs" />
+    <Compile Include="Hime\Parsers\RuleDefinition.cs" />
+    <Compile Include="Hime\Parsers\Action.cs" />
     <Compile Include="Hime\Kernel\Daemon.cs" />
     <Compile Include="Hime\Kernel\Reporting\Section.cs" />
     <Compile Include="Hime\Kernel\Resources\ResourceAccessor.cs" />
@@ -170,6 +188,8 @@
     <Compile Include="Hime\Kernel\Resources\IResourceCompiler.cs" />
     <Compile Include="Hime\Kernel\Resources\Parser.cs" />
     <Compile Include="Hime\Parsers\Variable.cs" />
+    <Compile Include="Hime\Parsers\Virtual.cs" />
+    <Compile Include="Hime\Parsers\TerminalText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

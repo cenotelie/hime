@@ -18,32 +18,33 @@ namespace Hime.Parsers
         internal protected TerminalSet Followers { get; private set; }
 
         
-        public Variable(Grammar Parent, ushort SID, string Name) : base(Parent, SID, Name) 
+        public Variable(Grammar parent, ushort sid, string name) : base(parent, sid, name) 
         { 
             this.Rules = new List<CFRule>();
             this.Firsts = new TerminalSet();
             this.Followers = new TerminalSet();
         }
 
-        public void AddRule(CFRule Rule)
+        public bool AddRule(CFRule rule)
         {
-            if (this.Rules.Contains(Rule))
-                return;
+            if (this.Rules.Contains(rule))
+                return false;
             int ID = this.Rules.Count;
-            Rule.ID = ID;
-            this.Rules.Add(Rule);
+            rule.ID = ID;
+            this.Rules.Add(rule);
+            return true;
         }
 
         public bool ComputeFirsts()
         {
             bool mod = false;
-            foreach (CFRule Rule in this.Rules)
+            foreach (CFRule rule in this.Rules)
             {
-                TerminalSet RuleFirsts = Rule.Definition.Firsts;
-                if (RuleFirsts != null)
-                    if (this.Firsts.AddRange(RuleFirsts))
+                TerminalSet rulefirsts = rule.Definition.Firsts;
+                if (rulefirsts != null)
+                    if (this.Firsts.AddRange(rulefirsts))
                         mod = true;
-                if (Rule.Definition.ComputeFirsts())
+                if (rule.Definition.ComputeFirsts())
                     mod = true;
             }
             return mod;
@@ -51,31 +52,31 @@ namespace Hime.Parsers
 
         public void ComputeFollowers_Step1()
         {
-            foreach (CFRule Rule in this.Rules)
-                Rule.Definition.ComputeFollowers_Step1();
+            foreach (CFRule rule in this.Rules)
+                rule.Definition.ComputeFollowers_Step1();
         }
 
         public bool ComputeFollowers_Step23()
         {
             bool mod = false;
-            foreach (CFRule Rule in this.Rules)
-                if (Rule.Definition.ComputeFollowers_Step23(this))
+            foreach (CFRule rule in this.Rules)
+                if (rule.Definition.ComputeFollowers_Step23(this))
                     mod = true;
             return mod;
         }
 
-        public override XmlNode GetXMLNode(XmlDocument Doc)
+        public override XmlNode GetXMLNode(XmlDocument document)
         {
-            XmlNode Node = Doc.CreateElement("SymbolVariable");
-            Node.Attributes.Append(Doc.CreateAttribute("SID"));
-            Node.Attributes.Append(Doc.CreateAttribute("Name"));
-            Node.Attributes["SID"].Value = SID.ToString("X");
-            Node.Attributes["Name"].Value = localName;
-            foreach (CFRule Rule in this.Rules)
+            XmlNode node = document.CreateElement("SymbolVariable");
+            node.Attributes.Append(document.CreateAttribute("SID"));
+            node.Attributes.Append(document.CreateAttribute("Name"));
+            node.Attributes["SID"].Value = SID.ToString("X");
+            node.Attributes["Name"].Value = localName;
+            foreach (CFRule rule in this.Rules)
             {
-                Node.AppendChild(Rule.GetXMLNode(Doc));
+                node.AppendChild(rule.GetXMLNode(document));
             }
-            return Node;
+            return node;
         }
     }
 }

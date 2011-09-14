@@ -85,15 +85,15 @@ namespace Hime.Parsers
 
         public override string ToString()
         {
-            System.Text.StringBuilder Builder = new System.Text.StringBuilder("{");
+            System.Text.StringBuilder builder = new System.Text.StringBuilder("{");
             for (int i = 0; i != Count; i++)
             {
                 if (i != 0)
-                    Builder.Append(", ");
-                Builder.Append(this[i].LocalName);
+                    builder.Append(", ");
+                builder.Append(this[i].LocalName);
             }
-            Builder.Append("}");
-            return Builder.ToString();
+            builder.Append("}");
+            return builder.ToString();
         }
     }
 }
