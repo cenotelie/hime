@@ -1,4 +1,10 @@
-﻿namespace Hime.Parsers
+﻿/*
+ * Author: Laurent Wouters
+ * Date: 14/09/2011
+ * Time: 17:22
+ * 
+ */
+namespace Hime.Parsers
 {
     public sealed class Virtual : Symbol
     {

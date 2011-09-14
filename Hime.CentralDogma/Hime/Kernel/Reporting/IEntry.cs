@@ -1,4 +1,10 @@
-﻿namespace Hime.Kernel.Reporting
+﻿/*
+ * Author: Laurent Wouters
+ * Date: 14/09/2011
+ * Time: 17:22
+ * 
+ */
+namespace Hime.Kernel.Reporting
 {
     public interface IEntry
     {

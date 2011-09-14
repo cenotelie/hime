@@ -1,4 +1,10 @@
-﻿namespace Hime.Kernel.Naming
+﻿/*
+ * Author: Laurent Wouters
+ * Date: 14/09/2011
+ * Time: 17:22
+ * 
+ */
+namespace Hime.Kernel.Naming
 {
     public class CannotAddChildException : NamingException
     {
