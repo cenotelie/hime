@@ -37,14 +37,14 @@ namespace Hime.Parsers.ContextFree.LR
         }
         
         public Symbol NextSymbol { get { return definition.GetSymbolAt(dotPosition); } }
-        public CFRuleDefinition NextChoice { get { return rule.Definition.GetChoiceAtIndex(dotPosition + 1); } }
+        public CFRuleDefinition NextChoice { get { return rule.Definition.GetChoiceAt(dotPosition + 1); } }
 
         public abstract TerminalSet Lookaheads { get; }
 
         public Item(CFRule Rule, int DotPosition)
         {
             rule = Rule;
-            definition = rule.Definition.GetChoiceAtIndex(0);
+            definition = rule.Definition.GetChoiceAt(0);
             dotPosition = DotPosition;
         }
 
@@ -85,7 +85,7 @@ namespace Hime.Parsers.ContextFree.LR
 
             System.Xml.XmlNode symbols = document.CreateElement("Symbols");
             int i = 0;
-            foreach (RuleDefinitionPart Part in rule.Definition.GetChoiceAtIndex(0).Parts)
+            foreach (RuleDefinitionPart Part in rule.Definition.GetChoiceAt(0).Parts)
             {
                 if (i == dotPosition)
                     symbols.AppendChild(document.CreateElement("Dot"));

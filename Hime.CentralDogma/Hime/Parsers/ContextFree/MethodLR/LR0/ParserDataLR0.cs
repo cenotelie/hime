@@ -63,7 +63,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
         protected void Export_Production(CFRule rule)
         {
-            int length = rule.Definition.GetChoiceAtIndex(0).Length;
+            int length = rule.Definition.GetChoiceAt(0).Length;
             stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Variable.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
             stream.WriteLine("        {");
             stream.WriteLine("            " + this.ParserName + " parser = baseParser as " + this.ParserName + ";");
@@ -117,7 +117,7 @@ namespace Hime.Parsers.ContextFree.LR
                 if (!first) stream.Write(", ");
                 string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
                 string head = "variables[" + this.variables.IndexOf(Rule.Variable) + "]";
-                stream.WriteLine("new LRRule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAtIndex(0).Length + ")");
+                stream.WriteLine("new LRRule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAt(0).Length + ")");
                 first = false;
             }
             stream.WriteLine("        };");

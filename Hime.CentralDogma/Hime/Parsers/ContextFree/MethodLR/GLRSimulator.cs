@@ -151,7 +151,7 @@ namespace Hime.Parsers.ContextFree.LR
                 {
                     if (reduce.Lookahead.SID != lookahead.SID)
                         continue;
-                    GLRSimulatorState reduceOrigin = GetOrigin(node, reduce.ToReduceRule.Definition.GetChoiceAtIndex(0));
+                    GLRSimulatorState reduceOrigin = GetOrigin(node, reduce.ToReduceRule.Definition.GetChoiceAt(0));
                     foreach (GLRStackNode nOrigin in reduceOrigin.Nodes)
                     {
                         if (nOrigin.State.Children.ContainsKey(reduce.ToReduceRule.Variable))
@@ -191,7 +191,7 @@ namespace Hime.Parsers.ContextFree.LR
                 return result;
             }
 
-            GLRSimulatorState origin = GetOrigin(pState, item.BaseRule.Definition.GetChoiceAtIndex(0));
+            GLRSimulatorState origin = GetOrigin(pState, item.BaseRule.Definition.GetChoiceAt(0));
             foreach (GLRStackNode node in origin.Nodes)
             {
                 if (node.State.Children.ContainsKey(item.BaseRule.Variable))
@@ -273,7 +273,7 @@ namespace Hime.Parsers.ContextFree.LR
                 return;
             List<CFRuleDefinition> definitions = new List<CFRuleDefinition>();
             foreach (CFRule rule in var.Rules)
-                definitions.Add(rule.Definition.GetChoiceAtIndex(0));
+                definitions.Add(rule.Definition.GetChoiceAt(0));
             CFRuleDefinition def = null;
             foreach (CFRuleDefinition d in definitions)
             {

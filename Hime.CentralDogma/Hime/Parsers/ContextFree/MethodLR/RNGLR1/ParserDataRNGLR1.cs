@@ -31,10 +31,10 @@ namespace Hime.Parsers.ContextFree.LR
                     nullableVars.Add(var);
                 foreach (CFRule rule in var.Rules)
                 {
-                    int length = rule.Definition.GetChoiceAtIndex(0).Length;
+                    int length = rule.Definition.GetChoiceAt(0).Length;
                     for (int i = 0; i != length; i++)
                     {
-                        CFRuleDefinition choice = rule.Definition.GetChoiceAtIndex(i);
+                        CFRuleDefinition choice = rule.Definition.GetChoiceAt(i);
                         if (choice.Firsts.Contains(TerminalEpsilon.Instance))
                             nullableChoices.Add(choice);
                     }
@@ -105,7 +105,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
         protected void Export_Production(CFRule Rule)
         {
-            string ParserLength = Rule.Definition.GetChoiceAtIndex(0).Length.ToString();
+            string ParserLength = Rule.Definition.GetChoiceAt(0).Length.ToString();
 
             stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
             stream.WriteLine("        {");
@@ -259,9 +259,9 @@ namespace Hime.Parsers.ContextFree.LR
                 else
                 {
                     int index = 0;
-                    if (Reduction.ToReduceRule.Definition.GetChoiceAtIndex(0).Length != Reduction.ReduceLength)
+                    if (Reduction.ToReduceRule.Definition.GetChoiceAt(0).Length != Reduction.ReduceLength)
                     {
-                        CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAtIndex(Reduction.ReduceLength);
+                        CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAt(Reduction.ReduceLength);
                         index = nullableChoices.IndexOf(def);
                     }
                     stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(Reduction.ToReduceRule) + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
@@ -334,7 +334,7 @@ namespace Hime.Parsers.ContextFree.LR
                 Variable var = nullableVars[i];
                 foreach (CFRule rule in var.Rules)
                 {
-                    CFRuleDefinition definition = rule.Definition.GetChoiceAtIndex(0);
+                    CFRuleDefinition definition = rule.Definition.GetChoiceAt(0);
                     if (definition.Firsts.Contains(TerminalEpsilon.Instance))
                     {
                         foreach (RuleDefinitionPart part in definition.Parts)

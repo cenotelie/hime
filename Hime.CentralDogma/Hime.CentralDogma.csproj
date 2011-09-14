@@ -118,6 +118,12 @@
     <Compile Include="Hime\Parsers\Automata\NFAStateSet.cs" />
     <Compile Include="Hime\Parsers\Automata\CharSpan.cs" />
     <Compile Include="Hime\Parsers\Automata\NFATransition.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFParserGenerator.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFRuleDefinition.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFRuleDefinitionSet.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\TemplateRule.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\TemplateRuleInstance.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\TemplateRuleParameter.cs" />
     <Compile Include="Hime\Parsers\EAccessModifier.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />
@@ -125,7 +131,7 @@
     <Compile Include="Hime\Parsers\ContextFree\CFGrammarText.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CompilerContext.cs" />
     <Compile Include="Hime\Parsers\ContextFree\CFGrammarCompiler.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\Grammars.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFGrammar.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LR0\ParserDataLR0.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\LRStar\Decider.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\GLRSimulator.cs" />
@@ -159,7 +165,7 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\Method.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\RNGLR1\ParserDataRNGLR1.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateActionReduce.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\Rules.cs" />
+    <Compile Include="Hime\Parsers\ContextFree\CFRule.cs" />
     <Compile Include="Hime\Parsers\Automata\DFA.cs" />
     <Compile Include="Hime\Parsers\Exporters\TextLexerExporter.cs" />
     <Compile Include="Hime\Parsers\Grammar.cs" />
