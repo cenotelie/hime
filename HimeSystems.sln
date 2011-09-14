@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himecc", "himecc\himecc.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himev", "himev\himev.csproj", "{BDC14857-662D-4373-9FB4-CE92F2FBCF1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.VSTests", "Hime.VSTests\Hime.VSTests.csproj", "{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.NUnit", "Hime.NUnit\Hime.NUnit.csproj", "{30BE2190-7AA2-431C-A993-8E61501ED0FF}"
 EndProject
 Global
@@ -100,16 +98,6 @@ Global
 		{BDC14857-662D-4373-9FB4-CE92F2FBCF1A}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{BDC14857-662D-4373-9FB4-CE92F2FBCF1A}.Release|x86.ActiveCfg = Release|x86
 		{BDC14857-662D-4373-9FB4-CE92F2FBCF1A}.Release|x86.Build.0 = Release|x86
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Debug|.NET.ActiveCfg = Debug|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Release|.NET.ActiveCfg = Release|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7761AB77-DB9B-4407-BAB0-30DFE83EC32E}.Release|x86.ActiveCfg = Release|Any CPU
 		{30BE2190-7AA2-431C-A993-8E61501ED0FF}.Debug|.NET.ActiveCfg = Debug|Any CPU
 		{30BE2190-7AA2-431C-A993-8E61501ED0FF}.Debug|.NET.Build.0 = Debug|Any CPU
 		{30BE2190-7AA2-431C-A993-8E61501ED0FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
