@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers
 {
-    public sealed class Action : Symbol
+    public sealed class Action : GrammarSymbol
     {
         public Action(Grammar parent, string name) : base(parent, 0, name) { }
 

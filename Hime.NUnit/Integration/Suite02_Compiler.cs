@@ -24,7 +24,7 @@ namespace Hime.NUnit.Integration
         		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
-        	ResourceCompiler compiler = new ResourceCompiler(reporter);
+        	ResourceLoader compiler = new ResourceLoader(reporter);
             StringReader reader = new StringReader(grammar);
             compiler.CompileData(reader);
             reader.Close();
@@ -38,7 +38,7 @@ namespace Hime.NUnit.Integration
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
-        	ResourceCompiler compiler = new ResourceCompiler(reporter);
+        	ResourceLoader compiler = new ResourceLoader(reporter);
             StringReader reader = new StringReader(grammar);
             compiler.CompileData(reader);
             reader.Close();
@@ -53,11 +53,11 @@ namespace Hime.NUnit.Integration
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
-        	ResourceCompiler compiler = new ResourceCompiler(reporter);
+        	ResourceLoader compiler = new ResourceLoader(reporter);
         	// TODO: this is a bit strange, think about it
             StringReader reader = new StringReader(grammar);
             compiler.AddInput(reader);
-            compiler.Compile();
+            compiler.Load();
             reader.Close();
         }
         
@@ -69,11 +69,11 @@ namespace Hime.NUnit.Integration
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
-        	ResourceCompiler compiler = new ResourceCompiler(reporter);
+        	ResourceLoader compiler = new ResourceLoader(reporter);
         	// TODO: this is a bit strange, think about it
             StringReader reader = new StringReader(grammar);
             compiler.AddInput(reader);
-            compiler.Compile();
+            compiler.Load();
             reader.Close();
             Assert.IsFalse(reporter.Result.HasErrors);
         }

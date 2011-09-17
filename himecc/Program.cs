@@ -55,9 +55,8 @@ namespace Hime.HimeCC
                 task.ParserFile = options.ParserFile;
             task.ExportLog = options.ExportHTMLLog;
             task.ExportDoc = options.ExportDocumentation;
-            task.Execute();
+            Compiler compiler = new Compiler();
+            compiler.Execute(task);
         }
     }
 }
-// TODO: apply strict coding standards
-// - remove all static methods

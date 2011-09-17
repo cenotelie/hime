@@ -26,7 +26,7 @@ namespace Hime.Parsers.ContextFree.LR
         public override void Build(State Set)
         {
             // Build shift actions
-            foreach (Symbol Next in Set.Children.Keys)
+            foreach (GrammarSymbol Next in Set.Children.Keys)
             {
                 List<StateAction> Actions = new List<StateAction>();
                 Actions.Add(new StateActionShift(Next, Set.Children[Next]));
@@ -38,9 +38,9 @@ namespace Hime.Parsers.ContextFree.LR
             foreach (ItemLR1 Item in Set.Items)
             {
                 // Check for right nulled reduction
-                if (Item.Action == ItemAction.Shift && !Item.BaseRule.Definition.GetChoiceAt(Item.DotPosition).Firsts.Contains(TerminalEpsilon.Instance))
+                if (Item.Action == ItemAction.Shift && !Item.BaseRule.CFBody.GetChoiceAt(Item.DotPosition).Firsts.Contains(TerminalEpsilon.Instance))
                     continue;
-                bool rightnulled = (Item.DotPosition != Item.BaseRule.Definition.GetChoiceAt(0).Length);
+                bool rightnulled = (Item.DotPosition != Item.BaseRule.CFBody.GetChoiceAt(0).Length);
                 // There is already a shift action for the lookahead => conflict
                 if (Set.Children.ContainsKey(Item.Lookahead))
                 {

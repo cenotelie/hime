@@ -11,7 +11,7 @@ using Hime.Kernel;
 	
 namespace Hime.NUnit.Integration
 {
-	[TestFixture]
+	[TestFixture, Ignore]
 	public class Suite06_KernelDaemon
 	{
 		private string path;

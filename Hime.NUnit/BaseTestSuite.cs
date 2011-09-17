@@ -2,6 +2,7 @@
 using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using Hime.Parsers;
 using Hime.Kernel.Reporting;
@@ -11,6 +12,10 @@ namespace Hime.NUnit
 {
     public class BaseTestSuite
     {
+        protected static string directory = "Test";
+        protected static string lexerFile = Path.Combine(directory, "TestLexer.cs");
+        protected static string parserFile = Path.Combine(directory, "TestParser.cs");
+
         protected string GetAllTextFor(string resourceName)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -21,40 +26,40 @@ namespace Hime.NUnit
             return data;
         }
 
-        protected Report CompileResource(string resource, EParsingMethod method)
+        protected Report CompileResource(string resource, ParsingMethod method)
         {
             CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(GetAllTextFor(resource));
             task.Method = method;
-            task.ParserFile = "Test.cs";
-            Report report = task.Execute();
+            task.LexerFile = lexerFile;
+            task.ParserFile = parserFile;
+            Report report = (new Compiler()).Execute(task);
             return report;
         }
 
-        protected Report CompileRaw(string rawInput, EParsingMethod method)
+        protected Report CompileRaw(string rawInput, ParsingMethod method)
         {
             CompilationTask task = new Parsers.CompilationTask();
             task.InputRawData.Add(rawInput);
             task.Method = method;
-            task.LexerFile = "Test.cs";
-            task.ParserFile = task.LexerFile;
-            Report report = task.Execute();
+            task.LexerFile = lexerFile;
+            task.ParserFile = parserFile;
+            Report report = (new Compiler()).Execute(task);
             return report;
         }
 
         protected Assembly Build()
         {
             string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
-            System.IO.File.Copy(redist, "Hime.Redist.dll", true);
-            string code = System.IO.File.ReadAllText("Test.cs");
+            System.IO.File.Copy(redist, Path.Combine(directory, "Hime.Redist.dll"), true);
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
             compilerparams.GenerateExecutable = false;
             compilerparams.GenerateInMemory = true;
             compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
             compilerparams.ReferencedAssemblies.Add("System.dll");
-            compilerparams.ReferencedAssemblies.Add("Hime.Redist.dll");
-            System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromSource(compilerparams, code);
+            compilerparams.ReferencedAssemblies.Add(Path.Combine(directory, "Hime.Redist.dll"));
+            System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
             if (results.Errors.Count != 0)
                 Assert.Fail(results.Errors[0].ToString());
             return results.CompiledAssembly;

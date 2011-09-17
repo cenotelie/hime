@@ -136,7 +136,7 @@ namespace Hime.Parsers.ContextFree.LR
             foreach (GLRStackNode node in choice.Nodes)
             {
                 State state = node.State;
-                foreach (Symbol s in state.Children.Keys)
+                foreach (GrammarSymbol s in state.Children.Keys)
                 {
                     if (!(s is Terminal))
                         continue;

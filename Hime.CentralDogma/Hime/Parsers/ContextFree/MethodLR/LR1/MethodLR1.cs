@@ -23,14 +23,14 @@ namespace Hime.Parsers.ContextFree.LR
             Close();
             reporter.Info("LR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("LR(1)", "Done !");
-            return new ParserDataLR1(this, grammar, graph);
+            return new ParserDataLR1(reporter, grammar, graph);
         }
 
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
         {
             // Create the first set
-            Variable AxiomVar = Grammar.GetVariable("_Axiom_");
-            ItemLR1 AxiomItem = new ItemLR1(AxiomVar.Rules[0], 0, TerminalEpsilon.Instance);
+            CFVariable AxiomVar = Grammar.GetCFVariable("_Axiom_");
+            ItemLR1 AxiomItem = new ItemLR1(AxiomVar.CFRules[0], 0, TerminalEpsilon.Instance);
             StateKernel AxiomKernel = new StateKernel();
             AxiomKernel.AddItem(AxiomItem);
             State AxiomSet = AxiomKernel.GetClosure();

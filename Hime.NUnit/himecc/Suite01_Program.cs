@@ -31,7 +31,7 @@ namespace Hime.NUnit.himecc
         public void Test002_DefaultMethod()
         {
             HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.AreEqual(options.Method, EParsingMethod.RNGLALR1);
+            Assert.AreEqual(options.Method, ParsingMethod.RNGLALR1);
         }
 
         [Test]

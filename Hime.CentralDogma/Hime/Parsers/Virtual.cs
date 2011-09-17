@@ -6,7 +6,7 @@
  */
 namespace Hime.Parsers
 {
-    public sealed class Virtual : Symbol
+    public sealed class Virtual : GrammarSymbol
     {
         public Virtual(Grammar parent, string name) : base(parent, 0, name) { }
 

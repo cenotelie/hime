@@ -4,16 +4,20 @@
  * Time: 17:22
  * 
  */
+using System;
+using System.IO;
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class ParserDataGLR1 : ParserData
+    class ParserDataGLR1 : ParserDataLR
     {
-        //protected System.IO.StreamWriter stream;
+        public ParserDataGLR1(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 
-        public ParserDataGLR1(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
-
-        public override bool Export(IList<Terminal> expected, CompilationTask options) { return false; }
+        public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

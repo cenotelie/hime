@@ -8,7 +8,7 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Kernel.Resources.Parser
 {
-    public class FileCentralDogma_Lexer : LexerText
+    class FileCentralDogma_Lexer : LexerText
     {
         public static readonly SymbolTerminal[] terminals = {
             new SymbolTerminal(0x1, "ε"),
@@ -1316,7 +1316,7 @@ namespace Hime.Kernel.Resources.Parser
         public FileCentralDogma_Lexer(System.IO.TextReader input) : base(input) {}
         public FileCentralDogma_Lexer(FileCentralDogma_Lexer original) : base(original) {}
     }
-    public class FileCentralDogma_Parser : LR1TextParser
+    class FileCentralDogma_Parser : LR1TextParser
     {
         public static readonly SymbolVariable[] variables = {
             new SymbolVariable(0x13, "qualified_name"), 

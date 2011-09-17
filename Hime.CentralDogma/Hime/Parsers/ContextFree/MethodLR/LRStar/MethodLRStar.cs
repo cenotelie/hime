@@ -80,7 +80,7 @@ namespace Hime.Parsers.ContextFree.LR
             Close();
             reporter.Info("LR(*)", graph.States.Count.ToString() + " LALR(1) states constructed.");
             reporter.Info("LR(*)", "Done !");
-            return new ParserDataLRStar(this, grammar, graph, deciders);
+            return new ParserDataLRStar(reporter, grammar, graph, deciders);
         }
     }
 }

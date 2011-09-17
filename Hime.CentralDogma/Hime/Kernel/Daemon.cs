@@ -34,12 +34,13 @@ namespace Hime.Kernel
             task.InputFiles.Add(path + "CSGrammars.gram");
             task.GrammarName = "Hime.Kernel.FileCentralDogma";
             task.Namespace = "Hime.Kernel.Resources.Parser";
-            task.Method = EParsingMethod.LALR1;
+            task.Method = ParsingMethod.LALR1;
             // TODO: this assignment is a bit strange, should not be done like that?
             // see how it is done with options in himecc
             task.ParserFile = path + "KernelResources.Parser.cs";
             task.ExportLog = true;
-            Report result = task.Execute();
+            Compiler compiler = new Compiler();
+            Report result = compiler.Execute(task);
             
             // Close session
             session.Close();

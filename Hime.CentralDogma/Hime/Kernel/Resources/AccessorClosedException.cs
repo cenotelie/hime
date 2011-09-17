@@ -6,7 +6,7 @@
  */
 namespace Hime.Kernel.Resources
 {
-    public sealed class AccessorClosedException : ResourceException
+    class AccessorClosedException : System.Exception
     {
         private ResourceAccessor session;
 

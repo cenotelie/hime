@@ -26,7 +26,7 @@ namespace Hime.Parsers.ContextFree.LR
         public override void Build(State Set)
         {
             // Build shift actions
-            foreach (Symbol Next in Set.Children.Keys)
+            foreach (GrammarSymbol Next in Set.Children.Keys)
             {
                 List<StateAction> Actions = new List<StateAction>();
                 Actions.Add(new StateActionShift(Next, Set.Children[Next]));

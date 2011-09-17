@@ -7,63 +7,35 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using Hime.Parsers.ContextFree;
+using System.Collections.ObjectModel;
 
 namespace Hime.Parsers
 {
-	public class Variable : Symbol
+	public class Variable : GrammarSymbol
     {
-        internal protected List<CFRule> Rules { get; private set; }
-        internal protected TerminalSet Firsts { get; private set; }
-        internal protected TerminalSet Followers { get; private set; }
+        protected List<Rule> rules;
+        protected ReadOnlyCollection<Rule> roRules;
 
-        
+        public IList<Rule> Rules { get { return roRules; } }
+
         public Variable(Grammar parent, ushort sid, string name) : base(parent, sid, name) 
-        { 
-            this.Rules = new List<CFRule>();
-            this.Firsts = new TerminalSet();
-            this.Followers = new TerminalSet();
+        {
+            this.rules = new List<Rule>();
+            this.roRules = new ReadOnlyCollection<Rule>(this.rules);
         }
 
-        public bool AddRule(CFRule rule)
+        internal Rule AddRule(Rule rule)
         {
-            if (this.Rules.Contains(rule))
-                return false;
-            int ID = this.Rules.Count;
+            int index = rules.IndexOf(rule);
+            if (index != -1)
+                return rules[index];
+            int ID = rules.Count;
             rule.ID = ID;
-            this.Rules.Add(rule);
-            return true;
+            rules.Add(rule);
+            OnRuleAdd(rule);
+            return rule;
         }
-
-        public bool ComputeFirsts()
-        {
-            bool mod = false;
-            foreach (CFRule rule in this.Rules)
-            {
-                TerminalSet rulefirsts = rule.Definition.Firsts;
-                if (rulefirsts != null)
-                    if (this.Firsts.AddRange(rulefirsts))
-                        mod = true;
-                if (rule.Definition.ComputeFirsts())
-                    mod = true;
-            }
-            return mod;
-        }
-
-        public void ComputeFollowers_Step1()
-        {
-            foreach (CFRule rule in this.Rules)
-                rule.Definition.ComputeFollowers_Step1();
-        }
-
-        public bool ComputeFollowers_Step23()
-        {
-            bool mod = false;
-            foreach (CFRule rule in this.Rules)
-                if (rule.Definition.ComputeFollowers_Step23(this))
-                    mod = true;
-            return mod;
-        }
+        protected virtual void OnRuleAdd(Rule rule) { }
 
         public override XmlNode GetXMLNode(XmlDocument document)
         {
@@ -72,10 +44,8 @@ namespace Hime.Parsers
             node.Attributes.Append(document.CreateAttribute("Name"));
             node.Attributes["SID"].Value = SID.ToString("X");
             node.Attributes["Name"].Value = localName;
-            foreach (CFRule rule in this.Rules)
-            {
+            foreach (Rule rule in this.Rules)
                 node.AppendChild(rule.GetXMLNode(document));
-            }
             return node;
         }
     }

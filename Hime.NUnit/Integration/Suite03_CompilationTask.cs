@@ -22,8 +22,8 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = EParsingMethod.LR0;
-            task.ExecuteBody();
+            task.Method = ParsingMethod.LR0;
+            (new Compiler()).ExecuteDo(task);
         }
 
         [Test]
@@ -34,9 +34,10 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = EParsingMethod.LR0;
-            task.ExecuteLoadData();
-            Assert.IsFalse(task.Result.HasErrors);
+            task.Method = ParsingMethod.LR0;
+            Compiler compiler = new Compiler();
+            compiler.LoadData(task.InputFiles, task.InputRawData);
+            Assert.IsFalse(compiler.Reporter.Result.HasErrors);
         }
         
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
@@ -48,8 +49,8 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = EParsingMethod.LR0;
-            Report result = task.Execute();
+            task.Method = ParsingMethod.LR0;
+            Report result = (new Compiler()).Execute(task);
             Assert.IsFalse(result.HasErrors);
         }
         
@@ -61,9 +62,9 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = EParsingMethod.LR0;
-            Report result = task.Execute();
-            Assert.AreEqual("TestLexer.cs", task.LexerFile);
+            task.Method = ParsingMethod.LR0;
+            Report result = (new Compiler()).Execute(task);
+            Assert.IsTrue(System.IO.File.Exists("TestLexer.cs"));
         }
         
         [Test]
@@ -74,9 +75,9 @@ namespace Hime.NUnit.Integration
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = EParsingMethod.LR0;
-            Report result = task.Execute();
-            Assert.AreEqual("TestParser.cs", task.ParserFile);
+            task.Method = ParsingMethod.LR0;
+            Report result = (new Compiler()).Execute(task);
+            Assert.IsTrue(System.IO.File.Exists("TestParser.cs"));
         }
 	}
 }

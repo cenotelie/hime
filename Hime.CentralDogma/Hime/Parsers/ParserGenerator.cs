@@ -4,11 +4,13 @@
  * Time: 17:22
  * 
  */
+using Hime.Kernel.Reporting;
+
 namespace Hime.Parsers
 {
     public interface ParserGenerator
     {
         string Name { get; }
-        ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter);
+        ParserData Build(Grammar grammar, Reporter reporter);
     }
 }

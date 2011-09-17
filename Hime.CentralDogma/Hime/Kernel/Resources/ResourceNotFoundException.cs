@@ -6,7 +6,7 @@
  */
 namespace Hime.Kernel.Resources
 {
-    public sealed class ResourceNotFoundException : ResourceException
+    class ResourceNotFoundException : System.Exception
     {
         private string resourceName;
 

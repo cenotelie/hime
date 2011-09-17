@@ -6,47 +6,46 @@
  */
 using System.Collections.Generic;
 using Hime.Kernel.Unicode;
+using Hime.Kernel.Naming;
+using Hime.Kernel.Resources;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree
 {
-    class CFGrammarCompiler : Kernel.Resources.IResourceCompiler
+    class CFGrammarLoader : LoaderPlugin
     {
         private static string[] resourcesNames = new string[] { "cf_grammar_text", "cf_grammar_bin" };
-        private const string subruleHeadRadical = "";
-        private const string subruleHeadRadicalMultiplicity = subruleHeadRadical + "_m";
-        private const string subruleHeadRadicalRestrict = subruleHeadRadical + "_r";
-        private Hime.Kernel.Reporting.Reporter log;
+
+        private Reporter log;
         private bool hasErrors;
 
-        public string CompilerName { get { return "HimeSystems.CentralDogma.ContextFreeGrammarCompiler"; } }
-        public int CompilerVersionMajor { get { return 1; } }
-        public int CompilerVersionMinor { get { return 0; } }
+        public string Name { get { return (typeof(CFGrammarLoader)).FullName; } }
         public string[] ResourceNames { get { return resourcesNames; } }
 
-        public CFGrammarCompiler() { }
+        public CFGrammarLoader() { }
 
-        public void CreateResource(Kernel.Naming.Symbol container, Redist.Parsers.SyntaxTreeNode syntaxNode, Kernel.Resources.ResourceGraph graph, Hime.Kernel.Reporting.Reporter log)
+        public void CreateResource(Symbol container, Redist.Parsers.SyntaxTreeNode syntaxNode, ResourceGraph graph, Reporter log)
         {
-            Kernel.Naming.SymbolAccess access = Kernel.Resources.ResourceCompiler.CompileSymbolAccess(syntaxNode.Children[0]);
+            SymbolAccess access = ResourceLoader.CompileSymbolAccess(syntaxNode.Children[0]);
             string name = ((Redist.Parsers.SymbolTokenText)syntaxNode.Children[1].Symbol).ValueText;
             CFGrammar grammar = null;
-            Kernel.Resources.Resource resource = null;
+            Resource resource = null;
             
             if (syntaxNode.Symbol.Name == "cf_grammar_text")
                 grammar = new CFGrammarText(name);
             else if (syntaxNode.Symbol.Name == "cf_grammar_bin")
                 grammar = new CFGrammarBinary(name);
             grammar.Access = access;
-            resource = new Hime.Kernel.Resources.Resource(grammar, syntaxNode, this);
+            resource = new Resource(grammar, syntaxNode, this);
             container.SymbolAddChild(grammar);
             graph.AddResource(resource);
         }
-        public void CreateDependencies(Kernel.Resources.Resource resource, Kernel.Resources.ResourceGraph graph, Hime.Kernel.Reporting.Reporter log)
+        public void CreateDependencies(Resource resource, ResourceGraph graph, Reporter log)
         {
             foreach (Redist.Parsers.SyntaxTreeNode Parent in resource.SyntaxNode.Children[2].Children)
             {
-                Kernel.Naming.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(Parent);
-                Kernel.Naming.Symbol Symbol = resource.Symbol.ResolveName(Name);
+                QualifiedName Name = ResourceLoader.CompileQualifiedName(Parent);
+                Symbol Symbol = resource.Symbol.ResolveName(Name);
                 if (resource.Symbol is CFGrammarText && Symbol is CFGrammarText)
                     resource.AddDependency("parent", graph.GetResource(Symbol));
                 else if (resource.Symbol is CFGrammarBinary && Symbol is CFGrammarBinary)
@@ -63,12 +62,12 @@ namespace Hime.Parsers.ContextFree
                         {
                             if (terminal.Children[2].Children.Count == 1)
                             {
-                                Kernel.Naming.QualifiedName Name = Kernel.Resources.ResourceCompiler.CompileQualifiedName(terminal.Children[2].Children[0]);
-                                Kernel.Naming.Symbol Symbol = resource.Symbol.ResolveName(Name);
+                                QualifiedName Name = ResourceLoader.CompileQualifiedName(terminal.Children[2].Children[0]);
+                                Symbol Symbol = resource.Symbol.ResolveName(Name);
                                 if (Symbol is Grammar)
                                 {
                                     bool found = false;
-                                    foreach (KeyValuePair<string, Kernel.Resources.Resource> dependency in resource.Dependencies)
+                                    foreach (KeyValuePair<string, Resource> dependency in resource.Dependencies)
                                     {
                                         if (dependency.Value.Symbol == Symbol)
                                         {
@@ -85,13 +84,13 @@ namespace Hime.Parsers.ContextFree
                 }
             }
         }
-        public int CompileSolveDependencies(Kernel.Resources.Resource resource, Hime.Kernel.Reporting.Reporter log)
+        public int CompileSolveDependencies(Resource resource, Reporter log)
         {
             CFGrammar grammar = resource.Symbol as CFGrammar;
             int Solved = 0;
             for (int i = 0; i != resource.Dependencies.Count; i++)
             {
-                if (resource.Dependencies[i].Value.IsCompiled)
+                if (resource.Dependencies[i].Value.IsLoaded)
                 {
                     if (resource.Dependencies[i].Key == "parent")
                         grammar.Inherit((CFGrammar)resource.Dependencies[i].Value.Symbol);
@@ -102,30 +101,26 @@ namespace Hime.Parsers.ContextFree
             }
             return Solved;
         }
-        public bool Compile(Kernel.Resources.Resource resource, Hime.Kernel.Reporting.Reporter log)
+        public bool Compile(Resource resource, Reporter log)
         {
             this.log = log;
             this.hasErrors = false;
             if (resource.Symbol is CFGrammarText)
             {
                 Compile_Recognize_grammar_text((CFGrammar)resource.Symbol, resource.SyntaxNode);
-                resource.IsCompiled = true;
+                resource.IsLoaded = true;
             }
             else if (resource.Symbol is CFGrammarBinary)
             {
                 Compile_Recognize_grammar_bin((CFGrammar)resource.Symbol, resource.SyntaxNode);
-                resource.IsCompiled = true;
+                resource.IsLoaded = true;
             }
             return (!hasErrors);
         }
-        public override string ToString()
-        {
-            return CompilerName + " " + CompilerVersionMajor.ToString() + "." + CompilerVersionMinor.ToString();
-        }
 
 
 
-        private Symbol Compile_Tool_NameToSymbol(string name, CFGrammar data, CompilerContext context)
+        private GrammarSymbol Compile_Tool_NameToSymbol(string name, CFGrammar data, CompilerContext context)
         {
             if (context.IsReference(name))
                 return context.GetReference(name);
@@ -400,7 +395,7 @@ namespace Hime.Parsers.ContextFree
             Grammar subGrammar = null;
             if (node.Children[2].Children.Count == 1)
             {
-                Kernel.Naming.QualifiedName subGramName = Kernel.Resources.ResourceCompiler.CompileQualifiedName(node.Children[2].Children[0]);
+                QualifiedName subGramName = ResourceLoader.CompileQualifiedName(node.Children[2].Children[0]);
                 subGrammar = (Grammar)data.ResolveName(subGramName);
             }
             Terminal terminal = data.AddTerminalText(name, nfa, subGrammar);
@@ -410,17 +405,17 @@ namespace Hime.Parsers.ContextFree
         }
 
 
-        private CFRuleDefinitionSet Compile_Recognize_grammar_bin_terminal_data(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_grammar_bin_terminal_data(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
-            CFRuleDefinitionSet set = new CFRuleDefinitionSet();
+            CFRuleBodySet set = new CFRuleBodySet();
             string name = ((Redist.Parsers.SymbolTokenText)node.Symbol).ValueText;
             Terminal terminal = data.GetTerminal(name);
             if (terminal == null)
                 terminal = data.AddTerminalBin((TerminalBinType)System.Enum.Parse(typeof(TerminalBinType), node.Symbol.Name), name);
-            set.Add(new CFRuleDefinition(terminal));
+            set.Add(new CFRuleBody(terminal));
             return set;
         }
-        private CFRuleDefinitionSet Compile_Recognize_grammar_bin_terminal(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_grammar_bin_terminal(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
             node = node.Children[0];
             if (node.Symbol.Name == "SYMBOL_VALUE_UINT8")
@@ -447,9 +442,9 @@ namespace Hime.Parsers.ContextFree
                 return Compile_Recognize_grammar_bin_terminal_data(data, node);
             if (node.Symbol.Name == "SYMBOL_JOKER_BINARY")
                 return Compile_Recognize_grammar_bin_terminal_data(data, node);
-            return new CFRuleDefinitionSet();
+            return new CFRuleBodySet();
         }
-        private CFRuleDefinitionSet Compile_Recognize_grammar_text_terminal(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_grammar_text_terminal(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
             // Construct the terminal name
             string value = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;
@@ -465,59 +460,58 @@ namespace Hime.Parsers.ContextFree
                 nfa.StateExit.Final = terminal;
             }
             // Create the definition set
-            CFRuleDefinitionSet set = new CFRuleDefinitionSet();
-            set.Add(new CFRuleDefinition(terminal));
+            CFRuleBodySet set = new CFRuleBodySet();
+            set.Add(new CFRuleBody(terminal));
             return set;
         }
 
-
-        private CFRuleDefinitionSet Compile_Recognize_rule_sym_action(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_action(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
-            CFRuleDefinitionSet set = new CFRuleDefinitionSet();
+            CFRuleBodySet set = new CFRuleBodySet();
             string name = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;
             Action action = data.GetAction(name);
             if (action == null)
                 action = data.AddAction(name);
-            set.Add(new CFRuleDefinition(action));
+            set.Add(new CFRuleBody(action));
             return set;
         }
-        private CFRuleDefinitionSet Compile_Recognize_rule_sym_virtual(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_virtual(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
-            CFRuleDefinitionSet set = new CFRuleDefinitionSet();
+            CFRuleBodySet set = new CFRuleBodySet();
             string name = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;
             name = name.Substring(1, name.Length - 2);
             Virtual vir = data.GetVirtual(name);
             if (vir == null)
                 vir = data.AddVirtual(name);
-            set.Add(new CFRuleDefinition(vir));
+            set.Add(new CFRuleBody(vir));
             return set;
         }
-        private CFRuleDefinitionSet Compile_Recognize_rule_sym_ref_simple(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_ref_simple(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
         {
             Redist.Parsers.SymbolTokenText token = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol);
-            CFRuleDefinitionSet defs = new CFRuleDefinitionSet();
+            CFRuleBodySet defs = new CFRuleBodySet();
             if (token.ValueText == "ε")
             {
-                defs.Add(new CFRuleDefinition());
+                defs.Add(new CFRuleBody());
             }
             else
             {
-                Symbol symbol = Compile_Tool_NameToSymbol(token.ValueText, data, context);
+                GrammarSymbol symbol = Compile_Tool_NameToSymbol(token.ValueText, data, context);
                 if (symbol != null)
-                    defs.Add(new CFRuleDefinition(symbol));
+                    defs.Add(new CFRuleBody(symbol));
                 else
                 {
                     log.Error("Compiler", "@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
                     hasErrors = true;
-                    defs.Add(new CFRuleDefinition());
+                    defs.Add(new CFRuleBody());
                 }
             }
             return defs;
         }
-        private CFRuleDefinitionSet Compile_Recognize_rule_sym_ref_template(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_ref_template(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
         {
             Redist.Parsers.SymbolTokenText token = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol);
-            CFRuleDefinitionSet defs = new CFRuleDefinitionSet();
+            CFRuleBodySet defs = new CFRuleBodySet();
             // Get the information
             string name = token.ValueText;
             int paramCount = node.Children[1].Children.Count;
@@ -525,21 +519,21 @@ namespace Hime.Parsers.ContextFree
             if (!context.IsTemplateRule(name, paramCount))
             {
                 log.Error("Compiler", "Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
-                defs.Add(new CFRuleDefinition());
+                defs.Add(new CFRuleBody());
                 return defs;
             }
             // Recognize the parameters
-            TemplateRuleParameter parameters = new TemplateRuleParameter();
+            List<GrammarSymbol> parameters = new List<GrammarSymbol>();
             foreach (Redist.Parsers.SyntaxTreeNode symbolNode in node.Children[1].Children)
                 parameters.Add(Compile_Recognize_rule_def_atom(data, context, symbolNode)[0].Parts[0].Symbol);
             // Get the corresponding variable
             Variable variable = context.GetVariableFromMetaRule(name, parameters, context);
             // Create the definition
-            defs.Add(new CFRuleDefinition(variable));
+            defs.Add(new CFRuleBody(variable));
             return defs;
         }
 
-        private CFRuleDefinitionSet Compile_Recognize_rule_def_atom(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
+        private CFRuleBodySet Compile_Recognize_rule_def_atom(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
         {
             if (node.Symbol.Name == "rule_sym_action")
                 return Compile_Recognize_rule_sym_action(data, node);
@@ -555,91 +549,91 @@ namespace Hime.Parsers.ContextFree
                 return Compile_Recognize_grammar_bin_terminal(data, node);
             return null;
         }
-        public CFRuleDefinitionSet Compile_Recognize_rule_definition(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
+        public CFRuleBodySet Compile_Recognize_rule_definition(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
         {
             if (node.Symbol is Redist.Parsers.SymbolTokenText)
             {
                 Redist.Parsers.SymbolTokenText token = (Redist.Parsers.SymbolTokenText)node.Symbol;
                 if (token.ValueText == "?")
                 {
-                    CFRuleDefinitionSet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
-                    setInner.Insert(0, new CFRuleDefinition());
+                    CFRuleBodySet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    setInner.Insert(0, new CFRuleBody());
                     return setInner;
                 }
                 else if (token.ValueText == "*")
                 {
-                    CFRuleDefinitionSet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
-                    Variable subVar = data.AddVariable(subruleHeadRadicalMultiplicity + data.NextSID.ToString());
-                    foreach (CFRuleDefinition def in setInner)
+                    CFRuleBodySet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    CFVariable subVar = data.NewCFVariable();
+                    foreach (CFRuleBody def in setInner)
                         subVar.AddRule(new CFRule(subVar, def, true));
-                    CFRuleDefinitionSet setVar = new CFRuleDefinitionSet();
-                    setVar.Add(new CFRuleDefinition(subVar));
+                    CFRuleBodySet setVar = new CFRuleBodySet();
+                    setVar.Add(new CFRuleBody(subVar));
                     setVar = setVar * setInner;
-                    foreach (CFRuleDefinition def in setVar)
+                    foreach (CFRuleBody def in setVar)
                         subVar.AddRule(new CFRule(subVar, def, true));
-                    setVar = new CFRuleDefinitionSet();
-                    setVar.Add(new CFRuleDefinition());
-                    setVar.Add(new CFRuleDefinition(subVar));
+                    setVar = new CFRuleBodySet();
+                    setVar.Add(new CFRuleBody());
+                    setVar.Add(new CFRuleBody(subVar));
                     return setVar;
                 }
                 else if (token.ValueText == "+")
                 {
-                    CFRuleDefinitionSet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
-                    Variable subVar = data.AddVariable(subruleHeadRadicalMultiplicity + data.NextSID.ToString());
-                    foreach (CFRuleDefinition def in setInner)
+                    CFRuleBodySet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    CFVariable subVar = data.NewCFVariable();
+                    foreach (CFRuleBody def in setInner)
                         subVar.AddRule(new CFRule(subVar, def, true));
-                    CFRuleDefinitionSet setVar = new CFRuleDefinitionSet();
-                    setVar.Add(new CFRuleDefinition(subVar));
+                    CFRuleBodySet setVar = new CFRuleBodySet();
+                    setVar.Add(new CFRuleBody(subVar));
                     setVar = setVar * setInner;
-                    foreach (CFRuleDefinition Def in setVar)
+                    foreach (CFRuleBody Def in setVar)
                         subVar.AddRule(new CFRule(subVar, Def, true));
-                    setVar = new CFRuleDefinitionSet();
-                    setVar.Add(new CFRuleDefinition(subVar));
+                    setVar = new CFRuleBodySet();
+                    setVar.Add(new CFRuleBody(subVar));
                     return setVar;
                 }
                 else if (token.ValueText == "^")
                 {
-                    CFRuleDefinitionSet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    CFRuleBodySet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
                     setInner.SetActionPromote();
                     return setInner;
                 }
                 else if (token.ValueText == "!")
                 {
-                    CFRuleDefinitionSet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    CFRuleBodySet setInner = Compile_Recognize_rule_definition(data, context, node.Children[0]);
                     setInner.SetActionDrop();
                     return setInner;
                 }
                 else if (token.ValueText == "|")
                 {
-                    CFRuleDefinitionSet setLeft = Compile_Recognize_rule_definition(data, context, node.Children[0]);
-                    CFRuleDefinitionSet setRight = Compile_Recognize_rule_definition(data, context, node.Children[1]);
+                    CFRuleBodySet setLeft = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    CFRuleBodySet setRight = Compile_Recognize_rule_definition(data, context, node.Children[1]);
                     return (setLeft + setRight);
                 }
                 else if (token.ValueText == "-")
                 {
-                    CFRuleDefinitionSet setLeft = Compile_Recognize_rule_definition(data, context, node.Children[0]);
-                    CFRuleDefinitionSet setRight = Compile_Recognize_rule_definition(data, context, node.Children[1]);
-                    Variable subVar = data.AddVariable(subruleHeadRadicalRestrict + data.NextSID.ToString());
-                    foreach (CFRuleDefinition def in setLeft)
+                    CFRuleBodySet setLeft = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                    CFRuleBodySet setRight = Compile_Recognize_rule_definition(data, context, node.Children[1]);
+                    CFVariable subVar = data.NewCFVariable();
+                    foreach (CFRuleBody def in setLeft)
                         subVar.AddRule(new CFRule(subVar, def, true, subVar.SID));
-                    foreach (CFRuleDefinition def in setRight)
+                    foreach (CFRuleBody def in setRight)
                         subVar.AddRule(new CFRule(subVar, def, true, -subVar.SID));
-                    CFRuleDefinitionSet setFinal = new CFRuleDefinitionSet();
-                    setFinal.Add(new CFRuleDefinition(subVar));
+                    CFRuleBodySet setFinal = new CFRuleBodySet();
+                    setFinal.Add(new CFRuleBody(subVar));
                     return setFinal;
                 }
                 return Compile_Recognize_rule_def_atom(data, context, node);
             }
             else if (node.Symbol.Name == "emptypart")
             {
-                CFRuleDefinitionSet set = new CFRuleDefinitionSet();
-                set.Add(new CFRuleDefinition());
+                CFRuleBodySet set = new CFRuleBodySet();
+                set.Add(new CFRuleBody());
                 return set;
             }
             else if (node.Symbol.Name == "concat")
             {
-                CFRuleDefinitionSet setLeft = Compile_Recognize_rule_definition(data, context, node.Children[0]);
-                CFRuleDefinitionSet setRight = Compile_Recognize_rule_definition(data, context, node.Children[1]);
+                CFRuleBodySet setLeft = Compile_Recognize_rule_definition(data, context, node.Children[0]);
+                CFRuleBodySet setRight = Compile_Recognize_rule_definition(data, context, node.Children[1]);
                 return (setLeft * setRight);
             }
             else
@@ -648,9 +642,9 @@ namespace Hime.Parsers.ContextFree
         private void Compile_Recognize_rule(CFGrammar data, CompilerContext context, Redist.Parsers.SyntaxTreeNode node)
         {
             string name = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;
-            Variable var = data.GetVariable(name);
-            CFRuleDefinitionSet defs = Compile_Recognize_rule_definition(data, context, node.Children[1]);
-            foreach (CFRuleDefinition def in defs)
+            CFVariable var = data.GetCFVariable(name);
+            CFRuleBodySet defs = Compile_Recognize_rule_definition(data, context, node.Children[1]);
+            foreach (CFRuleBody def in defs)
                 var.AddRule(new CFRule(var, def, false));
         }
 
@@ -671,7 +665,7 @@ namespace Hime.Parsers.ContextFree
             // Add existing meta-rules that may have been inherited
             foreach (TemplateRule templateRule in data.TemplateRules)
                 context.AddTemplateRule(templateRule);
-            // Load new variables for the rules' head and the meta-rules themselves
+            // Load new variables for the rules' head
             foreach (Redist.Parsers.SyntaxTreeNode node in rulesNode.Children)
             {
                 if (node.Symbol.Name.StartsWith("cf_rule_simple"))
@@ -682,7 +676,7 @@ namespace Hime.Parsers.ContextFree
                         var = data.AddVariable(name);
                 }
                 else if (node.Symbol.Name.StartsWith("cf_rule_template"))
-                    context.AddTemplateRule(data.AddTemplateRule(node, this));
+                    context.AddTemplateRule(data.AddTemplateRule(node));
             }
             // Load the grammar rules
             foreach (Redist.Parsers.SyntaxTreeNode node in rulesNode.Children)

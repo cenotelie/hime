@@ -134,7 +134,7 @@ namespace Hime.Parsers.ContextFree.LR
                 // Set ID
                 setLALR1.ID = i;
                 // Link
-                foreach (Symbol symbol in setLR0.Children.Keys)
+                foreach (GrammarSymbol symbol in setLR0.Children.Keys)
                 {
                     State childLALR1 = graphLALR1.States[setLR0.Children[symbol].ID];
                     setLALR1.Children.Add(symbol, childLALR1);

@@ -17,26 +17,26 @@ namespace Hime.Kernel.Resources
         private Naming.Symbol symbol;
         private SyntaxTreeNode syntaxNode;
         private List<KeyValuePair<string, Resource>> dependencies;
-        private IResourceCompiler compiler;
-        private bool isCompiled;
+        private LoaderPlugin loader;
+        private bool isLoaded;
 
         public Naming.Symbol Symbol { get { return symbol; } }
         public SyntaxTreeNode SyntaxNode { get { return syntaxNode; } }
         public List<KeyValuePair<string, Resource>> Dependencies { get { return dependencies; } }
-        public IResourceCompiler Compiler { get { return compiler; } }
-        public bool IsCompiled
+        public LoaderPlugin Loader { get { return loader; } }
+        public bool IsLoaded
         {
-            get { return isCompiled; }
-            set { isCompiled = value; }
+            get { return isLoaded; }
+            set { isLoaded = value; }
         }
 
-        public Resource(Naming.Symbol symbol, SyntaxTreeNode syntaxNode, IResourceCompiler compiler)
+        public Resource(Naming.Symbol symbol, SyntaxTreeNode syntaxNode, LoaderPlugin loader)
         {
             this.symbol = symbol;
             this.syntaxNode = syntaxNode;
             this.dependencies = new List<KeyValuePair<string, Resource>>();
-            this.compiler = compiler;
-            this.isCompiled = false;
+            this.loader = loader;
+            this.isLoaded = false;
         }
 
         public void AddDependency(string tag, Resource resource)
@@ -46,7 +46,7 @@ namespace Hime.Kernel.Resources
         
         public void CreateDependencies(ResourceGraph graph, Reporter logger)
         {
-        	this.Compiler.CreateDependencies(this, graph, logger);
+        	this.Loader.CreateDependencies(this, graph, logger);
         }
     }
 }

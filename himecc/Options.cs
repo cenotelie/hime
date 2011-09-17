@@ -16,7 +16,7 @@ namespace Hime.HimeCC
         public Options()
         {
             Inputs = new List<string>();
-            Method = Parsers.EParsingMethod.RNGLALR1;
+            Method = Parsers.ParsingMethod.RNGLALR1;
             ExportHTMLLog = false;
         }
 
@@ -30,7 +30,7 @@ namespace Hime.HimeCC
         public string Namespace;
 
         [Option("m", "method", Required = false, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1|LRStar")]
-        public Parsers.EParsingMethod Method;
+        public Parsers.ParsingMethod Method;
 
         [Option(null, "lexer", Required = false, HelpText = "Path and name of the file for the generated lexer")]
         public string LexerFile;

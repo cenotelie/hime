@@ -4,37 +4,38 @@
  * Time: 17:22
  * 
  */
+using System;
+using System.IO;
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class ParserDataRNGLR1 : ParserData
+    class ParserDataRNGLR1 : ParserDataLR
     {
-        protected Kernel.Reporting.Reporter reporter;
-        protected string terminalsAccessor;
         protected List<Variable> nullableVars;
-        protected List<CFRuleDefinition> nullableChoices;
+        protected List<CFRuleBody> nullableChoices;
 
-        public ParserDataRNGLR1(ParserGenerator generator, CFGrammar gram, Graph graph)
-            : base(generator, gram, graph)
+        public ParserDataRNGLR1(Reporter reporter, CFGrammar gram, Graph graph)
+            : base(reporter, gram, graph)
         {
             nullableVars = new List<Variable>();
-            nullableChoices = new List<CFRuleDefinition>();
+            nullableChoices = new List<CFRuleBody>();
         }
 
         protected void DetermineNullables()
         {
-            nullableChoices.Add(new CFRuleDefinition());
-            foreach (Variable var in this.GrammarVariables)
+            nullableChoices.Add(new CFRuleBody());
+            foreach (CFVariable var in variables)
             {
                 if (var.Firsts.Contains(TerminalEpsilon.Instance))
                     nullableVars.Add(var);
                 foreach (CFRule rule in var.Rules)
                 {
-                    int length = rule.Definition.GetChoiceAt(0).Length;
+                    int length = rule.CFBody.GetChoiceAt(0).Length;
                     for (int i = 0; i != length; i++)
                     {
-                        CFRuleDefinition choice = rule.Definition.GetChoiceAt(i);
+                        CFRuleBody choice = rule.CFBody.GetChoiceAt(i);
                         if (choice.Firsts.Contains(TerminalEpsilon.Instance))
                             nullableChoices.Add(choice);
                     }
@@ -42,38 +43,38 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-        public override bool Export(IList<Terminal> expected, CompilationTask options)
+        public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
-            reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
-            debug = options.ExportDebug;
-            terminalsAccessor = this.LexerName + ".terminals";
+            debug = exportDebug;
+            terminalsAccessor = lexerClassName + ".terminals";
             DetermineNullables();
-            stream = options.ParserWriter;
-            stream.WriteLine("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.ParserName + " : BaseRNGLR1Parser");
+
+            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
-            Export_Variables(stream);
-            Export_NullVars();
-            Export_NullChoices();
+            ExportVariables(stream);
+            Export_NullVars(stream);
+            Export_NullChoices(stream);
             foreach (CFRule rule in this.GrammarRules)
-                Export_Production(rule);
-            Export_Rules();
-            Export_States();
-            Export_NullBuilders();
-            Export_Actions();
-            Export_Setup();
-            Export_StaticConstructor();
-            return base.Export(expected, options);
+                Export_Production(stream, rule, className);
+            Export_Rules(stream);
+            Export_States(stream);
+            Export_NullBuilders(stream);
+            Export_Actions(stream);
+            Export_Setup(stream);
+            Export_StaticConstructor(stream, className);
+            ExportConstructor(stream, className, lexerClassName);
+            stream.WriteLine("    }");
         }
-        protected void Export_StaticConstructor()
+        protected void Export_StaticConstructor(StreamWriter stream, string className)
         {
-            stream.WriteLine("        static " + this.ParserName + "()");
+            stream.WriteLine("        static " + className + "()");
             stream.WriteLine("        {");
             stream.WriteLine("            BuildNullables();");
             stream.WriteLine("        }");
         }
-        protected void Export_Setup()
+        protected void Export_Setup(StreamWriter stream)
         {
             stream.WriteLine("        protected override void setup()");
             stream.WriteLine("        {");
@@ -81,13 +82,13 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("            nullChoicesSPPF = staticNullChoicesSPPF;");
             stream.WriteLine("            rules = staticRules;");
             stream.WriteLine("            states = staticStates;");
-            stream.WriteLine("            axiomID = " + this.GetOption("Axiom") + ";");
-            stream.WriteLine("            axiomNullSPPF = " + this.GetOption("Axiom") + ";");
-            stream.WriteLine("            axiomPrimeID = " + this.GetVariable("_Axiom_") + ";");
+            stream.WriteLine("            axiomID = " + GetVariable(GetOption("Axiom")) + ";");
+            stream.WriteLine("            axiomNullSPPF = " + GetVariable(GetOption("Axiom")) + ";");
+            stream.WriteLine("            axiomPrimeID = " + GetVariable("_Axiom_") + ";");
             stream.WriteLine("        }");
         }
-        
-        protected void Export_Actions()
+
+        protected void Export_Actions(StreamWriter stream)
         {
             List<string> Names = new List<string>();
             foreach (Action action in this.GrammarActions)
@@ -103,28 +104,28 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("        }");
             }
         }
-        protected void Export_Production(CFRule Rule)
+        protected void Export_Production(StreamWriter stream, CFRule Rule, string className)
         {
-            string ParserLength = Rule.Definition.GetChoiceAt(0).Length.ToString();
+            string ParserLength = Rule.CFBody.GetChoiceAt(0).Length.ToString();
 
-            stream.WriteLine("        private static void Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
+            stream.WriteLine("        private static void Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
             stream.WriteLine("        {");
             if (Rule.ReplaceOnProduction)
                 stream.WriteLine("            root.Action = SyntaxTreeNodeAction.Replace;");
             stream.WriteLine("            SPPFNodeFamily family = new SPPFNodeFamily(root);");
             int i = 0;
-            foreach (RuleDefinitionPart Part in Rule.Definition.Parts)
+            foreach (RuleBodyElement Part in Rule.CFBody.Parts)
             {
                 if (Part.Symbol is Action)
                 {
                     Action action = (Action)Part.Symbol;
-                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + this.ParserName + ")parser).actions." + action.LocalName + "), 0));");
+                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.LocalName + "\", ((" + className + ")parser).actions." + action.LocalName + "), 0));");
                 }
                 else if (Part.Symbol is Virtual)
                     stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolVirtual(\"" + ((Virtual)Part.Symbol).LocalName + "\"), 0, SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
                 else if (Part.Symbol is Terminal || Part.Symbol is Variable)
                 {
-                    if (Part.Action != RuleDefinitionPartAction.Nothing)
+                    if (Part.Action != RuleBodyElementAction.Nothing)
                         stream.WriteLine("            nodes[" + i.ToString() + "].Action = SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
                     stream.WriteLine("            family.AddChild(nodes[" + i.ToString() + "]);");
                     i++;
@@ -133,7 +134,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("            if (!root.HasEquivalentFamily(family)) root.AddFamily(family);");
             stream.WriteLine("        }");
         }
-        protected void Export_Rules()
+        protected void Export_Rules(StreamWriter stream)
         {
             stream.WriteLine("        private static Rule[] staticRules = {");
             bool first = true;
@@ -141,17 +142,17 @@ namespace Hime.Parsers.ContextFree.LR
             {
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
-                string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "variables[" + this.variables.IndexOf(Rule.Variable) + "]";
+                string production = "Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X");
+                string head = "variables[" + this.variables.IndexOf(Rule.Head) + "]";
                 stream.WriteLine("new Rule(" + production + ", " + head + ")");
                 first = false;
             }
             stream.WriteLine("        };");
         }
-        protected void Export_State(State state)
+        protected void Export_State(StreamWriter stream, State state)
         {
             TerminalSet expected = state.Reductions.ExpectedTerminals;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (Symbol is Terminal)
                     expected.Add((Terminal)Symbol);
@@ -190,7 +191,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("},");
 
             int ShitTerminalCount = 0;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -200,7 +201,7 @@ namespace Hime.Parsers.ContextFree.LR
             // Write shifts on terminal
             stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -211,7 +212,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("},");
             stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -224,7 +225,7 @@ namespace Hime.Parsers.ContextFree.LR
             // Write shifts on variable
             stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
@@ -235,7 +236,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("},");
             stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
@@ -253,15 +254,15 @@ namespace Hime.Parsers.ContextFree.LR
                 if (Reduction.ReduceLength == 0)
                 {
                     int index = 0;
-                    index = nullableVars.IndexOf(Reduction.ToReduceRule.Variable);
+                    index = nullableVars.IndexOf(Reduction.ToReduceRule.Head);
                     stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(Reduction.ToReduceRule) + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullVarsSPPF[0x" + index.ToString("X") + "])");
                 }
                 else
                 {
                     int index = 0;
-                    if (Reduction.ToReduceRule.Definition.GetChoiceAt(0).Length != Reduction.ReduceLength)
+                    if (Reduction.ToReduceRule.CFBody.GetChoiceAt(0).Length != Reduction.ReduceLength)
                     {
-                        CFRuleDefinition def = Reduction.ToReduceRule.Definition.GetChoiceAt(Reduction.ReduceLength);
+                        CFRuleBody def = Reduction.ToReduceRule.CFBody.GetChoiceAt(Reduction.ReduceLength);
                         index = nullableChoices.IndexOf(def);
                     }
                     stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(Reduction.ToReduceRule) + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
@@ -270,7 +271,7 @@ namespace Hime.Parsers.ContextFree.LR
             }
             stream.WriteLine("})");
         }
-        protected void Export_States()
+        protected void Export_States(StreamWriter stream)
         {
             stream.WriteLine("        private static State[] staticStates = {");
             bool first = true;
@@ -278,13 +279,13 @@ namespace Hime.Parsers.ContextFree.LR
             {
                 stream.Write("            ");
                 if (!first) stream.Write(", ");
-                Export_State(State);
+                Export_State(stream, State);
                 first = false;
             }
             stream.WriteLine("        };");
         }
-        
-        protected void Export_NullVars()
+
+        protected void Export_NullVars(StreamWriter stream)
         {
             stream.Write("        private static SPPFNode[] staticNullVarsSPPF = { ");
             bool first = true;
@@ -305,11 +306,11 @@ namespace Hime.Parsers.ContextFree.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_NullChoices()
+        protected void Export_NullChoices(StreamWriter stream)
         {
             stream.Write("        private static SPPFNode[] staticNullChoicesSPPF = { ");
             bool first = true;
-            foreach (CFRuleDefinition definition in nullableChoices)
+            foreach (CFRuleBody definition in nullableChoices)
             {
                 if (!first) stream.Write(", ");
                 stream.Write("new SPPFNode(null, 0, SyntaxTreeNodeAction.Replace)");
@@ -317,14 +318,14 @@ namespace Hime.Parsers.ContextFree.LR
             }
             stream.WriteLine(" };");
         }
-        protected void Export_NullBuilders()
+        protected void Export_NullBuilders(StreamWriter stream)
         {
             stream.WriteLine("        private static void BuildNullables() { ");
             stream.WriteLine("            List<SPPFNode> temp = new List<SPPFNode>();");
             for (int i=0; i!=nullableChoices.Count; i++)
             {
-                CFRuleDefinition definition = nullableChoices[i];
-                foreach (RuleDefinitionPart part in definition.Parts)
+                CFRuleBody definition = nullableChoices[i];
+                foreach (RuleBodyElement part in definition.Parts)
                     stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((Variable)part.Symbol) + "]);");
                 stream.WriteLine("            staticNullChoicesSPPF[" + i + "].AddFamily(temp);");
                 stream.WriteLine("            temp.Clear();");
@@ -334,10 +335,10 @@ namespace Hime.Parsers.ContextFree.LR
                 Variable var = nullableVars[i];
                 foreach (CFRule rule in var.Rules)
                 {
-                    CFRuleDefinition definition = rule.Definition.GetChoiceAt(0);
+                    CFRuleBody definition = rule.CFBody.GetChoiceAt(0);
                     if (definition.Firsts.Contains(TerminalEpsilon.Instance))
                     {
-                        foreach (RuleDefinitionPart part in definition.Parts)
+                        foreach (RuleBodyElement part in definition.Parts)
                             stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((Variable)part.Symbol) + "]);");
                         stream.WriteLine("            staticNullVarsSPPF[" + i + "].AddFamily(temp);");
                         stream.WriteLine("            temp.Clear();");

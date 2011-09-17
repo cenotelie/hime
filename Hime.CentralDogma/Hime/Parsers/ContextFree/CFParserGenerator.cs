@@ -11,6 +11,6 @@ namespace Hime.Parsers.ContextFree
 {
     public interface CFParserGenerator : ParserGenerator
     {
-        ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter);
+        ParserData Build(CFGrammar grammar, Reporter reporter);
     }
 }

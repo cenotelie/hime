@@ -10,24 +10,24 @@ namespace Hime.Parsers.ContextFree
 {
     class CompilerContext
     {
-        private CFGrammarCompiler compiler;
+        private CFGrammarLoader compiler;
         private List<TemplateRule> templateRules;
-        private Dictionary<string, Symbol> references;
+        private Dictionary<string, GrammarSymbol> references;
 
-        public CFGrammarCompiler Compiler { get { return compiler; } }
+        public CFGrammarLoader Compiler { get { return compiler; } }
 
-        public CompilerContext(CFGrammarCompiler compiler)
+        public CompilerContext(CFGrammarLoader compiler)
         {
             this.compiler = compiler;
             this.templateRules = new List<TemplateRule>();
-            this.references = new Dictionary<string, Symbol>();
+            this.references = new Dictionary<string, GrammarSymbol>();
         }
 
         public CompilerContext(CompilerContext copied)
         {
             compiler = copied.Compiler;
             templateRules = new List<TemplateRule>(copied.templateRules);
-            references = new Dictionary<string, Symbol>();
+            references = new Dictionary<string, GrammarSymbol>();
         }
 
         public void AddTemplateRule(TemplateRule templateRule) { templateRules.Add(templateRule); }
@@ -40,7 +40,7 @@ namespace Hime.Parsers.ContextFree
             return false;
         }
 
-        public Variable GetVariableFromMetaRule(string name, TemplateRuleParameter parameters, CompilerContext context)
+        public Variable GetVariableFromMetaRule(string name, List<GrammarSymbol> parameters, CompilerContext context)
         {
             foreach (TemplateRule tRule in templateRules)
             {
@@ -50,9 +50,9 @@ namespace Hime.Parsers.ContextFree
             return null;
         }
 
-        public void AddReference(string name, Symbol symbol) { references.Add(name, symbol); }
+        public void AddReference(string name, GrammarSymbol symbol) { references.Add(name, symbol); }
         public bool IsReference(string name) { return references.ContainsKey(name); }
-        public Symbol GetReference(string name)
+        public GrammarSymbol GetReference(string name)
         {
             if (references.ContainsKey(name))
                 return references[name];

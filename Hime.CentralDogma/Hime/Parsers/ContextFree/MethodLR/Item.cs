@@ -13,7 +13,7 @@ namespace Hime.Parsers.ContextFree.LR
         public const string dot = "●";
 
         protected CFRule rule;
-        protected CFRuleDefinition definition;
+        protected CFRuleBody definition;
         protected int dotPosition;
 
         public CFRule BaseRule { get { return rule; } }
@@ -28,15 +28,15 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
         
-        public Symbol NextSymbol { get { return definition.GetSymbolAt(dotPosition); } }
-        public CFRuleDefinition NextChoice { get { return rule.Definition.GetChoiceAt(dotPosition + 1); } }
+        public GrammarSymbol NextSymbol { get { return definition.GetSymbolAt(dotPosition); } }
+        public CFRuleBody NextChoice { get { return rule.CFBody.GetChoiceAt(dotPosition + 1); } }
 
         public abstract TerminalSet Lookaheads { get; }
 
         public Item(CFRule Rule, int DotPosition)
         {
             rule = Rule;
-            definition = rule.Definition.GetChoiceAt(0);
+            definition = rule.CFBody.GetChoiceAt(0);
             dotPosition = DotPosition;
         }
 
@@ -62,8 +62,8 @@ namespace Hime.Parsers.ContextFree.LR
             root.Attributes.Append(document.CreateAttribute("HeadName"));
             root.Attributes.Append(document.CreateAttribute("HeadSID"));
             root.Attributes.Append(document.CreateAttribute("Conflict"));
-            root.Attributes["HeadName"].Value = rule.Variable.LocalName;
-            root.Attributes["HeadSID"].Value = rule.Variable.SID.ToString("X");
+            root.Attributes["HeadName"].Value = rule.Head.LocalName;
+            root.Attributes["HeadSID"].Value = rule.Head.SID.ToString("X");
             root.Attributes["Conflict"].Value = GetXMLNode_Conflict(set, this).ToString();
 
             System.Xml.XmlNode action = document.CreateElement("Action");
@@ -77,7 +77,7 @@ namespace Hime.Parsers.ContextFree.LR
 
             System.Xml.XmlNode symbols = document.CreateElement("Symbols");
             int i = 0;
-            foreach (RuleDefinitionPart Part in rule.Definition.GetChoiceAt(0).Parts)
+            foreach (RuleBodyElement Part in rule.CFBody.GetChoiceAt(0).Parts)
             {
                 if (i == dotPosition)
                     symbols.AppendChild(document.CreateElement("Dot"));

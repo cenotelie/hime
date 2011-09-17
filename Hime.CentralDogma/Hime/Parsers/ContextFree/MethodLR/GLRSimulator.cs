@@ -11,12 +11,12 @@ namespace Hime.Parsers.ContextFree.LR
     class GLRSimulator
     {
         private Graph graph;
-        private Dictionary<int, Dictionary<Symbol, List<State>>> inverseGraph;
+        private Dictionary<int, Dictionary<GrammarSymbol, List<State>>> inverseGraph;
 
         public GLRSimulator(Graph graph)
         {
             this.graph = graph;
-            this.inverseGraph = new Dictionary<int, Dictionary<Symbol, List<State>>>();
+            this.inverseGraph = new Dictionary<int, Dictionary<GrammarSymbol, List<State>>>();
             BuildInverse();
         }
 
@@ -24,12 +24,12 @@ namespace Hime.Parsers.ContextFree.LR
         {
             foreach (State set in graph.States)
             {
-                foreach (Symbol symbol in set.Children.Keys)
+                foreach (GrammarSymbol symbol in set.Children.Keys)
                 {
                     State child = set.Children[symbol];
                     if (!inverseGraph.ContainsKey(child.ID))
-                        inverseGraph.Add(child.ID, new Dictionary<Symbol, List<State>>());
-                    Dictionary<Symbol, List<State>> inverses = inverseGraph[child.ID];
+                        inverseGraph.Add(child.ID, new Dictionary<GrammarSymbol, List<State>>());
+                    Dictionary<GrammarSymbol, List<State>> inverses = inverseGraph[child.ID];
                     if (!inverses.ContainsKey(symbol))
                         inverses.Add(symbol, new List<State>());
                     List<State> parents = inverses[symbol];
@@ -51,14 +51,14 @@ namespace Hime.Parsers.ContextFree.LR
                 {
                     if (reduce.Lookahead.SID != lookahead.SID)
                         continue;
-                    GLRSimulatorState reduceOrigin = GetOrigin(node, reduce.ToReduceRule.Definition.GetChoiceAt(0));
+                    GLRSimulatorState reduceOrigin = GetOrigin(node, reduce.ToReduceRule.CFBody.GetChoiceAt(0));
                     foreach (GLRStackNode nOrigin in reduceOrigin.Nodes)
                     {
-                        if (nOrigin.State.Children.ContainsKey(reduce.ToReduceRule.Variable))
+                        if (nOrigin.State.Children.ContainsKey(reduce.ToReduceRule.Head))
                         {
-                            State next = nOrigin.State.Children[reduce.ToReduceRule.Variable];
+                            State next = nOrigin.State.Children[reduce.ToReduceRule.Head];
                             GLRStackNode follower = before.Add(next);
-                            follower.AddPrevious(reduce.ToReduceRule.Variable, nOrigin);
+                            follower.AddPrevious(reduce.ToReduceRule.Head, nOrigin);
                         }
                     }
                 }
@@ -91,38 +91,38 @@ namespace Hime.Parsers.ContextFree.LR
                 return result;
             }
 
-            GLRSimulatorState origin = GetOrigin(pState, item.BaseRule.Definition.GetChoiceAt(0));
+            GLRSimulatorState origin = GetOrigin(pState, item.BaseRule.CFBody.GetChoiceAt(0));
             foreach (GLRStackNode node in origin.Nodes)
             {
-                if (node.State.Children.ContainsKey(item.BaseRule.Variable))
+                if (node.State.Children.ContainsKey(item.BaseRule.Head))
                 {
-                    State next = node.State.Children[item.BaseRule.Variable];
+                    State next = node.State.Children[item.BaseRule.Head];
                     GLRStackNode nNode = result.Add(next);
-                    nNode.AddPrevious(item.BaseRule.Variable, node);
+                    nNode.AddPrevious(item.BaseRule.Head, node);
                 }
             }
             return Simulate(result, lookahead);
         }
 
-        private GLRSimulatorState GetOrigin(GLRStackNode node, CFRuleDefinition definition)
+        private GLRSimulatorState GetOrigin(GLRStackNode node, CFRuleBody definition)
         {
             GLRSimulatorState current = new GLRSimulatorState();
             current.Add(node);
             return GetOrigin(current, definition);
         }
-        private GLRSimulatorState GetOrigin(GLRSimulatorState current, CFRuleDefinition definition)
+        private GLRSimulatorState GetOrigin(GLRSimulatorState current, CFRuleBody definition)
         {
             GLRSimulatorState result = current;
             int index = definition.Length - 1;
             while (index != -1)
             {
-                Symbol symbol = definition.Parts[index].Symbol;
+                GrammarSymbol symbol = definition.Parts[index].Symbol;
                 result = GetOrigin(result, symbol);
                 index--;
             }
             return result;
         }
-        private GLRSimulatorState GetOrigin(GLRSimulatorState current, Symbol symbol)
+        private GLRSimulatorState GetOrigin(GLRSimulatorState current, GrammarSymbol symbol)
         {
             GLRSimulatorState result = new GLRSimulatorState();
             foreach (GLRStackNode node in current.Nodes)
@@ -135,7 +135,7 @@ namespace Hime.Parsers.ContextFree.LR
                 }
                 if (!inverseGraph.ContainsKey(node.State.ID))
                     continue;
-                Dictionary<Symbol, List<State>> inverses = inverseGraph[node.State.ID];
+                Dictionary<GrammarSymbol, List<State>> inverses = inverseGraph[node.State.ID];
                 if (!inverses.ContainsKey(symbol))
                     continue;
                 foreach (State previous in inverses[symbol])
@@ -151,15 +151,15 @@ namespace Hime.Parsers.ContextFree.LR
         public List<List<Terminal>> GetInputsFor(State state)
         {
             List<List<Terminal>> result = new List<List<Terminal>>();
-            foreach (ICollection<Symbol> path in GetPaths(state))
+            foreach (ICollection<GrammarSymbol> path in GetPaths(state))
             {
                 List<Terminal> input = new List<Terminal>();
-                foreach (Symbol s in path)
+                foreach (GrammarSymbol s in path)
                 {
                     if (s is Terminal)
                         input.Add(s as Terminal);
                     else
-                        BuildInput(input, s as Variable, new Stack<CFRuleDefinition>());
+                        BuildInput(input, s as CFVariable, new Stack<CFRuleBody>());
                 }
                 result.Add(input);
             }
@@ -167,15 +167,15 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         // TODO: there is a bug in this method, it may call itself forever
-        private void BuildInput(List<Terminal> sample, Variable var, Stack<CFRuleDefinition> stack)
+        private void BuildInput(List<Terminal> sample, CFVariable var, Stack<CFRuleBody> stack)
         {
             if (var.Firsts.Contains(TerminalEpsilon.Instance))
                 return;
-            List<CFRuleDefinition> definitions = new List<CFRuleDefinition>();
+            List<CFRuleBody> definitions = new List<CFRuleBody>();
             foreach (CFRule rule in var.Rules)
-                definitions.Add(rule.Definition.GetChoiceAt(0));
-            CFRuleDefinition def = null;
-            foreach (CFRuleDefinition d in definitions)
+                definitions.Add(rule.CFBody.GetChoiceAt(0));
+            CFRuleBody def = null;
+            foreach (CFRuleBody d in definitions)
             {
                 if (!stack.Contains(d))
                 {
@@ -185,9 +185,9 @@ namespace Hime.Parsers.ContextFree.LR
             }
             if (def == null)
                 def = definitions[0];
-            CFRuleDefinition[] stackElements = stack.ToArray();
+            CFRuleBody[] stackElements = stack.ToArray();
             stack.Push(def);
-            foreach (RuleDefinitionPart part in def.Parts)
+            foreach (RuleBodyElement part in def.Parts)
             {
                 if (part.Symbol is Terminal)
                 {
@@ -199,9 +199,9 @@ namespace Hime.Parsers.ContextFree.LR
                 	// TODO: cleanup this code, this is really not a nice patch!!
                 	// TODO: this is surely ineficient, but I don't understand the algorithm to do better yet
                 	// The idea is to try and avoid infinite recursive call by checking the symbol was not already processed before
-                	foreach (CFRuleDefinition definition in stackElements)
+                	foreach (CFRuleBody definition in stackElements)
                 	{
-                		foreach (RuleDefinitionPart definitionPart in definition.Parts)
+                		foreach (RuleBodyElement definitionPart in definition.Parts)
                 		{
                 			if (definitionPart.Symbol.Equals(part.Symbol))
                 			{
@@ -210,7 +210,7 @@ namespace Hime.Parsers.ContextFree.LR
                 		}
                 	}
 	                // if part.Symbol is not the same as another part.symbol found in a previous definition
-                	if (!symbolFound) BuildInput(sample, part.Symbol as Variable, stack);
+                	if (!symbolFound) BuildInput(sample, part.Symbol as CFVariable, stack);
                 }
             }
             stack.Pop();
@@ -220,8 +220,8 @@ namespace Hime.Parsers.ContextFree.LR
         {
             public State state;
             public ENode next;
-            public Symbol transition;
-            public ENode(State state, ENode next, Symbol transition)
+            public GrammarSymbol transition;
+            public ENode(State state, ENode next, GrammarSymbol transition)
             {
                 this.state = state;
                 this.next = next;
@@ -229,7 +229,7 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-        private List<ICollection<Symbol>> GetPaths(State state)
+        private List<ICollection<GrammarSymbol>> GetPaths(State state)
         {
             Dictionary<int, SortedList<ushort, ENode>> visited = new Dictionary<int, SortedList<ushort, ENode>>();
             LinkedList<ENode> queue = new LinkedList<ENode>();
@@ -242,8 +242,8 @@ namespace Hime.Parsers.ContextFree.LR
                 queue.RemoveFirst();
                 if (!inverseGraph.ContainsKey(current.state.ID))
                     continue;
-                Dictionary<Symbol, List<State>> transitions = inverseGraph[current.state.ID];
-                foreach (Symbol s in transitions.Keys)
+                Dictionary<GrammarSymbol, List<State>> transitions = inverseGraph[current.state.ID];
+                foreach (GrammarSymbol s in transitions.Keys)
                 {
                     foreach (State previous in transitions[s])
                     {
@@ -264,11 +264,11 @@ namespace Hime.Parsers.ContextFree.LR
                 }
             }
 
-            List<ICollection<Symbol>> paths = new List<ICollection<Symbol>>();
+            List<ICollection<GrammarSymbol>> paths = new List<ICollection<GrammarSymbol>>();
             foreach (ENode start in goals)
             {
                 ENode node = start;
-                LinkedList<Symbol> path = new LinkedList<Symbol>();
+                LinkedList<GrammarSymbol> path = new LinkedList<GrammarSymbol>();
                 while (node.next != null)
                 {
                     path.AddLast(node.transition);

@@ -4,38 +4,38 @@
  * Time: 17:22
  * 
  */
+using System.Xml;
 using System.Collections.Generic;
+using System.IO;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class ParserDataLR0 : ParserData
+    class ParserDataLR0 : ParserDataLR
     {
-        protected Kernel.Reporting.Reporter reporter;
-        protected string terminalsAccessor;
+        public ParserDataLR0(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 
-        public ParserDataLR0(ParserGenerator generator, CFGrammar gram, Graph graph) : base(generator, gram, graph) { }
-        
-        public override bool Export(IList<Terminal> expected, CompilationTask options)
+        public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
-            reporter = options.Reporter;
             terminals = new List<Terminal>(expected);
-            debug = options.ExportDebug;
-            terminalsAccessor = this.LexerName + ".terminals";
-            stream = options.ParserWriter;
-            stream.Write("    " + options.GeneratedCodeModifier.ToString().ToLower() + " class " + this.ParserName + " : ");
+            debug = exportDebug;
+            terminalsAccessor = lexerClassName + ".terminals";
+
+            stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");
             stream.WriteLine("LR0TextParser");
             stream.WriteLine("    {");
-            Export_Variables(stream);
+            ExportVariables(stream);
             foreach (CFRule rule in this.GrammarRules)
-                Export_Production(rule);
-            Export_Rules();
-            Export_States();
-            Export_Actions();
-            Export_Setup();
-            return base.Export(expected, options);
+                Export_Production(stream, rule, className);
+            Export_Rules(stream);
+            Export_States(stream);
+            Export_Actions(stream);
+            Export_Setup(stream);
+            ExportConstructor(stream, className, lexerClassName);
+            stream.WriteLine("    }");
         }
-        
-        protected void Export_Setup()
+
+        protected void Export_Setup(StreamWriter stream)
         {
             stream.WriteLine("        protected override void setup()");
             stream.WriteLine("        {");
@@ -45,7 +45,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("        }");
         }
 
-        protected void Export_Actions()
+        protected void Export_Actions(StreamWriter stream)
         {
             List<string> Names = new List<string>();
             foreach (Action action in this.GrammarActions)
@@ -61,12 +61,12 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("        }");
             }
         }
-        protected void Export_Production(CFRule rule)
+        protected void Export_Production(StreamWriter stream, CFRule rule, string className)
         {
-            int length = rule.Definition.GetChoiceAt(0).Length;
-            stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Variable.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
+            int length = rule.CFBody.GetChoiceAt(0).Length;
+            stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Head.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
             stream.WriteLine("        {");
-            stream.WriteLine("            " + this.ParserName + " parser = baseParser as " + this.ParserName + ";");
+            stream.WriteLine("            " + className + " parser = baseParser as " + className + ";");
             if (length != 0)
             {
                 stream.WriteLine("            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;");
@@ -74,13 +74,13 @@ namespace Hime.Parsers.ContextFree.LR
                 for (int i = 1; i != length; i++)
                     stream.WriteLine("            current = current.Previous;");
             }
-            stream.Write("            SyntaxTreeNode root = new SyntaxTreeNode(variables[" + this.variables.IndexOf(rule.Variable) + "]");
+            stream.Write("            SyntaxTreeNode root = new SyntaxTreeNode(variables[" + this.variables.IndexOf(rule.Head) + "]");
             if (rule.ReplaceOnProduction)
                 stream.WriteLine(", SyntaxTreeNodeAction.Replace);");
             else
                 stream.WriteLine(");");
 
-            foreach (RuleDefinitionPart part in rule.Definition.Parts)
+            foreach (RuleBodyElement part in rule.CFBody.Parts)
             {
                 if (part.Symbol is Action)
                 {
@@ -91,10 +91,10 @@ namespace Hime.Parsers.ContextFree.LR
                     stream.WriteLine("            root.AppendChild(new SyntaxTreeNode(new SymbolVirtual(\"" + part.Symbol.LocalName + "\"), SyntaxTreeNodeAction." + part.Action.ToString() + "));");
                 else if (part.Symbol is Terminal || part.Symbol is Variable)
                 {
-                    if (part.Action != RuleDefinitionPartAction.Drop)
+                    if (part.Action != RuleBodyElementAction.Drop)
                     {
                         stream.Write("            root.AppendChild(current.Value");
-                        if (part.Action != RuleDefinitionPartAction.Nothing)
+                        if (part.Action != RuleBodyElementAction.Nothing)
                             stream.WriteLine(", SyntaxTreeNodeAction." + part.Action.ToString() + ");");
                         else
                             stream.WriteLine(");");
@@ -107,7 +107,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("            return root;");
             stream.WriteLine("        }");
         }
-        protected void Export_Rules()
+        protected void Export_Rules(StreamWriter stream)
         {
             stream.WriteLine("        private static LRRule[] staticRules = {");
             bool first = true;
@@ -115,18 +115,18 @@ namespace Hime.Parsers.ContextFree.LR
             {
                 stream.Write("           ");
                 if (!first) stream.Write(", ");
-                string production = "Production_" + Rule.Variable.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "variables[" + this.variables.IndexOf(Rule.Variable) + "]";
-                stream.WriteLine("new LRRule(" + production + ", " + head + ", " + Rule.Definition.GetChoiceAt(0).Length + ")");
+                string production = "Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X");
+                string head = "variables[" + this.variables.IndexOf(Rule.Head) + "]";
+                stream.WriteLine("new LRRule(" + production + ", " + head + ", " + Rule.CFBody.GetChoiceAt(0).Length + ")");
                 first = false;
             }
             stream.WriteLine("        };");
         }
         
-        protected void Export_State_Shifts(State state)
+        protected void Export_State_Shifts(StreamWriter stream, State state)
         {
             TerminalSet expected = new TerminalSet();
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (Symbol is Terminal)
                     expected.Add((Terminal)Symbol);
@@ -165,7 +165,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("},");
 
             int ShitTerminalCount = 0;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -175,7 +175,7 @@ namespace Hime.Parsers.ContextFree.LR
             // Write shifts on terminal
             stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -186,7 +186,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("},");
             stream.Write("               new ushort[" + ShitTerminalCount + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Terminal))
                     continue;
@@ -199,7 +199,7 @@ namespace Hime.Parsers.ContextFree.LR
             // Write shifts on variable
             stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
@@ -210,7 +210,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("},");
             stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
             first = true;
-            foreach (Symbol Symbol in state.Children.Keys)
+            foreach (GrammarSymbol Symbol in state.Children.Keys)
             {
                 if (!(Symbol is Variable))
                     continue;
@@ -220,7 +220,7 @@ namespace Hime.Parsers.ContextFree.LR
             }
             stream.WriteLine("})");
         }
-        protected void Export_State_Reduction(State state)
+        protected void Export_State_Reduction(StreamWriter stream, State state)
         {
             bool first = true;
             stream.WriteLine("new LR0State(");
@@ -245,8 +245,8 @@ namespace Hime.Parsers.ContextFree.LR
             stream.Write("               staticRules[" + this.IndexOfRule(state.Reductions[0].ToReduceRule) + "]");
             stream.WriteLine(")");
         }
-        
-        protected void Export_States()
+
+        protected void Export_States(StreamWriter stream)
         {
             stream.WriteLine("        private static LR0State[] staticStates = {");
             bool first = true;
@@ -255,9 +255,9 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.Write("            ");
                 if (!first) stream.Write(", ");
                 if (state.Reductions.Count == 0)
-                    Export_State_Shifts(state);
+                    Export_State_Shifts(stream, state);
                 else
-                    Export_State_Reduction(state);
+                    Export_State_Reduction(stream, state);
                 first = false;
             }
             stream.WriteLine("        };");

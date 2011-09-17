@@ -11,6 +11,6 @@ namespace Hime.Parsers.ContextFree.LR
     interface StateAction
     {
         ItemAction ActionType { get; }
-        Symbol OnSymbol { get; }
+        GrammarSymbol OnSymbol { get; }
     }
 }

@@ -29,7 +29,7 @@ namespace Hime.Parsers.ContextFree.LR
             Close();
             reporter.Info("RNGLR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("RNGLR(1)", "Done !");
-            return new ParserDataRNGLR1(this, grammar, graph);
+            return new ParserDataRNGLR1(reporter, grammar, graph);
         }
 
         public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)

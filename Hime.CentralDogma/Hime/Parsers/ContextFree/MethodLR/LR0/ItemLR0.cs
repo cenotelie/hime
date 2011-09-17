@@ -23,7 +23,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
         public override void CloseTo(List<Item> closure, Dictionary<CFRule, Dictionary<int, List<Item>>> map)
         {
-            Symbol next = NextSymbol;
+            GrammarSymbol next = NextSymbol;
             if (next == null)
                 return;
             Variable nextVar = next as Variable;
@@ -51,10 +51,10 @@ namespace Hime.Parsers.ContextFree.LR
         public override string ToString(bool ShowDecoration)
         {
             System.Text.StringBuilder Builder = new System.Text.StringBuilder("[");
-            Builder.Append(rule.Variable.ToString());
+            Builder.Append(rule.Head.ToString());
             Builder.Append(" " + CFRule.arrow);
             int i = 0;
-            foreach (RuleDefinitionPart Part in definition.Parts)
+            foreach (RuleBodyElement Part in definition.Parts)
             {
                 if (i == dotPosition)
                     Builder.Append(" " + dot);

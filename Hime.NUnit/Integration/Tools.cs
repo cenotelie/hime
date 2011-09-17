@@ -8,7 +8,7 @@ namespace Hime.NUnit.Integration
 {
     public class Tools
     {
-        public bool BuildRawText(string grammar, EParsingMethod method)
+        public bool BuildRawText(string grammar, ParsingMethod method)
         {
             CompilationTask task = new CompilationTask();
             task.InputRawData.Add(grammar);
@@ -17,18 +17,19 @@ namespace Hime.NUnit.Integration
         
         // TODO: try to factor all calls to new CompilationTask
         // TODO: remove all static methods
-        public bool BuildResource(string file, EParsingMethod method)
+        public bool BuildResource(string file, ParsingMethod method)
         {
             CompilationTask task = new CompilationTask();
             task.InputFiles.Add(file);
             return this.RunTask(task, method);
         }
         
-        private bool RunTask(CompilationTask task, EParsingMethod method)
+        private bool RunTask(CompilationTask task, ParsingMethod method)
         {
             task.GrammarName = "Test";
             task.Method = method;
-            Report report = task.Execute();
+            Compiler compiler = new Compiler();
+            Report report = compiler.Execute(task);
             return !report.HasErrors;
         }
 

@@ -14,23 +14,23 @@ namespace Hime.Parsers.ContextFree.LR
 
         public MethodGLR1() { }
 
-        public ParserData Build(Grammar Grammar, Hime.Kernel.Reporting.Reporter Reporter) { return Build((CFGrammar)Grammar, Reporter); }
-        public ParserData Build(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Reporter)
+        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            Reporter.Info("GLR(1)", "Constructing GLR(1) data ...");
-            Graph Graph = ConstructGraph(Grammar, Reporter);
+            reporter.Info("GLR(1)", "Constructing GLR(1) data ...");
+            Graph Graph = ConstructGraph(grammar, reporter);
             // Output conflicts
             foreach (State Set in Graph.States)
                 foreach (Conflict Conflict in Set.Conflicts)
-                    Reporter.Report(Conflict);
-            Reporter.Info("GLR(1)", Graph.States.Count.ToString() + " states explored.");
-            Reporter.Info("GLR(1)", "Done !");
-            return new ParserDataGLR1(this, Grammar, Graph);
+                    reporter.Report(Conflict);
+            reporter.Info("GLR(1)", Graph.States.Count.ToString() + " states explored.");
+            reporter.Info("GLR(1)", "Done !");
+            return new ParserDataGLR1(reporter, grammar, Graph);
         }
 
-        public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
+        public static Graph ConstructGraph(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            Graph GraphLR1 = MethodLR1.ConstructGraph(Grammar, Log);
+            Graph GraphLR1 = MethodLR1.ConstructGraph(grammar, reporter);
             foreach (State Set in GraphLR1.States)
                 Set.BuildReductions(new StateReductionsGLR1());
             return GraphLR1;

@@ -13,7 +13,7 @@ namespace Hime.Parsers.ContextFree.LR
         protected int id;
         protected StateKernel kernel;
         protected List<Item> items;
-        protected Dictionary<Symbol, State> children;
+        protected Dictionary<GrammarSymbol, State> children;
         protected StateReductions reductions;
         
         public int ID
@@ -24,20 +24,20 @@ namespace Hime.Parsers.ContextFree.LR
         public StateKernel Kernel { get { return kernel; } }
         public StateReductions Reductions { get { return reductions; } }
         public ICollection<Item> Items { get { return items; } }
-        public Dictionary<Symbol, State> Children { get { return children; } }
+        public Dictionary<GrammarSymbol, State> Children { get { return children; } }
         public ICollection<Conflict> Conflicts { get { return reductions.Conflicts; } }
         
         public State(StateKernel Kernel, List<Item> Items)
         {
             kernel = Kernel;
             items = Items;
-            children = new Dictionary<Symbol, State>(Symbol.Comparer.Instance);
+            children = new Dictionary<GrammarSymbol, State>(GrammarSymbol.Comparer.Instance);
         }
 
         public void BuildGraph(Graph Graph)
         {
             // Shift dictionnary for the current set
-            Dictionary<Symbol, StateKernel> Shifts = new Dictionary<Symbol, StateKernel>();
+            Dictionary<GrammarSymbol, StateKernel> Shifts = new Dictionary<GrammarSymbol, StateKernel>();
             // Build the children kernels from the shift actions
             foreach (Item Item in items)
             {
@@ -55,7 +55,7 @@ namespace Hime.Parsers.ContextFree.LR
                 }
             }
             // Close the children and add them to the graph
-            foreach (Symbol Next in Shifts.Keys)
+            foreach (GrammarSymbol Next in Shifts.Keys)
             {
                 StateKernel Kernel = Shifts[Next];
                 State Child = Graph.ContainsSet(Kernel);

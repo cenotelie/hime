@@ -11,13 +11,13 @@ namespace Hime.Parsers.ContextFree
     class TemplateRuleInstance
     {
         private TemplateRule templateRule;
-        private Variable variable;
-        private TemplateRuleParameter parameters;
+        private CFVariable variable;
+        private List<GrammarSymbol> parameters;
 
         public Variable HeadVariable { get { return variable; } }
-        public TemplateRuleParameter Parameters { get { return parameters; } }
+        public List<GrammarSymbol> Parameters { get { return parameters; } }
 
-        public TemplateRuleInstance(TemplateRule tRule, TemplateRuleParameter parameters, CFGrammar data)
+        public TemplateRuleInstance(TemplateRule tRule, List<GrammarSymbol> parameters, CFGrammar data)
         {
             // Build the head variable name
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
@@ -31,13 +31,13 @@ namespace Hime.Parsers.ContextFree
             builder.Append(">");
             string name = builder.ToString();
             // Create and add the variable to the grammar
-            variable = data.AddVariable(name);
+            variable = data.AddCFVariable(name);
             // Copy parameters
-            parameters = new TemplateRuleParameter(parameters);
+            parameters = new List<GrammarSymbol>(parameters);
             // Set parent template rule
             templateRule = tRule;
         }
-        public TemplateRuleInstance(TemplateRule tRule, TemplateRuleParameter parameters, Variable variable)
+        public TemplateRuleInstance(TemplateRule tRule, List<GrammarSymbol> parameters, CFVariable variable)
         {
             this.templateRule = tRule;
             this.parameters = parameters;
@@ -52,13 +52,13 @@ namespace Hime.Parsers.ContextFree
             for (int i = 0; i != parameters.Count; i++)
                 newContext.AddReference(templateRule.Parameters[i], parameters[i]);
             // Recognize the rule with the new context
-            CFRuleDefinitionSet set = newContext.Compiler.Compile_Recognize_rule_definition(data, newContext, templateRule.DefinitionNode);
+            CFRuleBodySet set = newContext.Compiler.Compile_Recognize_rule_definition(data, newContext, templateRule.DefinitionNode);
             // Add recognized rules to the variable
-            foreach (CFRuleDefinition def in set)
+            foreach (CFRuleBody def in set)
                 variable.AddRule(new CFRule(variable, def, false));
         }
 
-        public bool MatchParameters(TemplateRuleParameter parameters)
+        public bool MatchParameters(List<GrammarSymbol> parameters)
         {
             if (parameters.Count != parameters.Count)
                 return false;

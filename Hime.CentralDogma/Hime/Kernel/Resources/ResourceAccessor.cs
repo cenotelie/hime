@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Kernel.Resources
 {
-    public sealed class ResourceAccessor
+    class ResourceAccessor
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 

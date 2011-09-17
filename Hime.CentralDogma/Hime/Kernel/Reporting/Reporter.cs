@@ -32,7 +32,7 @@ namespace Hime.Kernel.Reporting
         public Reporter()
         {
             Configure();
-            log = log4net.LogManager.GetLogger(typeof(Hime.Parsers.CompilationTask));
+            log = log4net.LogManager.GetLogger(typeof(Hime.Parsers.Compiler));
             report = new Report();
         }
 

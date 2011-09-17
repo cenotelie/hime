@@ -14,7 +14,7 @@ namespace Hime.Parsers.ContextFree.LR
         protected CFRule toReduce;
 
         public ItemAction ActionType { get { return ItemAction.Shift; } }
-        public Symbol OnSymbol { get { return lookahead; } }
+        public GrammarSymbol OnSymbol { get { return lookahead; } }
         public Terminal Lookahead { get { return lookahead; } }
         public CFRule ToReduceRule { get { return toReduce; } }
 

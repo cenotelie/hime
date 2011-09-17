@@ -8,7 +8,7 @@ using System;
 
 namespace Hime.Parsers
 {
-    public abstract class Terminal : Symbol
+    public abstract class Terminal : GrammarSymbol
     {
         protected int priority;
 

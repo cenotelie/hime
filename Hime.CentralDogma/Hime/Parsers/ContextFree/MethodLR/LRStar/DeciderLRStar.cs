@@ -57,7 +57,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
         private void BuildFirst_Shift(DeciderStateLRStar first, Item item, int index, List<Terminal> conflicts)
         {
-            Symbol symbol = item.NextSymbol;
+            GrammarSymbol symbol = item.NextSymbol;
             if (symbol is Terminal)
             {
                 Terminal t = (Terminal)symbol;
