@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodRNGLR1 : BaseMethod, CFParserGenerator
+    class MethodRNGLR1 : BaseMethod
     {
-        public string Name { get { return "RNGLR(1)"; } }
+        public override string Name { get { return "RNGLR(1)"; } }
 
         public MethodRNGLR1() { }
 
@@ -20,8 +20,7 @@ namespace Hime.Parsers.ContextFree.LR
                 conflict.IsError = false;
         }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("RNGLR(1)", "Constructing RNGLR(1) data ...");

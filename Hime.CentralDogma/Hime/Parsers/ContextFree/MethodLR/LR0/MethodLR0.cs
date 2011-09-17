@@ -8,14 +8,13 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodLR0 : BaseMethod, CFParserGenerator
+    class MethodLR0 : BaseMethod
     {
-        public string Name { get { return "LR(0)"; } }
+        public override string Name { get { return "LR(0)"; } }
 
         public MethodLR0() { }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LR(0)", "Constructing LR(0) data ...");

@@ -57,7 +57,6 @@ namespace Hime.Kernel.Resources
         	// TODO: simplify: this is not really necessary because of the reporter?
         	// TODO: make a test for the case where hasErrors and reporter.HasErrors do not coincide
             bool hasErrors = false;
-            log.BeginSection("Loader");
             log.Info("Loader", "CentralDogma " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
             foreach (string name in plugins.Keys)
                 log.Info("Loader", "Register plugin " + plugins[name].ToString() + " for " + name);
@@ -103,7 +102,6 @@ namespace Hime.Kernel.Resources
                     break;
                 }
             }
-            log.EndSection();
             return (!hasErrors);
         }
 

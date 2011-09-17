@@ -8,14 +8,13 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodGLR1 : CFParserGenerator
+    class MethodGLR1 : BaseMethod
     {
-        public string Name { get { return "GLR(1)"; } }
+        public override string Name { get { return "GLR(1)"; } }
 
         public MethodGLR1() { }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             reporter.Info("GLR(1)", "Constructing GLR(1) data ...");
             Graph Graph = ConstructGraph(grammar, reporter);

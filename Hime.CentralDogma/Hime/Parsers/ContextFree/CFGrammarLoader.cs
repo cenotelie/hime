@@ -688,8 +688,8 @@ namespace Hime.Parsers.ContextFree
 
         private void Compile_Recognize_grammar_text(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode node)
         {
-            log.Info("Compiler", "Compiling grammar " + grammar.LocalName);
-            log.Info("Compiler", "Grammar takes text as input");
+            log.Info("Loader", "Loading grammar " + grammar.LocalName);
+            log.Info("Loader", "Grammar takes text as input");
             for (int i = 3; i < node.Children.Count; i++)
             {
                 Redist.Parsers.SyntaxTreeNode child = node.Children[i];
@@ -703,8 +703,8 @@ namespace Hime.Parsers.ContextFree
         }
         private void Compile_Recognize_grammar_bin(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode node)
         {
-            log.Info("Compiler", "Compiling grammar " + grammar.LocalName);
-            log.Info("Compiler", "Grammar takes binary as input");
+            log.Info("Loader", "Loading grammar " + grammar.LocalName);
+            log.Info("Loader", "Grammar takes binary as input");
             for (int i = 3; i < node.Children.Count; i++)
             {
                 Redist.Parsers.SyntaxTreeNode child = node.Children[i];

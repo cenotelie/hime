@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class BaseMethod
+    abstract class BaseMethod : CFParserGenerator
     {
         private List<System.Threading.Thread> workers;
         private List<State>.Enumerator enumerator;
@@ -17,6 +17,11 @@ namespace Hime.Parsers.ContextFree.LR
         protected GLRSimulator simulator;
         protected Hime.Kernel.Reporting.Reporter reporter;
         protected Graph graph;
+
+        public abstract string Name { get; }
+
+        public abstract ParserData Build(CFGrammar grammar, Kernel.Reporting.Reporter reporter);
+        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
 
         protected virtual void OnBeginState(State state) { }
         protected virtual void OnConflictTreated(State state, Conflict conflict) { }
@@ -29,7 +34,7 @@ namespace Hime.Parsers.ContextFree.LR
             _lock = new object();
 
             int threadCount = System.Environment.ProcessorCount;
-            reporter.Info("Compiler", "Spawning " + threadCount + " threads for data building");
+            reporter.Info(Name, "Spawning " + threadCount + " threads for data building");
             while (threadCount != 0)
             {
                 SpawnWorker(threadCount);

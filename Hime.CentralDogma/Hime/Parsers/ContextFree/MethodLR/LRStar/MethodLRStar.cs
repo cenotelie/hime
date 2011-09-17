@@ -8,12 +8,12 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodLRStar : BaseMethod, CFParserGenerator
+    class MethodLRStar : BaseMethod
     {
         private Dictionary<State, DeciderLRStar> deciders;
         private Dictionary<State, List<ICollection<Terminal>>> lookaheads;
 
-        public string Name { get { return "LR(*)"; } }
+        public override string Name { get { return "LR(*)"; } }
 
         public MethodLRStar() { }
 
@@ -69,8 +69,7 @@ namespace Hime.Parsers.ContextFree.LR
             return right.Count - left.Count;
         }
 
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
-        public ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LR(*)", "LR(*) data ...");

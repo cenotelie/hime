@@ -10,12 +10,11 @@ namespace Hime.Demo.Tasks
         public void Execute()
         {
             CompilationTask task = new CompilationTask();
-            task.Namespace = "Hime.Kernel.CommandLine.Parser";
+            task.Namespace = "Analyser";
             task.ExportLog = true;
             task.ExportDoc = false;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\CommandLine.gram");
-            task.ParserFile = "Parser.cs";
+            task.InputFiles.Add("Languages\\MathExp.gram");
             task.Method = ParsingMethod.LALR1;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             Compiler compiler = new Compiler();

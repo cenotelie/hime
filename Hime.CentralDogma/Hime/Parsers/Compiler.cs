@@ -33,14 +33,18 @@ namespace Hime.Parsers
 
         public Report Execute(CompilationTask task)
         {
+            reporter.BeginSection("Compilation Task");
             string gname = null;
             try { gname = ExecuteDo(task); }
             catch (Exception ex) { reporter.Report(ex); }
+            reporter.EndSection();
+
             if (task.ExportLog)
                 reporter.ExportMHTML(gname + "Log.mht", "Compiler Log");
             return reporter.Result;
         }
 
+        // TODO: this method should be private but it is used in tests, either refactor tests or this
         public string ExecuteDo(CompilationTask task)
         {
             // Load data
