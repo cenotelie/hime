@@ -15,7 +15,6 @@ namespace Hime.Parsers
     public interface ParserData
     {
         void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug);
-        List<string> SerializeVisuals(string directory, bool exportVisuals, string dotBin);
-        XmlNode SerializeXML(XmlDocument document);
+        void Document(string file, bool exportVisuals, string dotBin);
     }
 }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Kernel.Resources
 {
-    class ResourceAccessor
+    public class ResourceAccessor
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
@@ -23,7 +23,7 @@ namespace Hime.Kernel.Resources
         public bool IsClosed { get { return isClosed; } }
         public ICollection<string> Files { get { return files; } }
 
-        internal ResourceAccessor()
+        public ResourceAccessor()
             : this(System.Reflection.Assembly.GetExecutingAssembly(), "Hime.Resources")
         { }
         public ResourceAccessor(System.Reflection.Assembly assembly, string defaultPath)

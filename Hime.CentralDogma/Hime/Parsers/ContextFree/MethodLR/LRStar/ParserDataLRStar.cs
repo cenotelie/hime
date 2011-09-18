@@ -21,6 +21,12 @@ namespace Hime.Parsers.ContextFree.LR
             this.deciders = deciders;
         }
 
+        protected override string GetTransformation(bool exportVisuals)
+        {
+            if (exportVisuals) return "ParserData_LRStarSVG";
+            else return "ParserData_LRStarDOT";
+        }
+
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
             terminals = new List<Terminal>(expected);

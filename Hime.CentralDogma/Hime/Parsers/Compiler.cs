@@ -40,7 +40,7 @@ namespace Hime.Parsers
             reporter.EndSection();
 
             if (task.ExportLog)
-                reporter.ExportMHTML(gname + "Log.mht", "Compiler Log");
+                reporter.ExportMHTML(GetLogName(gname) + ".mht", "Compiler Log");
             return reporter.Result;
         }
 
@@ -88,11 +88,17 @@ namespace Hime.Parsers
             stream = OpenOutputStream(parserFile, nmspace);
             parserData.Export(stream, GetParserName(gname), task.GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected, task.ExportDebug);
             CloseOutputStream(stream);
+
+            // Export documentation
+            if (task.ExportDoc)
+                parserData.Document(GetDocumentationName(gname) + ".mht", task.ExportVisuals, task.DOTBinary);
             return gname;
         }
 
         private string GetLexerName(string grammarName) { return grammarName + "Lexer"; }
         private string GetParserName(string grammarName) { return grammarName + "Parser"; }
+        private string GetLogName(string grammarName) { return grammarName + "Log"; }
+        private string GetDocumentationName(string grammarName) { return grammarName + "Doc"; }
 
         public Namespace LoadData(ICollection<string> files, ICollection<string> raws)
         {

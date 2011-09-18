@@ -131,7 +131,6 @@
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateActionShift.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateKernel.cs" />
     <Compile Include="Hime\Parsers\ContextFree\MethodLR\StateReductions.cs" />
-    <Compile Include="Hime\Parsers\ContextFree\CFDocumentationGenerator.cs" />
     <Compile Include="Hime\Parsers\AccessModifier.cs" />
     <Compile Include="Hime\Parsers\Automata\NFA.cs" />
     <Compile Include="Hime\Parsers\CompilationTask.cs" />

@@ -12,8 +12,8 @@ namespace Hime.Demo.Tasks
             CompilationTask task = new CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDoc = false;
-            task.ExportVisuals = false;
+            task.ExportDoc = true;
+            task.ExportVisuals = true;
             task.InputFiles.Add("Languages\\MathExp.gram");
             task.Method = ParsingMethod.LALR1;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";

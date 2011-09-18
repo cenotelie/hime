@@ -96,30 +96,30 @@ namespace Hime.Kernel.Reporting
             Doc.ChildNodes[1].Attributes["title"].Value = title;
             Doc.Save(fileName + ".xml");
 
-            Resources.ResourceAccessor Session = new Resources.ResourceAccessor();
-            Session.AddCheckoutFile(fileName + ".xml");
-            Session.CheckOut("Transforms.Logs.xslt", File.DirectoryName + "Logs.xslt");
+            Resources.ResourceAccessor session = new Resources.ResourceAccessor();
+            session.AddCheckoutFile(fileName + ".xml");
+            session.CheckOut("Transforms.Logs.xslt", File.DirectoryName + "Logs.xslt");
 
             System.Xml.Xsl.XslCompiledTransform Transform = new System.Xml.Xsl.XslCompiledTransform();
             Transform.Load(File.DirectoryName + "Logs.xslt");
             Transform.Transform(fileName + ".xml", fileName + ".html");
-            Session.AddCheckoutFile(fileName + ".html");
+            session.AddCheckoutFile(fileName + ".html");
 
             Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
             compiler.Title = title;
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", fileName + ".html"));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", Session.GetStreamFor("Transforms.Logs.css")));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", Session.GetStreamFor("Transforms.Hime.js")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
 
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", Session.GetStreamFor("Visuals.button_plus.gif")));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_minus.gif", Session.GetStreamFor("Visuals.button_minus.gif")));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Logo.png", Session.GetStreamFor("Visuals.Hime.Logo.png")));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Info.png", Session.GetStreamFor("Visuals.Hime.Info.png")));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Warning.png", Session.GetStreamFor("Visuals.Hime.Warning.png")));
-            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", Session.GetStreamFor("Visuals.Hime.Error.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", session.GetStreamFor("Visuals.button_plus.gif")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_minus.gif", session.GetStreamFor("Visuals.button_minus.gif")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Logo.png", session.GetStreamFor("Visuals.Hime.Logo.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Info.png", session.GetStreamFor("Visuals.Hime.Info.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Warning.png", session.GetStreamFor("Visuals.Hime.Warning.png")));
+            compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", session.GetStreamFor("Visuals.Hime.Error.png")));
             compiler.CompileTo(fileName);
 
-            Session.Close();
+            session.Close();
         }
     }
 }
