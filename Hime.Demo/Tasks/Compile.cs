@@ -12,13 +12,12 @@ namespace Hime.Demo.Tasks
             CompilationTask task = new CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDoc = true;
-            task.ExportVisuals = true;
-            task.InputFiles.Add("Languages\\MathExp.gram");
-            task.Method = ParsingMethod.LALR1;
+            task.ExportDoc = false;
+            task.ExportVisuals = false;
+            task.InputFiles.Add("Languages\\ANSI_C.gram");
+            task.Method = ParsingMethod.LRStar;
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
-            Compiler compiler = new Compiler();
-            compiler.Execute(task);
+            (new Compiler()).Execute(task);
         }
     }
 }

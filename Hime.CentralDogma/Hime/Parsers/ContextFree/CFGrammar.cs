@@ -79,9 +79,10 @@ namespace Hime.Parsers.ContextFree
         public override Variable NewVariable() { return NewCFVariable(); }
         public CFVariable NewCFVariable()
         {
-            CFVariable var = new CFVariable(this, nextSID, "_v" + nextSID);
-            children.Add(name, var);
-            variables.Add(name, var);
+            string varName = "_v" + nextSID;
+            CFVariable var = new CFVariable(this, nextSID, varName);
+            children.Add(varName, var);
+            variables.Add(varName, var);
             nextSID++;
             return var;
         }

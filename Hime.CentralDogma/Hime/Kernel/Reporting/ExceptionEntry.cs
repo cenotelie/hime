@@ -12,13 +12,15 @@ namespace Hime.Kernel.Reporting
 
         public ELevel Level { get { return ELevel.Error; } }
         public string Component { get { return "Compiler"; } }
-        public string Message { get { return "Exception: " + exception.Message; } }
+        public string Message { get { return "Exception " + exception.Message; } }
 
         public ExceptionEntry(System.Exception ex) { exception = ex; }
 
         public System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc)
         {
             System.Xml.XmlNode element = doc.CreateElement("Exception");
+            element.Attributes.Append(doc.CreateAttribute("EID"));
+            element.Attributes["EID"].Value = exception.GetHashCode().ToString();
             System.Xml.XmlNode message = doc.CreateElement("Message");
             message.InnerText = Message;
             element.AppendChild(message);

@@ -16,10 +16,57 @@
 
   <xsl:template match="Exception">
     <td class="HimeData">
+      <img src="hime_data/button_plus.gif">
+        <xsl:attribute name="id">
+          <xsl:text>button_ex_</xsl:text>
+          <xsl:value-of select="@EID"/>
+        </xsl:attribute>
+        <xsl:attribute name="onclick">
+          <xsl:text>toggle(</xsl:text>
+          <xsl:text>button_ex_</xsl:text>
+          <xsl:value-of select="@EID"/>
+          <xsl:text>,</xsl:text>
+          <xsl:text>content_ex_</xsl:text>
+          <xsl:value-of select="@EID"/>
+          <xsl:text>)</xsl:text>
+        </xsl:attribute>
+      </img>
       <xsl:value-of select="Message"/>
+      <div style="display: none;">
+        <xsl:attribute name="id">
+          <xsl:text>content_ex_</xsl:text>
+          <xsl:value-of select="@EID"/>
+        </xsl:attribute>
+        <br/>
+        <table cellpadding="0" cellspacing="0" border="1" rules="all" frame="box">
+          <xsl:apply-templates select="Stack"/>
+        </table>
+      </div>
     </td>
   </xsl:template>
 
+  <xsl:template match="Line">
+    <tr>
+      <td class="HimeDataLine">
+        <xsl:attribute name="style">
+          <xsl:text>background-color: </xsl:text>
+          <xsl:choose>
+            <xsl:when test="(position() mod 4)=0">
+              <xsl:text>#FFFFFF</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>#DDDDDD</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>;</xsl:text>
+        </xsl:attribute>
+        <div style="margin: 3px;">
+          <xsl:value-of select="."/>
+        </div>
+      </td>
+    </tr>
+  </xsl:template>
+  
   <xsl:template match="Conflict">
     <td class="HimeData">
       <img src="hime_data/button_plus.gif">
