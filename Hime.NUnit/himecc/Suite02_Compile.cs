@@ -31,7 +31,7 @@ namespace Hime.NUnit.himecc
             string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
 	       	Generate(command);
             string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
-            System.IO.File.Copy(redist, directory + "\\Hime.Redist.dll");
+            File.Copy(redist, directory + "\\Hime.Redist.dll");
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
             compilerparams.GenerateExecutable = false;
@@ -73,15 +73,21 @@ namespace Hime.NUnit.himecc
         }
 
         [Test]
-        public void Test003_DefaultNamespace_GeneratedParser()
+        public void Test003_Compile_ShouldNotFail()
         {
-        	System.Reflection.Assembly assembly = Compile();
+        	this.Compile();
+        }
+
+		[Test]
+        public void Test004_DefaultNamespace_GeneratedParser()
+        {
+        	Assembly assembly = Compile();
             Type parser = assembly.GetType("MathExp.MathExpParser");
             Assert.IsNotNull(parser);
         }
 
         [Test]
-        public void Test003_DontCrashOnEmptyFile()
+        public void Test005_DontCrashOnEmptyFile()
         {
         	Generate(new string[] { Path.Combine(directory, "Empty.gram") });
         }

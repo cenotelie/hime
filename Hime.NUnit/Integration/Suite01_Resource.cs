@@ -16,7 +16,6 @@ namespace Hime.NUnit.Integration
 		[Test]
 		public void test000_CreateDependencies_ShouldNotFail() 
 		{
-			Resource resource;
 		}
 	}
 }

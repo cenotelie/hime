@@ -8,6 +8,7 @@ using System;
 using NUnit.Framework;
 using Hime.Parsers;
 using Hime.Kernel.Reporting;
+using System.IO;
 
 namespace Hime.NUnit.Integration
 {
@@ -63,8 +64,9 @@ namespace Hime.NUnit.Integration
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
             task.Method = ParsingMethod.LR0;
-            Report result = (new Compiler()).Execute(task);
-            Assert.IsTrue(System.IO.File.Exists("TestLexer.cs"));
+			Compiler compiler = new Compiler();
+            compiler.Execute(task);
+            Assert.IsTrue(File.Exists("TestLexer.cs"));
         }
         
         [Test]
@@ -76,7 +78,8 @@ namespace Hime.NUnit.Integration
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
             task.Method = ParsingMethod.LR0;
-            Report result = (new Compiler()).Execute(task);
+			Compiler compiler = new Compiler();
+            compiler.Execute(task);
             Assert.IsTrue(System.IO.File.Exists("TestParser.cs"));
         }
 	}
