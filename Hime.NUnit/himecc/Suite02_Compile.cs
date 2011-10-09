@@ -19,9 +19,8 @@ namespace Hime.NUnit.himecc
       	
         private void Generate(string[] command)
         {
-            if (System.IO.Directory.Exists(directory))
-                System.IO.Directory.Delete(directory, true);
-            System.IO.Directory.CreateDirectory(directory);
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+            Directory.CreateDirectory(directory);
             new Tools().Export(Path.GetFileName(command[0]), command[0]);
             Program.Main(command);
         }
@@ -31,12 +30,14 @@ namespace Hime.NUnit.himecc
             string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
 	       	Generate(command);
             string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
-            File.Copy(redist, directory + "\\Hime.Redist.dll");
+			string redistPath = Path.Combine(directory, "Hime.Redist.dll");
+			if (File.Exists(redistPath)) File.Delete(redistPath);
+			File.Copy(redist, redistPath);
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
             compilerparams.GenerateExecutable = false;
             compilerparams.GenerateInMemory = true;
-            compilerparams.ReferencedAssemblies.Add(directory + "\\Hime.Redist.dll");
+            compilerparams.ReferencedAssemblies.Add(redistPath);
             System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
             System.Reflection.Assembly assembly = results.CompiledAssembly;
             System.IO.Directory.Delete(directory, true);
