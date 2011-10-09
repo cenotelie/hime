@@ -25,8 +25,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("LR0TextParser");
             stream.WriteLine("    {");
             ExportVariables(stream);
-            foreach (CFRule rule in this.GrammarRules)
-                Export_Production(stream, rule, className);
+            foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);
             Export_States(stream);
             Export_Actions(stream);

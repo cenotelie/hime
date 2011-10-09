@@ -56,8 +56,7 @@ namespace Hime.Parsers.ContextFree.LR
             ExportVariables(stream);
             Export_NullVars(stream);
             Export_NullChoices(stream);
-            foreach (CFRule rule in this.GrammarRules)
-                Export_Production(stream, rule, className);
+            foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);
             Export_States(stream);
             Export_NullBuilders(stream);
@@ -104,7 +103,7 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("        }");
             }
         }
-        override protected void Export_Production(StreamWriter stream, CFRule Rule, string className)
+        override protected void ExportProduction(StreamWriter stream, CFRule Rule, string className)
         {
             stream.WriteLine("        private static void Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
             stream.WriteLine("        {");

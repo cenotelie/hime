@@ -66,7 +66,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("        public " + className + "(" + lexerClassName + " lexer" + argument + ") : base (lexer) { " + body + " }");
         }
 		
-		protected virtual void Export_Production(StreamWriter stream, CFRule rule, string className)
+		protected virtual void ExportProduction(StreamWriter stream, CFRule rule, string className)
 		{
             int length = rule.CFBody.GetChoiceAt(0).Length;
             stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Head.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");

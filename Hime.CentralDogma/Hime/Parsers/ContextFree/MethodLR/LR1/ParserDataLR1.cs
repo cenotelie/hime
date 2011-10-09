@@ -14,7 +14,8 @@ namespace Hime.Parsers.ContextFree.LR
     class ParserDataLR1 : ParserDataLR
     {
         public ParserDataLR1(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
-
+		
+		// TODO: this method should be factored with other Export in ParserDatas...
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
             terminals = new List<Terminal>(expected);
@@ -29,8 +30,7 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("LR1BinaryParser");
             stream.WriteLine("    {");
             ExportVariables(stream);
-            foreach (CFRule rule in this.GrammarRules)
-                Export_Production(stream, rule, className);
+            foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);
             Export_States(stream);
             Export_Actions(stream);
