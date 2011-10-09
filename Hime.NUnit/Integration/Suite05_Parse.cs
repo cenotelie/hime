@@ -32,19 +32,26 @@ namespace Hime.NUnit.Integration
         }
 
         [Test]
-        public void Test002_SimpleList_LR1()
+        public void Test002_Build_ShouldNotFail()
+        {
+			CompileRaw(grammar1, ParsingMethod.LR1);
+			Build();
+		}
+		
+		[Test]
+        public void Test003_SimpleList_LR1()
         {
             TestGrammar(grammar1, ParsingMethod.LR1, "xxx");
         }
 
         [Test]
-        public void Test003_SimpleList_LALR1()
+        public void Test004_SimpleList_LALR1()
         {
             TestGrammar(grammar1, ParsingMethod.LALR1, "xxx");
         }
 
         [Test]
-        public void Test004_SimpleList_LRStar()
+        public void Test005_SimpleList_LRStar()
         {
             TestGrammar(grammar1, ParsingMethod.LRStar, "xxx");
         }
