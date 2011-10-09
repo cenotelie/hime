@@ -77,9 +77,9 @@ namespace Hime.Parsers.ContextFree.LR
             int length = rule.CFBody.GetChoiceAt(0).Length;
             stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Head.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
             stream.WriteLine("        {");
-            stream.WriteLine("            " + className + " parser = baseParser as " + className + ";");
             if (length != 0)
             {
+	            stream.WriteLine("            " + className + " parser = baseParser as " + className + ";");
                 stream.WriteLine("            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;");
                 stream.WriteLine("            LinkedListNode<SyntaxTreeNode> temp = null;");
                 for (int i = 1; i != length; i++)
