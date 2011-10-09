@@ -104,10 +104,8 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("        }");
             }
         }
-        protected void Export_Production(StreamWriter stream, CFRule Rule, string className)
+        override protected void Export_Production(StreamWriter stream, CFRule Rule, string className)
         {
-            string ParserLength = Rule.CFBody.GetChoiceAt(0).Length.ToString();
-
             stream.WriteLine("        private static void Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
             stream.WriteLine("        {");
             if (Rule.ReplaceOnProduction)

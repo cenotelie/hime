@@ -61,53 +61,8 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("        }");
             }
         }
-        protected void Export_Production(StreamWriter stream, CFRule rule, string className)
-        {
-            int length = rule.CFBody.GetChoiceAt(0).Length;
-            stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Head.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
-            stream.WriteLine("        {");
-            if (length != 0)
-            {
-				stream.WriteLine("            " + className + " parser = baseParser as " + className + ";");
-                stream.WriteLine("            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;");
-                stream.WriteLine("            LinkedListNode<SyntaxTreeNode> temp = null;");
-                for (int i = 1; i != length; i++)
-                    stream.WriteLine("            current = current.Previous;");
-            }
-            stream.Write("            SyntaxTreeNode root = new SyntaxTreeNode(variables[" + this.variables.IndexOf(rule.Head) + "]");
-            if (rule.ReplaceOnProduction)
-                stream.WriteLine(", SyntaxTreeNodeAction.Replace);");
-            else
-                stream.WriteLine(");");
 
-            foreach (RuleBodyElement part in rule.CFBody.Parts)
-            {
-                if (part.Symbol is Action)
-                {
-                    Action action = (Action)part.Symbol;
-                    stream.WriteLine("            parser.actions." + action.LocalName + "(root);");
-                }
-                else if (part.Symbol is Virtual)
-                    stream.WriteLine("            root.AppendChild(new SyntaxTreeNode(new SymbolVirtual(\"" + part.Symbol.LocalName + "\"), SyntaxTreeNodeAction." + part.Action.ToString() + "));");
-                else if (part.Symbol is Terminal || part.Symbol is Variable)
-                {
-                    if (part.Action != RuleBodyElementAction.Drop)
-                    {
-                        stream.Write("            root.AppendChild(current.Value");
-                        if (part.Action != RuleBodyElementAction.Nothing)
-                            stream.WriteLine(", SyntaxTreeNodeAction." + part.Action.ToString() + ");");
-                        else
-                            stream.WriteLine(");");
-                    }
-                    stream.WriteLine("            temp = current.Next;");
-                    stream.WriteLine("            parser.nodes.Remove(current);");
-                    stream.WriteLine("            current = temp;");
-                }
-            }
-            stream.WriteLine("            return root;");
-            stream.WriteLine("        }");
-        }
-        protected void Export_Rules(StreamWriter stream)
+		protected void Export_Rules(StreamWriter stream)
         {
             stream.WriteLine("        private static LRRule[] staticRules = {");
             bool first = true;
