@@ -235,11 +235,9 @@ namespace Hime.Redist.Parsers
                 count++;
             }
 
+            input.Rewind(count - matchedLength);
             if (matched == null)
-            {
-                input.Rewind(count);
                 return null;
-            }
             return new SymbolTokenText(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine);
         }
     }
