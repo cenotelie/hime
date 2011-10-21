@@ -180,7 +180,7 @@ namespace Hime.Parsers.ContextFree.LR
             {
                 int index = terminals.IndexOf(terminal);
                 if (index == -1)
-                    reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the parser. Check the regular expressions.");
+                    reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the lexer. Check the regular expressions.");
                 if (!first) stream.Write(", ");
                 stream.Write(terminalsAccessor + "[" + index + "]");
                 first = false;
