@@ -50,7 +50,7 @@ namespace Hime.NUnit
 
         protected Assembly Build()
         {
-            string redist = Assembly.GetAssembly(typeof(Redist.Parsers.ILexer)).Location;
+            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.ILexer)).Location;
             File.Copy(redist, Path.Combine(directory, "Hime.Redist.dll"), true);
             System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
             System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();

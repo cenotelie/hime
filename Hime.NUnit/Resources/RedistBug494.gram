@@ -1,0 +1,14 @@
+﻿public cf text grammar Test
+{
+	options
+	{
+		Axiom = "input";
+	}
+	terminals {
+		A -> 'a' ;
+		AAB -> 'aab' ;
+	}
+	rules {
+		input -> (A | AAB)+ ;
+	}
+}

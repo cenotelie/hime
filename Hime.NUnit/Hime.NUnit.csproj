@@ -61,6 +61,7 @@
     <Compile Include="Integration\Suite05_Parse.cs" />
     <Compile Include="Integration\Suite06_KernelDaemon.cs" />
     <Compile Include="Integration\Tools.cs" />
+    <Compile Include="Redist\Suite00_Bugs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
@@ -90,5 +91,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\AmbiguousLR1.gram" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RedistBug494.gram">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
