@@ -60,17 +60,19 @@ namespace Hime.Kernel.Resources
             log.Info("Loader", "CentralDogma " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
             foreach (string name in plugins.Keys)
                 log.Info("Loader", "Register plugin " + plugins[name].ToString() + " for " + name);
-            foreach (string resourceName in inputNamedResources.Keys)
-                log.Info("Loader", "Compilation unit " + resourceName);
-            if (inputAnonResources.Count != 0)
-                log.Info("Loader", "Compilation unit " + inputAnonResources.Count.ToString() + " raw resources");
 
             // Parse
             // TODO: find a way to merge these two lines
             foreach (string resourceName in inputNamedResources.Keys)
+            {
+                log.Info("Loader", "Loading compilation unit " + resourceName);
                 CompileData(inputNamedResources[resourceName]);
+            }
             foreach (TextReader data in inputAnonResources)
+            {
+                log.Info("Loader", "Loading compilation unit from raw resources");
                 CompileData(data);
+            }
 
             // Build resources
             foreach (SyntaxTreeNode file in intermediateRoot.Children)
@@ -136,8 +138,6 @@ namespace Hime.Kernel.Resources
                 return;
             }
 
-            foreach (LexerTextError error in lexer.Errors)
-                log.Report(new BaseEntry(ELevel.Error, "Lexer", error.Message));
             foreach (ParserError error in parser.Errors)
                 log.Report(new BaseEntry(ELevel.Error, "Parser", error.Message));
 
