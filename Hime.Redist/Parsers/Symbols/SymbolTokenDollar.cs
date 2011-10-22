@@ -14,7 +14,7 @@ namespace Hime.Redist.Parsers
     sealed class SymbolTokenDollar : SymbolToken
     {
         private static SymbolTokenDollar instance = new SymbolTokenDollar();
-        private SymbolTokenDollar() : base(2, "$") { }
+        private SymbolTokenDollar() : base(2, "EOF") { }
         /// <summary>
         /// Gets the dollar token
         /// </summary>
@@ -22,6 +22,6 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the data represented by this symbol
         /// </summary>
-        public override object Value { get { return "$"; } }
+        public override object Value { get { return "EOF"; } }
     }
 }

@@ -107,15 +107,25 @@ namespace Hime.Redist.Parsers
         /// <param name="input">Input lexer</param>
         public LRParser(ILexer input)
         {
-            errorSimulationLength = 3;
-            maxErrorCount = 100;
+            this.errorSimulationLength = 3;
+            this.maxErrorCount = 100;
             setup();
-            errors = new List<ParserError>();
-            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
-            lexer = input;
-            stack = new Stack<ushort>();
-            state = 0x0000;
-            nodes = new LinkedList<SyntaxTreeNode>();
+            this.errors = new List<ParserError>();
+            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
+            this.lexer = input;
+            this.stack = new Stack<ushort>();
+            this.state = 0x0000;
+            this.nodes = new LinkedList<SyntaxTreeNode>();
+            this.lexer.OnError = new OnErrorHandler(OnLexicalError);
+        }
+
+        /// <summary>
+        /// Adds the given lexical error emanating from the lexer to the list of errors
+        /// </summary>
+        /// <param name="error">Lexical error</param>
+        private void OnLexicalError(ParserError error)
+        {
+            errors.Add(error);
         }
 
         /// <summary>
@@ -138,7 +148,7 @@ namespace Hime.Redist.Parsers
                     return nodes.First.Value.ApplyActions();
                 else
                 {
-                    errors.Add(new ParserErrorUnexpectedToken(nextToken, GetState(state).GetExpectedNames()));
+                    errors.Add(new UnexpectedTokenError(nextToken, GetState(state).GetExpectedNames(), lexer.CurrentLine, lexer.CurrentColumn));
                     if (errors.Count >= maxErrorCount)
                         throw new ParserException("Too many errors, parsing stopped.");
                     nextToken = OnUnexpectedToken(nextToken);

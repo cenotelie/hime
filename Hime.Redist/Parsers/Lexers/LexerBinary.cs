@@ -38,7 +38,8 @@ namespace Hime.Redist.Parsers
         protected bool dollarEmitted;
 
         public int CurrentLine { get { return 0; } }
-        public int InputLength { get { return input.Length; } }
+        public int CurrentColumn { get { return input.Length; } }
+        public OnErrorHandler OnError { set { } }
 
         protected abstract void setup();
         public abstract ILexer Clone();

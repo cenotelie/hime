@@ -33,15 +33,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         protected ushort separatorID;
 
-        // Lexer state data
-        /// <summary>
-        /// Lexer's errors
-        /// </summary>
-        protected List<LexerTextError> errors;
-        /// <summary>
-        /// Exposed read-only list of lexer's errors
-        /// </summary>
-        protected System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError> readonlyErrors;
+        protected OnErrorHandler errorHandler;
         /// <summary>
         /// Lexer's input
         /// </summary>
@@ -68,10 +60,6 @@ namespace Hime.Redist.Parsers
         protected int bufferSize;
 
         /// <summary>
-        /// Gets the errors encountered by the lexer
-        /// </summary>
-        public ICollection<LexerTextError> Errors { get { return readonlyErrors; } }
-        /// <summary>
         /// Gets the text of the input that has already been read
         /// </summary>
         public string InputText { get { return input.GetReadText(); } }
@@ -83,6 +71,10 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number
         /// </summary>
         public int CurrentColumn { get { return currentColumn; } }
+        /// <summary>
+        /// Sets the handler for lexical errors
+        /// </summary>
+        public OnErrorHandler OnError { set { errorHandler = value; } }
         /// <summary>
         /// True if the lexer is at the end of the input
         /// </summary>
@@ -105,8 +97,6 @@ namespace Hime.Redist.Parsers
         protected LexerText(System.IO.TextReader input)
         {
             setup();
-            errors = new List<LexerTextError>();
-            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<LexerTextError>(errors);
             this.input = new BufferedTextReader(input);
             currentLine = 1;
             currentColumn = 1;
@@ -121,7 +111,6 @@ namespace Hime.Redist.Parsers
         protected LexerText(LexerText original)
         {
             setup();
-            errors = new List<LexerTextError>(original.errors);
             input = original.input.Clone();
             currentLine = original.currentLine;
             currentColumn = original.currentColumn;
@@ -163,7 +152,7 @@ namespace Hime.Redist.Parsers
                 {
                     bool atend = false;
                     char c = input.Read(out atend);
-                    errors.Add(new LexerTextErrorDiscardedChar(c, currentLine, currentColumn));
+                    errorHandler(new UnexpectedCharError(c, currentLine, currentColumn));
                     AdvanceStats(c.ToString());
                 }
                 else

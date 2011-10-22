@@ -17,5 +17,15 @@ namespace Hime.Redist.Parsers
         /// Gets the error's message
         /// </summary>
         string Message { get; }
+
+        /// <summary>
+        /// Gets the error's line number
+        /// </summary>
+        int Line { get; }
+
+        /// <summary>
+        /// Get the error's column number
+        /// </summary>
+        int Column { get; }
     }
 }

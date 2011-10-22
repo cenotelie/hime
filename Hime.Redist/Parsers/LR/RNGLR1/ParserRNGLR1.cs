@@ -220,7 +220,7 @@ namespace Hime.Redist.Parsers
                             }
                         }
                     }
-                    errors.Add(new ParserErrorUnexpectedToken(oldtoken, expected.ToArray()));
+                    errors.Add(new UnexpectedTokenError(oldtoken, expected.ToArray(), lexer.CurrentLine, lexer.CurrentColumn));
                     return null;
                 }
                 Ui = Uj;

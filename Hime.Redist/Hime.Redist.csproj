@@ -62,11 +62,9 @@
     <Compile Include="Parsers\Lexers\ILexer.cs" />
     <Compile Include="Parsers\Lexers\LexerBinary.cs" />
     <Compile Include="Parsers\Lexers\LexerDFAState.cs" />
-    <Compile Include="Parsers\Lexers\LexerError.cs" />
     <Compile Include="Parsers\Lexers\LexerException.cs" />
     <Compile Include="Parsers\Lexers\LexerText.cs" />
-    <Compile Include="Parsers\Lexers\LexerTextError.cs" />
-    <Compile Include="Parsers\Lexers\LexerTextErrorDiscardedChar.cs" />
+    <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\LR\LR0\LR0State.cs" />
     <Compile Include="Parsers\LR\LR0\LR0TextParser.cs" />
     <Compile Include="Parsers\LR\LR1\LR1State.cs" />
@@ -78,7 +76,7 @@
     <Compile Include="Parsers\LR\LRStar\LRStarState.cs" />
     <Compile Include="Parsers\LR\LRState.cs" />
     <Compile Include="Parsers\ParserError.cs" />
-    <Compile Include="Parsers\ParserErrorUnexpectedToken.cs" />
+    <Compile Include="Parsers\UnexpectedTokenError.cs" />
     <Compile Include="Parsers\ParserException.cs" />
     <Compile Include="Parsers\Symbols\SymbolAction.cs" />
     <Compile Include="Parsers\Symbols\SymbolTerminal.cs" />
