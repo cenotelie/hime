@@ -1,7 +1,7 @@
 ﻿/*
- * Author: Charles Hymans
- * Date: 18/07/2011
- * Time: 20:59
+ * Author: Laurent Wouters
+ * Date: 21/10/2011
+ * Time: 19:00
  * 
  */
 using System;
