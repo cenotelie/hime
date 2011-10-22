@@ -14,8 +14,8 @@ namespace Hime.Demo.Tasks
             Hime.Redist.Parsers.SyntaxTreeNode root = parser.Analyse();
             System.Console.Write(interpreter.Value);
 
-            foreach (Hime.Redist.Parsers.LexerError error in lexer.Errors) System.Console.WriteLine(error.ToString());
-            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors) System.Console.WriteLine(error.ToString());
+            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors)
+                System.Console.WriteLine(error.ToString());
             if (root != null)
             {
                 LangTest.WinTreeView window = new LangTest.WinTreeView(root);

@@ -12,8 +12,8 @@ namespace Hime.Demo.Tasks
             Analyser.ANSI_C_Parser parser = new Analyser.ANSI_C_Parser(lexer);
             Hime.Redist.Parsers.SyntaxTreeNode root = parser.Analyse();
 
-            foreach (Hime.Redist.Parsers.LexerError error in lexer.Errors) System.Console.WriteLine(error.ToString());
-            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors) System.Console.WriteLine(error.ToString());
+            foreach (Hime.Redist.Parsers.ParserError error in parser.Errors)
+                System.Console.WriteLine(error.ToString());
             if (root != null)
             {
                 LangTest.WinTreeView window = new LangTest.WinTreeView(root);
