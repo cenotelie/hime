@@ -39,7 +39,8 @@ namespace Hime.Parsers.ContextFree.LR
             this.rules = new List<Rule>(this.grammar.Rules);
         }
 
-        public virtual void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
+		// TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
+        public void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
 		{
 	        this.terminals = new List<Terminal>(expected);
             this.debug = exportDebug;
@@ -53,6 +54,11 @@ namespace Hime.Parsers.ContextFree.LR
 			ExportStates(stream);
             ExportActions(stream);
             ExportSetup(stream);
+            ExportConstructor(stream, className, lexerClassName);
+			// TODO: try to get rid of this method
+			ExportAdditionalElements(stream, className);
+						
+			stream.WriteLine("    }");
 		}
 
         protected void ExportVariables(StreamWriter stream)
@@ -73,8 +79,13 @@ namespace Hime.Parsers.ContextFree.LR
 		protected abstract void ExportStates(StreamWriter stream);
 		protected abstract void ExportActions(StreamWriter stream);
 		protected abstract void ExportSetup(StreamWriter stream);
+		
+		// TODO: try to get rid of this method
+		protected virtual void ExportAdditionalElements(StreamWriter stream, string className)
+		{
+		}
 			
-        protected void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
+        private void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
         {
             string argument = "";
             string body = "";

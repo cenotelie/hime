@@ -46,20 +46,15 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-        public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
-        {
-			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
-
-            ExportConstructor(stream, className, lexerClassName);
-
+		protected override void ExportAdditionalElements(StreamWriter stream, string className)
+		{
 			DetermineNullables();
             Export_NullVars(stream);
             Export_NullChoices(stream);
             Export_NullBuilders(stream);
             Export_StaticConstructor(stream, className);
-
-			stream.WriteLine("    }");
-        }
+		}
+		
         protected void Export_StaticConstructor(StreamWriter stream, string className)
         {
             stream.WriteLine("        static " + className + "()");

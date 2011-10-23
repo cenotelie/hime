@@ -21,13 +21,6 @@ namespace Hime.Parsers.ContextFree.LR
 			get { throw new NotImplementedException ();	}
 		}
 		
-		// TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
-        public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
-        {
-			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?
-            throw new NotImplementedException();
-        }
-		
 		protected override void ExportRules (StreamWriter stream)
 		{
 			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?
