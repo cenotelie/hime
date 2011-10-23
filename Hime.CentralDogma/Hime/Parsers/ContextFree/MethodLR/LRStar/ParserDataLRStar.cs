@@ -30,13 +30,10 @@ namespace Hime.Parsers.ContextFree.LR
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
-
-			debug = exportDebug;
-            terminalsAccessor = lexerClassName + ".terminals";
-
             stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");
             stream.WriteLine("LRStarBaseParser");
             stream.WriteLine("    {");
+
             ExportVariables(stream);
             foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);

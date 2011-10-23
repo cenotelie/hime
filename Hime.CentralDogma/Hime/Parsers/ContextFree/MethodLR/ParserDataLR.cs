@@ -13,14 +13,14 @@ namespace Hime.Parsers.ContextFree.LR
 {
     public abstract class ParserDataLR : ParserData
     {
-        protected Reporter reporter;
-        protected CFGrammar grammar;
-        protected Graph graph;
-        protected List<Terminal> terminals;
-        protected List<Variable> variables;
-        protected List<Rule> rules;
-        protected string terminalsAccessor;
-        protected bool debug;
+        internal protected Reporter reporter;
+        internal protected CFGrammar grammar;
+        internal protected Graph graph;
+        internal protected List<Terminal> terminals;
+        internal protected List<Variable> variables;
+        internal protected List<Rule> rules;
+        internal protected string terminalsAccessor;
+        internal protected bool debug;
 
         internal protected ICollection<Rule> GrammarRules { get { return rules; } }
         internal protected string IndexOfRule(Rule rule) { return "0x" + rules.IndexOf(rule).ToString("X"); }
@@ -40,6 +40,8 @@ namespace Hime.Parsers.ContextFree.LR
         public virtual void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
 		{
 	        this.terminals = new List<Terminal>(expected);
+            this.debug = exportDebug;
+            this.terminalsAccessor = lexerClassName + ".terminals";
 		}
 
         protected void ExportVariables(StreamWriter stream)

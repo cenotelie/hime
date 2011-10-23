@@ -19,18 +19,16 @@ namespace Hime.Parsers.ContextFree.LR
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
-
-            debug = exportDebug;
-            terminalsAccessor = lexerClassName + ".terminals";
-
+			
             stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");
-            // TODO: not nice!!!
+            // TODO: not nice!!! because based on type, should rather call a method on grammar
             if (grammar is CFGrammarText)
                 stream.WriteLine("LR1TextParser");
             else
                 stream.WriteLine("LR1BinaryParser");
             stream.WriteLine("    {");
-            ExportVariables(stream);
+
+			ExportVariables(stream);
             foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);
             Export_States(stream);

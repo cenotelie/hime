@@ -19,9 +19,6 @@ namespace Hime.Parsers.ContextFree.LR
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
 
-			debug = exportDebug;
-            terminalsAccessor = lexerClassName + ".terminals";
-
             stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");
             stream.WriteLine("LR0TextParser");
             stream.WriteLine("    {");

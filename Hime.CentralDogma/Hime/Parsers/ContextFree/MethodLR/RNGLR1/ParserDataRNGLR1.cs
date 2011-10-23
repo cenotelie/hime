@@ -23,7 +23,7 @@ namespace Hime.Parsers.ContextFree.LR
             nullableChoices = new List<CFRuleBody>();
         }
 
-        protected void DetermineNullables()
+        private void DetermineNullables()
         {
             nullableChoices.Add(new CFRuleBody());
             foreach (CFVariable var in variables)
@@ -46,14 +46,11 @@ namespace Hime.Parsers.ContextFree.LR
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
-
-            debug = exportDebug;
-            terminalsAccessor = lexerClassName + ".terminals";
-            DetermineNullables();
-
             stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : BaseRNGLR1Parser");
             stream.WriteLine("    {");
 
+
+			DetermineNullables();
             ExportVariables(stream);
             Export_NullVars(stream);
             Export_NullChoices(stream);
