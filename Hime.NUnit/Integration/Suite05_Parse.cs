@@ -51,7 +51,14 @@ namespace Hime.NUnit.Integration
         }
 
         [Test]
-        public void Test005_SimpleList_LRStar()
+        public void Test005_LRStar_ShouldNotFail()
+        {
+			Report result = CompileRaw(grammar1, ParsingMethod.LRStar);
+            Assert.IsFalse(result.HasErrors);
+        }
+
+		[Test]
+        public void Test006_SimpleList_LRStar()
         {
             TestGrammar(grammar1, ParsingMethod.LRStar, "xxx");
         }

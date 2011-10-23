@@ -17,6 +17,7 @@ namespace Hime.Parsers.ContextFree.LR
 
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
+			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?
             throw new NotImplementedException();
         }
     }

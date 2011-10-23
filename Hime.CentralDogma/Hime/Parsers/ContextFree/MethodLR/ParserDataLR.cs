@@ -37,7 +37,10 @@ namespace Hime.Parsers.ContextFree.LR
             this.rules = new List<Rule>(this.grammar.Rules);
         }
 
-        public abstract void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug);
+        public virtual void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
+		{
+	        this.terminals = new List<Terminal>(expected);
+		}
 
         protected void ExportVariables(StreamWriter stream)
         {

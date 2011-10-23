@@ -17,8 +17,9 @@ namespace Hime.Parsers.ContextFree.LR
 
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
-            terminals = new List<Terminal>(expected);
-            debug = exportDebug;
+			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
+
+			debug = exportDebug;
             terminalsAccessor = lexerClassName + ".terminals";
 
             stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");

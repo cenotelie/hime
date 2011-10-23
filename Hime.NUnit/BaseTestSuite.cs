@@ -28,13 +28,7 @@ namespace Hime.NUnit
 
         protected Report CompileResource(string resource, ParsingMethod method)
         {
-            CompilationTask task = new Parsers.CompilationTask();
-            task.InputRawData.Add(GetAllTextFor(resource));
-            task.Method = method;
-            task.LexerFile = lexerFile;
-            task.ParserFile = parserFile;
-            Report report = (new Compiler()).Execute(task);
-            return report;
+			return CompileRaw(GetAllTextFor(resource), method);
         }
 
         protected Report CompileRaw(string rawInput, ParsingMethod method)
@@ -44,8 +38,7 @@ namespace Hime.NUnit
             task.Method = method;
             task.LexerFile = lexerFile;
             task.ParserFile = parserFile;
-            Report report = (new Compiler()).Execute(task);
-            return report;
+            return (new Compiler()).Execute(task);
         }
 
         protected Assembly Build()

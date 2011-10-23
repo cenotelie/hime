@@ -45,7 +45,8 @@ namespace Hime.Parsers.ContextFree.LR
 
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
-            terminals = new List<Terminal>(expected);
+			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
+
             debug = exportDebug;
             terminalsAccessor = lexerClassName + ".terminals";
             DetermineNullables();
