@@ -43,5 +43,10 @@ namespace Hime.Parsers.ContextFree.LR
 		{
 			throw new NotImplementedException ();
 		}
+		
+		protected override void ExportSetup (StreamWriter stream)
+		{
+			throw new NotImplementedException ();
+		}
     }
 }

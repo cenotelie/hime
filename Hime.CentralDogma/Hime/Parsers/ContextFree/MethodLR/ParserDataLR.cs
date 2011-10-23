@@ -52,6 +52,7 @@ namespace Hime.Parsers.ContextFree.LR
             ExportRules(stream);
 			ExportStates(stream);
             ExportActions(stream);
+            ExportSetup(stream);
 		}
 
         protected void ExportVariables(StreamWriter stream)
@@ -71,6 +72,7 @@ namespace Hime.Parsers.ContextFree.LR
 		protected abstract void ExportRules(StreamWriter stream);
 		protected abstract void ExportStates(StreamWriter stream);
 		protected abstract void ExportActions(StreamWriter stream);
+		protected abstract void ExportSetup(StreamWriter stream);
 			
         protected void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
         {

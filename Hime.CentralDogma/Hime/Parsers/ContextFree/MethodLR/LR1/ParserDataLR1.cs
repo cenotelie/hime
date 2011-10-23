@@ -31,11 +31,10 @@ namespace Hime.Parsers.ContextFree.LR
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
 
-            Export_Setup(stream);
             ExportConstructor(stream, className, lexerClassName);
             stream.WriteLine("    }");
         }
-        protected void Export_Setup(StreamWriter stream)
+        protected override void ExportSetup(StreamWriter stream)
         {
             stream.WriteLine("        protected override void setup()");
             stream.WriteLine("        {");
