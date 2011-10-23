@@ -50,7 +50,6 @@ namespace Hime.Parsers.ContextFree.LR
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
 
-            Export_Actions(stream);
             Export_Setup(stream);
             ExportConstructor(stream, className, lexerClassName);
 
@@ -83,7 +82,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("        }");
         }
 
-        protected void Export_Actions(StreamWriter stream)
+        protected override void ExportActions(StreamWriter stream)
         {
             List<string> Names = new List<string>();
             foreach (Action action in this.GrammarActions)
