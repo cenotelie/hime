@@ -50,7 +50,6 @@ namespace Hime.Parsers.ContextFree.LR
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
 
-            Export_Rules(stream);
             Export_States(stream);
             Export_Actions(stream);
             Export_Setup(stream);
@@ -129,7 +128,8 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("            if (!root.HasEquivalentFamily(family)) root.AddFamily(family);");
             stream.WriteLine("        }");
         }
-        protected void Export_Rules(StreamWriter stream)
+		
+        override protected void ExportRules(StreamWriter stream)
         {
             stream.WriteLine("        private static Rule[] staticRules = {");
             bool first = true;

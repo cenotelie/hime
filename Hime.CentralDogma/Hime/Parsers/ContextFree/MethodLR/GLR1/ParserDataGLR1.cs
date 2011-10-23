@@ -26,5 +26,11 @@ namespace Hime.Parsers.ContextFree.LR
 			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?
             throw new NotImplementedException();
         }
+		
+		protected override void ExportRules (System.IO.StreamWriter stream)
+		{
+			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?
+			throw new NotImplementedException ();
+		}
     }
 }
