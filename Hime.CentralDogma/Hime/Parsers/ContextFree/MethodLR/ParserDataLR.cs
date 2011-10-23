@@ -50,6 +50,7 @@ namespace Hime.Parsers.ContextFree.LR
             ExportVariables(stream);
             foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             ExportRules(stream);
+			ExportStates(stream);
 		}
 
         protected void ExportVariables(StreamWriter stream)
@@ -67,7 +68,8 @@ namespace Hime.Parsers.ContextFree.LR
         }
 		
 		protected abstract void ExportRules(StreamWriter stream);
-		
+		protected abstract void ExportStates(StreamWriter stream);
+			
         protected void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
         {
             string argument = "";
