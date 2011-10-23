@@ -50,19 +50,19 @@ namespace Hime.Parsers.ContextFree.LR
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
 
-			DetermineNullables();
-            ExportVariables(stream);
-            Export_NullVars(stream);
-            Export_NullChoices(stream);
-            foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);
             Export_States(stream);
-            Export_NullBuilders(stream);
             Export_Actions(stream);
             Export_Setup(stream);
-            Export_StaticConstructor(stream, className);
             ExportConstructor(stream, className, lexerClassName);
-            stream.WriteLine("    }");
+
+			DetermineNullables();
+            Export_NullVars(stream);
+            Export_NullChoices(stream);
+            Export_NullBuilders(stream);
+            Export_StaticConstructor(stream, className);
+
+			stream.WriteLine("    }");
         }
         protected void Export_StaticConstructor(StreamWriter stream, string className)
         {

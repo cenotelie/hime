@@ -47,6 +47,8 @@ namespace Hime.Parsers.ContextFree.LR
 
 			stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
             stream.WriteLine("    {");
+            ExportVariables(stream);
+            foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
 		}
 
         protected void ExportVariables(StreamWriter stream)
