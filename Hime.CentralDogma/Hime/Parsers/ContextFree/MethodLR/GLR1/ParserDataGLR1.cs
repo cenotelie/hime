@@ -15,6 +15,12 @@ namespace Hime.Parsers.ContextFree.LR
     {
         public ParserDataGLR1(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 
+		internal protected override string GetBaseClassName 
+		{
+			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?
+			get { throw new NotImplementedException ();	}
+		}
+
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			// TODO: why is it a NotImplementedException here? Will it be implemented some day, or is it a problem in the class hierarchy?

@@ -13,6 +13,9 @@ namespace Hime.Parsers.ContextFree.LR
 {
     class ParserDataRNGLR1 : ParserDataLR
     {
+		internal protected override string GetBaseClassName {
+			get { return "BaseRNGLR1Parser"; }
+		}
         protected List<Variable> nullableVars;
         protected List<CFRuleBody> nullableChoices;
 
@@ -46,9 +49,6 @@ namespace Hime.Parsers.ContextFree.LR
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : BaseRNGLR1Parser");
-            stream.WriteLine("    {");
-
 
 			DetermineNullables();
             ExportVariables(stream);

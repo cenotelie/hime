@@ -13,15 +13,17 @@ namespace Hime.Parsers.ContextFree.LR
 {
     class ParserDataLR0 : ParserDataLR
     {
+		internal protected override string GetBaseClassName 
+		{
+			get { return "LR0TextParser"; }
+		}
+		
         public ParserDataLR0(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
 
-            stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");
-            stream.WriteLine("LR0TextParser");
-            stream.WriteLine("    {");
             ExportVariables(stream);
             foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
             Export_Rules(stream);

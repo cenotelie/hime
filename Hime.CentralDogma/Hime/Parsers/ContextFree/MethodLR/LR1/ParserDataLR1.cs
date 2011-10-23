@@ -15,18 +15,21 @@ namespace Hime.Parsers.ContextFree.LR
     {
         public ParserDataLR1(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 		
+		internal protected override string GetBaseClassName 
+		{
+			get 
+			{
+				// TODO: not nice!!! because based on type, should rather call a method on grammar
+				if (grammar is CFGrammarText) return "LR1TextParser";
+            	return "LR1BinaryParser";
+            
+			}
+		}
+		
 		// TODO: this method should be factored with other Export in ParserDatas...
         public override void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
         {
 			base.Export(stream, className, modifier, lexerClassName, expected, exportDebug);
-			
-            stream.Write("    " + modifier.ToString().ToLower() + " class " + className + " : ");
-            // TODO: not nice!!! because based on type, should rather call a method on grammar
-            if (grammar is CFGrammarText)
-                stream.WriteLine("LR1TextParser");
-            else
-                stream.WriteLine("LR1BinaryParser");
-            stream.WriteLine("    {");
 
 			ExportVariables(stream);
             foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);

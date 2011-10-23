@@ -28,6 +28,8 @@ namespace Hime.Parsers.ContextFree.LR
         internal protected string GetVariable(string name) { return "0x" + grammar.GetVariable(name).SID.ToString("X"); }
         internal protected string GetOption(string name) { return this.grammar.GetOption(name); }
         
+		internal abstract protected string GetBaseClassName { get; }
+		
         public ParserDataLR(Reporter reporter, CFGrammar gram, Graph graph)
         {
             this.reporter = reporter;
@@ -42,6 +44,9 @@ namespace Hime.Parsers.ContextFree.LR
 	        this.terminals = new List<Terminal>(expected);
             this.debug = exportDebug;
             this.terminalsAccessor = lexerClassName + ".terminals";
+
+			stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
+            stream.WriteLine("    {");
 		}
 
         protected void ExportVariables(StreamWriter stream)
