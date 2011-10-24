@@ -204,8 +204,8 @@
     <Compile Include="Hime\Parsers\Virtual.cs" />
     <Compile Include="Hime\Parsers\TerminalText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Hime\Kernel\Resources\FileCentralDogmaLexer.cs" />
-    <Compile Include="Hime\Kernel\Resources\FileCentralDogmaParser.cs" />
+    <Compile Include="Hime\Kernel\Generated\FileCentralDogmaLexer.cs" />
+    <Compile Include="Hime\Kernel\Generated\FileCentralDogmaParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Hime\Resources\Examples\Tokenizer.gram" />
@@ -227,11 +227,12 @@
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.CIL.CSharp.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Asm.x86_32.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Java.Bytecode.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\Kernel.gram" />
     <EmbeddedResource Include="Hime\Resources\Daemon\Formats.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\CSGrammars.gram" />
-    <EmbeddedResource Include="Hime\Resources\Daemon\CFGrammars.gram" />
     <EmbeddedResource Include="Hime\Resources\Examples\Earth.Java.ClassFile.format" />
+    <EmbeddedResource Include="Hime\Kernel\Generated\SourceGrammar\CFGrammars.gram" />
+    <EmbeddedResource Include="Hime\Kernel\Generated\SourceGrammar\CSGrammars.gram" />
+    <EmbeddedResource Include="Hime\Kernel\Generated\SourceGrammar\Kernel.gram" />
+    <None Include="Hime\Kernel\Generated\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Hime\Resources\Visuals\button_minus.gif" />
@@ -289,4 +290,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Hime\Kernel\Generated\" />
+    <Folder Include="Hime\Kernel\Generated\SourceGrammar\" />
+    <Folder Include="Hime\Resources\Daemon\" />
+    <Folder Include="Hime\Kernel\Resources\" />
+  </ItemGroup>
 </Project>
