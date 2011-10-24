@@ -25,8 +25,8 @@ namespace Hime.Parsers.ContextFree
                 TerminalText clone = AddTerminalText(terminal.LocalName, terminal.NFA.Clone(false), terminal.SubGrammar);
                 clone.NFA.StateExit.Final = clone;
             }
-            InheritTemplateRules(parent as CFGrammar);
             InheritVariables(parent as CFGrammar);
+            InheritTemplateRules(parent as CFGrammar);
         }
 
         public override Grammar Clone()

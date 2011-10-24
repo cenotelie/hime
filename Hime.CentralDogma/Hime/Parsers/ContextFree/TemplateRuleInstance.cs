@@ -31,11 +31,11 @@ namespace Hime.Parsers.ContextFree
             builder.Append(">");
             string name = builder.ToString();
             // Create and add the variable to the grammar
-            variable = data.AddCFVariable(name);
+            this.variable = data.AddCFVariable(name);
             // Copy parameters
-            parameters = new List<GrammarSymbol>(parameters);
+            this.parameters = new List<GrammarSymbol>(parameters);
             // Set parent template rule
-            templateRule = tRule;
+            this.templateRule = tRule;
         }
         public TemplateRuleInstance(TemplateRule tRule, List<GrammarSymbol> parameters, CFVariable variable)
         {

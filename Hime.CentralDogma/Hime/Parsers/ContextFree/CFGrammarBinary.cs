@@ -21,8 +21,8 @@ namespace Hime.Parsers.ContextFree
             InheritVirtuals(parent);
             foreach (TerminalBin terminal in parent.Terminals)
                 AddTerminalBin(terminal.Type, terminal.LocalName);
+			InheritVariables(parent as CFGrammar);
             InheritTemplateRules(parent as CFGrammar);
-            InheritVariables(parent as CFGrammar);
         }
         // TODO: factor code with CFGrammarText
         public override Grammar Clone()
