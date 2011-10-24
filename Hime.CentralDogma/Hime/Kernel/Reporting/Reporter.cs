@@ -5,6 +5,7 @@
  * 
  */
 using System;
+using log4net;
 
 namespace Hime.Kernel.Reporting
 {
@@ -13,15 +14,14 @@ namespace Hime.Kernel.Reporting
         protected Report report;
         protected Section topSection;
         protected Section currentSection;
-        protected log4net.ILog log;
+        protected ILog log;
 
         public Report Result { get { return report; } }
 
         private static bool configured = false;
         private static void Configure()
         {
-            if (configured)
-                return;
+            if (configured) return;
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout("%-5p: %m%n");
             log4net.Appender.ConsoleAppender appender = new log4net.Appender.ConsoleAppender();
             appender.Layout = layout;
@@ -76,17 +76,18 @@ namespace Hime.Kernel.Reporting
 
         protected void AddEntry(IEntry entry)
         {
-            if (currentSection != null)
-                currentSection.AddEntry(entry);
-            else
+			Section section = currentSection;
+            if (section == null)
             {
+				// TODO: shouldn't it be an invariant that it is never null?
                 if (topSection == null)
                 {
                     topSection = new Section("global");
                     report.Sections.Insert(0, topSection);
                 }
-                topSection.AddEntry(entry);
+                section = topSection;
             }
+			section.AddEntry(entry);
         }
 
         public void ExportMHTML(string fileName, string title)
