@@ -200,11 +200,12 @@
     <Compile Include="Hime\Kernel\Resources\ResourceGraph.cs" />
     <Compile Include="Hime\Kernel\Resources\ResourceNotFoundException.cs" />
     <Compile Include="Hime\Kernel\Resources\LoaderPlugin.cs" />
-    <Compile Include="Hime\Kernel\Resources\Parser.cs" />
     <Compile Include="Hime\Parsers\Variable.cs" />
     <Compile Include="Hime\Parsers\Virtual.cs" />
     <Compile Include="Hime\Parsers\TerminalText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Hime\Kernel\Resources\FileCentralDogmaLexer.cs" />
+    <Compile Include="Hime\Kernel\Resources\FileCentralDogmaParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Hime\Resources\Examples\Tokenizer.gram" />

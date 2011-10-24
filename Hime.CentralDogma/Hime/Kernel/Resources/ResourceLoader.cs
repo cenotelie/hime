@@ -10,6 +10,7 @@ using System.IO;
 using Hime.Kernel.Naming;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
+using Hime.Kernel.Resources.Parser;
 
 namespace Hime.Kernel.Resources
 {
@@ -128,8 +129,8 @@ namespace Hime.Kernel.Resources
 		// TODO: made this method public for test, but maybe this is a sign of not optimal architecture, think about it
         public void CompileData(TextReader input)
         {
-            Parser.FileCentralDogma_Lexer lexer = new Parser.FileCentralDogma_Lexer(input);
-            Parser.FileCentralDogma_Parser parser = new Parser.FileCentralDogma_Parser(lexer);
+            FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(input);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             // TODO: rewrite this code, it is a bit strange
             SyntaxTreeNode root = null;
             try { root = parser.Analyse(); }

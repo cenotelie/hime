@@ -19,8 +19,8 @@ namespace Hime.NUnit.Integration
         {
         	string grammar = "";
         	
-        	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
-            FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);
+        	FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             parser.Analyse();
         }
 
@@ -30,8 +30,8 @@ namespace Hime.NUnit.Integration
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
         	
-        	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
-            FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);
+        	FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             parser.Analyse();
         }
 		
@@ -41,8 +41,8 @@ namespace Hime.NUnit.Integration
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
         	
-        	FileCentralDogma_Lexer lexer = new FileCentralDogma_Lexer(grammar);
-            FileCentralDogma_Parser parser = new FileCentralDogma_Parser(lexer);
+        	FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             parser.Analyse();
             Assert.AreEqual(0, parser.Errors.Count);
         }
