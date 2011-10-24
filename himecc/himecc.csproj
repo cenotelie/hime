@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,7 +12,6 @@
     <AssemblyName>himecc</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -59,7 +58,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="CommandLine, Version=1.8.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\CommandLine\CommandLine.dll</HintPath>
+      <HintPath>..\Libraries\CommandLine\CommandLine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -72,8 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
-    <Content Include="Libraries\CommandLine\CommandLine.dll" />
-    <Content Include="Libraries\CommandLine\CommandLine.XML" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hime.CentralDogma\Hime.CentralDogma.csproj">
