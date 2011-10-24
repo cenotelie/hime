@@ -87,12 +87,19 @@ namespace Hime.Parsers.Automata
         {
             states.AddRange(sub.states);
         }
-
-
+		
+		private static NFA BuildNFA()
+		{
+			NFA result = new NFA();
+			// shouldn't it be result.stateEntry = result.AddNewState()? => try
+            result.stateEntry = new NFAState();
+			return result;
+		}
+		
+		// TODO: should get rid of static methods
         public static NFA OperatorOption(NFA sub, bool useClones)
         {
-            NFA final = new NFA();
-            final.stateEntry = new NFAState();
+            NFA final = BuildNFA();
             final.stateExit = new NFAState();
             final.states.Add(final.stateEntry);
             if (useClones)
@@ -104,10 +111,10 @@ namespace Hime.Parsers.Automata
             sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
             return final;
         }
-        public static NFA OperatorStar(NFA sub, bool useClones)
+		// TODO: should get rid of static methods
+		public static NFA OperatorStar(NFA sub, bool useClones)
         {
-            NFA final = new NFA();
-            final.stateEntry = new NFAState();
+            NFA final = BuildNFA();
             final.stateExit = new NFAState();
             final.states.Add(final.stateEntry);
             if (useClones)
@@ -122,8 +129,7 @@ namespace Hime.Parsers.Automata
         }
         public static NFA OperatorPlus(NFA sub, bool useClones)
         {
-            NFA final = new NFA();
-            final.stateEntry = new NFAState();
+            NFA final = BuildNFA();
             final.stateExit = new NFAState();
             final.states.Add(final.stateEntry);
             if (useClones)
@@ -137,8 +143,7 @@ namespace Hime.Parsers.Automata
         }
         public static NFA OperatorRange(NFA sub, bool useClones, uint min, uint max)
         {
-            NFA final = new NFA();
-            final.stateEntry = new NFAState();
+            NFA final = BuildNFA();
             final.stateExit = new NFAState();
             final.states.Add(final.stateEntry);
 
@@ -162,6 +167,25 @@ namespace Hime.Parsers.Automata
             
             if (min == 0)
                 final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
+            return final;
+        }
+		public static NFA OperatorUnion(NFA left, NFA right, bool useClones)
+        {
+            NFA final = BuildNFA();
+            final.stateExit = new NFAState();
+            final.states.Add(final.stateEntry);
+            if (useClones)
+            {
+                left = left.Clone(true);
+                right = right.Clone(true);
+            }
+            final.states.AddRange(left.states);
+            final.states.AddRange(right.states);
+            final.states.Add(final.stateExit);
+            final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
+            final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
+            left.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+            right.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
             return final;
         }
         public static NFA OperatorConcat(NFA left, NFA right, bool useClones)
@@ -215,26 +239,6 @@ namespace Hime.Parsers.Automata
                     state.AddTransition(NFA.Epsilon, final.stateExit);
                 }
             }
-            return final;
-        }
-        public static NFA OperatorUnion(NFA left, NFA right, bool useClones)
-        {
-            NFA final = new NFA();
-            final.stateEntry = new NFAState();
-            final.stateExit = new NFAState();
-            final.states.Add(final.stateEntry);
-            if (useClones)
-            {
-                left = left.Clone(true);
-                right = right.Clone(true);
-            }
-            final.states.AddRange(left.states);
-            final.states.AddRange(right.states);
-            final.states.Add(final.stateExit);
-            final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
-            final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
-            left.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
-            right.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
             return final;
         }
     }
