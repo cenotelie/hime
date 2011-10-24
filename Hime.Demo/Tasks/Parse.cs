@@ -17,7 +17,7 @@ namespace Hime.Demo.Tasks
             Analyser.Test2_Lexer lexer = new Analyser.Test2_Lexer(new System.IO.StreamReader("Test2.txt"));
             //Analyser.Test2_Lexer lexer = new Analyser.Test2_Lexer("((x.x)x.x).x");
             Analyser.Test2_Parser parser = new Analyser.Test2_Parser(lexer);
-            Hime.Redist.Parsers.SyntaxTreeNode root = parser.Analyse();
+            parser.Analyse();
 
             /*foreach (Hime.Redist.Parsers.LexerError error in lexer.Errors) System.Console.WriteLine(error.ToString());
             foreach (Hime.Redist.Parsers.ParserError error in parser.Errors) System.Console.WriteLine(error.ToString());

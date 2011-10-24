@@ -255,9 +255,7 @@ namespace Analyser
         }
         private static SyntaxTreeNode Production_15_1 (LRParser baseParser)
         {
-            Test2_Parser parser = baseParser as Test2_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[4], SyntaxTreeNodeAction.Replace);
-            return root;
+            return new SyntaxTreeNode(variables[4], SyntaxTreeNodeAction.Replace);
         }
         private static SyntaxTreeNode Production_16_0 (LRParser baseParser)
         {

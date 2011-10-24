@@ -1556,9 +1556,7 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_19_0 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[6]);
-            return root;
+            return new SyntaxTreeNode(variables[6]);
         }
         private static SyntaxTreeNode Production_19_1 (LRParser baseParser)
         {
@@ -2131,9 +2129,7 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_68_0 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[25]);
-            return root;
+            return new SyntaxTreeNode(variables[25]);
         }
         private static SyntaxTreeNode Production_68_1 (LRParser baseParser)
         {
@@ -2518,9 +2514,7 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_72_0 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[35]);
-            return root;
+            return new SyntaxTreeNode(variables[35]);
         }
         private static SyntaxTreeNode Production_72_1 (LRParser baseParser)
         {
@@ -3122,7 +3116,6 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_80_1 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[49]);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("emptypart"), SyntaxTreeNodeAction.Promote));
             return root;
@@ -3795,7 +3788,6 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_92_1 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[67]);
             root.AppendChild(new SyntaxTreeNode(new SymbolVirtual("emptypart"), SyntaxTreeNodeAction.Promote));
             return root;
@@ -4528,7 +4520,6 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_E4_0 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
             SyntaxTreeNode root = new SyntaxTreeNode(variables[86]);
             return root;
         }
@@ -4732,9 +4723,7 @@ namespace Hime.Kernel.Resources.Parser
         }
         private static SyntaxTreeNode Production_E9_0 (LRParser baseParser)
         {
-            FileCentralDogma_Parser parser = baseParser as FileCentralDogma_Parser;
-            SyntaxTreeNode root = new SyntaxTreeNode(variables[91]);
-            return root;
+            return new SyntaxTreeNode(variables[91]);
         }
         private static SyntaxTreeNode Production_E9_1 (LRParser baseParser)
         {
