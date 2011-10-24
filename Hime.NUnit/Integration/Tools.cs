@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Hime.Parsers;
 using Hime.Kernel.Reporting;
+using System.Reflection;
+using Hime.Kernel.Resources;
 
 namespace Hime.NUnit.Integration
 {
@@ -35,18 +37,17 @@ namespace Hime.NUnit.Integration
 
         public void Export(string resourceName, string fileName)
         {
-            System.Reflection.Assembly p_Assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            Assembly assembly = Assembly.GetExecutingAssembly();
             string p_DefaultPath = "Resources";
-            Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor(p_Assembly, p_DefaultPath);
+            Kernel.Resources.ResourceAccessor accessor = new ResourceAccessor(assembly, p_DefaultPath);
             accessor.Export(resourceName, fileName);
             accessor.Close();
         }
-        public string GetAllTextFor(string Name)
+        public string GetAllTextFor(string name)
         {
-            System.Reflection.Assembly p_Assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            string p_DefaultPath = "Resources";
-            Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor(p_Assembly, p_DefaultPath);
-            string data = accessor.GetAllTextFor(Name);
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            ResourceAccessor accessor = new ResourceAccessor(assembly, "Resources");
+            string data = accessor.GetAllTextFor(name);
             accessor.Close();
             return data;
         }

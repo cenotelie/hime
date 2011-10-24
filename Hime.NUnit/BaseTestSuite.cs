@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Hime.Parsers;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
+using Hime.Kernel.Resources;
 
 namespace Hime.NUnit
 {
@@ -15,13 +16,13 @@ namespace Hime.NUnit
         protected static string directory = "Test";
         protected static string lexerFile = Path.Combine(directory, "TestLexer.cs");
         protected static string parserFile = Path.Combine(directory, "TestParser.cs");
-
-        protected string GetAllTextFor(string resourceName)
+		
+		// TODO: could factor this method with other GetAllTextFor in Tools.cs
+        protected string GetAllTextFor(string name)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string defaultPath = "Resources";
-            Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor(assembly, defaultPath);
-            string data = accessor.GetAllTextFor(resourceName);
+            ResourceAccessor accessor = new ResourceAccessor(assembly, "Resources");
+            string data = accessor.GetAllTextFor(name);
             accessor.Close();
             return data;
         }

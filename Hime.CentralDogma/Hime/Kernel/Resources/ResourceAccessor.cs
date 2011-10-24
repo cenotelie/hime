@@ -84,28 +84,17 @@ namespace Hime.Kernel.Resources
 
         public Stream GetStreamFor(string resourceName)
         {
-            if (isClosed)
-                throw new AccessorClosedException(this);
+			// TODO: could factor this with ReadResource
+            if (isClosed) throw new AccessorClosedException(this);
             Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (stream == null)
-                throw new ResourceNotFoundException(resourceName);
+            if (stream == null) throw new ResourceNotFoundException(resourceName);
             streams.Add(stream);
             return stream;
         }
 
         public string GetAllTextFor(string resourceName)
 		{
-            if (isClosed)
-                throw new AccessorClosedException(this);
-            // Get a stream on the resource
-            Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (stream == null)
-                throw new ResourceNotFoundException(resourceName);
-            // Extract content to a buffer
-			byte[] buffer = new byte[stream.Length];
-			int readCount = stream.Read(buffer, 0, buffer.Length);
-            if (readCount != buffer.Length)
-                return null;
+			byte[] buffer = ReadResource(resourceName);
             // Detect encoding and strip encoding preambule
             Encoding encoding = DetectEncoding(buffer);
             buffer = StripPreambule(buffer, encoding);
