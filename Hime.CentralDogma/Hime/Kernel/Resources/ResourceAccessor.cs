@@ -5,6 +5,9 @@
  * 
  */
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
 
 namespace Hime.Kernel.Resources
 {
@@ -12,7 +15,7 @@ namespace Hime.Kernel.Resources
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
-		private System.Reflection.Assembly assembly;
+		private Assembly assembly;
 		private string rootNamespace;
 		private string defaultPath;
         private List<string> files;
@@ -24,9 +27,9 @@ namespace Hime.Kernel.Resources
         public ICollection<string> Files { get { return files; } }
 
         public ResourceAccessor()
-            : this(System.Reflection.Assembly.GetExecutingAssembly(), "Hime.Resources")
+            : this(Assembly.GetExecutingAssembly(), "Hime.Resources")
         { }
-        public ResourceAccessor(System.Reflection.Assembly assembly, string defaultPath)
+        public ResourceAccessor(Assembly assembly, string defaultPath)
         {
             accessors.Add(this);
             this.assembly = assembly;
@@ -59,34 +62,31 @@ namespace Hime.Kernel.Resources
 
         public void CheckOut(string resourceName, string fileName)
         {
-            if (isClosed)
-                throw new AccessorClosedException(this);
-            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (stream == null)
-                throw new ResourceNotFoundException(resourceName);
-            byte[] buffer = new byte[stream.Length];
-            int readcount = stream.Read(buffer, 0, buffer.Length);
-            System.IO.File.WriteAllBytes(fileName, buffer);
+			Export(resourceName, fileName);
             files.Add(fileName);
         }
-
+		
+		private byte[] ReadResource(string resourceName)
+		{
+            if (isClosed) throw new AccessorClosedException(this);
+            Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            if (stream == null) throw new ResourceNotFoundException(resourceName);
+            byte[] buffer = new byte[stream.Length];
+            stream.Read(buffer, 0, buffer.Length);
+			return buffer;
+		}
+		
         public void Export(string resourceName, string fileName)
         {
-            if (isClosed)
-                throw new AccessorClosedException(this);
-            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (stream == null)
-                throw new ResourceNotFoundException(resourceName);
-            byte[] buffer = new byte[stream.Length];
-            int readCount = stream.Read(buffer, 0, buffer.Length);
-            System.IO.File.WriteAllBytes(fileName, buffer);
+            byte[] buffer = this.ReadResource(resourceName);
+            File.WriteAllBytes(fileName, buffer);
         }
 
-        public System.IO.Stream GetStreamFor(string resourceName)
+        public Stream GetStreamFor(string resourceName)
         {
             if (isClosed)
                 throw new AccessorClosedException(this);
-            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (stream == null)
                 throw new ResourceNotFoundException(resourceName);
             streams.Add(stream);
@@ -98,7 +98,7 @@ namespace Hime.Kernel.Resources
             if (isClosed)
                 throw new AccessorClosedException(this);
             // Get a stream on the resource
-            System.IO.Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
+            Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (stream == null)
                 throw new ResourceNotFoundException(resourceName);
             // Extract content to a buffer
@@ -107,32 +107,31 @@ namespace Hime.Kernel.Resources
             if (readCount != buffer.Length)
                 return null;
             // Detect encoding and strip encoding preambule
-            System.Text.Encoding encoding = DetectEncoding(buffer);
+            Encoding encoding = DetectEncoding(buffer);
             buffer = StripPreambule(buffer, encoding);
             // Return decoded text
-			return new string(System.Text.Encoding.UTF8.GetChars(buffer));
+			return new string(Encoding.UTF8.GetChars(buffer));
 		}
         
-        private static System.Text.Encoding DetectEncoding(byte[] buffer)
+        private static Encoding DetectEncoding(byte[] buffer)
         {
-            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.UTF8))
-                return System.Text.Encoding.UTF8;
-            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.Unicode))
-                return System.Text.Encoding.Unicode;
-            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.BigEndianUnicode))
-                return System.Text.Encoding.BigEndianUnicode;
-            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.UTF32))
-                return System.Text.Encoding.UTF32;
-            if (DetectEncoding_TryEncoding(buffer, System.Text.Encoding.ASCII))
-                return System.Text.Encoding.ASCII;
-            return System.Text.Encoding.Default;
+            if (DetectEncoding_TryEncoding(buffer, Encoding.UTF8))
+                return Encoding.UTF8;
+            if (DetectEncoding_TryEncoding(buffer, Encoding.Unicode))
+                return Encoding.Unicode;
+            if (DetectEncoding_TryEncoding(buffer, Encoding.BigEndianUnicode))
+                return Encoding.BigEndianUnicode;
+            if (DetectEncoding_TryEncoding(buffer, Encoding.UTF32))
+                return Encoding.UTF32;
+            if (DetectEncoding_TryEncoding(buffer, Encoding.ASCII))
+                return Encoding.ASCII;
+            return Encoding.Default;
         }
-        private static bool DetectEncoding_TryEncoding(byte[] buffer, System.Text.Encoding encoding)
+        private static bool DetectEncoding_TryEncoding(byte[] buffer, Encoding encoding)
         {
             byte[] preambule = encoding.GetPreamble();
-            if (buffer.Length < preambule.Length)
-                return false;
-            for (int i = 0; i != preambule.Length; i++)
+            if (buffer.Length < preambule.Length) return false;
+            for (int i = 0; i < preambule.Length; i++)
             {
                 if (buffer[i] != preambule[i])
                     return false;

@@ -130,18 +130,15 @@ namespace Hime.Redist.Parsers
                 if (states[CurrentState].HasReductionOnTerminal(NextToken.SymbolID))
                 {
                     LRReduction reduction = states[CurrentState].GetReductionOnTerminal(NextToken.SymbolID);
-                    Production Reduce = reduction.toReduce.OnReduction;
-                    ushort HeadID = reduction.toReduce.Head.SymbolID;
-                    for (ushort j = 0; j != reduction.toReduce.Length; j++)
-                        stack.Pop();
+                    LRRule rule = reduction.toReduce;
+                    ushort HeadID = rule.Head.SymbolID;
+                    for (ushort j = 0; j != rule.Length; j++) stack.Pop();
                     // If next symbol is e (after $) : return
-                    if (NextToken.SymbolID == 0x1)
-                        return true;
+                    if (NextToken.SymbolID == 0x1) return true;
                     // Shift to next state on the reduce variable
                     NextState = states[stack.Peek()].GetNextByShiftOnVariable(HeadID);
                     // Handle error here : no transition for symbol HeadID
-                    if (NextState == 0xFFFF)
-                        return false;
+                    if (NextState == 0xFFFF) return false;
                     CurrentState = NextState;
                     stack.Push(CurrentState);
                     continue;
