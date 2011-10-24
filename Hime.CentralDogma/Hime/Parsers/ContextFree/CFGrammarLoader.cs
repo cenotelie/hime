@@ -310,10 +310,16 @@ namespace Hime.Parsers.ContextFree
             }
             return ((TerminalText)Ref).NFA.Clone(false);
         }
+		
         private Automata.NFA Compile_Recognize_terminal_definition(CFGrammar Data, Redist.Parsers.SyntaxTreeNode node)
         {
+			Redist.Parsers.Symbol symbol = node.Symbol;
+			
             // Symbol is a token
-            if (node.Symbol is Redist.Parsers.SymbolTokenText)
+			// TODO: this check is not nice, 
+			// also it is strange to use here some many Redist.Parsers objects 
+			// (shouldn't the work be done in the other namespace?)
+			if (symbol is Redist.Parsers.SymbolTokenText)
             {
                 Redist.Parsers.SymbolTokenText token = (Redist.Parsers.SymbolTokenText)node.Symbol;
                 if (token.ValueText == "?")
@@ -367,10 +373,10 @@ namespace Hime.Parsers.ContextFree
                 final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
                 return final;
             }
-            else if (node.Symbol is Redist.Parsers.SymbolVirtual)
+			// TODO: this cast is not nice!!
+            else if (symbol is Redist.Parsers.SymbolVirtual)
             {
-                Redist.Parsers.SymbolVirtual token = (Redist.Parsers.SymbolVirtual)node.Symbol;
-                if (node.Symbol.Name == "range")
+                if (symbol.Name == "range")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(Data, node.Children[0]);
                     uint min = System.Convert.ToUInt32(((Redist.Parsers.SymbolTokenText)node.Children[1].Symbol).ValueText);
@@ -379,7 +385,7 @@ namespace Hime.Parsers.ContextFree
                         max = System.Convert.ToUInt32(((Redist.Parsers.SymbolTokenText)node.Children[2].Symbol).ValueText);
                     return Automata.NFA.OperatorRange(inner, false, min, max);
                 }
-                else if (node.Symbol.Name == "concat")
+                if (symbol.Name == "concat")
                 {
                     Automata.NFA left = Compile_Recognize_terminal_definition(Data, node.Children[0]);
                     Automata.NFA right = Compile_Recognize_terminal_definition(Data, node.Children[1]);
@@ -388,6 +394,7 @@ namespace Hime.Parsers.ContextFree
             }
             return null;
         }
+		
         private Terminal Compile_Recognize_terminal(CFGrammar data, Redist.Parsers.SyntaxTreeNode node)
         {
             string name = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;

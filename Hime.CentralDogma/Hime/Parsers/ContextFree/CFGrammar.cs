@@ -38,7 +38,6 @@ namespace Hime.Parsers.ContextFree
                 foreach (CFRule rule in variable.Rules)
                 {
                     List<RuleBodyElement> parts = new List<RuleBodyElement>();
-                    CFRuleBody def = new CFRuleBody();
                     foreach (RuleBodyElement part in rule.CFBody.Parts)
                     {
                         GrammarSymbol symbol = null;
