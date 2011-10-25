@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{30BE2190-7AA2-431C-A993-8E61501ED0FF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Hime.NUnit</RootNamespace>
-    <AssemblyName>Hime.NUnit</AssemblyName>
+    <RootNamespace>Hime.Tests</RootNamespace>
+    <AssemblyName>Tests</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <SourceAnalysisOverrideSettingsFile>C:\Users\Charles\AppData\Roaming\ICSharpCode/SharpDevelop4.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <PublishUrl>publish\</PublishUrl>
@@ -83,16 +83,28 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\MathExp.gram" />
-    <EmbeddedResource Include="Resources\CFGrammars.gram" />
-    <EmbeddedResource Include="Resources\CSGrammars.gram" />
-    <EmbeddedResource Include="Resources\Kernel.gram" />
+    <EmbeddedResource Include="Resources\MathExp.gram">
+      <LogicalName>Tests.Resources.MathExp.gram</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CFGrammars.gram">
+      <LogicalName>Tests.Resources.CFGrammars.gram</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CSGrammars.gram">
+      <LogicalName>Tests.Resources.CSGrammars.gram</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Kernel.gram">
+      <LogicalName>Tests.Resources.Kernel.gram</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Empty.gram" />
+    <EmbeddedResource Include="Resources\Empty.gram">
+      <LogicalName>Tests.Resources.Empty.gram</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\AmbiguousLR1.gram" />
+    <EmbeddedResource Include="Resources\AmbiguousLR1.gram">
+      <LogicalName>Tests.Resources.AmbiguousLR1.gram</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RedistBug494.gram">

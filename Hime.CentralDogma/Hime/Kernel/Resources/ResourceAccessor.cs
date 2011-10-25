@@ -11,6 +11,7 @@ using System.Text;
 
 namespace Hime.Kernel.Resources
 {
+	// TODO: why is this class needed? Think about it
     public class ResourceAccessor
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
@@ -29,12 +30,14 @@ namespace Hime.Kernel.Resources
         public ResourceAccessor()
             : this(Assembly.GetExecutingAssembly(), "Hime.Resources")
         { }
+		
         public ResourceAccessor(Assembly assembly, string defaultPath)
         {
             accessors.Add(this);
             this.assembly = assembly;
             this.rootNamespace = assembly.GetName().Name;
-            if (defaultPath == null || defaultPath == string.Empty)
+			// TODO: should simplify this!! In particular remove this first case
+            if (defaultPath == null || defaultPath == "")
                 this.defaultPath = rootNamespace + ".";
             else
                 this.defaultPath = rootNamespace + "." + defaultPath + ".";
@@ -69,8 +72,9 @@ namespace Hime.Kernel.Resources
 		private byte[] ReadResource(string resourceName)
 		{
             if (isClosed) throw new AccessorClosedException(this);
-            Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (stream == null) throw new ResourceNotFoundException(resourceName);
+			string resourcePath = defaultPath + resourceName;
+            Stream stream = this.assembly.GetManifestResourceStream(resourcePath);
+			if (stream == null) throw new ResourceNotFoundException(resourcePath);
             byte[] buffer = new byte[stream.Length];
             stream.Read(buffer, 0, buffer.Length);
 			return buffer;

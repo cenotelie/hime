@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himecc", "himecc\himecc.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himev", "himev\himev.csproj", "{BDC14857-662D-4373-9FB4-CE92F2FBCF1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.NUnit", "Hime.NUnit\Hime.NUnit.csproj", "{30BE2190-7AA2-431C-A993-8E61501ED0FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{30BE2190-7AA2-431C-A993-8E61501ED0FF}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution

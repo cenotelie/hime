@@ -17,5 +17,12 @@ namespace Hime.Kernel.Resources
         {
             resourceName = name;
         }
+		/*
+		 	System.Console.WriteLine(assembly.FullName);
+			foreach (string toto in assembly.GetManifestResourceNames())
+			{
+				System.Console.WriteLine(toto);
+			}
+		 */
     }
 }
