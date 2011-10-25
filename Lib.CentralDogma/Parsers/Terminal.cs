@@ -5,25 +5,24 @@
  * 
  */
 using System;
+using System.Xml;
 
 namespace Hime.Parsers
 {
     public abstract class Terminal : GrammarSymbol
     {
-        protected int priority;
-
-        public int Priority
+        internal int Priority
         {
-            get { return priority; }
-            set { priority = value; }
+            get;
+            set;
         }
 
         public Terminal(Grammar parent, ushort sid, string name, int priority) : base(parent, sid, name)
         {
-            this.priority = priority;
+            this.Priority = priority;
         }
 
-        public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document)
+        public override XmlNode GetXMLNode(XmlDocument document)
         {
             System.Xml.XmlNode node = document.CreateElement("SymbolTerminal");
             node.Attributes.Append(document.CreateAttribute("SID"));
@@ -32,7 +31,7 @@ namespace Hime.Parsers
             node.Attributes.Append(document.CreateAttribute("Value"));
             node.Attributes["SID"].Value = SID.ToString();
             node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
-            node.Attributes["Priority"].Value = priority.ToString();
+            node.Attributes["Priority"].Value = this.Priority.ToString();
             node.Attributes["Value"].Value = this.ToString();
             return node;
         }

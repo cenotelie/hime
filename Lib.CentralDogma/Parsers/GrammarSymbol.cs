@@ -35,6 +35,7 @@ namespace Hime.Parsers
         {
             if (symbol is Grammar)
                 this.Parent = (Grammar)symbol;
+			// TODO: this code is really not nice here
             else
                 throw new Kernel.Naming.WrongParentSymbolException(this, symbol.GetType(), typeof(Grammar));
         }

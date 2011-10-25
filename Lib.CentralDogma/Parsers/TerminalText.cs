@@ -4,6 +4,8 @@
  * Time: 17:22
  * 
  */
+using System.Xml;
+
 namespace Hime.Parsers
 {
     public sealed class TerminalText : Terminal
@@ -34,7 +36,7 @@ namespace Hime.Parsers
                 this.value = this.value.Substring(2, this.value.Length - 3);
         }
 
-        public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document)
+        public override XmlNode GetXMLNode(XmlDocument document)
         {
             System.Xml.XmlNode node = document.CreateElement("SymbolTerminalText");
             node.Attributes.Append(document.CreateAttribute("SID"));
@@ -44,7 +46,7 @@ namespace Hime.Parsers
             node.Attributes.Append(document.CreateAttribute("Value"));
             node.Attributes["SID"].Value = SID.ToString("X");
             node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
-            node.Attributes["Priority"].Value = priority.ToString();
+            node.Attributes["Priority"].Value = this.Priority.ToString();
             if (subGrammar != null)
                 node.Attributes["SubGrammar"].Value = subGrammar.CompleteName.ToString('_');
             node.Attributes["Value"].Value = value;

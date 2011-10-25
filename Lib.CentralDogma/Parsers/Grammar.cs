@@ -136,8 +136,7 @@ namespace Hime.Parsers
 
         public Virtual AddVirtual(string name)
         {
-            if (virtuals.ContainsKey(name))
-                return virtuals[name];
+            if (virtuals.ContainsKey(name)) return virtuals[name];
             Virtual Virtual = new Virtual(this, name);
             children.Add(name, Virtual);
             virtuals.Add(name, Virtual);
