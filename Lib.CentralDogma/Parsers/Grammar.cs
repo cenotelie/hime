@@ -61,10 +61,9 @@ namespace Hime.Parsers
             else
                 options.Add(name, value);
         }
+		
         public string GetOption(string name)
         {
-            if (!options.ContainsKey(name))
-                return null;
             return options[name];
         }
 
@@ -175,6 +174,7 @@ namespace Hime.Parsers
             foreach (string option in parent.Options)
                 AddOption(option, parent.GetOption(option));
         }
+		
         protected void InheritActions(Grammar parent)
         {
             foreach (Action action in parent.Actions)
