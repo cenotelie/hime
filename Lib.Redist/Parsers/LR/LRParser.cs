@@ -130,13 +130,13 @@ namespace Hime.Redist.Parsers
         public SyntaxTreeNode Analyse()
         {
             stack.Push(state);
-            SymbolToken nextToken = GetNextToken(lexer, state);
+            SymbolToken nextToken = GetNextToken(lexer);
 
             while (true)
             {
                 if (RunForToken(nextToken))
                 {
-                    nextToken = GetNextToken(lexer, state);
+                    nextToken = GetNextToken(lexer);
                     continue;
                 }
                 else if (nextToken.SymbolID == 0x0001)
@@ -159,7 +159,7 @@ namespace Hime.Redist.Parsers
         /// <param name="lexer">Base lexer for reading tokens</param>
         /// <param name="state">Parser's current state</param>
         /// <returns>The next token in the input</returns>
-        internal protected SymbolToken GetNextToken(ILexer lexer, ushort state) 
+        internal protected SymbolToken GetNextToken(ILexer lexer) 
 		{ 
 			return lexer.GetNextToken(); 
 		}

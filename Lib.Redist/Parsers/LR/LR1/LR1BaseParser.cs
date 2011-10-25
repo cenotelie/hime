@@ -53,7 +53,7 @@ namespace Hime.Redist.Parsers
             Stack<ushort> TestStack = new Stack<ushort>(TempStack);
             if (Simulate(TestStack, TestLexer))
             {
-                return GetNextToken(lexer, state);
+                return GetNextToken(lexer);
             }
             return null;
         }
@@ -73,7 +73,7 @@ namespace Hime.Redist.Parsers
                 {
                     RunForToken(Inserted[0]);
                     RunForToken(Inserted[1]);
-                    return GetNextToken(lexer, state);
+                    return GetNextToken(lexer);
                 }
             }
             return null;
@@ -92,7 +92,7 @@ namespace Hime.Redist.Parsers
                 if (Simulate(TestStack, TestLexer, Inserted))
                 {
                     RunForToken(Inserted[0]);
-                    return GetNextToken(lexer, state);
+                    return GetNextToken(lexer);
                 }
             }
             return null;
@@ -109,7 +109,7 @@ namespace Hime.Redist.Parsers
                 InsertedIndex++;
             }
             else
-                NextToken = GetNextToken(lexer, CurrentState);
+                NextToken = GetNextToken(lexer);
 
             for (int i = 0; i != errorSimulationLength + inserted.Count; i++)
             {
@@ -124,7 +124,7 @@ namespace Hime.Redist.Parsers
                         InsertedIndex++;
                     }
                     else
-                        NextToken = GetNextToken(lexer, CurrentState);
+                        NextToken = GetNextToken(lexer);
                     continue;
                 }
                 if (states[CurrentState].HasReductionOnTerminal(NextToken.SymbolID))
