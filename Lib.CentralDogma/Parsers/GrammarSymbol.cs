@@ -6,6 +6,7 @@
  */
 using System.Collections.Generic;
 using Hime.Kernel.Naming;
+using System.Xml;
 
 namespace Hime.Parsers
 {
@@ -39,7 +40,7 @@ namespace Hime.Parsers
         }
         protected override void SymbolSetCompleteName(QualifiedName name) { completeName = name; }
         public override void SymbolAddChild(Symbol symbol) { throw new Kernel.Naming.CannotAddChildException(this, symbol); }
-        public abstract System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document);
+        public abstract XmlNode GetXMLNode(XmlDocument document);
 
         internal class Comparer : IEqualityComparer<GrammarSymbol>
         {

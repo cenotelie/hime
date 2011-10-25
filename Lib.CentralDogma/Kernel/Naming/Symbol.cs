@@ -10,23 +10,22 @@ namespace Hime.Kernel.Naming
 {
     public abstract class Symbol
     {
-        protected SymbolAccess access;
         protected Dictionary<string, Symbol> children;
 
         public Symbol Parent { get; protected set; }
         public abstract string LocalName { get; }
         public abstract QualifiedName CompleteName { get; }
-        public SymbolAccess Access
+        internal SymbolAccess Access
         {
-            get { return access; }
-            set { access = value; }
+            get;
+            set;
         }
         public ICollection<Symbol> Children { get { return children.Values; } }
 
         public Symbol()
         {
             children = new Dictionary<string, Symbol>();
-            access = SymbolAccess.Public;
+            this.Access = SymbolAccess.Public;
         }
 
         protected abstract void SymbolSetParent(Symbol symbol);
