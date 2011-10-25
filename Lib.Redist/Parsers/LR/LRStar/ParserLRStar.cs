@@ -27,14 +27,6 @@ namespace Hime.Redist.Parsers
         /// <returns>The new next token if the error is resolved, null otherwise</returns>
         protected override SymbolToken OnUnexpectedToken(SymbolToken nextToken) { return null; }
 
-        /// <summary>
-        /// Gets the next token in the input
-        /// </summary>
-        /// <param name="lexer">Base lexer for reading tokens</param>
-        /// <param name="state">Parser's current state</param>
-        /// <returns>The next token in the input</returns>
-        protected override SymbolToken GetNextToken(ILexer lexer, ushort state) { return lexer.GetNextToken(); }
-
         public LRStarBaseParser(ILexer input) : base(input) { reader = new BufferedTokenReader(input); }
 
         protected ushort RunDecider(ushort first, out LRRule reduction)

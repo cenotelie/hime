@@ -189,16 +189,5 @@ namespace Hime.Redist.Parsers
                 return false;
             }
         }
-		
-		/// <summary>
-        /// Gets the next token in the input
-        /// </summary>
-        /// <param name="lexer">Base lexer for reading tokens</param>
-        /// <param name="state">Parser's current state</param>
-        /// <returns>The next token in the input</returns>
-        protected override SymbolToken GetNextToken(ILexer lexer, ushort state) 
-		{ 
-			return lexer.GetNextToken(); 
-		}
     }
 }

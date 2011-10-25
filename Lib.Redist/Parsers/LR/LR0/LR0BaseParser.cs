@@ -77,16 +77,5 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="input">Input lexer</param>
         public LR0BaseParser(ILexer input) :base(input) { }
-
-		/// <summary>
-        /// Gets the next token in the input
-        /// </summary>
-        /// <param name="lexer">Base lexer for reading tokens</param>
-        /// <param name="state">Parser's current state</param>
-        /// <returns>The next token in the input</returns>
-        protected override SymbolToken GetNextToken(ILexer lexer, ushort state) 
-		{ 
-			return lexer.GetNextToken(); 
-		}
     }
 }

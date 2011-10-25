@@ -73,14 +73,6 @@ namespace Hime.Redist.Parsers
         protected abstract void setup();
         
         /// <summary>
-        /// Gets the next token in the input
-        /// </summary>
-        /// <param name="lexer">Base lexer for reading tokens</param>
-        /// <param name="state">Parser's current state</param>
-        /// <returns>The next token in the input</returns>
-        protected abstract SymbolToken GetNextToken(ILexer lexer, ushort state);
-
-        /// <summary>
         /// Gets the automaton's state with the given id
         /// </summary>
         /// <param name="id">State's id</param>
@@ -157,5 +149,16 @@ namespace Hime.Redist.Parsers
                 }
             }
         }
+		
+		/// <summary>
+        /// Gets the next token in the input
+        /// </summary>
+        /// <param name="lexer">Base lexer for reading tokens</param>
+        /// <param name="state">Parser's current state</param>
+        /// <returns>The next token in the input</returns>
+        internal protected SymbolToken GetNextToken(ILexer lexer, ushort state) 
+		{ 
+			return lexer.GetNextToken(); 
+		}
     }
 }
