@@ -71,10 +71,7 @@ namespace Hime.Kernel.Resources
 		
 		private byte[] ReadResource(string resourceName)
 		{
-            if (isClosed) throw new AccessorClosedException(this);
-			string resourcePath = defaultPath + resourceName;
-            Stream stream = this.assembly.GetManifestResourceStream(resourcePath);
-			if (stream == null) throw new ResourceNotFoundException(resourcePath);
+			Stream stream = GetStreamFor(resourceName);
             byte[] buffer = new byte[stream.Length];
             stream.Read(buffer, 0, buffer.Length);
 			return buffer;

@@ -109,6 +109,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\RedistBug494.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <LogicalName>Tests.Resources.RedistBug494.gram</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
 </Project>
