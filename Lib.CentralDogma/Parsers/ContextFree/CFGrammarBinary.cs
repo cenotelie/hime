@@ -14,23 +14,13 @@ namespace Hime.Parsers.ContextFree
     {
         public CFGrammarBinary(string name) : base(name) { }
 
-        public override void Inherit(Grammar parent)
+        protected override void InheritTerminals(CFGrammar parent)
         {
-            InheritOptions(parent);
-            InheritActions(parent);
-            InheritVirtuals(parent);
             foreach (TerminalBin terminal in parent.Terminals)
                 AddTerminalBin(terminal.Type, terminal.LocalName);
-			InheritVariables(parent as CFGrammar);
-            InheritTemplateRules(parent as CFGrammar);
         }
-        // TODO: factor code with CFGrammarText
-        public override Grammar Clone()
-        {
-            CFGrammar result = new CFGrammarBinary(name);
-            result.Inherit(this);
-            return result;
-        }
+
+        protected override Grammar CreateCopy() { return new CFGrammarBinary(name); }
 
         public override LexerData GetLexerData(Reporter reporter)
         {

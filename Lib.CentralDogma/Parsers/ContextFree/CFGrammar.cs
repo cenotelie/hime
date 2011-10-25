@@ -22,6 +22,18 @@ namespace Hime.Parsers.ContextFree
             templateRules = new List<TemplateRule>();
         }
 
+        public override void Inherit(Grammar parent)
+        {
+            InheritOptions(parent);
+            InheritActions(parent);
+            InheritVirtuals(parent);
+            InheritTerminals(parent as CFGrammar);
+            InheritVariables(parent as CFGrammar);
+            InheritTemplateRules(parent as CFGrammar);
+        }
+
+        protected abstract void InheritTerminals(CFGrammar parent);
+
         protected void InheritTemplateRules(CFGrammar parent)
         {
             foreach (TemplateRule tRule in parent.TemplateRules)

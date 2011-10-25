@@ -167,7 +167,15 @@ namespace Hime.Parsers
         public abstract Rule CreateRule(Variable head, List<RuleBodyElement> body);
 
         public abstract void Inherit(Grammar parent);
-        public abstract Grammar Clone();
+        
+        public Grammar Clone()
+        {
+            Grammar clone = CreateCopy();
+            clone.Inherit(this);
+            return clone;
+        }
+
+        protected abstract Grammar CreateCopy();
 
         protected void InheritOptions(Grammar parent)
         {

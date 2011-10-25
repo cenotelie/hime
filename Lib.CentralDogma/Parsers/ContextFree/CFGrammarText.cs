@@ -15,26 +15,16 @@ namespace Hime.Parsers.ContextFree
     {
         public CFGrammarText(string name) : base(name) { }
 
-        public override void Inherit(Grammar parent)
+        protected override void InheritTerminals(CFGrammar parent)
         {
-            InheritOptions(parent);
-            InheritActions(parent);
-            InheritVirtuals(parent);
             foreach (TerminalText terminal in parent.Terminals)
             {
                 TerminalText clone = AddTerminalText(terminal.LocalName, terminal.NFA.Clone(false), terminal.SubGrammar);
                 clone.NFA.StateExit.Final = clone;
             }
-            InheritVariables(parent as CFGrammar);
-            InheritTemplateRules(parent as CFGrammar);
         }
 
-        public override Grammar Clone()
-        {
-            Grammar result = new CFGrammarText(name);
-            result.Inherit(this);
-            return result;
-        }
+        protected override Grammar CreateCopy() { return new CFGrammarText(name); }
 
         private Automata.DFA PrepareDFA(Reporter log)
         {
