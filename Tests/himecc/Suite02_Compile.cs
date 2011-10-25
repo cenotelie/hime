@@ -1,14 +1,19 @@
-﻿using System;
-using System.Text;
+﻿/*
+ * @author Charles Hymans
+ * */
+
+using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using NUnit.Framework;
-using System.Reflection;
-using Hime.NUnit.Integration;
-using Hime.HimeCC;
 using System.IO;
+using System.Reflection;
+using System.Text;
+using Hime.HimeCC;
 using Hime.Kernel.Reporting;
+using Hime.NUnit.Integration;
 using Hime.Parsers;
-	
+using NUnit.Framework;
+
 namespace Hime.NUnit.himecc
 {
     [TestFixture]
@@ -35,15 +40,17 @@ namespace Hime.NUnit.himecc
 			string redistPath = Path.Combine(directory, "Hime.Redist.dll");
 			if (File.Exists(redistPath)) File.Delete(redistPath);
 			File.Copy(redist, redistPath);
-            System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
-            System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
-            compilerparams.GenerateExecutable = false;
-            compilerparams.GenerateInMemory = true;
-            compilerparams.ReferencedAssemblies.Add(redistPath);
-            System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
-            System.Reflection.Assembly assembly = results.CompiledAssembly;
-            System.IO.Directory.Delete(directory, true);
-            return assembly;
+            using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
+			{
+	            CompilerParameters compilerparams = new CompilerParameters();
+    	        compilerparams.GenerateExecutable = false;
+        	    compilerparams.GenerateInMemory = true;
+            	compilerparams.ReferencedAssemblies.Add(redistPath);
+            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
+            	Assembly assembly = results.CompiledAssembly;
+            	Directory.Delete(directory, true);
+            	return assembly;
+			}
         }
 
         // TODO: factor all calls to new Tools (inherit from Tools and call this TestTemplate)
