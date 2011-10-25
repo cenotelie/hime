@@ -10,14 +10,13 @@ namespace Hime.Parsers.ContextFree
 {
     class TemplateRule
     {
-        private string headName;
         private List<string> parameters;
         private List<TemplateRuleInstance> instances;
         private CFGrammar grammar;
         private Redist.Parsers.SyntaxTreeNode ruleNode;
         private Redist.Parsers.SyntaxTreeNode definitionNode;
 
-        public string HeadName { get { return headName; } }
+        public string HeadName { get; private set; }
         public int ParametersCount { get { return parameters.Count; } }
         public List<string> Parameters { get { return parameters; } }
         public Redist.Parsers.SyntaxTreeNode RuleNode { get { return ruleNode; } }
@@ -25,7 +24,7 @@ namespace Hime.Parsers.ContextFree
 
         public TemplateRule(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode ruleNode)
         {
-            this.headName = ((Redist.Parsers.SymbolTokenText)ruleNode.Children[0].Symbol).ValueText;
+            this.HeadName = ((Redist.Parsers.SymbolTokenText)ruleNode.Children[0].Symbol).ValueText;
             this.parameters = new List<string>();
             this.instances = new List<TemplateRuleInstance>();
             this.grammar = grammar;
@@ -37,7 +36,7 @@ namespace Hime.Parsers.ContextFree
 
         public TemplateRule(TemplateRule copied, CFGrammar data)
         {
-            headName = copied.headName;
+            this.HeadName = copied.HeadName;
             parameters = new List<string>(copied.parameters);
             instances = new List<TemplateRuleInstance>();
             grammar = data;
