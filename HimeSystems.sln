@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.CentralDogma", "Hime.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Redist", "Hime.Redist\Hime.Redist.csproj", "{8E4DE283-BA6E-4779-8C79-EB708002EDCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "himecc", "himecc\himecc.csproj", "{7A05384E-959E-4D54-B23A-D357AC0153B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeCC", "himecc\Exe.HimeCC.csproj", "{7A05384E-959E-4D54-B23A-D357AC0153B5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{30BE2190-7AA2-431C-A993-8E61501ED0FF}"
 EndProject
