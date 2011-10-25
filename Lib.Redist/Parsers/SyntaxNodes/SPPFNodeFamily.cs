@@ -39,7 +39,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="parent">The node owning this family</param>
         /// <param name="nodes">The list of children for this family</param>
-        public SPPFNodeFamily(SPPFNode parent, List<SPPFNode> nodes)
+        public SPPFNodeFamily(SPPFNode parent, IEnumerable<SPPFNode> nodes)
         {
             this.parent = parent;
             this.children = new List<SPPFNode>(nodes);
