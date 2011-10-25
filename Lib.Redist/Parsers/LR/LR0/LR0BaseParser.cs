@@ -24,14 +24,13 @@ namespace Hime.Redist.Parsers
         /// <param name="id">State's id</param>
         /// <returns>The automaton's state which has the given id, or null if no state with the given id is found</returns>
         protected override LRState GetState(int id) { return states[id]; }
-
-        /// <summary>
-        /// Acts when an unexpected token is encountered
+		
+		/// <summary>
+        /// Initializes a new instance of the LR0BaseParser class with the given lexer
         /// </summary>
-        /// <param name="token">Current token</param>
-        /// <returns>The new next token if the error is resolved, null otherwise</returns>
-        protected override SymbolToken OnUnexpectedToken(SymbolToken nextToken) { return null; }
-
+        /// <param name="input">Input lexer</param>
+        public LR0BaseParser(ILexer input): base(input) { }
+		
         /// <summary>
         /// Runs the parser for the given state and token
         /// </summary>
@@ -71,11 +70,5 @@ namespace Hime.Redist.Parsers
                 }
             }
         }
-
-        /// <summary>
-        /// Initializes a new instance of the LR0BaseParser class with the given lexer
-        /// </summary>
-        /// <param name="input">Input lexer</param>
-        public LR0BaseParser(ILexer input) :base(input) { }
     }
 }

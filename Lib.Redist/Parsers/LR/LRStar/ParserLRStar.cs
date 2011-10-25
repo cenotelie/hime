@@ -20,16 +20,12 @@ namespace Hime.Redist.Parsers
         /// <returns>The automaton's state which has the given id, or null if no state with the given id is found</returns>
         protected override LRState GetState(int id) { return states[id]; }
 
-        /// <summary>
-        /// Acts when an unexpected token is encountered
-        /// </summary>
-        /// <param name="token">Current token</param>
-        /// <returns>The new next token if the error is resolved, null otherwise</returns>
-        protected override SymbolToken OnUnexpectedToken(SymbolToken nextToken) { return null; }
+        public LRStarBaseParser(ILexer input) : base(input) 
+		{ 
+			reader = new BufferedTokenReader(input); 
+		}
 
-        public LRStarBaseParser(ILexer input) : base(input) { reader = new BufferedTokenReader(input); }
-
-        protected ushort RunDecider(ushort first, out LRRule reduction)
+        private ushort RunDecider(ushort first, out LRRule reduction)
         {
             int depth = 0;
             reduction = null;

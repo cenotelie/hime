@@ -26,6 +26,12 @@ namespace Hime.Redist.Parsers
         protected override LRState GetState(int id) { return states[id]; }
 
         /// <summary>
+        /// Initializes a new instance of the LR1BaseParser class with the given lexer
+        /// </summary>
+        /// <param name="input">Input lexer</param>
+        public LR1BaseParser(ILexer input) : base(input) { }
+
+		/// <summary>
         /// Acts when an unexpected token is encountered
         /// </summary>
         /// <param name="token">Current token</param>
@@ -33,21 +39,13 @@ namespace Hime.Redist.Parsers
         protected override SymbolToken OnUnexpectedToken(SymbolToken nextToken)
         {
             SymbolToken token = SimpleRecovery_RemoveUnexpected();
-            if (token != null)
-                return token;
+            if (token != null) return token;
             token = SimpleRecovery_InsertExpected(nextToken);
-            if (token != null)
-                return token;
+            if (token != null) return token;
             return SimpleRecovery_ReplaceUnexpectedByExpected();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the LR1BaseParser class with the given lexer
-        /// </summary>
-        /// <param name="input">Input lexer</param>
-        public LR1BaseParser(ILexer input) : base(input) { }
-
-        protected SymbolToken SimpleRecovery_RemoveUnexpected()
+        private SymbolToken SimpleRecovery_RemoveUnexpected()
         {
             ILexer TestLexer = lexer.Clone();
             List<ushort> TempStack = new List<ushort>(stack);
@@ -59,7 +57,8 @@ namespace Hime.Redist.Parsers
             }
             return null;
         }
-        protected SymbolToken SimpleRecovery_InsertExpected(SymbolToken nextToken)
+		
+        private SymbolToken SimpleRecovery_InsertExpected(SymbolToken nextToken)
         {
             for (int i = 0; i != states[state].expecteds.Length; i++)
             {
@@ -79,7 +78,8 @@ namespace Hime.Redist.Parsers
             }
             return null;
         }
-        protected SymbolToken SimpleRecovery_ReplaceUnexpectedByExpected()
+		
+        private SymbolToken SimpleRecovery_ReplaceUnexpectedByExpected()
         {
             for (int i = 0; i != states[state].expecteds.Length; i++)
             {
@@ -98,7 +98,7 @@ namespace Hime.Redist.Parsers
             return null;
         }
 
-        protected bool Simulate(Stack<ushort> stack, ILexer lexer, List<SymbolToken> inserted)
+        private bool Simulate(Stack<ushort> stack, ILexer lexer, List<SymbolToken> inserted)
         {
             int InsertedIndex = 0;
             ushort CurrentState = stack.Peek();
@@ -148,7 +148,8 @@ namespace Hime.Redist.Parsers
             }
             return true;
         }
-        protected bool Simulate(Stack<ushort> stack, ILexer lexer)
+		
+        private bool Simulate(Stack<ushort> stack, ILexer lexer)
         {
             return Simulate(stack, lexer, new List<SymbolToken>());
         }

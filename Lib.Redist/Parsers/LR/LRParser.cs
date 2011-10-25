@@ -84,7 +84,10 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="token">Current token</param>
         /// <returns>The new next token if the error is resolved, null otherwise</returns>
-        protected abstract SymbolToken OnUnexpectedToken(SymbolToken nextToken);
+        protected virtual SymbolToken OnUnexpectedToken(SymbolToken nextToken) 
+		{ 
+			return null; 
+		}
 
         /// <summary>
         /// Runs the parser for the given state and token
