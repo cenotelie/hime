@@ -20,8 +20,7 @@ namespace Hime.Parsers
 
         public override XmlNode GetXMLNode(XmlDocument document)
         {
-            XmlNode node = document.CreateElement("SymbolTerminal");
-            this.AddAttributeToNode(document, node, "Name", localName.Replace("\"", "\\\""));
+			XmlNode node = base.GetXMLNode(document);
             this.AddAttributeToNode(document, node, "SID", SID.ToString());
             this.AddAttributeToNode(document, node, "Priority", this.Priority.ToString());
             this.AddAttributeToNode(document, node, "Value", this.ToString());

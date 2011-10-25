@@ -40,8 +40,7 @@ namespace Hime.Parsers
 		
         public override XmlNode GetXMLNode(XmlDocument document)
         {
-            XmlNode node = document.CreateElement("SymbolVariable");
-			this.AddAttributeToNode(document, node, "Name", localName);
+   			XmlNode node = base.GetXMLNode(document);
 			this.AddAttributeToNode(document, node, "SID", SID.ToString("X"));
             foreach (Rule rule in this.Rules)
                 node.AppendChild(rule.GetXMLNode(document));

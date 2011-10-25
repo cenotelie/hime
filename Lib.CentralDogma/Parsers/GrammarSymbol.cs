@@ -41,7 +41,13 @@ namespace Hime.Parsers
         }
         protected override void SymbolSetCompleteName(QualifiedName name) { completeName = name; }
         public override void SymbolAddChild(Symbol symbol) { throw new Kernel.Naming.CannotAddChildException(this, symbol); }
-        public abstract XmlNode GetXMLNode(XmlDocument document);
+        
+		public virtual XmlNode GetXMLNode(XmlDocument document)
+        {
+            XmlNode node = document.CreateElement("SymbolVirtual");
+            this.AddAttributeToNode(document, node, "Name", localName.Replace("\"", "\\\""));
+            return node;
+        }
 		
 		// TODO: maybe should wrap Node in our own class and put this method in there instead
 		internal protected void AddAttributeToNode(XmlDocument document, XmlNode node, string attributeName, string attributeValue)

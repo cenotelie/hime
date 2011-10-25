@@ -12,13 +12,6 @@ namespace Hime.Parsers
     {
         public Virtual(Grammar parent, string name) : base(parent, 0, name) { }
 
-        public override XmlNode GetXMLNode(XmlDocument document)
-        {
-            XmlNode node = document.CreateElement("SymbolVirtual");
-            this.AddAttributeToNode(document, node, "Name", localName);
-            return node;
-        }
-
         public override string ToString() { return "\"" + localName + "\""; }
     }
 }
