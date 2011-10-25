@@ -6,6 +6,7 @@
  */
 using System.Collections.Generic;
 
+// TODO: think about it, but it is strange to have so many different Symbol types (UInt16, 32...)
 namespace Hime.Redist.Parsers
 {
     /// <summary>

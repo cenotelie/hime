@@ -22,11 +22,13 @@ namespace Hime.Redist.Parsers
             this.name = name;
             this.sid = 0;
         }
+		
         /// <summary>
         /// Serves as a hash function for a particular type
         /// </summary>
         /// <returns>A hash code for the current symbol</returns>
-        public override int GetHashCode() { return base.GetHashCode(); }
+        public override int GetHashCode() { return this.name.GetHashCode(); }
+		
         /// <summary>
         /// Determines whether the specified symbol is equal to the current symbol
         /// </summary>
@@ -35,8 +37,7 @@ namespace Hime.Redist.Parsers
         public override bool Equals(object obj)
         {
             SymbolVirtual other = obj as SymbolVirtual;
-            if (other == null)
-                return false;
+            if (other == null) return false;
             return (this.name == other.name);
         }
     }

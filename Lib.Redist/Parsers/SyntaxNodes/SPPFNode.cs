@@ -70,7 +70,7 @@ namespace Hime.Redist.Parsers
         /// Adds a new family to be constructed from a list of nodes
         /// </summary>
         /// <param name="nodes">The list of nodes forming the new family</param>
-        public void AddFamily(List<SPPFNode> nodes) { families.Add(new SPPFNodeFamily(this, nodes)); }
+        public void AddFamily(IEnumerable<SPPFNode> nodes) { families.Add(new SPPFNodeFamily(this, nodes)); }
 
         /// <summary>
         /// Determines whether this node is equivalent to the given one
