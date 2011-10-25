@@ -42,6 +42,14 @@ namespace Hime.Parsers
         protected override void SymbolSetCompleteName(QualifiedName name) { completeName = name; }
         public override void SymbolAddChild(Symbol symbol) { throw new Kernel.Naming.CannotAddChildException(this, symbol); }
         public abstract XmlNode GetXMLNode(XmlDocument document);
+		
+		// TODO: maybe should wrap Node in our own class and put this method in there instead
+		internal protected void AddAttributeToNode(XmlDocument document, XmlNode node, string attributeName, string attributeValue)
+		{
+			XmlAttribute attribute = document.CreateAttribute(attributeName);
+			node.Attributes.Append(attribute);
+			node.Attributes[attributeName].Value = attributeValue;
+		}
 
         internal class Comparer : IEqualityComparer<GrammarSymbol>
         {
@@ -50,6 +58,6 @@ namespace Hime.Parsers
             private Comparer() { }
             private static Comparer instance = new Comparer();
             public static Comparer Instance { get { return instance; } }
-        }
+        }		
     }
 }

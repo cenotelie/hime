@@ -35,15 +35,14 @@ namespace Hime.Parsers
             OnRuleAdd(rule);
             return rule;
         }
+		
         protected virtual void OnRuleAdd(Rule rule) { }
-
+		
         public override XmlNode GetXMLNode(XmlDocument document)
         {
             XmlNode node = document.CreateElement("SymbolVariable");
-            node.Attributes.Append(document.CreateAttribute("SID"));
-            node.Attributes.Append(document.CreateAttribute("Name"));
-            node.Attributes["SID"].Value = SID.ToString("X");
-            node.Attributes["Name"].Value = localName;
+			this.AddAttributeToNode(document, node, "Name", localName);
+			this.AddAttributeToNode(document, node, "SID", SID.ToString("X"));
             foreach (Rule rule in this.Rules)
                 node.AppendChild(rule.GetXMLNode(document));
             return node;

@@ -15,8 +15,7 @@ namespace Hime.Parsers
         public override XmlNode GetXMLNode(XmlDocument document)
         {
             XmlNode node = document.CreateElement("SymbolVirtual");
-            node.Attributes.Append(document.CreateAttribute("Name"));
-            node.Attributes["Name"].Value = localName;
+            this.AddAttributeToNode(document, node, "Name", localName);
             return node;
         }
 

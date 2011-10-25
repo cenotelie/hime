@@ -4,6 +4,7 @@
  * Time: 17:22
  * 
  */
+using System.Xml;
 using System.Collections.Generic;
 
 namespace Hime.Parsers
@@ -12,11 +13,10 @@ namespace Hime.Parsers
     {
         public Action(Grammar parent, string name) : base(parent, 0, name) { }
 
-        public override System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document)
+        public override XmlNode GetXMLNode(XmlDocument document)
         {
-            System.Xml.XmlNode node = document.CreateElement("SymbolAction");
-            node.Attributes.Append(document.CreateAttribute("Name"));
-            node.Attributes["Name"].Value = localName;
+            XmlNode node = document.CreateElement("SymbolAction");
+            this.AddAttributeToNode(document, node, "Name", localName);
             return node;
         }
 
