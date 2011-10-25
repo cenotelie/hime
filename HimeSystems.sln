@@ -11,11 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeDemo", "Exe.HimeDemo\Exe.HimeDemo.csproj", "{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.CentralDogma", "Hime.CentralDogma\Hime.CentralDogma.csproj", "{BA0D93DF-9EA3-4643-A18C-E463376AADA7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.CentralDogma", "Lib.CentralDogma\Lib.CentralDogma.csproj", "{BA0D93DF-9EA3-4643-A18C-E463376AADA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Redist", "Hime.Redist\Hime.Redist.csproj", "{8E4DE283-BA6E-4779-8C79-EB708002EDCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Redist", "Lib.Redist\Lib.Redist.csproj", "{8E4DE283-BA6E-4779-8C79-EB708002EDCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeCC", "himecc\Exe.HimeCC.csproj", "{7A05384E-959E-4D54-B23A-D357AC0153B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeCC", "Exe.HimeCC\Exe.HimeCC.csproj", "{7A05384E-959E-4D54-B23A-D357AC0153B5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{30BE2190-7AA2-431C-A993-8E61501ED0FF}"
 EndProject

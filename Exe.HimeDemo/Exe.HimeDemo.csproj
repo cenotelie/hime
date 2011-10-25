@@ -125,13 +125,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hime.CentralDogma\Hime.CentralDogma.csproj">
+    <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
-      <Name>Hime.CentralDogma</Name>
+      <Name>Lib.CentralDogma</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
+    <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
-      <Name>Hime.Redist</Name>
+      <Name>Lib.Redist</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

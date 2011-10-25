@@ -63,17 +63,17 @@
     <Compile Include="redist\Suite00_Bugs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
-      <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
-      <Name>Hime.Redist</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Hime.CentralDogma\Hime.CentralDogma.csproj">
-      <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
-      <Name>Hime.CentralDogma</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\himecc\Exe.HimeCC.csproj">
+    <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
       <Project>{7A05384E-959E-4D54-B23A-D357AC0153B5}</Project>
       <Name>Exe.HimeCC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">
+      <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
+      <Name>Lib.CentralDogma</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
+      <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
+      <Name>Lib.Redist</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

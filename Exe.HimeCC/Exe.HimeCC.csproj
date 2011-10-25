@@ -73,9 +73,9 @@
     <Content Include="Hime.Logo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hime.CentralDogma\Hime.CentralDogma.csproj">
+    <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
-      <Name>Hime.CentralDogma</Name>
+      <Name>Lib.CentralDogma</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
