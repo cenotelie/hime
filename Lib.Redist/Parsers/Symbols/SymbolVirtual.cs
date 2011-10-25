@@ -17,17 +17,18 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the SymbolVirtual class with a name
         /// </summary>
         /// <param name="name">The name of the virtual symbol</param>
-        public SymbolVirtual(string name)
+        public SymbolVirtual(string name) : base(0, name)
         {
-            this.name = name;
-            this.sid = 0;
         }
 		
         /// <summary>
         /// Serves as a hash function for a particular type
         /// </summary>
         /// <returns>A hash code for the current symbol</returns>
-        public override int GetHashCode() { return this.name.GetHashCode(); }
+        public override int GetHashCode() 
+		{ 
+			return this.Name.GetHashCode(); 
+		}
 		
         /// <summary>
         /// Determines whether the specified symbol is equal to the current symbol
@@ -38,7 +39,7 @@ namespace Hime.Redist.Parsers
         {
             SymbolVirtual other = obj as SymbolVirtual;
             if (other == null) return false;
-            return (this.name == other.name);
+            return (this.Name == other.Name);
         }
     }
 }

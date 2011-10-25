@@ -18,10 +18,8 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="sid">The unique ID of the symbol</param>
         /// <param name="name">The name of the symbol</param>
-        public SymbolVariable(ushort sid, string name)
+        public SymbolVariable(ushort sid, string name) : base(sid, name)
         {
-            this.sid = sid;
-            this.name = name;
         }
     }
 }

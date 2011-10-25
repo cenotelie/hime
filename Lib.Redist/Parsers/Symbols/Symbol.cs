@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 
 // TODO: think about it, but it is strange to have so many different Symbol types (UInt16, 32...)
+// TODO: also think about it: do all symbols need an sid and a name?
 namespace Hime.Redist.Parsers
 {
     /// <summary>
@@ -15,33 +16,38 @@ namespace Hime.Redist.Parsers
     public abstract class Symbol
     {
         /// <summary>
-        /// symbol's unique ID
-        /// </summary>
-        protected ushort sid;
-        /// <summary>
-        /// symbol's name
-        /// </summary>
-        protected string name;
-
-        /// <summary>
         /// Gets the symbol's unique ID
         /// </summary>
-        public ushort SymbolID { get { return sid; } }
+        public ushort SymbolID { get; private set; }
         /// <summary>
         /// Gets the symbol's name
         /// </summary>
-        public string Name { get { return name; } }
-
+        public string Name { get; private set; }
+		
+		public Symbol(ushort sid, string name)
+        {
+            this.SymbolID = sid;
+            this.Name = name;
+        }
+		
         /// <summary>
         /// Returns the name of the symbol
         /// </summary>
         /// <returns>The name of the symbol</returns>
-        public override string ToString() { return name; }
+        public override string ToString() 
+		{ 
+			return this.Name; 
+		}
+		
         /// <summary>
         /// Serves as a hash function for a particular type
         /// </summary>
         /// <returns>A hash code for the current symbol</returns>
-        public override int GetHashCode() { return base.GetHashCode(); }
+        public override int GetHashCode() 
+		{ 
+			return this.SymbolID.GetHashCode(); 
+		}
+		
         /// <summary>
         /// Determines whether the specified symbol is equal to the current symbol
         /// </summary>
@@ -50,9 +56,8 @@ namespace Hime.Redist.Parsers
         public override bool Equals(object obj)
         {
             Symbol symbol = obj as Symbol;
-            if (symbol == null)
-                return false;
-            return this.sid == symbol.sid;
+            if (symbol == null) return false;
+            return this.SymbolID == symbol.SymbolID;
         }
     }
 }
