@@ -6,6 +6,8 @@ using System.Reflection;
 using Hime.NUnit.Integration;
 using Hime.HimeCC;
 using System.IO;
+using Hime.Kernel.Reporting;
+using Hime.Parsers;
 	
 namespace Hime.NUnit.himecc
 {
@@ -92,5 +94,50 @@ namespace Hime.NUnit.himecc
         {
         	Generate(new string[] { Path.Combine(directory, "Empty.gram") });
         }
-    }
+
+	
+		// TODO: should simplify this test by adding a return code to main!!!
+		[Test]
+        public void Test006_ShouldNotFail()
+        {
+			string[] command = new string[] { Path.Combine(directory, "Kernel.gram"),
+					Path.Combine(directory, "CFGrammars.gram"),
+					Path.Combine(directory, "CSGrammars.gram"),
+					"-g", "Hime.Kernel.FileCentralDogma", "-m", "LALR"
+				};
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+            Directory.CreateDirectory(directory);
+            new Tools().Export(Path.GetFileName(command[0]), command[0]);
+			new Tools().Export(Path.GetFileName(command[1]), command[1]);
+			new Tools().Export(Path.GetFileName(command[2]), command[2]);
+
+			Program program = new Program();
+        	Options options = program.ParseArguments(command);
+            if (options.Inputs.Count == 0) 
+            {
+            	System.Console.WriteLine(options.GetUsage());
+            	return;
+            }
+			
+			CompilationTask task = new CompilationTask();
+            foreach (string input in options.Inputs)
+                task.InputFiles.Add(input);
+            task.Method = options.Method;
+            // TODO: this test is probably not necessary, as options.GrammarName is already equal to null
+            // TODO: remove this test
+            if (options.GrammarName != null)
+                task.GrammarName = options.GrammarName;
+            if (options.Namespace != null)
+                task.Namespace = options.Namespace;
+            if (options.LexerFile != null)
+                task.LexerFile = options.LexerFile;
+            if (options.ParserFile != null)
+                task.ParserFile = options.ParserFile;
+            task.ExportLog = options.ExportHTMLLog;
+            task.ExportDoc = options.ExportDocumentation;
+            Compiler compiler = new Compiler();
+            Report result = compiler.Execute(task);
+			Assert.IsFalse(result.HasErrors);
+        }
+	}
 }

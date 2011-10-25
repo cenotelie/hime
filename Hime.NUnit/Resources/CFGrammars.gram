@@ -1,0 +1,141 @@
+﻿namespace Hime.Parsers
+{
+	public cf text grammar GrammarContextFree : Kernel.GrammarKernel
+	{
+		options {}
+		terminals
+		{
+			INTEGER					-> [1-9] [0-9]* | '0' ;
+			QUOTED_DATA				-> '"' [^"]* '"';
+			ESCAPEES				-> '\\\\'	/*Backslash*/
+									| '\\0'		/*Unicode character 0*/
+									| '\\a'		/*Alert (character 7)*/
+									| '\\b'		/*Backspace (character 8)*/
+									| '\\f'		/*Form feed (character 12)*/
+									| '\\n'		/*New line (character 10)*/
+									| '\\r'		/*Carriage return (character 13)*/
+									| '\\t'		/*Horizontal tab (character 9)*/
+									| '\\v';	/*Vertical quote (character 11)*/
+			SYMBOL_TERMINAL_TEXT	-> '\'' ([^\\'] | ESCAPEES | '\\\'')+ '\'';
+			SYMBOL_TERMINAL_SET		-> '[' ([^\\\[\]] | ESCAPEES | '\\[' | '\\]')+ ']';
+			SYMBOL_TERMINAL_UBLOCK	-> '\\ub' '{' NAME '}' ;
+			SYMBOL_TERMINAL_UCAT	-> '\\uc' '{' NAME '}' ;
+			
+			SYMBOL_VALUE_UINT8		-> '0x' [a-fA-F0-9] [a-fA-F0-9] ;
+			SYMBOL_VALUE_UINT16		-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
+			SYMBOL_VALUE_UINT32		-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
+			SYMBOL_VALUE_UINT64		-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
+			SYMBOL_VALUE_UINT128	-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
+			SYMBOL_VALUE_BINARY		-> '0b' [01]+ ;
+			
+			SYMBOL_JOKER_UINT8		-> '0x' 'XX' ;
+			SYMBOL_JOKER_UINT16		-> '0x' 'XXXX' ;
+			SYMBOL_JOKER_UINT32		-> '0x' 'XXXXXXXX' ;
+			SYMBOL_JOKER_UINT64		-> '0x' 'XXXXXXXXXXXXXXXX' ;
+			SYMBOL_JOKER_UINT128	-> '0x' 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' ;
+			SYMBOL_JOKER_BINARY		-> '0b' 'B'+ ;
+		}
+		rules
+		{
+			/* Options section definition */
+			option			-> NAME '='! QUOTED_DATA ';'! ;
+			
+			
+			/* Terminals section definition for text grammars */
+			terminal_def_atom_any		-> '.'^ ;
+			terminal_def_atom_unicode	-> (SYMBOL_VALUE_UINT8 | SYMBOL_VALUE_UINT16)^ ;
+			terminal_def_atom_text		-> SYMBOL_TERMINAL_TEXT^ ;
+			terminal_def_atom_set		-> SYMBOL_TERMINAL_SET^ ;
+			terminal_def_atom_ublock	-> SYMBOL_TERMINAL_UBLOCK^ ;
+			terminal_def_atom_ucat		-> SYMBOL_TERMINAL_UCAT^ ;
+			terminal_def_atom_span		-> terminal_def_atom_unicode '..'^ terminal_def_atom_unicode ;
+			terminal_def_atom			-> terminal_def_atom_any^
+										|  terminal_def_atom_unicode^
+										|  terminal_def_atom_text^
+										|  terminal_def_atom_set^
+										|  terminal_def_atom_span^
+										|  terminal_def_atom_ucat^
+										|  terminal_def_atom_ublock^
+										|  NAME^;
+			terminal_def_element		-> terminal_def_atom^
+										| '('! terminal_definition^ ')'! ;
+			terminal_def_cardinalilty	-> '*'^
+										|  '+'^
+										|  '?'^
+										|  "range"^ '{'! INTEGER (','! INTEGER)? '}'! ;
+			terminal_def_repetition		-> terminal_def_element^ terminal_def_cardinalilty^?;
+			terminal_def_fragment		-> terminal_def_repetition^ ("concat"^ terminal_def_repetition)*;
+			terminal_def_restrict		-> terminal_def_fragment^ ('-'^ terminal_def_fragment)* ;
+			terminal_definition			-> terminal_def_restrict^ ('|'^ terminal_def_restrict)*;
+			terminal_subgrammar			-> ('=>'! qualified_name)? ;
+			terminal					-> NAME '->'! terminal_definition terminal_subgrammar ';'! ;
+			
+			
+			/* Define symbols for grammar rules */
+			rule_sym_action					-> '{'! NAME '}'! ;
+			rule_sym_virtual				-> QUOTED_DATA ;
+			rule_sym_ref_params<terminal>	-> '<'! rule_def_atom<terminal> (','! rule_def_atom<terminal>)* '>'! ;
+			rule_sym_ref_template<terminal>	-> NAME rule_sym_ref_params<terminal> ;
+			rule_sym_ref_simple				-> NAME;
+			
+			/* Define the rule definition */
+			rule_def_atom<terminal>			-> rule_sym_action^
+											|  rule_sym_virtual^ 
+											|  rule_sym_ref_simple^
+											|  rule_sym_ref_template<terminal>^
+											|  terminal^ ;
+			rule_def_element<terminal>		->	rule_def_atom<terminal>^ | '('! rule_definition<terminal>^ ')'!;
+			rule_def_tree_action<terminal>	-> rule_def_element<terminal>^ ('^' | '!')^?;
+			rule_def_repetition<terminal>	-> rule_def_tree_action<terminal>^ ('*' | '+' | '?')^?;
+			rule_def_fragment<terminal>		-> rule_def_repetition<terminal>^ ("concat"^ rule_def_repetition<terminal>)*;
+			rule_def_restrict<terminal>		-> rule_def_fragment<terminal>^ ('-'^ rule_def_fragment<terminal>)*;
+			rule_def_choice<terminal>		-> rule_def_restrict<terminal>^ | "emptypart"^ ;
+			rule_definition<terminal>		-> rule_def_choice<terminal>^ ('|'^ rule_def_choice<terminal>)*;
+			
+			/* Define rules */
+			rule_template_params			-> '<'! NAME (','! NAME)* '>'!;
+			cf_rule_template<terminal>		-> NAME rule_template_params '->'! rule_definition<terminal> ';'! ;
+			cf_rule_simple<terminal>		-> NAME '->'! rule_definition<terminal> ';'! ;
+			
+			
+			/* Define the grammars */
+			grammar_bin_terminal	-> SYMBOL_VALUE_UINT8
+									|  SYMBOL_VALUE_UINT16
+									|  SYMBOL_VALUE_UINT32
+									|  SYMBOL_VALUE_UINT64
+									|  SYMBOL_VALUE_UINT128
+									|  SYMBOL_VALUE_BINARY
+									|  SYMBOL_JOKER_UINT8
+									|  SYMBOL_JOKER_UINT16
+									|  SYMBOL_JOKER_UINT32
+									|  SYMBOL_JOKER_UINT64
+									|  SYMBOL_JOKER_UINT128
+									|  SYMBOL_JOKER_BINARY ;
+			grammar_text_terminal	-> terminal_def_atom_text ;
+			
+			grammar_options				-> 'options'^ '{'! option* '}'! ;
+			grammar_terminals			-> 'terminals'^ '{'! terminal* '}'! ;
+			grammar_cf_rules<terminal>	-> 'rules'^ '{'! (cf_rule_simple<terminal> | cf_rule_template<terminal>)* '}'! ;
+			grammar_parency				-> (':'! qualified_name (','! qualified_name)*)? ;
+			grammar_access				-> symbol_access_public^
+										|  symbol_access_private^
+										|  symbol_access_protected^
+										|  symbol_access_internal^ ;
+			
+			cf_grammar_text	-> grammar_access ('cf' 'text' 'grammar')! NAME grammar_parency
+								'{'!
+									grammar_options
+									grammar_terminals?
+									grammar_cf_rules<grammar_text_terminal>
+								'}'! ;
+			cf_grammar_bin	-> grammar_access ('cf' 'bin' 'grammar')! NAME grammar_parency
+								'{'!
+									grammar_options
+									grammar_cf_rules<grammar_bin_terminal>
+								'}'! ;
+			
+			Namespace_child_symbol	-> cf_grammar_text^
+									| cf_grammar_bin^ ;
+		}
+	}
+}

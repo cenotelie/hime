@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,6 @@
     <RootNamespace>Hime.NUnit</RootNamespace>
     <AssemblyName>Hime.NUnit</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
     <SourceAnalysisOverrideSettingsFile>C:\Users\Charles\AppData\Roaming\ICSharpCode/SharpDevelop4.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -61,7 +60,7 @@
     <Compile Include="Integration\Suite05_Parse.cs" />
     <Compile Include="Integration\Suite06_KernelDaemon.cs" />
     <Compile Include="Integration\Tools.cs" />
-    <Compile Include="Redist\Suite00_Bugs.cs" />
+    <Compile Include="redist\Suite00_Bugs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
@@ -85,6 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\MathExp.gram" />
+    <EmbeddedResource Include="Resources\CFGrammars.gram" />
+    <EmbeddedResource Include="Resources\CSGrammars.gram" />
+    <EmbeddedResource Include="Resources\Kernel.gram" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Empty.gram" />
