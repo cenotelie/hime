@@ -8,7 +8,7 @@ using System;
 using NUnit.Framework;
 using Hime.Kernel.Resources;
 
-namespace Hime.NUnit.Integration
+namespace Hime.Tests.Integration
 {
   	[TestFixture]
 	public class Suite01_Resource

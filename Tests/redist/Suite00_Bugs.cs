@@ -11,7 +11,7 @@ using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 using System.Reflection;
 
-namespace Hime.NUnit.Redist
+namespace Hime.Tests.Redist
 {
     [TestFixture]
     public class Suite00_Bugs : BaseTestSuite

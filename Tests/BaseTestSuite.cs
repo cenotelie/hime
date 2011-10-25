@@ -9,7 +9,7 @@ using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 using Hime.Kernel.Resources;
 
-namespace Hime.NUnit
+namespace Hime.Tests
 {
     public class BaseTestSuite
     {

@@ -9,7 +9,7 @@ using System.IO;
 using NUnit.Framework;
 using Hime.Kernel;
 	
-namespace Hime.NUnit.Integration
+namespace Hime.Tests.Integration
 {
 	[TestFixture, Ignore]
 	public class Suite06_KernelDaemon

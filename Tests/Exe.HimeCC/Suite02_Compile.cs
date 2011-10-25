@@ -10,11 +10,11 @@ using System.Reflection;
 using System.Text;
 using Hime.HimeCC;
 using Hime.Kernel.Reporting;
-using Hime.NUnit.Integration;
+using Hime.Tests.Integration;
 using Hime.Parsers;
 using NUnit.Framework;
 
-namespace Hime.NUnit.himecc
+namespace Hime.Tests.HimeCC
 {
     [TestFixture]
     public class Suite02_Compile
@@ -117,34 +117,9 @@ namespace Hime.NUnit.himecc
             new Tools().Export(Path.GetFileName(command[0]), command[0]);
 			new Tools().Export(Path.GetFileName(command[1]), command[1]);
 			new Tools().Export(Path.GetFileName(command[2]), command[2]);
-
-			Program program = new Program();
-        	Options options = program.ParseArguments(command);
-            if (options.Inputs.Count == 0) 
-            {
-            	System.Console.WriteLine(options.GetUsage());
-            	return;
-            }
 			
-			CompilationTask task = new CompilationTask();
-            foreach (string input in options.Inputs)
-                task.InputFiles.Add(input);
-            task.Method = options.Method;
-            // TODO: this test is probably not necessary, as options.GrammarName is already equal to null
-            // TODO: remove this test
-            if (options.GrammarName != null)
-                task.GrammarName = options.GrammarName;
-            if (options.Namespace != null)
-                task.Namespace = options.Namespace;
-            if (options.LexerFile != null)
-                task.LexerFile = options.LexerFile;
-            if (options.ParserFile != null)
-                task.ParserFile = options.ParserFile;
-            task.ExportLog = options.ExportHTMLLog;
-            task.ExportDoc = options.ExportDocumentation;
-            Compiler compiler = new Compiler();
-            Report result = compiler.Execute(task);
-			Assert.IsFalse(result.HasErrors);
+			int result = Program.Main(command);
+			Assert.AreEqual(0, result);
         }
 	}
 }

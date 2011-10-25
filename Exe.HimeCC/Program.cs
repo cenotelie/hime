@@ -9,21 +9,25 @@ using System.Collections.Generic;
 using System.Text;
 using Hime.Parsers;
 using CommandLine;
+using Hime.Kernel.Reporting;
 
 namespace Hime.HimeCC
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
         	Program program = new Program();
         	Options options = program.ParseArguments(args);
             if (options.Inputs.Count == 0) 
             {
             	System.Console.WriteLine(options.GetUsage());
-            	return;
+            	return 0;
             }
-        	program.Execute(options);
+        	Report result = program.Execute(options);
+			// TODO: maybe would be nicer to return the number of errors
+			if (result.HasErrors) return 1;
+			return 0;
         }
 
         public Options ParseArguments(string[] args)
@@ -37,7 +41,7 @@ namespace Hime.HimeCC
             return options;
         }
 
-        public void Execute(Options options)
+        public Report Execute(Options options)
         {
             CompilationTask task = new CompilationTask();
             foreach (string input in options.Inputs)
@@ -56,7 +60,7 @@ namespace Hime.HimeCC
             task.ExportLog = options.ExportHTMLLog;
             task.ExportDoc = options.ExportDocumentation;
             Compiler compiler = new Compiler();
-            compiler.Execute(task);
+            return compiler.Execute(task);
         }
     }
 }

@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Hime.HimeCC;
 using Hime.Parsers;
 
-namespace Hime.NUnit.himecc
+namespace Hime.Tests.HimeCC
 {
     [TestFixture]
     public class Suite01_Program
@@ -14,67 +14,74 @@ namespace Hime.NUnit.himecc
         private Program program = new Program();
 
         [Test]
-        public void Test000_MinimalCommand()
+        public void Test000_ParseArguments_MinimalCommand()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.IsNotNull(options);
         }
 
         [Test]
-        public void Test001_DefaultNamespace()
+        public void Test001_ParseArguments_DefaultNamespace()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.IsNull(options.Namespace);
         }
 
         [Test]
-        public void Test002_DefaultMethod()
+        public void Test002_ParseArguments_DefaultMethod()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.AreEqual(options.Method, ParsingMethod.RNGLALR1);
         }
 
         [Test]
-        public void Test003_DefaultLexer()
+        public void Test003_ParseArguments_DefaultLexer()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.IsNull(options.LexerFile);
         }
 
         [Test]
-        public void Test004_DefaultParser()
+        public void Test004_ParseArguments_DefaultParser()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.IsNull(options.ParserFile);
         }
 
         [Test]
-        public void Test005_DefaultLogExport()
+        public void Test005_ParseArguments_DefaultLogExport()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.IsFalse(options.ExportHTMLLog);
         }
 
         [Test]
-        public void Test006_DefaultDocExport()
+        public void Test006_ParseArguments_DefaultDocExport()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.IsFalse(options.ExportDocumentation);
         }
 
         [Test]
-        public void Test007_DefaultInput()
+        public void Test007_ParseArguments_DefaultInput()
         {
-            HimeCC.Options options = this.program.ParseArguments(p_DefaultCommand);
+            Options options = this.program.ParseArguments(p_DefaultCommand);
             Assert.AreEqual(options.Inputs.Count, 1);
             Assert.AreEqual(options.Inputs[0], p_DefaultCommand[0]);
         }
 
         [Test]
-        public void Test008_EmptyCommand()
+        public void Test008_ParseArguments_EmptyCommand()
         {
-            HimeCC.Options options = this.program.ParseArguments(new string[] { });
+            Options options = this.program.ParseArguments(new string[] { });
             Assert.AreEqual(0, options.Inputs.Count);
         }
+		
+		[Test]
+		public void Test009_Main_ShouldReturnStatus()
+		{
+			int result = Program.Main(new string[0]);
+			Assert.AreEqual(0, result);
+		}
     }
 }

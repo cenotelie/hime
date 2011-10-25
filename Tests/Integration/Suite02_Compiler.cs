@@ -12,7 +12,7 @@ using Hime.Kernel.Resources;
 using Hime.Kernel.Reporting;
 using System.IO;
 
-namespace Hime.NUnit.Integration
+namespace Hime.Tests.Integration
 {
 	[TestFixture]
 	public class Suite02_Compiler

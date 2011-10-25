@@ -6,7 +6,7 @@ using Hime.Kernel.Reporting;
 using System.Reflection;
 using Hime.Kernel.Resources;
 
-namespace Hime.NUnit.Integration
+namespace Hime.Tests.Integration
 {
     public class Tools
     {
