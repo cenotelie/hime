@@ -277,9 +277,9 @@
     <EmbeddedResource Include="Hime\Resources\Visuals\Hime.Warning.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hime.Redist\Hime.Redist.csproj">
+    <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
-      <Name>Hime.Redist</Name>
+      <Name>Lib.Redist</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
