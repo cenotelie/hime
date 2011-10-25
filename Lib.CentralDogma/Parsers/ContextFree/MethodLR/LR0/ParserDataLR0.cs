@@ -15,7 +15,7 @@ namespace Hime.Parsers.ContextFree.LR
     {
 		internal protected override string GetBaseClassName 
 		{
-			get { return "LR0TextParser"; }
+			get { return "LR0BaseParser"; }
 		}
 		
         public ParserDataLR0(Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }

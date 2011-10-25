@@ -68,7 +68,7 @@ namespace Hime.Tests
             {
                 if (types[i].BaseType == typeof(LexerText))
                     lexerType = types[i];
-                else if (types[i].BaseType == typeof(LR0TextParser))
+                else if (types[i].BaseType == typeof(LR0BaseParser))
                     parserType = types[i];
                 else if (types[i].BaseType == typeof(LR1BaseParser))
                     parserType = types[i];
