@@ -20,7 +20,7 @@ namespace Hime.Parsers.ContextFree.LR
 			get 
 			{
 				// TODO: not nice!!! because based on type, should rather call a method on grammar
-				if (grammar is CFGrammarText) return "LR1TextParser";
+				if (grammar is CFGrammarText) return "LR1BaseParser";
             	return "LR1BinaryParser";
             
 			}

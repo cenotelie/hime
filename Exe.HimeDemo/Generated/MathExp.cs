@@ -97,7 +97,8 @@ namespace Analyser
         public MathExp_Lexer(System.IO.TextReader input) : base(input) {}
         public MathExp_Lexer(MathExp_Lexer original) : base(original) {}
     }
-    class MathExp_Parser : LR1TextParser
+	
+    class MathExp_Parser : LR1BaseParser
     {
         public static readonly SymbolVariable[] variables = {
             new SymbolVariable(0x8, "exp_atom"), 
