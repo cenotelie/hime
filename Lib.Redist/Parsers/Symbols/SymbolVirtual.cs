@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a synthetic symbol in an abstract syntax tree
     /// </summary>
-    public sealed class SymbolVirtual : Symbol
+    public class SymbolVirtual : Symbol
     {
         /// <summary>
         /// Initializes a new instance of the SymbolVirtual class with a name
