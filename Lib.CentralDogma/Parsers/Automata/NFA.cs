@@ -91,8 +91,8 @@ namespace Hime.Parsers.Automata
 		private static NFA BuildNFA()
 		{
 			NFA result = new NFA();
-			// shouldn't it be result.stateEntry = result.AddNewState()? => try
-            result.stateEntry = new NFAState();
+            result.stateEntry = result.AddNewState();
+            result.stateExit = result.AddNewState();
 			return result;
 		}
 		
@@ -100,12 +100,9 @@ namespace Hime.Parsers.Automata
         public static NFA OperatorOption(NFA sub, bool useClones)
         {
             NFA final = BuildNFA();
-            final.stateExit = new NFAState();
-            final.states.Add(final.stateEntry);
             if (useClones)
                 sub = sub.Clone();
             final.states.AddRange(sub.states);
-            final.states.Add(final.stateExit);
             final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
             final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
             sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
@@ -115,12 +112,9 @@ namespace Hime.Parsers.Automata
 		public static NFA OperatorStar(NFA sub, bool useClones)
         {
             NFA final = BuildNFA();
-            final.stateExit = new NFAState();
-            final.states.Add(final.stateEntry);
             if (useClones)
                 sub = sub.Clone();
             final.states.AddRange(sub.states);
-            final.states.Add(final.stateExit);
             final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
             final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
             sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
@@ -130,12 +124,9 @@ namespace Hime.Parsers.Automata
         public static NFA OperatorPlus(NFA sub, bool useClones)
         {
             NFA final = BuildNFA();
-            final.stateExit = new NFAState();
-            final.states.Add(final.stateEntry);
             if (useClones)
                 sub = sub.Clone();
             final.states.AddRange(sub.states);
-            final.states.Add(final.stateExit);
             final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
             sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
             final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
@@ -144,8 +135,6 @@ namespace Hime.Parsers.Automata
         public static NFA OperatorRange(NFA sub, bool useClones, uint min, uint max)
         {
             NFA final = BuildNFA();
-            final.stateExit = new NFAState();
-            final.states.Add(final.stateEntry);
 
             NFAState last = final.stateEntry;
             for (uint i = 0; i != min; i++)
@@ -162,7 +151,6 @@ namespace Hime.Parsers.Automata
                 last.AddTransition(NFA.Epsilon, inner.stateEntry);
                 last = inner.stateExit;
             }
-            final.states.Add(final.stateExit);
             last.AddTransition(NFA.Epsilon, final.stateExit);
             
             if (min == 0)
@@ -172,8 +160,6 @@ namespace Hime.Parsers.Automata
 		public static NFA OperatorUnion(NFA left, NFA right, bool useClones)
         {
             NFA final = BuildNFA();
-            final.stateExit = new NFAState();
-            final.states.Add(final.stateEntry);
             if (useClones)
             {
                 left = left.Clone(true);
@@ -181,7 +167,6 @@ namespace Hime.Parsers.Automata
             }
             final.states.AddRange(left.states);
             final.states.AddRange(right.states);
-            final.states.Add(final.stateExit);
             final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
             final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
             left.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
@@ -205,9 +190,7 @@ namespace Hime.Parsers.Automata
         }
         public static NFA OperatorDifference(NFA left, NFA right, bool useClones)
         {
-            NFA final = new NFA();
-            final.stateEntry = final.AddNewState();
-            final.stateExit = final.AddNewState();
+            NFA final = BuildNFA();
             NFAState statePositive = final.AddNewState();
             NFAState stateNegative = final.AddNewState();
             statePositive.Mark = 1;
