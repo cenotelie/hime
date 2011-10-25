@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		VersionInfo.cs = VersionInfo.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.Demo", "Hime.Demo\Hime.Demo.csproj", "{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeDemo", "Exe.HimeDemo\Exe.HimeDemo.csproj", "{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hime.CentralDogma", "Hime.CentralDogma\Hime.CentralDogma.csproj", "{BA0D93DF-9EA3-4643-A18C-E463376AADA7}"
 EndProject
@@ -119,6 +119,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Hime.Demo\Hime.Demo.csproj
+		StartupItem = Exe.HimeDemo\Exe.HimeDemo.csproj
 	EndGlobalSection
 EndGlobal
