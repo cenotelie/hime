@@ -244,22 +244,26 @@ namespace Hime.Parsers.ContextFree.LR
             foreach (StateActionRNReduce Reduction in state.Reductions)
             {
                 if (!first) stream.Write(", ");
-                if (Reduction.ReduceLength == 0)
+				string tableName;
+                int index = 0;
+				int reductionLength = Reduction.ReduceLength;
+				CFRule reductionRule = Reduction.ToReduceRule;
+                if (reductionLength == 0)
                 {
-                    int index = 0;
-                    index = nullableVars.IndexOf(Reduction.ToReduceRule.Head);
-                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(Reduction.ToReduceRule) + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullVarsSPPF[0x" + index.ToString("X") + "])");
+                    index = nullableVars.IndexOf(reductionRule.Head);
+					tableName = "staticNullVarsSPPF";
                 }
                 else
                 {
-                    int index = 0;
-                    if (Reduction.ToReduceRule.CFBody.GetChoiceAt(0).Length != Reduction.ReduceLength)
+                    if (reductionRule.CFBody.GetChoiceAt(0).Length != reductionLength)
                     {
-                        CFRuleBody def = Reduction.ToReduceRule.CFBody.GetChoiceAt(Reduction.ReduceLength);
+                        CFRuleBody def = reductionRule.CFBody.GetChoiceAt(reductionLength);
                         index = nullableChoices.IndexOf(def);
                     }
-                    stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(Reduction.ToReduceRule) + "], 0x" + Reduction.ReduceLength.ToString("X") + ", staticNullChoicesSPPF[0x" + index.ToString("X") + "])");
+					tableName = "staticNullChoicesSPPF";
                 }
+				// TODO: think about it but many violations of the Demeter rule!!!
+                stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(reductionRule) + "], 0x" + reductionLength.ToString("X") + ", " + tableName + "[0x" + index.ToString("X") + "])");
                 first = false;
             }
             stream.WriteLine("})");

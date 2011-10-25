@@ -23,7 +23,11 @@ namespace Hime.Parsers.ContextFree.LR
         internal protected bool debug;
 
         internal protected ICollection<Rule> GrammarRules { get { return rules; } }
-        internal protected string IndexOfRule(Rule rule) { return "0x" + rules.IndexOf(rule).ToString("X"); }
+        internal protected string IndexOfRule(Rule rule) 
+		{ 
+			return "0x" + rules.IndexOf(rule).ToString("X"); 
+		}
+		
         internal protected ICollection<Action> GrammarActions { get { return grammar.Actions; } }
         internal protected string GetVariable(string name) { return "0x" + grammar.GetVariable(name).SID.ToString("X"); }
         internal protected string GetOption(string name) { return this.grammar.GetOption(name); }
