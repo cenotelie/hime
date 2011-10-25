@@ -40,17 +40,20 @@ namespace Hime.Parsers.ContextFree.LR
                 }
             }
         }
-        protected override void OnConflictTreated(State state, Conflict conflict)
+		
+		// TODO: code not nice, too complex
+		protected override void OnConflictTreated(State state, Conflict conflict)
         {
             List<ICollection<Terminal>> temp = lookaheads[state];
             List<ICollection<Terminal>> relevant = new List<ICollection<Terminal>>();
             foreach (ICollection<Terminal> path in temp)
             {
-                IEnumerator<Terminal> enumerator = path.GetEnumerator();
-                enumerator.MoveNext();
-                Terminal first = enumerator.Current;
-                if (first == conflict.ConflictSymbol)
-                    relevant.Add(path);
+                using (IEnumerator<Terminal> enumerator = path.GetEnumerator())
+				{
+                	enumerator.MoveNext();
+                	Terminal first = enumerator.Current;
+                	if (first == conflict.ConflictSymbol) relevant.Add(path);
+				}
             }
             if (relevant.Count != 0)
             {
