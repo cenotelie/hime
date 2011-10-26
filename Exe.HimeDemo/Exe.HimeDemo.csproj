@@ -123,17 +123,6 @@
       <DependentUpon>WinTreeView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Examples\Tokenizer.gram" />
-    <EmbeddedResource Include="Examples\Earth.Asm.PE.format" />
-    <EmbeddedResource Include="Examples\Earth.CIL.PE.format" />
-    <EmbeddedResource Include="Examples\Earth.CIL.Asm.gram" />
-    <EmbeddedResource Include="Examples\Earth.B.gram" />
-    <EmbeddedResource Include="Examples\Earth.CIL.CSharp.gram" />
-    <EmbeddedResource Include="Examples\Earth.Asm.x86_32.gram" />
-    <EmbeddedResource Include="Examples\Earth.Java.Bytecode.gram" />
-    <EmbeddedResource Include="Examples\BinLibrary.gram" />
-    <EmbeddedResource Include="Examples\Formats.gram" />
-    <EmbeddedResource Include="Examples\Earth.Java.ClassFile.format" />
     <EmbeddedResource Include="Grammars\Tokenizer.gram" />
     <EmbeddedResource Include="Grammars\Earth.Asm.PE.format" />
     <EmbeddedResource Include="Grammars\Earth.CIL.PE.format" />
@@ -164,7 +153,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Examples\" />
-  </ItemGroup>
 </Project>

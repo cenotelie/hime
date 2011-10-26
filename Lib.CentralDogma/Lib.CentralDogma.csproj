@@ -280,8 +280,6 @@
   <ItemGroup>
     <Folder Include="Kernel\Generated\" />
     <Folder Include="Kernel\Generated\SourceGrammar\" />
-    <Folder Include="Resources\Daemon\" />
     <Folder Include="Kernel\Resources\" />
-    <Folder Include="Resources\Examples\" />
   </ItemGroup>
 </Project>
