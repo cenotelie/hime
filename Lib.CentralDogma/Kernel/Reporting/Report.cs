@@ -15,18 +15,17 @@ namespace Hime.Kernel.Reporting
 	/// </summary>
 	public class Report
 	{
-        protected List<Section> sections;
-        public List<Section> Sections { get { return sections; } }
+        public List<Section> Sections { get; set; }
 
         public Report()
         {
-            sections = new List<Section>();
+            this.Sections = new List<Section>();
         }
 
         public Section AddSection(string name)
         {
             Section section = new Section(name);
-            sections.Add(section);
+            this.Sections.Add(section);
             return section;
         }
 		
@@ -38,7 +37,7 @@ namespace Hime.Kernel.Reporting
             result.AppendChild(result.CreateElement("Log"));
             result.ChildNodes[1].Attributes.Append(result.CreateAttribute("title"));
             result.ChildNodes[1].Attributes["title"].Value = title;
-            foreach (Section section in sections)
+            foreach (Section section in this.Sections)
 			{
                 result.ChildNodes[1].AppendChild(section.GetXMLNode(result));
 			}
