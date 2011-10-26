@@ -12,7 +12,13 @@ namespace Hime.Tests.Project0_CentralDogma
 	public class Suite02_Report
 	{
 		[Test]
-		public void Test000_ErrorCount_ShouldReturnTheNumberOfErrors()
+		public void Test000_Constructor_ShouldNotFail()
+		{
+			new Report();
+		}
+		
+		[Test]
+		public void Test001_ErrorCount_ShouldReturnTheNumberOfErrors()
 		{
 			Report report = new Report();
 			Assert.AreEqual(0, report.ErrorCount);

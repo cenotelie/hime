@@ -29,8 +29,8 @@ namespace Hime.Kernel.Reporting
             return section;
         }
 		
-		// TODO: rename into ToXmlDocument (Like ToString)
-        public XmlDocument GetXML(string title)
+		// TODO: maybe the title could be passed to the Report constructor instead? think about it
+        public XmlDocument ToXmlDocument(string title)
         {
             XmlDocument result = new XmlDocument();
             result.AppendChild(result.CreateXmlDeclaration("1.0", "utf-8", "yes"));
@@ -41,6 +41,7 @@ namespace Hime.Kernel.Reporting
 			{
                 result.ChildNodes[1].AppendChild(section.GetXMLNode(result));
 			}
+            result.ChildNodes[1].Attributes["title"].Value = title;
             return result;
         }
         

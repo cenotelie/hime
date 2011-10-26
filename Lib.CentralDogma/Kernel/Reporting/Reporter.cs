@@ -7,6 +7,7 @@
 using System;
 using log4net;
 using Hime.Kernel.Resources;
+using Hime.Kernel.Documentation;
 using System.Xml;
 using System.Xml.Xsl;
 using System.IO;
@@ -73,7 +74,8 @@ namespace Hime.Kernel.Reporting
                 case ELevel.Error: log.Error(entry.Component + ": " + entry.Message); break;
             }
         }
-        public void Report(System.Exception exception)
+		
+        public void Report(Exception exception)
         {
             Report(new ExceptionEntry(exception));
         }
@@ -96,33 +98,34 @@ namespace Hime.Kernel.Reporting
 
         public void ExportMHTML(string fileName, string title)
         {
-            XmlDocument document = report.GetXML(title);
+            XmlDocument document = report.ToXmlDocument(title);
             FileInfo File = new FileInfo(fileName);
-            document.ChildNodes[1].Attributes["title"].Value = title;
-            document.Save(fileName + ".xml");
+			string xmlFileName = fileName + ".xml";
+			string htmlFileName = fileName + ".html";
+            document.Save(xmlFileName);
 
             using (ResourceAccessor session = new ResourceAccessor())
 			{
-	            session.AddCheckoutFile(fileName + ".xml");
+	            session.AddCheckoutFile(xmlFileName);
     	        session.CheckOut("Transforms.Logs.xslt", File.DirectoryName + "Logs.xslt");
 
 	            XslCompiledTransform Transform = new XslCompiledTransform();
     	        Transform.Load(File.DirectoryName + "Logs.xslt");
-        	    Transform.Transform(fileName + ".xml", fileName + ".html");
-            	session.AddCheckoutFile(fileName + ".html");
+        	    Transform.Transform(xmlFileName, htmlFileName);
+            	session.AddCheckoutFile(htmlFileName);
 
 	            Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler();
     	        compiler.Title = title;
-        	    compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", fileName + ".html"));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
+        	    compiler.AddSource(new MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", htmlFileName));
+            	compiler.AddSource(new MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
+            	compiler.AddSource(new MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
 
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", session.GetStreamFor("Visuals.button_plus.gif")));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/gif", "hime_data/button_minus.gif", session.GetStreamFor("Visuals.button_minus.gif")));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Logo.png", session.GetStreamFor("Visuals.Hime.Logo.png")));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Info.png", session.GetStreamFor("Visuals.Hime.Info.png")));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Warning.png", session.GetStreamFor("Visuals.Hime.Warning.png")));
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", session.GetStreamFor("Visuals.Hime.Error.png")));
+            	compiler.AddSource(new MHTMLSourceStreamImage("image/gif", "hime_data/button_plus.gif", session.GetStreamFor("Visuals.button_plus.gif")));
+            	compiler.AddSource(new MHTMLSourceStreamImage("image/gif", "hime_data/button_minus.gif", session.GetStreamFor("Visuals.button_minus.gif")));
+            	compiler.AddSource(new MHTMLSourceStreamImage("image/png", "hime_data/Hime.Logo.png", session.GetStreamFor("Visuals.Hime.Logo.png")));
+            	compiler.AddSource(new MHTMLSourceStreamImage("image/png", "hime_data/Hime.Info.png", session.GetStreamFor("Visuals.Hime.Info.png")));
+            	compiler.AddSource(new MHTMLSourceStreamImage("image/png", "hime_data/Hime.Warning.png", session.GetStreamFor("Visuals.Hime.Warning.png")));
+            	compiler.AddSource(new MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", session.GetStreamFor("Visuals.Hime.Error.png")));
             	compiler.CompileTo(fileName);
 			}
         }
