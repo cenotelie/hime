@@ -54,23 +54,13 @@
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
-    <Compile Include="Project2.Integration\Suite05_Parse.cs" />
-    <Compile Include="Project2.Integration\Suite04_Ambiguous.cs" />
-    <Compile Include="Project0.CentralDogma\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Project0.CentralDogma\Suite01_Resource.cs" />
-    <Compile Include="Project0.CentralDogma\Suite02_Compiler.cs" />
-    <Compile Include="Project0.CentralDogma\Suite03_CompilationTask.cs" />
-    <Compile Include="Project1.HimeDemo\Suite06_Daemon.cs" />
     <Compile Include="Project0_CentralDogma\Suite00_FileCentralDogmaParser.cs" />
     <Compile Include="Project0_CentralDogma\Suite01_Resource.cs" />
     <Compile Include="Project0_CentralDogma\Suite02_Compiler.cs" />
     <Compile Include="Project0_CentralDogma\Suite03_CompilationTask.cs" />
-    <Compile Include="Project0_CentralDogma\.svn\all-wcprops" />
     <Compile Include="Project1_HimeDemo\Suite06_Daemon.cs" />
-    <Compile Include="Project1_HimeDemo\.svn\all-wcprops" />
     <Compile Include="Project2_Integration\Suite05_Parse.cs" />
     <Compile Include="Project2_Integration\Suite04_Ambiguous.cs" />
-    <Compile Include="Project2_Integration\.svn\all-wcprops" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -127,8 +117,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Project0.CentralDogma\" />
-    <Folder Include="Project2.Integration\" />
-    <Folder Include="Project1.HimeDemo\" />
+    <Folder Include="Project1_HimeDemo\" />
   </ItemGroup>
 </Project>

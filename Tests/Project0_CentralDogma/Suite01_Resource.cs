@@ -8,7 +8,7 @@ using System;
 using NUnit.Framework;
 using Hime.Kernel.Resources;
 
-namespace Hime.Tests.Project0.CentralDogma
+namespace Hime.Tests.Project0_CentralDogma
 {
   	[TestFixture]
 	public class Suite01_Resource
