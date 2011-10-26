@@ -124,6 +124,16 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Examples\Tokenizer.gram" />
+    <EmbeddedResource Include="Examples\Earth.Asm.PE.format" />
+    <EmbeddedResource Include="Examples\Earth.CIL.PE.format" />
+    <EmbeddedResource Include="Examples\Earth.CIL.Asm.gram" />
+    <EmbeddedResource Include="Examples\Earth.B.gram" />
+    <EmbeddedResource Include="Examples\Earth.CIL.CSharp.gram" />
+    <EmbeddedResource Include="Examples\Earth.Asm.x86_32.gram" />
+    <EmbeddedResource Include="Examples\Earth.Java.Bytecode.gram" />
+    <EmbeddedResource Include="Examples\BinLibrary.gram" />
+    <EmbeddedResource Include="Examples\Formats.gram" />
+    <EmbeddedResource Include="Examples\Earth.Java.ClassFile.format" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">

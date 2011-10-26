@@ -216,17 +216,6 @@
     <None Include="Resources\Visuals\svg\Hime.Shift.svg" />
     <None Include="Resources\Visuals\svg\Hime.ShiftReduce.svg" />
     <None Include="Resources\Visuals\svg\Hime.Warning.svg" />
-    <EmbeddedResource Include="Resources\Examples\Earth.Asm.PE.format" />
-    <EmbeddedResource Include="Resources\Examples\Earth.CIL.PE.format" />
-    <EmbeddedResource Include="Resources\Daemon\BinLibrary.gram" />
-    <EmbeddedResource Include="Resources\Examples\Earth.CIL.Asm.gram" />
-    <EmbeddedResource Include="Resources\Examples\Earth.B.gram">
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Examples\Earth.CIL.CSharp.gram" />
-    <EmbeddedResource Include="Resources\Examples\Earth.Asm.x86_32.gram" />
-    <EmbeddedResource Include="Resources\Examples\Earth.Java.Bytecode.gram" />
-    <EmbeddedResource Include="Resources\Daemon\Formats.gram" />
-    <EmbeddedResource Include="Resources\Examples\Earth.Java.ClassFile.format" />
     <EmbeddedResource Include="Kernel\Generated\SourceGrammar\CFGrammars.gram" />
     <EmbeddedResource Include="Kernel\Generated\SourceGrammar\CSGrammars.gram" />
     <EmbeddedResource Include="Kernel\Generated\SourceGrammar\Kernel.gram" />
