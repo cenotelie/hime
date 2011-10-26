@@ -4,25 +4,33 @@
  * Time: 17:22
  * 
  */
+using System.Reflection;
+using System.Text;
+
 namespace Hime.Kernel.Resources
 {
     class ResourceNotFoundException : System.Exception
     {
         private string resourceName;
+		private Assembly assembly;
 
-        public string ResourceName { get { return resourceName; } }
-
-        public ResourceNotFoundException(string name)
-            : base("No resource with name " + name + " found")
+        public ResourceNotFoundException(string name, Assembly assembly)
         {
-            resourceName = name;
+            this.resourceName = name;
+			this.assembly = assembly;
         }
-		/*
-		 	System.Console.WriteLine(assembly.FullName);
-			foreach (string toto in assembly.GetManifestResourceNames())
-			{
-				System.Console.WriteLine(toto);
+		
+		public override string Message {
+			get {
+				StringBuilder result = new StringBuilder();
+				result.AppendLine("No resource with name " + this.resourceName + " found in assembly " + this.assembly.FullName + ".");
+				result.AppendLine("Available resources:");
+				foreach (string resource in this.assembly.GetManifestResourceNames())
+				{
+					result.AppendLine("\t" + resource);
+				}
+				return result.ToString();
 			}
-		 */
+		}
     }
 }

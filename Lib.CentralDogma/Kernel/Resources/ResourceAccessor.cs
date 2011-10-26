@@ -37,11 +37,10 @@ namespace Hime.Kernel.Resources
             accessors.Add(this);
             this.assembly = assembly;
             this.rootNamespace = assembly.GetName().Name;
-			// TODO: should simplify this!! In particular remove this first case
-            if (defaultPath == null || defaultPath == "")
-                this.defaultPath = rootNamespace + ".";
-            else
-                this.defaultPath = rootNamespace + "." + defaultPath + ".";
+			this.defaultPath = rootNamespace + ".";
+			// TODO: should simplify this!! In particular remove this check, should not be necessary
+            if (defaultPath != null && defaultPath != "")
+                this.defaultPath += defaultPath + ".";
             this.files = new List<string>();
             this.streams = new List<System.IO.Stream>();
             this.isClosed = false;
@@ -57,8 +56,7 @@ namespace Hime.Kernel.Resources
 
         public void AddCheckoutFile(string fileName)
         {
-            if (isClosed)
-                throw new AccessorClosedException(this);
+            if (isClosed) throw new AccessorClosedException(this);
             files.Add(fileName);
         }
 
@@ -86,8 +84,8 @@ namespace Hime.Kernel.Resources
         {
 			// TODO: could factor this with ReadResource
             if (isClosed) throw new AccessorClosedException(this);
-            Stream stream = assembly.GetManifestResourceStream(defaultPath + resourceName);
-            if (stream == null) throw new ResourceNotFoundException(resourceName);
+            Stream stream = this.assembly.GetManifestResourceStream(defaultPath + resourceName);
+            if (stream == null) throw new ResourceNotFoundException(resourceName, this.assembly);
             streams.Add(stream);
             return stream;
         }
