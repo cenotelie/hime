@@ -61,8 +61,7 @@ namespace Hime.Parsers
             Grammar grammar = null;
             if (task.GrammarName != null) grammar = GetGrammar(root, task.GrammarName);
             else grammar = GetGrammar(root);
-            if (grammar == null)
-                return null;
+            if (grammar == null) return null;
 
             // Get the lexer data
             LexerData lexerData = grammar.GetLexerData(reporter);
@@ -150,10 +149,7 @@ namespace Hime.Parsers
 
         public Grammar GetGrammar(Namespace root)
         {
-            Grammar grammar = FindFirstGrammar(root);
-            if (grammar == null)
-                reporter.Error("Compiler", "Cannot find any grammar");
-            return grammar;
+            return FindFirstGrammar(root);
         }
 
         private Grammar FindFirstGrammar(Symbol symbol)

@@ -20,7 +20,7 @@ namespace Hime.Tests.Project0_CentralDogma
 	public class Suite04_Compiler
 	{	
 		[Test]
-		public void Test004_Execute_ShouldNotFailWhenExportLogIsSet()
+		public void Test000_Execute_ShouldNotFailWhenExportLogIsSet()
 		{
 			string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
@@ -29,12 +29,28 @@ namespace Hime.Tests.Project0_CentralDogma
 			task.InputRawData.Add(grammar);
 			
          	task.ExportLog = true;
-			// TODO: build the compiler with the task as argument??
-        	Compiler compiler = new Compiler(task);
+
+			Compiler compiler = new Compiler(task);
        	    Report result = compiler.Execute();
 			Assert.IsFalse(result.HasErrors);
 		}
+
+		[Test]
+		public void Test001_Execute_ShouldReturnOnlyOneErrorOnUnrecoverableSyntaxError()
+		{
+			string grammar = 
+        		"public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
+			
+            CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
+			task.InputRawData.Add(grammar);
+			
+        	Compiler compiler = new Compiler(task);
+       	    Report result = compiler.Execute();
+			Assert.AreEqual(1, result.ErrorCount);
+		}
 		
+		// TODO: help screen is incomplete => add tests
+		// TODO: format of errors: maybe should start with line number??
         // TODO: do a test with incorrect syntax but for which Compile returns false (saying it has no errors) even though errors are dumped
 		// TODO: remarks on the syntax of grammars:
 		// why is cf necessary => should just remove it

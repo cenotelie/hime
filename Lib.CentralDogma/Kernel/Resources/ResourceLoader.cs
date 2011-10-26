@@ -11,6 +11,7 @@ using Hime.Kernel.Naming;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 using Hime.Kernel.Resources.Parser;
+using System.Reflection;
 
 namespace Hime.Kernel.Resources
 {
@@ -39,7 +40,7 @@ namespace Hime.Kernel.Resources
             plugins = new Dictionary<string, LoaderPlugin>(defaultPlugins);
             inputNamedResources = new Dictionary<string, TextReader>();
             inputAnonResources = new List<TextReader>();
-            intermediateRoot = new SyntaxTreeNode(null);
+            this.intermediateRoot = new SyntaxTreeNode(null);
             intermediateResources = new ResourceGraph();
             this.outputRootNamespace = new Naming.Namespace(null, "global");
             this.log = reporter;
@@ -60,7 +61,7 @@ namespace Hime.Kernel.Resources
         	// TODO: simplify: this is not really necessary because of the reporter?
         	// TODO: make a test for the case where hasErrors and reporter.HasErrors do not coincide
             bool hasErrors = false;
-            log.Info("Loader", "CentralDogma " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            log.Info("Loader", "CentralDogma " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
             foreach (string name in plugins.Keys)
                 log.Info("Loader", "Register plugin " + plugins[name].ToString() + " for " + name);
 
@@ -78,7 +79,7 @@ namespace Hime.Kernel.Resources
             }
 
             // Build resources
-            foreach (SyntaxTreeNode file in intermediateRoot.Children)
+            foreach (SyntaxTreeNode file in this.intermediateRoot.Children)
                 Compile_file(file);
 
             // Build dependencies
@@ -110,9 +111,8 @@ namespace Hime.Kernel.Resources
 			if (hasErrors) return null;
 			return this.outputRootNamespace;
         }
-
-
-
+		
+		// TODO: remove all static methods!!
         public static QualifiedName CompileQualifiedName(SyntaxTreeNode node)
         {
             List<string> path = new List<string>();
@@ -139,18 +139,15 @@ namespace Hime.Kernel.Resources
 			{ 
 				SyntaxTreeNode root = parser.Analyse(); 
 	            intermediateRoot.AppendChild(root);
-			}
-            catch (ParserException e) 
-			{
-                log.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
-            }
-			finally
-			{
 	            foreach (ParserError error in parser.Errors)
 				{
     	            log.Report(new Entry(ELevel.Error, "Parser", error.Message));				
 				}
 			}
+            catch (ParserException e) 
+			{
+                log.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
+            }
         }
 
 
