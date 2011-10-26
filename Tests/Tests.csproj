@@ -59,9 +59,10 @@
     <Compile Include="Project2_Integration\Suite05_Parse.cs" />
     <Compile Include="Project2_Integration\Suite04_Ambiguous.cs" />
     <Compile Include="Project0_CentralDogma\Suite01_Resource.cs" />
-    <Compile Include="Project0_CentralDogma\Suite03_Compiler.cs" />
-    <Compile Include="Project0_CentralDogma\Suite04_CompilationTask.cs" />
     <Compile Include="Project0_CentralDogma\Suite02_Report.cs" />
+    <Compile Include="Project0_CentralDogma\Suite05_CompilationTask.cs" />
+    <Compile Include="Project0_CentralDogma\Suite03_ResourceLoader.cs" />
+    <Compile Include="Project0_CentralDogma\Suite04_Compiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
