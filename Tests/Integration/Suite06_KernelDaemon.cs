@@ -19,14 +19,18 @@ namespace Hime.Tests.Integration
 		[SetUp]
 		public void SetUp() 
 		{
-			DirectoryInfo currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-			DirectoryInfo projectRoot = currentDirectory.Parent.Parent.Parent;
-			string path = Path.Combine(Path.Combine(projectRoot.FullName, "Hime.NUnit"), "bin");
-			this.daemon = new Daemon(path);
+			string currentDirectory = Environment.CurrentDirectory;
+			DirectoryInfo projectRoot = new DirectoryInfo(currentDirectory).Parent.Parent.Parent;
+			string inputPath = Path.Combine(projectRoot.FullName, "Lib.CentralDogma");
+			inputPath = Path.Combine(inputPath, "Kernel");
+			inputPath = Path.Combine(inputPath, "Generated");
+			inputPath = Path.Combine(inputPath, "SourceGrammar");
+			string outputPath = Path.Combine(currentDirectory, "Daemon");
+			this.daemon = new Daemon(inputPath, outputPath);
 		}
 		
 		// TODO: should do this test without really generating (should be able to decide the output Stream instead of the path as a string)
-		[Test, Ignore]
+		[Test]
 		public void Test000_GenerateNextStep_GeneratesParserForCentralDogma()
 		{
 			this.daemon.GenerateNextStep();

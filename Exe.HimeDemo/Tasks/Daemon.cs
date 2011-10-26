@@ -15,11 +15,18 @@ namespace Hime.Demo.Tasks
 {
     public class Daemon : IExecutable
     {
+		// input path: where to find the source grammars
         private string path;
+		// output path: where to generate the result 
+		// TODO: this should not be necessary
+		// should be able to generate on 
+		// standard output instead of files!!!
+		private string outputPath;
 
-        public Daemon(string directory)
+        public Daemon(string inputPath, string outputPath)
         {
-            this.path = Path.Combine(directory, "Daemon");
+            this.path = inputPath;
+			this.outputPath = outputPath;
         }
 
         public void Execute()
@@ -29,26 +36,16 @@ namespace Hime.Demo.Tasks
 		
 		public bool GenerateNextStep()
 		{
-			// input path: where to find the source grammar
-			// output path: where to generate the result => first should be able to generate on 
-			// standard output instead of files!!!
 			System.Console.WriteLine(path);
+            System.Console.WriteLine(this.outputPath);
+
 			// Test path
-            if (Directory.Exists(path)) Directory.Delete(path, true);
-            DirectoryInfo directory = Directory.CreateDirectory(path);
-            System.Console.WriteLine(directory.FullName);
+            if (Directory.Exists(this.outputPath)) Directory.Delete(outputPath, true);
+            Directory.CreateDirectory(outputPath);
 
 			string pathToKernel = Path.Combine(path, "Kernel.gram");
 			string pathToContextFree = Path.Combine(path, "CFGrammars.gram");
 			string pathToContextSensitive = Path.Combine(path, "CSGrammars.gram");
-
-			// Checkout resources
-            using (ResourceAccessor session = new ResourceAccessor())
-			{
-            	session.CheckOut("Daemon.Kernel.gram", pathToKernel);
-            	session.CheckOut("Daemon.CFGrammars.gram", pathToContextFree);
-            	session.CheckOut("Daemon.CSGrammars.gram", pathToContextSensitive);
-			}
 			
             CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
          	task.InputFiles.Add(pathToKernel);
@@ -58,7 +55,7 @@ namespace Hime.Demo.Tasks
          	task.Namespace = "Hime.Kernel.Resources.Parser";
          	// TODO: this assignment is a bit strange, should not be done like that?
         	// see how it is done with options in himecc
-        	task.ParserFile = Path.Combine(path, "KernelResources.Parser.cs");
+        	task.ParserFile = Path.Combine(this.outputPath, "KernelResources.Parser.cs");
          	task.ExportLog = true;
         	Compiler compiler = new Compiler();
        	    Report result = compiler.Execute(task);
