@@ -45,7 +45,6 @@ namespace Hime.Tests.Integration
             Assert.IsFalse(reporter.Result.HasErrors);
         }
 
-        // TODO:
         [Test]
         public void Test002_Compile_ShouldNotThrowExceptionWhenSectionTerminalsIsNotPresent()
         {
@@ -61,7 +60,6 @@ namespace Hime.Tests.Integration
             reader.Close();
         }
         
-        // TODO:
         [Test]
         public void Test003_Compile_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
