@@ -92,8 +92,8 @@ namespace Hime.Tests.Project0_CentralDogma
 			
          	task.ExportLog = true;
 			// TODO: build the compiler with the task as argument??
-        	Compiler compiler = new Compiler();
-       	    Report result = compiler.Execute(task);
+        	Compiler compiler = new Compiler(task);
+       	    Report result = compiler.Execute();
 			Assert.IsFalse(result.HasErrors);
 		}
 		

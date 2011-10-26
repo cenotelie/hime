@@ -8,6 +8,7 @@ using System;
 using NUnit.Framework;
 using Hime.Parsers;
 using Hime.Kernel.Reporting;
+using Hime.Kernel.Naming;
 using System.IO;
 
 namespace Hime.Tests.Project0_CentralDogma
@@ -23,7 +24,8 @@ namespace Hime.Tests.Project0_CentralDogma
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            (new Compiler()).ExecuteDo(task);
+			Compiler compiler = new Compiler(task);
+            compiler.ExecuteDo();
         }
 
         [Test]
@@ -34,9 +36,9 @@ namespace Hime.Tests.Project0_CentralDogma
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            Compiler compiler = new Compiler();
-            compiler.LoadData(task.InputFiles, task.InputRawData);
-            Assert.IsFalse(compiler.Reporter.Result.HasErrors);
+            Compiler compiler = new Compiler(task);
+            Namespace result = compiler.LoadData();
+            Assert.IsNotNull(result);
         }
         
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
@@ -48,7 +50,8 @@ namespace Hime.Tests.Project0_CentralDogma
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            Report result = (new Compiler()).Execute(task);
+			Compiler compiler = new Compiler(task);
+            Report result = compiler.Execute();
             Assert.IsFalse(result.HasErrors);
         }
         
@@ -60,8 +63,8 @@ namespace Hime.Tests.Project0_CentralDogma
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-			Compiler compiler = new Compiler();
-            compiler.Execute(task);
+			Compiler compiler = new Compiler(task);
+            compiler.Execute();
             Assert.IsTrue(File.Exists("TestLexer.cs"));
         }
         
@@ -73,9 +76,9 @@ namespace Hime.Tests.Project0_CentralDogma
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-			Compiler compiler = new Compiler();
-            compiler.Execute(task);
-            Assert.IsTrue(System.IO.File.Exists("TestParser.cs"));
+			Compiler compiler = new Compiler(task);
+            compiler.Execute();
+            Assert.IsTrue(File.Exists("TestParser.cs"));
         }
 	}
 }

@@ -54,8 +54,8 @@ namespace Hime.Demo.Tasks
         	// see how it is done with options in himecc
         	task.ParserFile = Path.Combine(this.outputPath, "KernelResources.Parser.cs");
          	task.ExportLog = true;
-        	Compiler compiler = new Compiler();
-       	    Report result = compiler.Execute(task);
+        	Compiler compiler = new Compiler(task);
+       	    Report result = compiler.Execute();
             return !result.HasErrors;
 		}
     }

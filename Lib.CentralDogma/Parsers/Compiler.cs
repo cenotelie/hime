@@ -16,27 +16,29 @@ namespace Hime.Parsers
 {
     public sealed class Compiler
     {
+        private Reporter reporter;
+		// TODO: remove class CompilationTask? (move its every field in there!)
+		private CompilationTask task;
+
         static Compiler()
         {
             ResourceLoader.RegisterPlugin(new ContextFree.CFGrammarLoader());
         }
 
-        private Reporter reporter;
-
         public string Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
-        public Reporter Reporter { get { return reporter; } }
 
-        public Compiler()
+        public Compiler(CompilationTask task)
         {
+			this.task = task;
             reporter = new Reporter();
         }
 
-        public Report Execute(CompilationTask task)
+        public Report Execute()
         {
             this.reporter.BeginSection("Compilation Task");
             try 
 			{ 
-				string gname = ExecuteDo(task); 
+				string gname = ExecuteDo(); 
 				if (task.ExportLog) reporter.ExportMHTML(GetLogName(gname) + ".mht", "Compiler Log");
 			}
 			catch (Exception ex) 
@@ -49,19 +51,16 @@ namespace Hime.Parsers
         }
 
         // TODO: this method should be private but it is used in tests, either refactor tests or this
-        public string ExecuteDo(CompilationTask task)
+        internal string ExecuteDo()
         {
             // Load data
-            Namespace root = LoadData(task.InputFiles, task.InputRawData);
-            if (root == null)
-                return null;
+            Namespace root = LoadData();
+            if (root == null) return null;
 
             // Retrieve the grammar to compile
             Grammar grammar = null;
-            if (task.GrammarName != null)
-                grammar = GetGrammar(root, task.GrammarName);
-            else
-                grammar = GetGrammar(root);
+            if (task.GrammarName != null) grammar = GetGrammar(root, task.GrammarName);
+            else grammar = GetGrammar(root);
             if (grammar == null)
                 return null;
 
@@ -104,34 +103,32 @@ namespace Hime.Parsers
         private string GetLogName(string grammarName) { return grammarName + "Log"; }
         private string GetDocumentationName(string grammarName) { return grammarName + "Doc"; }
 
-        public Namespace LoadData(ICollection<string> files, ICollection<string> raws)
+        internal Namespace LoadData()
         {
-            if (files.Count == 0 && raws.Count == 0)
-            {
-                reporter.Error("Compiler", "No input!");
-                return null;
-            }
             ResourceLoader loader = new ResourceLoader(reporter);
             List<TextReader> readers = new List<TextReader>();
             // TODO: they are both streams => could be unified!!
-            foreach (string file in files)
+            foreach (string file in task.InputFiles)
             {
                 TextReader reader = new StreamReader(file);
                 readers.Add(reader);
                 loader.AddInput(reader, file);
             }
-            foreach (string data in raws)
+            foreach (string data in task.InputRawData)
             {
                 TextReader reader = new StringReader(data);
                 readers.Add(reader);
                 loader.AddInput(reader);
             }
+			if (readers.Count == 0)
+			{
+                reporter.Error("Compiler", "No input!");
+                return null;
+			}
             bool result = loader.Load();
             Namespace root = loader.OutputRootNamespace;
-            foreach (System.IO.TextReader reader in readers)
-                reader.Close();
-            if (!result)
-                return null;
+            foreach (TextReader reader in readers) reader.Close();
+            if (!result) return null;
             return root;
         }
 

@@ -38,7 +38,8 @@ namespace Hime.Tests
             task.InputRawData.Add(rawInput);
             task.LexerFile = lexerFile;
             task.ParserFile = parserFile;
-            return (new Compiler()).Execute(task);
+			Compiler compiler = new Compiler(task);
+            return compiler.Execute();
         }
 
         protected Assembly Build()

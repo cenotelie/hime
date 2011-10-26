@@ -24,8 +24,8 @@ namespace Hime.HimeCC
             	System.Console.WriteLine(options.GetUsage());
             	return 0;
 			}
-            Compiler compiler = new Compiler();
-        	Report result = compiler.Execute(task);
+            Compiler compiler = new Compiler(task);
+        	Report result = compiler.Execute();
 			// TODO: maybe would be nicer to return the number of errors
 			if (result.HasErrors) return 1;
 			return 0;
