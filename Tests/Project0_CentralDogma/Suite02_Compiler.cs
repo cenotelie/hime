@@ -81,8 +81,8 @@ namespace Hime.Tests.Project0_CentralDogma
         }
         
 		// TODO: fix this
-		[Test, Ignore]
-		public void Test004_Execute_ShouldNoteFailWhenExportLogIsSet()
+		[Test]
+		public void Test004_Execute_ShouldNotFailWhenExportLogIsSet()
 		{
 			string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";

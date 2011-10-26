@@ -38,7 +38,7 @@ namespace Hime.Tests.Project1_HimeDemo
 			this.daemon.GenerateNextStep();
 		}
 		
-		[Test, Ignore]
+		[Test]
 		public void Test001_GenerateNextStep_ShouldNotHaveErrors()
 		{
 			bool success = this.daemon.GenerateNextStep();
