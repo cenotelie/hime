@@ -134,6 +134,17 @@
     <EmbeddedResource Include="Examples\BinLibrary.gram" />
     <EmbeddedResource Include="Examples\Formats.gram" />
     <EmbeddedResource Include="Examples\Earth.Java.ClassFile.format" />
+    <EmbeddedResource Include="Grammars\Tokenizer.gram" />
+    <EmbeddedResource Include="Grammars\Earth.Asm.PE.format" />
+    <EmbeddedResource Include="Grammars\Earth.CIL.PE.format" />
+    <EmbeddedResource Include="Grammars\Earth.CIL.Asm.gram" />
+    <EmbeddedResource Include="Grammars\Earth.B.gram" />
+    <EmbeddedResource Include="Grammars\Earth.CIL.CSharp.gram" />
+    <EmbeddedResource Include="Grammars\Earth.Asm.x86_32.gram" />
+    <EmbeddedResource Include="Grammars\Earth.Java.Bytecode.gram" />
+    <EmbeddedResource Include="Grammars\BinLibrary.gram" />
+    <EmbeddedResource Include="Grammars\Formats.gram" />
+    <EmbeddedResource Include="Grammars\Earth.Java.ClassFile.format" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">

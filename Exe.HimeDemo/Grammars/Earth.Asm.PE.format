@@ -1,0 +1,271 @@
+﻿namespace Hime.Earth.Asm
+{
+	public struct PEDosStub
+	{
+		.deserializer;
+		.field int16 magic [const(0x5A4D)];
+		.field int16 cblp;
+		.field int16 cp;
+		.field int16 crlc;
+		.field int16 cparhdr;
+		.field int16 minalloc;
+		.field int16 maxalloc;
+		.field int16 ss;
+		.field int16 sp;
+		.field int16 csum;
+		.field int16 ip;
+		.field int16 cs;
+		.field int16 lfarlc;
+		.field int16 ovno;
+		.field int16 res;
+		.field int16 oemid;
+		.field int16 oeminfo;
+		.field int16 res2;
+		.field int32 lfanew [];
+		.field byte[] signature [arraylength(64)];
+	}
+	
+	public enum PEMachineType : int16
+	{
+		IMAGE_FILE_MACHINE_UNKNOWN		= 0x0,    /* The contents of this field are assumed to be applicable to any machine type*/
+		IMAGE_FILE_MACHINE_AM33			= 0x1d3,  /* Matsushita AM33*/
+		IMAGE_FILE_MACHINE_AMD64		= 0x8664, /* x64*/
+		IMAGE_FILE_MACHINE_ARM			= 0x1c0,  /* ARM little endian*/
+		IMAGE_FILE_MACHINE_EBC			= 0xebc,  /* EFI byte code*/
+		IMAGE_FILE_MACHINE_I386			= 0x14c,  /* Intel 386 or later processors and compatible processors*/
+		IMAGE_FILE_MACHINE_IA64			= 0x200,  /* Intel Itanium processor family*/
+		IMAGE_FILE_MACHINE_M32R			= 0x9041, /* Mitsubishi M32R little endian*/
+		IMAGE_FILE_MACHINE_MIPS16		= 0x266,  /* MIPS16*/
+		IMAGE_FILE_MACHINE_MIPSFPU		= 0x366,  /* MIPS with FPU*/
+		IMAGE_FILE_MACHINE_MIPSFPU16	= 0x466,  /* MIPS16 with FPU*/
+		IMAGE_FILE_MACHINE_POWERPC		= 0x1f0,  /* Power PC little endian*/
+		IMAGE_FILE_MACHINE_POWERPCFP	= 0x1f1,  /* Power PC with floating point support*/
+		IMAGE_FILE_MACHINE_R4000		= 0x166,  /* MIPS little endian*/
+		IMAGE_FILE_MACHINE_SH3			= 0x1a2,  /* Hitachi SH3*/
+		IMAGE_FILE_MACHINE_SH3DSP		= 0x1a3,  /* Hitachi SH3 DSP*/
+		IMAGE_FILE_MACHINE_SH4			= 0x1a6,  /* Hitachi SH4*/
+		IMAGE_FILE_MACHINE_SH5			= 0x1a8,  /* Hitachi SH5*/
+		IMAGE_FILE_MACHINE_THUMB		= 0x1c2,  /* Thumb*/
+		IMAGE_FILE_MACHINE_WCEMIPSV2	= 0x169  /* MIPS little-endian WCE v2 */
+	}
+	
+	public flag PECharacteristics : int16
+	{
+		IMAGE_FILE_RELOCS_STRIPPED			= 0x0001,	/* Image only, Windows CE, and Microsoft Windows NT® and later. This indicates that the file does not contain base relocations and must therefore be loaded at its preferred base address. If the base address is not available, the loader reports an error. The default behavior of the linker is to strip base relocations from executable (EXE) files. */
+		IMAGE_FILE_EXECUTABLE_IMAGE			= 0x0002,	/* Image only. This indicates that the image file is valid and can be run. If this flag is not set, it indicates a linker error. */
+		IMAGE_FILE_LINE_NUMS_STRIPPED		= 0x0004,	/* COFF line numbers have been removed. This flag is deprecated and should be zero. */
+		IMAGE_FILE_LOCAL_SYMS_STRIPPED		= 0x0008,	/* COFF symbol table entries for local symbols have been removed. This flag is deprecated and should be zero. */
+		IMAGE_FILE_AGGRESSIVE_WS_TRIM		= 0x0010,	/* Obsolete. Aggressively trim working set. This flag is deprecated for Windows 2000 and later and must be zero. */
+		IMAGE_FILE_LARGE_ADDRESS_AWARE		= 0x0020,	/* Application can handle > 2 GB addresses. */
+		IMAGE_FILE_BYTES_REVERSED_LO		= 0x0080,	/* Little endian: the least significant bit (LSB) precedes the most significant bit (MSB) in memory. This flag is deprecated and should be zero. */
+		IMAGE_FILE_32BIT_MACHINE			= 0x0100,	/* Machine is based on a 32-bit-word architecture. */
+		IMAGE_FILE_DEBUG_STRIPPED			= 0x0200,	/* Debugging information is removed from the image file. */
+		IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP	= 0x0400,	/* If the image is on removable media, fully load it and copy it to the swap file. */
+		IMAGE_FILE_NET_RUN_FROM_SWAP		= 0x0800,	/* If the image is on network media, fully load it and copy it to the swap file. */
+		IMAGE_FILE_SYSTEM					= 0x1000,	/* The image file is a system file, not a user program. */
+		IMAGE_FILE_DLL						= 0x2000,	/* The image file is a dynamic-link library (DLL). Such files are considered executable files for almost all purposes, although they cannot be directly run. */
+		IMAGE_FILE_UP_SYSTEM_ONLY			= 0x4000,	/* The file should be run only on a uniprocessor machine. */
+		IMAGE_FILE_BYTES_REVERSED_HI		= 0x8000	/* Big endian: the MSB precedes the LSB in memory. This flag is deprecated and should be zero. */
+	}
+	
+	public enum PESubsystem : int16
+	{
+		IMAGE_SUBSYSTEM_UNKNOWN					= 0,	/* An unknown subsystem */
+		IMAGE_SUBSYSTEM_NATIVE					= 1,	/* Device drivers and native Windows processes */
+		IMAGE_SUBSYSTEM_WINDOWS_GUI				= 2,	/* The Windows graphical user interface (GUI) subsystem */
+		IMAGE_SUBSYSTEM_WINDOWS_CUI				= 3,	/* The Windows character subsystem */
+		IMAGE_SUBSYSTEM_POSIX_CUI				= 7,	/* The Posix character subsystem */
+		IMAGE_SUBSYSTEM_WINDOWS_CE_GUI			= 9,	/* Windows CE */
+		IMAGE_SUBSYSTEM_EFI_APPLICATION			= 10,	/* An Extensible Firmware Interface (EFI) application */
+		IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER	= 11,	/* An EFI driver with boot services */
+		IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER		= 12,	/* An EFI driver with run-time services */
+		IMAGE_SUBSYSTEM_EFI_ROM					= 13,	/* An EFI ROM image */
+		IMAGE_SUBSYSTEM_XBOX					= 14	/* XBOX */
+	}
+	
+	public flag PEDLLFlag : int16
+	{
+		IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE			= 0x0040,	/* DLL can be relocated at load time. */
+		IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY		= 0x0080,	/* Code Integrity checks are enforced. */
+		IMAGE_DLLCHARACTERISTICS_NX_COMPAT				= 0x0100,	/* Image is NX compatible. */
+		IMAGE_DLLCHARACTERISTICS_NO_ISOLATION			= 0x0200,	/* Isolation aware, but do not isolate the image. */
+		IMAGE_DLLCHARACTERISTICS_NO_SEH					= 0x0400,	/* Does not use structured exception (SE) handling. No SE handler may be called in this image. */
+		IMAGE_DLLCHARACTERISTICS_NO_BIND				= 0x0800,	/* Do not bind the image. */
+		IMAGE_DLLCHARACTERISTICS_WDM_DRIVER				= 0x2000,	/* A WDM driver. */
+		IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE	= 0x8000	/* Terminal Server aware. */
+	}
+	
+	public flag PESectionFlags : int32
+	{
+		IMAGE_SCN_TYPE_NO_PAD				= 0x00000008,	/* The section should not be padded to the next boundary. This flag is obsolete and is replaced by IMAGE_SCN_ALIGN_1BYTES. This is valid only for object files. */
+		IMAGE_SCN_CNT_CODE					= 0x00000020,	/* The section contains executable code. */
+		IMAGE_SCN_CNT_INITIALIZED_DATA		= 0x00000040,	/* The section contains initialized data. */
+		IMAGE_SCN_CNT_UNINITIALIZED_DATA	= 0x00000080,	/* The section contains uninitialized data. */
+		IMAGE_SCN_LNK_OTHER					= 0x00000100,	/* Reserved for future use. */
+		IMAGE_SCN_LNK_INFO					= 0x00000200,	/* The section contains comments or other information. The .drectve section has this type. This is valid for object files only. */
+		IMAGE_SCN_LNK_REMOVE				= 0x00000800,	/* The section will not become part of the image. This is valid only for object files. */
+		IMAGE_SCN_LNK_COMDAT				= 0x00001000,	/* The section contains COMDAT data. For more information, see section 5.5.6, “COMDAT Sections (Object Only).” This is valid only for object files. */
+		IMAGE_SCN_GPREL						= 0x00008000,	/* The section contains data referenced through the global pointer (GP). */
+		IMAGE_SCN_MEM_PURGEABLE				= 0x00020000,	/* Reserved for future use. */
+		IMAGE_SCN_MEM_16BIT					= 0x00020000,	/* Reserved for future use. */
+		IMAGE_SCN_MEM_LOCKED				= 0x00040000,	/* Reserved for future use. */
+		IMAGE_SCN_MEM_PRELOAD				= 0x00080000,	/* Reserved for future use. */
+		IMAGE_SCN_ALIGN_1BYTES				= 0x00100000,	/* Align data on a 1-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_2BYTES				= 0x00200000,	/* Align data on a 2-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_4BYTES				= 0x00300000,	/* Align data on a 4-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_8BYTES				= 0x00400000,	/* Align data on an 8-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_16BYTES				= 0x00500000,	/* Align data on a 16-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_32BYTES				= 0x00600000,	/* Align data on a 32-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_64BYTES				= 0x00700000,	/* Align data on a 64-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_128BYTES			= 0x00800000,	/* Align data on a 128-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_256BYTES			= 0x00900000,	/* Align data on a 256-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_512BYTES			= 0x00A00000,	/* Align data on a 512-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_1024BYTES			= 0x00B00000,	/* Align data on a 1024-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_2048BYTES			= 0x00C00000,	/* Align data on a 2048-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_4096BYTES			= 0x00D00000,	/* Align data on a 4096-byte boundary. Valid only for object files. */
+		IMAGE_SCN_ALIGN_8192BYTES			= 0x00E00000,	/* Align data on an 8192-byte boundary. Valid only for object files. */
+		IMAGE_SCN_LNK_NRELOC_OVFL			= 0x01000000,	/* The section contains extended relocations. */
+		IMAGE_SCN_MEM_DISCARDABLE			= 0x02000000,	/* The section can be discarded as needed. */
+		IMAGE_SCN_MEM_NOT_CACHED			= 0x04000000,	/* The section cannot be cached. */
+		IMAGE_SCN_MEM_NOT_PAGED				= 0x08000000,	/* The section is not pageable. */
+		IMAGE_SCN_MEM_SHARED				= 0x10000000,	/* The section can be shared in memory. */
+		IMAGE_SCN_MEM_EXECUTE				= 0x20000000,	/* The section can be executed as code. */
+		IMAGE_SCN_MEM_READ					= 0x40000000,	/* The section can be read. */
+		IMAGE_SCN_MEM_WRITE					= 0x80000000	/* The section can be written to. */
+	}
+	
+	public struct PEHeader
+	{
+		.deserializer;
+		.field string Signature [box(4) encoding(ascii) const("PE\0\0")];
+		.field PEMachineType Machine;
+		.field int16 NumberOfSections;
+		.field int32 TimeDateStamp;
+		.field int32 PointerToSymbolTable;
+		.field int32 NumberOfSymbols;
+		.field int16 OptionalHeaderSize;
+		.field PECharacteristics Characteristics;
+	}
+	
+	public struct PEOptionalHeader
+	{
+		.deserializer;
+		.field PEOptionalHeaderStandard Standard;
+		.field PEOptionalHeaderWinNT WinNT;
+		.field PEOptionalHeaderDirectoryEntry EntryExportTable;
+		.field PEOptionalHeaderDirectoryEntry EntryImportTable;
+		.field PEOptionalHeaderDirectoryEntry EntryResourceTable;
+		.field PEOptionalHeaderDirectoryEntry EntryExceptionTable;
+		.field PEOptionalHeaderDirectoryEntry EntryCertificateTable;
+		.field PEOptionalHeaderDirectoryEntry EntryBaseRelocationTable;
+		.field PEOptionalHeaderDirectoryEntry EntryDebug;
+		.field PEOptionalHeaderDirectoryEntry EntryCopyright;
+		.field PEOptionalHeaderDirectoryEntry EntryGlobalPtr;
+		.field PEOptionalHeaderDirectoryEntry EntryTLSTable;
+		.field PEOptionalHeaderDirectoryEntry EntryLoadConfigTable;
+		.field PEOptionalHeaderDirectoryEntry EntryBoundImport;
+		.field PEOptionalHeaderDirectoryEntry EntryIAT;
+		.field PEOptionalHeaderDirectoryEntry EntryDelayImportDescriptor;
+		.field PEOptionalHeaderDirectoryEntry EntryCLIHeader;
+		.field PEOptionalHeaderDirectoryEntry EntryReserved;
+	}
+	public struct PEOptionalHeaderStandard
+	{
+		.deserializer;
+		.parent PEOptionalHeader;
+		.field int16 Magic [const(0x10B0)];
+		.field byte MajorLinkerVersion;
+		.field byte MinorLinkerVersion;
+		.field int32 SizeofCode;
+		.field int32 SizeOfInitializedData;
+		.field int32 SizeOfUninitializedData;
+		.field int32 AddressOfEntryPoint;
+		.field int32 BaseOfCode;
+		.field int32 BaseOfData;
+	}
+	public struct PEOptionalHeaderWinNT
+	{
+		.deserializer;
+		.parent PEOptionalHeader;
+		.field int32 ImageBase;
+		.field int32 SectionAlignment;
+		.field int32 FileAlignment;
+		.field int16 MajorOSVersion;
+		.field int16 MinorOSVersion;
+		.field int16 MajorSubsystemVersion;
+		.field int16 MinorSubsystemVersion;
+		.field int32 Win32VersionValue;
+		.field int32 ImageSize;
+		.field int32 HeaderSize;
+		.field int32 FileChecksum;
+		.field PESubsystem Subsystem;
+		.field PEDLLFlag DLLFlags;
+		.field int32 StackReserveSize;
+		.field int32 StackCommitSize;
+		.field int32 HeapReserveSize;
+		.field int32 HeapCommitSize;
+		.field int32 LoadFlags;
+		.field int32 NumberOfDataDirectories;
+	}
+	public struct PEOptionalHeaderDirectoryEntry
+	{
+		.deserializer;
+		.parent PEOptionalHeader;
+		.field int32 VirtualAddress;
+		.field int32 Size;
+	}
+	
+	
+	public struct PESectionHeader
+	{
+		.deserializer;
+		.field string Name [box(8) encoding(ascii)];
+		.field int32 VirtualSize;
+		.field int32 VirtualAddress;
+		.field int32 SizeOfRawData;
+		.field int32 PointerToRawData;
+		.field int32 PointerToRelocations;
+		.field int32 PointerToLinenumbers;
+		.field PESectionFlags Characteristics;
+	}
+	
+	
+	
+	public struct PEImportTable
+	{
+		.deserializer;
+	}
+	
+	public struct PEImportLookupTable
+	{
+		.deserializer;
+		.field PEImportEntry[] Entries [endswith(0x00000000)];
+	}
+	
+	public struct PEImportLookupEntry { }
+	public struct PEImportLookupEntryByOrdinal : PEImportLookupEntry
+	{
+		.deserializer;
+		.field int32 Value
+		{
+			.field bit<1> ByOrdinal [const(0b1)];
+			.field bit<15> Pad;
+			.field bit<16> Number;
+		}
+	}
+	public struct PEImportLookupEntryByName : PEImportLookupEntry
+	{
+		.deserializer;
+		.field int32 Value
+		{
+			.field bit<1> ByOrdinal [const(0b0)];
+			.field bit<31> HintNameRVA;
+		}
+	}
+	public struct PEImportLookupHintName
+	{
+		.deserializer;
+		.field int16 Hint;
+		.field string Name [nullterminated encoding(ascii)];
+	}
+}

@@ -1,0 +1,449 @@
+﻿namespace Hime.Earth.CIL
+{
+	public cf text grammar GrammarCILBinary : Hime.Kernel.Library.GrammarLibFlag
+	{
+		options
+		{
+		}
+		rules
+		{
+			inst_target32	-> 0xXXXXXXXX ;
+			inst_target8	-> 0xXX ;
+			
+			meta_token	-> 0xXXXXXXXX ;
+			
+			
+			
+			prefix_constrained		-> 0xFE! 0x16! meta_token ;
+			prefix_no_typecheck			-> flag_value;
+			prefix_no_rangecheck		-> flag_value;
+			prefix_no_nullcheck			-> flag_value;
+			prefix_no<type,range,null>	-> 0xFE! 0x19! 0b0000! 0b0! type range null ;
+			prefix_readonly			-> 0xFE! 0x1E! ;
+			prefix_tail				-> 0xFE! 0x14! ;
+			prefix_unaligned_align1	-> 0x01 ;
+			prefix_unaligned_align2	-> 0x02 ;
+			prefix_unaligned_align4	-> 0x04 ;
+			prefix_unaligned_align	-> prefix_unaligned_align1^ | prefix_unaligned_align2^ | prefix_unaligned_align4^ ;
+			prefix_unaligned		-> 0xFE! 0x12! prefix_unaligned_align ;
+			prefix_volatile			-> 0xFE! 0x13! ;
+			
+			inst_add		-> 0x58! ;
+			inst_add_ovf	-> 0xD6! ;
+			inst_add_ovf_un	-> 0xD7! ;
+			inst_and		-> 0x5F! ;
+			inst_arglist	-> 0xFE! 0x00! ;
+			inst_beq		-> 0x3B! inst_target32 ;
+			inst_beq_s		-> 0x2E! inst_target8 ;
+			inst_beg		-> 0x3C! inst_target32 ;
+			inst_beg_s		-> 0x2F! inst_target8 ;
+		}
+	}
+	
+	public cf text grammar GrammarCILAsm
+	{
+		options
+		{ }
+		terminals
+		{
+			NEW_LINE		-> 0x000D /* CR */
+							|  0x000A /* LF */
+							|  0x000D 0x000A /* CR LF */
+							|  0x2028 /* LS */
+							|  0x2029 /* PS */ ;
+			WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+			COMMENT_LINE	-> '//' (0x0000 .. 0xFFFF - NEW_LINE)* NEW_LINE ;
+			COMMENT_BLOCK	-> '/*' ([^*] | '*' [^/])* '*/' ;
+			SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
+			
+			BYTE			-> [0-9a-fA-F] [0-9a-fA-F];
+			INT_HEX8		-> '0x' [0-9a-fA-F] [0-9a-fA-F] ;
+			INT_HEX16		-> '0x' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] ;
+			INT_HEX32		-> '0x' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] ;
+			INT_HEX64		-> '0x' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] ;
+			INT_DEC			-> [1-9] [0-9]* | '0' ;
+			REAL			-> INT_DEC? '.' INT_DEC ([eE] INT_DEC)?
+							|  INT_DEC? ('.' INT_DEC)? [eE] INT_DEC ;
+			QSTRING			-> '"' ([^\\"] | '\\' 0x0000 .. 0xFFFF)* '"' ;
+			SQSTRING		-> '\'' ([^\\'] | '\\' 0x0000 .. 0xFFFF)* '\'' ;
+			
+			ID				-> [a-zA-Z_$@?`] [0-9a-zA-Z_$@?`]* ;
+		}
+		rules
+		{
+			byte			-> BYTE | INT_DEC ;
+			bytes			-> byte+ ;
+			int32			-> INT_HEX8 | INT_HEX16 | INT_HEX32 | INT_DEC ;
+			int64			-> INT_HEX64 | INT_DEC ;
+			int				-> INT_HEX8 | INT_HEX16 | INT_HEX32 | INT_HEX64 | INT_DEC;
+			float32			-> REAL | 'float32' '(' int32 ')' ;
+			float64			-> REAL | 'float64' '(' int64 ')' ;
+			float			-> REAL ;
+			
+			id				-> ID | SQSTRING ;
+			dotted_name		-> id ('.'! id)* ;
+			
+			label_or_offset	-> id ;
+			labels			-> label_or_offset (','! label_or_offset)* ;
+			code_label		-> id ':'! ;
+			data_label		-> id ;
+			
+			
+			
+			type	-> '!' int32					/* Generic parameter in a type definition, accessed by index from 0 */
+					|  '!!' int32					/* Generic parameter in a method definition, accessed by index from 0 */
+					|  'bool'						/* Boolean */
+					|  'char'						/* 16-bit unicode code point */
+					|  'class' type_reference		/* User defined reference type */
+					|  'float32'					/* 32-bit floating point number */
+					|  'float64'					/* 64-bit floating point number */
+					|  'int8'						/* Signed 8-bit integer */
+					|  'int16'						/* Signed 16-bit integer */
+					|  'int32'						/* Signed 32-bit integer */
+					|  'int64'						/* Signed 64-bit integer */
+					|  'method' call_conv type '*' '(' parameters ')' /* Method pointer */
+					|  'native' 'int'				/* 32- or 64-bit signed integer whose size is platform specific */
+					|  'native' 'unsigned' 'int'	/* 32- or 64-bit unsigned integer whose size is platform specific */
+					|  'object'						/* System.Object */
+					|  'string'						/* System.String */
+					|  type '&'						/* Managed pointer to type */
+					|  type '*'						/* Unmanaged pointer to type */
+					|  type '<' gen_args '>'		/* Instanciation of a generic type */
+					|  type '[' (bound (',' bound)*)? ']'	/* array of type */
+					|  type 'modopt' '(' type_reference ')'	/* Custom modifier that can be ignored by the caller */
+					|  type 'modreq' '(' type_reference ')' /* Custom modifier that the caller shall understand */
+					|  type 'pinned'				/* For local variables only. The garbage collector shall not move the referenced value */
+					|  'typedref'					/* Typed reference (System.TypedReference) created by mkrefany and used by refanytype or refanyval */
+					|  'valuetype' type_reference	/* Unboxed user defined value type */
+					|  'unsigned' 'int8'			/* Unsigned 8-bit integer */
+					|  'unsigned' 'int16'			/* Unsigned 16-bit integer */
+					|  'unsigned' 'int32'			/* Unsigned 32-bit integer */
+					|  'unsigned' 'int64'			/* Unsigned 64-bit integer */
+					|  'void'						/* No type */ ;
+			bound	-> '...'
+					|  int32
+					|  int32 '...'
+					|  int32 '...' int32 ;
+			type_spec	-> '[' '.module'? dotted_name ']'
+						|  type_reference
+						|  type ;
+			
+			resolution_scope		-> '[' '.module'? dotted_name ']' ;
+			type_reference			-> resolution_scope? dotted_name ('/' dotted_name)* ;
+			type_value_reference	-> 'boxed' type_reference
+									|  'valuetype' type_reference ;
+			
+			type_native			-> '[' ']'					/* Native array */
+								|  'bool'					/* Boolean (4-byte integer) */
+								|  'float32'				/* 32-bit floating point number */
+								|  'float64'				/* 64-bit floating point number */
+								|  'int'					/* Signed Platform specific integer */
+								|  'int8'					/* Signed 8-bit integer */
+								|  'int16'					/* Signed 16-bit integer */
+								|  'int32'					/* Signed 32-bit integer */
+								|  'int64'					/* Signed 64-bit integer */
+								|  'unsigned' 'int'			/* Unsigned Platform specific integer */
+								|  'unsigned' 'int8'		/* Unsigned 8-bit integer */
+								|  'unsigned' 'int16'		/* Unsigned 16-bit integer */
+								|  'unsigned' 'int32'		/* Unsigned 32-bit integer */
+								|  'unsigned' 'int64'		/* Unsigned 64-bit integer */
+								|  'lptstr'					/* Pointer to a null-terminated array of ANSI characters. */
+								|  'spwstr'					/* Pointer to a null-terminated array of Unicode characters */
+								|  'method'					/* Function pointer */
+								|  type_native '[' int32? ']'			/* Array of type_native */
+								|  type_native '[' int32? '+' int32 ']'	/* Array of type_native with element size */ ;
+			
+			
+			gen_args			-> type (',' type)* ;
+			gen_pars			-> gen_par (',' gen_par)* ;
+			gen_par				-> ( gen_par_attribs* ('(' gen_constraints? ')')? )? id ;
+			gen_par_attribs		-> '+'			/* Covariant generic parameter */
+								|  '-'			/* Contravariant generic parameter */
+								|  'class'		/* id should refer a class (may be abstract) */
+								|  'valuetype'	/* id should refer a value type */
+								|  '.ctor'		/* id should refer a concrete class */ ;
+			gen_constraints		-> type (',' type)* ;
+			gen_arity			-> ('<' '[' int32 ']' '>')? ;
+			
+			class_header		-> class_attr* id ('<' gen_pars '>')?
+									('extends' type_spec ('implements' type_spec)? (',' type_spec)*)? ;
+			class_attr			-> 'abstract'			/* Type is abstract */
+								|  'ansi'				/* Marshal strings to platform as ANSI */
+								|  'auto'				/* Layout of fields is provided automatically */
+								|  'autochar'			/* Marhsal strings to platform as ANSI or Unicode */
+								|  'beforefieldinit'	/* Need not intialize the type before a static method is called */
+								|  'explicit'			/* Layout of fields is provided explicitly */
+								|  'interface'			/* Declare an interface */
+								|  'nested' 'assembly'	/* Assembly accessibility for nested type */
+								|  'nested' 'famandassem' /* Family and assembly accessibility for nested type */
+								|  'nested' 'family'	/* Family accessibility for nested type */
+								|  'nested' 'famorassem' /* Family or assembly accessibility for nested type */
+								|  'nested' 'private'	/* Private accessibility for nested type */
+								|  'nested' 'public'	/* Public accessibility for nested type */
+								|  'private'			/* Private visibility of top-level type */
+								|  'public'				/* Public visibility of top-level type */
+								|  'rtspecialname'		/* Special treatment by runtime */
+								|  'sealed'				/* The type cannot be derived from */
+								|  'sequential'			/* Layout of fields is sequential */
+								|  'serializable'		/* Reserved (to indicate this type can be serialized */
+								|  'specialname'		/* Might get special treatment by tools */
+								|  'unicode'			/* Marshal strings to platform as Unicode */ ;
+			class_member		-> '.class' class_header '{' class_member* '}'
+								|  '.custom' custom_decl
+								|  '.data' data_decl
+								|  '.event' event_header '{' event_member* '}'
+								|  '.field' field_decl
+								|  '.method' method_header '{' method_body_item* '}'
+								|  '.method' method_header_ctor '{' method_body_item* '}'
+								|  '.method' method_header_cctor '{' method_body_item* '}'
+								|  '.override' type_spec '::' method_name
+										'with' call_conv type type_spec '::' method_name '(' parameters ')'
+								|  '.override' 'method' call_conv type type_spec '::' method_name gen_arity '(' parameters ')'
+										'with' 'method' call_conv type type_spec '::' method_name gen_arity '(' parameters ')'
+								|  '.pack' int32
+								|  '.param' type '[' int32 ']'
+								|  '.property' prop_header '{' prop_member '}'
+								|  '.size' int32
+								|  extern_source_decl
+								|  security_decl ;
+			field_decl			-> ('[' int32 ']')? field_attr* type id ;
+			
+			
+			
+			
+			
+			extern_source_decl	-> '.line' int32 (':' int32)? SQSTRING? ;
+			
+			file_name		-> dotted_name ;
+			
+			ILFile			-> declaration* ;
+			declaration		-> decl_assembly
+							|  decl_assembly_extern
+							|  decl_class
+							|  decl_class_extern
+							|  decl_corflags
+							|  decl_custom
+							|  decl_data
+							|  decl_field
+							|  decl_file
+							|  decl_method
+							|  decl_module
+							|  decl_module_extern
+							|  decl_mresource
+							|  decl_subsystem
+							|  decl_vtfixup
+							|  extern_source_decl
+							|  security_decl ;
+			decl_assembly			-> '.assembly' dotted_name '{' asm_decl* '}' ;
+			decl_assembly_extern	-> '.assembly' 'extern' dotted_name '{' asm_ref_decl* '}' ;
+			decl_class				-> '.class' class_header '{' class_member* '}' ;
+			decl_class_extern		-> '.class' 'extern' export_attr dotted_name '{' extern_class_decl* '}' ;
+			decl_corflags			-> '.corflags' int32 ;
+			decl_custom				-> '.custom' custom_decl ;
+			decl_data				-> '.data' data_decl ;
+			decl_field				-> '.field' field_decl ;
+			decl_file				-> '.file' 'nometadata'? file_name '.hash' '=' '(' bytes ')' '.entrypoint'? ;
+			decl_method				-> '.method' method_header '{' method_body_item* '}' ;
+			decl_module				-> '.module' file_name? ;
+			decl_module_extern		-> '.module' 'extern' file_name ;
+			decl_mresource			-> '.mresource' ('public' | 'private')? dotted_name '{' man_res_decl* '}' ;
+			decl_subsystem			-> '.subsystem' int32 ;
+			decl_vtfixup			-> '.vtfixup' vtfixup_decl ;
+			
+			
+			asm_decl	-> '.custom' custom_decl
+						|  '.hash' 'algorithm' int32
+						|  '.culture' QSTRING
+						|  '.publickey' '=' '(' bytes ')'
+						|  '.ver' int32 ':' int32 ':' int32 ':' int32
+						|  security_decl ;
+			
+			asm_ref_decl	-> '.custom' custom_decl
+							|  '.hash' '=' '(' bytes ')'
+							|  '.culture' QSTRING
+							|  '.publickey' '=' '(' bytes ')'
+							|  '.publickeytoken' '=' '(' bytes ')'
+							|  '.ver' int32 ':' int32 ':' int32 ':' int32 ;
+			
+			extern_class_decl	-> '.file' dotted_name
+								|  '.class' 'extern' dotted_name
+								|  '.custom' custom_decl ;
+			
+			security_decl	-> '.permissionset' sec_action '=' '(' bytes ')'
+							|  '.permission' sec_action type_reference '(' name_val_pairs ')' ;
+			name_val_pairs	-> name_val_pair (',' name_val_pair)* ;
+			name_val_pair	-> SQSTRING '=' SQSTRING ;
+			sec_action		-> 'assert'			/* Assert permission so that callers do not need it */
+							|  'demand'			/* Demand permission of all callers */
+							|  'deny'			/* Deny permission so check will fail */
+							|  'inheritcheck'	/* Demand permission of a derived class */
+							|  'linkcheck'		/* Demand permission of caller */
+							|  'permitonly'		/* Reduce permission so check will fail */
+							|  'reqopt'			/* Request optional additional permissions */
+							|  'reqrefuse'		/* Refuse to be granted these permissions */
+							|  'request'		/* Hint that permission might be required */ ;
+			
+			custom_decl		-> method_header_ctor ('=' '(' bytes ')')? ;
+			
+			man_res_decl	-> '.assembly' 'extern' dotted_name
+							|  '.custom' custom_decl
+							|  '.file' dotted_name 'at' int32 ;
+			
+			
+			method_name			-> dotted_name | '.ctor' | '.cctor' ;
+			method_header		-> meth_attr* call_conv? type
+									('marshal' '(' type_native ')')?
+									dotted_name ('<' gen_pars '>')? '(' parameters ')' impl_attr* ;
+			method_header_ctor	-> meth_attr* call_conv? type
+									('marshal' '(' type_native ')')?
+									'.ctor' ('<' gen_pars '>')? '(' parameters ')' impl_attr* ;
+			method_header_cctor	-> meth_attr* call_conv? type
+									('marshal' '(' type_native ')')?
+									'.cctor' ('<' gen_pars '>')? '(' parameters ')' impl_attr* ;
+			
+			parameters		-> (param (',' param)* )? ;
+			param			-> '...'
+							|  param_attr* type ('marshal' '(' type_native ')')? id? ;
+			param_attr		-> '[' 'in' ']'
+							|  '[' 'opt' ']'
+							|  '[' out ']' ;
+			
+			call_conv			-> ('instance' 'explicit'?)? call_kind? ;
+			call_kind			-> 'default'
+								|  'unmanaged' 'cdecl'
+								|  'unmanaged' 'fastcall'
+								|  'unmanaged' 'stdcall'
+								|  'unmanaged' 'thiscall'
+								|  'vararg' ;
+			meth_attr			-> 'abstract'			/* This method is abstract, shall also be virtual */
+								|  'assembly'			/* Assembly accessible */
+								|  'compilercontrolled'	/* Compiler-controlled accessibility */
+								|  'famandassem'		/* Family and Assembly accessibility */
+								|  'final'				/* This virtual method cannot be overriden by derived classes */
+								|  'hidebysig'			/* Hide by signature, ignored by the runtime */
+								|  'newslot'			/* Specifies that this method shall get a new slot in the virtual method table */
+								|  'pinvokeimpl' '(' SQTRING ('as' QSTRING)? pinv_attr* ')' /* Method is actually implemented in native code on the underlying platform */
+								|  'private'			/* Private accessibility */
+								|  'public'				/* Public accessibility */
+								|  'rtspecialname'		/* The method name needs to be treated in a special way by the runtime */
+								|  'specialname'		/* The method name needs to be treated in a special way by some tool */
+								|  'static'				/* Method is static */
+								|  'virtual'			/* Method is virtual */
+								|  'strict'				/* Check accessibility on override */ ;
+			pinv_attr			-> 'ansi'			/* ANSI characgter set */
+								|  'autochar'		/* Determine character set automatically */
+								|  'cdecl'			/* Standard C style call */
+								|  'fastcall'		/* C style fastcall */
+								|  'stdcall'		/* Standard C++ style call */
+								|  'thiscall'		/* The methods accept an implicit this pointer */
+								|  'unicode'		/* Unicode character set */
+								|  'platformapi'	/* Use call convention appropriate to target platform */ ;
+			impl_attr			-> 'cil'			/* The method contains standard CIL code */
+								|  'forwardref'		/* The body of this method is not specified with this declaration */
+								|  'internalcall'	/* Denotes the method body is provided by the CLI itself */
+								|  'managed'		/* The method is a managed method */
+								|  'native'			/* The method contains native code */
+								|  'noinlining'		/* the runtime shall not expand the method inline */
+								|  'runtime'		/* The body of the method is not defined, but is produced by the runtime */
+								|  'synchronized'	/* The method shall be executed in a single threaded fashion */
+								|  'unmanaged'		/* Specifies that the method is unmanaged */ ;
+			
+			method_body_item	-> '.custom' custom_decl
+								|  '.data' data_decl
+								|  '.emitbyte' int32
+								|  '.entrypoint'
+								|  '.locals' 'init'? '(' locals_signature ')'
+								|  '.maxstack' int32
+								|  '.override' type_spec '::' method_name
+								|  '.override' 'method' call_conv type type_spec '::' method_name gen_arity '(' parameters ')'
+								|  '.param' '[' int32 ']' ('=' field_init)?
+								|  '.param' 'type' '['int32 ']'
+								|  extern_source_decl
+								|  instr
+								|  id ':'
+								|  scope_block
+								|  security_decl
+								|  seh_block ;
+			locals_signature	-> local (',' local)* ;
+			local				-> type id? ;
+			scope_block			-> '{' method_body_item* '}' ;
+			
+			
+			
+			vtfixup_decl		-> int32? vtfixup_attr* 'at' data_label ;
+			vtfixup_attr		-> 'fromunmanaged' |  int ;
+			
+			
+			
+			field		-> '.field' field_decl ;
+			field_decl	-> ('[' int32 ']')? field_attr* type id ('=' field_init | 'at' data_label)? ;
+			field_attr	-> 'assembly'
+						|  'famandassem'
+						|  'family'
+						|  'famorassem'
+						|  'initonly'
+						|  'literal'
+						|  'marshal' '(' type_native ')'
+						|  'notserialized'
+						|  'private'
+						|  'compilercontrolled'
+						|  'public'
+						|  'rtspecialname'
+						|  'specialname'
+						|  'static' ;
+			field_init	-> 'bool' '(' ('true' | 'false') ')'
+						|  'bytearray' '(' bytes ')'
+						|  'char' '(' int32 ')'
+						|  'float32' '(' float64 ')'
+						|  'float32' '(' int32 ')'
+						|  'float64' '(' int64 ')'
+						|  'unsigned'? 'int8' '(' int32 ')'
+						|  'unsigned'? 'int16' '(' int32 ')'
+						|  'unsigned'? 'int32' '(' int32 ')'
+						|  'unsigned'? 'int64' '(' int64 ')'
+						|  QSTRING
+						|  'nullref' ;
+			
+			
+			data_decl		-> (data_label '=')? dd_body ;
+			dd_body			-> dd_item | '{' dd_item_list '}' ;
+			dd_item_list	-> dd_item (',' dd_item)* ;
+			dd_item			-> '&' '(' id ')'
+							|  'bytearray' '(' bytes ')'
+							|  'char' '*' '(' QSTRING ')'
+							|  'float32' ('(' float64 ')')? ('[' int32 ']')?
+							|  'float64' ('(' float64 ')')? ('[' int32 ']')?
+							|  'int8' ('(' int32 ')')? ('[' int32 ']')?
+							|  'int16' ('(' int32 ')')? ('[' int32 ']')?
+							|  'int32' ('(' int32 ')')? ('[' int32 ']')?
+							|  'int64' ('(' int64 ')')? ('[' int32 ']')? ;
+			
+			
+			prop_header		-> 'specialname'? 'rtspecialname'? call_conv type id '(' parameters ')' ;
+			prop_member		-> '.custom' custom_decl
+							|  '.get' call_conv type (type_spec '::')? method_name '(' parameters ')'
+							|  '.set' call_conv type (type_spec '::')? method_name '(' parameters ')'
+							|  '.other' call_conv type (type_spec '::')? method_name '(' parameters ')'
+							|  extern_source_decl ;
+			
+			event_header	-> 'specialname'? 'rtspecialname'? type_spec? id ;
+			event_member	-> '.addon' call_conv type (type_spec '::')? method_name  '(' parameters ')'
+							|  '.fire' call_conv type (type_spec '::')? method_name  '(' parameters ')'
+							|  '.other' call_conv type (type_spec '::')? method_name  '(' parameters ')'
+							|  '.removeon' call_conv type (type_spec '::')? method_name  '(' parameters ')'
+							|  '.custom' custom_decl
+							|  extern_source_decl ;
+			
+			
+			seh_block		-> try_block seh_clause seh_clause* ;
+			try_block		-> '.try' label 'to' label
+							|  '.try' scope_block ;
+			seh_clause		-> 'catch' type_reference handler_block
+							|  'fault' handler_block
+							|  'filter' label handler_block
+							|  'finally' handler_block ;
+			handler_block	-> 'handler' label 'to' label
+							|  scope_block ;
+		}
+	}
+}
