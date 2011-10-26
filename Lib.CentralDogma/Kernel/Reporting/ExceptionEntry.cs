@@ -4,11 +4,14 @@
  * Time: 17:22
  * 
  */
+using System;
+using System.Xml;
+
 namespace Hime.Kernel.Reporting
 {
     public class ExceptionEntry : IEntry
     {
-        protected System.Exception exception;
+        private Exception exception;
 
         public ELevel Level { get { return ELevel.Error; } }
         public string Component { get { return "Compiler"; } }
@@ -16,23 +19,23 @@ namespace Hime.Kernel.Reporting
 
         public ExceptionEntry(System.Exception ex) { exception = ex; }
 
-        public System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc)
+        public XmlNode GetMessageNode(XmlDocument doc)
         {
-            System.Xml.XmlNode element = doc.CreateElement("Exception");
+            XmlNode element = doc.CreateElement("Exception");
             element.Attributes.Append(doc.CreateAttribute("EID"));
             element.Attributes["EID"].Value = exception.GetHashCode().ToString();
-            System.Xml.XmlNode message = doc.CreateElement("Message");
+            XmlNode message = doc.CreateElement("Message");
             message.InnerText = Message;
             element.AppendChild(message);
-            System.Xml.XmlNode method = doc.CreateElement("Method");
+            XmlNode method = doc.CreateElement("Method");
             method.InnerText = exception.TargetSite.ToString();
             element.AppendChild(method);
-            System.Xml.XmlNode stack = doc.CreateElement("Stack");
+            XmlNode stack = doc.CreateElement("Stack");
             string data = exception.StackTrace;
-            string[] lines = data.Split(new string[] { "\r\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = data.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string line in lines)
             {
-                System.Xml.XmlNode nl = doc.CreateElement("Line");
+                XmlNode nl = doc.CreateElement("Line");
                 nl.InnerText = line;
                 stack.AppendChild(nl);
             }
