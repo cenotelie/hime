@@ -20,7 +20,6 @@ namespace Hime.Tests.HimeCC
     public class Suite02_Compile: BaseTestSuite
     {
         private static string source = Path.Combine(directory, "MathExp.gram");
-        private static string parserFile = Path.Combine(directory, "MathExpParser.cs");
       	
         private void Generate(string[] command)
         {
