@@ -56,11 +56,11 @@
     <Compile Include="Integration\Suite03_CompilationTask.cs" />
     <Compile Include="Integration\Suite04_Ambiguous.cs" />
     <Compile Include="Integration\Suite05_Parse.cs" />
-    <Compile Include="Integration\Suite06_KernelDaemon.cs" />
     <Compile Include="redist\Suite00_Bugs.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
+    <Compile Include="Project0.HimeDemo\Suite06_Daemon.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -115,5 +115,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <LogicalName>Tests.Resources.RedistBug494.gram</LogicalName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Project0.HimeDemo\" />
+    <Folder Include="Integration\" />
   </ItemGroup>
 </Project>

@@ -9,10 +9,10 @@ using System.IO;
 using NUnit.Framework;
 using Hime.Demo.Tasks;
 	
-namespace Hime.Tests.Integration
+namespace Hime.Tests.Project0.HimeDemo
 {
 	[TestFixture]
-	public class Suite06_KernelDaemon
+	public class Suite06_Daemon
 	{
 		private Daemon daemon;
 		

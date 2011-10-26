@@ -36,9 +36,6 @@ namespace Hime.Demo.Tasks
 		
 		public bool GenerateNextStep()
 		{
-			System.Console.WriteLine(path);
-            System.Console.WriteLine(this.outputPath);
-
 			// Test path
             if (Directory.Exists(this.outputPath)) Directory.Delete(outputPath, true);
             Directory.CreateDirectory(outputPath);
