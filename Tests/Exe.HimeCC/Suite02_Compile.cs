@@ -17,18 +17,16 @@ using NUnit.Framework;
 namespace Hime.Tests.HimeCC
 {
     [TestFixture]
-    public class Suite02_Compile
+    public class Suite02_Compile: BaseTestSuite
     {
-        private static string directory = "Test";
         private static string source = Path.Combine(directory, "MathExp.gram");
-        private static string lexerFile = Path.Combine(directory, "MathExpLexer.cs");
         private static string parserFile = Path.Combine(directory, "MathExpParser.cs");
       	
         private void Generate(string[] command)
         {
             if (Directory.Exists(directory)) Directory.Delete(directory, true);
             Directory.CreateDirectory(directory);
-            new Tools().Export(Path.GetFileName(command[0]), command[0]);
+            Export(Path.GetFileName(command[0]), command[0]);
             Program.Main(command);
         }
         
@@ -63,7 +61,7 @@ namespace Hime.Tests.HimeCC
             System.IO.Directory.CreateDirectory(directory);
             string fileName = "MathExp.gram";
             string command = directory + "\\" + fileName;
-            new Tools().Export(fileName, command);
+            Export(fileName, command);
         }
         
         [Test]
@@ -114,9 +112,9 @@ namespace Hime.Tests.HimeCC
 				};
             if (Directory.Exists(directory)) Directory.Delete(directory, true);
             Directory.CreateDirectory(directory);
-            new Tools().Export(Path.GetFileName(command[0]), command[0]);
-			new Tools().Export(Path.GetFileName(command[1]), command[1]);
-			new Tools().Export(Path.GetFileName(command[2]), command[2]);
+            Export(Path.GetFileName(command[0]), command[0]);
+			Export(Path.GetFileName(command[1]), command[1]);
+			Export(Path.GetFileName(command[2]), command[2]);
 			
 			int result = Program.Main(command);
 			Assert.AreEqual(0, result);

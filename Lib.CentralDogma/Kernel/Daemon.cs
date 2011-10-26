@@ -43,7 +43,7 @@ namespace Hime.Kernel
             Report result = compiler.Execute(task);
             
             // Close session
-            session.Close();
+            session.Dispose();
             return !result.HasErrors;
         }
 

@@ -246,7 +246,7 @@ namespace Hime.Parsers.ContextFree.LR
                 accessor.AddCheckoutFile(vfile);
             }
             compiler.CompileTo(file);
-            accessor.Close();
+            accessor.Dispose();
             System.IO.Directory.Delete(directory, true);
         }
 

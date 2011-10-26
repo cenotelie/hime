@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="BaseTestSuite.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Program.cs" />
-    <Compile Include="Exe.himeCC\Suite02_Compile.cs" />
     <Compile Include="Integration\Suite01_Resource.cs" />
     <Compile Include="Integration\Suite02_Compiler.cs" />
     <Compile Include="Integration\Suite00_FileCentralDogmaParser.cs" />
@@ -59,8 +58,8 @@
     <Compile Include="Integration\Suite04_Ambiguous.cs" />
     <Compile Include="Integration\Suite05_Parse.cs" />
     <Compile Include="Integration\Suite06_KernelDaemon.cs" />
-    <Compile Include="Integration\Tools.cs" />
     <Compile Include="redist\Suite00_Bugs.cs" />
+    <Compile Include="Exe.HimeCC\Suite02_Compile.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">

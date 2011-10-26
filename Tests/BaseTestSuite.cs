@@ -21,10 +21,10 @@ namespace Hime.Tests
         protected string GetAllTextFor(string name)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            ResourceAccessor accessor = new ResourceAccessor(assembly, "Resources");
-            string data = accessor.GetAllTextFor(name);
-            accessor.Close();
-            return data;
+            using (ResourceAccessor accessor = new ResourceAccessor(assembly, "Resources"))
+			{
+	            return accessor.GetAllTextFor(name);
+			}
         }
 
         protected Report CompileResource(string resource, ParsingMethod method)
@@ -94,6 +94,18 @@ namespace Hime.Tests
             SyntaxTreeNode root = parser.Analyse();
             errors = (parser.Errors.Count != 0);
             return root;
+        }
+
+		// TODO: try to factor all calls to new CompilationTask
+        // TODO: remove all static methods
+        internal protected void Export(string resourceName, string fileName)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string p_DefaultPath = "Resources";
+            using (ResourceAccessor accessor = new ResourceAccessor(assembly, p_DefaultPath))
+			{
+            	accessor.Export(resourceName, fileName);
+			}
         }
     }
 }

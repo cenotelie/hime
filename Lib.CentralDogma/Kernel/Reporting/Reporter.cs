@@ -120,7 +120,7 @@ namespace Hime.Kernel.Reporting
             compiler.AddSource(new Kernel.Documentation.MHTMLSourceStreamImage("image/png", "hime_data/Hime.Error.png", session.GetStreamFor("Visuals.Hime.Error.png")));
             compiler.CompileTo(fileName);
 
-            session.Close();
+            session.Dispose();
         }
     }
 }

@@ -11,7 +11,7 @@ using Hime.Kernel;
 	
 namespace Hime.Tests.Integration
 {
-	[TestFixture, Ignore]
+	[TestFixture]
 	public class Suite06_KernelDaemon
 	{
 		private string path;
@@ -26,13 +26,13 @@ namespace Hime.Tests.Integration
 		}
 		
 		// TODO: should do this test without really generating (should be able to decide the output Stream instead of the path as a string)
-		[Test]
+		[Test, Ignore]
 		public void Test000_GenerateNextStep_GeneratesParserForCentralDogma()
 		{
 			Daemon.GenerateNextStep(this.path);
 		}
 
-		[Test]
+		[Test, Ignore]
 		public void Test001_GenerateNextStep_ShouldNotHaveErrors()
 		{
 			bool success = Daemon.GenerateNextStep(this.path);

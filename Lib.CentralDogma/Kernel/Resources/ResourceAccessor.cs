@@ -4,6 +4,7 @@
  * Time: 17:22
  * 
  */
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -12,7 +13,7 @@ using System.Text;
 namespace Hime.Kernel.Resources
 {
 	// TODO: why is this class needed? Think about it
-    public class ResourceAccessor
+    public class ResourceAccessor: IDisposable
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
@@ -46,12 +47,10 @@ namespace Hime.Kernel.Resources
             this.isClosed = false;
         }
 
-        public void Close()
+        public void Dispose()
         {
-            foreach (string file in files)
-                System.IO.File.Delete(file);
-            foreach (System.IO.Stream stream in streams)
-                stream.Close();
+            foreach (string file in files) File.Delete(file);
+            foreach (Stream stream in streams) stream.Close();
             isClosed = true;
             accessors.Remove(this);
         }
