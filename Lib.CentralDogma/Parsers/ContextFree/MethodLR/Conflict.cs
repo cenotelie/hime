@@ -11,6 +11,7 @@ using System.Text;
 
 namespace Hime.Parsers.ContextFree.LR
 {
+	// should not inherit from Entry, rather should build an entry when needed!!
     public class Conflict : Entry
     {
         private State state;
@@ -18,17 +19,8 @@ namespace Hime.Parsers.ContextFree.LR
         private Terminal lookahead;
         private List<Item> items;
         private List<ConflictExample> examples;
-        private bool isError;
         private bool isResolved;
 
-        internal override ELevel Level {
-            get
-            {
-                if (isError) return ELevel.Error;
-                return ELevel.Warning;
-            }
-        }
-		
         public State State { get { return state; } }
         internal override string Message { get { return ToString(); } }
         public ConflictType ConflictType { get { return type; } }
@@ -38,8 +30,10 @@ namespace Hime.Parsers.ContextFree.LR
 		
         public bool IsError
         {
-            get { return isError; }
-            set { isError = value; }
+            set { 
+                if (value) this.Level = ELevel.Error;
+				else this.Level = ELevel.Warning;
+			}
         }
 		
         public bool IsResolved
@@ -49,13 +43,12 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         public Conflict(string component, State state, ConflictType type, Terminal lookahead)
+			// TODO: this is a bit strange, not ideal...
 			: base(ELevel.Error, component, "")
         {
             this.state = state;
             this.type = type;
             this.lookahead = lookahead;
-			// TODO: remove this use Level
-            this.isError = true;
             this.isResolved = false;
             items = new List<Item>();
             examples = new List<ConflictExample>();
@@ -66,7 +59,6 @@ namespace Hime.Parsers.ContextFree.LR
         {
             this.state = state;
             this.type = type;
-            this.isError = true;
             this.isResolved = false;
             items = new List<Item>();
             examples = new List<ConflictExample>();
