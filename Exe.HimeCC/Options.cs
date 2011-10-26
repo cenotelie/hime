@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.Text;
 using CommandLine;
 using Hime.Parsers;
+using System.Reflection;
 
 namespace Hime.HimeCC
 {
-	// TODO: put as much fields as possible into private
 	// I do not like CommandLine because it forces you to have public fields!!!
     internal class Options
     {
@@ -27,13 +27,13 @@ namespace Hime.HimeCC
         public List<string> inputs;
 
         [Option("g", "grammar", Required = false, HelpText="Name of the grammar for which a parser shall be generated")]
-        private string grammarName;
+        public string grammarName;
 
         [Option("n", "namespace", Required = false, HelpText = "Namespace for the generated Lexer and Parser classes")]
-        private string outputNamespace;
+        public string outputNamespace;
 
         [Option("m", "method", Required = false, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1|LRStar")]
-        private ParsingMethod method;
+        public ParsingMethod method;
 
         [Option(null, "lexer", Required = false, HelpText = "Path and name of the file for the generated lexer")]
         public string lexerFile;
@@ -42,15 +42,15 @@ namespace Hime.HimeCC
         public string parserFile;
 
         [Option("l", "log", Required = false, HelpText = "True to export the generation log (HTML file)")]
-        private bool exportLog;
+        public bool exportLog;
 
         [Option("d", "doc", Required = false, HelpText = "True to export the parser documentation (HTML files)")]
-        private bool exportDocumentation;
+        public bool exportDocumentation;
 
         [HelpOption("h", "help", HelpText = "Display this help screen.")]
         public string GetUsage()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            Assembly assembly = Assembly.GetExecutingAssembly();
             CommandLine.Text.HelpText help = new CommandLine.Text.HelpText(assembly.FullName);
             help.AdditionalNewLineAfterOption = true;
             help.AddPreOptionsLine("This is free software. You may redistribute copies of it under the terms of");

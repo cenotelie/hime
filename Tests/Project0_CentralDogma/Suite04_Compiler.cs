@@ -36,7 +36,7 @@ namespace Hime.Tests.Project0_CentralDogma
 		}
 
 		[Test]
-		public void Test001_Execute_ShouldReturnOnlyOneErrorOnUnrecoverableSyntaxError()
+		public void Test001_Execute_ShouldReturnOnlyOneErrorOnUnrecoverableSyntaxError_Issue414()
 		{
 			string grammar = 
         		"public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";

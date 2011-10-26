@@ -2,6 +2,7 @@
  * @author Charles Hymans
  * */
 
+using System;
 using NUnit.Framework;
 using Hime.HimeCC;
 using Hime.Parsers;
@@ -88,5 +89,61 @@ namespace Hime.Tests.HimeCC
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(command);
             Assert.IsNotNull(task);
         }
+		
+		[Test]
+		public void Test010_GetUsage_HasGrammarOption()
+		{
+			string usage = this.options.GetUsage();
+			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
+			{
+				System.Console.WriteLine(line);
+				if (line.Contains("g, grammar")) Assert.Pass();
+			}
+			Assert.Fail();
+		}
+		
+		[Test]
+		public void Test011_GetUsage_HasNamespaceOption()
+		{
+			string usage = this.options.GetUsage();
+			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
+			{
+				if (line.Contains("n, namespace")) Assert.Pass();
+			}
+			Assert.Fail();
+		}
+		
+		[Test]
+		public void Test011_GetUsage_HasMethodOption()
+		{
+			string usage = this.options.GetUsage();
+			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
+			{
+				if (line.Contains("m, method")) Assert.Pass();
+			}
+			Assert.Fail();
+		}
+		
+		[Test]
+		public void Test012_GetUsage_HasLogOption()
+		{
+			string usage = this.options.GetUsage();
+			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
+			{
+				if (line.Contains("l, log")) Assert.Pass();
+			}
+			Assert.Fail();
+		}
+		
+		[Test]
+		public void Test013_GetUsage_HasDocOption()
+		{
+			string usage = this.options.GetUsage();
+			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
+			{
+				if (line.Contains("d, doc")) Assert.Pass();
+			}
+			Assert.Fail();
+		}
     }
 }
