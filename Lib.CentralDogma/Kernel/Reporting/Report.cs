@@ -6,6 +6,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Hime.Kernel.Reporting
 {
@@ -28,22 +29,26 @@ namespace Hime.Kernel.Reporting
             sections.Add(section);
             return section;
         }
-
-        public System.Xml.XmlDocument GetXML(string title)
+		
+		// TODO: rename into ToXmlDocument (Like ToString)
+        public XmlDocument GetXML(string title)
         {
-            System.Xml.XmlDocument Doc = new System.Xml.XmlDocument();
-            Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "utf-8", "yes"));
-            Doc.AppendChild(Doc.CreateElement("Log"));
-            Doc.ChildNodes[1].Attributes.Append(Doc.CreateAttribute("title"));
-            Doc.ChildNodes[1].Attributes["title"].Value = title;
+            XmlDocument result = new XmlDocument();
+            result.AppendChild(result.CreateXmlDeclaration("1.0", "utf-8", "yes"));
+            result.AppendChild(result.CreateElement("Log"));
+            result.ChildNodes[1].Attributes.Append(result.CreateAttribute("title"));
+            result.ChildNodes[1].Attributes["title"].Value = title;
             foreach (Section section in sections)
-                Doc.ChildNodes[1].AppendChild(section.GetXMLNode(Doc));
-            return Doc;
+			{
+                result.ChildNodes[1].AppendChild(section.GetXMLNode(result));
+			}
+            return result;
         }
         
         public bool HasErrors
         {
-        	get {
+        	get 
+			{
 	        	foreach (Section section in this.Sections)
 	            {
 	                foreach (IEntry entry in section.Entries)
@@ -54,5 +59,21 @@ namespace Hime.Kernel.Reporting
 	            return false;
         	}
         }
+		
+		public int ErrorCount
+		{
+			get
+			{
+				int result = 0;
+				foreach (Section section in this.Sections)
+	            {
+	                foreach (IEntry entry in section.Entries)
+	                {
+	                    if (entry.Level == ELevel.Error) result++;
+	                }
+	            }
+	            return result;
+			}
+		}
 	}
 }

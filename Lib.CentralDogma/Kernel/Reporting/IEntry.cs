@@ -4,6 +4,8 @@
  * Time: 17:22
  * 
  */
+using System.Xml;
+
 namespace Hime.Kernel.Reporting
 {
     public interface IEntry
@@ -12,6 +14,6 @@ namespace Hime.Kernel.Reporting
         string Component { get; }
         string Message { get; }
 
-        System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc);
+        XmlNode GetMessageNode(XmlDocument doc);
     }
 }

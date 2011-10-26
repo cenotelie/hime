@@ -55,12 +55,13 @@
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
     <Compile Include="Project0_CentralDogma\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Project0_CentralDogma\Suite01_Resource.cs" />
-    <Compile Include="Project0_CentralDogma\Suite02_Compiler.cs" />
-    <Compile Include="Project0_CentralDogma\Suite03_CompilationTask.cs" />
     <Compile Include="Project1_HimeDemo\Suite06_Daemon.cs" />
     <Compile Include="Project2_Integration\Suite05_Parse.cs" />
     <Compile Include="Project2_Integration\Suite04_Ambiguous.cs" />
+    <Compile Include="Project0_CentralDogma\Suite01_Resource.cs" />
+    <Compile Include="Project0_CentralDogma\Suite03_Compiler.cs" />
+    <Compile Include="Project0_CentralDogma\Suite04_CompilationTask.cs" />
+    <Compile Include="Project0_CentralDogma\Suite02_Report.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">

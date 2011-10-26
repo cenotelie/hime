@@ -5,10 +5,11 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    public class Conflict : Hime.Kernel.Reporting.IEntry
+    public class Conflict : IEntry
     {
         private string component;
         private State state;
