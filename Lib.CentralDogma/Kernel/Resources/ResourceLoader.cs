@@ -14,6 +14,7 @@ using Hime.Kernel.Resources.Parser;
 
 namespace Hime.Kernel.Resources
 {
+	// TODO: think about it, but maybe this class is doing too many things?
 	class ResourceLoader
     {
         private static Dictionary<string, LoaderPlugin> defaultPlugins = new Dictionary<string, LoaderPlugin>();
@@ -31,7 +32,7 @@ namespace Hime.Kernel.Resources
         private ResourceGraph intermediateResources;
 
         public Dictionary<string, LoaderPlugin> Plugins { get { return plugins; } }
-        public Namespace OutputRootNamespace { get; private set; }
+        private Namespace outputRootNamespace;
         
         public ResourceLoader(Reporter reporter)
         {
@@ -40,7 +41,7 @@ namespace Hime.Kernel.Resources
             inputAnonResources = new List<TextReader>();
             intermediateRoot = new SyntaxTreeNode(null);
             intermediateResources = new ResourceGraph();
-            this.OutputRootNamespace = new Naming.Namespace(null, "global");
+            this.outputRootNamespace = new Naming.Namespace(null, "global");
             this.log = reporter;
         }
 
@@ -53,7 +54,7 @@ namespace Hime.Kernel.Resources
             inputNamedResources.Add(name, input);
         }
 
-        public bool Load()
+        public Namespace Load()
         {
         	// TODO: simplify: this is not really necessary because of the reporter?
         	// TODO: make a test for the case where hasErrors and reporter.HasErrors do not coincide
@@ -105,7 +106,8 @@ namespace Hime.Kernel.Resources
                     break;
                 }
             }
-            return (!hasErrors);
+			if (hasErrors) return null;
+			return this.outputRootNamespace;
         }
 
 
@@ -156,11 +158,11 @@ namespace Hime.Kernel.Resources
             foreach (SyntaxTreeNode child in node.Children)
             {
                 if (child.Symbol.Name == "Namespace")
-                    Compile_namespace(child, this.OutputRootNamespace);
+                    Compile_namespace(child, this.outputRootNamespace);
                 else
                 {
                     LoaderPlugin plugin = GetPluginFor(child.Symbol.Name);
-                    plugin.CreateResource(this.OutputRootNamespace, child, intermediateResources, log);
+                    plugin.CreateResource(this.outputRootNamespace, child, intermediateResources, log);
                 }
             }
         }

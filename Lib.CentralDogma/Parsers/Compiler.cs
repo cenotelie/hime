@@ -125,10 +125,9 @@ namespace Hime.Parsers
                 reporter.Error("Compiler", "No input!");
                 return null;
 			}
-            bool result = loader.Load();
-            Namespace root = loader.OutputRootNamespace;
+            Namespace root = loader.Load();
+			// TODO: close should be done by the loader
             foreach (TextReader reader in readers) reader.Close();
-            if (!result) return null;
             return root;
         }
 
