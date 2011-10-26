@@ -61,6 +61,7 @@
     <Compile Include="Project0.CentralDogma\Suite01_Resource.cs" />
     <Compile Include="Project0.CentralDogma\Suite02_Compiler.cs" />
     <Compile Include="Project0.CentralDogma\Suite03_CompilationTask.cs" />
+    <Compile Include="Project1.HimeDemo\Suite06_Daemon.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -121,5 +122,6 @@
     <Folder Include="Integration\" />
     <Folder Include="Project0.CentralDogma\" />
     <Folder Include="Project2.Integration\" />
+    <Folder Include="Project1.HimeDemo\" />
   </ItemGroup>
 </Project>
