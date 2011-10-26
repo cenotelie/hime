@@ -38,33 +38,6 @@ namespace Hime.Tests.Project1_HimeDemo
 			this.daemon.GenerateNextStep();
 		}
 		
-		// TODO:
-		[Test, Ignore]
-		public void Test001_Compiler_Execute_ShouldNoteFailOnWhenExportLog()
-		{
-			string currentDirectory = Environment.CurrentDirectory;
-			DirectoryInfo projectRoot = new DirectoryInfo(currentDirectory).Parent.Parent.Parent;
-			string inputPath = Path.Combine(projectRoot.FullName, "Lib.CentralDogma");
-			inputPath = Path.Combine(inputPath, "Kernel");
-			inputPath = Path.Combine(inputPath, "Generated");
-			inputPath = Path.Combine(inputPath, "SourceGrammar");
-
-			string pathToKernel = Path.Combine(inputPath, "Kernel.gram");
-			string pathToContextFree = Path.Combine(inputPath, "CFGrammars.gram");
-			string pathToContextSensitive = Path.Combine(inputPath, "CSGrammars.gram");
-			
-            CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
-         	task.InputFiles.Add(pathToKernel);
-          	task.InputFiles.Add(pathToContextFree);
-         	task.InputFiles.Add(pathToContextSensitive);
-         	task.GrammarName = "Hime.Kernel.FileCentralDogma";
-			
-         	task.ExportLog = true;
-        	Compiler compiler = new Compiler();
-       	    Report result = compiler.Execute(task);
-			Assert.IsFalse(result.HasErrors);
-		}
-		
 		[Test, Ignore]
 		public void Test001_GenerateNextStep_ShouldNotHaveErrors()
 		{
