@@ -58,9 +58,9 @@
     <Compile Include="Integration\Suite05_Parse.cs" />
     <Compile Include="Integration\Suite06_KernelDaemon.cs" />
     <Compile Include="redist\Suite00_Bugs.cs" />
-    <Compile Include="Exe.HimeCC\Suite02_Compile.cs" />
-    <Compile Include="Exe.HimeCC\Suite03_Program.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
+    <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
+    <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
