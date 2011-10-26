@@ -50,17 +50,17 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="BaseTestSuite.cs" />
-    <Compile Include="Integration\Suite01_Resource.cs" />
-    <Compile Include="Integration\Suite02_Compiler.cs" />
-    <Compile Include="Integration\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Integration\Suite03_CompilationTask.cs" />
-    <Compile Include="Integration\Suite04_Ambiguous.cs" />
-    <Compile Include="Integration\Suite05_Parse.cs" />
     <Compile Include="redist\Suite00_Bugs.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
     <Compile Include="Project0.HimeDemo\Suite06_Daemon.cs" />
+    <Compile Include="Project2.Integration\Suite05_Parse.cs" />
+    <Compile Include="Project2.Integration\Suite04_Ambiguous.cs" />
+    <Compile Include="Project0.CentralDogma\Suite00_FileCentralDogmaParser.cs" />
+    <Compile Include="Project0.CentralDogma\Suite01_Resource.cs" />
+    <Compile Include="Project0.CentralDogma\Suite02_Compiler.cs" />
+    <Compile Include="Project0.CentralDogma\Suite03_CompilationTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -119,5 +119,7 @@
   <ItemGroup>
     <Folder Include="Project0.HimeDemo\" />
     <Folder Include="Integration\" />
+    <Folder Include="Project0.CentralDogma\" />
+    <Folder Include="Project2.Integration\" />
   </ItemGroup>
 </Project>
