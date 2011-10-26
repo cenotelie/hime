@@ -100,7 +100,6 @@
     <Compile Include="Kernel\Reporting\ELevel.cs" />
     <Compile Include="Kernel\Reporting\ExceptionEntry.cs" />
     <Compile Include="Kernel\Reporting\IEntry.cs" />
-    <Compile Include="Kernel\Resources\AccessorClosedException.cs" />
     <Compile Include="Kernel\Resources\NoResourceLoaderFoundException.cs" />
     <Compile Include="Kernel\Resources\Resource.cs" />
     <Compile Include="Kernel\Resources\ResourceLoader.cs" />

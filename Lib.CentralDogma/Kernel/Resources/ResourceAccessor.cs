@@ -22,10 +22,7 @@ namespace Hime.Kernel.Resources
 		private string defaultPath;
         private List<string> files;
         private List<Stream> streams;
-        private bool isClosed;
 
-        public bool IsOpen { get { return !isClosed; } }
-        public bool IsClosed { get { return isClosed; } }
         public ICollection<string> Files { get { return files; } }
 
         public ResourceAccessor()
@@ -43,20 +40,17 @@ namespace Hime.Kernel.Resources
                 this.defaultPath += defaultPath + ".";
             this.files = new List<string>();
             this.streams = new List<Stream>();
-            this.isClosed = false;
         }
 
         public void Dispose()
         {
             foreach (string file in files) File.Delete(file);
             foreach (Stream stream in streams) stream.Close();
-            this.isClosed = true;
             accessors.Remove(this);
         }
 
         public void AddCheckoutFile(string fileName)
         {
-            if (this.isClosed) throw new AccessorClosedException();
             files.Add(fileName);
         }
 
@@ -82,7 +76,6 @@ namespace Hime.Kernel.Resources
 
         public Stream GetStreamFor(string resourceName)
         {
-            if (this.isClosed) throw new AccessorClosedException();
             Stream stream = this.assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (stream == null) throw new ResourceNotFoundException(resourceName, this.assembly);
             streams.Add(stream);
