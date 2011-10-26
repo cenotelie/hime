@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    public class Conflict : IEntry
+    public class Conflict : Entry
     {
         private State state;
         private ConflictType type;
@@ -21,7 +21,7 @@ namespace Hime.Parsers.ContextFree.LR
         private bool isError;
         private bool isResolved;
 
-        public ELevel Level {
+        internal override ELevel Level {
             get
             {
                 if (isError) return Kernel.Reporting.ELevel.Error;
@@ -29,14 +29,14 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 		
-        public string Component
+        internal override string Component
         {
             get;
-            internal set;
+            set;
         }
 		
         public State State { get { return state; } }
-        public string Message { get { return ToString(); } }
+        internal override string Message { get { return ToString(); } }
         public ConflictType ConflictType { get { return type; } }
         public Terminal ConflictSymbol { get { return lookahead; } }
         public ICollection<Item> Items { get { return items; } }
@@ -77,7 +77,7 @@ namespace Hime.Parsers.ContextFree.LR
         public void AddItem(Item Item) { items.Add(Item); }
         public bool ContainsItem(Item Item) { return items.Contains(Item); }
 
-        public XmlNode GetMessageNode(XmlDocument doc)
+        internal override XmlNode GetMessageNode(XmlDocument doc)
         {
             XmlNode element = doc.CreateElement("Conflict");
 

@@ -6,43 +6,44 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Hime.Kernel.Reporting
 {
     public class Section
     {
-        protected List<IEntry> entries;
+        protected List<Entry> entries;
         protected string name;
 
-        public ICollection<IEntry> Entries { get { return entries; } }
+        public ICollection<Entry> Entries { get { return entries; } }
         public string Name { get { return name; } }
 
         public Section(string name)
         {
             this.name = name;
-            this.entries = new List<IEntry>();
+            this.entries = new List<Entry>();
         }
 
-        public void AddEntry(IEntry entry)
+        public void AddEntry(Entry entry)
         {
             this.entries.Add(entry);
         }
 
 
-        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument doc)
+        public XmlNode GetXMLNode(XmlDocument doc)
         {
-            System.Xml.XmlNode node = doc.CreateElement("Section");
+            XmlNode node = doc.CreateElement("Section");
             node.Attributes.Append(doc.CreateAttribute("id"));
             node.Attributes.Append(doc.CreateAttribute("name"));
             node.Attributes["id"].Value = "section" + GetHashCode().ToString("X");
             node.Attributes["name"].Value = Name;
-            foreach (IEntry entry in entries)
+            foreach (Entry entry in entries)
                 node.AppendChild(GetXMLNode_Entry(doc, entry));
             return node;
         }
-        private System.Xml.XmlNode GetXMLNode_Entry(System.Xml.XmlDocument doc, IEntry entry)
+        private XmlNode GetXMLNode_Entry(XmlDocument doc, Entry entry)
         {
-            System.Xml.XmlNode node = doc.CreateElement("Entry");
+            XmlNode node = doc.CreateElement("Entry");
             node.Attributes.Append(doc.CreateAttribute("mark"));
             node.Attributes["mark"].Value = entry.Level.ToString();
             System.Xml.XmlNode nodeComponent = doc.CreateElement("Component");

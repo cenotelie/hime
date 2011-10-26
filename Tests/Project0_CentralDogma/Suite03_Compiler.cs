@@ -11,6 +11,8 @@ using Hime.Parsers;
 using Hime.Kernel.Resources;
 using Hime.Kernel.Reporting;
 using System.IO;
+using Hime.Kernel.Resources.Parser;
+using Hime.Redist.Parsers;
 
 namespace Hime.Tests.Project0_CentralDogma
 {
@@ -19,16 +21,49 @@ namespace Hime.Tests.Project0_CentralDogma
 	{	
 		// TODO: this test should not be in this test suite => move
 		[Test]
+        public void Test000_Analyse_ShouldReturnNullOnSyntaxError()
+        {
+        	string grammar = 
+        		"public cf text grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
+        	
+            using (StringReader reader = new StringReader(grammar))
+			{
+				FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(reader);
+	            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
+	            SyntaxTreeNode result = parser.Analyse();
+				Assert.IsNull(result);
+			}
+        }
+		
+		// TODO: this test should not be in this test suite => move
+		[Test]
         public void Test000_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
+        {
+        	string grammar = 
+        		"public cf text grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
+        	
+        	Reporter reporter = new Reporter();
+        	ResourceLoader loader = new ResourceLoader(reporter);
+            using (StringReader reader = new StringReader(grammar))
+			{
+            	loader.CompileData(reader);
+			}
+            Assert.IsTrue(reporter.Result.HasErrors);
+        }
+
+		// TODO: this test should not be in this test suite => move
+		[Test]
+        public void Test001_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
         	
         	Reporter reporter = new Reporter();
-        	ResourceLoader compiler = new ResourceLoader(reporter);
-            StringReader reader = new StringReader(grammar);
-            compiler.CompileData(reader);
-            reader.Close();
+        	ResourceLoader loader = new ResourceLoader(reporter);
+            using (StringReader reader = new StringReader(grammar))
+			{
+            	loader.CompileData(reader);
+			}
             Assert.IsTrue(reporter.Result.HasErrors);
         }
         

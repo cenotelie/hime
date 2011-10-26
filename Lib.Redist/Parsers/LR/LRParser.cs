@@ -139,17 +139,16 @@ namespace Hime.Redist.Parsers
                     nextToken = GetNextToken(lexer);
                     continue;
                 }
-                else if (nextToken.SymbolID == 0x0001)
-                    return nodes.First.Value.ApplyActions();
-                else
-                {
-                    errors.Add(new UnexpectedTokenError(nextToken, GetState(state).GetExpectedNames(), lexer.CurrentLine, lexer.CurrentColumn));
-                    if (errors.Count >= maxErrorCount)
+                if (nextToken.SymbolID == 0x0001) return nodes.First.Value.ApplyActions();
+
+				errors.Add(new UnexpectedTokenError(nextToken, GetState(state).GetExpectedNames(), lexer.CurrentLine, lexer.CurrentColumn));
+                if (errors.Count >= maxErrorCount)
+				{
                         throw new ParserException("Too many errors, parsing stopped.");
-                    nextToken = OnUnexpectedToken(nextToken);
-                    if (nextToken == null)
-                    	return null;
-                }
+				}
+                nextToken = OnUnexpectedToken(nextToken);
+				System.Console.WriteLine("nextToken: " + (nextToken == null));
+                if (nextToken == null) return null;
             }
         }
 		

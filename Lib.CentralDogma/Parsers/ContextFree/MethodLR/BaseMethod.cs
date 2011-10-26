@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -53,7 +54,8 @@ namespace Hime.Parsers.ContextFree.LR
                 return enumerator.Current;
             }
         }
-        private void Report(Hime.Kernel.Reporting.IEntry entry)
+		
+        private void Report(Entry entry)
         {
             lock (reporter)
             {

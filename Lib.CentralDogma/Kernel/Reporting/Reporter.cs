@@ -64,7 +64,8 @@ namespace Hime.Kernel.Reporting
             AddEntry(new BaseEntry(ELevel.Error, component, message));
             log.Fatal(component + ": " + message);
         }
-        public void Report(IEntry entry)
+		
+        public void Report(Entry entry)
         {
             AddEntry(entry);
             switch (entry.Level)
@@ -80,7 +81,7 @@ namespace Hime.Kernel.Reporting
             Report(new ExceptionEntry(exception));
         }
 
-        protected void AddEntry(IEntry entry)
+        protected void AddEntry(Entry entry)
         {
 			Section section = currentSection;
             if (section == null)

@@ -9,17 +9,17 @@ using System.Xml;
 
 namespace Hime.Kernel.Reporting
 {
-    public class ExceptionEntry : IEntry
+    public class ExceptionEntry : Entry
     {
         private Exception exception;
 
-        public ELevel Level { get { return ELevel.Error; } }
-        public string Component { get { return "Compiler"; } }
-        public string Message { get { return "Exception " + exception.Message; } }
+        internal override ELevel Level { get { return ELevel.Error; } }
+        internal override string Component { get { return "Compiler"; } }
+        internal override string Message { get { return "Exception " + exception.Message; } }
 
         public ExceptionEntry(System.Exception ex) { exception = ex; }
 
-        public XmlNode GetMessageNode(XmlDocument doc)
+        internal override XmlNode GetMessageNode(XmlDocument doc)
         {
             XmlNode element = doc.CreateElement("Exception");
             element.Attributes.Append(doc.CreateAttribute("EID"));

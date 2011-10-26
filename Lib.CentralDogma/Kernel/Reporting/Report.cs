@@ -51,7 +51,7 @@ namespace Hime.Kernel.Reporting
 			{
 	        	foreach (Section section in this.Sections)
 	            {
-	                foreach (IEntry entry in section.Entries)
+	                foreach (Entry entry in section.Entries)
 	                {
 	                    if (entry.Level == ELevel.Error) return true;
 	                }
@@ -67,7 +67,7 @@ namespace Hime.Kernel.Reporting
 				int result = 0;
 				foreach (Section section in this.Sections)
 	            {
-	                foreach (IEntry entry in section.Entries)
+	                foreach (Entry entry in section.Entries)
 	                {
 	                    if (entry.Level == ELevel.Error) result++;
 	                }
