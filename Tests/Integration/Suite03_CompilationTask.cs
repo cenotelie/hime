@@ -20,10 +20,9 @@ namespace Hime.Tests.Integration
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
+            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = ParsingMethod.LR0;
             (new Compiler()).ExecuteDo(task);
         }
 
@@ -32,10 +31,9 @@ namespace Hime.Tests.Integration
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
+            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = ParsingMethod.LR0;
             Compiler compiler = new Compiler();
             compiler.LoadData(task.InputFiles, task.InputRawData);
             Assert.IsFalse(compiler.Reporter.Result.HasErrors);
@@ -47,10 +45,9 @@ namespace Hime.Tests.Integration
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
+            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = ParsingMethod.LR0;
             Report result = (new Compiler()).Execute(task);
             Assert.IsFalse(result.HasErrors);
         }
@@ -60,10 +57,9 @@ namespace Hime.Tests.Integration
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
+            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = ParsingMethod.LR0;
 			Compiler compiler = new Compiler();
             compiler.Execute(task);
             Assert.IsTrue(File.Exists("TestLexer.cs"));
@@ -74,10 +70,9 @@ namespace Hime.Tests.Integration
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
+            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.Method = ParsingMethod.LR0;
 			Compiler compiler = new Compiler();
             compiler.Execute(task);
             Assert.IsTrue(System.IO.File.Exists("TestParser.cs"));

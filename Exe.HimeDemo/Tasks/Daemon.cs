@@ -40,13 +40,12 @@ namespace Hime.Demo.Tasks
             	session.CheckOut("Daemon.CFGrammars.gram", pathToContextFree);
             	session.CheckOut("Daemon.CSGrammars.gram", pathToContextSensitive);
 
-            	CompilationTask task = new CompilationTask();
+            	CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
          	   	task.InputFiles.Add(pathToKernel);
           	  	task.InputFiles.Add(pathToContextFree);
          	   	task.InputFiles.Add(pathToContextSensitive);
          	   	task.GrammarName = "Hime.Kernel.FileCentralDogma";
          	   	task.Namespace = "Hime.Kernel.Resources.Parser";
-         	   	task.Method = ParsingMethod.LALR1;
          	   	// TODO: this assignment is a bit strange, should not be done like that?
         	    // see how it is done with options in himecc
         	    task.ParserFile = Path.Combine(path, "KernelResources.Parser.cs");

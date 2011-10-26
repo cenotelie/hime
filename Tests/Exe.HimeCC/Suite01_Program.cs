@@ -52,7 +52,8 @@ namespace Hime.Tests.HimeCC
         public void Test005_ParseArguments_DefaultLogExport()
         {
             Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.IsFalse(options.ExportHTMLLog);
+			CompilationTask task = options.BuildCompilationTask();
+            Assert.IsFalse(task.ExportLog);
         }
 
         [Test]

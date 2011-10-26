@@ -34,9 +34,8 @@ namespace Hime.Tests
 
         protected Report CompileRaw(string rawInput, ParsingMethod method)
         {
-            CompilationTask task = new Parsers.CompilationTask();
+            CompilationTask task = new CompilationTask(method);
             task.InputRawData.Add(rawInput);
-            task.Method = method;
             task.LexerFile = lexerFile;
             task.ParserFile = parserFile;
             return (new Compiler()).Execute(task);

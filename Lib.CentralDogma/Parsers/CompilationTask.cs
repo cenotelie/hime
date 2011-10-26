@@ -18,7 +18,7 @@ namespace Hime.Parsers
         public ICollection<string> InputFiles { get; private set; }
         public string GrammarName { get; set; }
         public string Namespace { get; set; }
-        public ParsingMethod Method { get; set; }
+        public ParsingMethod Method { get; private set; }
         public string LexerFile { get; set; }
         public string ParserFile { get; set; }
         public bool ExportDebug { get; set; }
@@ -28,11 +28,11 @@ namespace Hime.Parsers
         public string DOTBinary { get; set; }
         public AccessModifier GeneratedCodeModifier { get; set; }
         
-        public CompilationTask()
+        public CompilationTask(ParsingMethod method)
         {
             InputRawData = new List<string>();
             InputFiles = new List<string>();
-            Method = ParsingMethod.RNGLALR1;
+            this.Method = method;
             ExportDebug = false;
             ExportLog = false;
             ExportDocumentation = false;
