@@ -15,7 +15,7 @@ namespace Hime.Kernel.Reporting
 	/// </summary>
 	public class Report
 	{
-        public List<Section> Sections { get; set; }
+        public List<Section> Sections { get; private set; }
 
         public Report()
         {
