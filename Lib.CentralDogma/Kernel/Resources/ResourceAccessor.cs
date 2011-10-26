@@ -26,7 +26,7 @@ namespace Hime.Kernel.Resources
         public ICollection<string> Files { get { return files; } }
 
         public ResourceAccessor()
-            : this(Assembly.GetExecutingAssembly(), "Hime.Resources")
+            : this(Assembly.GetExecutingAssembly(), "Resources")
         { }
 		
         public ResourceAccessor(Assembly assembly, string defaultPath)

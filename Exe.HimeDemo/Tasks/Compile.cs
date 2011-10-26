@@ -14,8 +14,7 @@ namespace Hime.Demo.Tasks
             task.ExportLog = true;
             task.ExportDocumentation = false;
             task.ExportVisuals = false;
-            task.InputRawData.Add("");
-            //task.InputFiles.Add("Languages\\ANSI_C.gram");
+            task.InputFiles.Add("Languages\\ANSI_C.gram");
             task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
             (new Compiler()).Execute(task);
         }
