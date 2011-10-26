@@ -112,7 +112,7 @@ namespace Hime.Parsers
             {
                 TextReader reader = new StreamReader(file);
                 readers.Add(reader);
-                loader.AddInput(reader, file);
+                loader.AddInput(file, reader);
             }
             foreach (string data in task.InputRawData)
             {
@@ -126,7 +126,6 @@ namespace Hime.Parsers
                 return null;
 			}
             Namespace root = loader.Load();
-			// TODO: close should be done by the loader
             foreach (TextReader reader in readers) reader.Close();
             return root;
         }

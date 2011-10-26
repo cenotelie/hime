@@ -49,7 +49,8 @@ namespace Hime.Kernel.Resources
         {
             inputAnonResources.Add(input);
         }
-        public void AddInput(TextReader input, string name)
+		
+        public void AddInput(string name, TextReader input)
         {
             inputNamedResources.Add(name, input);
         }
