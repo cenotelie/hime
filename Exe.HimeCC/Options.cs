@@ -13,32 +13,33 @@ using Hime.Parsers;
 namespace Hime.HimeCC
 {
 	// TODO: put as much fields as possible into private
-    public class Options
+	// I do not like CommandLine because it forces you to have public fields!!!
+    internal class Options
     {
         public Options()
         {
-            this.Inputs = new List<string>();
-            this.Method = Parsers.ParsingMethod.RNGLALR1;
+            this.inputs = new List<string>();
+            this.method = ParsingMethod.RNGLALR1;
             this.exportLog = false;
         }
 
         [ValueList(typeof(List<string>))]
-        public List<string> Inputs;
+        public List<string> inputs;
 
         [Option("g", "grammar", Required = false, HelpText="Name of the grammar for which a parser shall be generated")]
-        public string GrammarName;
+        private string grammarName;
 
         [Option("n", "namespace", Required = false, HelpText = "Namespace for the generated Lexer and Parser classes")]
-        public string Namespace;
+        private string outputNamespace;
 
         [Option("m", "method", Required = false, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1|LRStar")]
-        public Parsers.ParsingMethod Method;
+        private ParsingMethod method;
 
         [Option(null, "lexer", Required = false, HelpText = "Path and name of the file for the generated lexer")]
-        public string LexerFile;
+        public string lexerFile;
 
         [Option(null, "parser", Required = false, HelpText = "Path and name of the file for the generated parser")]
-        public string ParserFile;
+        public string parserFile;
 
         [Option("l", "log", Required = false, HelpText = "True to export the generation log (HTML file)")]
         private bool exportLog;
@@ -72,14 +73,14 @@ namespace Hime.HimeCC
 		{
             CommandLineParser parser = new CommandLineParser();
             if (!parser.ParseArguments(arguments, this)) return null;
-            if (this.Inputs.Count == 0) return null;
+            if (this.inputs.Count == 0) return null;
 
-			CompilationTask task = new CompilationTask(this.Method);
-            task.Namespace = this.Namespace;
-            foreach (string input in this.Inputs) task.InputFiles.Add(input);
-            task.GrammarName = this.GrammarName;
-            task.LexerFile = this.LexerFile;
-            task.ParserFile = this.ParserFile;
+			CompilationTask task = new CompilationTask(this.method);
+            task.Namespace = this.outputNamespace;
+            foreach (string input in this.inputs) task.InputFiles.Add(input);
+            task.GrammarName = this.grammarName;
+            task.LexerFile = this.lexerFile;
+            task.ParserFile = this.parserFile;
             task.ExportLog = this.exportLog;
             task.ExportDocumentation = this.exportDocumentation;
 			return task;
