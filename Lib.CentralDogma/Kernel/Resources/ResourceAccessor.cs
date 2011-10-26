@@ -13,7 +13,7 @@ using System.Text;
 namespace Hime.Kernel.Resources
 {
 	// TODO: why is this class needed? Think about it
-    public class ResourceAccessor: IDisposable
+    public class ResourceAccessor : IDisposable
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
@@ -21,7 +21,7 @@ namespace Hime.Kernel.Resources
 		private string rootNamespace;
 		private string defaultPath;
         private List<string> files;
-        private List<System.IO.Stream> streams;
+        private List<Stream> streams;
         private bool isClosed;
 
         public bool IsOpen { get { return !isClosed; } }
@@ -42,7 +42,7 @@ namespace Hime.Kernel.Resources
             if (defaultPath != null && defaultPath != "")
                 this.defaultPath += defaultPath + ".";
             this.files = new List<string>();
-            this.streams = new List<System.IO.Stream>();
+            this.streams = new List<Stream>();
             this.isClosed = false;
         }
 
@@ -50,13 +50,13 @@ namespace Hime.Kernel.Resources
         {
             foreach (string file in files) File.Delete(file);
             foreach (Stream stream in streams) stream.Close();
-            isClosed = true;
+            this.isClosed = true;
             accessors.Remove(this);
         }
 
         public void AddCheckoutFile(string fileName)
         {
-            if (isClosed) throw new AccessorClosedException(this);
+            if (this.isClosed) throw new AccessorClosedException();
             files.Add(fileName);
         }
 
@@ -82,8 +82,7 @@ namespace Hime.Kernel.Resources
 
         public Stream GetStreamFor(string resourceName)
         {
-			// TODO: could factor this with ReadResource
-            if (isClosed) throw new AccessorClosedException(this);
+            if (this.isClosed) throw new AccessorClosedException();
             Stream stream = this.assembly.GetManifestResourceStream(defaultPath + resourceName);
             if (stream == null) throw new ResourceNotFoundException(resourceName, this.assembly);
             streams.Add(stream);

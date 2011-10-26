@@ -8,14 +8,8 @@ namespace Hime.Kernel.Resources
 {
     class AccessorClosedException : System.Exception
     {
-        private ResourceAccessor session;
-
-        public ResourceAccessor Session { get { return session; } }
-
-        public AccessorClosedException(ResourceAccessor session)
-            : base("The session is already closed")
+        public AccessorClosedException() : base("The session is already closed")
         {
-            this.session = session;
         }
     }
 }
