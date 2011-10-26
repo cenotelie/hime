@@ -11,7 +11,7 @@ using Hime.Demo.Tasks;
 using Hime.Kernel.Reporting;
 using Hime.Parsers;
 
-namespace Hime.Tests.Project0.HimeDemo
+namespace Hime.Tests.Project1.HimeDemo
 {
 	[TestFixture]
 	public class Suite06_Daemon

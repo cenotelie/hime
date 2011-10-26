@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Text;
 using Hime.HimeCC;
 using Hime.Kernel.Reporting;
-using Hime.Tests.Integration;
 using Hime.Parsers;
 using NUnit.Framework;
 

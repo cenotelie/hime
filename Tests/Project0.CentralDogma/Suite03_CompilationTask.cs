@@ -10,7 +10,7 @@ using Hime.Parsers;
 using Hime.Kernel.Reporting;
 using System.IO;
 
-namespace Hime.Tests.Integration
+namespace Hime.Tests.Project0.CentralDogma
 {
 	[TestFixture]
 	public class Suite03_CompilationTask
