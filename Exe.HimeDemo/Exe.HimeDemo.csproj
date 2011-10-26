@@ -123,6 +123,7 @@
       <DependentUpon>WinTreeView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Examples\Tokenizer.gram" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">
@@ -142,4 +143,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Examples\" />
+  </ItemGroup>
 </Project>

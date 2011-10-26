@@ -207,7 +207,6 @@
     <Compile Include="Kernel\Generated\FileCentralDogmaParser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Examples\Tokenizer.gram" />
     <None Include="Resources\Visuals\svg\Hime.Error.svg" />
     <None Include="Resources\Visuals\svg\Hime.Info.svg" />
     <None Include="Resources\Visuals\svg\Hime.Logo.svg" />
@@ -294,5 +293,6 @@
     <Folder Include="Kernel\Generated\SourceGrammar\" />
     <Folder Include="Resources\Daemon\" />
     <Folder Include="Kernel\Resources\" />
+    <Folder Include="Resources\Examples\" />
   </ItemGroup>
 </Project>
