@@ -4,29 +4,27 @@
  * Time: 17:22
  * 
  */
+using System.Xml;
+
 namespace Hime.Kernel.Reporting
 {
     public class BaseEntry : IEntry
     {
-        protected ELevel level;
-        protected string component;
-        protected string message;
-
-        public ELevel Level { get { return level; } }
-        public string Component { get { return component; } }
-        public string Message { get { return message; } }
+        public ELevel Level { get; private set; }
+        public string Component { get; private set; }
+        public string Message { get; private set; }
 
         public BaseEntry(ELevel level, string component, string message)
         {
-            this.level = level;
-            this.component = component;
-            this.message = message;
+            this.Level = level;
+            this.Component = component;
+            this.Message = message;
         }
 
-        public System.Xml.XmlNode GetMessageNode(System.Xml.XmlDocument doc)
+        public XmlNode GetMessageNode(XmlDocument doc)
         {
-            System.Xml.XmlNode element = doc.CreateElement("Message");
-            element.InnerText = message;
+            XmlNode element = doc.CreateElement("Message");
+            element.InnerText = this.Message;
             return element;
         }
     }
