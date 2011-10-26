@@ -18,13 +18,12 @@ namespace Hime.HimeCC
         public static int Main(string[] args)
         {
             Options options = new Options();
-			options.FillFromArguments(args);
-            if (options.Inputs.Count == 0) 
-            {
+			CompilationTask task = options.BuildCompilationTaskFromArguments(args);
+			if (task == null) 
+			{
             	System.Console.WriteLine(options.GetUsage());
             	return 0;
-            }
-			CompilationTask task = options.BuildCompilationTask();
+			}
             Compiler compiler = new Compiler();
         	Report result = compiler.Execute(task);
 			// TODO: maybe would be nicer to return the number of errors

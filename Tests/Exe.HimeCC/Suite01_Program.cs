@@ -16,58 +16,56 @@ namespace Hime.Tests.HimeCC
         [Test]
         public void Test000_ParseArguments_MinimalCommand()
         {
-            this.options.FillFromArguments(defaultCommand);
+            this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsNotNull(this.options);
         }
 
         [Test]
         public void Test001_ParseArguments_DefaultNamespace()
         {
-            this.options.FillFromArguments(defaultCommand);
+            this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsNull(this.options.Namespace);
         }
 
         [Test]
         public void Test002_ParseArguments_DefaultMethod()
         {
-            this.options.FillFromArguments(defaultCommand);
+            this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.AreEqual(this.options.Method, ParsingMethod.RNGLALR1);
         }
 
         [Test]
         public void Test003_ParseArguments_DefaultLexer()
         {
-            this.options.FillFromArguments(defaultCommand);
+            this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsNull(this.options.LexerFile);
         }
 
         [Test]
         public void Test004_ParseArguments_DefaultParser()
         {
-            this.options.FillFromArguments(defaultCommand);
+            this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsNull(this.options.ParserFile);
         }
 
         [Test]
         public void Test005_ParseArguments_DefaultLogExport()
         {
-            this.options.FillFromArguments(defaultCommand);
-			CompilationTask task = this.options.BuildCompilationTask();
+            CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsFalse(task.ExportLog);
         }
 
         [Test]
         public void Test006_ParseArguments_DefaultDocExport()
         {
-            this.options.FillFromArguments(defaultCommand);
-			CompilationTask task = this.options.BuildCompilationTask();
+            CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsFalse(task.ExportDocumentation);
         }
 
         [Test]
         public void Test007_ParseArguments_DefaultInput()
         {
-            this.options.FillFromArguments(defaultCommand);
+            this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.AreEqual(this.options.Inputs.Count, 1);
             Assert.AreEqual(this.options.Inputs[0], defaultCommand[0]);
         }
@@ -75,7 +73,7 @@ namespace Hime.Tests.HimeCC
         [Test]
         public void Test008_ParseArguments_EmptyCommand()
         {
-            this.options.FillFromArguments(new string[] { });
+            this.options.BuildCompilationTaskFromArguments(new string[] { });
             Assert.AreEqual(0, this.options.Inputs.Count);
         }
 		

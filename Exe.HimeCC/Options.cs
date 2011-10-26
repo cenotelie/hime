@@ -68,8 +68,12 @@ namespace Hime.HimeCC
             return help;
         }
 
-		public CompilationTask BuildCompilationTask()
+		public CompilationTask BuildCompilationTaskFromArguments(string[] arguments)
 		{
+            CommandLineParser parser = new CommandLineParser();
+            if (!parser.ParseArguments(arguments, this)) return null;
+            if (this.Inputs.Count == 0) return null;
+
 			CompilationTask task = new CompilationTask(this.Method);
             task.Namespace = this.Namespace;
             foreach (string input in this.Inputs) task.InputFiles.Add(input);
@@ -79,15 +83,6 @@ namespace Hime.HimeCC
             task.ExportLog = this.exportLog;
             task.ExportDocumentation = this.exportDocumentation;
 			return task;
-		}
-	
-		public void FillFromArguments(string[] arguments)
-		{
-            CommandLineParser parser = new CommandLineParser();
-            if (!parser.ParseArguments(arguments, this))
-            {
-            	this.Inputs = new List<string>();
-            }
 		}
 	}
 }
