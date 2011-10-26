@@ -135,22 +135,22 @@ namespace Hime.Kernel.Resources
             FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(input);
             FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             // TODO: rewrite this code, it is a bit strange
-            SyntaxTreeNode root = null;
-            try { root = parser.Analyse(); }
-            catch (System.Exception e) {
+            try 
+			{ 
+				SyntaxTreeNode root = parser.Analyse(); 
+	            intermediateRoot.AppendChild(root);
+			}
+            catch (ParserException e) 
+			{
                 log.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
-                return;
             }
-
-            foreach (ParserError error in parser.Errors)
-                log.Report(new Entry(ELevel.Error, "Parser", error.Message));
-
-            if (root == null)
-            {
-                log.Error("Parser", "encountered an unrecoverable error.");
-                return;
-            }
-            intermediateRoot.AppendChild(root);
+			finally
+			{
+	            foreach (ParserError error in parser.Errors)
+				{
+    	            log.Report(new Entry(ELevel.Error, "Parser", error.Message));				
+				}
+			}
         }
 
 

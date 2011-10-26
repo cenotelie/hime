@@ -147,8 +147,10 @@ namespace Hime.Redist.Parsers
                         throw new ParserException("Too many errors, parsing stopped.");
 				}
                 nextToken = OnUnexpectedToken(nextToken);
-				System.Console.WriteLine("nextToken: " + (nextToken == null));
-                if (nextToken == null) return null;
+                if (nextToken == null) 
+				{
+					throw new ParserException("Parser recovery on unexpected token failed, parsing stopped.");
+				}
             }
         }
 		

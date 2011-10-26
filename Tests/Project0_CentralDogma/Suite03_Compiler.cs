@@ -21,22 +21,6 @@ namespace Hime.Tests.Project0_CentralDogma
 	{	
 		// TODO: this test should not be in this test suite => move
 		[Test]
-        public void Test000_Analyse_ShouldReturnNullOnSyntaxError()
-        {
-        	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
-        	
-            using (StringReader reader = new StringReader(grammar))
-			{
-				FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(reader);
-	            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
-	            SyntaxTreeNode result = parser.Analyse();
-				Assert.IsNull(result);
-			}
-        }
-		
-		// TODO: this test should not be in this test suite => move
-		[Test]
         public void Test000_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
         {
         	string grammar = 
