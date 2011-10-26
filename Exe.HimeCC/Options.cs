@@ -81,5 +81,13 @@ namespace Hime.HimeCC
 			return task;
 		}
 	
+		public void FillFromArguments(string[] arguments)
+		{
+            CommandLineParser parser = new CommandLineParser();
+            if (!parser.ParseArguments(arguments, this))
+            {
+            	this.Inputs = new List<string>();
+            }
+		}
 	}
 }

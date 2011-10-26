@@ -10,73 +10,73 @@ namespace Hime.Tests.HimeCC
     [TestFixture]
     public class Suite01_Program
     {
-        private static string[] p_DefaultCommand = new string[] { "MyGram.gram" };
-        private Program program = new Program();
-
+        private static string[] defaultCommand = new string[] { "MyGram.gram" };
+        private Options options = new Options();
+		// TODO: move the tests on a suite about Options
         [Test]
         public void Test000_ParseArguments_MinimalCommand()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.IsNotNull(options);
+            this.options.FillFromArguments(defaultCommand);
+            Assert.IsNotNull(this.options);
         }
 
         [Test]
         public void Test001_ParseArguments_DefaultNamespace()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.IsNull(options.Namespace);
+            this.options.FillFromArguments(defaultCommand);
+            Assert.IsNull(this.options.Namespace);
         }
 
         [Test]
         public void Test002_ParseArguments_DefaultMethod()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.AreEqual(options.Method, ParsingMethod.RNGLALR1);
+            this.options.FillFromArguments(defaultCommand);
+            Assert.AreEqual(this.options.Method, ParsingMethod.RNGLALR1);
         }
 
         [Test]
         public void Test003_ParseArguments_DefaultLexer()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.IsNull(options.LexerFile);
+            this.options.FillFromArguments(defaultCommand);
+            Assert.IsNull(this.options.LexerFile);
         }
 
         [Test]
         public void Test004_ParseArguments_DefaultParser()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.IsNull(options.ParserFile);
+            this.options.FillFromArguments(defaultCommand);
+            Assert.IsNull(this.options.ParserFile);
         }
 
         [Test]
         public void Test005_ParseArguments_DefaultLogExport()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-			CompilationTask task = options.BuildCompilationTask();
+            this.options.FillFromArguments(defaultCommand);
+			CompilationTask task = this.options.BuildCompilationTask();
             Assert.IsFalse(task.ExportLog);
         }
 
         [Test]
         public void Test006_ParseArguments_DefaultDocExport()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-			CompilationTask task = options.BuildCompilationTask();
+            this.options.FillFromArguments(defaultCommand);
+			CompilationTask task = this.options.BuildCompilationTask();
             Assert.IsFalse(task.ExportDocumentation);
         }
 
         [Test]
         public void Test007_ParseArguments_DefaultInput()
         {
-            Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.AreEqual(options.Inputs.Count, 1);
-            Assert.AreEqual(options.Inputs[0], p_DefaultCommand[0]);
+            this.options.FillFromArguments(defaultCommand);
+            Assert.AreEqual(this.options.Inputs.Count, 1);
+            Assert.AreEqual(this.options.Inputs[0], defaultCommand[0]);
         }
 
         [Test]
         public void Test008_ParseArguments_EmptyCommand()
         {
-            Options options = this.program.ParseArguments(new string[] { });
-            Assert.AreEqual(0, options.Inputs.Count);
+            this.options.FillFromArguments(new string[] { });
+            Assert.AreEqual(0, this.options.Inputs.Count);
         }
 		
 		[Test]
