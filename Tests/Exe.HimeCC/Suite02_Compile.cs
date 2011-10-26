@@ -63,8 +63,8 @@ namespace Hime.Tests.HimeCC
             Export(fileName, command);
         }
         
-        [Test]
-        public void Test001_DefaultNamespace_GeneratedLexer()
+		[Test]
+        public void Test002_DefaultNamespace_GeneratedLexer()
         {
             string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
         	Generate(command);
@@ -72,7 +72,7 @@ namespace Hime.Tests.HimeCC
         }
 
         [Test]
-        public void Test002_DefaultNamespace_GeneratedLexer()
+        public void Test003_DefaultNamespace_GeneratedLexer()
         {
         	Assembly assembly = Compile();
             System.Type lexer = assembly.GetType("MathExp.MathExpLexer");
@@ -80,13 +80,13 @@ namespace Hime.Tests.HimeCC
         }
 
         [Test]
-        public void Test003_Compile_ShouldNotFail()
+        public void Test004_Compile_ShouldNotFail()
         {
         	this.Compile();
         }
 
 		[Test]
-        public void Test004_DefaultNamespace_GeneratedParser()
+        public void Test005_DefaultNamespace_GeneratedParser()
         {
         	Assembly assembly = Compile();
             Type parser = assembly.GetType("MathExp.MathExpParser");
@@ -94,7 +94,7 @@ namespace Hime.Tests.HimeCC
         }
 
         [Test]
-        public void Test005_DontCrashOnEmptyFile()
+        public void Test006_DontCrashOnEmptyFile()
         {
         	Generate(new string[] { Path.Combine(directory, "Empty.gram") });
         }
@@ -102,7 +102,7 @@ namespace Hime.Tests.HimeCC
 	
 		// TODO: should simplify this test by adding a return code to main!!!
 		[Test]
-        public void Test006_ShouldNotFail()
+        public void Test007_ShouldNotFail()
         {
 			string[] command = new string[] { Path.Combine(directory, "Kernel.gram"),
 					Path.Combine(directory, "CFGrammars.gram"),
