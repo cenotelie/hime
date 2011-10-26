@@ -96,7 +96,6 @@
     <Compile Include="Kernel\Naming\WrongParentSymbolException.cs" />
     <Compile Include="Kernel\Reporting\Report.cs" />
     <Compile Include="Kernel\Reporting\Reporter.cs" />
-    <Compile Include="Kernel\Reporting\BaseEntry.cs" />
     <Compile Include="Kernel\Reporting\ELevel.cs" />
     <Compile Include="Kernel\Reporting\ExceptionEntry.cs" />
     <Compile Include="Kernel\Resources\NoResourceLoaderFoundException.cs" />

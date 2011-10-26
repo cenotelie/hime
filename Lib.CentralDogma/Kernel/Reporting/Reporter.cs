@@ -46,22 +46,22 @@ namespace Hime.Kernel.Reporting
 
         public void Info(string component, string message)
         {
-            AddEntry(new BaseEntry(ELevel.Info, component, message));
+            AddEntry(new Entry(ELevel.Info, component, message));
             log.Info(component + ": " + message);
         }
         public void Warn(string component, string message)
         {
-            AddEntry(new BaseEntry(ELevel.Warning, component, message));
+            AddEntry(new Entry(ELevel.Warning, component, message));
             log.Warn(component + ": " + message);
         }
         public void Error(string component, string message)
         {
-            AddEntry(new BaseEntry(ELevel.Error, component, message));
+            AddEntry(new Entry(ELevel.Error, component, message));
             log.Error(component + ": " + message);
         }
         public void Fatal(string component, string message)
         {
-            AddEntry(new BaseEntry(ELevel.Error, component, message));
+            AddEntry(new Entry(ELevel.Error, component, message));
             log.Fatal(component + ": " + message);
         }
 		

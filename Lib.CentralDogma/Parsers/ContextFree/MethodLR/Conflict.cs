@@ -24,15 +24,9 @@ namespace Hime.Parsers.ContextFree.LR
         internal override ELevel Level {
             get
             {
-                if (isError) return Kernel.Reporting.ELevel.Error;
-                return Kernel.Reporting.ELevel.Warning;
+                if (isError) return ELevel.Error;
+                return ELevel.Warning;
             }
-        }
-		
-        internal override string Component
-        {
-            get;
-            set;
         }
 		
         public State State { get { return state; } }
@@ -41,11 +35,13 @@ namespace Hime.Parsers.ContextFree.LR
         public Terminal ConflictSymbol { get { return lookahead; } }
         public ICollection<Item> Items { get { return items; } }
         public List<ConflictExample> Examples { get { return examples; } }
+		
         public bool IsError
         {
             get { return isError; }
             set { isError = value; }
         }
+		
         public bool IsResolved
         {
             get { return isResolved; }
@@ -53,19 +49,21 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         public Conflict(string component, State state, ConflictType type, Terminal lookahead)
+			: base(ELevel.Error, component, "")
         {
-            this.Component = component;
             this.state = state;
             this.type = type;
             this.lookahead = lookahead;
+			// TODO: remove this use Level
             this.isError = true;
             this.isResolved = false;
             items = new List<Item>();
             examples = new List<ConflictExample>();
         }
+		
         public Conflict(string component, State state, ConflictType type)
+			: base(ELevel.Error, component, "")
         {
-            this.Component = component;
             this.state = state;
             this.type = type;
             this.isError = true;

@@ -143,7 +143,7 @@ namespace Hime.Kernel.Resources
             }
 
             foreach (ParserError error in parser.Errors)
-                log.Report(new BaseEntry(ELevel.Error, "Parser", error.Message));
+                log.Report(new Entry(ELevel.Error, "Parser", error.Message));
 
             if (root == null)
             {

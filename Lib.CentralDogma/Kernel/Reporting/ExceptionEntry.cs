@@ -13,11 +13,10 @@ namespace Hime.Kernel.Reporting
     {
         private Exception exception;
 
-        internal override ELevel Level { get { return ELevel.Error; } }
-        internal override string Component { get { return "Compiler"; } }
-        internal override string Message { get { return "Exception " + exception.Message; } }
-
-        public ExceptionEntry(System.Exception ex) { exception = ex; }
+        public ExceptionEntry(Exception exception) : base(ELevel.Error, "Compiler", "Exception " + exception.Message)
+		{ 
+			this.exception = exception;
+		}
 
         internal override XmlNode GetMessageNode(XmlDocument doc)
         {
