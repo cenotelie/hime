@@ -54,7 +54,6 @@
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
-    <Compile Include="Project0.HimeDemo\Suite06_Daemon.cs" />
     <Compile Include="Project2.Integration\Suite05_Parse.cs" />
     <Compile Include="Project2.Integration\Suite04_Ambiguous.cs" />
     <Compile Include="Project0.CentralDogma\Suite00_FileCentralDogmaParser.cs" />
@@ -118,7 +117,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Project0.HimeDemo\" />
     <Folder Include="Integration\" />
     <Folder Include="Project0.CentralDogma\" />
     <Folder Include="Project2.Integration\" />
