@@ -11,11 +11,11 @@ namespace Hime.Demo.Tasks
 {
     public class Daemon : IExecutable
     {
-        private string directory;
+        private string path;
 
         public Daemon(string directory)
         {
-            this.directory = Path.Combine(directory, "Daemon");
+            this.path = Path.Combine(directory, "Daemon");
         }
 
         public void Execute()
@@ -26,7 +26,6 @@ namespace Hime.Demo.Tasks
 		public bool GenerateNextStep()
 		{
 			// Test path
-            string path = this.directory;
             if (Directory.Exists(path)) Directory.Delete(path, true);
             DirectoryInfo directory = Directory.CreateDirectory(path);
             System.Console.WriteLine(directory.FullName);

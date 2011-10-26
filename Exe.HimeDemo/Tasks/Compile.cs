@@ -12,7 +12,7 @@ namespace Hime.Demo.Tasks
             CompilationTask task = new CompilationTask();
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDoc = false;
+            task.ExportDocumentation = false;
             task.ExportVisuals = false;
             task.InputRawData.Add("");
             //task.InputFiles.Add("Languages\\ANSI_C.gram");

@@ -33,14 +33,18 @@ namespace Hime.Parsers
 
         public Report Execute(CompilationTask task)
         {
-            reporter.BeginSection("Compilation Task");
-            string gname = null;
-            try { gname = ExecuteDo(task); }
-            catch (Exception ex) { reporter.Report(ex); }
+            this.reporter.BeginSection("Compilation Task");
+            try 
+			{ 
+				string gname = ExecuteDo(task); 
+				if (task.ExportLog) reporter.ExportMHTML(GetLogName(gname) + ".mht", "Compiler Log");
+			}
+			catch (Exception ex) 
+			{ 
+				reporter.Report(ex); 
+			}
             reporter.EndSection();
-
-            if (task.ExportLog)
-                reporter.ExportMHTML(GetLogName(gname) + ".mht", "Compiler Log");
+            
             return reporter.Result;
         }
 
@@ -90,7 +94,7 @@ namespace Hime.Parsers
             CloseOutputStream(stream);
 
             // Export documentation
-            if (task.ExportDoc)
+            if (task.ExportDocumentation)
                 parserData.Document(GetDocumentationName(gname) + ".mht", task.ExportVisuals, task.DOTBinary);
             return gname;
         }

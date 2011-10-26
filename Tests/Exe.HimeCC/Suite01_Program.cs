@@ -59,7 +59,8 @@ namespace Hime.Tests.HimeCC
         public void Test006_ParseArguments_DefaultDocExport()
         {
             Options options = this.program.ParseArguments(p_DefaultCommand);
-            Assert.IsFalse(options.ExportDocumentation);
+			CompilationTask task = options.BuildCompilationTask();
+            Assert.IsFalse(task.ExportDocumentation);
         }
 
         [Test]

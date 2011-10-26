@@ -8,9 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CommandLine;
+using Hime.Parsers;
 
 namespace Hime.HimeCC
 {
+	// TODO: put as much fields as possible into private
     public class Options
     {
         public Options()
@@ -42,7 +44,7 @@ namespace Hime.HimeCC
         public bool ExportHTMLLog;
 
         [Option("d", "doc", Required = false, HelpText = "True to export the parser documentation (HTML files)")]
-        public bool ExportDocumentation;
+        private bool exportDocumentation;
 
         [HelpOption("h", "help", HelpText = "Display this help screen.")]
         public string GetUsage()
@@ -65,5 +67,20 @@ namespace Hime.HimeCC
             help.AddOptions(this);
             return help;
         }
-    }
+
+		public CompilationTask BuildCompilationTask()
+		{
+			CompilationTask task = new CompilationTask();
+            foreach (string input in this.Inputs) task.InputFiles.Add(input);
+            task.Method = this.Method;
+            task.GrammarName = this.GrammarName;
+            task.Namespace = this.Namespace;
+            task.LexerFile = this.LexerFile;
+            task.ParserFile = this.ParserFile;
+            task.ExportLog = this.ExportHTMLLog;
+            task.ExportDocumentation = this.exportDocumentation;
+			return task;
+		}
+	
+	}
 }

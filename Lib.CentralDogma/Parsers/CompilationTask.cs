@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hime.Parsers
 {
-    public sealed class CompilationTask
+    public class CompilationTask
     {
         public ICollection<string> InputRawData { get; private set; }
         public ICollection<string> InputFiles { get; private set; }
@@ -23,7 +23,7 @@ namespace Hime.Parsers
         public string ParserFile { get; set; }
         public bool ExportDebug { get; set; }
         public bool ExportLog { get; set; }
-        public bool ExportDoc { get; set; }
+        public bool ExportDocumentation { get; set; }
         public bool ExportVisuals { get; set; }
         public string DOTBinary { get; set; }
         public AccessModifier GeneratedCodeModifier { get; set; }
@@ -35,7 +35,7 @@ namespace Hime.Parsers
             Method = ParsingMethod.RNGLALR1;
             ExportDebug = false;
             ExportLog = false;
-            ExportDoc = false;
+            ExportDocumentation = false;
             ExportVisuals = false;
             GeneratedCodeModifier = AccessModifier.Public;
         }

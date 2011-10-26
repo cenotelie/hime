@@ -43,22 +43,7 @@ namespace Hime.HimeCC
 
         public Report Execute(Options options)
         {
-            CompilationTask task = new CompilationTask();
-            foreach (string input in options.Inputs)
-                task.InputFiles.Add(input);
-            task.Method = options.Method;
-            // TODO: this test is probably not necessary, as options.GrammarName is already equal to null
-            // TODO: remove this test
-            if (options.GrammarName != null)
-                task.GrammarName = options.GrammarName;
-            if (options.Namespace != null)
-                task.Namespace = options.Namespace;
-            if (options.LexerFile != null)
-                task.LexerFile = options.LexerFile;
-            if (options.ParserFile != null)
-                task.ParserFile = options.ParserFile;
-            task.ExportLog = options.ExportHTMLLog;
-            task.ExportDoc = options.ExportDocumentation;
+			CompilationTask task = options.BuildCompilationTask();
             Compiler compiler = new Compiler();
             return compiler.Execute(task);
         }
