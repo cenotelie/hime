@@ -7,35 +7,35 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using Hime.Kernel;
+using Hime.Demo.Tasks;
 	
 namespace Hime.Tests.Integration
 {
 	[TestFixture]
 	public class Suite06_KernelDaemon
 	{
-		private string path;
+		private Daemon daemon;
 		
 		[SetUp]
 		public void SetUp() 
 		{
 			DirectoryInfo currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
 			DirectoryInfo projectRoot = currentDirectory.Parent.Parent.Parent;
-			path = Path.Combine(Path.Combine(projectRoot.FullName, "Hime.NUnit"), "bin");
-
+			string path = Path.Combine(Path.Combine(projectRoot.FullName, "Hime.NUnit"), "bin");
+			this.daemon = new Daemon(path);
 		}
 		
 		// TODO: should do this test without really generating (should be able to decide the output Stream instead of the path as a string)
 		[Test, Ignore]
 		public void Test000_GenerateNextStep_GeneratesParserForCentralDogma()
 		{
-			Daemon.GenerateNextStep(this.path);
+			this.daemon.GenerateNextStep();
 		}
 
 		[Test, Ignore]
 		public void Test001_GenerateNextStep_ShouldNotHaveErrors()
 		{
-			bool success = Daemon.GenerateNextStep(this.path);
+			bool success = this.daemon.GenerateNextStep();
 			Assert.IsTrue(success);
 		}
 		

@@ -194,7 +194,6 @@
     <Compile Include="Parsers\TerminalSet.cs" />
     <Compile Include="Parsers\RuleBody.cs" />
     <Compile Include="Parsers\Action.cs" />
-    <Compile Include="Kernel\Daemon.cs" />
     <Compile Include="Kernel\Reporting\Section.cs" />
     <Compile Include="Kernel\Resources\ResourceAccessor.cs" />
     <Compile Include="Kernel\Resources\ResourceGraph.cs" />

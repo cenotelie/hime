@@ -74,6 +74,10 @@
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Lib.Redist</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Exe.HimeDemo\Exe.HimeDemo.csproj">
+      <Project>{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}</Project>
+      <Name>Exe.HimeDemo</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=2.5.3.9345, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
