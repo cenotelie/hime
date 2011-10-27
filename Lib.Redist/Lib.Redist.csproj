@@ -46,6 +46,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Hime.Redist.XML</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
