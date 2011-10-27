@@ -134,7 +134,6 @@ namespace Hime.Kernel.Resources
         {
             FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(input);
             FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
-            // TODO: rewrite this code, it is a bit strange
             try 
 			{ 
 				SyntaxTreeNode root = parser.Analyse(); 
@@ -146,7 +145,12 @@ namespace Hime.Kernel.Resources
 			}
             catch (ParserException e) 
 			{
-                log.Fatal("Parser", "encountered a fatal error. Exception thrown: " + e.Message);
+//				log.Fatal("Parser", e.Message);
+	            foreach (ParserError error in parser.Errors)
+				{
+					// TODO: log.Report and log.Fatal should have the same signature!!!
+    	            log.Fatal("Parser", new Entry(ELevel.Error, "Parser", error.Message).Message);				
+				}
             }
         }
 
@@ -164,7 +168,8 @@ namespace Hime.Kernel.Resources
                 }
             }
         }
-        private void Compile_namespace(Redist.Parsers.SyntaxTreeNode node, Naming.Namespace currentNamespace)
+		
+        private void Compile_namespace(SyntaxTreeNode node, Namespace currentNamespace)
         {
             QualifiedName name = CompileQualifiedName(node.Children[0]);
             currentNamespace = currentNamespace.AddSubNamespace(name);

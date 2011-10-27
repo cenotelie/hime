@@ -10,6 +10,7 @@ namespace Hime.Kernel.Reporting
 {
     public class Entry
     {
+		// TODO: maybe could add position in file
         internal virtual ELevel Level { get; set; }
         internal virtual string Component { get; set; }
         internal virtual string Message { get; private set; }
@@ -27,5 +28,10 @@ namespace Hime.Kernel.Reporting
             element.InnerText = this.Message;
             return element;
         }
+		
+		public override string ToString ()
+		{
+			return this.Level + ": " + this.Component + ": " + this.Message;
+		}
     }
 }

@@ -48,6 +48,24 @@ namespace Hime.Tests.Project0_CentralDogma
        	    Report result = compiler.Execute();
 			Assert.AreEqual(1, result.ErrorCount);
 		}
+
+		[Test]
+		public void Test002_Execute_TheErrorShouldIndicateLineNumber_Issue414()
+		{
+			string grammar = 
+        		"public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
+			
+            CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
+			task.InputRawData.Add(grammar);
+			
+        	Compiler compiler = new Compiler(task);
+       	    Report result = compiler.Execute();
+			foreach (Entry error in result.Errors)
+			{
+				// TODO: here should be FATAL: Parser: ...
+				Assert.IsTrue(error.ToString().StartsWith("Error: Parser: @(1, 12)"));
+			}
+		}
 		
 		// TODO: help screen is incomplete => add tests
 		// TODO: format of errors: maybe should start with line number??

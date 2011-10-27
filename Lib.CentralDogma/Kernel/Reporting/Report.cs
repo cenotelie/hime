@@ -15,6 +15,7 @@ namespace Hime.Kernel.Reporting
 	/// </summary>
 	public class Report
 	{
+		// TODO: maybe would be more convenient to have a dictionary from section name to sections
         public List<Section> Sections { get; private set; }
 
         public Report()
@@ -73,6 +74,20 @@ namespace Hime.Kernel.Reporting
 	                }
 	            }
 	            return result;
+			}
+		}
+		
+		public IEnumerable<Entry> Errors
+		{
+			get
+			{
+				foreach (Section section in this.Sections)
+	            {
+	                foreach (Entry entry in section.Entries)
+	                {
+	                    if (entry.Level == ELevel.Error) yield return entry;
+	                }
+	            }
 			}
 		}
 	}
