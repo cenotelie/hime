@@ -52,6 +52,9 @@ namespace Hime.Tests.Project0_CentralDogma
 		[Test]
 		public void Test002_Execute_TheErrorShouldIndicateLineNumber_Issue414()
 		{
+		// TODO: in that case, error message is not that nice could be improved
+			// remplace ; with ,
+			// do not put { cf } but "cf" (there is only one case and it is consistent with "text"
 			string grammar = 
         		"public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
 			
