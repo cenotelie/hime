@@ -143,9 +143,8 @@ namespace Hime.Kernel.Resources
     	            log.Report(new Entry(ELevel.Error, "Parser", error.Message));				
 				}
 			}
-            catch (ParserException e) 
+            catch (ParserException) 
 			{
-//				log.Fatal("Parser", e.Message);
 	            foreach (ParserError error in parser.Errors)
 				{
 					// TODO: log.Report and log.Fatal should have the same signature!!!
