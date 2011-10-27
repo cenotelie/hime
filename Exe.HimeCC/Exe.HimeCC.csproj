@@ -48,6 +48,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x86</PlatformTarget>
+    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
@@ -58,6 +59,7 @@
     <OutputPath>bin\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
     <DefineConstants>TRACE</DefineConstants>
+    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
