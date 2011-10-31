@@ -92,7 +92,6 @@
     <Compile Include="Parsers\Symbols\SymbolVirtual.cs" />
     <Compile Include="Parsers\SyntaxNodes\SPPFNodeFamily.cs" />
     <Compile Include="Parsers\SyntaxNodes\SyntaxTreeNode.cs" />
-    <Compile Include="Binary\BaseBinary.cs" />
     <Compile Include="Parsers\Lexers\BufferedTextReader.cs" />
     <Compile Include="Parsers\Lexers\BufferedTokenReader.cs" />
     <Compile Include="Parsers\LR\RNGLR1\GSS.cs" />
@@ -105,6 +104,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\SyntaxNodes\SPPFNode.cs" />
     <Compile Include="Parsers\Symbols\Symbol.cs" />
+    <Compile Include="Binary\BinaryException.cs" />
+    <Compile Include="Binary\DataSegment.cs" />
+    <Compile Include="Binary\DataInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

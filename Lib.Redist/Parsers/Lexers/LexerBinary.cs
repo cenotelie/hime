@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Binary;
 
-// TODO: think about it: what is LexerBinary for?
+// TODO: think about it: what is LexerBinary for? => remove or have concrete uses or it!!
 namespace Hime.Redist.Parsers
 {
     /// <summary>
@@ -56,8 +56,18 @@ namespace Hime.Redist.Parsers
         /// Required by interface ILexer.
         /// </summary>
 		public OnErrorHandler OnError { set { } }
-
+		
+		/// <summary>
+		/// Setup this instance.
+		/// Call in constructor.
+		/// </summary>
         protected abstract void setup();
+        
+		/// <summary>
+        /// Gets a clone of this lexer.
+        /// Required by interface ILexer.
+        /// </summary>
+        /// <returns>A clone of this lexer</returns>
         public abstract ILexer Clone();
 
         private LexerBinary(DataInput input)
@@ -67,9 +77,19 @@ namespace Hime.Redist.Parsers
             this.currentBitLeft = 8;
         }
 
+		/// <summary>
+        /// Gets the next token in the input.
+        /// Required by interface ILexer.
+        /// </summary>
+        /// <returns>The next token in the input</returns>
         public SymbolToken GetNextToken() { throw new LexerException("Binary lexer cannot match a token without an expected tokens list."); }
 
-        public SymbolToken GetNextToken(ushort[] IDs)
+        /// <summary>
+        /// Get the next token in the input that has is of one of the provided IDs.
+        /// </summary>
+        /// <param name="ids">The possible IDs of the next expected token</param>
+        /// <returns>The next token in the input</returns>
+        public SymbolToken GetNextToken(ushort[] ids)
         {
             if (dollarEmitted)
                 return SymbolTokenEpsilon.Instance;
@@ -79,24 +99,22 @@ namespace Hime.Redist.Parsers
                 return SymbolTokenDollar.Instance;
             }
 
-            foreach (ushort ID in IDs)
+            foreach (ushort id in ids)
             {
-                SymbolToken Temp = GetNextToken_Apply(ID);
-                if (Temp != null) return Temp;
+                SymbolToken temp = GetNextToken_Apply(id);
+                if (temp != null) return temp;
             }
             dollarEmitted = true;
             return SymbolTokenDollar.Instance;
         }
 
-        protected SymbolToken GetNextToken_Apply(ushort ID)
+        private SymbolToken GetNextToken_Apply(ushort ID)
         {
             if (!getNextTokens.ContainsKey(ID)) return null;
             return getNextTokens[ID]();
         }
 
-
-
-        protected SymbolToken GetNextToken_Apply_NB(ushort sid, string name, byte value, int length)
+        private SymbolToken GetNextToken_Apply_NB(ushort sid, string name, byte value, int length)
         {
             if (currentBitLeft < length) return null;
             if (((input.ReadByte() >> (currentBitLeft - length)) & flags[length]) != value) return null;
@@ -109,24 +127,18 @@ namespace Hime.Redist.Parsers
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(1)) return null;
-            if (input.ReadByte() == value)
-            {
-                input.ReadAndAdvanceByte();
-                return new SymbolTokenUInt8(name, sid, value);
-            }
-            return null;
+			if (input.ReadByte() != value) return null;
+            input.ReadAndAdvanceByte();
+            return new SymbolTokenUInt8(name, sid, value);
         }
 		
         private SymbolToken GetNextToken_Apply_N16(ushort sid, string name, byte value)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(2)) return null;
-            if (input.ReadByte() == value)
-            {
-                input.ReadAndAdvanceUInt16();
-                return new SymbolTokenUInt16(name, sid, value);
-            }
-            return null;
+            if (input.ReadByte() != value) return null;
+            input.ReadAndAdvanceUInt16();
+            return new SymbolTokenUInt16(name, sid, value);
         }
 		
         private SymbolToken GetNextToken_Apply_N32(ushort sid, string name, byte value)

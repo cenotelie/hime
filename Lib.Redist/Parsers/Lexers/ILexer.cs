@@ -27,6 +27,8 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number in the input
         /// </summary>
         int CurrentColumn { get; }
+
+		// TODO: think about it, but a Clone method is not a good sign. What is it needed for?
         /// <summary>
         /// Gets a clone of this lexer
         /// </summary>
