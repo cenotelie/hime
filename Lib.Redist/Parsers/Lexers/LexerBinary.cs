@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Redist.Binary;
 
 namespace Hime.Redist.Parsers
 {
@@ -30,7 +31,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Bit flags
         /// </summary>
-        protected static byte[] flags = { 0x00, flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8 };
+        private static byte[] flags = { 0x00, flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8 };
 
         protected Dictionary<ushort, ApplyGetNextToken> getNextTokens;
         protected Binary.DataInput input;
@@ -44,7 +45,7 @@ namespace Hime.Redist.Parsers
         protected abstract void setup();
         public abstract ILexer Clone();
 
-        protected LexerBinary(Binary.DataInput input)
+        protected LexerBinary(DataInput input)
         {
             setup();
             this.input = input;
