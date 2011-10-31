@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Binary;
 
+// TODO: think about it: what is LexerBinary for?
 namespace Hime.Redist.Parsers
 {
     /// <summary>
@@ -33,19 +34,33 @@ namespace Hime.Redist.Parsers
         /// </summary>
         private static byte[] flags = { 0x00, flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8 };
 
-        protected Dictionary<ushort, ApplyGetNextToken> getNextTokens;
-        protected Binary.DataInput input;
-        protected int currentBitLeft;
-        protected bool dollarEmitted;
-
+        private Dictionary<ushort, ApplyGetNextToken> getNextTokens;
+        private DataInput input;
+        private int currentBitLeft;
+        private bool dollarEmitted;
+		
+		/// <summary>
+        /// Gets the current line number in the input.
+        /// Required by interface ILexer.
+        /// </summary>
         public int CurrentLine { get { return 0; } }
+		
+        /// <summary>
+        /// Gets the current column number in the input.
+        /// Required by interface ILexer.
+        /// </summary>
         public int CurrentColumn { get { return input.Length; } }
-        public OnErrorHandler OnError { set { } }
+		
+        /// <summary>
+        /// Sets the handler for lexical errors.
+        /// Required by interface ILexer.
+        /// </summary>
+		public OnErrorHandler OnError { set { } }
 
         protected abstract void setup();
         public abstract ILexer Clone();
 
-        protected LexerBinary(DataInput input)
+        private LexerBinary(DataInput input)
         {
             setup();
             this.input = input;
@@ -89,7 +104,8 @@ namespace Hime.Redist.Parsers
             if (currentBitLeft == 0) { currentBitLeft = 8; input.ReadAndAdvanceByte(); }
             return new SymbolTokenBits(name, sid, value);
         }
-        protected SymbolToken GetNextToken_Apply_N8(ushort sid, string name, byte value)
+		
+        private SymbolToken GetNextToken_Apply_N8(ushort sid, string name, byte value)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(1)) return null;
@@ -100,7 +116,8 @@ namespace Hime.Redist.Parsers
             }
             return null;
         }
-        protected SymbolToken GetNextToken_Apply_N16(ushort sid, string name, byte value)
+		
+        private SymbolToken GetNextToken_Apply_N16(ushort sid, string name, byte value)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(2)) return null;
@@ -111,7 +128,8 @@ namespace Hime.Redist.Parsers
             }
             return null;
         }
-        protected SymbolToken GetNextToken_Apply_N32(ushort sid, string name, byte value)
+		
+        private SymbolToken GetNextToken_Apply_N32(ushort sid, string name, byte value)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(4)) return null;
@@ -122,7 +140,8 @@ namespace Hime.Redist.Parsers
             }
             return null;
         }
-        protected SymbolToken GetNextToken_Apply_N64(ushort sid, string name, byte value)
+		
+        private SymbolToken GetNextToken_Apply_N64(ushort sid, string name, byte value)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(8)) return null;
@@ -134,7 +153,7 @@ namespace Hime.Redist.Parsers
             return null;
         }
 
-        protected SymbolToken GetNextToken_Apply_JB(ushort sid, string name, int length)
+        private SymbolToken GetNextToken_Apply_JB(ushort sid, string name, int length)
         {
             if (currentBitLeft < length) return null;
             SymbolToken Temp = new SymbolTokenBits(name, sid, (byte)((input.ReadByte() >> (currentBitLeft - length)) & length));
@@ -142,25 +161,31 @@ namespace Hime.Redist.Parsers
             if (currentBitLeft == 0) { currentBitLeft = 8; input.ReadAndAdvanceByte(); }
             return Temp;
         }
-        protected SymbolToken GetNextToken_Apply_J8(ushort sid, string name)
+		
+        private SymbolToken GetNextToken_Apply_J8(ushort sid, string name)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(1)) return null;
             return new SymbolTokenUInt8(name, sid, input.ReadAndAdvanceByte());
         }
-        protected SymbolToken GetNextToken_Apply_J16(ushort sid, string name)
+		
+        private SymbolToken GetNextToken_Apply_J16(ushort sid, string name)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(2)) return null;
             return new SymbolTokenUInt16(name, sid, input.ReadAndAdvanceByte());
         }
-        protected SymbolToken GetNextToken_Apply_J32(ushort sid, string name)
+		
+        private SymbolToken GetNextToken_Apply_J32(ushort sid, string name)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(4)) return null;
             return new SymbolTokenUInt32(name, sid, input.ReadAndAdvanceByte());
         }
-        protected SymbolToken GetNextToken_Apply_J64(ushort sid, string name)
+		
+		// TODO: what is all that for? all these methods _Apply_Js??
+		// TODO: try to factor them? => they are all similar except the size which is read
+        private SymbolToken GetNextToken_Apply_J64(ushort sid, string name)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(8)) return null;
