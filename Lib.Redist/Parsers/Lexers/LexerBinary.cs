@@ -34,7 +34,6 @@ namespace Hime.Redist.Parsers
         /// </summary>
         private static byte[] flags = { 0x00, flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8 };
 
-        private Dictionary<ushort, ApplyGetNextToken> getNextTokens;
         private DataInput input;
         private int currentBitLeft;
         private bool dollarEmitted;
@@ -110,8 +109,7 @@ namespace Hime.Redist.Parsers
 
         private SymbolToken GetNextToken_Apply(ushort ID)
         {
-            if (!getNextTokens.ContainsKey(ID)) return null;
-            return getNextTokens[ID]();
+            return null;
         }
 
         private SymbolToken GetNextToken_Apply_NB(ushort sid, string name, byte value, int length)
