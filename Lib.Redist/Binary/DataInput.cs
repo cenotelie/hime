@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Binary
 {
-    public class DataInput
+    internal class DataInput
     {
         private bool performCheckPosition;
 		private bool performCheckUnread;
@@ -21,22 +21,17 @@ namespace Hime.Redist.Binary
         private int currentBegin;
         private int currentPosition;
 		
-        public bool PerformCheckUnread
-        {
-            get { return performCheckUnread; }
-            set { performCheckUnread = value; }
-        }
-		
-        public int Length { get { return dataSegment.Length; } }
-        public int CurrentPosition { get { return currentPosition; } }
-        public bool IsAtBegin { get { return (currentPosition == dataSegment.PositionBegin); } }
-        public bool IsAtEnd { get { return (currentPosition == dataSegment.PositionEnd + 1); } }
+        internal int Length { get { return dataSegment.Length; } }
+        
+        private bool IsAtBegin { get { return (currentPosition == dataSegment.PositionBegin); } }
+        
+		internal bool IsAtEnd { get { return (currentPosition == dataSegment.PositionEnd + 1); } }
 
-        public DataInput(byte[] data) : this(data, 0, data.Length)
+        private DataInput(byte[] data) : this(data, 0, data.Length)
         {
         }
 		
-        public DataInput(byte[] data, int originOffset, int length)
+        private DataInput(byte[] data, int originOffset, int length)
         {
             this.performCheckPosition = true;
             this.data = data;
@@ -48,7 +43,7 @@ namespace Hime.Redist.Binary
             this.currentPosition = originOffset;
         }
 
-        public DataInput Clone()
+        private DataInput Clone()
         {
             DataInput result = new DataInput(this.data);
             result.performCheckPosition = this.performCheckPosition;
@@ -60,7 +55,7 @@ namespace Hime.Redist.Binary
             return result;
         }
 
-        public void Reset()
+        private void Reset()
         {
             readSegments.Clear();
             previousBegin.Clear();
@@ -69,7 +64,7 @@ namespace Hime.Redist.Binary
             currentPosition = currentBegin;
         }
 
-        public bool CanRead(int length)
+        internal bool CanRead(int length)
         {
             // Check [in data]
             if (!dataSegment.Contains(currentPosition) || !dataSegment.Contains(currentPosition + length))
@@ -82,6 +77,7 @@ namespace Hime.Redist.Binary
             }
             return true;
         }
+		
         private void CheckPosition_OnRead(int Length)
         {
             // Check [in data]
@@ -103,69 +99,65 @@ namespace Hime.Redist.Binary
             }
         }
 
-        public System.Byte ReadByte()
+        internal Byte ReadByte()
         {
             if (this.performCheckPosition)
                 CheckPosition_OnRead(1);
             return data[currentPosition];
         }
-        public System.Byte ReadAndAdvanceByte()
-        {
-            System.Byte CurrentData = ReadByte();
-            currentPosition++;
-            return CurrentData;
-        }
-        public System.UInt16 ReadUInt16()
+		
+        private UInt16 ReadUInt16()
         {
             if (this.performCheckPosition)
                 CheckPosition_OnRead(2);
-            System.UInt16 part8 = (System.UInt16)((System.UInt16)data[currentPosition + 1] << 8);
-            System.UInt16 part0 = (System.UInt16)data[currentPosition];
-            return (System.UInt16)(part8 | part0);
+            UInt16 part8 = (UInt16)((UInt16)data[currentPosition + 1] << 8);
+            UInt16 part0 = (UInt16)data[currentPosition];
+            return (UInt16)(part8 | part0);
         }
-        public System.UInt16 ReadAndAdvanceUInt16()
-        {
-            System.UInt16 CurrentData = ReadUInt16();
-            currentPosition += 2;
-            return CurrentData;
-        }
-        public System.UInt32 ReadUInt32()
+		
+        private UInt32 ReadUInt32()
         {
             if (this.performCheckPosition)
                 CheckPosition_OnRead(4);
-            System.UInt32 part24 = (System.UInt32)data[currentPosition + 3] << 24;
-            System.UInt32 part16 = (System.UInt32)data[currentPosition + 2] << 16;
-            System.UInt32 part8 = (System.UInt32)data[currentPosition + 1] << 8;
-            System.UInt32 part0 = (System.UInt32)data[currentPosition];
+            UInt32 part24 = (UInt32)data[currentPosition + 3] << 24;
+            UInt32 part16 = (UInt32)data[currentPosition + 2] << 16;
+            UInt32 part8 = (UInt32)data[currentPosition + 1] << 8;
+            UInt32 part0 = (UInt32)data[currentPosition];
             return part24 | part16 | part8 | part0;
-        }
-        public System.UInt32 ReadAndAdvanceUInt32()
-        {
-            System.UInt32 CurrentData = ReadUInt32();
-            currentPosition += 4;
-            return CurrentData;
         }
 		
         private UInt64 ReadUInt64()
         {
-            if (this.performCheckPosition) CheckPosition_OnRead(8);
-            UInt64 part56 = (UInt64)data[currentPosition + 7] << (8*7);
-			UInt64 result = part56;
-            UInt64 part48 = (UInt64)data[currentPosition + 6] << (8*6);
-			result = result | part48;
-            UInt64 part40 = (UInt64)data[currentPosition + 5] << (8*5);
-			result = result | part40;
-            UInt64 part32 = (UInt64)data[currentPosition + 4] << (8*4);
-			result = result | part32;
-            UInt64 part24 = (UInt64)data[currentPosition + 3] << (8*3);
-			result = result | part24;
-            UInt64 part16 = (UInt64)data[currentPosition + 2] << (8*2);
-			result = result | part16;
-            UInt64 part8 = (UInt64)data[currentPosition + 1] << 8;
-			result = result | part8;
-            UInt64 part0 = (UInt64)data[currentPosition];
-			result = result | part0;
+			int size = sizeof(UInt64);
+            if (this.performCheckPosition) CheckPosition_OnRead(size);
+			UInt64 result = 0;
+			for (int i = 0; i < size; i++)
+			{
+				UInt64 part = (UInt64)data[currentPosition + i] << (8*i);
+				result = result | part;
+			}
             return result;
+        }
+		
+        internal Byte ReadAndAdvanceByte()
+        {
+            Byte CurrentData = ReadByte();
+            currentPosition++;
+            return CurrentData;
+        }
+						
+        internal UInt16 ReadAndAdvanceUInt16()
+        {
+            UInt16 CurrentData = ReadUInt16();
+            currentPosition += 2;
+            return CurrentData;
+        }
+
+        internal UInt32 ReadAndAdvanceUInt32()
+        {
+            System.UInt32 CurrentData = ReadUInt32();
+            currentPosition += 4;
+            return CurrentData;
         }
 		
         internal UInt64 ReadAndAdvanceUInt64()
