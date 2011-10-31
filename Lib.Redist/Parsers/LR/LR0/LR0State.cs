@@ -8,7 +8,11 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    internal class LR0State : LRState
+	/// <summary>
+	/// State for LR0 parsers.
+	/// </summary>
+	// TODO: think about it, but maybe could use the same state for any kind of parsers. In the end an automaton is an automaton?
+    public class LR0State : LRState
     {
         /// <summary>
         /// Rule to reduce on this state
