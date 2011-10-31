@@ -16,7 +16,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// States of the LR(0) parser automaton
         /// </summary>
-        protected LR0State[] states;
+        private LR0State[] states;
 
         /// <summary>
         /// Gets the automaton's state with the given id

@@ -33,7 +33,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         protected ushort separatorID;
 
-        protected OnErrorHandler errorHandler;
+        private OnErrorHandler errorHandler;
         /// <summary>
         /// Lexer's input
         /// </summary>

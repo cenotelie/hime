@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    public sealed class LR0State : LRState
+    internal class LR0State : LRState
     {
         /// <summary>
         /// Rule to reduce on this state
