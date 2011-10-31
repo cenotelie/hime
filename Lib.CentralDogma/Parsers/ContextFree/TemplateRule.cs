@@ -5,43 +5,43 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Redist.Parsers;
 
 namespace Hime.Parsers.ContextFree
 {
     class TemplateRule
     {
-        private List<string> parameters;
         private List<TemplateRuleInstance> instances;
         private CFGrammar grammar;
-        private Redist.Parsers.SyntaxTreeNode ruleNode;
-        private Redist.Parsers.SyntaxTreeNode definitionNode;
 
-        public string HeadName { get; private set; }
-        public int ParametersCount { get { return parameters.Count; } }
-        public List<string> Parameters { get { return parameters; } }
-        public Redist.Parsers.SyntaxTreeNode RuleNode { get { return ruleNode; } }
-        public Redist.Parsers.SyntaxTreeNode DefinitionNode { get { return definitionNode; } }
+        internal string HeadName { get; private set; }
+        internal List<string> Parameters { get; private set; }
+        internal int ParametersCount { get { return this.Parameters.Count; } }
+		internal SyntaxTreeNode RuleNode { get; private set; }
+        internal SyntaxTreeNode DefinitionNode { get; private set; }
 
-        public TemplateRule(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode ruleNode)
+        public TemplateRule(CFGrammar grammar, SyntaxTreeNode ruleNode)
         {
-            this.HeadName = ((Redist.Parsers.SymbolTokenText)ruleNode.Children[0].Symbol).ValueText;
-            this.parameters = new List<string>();
+            this.HeadName = ((SymbolTokenText)ruleNode.Children[0].Symbol).ValueText;
+            this.Parameters = new List<string>();
             this.instances = new List<TemplateRuleInstance>();
             this.grammar = grammar;
-            this.ruleNode = ruleNode;
-            this.definitionNode = ruleNode.Children[2];
-            foreach (Redist.Parsers.SyntaxTreeNode Node in ruleNode.Children[1].Children)
-                this.parameters.Add(((Redist.Parsers.SymbolTokenText)Node.Symbol).ValueText);
+            this.RuleNode = ruleNode;
+            this.DefinitionNode = ruleNode.Children[2];
+            foreach (SyntaxTreeNode Node in ruleNode.Children[1].Children)
+			{
+                this.Parameters.Add(((SymbolTokenText)Node.Symbol).ValueText);
+			}
         }
 
         public TemplateRule(TemplateRule copied, CFGrammar data)
         {
             this.HeadName = copied.HeadName;
-            parameters = new List<string>(copied.parameters);
+            this.Parameters = new List<string>(copied.Parameters);
             instances = new List<TemplateRuleInstance>();
             grammar = data;
-            ruleNode = copied.ruleNode;
-            definitionNode = copied.definitionNode;
+            this.RuleNode = copied.RuleNode;
+            this.DefinitionNode = copied.DefinitionNode;
             foreach (TemplateRuleInstance instance in copied.instances)
             {
                 CFVariable headVar = data.GetCFVariable(instance.HeadVariable.LocalName);
