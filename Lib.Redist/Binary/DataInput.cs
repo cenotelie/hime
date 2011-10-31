@@ -12,7 +12,7 @@ namespace Hime.Redist.Binary
     public class DataInput
     {
         private bool performCheckPosition;
-        private bool performCheckUnread;
+		private bool performCheckUnread;
         private byte[] data;
         private DataSegment dataSegment;
         private List<DataSegment> readSegments;
@@ -20,31 +20,22 @@ namespace Hime.Redist.Binary
         private Stack<int> previousEnd;
         private int currentBegin;
         private int currentPosition;
-
-        public bool PerformCheckPosition
-        {
-            get { return performCheckPosition; }
-            set { performCheckPosition = value; }
-        }
+		
         public bool PerformCheckUnread
         {
             get { return performCheckUnread; }
             set { performCheckUnread = value; }
         }
+		
         public int Length { get { return dataSegment.Length; } }
         public int CurrentPosition { get { return currentPosition; } }
         public bool IsAtBegin { get { return (currentPosition == dataSegment.PositionBegin); } }
         public bool IsAtEnd { get { return (currentPosition == dataSegment.PositionEnd + 1); } }
 
-        public DataInput(byte[] data)
+        public DataInput(byte[] data) : this(data, 0, data.Length)
         {
-            this.performCheckPosition = true;
-            this.data = data;
-            this.dataSegment = new DataSegment(0, data.Length - 1);
-            this.readSegments = new List<DataSegment>();
-            this.previousBegin = new Stack<int>();
-            this.previousEnd = new Stack<int>();
         }
+		
         public DataInput(byte[] data, int originOffset, int length)
         {
             this.performCheckPosition = true;
@@ -59,14 +50,14 @@ namespace Hime.Redist.Binary
 
         public DataInput Clone()
         {
-            DataInput Clone = new DataInput(data);
-            Clone.performCheckPosition = performCheckPosition;
-            Clone.performCheckUnread = performCheckUnread;
-            Clone.dataSegment = dataSegment;
-            Clone.currentBegin = currentBegin;
-            Clone.currentPosition = currentPosition;
+            DataInput result = new DataInput(this.data);
+            result.performCheckPosition = this.performCheckPosition;
+            result.performCheckUnread = this.performCheckUnread;
+            result.dataSegment = this.dataSegment;
+            result.currentBegin = this.currentBegin;
+            result.currentPosition = this.currentPosition;
 
-            return Clone;
+            return result;
         }
 
         public void Reset()
@@ -114,7 +105,7 @@ namespace Hime.Redist.Binary
 
         public System.Byte ReadByte()
         {
-            if (performCheckPosition)
+            if (this.performCheckPosition)
                 CheckPosition_OnRead(1);
             return data[currentPosition];
         }
@@ -126,7 +117,7 @@ namespace Hime.Redist.Binary
         }
         public System.UInt16 ReadUInt16()
         {
-            if (performCheckPosition)
+            if (this.performCheckPosition)
                 CheckPosition_OnRead(2);
             System.UInt16 part8 = (System.UInt16)((System.UInt16)data[currentPosition + 1] << 8);
             System.UInt16 part0 = (System.UInt16)data[currentPosition];
@@ -140,7 +131,7 @@ namespace Hime.Redist.Binary
         }
         public System.UInt32 ReadUInt32()
         {
-            if (performCheckPosition)
+            if (this.performCheckPosition)
                 CheckPosition_OnRead(4);
             System.UInt32 part24 = (System.UInt32)data[currentPosition + 3] << 24;
             System.UInt32 part16 = (System.UInt32)data[currentPosition + 2] << 16;
@@ -154,42 +145,53 @@ namespace Hime.Redist.Binary
             currentPosition += 4;
             return CurrentData;
         }
-        public System.UInt64 ReadUInt64()
+		
+        private UInt64 ReadUInt64()
         {
-            if (performCheckPosition)
-                CheckPosition_OnRead(8);
-            System.UInt64 part56 = (System.UInt64)data[currentPosition + 7] << 56;
-            System.UInt64 part48 = (System.UInt64)data[currentPosition + 6] << 48;
-            System.UInt64 part40 = (System.UInt64)data[currentPosition + 5] << 40;
-            System.UInt64 part32 = (System.UInt64)data[currentPosition + 4] << 32;
-            System.UInt64 part24 = (System.UInt64)data[currentPosition + 3] << 24;
-            System.UInt64 part16 = (System.UInt64)data[currentPosition + 2] << 16;
-            System.UInt64 part8 = (System.UInt64)data[currentPosition + 1] << 8;
-            System.UInt64 part0 = (System.UInt64)data[currentPosition];
-            return part56 | part48 | part40 | part32 | part24 | part16 | part8 | part0;
+            if (this.performCheckPosition) CheckPosition_OnRead(8);
+            UInt64 part56 = (UInt64)data[currentPosition + 7] << (8*7);
+			UInt64 result = part56;
+            UInt64 part48 = (UInt64)data[currentPosition + 6] << (8*6);
+			result = result | part48;
+            UInt64 part40 = (UInt64)data[currentPosition + 5] << (8*5);
+			result = result | part40;
+            UInt64 part32 = (UInt64)data[currentPosition + 4] << (8*4);
+			result = result | part32;
+            UInt64 part24 = (UInt64)data[currentPosition + 3] << (8*3);
+			result = result | part24;
+            UInt64 part16 = (UInt64)data[currentPosition + 2] << (8*2);
+			result = result | part16;
+            UInt64 part8 = (UInt64)data[currentPosition + 1] << 8;
+			result = result | part8;
+            UInt64 part0 = (UInt64)data[currentPosition];
+			result = result | part0;
+            return result;
         }
-        public System.UInt64 ReadAndAdvanceUInt64()
+		
+        internal UInt64 ReadAndAdvanceUInt64()
         {
-            System.UInt64 CurrentData = ReadUInt64();
+            UInt64 CurrentData = ReadUInt64();
             currentPosition += 8;
             return CurrentData;
         }
 
-        public void PositionShift(int offset)
+        private void PositionShift(int offset)
         {
             previousBegin.Push(currentBegin);
             previousEnd.Push(currentPosition);
             currentBegin = currentPosition + offset;
             currentPosition = currentBegin;
         }
-        public void PositionMoveTo(int position)
+		
+        private void PositionMoveTo(int position)
         {
             previousBegin.Push(currentBegin);
             previousEnd.Push(currentPosition);
             currentBegin = position;
             currentPosition = position;
         }
-        public void PositionReturn()
+		// TODO: this method is dead code? remove?
+        private void PositionReturn()
         {
             readSegments.Add(new DataSegment(currentBegin, currentPosition - 1));
             currentBegin = previousBegin.Pop();
