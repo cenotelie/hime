@@ -8,7 +8,11 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    public sealed class LR1State : LRState
+	// TODO: Compare with LR0State and see if they can not be all the same in the end
+	/// <summary>
+	/// State for LR1 automata.
+	/// </summary>
+    public class LR1State : LRState
     {
         /// <summary>
         /// Dictionary associating a reduction to terminal ID

@@ -82,7 +82,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Acts when an unexpected token is encountered
         /// </summary>
-        /// <param name="token">Current token</param>
+        /// <param name="nextToken">Current token</param>
         /// <returns>The new next token if the error is resolved, null otherwise</returns>
         protected virtual SymbolToken OnUnexpectedToken(SymbolToken nextToken) 
 		{ 
@@ -158,9 +158,8 @@ namespace Hime.Redist.Parsers
         /// Gets the next token in the input
         /// </summary>
         /// <param name="lexer">Base lexer for reading tokens</param>
-        /// <param name="state">Parser's current state</param>
         /// <returns>The next token in the input</returns>
-        internal protected SymbolToken GetNextToken(ILexer lexer) 
+        protected SymbolToken GetNextToken(ILexer lexer) 
 		{ 
 			return lexer.GetNextToken(); 
 		}

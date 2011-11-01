@@ -8,9 +8,10 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    public sealed class LRStarState : LRState
+    public class LRStarState : LRState
     {
-        public DeciderState[] decider;
+        internal DeciderState[] decider;
+		
         public LRStarState(string[] items, SymbolTerminal[] expected, DeciderState[] decider, ushort[] sv_keys, ushort[] sv_val) : base(items)
         {
             this.expecteds = expected;
