@@ -8,7 +8,7 @@
     <ProjectGuid>{B4C8FA2B-8ECF-4BB2-85A0-50F58C122BAF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hime.HimeDemo</RootNamespace>
+    <RootNamespace>Hime.Demo</RootNamespace>
     <AssemblyName>HimeDemo</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -105,6 +105,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest" />
+    <Compile Include="Tasks\ParsingTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WinTreeView.resx">

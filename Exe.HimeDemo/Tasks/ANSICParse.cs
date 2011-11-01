@@ -9,27 +9,12 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
-    class ANSICParse : IExecutable
+    internal class ANSICParse : ParsingTask
     {
-        public void Execute()
-        {
+		internal ANSICParse()
+		{
             Analyser.ANSI_C_Lexer lexer = new Analyser.ANSI_C_Lexer(new StreamReader("test.c"));
-            Analyser.ANSI_C_Parser parser = new Analyser.ANSI_C_Parser(lexer);
-            SyntaxTreeNode root = parser.Analyse();
-
-            foreach (ParserError error in parser.Errors)
-			{
-                Console.WriteLine(error.ToString());
-			}
-			
-            if (root != null)
-            {
-				// TODO: what is this LangTest namespace, why is it different?
-				using (LangTest.WinTreeView window = new LangTest.WinTreeView(root))
-				{
-                	window.ShowDialog();
-				}
-            }
-        }
+            this.parser = new Analyser.ANSI_C_Parser(lexer);
+		}
     }
 }
