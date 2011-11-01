@@ -161,9 +161,9 @@ namespace Hime.Parsers.ContextFree.LR
 
             using (ResourceAccessor accessor = new ResourceAccessor())
 			{
-	            MHTMLCompiler compiler = new MHTMLCompiler();
-    	        compiler.Title = "Documentation " + grammar.LocalName;
-        	    compiler.AddSource(new MHTMLSourceStreamText("text/html", "utf-8", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
+	            MHTMLCompiler compiler = new MHTMLCompiler("Documentation " + grammar.LocalName);
+
+				compiler.AddSource(new MHTMLSourceStreamText("text/html", "utf-8", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
             	compiler.AddSource(new MHTMLSourceStreamText("text/html", "utf-8", "GraphParser.html", accessor.GetStreamFor("Transforms.Doc.Parser.html")));
             	compiler.AddSource(new MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
             	compiler.AddSource(new MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
