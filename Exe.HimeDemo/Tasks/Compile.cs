@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Hime.Parsers;
+using System.IO;
 
 namespace Hime.Demo.Tasks
 {
@@ -15,7 +16,11 @@ namespace Hime.Demo.Tasks
             task.ExportDocumentation = false;
             task.ExportVisuals = false;
             task.InputFiles.Add("Languages\\ANSI_C.gram");
-            task.DOTBinary = "C:\\Program Files\\Graphviz 2.28\\bin\\dot.exe";
+			string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+			path = Path.Combine(path, "Graphviz 2.28");
+			path = Path.Combine(path, "bin");
+			path = Path.Combine(path, "dot.exe");
+            task.DOTBinary = path;
 			Compiler compiler = new Compiler(task);
             compiler.Execute();
         }
