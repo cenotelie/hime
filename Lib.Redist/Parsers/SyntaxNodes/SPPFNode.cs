@@ -117,10 +117,8 @@ namespace Hime.Redist.Parsers
             {
                 foreach (SPPFNode child in families[0].Children)
                 {
-                    if (child.Symbol is SymbolAction)
-                        ((SymbolAction)child.Symbol).Action.Invoke(me);
-                    else
-                        me.AppendChild(child.GetFirstTree());
+                    if (child.Symbol is SymbolAction) ((SymbolAction)child.Symbol).Action.Invoke(me);
+                    else me.AppendChild(child.GetFirstTree());
                 }
             }
             else if (families.Count >= 1)
