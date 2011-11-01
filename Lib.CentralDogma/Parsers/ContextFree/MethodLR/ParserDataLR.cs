@@ -190,7 +190,7 @@ namespace Hime.Parsers.ContextFree.LR
         	    XslCompiledTransform transform = new XslCompiledTransform();
             	transform.Load(directory + "\\Header.xslt");
             	transform.Transform(directory + "\\data.xml", directory + "\\header.html");
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceFileText("text/html", "utf-8", "header.html", directory + "\\header.html"));
+            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceFile("text/html", "header.html", directory + "\\header.html"));
             	accessor.AddCheckoutFile(directory + "\\header.html");
 				
             	// generate grammar
@@ -198,7 +198,7 @@ namespace Hime.Parsers.ContextFree.LR
             	transform = new XslCompiledTransform();
           		transform.Load(directory + "\\Grammar.xslt");
          	   	transform.Transform(directory + "\\data.xml", directory + "\\grammar.html");
-         	   	compiler.AddSource(new MHTMLSourceFileText("text/html", "utf-8", "grammar.html", directory + "\\grammar.html"));
+         	   	compiler.AddSource(new MHTMLSourceFile("text/html", "grammar.html", directory + "\\grammar.html"));
             	accessor.AddCheckoutFile(directory + "\\grammar.html");
 
             	doc = new XmlDocument();
@@ -219,7 +219,7 @@ namespace Hime.Parsers.ContextFree.LR
                 	doc.Save(temp + ".xml");
                 	accessor.AddCheckoutFile(temp + ".xml");
                 	transform.Transform(temp + ".xml", temp + ".html");
-                	compiler.AddSource(new MHTMLSourceFileText("text/html", "utf-8", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
+                	compiler.AddSource(new MHTMLSourceFile("text/html", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
                 	accessor.AddCheckoutFile(temp + ".html");
             	}
 
@@ -234,7 +234,7 @@ namespace Hime.Parsers.ContextFree.LR
             	transform = new XslCompiledTransform();
             	transform.Load(directory + "\\Menu.xslt");
             	transform.Transform(directory + "\\data.xml", directory + "\\menu.html");
-            	compiler.AddSource(new MHTMLSourceFileText("text/html", "utf-8", "menu.html", directory + "\\menu.html"));
+            	compiler.AddSource(new MHTMLSourceFile("text/html", "menu.html", directory + "\\menu.html"));
             	accessor.AddCheckoutFile(directory + "\\menu.html");
 
             	// export parser data
@@ -243,8 +243,8 @@ namespace Hime.Parsers.ContextFree.LR
             	{
                 	FileInfo info = new FileInfo(vfile);
 					MHTMLSource source;
-                	if (vfile.EndsWith(".svg")) source = new MHTMLSourceFileImage("image/svg+xml", info.Name, vfile);
-            	    else source = new MHTMLSourceFileText("text/plain", "utf-8", info.Name, vfile);
+                	if (vfile.EndsWith(".svg")) source = new MHTMLSourceFile("image/svg+xml", info.Name, vfile);
+            	    else source = new MHTMLSourceFile("text/plain", info.Name, vfile);
 					compiler.AddSource(source);
     	            accessor.AddCheckoutFile(vfile);
 	            }

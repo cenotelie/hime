@@ -74,8 +74,6 @@
     <Compile Include="Kernel\Documentation\MHTMLCompiler.cs" />
     <Compile Include="Kernel\Documentation\MHTMLSource.cs" />
     <Compile Include="Kernel\Documentation\MHTMLSourceFile.cs" />
-    <Compile Include="Kernel\Documentation\MHTMLSourceFileImage.cs" />
-    <Compile Include="Kernel\Documentation\MHTMLSourceFileText.cs" />
     <Compile Include="Kernel\Documentation\MHTMLSourceStream.cs" />
     <Compile Include="Kernel\Documentation\MHTMLSourceStreamImage.cs" />
     <Compile Include="Kernel\Documentation\MHTMLSourceStreamText.cs" />

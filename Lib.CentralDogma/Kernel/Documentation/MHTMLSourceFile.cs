@@ -6,7 +6,7 @@
  */
 namespace Hime.Kernel.Documentation
 {
-    public abstract class MHTMLSourceFile : MHTMLSource
+    internal class MHTMLSourceFile : MHTMLSource
     {
         private const int bufferSize = 900;
         protected string mime;

@@ -117,7 +117,7 @@ namespace Hime.Kernel.Reporting
 
 	            Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler(title);
 
-				compiler.AddSource(new MHTMLSourceFileText("text/html", "utf-8", "Grammar.html", htmlFileName));
+				compiler.AddSource(new MHTMLSourceFile("text/html", "Grammar.html", htmlFileName));
             	compiler.AddSource(new MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
             	compiler.AddSource(new MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
 
