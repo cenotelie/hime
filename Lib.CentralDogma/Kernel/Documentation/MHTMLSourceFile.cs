@@ -11,25 +11,21 @@ namespace Hime.Kernel.Documentation
 {
     internal class MHTMLSourceFile : MHTMLSource
     {
-        private const int bufferSize = 900;
-        protected string mime;
         protected string location;
         protected string file;
         private Stream stream;
         private byte[] buffer;
 
-        public virtual string ContentType { get { return mime; } }
-        public string ContentTransferEncoding { get { return "base64"; } }
-        public string ContentLocation { get { return location; } }
+        public override string ContentTransferEncoding { get { return "base64"; } }
+        public override string ContentLocation { get { return location; } }
 
-        public MHTMLSourceFile(string mime, string location, string file)
+        public MHTMLSourceFile(string mime, string location, string file) : base(mime)
         {
-            this.mime = mime;
             this.location = location;
             this.file = file;
         }
 
-        public string Read()
+        public override string Read()
         {
             if (stream == null)
             {
@@ -43,7 +39,7 @@ namespace Hime.Kernel.Documentation
             return Convert.ToBase64String(buffer, 0, read);
         }
 		
-        public void Close()
+        public override void Close()
         {
             if (stream != null)
                 stream.Close();

@@ -6,12 +6,19 @@
  */
 namespace Hime.Kernel.Documentation
 {
-    public interface MHTMLSource
+    internal abstract class MHTMLSource
     {
-        string ContentType { get; }
-        string ContentTransferEncoding { get; }
-        string ContentLocation { get; }
-        string Read();
-        void Close();
+        protected const int bufferSize = 900;
+
+        public string ContentType { get; private set; }
+        public abstract string ContentTransferEncoding { get; }
+        public abstract string ContentLocation { get; }
+        public abstract string Read();
+        public abstract void Close();
+		
+		internal MHTMLSource(string mime)
+		{
+			this.ContentType = mime;
+		}
     }
 }
