@@ -42,7 +42,7 @@ namespace Hime.Redist.Parsers
             {
                 if (states[state].HasReduction())
                 {
-                    LRRule rule = states[state].reduction;
+                    LRRule rule = states[state].Reduction;
                     Production Reduce = rule.OnReduction;
                     ushort HeadID = rule.Head.SymbolID;
                     nodes.AddLast(Reduce(this));

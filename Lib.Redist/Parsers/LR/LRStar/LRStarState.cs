@@ -8,10 +8,15 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
+	/// <summary>
+	/// States for LRStar automata.
+	/// </summary>
     public class LRStarState : LRState
     {
         internal DeciderState[] decider;
 		
+		// TODO: not nice: it is strange that items seem not to be used, idem of shiftsOnTerminal
+		// TODO: Maybe LRState should not be like it is now... Think about it.
         public LRStarState(string[] items, SymbolTerminal[] expected, DeciderState[] decider, ushort[] sv_keys, ushort[] sv_val) : base(items)
         {
             this.expecteds = expected;
