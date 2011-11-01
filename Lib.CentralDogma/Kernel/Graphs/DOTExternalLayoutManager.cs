@@ -5,6 +5,8 @@
  * 
  */
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
 namespace Hime.Kernel.Graphs
 {
@@ -14,19 +16,21 @@ namespace Hime.Kernel.Graphs
 
         public DOTExternalLayoutManager(string binary)
         {
-            executable = binary;
+            this.executable = binary;
         }
 
         public void Render(string dotFile, string svgFile)
         {
-            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            StringBuilder builder = new StringBuilder();
             builder.Append("-Tsvg");
             builder.Append(" -o");
             builder.Append(svgFile);
             builder.Append(" ");
             builder.Append(dotFile);
-            System.Diagnostics.Process process = System.Diagnostics.Process.Start(executable, builder.ToString());
-            process.WaitForExit();
+            using (Process process = Process.Start(this.executable, builder.ToString()))
+			{
+            	process.WaitForExit();
+			}
         }
     }
 }
