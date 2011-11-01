@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents an action symbol in a shared packed parse forest
     /// </summary>
-    public sealed class SymbolAction : SymbolVirtual
+    public class SymbolAction : SymbolVirtual
     {
         /// <summary>
         /// Represents the method to call for executing the action

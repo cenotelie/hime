@@ -24,6 +24,15 @@ namespace Hime.Redist.Parsers
         /// <returns>The string representation of this error</returns>
         public override string ToString() { return this.Message; }
 		
+		/// <summary>
+		/// Error thrown by the parser.
+		/// </summary>
+		/// <param name='line'>
+		/// Line.
+		/// </param>
+		/// <param name='column'>
+		/// Column.
+		/// </param>
 		protected ParserError(int line, int column)
 		{
 			this.Message = "@("+ line + ", " + column + ") Unexpected ";

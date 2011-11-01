@@ -19,6 +19,9 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public interface ILexer
     {
+		// TODO: instead of having a line and column, should have a Position!!
+		// Binary position is number of characters since start
+		// Text position is line and column
         /// <summary>
         /// Gets the current line number in the input
         /// </summary>

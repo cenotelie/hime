@@ -13,7 +13,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents an unexpected character error in the input stream of a lexer
     /// </summary>
-    public class UnexpectedCharError : ParserError
+    internal class UnexpectedCharError : ParserError
     {
         /// <summary>
         /// Initializes a new instance of the LexerTextErrorDiscardedChar class for the given character at the given line and column number

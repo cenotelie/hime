@@ -13,7 +13,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents an unexpected token error in a parser
     /// </summary>
-    public class UnexpectedTokenError : ParserError
+    internal class UnexpectedTokenError : ParserError
     {
 		/// <summary>
 		/// Initializes a new instance of the ParserErrorUnexpectedToken class with a token and an array of expected names.
