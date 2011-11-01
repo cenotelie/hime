@@ -12,7 +12,7 @@ using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree
 {
-    class CFGrammarLoader : LoaderPlugin
+    class CFGrammarLoader
     {
         private static string[] resourcesNames = new string[] { "cf_grammar_text", "cf_grammar_bin" };
 

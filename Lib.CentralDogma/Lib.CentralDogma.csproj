@@ -195,7 +195,6 @@
     <Compile Include="Kernel\Resources\ResourceAccessor.cs" />
     <Compile Include="Kernel\Resources\ResourceGraph.cs" />
     <Compile Include="Kernel\Resources\ResourceNotFoundException.cs" />
-    <Compile Include="Kernel\Resources\LoaderPlugin.cs" />
     <Compile Include="Parsers\Variable.cs" />
     <Compile Include="Parsers\Virtual.cs" />
     <Compile Include="Parsers\TerminalText.cs" />

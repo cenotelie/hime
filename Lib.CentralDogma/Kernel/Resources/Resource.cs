@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Hime.Kernel.Naming;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
+using Hime.Parsers.ContextFree;
 
 namespace Hime.Kernel.Resources
 {
@@ -17,11 +18,11 @@ namespace Hime.Kernel.Resources
         internal Naming.Symbol Symbol { get; private set; }
         internal SyntaxTreeNode SyntaxNode { get; private set; }
         internal List<KeyValuePair<string, Resource>> Dependencies { get; private set; }
-        internal LoaderPlugin Loader { get; private set; }
+        internal CFGrammarLoader Loader { get; private set; }
 		
         internal bool IsLoaded { get; set; }
 
-        internal Resource(Naming.Symbol symbol, SyntaxTreeNode syntaxNode, LoaderPlugin loader)
+        internal Resource(Naming.Symbol symbol, SyntaxTreeNode syntaxNode, CFGrammarLoader loader)
         {
             this.Symbol = symbol;
             this.SyntaxNode = syntaxNode;

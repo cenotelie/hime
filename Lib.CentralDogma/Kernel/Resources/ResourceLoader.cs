@@ -12,32 +12,33 @@ using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 using Hime.Kernel.Resources.Parser;
 using System.Reflection;
+using Hime.Parsers.ContextFree;
 
 namespace Hime.Kernel.Resources
 {
 	// TODO: think about it, but maybe this class is doing too many things?
 	class ResourceLoader
     {
-        private static Dictionary<string, LoaderPlugin> defaultPlugins = new Dictionary<string, LoaderPlugin>();
-        internal static void RegisterPlugin(LoaderPlugin plugin)
+        private static Dictionary<string, CFGrammarLoader> defaultPlugins = new Dictionary<string, CFGrammarLoader>();
+        internal static void RegisterPlugin(CFGrammarLoader plugin)
         {
             for (int i = 0; i != plugin.ResourceNames.Length; i++)
                 defaultPlugins.Add(plugin.ResourceNames[i], plugin);
         }
 
-        private Dictionary<string, LoaderPlugin> plugins;
+        private Dictionary<string, CFGrammarLoader> plugins;
         private Dictionary<string, TextReader> inputNamedResources;
         private List<TextReader> inputAnonResources;
         private Reporter log;
         private SyntaxTreeNode intermediateRoot;
         private ResourceGraph intermediateResources;
 
-        public Dictionary<string, LoaderPlugin> Plugins { get { return plugins; } }
+        public Dictionary<string, CFGrammarLoader> Plugins { get { return plugins; } }
         private Namespace outputRootNamespace;
         
         public ResourceLoader(Reporter reporter)
         {
-            plugins = new Dictionary<string, LoaderPlugin>(defaultPlugins);
+            plugins = new Dictionary<string, CFGrammarLoader>(defaultPlugins);
             inputNamedResources = new Dictionary<string, TextReader>();
             inputAnonResources = new List<TextReader>();
             this.intermediateRoot = new SyntaxTreeNode(null);
@@ -162,7 +163,7 @@ namespace Hime.Kernel.Resources
                     Compile_namespace(child, this.outputRootNamespace);
                 else
                 {
-                    LoaderPlugin plugin = GetPluginFor(child.Symbol.Name);
+                    CFGrammarLoader plugin = GetPluginFor(child.Symbol.Name);
                     plugin.CreateResource(this.outputRootNamespace, child, intermediateResources, log);
                 }
             }
@@ -178,13 +179,13 @@ namespace Hime.Kernel.Resources
                     Compile_namespace(child, currentNamespace);
                 else
                 {
-                    LoaderPlugin plugin = GetPluginFor(child.Symbol.Name);
+                    CFGrammarLoader plugin = GetPluginFor(child.Symbol.Name);
                     plugin.CreateResource(currentNamespace, child, intermediateResources, log);
                 }
             }
         }
 
-        private LoaderPlugin GetPluginFor(string name)
+        private CFGrammarLoader GetPluginFor(string name)
         {
             if (plugins.ContainsKey(name))
                 return plugins[name];
