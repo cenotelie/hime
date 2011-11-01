@@ -84,6 +84,7 @@ namespace Hime.Parsers.ContextFree
                 }
             }
         }
+		
         public int CompileSolveDependencies(Resource resource, Reporter log)
         {
             CFGrammar grammar = resource.Symbol as CFGrammar;
@@ -101,18 +102,22 @@ namespace Hime.Parsers.ContextFree
             }
             return Solved;
         }
+		
         public bool Compile(Resource resource, Reporter log)
         {
             this.log = log;
             this.hasErrors = false;
-            if (resource.Symbol is CFGrammarText)
+			Symbol grammar = resource.Symbol;
+            log.Info("Loader", "Loading grammar " + grammar.LocalName);
+			// TODO: this cast is really ugly
+            if (grammar is CFGrammarText)
             {
-                Compile_Recognize_grammar_text((CFGrammar)resource.Symbol, resource.SyntaxNode);
+                Compile_Recognize_grammar_text((CFGrammar)grammar, resource.SyntaxNode);
                 resource.IsLoaded = true;
             }
-            else if (resource.Symbol is CFGrammarBinary)
+            else if (grammar is CFGrammarBinary)
             {
-                Compile_Recognize_grammar_bin((CFGrammar)resource.Symbol, resource.SyntaxNode);
+                Compile_Recognize_grammar_bin((CFGrammar)grammar, resource.SyntaxNode);
                 resource.IsLoaded = true;
             }
             return (!hasErrors);
@@ -695,7 +700,6 @@ namespace Hime.Parsers.ContextFree
 
         private void Compile_Recognize_grammar_text(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode node)
         {
-            log.Info("Loader", "Loading grammar " + grammar.LocalName);
             log.Info("Loader", "Grammar takes text as input");
             for (int i = 3; i < node.Children.Count; i++)
             {
@@ -710,7 +714,6 @@ namespace Hime.Parsers.ContextFree
         }
         private void Compile_Recognize_grammar_bin(CFGrammar grammar, Redist.Parsers.SyntaxTreeNode node)
         {
-            log.Info("Loader", "Loading grammar " + grammar.LocalName);
             log.Info("Loader", "Grammar takes binary as input");
             for (int i = 3; i < node.Children.Count; i++)
             {
