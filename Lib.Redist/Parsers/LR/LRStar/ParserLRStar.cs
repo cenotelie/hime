@@ -37,10 +37,10 @@ namespace Hime.Redist.Parsers
             ds = lrState.decider[ds[token]];
             while (true)
             {
-                if (ds.shift != 0xFFFF)
+                if (ds.Shift != 0xFFFF)
                 {
                     reader.Rewind(depth);
-                    return ds.shift;
+                    return ds.Shift;
                 }
                 if (ds.reduction.Head != null)
                 {

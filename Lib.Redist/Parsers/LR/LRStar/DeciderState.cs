@@ -8,17 +8,17 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    public struct DeciderState
+    public class DeciderState
     {
         private Dictionary<ushort, ushort> transitions;
-        public ushort shift;
+        internal ushort Shift { get; private set; }
         public LRRule reduction;
         public DeciderState(ushort[] t_keys, ushort[] t_val, ushort shift, LRRule reduction)
         {
             this.transitions = new Dictionary<ushort, ushort>();
             for (int i = 0; i != t_keys.Length; i++)
                 this.transitions.Add(t_keys[i], t_val[i]);
-            this.shift = shift;
+            this.Shift = shift;
             this.reduction = reduction;
         }
 		
