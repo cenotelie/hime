@@ -62,10 +62,12 @@ namespace Hime.Kernel.Resources
 		
 		private byte[] ReadResource(string resourceName)
 		{
-			Stream stream = GetStreamFor(resourceName);
-            byte[] buffer = new byte[stream.Length];
-            stream.Read(buffer, 0, buffer.Length);
-			return buffer;
+			using (Stream stream = GetStreamFor(resourceName))
+			{
+            	byte[] buffer = new byte[stream.Length];
+            	stream.Read(buffer, 0, buffer.Length);
+				return buffer;
+			}
 		}
 		
         public void Export(string resourceName, string fileName)
