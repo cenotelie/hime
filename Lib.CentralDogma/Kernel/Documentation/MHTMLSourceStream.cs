@@ -11,23 +11,8 @@ namespace Hime.Kernel.Documentation
 {
     internal class MHTMLSourceStream : MHTMLSource
     {
-        private Stream stream;
-        private byte[] buffer;
-
-        internal MHTMLSourceStream(string mime, string location, Stream stream) : base(mime, location)
+        internal MHTMLSourceStream(string mime, string location, Stream stream) : base(mime, location, stream)
         {
-            this.stream = stream;
-            this.buffer = new byte[bufferSize];
         }
-
-        internal override string Read()
-        {
-            int read = stream.Read(buffer, 0, bufferSize);
-            if (read == 0)
-                return null;
-            return Convert.ToBase64String(buffer, 0, read);
-        }
-		
-        internal override void Close() { }
     }
 }

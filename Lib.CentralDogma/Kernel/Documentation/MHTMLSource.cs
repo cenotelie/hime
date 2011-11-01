@@ -4,11 +4,17 @@
  * Time: 17:22
  * 
  */
+using System;
+using System.IO;
+
 namespace Hime.Kernel.Documentation
 {
     internal abstract class MHTMLSource
     {
-        protected const int bufferSize = 900;
+        private const int bufferSize = 900;
+
+		private Stream stream;
+        private byte[] buffer;
 
         internal string ContentType { get; private set; }
 
@@ -16,13 +22,25 @@ namespace Hime.Kernel.Documentation
 		
         internal string ContentTransferEncoding { get { return "base64"; } }
 
-		internal abstract string Read();
-        internal abstract void Close();
+        internal string Read()
+        {
+            int read = stream.Read(buffer, 0, bufferSize);
+            if (read == 0)
+                return null;
+            return Convert.ToBase64String(buffer, 0, read);
+        }
+
+		internal void Close() 
+		{ 
+			this.stream.Close();
+		}
 		
-		internal MHTMLSource(string mime, string location)
+		internal MHTMLSource(string mime, string location, Stream stream)
 		{
 			this.ContentType = mime;
 			this.ContentLocation = location;
+			this.stream = stream;
+            this.buffer = new byte[bufferSize];
 		}
     }
 }

@@ -190,7 +190,7 @@ namespace Hime.Parsers.ContextFree.LR
         	    XslCompiledTransform transform = new XslCompiledTransform();
             	transform.Load(directory + "\\Header.xslt");
             	transform.Transform(directory + "\\data.xml", directory + "\\header.html");
-            	compiler.AddSource(new Kernel.Documentation.MHTMLSourceFile("text/html", "header.html", directory + "\\header.html"));
+            	compiler.AddSource(new MHTMLSourceFile("text/html", "header.html", directory + "\\header.html"));
             	accessor.AddCheckoutFile(directory + "\\header.html");
 				
             	// generate grammar
