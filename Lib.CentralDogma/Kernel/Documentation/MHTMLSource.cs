@@ -10,15 +10,17 @@ namespace Hime.Kernel.Documentation
     {
         protected const int bufferSize = 900;
 
-        public string ContentType { get; private set; }
+        internal string ContentType { get; private set; }
+		internal string ContentLocation { get; private set; }
+		
         public abstract string ContentTransferEncoding { get; }
-        public abstract string ContentLocation { get; }
         public abstract string Read();
         public abstract void Close();
 		
-		internal MHTMLSource(string mime)
+		internal MHTMLSource(string mime, string location)
 		{
 			this.ContentType = mime;
+			this.ContentLocation = location;
 		}
     }
 }

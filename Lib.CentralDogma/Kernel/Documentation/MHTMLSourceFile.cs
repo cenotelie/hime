@@ -11,17 +11,14 @@ namespace Hime.Kernel.Documentation
 {
     internal class MHTMLSourceFile : MHTMLSource
     {
-        protected string location;
         protected string file;
         private Stream stream;
         private byte[] buffer;
 
         public override string ContentTransferEncoding { get { return "base64"; } }
-        public override string ContentLocation { get { return location; } }
 
-        public MHTMLSourceFile(string mime, string location, string file) : base(mime)
+        public MHTMLSourceFile(string mime, string location, string file) : base(mime, location)
         {
-            this.location = location;
             this.file = file;
         }
 
