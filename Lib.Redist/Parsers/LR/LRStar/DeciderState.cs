@@ -10,7 +10,7 @@ namespace Hime.Redist.Parsers
 {
     public struct DeciderState
     {
-        public Dictionary<ushort, ushort> transitions;
+        private Dictionary<ushort, ushort> transitions;
         public ushort shift;
         public LRRule reduction;
         public DeciderState(ushort[] t_keys, ushort[] t_val, ushort shift, LRRule reduction)
@@ -21,5 +21,15 @@ namespace Hime.Redist.Parsers
             this.shift = shift;
             this.reduction = reduction;
         }
+		
+		internal bool ContainsKey(ushort token)
+		{
+			return this.transitions.ContainsKey(token);
+		}
+		
+		internal ushort this[ushort index]
+		{
+			get { return this.transitions[index]; }
+		}
     }
 }

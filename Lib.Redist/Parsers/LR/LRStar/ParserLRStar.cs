@@ -32,9 +32,9 @@ namespace Hime.Redist.Parsers
             LRStarState lrState = states[state];
             DeciderState ds = lrState.decider[0];
             ushort token = first;
-            if (!ds.transitions.ContainsKey(token)) // Unexpected token !
+            if (!ds.ContainsKey(token)) // Unexpected token !
                 return 0xFFFF;
-            ds = lrState.decider[ds.transitions[token]];
+            ds = lrState.decider[ds[token]];
             while (true)
             {
                 if (ds.shift != 0xFFFF)
@@ -51,13 +51,13 @@ namespace Hime.Redist.Parsers
                 // go to new state
                 token = reader.Read().SymbolID;
                 depth++;
-                if (!ds.transitions.ContainsKey(token))
+                if (!ds.ContainsKey(token))
                 {
                     // Unexpected token !
                     reader.Rewind(depth);
                     return 0xFFFF;
                 }
-                ds = lrState.decider[ds.transitions[token]];
+                ds = lrState.decider[ds[token]];
             }
         }
 
