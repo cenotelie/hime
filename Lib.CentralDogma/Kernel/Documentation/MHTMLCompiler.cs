@@ -49,6 +49,7 @@ namespace Hime.Kernel.Documentation
 
         	    foreach (MHTMLSource source in sources)
             	{
+					// TODO: maybe put this code in ToString of MHTMLSource
 	                writer.WriteLine();
     	            writer.WriteLine();
         	        writer.WriteLine("--" + boundary);

@@ -9,13 +9,14 @@ using System.IO;
 
 namespace Hime.Kernel.Documentation
 {
-    internal abstract class MHTMLSource
+    internal class MHTMLSource
     {
         private const int bufferSize = 900;
 
 		private Stream stream;
         private byte[] buffer;
-
+		
+		// TODO: make private
         internal string ContentType { get; private set; }
 
 		internal string ContentLocation { get; private set; }
@@ -42,5 +43,9 @@ namespace Hime.Kernel.Documentation
 			this.stream = stream;
             this.buffer = new byte[bufferSize];
 		}
-    }
+		
+		internal MHTMLSource(string mime, string location, string file) : this(mime, location, new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+        }
+	}
 }

@@ -73,8 +73,6 @@
     </Compile>
     <Compile Include="Kernel\Documentation\MHTMLCompiler.cs" />
     <Compile Include="Kernel\Documentation\MHTMLSource.cs" />
-    <Compile Include="Kernel\Documentation\MHTMLSourceFile.cs" />
-    <Compile Include="Kernel\Documentation\MHTMLSourceStream.cs" />
     <Compile Include="Kernel\Graphs\DOTExternalLayoutManager.cs" />
     <Compile Include="Kernel\Graphs\DOTLayoutManager.cs" />
     <Compile Include="Kernel\Graphs\DOTNodeShape.cs" />

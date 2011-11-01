@@ -163,22 +163,22 @@ namespace Hime.Parsers.ContextFree.LR
 			{
 	            MHTMLCompiler compiler = new MHTMLCompiler("Documentation " + grammar.LocalName);
 
-				compiler.AddSource(new MHTMLSourceStream("text/html", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
-            	compiler.AddSource(new MHTMLSourceStream("text/html", "GraphParser.html", accessor.GetStreamFor("Transforms.Doc.Parser.html")));
-            	compiler.AddSource(new MHTMLSourceStream("text/css", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
-            	compiler.AddSource(new MHTMLSourceStream("text/javascript", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
-            	compiler.AddSource(new MHTMLSourceStream("image/gif", "hime_data/button_plus.gif", accessor.GetStreamFor("Visuals.button_plus.gif")));
-            	compiler.AddSource(new MHTMLSourceStream("image/gif", "hime_data/button_minus.gif", accessor.GetStreamFor("Visuals.button_minus.gif")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Logo.png", accessor.GetStreamFor("Visuals.Hime.Logo.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.GoTo.png", accessor.GetStreamFor("Visuals.Hime.GoTo.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Info.png", accessor.GetStreamFor("Visuals.Hime.Info.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Warning.png", accessor.GetStreamFor("Visuals.Hime.Warning.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Error.png", accessor.GetStreamFor("Visuals.Hime.Error.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Shift.png", accessor.GetStreamFor("Visuals.Hime.Shift.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Reduce.png", accessor.GetStreamFor("Visuals.Hime.Reduce.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.None.png", accessor.GetStreamFor("Visuals.Hime.None.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.ShiftReduce.png", accessor.GetStreamFor("Visuals.Hime.ShiftReduce.png")));
-            	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.ReduceReduce.png", accessor.GetStreamFor("Visuals.Hime.ReduceReduce.png")));
+				compiler.AddSource(new MHTMLSource("text/html", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
+            	compiler.AddSource(new MHTMLSource("text/html", "GraphParser.html", accessor.GetStreamFor("Transforms.Doc.Parser.html")));
+            	compiler.AddSource(new MHTMLSource("text/css", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
+            	compiler.AddSource(new MHTMLSource("text/javascript", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
+            	compiler.AddSource(new MHTMLSource("image/gif", "hime_data/button_plus.gif", accessor.GetStreamFor("Visuals.button_plus.gif")));
+            	compiler.AddSource(new MHTMLSource("image/gif", "hime_data/button_minus.gif", accessor.GetStreamFor("Visuals.button_minus.gif")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Logo.png", accessor.GetStreamFor("Visuals.Hime.Logo.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.GoTo.png", accessor.GetStreamFor("Visuals.Hime.GoTo.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Info.png", accessor.GetStreamFor("Visuals.Hime.Info.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Warning.png", accessor.GetStreamFor("Visuals.Hime.Warning.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Error.png", accessor.GetStreamFor("Visuals.Hime.Error.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Shift.png", accessor.GetStreamFor("Visuals.Hime.Shift.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Reduce.png", accessor.GetStreamFor("Visuals.Hime.Reduce.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.None.png", accessor.GetStreamFor("Visuals.Hime.None.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.ShiftReduce.png", accessor.GetStreamFor("Visuals.Hime.ShiftReduce.png")));
+            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.ReduceReduce.png", accessor.GetStreamFor("Visuals.Hime.ReduceReduce.png")));
 
             	XmlDocument doc = new XmlDocument();
             	doc.AppendChild(SerializeGrammar(doc));
@@ -190,7 +190,7 @@ namespace Hime.Parsers.ContextFree.LR
         	    XslCompiledTransform transform = new XslCompiledTransform();
             	transform.Load(directory + "\\Header.xslt");
             	transform.Transform(directory + "\\data.xml", directory + "\\header.html");
-            	compiler.AddSource(new MHTMLSourceFile("text/html", "header.html", directory + "\\header.html"));
+            	compiler.AddSource(new MHTMLSource("text/html", "header.html", directory + "\\header.html"));
             	accessor.AddCheckoutFile(directory + "\\header.html");
 				
             	// generate grammar
@@ -198,7 +198,7 @@ namespace Hime.Parsers.ContextFree.LR
             	transform = new XslCompiledTransform();
           		transform.Load(directory + "\\Grammar.xslt");
          	   	transform.Transform(directory + "\\data.xml", directory + "\\grammar.html");
-         	   	compiler.AddSource(new MHTMLSourceFile("text/html", "grammar.html", directory + "\\grammar.html"));
+         	   	compiler.AddSource(new MHTMLSource("text/html", "grammar.html", directory + "\\grammar.html"));
             	accessor.AddCheckoutFile(directory + "\\grammar.html");
 
             	doc = new XmlDocument();
@@ -219,7 +219,7 @@ namespace Hime.Parsers.ContextFree.LR
                 	doc.Save(temp + ".xml");
                 	accessor.AddCheckoutFile(temp + ".xml");
                 	transform.Transform(temp + ".xml", temp + ".html");
-                	compiler.AddSource(new MHTMLSourceFile("text/html", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
+                	compiler.AddSource(new MHTMLSource("text/html", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
                 	accessor.AddCheckoutFile(temp + ".html");
             	}
 
@@ -234,7 +234,7 @@ namespace Hime.Parsers.ContextFree.LR
             	transform = new XslCompiledTransform();
             	transform.Load(directory + "\\Menu.xslt");
             	transform.Transform(directory + "\\data.xml", directory + "\\menu.html");
-            	compiler.AddSource(new MHTMLSourceFile("text/html", "menu.html", directory + "\\menu.html"));
+            	compiler.AddSource(new MHTMLSource("text/html", "menu.html", directory + "\\menu.html"));
             	accessor.AddCheckoutFile(directory + "\\menu.html");
 
             	// export parser data
@@ -242,9 +242,10 @@ namespace Hime.Parsers.ContextFree.LR
             	foreach (string vfile in files)
             	{
                 	FileInfo info = new FileInfo(vfile);
-					MHTMLSource source;
-                	if (vfile.EndsWith(".svg")) source = new MHTMLSourceFile("image/svg+xml", info.Name, vfile);
-            	    else source = new MHTMLSourceFile("text/plain", info.Name, vfile);
+					string mime;
+                	if (vfile.EndsWith(".svg")) mime = "image/svg+xml";
+            	    else mime = "text/plain";
+					MHTMLSource source = new MHTMLSource(mime, info.Name, vfile);
 					compiler.AddSource(source);
     	            accessor.AddCheckoutFile(vfile);
 	            }
