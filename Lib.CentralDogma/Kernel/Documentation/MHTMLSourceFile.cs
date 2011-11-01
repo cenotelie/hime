@@ -4,6 +4,9 @@
  * Time: 17:22
  * 
  */
+using System;
+using System.IO;
+
 namespace Hime.Kernel.Documentation
 {
     internal class MHTMLSourceFile : MHTMLSource
@@ -12,7 +15,7 @@ namespace Hime.Kernel.Documentation
         protected string mime;
         protected string location;
         protected string file;
-        private System.IO.Stream stream;
+        private Stream stream;
         private byte[] buffer;
 
         public virtual string ContentType { get { return mime; } }
@@ -37,8 +40,9 @@ namespace Hime.Kernel.Documentation
             int read = stream.Read(buffer, 0, bufferSize);
             if (read == 0)
                 return null;
-            return System.Convert.ToBase64String(buffer, 0, read);
+            return Convert.ToBase64String(buffer, 0, read);
         }
+		
         public void Close()
         {
             if (stream != null)
