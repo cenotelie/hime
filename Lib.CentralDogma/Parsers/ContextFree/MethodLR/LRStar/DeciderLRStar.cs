@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class DeciderLRStar
+    internal class DeciderLRStar
     {
         private State lrstate;
         private List<Item> items;
@@ -16,13 +16,13 @@ namespace Hime.Parsers.ContextFree.LR
         private Dictionary<Conflict, DeciderStateLRStar> origins;
         private Dictionary<Conflict, bool> isResolved;
 
-        public State LRState { get { return lrstate; } }
-        public ICollection<DeciderStateLRStar> States { get { return states; } }
-        public ICollection<Conflict> Conflicts { get { return isResolved.Keys; } }
+        internal State LRState { get { return lrstate; } }
+        internal ICollection<DeciderStateLRStar> States { get { return states; } }
+        internal ICollection<Conflict> Conflicts { get { return isResolved.Keys; } }
 
-        public bool IsResolved(Conflict conflict) { return isResolved[conflict]; }
+        internal bool IsResolved(Conflict conflict) { return isResolved[conflict]; }
 
-        public DeciderLRStar(State state)
+        internal DeciderLRStar(State state)
         {
             lrstate = state;
             items = new List<Item>(lrstate.Items);
@@ -31,9 +31,9 @@ namespace Hime.Parsers.ContextFree.LR
             isResolved = new Dictionary<Conflict, bool>();
         }
 
-        public Item GetItem(int decision) { return items[decision]; }
+        internal Item GetItem(int decision) { return items[decision]; }
 
-        public void Build(GLRSimulator simulator)
+        internal void Build(GLRSimulator simulator)
         {
             DeciderStateLRStar first = new DeciderStateLRStar(this);
             states.Add(first);
@@ -55,6 +55,7 @@ namespace Hime.Parsers.ContextFree.LR
             Close(simulator);
             CheckConflicts();
         }
+		
         private void BuildFirst_Shift(DeciderStateLRStar first, Item item, int index, List<Terminal> conflicts)
         {
             GrammarSymbol symbol = item.NextSymbol;
@@ -141,7 +142,7 @@ namespace Hime.Parsers.ContextFree.LR
             return true;
         }
 
-        public DeciderStateLRStar AddUnique(DeciderStateLRStar candidate)
+        internal DeciderStateLRStar AddUnique(DeciderStateLRStar candidate)
         {
             foreach (DeciderStateLRStar potential in states)
                 if (potential.Equals(candidate))
@@ -150,7 +151,7 @@ namespace Hime.Parsers.ContextFree.LR
             return candidate;
         }
 
-        public List<ICollection<Terminal>> GetUnsolvedPaths()
+        internal List<ICollection<Terminal>> GetUnsolvedPaths()
         {
             List<DeciderStateLRStar> visited = new List<DeciderStateLRStar>();
             List<ICollection<Terminal>> result = new List<ICollection<Terminal>>();
