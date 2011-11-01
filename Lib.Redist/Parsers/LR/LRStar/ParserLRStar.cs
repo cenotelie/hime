@@ -42,9 +42,9 @@ namespace Hime.Redist.Parsers
                     reader.Rewind(depth);
                     return ds.Shift;
                 }
-                if (ds.reduction.Head != null)
+                if (ds.Reduction.Head != null)
                 {
-                    reduction = ds.reduction;
+                    reduction = ds.Reduction;
                     reader.Rewind(depth);
                     return 0xFFFF;
                 }
