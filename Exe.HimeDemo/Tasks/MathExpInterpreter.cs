@@ -16,7 +16,7 @@ namespace Hime.Demo.Tasks
 
         internal MathExpInterpreter() { stack = new System.Collections.Generic.Stack<float>(); }
 
-        internal void OnNumber(SyntaxTreeNode SubRoot)
+        public void OnNumber(SyntaxTreeNode SubRoot)
         {
         	SyntaxTreeNode node = SubRoot.Children[0];
             SymbolTokenText token = (SymbolTokenText)node.Symbol;
@@ -24,28 +24,28 @@ namespace Hime.Demo.Tasks
             stack.Push(value);
         }
 
-        internal void OnMult(SyntaxTreeNode SubRoot)
+        public void OnMult(SyntaxTreeNode SubRoot)
         {
         	float right = stack.Pop();
             float left = stack.Pop();
             stack.Push(left * right);
         }
 
-        internal void OnDiv(SyntaxTreeNode SubRoot)
+        public void OnDiv(SyntaxTreeNode SubRoot)
         {
             float right = stack.Pop();
             float left = stack.Pop();
             stack.Push(left / right);
         }
 
-        internal void OnPlus(SyntaxTreeNode SubRoot)
+        public void OnPlus(SyntaxTreeNode SubRoot)
         {
             float right = stack.Pop();
             float left = stack.Pop();
             stack.Push(left + right);
         }
 
-        internal void OnMinus(SyntaxTreeNode SubRoot)
+        public void OnMinus(SyntaxTreeNode SubRoot)
         {
             float right = stack.Pop();
             float left = stack.Pop();
