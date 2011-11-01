@@ -11,21 +11,22 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents an error in a parser
     /// </summary>
-    public interface ParserError
+    public class ParserError
     {
         /// <summary>
         /// Gets the error's message
         /// </summary>
-        string Message { get; }
+        public string Message { get; protected set; }
 
         /// <summary>
-        /// Gets the error's line number
+        /// Returns the string representation of this error
         /// </summary>
-        int Line { get; }
-
-        /// <summary>
-        /// Get the error's column number
-        /// </summary>
-        int Column { get; }
+        /// <returns>The string representation of this error</returns>
+        public override string ToString() { return this.Message; }
+		
+		protected ParserError(int line, int column)
+		{
+			this.Message = "@("+ line + ", " + column + ") Unexpected ";
+		}
     }
 }
