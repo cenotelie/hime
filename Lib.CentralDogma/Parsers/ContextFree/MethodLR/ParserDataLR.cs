@@ -163,10 +163,10 @@ namespace Hime.Parsers.ContextFree.LR
 			{
 	            MHTMLCompiler compiler = new MHTMLCompiler("Documentation " + grammar.LocalName);
 
-				compiler.AddSource(new MHTMLSourceStreamText("text/html", "utf-8", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
-            	compiler.AddSource(new MHTMLSourceStreamText("text/html", "utf-8", "GraphParser.html", accessor.GetStreamFor("Transforms.Doc.Parser.html")));
-            	compiler.AddSource(new MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
-            	compiler.AddSource(new MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
+				compiler.AddSource(new MHTMLSourceStream("text/html", "index.html", accessor.GetStreamFor("Transforms.Doc.Index.html")));
+            	compiler.AddSource(new MHTMLSourceStream("text/html", "GraphParser.html", accessor.GetStreamFor("Transforms.Doc.Parser.html")));
+            	compiler.AddSource(new MHTMLSourceStream("text/css", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
+            	compiler.AddSource(new MHTMLSourceStream("text/javascript", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
             	compiler.AddSource(new MHTMLSourceStream("image/gif", "hime_data/button_plus.gif", accessor.GetStreamFor("Visuals.button_plus.gif")));
             	compiler.AddSource(new MHTMLSourceStream("image/gif", "hime_data/button_minus.gif", accessor.GetStreamFor("Visuals.button_minus.gif")));
             	compiler.AddSource(new MHTMLSourceStream("image/png", "hime_data/Hime.Logo.png", accessor.GetStreamFor("Visuals.Hime.Logo.png")));

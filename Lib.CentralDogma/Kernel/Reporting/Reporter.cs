@@ -118,8 +118,8 @@ namespace Hime.Kernel.Reporting
 	            Kernel.Documentation.MHTMLCompiler compiler = new Kernel.Documentation.MHTMLCompiler(title);
 
 				compiler.AddSource(new MHTMLSourceFile("text/html", "Grammar.html", htmlFileName));
-            	compiler.AddSource(new MHTMLSourceStreamText("text/css", "utf-8", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
-            	compiler.AddSource(new MHTMLSourceStreamText("text/javascript", "utf-8", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
+            	compiler.AddSource(new MHTMLSourceStream("text/css", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
+            	compiler.AddSource(new MHTMLSourceStream("text/javascript", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
 
             	compiler.AddSource(new MHTMLSourceStream("image/gif", "hime_data/button_plus.gif", session.GetStreamFor("Visuals.button_plus.gif")));
             	compiler.AddSource(new MHTMLSourceStream("image/gif", "hime_data/button_minus.gif", session.GetStreamFor("Visuals.button_minus.gif")));
