@@ -12,36 +12,27 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Kernel.Resources
 {
-    class Resource
+    internal class Resource
     {
-        private Naming.Symbol symbol;
-        private SyntaxTreeNode syntaxNode;
-        private List<KeyValuePair<string, Resource>> dependencies;
-        private LoaderPlugin loader;
-        private bool isLoaded;
+        internal Naming.Symbol Symbol { get; private set; }
+        internal SyntaxTreeNode SyntaxNode { get; private set; }
+        internal List<KeyValuePair<string, Resource>> Dependencies { get; private set; }
+        internal LoaderPlugin Loader { get; private set; }
+		
+        internal bool IsLoaded { get; set; }
 
-        public Naming.Symbol Symbol { get { return symbol; } }
-        public SyntaxTreeNode SyntaxNode { get { return syntaxNode; } }
-        public List<KeyValuePair<string, Resource>> Dependencies { get { return dependencies; } }
-        public LoaderPlugin Loader { get { return loader; } }
-        public bool IsLoaded
+        internal Resource(Naming.Symbol symbol, SyntaxTreeNode syntaxNode, LoaderPlugin loader)
         {
-            get { return isLoaded; }
-            set { isLoaded = value; }
+            this.Symbol = symbol;
+            this.SyntaxNode = syntaxNode;
+            this.Dependencies = new List<KeyValuePair<string, Resource>>();
+            this.Loader = loader;
+            this.IsLoaded = false;
         }
 
-        public Resource(Naming.Symbol symbol, SyntaxTreeNode syntaxNode, LoaderPlugin loader)
+        internal void AddDependency(string tag, Resource resource)
         {
-            this.symbol = symbol;
-            this.syntaxNode = syntaxNode;
-            this.dependencies = new List<KeyValuePair<string, Resource>>();
-            this.loader = loader;
-            this.isLoaded = false;
-        }
-
-        public void AddDependency(string tag, Resource resource)
-        {
-            dependencies.Add(new KeyValuePair<string, Resource>(tag, resource));
+            this.Dependencies.Add(new KeyValuePair<string, Resource>(tag, resource));
         }
     }
 }
