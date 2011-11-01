@@ -11,11 +11,13 @@ namespace Hime.Kernel.Documentation
         protected const int bufferSize = 900;
 
         internal string ContentType { get; private set; }
+
 		internal string ContentLocation { get; private set; }
 		
-        public abstract string ContentTransferEncoding { get; }
-        public abstract string Read();
-        public abstract void Close();
+        internal string ContentTransferEncoding { get { return "base64"; } }
+
+		internal abstract string Read();
+        internal abstract void Close();
 		
 		internal MHTMLSource(string mime, string location)
 		{
