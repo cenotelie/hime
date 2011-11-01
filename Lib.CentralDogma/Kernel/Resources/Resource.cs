@@ -43,10 +43,5 @@ namespace Hime.Kernel.Resources
         {
             dependencies.Add(new KeyValuePair<string, Resource>(tag, resource));
         }
-        
-        public void CreateDependencies(ResourceGraph graph, Reporter logger)
-        {
-        	this.Loader.CreateDependencies(this, graph, logger);
-        }
     }
 }
