@@ -8,7 +8,7 @@ namespace Hime.Demo
 {
     public class Program
     {        
-        static void Main(string[] args)
+        static void Main()
         {
             IExecutable executable = new Compile();
             executable.Execute();
