@@ -12,9 +12,10 @@ namespace Hime.Demo.Tasks
     {
 		private Stack<float> stack;
 
-        internal float Value { get { return stack.Peek(); } }
-
-        internal MathExpInterpreter() { stack = new System.Collections.Generic.Stack<float>(); }
+        internal MathExpInterpreter() 
+		{ 
+			this.stack = new System.Collections.Generic.Stack<float>(); 
+		}
 
         public void OnNumber(SyntaxTreeNode SubRoot)
         {
