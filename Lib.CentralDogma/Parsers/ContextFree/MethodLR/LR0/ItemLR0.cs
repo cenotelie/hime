@@ -45,7 +45,6 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         public override bool ItemEquals(Item item) { return Equals_Base(item); }
-        public override int GetHashCode() { return base.GetHashCode(); }
 
         public override string ToString() { return ToString(false); }
         public override string ToString(bool ShowDecoration)
