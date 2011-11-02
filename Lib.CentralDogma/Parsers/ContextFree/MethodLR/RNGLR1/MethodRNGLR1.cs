@@ -23,12 +23,16 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
 			base.Build(grammar, reporter);
-            graph = ConstructGraph(grammar);
             Close();
             this.ReportInfo(graph.States.Count.ToString() + " states explored.");
             this.ReportInfo("Done !");
             return new ParserDataRNGLR1(reporter, grammar, graph);
         }
+		
+		protected override Graph BuildGraph (CFGrammar grammar)
+		{
+			return ConstructGraph(grammar);
+		}
 
 		// TODO: try to remove static methods
         public static Graph ConstructGraph(CFGrammar grammar)
