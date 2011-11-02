@@ -18,7 +18,7 @@ namespace Hime.Parsers.Automata
         {
             groups = new List<DFAStateGroup>();
         }
-        public DFAPartition(DFA dfa)
+        internal DFAPartition(DFA dfa)
         {
             groups = new List<DFAStateGroup>();
             // Partition the DFA states between final and non-finals

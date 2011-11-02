@@ -9,7 +9,7 @@ using Hime.Kernel.Graphs;
 
 namespace Hime.Parsers.Automata
 {
-    public sealed class DFA
+    internal class DFA
     {
         private List<DFAState> states;
 

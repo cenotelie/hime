@@ -34,7 +34,7 @@ namespace Hime.Parsers.Automata
             states = new List<NFAState>();
         }
 
-        public NFA(DFA dfa)
+        internal NFA(DFA dfa)
         {
             states = new List<NFAState>();
             List<DFAState> dfaStates = new List<DFAState>(dfa.States);

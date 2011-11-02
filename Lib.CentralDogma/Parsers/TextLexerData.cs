@@ -19,7 +19,7 @@ namespace Hime.Parsers
 
         public IList<Terminal> Expected { get { return terminals; } }
 
-        public TextLexerData(Automata.DFA dfa, Terminal separator)
+        internal TextLexerData(Automata.DFA dfa, Terminal separator)
         {
             this.dfa = dfa;
             this.terminals = new List<Terminal>();
