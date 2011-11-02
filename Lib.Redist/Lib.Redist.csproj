@@ -95,7 +95,6 @@
     <Compile Include="Parsers\SyntaxNodes\SyntaxTreeNode.cs" />
     <Compile Include="Parsers\Lexers\BufferedTextReader.cs" />
     <Compile Include="Parsers\Lexers\BufferedTokenReader.cs" />
-    <Compile Include="Parsers\LR\RNGLR1\GSS.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Parsers\LR\LR0\LR0BaseParser.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
@@ -108,6 +107,7 @@
     <Compile Include="Binary\BinaryException.cs" />
     <Compile Include="Binary\DataSegment.cs" />
     <Compile Include="Binary\DataInput.cs" />
+    <Compile Include="Parsers\LR\RNGLR1\GSSNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
