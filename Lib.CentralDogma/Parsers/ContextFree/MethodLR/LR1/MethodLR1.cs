@@ -35,14 +35,8 @@ namespace Hime.Parsers.ContextFree.LR
             StateKernel AxiomKernel = new StateKernel();
             AxiomKernel.AddItem(AxiomItem);
             State AxiomSet = AxiomKernel.GetClosure();
-            Graph graph = new Graph();
+            Graph graph = new Graph(AxiomSet);
             // Construct the graph
-            graph.States.Add(AxiomSet);
-            for (int i = 0; i != graph.States.Count; i++)
-            {
-               	graph.States[i].BuildGraph(graph);
-                graph.States[i].ID = i;
-            }
             foreach (State Set in graph.States)
 			{
                 Set.BuildReductions(new StateReductionsLR1());
