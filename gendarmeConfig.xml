@@ -9,7 +9,7 @@
 		<rules include="*" from="Gendarme.Rules.Exceptions.dll" />
 		<rules include="*" from="Gendarme.Rules.Interoperability.dll"/>
 		<rules include="*" from="Gendarme.Rules.Naming.dll"/>
-		<rules include="*" exclude="AvoidUnneededFieldInitializationRule | UseStringEmptyRule | AvoidConcatenatingCharsRule" from="Gendarme.Rules.Performance.dll" />
+		<rules include="*" exclude="AvoidUnneededFieldInitializationRule | UseStringEmptyRule | AvoidConcatenatingCharsRule | AvoidRepetitiveCallsToPropertiesRule" from="Gendarme.Rules.Performance.dll" />
 		<rules include="*" from="Gendarme.Rules.Portability.dll" />
 		<rules include="*" from="Gendarme.Rules.Security.dll" />
 		<rules include="*" from="Gendarme.Rules.Security.Cas.dll" />
