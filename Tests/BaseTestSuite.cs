@@ -8,6 +8,7 @@ using Hime.Parsers;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
 using Hime.Kernel.Resources;
+using System.CodeDom.Compiler;
 
 namespace Hime.Tests
 {
@@ -46,17 +47,18 @@ namespace Hime.Tests
         {
             string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.ILexer)).Location;
             File.Copy(redist, Path.Combine(directory, "Hime.Redist.dll"), true);
-            System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#");
-            System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
-            compilerparams.GenerateExecutable = false;
-            compilerparams.GenerateInMemory = true;
-            compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
-            compilerparams.ReferencedAssemblies.Add("System.dll");
-            compilerparams.ReferencedAssemblies.Add(Path.Combine(directory, "Hime.Redist.dll"));
-            System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
-            if (results.Errors.Count != 0)
-                Assert.Fail(results.Errors[0].ToString());
-            return results.CompiledAssembly;
+            using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
+			{
+            	CompilerParameters compilerparams = new CompilerParameters();
+            	compilerparams.GenerateExecutable = false;
+            	compilerparams.GenerateInMemory = true;
+            	compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
+            	compilerparams.ReferencedAssemblies.Add("System.dll");
+            	compilerparams.ReferencedAssemblies.Add(Path.Combine(directory, "Hime.Redist.dll"));
+            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
+            	Assert.AreEqual(0, results.Errors.Count, results.Errors[0].ToString());
+            	return results.CompiledAssembly;
+			}
         }
 
         protected SyntaxTreeNode Parse(Assembly assembly, string input, out bool errors)
