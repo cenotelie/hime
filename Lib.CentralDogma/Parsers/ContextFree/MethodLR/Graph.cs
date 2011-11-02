@@ -63,6 +63,16 @@ namespace Hime.Parsers.ContextFree.LR
 				string serializedState = state.ToStringForSerialization(); 
                 serializer.WriteNode(serializedState, serializedState, "Set_" + serializedState + ".html");
 			}
+            foreach (State state in this.States)
+			{
+				string serializedState = state.ToStringForSerialization(); 
+                foreach (GrammarSymbol symbol in state.Children.Keys)
+				{
+					// TODO: should do a search for symbol.ToString().Replace("\"", "\\\"") and factor!!
+                    serializer.WriteEdge(serializedState, state.Children[symbol].ToStringForSerialization(), symbol.ToString().Replace("\"", "\\\""));
+				}
+			}
+
 		}
     }
 }

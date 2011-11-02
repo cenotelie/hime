@@ -267,11 +267,8 @@ namespace Hime.Parsers.ContextFree.LR
 
         protected void SerializeGraphVisual(string directory, bool exportVisuals, string dotBin, List<string> results)
         {
-            DOTSerializer serializer = new DOTSerializer("Parser", directory + "\\GraphParser.dot");
+            DOTSerializer serializer = new DOTSerializer("Parser", Path.Combine(directory, "GraphParser.dot"));
 			graph.Serialize(serializer);
-            foreach (State set in graph.States)
-                foreach (GrammarSymbol symbol in set.Children.Keys)
-                    serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.ToString().Replace("\"", "\\\""));
             serializer.Close();
             results.Add(directory + "\\GraphParser.dot");
 
