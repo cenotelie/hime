@@ -11,6 +11,7 @@ using System.Text;
 using Hime.Kernel.Reporting;
 using Hime.Kernel.Naming;
 using Hime.Kernel.Resources;
+using Hime.Parsers.ContextFree.LR;
 
 namespace Hime.Parsers
 {
@@ -174,17 +175,17 @@ namespace Hime.Parsers
             switch (method)
             {
                 case ParsingMethod.LR0:
-                    return new Hime.Parsers.ContextFree.LR.MethodLR0();
+                    return new MethodLR0(this.reporter);
                 case ParsingMethod.LR1:
-                    return new Hime.Parsers.ContextFree.LR.MethodLR1();
+                    return new MethodLR1(this.reporter);
                 case ParsingMethod.LALR1:
-                    return new Hime.Parsers.ContextFree.LR.MethodLALR1();
+                    return new MethodLALR1(this.reporter);
                 case ParsingMethod.LRStar:
-                    return new Hime.Parsers.ContextFree.LR.MethodLRStar();
+                    return new MethodLRStar(this.reporter);
                 case ParsingMethod.RNGLR1:
-                    return new Hime.Parsers.ContextFree.LR.MethodRNGLR1();
+                    return new MethodRNGLR1(this.reporter);
                 case ParsingMethod.RNGLALR1:
-                    return new Hime.Parsers.ContextFree.LR.MethodRNGLALR1();
+                    return new MethodRNGLALR1(this.reporter);
             }
             string message = "Unsupported parsing method: " + method.ToString();
             reporter.Error("Compiler", message);

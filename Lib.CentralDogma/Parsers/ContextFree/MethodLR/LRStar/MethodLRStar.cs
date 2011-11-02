@@ -14,7 +14,7 @@ namespace Hime.Parsers.ContextFree.LR
         private Dictionary<State, DeciderLRStar> deciders;
         private Dictionary<State, List<ICollection<Terminal>>> lookaheads;
 
-        public MethodLRStar() : base("LR(*)")
+        public MethodLRStar(Reporter reporter) : base("LR(*)", reporter)
 		{
 		}
 

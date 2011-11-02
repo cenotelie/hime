@@ -5,12 +5,13 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
     class MethodGLR1 : BaseMethod
     {
-        public MethodGLR1() : base("GLR(1)")
+        public MethodGLR1(Reporter reporter) : base("GLR(1)", reporter)
 		{
 		}
 

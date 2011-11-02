@@ -25,9 +25,10 @@ namespace Hime.Parsers.ContextFree.LR
 
         public string Name { get { return this.name; } }
 		
-		protected BaseMethod(string name)
+		protected BaseMethod(string name, Reporter reporter)
 		{
 			this.name = name;
+			this.reporter = reporter;
 		}
 		
 		// TODO: should register the reporter during class construction!!

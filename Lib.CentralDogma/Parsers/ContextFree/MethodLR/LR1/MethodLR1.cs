@@ -11,7 +11,7 @@ namespace Hime.Parsers.ContextFree.LR
 {
     internal class MethodLR1 : BaseMethod
     {
-        internal MethodLR1() : base("LR(1)")
+        internal MethodLR1(Reporter reporter) : base("LR(1)", reporter)
 		{
 		}
 

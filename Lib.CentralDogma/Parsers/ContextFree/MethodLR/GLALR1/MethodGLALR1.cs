@@ -11,7 +11,7 @@ namespace Hime.Parsers.ContextFree.LR
 {
     class MethodGLALR1 : BaseMethod
     {
-        public MethodGLALR1() : base("GLALR(1)")
+        public MethodGLALR1(Reporter reporter) : base("GLALR(1)", reporter)
 		{ 
 		}
 
