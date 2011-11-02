@@ -25,6 +25,7 @@ namespace Hime.Parsers.ContextFree.LR
         public virtual ParserData Build(CFGrammar grammar, Reporter reporter)
 		{
 			this.reporter = reporter;
+            this.ReportInfo("Constructing " + this.Name + " data ...");
 			return null;
 		}
 		

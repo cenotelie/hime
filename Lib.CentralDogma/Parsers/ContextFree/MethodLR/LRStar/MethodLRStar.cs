@@ -76,7 +76,6 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
 			base.Build(grammar, reporter);
-            this.ReportInfo("LR(*) data ...");
             graph = MethodLALR1.ConstructGraph(grammar);
             deciders = new Dictionary<State, DeciderLRStar>();
             lookaheads = new Dictionary<State, List<ICollection<Terminal>>>();

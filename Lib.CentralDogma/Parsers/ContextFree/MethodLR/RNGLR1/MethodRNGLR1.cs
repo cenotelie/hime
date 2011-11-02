@@ -23,7 +23,6 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
 			base.Build(grammar, reporter);
-            this.ReportInfo("Constructing RNGLR(1) data ...");
             graph = ConstructGraph(grammar);
             Close();
             this.ReportInfo(graph.States.Count.ToString() + " states explored.");

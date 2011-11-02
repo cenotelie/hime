@@ -18,7 +18,6 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
 			base.Build(grammar, reporter);
-            this.ReportInfo("Constructing GLALR(1) data ...");
             Graph Graph = ConstructGraph(grammar);
             // Output conflicts
             foreach (State Set in Graph.States)
