@@ -6,6 +6,7 @@
  */
 using System.Collections.Generic;
 using Hime.Kernel.Graphs;
+using System.Xml;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -73,5 +74,17 @@ namespace Hime.Parsers.ContextFree.LR
 				}
 			}
 		}
+		
+		internal XmlNode Serialize(XmlDocument document)
+        {
+            XmlNode nodegraph = document.CreateElement("LRGraph");
+            foreach (State state in this.States)
+			{
+                nodegraph.AppendChild(state.Serialize(document));
+			}
+            return nodegraph;
+        }
+
+
     }
 }

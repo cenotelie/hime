@@ -181,9 +181,9 @@ namespace Hime.Parsers.ContextFree.LR
             	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.ShiftReduce.png", accessor.GetStreamFor("Visuals.Hime.ShiftReduce.png")));
             	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.ReduceReduce.png", accessor.GetStreamFor("Visuals.Hime.ReduceReduce.png")));
 
-            	XmlDocument doc = new XmlDocument();
-            	doc.AppendChild(SerializeGrammar(doc));
-            	doc.Save(directory + "\\data.xml");
+            	XmlDocument document = new XmlDocument();
+            	document.AppendChild(SerializeGrammar(document));
+            	document.Save(directory + "\\data.xml");
             	accessor.AddCheckoutFile(directory + "\\data.xml");
 
 	            // generate header
@@ -202,9 +202,9 @@ namespace Hime.Parsers.ContextFree.LR
          	   	compiler.AddSource(new MHTMLSource("text/html", "grammar.html", directory + "\\grammar.html"));
             	accessor.AddCheckoutFile(directory + "\\grammar.html");
 
-            	doc = new XmlDocument();
+            	document = new XmlDocument();
             	List<XmlNode> nodes = new List<XmlNode>();
-            	XmlNode nodeGraph = SerializeGraph(doc);
+            	XmlNode nodeGraph = this.graph.Serialize(document);
             	foreach (XmlNode child in nodeGraph.ChildNodes) nodes.Add(child);
 
 	            // generate sets
@@ -215,20 +215,20 @@ namespace Hime.Parsers.ContextFree.LR
             	foreach (XmlNode child in nodes)
             	{
                 	string temp = directory + "\\Set_" + child.Attributes["SetID"].Value;
-                	while (doc.HasChildNodes) doc.RemoveChild(doc.FirstChild);
-                	doc.AppendChild(child);
-                	doc.Save(temp + ".xml");
+                	while (document.HasChildNodes) document.RemoveChild(document.FirstChild);
+                	document.AppendChild(child);
+                	document.Save(temp + ".xml");
                 	accessor.AddCheckoutFile(temp + ".xml");
                 	transform.Transform(temp + ".xml", temp + ".html");
                 	compiler.AddSource(new MHTMLSource("text/html", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
                 	accessor.AddCheckoutFile(temp + ".html");
             	}
 
-            	while (doc.HasChildNodes) doc.RemoveChild(doc.FirstChild);
-            	doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-            	doc.AppendChild(nodeGraph);
+            	while (document.HasChildNodes) document.RemoveChild(document.FirstChild);
+            	document.AppendChild(document.CreateXmlDeclaration("1.0", "utf-8", null));
+            	document.AppendChild(nodeGraph);
             	foreach (XmlNode child in nodes) nodeGraph.AppendChild(child);
-            	doc.Save(directory + "\\data.xml");
+            	document.Save(directory + "\\data.xml");
             
 				// generate menu
             	accessor.CheckOut("Transforms.Doc.Menu.xslt", directory + "\\Menu.xslt");
@@ -281,15 +281,6 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         protected virtual void SerializeSpecifics(string directory, bool exportVisuals, string dotBin, List<string> results) { }
-
-        protected XmlNode SerializeGraph(XmlDocument document)
-        {
-            XmlNode nodegraph = document.CreateElement("LRGraph");
-			//graph.Serialize(document)
-            foreach (State state in graph.States)
-                nodegraph.AppendChild(state.Serialize(document));
-            return nodegraph;
-        }
 
         protected XmlNode SerializeGrammar(XmlDocument document)
         {
