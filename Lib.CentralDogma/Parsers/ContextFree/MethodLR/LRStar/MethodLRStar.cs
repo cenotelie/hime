@@ -76,8 +76,6 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
 			base.Build(grammar, reporter);
-            this.ReportInfo(graph.States.Count.ToString() + " LALR(1) states constructed.");
-            this.ReportInfo("Done !");
             return new ParserDataLRStar(reporter, grammar, graph, deciders);
         }
 		

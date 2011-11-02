@@ -28,6 +28,8 @@ namespace Hime.Parsers.ContextFree.LR
             this.ReportInfo("Constructing " + this.Name + " data ...");
 			this.graph = this.BuildGraph(grammar);
             Close();
+            this.ReportInfo(this.graph.States.Count.ToString() + " states explored.");
+            this.ReportInfo("Done !");
 			return null;
 		}
 		
