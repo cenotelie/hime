@@ -23,8 +23,6 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		private string name;
 
-        public string Name { get { return this.name; } }
-		
 		protected BaseMethod(string name, Reporter reporter)
 		{
 			this.name = name;
@@ -34,7 +32,7 @@ namespace Hime.Parsers.ContextFree.LR
 		// TODO: should register the reporter during class construction!!
         public ParserData Build(CFGrammar grammar)
 		{
-            this.ReportInfo("Constructing " + this.Name + " data ...");
+            this.ReportInfo("Constructing " + this.name + " data ...");
 			this.graph = this.BuildGraph(grammar);
             Close();
             this.ReportInfo(this.graph.States.Count.ToString() + " states explored.");
@@ -47,7 +45,7 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		protected void ReportInfo(string message)
 		{
-			this.reporter.Info(this.Name, message);
+			this.reporter.Info(this.name, message);
 		}
 		
 		// TODO: remove this method? strange!!!
@@ -68,7 +66,7 @@ namespace Hime.Parsers.ContextFree.LR
             _lock = new object();
 
             int threadCount = System.Environment.ProcessorCount;
-            reporter.Info(Name, "Spawning " + threadCount + " threads for data building");
+            this.ReportInfo("Spawning " + threadCount + " threads for data building");
             while (threadCount != 0)
             {
                 SpawnWorker(threadCount);

@@ -12,8 +12,6 @@ namespace Hime.Parsers
 	// TODO: replace this by BaseMethod and rename BaseMethod into ParserGenerator
     public interface ParserGenerator
     {
-		// TODO: check Name is really necessary?
-        string Name { get; }
 		ParserData Build(CFGrammar grammar);
     }
 }
