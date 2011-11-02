@@ -4,47 +4,48 @@
  * Time: 17:22
  * 
  */
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Hime.Kernel.Graphs
 {
-    public class DOTSerializer
+    internal class DOTSerializer
     {
-        private System.IO.StreamWriter writer;
+        private StreamWriter writer;
 
-        public DOTSerializer(string name, string file)
+        internal DOTSerializer(string name, string file)
         {
             writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
             writer.WriteLine("digraph " + name + " {");
         }
 
-        public void WriteNode(string id)
+        internal void WriteNode(string id)
         {
-            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(id) + "\"];");
+			this.WriteNode(id, id);
         }
-        public void WriteNode(string id, string label)
+		
+        internal void WriteNode(string id, string label)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\"];");
         }
-        public void WriteNode(string id, string label, string url)
+		
+        internal void WriteNode(string id, Uri url)
         {
-            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\", URL=\"" + url + "\"];");
+            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(id) + "\", URL=\"" + url + "\"];");
         }
-        public void WriteNode(string id, string label, DOTNodeShape shape)
+		
+        internal void WriteNode(string id, string label, DOTNodeShape shape)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
         }
-        public void WriteNode(string id, string label, DOTNodeShape shape, string url)
-        {
-            writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\", URL=\"" + url + "\",shape=" + shape.ToString() + "];");
-        }
 
-        public void WriteEdge(string tail, string head, string label)
+        internal void WriteEdge(string tail, string head, string label)
         {
             writer.WriteLine("    _" + tail + " -> _" + head + " [label=\"" + label + "\"];");
         }
 
-        public void Close()
+        internal void Close()
         {
             writer.WriteLine("}");
             writer.Close();

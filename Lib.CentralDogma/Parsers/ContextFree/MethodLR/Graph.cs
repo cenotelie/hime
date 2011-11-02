@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using Hime.Kernel.Graphs;
 using System.Xml;
+using System;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -50,7 +51,7 @@ namespace Hime.Parsers.ContextFree.LR
 			foreach (State state in this.States)
 			{
 				string serializedState = state.ToStringForSerialization(); 
-                serializer.WriteNode(serializedState, serializedState, "Set_" + serializedState + ".html");
+                serializer.WriteNode(serializedState, new Uri("Set_" + serializedState + ".html"));
 			}
             foreach (State state in this.States)
 			{

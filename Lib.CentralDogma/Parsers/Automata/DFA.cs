@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Graphs;
 
 namespace Hime.Parsers.Automata
 {
@@ -140,7 +141,7 @@ namespace Hime.Parsers.Automata
             }
         }
 
-        public void SerializeGraph(Kernel.Graphs.DOTSerializer serializer)
+        internal void SerializeGraph(DOTSerializer serializer)
         {
             foreach (DFAState state in states)
             {
