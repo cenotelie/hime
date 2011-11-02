@@ -196,6 +196,6 @@ namespace Hime.Parsers
         }
 
         public abstract LexerData GetLexerData(Reporter reporter);
-        public abstract ParserData GetParserData(Reporter reporter, BaseMethod generator);
+        public abstract ParserData GetParserData(Reporter reporter, ParserGenerator generator);
     }
 }

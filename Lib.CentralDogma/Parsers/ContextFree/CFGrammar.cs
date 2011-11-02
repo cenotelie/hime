@@ -179,7 +179,7 @@ namespace Hime.Parsers.ContextFree
             return true;
         }
 
-        public override ParserData GetParserData(Reporter reporter, BaseMethod generator)
+        public override ParserData GetParserData(Reporter reporter, ParserGenerator generator)
         {
             AddRealAxiom(reporter);
             ComputeFirsts(reporter);

@@ -9,7 +9,7 @@ using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodLR0 : BaseMethod
+    class MethodLR0 : ParserGenerator
     {
         public MethodLR0(Reporter reporter) : base("LR(0)", reporter)
 		{

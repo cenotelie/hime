@@ -9,7 +9,7 @@ using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodLRStar : BaseMethod
+    class MethodLRStar : ParserGenerator
     {
         private Dictionary<State, DeciderLRStar> deciders;
         private Dictionary<State, List<ICollection<Terminal>>> lookaheads;

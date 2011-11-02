@@ -153,7 +153,6 @@
     <Compile Include="Parsers\ContextFree\MethodLR\Conflict.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\State.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\Item.cs" />
-    <Compile Include="Parsers\ContextFree\MethodLR\BaseMethod.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\RNGLALR1\StateReductionsRNGLALR1.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\RNGLALR1\MethodRNGLALR1.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\RNGLR1\StateReductionsRNGLR1.cs" />
@@ -194,6 +193,7 @@
     <Compile Include="Kernel\Generated\FileCentralDogmaLexer.cs" />
     <Compile Include="Kernel\Generated\FileCentralDogmaParser.cs" />
     <Compile Include="Kernel\Reporting\Entry.cs" />
+    <Compile Include="Parsers\ContextFree\MethodLR\ParserGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Visuals\svg\Hime.Error.svg" />
