@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class GLRSimulatorState
+    public class GLRSimulatorState
     {
 
         private IList<GLRStackNode> nodes;

@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using Hime.Kernel.Reporting;
 using System.Xml;
+using Hime.Parsers.ContextFree.LR;
 
 namespace Hime.Parsers.ContextFree
 {
@@ -178,7 +179,7 @@ namespace Hime.Parsers.ContextFree
             return true;
         }
 
-        public override ParserData GetParserData(Reporter reporter, ParserGenerator generator)
+        public override ParserData GetParserData(Reporter reporter, BaseMethod generator)
         {
             AddRealAxiom(reporter);
             ComputeFirsts(reporter);

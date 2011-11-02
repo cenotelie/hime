@@ -170,7 +170,6 @@
     <Compile Include="Parsers\LexerData.cs" />
     <Compile Include="Parsers\ParsingMethod.cs" />
     <Compile Include="Parsers\ParserData.cs" />
-    <Compile Include="Parsers\ParserGenerator.cs" />
     <Compile Include="Parsers\Rule.cs" />
     <Compile Include="Parsers\RuleBodyElement.cs" />
     <Compile Include="Parsers\RuleBodyElementAction.cs" />

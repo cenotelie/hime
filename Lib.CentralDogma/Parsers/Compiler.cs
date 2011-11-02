@@ -170,7 +170,7 @@ namespace Hime.Parsers
             return null;
         }
 
-        public ParserGenerator GetParserGenerator(ParsingMethod method)
+        public BaseMethod GetParserGenerator(ParsingMethod method)
         {
             switch (method)
             {

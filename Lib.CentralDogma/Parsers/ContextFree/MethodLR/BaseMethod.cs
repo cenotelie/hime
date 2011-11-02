@@ -11,7 +11,7 @@ namespace Hime.Parsers.ContextFree.LR
 {
 	// TODO: should remove all subclasses of BaseMethod and transforms this into data
 	// for instance a dictionary from method name to an instance...
-    abstract class BaseMethod : ParserGenerator
+    public abstract class BaseMethod
     {
         private List<System.Threading.Thread> workers;
         private List<State>.Enumerator enumerator;

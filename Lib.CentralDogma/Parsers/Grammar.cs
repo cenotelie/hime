@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using Hime.Kernel.Naming;
 using Hime.Kernel.Reporting;
+using Hime.Parsers.ContextFree.LR;
 
 namespace Hime.Parsers
 {
@@ -195,6 +196,6 @@ namespace Hime.Parsers
         }
 
         public abstract LexerData GetLexerData(Reporter reporter);
-        public abstract ParserData GetParserData(Reporter reporter, ParserGenerator generator);
+        public abstract ParserData GetParserData(Reporter reporter, BaseMethod generator);
     }
 }

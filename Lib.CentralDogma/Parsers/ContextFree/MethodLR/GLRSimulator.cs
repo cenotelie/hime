@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class GLRSimulator
+    public class GLRSimulator
     {
         private Graph graph;
         private Dictionary<int, Dictionary<GrammarSymbol, List<State>>> inverseGraph;
