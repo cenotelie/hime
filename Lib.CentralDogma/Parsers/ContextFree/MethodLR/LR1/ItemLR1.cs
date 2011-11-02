@@ -93,8 +93,7 @@ namespace Hime.Parsers.ContextFree.LR
                 return false;
             return Equals_Base(tested);
         }
-        public override int GetHashCode() { return base.GetHashCode(); }
-
+		
         public override string ToString() { return ToString(false); }
         public override string ToString(bool ShowDecoration)
         {
