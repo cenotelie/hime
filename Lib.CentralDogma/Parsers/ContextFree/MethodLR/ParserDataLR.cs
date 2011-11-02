@@ -268,8 +268,7 @@ namespace Hime.Parsers.ContextFree.LR
         protected void SerializeGraphVisual(string directory, bool exportVisuals, string dotBin, List<string> results)
         {
             DOTSerializer serializer = new DOTSerializer("Parser", directory + "\\GraphParser.dot");
-            foreach (State state in graph.States)
-                serializer.WriteNode(state.ID.ToString("X"), state.ID.ToString("X"), "Set_" + state.ID.ToString("X") + ".html");
+			graph.Serialize(serializer);
             foreach (State set in graph.States)
                 foreach (GrammarSymbol symbol in set.Children.Keys)
                     serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.ToString().Replace("\"", "\\\""));
