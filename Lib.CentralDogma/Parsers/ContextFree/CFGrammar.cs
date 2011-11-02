@@ -183,7 +183,7 @@ namespace Hime.Parsers.ContextFree
             AddRealAxiom(reporter);
             ComputeFirsts(reporter);
             ComputeFollowers(reporter);
-            return generator.Build(this, reporter);
+            return generator.Build(this);
         }
     }
 }

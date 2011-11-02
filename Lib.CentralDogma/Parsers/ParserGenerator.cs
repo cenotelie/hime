@@ -14,8 +14,6 @@ namespace Hime.Parsers
     {
 		// TODO: check Name is really necessary?
         string Name { get; }
-		// TODO: remove this method
-        ParserData Build(Grammar grammar, Reporter reporter);
 		ParserData Build(CFGrammar grammar);
     }
 }
