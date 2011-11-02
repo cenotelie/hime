@@ -16,13 +16,24 @@ namespace Hime.Parsers.ContextFree.LR
         private object _lock;
 
         protected GLRSimulator simulator;
-        protected Hime.Kernel.Reporting.Reporter reporter;
+        protected Reporter reporter;
         protected Graph graph;
 
         public abstract string Name { get; }
-
-        public abstract ParserData Build(CFGrammar grammar, Kernel.Reporting.Reporter reporter);
-        public ParserData Build(Grammar grammar, Hime.Kernel.Reporting.Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+		
+		// TODO: should register the reporter during class construction!!
+        public virtual ParserData Build(CFGrammar grammar, Reporter reporter)
+		{
+			this.reporter = reporter;
+			return null;
+		}
+		
+		protected void ReportInfo(string message)
+		{
+			this.reporter.Info(this.Name, message);
+		}
+		
+        public ParserData Build(Grammar grammar, Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
 
         protected virtual void OnBeginState(State state) { }
         protected virtual void OnConflictTreated(State state, Conflict conflict) { }

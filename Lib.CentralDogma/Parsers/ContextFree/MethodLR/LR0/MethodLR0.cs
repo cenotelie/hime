@@ -17,12 +17,12 @@ namespace Hime.Parsers.ContextFree.LR
 
         public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
-            this.reporter = reporter;
-            reporter.Info("LR(0)", "Constructing LR(0) data ...");
+			base.Build(grammar, reporter);
+            this.ReportInfo("Constructing LR(0) data ...");
             graph = ConstructGraph(grammar);
             Close();
-            reporter.Info("LR(0)", graph.States.Count.ToString() + " states explored.");
-            reporter.Info("LR(0)", "Done !");
+            this.ReportInfo(graph.States.Count.ToString() + " states explored.");
+            this.ReportInfo("Done !");
             return new ParserDataLR0(reporter, grammar, graph);
         }
 

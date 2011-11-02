@@ -23,12 +23,12 @@ namespace Hime.Parsers.ContextFree.LR
 
         public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
-            this.reporter = reporter;
-            reporter.Info("RNGLALR(1)", "Constructing RNGLALR(1) data ...");
+			base.Build(grammar, reporter);
+            this.ReportInfo("Constructing RNGLALR(1) data ...");
             graph = ConstructGraph(grammar);
             Close();
-            reporter.Info("RNGLALR(1)", graph.States.Count.ToString() + " states explored.");
-            reporter.Info("RNGLALR(1)", "Done !");
+            this.ReportInfo(graph.States.Count.ToString() + " states explored.");
+            this.ReportInfo("Done !");
             return new ParserDataRNGLR1(reporter, grammar, graph);
         }
 		

@@ -16,14 +16,15 @@ namespace Hime.Parsers.ContextFree.LR
 
         public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            reporter.Info("GLR(1)", "Constructing GLR(1) data ...");
+			base.Build(grammar, reporter);
+            this.ReportInfo("Constructing GLR(1) data ...");
             Graph Graph = ConstructGraph(grammar);
             // Output conflicts
             foreach (State Set in Graph.States)
                 foreach (Conflict Conflict in Set.Conflicts)
                     reporter.Report(Conflict);
-            reporter.Info("GLR(1)", Graph.States.Count.ToString() + " states explored.");
-            reporter.Info("GLR(1)", "Done !");
+            this.ReportInfo(Graph.States.Count.ToString() + " states explored.");
+            this.ReportInfo("Done !");
             return new ParserDataGLR1(reporter, grammar, Graph);
         }
 		
