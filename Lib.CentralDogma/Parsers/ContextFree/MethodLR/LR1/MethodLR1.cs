@@ -11,9 +11,9 @@ namespace Hime.Parsers.ContextFree.LR
 {
     internal class MethodLR1 : BaseMethod
     {
-        public override string Name { get { return "LR(1)"; } }
-
-        internal MethodLR1() { }
+        internal MethodLR1() : base("LR(1)")
+		{
+		}
 
 		protected override Graph BuildGraph (CFGrammar grammar)
 		{

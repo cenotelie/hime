@@ -20,8 +20,15 @@ namespace Hime.Parsers.ContextFree.LR
         protected GLRSimulator simulator;
         protected Reporter reporter;
         protected Graph graph;
+		
+		private string name;
 
-        public abstract string Name { get; }
+        public string Name { get { return this.name; } }
+		
+		protected BaseMethod(string name)
+		{
+			this.name = name;
+		}
 		
 		// TODO: should register the reporter during class construction!!
         public ParserData Build(CFGrammar grammar, Reporter reporter)

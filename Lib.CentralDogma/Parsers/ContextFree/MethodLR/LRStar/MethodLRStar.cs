@@ -14,9 +14,9 @@ namespace Hime.Parsers.ContextFree.LR
         private Dictionary<State, DeciderLRStar> deciders;
         private Dictionary<State, List<ICollection<Terminal>>> lookaheads;
 
-        public override string Name { get { return "LR(*)"; } }
-
-        public MethodLRStar() { }
+        public MethodLRStar() : base("LR(*)")
+		{
+		}
 
         protected override void OnBeginState(State state)
         {

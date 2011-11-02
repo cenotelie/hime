@@ -11,9 +11,9 @@ namespace Hime.Parsers.ContextFree.LR
 {
     class MethodRNGLALR1 : BaseMethod
     {
-        public override string Name { get { return "RNGLALR(1)"; } }
-
-        public MethodRNGLALR1() { }
+        public MethodRNGLALR1() : base("RNGLALR(1)")
+		{
+		}
 
         protected override void OnBeginState(State state)
         {
