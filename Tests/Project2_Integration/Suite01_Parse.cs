@@ -1,4 +1,7 @@
-﻿using System;
+﻿/*
+ * Author: Charles Hymans
+ * */
+using System;
 using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
@@ -6,6 +9,8 @@ using NUnit.Framework;
 using Hime.Parsers;
 using Hime.Kernel.Reporting;
 using Hime.Redist.Parsers;
+using System.IO;
+using System.CodeDom.Compiler;
 
 namespace Hime.Tests.Project2_Integration
 {
@@ -26,46 +31,46 @@ namespace Hime.Tests.Project2_Integration
         }
 
         [Test]
-        public void Test000_SimpleGrammar_LR0()
+        public void Test001_SimpleGrammar_LR0()
         {
 			CompileRaw("public cf text grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'; } }", ParsingMethod.LR0);
             Build();
         }
 
 		[Test]
-        public void Test001_SimpleGrammar_LR0()
+        public void Test002_SimpleGrammar_LR0()
         {
             TestGrammar(grammar0, ParsingMethod.LR0, "adbc");
         }
 
         [Test]
-        public void Test002_Build_ShouldNotFail()
+        public void Test003_Build_ShouldNotFail()
         {
 			CompileRaw(grammar1, ParsingMethod.LR1);
 			Build();
 		}
 		
 		[Test]
-        public void Test003_SimpleList_LR1()
+        public void Test004_SimpleList_LR1()
         {
             TestGrammar(grammar1, ParsingMethod.LR1, "xxx");
         }
 
         [Test]
-        public void Test004_SimpleList_LALR1()
+        public void Test005_SimpleList_LALR1()
         {
             TestGrammar(grammar1, ParsingMethod.LALR1, "xxx");
         }
 
         [Test]
-        public void Test005_LRStar_ShouldNotFail()
+        public void Test006_LRStar_ShouldNotFail()
         {
 			Report result = CompileRaw(grammar1, ParsingMethod.LRStar);
             Assert.IsFalse(result.HasErrors);
         }
 
 		[Test]
-        public void Test006_SimpleList_LRStar()
+        public void Test007_SimpleList_LRStar()
         {
             TestGrammar(grammar1, ParsingMethod.LRStar, "xxx");
         }

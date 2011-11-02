@@ -56,7 +56,7 @@ namespace Hime.Tests
             	compilerparams.ReferencedAssemblies.Add("System.dll");
             	compilerparams.ReferencedAssemblies.Add(Path.Combine(directory, "Hime.Redist.dll"));
             	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
-            	Assert.AreEqual(0, results.Errors.Count, results.Errors[0].ToString());
+            	Assert.AreEqual(0, results.Errors.Count);
             	return results.CompiledAssembly;
 			}
         }
