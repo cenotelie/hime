@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -14,11 +15,11 @@ namespace Hime.Parsers.ContextFree.LR
 
         public MethodLR0() { }
 
-        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LR(0)", "Constructing LR(0) data ...");
-            graph = ConstructGraph(grammar, reporter);
+            graph = ConstructGraph(grammar);
             Close();
             reporter.Info("LR(0)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("LR(0)", "Done !");
@@ -26,7 +27,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
 
-        public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
+        public static Graph ConstructGraph(CFGrammar Grammar)
         {
             // Create the first set
             CFVariable AxiomVar = Grammar.GetCFVariable("_Axiom_");

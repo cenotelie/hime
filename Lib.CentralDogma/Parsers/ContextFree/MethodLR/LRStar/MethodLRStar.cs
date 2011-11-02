@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -72,11 +73,11 @@ namespace Hime.Parsers.ContextFree.LR
             return right.Count - left.Count;
         }
 
-        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LR(*)", "LR(*) data ...");
-            graph = MethodLALR1.ConstructGraph(grammar, reporter);
+            graph = MethodLALR1.ConstructGraph(grammar);
             deciders = new Dictionary<State, DeciderLRStar>();
             lookaheads = new Dictionary<State, List<ICollection<Terminal>>>();
             Close();

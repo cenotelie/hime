@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -14,20 +15,21 @@ namespace Hime.Parsers.ContextFree.LR
 
         public MethodLALR1() { }
 
-        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LALR(1)", "Constructing LALR(1) data ...");
-            graph = ConstructGraph(grammar, reporter);
+            graph = ConstructGraph(grammar);
             Close();
             reporter.Info("LALR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("LALR(1)", "Done !");
             return new ParserDataLR1(reporter, grammar, graph);
         }
 
-        public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
+		// TODO: remove static methods
+        public static Graph ConstructGraph(CFGrammar Grammar)
         {
-            Graph GraphLR0 = MethodLR0.ConstructGraph(Grammar, Log);
+            Graph GraphLR0 = MethodLR0.ConstructGraph(Grammar);
             KernelGraph Kernels = new KernelGraph(GraphLR0);
             return Kernels.GetGraphLALR1();
         }
