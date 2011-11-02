@@ -23,23 +23,23 @@ namespace Hime.Parsers.ContextFree.LR
 
         public StateReductionsLALR1() : base() { }
 
-        public override void Build(State set)
+        public override void Build(State state)
         {
             // Recutions dictionnary for the given set
             Dictionary<Terminal, ItemLALR1> Reductions = new Dictionary<Terminal, ItemLALR1>();
             // Construct reductions
-            foreach (ItemLALR1 item in set.Items)
+            foreach (ItemLALR1 item in state.Items)
             {
                 if (item.Action == ItemAction.Shift)
                     continue;
                 foreach (Terminal lookahead in item.Lookaheads)
                 {
                     // There is already a shift action for the lookahead => conflict
-                    if (set.Children.ContainsKey(lookahead))
-                        StateReductionsLR1.HandleConflict_ShiftReduce("LALR(1)", conflicts, item, set, lookahead);
+                    if (state.Children.ContainsKey(lookahead))
+                        StateReductionsLR1.HandleConflict_ShiftReduce("LALR(1)", conflicts, item, state, lookahead);
                     // There is already a reduction action for the lookahead => conflict
                     else if (Reductions.ContainsKey(lookahead))
-                        StateReductionsLR1.HandleConflict_ReduceReduce("LALR(1)", conflicts, item, Reductions[lookahead], set, lookahead);
+                        StateReductionsLR1.HandleConflict_ReduceReduce("LALR(1)", conflicts, item, Reductions[lookahead], state, lookahead);
                     else // No conflict
                     {
                         Reductions.Add(lookahead, item);

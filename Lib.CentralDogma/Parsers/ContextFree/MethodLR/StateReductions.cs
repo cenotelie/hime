@@ -21,7 +21,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         public abstract TerminalSet ExpectedTerminals { get; }
-        public abstract void Build(State Set);
+        public abstract void Build(State state);
 
         public void Add(StateActionReduce action)
         {
