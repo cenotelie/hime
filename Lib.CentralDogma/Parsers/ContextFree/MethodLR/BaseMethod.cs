@@ -27,6 +27,7 @@ namespace Hime.Parsers.ContextFree.LR
 			this.reporter = reporter;
             this.ReportInfo("Constructing " + this.Name + " data ...");
 			this.graph = this.BuildGraph(grammar);
+            Close();
 			return null;
 		}
 		

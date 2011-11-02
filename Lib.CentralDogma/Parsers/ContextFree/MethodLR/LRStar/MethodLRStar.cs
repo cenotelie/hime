@@ -76,9 +76,6 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
 			base.Build(grammar, reporter);
-            deciders = new Dictionary<State, DeciderLRStar>();
-            lookaheads = new Dictionary<State, List<ICollection<Terminal>>>();
-            Close();
             this.ReportInfo(graph.States.Count.ToString() + " LALR(1) states constructed.");
             this.ReportInfo("Done !");
             return new ParserDataLRStar(reporter, grammar, graph, deciders);
@@ -86,7 +83,10 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		protected override Graph BuildGraph (CFGrammar grammar)
 		{
-			return MethodLALR1.ConstructGraph(grammar);
+			Graph result = MethodLALR1.ConstructGraph(grammar);
+            deciders = new Dictionary<State, DeciderLRStar>();
+            lookaheads = new Dictionary<State, List<ICollection<Terminal>>>();
+			return result;
 		}
     }
 }
