@@ -106,7 +106,6 @@
     <Compile Include="Parsers\Automata\CharSpan.cs" />
     <Compile Include="Parsers\Automata\NFATransition.cs" />
     <Compile Include="Parsers\Compiler.cs" />
-    <Compile Include="Parsers\ContextFree\CFParserGenerator.cs" />
     <Compile Include="Parsers\ContextFree\CFRuleBody.cs" />
     <Compile Include="Parsers\ContextFree\CFRuleBodySet.cs" />
     <Compile Include="Parsers\ContextFree\CFVariable.cs" />
