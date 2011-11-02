@@ -9,6 +9,8 @@ using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
+	// TODO: should remove all subclasses of BaseMethod and transforms this into data
+	// for instance a dictionary from method name to an instance...
     abstract class BaseMethod : CFParserGenerator
     {
         private List<System.Threading.Thread> workers;
@@ -22,7 +24,7 @@ namespace Hime.Parsers.ContextFree.LR
         public abstract string Name { get; }
 		
 		// TODO: should register the reporter during class construction!!
-        public virtual ParserData Build(CFGrammar grammar, Reporter reporter)
+        public ParserData Build(CFGrammar grammar, Reporter reporter)
 		{
 			this.reporter = reporter;
             this.ReportInfo("Constructing " + this.Name + " data ...");
@@ -30,10 +32,11 @@ namespace Hime.Parsers.ContextFree.LR
             Close();
             this.ReportInfo(this.graph.States.Count.ToString() + " states explored.");
             this.ReportInfo("Done !");
-			return null;
+			return BuildParserData(grammar);
 		}
 		
 		protected abstract Graph BuildGraph(CFGrammar grammar);
+		protected abstract ParserData BuildParserData(CFGrammar grammar);
 		
 		protected void ReportInfo(string message)
 		{

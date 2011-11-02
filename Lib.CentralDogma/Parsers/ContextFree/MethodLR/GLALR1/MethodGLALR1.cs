@@ -15,12 +15,6 @@ namespace Hime.Parsers.ContextFree.LR
 
         public MethodGLALR1() { }
 
-        public override ParserData Build(CFGrammar grammar, Reporter reporter)
-        {
-			base.Build(grammar, reporter);
-            return new ParserDataGLR1(reporter, grammar, this.graph);
-        }
-		
 		protected override Graph BuildGraph (CFGrammar grammar)
 		{
 			Graph result = ConstructGraph(grammar);
@@ -29,6 +23,11 @@ namespace Hime.Parsers.ContextFree.LR
                 foreach (Conflict Conflict in Set.Conflicts)
                     reporter.Report(Conflict);
 			return result;
+		}
+		
+		protected override ParserData BuildParserData (CFGrammar grammar)
+		{
+			return new ParserDataGLR1(this.reporter, grammar, this.graph);
 		}
 
 		// TODO: remove static methods

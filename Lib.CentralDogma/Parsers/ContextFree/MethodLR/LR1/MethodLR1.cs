@@ -15,15 +15,14 @@ namespace Hime.Parsers.ContextFree.LR
 
         internal MethodLR1() { }
 
-        public override ParserData Build(CFGrammar grammar, Reporter reporter)
-        {
-			base.Build(grammar, reporter);
-            return new ParserDataLR1(reporter, grammar, graph);
-        }
-		
 		protected override Graph BuildGraph (CFGrammar grammar)
 		{
 			return ConstructGraph(grammar);
+		}
+		
+		protected override ParserData BuildParserData (CFGrammar grammar)
+		{
+			return new ParserDataLR1(this.reporter, grammar, this.graph);
 		}
 		
 		// TODO: try to remove static methods

@@ -5,6 +5,7 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -19,18 +20,17 @@ namespace Hime.Parsers.ContextFree.LR
             foreach (Conflict conflict in state.Conflicts)
                 conflict.IsError = false;
         }
-
-        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
-        {
-			base.Build(grammar, reporter);
-            return new ParserDataRNGLR1(reporter, grammar, graph);
-        }
 		
 		protected override Graph BuildGraph (CFGrammar grammar)
 		{
 			return ConstructGraph(grammar);
 		}
-
+		
+		protected override ParserData BuildParserData (CFGrammar grammar)
+		{
+			return new ParserDataRNGLR1(this.reporter, grammar, this.graph);
+		}
+		
 		// TODO: try to remove static methods
         public static Graph ConstructGraph(CFGrammar grammar)
         {

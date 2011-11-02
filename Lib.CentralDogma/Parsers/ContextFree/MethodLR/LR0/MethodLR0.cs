@@ -14,18 +14,16 @@ namespace Hime.Parsers.ContextFree.LR
         public override string Name { get { return "LR(0)"; } }
 
         public MethodLR0() { }
-
-        public override ParserData Build(CFGrammar grammar, Reporter reporter)
-        {
-			base.Build(grammar, reporter);
-            return new ParserDataLR0(reporter, grammar, graph);
-        }
 		
 		protected override Graph BuildGraph (CFGrammar grammar)
 		{
 			return ConstructGraph(grammar);
 		}
-
+		
+		protected override ParserData BuildParserData (CFGrammar grammar)
+		{
+			return new ParserDataLR0(this.reporter, grammar, this.graph);
+		}
 
         public static Graph ConstructGraph(CFGrammar Grammar)
         {
