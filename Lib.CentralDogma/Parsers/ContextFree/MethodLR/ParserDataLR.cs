@@ -287,18 +287,8 @@ namespace Hime.Parsers.ContextFree.LR
             XmlNode nodegraph = document.CreateElement("LRGraph");
 			//graph.Serialize(document)
             foreach (State state in graph.States)
-                nodegraph.AppendChild(SerializeGraphState(document, state));
+                nodegraph.AppendChild(state.Serialize(document));
             return nodegraph;
-        }
-
-        private XmlNode SerializeGraphState(XmlDocument document, State state)
-        {
-            XmlNode root = document.CreateElement("ItemSet");
-            root.Attributes.Append(document.CreateAttribute("SetID"));
-            root.Attributes["SetID"].Value = state.ID.ToString("X");
-            foreach (Item item in state.Items)
-                root.AppendChild(item.GetXMLNode(document, state));
-            return root;
         }
 
         protected XmlNode SerializeGrammar(XmlDocument document)

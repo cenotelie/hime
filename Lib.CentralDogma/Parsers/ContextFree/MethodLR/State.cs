@@ -6,6 +6,7 @@
  */
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -98,6 +99,18 @@ namespace Hime.Parsers.ContextFree.LR
 		internal string ToStringForSerialization()
 		{
 			return this.ID.ToString("X");
+		}
+		
+		internal XmlNode Serialize(XmlDocument document)
+		{
+            XmlNode root = document.CreateElement("ItemSet");
+            root.Attributes.Append(document.CreateAttribute("SetID"));
+            root.Attributes["SetID"].Value = this.ToStringForSerialization();
+            foreach (Item item in this.Items)
+			{
+                root.AppendChild(item.GetXMLNode(document, this));
+			}
+            return root;
 		}
     }
 }
