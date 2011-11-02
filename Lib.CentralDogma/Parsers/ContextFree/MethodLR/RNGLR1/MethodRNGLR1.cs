@@ -24,7 +24,7 @@ namespace Hime.Parsers.ContextFree.LR
         {
             this.reporter = reporter;
             reporter.Info("RNGLR(1)", "Constructing RNGLR(1) data ...");
-            graph = ConstructGraph(grammar, reporter);
+            graph = ConstructGraph(grammar);
             Close();
             reporter.Info("RNGLR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("RNGLR(1)", "Done !");
@@ -32,7 +32,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
 		// TODO: try to remove static methods
-        public static Graph ConstructGraph(CFGrammar grammar, Hime.Kernel.Reporting.Reporter Log)
+        public static Graph ConstructGraph(CFGrammar grammar)
         {
             Graph GraphLR1 = MethodLR1.ConstructGraph(grammar);
             foreach (State Set in GraphLR1.States)

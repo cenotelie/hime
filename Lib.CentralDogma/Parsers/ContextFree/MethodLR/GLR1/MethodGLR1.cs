@@ -17,7 +17,7 @@ namespace Hime.Parsers.ContextFree.LR
         public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
             reporter.Info("GLR(1)", "Constructing GLR(1) data ...");
-            Graph Graph = ConstructGraph(grammar, reporter);
+            Graph Graph = ConstructGraph(grammar);
             // Output conflicts
             foreach (State Set in Graph.States)
                 foreach (Conflict Conflict in Set.Conflicts)
@@ -28,7 +28,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
 		
 		// TODO: try to remove static methods
-        public static Graph ConstructGraph(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public static Graph ConstructGraph(CFGrammar grammar)
         {
             Graph GraphLR1 = MethodLR1.ConstructGraph(grammar);
             foreach (State Set in GraphLR1.States)
