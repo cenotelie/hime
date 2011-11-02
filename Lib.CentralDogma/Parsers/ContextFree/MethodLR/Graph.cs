@@ -16,7 +16,7 @@ namespace Hime.Parsers.ContextFree.LR
 		// TODO: should try to put this private!!
         internal List<State> States { get { return sets; } }
 
-        public Graph()
+        internal Graph()
         {
             sets = new List<State>();
         }
@@ -31,7 +31,7 @@ namespace Hime.Parsers.ContextFree.LR
             }
 		}
 
-        public State ContainsSet(StateKernel Kernel)
+        internal State ContainsSet(StateKernel Kernel)
         {
             foreach (State Potential in sets)
                 if (Potential.Kernel.Equals(Kernel))
@@ -39,7 +39,7 @@ namespace Hime.Parsers.ContextFree.LR
             return null;
         }
 
-        public State AddUnique(State Set)
+        internal State AddUnique(State Set)
         {
             foreach (State Potential in sets)
             {
@@ -51,7 +51,7 @@ namespace Hime.Parsers.ContextFree.LR
             return Set;
         }
 
-        public void Add(State Set)
+        internal void Add(State Set)
         {
             sets.Add(Set);
         }
