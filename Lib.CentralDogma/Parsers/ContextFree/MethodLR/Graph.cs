@@ -40,18 +40,6 @@ namespace Hime.Parsers.ContextFree.LR
             return null;
         }
 
-        internal State AddUnique(State Set)
-        {
-            foreach (State Potential in sets)
-            {
-                // If same kernel : return the set
-                if (Potential.Equals(Set))
-                    return Potential;
-            }
-            sets.Add(Set);
-            return Set;
-        }
-
         internal void Add(State Set)
         {
             sets.Add(Set);
