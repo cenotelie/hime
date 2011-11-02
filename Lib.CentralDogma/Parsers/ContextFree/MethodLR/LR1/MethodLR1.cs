@@ -5,45 +5,49 @@
  * 
  */
 using System.Collections.Generic;
+using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    class MethodLR1 : BaseMethod
+    internal class MethodLR1 : BaseMethod
     {
         public override string Name { get { return "LR(1)"; } }
 
-        public MethodLR1() { }
+        internal MethodLR1() { }
 
-        public override ParserData Build(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
+        public override ParserData Build(CFGrammar grammar, Reporter reporter)
         {
             this.reporter = reporter;
             reporter.Info("LR(1)", "Constructing LR(1) data ...");
-            graph = ConstructGraph(grammar, reporter);
+            graph = ConstructGraph(grammar);
             Close();
             reporter.Info("LR(1)", graph.States.Count.ToString() + " states explored.");
             reporter.Info("LR(1)", "Done !");
             return new ParserDataLR1(reporter, grammar, graph);
         }
-
-        public static Graph ConstructGraph(CFGrammar Grammar, Hime.Kernel.Reporting.Reporter Log)
+		
+		// TODO: try to remove static methods
+        internal static Graph ConstructGraph(CFGrammar grammar)
         {
             // Create the first set
-            CFVariable AxiomVar = Grammar.GetCFVariable("_Axiom_");
+            CFVariable AxiomVar = grammar.GetCFVariable("_Axiom_");
             ItemLR1 AxiomItem = new ItemLR1(AxiomVar.CFRules[0], 0, TerminalEpsilon.Instance);
             StateKernel AxiomKernel = new StateKernel();
             AxiomKernel.AddItem(AxiomItem);
             State AxiomSet = AxiomKernel.GetClosure();
-            Graph Graph = new Graph();
+            Graph graph = new Graph();
             // Construct the graph
-            Graph.States.Add(AxiomSet);
-            for (int i = 0; i != Graph.States.Count; i++)
+            graph.States.Add(AxiomSet);
+            for (int i = 0; i != graph.States.Count; i++)
             {
-                Graph.States[i].BuildGraph(Graph);
-                Graph.States[i].ID = i;
+               	graph.States[i].BuildGraph(graph);
+                graph.States[i].ID = i;
             }
-            foreach (State Set in Graph.States)
+            foreach (State Set in graph.States)
+			{
                 Set.BuildReductions(new StateReductionsLR1());
-            return Graph;
+			}
+            return graph;
         }
     }
 }

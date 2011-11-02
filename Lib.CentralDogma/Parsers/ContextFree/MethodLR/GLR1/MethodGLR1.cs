@@ -26,10 +26,11 @@ namespace Hime.Parsers.ContextFree.LR
             reporter.Info("GLR(1)", "Done !");
             return new ParserDataGLR1(reporter, grammar, Graph);
         }
-
+		
+		// TODO: try to remove static methods
         public static Graph ConstructGraph(CFGrammar grammar, Hime.Kernel.Reporting.Reporter reporter)
         {
-            Graph GraphLR1 = MethodLR1.ConstructGraph(grammar, reporter);
+            Graph GraphLR1 = MethodLR1.ConstructGraph(grammar);
             foreach (State Set in GraphLR1.States)
                 Set.BuildReductions(new StateReductionsGLR1());
             return GraphLR1;
