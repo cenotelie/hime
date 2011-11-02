@@ -4,6 +4,7 @@
  * Time: 17:22
  * 
  */
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -41,7 +42,7 @@ namespace Hime.Kernel.Documentation
         	    writer.Write("Subject: ");
             	writer.WriteLine(title);
 	            writer.Write("Date: ");
-    	        writer.WriteLine(System.DateTime.Now.ToLongDateString());
+    	        writer.WriteLine(DateTime.Now.ToLongDateString());
         	    writer.WriteLine("MIME-Version: 1.0");
             	writer.WriteLine("Content-Type: multipart/related;");
 	            writer.WriteLine("\ttype=\"text/html\";");
@@ -49,34 +50,11 @@ namespace Hime.Kernel.Documentation
 
         	    foreach (MHTMLSource source in sources)
             	{
-					// TODO: maybe put this code in ToString of MHTMLSource
 	                writer.WriteLine();
     	            writer.WriteLine();
         	        writer.WriteLine("--" + boundary);
-            	    writer.Write("Content-Type: ");
-                	writer.WriteLine(source.ContentType);
-	                writer.Write("Content-Transfer-Encoding: ");
-    	            writer.WriteLine(source.ContentTransferEncoding);
-        	        writer.Write("Content-Location: ");
-            	    writer.WriteLine(source.ContentLocation);
-                	writer.WriteLine();
 
-	                int length = 0;
-    	            string text = source.Read();
-        	        while (text != null)
-            	    {
-                	    while (linebreak < (length + text.Length))
-                    	{
-	                        string part1 = text.Substring(0, linebreak - length);
-    	                    text = text.Substring(linebreak - length);
-        	                writer.WriteLine(part1);
-            	            length = 0;
-                	    }
-                    	length += text.Length;
-	                    writer.Write(text);
-    	                text = source.Read();
-        	        }
-            	    source.Close();
+					writer.Write(source.ToMHTML(linebreak));
             	}
 
 	            writer.WriteLine();
