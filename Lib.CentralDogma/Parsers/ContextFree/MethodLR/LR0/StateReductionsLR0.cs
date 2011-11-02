@@ -17,26 +17,26 @@ namespace Hime.Parsers.ContextFree.LR
 
         public StateReductionsLR0() : base() { }
 
-        public override void Build(State Set)
+        public override void Build(State state)
         {
             Item reduce = null;
             // Look for Reduce actions
-            foreach (Item item in Set.Items)
+            foreach (Item item in state.Items)
             {
                 // Ignore Shift actions
                 if (item.Action == ItemAction.Shift)
                     continue;
-                if (Set.Children.Count != 0)
+                if (state.Children.Count != 0)
                 {
                     // Conflict Shift/Reduce
-                    Conflict Conflict = new Conflict("LR(0)", Set, ConflictType.ShiftReduce);
+                    Conflict Conflict = new Conflict("LR(0)", state, ConflictType.ShiftReduce);
                     Conflict.AddItem(item);
                     conflicts.Add(Conflict);
                 }
                 if (reduce != null)
                 {
                     // Conflict Reduce/Reduce
-                    Conflict Conflict = new Conflict("LR(0)", Set, ConflictType.ReduceReduce);
+                    Conflict Conflict = new Conflict("LR(0)", state, ConflictType.ReduceReduce);
                     Conflict.AddItem(item);
                     Conflict.AddItem(reduce);
                     conflicts.Add(Conflict);
