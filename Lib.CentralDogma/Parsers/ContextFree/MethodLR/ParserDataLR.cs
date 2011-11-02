@@ -11,6 +11,7 @@ using System.IO;
 using Hime.Kernel.Reporting;
 using Hime.Kernel.Resources;
 using Hime.Kernel.Documentation;
+using Hime.Kernel.Graphs;
 
 namespace Hime.Parsers.ContextFree.LR
 {
@@ -266,9 +267,9 @@ namespace Hime.Parsers.ContextFree.LR
 
         protected void SerializeGraphVisual(string directory, bool exportVisuals, string dotBin, List<string> results)
         {
-            Kernel.Graphs.DOTSerializer serializer = new Kernel.Graphs.DOTSerializer("Parser", directory + "\\GraphParser.dot");
-            foreach (State set in graph.States)
-                serializer.WriteNode(set.ID.ToString("X"), set.ID.ToString("X"), "Set_" + set.ID.ToString("X") + ".html");
+            DOTSerializer serializer = new DOTSerializer("Parser", directory + "\\GraphParser.dot");
+            foreach (State state in graph.States)
+                serializer.WriteNode(state.ID.ToString("X"), state.ID.ToString("X"), "Set_" + state.ID.ToString("X") + ".html");
             foreach (State set in graph.States)
                 foreach (GrammarSymbol symbol in set.Children.Keys)
                     serializer.WriteEdge(set.ID.ToString("X"), set.Children[symbol].ID.ToString("X"), symbol.ToString().Replace("\"", "\\\""));

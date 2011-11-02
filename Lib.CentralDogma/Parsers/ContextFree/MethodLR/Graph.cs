@@ -13,7 +13,7 @@ namespace Hime.Parsers.ContextFree.LR
         private List<State> sets;
 		
 		// TODO: should try to put this private!!
-        public List<State> States { get { return sets; } }
+        internal List<State> States { get { return sets; } }
 
         public Graph()
         {

@@ -5,22 +5,24 @@
  * 
  */
 using System.Collections.Generic;
+using System.Text;
 
 namespace Hime.Parsers.ContextFree.LR
 {
     public class State
     {
-        protected int id;
         protected StateKernel kernel;
         protected List<Item> items;
         protected Dictionary<GrammarSymbol, State> children;
         protected StateReductions reductions;
         
+		// TODO: at least set should be protected!!!!
         public int ID
         {
-            get { return id; }
-            set { id = value; }
+            get;
+            set;
         }
+		
         public StateKernel Kernel { get { return kernel; } }
         public StateReductions Reductions { get { return reductions; } }
         public ICollection<Item> Items { get { return items; } }
@@ -77,10 +79,11 @@ namespace Hime.Parsers.ContextFree.LR
         public bool Equals(State Set) { return (kernel.Equals(Set.kernel)); }
         public override bool Equals(object obj) { return Equals(obj as State); }
         public override int GetHashCode() { return base.GetHashCode(); }
+		
         public override string ToString()
         {
-            System.Text.StringBuilder Builder = new System.Text.StringBuilder("S ");
-            Builder.Append(id.ToString("X"));
+            StringBuilder Builder = new StringBuilder("S ");
+            Builder.Append(this.ID.ToString("X"));
             Builder.Append(" = {");
             foreach (Item Item in items)
             {
@@ -91,5 +94,10 @@ namespace Hime.Parsers.ContextFree.LR
             Builder.Append("}");
             return Builder.ToString();
         }
+		
+		internal string ToStringForSerialization()
+		{
+			return this.ID.ToString("X");
+		}
     }
 }
