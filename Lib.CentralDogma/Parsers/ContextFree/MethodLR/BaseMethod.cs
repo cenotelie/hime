@@ -32,9 +32,8 @@ namespace Hime.Parsers.ContextFree.LR
 		}
 		
 		// TODO: should register the reporter during class construction!!
-        public ParserData Build(CFGrammar grammar, Reporter reporter)
+        public ParserData Build(CFGrammar grammar)
 		{
-			this.reporter = reporter;
             this.ReportInfo("Constructing " + this.Name + " data ...");
 			this.graph = this.BuildGraph(grammar);
             Close();
@@ -51,7 +50,12 @@ namespace Hime.Parsers.ContextFree.LR
 			this.reporter.Info(this.Name, message);
 		}
 		
-        public ParserData Build(Grammar grammar, Reporter reporter) { return Build((CFGrammar)grammar, reporter); }
+		// TODO: remove this method? strange!!!
+		// TODO: at least remove reporter!!
+        public ParserData Build(Grammar grammar, Reporter reporter) 
+		{ 
+			return Build((CFGrammar)grammar); 
+		}
 
         protected virtual void OnBeginState(State state) { }
         protected virtual void OnConflictTreated(State state, Conflict conflict) { }

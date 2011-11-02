@@ -9,8 +9,9 @@ using Hime.Kernel.Reporting;
 
 namespace Hime.Parsers.ContextFree
 {
+	// TODO: remove this intermediate interface??
     public interface CFParserGenerator : ParserGenerator
     {
-        ParserData Build(CFGrammar grammar, Reporter reporter);
+        ParserData Build(CFGrammar grammar);
     }
 }
