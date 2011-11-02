@@ -56,7 +56,7 @@ namespace Hime.Parsers.ContextFree.LR
             sets.Add(Set);
         }
 		
-		internal void Serialize(DOTSerializer serializer)
+		internal void SerializeVisual(DOTSerializer serializer)
 		{
 			foreach (State state in this.States)
 			{
@@ -72,7 +72,6 @@ namespace Hime.Parsers.ContextFree.LR
                     serializer.WriteEdge(serializedState, state.Children[symbol].ToStringForSerialization(), symbol.ToString().Replace("\"", "\\\""));
 				}
 			}
-
 		}
     }
 }

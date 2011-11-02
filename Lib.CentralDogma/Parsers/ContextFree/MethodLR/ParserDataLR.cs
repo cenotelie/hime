@@ -268,7 +268,7 @@ namespace Hime.Parsers.ContextFree.LR
         protected void SerializeGraphVisual(string directory, bool exportVisuals, string dotBin, List<string> results)
         {
             DOTSerializer serializer = new DOTSerializer("Parser", Path.Combine(directory, "GraphParser.dot"));
-			graph.Serialize(serializer);
+			graph.SerializeVisual(serializer);
             serializer.Close();
             results.Add(directory + "\\GraphParser.dot");
 
@@ -285,12 +285,13 @@ namespace Hime.Parsers.ContextFree.LR
         protected XmlNode SerializeGraph(XmlDocument document)
         {
             XmlNode nodegraph = document.CreateElement("LRGraph");
+			//graph.Serialize(document)
             foreach (State state in graph.States)
                 nodegraph.AppendChild(SerializeGraphState(document, state));
             return nodegraph;
         }
 
-        protected XmlNode SerializeGraphState(XmlDocument document, State state)
+        private XmlNode SerializeGraphState(XmlDocument document, State state)
         {
             XmlNode root = document.CreateElement("ItemSet");
             root.Attributes.Append(document.CreateAttribute("SetID"));
