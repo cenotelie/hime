@@ -30,7 +30,7 @@ namespace Hime.Kernel.Graphs
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\"];");
         }
 		
-        internal void WriteNode(string id, Uri url)
+        internal void WriteNodeURL(string id, string url)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(id) + "\", URL=\"" + url + "\"];");
         }

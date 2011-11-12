@@ -251,8 +251,8 @@ namespace Hime.Parsers.ContextFree.LR
     	            accessor.AddCheckoutFile(vfile);
 	            }
             	compiler.CompileTo(file);
-            	Directory.Delete(directory, true);
 			}
+            Directory.Delete(directory, true);
         }
 
         protected virtual string GetTransformation(bool exportVisuals) { return "ParserData_LR1"; }

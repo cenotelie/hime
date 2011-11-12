@@ -51,7 +51,7 @@ namespace Hime.Parsers.ContextFree.LR
 			foreach (State state in this.States)
 			{
 				string serializedState = state.ToStringForSerialization(); 
-                serializer.WriteNode(serializedState, new Uri("Set_" + serializedState + ".html"));
+                serializer.WriteNodeURL(serializedState, "Set_" + serializedState + ".html");
 			}
             foreach (State state in this.States)
 			{

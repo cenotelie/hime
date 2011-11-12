@@ -13,9 +13,9 @@ namespace Hime.Demo.Tasks
             CompilationTask task = new CompilationTask(ParsingMethod.LRStar);
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDocumentation = false;
+            task.ExportDocumentation = true;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\ANSI_C.gram");
+            task.InputFiles.Add("Languages\\MathExp.gram");
 			string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 			path = Path.Combine(path, "Graphviz 2.28");
 			path = Path.Combine(path, "bin");
