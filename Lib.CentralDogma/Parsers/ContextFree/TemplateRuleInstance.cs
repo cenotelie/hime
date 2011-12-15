@@ -60,11 +60,11 @@ namespace Hime.Parsers.ContextFree
 
         public bool MatchParameters(List<GrammarSymbol> parameters)
         {
-            if (parameters.Count != parameters.Count)
+            if (this.parameters.Count != parameters.Count)
                 return false;
-            for (int i = 0; i != parameters.Count; i++)
+            for (int i = 0; i != this.parameters.Count; i++)
             {
-                if (parameters[i].SID != parameters[i].SID)
+                if (this.parameters[i].SID != parameters[i].SID)
                     return false;
             }
             return true;
