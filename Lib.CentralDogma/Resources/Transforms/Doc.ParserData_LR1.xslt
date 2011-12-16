@@ -104,6 +104,21 @@
           </xsl:choose>
         </div>
       </td>
+      <td class="HimeDataCellCenterRight">
+        <xsl:if test="@Conflict!='None'">
+          <xsl:attribute name="style">
+            background-color: #FFEEEE;
+          </xsl:attribute>
+        </xsl:if>
+        <div class="ColumnConflicts">
+          <xsl:choose>
+            <xsl:when test="count(ConflictLookaheads/SymbolTerminalText)=0">∅</xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="ConflictLookaheads"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </div>
+      </td>
     </tr>
   </xsl:template>
 
@@ -130,18 +145,27 @@
               <td style="width: 60pt;" class="HimeDataCellTopLeft">
                 <img src="hime_data/button_plus.gif" onclick="showColumn(0)"/>
                 <img src="hime_data/button_minus.gif" onclick="hideColumn(0)"/>
+                Actions
               </td>
               <td class="HimeDataCellTop">
                 <img src="hime_data/button_plus.gif" onclick="showColumn(1)"/>
                 <img src="hime_data/button_minus.gif" onclick="hideColumn(1)"/>
+                Heads
               </td>
               <td class="HimeDataCellTop">
                 <img src="hime_data/button_plus.gif" onclick="showColumn(2)"/>
                 <img src="hime_data/button_minus.gif" onclick="hideColumn(2)"/>
+                Bodies
               </td>
               <td class="HimeDataCellTopRight">
                 <img src="hime_data/button_plus.gif" onclick="showColumn(3)"/>
                 <img src="hime_data/button_minus.gif" onclick="hideColumn(3)"/>
+                Lookaheads
+              </td>
+              <td class="HimeDataCellTopRight">
+                <img src="hime_data/button_plus.gif" onclick="showColumn(4)"/>
+                <img src="hime_data/button_minus.gif" onclick="hideColumn(4)"/>
+                Conflicts
               </td>
             </tr>
             <xsl:apply-templates/>

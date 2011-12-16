@@ -17,8 +17,8 @@ function display(uri) {
 }
 
 
-var columnNames = ["ColumnAction", "ColumnHead", "ColumnBody", "ColumnLookaheads"];
-var columnIsOn = [true, true, true, true];
+var columnNames = ["ColumnAction", "ColumnHead", "ColumnBody", "ColumnLookaheads", "ColumnConflicts"];
+var columnIsOn = [true, true, true, true, true];
 function showColumn(index) {
 	columnIsOn[index] = true;
 	resetColumns();

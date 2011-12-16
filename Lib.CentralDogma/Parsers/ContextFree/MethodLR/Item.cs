@@ -95,6 +95,17 @@ namespace Hime.Parsers.ContextFree.LR
                 lnode.AppendChild(lookahead);
             }
             root.AppendChild(lnode);
+
+            System.Xml.XmlNode cl = document.CreateElement("ConflictLookaheads");
+            foreach (Conflict conflict in set.Conflicts)
+            {
+                if (conflict.ContainsItem(this))
+                {
+                    System.Xml.XmlNode lookahead = conflict.ConflictSymbol.GetXMLNode(document);
+                    cl.AppendChild(lookahead);
+                }
+            }
+            root.AppendChild(cl);
             return root;
         }
         private ConflictType GetXMLNode_Conflict(State set, Item item)
