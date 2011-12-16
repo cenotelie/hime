@@ -68,9 +68,7 @@ namespace Hime.Parsers.ContextFree.LR
         {
             XmlNode nodegraph = document.CreateElement("LRGraph");
             foreach (State state in this.States)
-			{
                 nodegraph.AppendChild(state.Serialize(document));
-			}
             return nodegraph;
         }
 

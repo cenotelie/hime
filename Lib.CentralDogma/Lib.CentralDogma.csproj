@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -217,11 +217,8 @@
     <EmbeddedResource Include="Resources\Visuals\button_plus.gif" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Transforms\Doc.Header.xslt" />
-    <EmbeddedResource Include="Resources\Transforms\Doc.Index.html" />
-    <EmbeddedResource Include="Resources\Transforms\Doc.Menu.xslt" />
+    <EmbeddedResource Include="Resources\Transforms\Doc.Index.xslt" />
     <EmbeddedResource Include="Resources\Visuals\Hime.GoTo.png" />
-    <EmbeddedResource Include="Resources\Transforms\Doc.Parser.html" />
     <EmbeddedResource Include="Resources\Transforms\Doc.ParserData_LR1.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -243,7 +240,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Transforms\Hime.js" />
     <EmbeddedResource Include="Resources\Transforms\Hime.css" />
-    <EmbeddedResource Include="Resources\Transforms\Generators.Lexers.xslt" />
     <EmbeddedResource Include="Resources\Transforms\Logs.xslt" />
     <EmbeddedResource Include="Resources\Visuals\Hime.Error.png" />
     <EmbeddedResource Include="Resources\Visuals\Hime.Info.png" />
@@ -266,9 +262,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Kernel\Generated\" />
-    <Folder Include="Kernel\Generated\SourceGrammar\" />
-    <Folder Include="Kernel\Resources\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

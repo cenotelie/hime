@@ -36,49 +36,23 @@
 
   <xsl:template match="Item">
     <tr class="HimeLRItem">
-      <td style="width:60pt">
-        <xsl:attribute name="class">
-          <xsl:choose>
-            <xsl:when test="../Item[1]=.">
-              <xsl:text>HimeDataCellTopLeft</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>HimeDataCellCenterLeft</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <img style="width: 20pt; height: 20pt;">
-          <xsl:attribute name="src">
-            <xsl:text>hime_data/Hime.</xsl:text>
-            <xsl:value-of select="@Conflict"/>
-            <xsl:text>.png</xsl:text>
+      <td style="width: 60pt;" class="HimeDataCellCenterLeft">
+        <xsl:if test="@Conflict!='None'">
+          <xsl:attribute name="style">
+            background-color: #FFEEEE;
           </xsl:attribute>
-          <xsl:attribute name="alt">
-            <xsl:value-of select="@Conflict"/>
-            <xsl:text> conflict</xsl:text>
-          </xsl:attribute>
-        </img>
-      </td>
-      <td style="width: 60pt;">
-        <xsl:attribute name="class">
-          <xsl:choose>
-            <xsl:when test="../Item[1]=.">
-              <xsl:text>HimeDataCellTop</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>HimeDataCellCenter</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <img style="width: 20pt; height: 20pt;">
-          <xsl:attribute name="src">
-            <xsl:text>hime_data/Hime.</xsl:text>
-            <xsl:value-of select="Action/@Type"/>
-            <xsl:text>.png</xsl:text>
-          </xsl:attribute>
-          <xsl:attribute name="alt">
-            <xsl:value-of select="Action/@Type"/>
-          </xsl:attribute>
+        </xsl:if>
+        <div class="ColumnAction">
+          <img style="width: 20pt; height: 20pt;">
+            <xsl:attribute name="src">
+              <xsl:text>hime_data/Hime.</xsl:text>
+              <xsl:value-of select="Action/@Type"/>
+              <xsl:text>.png</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="alt">
+              <xsl:value-of select="Action/@Type"/>
+            </xsl:attribute>
+          </img>
           <xsl:if test="Action/@Type='Shift'">
             <span>
               to
@@ -90,54 +64,45 @@
               </a>
             </span>
           </xsl:if>
-        </img>
+        </div>
       </td>
-      <td>
-        <xsl:attribute name="class">
+      <td class="HimeDataCellCenter">
+        <xsl:if test="@Conflict!='None'">
+          <xsl:attribute name="style">
+            background-color: #FFEEEE;
+          </xsl:attribute>
+        </xsl:if>
+        <div class="ColumnHead">
+          <a class="HimeSymbolVariable" href="grammar.html">
+            <xsl:value-of select="@HeadName"/>
+          </a>
+          →
+        </div>
+      </td>
+      <td class="HimeDataCellCenter">
+        <xsl:if test="@Conflict!='None'">
+          <xsl:attribute name="style">
+            background-color: #FFEEEE;
+          </xsl:attribute>
+        </xsl:if>
+        <div class="ColumnBody">
+          <xsl:apply-templates select="Symbols"/>
+        </div>
+      </td>
+      <td class="HimeDataCellCenterRight">
+        <xsl:if test="@Conflict!='None'">
+          <xsl:attribute name="style">
+            background-color: #FFEEEE;
+          </xsl:attribute>
+        </xsl:if>
+        <div class="ColumnLookaheads">
           <xsl:choose>
-            <xsl:when test="../Item[1]=.">
-              <xsl:text>HimeDataCellTop</xsl:text>
-            </xsl:when>
+            <xsl:when test="count(Lookaheads/SymbolTerminalText)=0">∅</xsl:when>
             <xsl:otherwise>
-              <xsl:text>HimeDataCellCenter</xsl:text>
+              <xsl:apply-templates select="Lookaheads"/>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:attribute>
-        <a class="HimeSymbolVariable" href="grammar.html">
-          <xsl:value-of select="@HeadName"/>
-        </a>
-        →
-      </td>
-      <td>
-        <xsl:attribute name="class">
-          <xsl:choose>
-            <xsl:when test="../Item[1]=.">
-              <xsl:text>HimeDataCellTop</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>HimeDataCellCenter</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:apply-templates select="Symbols"/>
-      </td>
-      <td>
-        <xsl:attribute name="class">
-          <xsl:choose>
-            <xsl:when test="../Item[1]=.">
-              <xsl:text>HimeDataCellTopRight</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>HimeDataCellCenterRight</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:choose>
-          <xsl:when test="count(Lookaheads/SymbolTerminalText)=0">∅</xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="Lookaheads"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        </div>
       </td>
     </tr>
   </xsl:template>
@@ -159,8 +124,26 @@
             Set <xsl:value-of select="@SetID"/>
           </h1>
         </div>
-        <div class="HimeBody">
-          <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
+        <div>
+          <table border="0" cellspacing="0" cellpadding="0" >
+            <tr class="HimeLRItem">
+              <td style="width: 60pt;" class="HimeDataCellTopLeft">
+                <img src="hime_data/button_plus.gif" onclick="showColumn(0)"/>
+                <img src="hime_data/button_minus.gif" onclick="hideColumn(0)"/>
+              </td>
+              <td class="HimeDataCellTop">
+                <img src="hime_data/button_plus.gif" onclick="showColumn(1)"/>
+                <img src="hime_data/button_minus.gif" onclick="hideColumn(1)"/>
+              </td>
+              <td class="HimeDataCellTop">
+                <img src="hime_data/button_plus.gif" onclick="showColumn(2)"/>
+                <img src="hime_data/button_minus.gif" onclick="hideColumn(2)"/>
+              </td>
+              <td class="HimeDataCellTopRight">
+                <img src="hime_data/button_plus.gif" onclick="showColumn(3)"/>
+                <img src="hime_data/button_minus.gif" onclick="hideColumn(3)"/>
+              </td>
+            </tr>
             <xsl:apply-templates/>
           </table>
         </div>

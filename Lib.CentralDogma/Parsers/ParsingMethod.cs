@@ -14,7 +14,6 @@ namespace Hime.Parsers
         LALR1 = 3,
         RNGLR1 = 4,
         RNGLALR1 = 0,
-        LRStar = 5,
-        LRAutomata = 6
+        LRStar = 5
     }
 }
