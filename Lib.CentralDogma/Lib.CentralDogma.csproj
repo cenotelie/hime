@@ -113,6 +113,7 @@
     <Compile Include="Parsers\ContextFree\MethodLR\ConflictType.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\GLRSimulatorState.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\GLRStackNode.cs" />
+    <Compile Include="Parsers\ContextFree\MethodLR\GraphInverse.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\ItemAction.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\LRStar\DeciderLRStar.cs" />
     <Compile Include="Parsers\ContextFree\MethodLR\ParserDataLR.cs" />

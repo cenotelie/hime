@@ -100,16 +100,14 @@ namespace Hime.Parsers.ContextFree.LR
 		{
 			return this.ID.ToString("X");
 		}
-		
-		internal XmlNode Serialize(XmlDocument document)
+
+        internal XmlNode Serialize(XmlDocument document, GraphInverse inverse)
 		{
             XmlNode root = document.CreateElement("ItemSet");
             root.Attributes.Append(document.CreateAttribute("SetID"));
             root.Attributes["SetID"].Value = this.ToStringForSerialization();
             foreach (Item item in this.Items)
-			{
-                root.AppendChild(item.GetXMLNode(document, this));
-			}
+                root.AppendChild(item.GetXMLNode(document, inverse, this));
             return root;
 		}
     }

@@ -44,8 +44,10 @@ namespace Hime.Parsers
         
 		public virtual XmlNode GetXMLNode(XmlDocument document)
         {
-            XmlNode node = document.CreateElement("SymbolVirtual");
-            this.AddAttributeToNode(document, node, "Name", localName.Replace("\"", "\\\""));
+            XmlNode node = document.CreateElement("Symbol");
+            this.AddAttributeToNode(document, node, "type", this.GetType().Name);
+            this.AddAttributeToNode(document, node, "name", localName.Replace("\"", "\\\""));
+            this.AddAttributeToNode(document, node, "sid", SID.ToString("X"));
             return node;
         }
 		

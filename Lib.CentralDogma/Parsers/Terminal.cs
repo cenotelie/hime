@@ -21,9 +21,8 @@ namespace Hime.Parsers
         public override XmlNode GetXMLNode(XmlDocument document)
         {
 			XmlNode node = base.GetXMLNode(document);
-            this.AddAttributeToNode(document, node, "SID", SID.ToString());
-            this.AddAttributeToNode(document, node, "Priority", this.Priority.ToString());
-            this.AddAttributeToNode(document, node, "Value", this.ToString());
+            this.AddAttributeToNode(document, node, "priority", this.Priority.ToString());
+            this.AddAttributeToNode(document, node, "value", this.ToString());
             return node;
         }
     }

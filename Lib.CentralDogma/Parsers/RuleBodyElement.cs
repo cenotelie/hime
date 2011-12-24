@@ -28,27 +28,10 @@ namespace Hime.Parsers
 
         public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document)
         {
-            System.Xml.XmlNode node = document.CreateElement("Symbol");
+            System.Xml.XmlNode node = symbol.GetXMLNode(document);
             node.Attributes.Append(document.CreateAttribute("Action"));
-            node.Attributes.Append(document.CreateAttribute("SymbolType"));
-            node.Attributes.Append(document.CreateAttribute("SymbolID"));
-            node.Attributes.Append(document.CreateAttribute("SymbolName"));
-            node.Attributes.Append(document.CreateAttribute("SymbolValue"));
             node.Attributes.Append(document.CreateAttribute("ParserIndex"));
-
             node.Attributes["Action"].Value = action.ToString();
-            node.Attributes["SymbolID"].Value = symbol.SID.ToString("X");
-            node.Attributes["SymbolName"].Value = symbol.LocalName;
-            node.Attributes["SymbolValue"].Value = symbol.ToString();
-
-            if (symbol is Terminal)
-                node.Attributes["SymbolType"].Value = "Terminal";
-            else if (symbol is Variable)
-                node.Attributes["SymbolType"].Value = "Variable";
-            else if (symbol is Virtual)
-                node.Attributes["SymbolType"].Value = "Virtual";
-            else if (symbol is Action)
-                node.Attributes["SymbolType"].Value = "Action";
             return node;
         }
 

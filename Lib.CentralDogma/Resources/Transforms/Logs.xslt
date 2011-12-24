@@ -74,19 +74,19 @@
           <xsl:text>button_</xsl:text>
           <xsl:value-of select="./Header/@set"/>
           <xsl:text>_</xsl:text>
-          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+          <xsl:value-of select="./Header/Symbol/@sid"/>
         </xsl:attribute>
         <xsl:attribute name="onclick">
           <xsl:text>toggle(</xsl:text>
           <xsl:text>button_</xsl:text>
           <xsl:value-of select="./Header/@set"/>
           <xsl:text>_</xsl:text>
-          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+          <xsl:value-of select="./Header/Symbol/@sid"/>
           <xsl:text>,</xsl:text>
           <xsl:text>conflict_</xsl:text>
           <xsl:value-of select="./Header/@set"/>
           <xsl:text>_</xsl:text>
-          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+          <xsl:value-of select="./Header/Symbol/@sid"/>
           <xsl:text>)</xsl:text>
         </xsl:attribute>
       </img>
@@ -104,7 +104,7 @@
           <xsl:text>conflict_</xsl:text>
           <xsl:value-of select="./Header/@set"/>
           <xsl:text>_</xsl:text>
-          <xsl:value-of select="./Header/SymbolTerminalText/@SID"/>
+          <xsl:value-of select="./Header/Symbol/@sid"/>
         </xsl:attribute>
         <br/>
         <table border="0" cellpadding="0" cellspacing="0">
@@ -133,31 +133,22 @@
   </xsl:template>
 
   <xsl:template match="Symbol">
-    <xsl:if test="@SymbolType='Variable'">
-      <span class="HimeSymbolVariable">
-        <xsl:value-of select="@SymbolValue"/>
-      </span>
-    </xsl:if>
-    <xsl:if test="@SymbolType!='Variable'">
-      <span>
-        <xsl:attribute name="class">
-          <xsl:text>HimeSymbol</xsl:text>
-          <xsl:value-of select="@SymbolType"/>
-        </xsl:attribute>
-        <xsl:value-of select="@SymbolValue"/>
-      </span>
-    </xsl:if>
-  </xsl:template>
-  <xsl:template match="SymbolTerminalText">
-    <span class="HimeSymbolTerminal">
-      <xsl:value-of select="@Value"/>
+    <span>
+      <xsl:attribute name="class">
+        <xsl:text>HimeSymbol</xsl:text>
+        <xsl:value-of select="@type"/>
+      </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="@type='TerminalText'">
+          <xsl:value-of select="@value"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </span>
   </xsl:template>
-  <xsl:template match="SymbolTerminal">
-    <span class="HimeSymbolTerminal">
-      <xsl:value-of select="@Value"/>
-    </span>
-  </xsl:template>
+  
   <xsl:template match="Dot">
     <span>●</span>
   </xsl:template>
@@ -200,7 +191,7 @@
           <xsl:text>;</xsl:text>
         </xsl:attribute>
         <div style="margin: 3px;">
-          <span class="HimeSymbolVariable">
+          <span class="HimeSymbolCFVariable">
             <xsl:value-of select="@HeadName"/>
           </span>
           →

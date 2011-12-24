@@ -3,43 +3,48 @@
   <xsl:output method="xml" indent="yes"/>
 
   <xsl:template match="Symbol">
-    <xsl:if test="@SymbolType='Variable'">
-      <a class="HimeSymbolVariable" href="grammar.html">
-        <xsl:value-of select="@SymbolValue"/>
-      </a>
-    </xsl:if>
-    <xsl:if test="@SymbolType!='Variable'">
-      <span>
-        <xsl:attribute name="class">
-          <xsl:text>HimeSymbol</xsl:text>
-          <xsl:value-of select="@SymbolType"/>
-        </xsl:attribute>
-        <xsl:value-of select="@SymbolValue"/>
-      </span>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="SymbolTerminalText">
-    <span class="HimeSymbolTerminal">
-      <xsl:value-of select="@Value"/>
-    </span>
-  </xsl:template>
-  <xsl:template match="SymbolTerminal">
-    <span class="HimeSymbolTerminal">
-      <xsl:value-of select="@Value"/>
-    </span>
+    <xsl:choose>
+      <xsl:when test="@type='TerminalText'">
+        <span class="HimeSymbolTerminalText">
+          <xsl:value-of select="@value"/>
+        </span>
+      </xsl:when>
+      <xsl:when test="@type='CFVariable'">
+        <a class="HimeSymbolCFVariable" href="grammar.html">
+          <xsl:value-of select="@name"/>
+        </a>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="Dot">
     <span>●</span>
   </xsl:template>
 
+  <xsl:template match="Origin">
+    <tr>
+      <td>
+        <span>from</span>
+        <a>
+          <xsl:attribute name="href">
+            <xsl:text>Set_</xsl:text>
+            <xsl:value-of select="@State"/>
+            <xsl:text>.html</xsl:text>
+          </xsl:attribute>
+          <xsl:value-of select="@State"/>
+        </a>
+        <span>by</span>
+        <xsl:apply-templates select="Symbol"/>
+      </td>
+    </tr>
+  </xsl:template>
+  
   <xsl:template match="Item">
     <tr class="HimeLRItem">
       <td style="width: 60pt;" class="HimeDataCellCenterLeft">
-        <xsl:if test="@Conflict!='None'">
+        <xsl:if test="@Conflict!='false'">
           <xsl:attribute name="style">
-            background-color: #FFEEEE;
+            <xsl:text>background-color: #FFEEEE;</xsl:text>
           </xsl:attribute>
         </xsl:if>
         <div class="ColumnAction">
@@ -58,7 +63,9 @@
               to
               <a>
                 <xsl:attribute name="href">
-                  <xsl:text>Set_</xsl:text><xsl:value-of select="Action"/>.html
+                  <xsl:text>Set_</xsl:text>
+                  <xsl:value-of select="Action"/>
+                  <xsl:text>.html</xsl:text>
                 </xsl:attribute>
                 <xsl:value-of select="Action"/>
               </a>
@@ -67,9 +74,9 @@
         </div>
       </td>
       <td class="HimeDataCellCenter">
-        <xsl:if test="@Conflict!='None'">
+        <xsl:if test="@Conflict!='false'">
           <xsl:attribute name="style">
-            background-color: #FFEEEE;
+            <xsl:text>background-color: #FFEEEE;</xsl:text>
           </xsl:attribute>
         </xsl:if>
         <div class="ColumnHead">
@@ -80,9 +87,9 @@
         </div>
       </td>
       <td class="HimeDataCellCenter">
-        <xsl:if test="@Conflict!='None'">
+        <xsl:if test="@Conflict!='false'">
           <xsl:attribute name="style">
-            background-color: #FFEEEE;
+            <xsl:text>background-color: #FFEEEE;</xsl:text>
           </xsl:attribute>
         </xsl:if>
         <div class="ColumnBody">
@@ -90,33 +97,37 @@
         </div>
       </td>
       <td class="HimeDataCellCenterRight">
-        <xsl:if test="@Conflict!='None'">
+        <xsl:if test="@Conflict!='false'">
           <xsl:attribute name="style">
-            background-color: #FFEEEE;
+            <xsl:text>background-color: #FFEEEE;</xsl:text>
           </xsl:attribute>
         </xsl:if>
         <div class="ColumnLookaheads">
-          <xsl:choose>
-            <xsl:when test="count(Lookaheads/SymbolTerminalText)=0">∅</xsl:when>
-            <xsl:otherwise>
-              <xsl:apply-templates select="Lookaheads"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:apply-templates select="Lookaheads"/>
         </div>
       </td>
       <td class="HimeDataCellCenterRight">
-        <xsl:if test="@Conflict!='None'">
+        <xsl:if test="@Conflict!='false'">
           <xsl:attribute name="style">
-            background-color: #FFEEEE;
+            <xsl:text>background-color: #FFEEEE;</xsl:text>
           </xsl:attribute>
         </xsl:if>
         <div class="ColumnConflicts">
-          <xsl:choose>
-            <xsl:when test="count(ConflictLookaheads/SymbolTerminalText)=0">∅</xsl:when>
-            <xsl:otherwise>
-              <xsl:apply-templates select="ConflictLookaheads"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:apply-templates select="ConflictLookaheads"/>
+        </div>
+      </td>
+      <td class="HimeDataCellCenterRight">
+        <xsl:if test="@Conflict!='false'">
+          <xsl:attribute name="style">
+            <xsl:text>background-color: #FFEEEE;</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <div class="ColumnOrigins">
+          <xsl:if test="count(Origins/Origin)!=0">
+            <table border="0" cellspacing="0" cellpadding="0" >
+              <xsl:apply-templates select="Origins/Origin"/>
+            </table>
+          </xsl:if>
         </div>
       </td>
     </tr>
@@ -167,8 +178,13 @@
                 <img src="hime_data/button_minus.gif" onclick="hideColumn(4)"/>
                 Conflicts
               </td>
+              <td class="HimeDataCellTopRight">
+                <img src="hime_data/button_plus.gif" onclick="showColumn(5)"/>
+                <img src="hime_data/button_minus.gif" onclick="hideColumn(5)"/>
+                Origins
+              </td>
             </tr>
-            <xsl:apply-templates/>
+            <xsl:apply-templates select="Item"/>
           </table>
         </div>
       </body>

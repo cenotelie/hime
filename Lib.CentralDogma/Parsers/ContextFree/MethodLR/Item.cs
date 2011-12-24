@@ -56,7 +56,8 @@ namespace Hime.Parsers.ContextFree.LR
         public abstract override string ToString();
         public abstract string ToString(bool ShowDecoration);
 
-        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document, State set)
+        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document, State set) { return GetXMLNode(document, null, set); }
+        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument document, GraphInverse inverse, State set)
         {
             System.Xml.XmlNode root = document.CreateElement("Item");
             root.Attributes.Append(document.CreateAttribute("HeadName"));
@@ -64,7 +65,7 @@ namespace Hime.Parsers.ContextFree.LR
             root.Attributes.Append(document.CreateAttribute("Conflict"));
             root.Attributes["HeadName"].Value = rule.Head.LocalName;
             root.Attributes["HeadSID"].Value = rule.Head.SID.ToString("X");
-            root.Attributes["Conflict"].Value = GetXMLNode_Conflict(set, this).ToString();
+            root.Attributes["Conflict"].Value = GetXMLNode_Conflict(set).ToString().ToLower();
 
             System.Xml.XmlNode action = document.CreateElement("Action");
             action.Attributes.Append(document.CreateAttribute("Type"));
@@ -106,14 +107,46 @@ namespace Hime.Parsers.ContextFree.LR
                 }
             }
             root.AppendChild(cl);
+
+            if (inverse != null)
+            {
+                System.Xml.XmlNode origins = document.CreateElement("Origins");
+                if (set.Kernel.Items.Contains(this) && inverse.HasIncomings(set.ID))
+                {
+                    foreach (GrammarSymbol incoming in inverse.GetIncomings(set.ID))
+                    {
+                        foreach (State origin in inverse.GetOrigins(set.ID, incoming))
+                        {
+                            foreach (Item item in origin.Items)
+                            {
+                                if (IsOrigin(item))
+                                {
+                                    System.Xml.XmlNode onode = document.CreateElement("Origin");
+                                    onode.Attributes.Append(document.CreateAttribute("State"));
+                                    onode.Attributes["State"].Value = origin.ID.ToString("X");
+                                    onode.AppendChild(incoming.GetXMLNode(document));
+                                    origins.AppendChild(onode);
+                                }
+                            }
+                        }
+                    }
+                }
+                root.AppendChild(origins);
+            }
             return root;
         }
-        private ConflictType GetXMLNode_Conflict(State set, Item item)
+
+        private bool GetXMLNode_Conflict(State set)
         {
             foreach (Conflict conflict in set.Conflicts)
-                if (conflict.ContainsItem(item))
-                    return conflict.ConflictType;
-            return ConflictType.None;
+                if (conflict.ContainsItem(this))
+                    return true;
+            return false;
+        }
+
+        private bool IsOrigin(Item item)
+        {
+            return ((this.rule == item.rule) && (this.dotPosition == (item.dotPosition + 1)));
         }
     }
 }

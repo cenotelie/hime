@@ -37,11 +37,10 @@ namespace Hime.Parsers
         }
 		
         protected virtual void OnRuleAdd(Rule rule) { }
-		
-        public override XmlNode GetXMLNode(XmlDocument document)
+
+        public XmlNode GetXMLNodeWithRules(XmlDocument document)
         {
-   			XmlNode node = base.GetXMLNode(document);
-			this.AddAttributeToNode(document, node, "SID", SID.ToString("X"));
+            XmlNode node = base.GetXMLNode(document);
             foreach (Rule rule in this.Rules)
                 node.AppendChild(rule.GetXMLNode(document));
             return node;

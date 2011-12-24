@@ -66,9 +66,10 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		internal XmlNode Serialize(XmlDocument document)
         {
+            GraphInverse inverse = new GraphInverse(this);
             XmlNode nodegraph = document.CreateElement("LRGraph");
             foreach (State state in this.States)
-                nodegraph.AppendChild(state.Serialize(document));
+                nodegraph.AppendChild(state.Serialize(document, inverse));
             return nodegraph;
         }
 

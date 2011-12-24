@@ -8,35 +8,9 @@ using System.Collections.Generic;
 
 namespace Hime.Parsers.ContextFree.LR
 {
-    public class GLRSimulator
+    public class GLRSimulator : GraphInverse
     {
-        private Graph graph;
-        private Dictionary<int, Dictionary<GrammarSymbol, List<State>>> inverseGraph;
-
-        public GLRSimulator(Graph graph)
-        {
-            this.graph = graph;
-            this.inverseGraph = new Dictionary<int, Dictionary<GrammarSymbol, List<State>>>();
-            BuildInverse();
-        }
-
-        private void BuildInverse()
-        {
-            foreach (State set in graph.States)
-            {
-                foreach (GrammarSymbol symbol in set.Children.Keys)
-                {
-                    State child = set.Children[symbol];
-                    if (!inverseGraph.ContainsKey(child.ID))
-                        inverseGraph.Add(child.ID, new Dictionary<GrammarSymbol, List<State>>());
-                    Dictionary<GrammarSymbol, List<State>> inverses = inverseGraph[child.ID];
-                    if (!inverses.ContainsKey(symbol))
-                        inverses.Add(symbol, new List<State>());
-                    List<State> parents = inverses[symbol];
-                    parents.Add(set);
-                }
-            }
-        }
+        public GLRSimulator(Graph graph) : base(graph) { }
 
         public GLRSimulatorState Simulate(GLRSimulatorState origin, Terminal lookahead)
         {

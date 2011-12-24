@@ -146,7 +146,7 @@
 	font-size: 10pt;
 }
 
-.HimeSymbolVariable
+.HimeSymbolCFVariable
 {
     padding: 1px;
     margin: 2px;
@@ -155,7 +155,14 @@
     color: Black;
     text-decoration: none;
 }
-.HimeSymbolTerminal
+.HimeSymbolTerminalText
+{
+    padding: 1px;
+    margin: 2px;
+    border: 1px Solid #FF6600;
+    background-color: #FFDD88;
+}
+.HimeSymbolTerminalBin
 {
     padding: 1px;
     margin: 2px;

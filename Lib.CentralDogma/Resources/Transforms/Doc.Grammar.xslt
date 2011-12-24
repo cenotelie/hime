@@ -3,25 +3,32 @@
   <xsl:output method="xml" indent="yes"/>
 
   <xsl:template match="Symbol">
-    <xsl:if test="@SymbolType='Variable'">
-      <a class="HimeSymbolVariable">
-        <xsl:attribute name="href">
-          <xsl:text>#rule_</xsl:text>
-          <xsl:value-of select="@SymbolID"/>
-          <xsl:text>_0</xsl:text>
-        </xsl:attribute>
-        <xsl:value-of select="@SymbolValue"/>
-      </a>
-    </xsl:if>
-    <xsl:if test="@SymbolType!='Variable'">
-      <span>
-        <xsl:attribute name="class">
-          <xsl:text>HimeSymbol</xsl:text>
-          <xsl:value-of select="@SymbolType"/>
-        </xsl:attribute>
-        <xsl:value-of select="@SymbolValue"/>
-      </span>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@type='TerminalText'">
+        <span class="HimeSymbolTerminalText">
+          <xsl:value-of select="@value"/>
+        </span>
+      </xsl:when>
+      <xsl:when test="@type='CFVariable'">
+        <a class="HimeSymbolCFVariable">
+          <xsl:attribute name="href">
+            <xsl:text>#rule_</xsl:text>
+            <xsl:value-of select="@sid"/>
+            <xsl:text>_0</xsl:text>
+          </xsl:attribute>
+          <xsl:value-of select="@name"/>
+        </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <span>
+          <xsl:attribute name="class">
+            <xsl:text>HimeSymbol</xsl:text>
+            <xsl:value-of select="@type"/>
+          </xsl:attribute>
+          <xsl:value-of select="@name"/>
+        </span>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template match="Rule">
@@ -84,7 +91,7 @@
         </div>
         <div class="HimeBody">
           <table border="0" cellspacing="0" cellpadding="0" style="width: 100%;">
-            <xsl:apply-templates/>
+            <xsl:apply-templates select="//Rule"/>
           </table>
         </div>
       </body>

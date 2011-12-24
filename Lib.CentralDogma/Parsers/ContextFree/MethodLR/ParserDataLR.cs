@@ -196,14 +196,10 @@ namespace Hime.Parsers.ContextFree.LR
                 accessor.CheckOut("Transforms.Doc." + tfile + ".xslt", directory + "\\" + tfile + ".xslt");
                 transform = new XslCompiledTransform();
                 transform.Load(directory + "\\" + tfile + ".xslt");
-                /*List<XmlNode> nodes = new List<XmlNode>();
-                foreach (XmlNode child in nodeGraph.ChildNodes)
-                    nodes.Add(child);*/
                 foreach (XmlNode child in nodeGraph.ChildNodes)
                 {
                     string temp = directory + "\\Set_" + child.Attributes["SetID"].Value;
                     XmlDocument tempXML = new XmlDocument();
-                    //tempXML.AppendChild(tempXML.CreateXmlDeclaration("1.0", "utf-8", null));
                     tempXML.AppendChild(tempXML.ImportNode(child, true));
                     tempXML.Save(temp + ".xml");
                     accessor.AddCheckoutFile(temp + ".xml");
@@ -275,7 +271,7 @@ namespace Hime.Parsers.ContextFree.LR
             root.Attributes.Append(document.CreateAttribute("Name"));
             root.Attributes["Name"].Value = grammar.LocalName;
             foreach (Variable var in grammar.Variables)
-                root.AppendChild(var.GetXMLNode(document));
+                root.AppendChild(var.GetXMLNodeWithRules(document));
             return root;
         }
     }

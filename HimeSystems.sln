@@ -73,10 +73,6 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Exe.HimeDemo\Exe.HimeDemo.csproj
 	EndGlobalSection
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = HimeSystems.vsmdi
 	EndGlobalSection

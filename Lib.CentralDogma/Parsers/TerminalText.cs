@@ -38,18 +38,10 @@ namespace Hime.Parsers
 
         public override XmlNode GetXMLNode(XmlDocument document)
         {
-            System.Xml.XmlNode node = document.CreateElement("SymbolTerminalText");
-            node.Attributes.Append(document.CreateAttribute("SID"));
-            node.Attributes.Append(document.CreateAttribute("Name"));
-            node.Attributes.Append(document.CreateAttribute("Priority"));
+            System.Xml.XmlNode node = base.GetXMLNode(document);
             node.Attributes.Append(document.CreateAttribute("SubGrammar"));
-            node.Attributes.Append(document.CreateAttribute("Value"));
-            node.Attributes["SID"].Value = SID.ToString("X");
-            node.Attributes["Name"].Value = localName.Replace("\"", "\\\"");
-            node.Attributes["Priority"].Value = this.Priority.ToString();
             if (subGrammar != null)
                 node.Attributes["SubGrammar"].Value = subGrammar.CompleteName.ToString('_');
-            node.Attributes["Value"].Value = value;
             return node;
         }
 
