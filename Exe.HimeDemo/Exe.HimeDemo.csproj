@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -71,18 +71,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generated\ANSI_C.cs" />
-    <Compile Include="Generated\MathExp.cs" />
-    <Compile Include="Generated\Test2.cs" />
+    <Compile Include="Generated\ECMAScriptLexer.cs" />
+    <Compile Include="Generated\ECMAScriptParser.cs" />
     <Compile Include="IExecutable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\ANSICParse.cs" />
     <Compile Include="Tasks\Compile.cs" />
     <Compile Include="Tasks\Daemon.cs" />
-    <Compile Include="Tasks\MathExpInterpreter.cs" />
-    <Compile Include="Tasks\MathExpParse.cs" />
-    <Compile Include="Tasks\Parse.cs" />
+    <Compile Include="Tasks\TestECMAScript.cs" />
     <Compile Include="WinTreeView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -92,13 +88,10 @@
     <None Include="Languages\ANSI_C.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Languages\CommandLine.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Languages\CSharp4.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Languages\MathExp.gram">
+    <None Include="Languages\ECMAScript.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Languages\Test.gram">
@@ -112,17 +105,6 @@
       <DependentUpon>WinTreeView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Grammars\Tokenizer.gram" />
-    <EmbeddedResource Include="Grammars\Earth.Asm.PE.format" />
-    <EmbeddedResource Include="Grammars\Earth.CIL.PE.format" />
-    <EmbeddedResource Include="Grammars\Earth.CIL.Asm.gram" />
-    <EmbeddedResource Include="Grammars\Earth.B.gram" />
-    <EmbeddedResource Include="Grammars\Earth.CIL.CSharp.gram" />
-    <EmbeddedResource Include="Grammars\Earth.Asm.x86_32.gram" />
-    <EmbeddedResource Include="Grammars\Earth.Java.Bytecode.gram" />
-    <EmbeddedResource Include="Grammars\BinLibrary.gram" />
-    <EmbeddedResource Include="Grammars\Formats.gram" />
-    <EmbeddedResource Include="Grammars\Earth.Java.ClassFile.format" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">

@@ -10,12 +10,12 @@ namespace Hime.Demo.Tasks
     {
         public void Execute()
         {
-            CompilationTask task = new CompilationTask(ParsingMethod.LRStar);
+            CompilationTask task = new CompilationTask(ParsingMethod.RNGLALR1);
             task.Namespace = "Analyser";
             task.ExportLog = true;
-            task.ExportDocumentation = true;
+            task.ExportDocumentation = false;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\MathExp.gram");
+            task.InputFiles.Add("Languages\\ECMAScript.gram");
 			string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 			path = Path.Combine(path, "Graphviz 2.28");
 			path = Path.Combine(path, "bin");
