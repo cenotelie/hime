@@ -46,14 +46,14 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-		protected override void ExportAdditionalElements(StreamWriter stream, string className)
-		{
-			DetermineNullables();
+        protected override void ExportAdditionalStaticElements(StreamWriter stream, string className)
+        {
+            DetermineNullables();
             Export_NullVars(stream);
             Export_NullChoices(stream);
             Export_NullBuilders(stream);
             Export_StaticConstructor(stream, className);
-		}
+        }
 		
         protected void Export_StaticConstructor(StreamWriter stream, string className)
         {
