@@ -13,18 +13,23 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents an unexpected character error in the input stream of a lexer
     /// </summary>
-    internal class UnexpectedCharError : ParserError
+    public sealed class UnexpectedCharError : ParserError
     {
         /// <summary>
-        /// Initializes a new instance of the LexerTextErrorDiscardedChar class for the given character at the given line and column number
+        /// Gets the unexpected char
         /// </summary>
-        /// <param name="discarded">The errorneous character</param>
+        public char UnexpectedChar { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the UnexpectedCharError class for the given character at the given line and column number
+        /// </summary>
+        /// <param name="unexpected">The errorneous character</param>
         /// <param name="line">The line number of the character</param>
         /// <param name="column">The column number of the character</param>
-        public UnexpectedCharError(char discarded, int line, int column) : base(line, column)
+        public UnexpectedCharError(char unexpected, int line, int column) : base(line, column)
         {
-			// TODO: discarded should really be an encapsulated character with a little more semantics and a ToString method
-            this.Message += "character '" + discarded.ToString() + "' (0x" + Convert.ToInt32(discarded).ToString("X") + ")";
+            this.UnexpectedChar = unexpected;
+            this.Message += "Unexpected character '" + unexpected.ToString() + "' (0x" + Convert.ToInt32(unexpected).ToString("X") + ")";
         }
     }
 }

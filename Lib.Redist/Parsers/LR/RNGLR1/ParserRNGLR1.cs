@@ -218,14 +218,14 @@ namespace Hime.Redist.Parsers
                 {
                     // Generation is empty !
                     List<ushort> present = new List<ushort>();
-                    List<string> expected = new List<string>();
+                    List<SymbolTerminal> expected = new List<SymbolTerminal>();
                     foreach (GSSNode node in Ui)
                     {
                         foreach (SymbolTerminal terminal in states[node.DFAState].Expected)
                         {
                             if (!present.Contains(terminal.SymbolID))
                             {
-                                expected.Add(terminal.Name);
+                                expected.Add(terminal);
                                 present.Add(terminal.SymbolID);
                             }
                         }

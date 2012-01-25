@@ -67,32 +67,6 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
-        /// Gets a list of the expected terminal IDs
-        /// </summary>
-        /// <returns>The list of expected terminal IDs, or null if this is a reduction state</returns>
-        public ushort[] GetExpectedIDs()
-        {
-            if (expecteds == null) return null;
-            ushort[] results = new ushort[expecteds.Length];
-            for (int i = 0; i != expecteds.Length; i++)
-                results[i] = expecteds[i].SymbolID;
-            return results;
-        }
-
-        /// <summary>
-        /// Gets a list of the expected terminal names
-        /// </summary>
-        /// <returns>The list of expected terminal names, or null if this is a reduction state</returns>
-        public string[] GetExpectedNames()
-        {
-            if (expecteds == null) return null;
-            string[] results = new string[expecteds.Length];
-            for (int i = 0; i != expecteds.Length; i++)
-                results[i] = expecteds[i].Name;
-            return results;
-        }
-
-        /// <summary>
         /// Gets the next state ID by a shift action on the given terminal ID
         /// </summary>
         /// <param name="sid">The terminal ID</param>

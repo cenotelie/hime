@@ -141,7 +141,7 @@ namespace Hime.Redist.Parsers
                 }
                 if (nextToken.SymbolID == 0x0001) return nodes.First.Value.ApplyActions();
 
-				errors.Add(new UnexpectedTokenError(nextToken, GetState(state).GetExpectedNames(), lexer.CurrentLine, lexer.CurrentColumn));
+				errors.Add(new UnexpectedTokenError(nextToken, GetState(state).expecteds, lexer.CurrentLine, lexer.CurrentColumn));
                 if (errors.Count >= maxErrorCount)
 				{
                         throw new ParserException("Too many errors, parsing stopped.");
