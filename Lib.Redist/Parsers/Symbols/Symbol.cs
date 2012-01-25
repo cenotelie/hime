@@ -6,8 +6,6 @@
  */
 using System.Collections.Generic;
 
-// TODO: think about it, but it is strange to have so many different Symbol types (UInt16, 32...)
-// TODO: also think about it: do all symbols need an sid and a name?
 namespace Hime.Redist.Parsers
 {
     /// <summary>
@@ -16,14 +14,19 @@ namespace Hime.Redist.Parsers
     public abstract class Symbol
     {
         /// <summary>
-        /// Gets the symbol's unique ID
+        /// Gets the symbol's unique type ID
         /// </summary>
         public ushort SymbolID { get; private set; }
         /// <summary>
-        /// Gets the symbol's name
+        /// Gets the symbol's type name
         /// </summary>
         public string Name { get; private set; }
 		
+        /// <summary>
+        /// Initializes a new instance of the Symbol class with the given type ID and name
+        /// </summary>
+        /// <param name="sid">Symbol's unique type identifier</param>
+        /// <param name="name">Symbol's type name</param>
 		public Symbol(ushort sid, string name)
         {
             this.SymbolID = sid;

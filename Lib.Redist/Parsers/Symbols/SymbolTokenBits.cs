@@ -25,9 +25,9 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes a new instance of the SymbolTokenBits class
         /// </summary>
-        /// <param name="ClassName">Token's class name</param>
-        /// <param name="ClassSID">Token's class ID</param>
-        /// <param name="Value">Token binary value</param>
-        public SymbolTokenBits(string ClassName, ushort ClassSID, byte Value) : base(ClassSID, ClassName) { value = Value; }
+        /// <param name="sid">Token's unique type identifier</param>
+        /// <param name="name">Token's type name</param>
+        /// <param name="value">Token binary value</param>
+        public SymbolTokenBits(ushort sid, string name, byte value) : base(sid, name) { this.value = value; }
     }
 }

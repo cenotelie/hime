@@ -14,12 +14,10 @@ namespace Hime.Redist.Parsers
     public sealed class SymbolTerminal : Symbol
     {
         /// <summary>
-        /// Initializes a new instance of the SymbolTerminal class with the given id and name
+        /// Initializes a new instance of the SymbolTerminal class with the given type ID and name
         /// </summary>
-        /// <param name="sid">The unique ID of the symbol</param>
-        /// <param name="name">The name of the symbol</param>
-        public SymbolTerminal(ushort sid, string name) : base(sid, name)
-        {
-        }
+        /// <param name="sid">Symbol's unique type identifier</param>
+        /// <param name="name">Symbol's type name</param>
+        public SymbolTerminal(ushort sid, string name) : base(sid, name) { }
     }
 }

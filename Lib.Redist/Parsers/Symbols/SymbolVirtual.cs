@@ -16,10 +16,8 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes a new instance of the SymbolVirtual class with a name
         /// </summary>
-        /// <param name="name">The name of the virtual symbol</param>
-        public SymbolVirtual(string name) : base(0, name)
-        {
-        }
+        /// <param name="name">Symbol's type name</param>
+        public SymbolVirtual(string name) : base(0, name) { }
 		
         /// <summary>
         /// Serves as a hash function for a particular type

@@ -19,12 +19,10 @@ namespace Hime.Redist.Parsers
         public abstract object Value { get; }
 		
         /// <summary>
-        /// Initializes a new instance of the SymbolToken class with a given name and id
+        /// Initializes a new instance of the SymbolToken class with the given type ID and name
         /// </summary>
-        /// <param name="sid">The unique ID of the symbol</param>
-        /// <param name="name">The name of the symbol</param>
-        public SymbolToken(ushort sid, string name): base(sid, name)
-        {
-        }
+        /// <param name="sid">Symbol's unique type identifier</param>
+        /// <param name="name">Symbol's type name</param>
+        public SymbolToken(ushort sid, string name): base(sid, name) { }
     }
 }

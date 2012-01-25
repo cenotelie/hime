@@ -25,9 +25,9 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes a new instance of the SymbolTokenUInt8 class
         /// </summary>
-        /// <param name="ClassName">Token's class name</param>
-        /// <param name="ClassSID">Token's class ID</param>
-        /// <param name="Value">Token binary value</param>
-        public SymbolTokenUInt8(string ClassName, ushort ClassSID, byte Value) : base(ClassSID, ClassName) { value = Value; }
+        /// <param name="sid">Token's class ID</param>
+        /// <param name="name">Token's class name</param>
+        /// <param name="value">Token binary value</param>
+        public SymbolTokenUInt8(ushort sid, string name, byte value) : base(sid, name) { this.value = value; }
     }
 }

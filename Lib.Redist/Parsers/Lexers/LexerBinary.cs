@@ -118,7 +118,7 @@ namespace Hime.Redist.Parsers
             if (((input.ReadByte() >> (currentBitLeft - length)) & flags[length]) != value) return null;
             currentBitLeft -= length;
             if (currentBitLeft == 0) { currentBitLeft = 8; input.ReadAndAdvanceByte(); }
-            return new SymbolTokenBits(name, sid, value);
+            return new SymbolTokenBits(sid, name, value);
         }
 		
         private SymbolToken GetNextToken_Apply_N8(ushort sid, string name, byte value)
@@ -127,7 +127,7 @@ namespace Hime.Redist.Parsers
             if (!input.CanRead(1)) return null;
 			if (input.ReadByte() != value) return null;
             input.ReadAndAdvanceByte();
-            return new SymbolTokenUInt8(name, sid, value);
+            return new SymbolTokenUInt8(sid, name, value);
         }
 		
         private SymbolToken GetNextToken_Apply_N16(ushort sid, string name, byte value)
@@ -136,7 +136,7 @@ namespace Hime.Redist.Parsers
             if (!input.CanRead(2)) return null;
             if (input.ReadByte() != value) return null;
             input.ReadAndAdvanceUInt16();
-            return new SymbolTokenUInt16(name, sid, value);
+            return new SymbolTokenUInt16(sid, name, value);
         }
 		
         private SymbolToken GetNextToken_Apply_N32(ushort sid, string name, byte value)
@@ -146,7 +146,7 @@ namespace Hime.Redist.Parsers
             if (input.ReadByte() == value)
             {
                 input.ReadAndAdvanceUInt32();
-                return new SymbolTokenUInt32(name, sid, value);
+                return new SymbolTokenUInt32(sid, name, value);
             }
             return null;
         }
@@ -158,7 +158,7 @@ namespace Hime.Redist.Parsers
             if (input.ReadByte() == value)
             {
                 input.ReadAndAdvanceUInt64();
-                return new SymbolTokenUInt64(name, sid, value);
+                return new SymbolTokenUInt64(sid, name, value);
             }
             return null;
         }
@@ -166,7 +166,7 @@ namespace Hime.Redist.Parsers
         private SymbolToken GetNextToken_Apply_JB(ushort sid, string name, int length)
         {
             if (currentBitLeft < length) return null;
-            SymbolToken Temp = new SymbolTokenBits(name, sid, (byte)((input.ReadByte() >> (currentBitLeft - length)) & length));
+            SymbolToken Temp = new SymbolTokenBits(sid, name, (byte)((input.ReadByte() >> (currentBitLeft - length)) & length));
             currentBitLeft -= length;
             if (currentBitLeft == 0) { currentBitLeft = 8; input.ReadAndAdvanceByte(); }
             return Temp;
@@ -176,21 +176,21 @@ namespace Hime.Redist.Parsers
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(1)) return null;
-            return new SymbolTokenUInt8(name, sid, input.ReadAndAdvanceByte());
+            return new SymbolTokenUInt8(sid, name, input.ReadAndAdvanceByte());
         }
 		
         private SymbolToken GetNextToken_Apply_J16(ushort sid, string name)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(2)) return null;
-            return new SymbolTokenUInt16(name, sid, input.ReadAndAdvanceByte());
+            return new SymbolTokenUInt16(sid, name, input.ReadAndAdvanceByte());
         }
 		
         private SymbolToken GetNextToken_Apply_J32(ushort sid, string name)
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(4)) return null;
-            return new SymbolTokenUInt32(name, sid, input.ReadAndAdvanceByte());
+            return new SymbolTokenUInt32(sid, name, input.ReadAndAdvanceByte());
         }
 		
 		// TODO: what is all that for? all these methods _Apply_Js??
@@ -199,7 +199,7 @@ namespace Hime.Redist.Parsers
         {
             if (currentBitLeft != 8) return null;
             if (!input.CanRead(8)) return null;
-            return new SymbolTokenUInt64(name, sid, input.ReadAndAdvanceByte());
+            return new SymbolTokenUInt64(sid, name, input.ReadAndAdvanceByte());
         }
     }
 }

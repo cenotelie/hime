@@ -16,10 +16,8 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes a new instance of the SymbolVariable class with the given id and name
         /// </summary>
-        /// <param name="sid">The unique ID of the symbol</param>
-        /// <param name="name">The name of the symbol</param>
-        public SymbolVariable(ushort sid, string name) : base(sid, name)
-        {
-        }
+        /// <param name="sid">Symbol's unique type identifier</param>
+        /// <param name="name">Symbol's type name</param>
+        public SymbolVariable(ushort sid, string name) : base(sid, name) { }
     }
 }
