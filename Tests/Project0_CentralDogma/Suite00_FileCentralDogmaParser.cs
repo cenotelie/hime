@@ -16,36 +16,26 @@ namespace Hime.Tests.Project0_CentralDogma
 	public class Suite00_FileCentralDogmaParser
 	{
 		[Test]
-		public void Test000_Analyse_ShouldThrowParserExceptionOnEmptyString()
+		public void Test000_Analyse_ShouldReturnNullOnEmptyString()
         {
         	string grammar = "";
         	
         	FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
             FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
-			try
-			{
-            	parser.Analyse();
-				Assert.Fail();
-			} catch (ParserException)
-			{
-			}
+            if (parser.Analyse() != null)
+                Assert.Fail();
         }
 
 		[Test]
-		public void Test001_Analyse_ShouldThrowParserExceptionWhenSemiColonIsMissing()
+		public void Test001_Analyse_ShouldReturnNullWhenSemiColonIsMissing()
         {
         	string grammar = 
         		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
         	
         	FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
             FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
-			try
-			{
-            	parser.Analyse();
-				Assert.Fail();
-			} catch (ParserException)
-			{
-			}
+            if (parser.Analyse() != null)
+                Assert.Fail();
         }
 		
 		[Test]

@@ -54,7 +54,7 @@ namespace Hime.Parsers
         }
         private void ExportClone(StreamWriter stream, string className)
         {
-            stream.WriteLine("        public override ILexer Clone() {");
+            stream.WriteLine("        public override LexerText Clone() {");
             stream.WriteLine("            return new " + className + "(this);");
             stream.WriteLine("        }");
         }

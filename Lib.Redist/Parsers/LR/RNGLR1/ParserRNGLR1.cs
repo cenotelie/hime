@@ -126,7 +126,7 @@ namespace Hime.Redist.Parsers
         // Parser state data
         protected List<ParserError> errors;
         protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
-        protected ILexer lexer;
+        protected LexerText lexer;
         protected SymbolToken nextToken;
         protected LinkedList<ParserReduction> reductions;
         protected LinkedList<ParserShift> q;
@@ -136,14 +136,14 @@ namespace Hime.Redist.Parsers
 
         protected abstract void setup();
 
-        public BaseRNGLR1Parser(ILexer input)
+        public BaseRNGLR1Parser(LexerText input)
         {
             setup();
-            errors = new List<ParserError>();
-            readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
-            lexer = input;
-            nextToken = null;
-            lexer.OnError = new OnErrorHandler(OnLexicalError);
+            this.errors = new List<ParserError>();
+            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
+            this.lexer = input;
+            this.nextToken = null;
+            this.lexer.SetErrorHandler(new OnErrorHandler(OnLexicalError));
         }
 
         /// <summary>

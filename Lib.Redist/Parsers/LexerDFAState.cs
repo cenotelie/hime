@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Represents a state of the DFA
+    /// Represents a state in a lexer's DFA
     /// </summary>
     public struct LexerDFAState
     {

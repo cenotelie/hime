@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -61,11 +61,8 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Parsers\Lexers\ILexer.cs" />
-    <Compile Include="Parsers\Lexers\LexerBinary.cs" />
-    <Compile Include="Parsers\Lexers\LexerDFAState.cs" />
-    <Compile Include="Parsers\Lexers\LexerException.cs" />
-    <Compile Include="Parsers\Lexers\LexerText.cs" />
+    <Compile Include="Parsers\LexerDFAState.cs" />
+    <Compile Include="Parsers\LexerText.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\LR\LR0\LR0State.cs" />
     <Compile Include="Parsers\LR\LR1\LR1State.cs" />
@@ -77,24 +74,18 @@
     <Compile Include="Parsers\LR\LRState.cs" />
     <Compile Include="Parsers\ParserError.cs" />
     <Compile Include="Parsers\UnexpectedTokenError.cs" />
-    <Compile Include="Parsers\ParserException.cs" />
     <Compile Include="Parsers\Symbols\SymbolAction.cs" />
     <Compile Include="Parsers\Symbols\SymbolTerminal.cs" />
     <Compile Include="Parsers\Symbols\SymbolToken.cs" />
-    <Compile Include="Parsers\Symbols\SymbolTokenBits.cs" />
     <Compile Include="Parsers\Symbols\SymbolTokenDollar.cs" />
     <Compile Include="Parsers\Symbols\SymbolTokenEpsilon.cs" />
     <Compile Include="Parsers\Symbols\SymbolTokenText.cs" />
-    <Compile Include="Parsers\Symbols\SymbolTokenUInt16.cs" />
-    <Compile Include="Parsers\Symbols\SymbolTokenUInt32.cs" />
-    <Compile Include="Parsers\Symbols\SymbolTokenUInt64.cs" />
-    <Compile Include="Parsers\Symbols\SymbolTokenUInt8.cs" />
     <Compile Include="Parsers\Symbols\SymbolVariable.cs" />
     <Compile Include="Parsers\Symbols\SymbolVirtual.cs" />
     <Compile Include="Parsers\SyntaxNodes\SPPFNodeFamily.cs" />
     <Compile Include="Parsers\SyntaxNodes\SyntaxTreeNode.cs" />
-    <Compile Include="Parsers\Lexers\BufferedTextReader.cs" />
-    <Compile Include="Parsers\Lexers\BufferedTokenReader.cs" />
+    <Compile Include="Parsers\BufferedTextReader.cs" />
+    <Compile Include="Parsers\BufferedTokenReader.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Parsers\LR\LR0\LR0BaseParser.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
@@ -104,9 +95,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\SyntaxNodes\SPPFNode.cs" />
     <Compile Include="Parsers\Symbols\Symbol.cs" />
-    <Compile Include="Binary\BinaryException.cs" />
-    <Compile Include="Binary\DataSegment.cs" />
-    <Compile Include="Binary\DataInput.cs" />
     <Compile Include="Parsers\LR\RNGLR1\GSSNode.cs" />
   </ItemGroup>
   <ItemGroup>

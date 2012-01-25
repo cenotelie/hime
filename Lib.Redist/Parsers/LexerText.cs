@@ -9,9 +9,15 @@ using System.Collections.Generic;
 namespace Hime.Redist.Parsers
 {
     /// <summary>
+    /// Handler for lexical errors
+    /// </summary>
+    /// <param name="error"></param>
+    public delegate void OnErrorHandler(ParserError error);
+
+    /// <summary>
     /// Represents a lexer for a text stream
     /// </summary>
-    public abstract class LexerText : ILexer
+    public abstract class LexerText
     {
         /// <summary>
         /// Represents a callback for matching the content of a token to a grammar
@@ -72,10 +78,6 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public int CurrentColumn { get { return currentColumn; } }
         /// <summary>
-        /// Sets the handler for lexical errors
-        /// </summary>
-        public OnErrorHandler OnError { set { errorHandler = value; } }
-        /// <summary>
         /// True if the lexer is at the end of the input
         /// </summary>
         public bool IsAtEnd { get { return input.AtEnd(); } }
@@ -88,7 +90,7 @@ namespace Hime.Redist.Parsers
         /// Gets a clone of this lexer
         /// </summary>
         /// <returns>A clone of this lexer</returns>
-        public abstract ILexer Clone();
+        public abstract LexerText Clone();
 
         /// <summary>
         /// Initializes a new instance of the LexerText class with the given input
@@ -98,11 +100,11 @@ namespace Hime.Redist.Parsers
         {
             setup();
             this.input = new BufferedTextReader(input);
-            currentLine = 1;
-            currentColumn = 1;
-            isDollatEmited = false;
-            bufferSize = 100;
-            buffer = new char[bufferSize];
+            this.currentLine = 1;
+            this.currentColumn = 1;
+            this.isDollatEmited = false;
+            this.bufferSize = 100;
+            this.buffer = new char[this.bufferSize];
         }
         /// <summary>
         /// Initializes a new instance of the LexerText class as a copy of the given lexer
@@ -111,20 +113,19 @@ namespace Hime.Redist.Parsers
         protected LexerText(LexerText original)
         {
             setup();
-            input = original.input.Clone();
-            currentLine = original.currentLine;
-            currentColumn = original.currentColumn;
-            isDollatEmited = original.isDollatEmited;
-            bufferSize = 100;
-            buffer = new char[bufferSize];
+            this.input = original.input.Clone();
+            this.currentLine = original.currentLine;
+            this.currentColumn = original.currentColumn;
+            this.isDollatEmited = original.isDollatEmited;
+            this.bufferSize = 100;
+            this.buffer = new char[this.bufferSize];
         }
 
         /// <summary>
-        /// Get the next token in the input that has is of one of the provided IDs
+        /// Sets the error handler for this lexer
         /// </summary>
-        /// <param name="ids">The possible IDs of the next expected token</param>
-        /// <returns>The next token in the input</returns>
-        public SymbolToken GetNextToken(ushort[] ids) { throw new LexerException("Text lexer does not support this method."); }
+        /// <param name="handler"></param>
+        internal void SetErrorHandler(OnErrorHandler handler) { this.errorHandler = handler; }
 
         /// <summary>
         /// Gets the next token in the input

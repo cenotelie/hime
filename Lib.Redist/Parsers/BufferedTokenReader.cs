@@ -14,7 +14,7 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public sealed class BufferedTokenReader
     {
-        private ILexer lexer;
+        private LexerText lexer;
         private LinkedList<SymbolToken> readInput;
         private LinkedListNode<SymbolToken> currentNode;
 
@@ -22,7 +22,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the BufferedTokenReader class with the given lexer
         /// </summary>
         /// <param name="lexer">The lexer matching tokens</param>
-        public BufferedTokenReader(ILexer lexer)
+        public BufferedTokenReader(LexerText lexer)
         {
             this.lexer = lexer;
             readInput = new LinkedList<SymbolToken>();
@@ -37,23 +37,6 @@ namespace Hime.Redist.Parsers
             if (currentNode == null || currentNode.Next == null)
             {
                 SymbolToken value = lexer.GetNextToken();
-                currentNode = readInput.AddLast(value);
-                return value;
-            }
-            currentNode = currentNode.Next;
-            return currentNode.Value;
-        }
-
-        /// <summary>
-        /// Gets the next token in the stream that matches the given list of ids
-        /// </summary>
-        /// <param name="ids">The list of ids to match</param>
-        /// <returns>The next token in the stream matching the given ids</returns>
-        public SymbolToken Read(ushort[] ids)
-        {
-            if (currentNode == null || currentNode.Next == null)
-            {
-                SymbolToken value = lexer.GetNextToken(ids);
                 currentNode = readInput.AddLast(value);
                 return value;
             }

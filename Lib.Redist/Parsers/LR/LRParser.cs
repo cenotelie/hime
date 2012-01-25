@@ -46,7 +46,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Lexer associated to this parser
         /// </summary>
-        protected ILexer lexer;
+        protected LexerText lexer;
         /// <summary>
         /// Parser's stack
         /// </summary>
@@ -100,7 +100,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the LRParser class with the given lexer
         /// </summary>
         /// <param name="input">Input lexer</param>
-        public LRParser(ILexer input)
+        public LRParser(LexerText input)
         {
             this.errorSimulationLength = 3;
             this.maxErrorCount = 100;
@@ -111,7 +111,7 @@ namespace Hime.Redist.Parsers
             this.stack = new Stack<ushort>();
             this.state = 0x0000;
             this.nodes = new LinkedList<SyntaxTreeNode>();
-            this.lexer.OnError = new OnErrorHandler(OnLexicalError);
+            this.lexer.SetErrorHandler(new OnErrorHandler(OnLexicalError));
         }
 
         /// <summary>
@@ -130,38 +130,25 @@ namespace Hime.Redist.Parsers
         public SyntaxTreeNode Analyse()
         {
             stack.Push(state);
-            SymbolToken nextToken = GetNextToken(lexer);
+            SymbolToken nextToken = lexer.GetNextToken();
 
             while (true)
             {
                 if (RunForToken(nextToken))
                 {
-                    nextToken = GetNextToken(lexer);
+                    nextToken = lexer.GetNextToken();
                     continue;
                 }
-                if (nextToken.SymbolID == 0x0001) return nodes.First.Value.ApplyActions();
+                if (nextToken.SymbolID == 0x0001)
+                    return nodes.First.Value.ApplyActions();
 
 				errors.Add(new UnexpectedTokenError(nextToken, GetState(state).expecteds, lexer.CurrentLine, lexer.CurrentColumn));
                 if (errors.Count >= maxErrorCount)
-				{
-                        throw new ParserException("Too many errors, parsing stopped.");
-				}
+                    return null;
                 nextToken = OnUnexpectedToken(nextToken);
-                if (nextToken == null) 
-				{
-					throw new ParserException("Parser recovery on unexpected token failed, parsing stopped.");
-				}
+                if (nextToken == null)
+                    return null;
             }
         }
-		
-		/// <summary>
-        /// Gets the next token in the input
-        /// </summary>
-        /// <param name="lexer">Base lexer for reading tokens</param>
-        /// <returns>The next token in the input</returns>
-        protected SymbolToken GetNextToken(ILexer lexer) 
-		{ 
-			return lexer.GetNextToken(); 
-		}
     }
 }

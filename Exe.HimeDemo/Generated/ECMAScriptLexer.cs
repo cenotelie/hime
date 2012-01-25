@@ -16924,7 +16924,7 @@ namespace Analyser
             subGrammars = new Dictionary<ushort, MatchSubGrammar>();
             separatorID = 0x7;
         }
-        public override ILexer Clone() {
+        public override LexerText Clone() {
             return new ECMAScriptLexer(this);
         }
         public ECMAScriptLexer(string input) : base(new System.IO.StringReader(input)) {}

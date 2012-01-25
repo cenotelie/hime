@@ -91,6 +91,7 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		// TODO: try to get rid of this method
         protected virtual void ExportAdditionalStaticElements(StreamWriter stream, string className) { }
+        // TODO: try to get rid of this method
 		protected virtual void ExportAdditionalElements(StreamWriter stream, string className) { }
 			
         private void ExportConstructor(StreamWriter stream, string className, string lexerClassName)

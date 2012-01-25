@@ -32,7 +32,7 @@ namespace Hime.Tests.HimeCC
         {
             string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
 	       	Generate(command);
-            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.ILexer)).Location;
+            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
 			string redistPath = Path.Combine(directory, "Hime.Redist.dll");
 			if (File.Exists(redistPath)) File.Delete(redistPath);
 			File.Copy(redist, redistPath);

@@ -1309,7 +1309,7 @@ namespace Hime.Kernel.Resources.Parser
             subGrammars = new Dictionary<ushort, MatchSubGrammar>();
             separatorID = 0x7;
         }
-        public override ILexer Clone() {
+        public override LexerText Clone() {
             return new FileCentralDogmaLexer(this);
         }
         public FileCentralDogmaLexer(string input) : base(new System.IO.StringReader(input)) {}

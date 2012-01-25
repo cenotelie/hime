@@ -45,7 +45,7 @@ namespace Hime.Tests
 
         protected Assembly Build()
         {
-            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.ILexer)).Location;
+            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
             File.Copy(redist, Path.Combine(directory, "Hime.Redist.dll"), true);
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{

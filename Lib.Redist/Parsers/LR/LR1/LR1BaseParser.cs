@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the LR1BaseParser class with the given lexer
         /// </summary>
         /// <param name="input">Input lexer</param>
-        public LR1BaseParser(ILexer input) : base(input) { }
+        public LR1BaseParser(LexerText input) : base(input) { }
 
 		/// <summary>
         /// Acts when an unexpected token is encountered
@@ -47,13 +47,13 @@ namespace Hime.Redist.Parsers
 
         private SymbolToken SimpleRecovery_RemoveUnexpected()
         {
-            ILexer TestLexer = lexer.Clone();
+            LexerText TestLexer = lexer.Clone();
             List<ushort> TempStack = new List<ushort>(stack);
             TempStack.Reverse();
             Stack<ushort> TestStack = new Stack<ushort>(TempStack);
             if (Simulate(TestStack, TestLexer))
             {
-                return GetNextToken(lexer);
+                return lexer.GetNextToken();
             }
             return null;
         }
@@ -73,7 +73,7 @@ namespace Hime.Redist.Parsers
                 {
                     RunForToken(Inserted[0]);
                     RunForToken(Inserted[1]);
-                    return GetNextToken(lexer);
+                    return lexer.GetNextToken();
                 }
             }
             return null;
@@ -92,13 +92,13 @@ namespace Hime.Redist.Parsers
                 if (Simulate(TestStack, TestLexer, Inserted))
                 {
                     RunForToken(Inserted[0]);
-                    return GetNextToken(lexer);
+                    return lexer.GetNextToken();
                 }
             }
             return null;
         }
 
-        private bool Simulate(Stack<ushort> stack, ILexer lexer, List<SymbolToken> inserted)
+        private bool Simulate(Stack<ushort> stack, LexerText lexer, List<SymbolToken> inserted)
         {
             int InsertedIndex = 0;
             ushort CurrentState = stack.Peek();
@@ -109,7 +109,7 @@ namespace Hime.Redist.Parsers
                 InsertedIndex++;
             }
             else
-                NextToken = GetNextToken(lexer);
+                NextToken = lexer.GetNextToken();
 
             for (int i = 0; i != errorSimulationLength + inserted.Count; i++)
             {
@@ -124,7 +124,7 @@ namespace Hime.Redist.Parsers
                         InsertedIndex++;
                     }
                     else
-                        NextToken = GetNextToken(lexer);
+                        NextToken = lexer.GetNextToken();
                     continue;
                 }
                 if (states[CurrentState].HasReductionOnTerminal(NextToken.SymbolID))
@@ -149,7 +149,7 @@ namespace Hime.Redist.Parsers
             return true;
         }
 		
-        private bool Simulate(Stack<ushort> stack, ILexer lexer)
+        private bool Simulate(Stack<ushort> stack, LexerText lexer)
         {
             return Simulate(stack, lexer, new List<SymbolToken>());
         }

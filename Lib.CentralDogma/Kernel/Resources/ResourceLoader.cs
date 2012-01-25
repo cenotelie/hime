@@ -135,23 +135,11 @@ namespace Hime.Kernel.Resources
         {
             FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(input);
             FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
-            try 
-			{ 
-				SyntaxTreeNode root = parser.Analyse(); 
-	            intermediateRoot.AppendChild(root);
-	            foreach (ParserError error in parser.Errors)
-				{
-    	            log.Report(new Entry(ELevel.Error, "Parser", error.Message));				
-				}
-			}
-            catch (ParserException) 
-			{
-	            foreach (ParserError error in parser.Errors)
-				{
-					// TODO: log.Report and log.Fatal should have the same signature!!!
-    	            log.Fatal("Parser", new Entry(ELevel.Error, "Parser", error.Message).Message);				
-				}
-            }
+            SyntaxTreeNode root = parser.Analyse();
+            foreach (ParserError error in parser.Errors)
+                log.Report(new Entry(ELevel.Error, "Parser", error.Message));
+            if (root != null)
+                intermediateRoot.AppendChild(root);
         }
 
 
