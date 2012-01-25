@@ -28,7 +28,7 @@ namespace LangTest
                     string name = Child.Symbol.Name;
                     string value = "";
                     if (Child.Symbol is Hime.Redist.Parsers.SymbolToken)
-                        value = "\": " + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"";
+                        value = ": \"" + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"";
                     string header = name + value;
                     VChild = VNode.Nodes.Add(header);
                 }
