@@ -143,6 +143,16 @@ namespace Hime.Redist.Parsers
             readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             lexer = input;
             nextToken = null;
+            lexer.OnError = new OnErrorHandler(OnLexicalError);
+        }
+
+        /// <summary>
+        /// Adds the given lexical error emanating from the lexer to the list of errors
+        /// </summary>
+        /// <param name="error">Lexical error</param>
+        private void OnLexicalError(ParserError error)
+        {
+            errors.Add(error);
         }
 
         public SyntaxTreeNode Analyse()
