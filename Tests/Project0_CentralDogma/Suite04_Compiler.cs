@@ -6,12 +6,11 @@
  */
 using System;
 using NUnit.Framework;
-using Hime.Kernel;
+using Hime.Utils;
 using Hime.Parsers;
-using Hime.Kernel.Resources;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Resources;
+using Hime.Utils.Reporting;
 using System.IO;
-using Hime.Kernel.Resources.Parser;
 using Hime.Redist.Parsers;
 
 namespace Hime.Tests.Project0_CentralDogma
@@ -23,7 +22,7 @@ namespace Hime.Tests.Project0_CentralDogma
 		public void Test000_Execute_ShouldNotFailWhenExportLogIsSet()
 		{
 			string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
+        		"cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
 			
             CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
 			task.InputRawData.Add(grammar);
@@ -56,7 +55,7 @@ namespace Hime.Tests.Project0_CentralDogma
 			// remplace ; with ,
 			// do not put { cf } but "cf" (there is only one case and it is consistent with "text"
 			string grammar = 
-        		"public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
+        		"grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
 			
             CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
 			task.InputRawData.Add(grammar);
@@ -66,7 +65,7 @@ namespace Hime.Tests.Project0_CentralDogma
 			foreach (Entry error in result.Errors)
 			{
 				// TODO: here should be FATAL: Parser: ...
-				Assert.IsTrue(error.ToString().StartsWith("Error: Parser: @(1, 12)"));
+				Assert.IsTrue(error.ToString().StartsWith("Error: Parser: @(1, 1)"));
 			}
 		}
 		
@@ -81,7 +80,7 @@ namespace Hime.Tests.Project0_CentralDogma
 		
 		/* TODO: on this grammar the error message is not easy to understand
 		 * 	
-public cf text grammar test
+cf grammar test
 {
 	options
 	{

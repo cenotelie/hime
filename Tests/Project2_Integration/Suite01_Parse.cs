@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Hime.Parsers;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Reporting;
 using Hime.Redist.Parsers;
 using System.IO;
 using System.CodeDom.Compiler;
@@ -17,8 +17,8 @@ namespace Hime.Tests.Project2_Integration
     [TestFixture]
     public class Suite01_Parse : BaseTestSuite
     {
-        private const string grammar0 = "public cf text grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'S'b'T|'c'T|'d'; T->'a'T|'b'S|'c'; } }";
-        private const string grammar1 = "public cf text grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'x'*; } }";
+        private const string grammar0 = "cf grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'S'b'T|'c'T|'d'; T->'a'T|'b'S|'c'; } }";
+        private const string grammar1 = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'x'*; } }";
 
         private void TestGrammar(string grammar, ParsingMethod method, string input)
         {
@@ -33,7 +33,7 @@ namespace Hime.Tests.Project2_Integration
         [Test]
         public void Test001_SimpleGrammar_LR0()
         {
-			CompileRaw("public cf text grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'; } }", ParsingMethod.LR0);
+			CompileRaw("cf grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'; } }", ParsingMethod.LR0);
             Build();
         }
 

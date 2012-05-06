@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using Hime.Parsers;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Reporting;
 using Hime.Redist.Parsers;
-using Hime.Kernel.Resources;
+using Hime.Utils.Resources;
 using System.CodeDom.Compiler;
 
 namespace Hime.Tests

@@ -6,7 +6,7 @@
  */
 using System;
 using NUnit.Framework;
-using Hime.Kernel.Resources;
+using Hime.Utils.Resources;
 
 namespace Hime.Tests.Project0_CentralDogma
 {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -56,7 +56,6 @@
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
     <Compile Include="Project0_CentralDogma\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Project1_HimeDemo\Suite06_Daemon.cs" />
     <Compile Include="Project0_CentralDogma\Suite01_Resource.cs" />
     <Compile Include="Project0_CentralDogma\Suite02_Report.cs" />
     <Compile Include="Project0_CentralDogma\Suite05_CompilationTask.cs" />
@@ -93,15 +92,6 @@
     <EmbeddedResource Include="Resources\MathExp.gram">
       <LogicalName>Tests.Resources.MathExp.gram</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\CFGrammars.gram">
-      <LogicalName>Tests.Resources.CFGrammars.gram</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\CSGrammars.gram">
-      <LogicalName>Tests.Resources.CSGrammars.gram</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Kernel.gram">
-      <LogicalName>Tests.Resources.Kernel.gram</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Empty.gram">
@@ -120,6 +110,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Project1_HimeDemo\" />
+    <None Include="Resources\FileCentralDogma.gram" />
   </ItemGroup>
 </Project>

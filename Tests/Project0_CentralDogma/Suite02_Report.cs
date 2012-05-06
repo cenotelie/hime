@@ -4,7 +4,7 @@
  */
 using System;
 using NUnit.Framework;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Reporting;
 
 namespace Hime.Tests.Project0_CentralDogma
 {

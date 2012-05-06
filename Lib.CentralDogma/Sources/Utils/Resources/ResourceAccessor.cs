@@ -13,7 +13,7 @@ using System.Text;
 namespace Hime.Utils.Resources
 {
 	// TODO: why is this class needed? Think about it
-    class ResourceAccessor : IDisposable
+    public class ResourceAccessor : IDisposable
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
@@ -25,12 +25,13 @@ namespace Hime.Utils.Resources
 
         public ICollection<string> Files { get { return files; } }
 
-        public ResourceAccessor()
+        public ResourceAccessor() : this(Assembly.GetExecutingAssembly(), "Resources") { }
+        public ResourceAccessor(Assembly assembly, string defaultPath)
         {
             accessors.Add(this);
-            this.assembly = Assembly.GetExecutingAssembly();
+            this.assembly = assembly;
             this.rootNamespace = assembly.GetName().Name;
-			this.defaultPath = rootNamespace + ".Resources.";
+            this.defaultPath = rootNamespace + "." + defaultPath + ".";
             this.files = new List<string>();
             this.streams = new List<Stream>();
         }

@@ -7,7 +7,7 @@
 using System;
 using NUnit.Framework;
 using Hime.Parsers;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Reporting;
 using Hime.Redist.Parsers;
 using System.Reflection;
 

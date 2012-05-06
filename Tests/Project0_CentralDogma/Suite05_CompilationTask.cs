@@ -7,8 +7,7 @@
 using System;
 using NUnit.Framework;
 using Hime.Parsers;
-using Hime.Kernel.Reporting;
-using Hime.Kernel.Naming;
+using Hime.Utils.Reporting;
 using System.IO;
 
 namespace Hime.Tests.Project0_CentralDogma
@@ -20,7 +19,7 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test000_ExecuteBody_LR0_ShouldNotFailOnSimpleGrammar()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
+        		"cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
@@ -32,13 +31,12 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test001_ExecuteLoadData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
             Compiler compiler = new Compiler(task);
-            Namespace result = compiler.LoadData();
-            Assert.IsNotNull(result);
+            Assert.IsFalse(compiler.LoadInputs());
         }
         
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
@@ -46,7 +44,7 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test002_Execute_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
@@ -59,7 +57,7 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test003_Execute_LexerFileShouldBeGrammarNameSuffixLexer_Issue198()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
@@ -72,7 +70,7 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test004_Execute_ParserFileShouldBeGrammarNameSuffixLexer_Issue198()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask(ParsingMethod.LR0);
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";

@@ -1,4 +1,4 @@
-public cf text grammar MathExp
+cf grammar MathExp
 {
 	options
 	{

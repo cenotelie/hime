@@ -4,12 +4,11 @@
  */
 using System;
 using NUnit.Framework;
-using Hime.Kernel;
+using Hime.Utils;
 using Hime.Parsers;
-using Hime.Kernel.Resources;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Resources;
+using Hime.Utils.Reporting;
 using System.IO;
-using Hime.Kernel.Resources.Parser;
 using Hime.Redist.Parsers;
 
 namespace Hime.Tests.Project0_CentralDogma
@@ -22,45 +21,36 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test000_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
-        	
-        	Reporter reporter = new Reporter();
-        	ResourceLoader loader = new ResourceLoader(reporter);
-            using (StringReader reader = new StringReader(grammar))
-			{
-            	loader.CompileData(reader);
-			}
-            Assert.IsTrue(reporter.Result.HasErrors);
+        		"cf grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
+
+            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            task.InputRawData.Add(grammar);
+            Hime.Parsers.Compiler compiler = new Compiler(task);
+            Assert.IsTrue(compiler.LoadInputs());
         }
 
 		[Test]
         public void Test001_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
-        	
-        	Reporter reporter = new Reporter();
-        	ResourceLoader loader = new ResourceLoader(reporter);
-            using (StringReader reader = new StringReader(grammar))
-			{
-            	loader.CompileData(reader);
-			}
-            Assert.IsTrue(reporter.Result.HasErrors);
+        		"cf grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
+
+            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            task.InputRawData.Add(grammar);
+            Hime.Parsers.Compiler compiler = new Compiler(task);
+            Assert.IsTrue(compiler.LoadInputs());
         }
         
 		[Test]
         public void Test002_CompileData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-        	
-        	Reporter reporter = new Reporter();
-        	ResourceLoader loader = new ResourceLoader(reporter);
-            using (StringReader reader = new StringReader(grammar))
-			{
-            	loader.CompileData(reader);
-			}
-            Assert.IsFalse(reporter.Result.HasErrors);
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+
+            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            task.InputRawData.Add(grammar);
+            Hime.Parsers.Compiler compiler = new Compiler(task);
+            Assert.IsFalse(compiler.LoadInputs());
         }
 
 		// TODO: this test should not be in this test suite => move
@@ -68,16 +58,12 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test003_Compile_ShouldNotThrowExceptionWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-        	
-        	Reporter reporter = new Reporter();
-        	ResourceLoader compiler = new ResourceLoader(reporter);
-        	// TODO: this is a bit strange, think about it
-            using (StringReader reader = new StringReader(grammar))
-			{
-	            compiler.AddInput(reader);
-    	        compiler.Load();
-			}
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+
+            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            task.InputRawData.Add(grammar);
+            Hime.Parsers.Compiler compiler = new Compiler(task);
+            compiler.LoadInputs();
         }
         
 		// TODO: this test should not be in this test suite => move
@@ -85,17 +71,12 @@ namespace Hime.Tests.Project0_CentralDogma
         public void Test004_Compile_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
         	string grammar = 
-        		"public cf text grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-        	
-        	Reporter reporter = new Reporter();
-        	ResourceLoader compiler = new ResourceLoader(reporter);
-        	// TODO: this is a bit strange, think about it
-            using (StringReader reader = new StringReader(grammar))
-			{
-	            compiler.AddInput(reader);
-    	        compiler.Load();
-			}
-            Assert.IsFalse(reporter.Result.HasErrors);
+        		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
+
+            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            task.InputRawData.Add(grammar);
+            Hime.Parsers.Compiler compiler = new Compiler(task);
+            Assert.IsFalse(compiler.LoadInputs());
         }
         
         // TODO: do a test with incorrect syntax but for which Compile returns false (saying it has no errors) even though errors are dumped
@@ -107,7 +88,7 @@ namespace Hime.Tests.Project0_CentralDogma
 		
 		/* TODO: on this grammar the error message is not easy to understand
 		 * 	
-public cf text grammar test
+cf grammar test
 {
 	options
 	{

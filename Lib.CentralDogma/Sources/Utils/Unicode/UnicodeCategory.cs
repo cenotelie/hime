@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Utils.Unicode
 {
-    class UnicodeCategory
+    public class UnicodeCategory
     {
         protected string name;
         protected List<UnicodeSpan> spans;

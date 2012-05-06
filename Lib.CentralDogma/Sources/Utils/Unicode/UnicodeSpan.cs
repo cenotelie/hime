@@ -6,7 +6,7 @@
  */
 namespace Hime.Utils.Unicode
 {
-    class UnicodeSpan
+    public class UnicodeSpan
     {
         protected ushort begin;
         protected ushort end;

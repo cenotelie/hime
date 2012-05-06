@@ -144,7 +144,7 @@ namespace Hime.Parsers
         private string GetLogName(string grammarName) { return grammarName + "Log"; }
         private string GetDocumentationName(string grammarName) { return grammarName + "Doc"; }
 
-        private bool LoadInputs()
+        internal bool LoadInputs()
         {
             // TODO: they are both streams => could be unified!!
             intermediateRoot = new SyntaxTreeNode(null);

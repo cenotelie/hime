@@ -9,7 +9,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Hime.HimeCC;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Reporting;
 using Hime.Parsers;
 using NUnit.Framework;
 
@@ -31,22 +31,22 @@ namespace Hime.Tests.HimeCC
         private Assembly Compile()
         {
             string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
-	       	Generate(command);
+            Generate(command);
             string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
-			string redistPath = Path.Combine(directory, "Hime.Redist.dll");
-			if (File.Exists(redistPath)) File.Delete(redistPath);
-			File.Copy(redist, redistPath);
+            string redistPath = Path.Combine(directory, "Hime.Redist.dll");
+            if (File.Exists(redistPath)) File.Delete(redistPath);
+            File.Copy(redist, redistPath);
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
-			{
-	            CompilerParameters compilerparams = new CompilerParameters();
-    	        compilerparams.GenerateExecutable = false;
-        	    compilerparams.GenerateInMemory = true;
-            	compilerparams.ReferencedAssemblies.Add(redistPath);
-            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
-            	Assembly assembly = results.CompiledAssembly;
-            	Directory.Delete(directory, true);
-            	return assembly;
-			}
+            {
+                CompilerParameters compilerparams = new CompilerParameters();
+                compilerparams.GenerateExecutable = false;
+                compilerparams.GenerateInMemory = true;
+                compilerparams.ReferencedAssemblies.Add(redistPath);
+                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
+                Assembly assembly = results.CompiledAssembly;
+                Directory.Delete(directory, true);
+                return assembly;
+            }
         }
 
         // TODO: factor all calls to new Tools (inherit from Tools and call this TestTemplate)
@@ -110,17 +110,10 @@ namespace Hime.Tests.HimeCC
 		[Test]
         public void Test008_ShouldNotFail()
         {
-			string[] command = new string[] { Path.Combine(directory, "Kernel.gram"),
-					Path.Combine(directory, "CFGrammars.gram"),
-					Path.Combine(directory, "CSGrammars.gram"),
-					"-g", "Hime.Kernel.FileCentralDogma", "-m", "LALR"
-				};
+            string[] command = new string[] { Path.Combine(directory, "FileCentralDogma.gram"), "-g", "FileCentralDogma", "-m", "LALR" };
             if (Directory.Exists(directory)) Directory.Delete(directory, true);
             Directory.CreateDirectory(directory);
             Export(Path.GetFileName(command[0]), command[0]);
-			Export(Path.GetFileName(command[1]), command[1]);
-			Export(Path.GetFileName(command[2]), command[2]);
-			
 			int result = Program.Main(command);
 			Assert.AreEqual(0, result);
         }
