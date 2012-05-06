@@ -1,0 +1,104 @@
+﻿namespace Hime.Parsers
+{
+	public cf text grammar GrammarContextFree : Utils.GrammarKernel
+	{
+		options {}
+		terminals
+		{
+			INTEGER					-> [1-9] [0-9]* | '0' ;
+			QUOTED_DATA				-> '"' [^"]* '"';
+			ESCAPEES				-> '\\\\'	/*Backslash*/
+									| '\\0'		/*Unicode character 0*/
+									| '\\a'		/*Alert (character 7)*/
+									| '\\b'		/*Backspace (character 8)*/
+									| '\\f'		/*Form feed (character 12)*/
+									| '\\n'		/*New line (character 10)*/
+									| '\\r'		/*Carriage return (character 13)*/
+									| '\\t'		/*Horizontal tab (character 9)*/
+									| '\\v';	/*Vertical quote (character 11)*/
+			SYMBOL_TERMINAL_TEXT	-> '\'' ([^\\'] | ESCAPEES | '\\\'')+ '\'';
+			SYMBOL_TERMINAL_SET		-> '[' ([^\\\[\]] | ESCAPEES | '\\[' | '\\]')+ ']';
+			SYMBOL_TERMINAL_UBLOCK	-> '\\ub' '{' NAME '}' ;
+			SYMBOL_TERMINAL_UCAT	-> '\\uc' '{' NAME '}' ;
+			
+			SYMBOL_VALUE_UINT8		-> '0x' [a-fA-F0-9] [a-fA-F0-9] ;
+			SYMBOL_VALUE_UINT16		-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
+		}
+		rules
+		{
+			/* Options section definition */
+			option			-> NAME '='! QUOTED_DATA ';'! ;
+			
+			
+			/* Terminals section definition for text grammars */
+			terminal_def_atom_any		-> '.'^ ;
+			terminal_def_atom_unicode	-> (SYMBOL_VALUE_UINT8 | SYMBOL_VALUE_UINT16)^ ;
+			terminal_def_atom_text		-> SYMBOL_TERMINAL_TEXT^ ;
+			terminal_def_atom_set		-> SYMBOL_TERMINAL_SET^ ;
+			terminal_def_atom_ublock	-> SYMBOL_TERMINAL_UBLOCK^ ;
+			terminal_def_atom_ucat		-> SYMBOL_TERMINAL_UCAT^ ;
+			terminal_def_atom_span		-> terminal_def_atom_unicode '..'^ terminal_def_atom_unicode ;
+			terminal_def_atom			-> terminal_def_atom_any^
+										|  terminal_def_atom_unicode^
+										|  terminal_def_atom_text^
+										|  terminal_def_atom_set^
+										|  terminal_def_atom_span^
+										|  terminal_def_atom_ucat^
+										|  terminal_def_atom_ublock^
+										|  NAME^;
+			terminal_def_element		-> terminal_def_atom^
+										| '('! terminal_definition^ ')'! ;
+			terminal_def_cardinalilty	-> '*'^
+										|  '+'^
+										|  '?'^
+										|  "range"^ '{'! INTEGER (','! INTEGER)? '}'! ;
+			terminal_def_repetition		-> terminal_def_element^ terminal_def_cardinalilty^?;
+			terminal_def_fragment		-> terminal_def_repetition^ ("concat"^ terminal_def_repetition)*;
+			terminal_def_restrict		-> terminal_def_fragment^ ('-'^ terminal_def_fragment)* ;
+			terminal_definition			-> terminal_def_restrict^ ('|'^ terminal_def_restrict)*;
+			terminal_subgrammar			-> ('=>'! qualified_name)? ;
+			terminal					-> NAME '->'! terminal_definition terminal_subgrammar ';'! ;
+			
+			
+			/* Define symbols for grammar rules */
+			rule_sym_action			-> '{'! NAME '}'! ;
+			rule_sym_virtual		-> QUOTED_DATA ;
+			rule_sym_ref_params		-> '<'! rule_def_atom (','! rule_def_atom)* '>'! ;
+			rule_sym_ref_template	-> NAME rule_sym_ref_params ;
+			rule_sym_ref_simple		-> NAME;
+			
+			/* Define the rule definition */
+			rule_def_atom		-> rule_sym_action^
+									|  rule_sym_virtual^ 
+									|  rule_sym_ref_simple^
+									|  rule_sym_ref_template^
+									|  terminal_def_atom_text^ ;
+			rule_def_element	-> rule_def_atom^ | '('! rule_definition^ ')'!;
+			rule_def_tree_action-> rule_def_element^ ('^' | '!')^?;
+			rule_def_repetition	-> rule_def_tree_action^ ('*' | '+' | '?')^?;
+			rule_def_fragment	-> rule_def_repetition^ ("concat"^ rule_def_repetition)*;
+			rule_def_restrict	-> rule_def_fragment^ ('-'^ rule_def_fragment)*;
+			rule_def_choice		-> rule_def_restrict^ | "emptypart"^ ;
+			rule_definition		-> rule_def_choice^ ('|'^ rule_def_choice)*;
+			
+			/* Define rules */
+			rule_template_params	-> '<'! NAME (','! NAME)* '>'!;
+			cf_rule_template		-> NAME rule_template_params '->'! rule_definition ';'! ;
+			cf_rule_simple			-> NAME '->'! rule_definition ';'! ;
+			
+			
+			/* Define the grammars */			
+			grammar_options				-> 'options'^ '{'! option* '}'! ;
+			grammar_terminals			-> 'terminals'^ '{'! terminal* '}'! ;
+			grammar_cf_rules			-> 'rules'^ '{'! (cf_rule_simple | cf_rule_template)* '}'! ;
+			grammar_parency				-> (':'! qualified_name (','! qualified_name)*)? ;
+			
+			cf_grammar		-> ('cf' 'grammar')! NAME grammar_parency
+								'{'!
+									grammar_options
+									grammar_terminals?
+									grammar_cf_rules
+								'}'! ;
+		}
+	}
+}

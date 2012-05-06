@@ -15,7 +15,7 @@ namespace Hime.Demo.Tasks
             task.ExportLog = true;
             task.ExportDocumentation = false;
             task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\ECMAScript.gram");
+            task.InputFiles.Add("Languages\\Test.gram");
 			string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 			path = Path.Combine(path, "Graphviz 2.28");
 			path = Path.Combine(path, "bin");
