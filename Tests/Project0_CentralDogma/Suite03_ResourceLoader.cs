@@ -23,10 +23,10 @@ namespace Hime.Tests.Project0_CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            Hime.Parsers.Compiler compiler = new Compiler(task);
-            Assert.IsTrue(compiler.LoadInputs());
+            Assert.IsTrue(task.LoadInputs());
         }
 
 		[Test]
@@ -35,10 +35,10 @@ namespace Hime.Tests.Project0_CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            Hime.Parsers.Compiler compiler = new Compiler(task);
-            Assert.IsTrue(compiler.LoadInputs());
+            Assert.IsTrue(task.LoadInputs());
         }
         
 		[Test]
@@ -47,10 +47,10 @@ namespace Hime.Tests.Project0_CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            Hime.Parsers.Compiler compiler = new Compiler(task);
-            Assert.IsFalse(compiler.LoadInputs());
+            Assert.IsFalse(task.LoadInputs());
         }
 
 		// TODO: this test should not be in this test suite => move
@@ -60,10 +60,10 @@ namespace Hime.Tests.Project0_CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            Hime.Parsers.Compiler compiler = new Compiler(task);
-            compiler.LoadInputs();
+            task.LoadInputs();
         }
         
 		// TODO: this test should not be in this test suite => move
@@ -73,10 +73,10 @@ namespace Hime.Tests.Project0_CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.CompilationTask task = new CompilationTask(ParsingMethod.LR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            Hime.Parsers.Compiler compiler = new Compiler(task);
-            Assert.IsFalse(compiler.LoadInputs());
+            Assert.IsFalse(task.LoadInputs());
         }
         
         // TODO: do a test with incorrect syntax but for which Compile returns false (saying it has no errors) even though errors are dumped

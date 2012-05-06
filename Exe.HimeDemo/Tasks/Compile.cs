@@ -10,7 +10,8 @@ namespace Hime.Demo.Tasks
     {
         public void Execute()
         {
-            CompilationTask task = new CompilationTask(ParsingMethod.RNGLALR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.RNGLALR1;
             task.Namespace = "Hime.Demo.Generated.ECMA";
             task.ExportLog = true;
             task.ExportDocumentation = false;
@@ -21,8 +22,7 @@ namespace Hime.Demo.Tasks
 			path = Path.Combine(path, "bin");
 			path = Path.Combine(path, "dot.exe");
             task.DOTBinary = path;
-			Compiler compiler = new Compiler(task);
-            compiler.Execute();
+            task.Execute();
         }
     }
 }

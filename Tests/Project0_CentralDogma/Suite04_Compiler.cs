@@ -24,13 +24,13 @@ namespace Hime.Tests.Project0_CentralDogma
 			string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
 			
-            CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LALR1;
 			task.InputRawData.Add(grammar);
 			
          	task.ExportLog = true;
 
-			Compiler compiler = new Compiler(task);
-       	    Report result = compiler.Execute();
+       	    Report result = task.Execute();
 			Assert.IsFalse(result.HasErrors);
 		}
 
@@ -39,12 +39,12 @@ namespace Hime.Tests.Project0_CentralDogma
 		{
 			string grammar = 
         		"public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
+
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LALR1;
+            task.InputRawData.Add(grammar);
 			
-            CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
-			task.InputRawData.Add(grammar);
-			
-        	Compiler compiler = new Compiler(task);
-       	    Report result = compiler.Execute();
+       	    Report result = task.Execute();
 			Assert.AreEqual(1, result.ErrorCount);
 		}
 
@@ -56,12 +56,12 @@ namespace Hime.Tests.Project0_CentralDogma
 			// do not put { cf } but "cf" (there is only one case and it is consistent with "text"
 			string grammar = 
         		"grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
+
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LALR1;
+            task.InputRawData.Add(grammar);
 			
-            CompilationTask task = new CompilationTask(ParsingMethod.LALR1);
-			task.InputRawData.Add(grammar);
-			
-        	Compiler compiler = new Compiler(task);
-       	    Report result = compiler.Execute();
+       	    Report result = task.Execute();
 			foreach (Entry error in result.Errors)
 			{
 				// TODO: here should be FATAL: Parser: ...

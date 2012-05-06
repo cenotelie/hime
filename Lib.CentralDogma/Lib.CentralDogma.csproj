@@ -83,7 +83,6 @@
     <Compile Include="Sources\Parsers\Automata\NFATransition.cs" />
     <Compile Include="Sources\Parsers\Compiler\AccessModifier.cs" />
     <Compile Include="Sources\Parsers\Compiler\CompilationTask.cs" />
-    <Compile Include="Sources\Parsers\Compiler\Compiler.cs" />
     <Compile Include="Sources\Parsers\Compiler\CompilerPlugin.cs" />
     <Compile Include="Sources\Parsers\Compiler\GrammarLoader.cs" />
     <Compile Include="Sources\Parsers\Compiler\ParsingMethod.cs" />

@@ -75,10 +75,11 @@ namespace Hime.HimeCC
             if (!parser.ParseArguments(arguments, this)) return null;
             if (this.inputs.Count == 0) return null;
 
-			CompilationTask task = new CompilationTask(this.method);
+			CompilationTask task = new CompilationTask();
             task.Namespace = this.outputNamespace;
             foreach (string input in this.inputs) task.InputFiles.Add(input);
             task.GrammarName = this.grammarName;
+            task.Method = this.method;
             task.LexerFile = this.lexerFile;
             task.ParserFile = this.parserFile;
             task.ExportLog = this.exportLog;

@@ -20,11 +20,11 @@ namespace Hime.Tests.Project0_CentralDogma
         {
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-			Compiler compiler = new Compiler(task);
-            compiler.ExecuteDo();
+            task.ExecuteDo();
         }
 
         [Test]
@@ -32,11 +32,11 @@ namespace Hime.Tests.Project0_CentralDogma
         {
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            Compiler compiler = new Compiler(task);
-            Assert.IsFalse(compiler.LoadInputs());
+            Assert.IsFalse(task.LoadInputs());
         }
         
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
@@ -45,11 +45,11 @@ namespace Hime.Tests.Project0_CentralDogma
         {
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-			Compiler compiler = new Compiler(task);
-            Report result = compiler.Execute();
+            Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
         }
         
@@ -58,11 +58,11 @@ namespace Hime.Tests.Project0_CentralDogma
         {
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-			Compiler compiler = new Compiler(task);
-            compiler.Execute();
+            task.Execute();
             Assert.IsTrue(File.Exists("TestLexer.cs"));
         }
         
@@ -71,11 +71,11 @@ namespace Hime.Tests.Project0_CentralDogma
         {
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask(ParsingMethod.LR0);
+            CompilationTask task = new CompilationTask();
+            task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-			Compiler compiler = new Compiler(task);
-            compiler.Execute();
+            task.Execute();
             Assert.IsTrue(File.Exists("TestParser.cs"));
         }
 	}

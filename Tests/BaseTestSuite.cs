@@ -35,12 +35,12 @@ namespace Hime.Tests
 
         protected Report CompileRaw(string rawInput, ParsingMethod method)
         {
-            CompilationTask task = new CompilationTask(method);
+            CompilationTask task = new CompilationTask();
+            task.Method = method;
             task.InputRawData.Add(rawInput);
             task.LexerFile = lexerFile;
             task.ParserFile = parserFile;
-			Compiler compiler = new Compiler(task);
-            return compiler.Execute();
+            return task.Execute();
         }
 
         protected Assembly Build()
