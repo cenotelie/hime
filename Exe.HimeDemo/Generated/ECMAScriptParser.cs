@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
 
-namespace Analyser
+namespace Hime.Demo.Generated.ECMA
 {
     public class ECMAScriptParser : BaseRNGLR1Parser
     {

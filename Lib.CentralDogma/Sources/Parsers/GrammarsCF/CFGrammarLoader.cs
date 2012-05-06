@@ -16,7 +16,6 @@ namespace Hime.Parsers.ContextFree
     {
         private Reporter reporter;
         private SyntaxTreeNode syntaxRoot;
-        private bool hasErrors;
         private string name;
         private List<string> inherited;
         private CFGrammar grammar;
@@ -33,31 +32,30 @@ namespace Hime.Parsers.ContextFree
             this.inherited = new List<string>();
             foreach (SyntaxTreeNode child in syntaxRoot.Children[1].Children)
                 inherited.Add(((SymbolTokenText)child.Symbol).ValueText);
-            reporter.Info("CFGrammarLoader", "Loading grammar " + name);
+            reporter.Info("Compiler", "Loading grammar " + name);
             this.grammar = new CFGrammar(name);
-            Compile_Recognize_grammar_text(syntaxRoot);
+            if (inherited.Count == 0)
+                Compile_Recognize_grammar_text(syntaxRoot);
         }
 
-        public int Resolve(Dictionary<string, GrammarLoader> loaders)
+        public void Load(Dictionary<string, GrammarLoader> loaders)
         {
             List<string> temp = new List<string>(inherited);
-            int solved = 0;
             foreach (string parent in temp)
             {
                 if (!loaders.ContainsKey(parent))
                 {
-                    reporter.Fatal("CFGrammarLoader", "Grammar " + parent + " inherited by " + name + " cannot be found");
+                    reporter.Fatal("Compiler", "Grammar " + parent + " inherited by " + name + " cannot be found");
                     inherited.Remove(parent);
-                    solved++;
                 }
                 GrammarLoader loader = loaders[parent];
                 if (!loader.IsSolved)
                     continue;
                 this.grammar.Inherit(loader.Grammar);
                 inherited.Remove(parent);
-                solved++;
             }
-            return solved;
+            if (inherited.Count == 0)
+                Compile_Recognize_grammar_text(syntaxRoot);
         }
 
         private GrammarSymbol Compile_Tool_NameToSymbol(string name, CompilerContext context)
@@ -240,8 +238,7 @@ namespace Hime.Parsers.ContextFree
             Terminal Ref = grammar.GetTerminal(token.ValueText);
             if (Ref == null)
             {
-                reporter.Error("CFGrammarLoader", "@" + token.Line + " Cannot find terminal " + token.ValueText);
-                hasErrors = true;
+                reporter.Error("Compiler", "@" + token.Line + " Cannot find terminal " + token.ValueText);
                 Automata.NFA Final = new Hime.Parsers.Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -347,7 +344,7 @@ namespace Hime.Parsers.ContextFree
         private CFRuleBodySet Compile_Recognize_grammar_text_terminal(SyntaxTreeNode node)
         {
             // Construct the terminal name
-            string value = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;
+            string value = ((Redist.Parsers.SymbolTokenText)node.Symbol).ValueText;
             value = value.Substring(1, value.Length - 2);
             value = "@\"" + value.Replace("\\'", "'").Replace("\\\\", "\\") + "\"";
             // Check for previous instance in the grammar's grammar
@@ -355,7 +352,7 @@ namespace Hime.Parsers.ContextFree
             if (terminal == null)
             {
                 // Create the terminal
-                Automata.NFA nfa = Compile_Recognize_terminal_def_atom_text(node.Children[0]);
+                Automata.NFA nfa = Compile_Recognize_terminal_def_atom_text(node);
                 terminal = grammar.AddTerminalText(value, nfa);
                 nfa.StateExit.Final = terminal;
             }
@@ -401,8 +398,7 @@ namespace Hime.Parsers.ContextFree
                     defs.Add(new CFRuleBody(symbol));
                 else
                 {
-                    reporter.Error("CFGrammarLoader", "@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
-                    hasErrors = true;
+                    reporter.Error("Compiler", "@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
                     defs.Add(new CFRuleBody());
                 }
             }
@@ -418,7 +414,7 @@ namespace Hime.Parsers.ContextFree
             // check for meta-rule existence
             if (!context.IsTemplateRule(name, paramCount))
             {
-                reporter.Error("CFGrammarLoader", "Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
+                reporter.Error("Compiler", "Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
                 defs.Add(new CFRuleBody());
                 return defs;
             }
@@ -443,7 +439,7 @@ namespace Hime.Parsers.ContextFree
                 return Compile_Recognize_rule_sym_ref_simple(context, node);
             if (node.Symbol.Name.StartsWith("rule_sym_ref_template"))
                 return Compile_Recognize_rule_sym_ref_template(context, node);
-            if (node.Symbol.Name == "grammar_text_terminal")
+            if (node.Symbol.Name == "SYMBOL_TERMINAL_TEXT")
                 return Compile_Recognize_grammar_text_terminal(node);
             return null;
         }
@@ -586,7 +582,7 @@ namespace Hime.Parsers.ContextFree
 
         private void Compile_Recognize_grammar_text(SyntaxTreeNode node)
         {
-            for (int i = 3; i < node.Children.Count; i++)
+            for (int i = 2; i < node.Children.Count; i++)
             {
                 SyntaxTreeNode child = node.Children[i];
                 if (child.Symbol.Name == "options")

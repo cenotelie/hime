@@ -121,7 +121,7 @@ namespace Hime.Parsers.ContextFree
 
         private Automata.DFA PrepareDFA(Reporter log)
         {
-            log.Info("Grammar", "Generating DFA for Terminals ...");
+            log.Info("CFGrammar", "Generating DFA for Terminals ...");
 
             // Construct a global NFA for all the terminals
             Automata.NFA final = new Automata.NFA();
@@ -137,7 +137,7 @@ namespace Hime.Parsers.ContextFree
             finalDFA = finalDFA.Minimize();
             finalDFA.RepackTransitions();
 
-            log.Info("Grammar", "Done !");
+            log.Info("CFGrammar", "Done !");
             return finalDFA;
         }
 
@@ -152,19 +152,19 @@ namespace Hime.Parsers.ContextFree
 
         protected bool AddRealAxiom(Reporter reporter)
         {
-            reporter.Info("Grammar", "Creating axiom ...");
+            reporter.Info("CFGrammar", "Creating axiom ...");
 
             // Search for Axiom option
             if (!options.ContainsKey("Axiom"))
             {
-                reporter.Error("Grammar", "Axiom option is undefined");
+                reporter.Error("CFGrammar", "Axiom option is undefined");
                 return false;
             }
             // Search for the variable specified as the Axiom
             string name = options["Axiom"];
             if (!variables.ContainsKey(name))
             {
-                reporter.Error("Grammar", "Cannot find axiom variable " + name);
+                reporter.Error("CFGrammar", "Cannot find axiom variable " + name);
                 return false;
             }
 
@@ -175,13 +175,13 @@ namespace Hime.Parsers.ContextFree
             parts.Add(new RuleBodyElement(TerminalDollar.Instance, RuleBodyElementAction.Drop));
             axiom.AddRule(new CFRule(axiom, new CFRuleBody(parts), false));
 
-            reporter.Info("Grammar", "Done !");
+            reporter.Info("CFGrammar", "Done !");
             return true;
         }
 
         protected bool ComputeFirsts(Reporter reporter)
         {
-            reporter.Info("Grammar", "Computing Firsts sets ...");
+            reporter.Info("CFGrammar", "Computing Firsts sets ...");
 
             bool mod = true;
             // While some modification has occured, repeat the process
@@ -193,13 +193,13 @@ namespace Hime.Parsers.ContextFree
                         mod = true;
             }
 
-            reporter.Info("Grammar", "Done !");
+            reporter.Info("CFGrammar", "Done !");
             return true;
         }
 
         protected bool ComputeFollowers(Reporter reporter)
         {
-            reporter.Info("Grammar", "Computing Followers sets ...");
+            reporter.Info("CFGrammar", "Computing Followers sets ...");
 
             bool mod = true;
             // Apply step 1 to each variable
@@ -214,7 +214,7 @@ namespace Hime.Parsers.ContextFree
                         mod = true;
             }
 
-            reporter.Info("Grammar", "Done !");
+            reporter.Info("CFGrammar", "Done !");
             return true;
         }
 

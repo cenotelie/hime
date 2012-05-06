@@ -16,6 +16,6 @@ namespace Hime.Parsers
         Grammar Grammar { get; }
         bool IsSolved { get; }
 
-        int Resolve(Dictionary<string, GrammarLoader> loaders);
+        void Load(Dictionary<string, GrammarLoader> loaders);
     }
 }

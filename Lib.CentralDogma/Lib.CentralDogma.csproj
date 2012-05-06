@@ -89,6 +89,7 @@
     <Compile Include="Sources\Parsers\Compiler\ParsingMethod.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF\CFGrammar.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF\CFGrammarLoader.cs" />
+    <Compile Include="Sources\Parsers\GrammarsCF\CFPlugin.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF\CFRule.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF\CFRuleBody.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF\CFRuleBodySet.cs" />
@@ -141,15 +142,15 @@
     <Compile Include="Sources\Parsers\GrammarsCF_LR\StateActionShift.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\StateKernel.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\StateReductions.cs" />
-    <Compile Include="Sources\Parsers\Grammars\Grammar.cs" />
-    <Compile Include="Sources\Parsers\Grammars\LexerData.cs" />
-    <Compile Include="Sources\Parsers\Grammars\ParserData.cs" />
-    <Compile Include="Sources\Parsers\Grammars\ParserGenerator.cs" />
-    <Compile Include="Sources\Parsers\Grammars\Rule.cs" />
-    <Compile Include="Sources\Parsers\Grammars\RuleBody.cs" />
-    <Compile Include="Sources\Parsers\Grammars\RuleBodyElement.cs" />
-    <Compile Include="Sources\Parsers\Grammars\RuleBodyElementAction.cs" />
-    <Compile Include="Sources\Parsers\Grammars\TextLexerData.cs" />
+    <Compile Include="Resources\Grammars\Grammar.cs" />
+    <Compile Include="Resources\Grammars\LexerData.cs" />
+    <Compile Include="Resources\Grammars\ParserData.cs" />
+    <Compile Include="Resources\Grammars\ParserGenerator.cs" />
+    <Compile Include="Resources\Grammars\Rule.cs" />
+    <Compile Include="Resources\Grammars\RuleBody.cs" />
+    <Compile Include="Resources\Grammars\RuleBodyElement.cs" />
+    <Compile Include="Resources\Grammars\RuleBodyElementAction.cs" />
+    <Compile Include="Resources\Grammars\TextLexerData.cs" />
     <Compile Include="Sources\Parsers\Input\FileCentralDogmaLexer.cs" />
     <Compile Include="Sources\Parsers\Input\FileCentralDogmaParser.cs" />
     <Compile Include="Sources\Parsers\Symbols\Action.cs" />
@@ -222,10 +223,8 @@
     <EmbeddedResource Include="Resources\Transforms\Doc.Grammar.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="Sources\Parsers\Input\ReadMe.txt" />
-    <EmbeddedResource Include="Sources\Parsers\Input\SourceGrammar\CFGrammars.gram" />
-    <EmbeddedResource Include="Sources\Parsers\Input\SourceGrammar\CSGrammars.gram" />
-    <EmbeddedResource Include="Sources\Parsers\Input\SourceGrammar\Kernel.gram" />
+    <None Include="Sources\Parsers\Input\FileCentralDogma.gram" />
+    <None Include="Sources\Parsers\Input\generate.bat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">

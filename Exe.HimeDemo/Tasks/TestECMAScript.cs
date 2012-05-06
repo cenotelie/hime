@@ -15,10 +15,10 @@ namespace Hime.Demo.Tasks
     {
         internal TestECMAScript()
 		{
-            Hime.Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor(typeof(Hime.Kernel.Resources.ResourceAccessor).Assembly, "Resources");
+            /*Hime.Kernel.Resources.ResourceAccessor accessor = new Kernel.Resources.ResourceAccessor(typeof(Hime.Kernel.Resources.ResourceAccessor).Assembly, "Resources");
             string content = accessor.GetAllTextFor("Transforms.Hime.js");
             Analyser.ECMAScriptLexer lexer = new Analyser.ECMAScriptLexer(content);
-            this.parser = new Analyser.ECMAScriptParser(lexer);
+            this.parser = new Analyser.ECMAScriptParser(lexer);*/
 		}
     }
 }

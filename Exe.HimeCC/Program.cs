@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using Hime.Parsers;
 using CommandLine;
-using Hime.Kernel.Reporting;
+using Hime.Utils.Reporting;
 
 namespace Hime.HimeCC
 {

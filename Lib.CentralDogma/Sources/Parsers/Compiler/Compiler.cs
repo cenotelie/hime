@@ -29,7 +29,8 @@ namespace Hime.Parsers
         public Compiler(CompilationTask task)
         {
             this.plugins = new Dictionary<string, CompilerPlugin>();
-			this.reporter = new Reporter();
+            this.plugins.Add("cf_grammar", new ContextFree.CFPlugin());
+            this.reporter = new Reporter();
             this.task = task;
             this.grammars = new Dictionary<string, Grammar>();
             this.loaders = new Dictionary<string, GrammarLoader>();
@@ -50,12 +51,12 @@ namespace Hime.Parsers
         // TODO: this method should be private but it is used in tests, either refactor tests or this
         internal string ExecuteDo()
         {
-            reporter.Info("Loader", "CentralDogma " + Version);
+            reporter.Info("Compiler", "CentralDogma " + Version);
             foreach (string name in plugins.Keys)
-                reporter.Info("Loader", "Registered plugin " + plugins[name].ToString() + " for " + name);
+                reporter.Info("Compiler", "Registered plugin " + plugins[name].ToString() + " for " + name);
             
             // Load data
-            if (!LoadInputs())
+            if (LoadInputs())
                 return null;
 
             // Solve dependencies and compile
@@ -67,7 +68,7 @@ namespace Hime.Parsers
                 foreach (GrammarLoader loader in loaders.Values)
                 {
                     if (loader.IsSolved) continue;
-                    loader.Resolve(loaders);
+                    loader.Load(loaders);
                     if (loader.IsSolved) solved++;
                     else unsolved++;
                 }
@@ -92,7 +93,11 @@ namespace Hime.Parsers
                 if (loaders.Count != 1)
                     reporter.Fatal("Compiler", "Inputs contain more than one grammar, cannot decide which one to compile");
                 else
-                    grammar = loaders.GetEnumerator().Current.Value.Grammar;
+                {
+                    Dictionary<string, GrammarLoader>.Enumerator enu = loaders.GetEnumerator();
+                    enu.MoveNext();
+                    grammar = enu.Current.Value.Grammar;
+                }
             }
             if (grammar == null)
                 return null;
@@ -146,16 +151,16 @@ namespace Hime.Parsers
             foreach (string file in task.InputFiles)
             {
                 TextReader reader = new StreamReader(file);
-                if (!LoadInput(file, reader))
-                    return false;
+                if (LoadInput(file, reader))
+                    return true;
             }
             foreach (string data in task.InputRawData)
             {
                 TextReader reader = new StringReader(data);
-                if (!LoadInput(null, reader))
-                    return false;
+                if (LoadInput(null, reader))
+                    return true;
             }
-            return true;
+            return false;
         }
 
         private bool LoadInput(string file, TextReader reader)
