@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// States for LRStar automata.
 	/// </summary>
-    public class LRStarState : LRState
+    public sealed class LRStarState : LRState
     {
         internal DeciderState[] decider;
 		

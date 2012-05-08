@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    public class DeciderState
+    public sealed class DeciderState
     {
         private Dictionary<ushort, ushort> transitions;
         internal ushort Shift { get; private set; }

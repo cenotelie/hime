@@ -12,7 +12,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// State for LR1 automata.
 	/// </summary>
-    public class LR1State : LRState
+    public sealed class LR1State : LRState
     {
         /// <summary>
         /// Dictionary associating a reduction to terminal ID
