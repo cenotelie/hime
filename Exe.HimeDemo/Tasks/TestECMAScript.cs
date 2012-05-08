@@ -15,9 +15,7 @@ namespace Hime.Demo.Tasks
     {
         internal TestECMAScript()
 		{
-            Utils.Resources.ResourceAccessor accessor = new Utils.Resources.ResourceAccessor(typeof(Hime.Utils.Resources.ResourceAccessor).Assembly, "Resources");
-            string content = accessor.GetAllTextFor("Transforms.Hime.js");
-            Hime.Demo.Generated.ECMA.ECMAScriptLexer lexer = new Hime.Demo.Generated.ECMA.ECMAScriptLexer(content);
+            Hime.Demo.Generated.ECMA.ECMAScriptLexer lexer = new Hime.Demo.Generated.ECMA.ECMAScriptLexer("");
             this.parser = new Hime.Demo.Generated.ECMA.ECMAScriptParser(lexer);
 		}
     }

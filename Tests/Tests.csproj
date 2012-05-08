@@ -51,6 +51,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="BaseTestSuite.cs" />
+    <Compile Include="Lib.Redist\Suite02_RNGLR.cs" />
     <Compile Include="Lib.Redist\Suite00_Bugs.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
@@ -94,5 +95,6 @@
     <EmbeddedResource Include="Resources\Exe.HimeCC\MathExp.gram" />
     <EmbeddedResource Include="Resources\Lib.CentralDogma\AmbiguousLR1.gram" />
     <EmbeddedResource Include="Resources\Lib.Redist\Bug494.gram" />
+    <EmbeddedResource Include="Resources\Lib.Redist\ECMAScript.gram" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@ namespace Hime.Demo
     {        
         static void Main()
         {
-            IExecutable executable = new Compile();
+            IExecutable executable = new TestECMAScript();
             executable.Execute();
         }
     }
