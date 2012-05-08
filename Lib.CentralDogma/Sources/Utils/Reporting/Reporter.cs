@@ -16,10 +16,10 @@ namespace Hime.Utils.Reporting
 {
     public sealed class Reporter
     {
-        protected Report report;
-        protected Section topSection;
-        protected Section currentSection;
-        protected ILog log;
+        private Report report;
+        private Section topSection;
+        private Section currentSection;
+        private ILog log;
 
         public Report Result { get { return report; } }
 
@@ -81,7 +81,7 @@ namespace Hime.Utils.Reporting
             Report(new ExceptionEntry(exception));
         }
 
-        protected void AddEntry(Entry entry)
+        private void AddEntry(Entry entry)
         {
 			Section section = currentSection;
             if (section == null)

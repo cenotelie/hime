@@ -5,6 +5,7 @@
  * 
  */
 using System;
+using System.IO;
 using NUnit.Framework;
 using Hime.Parsers;
 using Hime.Utils.Reporting;
@@ -19,9 +20,12 @@ namespace Hime.Tests.Redist
         [Test]
         public void Bug494()
         {
-            string grammar = GetAllTextFor("RedistBug494.gram");
-            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors, "Grammar compilation failed!");
-            Assembly assembly = Build();
+            string dir = GetTestDirectory();
+            string lexer = Path.Combine(dir, "lexer.cs");
+            string parser = Path.Combine(dir, "parser.cs");
+            string grammar = GetResourceContent("Lib.Redist.Bug494.gram");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1, lexer, parser).HasErrors, "Grammar compilation failed!");
+            Assembly assembly = Build(lexer, parser);
             bool errors = false;
             SyntaxTreeNode node = Parse(assembly, "aa", out errors);
             Assert.AreEqual(node.Children.Count, 2);

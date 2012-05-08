@@ -18,104 +18,90 @@ namespace Hime.Tests.HimeCC
     [TestFixture]
     public class Suite03_Compile: BaseTestSuite
     {
-        private static string source = Path.Combine(directory, "MathExp.gram");
-      	
-        private void Generate(string[] command)
-        {
-            if (Directory.Exists(directory)) Directory.Delete(directory, true);
-            Directory.CreateDirectory(directory);
-            Export(Path.GetFileName(command[0]), command[0]);
-            Program.Main(command);
-        }
-        
-        private Assembly Compile()
-        {
-            string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
-            Generate(command);
-            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
-            string redistPath = Path.Combine(directory, "Hime.Redist.dll");
-            if (File.Exists(redistPath)) File.Delete(redistPath);
-            File.Copy(redist, redistPath);
-            using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
-            {
-                CompilerParameters compilerparams = new CompilerParameters();
-                compilerparams.GenerateExecutable = false;
-                compilerparams.GenerateInMemory = true;
-                compilerparams.ReferencedAssemblies.Add(redistPath);
-                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
-                Assembly assembly = results.CompiledAssembly;
-                Directory.Delete(directory, true);
-                return assembly;
-            }
-        }
+        private static string defaultGrammar = "MathExp.gram";
+        private static string defaultLexer = "lexer.cs";
+        private static string defaultParser = "parser.cs";
 
-        // TODO: factor all calls to new Tools (inherit from Tools and call this TestTemplate)
-        // TODO: or move the code in Tools into real classes
-        [Test]
-        public void Test000_Generate_ShouldNotFailBecauseResourceIsNotEmbedded()
+        private string[] BuildDefaultCommand(string dir)
         {
-        	if (System.IO.Directory.Exists(directory))
-                System.IO.Directory.Delete(directory, true);
-            System.IO.Directory.CreateDirectory(directory);
-            string fileName = "MathExp.gram";
-            string command = directory + "\\" + fileName;
-            Export(fileName, command);
+            string source = Path.Combine(dir, defaultGrammar);
+            string lexer = Path.Combine(dir, defaultLexer);
+            string parser = Path.Combine(dir, defaultParser);
+            ExportResource("Exe.HimeCC." + defaultGrammar, source);
+            string[] command = new String[] { source, "--lexer", lexer, "--parser", parser };
+            return command;
         }
         
 		[Test]
         public void Test001_DefaultNamespace_GeneratedLexer()
         {
-            string[] command = new String[] { source, "--lexer", lexerFile, "--parser", parserFile };
-        	Generate(command);
-            File.ReadAllText(lexerFile);
+            string dir = GetTestDirectory();
+            Program.Main(BuildDefaultCommand(dir));
+            File.ReadAllText(Path.Combine(dir, defaultLexer));
         }
 
         [Test]
-        public void Test002_DefaultNamespace_ShouldNotFail()
+        public void Test002_DefaultNamespace_GeneratedParser()
         {
-        	Assembly assembly = Compile();
-            assembly.GetType("MathExp.MathExpLexer");
+            string dir = GetTestDirectory();
+            Program.Main(BuildDefaultCommand(dir));
+            File.ReadAllText(Path.Combine(dir, defaultParser));
+        }
+
+        [Test]
+        public void Test003_DefaultNamespace_ShouldBuild()
+        {
+            string dir = GetTestDirectory();
+            Program.Main(BuildDefaultCommand(dir));
+            Assembly assembly = Build(Path.Combine(dir, defaultLexer), Path.Combine(dir, defaultParser));
+            Assert.IsNotNull(assembly);
         }
 
 		[Test]
-        public void Test004_DefaultNamespace_GeneratedLexer()
+        public void Test004_DefaultNamespace_LexerExists()
         {
-        	Assembly assembly = Compile();
+            string dir = GetTestDirectory();
+            Program.Main(BuildDefaultCommand(dir));
+            Assembly assembly = Build(Path.Combine(dir, defaultLexer), Path.Combine(dir, defaultParser));
             System.Type lexer = assembly.GetType("MathExp.MathExpLexer");
             Assert.IsNotNull(lexer);
         }
 
         [Test]
-        public void Test005_Compile_ShouldNotFail()
+        public void Test005_DefaultNamespace_ParserExists()
         {
-        	this.Compile();
-        }
-
-		[Test]
-        public void Test006_DefaultNamespace_GeneratedParser()
-        {
-        	Assembly assembly = Compile();
-            Type parser = assembly.GetType("MathExp.MathExpParser");
-            Assert.IsNotNull(parser);
+            string dir = GetTestDirectory();
+            Program.Main(BuildDefaultCommand(dir));
+            Assembly assembly = Build(Path.Combine(dir, defaultLexer), Path.Combine(dir, defaultParser));
+            System.Type lexer = assembly.GetType("MathExp.MathExpParser");
+            Assert.IsNotNull(lexer);
         }
 
         [Test]
         public void Test007_DontCrashOnEmptyFile()
         {
-        	Generate(new string[] { Path.Combine(directory, "Empty.gram") });
+            string dir = GetTestDirectory();
+            string source = Path.Combine(dir, "Empty.gram");
+            string lexer = Path.Combine(dir, defaultLexer);
+            string parser = Path.Combine(dir, defaultParser);
+            ExportResource("Exe.HimeCC.Empty.gram", source);
+            string[] command = new String[] { source, "--lexer", lexer, "--parser", parser };
+            Program.Main(command);
         }
 
-	
-		// TODO: should simplify this test by adding a return code to main!!!
 		[Test]
-        public void Test008_ShouldNotFail()
+        public void Test008_CanCompileCentralDogma()
         {
-            string[] command = new string[] { Path.Combine(directory, "FileCentralDogma.gram"), "-g", "FileCentralDogma", "-m", "LALR" };
-            if (Directory.Exists(directory)) Directory.Delete(directory, true);
-            Directory.CreateDirectory(directory);
-            Export(Path.GetFileName(command[0]), command[0]);
-			int result = Program.Main(command);
-			Assert.AreEqual(0, result);
+            string dir = GetTestDirectory();
+            string source = Path.Combine(dir, "FileCentralDogma.gram");
+            string lexer = Path.Combine(dir, defaultLexer);
+            string parser = Path.Combine(dir, defaultParser);
+            ExportResource("Exe.HimeCC.FileCentralDogma.gram", source);
+            string[] command = new String[] { source, "-g", "FileCentralDogma", "--lexer", lexer, "--parser", parser, "-m", "LALR1" };
+            int result = Program.Main(command);
+            Assert.AreEqual(0, result);
+            Assembly assembly = Build(Path.Combine(dir, defaultLexer), Path.Combine(dir, defaultParser));
+            Assert.IsNotNull(assembly);
         }
 	}
 }

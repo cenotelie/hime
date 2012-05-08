@@ -8,7 +8,7 @@
     <ProjectGuid>{30BE2190-7AA2-431C-A993-8E61501ED0FF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Hime.Tests</RootNamespace>
-    <AssemblyName>Tests</AssemblyName>
+    <AssemblyName>Hime.Tests</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <SourceAnalysisOverrideSettingsFile>C:\Users\Charles\AppData\Roaming\ICSharpCode/SharpDevelop4.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <PublishUrl>publish\</PublishUrl>
@@ -51,18 +51,15 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="BaseTestSuite.cs" />
-    <Compile Include="redist\Suite00_Bugs.cs" />
+    <Compile Include="Lib.Redist\Suite00_Bugs.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
     <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
-    <Compile Include="Project0_CentralDogma\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Project0_CentralDogma\Suite01_Resource.cs" />
-    <Compile Include="Project0_CentralDogma\Suite02_Report.cs" />
-    <Compile Include="Project0_CentralDogma\Suite05_CompilationTask.cs" />
-    <Compile Include="Project0_CentralDogma\Suite03_ResourceLoader.cs" />
-    <Compile Include="Project0_CentralDogma\Suite04_Compiler.cs" />
-    <Compile Include="Project2_Integration\Suite01_Parse.cs" />
-    <Compile Include="Project2_Integration\Suite00_Ambiguous.cs" />
+    <Compile Include="Lib.CentralDogma\Suite00_FileCentralDogmaParser.cs" />
+    <Compile Include="Lib.CentralDogma\Suite01_Report.cs" />
+    <Compile Include="Lib.CentralDogma\Suite02_CompilationTask.cs" />
+    <Compile Include="Lib.Redist\Suite01_Parse.cs" />
+    <Compile Include="Lib.CentralDogma\Suite03_Ambiguous.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -89,27 +86,13 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\MathExp.gram">
-      <LogicalName>Tests.Resources.MathExp.gram</LogicalName>
-    </EmbeddedResource>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Empty.gram">
-      <LogicalName>Tests.Resources.Empty.gram</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\AmbiguousLR1.gram">
-      <LogicalName>Tests.Resources.AmbiguousLR1.gram</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\RedistBug494.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <LogicalName>Tests.Resources.RedistBug494.gram</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\FileCentralDogma.gram" />
+    <EmbeddedResource Include="Resources\Exe.HimeCC\Empty.gram" />
+    <EmbeddedResource Include="Resources\Exe.HimeCC\FileCentralDogma.gram" />
+    <EmbeddedResource Include="Resources\Exe.HimeCC\MathExp.gram" />
+    <EmbeddedResource Include="Resources\Lib.CentralDogma\AmbiguousLR1.gram" />
+    <EmbeddedResource Include="Resources\Lib.Redist\Bug494.gram" />
   </ItemGroup>
 </Project>

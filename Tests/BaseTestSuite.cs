@@ -12,41 +12,58 @@ using System.CodeDom.Compiler;
 
 namespace Hime.Tests
 {
-    public class BaseTestSuite
+    public abstract class BaseTestSuite
     {
-        protected static string directory = "Test";
-        protected static string lexerFile = Path.Combine(directory, "TestLexer.cs");
-        protected static string parserFile = Path.Combine(directory, "TestParser.cs");
-		
-		// TODO: could factor this method with other GetAllTextFor in Tools.cs
-        protected string GetAllTextFor(string name)
+        protected ResourceAccessor accessor;
+        protected string directory;
+
+        protected BaseTestSuite()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            using (ResourceAccessor accessor = new ResourceAccessor(assembly, "Resources"))
-			{
-	            return accessor.GetAllTextFor(name);
-			}
+            accessor = new ResourceAccessor(Assembly.GetExecutingAssembly(), "Resources");
+            directory = "Data_" + this.GetType().Name;
+            try
+            {
+                if (Directory.Exists(directory))
+                    Directory.Delete(directory, true);
+                Directory.CreateDirectory(directory);
+            }
+            catch (IOException ex)
+            {
+                File.AppendAllText("Log.txt", ex.Message + Environment.NewLine);
+            }
         }
 
-        protected Report CompileResource(string resource, ParsingMethod method)
-        {
-			return CompileRaw(GetAllTextFor(resource), method);
+        protected string GetTestDirectory() {
+            System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
+            string dir = Path.Combine(directory, caller.GetMethod().Name);
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, true);
+            Directory.CreateDirectory(dir);
+            return dir;
         }
 
-        protected Report CompileRaw(string rawInput, ParsingMethod method)
+        protected string GetResourceContent(string name) { return accessor.GetAllTextFor(name); }
+        protected void ExportResource(string name, string file) { accessor.Export(name, file); }
+
+        protected Report CompileResource(string resource, ParsingMethod method, string lexer, string parser)
+        {
+			return CompileRaw(GetResourceContent(resource), method, lexer, parser);
+        }
+
+        protected Report CompileRaw(string rawInput, ParsingMethod method, string lexer, string parser)
         {
             CompilationTask task = new CompilationTask();
             task.Method = method;
             task.InputRawData.Add(rawInput);
-            task.LexerFile = lexerFile;
-            task.ParserFile = parserFile;
+            task.LexerFile = lexer;
+            task.ParserFile = parser;
             return task.Execute();
         }
 
-        protected Assembly Build()
+        protected Assembly Build(string lexer, string parser)
         {
             string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
-            File.Copy(redist, Path.Combine(directory, "Hime.Redist.dll"), true);
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{
             	CompilerParameters compilerparams = new CompilerParameters();
@@ -54,8 +71,8 @@ namespace Hime.Tests
             	compilerparams.GenerateInMemory = true;
             	compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
             	compilerparams.ReferencedAssemblies.Add("System.dll");
-            	compilerparams.ReferencedAssemblies.Add(Path.Combine(directory, "Hime.Redist.dll"));
-            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexerFile, parserFile });
+                compilerparams.ReferencedAssemblies.Add(redist);
+            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexer, parser });
             	Assert.AreEqual(0, results.Errors.Count);
             	return results.CompiledAssembly;
 			}
@@ -96,18 +113,6 @@ namespace Hime.Tests
             SyntaxTreeNode root = parser.Analyse();
             errors = (parser.Errors.Count != 0);
             return root;
-        }
-
-		// TODO: try to factor all calls to new CompilationTask
-        // TODO: remove all static methods
-        internal protected void Export(string resourceName, string fileName)
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            string p_DefaultPath = "Resources";
-            using (ResourceAccessor accessor = new ResourceAccessor(assembly, p_DefaultPath))
-			{
-            	accessor.Export(resourceName, fileName);
-			}
         }
     }
 }

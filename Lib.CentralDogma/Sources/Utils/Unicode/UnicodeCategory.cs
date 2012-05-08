@@ -10,20 +10,20 @@ namespace Hime.Utils.Unicode
 {
     public sealed class UnicodeCategory
     {
-        protected string name;
-        protected List<UnicodeSpan> spans;
+        private string name;
+        private List<UnicodeSpan> spans;
 
         public string Name { get { return name; } }
         public ICollection<UnicodeSpan> Spans { get { return spans; } }
 
-        protected UnicodeCategory(string name)
+        private UnicodeCategory(string name)
         {
             this.name = name;
             this.spans = new List<UnicodeSpan>();
         }
 
-        protected static Dictionary<string, UnicodeCategory> classes = null;
-        protected static void BuildClasses()
+        private static Dictionary<string, UnicodeCategory> classes = null;
+        private static void BuildClasses()
         {
             classes = new Dictionary<string, UnicodeCategory>();
             UnicodeCategory c_Lu = new UnicodeCategory("Lu");
@@ -2478,7 +2478,7 @@ namespace Hime.Utils.Unicode
             c_Co.spans.Add(new UnicodeSpan(0xF8FF, 0xF8FF));
             BuildClasses_Class(c_Co);
         }
-        protected static void BuildClasses_Class(UnicodeCategory c) { classes.Add(c.name, c); }
+        private static void BuildClasses_Class(UnicodeCategory c) { classes.Add(c.name, c); }
         public static Dictionary<string, UnicodeCategory> Classes
         {
             get

@@ -6,10 +6,10 @@ using System;
 using NUnit.Framework;
 using Hime.Utils.Reporting;
 
-namespace Hime.Tests.Project0_CentralDogma
+namespace Hime.Tests.CentralDogma
 {
 	[TestFixture]
-	public class Suite02_Report
+	public class Suite01_Report
 	{
 		[Test]
 		public void Test000_Constructor_ShouldNotFail()

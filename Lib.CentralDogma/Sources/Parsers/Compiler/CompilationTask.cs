@@ -59,7 +59,6 @@ namespace Hime.Parsers
 
         public Report Execute()
         {
-            reporter.BeginSection("Compilation Task");
             string gname = null;
             try { gname = ExecuteDo(); }
             catch (Exception ex) { reporter.Report(ex); }
@@ -69,7 +68,7 @@ namespace Hime.Parsers
             return reporter.Result;
         }
 
-        internal string ExecuteDo()
+        private string ExecuteDo()
         {
             reporter.Info("Compiler", "CentralDogma " + Version);
             foreach (string name in plugins.Keys)

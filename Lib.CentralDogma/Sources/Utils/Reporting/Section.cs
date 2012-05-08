@@ -12,8 +12,8 @@ namespace Hime.Utils.Reporting
 {
     public sealed class Section
     {
-        protected List<Entry> entries;
-        protected string name;
+        private List<Entry> entries;
+        private string name;
 
         public ICollection<Entry> Entries { get { return entries; } }
         public string Name { get { return name; } }

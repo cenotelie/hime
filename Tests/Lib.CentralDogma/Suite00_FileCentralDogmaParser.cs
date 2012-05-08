@@ -9,7 +9,7 @@ using System.IO;
 using NUnit.Framework;
 using Hime.Redist.Parsers;
 
-namespace Hime.Tests.Project0_CentralDogma
+namespace Hime.Tests.CentralDogma
 {
 	[TestFixture]
 	public class Suite00_FileCentralDogmaParser

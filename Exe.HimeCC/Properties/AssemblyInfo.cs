@@ -23,4 +23,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("9ea6e226-e1bd-4ada-916f-cc26955947c0")]
 
 // added this visibility so that internal classes and methods may be tested in Hime.NUnit
-[assembly: InternalsVisibleTo("Tests")]
+[assembly: InternalsVisibleTo("Hime.Tests")]

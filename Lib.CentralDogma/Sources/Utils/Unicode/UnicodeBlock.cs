@@ -10,17 +10,17 @@ namespace Hime.Utils.Unicode
 {
     public sealed class UnicodeBlock : UnicodeSpan
     {
-        protected string name;
+        private string name;
         public string Name { get { return name; } }
 
-        protected UnicodeBlock(ushort begin, ushort end, string name)
+        private UnicodeBlock(ushort begin, ushort end, string name)
             : base(begin, end)
         {
             this.name = name;
         }
 
-        protected static Dictionary<string, UnicodeBlock> categories = null;
-        protected static void BuildCategories()
+        private static Dictionary<string, UnicodeBlock> categories = null;
+        private static void BuildCategories()
         {
             categories = new Dictionary<string, UnicodeBlock>();
             BuildCategories_Cat(new UnicodeBlock(0x0000, 0x007F, "IsBasicLatin"));
@@ -129,7 +129,7 @@ namespace Hime.Utils.Unicode
             BuildCategories_Cat(new UnicodeBlock(0xFF00, 0xFFEF, "IsHalfwidthandFullwidthForms"));
             BuildCategories_Cat(new UnicodeBlock(0xFFF0, 0xFFFF, "IsSpecials"));
         }
-        protected static void BuildCategories_Cat(UnicodeBlock cat) { categories.Add(cat.name, cat); }
+        private static void BuildCategories_Cat(UnicodeBlock cat) { categories.Add(cat.name, cat); }
         public static Dictionary<string, UnicodeBlock> Categories
         {
             get
