@@ -6581,7 +6581,7 @@ namespace Hime.Demo.Generated.ECMA
             rules = staticRules;
             states = staticStates;
             axiomID = 0x49;
-            axiomNullSPPF = 0x49;
+            axiomNullSPPF = 0x4;
             axiomPrimeID = 0xBF;
         }
         public ECMAScriptParser(ECMAScriptLexer lexer) : base (lexer) {  }

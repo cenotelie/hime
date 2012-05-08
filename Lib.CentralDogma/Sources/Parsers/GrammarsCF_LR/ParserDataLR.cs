@@ -33,7 +33,7 @@ namespace Hime.Parsers.ContextFree.LR
 		}
 		
         internal protected ICollection<Action> GrammarActions { get { return grammar.Actions; } }
-        internal protected string GetVariable(string name) { return "0x" + grammar.GetVariable(name).SID.ToString("X"); }
+        internal protected CFVariable GetVariable(string name) { return grammar.GetVariable(name) as CFVariable; }
         internal protected string GetOption(string name) { return this.grammar.GetOption(name); }
         
 		internal abstract protected string GetBaseClassName { get; }

@@ -63,22 +63,22 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("        }");
         }
 		
-		private string GetAxiomOption()
-		{
-			return this.GetVariable(this.GetOption("Axiom"));
-		}
-		
         protected override void ExportSetup(StreamWriter stream)
         {
+            string axiomID = GetVariable(GetOption("Axiom")).SID.ToString("X");
+            string _axiom_ID = GetVariable("_Axiom_").SID.ToString("X");
+            int index = nullableVars.IndexOf(GetVariable(GetOption("Axiom")));
+            if (index < 0) index = 0;
+
             stream.WriteLine("        protected override void setup()");
             stream.WriteLine("        {");
             stream.WriteLine("            nullVarsSPPF = staticNullVarsSPPF;");
             stream.WriteLine("            nullChoicesSPPF = staticNullChoicesSPPF;");
             stream.WriteLine("            rules = staticRules;");
             stream.WriteLine("            states = staticStates;");
-            stream.WriteLine("            axiomID = " + GetAxiomOption() + ";");
-            stream.WriteLine("            axiomNullSPPF = " + GetAxiomOption() + ";");
-            stream.WriteLine("            axiomPrimeID = " + GetVariable("_Axiom_") + ";");
+            stream.WriteLine("            axiomID = 0x" + axiomID + ";");
+            stream.WriteLine("            axiomNullSPPF = 0x" + index.ToString("X") + ";");
+            stream.WriteLine("            axiomPrimeID = 0x" + _axiom_ID + ";");
             stream.WriteLine("        }");
         }
 
