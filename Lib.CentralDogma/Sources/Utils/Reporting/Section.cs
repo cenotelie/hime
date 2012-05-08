@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace Hime.Utils.Reporting
 {
-    public class Section
+    public sealed class Section
     {
         protected List<Entry> entries;
         protected string name;

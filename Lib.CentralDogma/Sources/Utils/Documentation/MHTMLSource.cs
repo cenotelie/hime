@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Hime.Utils.Documentation
 {
-    public class MHTMLSource
+    public sealed class MHTMLSource
     {
         private const int bufferSize = 900;
         private const string contentTransferEncoding = "base64";

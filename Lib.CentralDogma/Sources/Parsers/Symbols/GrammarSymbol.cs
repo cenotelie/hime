@@ -37,7 +37,7 @@ namespace Hime.Parsers
 			node.Attributes[attributeName].Value = attributeValue;
 		}
 
-        public class Comparer : IEqualityComparer<GrammarSymbol>
+        public sealed class Comparer : IEqualityComparer<GrammarSymbol>
         {
             public bool Equals(GrammarSymbol x, GrammarSymbol y) { return (x.SID == y.SID); }
             public int GetHashCode(GrammarSymbol obj) { return obj.SID; }

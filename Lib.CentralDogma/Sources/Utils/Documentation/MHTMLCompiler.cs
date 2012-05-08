@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Hime.Utils.Documentation
 {
-    public class MHTMLCompiler
+    public sealed class MHTMLCompiler
     {
 		// TODO: why 76? Magic number?
         private const int linebreak = 76;

@@ -14,7 +14,7 @@ using System.IO;
 
 namespace Hime.Utils.Reporting
 {
-    public class Reporter
+    public sealed class Reporter
     {
         protected Report report;
         protected Section topSection;

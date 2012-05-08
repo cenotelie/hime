@@ -8,7 +8,7 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Parsers.Input
 {
-    public class FileCentralDogmaLexer : LexerText
+    public sealed class FileCentralDogmaLexer : LexerText
     {
         public static readonly SymbolTerminal[] terminals = {
             new SymbolTerminal(0x1, "ε"),

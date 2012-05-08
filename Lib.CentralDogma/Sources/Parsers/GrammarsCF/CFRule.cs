@@ -20,7 +20,7 @@ namespace Hime.Parsers.ContextFree
             : base(head, body, replaceOnProduction, watermark)
         { }
 
-        public class Comparer : IEqualityComparer<CFRule>
+        public sealed class Comparer : IEqualityComparer<CFRule>
         {
             public bool Equals(CFRule x, CFRule y)
             {

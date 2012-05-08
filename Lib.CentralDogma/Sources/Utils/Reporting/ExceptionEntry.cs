@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace Hime.Utils.Reporting
 {
-    public class ExceptionEntry : Entry
+    public sealed class ExceptionEntry : Entry
     {
         private Exception exception;
 

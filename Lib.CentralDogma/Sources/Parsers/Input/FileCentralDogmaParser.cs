@@ -8,7 +8,7 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Parsers.Input
 {
-    public class FileCentralDogmaParser : LR1BaseParser
+    public sealed class FileCentralDogmaParser : LR1BaseParser
     {
         public static readonly SymbolVariable[] variables = {
             new SymbolVariable(0x36, "option"), 

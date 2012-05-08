@@ -13,7 +13,7 @@ namespace Hime.Utils.Reporting
 	/// <summary>
 	/// Description of Report.
 	/// </summary>
-	public class Report
+	public sealed class Report
 	{
 		// TODO: maybe would be more convenient to have a dictionary from section name to sections
         public List<Section> Sections { get; private set; }

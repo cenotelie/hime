@@ -15,7 +15,7 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Parsers
 {
-    public class CompilationTask
+    public sealed class CompilationTask
     {
         public string Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
         

@@ -13,7 +13,7 @@ using System.Text;
 namespace Hime.Utils.Resources
 {
 	// TODO: why is this class needed? Think about it
-    public class ResourceAccessor : IDisposable
+    public sealed class ResourceAccessor : IDisposable
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
 
