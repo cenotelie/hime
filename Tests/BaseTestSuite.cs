@@ -14,6 +14,8 @@ namespace Hime.Tests
 {
     public abstract class BaseTestSuite
     {
+        protected const string log = "Log.txt";
+
         protected ResourceAccessor accessor;
         protected string directory;
 
@@ -29,7 +31,7 @@ namespace Hime.Tests
             }
             catch (IOException ex)
             {
-                File.AppendAllText("Log.txt", ex.Message + Environment.NewLine);
+                File.AppendAllText(log, ex.Message + Environment.NewLine);
             }
         }
 
@@ -40,6 +42,7 @@ namespace Hime.Tests
             if (Directory.Exists(dir))
                 Directory.Delete(dir, true);
             Directory.CreateDirectory(dir);
+            Environment.CurrentDirectory = dir;
             return dir;
         }
 

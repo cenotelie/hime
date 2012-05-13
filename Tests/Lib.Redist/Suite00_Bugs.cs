@@ -21,8 +21,8 @@ namespace Hime.Tests.Redist
         public void Bug494()
         {
             string dir = GetTestDirectory();
-            string lexer = Path.Combine(dir, "lexer.cs");
-            string parser = Path.Combine(dir, "parser.cs");
+            string lexer = "lexer.cs";
+            string parser = "parser.cs";
             string grammar = GetResourceContent("Lib.Redist.Bug494.gram");
             Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1, lexer, parser).HasErrors, "Grammar compilation failed!");
             Assembly assembly = Build(lexer, parser);

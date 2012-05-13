@@ -19,17 +19,20 @@ namespace Hime.Tests.Redist
     {
         private const string grammar0 = "cf grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ S->'a'S'b'T|'c'T|'d'; T->'a'T|'b'S|'c'; } }";
         private const string grammar1 = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'x'*; } }";
+        private const string grammar2 = "cf grammar Test { options{ Axiom=\"S\"; } terminals {a->'a'; b->'b';} rules{ S->A b | a b b; A->a; } }";
+        private const string grammar3 = "cf grammar Test { options{ Axiom=\"S\"; } terminals {a->'a'; b->'b';} rules{ S->a b A a|a B A a|a b a; A->a|a A; B->b; } }";
         
-        private void TestGrammar(string dir, string grammar, ParsingMethod method, string input)
+        private SyntaxTreeNode TestGrammar(string dir, string grammar, ParsingMethod method, string input)
         {
-            string lexer = System.IO.Path.Combine(dir, "lexer.cs");
-            string parser = System.IO.Path.Combine(dir, "parser.cs");
+            string lexer = "lexer.cs";
+            string parser = "parser.cs";
             Assert.IsFalse(CompileRaw(grammar, method, lexer, parser).HasErrors, "Grammar compilation failed!");
             Assembly assembly = Build(lexer, parser);
             bool errors = false;
             SyntaxTreeNode node = Parse(assembly, input, out errors);
             Assert.NotNull(node, "Failed to parse input!");
             Assert.IsFalse(errors, "Parsing errors!");
+            return node;
         }
 
 		[Test]
@@ -58,6 +61,13 @@ namespace Hime.Tests.Redist
         {
             string dir = GetTestDirectory();
             TestGrammar(dir, grammar1, ParsingMethod.LRStar, "xxx");
+        }
+
+        [Test]
+        public void Test004_Simple_RNGLR()
+        {
+            string dir = GetTestDirectory();
+            TestGrammar(dir, grammar2, ParsingMethod.RNGLALR1, "abb");
         }
     }
 }

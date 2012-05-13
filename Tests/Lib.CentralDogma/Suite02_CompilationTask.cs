@@ -13,17 +13,20 @@ using System.IO;
 namespace Hime.Tests.CentralDogma
 {
 	[TestFixture]
-	public class Suite02_CompilationTask
+	public class Suite02_CompilationTask : BaseTestSuite
 	{
 		[Test]
         public void Test000_Execute_LR0_ShouldNotFailOnSimpleGrammar()
         {
+            string dir = GetTestDirectory();
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             task.Execute();
         }
 
@@ -31,12 +34,15 @@ namespace Hime.Tests.CentralDogma
         [Test]
         public void Test001_Execute_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
-        	string grammar = 
+            string dir = GetTestDirectory();
+            string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
         }
@@ -44,7 +50,8 @@ namespace Hime.Tests.CentralDogma
         [Test]
         public void Test002_Execute_LexerFileShouldBeGrammarNameSuffixLexer_Issue198()
         {
-        	string grammar = 
+            string dir = GetTestDirectory();
+            string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
@@ -57,7 +64,8 @@ namespace Hime.Tests.CentralDogma
         [Test]
         public void Test003_Execute_ParserFileShouldBeGrammarNameSuffixLexer_Issue198()
         {
-        	string grammar = 
+            string dir = GetTestDirectory();
+            string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
@@ -70,15 +78,16 @@ namespace Hime.Tests.CentralDogma
         [Test]
         public void Test004_Execute_ShouldNotFailWhenExportLogIsSet()
         {
+            string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
 
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
             task.InputRawData.Add(grammar);
-
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             task.ExportLog = true;
-
             Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
         }
@@ -86,13 +95,15 @@ namespace Hime.Tests.CentralDogma
         [Test]
         public void Test005_Execute_ShouldReturnOnlyOneErrorOnUnrecoverableSyntaxError_Issue414()
         {
+            string dir = GetTestDirectory();
             string grammar =
                 "public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
 
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
             task.InputRawData.Add(grammar);
-
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             Report result = task.Execute();
             Assert.AreEqual(1, result.ErrorCount);
         }
@@ -103,13 +114,15 @@ namespace Hime.Tests.CentralDogma
             // TODO: in that case, error message is not that nice could be improved
             // remplace ; with ,
             // do not put { cf } but "cf" (there is only one case and it is consistent with "text"
+            string dir = GetTestDirectory();
             string grammar =
                 "grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
 
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
             task.InputRawData.Add(grammar);
-
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             Report result = task.Execute();
             foreach (Entry error in result.Errors)
             {
@@ -121,48 +134,60 @@ namespace Hime.Tests.CentralDogma
         [Test]
         public void Test007_LoadInputs_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
+            string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
             task.GrammarName = "Test";
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             Assert.IsFalse(task.LoadInputs());
         }
 
         [Test]
         public void Test008_CompileData_ShouldHaveErrorsWhenSemiColonIsMissing()
         {
+            string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
 
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             Assert.IsTrue(task.LoadInputs());
         }
 
         [Test]
         public void Test009_CompileData_ShouldNotHaveAnyErrorWhenSectionTerminalsIsNotPresent()
         {
+            string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
 
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             Assert.IsFalse(task.LoadInputs());
         }
 
         [Test]
         public void Test010_Compile_ShouldNotThrowExceptionWhenSectionTerminalsIsNotPresent()
         {
+            string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
 
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
+            task.LexerFile = "lexer.cs";
+            task.ParserFile = "parser.cs";
             task.LoadInputs();
         }
 
