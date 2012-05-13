@@ -15,7 +15,8 @@ namespace Hime.Redist.Parsers
     {
         private string value;
         private int line;
-        private SyntaxTreeNode subGrammarRoot;
+        private int column;
+        private SyntaxTreeNode subRoot;
 
         /// <summary>
         /// Gets the data represented by this symbol
@@ -26,16 +27,20 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public string ValueText { get { return value; } }
         /// <summary>
-        /// Gets the line number where the text was found
+        /// Gets the line number where the text begins
         /// </summary>
         public int Line { get { return line; } }
         /// <summary>
-        /// Gets or sets the root of the abstract syntax tree produced by parsing the text of this symbol
+        /// Gets the column number where the text begins
+        /// </summary>
+        public int Column { get { return column; } }
+        /// <summary>
+        /// Gets of sets the matched sub-grammar's root AST
         /// </summary>
         public SyntaxTreeNode SubGrammarRoot
         {
-            get { return subGrammarRoot; }
-            set { subGrammarRoot = value; }
+            get { return subRoot; }
+            set { subRoot = value; }
         }
 
         /// <summary>
@@ -45,12 +50,13 @@ namespace Hime.Redist.Parsers
         /// <param name="name">Token's type name</param>
         /// <param name="value">Token's value</param>
         /// <param name="line">Token's line number</param>
-        public SymbolTokenText(ushort sid, string name, string value, int line)
+        /// <param name="column">Token's column in the line</param>
+        public SymbolTokenText(ushort sid, string name, string value, int line, int column)
             : base(sid, name)
         {
             this.value = value;
             this.line = line;
-            this.subGrammarRoot = null;
+            this.column = column;
         }
     }
 }

@@ -148,8 +148,8 @@ namespace Hime.Redist.Parsers
                     isDollatEmited = true;
                     return SymbolTokenDollar.Instance;
                 }
-                SymbolTokenText Token = GetNextToken_DFA();
-                if (Token == null)
+                SymbolTokenText token = GetNextToken_DFA();
+                if (token == null)
                 {
                     bool atend = false;
                     char c = input.Read(out atend);
@@ -158,12 +158,12 @@ namespace Hime.Redist.Parsers
                 }
                 else
                 {
-                    AdvanceStats(Token.ValueText);
-                    if (Token.SymbolID != separatorID)
+                    AdvanceStats(token.ValueText);
+                    if (token.SymbolID != separatorID)
                     {
-                        if (subGrammars.ContainsKey(Token.SymbolID))
-                            Token.SubGrammarRoot = subGrammars[Token.SymbolID](Token.ValueText);
-                        return Token;
+                        if (subGrammars.ContainsKey(token.SymbolID))
+                            token.SubGrammarRoot = subGrammars[token.SymbolID](token.ValueText);
+                        return token;
                     }
                 }
             }
@@ -228,7 +228,7 @@ namespace Hime.Redist.Parsers
             input.Rewind(count - matchedLength);
             if (matched == null)
                 return null;
-            return new SymbolTokenText(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine);
+            return new SymbolTokenText(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine, currentColumn);
         }
     }
 }

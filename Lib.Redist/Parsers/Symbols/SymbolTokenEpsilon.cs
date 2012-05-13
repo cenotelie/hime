@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a special token for the absence of data in a stream
     /// </summary>
-    sealed class SymbolTokenEpsilon : SymbolToken
+    public sealed class SymbolTokenEpsilon : SymbolToken
     {
         private static SymbolTokenEpsilon instance = new SymbolTokenEpsilon();
         private SymbolTokenEpsilon() : base(1, "ε") { }

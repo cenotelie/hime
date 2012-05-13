@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a special token for the end of data stream
     /// </summary>
-    sealed class SymbolTokenDollar : SymbolToken
+    public sealed class SymbolTokenDollar : SymbolToken
     {
         private static SymbolTokenDollar instance = new SymbolTokenDollar();
         private SymbolTokenDollar() : base(2, "EOF") { }
