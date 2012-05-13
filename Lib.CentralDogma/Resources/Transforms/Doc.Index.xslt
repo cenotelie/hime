@@ -12,7 +12,7 @@
               Set <xsl:value-of select="@SetID"/>
             </td>
             <td style="width: 20px; height: 20px">
-              <img src="hime_data/Hime.GoTo.png" alt="Go to" style="width: 20px; height: 20px; cursor: pointer;">
+              <img src="resources/Hime.GoTo.png" alt="Go to" style="width: 20px; height: 20px; cursor: pointer;">
                 <xsl:attribute name="onclick">
                   <xsl:text>display('Set_</xsl:text>
                   <xsl:value-of select="@SetID"/>
@@ -31,8 +31,8 @@
       <head>
         <meta charset="utf-8"/>
         <title>Grammar documentation</title>
-        <link rel="stylesheet" type="text/css" href="hime_data/Hime.css" />
-        <script src="hime_data/Hime.js" type="text/javascript">aaa</script>
+        <link rel="stylesheet" type="text/css" href="resources/Hime.css" />
+        <script src="resources/Hime.js" type="text/javascript">aaa</script>
       </head>
       <body class="HimeBody">
         <div style="width:15%; height:100%; overflow:auto; float:left;">
@@ -45,7 +45,7 @@
                       Grammar
                     </td>
                     <td style="width: 20px; height: 20px">
-                      <img src="hime_data/Hime.GoTo.png" alt="Go to" style="width: 20px; height: 20px; cursor: pointer;" onclick="display('grammar.html')"/>
+                      <img src="resources/Hime.GoTo.png" alt="Go to" style="width: 20px; height: 20px; cursor: pointer;" onclick="display('grammar.html')"/>
                     </td>
                   </tr>
                 </table>

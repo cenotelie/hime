@@ -44,6 +44,8 @@ namespace Hime.Parsers
             private Comparer() { }
             private static Comparer instance = new Comparer();
             public static Comparer Instance { get { return instance; } }
-        }		
+        }
+
+        public override string ToString() { return Name; }
     }
 }

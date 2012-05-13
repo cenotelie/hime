@@ -27,7 +27,7 @@
         <span>from</span>
         <a>
           <xsl:attribute name="href">
-            <xsl:text>Set_</xsl:text>
+            <xsl:text>set_</xsl:text>
             <xsl:value-of select="@State"/>
             <xsl:text>.html</xsl:text>
           </xsl:attribute>
@@ -50,7 +50,7 @@
         <div class="ColumnAction">
           <img style="width: 20pt; height: 20pt;">
             <xsl:attribute name="src">
-              <xsl:text>hime_data/Hime.</xsl:text>
+              <xsl:text>resources/Hime.</xsl:text>
               <xsl:value-of select="Action/@Type"/>
               <xsl:text>.png</xsl:text>
             </xsl:attribute>
@@ -63,7 +63,7 @@
               to
               <a>
                 <xsl:attribute name="href">
-                  <xsl:text>Set_</xsl:text>
+                  <xsl:text>set_</xsl:text>
                   <xsl:value-of select="Action"/>
                   <xsl:text>.html</xsl:text>
                 </xsl:attribute>
@@ -72,6 +72,7 @@
             </span>
           </xsl:if>
         </div>
+        <div/>
       </td>
       <td class="HimeDataCellCenter">
         <xsl:if test="@Conflict!='false'">
@@ -85,6 +86,7 @@
           </a>
           →
         </div>
+        <div/>
       </td>
       <td class="HimeDataCellCenter">
         <xsl:if test="@Conflict!='false'">
@@ -95,6 +97,7 @@
         <div class="ColumnBody">
           <xsl:apply-templates select="Symbols"/>
         </div>
+        <div/>
       </td>
       <td class="HimeDataCellCenterRight">
         <xsl:if test="@Conflict!='false'">
@@ -105,6 +108,7 @@
         <div class="ColumnLookaheads">
           <xsl:apply-templates select="Lookaheads"/>
         </div>
+        <div/>
       </td>
       <td class="HimeDataCellCenterRight">
         <xsl:if test="@Conflict!='false'">
@@ -115,6 +119,7 @@
         <div class="ColumnConflicts">
           <xsl:apply-templates select="ConflictLookaheads"/>
         </div>
+        <div/>
       </td>
       <td class="HimeDataCellCenterRight">
         <xsl:if test="@Conflict!='false'">
@@ -129,6 +134,7 @@
             </table>
           </xsl:if>
         </div>
+        <div/>
       </td>
     </tr>
   </xsl:template>
@@ -141,8 +147,8 @@
         <title>
           Set <xsl:value-of select="@SetID"/>
         </title>
-        <link rel="stylesheet" type="text/css" href="hime_data/Hime.css" />
-        <script src="hime_data/Hime.js" type="text/javascript">aaa</script>
+        <link rel="stylesheet" type="text/css" href="resources/Hime.css" />
+        <script src="resources/Hime.js" type="text/javascript">aaa</script>
       </head>
       <body>
         <div>
@@ -154,33 +160,33 @@
           <table border="0" cellspacing="0" cellpadding="0" >
             <tr class="HimeLRItem">
               <td style="width: 60pt;" class="HimeDataCellTopLeft">
-                <img src="hime_data/button_plus.gif" onclick="showColumn(0)"/>
-                <img src="hime_data/button_minus.gif" onclick="hideColumn(0)"/>
+                <img src="resources/button_plus.gif" onclick="showColumn(0)"/>
+                <img src="resources/button_minus.gif" onclick="hideColumn(0)"/>
                 Actions
               </td>
               <td class="HimeDataCellTop">
-                <img src="hime_data/button_plus.gif" onclick="showColumn(1)"/>
-                <img src="hime_data/button_minus.gif" onclick="hideColumn(1)"/>
+                <img src="resources/button_plus.gif" onclick="showColumn(1)"/>
+                <img src="resources/button_minus.gif" onclick="hideColumn(1)"/>
                 Heads
               </td>
               <td class="HimeDataCellTop">
-                <img src="hime_data/button_plus.gif" onclick="showColumn(2)"/>
-                <img src="hime_data/button_minus.gif" onclick="hideColumn(2)"/>
+                <img src="resources/button_plus.gif" onclick="showColumn(2)"/>
+                <img src="resources/button_minus.gif" onclick="hideColumn(2)"/>
                 Bodies
               </td>
               <td class="HimeDataCellTopRight">
-                <img src="hime_data/button_plus.gif" onclick="showColumn(3)"/>
-                <img src="hime_data/button_minus.gif" onclick="hideColumn(3)"/>
+                <img src="resources/button_plus.gif" onclick="showColumn(3)"/>
+                <img src="resources/button_minus.gif" onclick="hideColumn(3)"/>
                 Lookaheads
               </td>
               <td class="HimeDataCellTopRight">
-                <img src="hime_data/button_plus.gif" onclick="showColumn(4)"/>
-                <img src="hime_data/button_minus.gif" onclick="hideColumn(4)"/>
+                <img src="resources/button_plus.gif" onclick="showColumn(4)"/>
+                <img src="resources/button_minus.gif" onclick="hideColumn(4)"/>
                 Conflicts
               </td>
               <td class="HimeDataCellTopRight">
-                <img src="hime_data/button_plus.gif" onclick="showColumn(5)"/>
-                <img src="hime_data/button_minus.gif" onclick="hideColumn(5)"/>
+                <img src="resources/button_plus.gif" onclick="showColumn(5)"/>
+                <img src="resources/button_minus.gif" onclick="hideColumn(5)"/>
                 Origins
               </td>
             </tr>

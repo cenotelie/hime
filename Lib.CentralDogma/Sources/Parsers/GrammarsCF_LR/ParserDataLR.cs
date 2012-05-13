@@ -156,90 +156,70 @@ namespace Hime.Parsers.ContextFree.LR
 		}
 		
 		// TODO: this method could be factored more (look at the similar code)
-        public void Document(string file, bool exportVisuals, string dotBin)
+        public void Document(string directory, bool exportVisuals, string dotBin)
         {
-            string directory = file + "_temp";
-            System.IO.Directory.CreateDirectory(directory);
+            if (Directory.Exists(directory))
+                Directory.Delete(directory, true);
+            Directory.CreateDirectory(directory);
+            string dirRes = Path.Combine(directory, "resources");
+            Directory.CreateDirectory(dirRes);
 
             using (ResourceAccessor accessor = new ResourceAccessor())
 			{
-	            MHTMLCompiler compiler = new MHTMLCompiler("Documentation " + grammar.Name);
-                compiler.AddSource(new MHTMLSource("text/css", "hime_data/Hime.css", accessor.GetStreamFor("Transforms.Hime.css")));
-            	compiler.AddSource(new MHTMLSource("text/javascript", "hime_data/Hime.js", accessor.GetStreamFor("Transforms.Hime.js")));
-            	compiler.AddSource(new MHTMLSource("image/gif", "hime_data/button_plus.gif", accessor.GetStreamFor("Visuals.button_plus.gif")));
-            	compiler.AddSource(new MHTMLSource("image/gif", "hime_data/button_minus.gif", accessor.GetStreamFor("Visuals.button_minus.gif")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Logo.png", accessor.GetStreamFor("Visuals.Hime.Logo.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.GoTo.png", accessor.GetStreamFor("Visuals.Hime.GoTo.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Info.png", accessor.GetStreamFor("Visuals.Hime.Info.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Warning.png", accessor.GetStreamFor("Visuals.Hime.Warning.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Error.png", accessor.GetStreamFor("Visuals.Hime.Error.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Shift.png", accessor.GetStreamFor("Visuals.Hime.Shift.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.Reduce.png", accessor.GetStreamFor("Visuals.Hime.Reduce.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.None.png", accessor.GetStreamFor("Visuals.Hime.None.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.ShiftReduce.png", accessor.GetStreamFor("Visuals.Hime.ShiftReduce.png")));
-            	compiler.AddSource(new MHTMLSource("image/png", "hime_data/Hime.ReduceReduce.png", accessor.GetStreamFor("Visuals.Hime.ReduceReduce.png")));
+                accessor.Export("Transforms.Hime.css", Path.Combine(dirRes, "Hime.css"));
+                accessor.Export("Transforms.Hime.js", Path.Combine(dirRes, "Hime.js"));
+                accessor.Export("Visuals.button_plus.gif", Path.Combine(dirRes, "button_plus.gif"));
+                accessor.Export("Visuals.button_minus.gif", Path.Combine(dirRes, "button_minus.gif"));
+                accessor.Export("Visuals.Hime.Logo.png", Path.Combine(dirRes, "Hime.Logo.png"));
+                accessor.Export("Visuals.Hime.GoTo.png", Path.Combine(dirRes, "Hime.GoTo.png"));
+                accessor.Export("Visuals.Hime.Info.png", Path.Combine(dirRes, "Hime.Info.png"));
+                accessor.Export("Visuals.Hime.Warning.png", Path.Combine(dirRes, "Hime.Warning.png"));
+                accessor.Export("Visuals.Hime.Error.png", Path.Combine(dirRes, "Hime.Error.png"));
+                accessor.Export("Visuals.Hime.Shift.png", Path.Combine(dirRes, "Hime.Shift.png"));
+                accessor.Export("Visuals.Hime.Reduce.png", Path.Combine(dirRes, "Hime.Reduce.png"));
+                accessor.Export("Visuals.Hime.None.png", Path.Combine(dirRes, "Hime.None.png"));
+                accessor.Export("Visuals.Hime.ShiftReduce.png", Path.Combine(dirRes, "Hime.ShiftReduce.png"));
+                accessor.Export("Visuals.Hime.ReduceReduce.png", Path.Combine(dirRes, "Hime.ReduceReduce.png"));
 
                 XmlDocument document = new XmlDocument();
                 XmlNode nodeGraph = this.graph.Serialize(document);
                 document.AppendChild(nodeGraph);
-                document.Save(directory + "\\data.xml");
+                document.Save(Path.Combine(directory, "data.xml"));
+                accessor.AddCheckoutFile(Path.Combine(directory, "data.xml"));
 
                 // generate index
-                accessor.CheckOut("Transforms.Doc.Index.xslt", directory + "\\Index.xslt");
+                accessor.CheckOut("Transforms.Doc.Index.xslt", Path.Combine(directory, "Index.xslt"));
                 XslCompiledTransform transform = new XslCompiledTransform();
-                transform.Load(directory + "\\Index.xslt");
-                transform.Transform(directory + "\\data.xml", directory + "\\index.html");
-                compiler.AddSource(new MHTMLSource("text/html", "index.html", directory + "\\index.html"));
-                accessor.AddCheckoutFile(directory + "\\index.html");
-
+                transform.Load(Path.Combine(directory, "Index.xslt"));
+                transform.Transform(Path.Combine(directory, "data.xml"), Path.Combine(directory, "index.html"));
+                
                 // generate sets
-                string tfile = GetTransformation(exportVisuals);
-                accessor.CheckOut("Transforms.Doc." + tfile + ".xslt", directory + "\\" + tfile + ".xslt");
+                accessor.CheckOut("Transforms.Doc.ParserData.xslt", Path.Combine(directory, "ParserData.xslt"));
                 transform = new XslCompiledTransform();
-                transform.Load(directory + "\\" + tfile + ".xslt");
+                transform.Load(Path.Combine(directory, "ParserData.xslt"));
                 foreach (XmlNode child in nodeGraph.ChildNodes)
                 {
-                    string temp = directory + "\\Set_" + child.Attributes["SetID"].Value;
+                    string temp = Path.Combine(directory, "set_" + child.Attributes["SetID"].Value);
                     XmlDocument tempXML = new XmlDocument();
                     tempXML.AppendChild(tempXML.ImportNode(child, true));
                     tempXML.Save(temp + ".xml");
                     accessor.AddCheckoutFile(temp + ".xml");
                     transform.Transform(temp + ".xml", temp + ".html");
-                    compiler.AddSource(new MHTMLSource("text/html", "Set_" + child.Attributes["SetID"].Value + ".html", temp + ".html"));
-                    accessor.AddCheckoutFile(temp + ".html");
                 }
 
+                // generate grammar
             	document = new XmlDocument();
             	document.AppendChild(SerializeGrammar(document));
-            	document.Save(directory + "\\data.xml");
-            	accessor.AddCheckoutFile(directory + "\\data.xml");
-
-            	// generate grammar
-            	accessor.CheckOut("Transforms.Doc.Grammar.xslt", directory + "\\Grammar.xslt");
+                document.Save(Path.Combine(directory, "data.xml"));
+            	accessor.CheckOut("Transforms.Doc.Grammar.xslt", Path.Combine(directory, "Grammar.xslt"));
                 transform = new XslCompiledTransform();
-          		transform.Load(directory + "\\Grammar.xslt");
-         	   	transform.Transform(directory + "\\data.xml", directory + "\\grammar.html");
-         	   	compiler.AddSource(new MHTMLSource("text/html", "grammar.html", directory + "\\grammar.html"));
-            	accessor.AddCheckoutFile(directory + "\\grammar.html");
+                transform.Load(Path.Combine(directory, "Grammar.xslt"));
+                transform.Transform(Path.Combine(directory, "data.xml"), Path.Combine(directory, "grammar.html"));
 
             	// export parser data
             	List<string> files = SerializeVisuals(directory, exportVisuals, dotBin);
-            	foreach (string vfile in files)
-            	{
-                	FileInfo info = new FileInfo(vfile);
-					string mime;
-                	if (vfile.EndsWith(".svg")) mime = "image/svg+xml";
-            	    else mime = "text/plain";
-					MHTMLSource source = new MHTMLSource(mime, info.Name, vfile);
-					compiler.AddSource(source);
-    	            accessor.AddCheckoutFile(vfile);
-	            }
-            	compiler.CompileTo(file);
 			}
-            Directory.Delete(directory, true);
         }
-
-        protected virtual string GetTransformation(bool exportVisuals) { return "ParserData_LR1"; }
 
         protected List<string> SerializeVisuals(string directory, bool exportVisuals, string dotBin)
         {
@@ -254,13 +234,13 @@ namespace Hime.Parsers.ContextFree.LR
             DOTSerializer serializer = new DOTSerializer("Parser", Path.Combine(directory, "GraphParser.dot"));
 			graph.SerializeVisual(serializer);
             serializer.Close();
-            results.Add(directory + "\\GraphParser.dot");
+            results.Add(Path.Combine(directory, "GraphParser.dot"));
 
             if (exportVisuals)
             {
                 DOTLayoutManager layout = new DOTExternalLayoutManager(dotBin);
-                layout.Render(directory + "\\GraphParser.dot", directory + "\\GraphParser.svg");
-                results.Add(directory + "\\GraphParser.svg");
+                layout.Render(Path.Combine(directory, "GraphParser.dot"), Path.Combine(directory, "GraphParser.svg"));
+                results.Add(Path.Combine(directory, "GraphParser.svg"));
             }
         }
 

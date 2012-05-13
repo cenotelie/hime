@@ -80,8 +80,8 @@
         <title>
           Grammar <xsl:value-of select="@Name"/>
         </title>
-        <link rel="stylesheet" type="text/css" href="hime_data/Hime.css" />
-        <script src="hime_data/Hime.js" type="text/javascript">aaa</script>
+        <link rel="stylesheet" type="text/css" href="resources/Hime.css" />
+        <script src="resources/Hime.js" type="text/javascript">aaa</script>
       </head>
       <body>
         <div>

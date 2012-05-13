@@ -209,13 +209,7 @@
     <EmbeddedResource Include="Resources\Transforms\Logs.css" />
     <EmbeddedResource Include="Resources\Transforms\Hime.js" />
     <EmbeddedResource Include="Resources\Transforms\Hime.css" />
-    <EmbeddedResource Include="Resources\Transforms\Doc.ParserData_LRStarSVG.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Transforms\Doc.ParserData_LRStarDOT.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Transforms\Doc.ParserData_LR1.xslt">
+    <EmbeddedResource Include="Resources\Transforms\Doc.ParserData.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Transforms\Doc.Index.xslt" />

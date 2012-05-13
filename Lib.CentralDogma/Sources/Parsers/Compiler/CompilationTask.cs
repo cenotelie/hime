@@ -154,7 +154,7 @@ namespace Hime.Parsers
 
             // Export documentation
             if (ExportDocumentation)
-                parserData.Document(GetDocumentationName(gname) + ".mht", ExportVisuals, DOTBinary);
+                parserData.Document(GetDocumentationName(gname), ExportVisuals, DOTBinary);
             return gname;
         }
 

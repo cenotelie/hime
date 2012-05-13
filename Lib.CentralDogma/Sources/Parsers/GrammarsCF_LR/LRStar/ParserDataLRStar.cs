@@ -26,12 +26,6 @@ namespace Hime.Parsers.ContextFree.LR
             this.deciders = deciders;
         }
 
-        protected override string GetTransformation(bool exportVisuals)
-        {
-            if (exportVisuals) return "ParserData_LRStarSVG";
-            else return "ParserData_LRStarDOT";
-        }
-
         protected override void ExportSetup(StreamWriter stream)
         {
             stream.WriteLine("        protected override void setup()");

@@ -14,6 +14,6 @@ namespace Hime.Parsers
     interface ParserData
     {
         void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug);
-        void Document(string file, bool exportVisuals, string dotBin);
+        void Document(string directory, bool exportVisuals, string dotBin);
     }
 }
