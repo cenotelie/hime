@@ -6,7 +6,7 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
-	internal class ParsingTask : IExecutable
+	class Parse : IExecutable
 	{
 		protected IParser parser;
 				

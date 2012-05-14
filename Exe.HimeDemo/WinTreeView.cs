@@ -34,7 +34,7 @@ namespace LangTest
                 }
                 else
                 {
-                    VChild = VNode.Nodes.Add("∅");
+                    VChild = VNode.Nodes.Add("<null>");
                 }
                 AddSubTree(VChild, Child);
             }
