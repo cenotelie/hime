@@ -14,6 +14,8 @@ namespace Hime.Parsers
         public ushort SID { get; private set; }
         public string Name { get; private set; }
 
+        protected abstract string Type { get; }
+
         public GrammarSymbol(ushort sid, string name)
         {
             this.SID = sid;
@@ -23,7 +25,7 @@ namespace Hime.Parsers
 		public virtual XmlNode GetXMLNode(XmlDocument document)
         {
             XmlNode node = document.CreateElement("Symbol");
-            this.AddAttributeToNode(document, node, "type", this.GetType().Name);
+            this.AddAttributeToNode(document, node, "type", Type);
             this.AddAttributeToNode(document, node, "name", Name.Replace("\"", "\\\""));
             this.AddAttributeToNode(document, node, "sid", SID.ToString("X"));
             return node;

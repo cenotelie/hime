@@ -4,12 +4,12 @@
 
   <xsl:template match="Symbol">
     <xsl:choose>
-      <xsl:when test="@type='TerminalText'">
+      <xsl:when test="@type='Terminal'">
         <span class="HimeSymbolTerminalText">
           <xsl:value-of select="@value"/>
         </span>
       </xsl:when>
-      <xsl:when test="@type='CFVariable'">
+      <xsl:when test="@type='Variable'">
         <a class="HimeSymbolCFVariable">
           <xsl:attribute name="href">
             <xsl:text>#rule_</xsl:text>

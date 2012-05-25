@@ -18,6 +18,8 @@ namespace Hime.Parsers
             this.Priority = priority;
         }
 
+        protected override string Type { get { return "Terminal"; } }
+
         public override XmlNode GetXMLNode(XmlDocument document)
         {
 			XmlNode node = base.GetXMLNode(document);

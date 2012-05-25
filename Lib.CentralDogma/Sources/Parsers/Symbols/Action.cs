@@ -13,6 +13,8 @@ namespace Hime.Parsers
     {
         public Action(string name) : base(0, name) { }
 
+        protected override string Type { get { return "Action"; } }
+
         public override string ToString() { return "{" + Name + "}"; }
     }
 }

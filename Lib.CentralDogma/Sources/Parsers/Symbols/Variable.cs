@@ -18,6 +18,8 @@ namespace Hime.Parsers
 
         public IList<Rule> Rules { get { return roRules; } }
 
+        protected override string Type { get { return "Variable"; } }
+
         public Variable(ushort sid, string name) : base(sid, name) 
         {
             this.rules = new List<Rule>();
