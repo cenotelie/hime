@@ -14,15 +14,15 @@ namespace Hime.Parsers
         protected string name;
         protected ushort nextSID;
         protected Dictionary<string, string> options;
-        protected Dictionary<string, GrammarSymbol> children;
-        protected Dictionary<string, Terminal> terminals;
+        protected Dictionary<string, Terminal> terminalsByName;
+        protected Dictionary<string, Terminal> terminalsByValue;
         protected Dictionary<string, Variable> variables;
         protected Dictionary<string, Virtual> virtuals;
         protected Dictionary<string, Action> actions;
 
         public string Name { get { return name; } }
         public ICollection<string> Options { get { return options.Keys; } }
-        public ICollection<Terminal> Terminals { get { return terminals.Values; } }
+        public ICollection<Terminal> Terminals { get { return terminalsByName.Values; } }
         public ICollection<Variable> Variables { get { return variables.Values; } }
         public ICollection<Virtual> Virtuals { get { return virtuals.Values; } }
         public ICollection<Action> Actions { get { return actions.Values; } }
@@ -41,8 +41,8 @@ namespace Hime.Parsers
         public Grammar(string name)
         {
             this.options = new Dictionary<string, string>();
-            this.children = new Dictionary<string, GrammarSymbol>();
-            this.terminals = new Dictionary<string, Terminal>();
+            this.terminalsByName = new Dictionary<string, Terminal>();
+            this.terminalsByValue = new Dictionary<string, Terminal>();
             this.variables = new Dictionary<string, Variable>();
             this.virtuals = new Dictionary<string, Virtual>();
             this.actions = new Dictionary<string, Action>();
@@ -65,37 +65,39 @@ namespace Hime.Parsers
 
         public GrammarSymbol GetSymbol(string name)
         {
-            if (terminals.ContainsKey(name)) return terminals[name];
+            if (terminalsByName.ContainsKey(name)) return terminalsByName[name];
             if (variables.ContainsKey(name)) return variables[name];
             if (virtuals.ContainsKey(name)) return virtuals[name];
             if (actions.ContainsKey(name)) return actions[name];
             return null;
         }
 
-        public TerminalText AddTerminalText(string name, Automata.NFA nfa)
+        public TerminalText AddTerminalAnon(string display, Automata.NFA nfa)
         {
-            TerminalText terminal;
-            if (children.ContainsKey(name) && terminals.ContainsKey(name))
-            {
-                terminal = (TerminalText)terminals[name];
-                terminal.Priority = nextSID;
-                terminal.NFA = nfa;
-            }
-            else
-            {
-                terminal = new TerminalText(nextSID, name, nextSID, nfa);
-                children.Add(name, terminal);
-                terminals.Add(name, terminal);
-            }
+            string name = "_t" + nextSID.ToString("X");
+            return AddTerminal(name, display, nfa);
+        }
+        public TerminalText AddTerminalNamed(string name, Automata.NFA nfa) { return AddTerminal(name, name, nfa); }
+        private TerminalText AddTerminal(string name, string display, Automata.NFA nfa)
+        {
+            TerminalText terminal = new TerminalText(nextSID, name, display, nextSID, nfa);
             nextSID++;
+            terminalsByName.Add(name, terminal);
+            terminalsByValue.Add(display, terminal);
             return terminal;
         }
 
-        public Terminal GetTerminal(string name)
+        public Terminal GetTerminalByName(string name)
         {
-            if (!terminals.ContainsKey(name))
+            if (!terminalsByName.ContainsKey(name))
                 return null;
-            return terminals[name];
+            return terminalsByName[name];
+        }
+        public Terminal GetTerminalByValue(string value)
+        {
+            if (!terminalsByValue.ContainsKey(value))
+                return null;
+            return terminalsByValue[value];
         }
 
         public abstract Variable AddVariable(string name);
@@ -112,7 +114,6 @@ namespace Hime.Parsers
         {
             if (virtuals.ContainsKey(name)) return virtuals[name];
             Virtual Virtual = new Virtual(name);
-            children.Add(name, Virtual);
             virtuals.Add(name, Virtual);
             return Virtual;
         }
@@ -127,7 +128,6 @@ namespace Hime.Parsers
         public Action AddAction(string name)
         {
             Action Action = new Action(name);
-            children.Add(name, Action);
             actions.Add(name, Action);
             return Action;
         }

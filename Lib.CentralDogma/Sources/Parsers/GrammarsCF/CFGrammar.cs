@@ -38,7 +38,7 @@ namespace Hime.Parsers.ContextFree
         {
             foreach (TerminalText terminal in parent.Terminals)
             {
-                TerminalText clone = AddTerminalText(terminal.Name, terminal.NFA.Clone(false));
+                TerminalText clone = AddTerminalNamed(terminal.Name, terminal.NFA.Clone(false));
                 clone.NFA.StateExit.Final = clone;
             }
         }
@@ -65,7 +65,7 @@ namespace Hime.Parsers.ContextFree
                         if (part.Symbol is Variable)
                             symbol = variables[part.Symbol.Name];
                         else if (part.Symbol is Terminal)
-                            symbol = terminals[part.Symbol.Name];
+                            symbol = terminalsByName[part.Symbol.Name];
                         else if (part.Symbol is Virtual)
                             symbol = virtuals[part.Symbol.Name];
                         else if (part.Symbol is Action)
@@ -90,7 +90,6 @@ namespace Hime.Parsers.ContextFree
             if (variables.ContainsKey(name))
                 return variables[name] as CFVariable;
             CFVariable var = new CFVariable(nextSID, name);
-            children.Add(name, var);
             variables.Add(name, var);
             nextSID++;
             return var;
@@ -99,9 +98,8 @@ namespace Hime.Parsers.ContextFree
         public override Variable NewVariable() { return NewCFVariable(); }
         public CFVariable NewCFVariable()
         {
-            string varName = "_v" + nextSID;
+            string varName = "_v" + nextSID.ToString("X");
             CFVariable var = new CFVariable(nextSID, varName);
-            children.Add(varName, var);
             variables.Add(varName, var);
             nextSID++;
             return var;
@@ -126,7 +124,7 @@ namespace Hime.Parsers.ContextFree
             // Construct a global NFA for all the terminals
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
-            foreach (TerminalText terminal in terminals.Values)
+            foreach (TerminalText terminal in terminalsByName.Values)
             {
                 Automata.NFA sub = terminal.NFA.Clone();
                 final.InsertSubNFA(sub);
@@ -146,7 +144,7 @@ namespace Hime.Parsers.ContextFree
             Automata.DFA finalDFA = PrepareDFA(reporter);
             Terminal separator = null;
             if (options.ContainsKey("Separator"))
-                separator = terminals[options["Separator"]];
+                separator = terminalsByName[options["Separator"]];
             return new TextLexerData(finalDFA, separator);
         }
 

@@ -26,7 +26,7 @@ namespace Hime.Parsers
         {
             XmlNode node = document.CreateElement("Symbol");
             this.AddAttributeToNode(document, node, "type", Type);
-            this.AddAttributeToNode(document, node, "name", Name);
+            this.AddAttributeToNode(document, node, "name", ToString());
             this.AddAttributeToNode(document, node, "sid", SID.ToString("X"));
             return node;
         }

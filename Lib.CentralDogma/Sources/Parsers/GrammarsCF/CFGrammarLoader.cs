@@ -235,7 +235,7 @@ namespace Hime.Parsers.ContextFree
         private Automata.NFA Compile_Recognize_terminal_def_atom_name(SyntaxTreeNode node)
         {
             Redist.Parsers.SymbolTokenText token = (Redist.Parsers.SymbolTokenText)node.Symbol;
-            Terminal Ref = grammar.GetTerminal(token.ValueText);
+            Terminal Ref = grammar.GetTerminalByName(token.ValueText);
             if (Ref == null)
             {
                 reporter.Error("Compiler", "@" + token.Line + " Cannot find terminal " + token.ValueText);
@@ -336,7 +336,7 @@ namespace Hime.Parsers.ContextFree
         {
             string name = ((Redist.Parsers.SymbolTokenText)node.Children[0].Symbol).ValueText;
             Automata.NFA nfa = Compile_Recognize_terminal_definition(node.Children[1]);
-            Terminal terminal = grammar.AddTerminalText(name, nfa);
+            Terminal terminal = grammar.AddTerminalNamed(name, nfa);
             nfa.StateExit.Final = terminal;
             return terminal;
         }
@@ -348,12 +348,12 @@ namespace Hime.Parsers.ContextFree
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
             // Check for previous instance in the grammar's grammar
-            Terminal terminal = grammar.GetTerminal(value);
+            Terminal terminal = grammar.GetTerminalByValue(value);
             if (terminal == null)
             {
                 // Create the terminal
                 Automata.NFA nfa = Compile_Recognize_terminal_def_atom_text(node);
-                terminal = grammar.AddTerminalText(value, nfa);
+                terminal = grammar.AddTerminalAnon(value, nfa);
                 nfa.StateExit.Final = terminal;
             }
             // Create the definition set
