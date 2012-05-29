@@ -11,6 +11,8 @@ namespace Hime.Parsers
 {
     abstract class Grammar
     {
+        private static System.Random rand = new System.Random();
+
         protected string name;
         protected ushort nextSID;
         protected Dictionary<string, string> options;
@@ -50,6 +52,8 @@ namespace Hime.Parsers
             this.nextSID = 3;
         }
 
+        protected string GenerateID() { return rand.Next().ToString("X"); }
+
         public void AddOption(string name, string value)
         {
             if (options.ContainsKey(name))
@@ -72,18 +76,18 @@ namespace Hime.Parsers
             return null;
         }
 
-        public TerminalText AddTerminalAnon(string display, Automata.NFA nfa)
+        public TerminalText AddTerminalAnon(string value, Automata.NFA nfa)
         {
-            string name = "_t" + nextSID.ToString("X");
-            return AddTerminal(name, display, nfa);
+            string name = "_t" + GenerateID();
+            return AddTerminal(name, value, nfa);
         }
         public TerminalText AddTerminalNamed(string name, Automata.NFA nfa) { return AddTerminal(name, name, nfa); }
-        private TerminalText AddTerminal(string name, string display, Automata.NFA nfa)
+        private TerminalText AddTerminal(string name, string value, Automata.NFA nfa)
         {
-            TerminalText terminal = new TerminalText(nextSID, name, display, nextSID, nfa);
+            TerminalText terminal = new TerminalText(nextSID, name, value, nextSID, nfa);
             nextSID++;
             terminalsByName.Add(name, terminal);
-            terminalsByValue.Add(display, terminal);
+            terminalsByValue.Add(value, terminal);
             return terminal;
         }
 
@@ -142,31 +146,40 @@ namespace Hime.Parsers
         public abstract Rule CreateRule(Variable head, List<RuleBodyElement> body);
 
         public abstract void Inherit(Grammar parent);
-        
-        public Grammar Clone()
-        {
-            Grammar clone = CreateCopy();
-            clone.Inherit(this);
-            return clone;
-        }
-
-        protected abstract Grammar CreateCopy();
 
         protected void InheritOptions(Grammar parent)
         {
             foreach (string option in parent.Options)
                 AddOption(option, parent.GetOption(option));
         }
-		
+
+        protected void InheritTerminals(Grammar parent)
+        {
+            foreach (TerminalText terminal in parent.terminalsByName.Values)
+            {
+                if (!terminalsByName.ContainsKey(terminal.Name) && !terminalsByValue.ContainsKey(terminal.Value))
+                {
+                    TerminalText clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false));
+                    clone.NFA.StateExit.Final = clone;
+                }
+            }
+        }
+
         protected void InheritActions(Grammar parent)
         {
             foreach (Action action in parent.Actions)
-                AddAction(action.Name);
+            {
+                if (!actions.ContainsKey(action.Name))
+                    AddAction(action.Name);
+            }
         }
         protected void InheritVirtuals(Grammar parent)
         {
             foreach (Virtual vir in parent.Virtuals)
-                AddVirtual(vir.Name);
+            {
+                if (!virtuals.ContainsKey(vir.Name))
+                    AddVirtual(vir.Name);
+            }
         }
 
         public abstract LexerData GetLexerData(Reporter reporter);

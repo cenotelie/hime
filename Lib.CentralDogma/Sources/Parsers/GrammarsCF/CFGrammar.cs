@@ -22,25 +22,14 @@ namespace Hime.Parsers.ContextFree
             templateRules = new List<TemplateRule>();
         }
 
-        protected override Grammar CreateCopy() { return new CFGrammar(name); }
-
         public override void Inherit(Grammar parent)
         {
             InheritOptions(parent);
             InheritActions(parent);
             InheritVirtuals(parent);
-            InheritTerminals(parent as CFGrammar);
+            InheritTerminals(parent);
             InheritVariables(parent as CFGrammar);
             InheritTemplateRules(parent as CFGrammar);
-        }
-
-        protected void InheritTerminals(CFGrammar parent)
-        {
-            foreach (TerminalText terminal in parent.Terminals)
-            {
-                TerminalText clone = AddTerminalNamed(terminal.Name, terminal.NFA.Clone(false));
-                clone.NFA.StateExit.Final = clone;
-            }
         }
 
         protected void InheritTemplateRules(CFGrammar parent)
@@ -98,7 +87,7 @@ namespace Hime.Parsers.ContextFree
         public override Variable NewVariable() { return NewCFVariable(); }
         public CFVariable NewCFVariable()
         {
-            string varName = "_v" + nextSID.ToString("X");
+            string varName = "_v" + GenerateID();
             CFVariable var = new CFVariable(nextSID, varName);
             variables.Add(varName, var);
             nextSID++;

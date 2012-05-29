@@ -11,15 +11,15 @@ namespace Hime.Parsers
     class TerminalText : Terminal
     {
         public Automata.NFA NFA { get; set; }
-        public string Display { get; private set; }
+        public string Value { get; private set; }
 
-        public TerminalText(ushort sid, string name, string display, int priority, Automata.NFA nfa)
+        public TerminalText(ushort sid, string name, string value, int priority, Automata.NFA nfa)
             : base(sid, name, priority)
         {
             this.NFA = nfa;
-            this.Display = display;
+            this.Value = value;
         }
 
-        public override string ToString() { return Display; }
+        public override string ToString() { return Value; }
     }
 }
