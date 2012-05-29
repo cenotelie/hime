@@ -133,18 +133,13 @@
   </xsl:template>
 
   <xsl:template match="Symbol">
-    <xsl:choose>
-      <xsl:when test="@type='Terminal'">
-        <span class="HimeSymbolTerminalText">
-          <xsl:value-of select="@name"/>
-        </span>
-      </xsl:when>
-      <xsl:when test="@type='Variable'">
-        <span class="HimeSymbolCFVariable">
-          <xsl:value-of select="@name"/>
-        </span>
-      </xsl:when>
-    </xsl:choose>
+    <span>
+	  <xsl:attribute name="class">
+		<xsl:text>HimeSymbol</xsl:text>
+		<xsl:value-of select="@type"/>
+	  </xsl:attribute>
+	  <xsl:value-of select="@name"/>
+	</span>
   </xsl:template>
   
   <xsl:template match="Dot">
@@ -189,7 +184,7 @@
           <xsl:text>;</xsl:text>
         </xsl:attribute>
         <div style="margin: 3px;">
-          <span class="HimeSymbolCFVariable">
+          <span class="HimeSymbolVariable">
             <xsl:value-of select="@HeadName"/>
           </span>
           →
@@ -254,7 +249,7 @@
         <title>
           <xsl:value-of select="@title"/>
         </title>
-        <link rel="stylesheet" type="text/css" href="hime_data/Logs.css" />
+        <link rel="stylesheet" type="text/css" href="hime_data/Hime.css" />
         <script src="hime_data/Hime.js" type="text/javascript">aaa</script>
       </head>
       <body>

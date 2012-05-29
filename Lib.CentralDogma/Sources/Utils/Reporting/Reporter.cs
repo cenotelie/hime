@@ -118,7 +118,7 @@ namespace Hime.Utils.Reporting
 	            Utils.Documentation.MHTMLCompiler compiler = new Utils.Documentation.MHTMLCompiler(title);
 
 				compiler.AddSource(new MHTMLSource("text/html", "Grammar.html", htmlFileName));
-            	compiler.AddSource(new MHTMLSource("text/css", "hime_data/Logs.css", session.GetStreamFor("Transforms.Logs.css")));
+                compiler.AddSource(new MHTMLSource("text/css", "hime_data/Hime.css", session.GetStreamFor("Transforms.Hime.css")));
             	compiler.AddSource(new MHTMLSource("text/javascript", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
 
             	compiler.AddSource(new MHTMLSource("image/gif", "hime_data/button_plus.gif", session.GetStreamFor("Visuals.button_plus.gif")));

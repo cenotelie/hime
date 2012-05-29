@@ -4,13 +4,8 @@
 
   <xsl:template match="Symbol">
     <xsl:choose>
-      <xsl:when test="@type='Terminal'">
-        <span class="HimeSymbolTerminalText">
-          <xsl:value-of select="@name"/>
-        </span>
-      </xsl:when>
       <xsl:when test="@type='Variable'">
-        <a class="HimeSymbolCFVariable">
+        <a class="HimeSymbolVariable">
           <xsl:attribute name="href">
             <xsl:text>#rule_</xsl:text>
             <xsl:value-of select="@sid"/>

@@ -206,7 +206,6 @@
     <EmbeddedResource Include="Resources\Visuals\button_plus.gif" />
     <EmbeddedResource Include="Resources\Visuals\button_minus.gif" />
     <EmbeddedResource Include="Resources\Transforms\Logs.xslt" />
-    <EmbeddedResource Include="Resources\Transforms\Logs.css" />
     <EmbeddedResource Include="Resources\Transforms\Hime.js" />
     <EmbeddedResource Include="Resources\Transforms\Hime.css" />
     <EmbeddedResource Include="Resources\Transforms\Doc.ParserData.xslt">

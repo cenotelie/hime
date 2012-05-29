@@ -11,13 +11,6 @@
 	width: 50px;
 	height: 50px;
 }
-.HimeSystemsName
-{
-	font-family: Sans-Serif;
-	font-size: 20pt;
-	color: #840000;
-	height: 100px;
-}
 .HimeDocumentTitle
 {
 	position: absolute;
@@ -75,7 +68,13 @@
 	font-family: Sans-Serif;
 	font-size: 10pt;
 }
-
+.HimeDataLine
+{
+	font-family: Sans-Serif;
+	font-size: 10pt;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
 
 .HimeDataCellTopLeft
 {
@@ -146,7 +145,16 @@
 	font-size: 10pt;
 }
 
-.HimeSymbolCFVariable
+.HimeLRState
+{
+    padding: 1px;
+    margin: 2px;
+    background-color: #FFFF00;
+    border: 1px solid #FF0000;
+    color: Black;
+    text-decoration: none;
+}
+.HimeSymbolVariable
 {
     padding: 1px;
     margin: 2px;
@@ -155,14 +163,7 @@
     color: Black;
     text-decoration: none;
 }
-.HimeSymbolTerminalText
-{
-    padding: 1px;
-    margin: 2px;
-    border: 1px Solid #FF6600;
-    background-color: #FFDD88;
-}
-.HimeSymbolTerminalBin
+.HimeSymbolTerminal
 {
     padding: 1px;
     margin: 2px;
