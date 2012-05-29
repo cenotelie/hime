@@ -346,7 +346,7 @@ namespace Hime.Parsers.ContextFree
             // Construct the terminal name
             string value = ((Redist.Parsers.SymbolTokenText)node.Symbol).ValueText;
             value = value.Substring(1, value.Length - 2);
-            value = "@\"" + value.Replace("\\'", "'").Replace("\\\\", "\\") + "\"";
+            value = ReplaceEscapees(value).Replace("\\'", "'");
             // Check for previous instance in the grammar's grammar
             Terminal terminal = grammar.GetTerminal(value);
             if (terminal == null)

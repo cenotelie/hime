@@ -6,7 +6,7 @@
     <xsl:choose>
       <xsl:when test="@type='Terminal'">
         <span class="HimeSymbolTerminalText">
-          <xsl:value-of select="@value"/>
+          <xsl:value-of select="@name"/>
         </span>
       </xsl:when>
       <xsl:when test="@type='Variable'">

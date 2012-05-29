@@ -133,20 +133,18 @@
   </xsl:template>
 
   <xsl:template match="Symbol">
-    <span>
-      <xsl:attribute name="class">
-        <xsl:text>HimeSymbol</xsl:text>
-        <xsl:value-of select="@type"/>
-      </xsl:attribute>
-      <xsl:choose>
-        <xsl:when test="@type='TerminalText'">
-          <xsl:value-of select="@value"/>
-        </xsl:when>
-        <xsl:otherwise>
+    <xsl:choose>
+      <xsl:when test="@type='Terminal'">
+        <span class="HimeSymbolTerminalText">
           <xsl:value-of select="@name"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </span>
+        </span>
+      </xsl:when>
+      <xsl:when test="@type='Variable'">
+        <span class="HimeSymbolCFVariable">
+          <xsl:value-of select="@name"/>
+        </span>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template match="Dot">
