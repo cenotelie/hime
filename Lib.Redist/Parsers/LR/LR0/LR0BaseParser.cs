@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the LR0BaseParser class with the given lexer
         /// </summary>
         /// <param name="input">Input lexer</param>
-        public LR0BaseParser(LexerText input): base(input) { }
+        public LR0BaseParser(ILexer input): base(input) { }
 		
         /// <summary>
         /// Runs the parser for the given state and token

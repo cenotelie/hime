@@ -61,8 +61,10 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Parsers\ILexer.cs" />
     <Compile Include="Parsers\LexerDFAState.cs" />
     <Compile Include="Parsers\LexerText.cs" />
+    <Compile Include="Parsers\TextLexer.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\LR\LR0\LR0State.cs" />
     <Compile Include="Parsers\LR\LR1\LR1State.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Parsers\SyntaxNodes\SPPFNode.cs" />
     <Compile Include="Parsers\Symbols\Symbol.cs" />
     <Compile Include="Parsers\LR\RNGLR1\GSSNode.cs" />
+    <Compile Include="Utils\MemoryMaps.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

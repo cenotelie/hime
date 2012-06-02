@@ -46,7 +46,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Lexer associated to this parser
         /// </summary>
-        protected LexerText lexer;
+        protected ILexer lexer;
         /// <summary>
         /// Parser's stack
         /// </summary>
@@ -100,7 +100,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the LRParser class with the given lexer
         /// </summary>
         /// <param name="input">Input lexer</param>
-        public LRParser(LexerText input)
+        public LRParser(ILexer input)
         {
             this.errorSimulationLength = 3;
             this.maxErrorCount = 100;

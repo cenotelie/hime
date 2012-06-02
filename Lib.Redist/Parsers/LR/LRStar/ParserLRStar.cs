@@ -20,7 +20,7 @@ namespace Hime.Redist.Parsers
         /// <returns>The automaton's state which has the given id, or null if no state with the given id is found</returns>
         protected override LRState GetState(int id) { return states[id]; }
 
-        public LRStarBaseParser(LexerText input) : base(input) 
+        public LRStarBaseParser(ILexer input) : base(input) 
 		{ 
 			reader = new BufferedTokenReader(input); 
 		}

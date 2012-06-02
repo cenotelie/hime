@@ -1,7 +1,7 @@
 ﻿/*
  * Author: Laurent Wouters
- * Date: 14/09/2011
- * Time: 17:25
+ * Date: 02/06/2012
+ * Time: 10:15
  * 
  */
 using System.Collections.Generic;
@@ -11,53 +11,79 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a lexer for a text stream
     /// </summary>
-    public abstract class LexerText : ILexer
+    public abstract class TextLexer : ILexer
     {
         /// <summary>
-        /// Represents a callback for matching the content of a token to a grammar
+        /// Data structure for a text lexer automaton
         /// </summary>
-        /// <param name="value">The text value of a token</param>
-        /// <returns>The abstract syntax tree node representing the result of parsing the value of the token</returns>
-        protected delegate SyntaxTreeNode MatchSubGrammar(string value);
+        protected class Automaton
+        {
+            private Utils.BlobInt table;
+            private Utils.BlobUShort states;
+            public Automaton(System.IO.Stream stream)
+            {
+                System.IO.BinaryReader reader = new System.IO.BinaryReader(stream);
+                int count = reader.ReadInt32();
+                byte[] bt = new byte[count * 4];
+                reader.Read(bt, 0, bt.Length);
+                byte[] bd = new byte[stream.Length - bt.Length - 4];
+                reader.Read(bd, 0, bd.Length);
+                reader.Close();
+                table = new Utils.BlobInt(bt);
+                states = new Utils.BlobUShort(bd);
+            }
+            public ushort GetTerminal(ushort state) { return states.data[table.data[state]]; }
+            public ushort GetTransitionsCount(ushort state) { return states.data[table.data[state] + 1]; }
+            public ushort GetTranstion(ushort state, int index, out ushort begin, out ushort end)
+            {
+                int offset = table.data[state] + 2 + index * 3;
+                begin = states.data[offset];
+                end = states.data[offset + 1];
+                return states.data[offset + 2];
+            }
+        }
 
         /// <summary>
-        /// States of the DFA
+        /// Lexer's automaton
         /// </summary>
-        protected LexerDFAState[] states;
+        protected Automaton lexAutomaton;
         /// <summary>
-        /// Map associating a callback to symbol ids
+        /// The terminals that can be recognized by this lexer
         /// </summary>
-        protected Dictionary<ushort, MatchSubGrammar> subGrammars;
+        protected SymbolTerminal[] lexTerminals;
         /// <summary>
         /// ID of the separator
         /// </summary>
-        protected ushort separatorID;
+        protected ushort lexSeparator;
 
+        /// <summary>
+        /// Error handler
+        /// </summary>
         private OnErrorHandler errorHandler;
         /// <summary>
         /// Lexer's input
         /// </summary>
-        protected BufferedTextReader input;
+        private BufferedTextReader input;
         /// <summary>
         /// Current line number
         /// </summary>
-        protected int currentLine;
+        private int currentLine;
         /// <summary>
         /// Current column number
         /// </summary>
-        protected int currentColumn;
+        private int currentColumn;
         /// <summary>
         /// True if the end of the input has been reached and the dollar token has been emited
         /// </summary>
-        protected bool isDollatEmited;
+        private bool isDollatEmited;
         /// <summary>
         /// Buffer for currently read text
         /// </summary>
-        protected char[] buffer;
+        private char[] buffer;
         /// <summary>
         /// Size of the buffer
         /// </summary>
-        protected int bufferSize;
+        private int bufferSize;
 
         /// <summary>
         /// Gets the text of the input that has already been read
@@ -77,22 +103,33 @@ namespace Hime.Redist.Parsers
         public bool IsAtEnd { get { return input.AtEnd(); } }
 
         /// <summary>
-        /// Sets up the inner data of the lexer
-        /// </summary>
-        protected abstract void setup();
-        /// <summary>
         /// Gets a clone of this lexer
         /// </summary>
         /// <returns>A clone of this lexer</returns>
         public abstract ILexer Clone();
 
+        protected static Automaton FindAutomaton(System.Type type, string resource)
+        {
+            System.Reflection.Assembly assembly = type.Assembly;
+            System.IO.Stream stream = assembly.GetManifestResourceStream(resource);
+            if (stream != null)
+                return new Automaton(stream);
+            string[] resources = assembly.GetManifestResourceNames();
+            foreach (string existing in resources)
+                if (existing.EndsWith(resource))
+                    return new Automaton(assembly.GetManifestResourceStream(existing));
+            return null;
+        }
+
         /// <summary>
         /// Initializes a new instance of the LexerText class with the given input
         /// </summary>
         /// <param name="input">The input as a text reader</param>
-        protected LexerText(System.IO.TextReader input)
+        protected TextLexer(Automaton automaton, SymbolTerminal[] terminals, ushort separator, System.IO.TextReader input)
         {
-            setup();
+            this.lexAutomaton = automaton;
+            this.lexTerminals = terminals;
+            this.lexSeparator = separator;
             this.input = new BufferedTextReader(input);
             this.currentLine = 1;
             this.currentColumn = 1;
@@ -104,9 +141,11 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the LexerText class as a copy of the given lexer
         /// </summary>
         /// <param name="original">The lexer to copy</param>
-        protected LexerText(LexerText original)
+        protected TextLexer(TextLexer original)
         {
-            setup();
+            this.lexAutomaton = original.lexAutomaton;
+            this.lexTerminals = original.lexTerminals;
+            this.lexSeparator = original.lexSeparator;
             this.input = original.input.Clone();
             this.currentLine = original.currentLine;
             this.currentColumn = original.currentColumn;
@@ -153,12 +192,8 @@ namespace Hime.Redist.Parsers
                 else
                 {
                     AdvanceStats(token.ValueText);
-                    if (token.SymbolID != separatorID)
-                    {
-                        if (subGrammars.ContainsKey(token.SymbolID))
-                            token.SubGrammarRoot = subGrammars[token.SymbolID](token.ValueText);
+                    if (token.SymbolID != lexSeparator)
                         return token;
-                    }
                 }
             }
         }
@@ -182,13 +217,14 @@ namespace Hime.Redist.Parsers
             SymbolTerminal matched = null;
             int matchedLength = 0;
             int count = 0;
-            LexerDFAState state = states[0];
+            ushort state = 0;
 
             while (true)
             {
-                if (state.terminal != null)
+                ushort terminal = lexAutomaton.GetTerminal(state);
+                if (terminal != 0xFFFF)
                 {
-                    matched = state.terminal;
+                    matched = lexTerminals[terminal];
                     matchedLength = count;
                 }
                 bool atend = false;
@@ -197,15 +233,20 @@ namespace Hime.Redist.Parsers
                     break;
                 ushort UCV = System.Convert.ToUInt16(c);
                 ushort nextState = 0xFFFF;
-                for (int i = 0; i != state.transitions.Length; i++)
+                ushort nb = lexAutomaton.GetTransitionsCount(state);
+                for (int i = 0; i != nb; i++)
                 {
-                    ushort[] transition = state.transitions[i];
-                    if (UCV >= transition[0] && UCV <= transition[1])
-                        nextState = transition[2];
+                    ushort begin = 0, end = 0, next = 0;
+                    next = lexAutomaton.GetTranstion(state, i, out begin, out end);
+                    if (UCV >= begin && UCV <= end)
+                    {
+                        nextState = next;
+                        break;
+                    }
                 }
                 if (nextState == 0xFFFF)
                     break;
-                state = states[nextState];
+                state = nextState;
                 c = input.Read(out atend);
                 if (count >= bufferSize)
                 {

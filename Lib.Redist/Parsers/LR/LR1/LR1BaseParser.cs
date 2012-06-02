@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the LR1BaseParser class with the given lexer
         /// </summary>
         /// <param name="input">Input lexer</param>
-        public LR1BaseParser(LexerText input) : base(input) { }
+        public LR1BaseParser(ILexer input) : base(input) { }
 
 		/// <summary>
         /// Acts when an unexpected token is encountered
@@ -47,13 +47,13 @@ namespace Hime.Redist.Parsers
 
         private SymbolToken SimpleRecovery_RemoveUnexpected()
         {
-            LexerText TestLexer = lexer.Clone();
+            ILexer copy = lexer.Clone();
             List<ushort> TempStack = new List<ushort>(stack);
             TempStack.Reverse();
             Stack<ushort> TestStack = new Stack<ushort>(TempStack);
-            if (Simulate(TestStack, TestLexer))
+            if (Simulate(TestStack, copy))
             {
-                return lexer.GetNextToken();
+                return copy.GetNextToken();
             }
             return null;
         }
@@ -62,14 +62,14 @@ namespace Hime.Redist.Parsers
         {
             for (int i = 0; i != states[state].expecteds.Length; i++)
             {
-                LexerText TestLexer = (LexerText)lexer.Clone();
+                ILexer copy = lexer.Clone();
                 List<ushort> TempStack = new List<ushort>(stack);
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
                 Inserted.Add(new SymbolTokenText(states[state].expecteds[i].SymbolID, states[state].expecteds[i].Name, string.Empty, lexer.CurrentLine, lexer.CurrentColumn));
                 Inserted.Add(nextToken);
-                if (Simulate(TestStack, TestLexer, Inserted))
+                if (Simulate(TestStack, copy, Inserted))
                 {
                     RunForToken(Inserted[0]);
                     RunForToken(Inserted[1]);
@@ -83,13 +83,13 @@ namespace Hime.Redist.Parsers
         {
             for (int i = 0; i != states[state].expecteds.Length; i++)
             {
-                LexerText TestLexer = (LexerText)lexer.Clone();
+                ILexer copy = lexer.Clone();
                 List<ushort> TempStack = new List<ushort>(stack);
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
                 List<SymbolToken> Inserted = new List<SymbolToken>();
                 Inserted.Add(new SymbolTokenText(states[state].expecteds[i].SymbolID, states[state].expecteds[i].Name, string.Empty, lexer.CurrentLine, lexer.CurrentColumn));
-                if (Simulate(TestStack, TestLexer, Inserted))
+                if (Simulate(TestStack, copy, Inserted))
                 {
                     RunForToken(Inserted[0]);
                     return lexer.GetNextToken();
@@ -98,7 +98,7 @@ namespace Hime.Redist.Parsers
             return null;
         }
 
-        private bool Simulate(Stack<ushort> stack, LexerText lexer, List<SymbolToken> inserted)
+        private bool Simulate(Stack<ushort> stack, ILexer lexer, List<SymbolToken> inserted)
         {
             int InsertedIndex = 0;
             ushort CurrentState = stack.Peek();
@@ -148,8 +148,8 @@ namespace Hime.Redist.Parsers
             }
             return true;
         }
-		
-        private bool Simulate(Stack<ushort> stack, LexerText lexer)
+
+        private bool Simulate(Stack<ushort> stack, ILexer lexer)
         {
             return Simulate(stack, lexer, new List<SymbolToken>());
         }

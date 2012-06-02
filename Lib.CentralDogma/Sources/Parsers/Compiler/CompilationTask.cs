@@ -144,13 +144,16 @@ namespace Hime.Parsers
                 nmspace = Namespace;
 
             // Export lexer
-            StreamWriter stream = OpenOutputStream(lexerFile, nmspace);
-            lexerData.Export(stream, GetLexerName(gname), GeneratedCodeModifier);
-            CloseOutputStream(stream);
+            StreamWriter txtOutput = OpenOutputStream(lexerFile, nmspace);
+            BinaryWriter binOutput = new BinaryWriter(new FileStream(gname + ".lexer", FileMode.Create));
+            lexerData.ExportCode(txtOutput, GetLexerName(gname), GeneratedCodeModifier, gname);
+            lexerData.ExportData(binOutput);
+            CloseOutputStream(txtOutput);
+            binOutput.Close();
             // Export parser
-            stream = OpenOutputStream(parserFile, nmspace);
-            parserData.Export(stream, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected, ExportDebug);
-            CloseOutputStream(stream);
+            txtOutput = OpenOutputStream(parserFile, nmspace);
+            parserData.Export(txtOutput, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected, ExportDebug);
+            CloseOutputStream(txtOutput);
 
             // Export documentation
             if (ExportDocumentation)

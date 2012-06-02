@@ -14,7 +14,7 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public sealed class BufferedTokenReader
     {
-        private LexerText lexer;
+        private ILexer lexer;
         private LinkedList<SymbolToken> readInput;
         private LinkedListNode<SymbolToken> currentNode;
 
@@ -22,7 +22,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the BufferedTokenReader class with the given lexer
         /// </summary>
         /// <param name="lexer">The lexer matching tokens</param>
-        public BufferedTokenReader(LexerText lexer)
+        public BufferedTokenReader(ILexer lexer)
         {
             this.lexer = lexer;
             readInput = new LinkedList<SymbolToken>();
