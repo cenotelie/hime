@@ -64,6 +64,7 @@
     <Compile Include="Parsers\ILexer.cs" />
     <Compile Include="Parsers\LexerDFAState.cs" />
     <Compile Include="Parsers\LexerText.cs" />
+    <Compile Include="Parsers\RewindableTextReader.cs" />
     <Compile Include="Parsers\TextLexer.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\LR\LR0\LR0State.cs" />

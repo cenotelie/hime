@@ -63,7 +63,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Lexer's input
         /// </summary>
-        private BufferedTextReader input;
+        private RewindableTextReader input;
         /// <summary>
         /// Current line number
         /// </summary>
@@ -86,10 +86,6 @@ namespace Hime.Redist.Parsers
         private int bufferSize;
 
         /// <summary>
-        /// Gets the text of the input that has already been read
-        /// </summary>
-        public string InputText { get { return input.GetReadText(); } }
-        /// <summary>
         /// Gets the current line number
         /// </summary>
         public int CurrentLine { get { return currentLine; } }
@@ -97,10 +93,6 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number
         /// </summary>
         public int CurrentColumn { get { return currentColumn; } }
-        /// <summary>
-        /// True if the lexer is at the end of the input
-        /// </summary>
-        public bool IsAtEnd { get { return input.AtEnd(); } }
 
         /// <summary>
         /// Gets a clone of this lexer
@@ -130,26 +122,10 @@ namespace Hime.Redist.Parsers
             this.lexAutomaton = automaton;
             this.lexTerminals = terminals;
             this.lexSeparator = separator;
-            this.input = new BufferedTextReader(input);
+            this.input = new RewindableTextReader(input);
             this.currentLine = 1;
             this.currentColumn = 1;
             this.isDollatEmited = false;
-            this.bufferSize = 100;
-            this.buffer = new char[this.bufferSize];
-        }
-        /// <summary>
-        /// Initializes a new instance of the LexerText class as a copy of the given lexer
-        /// </summary>
-        /// <param name="original">The lexer to copy</param>
-        protected TextLexer(TextLexer original)
-        {
-            this.lexAutomaton = original.lexAutomaton;
-            this.lexTerminals = original.lexTerminals;
-            this.lexSeparator = original.lexSeparator;
-            this.input = original.input.Clone();
-            this.currentLine = original.currentLine;
-            this.currentColumn = original.currentColumn;
-            this.isDollatEmited = original.isDollatEmited;
             this.bufferSize = 100;
             this.buffer = new char[this.bufferSize];
         }
@@ -166,28 +142,25 @@ namespace Hime.Redist.Parsers
         /// <returns>The next token in the input</returns>
         public SymbolToken GetNextToken()
         {
-            if (input.AtEnd())
-            {
-                if (isDollatEmited)
-                    return SymbolTokenEpsilon.Instance;
-                isDollatEmited = true;
-                return SymbolTokenDollar.Instance;
-            }
-
+            if (isDollatEmited)
+                return SymbolTokenEpsilon.Instance;
             while (true)
             {
-                if (input.AtEnd())
-                {
-                    isDollatEmited = true;
-                    return SymbolTokenDollar.Instance;
-                }
                 SymbolTokenText token = GetNextToken_DFA();
                 if (token == null)
                 {
                     bool atend = false;
                     char c = input.Read(out atend);
-                    errorHandler(new UnexpectedCharError(c, currentLine, currentColumn));
-                    AdvanceStats(c.ToString());
+                    if (atend)
+                    {
+                        isDollatEmited = true;
+                        return SymbolTokenDollar.Instance;
+                    }
+                    else
+                    {
+                        errorHandler(new UnexpectedCharError(c, currentLine, currentColumn));
+                        AdvanceStats(c.ToString());
+                    }
                 }
                 else
                 {
@@ -227,18 +200,27 @@ namespace Hime.Redist.Parsers
                     matched = lexTerminals[terminal];
                     matchedLength = count;
                 }
-                bool atend = false;
-                char c = input.Peek(out atend);
-                if (atend)
+                bool endOfInput = false;
+                char current = input.Read(out endOfInput);
+                if (endOfInput)
                     break;
-                ushort UCV = System.Convert.ToUInt16(c);
+                if (count == bufferSize)
+                {
+                    // buffer is too small, create larger buffer
+                    bufferSize *= 2;
+                    char[] temp = new char[bufferSize];
+                    System.Array.Copy(buffer, temp, count);
+                    buffer = temp;
+                }
+                buffer[count] = current;
+                count++;
                 ushort nextState = 0xFFFF;
                 ushort nb = lexAutomaton.GetTransitionsCount(state);
                 for (int i = 0; i != nb; i++)
                 {
                     ushort begin = 0, end = 0, next = 0;
                     next = lexAutomaton.GetTranstion(state, i, out begin, out end);
-                    if (UCV >= begin && UCV <= end)
+                    if (current >= begin && current <= end)
                     {
                         nextState = next;
                         break;
@@ -247,19 +229,7 @@ namespace Hime.Redist.Parsers
                 if (nextState == 0xFFFF)
                     break;
                 state = nextState;
-                c = input.Read(out atend);
-                if (count >= bufferSize)
-                {
-                    // buffer is too small, create larger buffer
-                    bufferSize *= 2;
-                    char[] temp = new char[bufferSize];
-                    System.Array.Copy(buffer, temp, count);
-                    buffer = temp;
-                }
-                buffer[count] = c;
-                count++;
             }
-
             input.Rewind(count - matchedLength);
             if (matched == null)
                 return null;
