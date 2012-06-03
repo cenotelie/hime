@@ -47,7 +47,7 @@ namespace Hime.Redist.Parsers
 
         private SymbolToken SimpleRecovery_RemoveUnexpected()
         {
-            ILexer copy = lexer.Clone();
+            ILexer copy = null;// lexer.Clone();
             List<ushort> TempStack = new List<ushort>(stack);
             TempStack.Reverse();
             Stack<ushort> TestStack = new Stack<ushort>(TempStack);
@@ -62,7 +62,7 @@ namespace Hime.Redist.Parsers
         {
             for (int i = 0; i != states[state].expecteds.Length; i++)
             {
-                ILexer copy = lexer.Clone();
+                ILexer copy = null;// lexer.Clone();
                 List<ushort> TempStack = new List<ushort>(stack);
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);
@@ -83,7 +83,7 @@ namespace Hime.Redist.Parsers
         {
             for (int i = 0; i != states[state].expecteds.Length; i++)
             {
-                ILexer copy = lexer.Clone();
+                ILexer copy = null;//lexer.Clone();
                 List<ushort> TempStack = new List<ushort>(stack);
                 TempStack.Reverse();
                 Stack<ushort> TestStack = new Stack<ushort>(TempStack);

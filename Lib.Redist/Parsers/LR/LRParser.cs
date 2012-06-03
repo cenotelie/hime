@@ -111,7 +111,7 @@ namespace Hime.Redist.Parsers
             this.stack = new Stack<ushort>();
             this.state = 0x0000;
             this.nodes = new LinkedList<SyntaxTreeNode>();
-            this.lexer.SetErrorHandler(new OnErrorHandler(OnLexicalError));
+            //this.lexer.SetErrorHandler(new AddLexicalError(OnLexicalError));
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Hime.Redist.Parsers
                 if (nextToken.SymbolID == 0x0001)
                     return nodes.First.Value.ApplyActions();
 
-				errors.Add(new UnexpectedTokenError(nextToken, GetState(state).expecteds, lexer.CurrentLine, lexer.CurrentColumn));
+				//errors.Add(new UnexpectedTokenError(nextToken, GetState(state).expecteds, lexer.CurrentLine, lexer.CurrentColumn));
                 if (errors.Count >= maxErrorCount)
                     return null;
                 nextToken = OnUnexpectedToken(nextToken);

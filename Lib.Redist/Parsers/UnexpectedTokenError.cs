@@ -32,14 +32,14 @@ namespace Hime.Redist.Parsers
 		/// <param name='expected'>The array of expected terminals</param>
         /// <param name="line">The line number of the token</param>
         /// <param name="column">The column number of the token</param>
-        internal UnexpectedTokenError(SymbolToken token, SymbolTerminal[] expected, int line, int column) : base(line, column)
+        internal UnexpectedTokenError(SymbolToken token, List<SymbolTerminal> expected, int line, int column) : base(line, column)
         {
             this.UnexpectedToken = token;
-            this.ExpectedTerminals = new List<SymbolTerminal>(expected);
+            this.ExpectedTerminals = expected;
             StringBuilder Builder = new StringBuilder("Unexpected token \"");
             Builder.Append(token.Value.ToString());
             Builder.Append("\"; expected: { ");
-            for (int i = 0; i != expected.Length; i++)
+            for (int i = 0; i != expected.Count; i++)
             {
                 if (i != 0) Builder.Append(", ");
                 Builder.Append(expected[i].Name);

@@ -143,7 +143,7 @@ namespace Hime.Redist.Parsers
             this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             this.lexer = input;
             this.nextToken = null;
-            this.lexer.SetErrorHandler(new OnErrorHandler(OnLexicalError));
+            this.lexer.SetErrorHandler(new AddLexicalError(OnLexicalError));
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace Hime.Redist.Parsers
                             }
                         }
                     }
-                    errors.Add(new UnexpectedTokenError(oldtoken, expected.ToArray(), lexer.CurrentLine, lexer.CurrentColumn));
+                    //errors.Add(new UnexpectedTokenError(oldtoken, expected.ToArray(), lexer.CurrentLine, lexer.CurrentColumn));
                     return null;
                 }
                 Ui = Uj;

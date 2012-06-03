@@ -9,23 +9,23 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Specifies the tree action for a given node
     /// </summary>
-    public enum SyntaxTreeNodeAction
+    public enum SyntaxTreeNodeAction : byte
     {
         /// <summary>
         /// Promote the node to the immediately upper level in the tree
         /// </summary>
-        Promote,
+        Promote = 3,
         /// <summary>
         /// Drop the node and all the children from the tree
         /// </summary>
-        Drop,
+        Drop = 2,
         /// <summary>
         /// Replace the node by its children
         /// </summary>
-        Replace,
+        Replace = 1,
         /// <summary>
         /// Default action for a node, do nothing
         /// </summary>
-        Nothing
+        Nothing = 0
     }
 }
