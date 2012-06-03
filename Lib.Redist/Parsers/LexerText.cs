@@ -33,7 +33,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         protected ushort separatorID;
 
-        private OnErrorHandler errorHandler;
+        private AddLexicalError errorHandler;
         /// <summary>
         /// Lexer's input
         /// </summary>
@@ -116,10 +116,14 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
+        /// Events for lexical errors
+        /// </summary>
+        public event AddLexicalError OnError;
+        /// <summary>
         /// Sets the error handler for this lexer
         /// </summary>
         /// <param name="handler"></param>
-        public void SetErrorHandler(OnErrorHandler handler) { this.errorHandler = handler; }
+        public void SetErrorHandler(AddLexicalError handler) { this.errorHandler = handler; }
 
         /// <summary>
         /// Gets the next token in the input

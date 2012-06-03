@@ -8,7 +8,7 @@ namespace Hime.Redist.Parsers
     /// Handler for lexical errors
     /// </summary>
     /// <param name="error">The new error</param>
-    public delegate void OnErrorHandler(ParserError error);
+    public delegate void AddLexicalError(ParserError error);
 
     /// <summary>
     /// Represents a lexer
@@ -16,16 +16,14 @@ namespace Hime.Redist.Parsers
     public interface ILexer
     {
         /// <summary>
-        /// Gets a copy of this lexer in the same state
+        /// Gets the current line number
         /// </summary>
-        /// <returns>A copy of this lexer in the same state</returns>
-        ILexer Clone();
+        int CurrentLine { get; }
 
         /// <summary>
-        /// Sets the error handler for this lexer
+        /// Gets the current column number
         /// </summary>
-        /// <param name="handler">The error handler</param>
-        void SetErrorHandler(OnErrorHandler handler);
+        int CurrentColumn { get; }
 
         /// <summary>
         /// Gets the next token in the input
@@ -34,12 +32,8 @@ namespace Hime.Redist.Parsers
         SymbolToken GetNextToken();
 
         /// <summary>
-        /// Gets the current line number
+        /// Events for lexical errors
         /// </summary>
-        int CurrentLine { get; }
-        /// <summary>
-        /// Gets the current column number
-        /// </summary>
-        int CurrentColumn { get; }
+        event AddLexicalError OnError;
     }
 }

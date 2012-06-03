@@ -64,8 +64,12 @@
     <Compile Include="Parsers\ILexer.cs" />
     <Compile Include="Parsers\LexerDFAState.cs" />
     <Compile Include="Parsers\LexerText.cs" />
+    <Compile Include="Parsers\LR\LRkAutomaton.cs" />
+    <Compile Include="Parsers\LR\LRkParser.cs" />
+    <Compile Include="Parsers\LR\LRkProduction.cs" />
     <Compile Include="Parsers\RewindableTextReader.cs" />
     <Compile Include="Parsers\TextLexer.cs" />
+    <Compile Include="Parsers\TextLexerAutomaton.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\LR\LR0\LR0State.cs" />
     <Compile Include="Parsers\LR\LR1\LR1State.cs" />
@@ -100,6 +104,7 @@
     <Compile Include="Parsers\Symbols\Symbol.cs" />
     <Compile Include="Parsers\LR\RNGLR1\GSSNode.cs" />
     <Compile Include="Utils\MemoryMaps.cs" />
+    <Compile Include="Utils\SIDHashMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
