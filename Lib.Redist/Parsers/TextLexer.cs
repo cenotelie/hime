@@ -8,6 +8,23 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
+    /* Binary data structure of lexers:
+     * uint32: number of entries in the states index table
+     * 
+     * -- states index table
+     * each entry is of the form:
+     * uint32: offset of the state from the beginning of the states table in number of uint16
+     * 
+     * -- states table
+     * each entry is of the form:
+     * uint16: recognized terminal's index
+     * uint16: number of transitions
+     * each transition is of the form:
+     * uint16: start of the range
+     * uint16: end of the range
+     * uint16: next state's index
+     */
+
     /// <summary>
     /// Represents a lexer for a text stream
     /// </summary>
