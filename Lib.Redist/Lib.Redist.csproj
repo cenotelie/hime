@@ -64,15 +64,13 @@
     <Compile Include="Parsers\ILexer.cs" />
     <Compile Include="Parsers\LexerDFAState.cs" />
     <Compile Include="Parsers\LexerText.cs" />
-    <Compile Include="Parsers\LR\LRkAutomaton.cs" />
-    <Compile Include="Parsers\LR\LRkParser.cs" />
-    <Compile Include="Parsers\LR\LRkProduction.cs" />
+    <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
+    <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
+    <Compile Include="Parsers\LR\LRk\LRkProduction.cs" />
     <Compile Include="Parsers\RewindableTextReader.cs" />
     <Compile Include="Parsers\TextLexer.cs" />
     <Compile Include="Parsers\TextLexerAutomaton.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
-    <Compile Include="Parsers\LR\LR0\LR0State.cs" />
-    <Compile Include="Parsers\LR\LR1\LR1State.cs" />
     <Compile Include="Parsers\LR\LRParser.cs" />
     <Compile Include="Parsers\LR\LRReduction.cs" />
     <Compile Include="Parsers\LR\LRRule.cs" />
@@ -94,15 +92,13 @@
     <Compile Include="Parsers\BufferedTextReader.cs" />
     <Compile Include="Parsers\BufferedTokenReader.cs" />
     <Compile Include="Parsers\IParser.cs" />
-    <Compile Include="Parsers\LR\LR0\LR0BaseParser.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
-    <Compile Include="Parsers\LR\RNGLR1\ParserRNGLR1.cs" />
-    <Compile Include="Parsers\LR\LR1\LR1BaseParser.cs" />
+    <Compile Include="Parsers\LR\RNGLR\ParserRNGLR1.cs" />
     <Compile Include="Parsers\SyntaxNodes\SyntaxTreeNodeAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\SyntaxNodes\SPPFNode.cs" />
     <Compile Include="Parsers\Symbols\Symbol.cs" />
-    <Compile Include="Parsers\LR\RNGLR1\GSSNode.cs" />
+    <Compile Include="Parsers\LR\RNGLR\GSSNode.cs" />
     <Compile Include="Utils\MemoryMaps.cs" />
     <Compile Include="Utils\SIDHashMap.cs" />
   </ItemGroup>

@@ -29,6 +29,8 @@ namespace Hime.Redist.Parsers.LR
          * Each shift is of the form:
          * uint16: =2
          * uint16: new state
+         * 
+         * -- productions table
          */
 
         private ushort ncols;
