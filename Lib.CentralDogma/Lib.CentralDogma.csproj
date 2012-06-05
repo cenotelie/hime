@@ -117,11 +117,10 @@
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LALR1\StateReductionsLALR1.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LR0\ItemLR0.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LR0\MethodLR0.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\LR0\ParserDataLR0.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LR0\StateReductionsLR0.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LR1\ItemLR1.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LR1\MethodLR1.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\LR1\ParserDataLR1.cs" />
+    <Compile Include="Sources\Parsers\GrammarsCF_LR\LR1\ParserDataLRk.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LR1\StateReductionsLR1.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LRStar\DeciderLRStar.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\LRStar\DeciderStateLRStar.cs" />

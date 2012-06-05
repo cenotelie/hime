@@ -22,7 +22,7 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		protected override ParserData BuildParserData (CFGrammar grammar)
 		{
-			return new ParserDataLR1(this.reporter, grammar, this.graph);
+			return new ParserDataLRk(this.reporter, grammar, this.graph);
 		}
 		
 		// TODO: try to remove static methods

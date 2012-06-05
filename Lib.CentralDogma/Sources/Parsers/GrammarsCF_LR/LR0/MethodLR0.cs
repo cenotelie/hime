@@ -22,7 +22,7 @@ namespace Hime.Parsers.ContextFree.LR
 		
 		protected override ParserData BuildParserData (CFGrammar grammar)
 		{
-			return new ParserDataLR0(this.reporter, grammar, this.graph);
+			return new ParserDataLRk(this.reporter, grammar, this.graph);
 		}
 
         public static Graph ConstructGraph(CFGrammar Grammar)

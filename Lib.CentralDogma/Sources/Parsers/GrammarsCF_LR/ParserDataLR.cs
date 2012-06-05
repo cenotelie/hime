@@ -22,13 +22,14 @@ namespace Hime.Parsers.ContextFree.LR
         internal protected Graph graph;
         internal protected List<Terminal> terminals;
         internal protected List<Variable> variables;
+        internal protected List<Virtual> virtuals;
+        internal protected List<Action> actions;
         internal protected List<Rule> rules;
         internal protected string terminalsAccessor;
-        internal protected bool debug;
 
         internal protected ICollection<Rule> GrammarRules { get { return rules; } }
         internal protected string IndexOfRule(Rule rule) 
-		{ 
+		{
 			return "0x" + rules.IndexOf(rule).ToString("X"); 
 		}
 		
@@ -44,31 +45,88 @@ namespace Hime.Parsers.ContextFree.LR
             this.grammar = gram;
             this.graph = graph;
             this.variables = new List<Variable>(gram.Variables);
+            this.virtuals = new List<Virtual>(gram.Virtuals);
+            this.actions = new List<Action>(gram.Actions);
             this.rules = new List<Rule>(this.grammar.Rules);
         }
 
 		// TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
-        public void Export(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, bool exportDebug)
+        public void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, string resource)
 		{
 	        this.terminals = new List<Terminal>(expected);
-            this.debug = exportDebug;
-            this.terminalsAccessor = lexerClassName + ".terminals";
-
+            
 			stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
             stream.WriteLine("    {");
+            ExportAutomaton(stream, className, resource);
             ExportVariables(stream);
-            foreach (CFRule rule in this.GrammarRules) ExportProduction(stream, rule, className);
-            ExportRules(stream);
-            ExportAdditionalStaticElements(stream, className);
-			ExportStates(stream);
+            ExportVirtuals(stream);
             ExportActions(stream);
-            ExportSetup(stream);
+            ExportActionsClass(stream);
+            ExportActionHooks(stream);
             ExportConstructor(stream, className, lexerClassName);
-			// TODO: try to get rid of this method
-			ExportAdditionalElements(stream, className);
-						
 			stream.WriteLine("    }");
 		}
+
+        public void ExportData(BinaryWriter stream)
+        {
+            List<Rule> rules = new List<Rule>(grammar.Rules);
+            stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
+            stream.Write((ushort)graph.States.Count);                   // Nb or rows
+            stream.Write((ushort)rules.Count);                          // Nb or productions
+
+            foreach (Terminal t in terminals)
+                stream.Write(t.SID);
+            foreach (Variable var in variables)
+                stream.Write(var.SID);
+            ExportDataTable(stream);
+            foreach (Rule rule in rules)
+                ExportProduction(stream, rule);
+        }
+
+        protected abstract void ExportDataTable(BinaryWriter stream);
+
+        protected void ExportProduction(BinaryWriter stream, Rule rule)
+        {
+            stream.Write((ushort)variables.IndexOf(rule.Head));
+            if (rule.ReplaceOnProduction) stream.Write((byte)1);
+            else stream.Write((byte)0);
+            stream.Write((byte)(rule as CFRule).CFBody.GetChoiceAt(0).Length);
+            byte length = 0;
+            foreach (RuleBodyElement elem in rule.Body.Parts)
+            {
+                if (elem.Symbol is Virtual || elem.Symbol is Action)
+                    length += 4;
+                else
+                    length += 2;
+            }
+            stream.Write(length);
+            foreach (RuleBodyElement elem in rule.Body.Parts)
+            {
+                if (elem.Symbol is Virtual)
+                {
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)6);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)7);
+                    else stream.Write((ushort)4);
+                    stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
+                }
+                else if (elem.Symbol is Action)
+                {
+                    stream.Write((ushort)8);
+                    stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
+                }
+                else
+                {
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)2);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)3);
+                    else stream.Write((ushort)0);
+                }
+            }
+        }
+
+        protected virtual void ExportAutomaton(StreamWriter stream, string className, string resource)
+        {
+            stream.WriteLine("        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(" + className + ").Assembly, \"" + resource + ".parser\");");
+        }
 
         protected void ExportVariables(StreamWriter stream)
         {
@@ -83,78 +141,65 @@ namespace Hime.Parsers.ContextFree.LR
             }
             stream.WriteLine(" };");
         }
-		
-		protected abstract void ExportRules(StreamWriter stream);
-		protected abstract void ExportStates(StreamWriter stream);
-		protected abstract void ExportActions(StreamWriter stream);
-		protected abstract void ExportSetup(StreamWriter stream);
-		
-		// TODO: try to get rid of this method
-        protected virtual void ExportAdditionalStaticElements(StreamWriter stream, string className) { }
-        // TODO: try to get rid of this method
-		protected virtual void ExportAdditionalElements(StreamWriter stream, string className) { }
-			
-        private void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
+
+        protected void ExportVirtuals(StreamWriter stream)
+        {
+            stream.WriteLine("        public static readonly SymbolVirtual[] variables = {");
+            bool first = true;
+            foreach (Virtual v in virtuals)
+            {
+                if (!first) stream.WriteLine(", ");
+                stream.Write("            ");
+                stream.Write("new SymbolVirtual(\"" + v.Name + "\")");
+                first = false;
+            }
+            stream.WriteLine(" };");
+        }
+
+        protected void ExportActions(StreamWriter stream)
+        {
+            stream.WriteLine("        public static readonly SemanticAction[] actions = {");
+            bool first = true;
+            foreach (Action action in actions)
+            {
+                if (!first) stream.WriteLine(", ");
+                stream.Write("            ");
+                stream.Write("new SemanticAction(" + action.Name + ")");
+                first = false;
+            }
+            stream.WriteLine(" };");
+        }
+
+        protected virtual void ExportActionsClass(StreamWriter stream)
+        {
+            if (actions.Count == 0)
+                return;
+            stream.WriteLine("        public interface Actions");
+            stream.WriteLine("        {");
+            foreach (Action action in actions)
+                stream.WriteLine("           void " + action.Name + "(SyntaxTreeNode sub);");
+            stream.WriteLine("        }");
+            stream.WriteLine("        private Actions userActions;");
+        }
+
+        protected virtual void ExportActionHooks(StreamWriter stream)
+        {
+            foreach (Action action in actions)
+                stream.WriteLine("        private void " + action.Name + "(SyntaxTreeNode sub) { this.userActions." + action.Name + "(sub); }");
+        }
+
+        protected virtual void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
         {
             string argument = "";
             string body = "";
-            if (this.GrammarActions.GetEnumerator().MoveNext())
+            if (actions.Count != 0)
             {
-                stream.WriteLine("        private Actions actions;");
-                argument = ", Actions actions";
-                body = "this.actions = actions;";
+                argument = ", Actions acts";
+                body = "this.userActions = acts;";
             }
-            stream.WriteLine("        public " + className + "(" + lexerClassName + " lexer" + argument + ") : base (lexer) { " + body + " }");
+            stream.WriteLine("        public " + className + "(" + lexerClassName + " lexer" + argument + ") : base (automaton, variables, virtuals, actions, lexer) { " + body + " }");
         }
-		
-		protected virtual void ExportProduction(StreamWriter stream, CFRule rule, string className)
-		{
-            int length = rule.CFBody.GetChoiceAt(0).Length;
-            stream.WriteLine("        private static SyntaxTreeNode Production_" + rule.Head.SID.ToString("X") + "_" + rule.ID.ToString("X") + " (LRParser baseParser)");
-            stream.WriteLine("        {");
-            if (length != 0)
-            {
-				stream.WriteLine("            " + className + " parser = baseParser as " + className + ";");
-                stream.WriteLine("            LinkedListNode<SyntaxTreeNode> current = parser.nodes.Last;");
-                stream.WriteLine("            LinkedListNode<SyntaxTreeNode> temp = null;");
-                for (int i = 1; i != length; i++)
-                    stream.WriteLine("            current = current.Previous;");
-            }
-            stream.Write("            SyntaxTreeNode root = new SyntaxTreeNode(variables[" + this.variables.IndexOf(rule.Head) + "]");
-            if (rule.ReplaceOnProduction)
-                stream.WriteLine(", SyntaxTreeNodeAction.Replace);");
-            else
-                stream.WriteLine(");");
-
-		    foreach (RuleBodyElement part in rule.CFBody.Parts)
-            {
-                if (part.Symbol is Action)
-                {
-                    Action action = (Action)part.Symbol;
-                    stream.WriteLine("            parser.actions." + action.Name + "(root);");
-                }
-                else if (part.Symbol is Virtual)
-                    stream.WriteLine("            root.AppendChild(new SyntaxTreeNode(new SymbolVirtual(\"" + part.Symbol.Name + "\"), SyntaxTreeNodeAction." + part.Action.ToString() + "));");
-                else if (part.Symbol is Terminal || part.Symbol is Variable)
-                {
-                    if (part.Action != RuleBodyElementAction.Drop)
-                    {
-                        stream.Write("            root.AppendChild(current.Value");
-                        if (part.Action != RuleBodyElementAction.Nothing)
-                            stream.WriteLine(", SyntaxTreeNodeAction." + part.Action.ToString() + ");");
-                        else
-                            stream.WriteLine(");");
-                    }
-                    stream.WriteLine("            temp = current.Next;");
-                    stream.WriteLine("            parser.nodes.Remove(current);");
-                    stream.WriteLine("            current = temp;");
-                }
-            }
-
-            stream.WriteLine("            return root;");
-            stream.WriteLine("        }");
-		}
-		
+        
 		// TODO: this method could be factored more (look at the similar code)
         public void Document(string directory, bool exportVisuals, string dotBin)
         {

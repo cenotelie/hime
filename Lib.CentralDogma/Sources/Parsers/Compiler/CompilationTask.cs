@@ -152,8 +152,11 @@ namespace Hime.Parsers
             binOutput.Close();
             // Export parser
             txtOutput = OpenOutputStream(parserFile, nmspace);
-            parserData.Export(txtOutput, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected, ExportDebug);
+            binOutput = new BinaryWriter(new FileStream(gname + ".parser", FileMode.Create));
+            parserData.ExportCode(txtOutput, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected, gname);
+            parserData.ExportData(binOutput);
             CloseOutputStream(txtOutput);
+            binOutput.Close();
 
             // Export documentation
             if (ExportDocumentation)
