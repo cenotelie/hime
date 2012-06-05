@@ -99,11 +99,6 @@
     <Compile Include="Sources\Parsers\GrammarsCF_LR\Conflict.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\ConflictExample.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\ConflictType.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\GLALR1\MethodGLALR1.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\GLALR1\StateReductionsGLALR1.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\GLR1\MethodGLR1.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\GLR1\ParserDataGLR1.cs" />
-    <Compile Include="Sources\Parsers\GrammarsCF_LR\GLR1\StateReductionsGLR1.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\GLRSimulator.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\GLRSimulatorState.cs" />
     <Compile Include="Sources\Parsers\GrammarsCF_LR\GLRStackNode.cs" />

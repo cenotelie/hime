@@ -17,27 +17,27 @@ namespace Hime.Parsers.ContextFree.LR
 {
     abstract class ParserDataLR : ParserData
     {
-        internal protected Reporter reporter;
-        internal protected CFGrammar grammar;
-        internal protected Graph graph;
-        internal protected List<Terminal> terminals;
-        internal protected List<Variable> variables;
-        internal protected List<Virtual> virtuals;
-        internal protected List<Action> actions;
-        internal protected List<Rule> rules;
-        internal protected string terminalsAccessor;
+        protected Reporter reporter;
+        protected CFGrammar grammar;
+        protected Graph graph;
+        protected List<Terminal> terminals;
+        protected List<Variable> variables;
+        protected List<Virtual> virtuals;
+        protected List<Action> actions;
+        protected List<Rule> rules;
+        protected string terminalsAccessor;
 
-        internal protected ICollection<Rule> GrammarRules { get { return rules; } }
-        internal protected string IndexOfRule(Rule rule) 
+        protected ICollection<Rule> GrammarRules { get { return rules; } }
+        protected string IndexOfRule(Rule rule) 
 		{
 			return "0x" + rules.IndexOf(rule).ToString("X"); 
 		}
 		
-        internal protected ICollection<Action> GrammarActions { get { return grammar.Actions; } }
-        internal protected CFVariable GetVariable(string name) { return grammar.GetVariable(name) as CFVariable; }
-        internal protected string GetOption(string name) { return this.grammar.GetOption(name); }
+        protected ICollection<Action> GrammarActions { get { return grammar.Actions; } }
+        protected CFVariable GetVariable(string name) { return grammar.GetVariable(name) as CFVariable; }
+        protected string GetOption(string name) { return this.grammar.GetOption(name); }
         
-		internal abstract protected string GetBaseClassName { get; }
+		abstract protected string GetBaseClassName { get; }
 		
         public ParserDataLR(Reporter reporter, CFGrammar gram, Graph graph)
         {
