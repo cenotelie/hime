@@ -54,7 +54,7 @@ namespace Hime.Redist.Parsers
         {
             ring[ringNextEntry] = value;
             ringNextEntry++;
-            if (ringNextEntry == ring.Length)
+            if (ringNextEntry == bufferInitSize)
                 ringNextEntry = 0;
             ringStart = ringNextEntry;
         }
@@ -76,19 +76,16 @@ namespace Hime.Redist.Parsers
             {
                 bufferSize = reader.Read(buffer, 0, buffer.Length);
                 bufferStart = 0;
+                if (bufferSize == 0)
+                {
+                    atEnd = true;
+                    return char.MinValue;
+                }
             }
-            if (bufferStart == bufferSize)
-            {
-                atEnd = true;
-                return char.MinValue;
-            }
-            else
-            {
-                atEnd = false;
-                char value = buffer[bufferStart];
-                bufferStart++;
-                return value;
-            }
+            atEnd = false;
+            char value = buffer[bufferStart];
+            bufferStart++;
+            return value;
         }
 
         /// <summary>

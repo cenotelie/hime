@@ -65,14 +65,15 @@ namespace Hime.Redist.Parsers
         /// <param name="assembly">The assembly containing the automaton definition</param>
         /// <param name="resource">The resource's name</param>
         /// <returns></returns>
-        public static LRkAutomaton FindAutomaton(System.Reflection.Assembly assembly, string resource)
+        public static LRkAutomaton FindAutomaton(System.Type type)
         {
-            System.IO.Stream stream = assembly.GetManifestResourceStream(resource);
+            System.Reflection.Assembly assembly = type.Assembly;
+            System.IO.Stream stream = assembly.GetManifestResourceStream(type.Name);
             if (stream != null)
                 return new LRkAutomaton(stream);
             string[] resources = assembly.GetManifestResourceNames();
             foreach (string existing in resources)
-                if (existing.EndsWith(resource))
+                if (existing.EndsWith(type.Name))
                     return new LRkAutomaton(assembly.GetManifestResourceStream(existing));
             return null;
         }
@@ -103,7 +104,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public List<ushort> GetExpected(ushort state)
+        public List<SymbolTerminal> GetExpected(ushort state)
         {
             return null;
         }
