@@ -51,13 +51,13 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
 		// TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
-        public void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, string resource)
+        public void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected)
 		{
 	        this.terminals = new List<Terminal>(expected);
             
 			stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
             stream.WriteLine("    {");
-            ExportAutomaton(stream, className, resource);
+            ExportAutomaton(stream, className);
             ExportVariables(stream);
             ExportVirtuals(stream);
             ExportActions(stream);
@@ -123,9 +123,9 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-        protected virtual void ExportAutomaton(StreamWriter stream, string className, string resource)
+        protected virtual void ExportAutomaton(StreamWriter stream, string className)
         {
-            stream.WriteLine("        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(" + className + ").Assembly, \"" + resource + ".parser\");");
+            stream.WriteLine("        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(" + className + "));");
         }
 
         protected void ExportVariables(StreamWriter stream)
@@ -144,7 +144,7 @@ namespace Hime.Parsers.ContextFree.LR
 
         protected void ExportVirtuals(StreamWriter stream)
         {
-            stream.WriteLine("        public static readonly SymbolVirtual[] virtuals = {");
+            stream.WriteLine("        private static readonly SymbolVirtual[] virtuals = {");
             bool first = true;
             foreach (Virtual v in virtuals)
             {
@@ -158,13 +158,23 @@ namespace Hime.Parsers.ContextFree.LR
 
         protected void ExportActions(StreamWriter stream)
         {
-            stream.WriteLine("        public static readonly SemanticAction[] actions = {");
+            stream.WriteLine("        private static readonly ParserAction[] pactions = {");
             bool first = true;
             foreach (Action action in actions)
             {
                 if (!first) stream.WriteLine(", ");
                 stream.Write("            ");
-                stream.Write("new SemanticAction(" + action.Name + ")");
+                stream.Write("new ParserAction(Parser" + action.Name + ")");
+                first = false;
+            }
+            stream.WriteLine(" };");
+            stream.WriteLine("        private static readonly RecognizerAction[] ractions = {");
+            first = true;
+            foreach (Action action in actions)
+            {
+                if (!first) stream.WriteLine(", ");
+                stream.Write("            ");
+                stream.Write("new RecognizerAction(Recognizer" + action.Name + ")");
                 first = false;
             }
             stream.WriteLine(" };");
@@ -174,18 +184,26 @@ namespace Hime.Parsers.ContextFree.LR
         {
             if (actions.Count == 0)
                 return;
-            stream.WriteLine("        public interface Actions");
+            stream.WriteLine("        public interface ParserActions");
             stream.WriteLine("        {");
             foreach (Action action in actions)
-                stream.WriteLine("           void " + action.Name + "(SyntaxTreeNode sub);");
+                stream.WriteLine("           void " + action.Name + "(CSTNode sub);");
             stream.WriteLine("        }");
-            stream.WriteLine("        private Actions userActions;");
+            stream.WriteLine("        public interface RecognizerActions");
+            stream.WriteLine("        {");
+            foreach (Action action in actions)
+                stream.WriteLine("           void " + action.Name + "(Symbol[] body, int length);");
+            stream.WriteLine("        }");
+            stream.WriteLine("        private ParserActions userPActions;");
+            stream.WriteLine("        private RecognizerActions userRActions;");
         }
 
         protected virtual void ExportActionHooks(StreamWriter stream)
         {
             foreach (Action action in actions)
-                stream.WriteLine("        private void " + action.Name + "(SyntaxTreeNode sub) { this.userActions." + action.Name + "(sub); }");
+                stream.WriteLine("        private void Parser" + action.Name + "(SyntaxTreeNode sub) { this.userPActions." + action.Name + "(sub); }");
+            foreach (Action action in actions)
+                stream.WriteLine("        private void Recognizer" + action.Name + "(Symbol[] body, int length) { this.userRActions." + action.Name + "(body, length); }");
         }
 
         protected virtual void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
@@ -194,10 +212,10 @@ namespace Hime.Parsers.ContextFree.LR
             string body = "";
             if (actions.Count != 0)
             {
-                argument = ", Actions acts";
-                body = "this.userActions = acts;";
+                argument = ", ParserActions pacts, RecognizerActions racts";
+                body = "this.userPActions = acts; this.userRActions = racts;";
             }
-            stream.WriteLine("        public " + className + "(" + lexerClassName + " lexer" + argument + ") : base (automaton, variables, virtuals, actions, lexer) { " + body + " }");
+            stream.WriteLine("        public " + className + "(" + lexerClassName + " lexer" + argument + ") : base (automaton, variables, virtuals, pactions, ractions, lexer) { " + body + " }");
         }
         
 		// TODO: this method could be factored more (look at the similar code)

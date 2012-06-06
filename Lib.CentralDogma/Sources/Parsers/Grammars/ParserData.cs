@@ -13,7 +13,7 @@ namespace Hime.Parsers
 {
     interface ParserData
     {
-        void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected, string resource);
+        void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected);
         void ExportData(BinaryWriter stream);
         void Document(string directory, bool exportVisuals, string dotBin);
     }

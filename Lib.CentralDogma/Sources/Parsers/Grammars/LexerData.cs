@@ -14,7 +14,7 @@ namespace Hime.Parsers
     interface LexerData
     {
         IList<Terminal> Expected { get; }
-        void ExportCode(StreamWriter codeStream, string className, AccessModifier modifier, string resource);
+        void ExportCode(StreamWriter codeStream, string className, AccessModifier modifier);
         void ExportData(BinaryWriter dataStream);
     }
 }

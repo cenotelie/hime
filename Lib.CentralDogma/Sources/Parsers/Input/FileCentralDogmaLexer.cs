@@ -10,7 +10,7 @@ namespace Hime.Parsers.Input
 {
     public class FileCentralDogmaLexer : TextLexer
     {
-        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(FileCentralDogmaLexer).Assembly, "FileCentralDogma.lexer");
+        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(FileCentralDogmaLexer));
         public static readonly SymbolTerminal[] terminals = {
             new SymbolTerminal(0x1, "ε"),
             new SymbolTerminal(0x2, "$"),

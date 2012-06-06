@@ -128,8 +128,8 @@ namespace Hime.Parsers
 
             // Build names
             string gname = grammar.Name;
-            string lexerFile = GetLexerName(gname) + ".cs";
-            string parserFile = GetParserName(gname) + ".cs";
+            string lexerFile = GetLexerName(gname);
+            string parserFile = GetParserName(gname);
             if (LexerFile != null)
                 lexerFile = LexerFile;
             if (ParserFile != null)
@@ -143,24 +143,41 @@ namespace Hime.Parsers
             if (Namespace != null)
                 nmspace = Namespace;
 
-            // Export lexer
-            StreamWriter txtOutput = OpenOutputStream(lexerFile, nmspace);
-            BinaryWriter binOutput = new BinaryWriter(new FileStream(gname + ".lexer", FileMode.Create));
-            lexerData.ExportCode(txtOutput, GetLexerName(gname), GeneratedCodeModifier, gname);
+            // Export lexer code
+            reporter.Info("Compiler", "Exporting lexer code at " + lexerFile + ".cs ...");
+            StreamWriter txtOutput = OpenOutputStream(lexerFile + ".cs", nmspace);
+            lexerData.ExportCode(txtOutput, GetLexerName(gname), GeneratedCodeModifier);
+            CloseOutputStream(txtOutput);
+            reporter.Info("Compiler", "Done!");
+            
+            // Export lexer data
+            reporter.Info("Compiler", "Exporting lexer data at " + lexerFile + " ...");
+            BinaryWriter binOutput = new BinaryWriter(new FileStream(lexerFile, FileMode.Create));
             lexerData.ExportData(binOutput);
-            CloseOutputStream(txtOutput);
             binOutput.Close();
-            // Export parser
-            txtOutput = OpenOutputStream(parserFile, nmspace);
-            binOutput = new BinaryWriter(new FileStream(gname + ".parser", FileMode.Create));
-            parserData.ExportCode(txtOutput, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected, gname);
-            parserData.ExportData(binOutput);
+            reporter.Info("Compiler", "Done!");
+            
+            // Export parser code
+            reporter.Info("Compiler", "Exporting parser data at " + parserFile + ".cs ...");
+            txtOutput = OpenOutputStream(parserFile + ".cs", nmspace);
+            parserData.ExportCode(txtOutput, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected);
             CloseOutputStream(txtOutput);
-            binOutput.Close();
+            reporter.Info("Compiler", "Done!");
 
+            // Export parser data
+            reporter.Info("Compiler", "Exporting parser data at " + parserFile + " ...");
+            binOutput = new BinaryWriter(new FileStream(parserFile, FileMode.Create));
+            parserData.ExportData(binOutput);
+            binOutput.Close();
+            reporter.Info("Compiler", "Done!");
+            
             // Export documentation
             if (ExportDocumentation)
+            {
+                reporter.Info("Compiler", "Exporting parser documentation at " + GetDocumentationName(gname));
                 parserData.Document(GetDocumentationName(gname), ExportVisuals, DOTBinary);
+                reporter.Info("Compiler", "Done!");
+            }
             return gname;
         }
 

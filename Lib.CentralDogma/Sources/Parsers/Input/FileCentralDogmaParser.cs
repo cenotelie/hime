@@ -10,7 +10,7 @@ namespace Hime.Parsers.Input
 {
     public class FileCentralDogmaParser : LRkParser
     {
-        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(FileCentralDogmaParser).Assembly, "FileCentralDogma.parser");
+        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(FileCentralDogmaParser));
         public static readonly SymbolVariable[] variables = {
             new SymbolVariable(0x2E, "option"), 
             new SymbolVariable(0x2F, "terminal_def_atom_any"), 
@@ -50,34 +50,36 @@ namespace Hime.Parsers.Input
             new SymbolVariable(0x51, "grammar_cf_rules"), 
             new SymbolVariable(0x52, "grammar_parency"), 
             new SymbolVariable(0x53, "cf_grammar"), 
-            new SymbolVariable(0x54, "_v1A2BC310"), 
-            new SymbolVariable(0x55, "_v7DCA46E6"), 
-            new SymbolVariable(0x56, "_v5CCB50B4"), 
-            new SymbolVariable(0x57, "_v517BB31C"), 
-            new SymbolVariable(0x58, "_v2340D992"), 
-            new SymbolVariable(0x59, "_v5B31890E"), 
-            new SymbolVariable(0x5A, "_v6E391A1C"), 
-            new SymbolVariable(0x5B, "_v22628D03"), 
-            new SymbolVariable(0x5C, "_v59C95C4D"), 
-            new SymbolVariable(0x5D, "_v1602712B"), 
-            new SymbolVariable(0x5E, "_v5E24CDEC"), 
-            new SymbolVariable(0x5F, "_v7E47B10"), 
+            new SymbolVariable(0x54, "_v56B23039"), 
+            new SymbolVariable(0x55, "_v754C29F7"), 
+            new SymbolVariable(0x56, "_v118A2E7F"), 
+            new SymbolVariable(0x57, "_v77ADD2DA"), 
+            new SymbolVariable(0x58, "_vB82F485"), 
+            new SymbolVariable(0x59, "_v6DFC6F07"), 
+            new SymbolVariable(0x5A, "_v7C68EB2B"), 
+            new SymbolVariable(0x5B, "_vC1CF708"), 
+            new SymbolVariable(0x5C, "_v7683BD4"), 
+            new SymbolVariable(0x5D, "_v7AF69AF6"), 
+            new SymbolVariable(0x5E, "_vF7064F8"), 
+            new SymbolVariable(0x5F, "_v32249C11"), 
             new SymbolVariable(0x63, "cs_rule_context"), 
             new SymbolVariable(0x64, "cs_rule_template"), 
             new SymbolVariable(0x65, "cs_rule_simple"), 
             new SymbolVariable(0x66, "grammar_cs_rules"), 
             new SymbolVariable(0x67, "cs_grammar"), 
-            new SymbolVariable(0x68, "_v53A85F42"), 
+            new SymbolVariable(0x68, "_v14511847"), 
             new SymbolVariable(0x69, "file_item"), 
             new SymbolVariable(0x6A, "file"), 
-            new SymbolVariable(0x6B, "_v264FE7C7"), 
+            new SymbolVariable(0x6B, "_v290B9CBC"), 
             new SymbolVariable(0x6C, "_Axiom_") };
-        public static readonly SymbolVirtual[] virtuals = {
+        private static readonly SymbolVirtual[] virtuals = {
             new SymbolVirtual("range"), 
             new SymbolVirtual("concat"), 
             new SymbolVirtual("emptypart") };
-        public static readonly SemanticAction[] actions = {
+        private static readonly ParserAction[] pactions = {
  };
-        public FileCentralDogmaParser(FileCentralDogmaLexer lexer) : base (automaton, variables, virtuals, actions, lexer) {  }
+        private static readonly RecognizerAction[] ractions = {
+ };
+        public FileCentralDogmaParser(FileCentralDogmaLexer lexer) : base (automaton, variables, virtuals, pactions, ractions, lexer) {  }
     }
 }

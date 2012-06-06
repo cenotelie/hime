@@ -34,11 +34,11 @@ namespace Hime.Parsers
             }
         }
 
-        public void ExportCode(StreamWriter codeStream, string className, AccessModifier modifier, string resource)
+        public void ExportCode(StreamWriter codeStream, string className, AccessModifier modifier)
         {
             codeStream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : TextLexer");
             codeStream.WriteLine("    {");
-            ExportStatics(codeStream, className, resource);
+            ExportStatics(codeStream, className);
             ExportConstructor(codeStream, className);
             codeStream.WriteLine("    }");
         }
@@ -54,9 +54,9 @@ namespace Hime.Parsers
             stream.WriteLine("        public " + className + "(string input) : base(automaton, terminals, 0x" + sep + ", new System.IO.StringReader(input)) {}");
             stream.WriteLine("        public " + className + "(System.IO.TextReader input) : base(automaton, terminals, 0x" + sep + ", input) {}");
         }
-        private void ExportStatics(StreamWriter stream, string className, string resource)
+        private void ExportStatics(StreamWriter stream, string className)
         {
-            stream.WriteLine("        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(" + className + ").Assembly, \"" + resource + ".lexer\");");
+            stream.WriteLine("        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(" + className + "));");
             stream.WriteLine("        public static readonly SymbolTerminal[] terminals = {");
             bool first = true;
             foreach (Terminal terminal in terminals)
