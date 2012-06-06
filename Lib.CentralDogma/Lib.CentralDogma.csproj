@@ -211,6 +211,8 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Sources\Parsers\Input\FileCentralDogma.gram" />
+    <EmbeddedResource Include="Sources\Parsers\Input\FileCentralDogma.lexer" />
+    <EmbeddedResource Include="Sources\Parsers\Input\FileCentralDogma.parser" />
     <None Include="Sources\Parsers\Input\generate.bat" />
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a base for all LR(k) parsers
     /// </summary>
-    public abstract class LRkParser
+    public abstract class LRkParser : IParser
     {
         /// <summary>
         /// Maximal size of the stack
@@ -191,6 +191,11 @@ namespace Hime.Redist.Parsers
                             ushort index = production.Bytecode[i + 1];
                             sub.AppendChild(new SyntaxTreeNode(parserVirtuals[index], (SyntaxTreeNodeAction)(op - 4)));
                             i++;
+                        }
+                        else if (op == 0)
+                        {
+                            sub.AppendChild(nodes[head + count + 1]);
+                            count++;
                         }
                         else
                         {
