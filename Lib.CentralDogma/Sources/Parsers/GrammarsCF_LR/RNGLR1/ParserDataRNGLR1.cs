@@ -13,9 +13,8 @@ namespace Hime.Parsers.ContextFree.LR
 {
     class ParserDataRNGLR1 : ParserDataLR
     {
-		internal protected override string GetBaseClassName {
-			get { return "BaseRNGLR1Parser"; }
-		}
+		protected override string GetBaseClassName { get { return "BaseRNGLR1Parser"; } }
+
         protected List<Variable> nullableVars;
         protected List<CFRuleBody> nullableChoices;
 
@@ -24,6 +23,11 @@ namespace Hime.Parsers.ContextFree.LR
         {
             nullableVars = new List<Variable>();
             nullableChoices = new List<CFRuleBody>();
+        }
+
+        protected override void ExportDataTable(BinaryWriter stream)
+        {
+            throw new NotImplementedException();
         }
 
         private void DetermineNullables()
@@ -46,7 +50,7 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-        protected override void ExportAdditionalStaticElements(StreamWriter stream, string className)
+        /*protected override void ExportAdditionalStaticElements(StreamWriter stream, string className)
         {
             DetermineNullables();
             Export_NullVars(stream);
@@ -344,6 +348,6 @@ namespace Hime.Parsers.ContextFree.LR
                 }
             }
             stream.WriteLine("        }");
-        }
+        }*/
     }
 }

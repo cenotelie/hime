@@ -64,6 +64,8 @@
     <Compile Include="Parsers\ILexer.cs" />
     <Compile Include="Parsers\LexerDFAState.cs" />
     <Compile Include="Parsers\LexerText.cs" />
+    <Compile Include="Parsers\LR\LR1\LR1BaseParser.cs" />
+    <Compile Include="Parsers\LR\LR1\LR1State.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkProduction.cs" />

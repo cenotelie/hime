@@ -36,10 +36,10 @@ namespace Hime.Parsers.ContextFree.LR
                         stream.Write((ushort)1);
                         stream.Write((ushort)rules.IndexOf(reductions[t]));
                     }
-                    else if (reductions.ContainsKey(null))
+                    else if (reductions.ContainsKey(TerminalNull.Instance))
                     {
                         stream.Write((ushort)1);
-                        stream.Write((ushort)rules.IndexOf(reductions[null]));
+                        stream.Write((ushort)rules.IndexOf(reductions[TerminalNull.Instance]));
                     }
                     else
                     {

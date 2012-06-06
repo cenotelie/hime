@@ -62,7 +62,8 @@ namespace Hime.Parsers.Automata
             return new CharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
         }
 
-        public static int Compare(CharSpan Left, CharSpan Right) { return Left.spanBegin.CompareTo(Right.spanBegin); }
+        public static int Compare(CharSpan left, CharSpan right) { return left.spanBegin.CompareTo(right.spanBegin); }
+        public static int CompareReverse(CharSpan left, CharSpan right) { return right.spanBegin.CompareTo(left.spanBegin); }
 
         public override string ToString()
         {

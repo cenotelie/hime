@@ -19,6 +19,9 @@ namespace Hime.Redist.Parsers
      * each entry is of the form:
      * uint16: recognized terminal's index
      * uint16: number of transitions
+     * -- cache: 256 entries
+     * uint16: next state's index for index of the entry
+     * -- transitions
      * each transition is of the form:
      * uint16: start of the range
      * uint16: end of the range
@@ -79,8 +82,11 @@ namespace Hime.Redist.Parsers
         /// <returns>The next DFA state</returns>
         public ushort GetTransition(ushort state, ushort value)
         {
-            int offset = table.data[state] + 2;
-            int count = states.data[table.data[state] + 1];
+            int offset = table.data[state];
+            if (value <= 255)
+                return states.data[offset + value + 2];
+            int count = states.data[offset + 1];
+            offset += 258;
             for (int i = 0; i != count; i++)
             {
                 if (value >= states.data[offset] && value <= states.data[offset + 1])

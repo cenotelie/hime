@@ -43,7 +43,7 @@ namespace Hime.Parsers.ContextFree.LR
                 }
                 else
                 {
-                	this.Add(new StateActionReduce(null, item.BaseRule));
+                	this.Add(new StateActionReduce(TerminalNull.Instance, item.BaseRule));
                     reduce = item;
                 }
             }

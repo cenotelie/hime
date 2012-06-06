@@ -7,7 +7,7 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace Hime.Redist.Parsers.LR
+namespace Hime.Redist.Parsers
 {
     /// <summary>
     /// Represents the LR(k) parsing table and productions
@@ -45,6 +45,7 @@ namespace Hime.Redist.Parsers.LR
             ushort nrows = reader.ReadUInt16();
             ushort nprod = reader.ReadUInt16();
             byte[] cb = new byte[ncols * 2];
+            stream.Read(cb, 0, ncols * 2);
             Utils.BlobUShort tc = new Utils.BlobUShort(cb);
             this.columns = new Utils.SIDHashMap<ushort>();
             for (ushort i = 0; i != ncols; i++)

@@ -144,7 +144,7 @@ namespace Hime.Parsers.ContextFree.LR
 
         protected void ExportVirtuals(StreamWriter stream)
         {
-            stream.WriteLine("        public static readonly SymbolVirtual[] variables = {");
+            stream.WriteLine("        public static readonly SymbolVirtual[] virtuals = {");
             bool first = true;
             foreach (Virtual v in virtuals)
             {

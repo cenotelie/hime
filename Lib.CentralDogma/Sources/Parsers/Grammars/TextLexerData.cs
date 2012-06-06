@@ -53,7 +53,6 @@ namespace Hime.Parsers
             if (separator != null) sep = separator.SID.ToString("X");
             stream.WriteLine("        public " + className + "(string input) : base(automaton, terminals, 0x" + sep + ", new System.IO.StringReader(input)) {}");
             stream.WriteLine("        public " + className + "(System.IO.TextReader input) : base(automaton, terminals, 0x" + sep + ", input) {}");
-            stream.WriteLine("        public " + className + "(" + className + " original) : base(original) {}");
         }
         private void ExportStatics(StreamWriter stream, string className, string resource)
         {
@@ -71,12 +70,32 @@ namespace Hime.Parsers
         }
         private void ExportState(BinaryWriter dataStream, Automata.DFAState state)
         {
+            ushort[] cache = new ushort[256];
+            for (int i = 0; i != 256; i++)
+                cache[i] = 0xFFFF;
+
+            foreach (Automata.CharSpan span in state.Transitions.Keys)
+            {
+                if (span.Begin <= 255)
+                {
+                    int end = (span.End < 255 ? span.End : 255);
+                    for (int i = span.Begin; i != end + 1; i++)
+                        cache[i] = (ushort)state.Transitions[span].ID;
+                }
+            }
+
             if (state.Final != null)
                 dataStream.Write((ushort)terminals.IndexOf(state.Final));
             else
                 dataStream.Write((ushort)0xFFFF);
             dataStream.Write((ushort)state.TransitionsCount);
-            foreach (Automata.CharSpan span in state.Transitions.Keys)
+
+            for (int i = 0; i != 256; i++)
+                dataStream.Write(cache[i]);
+
+            List<Automata.CharSpan> keys = new List<Automata.CharSpan>(state.Transitions.Keys);
+            keys.Sort(new Comparison<Automata.CharSpan>(Automata.CharSpan.CompareReverse));
+            foreach (Automata.CharSpan span in keys)
             {
                 dataStream.Write(System.Convert.ToUInt16(span.Begin));
                 dataStream.Write(System.Convert.ToUInt16(span.End));
@@ -90,7 +109,7 @@ namespace Hime.Parsers
             foreach (Automata.DFAState state in dfa.States)
             {
                 dataStream.Write(offset);
-                offset += state.TransitionsCount * 3 + 2;
+                offset += state.TransitionsCount * 3 + 258;
             }
             foreach (Automata.DFAState state in dfa.States)
                 ExportState(dataStream, state);

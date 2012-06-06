@@ -6,7 +6,7 @@
  */
 using System.IO;
 
-namespace Hime.Redist.Parsers.LR
+namespace Hime.Redist.Parsers
 {
     /* 
     * uint16: head's index
@@ -29,22 +29,25 @@ namespace Hime.Redist.Parsers.LR
         private ushort head;
         private byte headAction;
         private byte reducLength;
+        private byte bytecodeLength;
         private Utils.BlobUShort bytecode;
 
         public ushort Head { get { return head; } }
         public byte HeadAction { get { return headAction; } }
         public byte ReductionLength { get { return reducLength; } }
         public ushort[] Bytecode { get { return bytecode.data; } }
+        public int BytecodeLength { get { return bytecodeLength; } }
 
         public LRkProduction(BinaryReader stream)
         {
             this.head = stream.ReadUInt16();
             this.headAction = stream.ReadByte();
             this.reducLength = stream.ReadByte();
-            byte length = stream.ReadByte();
-            byte[] buffer = new byte[length];
-            stream.Read(buffer, 0, length);
+            this.bytecodeLength = stream.ReadByte();
+            byte[] buffer = new byte[this.bytecodeLength];
+            stream.Read(buffer, 0, this.bytecodeLength);
             this.bytecode = new Utils.BlobUShort(buffer);
+            this.bytecodeLength = (byte)(this.bytecodeLength >> 1);
         }
     }
 }

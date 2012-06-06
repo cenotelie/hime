@@ -7,7 +7,7 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace Hime.Redist.Parsers.LR
+namespace Hime.Redist.Parsers
 {
     /// <summary>
     /// Delegate for a semantic action on the given subtree
@@ -119,7 +119,7 @@ namespace Hime.Redist.Parsers.LR
             SymbolToken nextToken = lexer.GetNextToken();
             while (true)
             {
-                if (RunForToken(nextToken))
+                if (AnalyseOnToken(nextToken))
                 {
                     nextToken = lexer.GetNextToken();
                     continue;
@@ -134,11 +134,31 @@ namespace Hime.Redist.Parsers.LR
         }
 
         /// <summary>
+        /// Parses the input and returns whether the input is recognized
+        /// </summary>
+        /// <returns>True if the input is recognized, false otherwise</returns>
+        public bool Recognize()
+        {
+            SymbolToken nextToken = lexer.GetNextToken();
+            while (true)
+            {
+                if (RecognizeOnToken(nextToken))
+                {
+                    nextToken = lexer.GetNextToken();
+                    continue;
+                }
+                if (nextToken.SymbolID == 0x0001)
+                    return true;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Runs the parser for the given state and token
         /// </summary>
         /// <param name="token">Current token</param>
         /// <returns>true if the parser is able to consume the token, false otherwise</returns>
-        private bool RunForToken(SymbolToken token)
+        private bool AnalyseOnToken(SymbolToken token)
         {
             while (true)
             {
@@ -157,18 +177,20 @@ namespace Hime.Redist.Parsers.LR
                     SyntaxTreeNode sub = new SyntaxTreeNode(parserVariables[production.Head], (SyntaxTreeNodeAction)production.HeadAction);
                     head -= production.ReductionLength;
                     int count = 0;
-                    for (int i = 0; i != production.Bytecode.Length; i++)
+                    for (int i = 0; i != production.BytecodeLength; i++)
                     {
                         ushort op = production.Bytecode[i];
                         if (op == 8)
                         {
                             ushort index = production.Bytecode[i + 1];
-                            parserActions[i](sub);
+                            parserActions[index](sub);
+                            i++;
                         }
                         else if (op > 3)
                         {
                             ushort index = production.Bytecode[i + 1];
                             sub.AppendChild(new SyntaxTreeNode(parserVirtuals[index], (SyntaxTreeNodeAction)(op - 4)));
+                            i++;
                         }
                         else
                         {
@@ -180,6 +202,47 @@ namespace Hime.Redist.Parsers.LR
                     head++;
                     stack[head] = data;
                     nodes[head] = sub;
+                    continue;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Runs the parser for the given state and token
+        /// </summary>
+        /// <param name="token">Current token</param>
+        /// <returns>true if the parser is able to consume the token, false otherwise</returns>
+        private bool RecognizeOnToken(SymbolToken token)
+        {
+            while (true)
+            {
+                ushort action = 0;
+                ushort data = parserAutomaton.GetAction(stack[head], token.SymbolID, out action);
+                if (action == 2)
+                {
+                    head++;
+                    stack[head] = data;
+                    return true;
+                }
+                else if (action == 1)
+                {
+                    LRkProduction production = parserAutomaton.GetProduction(data);
+                    ushort headID = parserVariables[production.Head].SymbolID;
+                    head -= production.ReductionLength;
+                    for (int i = 0; i != production.BytecodeLength; i++)
+                    {
+                        ushort op = production.Bytecode[i];
+                        if (op == 8)
+                        {
+                            ushort index = production.Bytecode[i + 1];
+                            parserActions[index](null);
+                            i++;
+                        }
+                    }
+                    data = parserAutomaton.GetAction(stack[head], headID, out action);
+                    head++;
+                    stack[head] = data;
                     continue;
                 }
                 return false;

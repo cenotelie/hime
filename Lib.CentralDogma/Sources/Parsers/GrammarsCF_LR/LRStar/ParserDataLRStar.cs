@@ -14,10 +14,8 @@ namespace Hime.Parsers.ContextFree.LR
 {
     class ParserDataLRStar : ParserDataLR
     {
-		internal protected override string GetBaseClassName 
-		{
-			get { return "LRStarBaseParser"; }
-		}
+		protected override string GetBaseClassName { get { return "LRStarBaseParser"; } }
+
         private Dictionary<State, DeciderLRStar> deciders;
 
         public ParserDataLRStar(Reporter reporter, CFGrammar gram, Graph graph, Dictionary<State, DeciderLRStar> deciders)
@@ -26,7 +24,12 @@ namespace Hime.Parsers.ContextFree.LR
             this.deciders = deciders;
         }
 
-        protected override void ExportSetup(StreamWriter stream)
+        protected override void ExportDataTable(BinaryWriter stream)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*protected override void ExportSetup(StreamWriter stream)
         {
             stream.WriteLine("        protected override void setup()");
             stream.WriteLine("        {");
@@ -242,6 +245,6 @@ namespace Hime.Parsers.ContextFree.LR
             foreach (DeciderStateLRStar state in machine.States)
                 foreach (Terminal t in state.Transitions.Keys)
                     serializer.WriteEdge(state.ID.ToString(), state.Transitions[t].ID.ToString(), t.ToString().Replace("\"", "\\\""));
-        }
+        }*/
     }
 }

@@ -152,6 +152,7 @@
     <Compile Include="Sources\Parsers\Symbols\TerminalDollar.cs" />
     <Compile Include="Sources\Parsers\Symbols\TerminalDummy.cs" />
     <Compile Include="Sources\Parsers\Symbols\TerminalEpsilon.cs" />
+    <Compile Include="Sources\Parsers\Symbols\TerminalNull.cs" />
     <Compile Include="Sources\Parsers\Symbols\TerminalSet.cs" />
     <Compile Include="Sources\Parsers\Symbols\TerminalText.cs" />
     <Compile Include="Sources\Parsers\Symbols\Variable.cs" />
