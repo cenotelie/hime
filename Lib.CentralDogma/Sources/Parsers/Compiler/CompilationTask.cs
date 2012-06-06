@@ -37,7 +37,7 @@ namespace Hime.Parsers
         private Reporter reporter;
         private Dictionary<string, Grammar> grammars;
         private Dictionary<string, GrammarLoader> loaders;
-        private SyntaxTreeNode intermediateRoot;
+        private CSTNode intermediateRoot;
 
         public CompilationTask()
         {
@@ -172,7 +172,7 @@ namespace Hime.Parsers
         internal bool LoadInputs()
         {
             // TODO: they are both streams => could be unified!!
-            intermediateRoot = new SyntaxTreeNode(null);
+            intermediateRoot = new CSTNode(null);
             foreach (string file in InputFiles)
             {
                 TextReader reader = new StreamReader(file);
@@ -197,8 +197,8 @@ namespace Hime.Parsers
                 reporter.Info("Compiler", "Loading compilation unit from raw resources");
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
-            SyntaxTreeNode root = null;
-            try { root = parser.Analyse(); }
+            CSTNode root = null;
+            try { root = parser.Parse(); }
             catch (Exception ex)
             {
                 reporter.Fatal("Compiler", "Fatal error while parser the input");
@@ -212,7 +212,7 @@ namespace Hime.Parsers
             }
             if (root != null)
             {
-                foreach (SyntaxTreeNode gnode in root.Children)
+                foreach (CSTNode gnode in root.Children)
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {

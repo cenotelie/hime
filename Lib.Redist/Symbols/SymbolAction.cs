@@ -17,7 +17,7 @@ namespace Hime.Redist.Parsers
         /// Represents the method to call for the execution of the symbol
         /// </summary>
         /// <param name="subroot">The syntax tree node on which the action is executed</param>
-        public delegate void Callback(SyntaxTreeNode subroot);
+        public delegate void Callback(CSTNode subroot);
 
         /// <summary>
         /// Gets the callback for the execution of the symbol

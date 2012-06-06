@@ -16,7 +16,7 @@ namespace Hime.Redist.Parsers
         private string value;
         private int line;
         private int column;
-        private SyntaxTreeNode subRoot;
+        private CSTNode subRoot;
 
         /// <summary>
         /// Gets the data represented by this symbol
@@ -37,7 +37,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets of sets the matched sub-grammar's root AST
         /// </summary>
-        public SyntaxTreeNode SubGrammarRoot
+        public CSTNode SubGrammarRoot
         {
             get { return subRoot; }
             set { subRoot = value; }

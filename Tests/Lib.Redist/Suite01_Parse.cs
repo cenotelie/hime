@@ -22,14 +22,14 @@ namespace Hime.Tests.Redist
         private const string grammar2 = "cf grammar Test { options{ Axiom=\"S\"; } terminals {a->'a'; b->'b';} rules{ S->A b | a b b; A->a; } }";
         private const string grammar3 = "cf grammar Test { options{ Axiom=\"S\"; } terminals {a->'a'; b->'b';} rules{ S->a b A a|a B A a|a b a; A->a|a A; B->b; } }";
         
-        private SyntaxTreeNode TestGrammar(string dir, string grammar, ParsingMethod method, string input)
+        private CSTNode TestGrammar(string dir, string grammar, ParsingMethod method, string input)
         {
             string lexer = "lexer.cs";
             string parser = "parser.cs";
             Assert.IsFalse(CompileRaw(grammar, method, lexer, parser).HasErrors, "Grammar compilation failed!");
             Assembly assembly = Build(lexer, parser);
             bool errors = false;
-            SyntaxTreeNode node = Parse(assembly, input, out errors);
+            CSTNode node = Parse(assembly, input, out errors);
             Assert.NotNull(node, "Failed to parse input!");
             Assert.IsFalse(errors, "Parsing errors!");
             return node;

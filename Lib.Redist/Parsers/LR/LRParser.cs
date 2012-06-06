@@ -17,7 +17,7 @@ namespace Hime.Redist.Parsers
         /// Callback for rule productions
         /// </summary>
         /// <param name="parser">The reducing parser</param>
-        public delegate SyntaxTreeNode Production(LRParser parser);
+        public delegate CSTNode Production(LRParser parser);
 
         /// <summary>
         /// Number of tokens to correctly match during an error recovery procedure
@@ -58,7 +58,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Buffer for nodes of the AST being constructed
         /// </summary>
-        protected LinkedList<SyntaxTreeNode> nodes;
+        protected LinkedList<CSTNode> nodes;
 
         /// <summary>
         /// Gets a read-only collection of syntaxic errors encountered by the parser
@@ -110,7 +110,7 @@ namespace Hime.Redist.Parsers
             this.lexer = input;
             this.stack = new Stack<ushort>();
             this.state = 0x0000;
-            this.nodes = new LinkedList<SyntaxTreeNode>();
+            this.nodes = new LinkedList<CSTNode>();
             //this.lexer.SetErrorHandler(new AddLexicalError(OnLexicalError));
         }
 
@@ -127,7 +127,7 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public SyntaxTreeNode Analyse()
+        public CSTNode Parse()
         {
             stack.Push(state);
             SymbolToken nextToken = lexer.GetNextToken();

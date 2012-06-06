@@ -81,7 +81,7 @@ namespace Hime.Tests
 			}
         }
 
-        protected SyntaxTreeNode Parse(Assembly assembly, string input, out bool errors)
+        protected CSTNode Parse(Assembly assembly, string input, out bool errors)
         {
             Type lexerType = null;
             Type parserType = null;
@@ -113,7 +113,7 @@ namespace Hime.Tests
                 parser = parserConstructor.Invoke(new object[] { lexer }) as IParser;
             else
                 parser = parserConstructor.Invoke(new object[] { lexer, null }) as IParser;
-            SyntaxTreeNode root = parser.Analyse();
+            CSTNode root = parser.Parse();
             errors = (parser.Errors.Count != 0);
             return root;
         }

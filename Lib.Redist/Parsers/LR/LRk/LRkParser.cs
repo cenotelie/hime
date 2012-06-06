@@ -13,7 +13,7 @@ namespace Hime.Redist.Parsers
     /// Delegate for a semantic action on the given subtree
     /// </summary>
     /// <param name="subTree">Sub-Tree on which the action is applied</param>
-    public delegate void SemanticAction(SyntaxTreeNode subTree);
+    public delegate void SemanticAction(CSTNode subTree);
 
     /// <summary>
     /// Represents a base for all LR(k) parsers
@@ -65,7 +65,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Buffer for nodes of the AST being constructed
         /// </summary>
-        private SyntaxTreeNode[] nodes;
+        private CSTNode[] nodes;
         /// <summary>
         /// Current stack's head
         /// </summary>
@@ -90,7 +90,7 @@ namespace Hime.Redist.Parsers
             this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             this.lexer = input;
             this.stack = new ushort[stackMaxSize];
-            this.nodes = new SyntaxTreeNode[stackMaxSize];
+            this.nodes = new CSTNode[stackMaxSize];
             this.head = 0;
             this.lexer.OnError += RegisterError;
         }
@@ -114,7 +114,7 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public SyntaxTreeNode Analyse()
+        public CSTNode Parse()
         {
             SymbolToken nextToken = lexer.GetNextToken();
             while (true)
@@ -168,13 +168,13 @@ namespace Hime.Redist.Parsers
                 {
                     head++;
                     stack[head] = data;
-                    nodes[head] = new SyntaxTreeNode(token);
+                    nodes[head] = new CSTNode(token);
                     return true;
                 }
                 else if (action == 1)
                 {
                     LRkProduction production = parserAutomaton.GetProduction(data);
-                    SyntaxTreeNode sub = new SyntaxTreeNode(parserVariables[production.Head], (SyntaxTreeNodeAction)production.HeadAction);
+                    CSTNode sub = new CSTNode(parserVariables[production.Head], (CSTAction)production.HeadAction);
                     head -= production.ReductionLength;
                     int count = 0;
                     for (int i = 0; i != production.BytecodeLength; i++)
@@ -189,7 +189,7 @@ namespace Hime.Redist.Parsers
                         else if (op > 3)
                         {
                             ushort index = production.Bytecode[i + 1];
-                            sub.AppendChild(new SyntaxTreeNode(parserVirtuals[index], (SyntaxTreeNodeAction)(op - 4)));
+                            sub.AppendChild(new CSTNode(parserVirtuals[index], (CSTAction)(op - 4)));
                             i++;
                         }
                         else if (op == 0)
@@ -199,7 +199,7 @@ namespace Hime.Redist.Parsers
                         }
                         else
                         {
-                            sub.AppendChild(nodes[head + count + 1], (SyntaxTreeNodeAction)op);
+                            sub.AppendChild(nodes[head + count + 1], (CSTAction)op);
                             count++;
                         }
                     }

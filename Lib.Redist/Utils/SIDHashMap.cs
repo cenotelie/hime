@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hime.Redist.Utils
 {
-    internal class SIDHashMap<T> : IDictionary<ushort, T>
+    internal class SIDHashMap<T>
     {
         private T[] cache1;
         private T[] cache2;
@@ -33,31 +33,6 @@ namespace Hime.Redist.Utils
             }
         }
 
-        public bool ContainsKey(ushort key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ICollection<ushort> Keys
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool Remove(ushort key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryGetValue(ushort key, out T value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ICollection<T> Values
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         public T this[ushort key]
         {
             get
@@ -72,51 +47,6 @@ namespace Hime.Redist.Utils
             {
                 throw new NotImplementedException();
             }
-        }
-
-        public void Add(KeyValuePair<ushort, T> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Contains(KeyValuePair<ushort, T> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(KeyValuePair<ushort, T>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int Count
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool IsReadOnly
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool Remove(KeyValuePair<ushort, T> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<KeyValuePair<ushort, T>> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
         }
     }
 }

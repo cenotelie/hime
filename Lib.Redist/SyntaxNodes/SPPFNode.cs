@@ -14,9 +14,9 @@ namespace Hime.Redist.Parsers
     public sealed class SPPFNode
     {
         private Symbol symbol;
-        private SyntaxTreeNodeAction action;
+        private CSTAction action;
         private int generation;
-        private List<SPPFNodeFamily> families;
+        private List<SPPFFamily> families;
 
         /// <summary>
         /// Gets the symbol associated to this node
@@ -25,7 +25,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets or sets the action for this node
         /// </summary>
-        public SyntaxTreeNodeAction Action
+        public CSTAction Action
         {
             get { return action; }
             set { action = value; }
@@ -43,9 +43,9 @@ namespace Hime.Redist.Parsers
         public SPPFNode(Symbol symbol, int gen)
         {
             this.symbol = symbol;
-            this.action = SyntaxTreeNodeAction.Nothing;
+            this.action = CSTAction.Nothing;
             this.generation = gen;
-            this.families = new List<SPPFNodeFamily>();
+            this.families = new List<SPPFFamily>();
         }
         /// <summary>
         /// Initializes a new instance of the SPPFNode class with the given symbol, generation and action
@@ -53,24 +53,24 @@ namespace Hime.Redist.Parsers
         /// <param name="symbol">The symbol represented by this node</param>
         /// <param name="gen">The generation of this node</param>
         /// <param name="action">The action for this node</param>
-        public SPPFNode(Symbol symbol, int gen, SyntaxTreeNodeAction action)
+        public SPPFNode(Symbol symbol, int gen, CSTAction action)
         {
             this.symbol = symbol;
             this.action = action;
             this.generation = gen;
-            this.families = new List<SPPFNodeFamily>();
+            this.families = new List<SPPFFamily>();
         }
 
         /// <summary>
         /// Adds a new family for this node
         /// </summary>
         /// <param name="family">The new family for this node</param>
-        public void AddFamily(SPPFNodeFamily family) { families.Add(family); }
+        public void AddFamily(SPPFFamily family) { families.Add(family); }
         /// <summary>
         /// Adds a new family to be constructed from a list of nodes
         /// </summary>
         /// <param name="nodes">The list of nodes forming the new family</param>
-        public void AddFamily(IEnumerable<SPPFNode> nodes) { families.Add(new SPPFNodeFamily(this, nodes)); }
+        public void AddFamily(IEnumerable<SPPFNode> nodes) { families.Add(new SPPFFamily(this, nodes)); }
 
         /// <summary>
         /// Determines whether this node is equivalent to the given one
@@ -98,9 +98,9 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="family">The tested family</param>
         /// <returns>True if this node has an equivalent family, false otherwise</returns>
-        public bool HasEquivalentFamily(SPPFNodeFamily family)
+        public bool HasEquivalentFamily(SPPFFamily family)
         {
-            foreach (SPPFNodeFamily potential in families)
+            foreach (SPPFFamily potential in families)
                 if (potential.EquivalentTo(family))
                     return true;
             return false;
@@ -110,9 +110,9 @@ namespace Hime.Redist.Parsers
         /// Gets the first tree stemming from this SPPF
         /// </summary>
         /// <returns>The first tree stemming from this SPPF</returns>
-        public SyntaxTreeNode GetFirstTree()
+        public CSTNode GetFirstTree()
         {
-            SyntaxTreeNode me = new SyntaxTreeNode(symbol, action);
+            CSTNode me = new CSTNode(symbol, action);
             if (families.Count == 1)
             {
                 foreach (SPPFNode child in families[0].Children)
@@ -124,9 +124,9 @@ namespace Hime.Redist.Parsers
             else if (families.Count >= 1)
             {
                 // More than one solution => this is an error
-                foreach (SPPFNodeFamily family in families)
+                foreach (SPPFFamily family in families)
                 {
-                    SyntaxTreeNode subroot = new SyntaxTreeNode(null, SyntaxTreeNodeAction.Nothing);
+                    CSTNode subroot = new CSTNode(null, CSTAction.Nothing);
                     me.AppendChild(subroot);
                 }
             }

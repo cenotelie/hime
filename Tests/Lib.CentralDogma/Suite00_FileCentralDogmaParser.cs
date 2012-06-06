@@ -21,7 +21,7 @@ namespace Hime.Tests.CentralDogma
 
             Hime.Parsers.Input.FileCentralDogmaLexer lexer = new Hime.Parsers.Input.FileCentralDogmaLexer(grammar);
             Hime.Parsers.Input.FileCentralDogmaParser parser = new Hime.Parsers.Input.FileCentralDogmaParser(lexer);
-            if (parser.Analyse() != null)
+            if (parser.Parse() != null)
                 Assert.Fail();
         }
 
@@ -33,7 +33,7 @@ namespace Hime.Tests.CentralDogma
 
             Hime.Parsers.Input.FileCentralDogmaLexer lexer = new Hime.Parsers.Input.FileCentralDogmaLexer(grammar);
             Hime.Parsers.Input.FileCentralDogmaParser parser = new Hime.Parsers.Input.FileCentralDogmaParser(lexer);
-            if (parser.Analyse() != null)
+            if (parser.Parse() != null)
                 Assert.Fail();
         }
 		
@@ -45,7 +45,7 @@ namespace Hime.Tests.CentralDogma
 
             Hime.Parsers.Input.FileCentralDogmaLexer lexer = new Hime.Parsers.Input.FileCentralDogmaLexer(grammar);
             Hime.Parsers.Input.FileCentralDogmaParser parser = new Hime.Parsers.Input.FileCentralDogmaParser(lexer);
-            parser.Analyse();
+            parser.Parse();
             Assert.AreEqual(0, parser.Errors.Count);
         }
 	}

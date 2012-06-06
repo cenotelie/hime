@@ -155,7 +155,7 @@ namespace Hime.Redist.Parsers
             errors.Add(error);
         }
 
-        public SyntaxTreeNode Analyse()
+        public CSTNode Parse()
         {
             SPPFNode match = Match();
             if (match == null)

@@ -27,7 +27,7 @@ namespace Hime.Tests.Redist
             Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1, lexer, parser).HasErrors, "Grammar compilation failed!");
             Assembly assembly = Build(lexer, parser);
             bool errors = false;
-            SyntaxTreeNode node = Parse(assembly, "aa", out errors);
+            CSTNode node = Parse(assembly, "aa", out errors);
             Assert.AreEqual(node.Children.Count, 2);
         }
     }

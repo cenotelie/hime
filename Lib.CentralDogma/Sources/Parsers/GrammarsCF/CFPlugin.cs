@@ -6,7 +6,7 @@ namespace Hime.Parsers.ContextFree
 {
     class CFPlugin : CompilerPlugin
     {
-        public GrammarLoader GetLoader(Redist.Parsers.SyntaxTreeNode node, Utils.Reporting.Reporter log)
+        public GrammarLoader GetLoader(Redist.Parsers.CSTNode node, Utils.Reporting.Reporter log)
         {
             return new CFGrammarLoader(node, log);
         }

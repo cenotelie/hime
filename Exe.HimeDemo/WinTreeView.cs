@@ -10,7 +10,7 @@ namespace LangTest
 {
     partial class WinTreeView : Form
     {
-        public WinTreeView(Hime.Redist.Parsers.SyntaxTreeNode Root)
+        public WinTreeView(Hime.Redist.Parsers.CSTNode Root)
         {
             InitializeComponent();
 
@@ -18,9 +18,9 @@ namespace LangTest
             AddSubTree(VRoot, Root);
         }
 
-        private void AddSubTree(TreeNode VNode, Hime.Redist.Parsers.SyntaxTreeNode SNode)
+        private void AddSubTree(TreeNode VNode, Hime.Redist.Parsers.CSTNode SNode)
         {
-            foreach (Hime.Redist.Parsers.SyntaxTreeNode Child in SNode.Children)
+            foreach (Hime.Redist.Parsers.CSTNode Child in SNode.Children)
             {
                 TreeNode VChild = null;
                 if (Child.Symbol != null)

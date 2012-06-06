@@ -17,10 +17,10 @@ namespace Hime.Parsers.ContextFree
         internal string HeadName { get; private set; }
         internal List<string> Parameters { get; private set; }
         internal int ParametersCount { get { return this.Parameters.Count; } }
-		internal SyntaxTreeNode RuleNode { get; private set; }
-        internal SyntaxTreeNode DefinitionNode { get; private set; }
+		internal CSTNode RuleNode { get; private set; }
+        internal CSTNode DefinitionNode { get; private set; }
 
-        public TemplateRule(CFGrammar grammar, SyntaxTreeNode ruleNode)
+        public TemplateRule(CFGrammar grammar, CSTNode ruleNode)
         {
             this.HeadName = ((SymbolTokenText)ruleNode.Children[0].Symbol).ValueText;
             this.Parameters = new List<string>();
@@ -28,7 +28,7 @@ namespace Hime.Parsers.ContextFree
             this.grammar = grammar;
             this.RuleNode = ruleNode;
             this.DefinitionNode = ruleNode.Children[2];
-            foreach (SyntaxTreeNode Node in ruleNode.Children[1].Children)
+            foreach (CSTNode Node in ruleNode.Children[1].Children)
 			{
                 this.Parameters.Add(((SymbolTokenText)Node.Symbol).ValueText);
 			}

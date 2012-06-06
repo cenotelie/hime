@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a family of children for a SPPF node
     /// </summary>
-    public sealed class SPPFNodeFamily
+    public sealed class SPPFFamily
     {
         private SPPFNode parent;
         private List<SPPFNode> children;
@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the SPPFNodeFamily class with the given parent node
         /// </summary>
         /// <param name="parent">The node owning this family</param>
-        public SPPFNodeFamily(SPPFNode parent)
+        public SPPFFamily(SPPFNode parent)
         {
             this.parent = parent;
             this.children = new List<SPPFNode>();
@@ -39,7 +39,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="parent">The node owning this family</param>
         /// <param name="nodes">The list of children for this family</param>
-        public SPPFNodeFamily(SPPFNode parent, IEnumerable<SPPFNode> nodes)
+        public SPPFFamily(SPPFNode parent, IEnumerable<SPPFNode> nodes)
         {
             this.parent = parent;
             this.children = new List<SPPFNode>(nodes);
@@ -56,7 +56,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="family">The tested family</param>
         /// <returns>True if this family is equivalent to the tested one, false otherwise</returns>
-        public bool EquivalentTo(SPPFNodeFamily family)
+        public bool EquivalentTo(SPPFFamily family)
         {
             if (children.Count != family.children.Count)
                 return false;

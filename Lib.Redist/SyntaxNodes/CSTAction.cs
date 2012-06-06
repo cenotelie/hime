@@ -9,7 +9,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Specifies the tree action for a given node
     /// </summary>
-    public enum SyntaxTreeNodeAction : byte
+    public enum CSTAction : byte
     {
         /// <summary>
         /// Promote the node to the immediately upper level in the tree

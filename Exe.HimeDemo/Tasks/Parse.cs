@@ -12,7 +12,7 @@ namespace Hime.Demo.Tasks
 				
         public void Execute()
         {
-			SyntaxTreeNode root = parser.Analyse();
+			CSTNode root = parser.Parse();
 
             foreach (ParserError error in parser.Errors)
 			{

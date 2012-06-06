@@ -8,6 +8,6 @@ namespace Hime.Parsers
 {
     interface CompilerPlugin
     {
-        GrammarLoader GetLoader(SyntaxTreeNode node, Reporter log);
+        GrammarLoader GetLoader(CSTNode node, Reporter log);
     }
 }

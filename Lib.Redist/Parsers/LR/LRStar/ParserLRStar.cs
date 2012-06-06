@@ -74,7 +74,7 @@ namespace Hime.Redist.Parsers
                 ushort nextState = RunDecider(token.SymbolID, out reduction);
                 if (nextState != 0xFFFF)
                 {
-                    nodes.AddLast(new SyntaxTreeNode(token));
+                    nodes.AddLast(new CSTNode(token));
                     state = nextState;
                     stack.Push(state);
                     return true;

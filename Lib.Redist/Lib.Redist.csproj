@@ -85,13 +85,13 @@
     <Compile Include="Symbols\SymbolTokenText.cs" />
     <Compile Include="Symbols\SymbolVariable.cs" />
     <Compile Include="Symbols\SymbolVirtual.cs" />
-    <Compile Include="SyntaxNodes\SPPFNodeFamily.cs" />
-    <Compile Include="SyntaxNodes\SyntaxTreeNode.cs" />
+    <Compile Include="SyntaxNodes\SPPFFamily.cs" />
+    <Compile Include="SyntaxNodes\CSTNode.cs" />
     <Compile Include="Parsers\RewindableTokenReader.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
     <Compile Include="Parsers\LR\RNGLR\ParserRNGLR1.cs" />
-    <Compile Include="SyntaxNodes\SyntaxTreeNodeAction.cs" />
+    <Compile Include="SyntaxNodes\CSTAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxNodes\SPPFNode.cs" />
     <Compile Include="Symbols\Symbol.cs" />

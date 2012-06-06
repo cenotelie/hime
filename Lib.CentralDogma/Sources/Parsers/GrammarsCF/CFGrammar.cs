@@ -99,7 +99,7 @@ namespace Hime.Parsers.ContextFree
             return new CFRule(head as CFVariable, new CFRuleBody(body), false);
         }
 
-        public TemplateRule AddTemplateRule(Redist.Parsers.SyntaxTreeNode ruleNode)
+        public TemplateRule AddTemplateRule(Redist.Parsers.CSTNode ruleNode)
         {
             TemplateRule Rule = new TemplateRule(this, ruleNode);
             templateRules.Add(Rule);

@@ -66,9 +66,12 @@ namespace Hime.Redist.Parsers
         public event AddLexicalError OnError;
 
         /// <summary>
-        /// Initializes a new instance of the LexerText class with the given input
+        /// Initializes a new instance of the TextLexer class with the given input
         /// </summary>
-        /// <param name="input">The input as a text reader</param>
+        /// <param name="automaton">DFA automaton for this lexer</param>
+        /// <param name="terminals">Terminals recognized by this lexer</param>
+        /// <param name="separator">SID of the separator token</param>
+        /// <param name="input">Input to this lexer</param>
         protected TextLexer(TextLexerAutomaton automaton, SymbolTerminal[] terminals, ushort separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
