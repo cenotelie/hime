@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
     public abstract class LRStarBaseParser : LRParser
     {
         protected LRStarState[] states;
-        protected BufferedTokenReader reader;
+        protected RewindableTokenReader reader;
 
         /// <summary>
         /// Gets the automaton's state with the given id
@@ -22,7 +22,7 @@ namespace Hime.Redist.Parsers
 
         public LRStarBaseParser(ILexer input) : base(input) 
 		{ 
-			reader = new BufferedTokenReader(input); 
+			reader = new RewindableTokenReader(input); 
 		}
 
         private ushort RunDecider(ushort first, out LRRule reduction)

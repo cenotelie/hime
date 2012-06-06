@@ -12,7 +12,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a rewindable stream of tokens
     /// </summary>
-    public sealed class BufferedTokenReader
+    public sealed class RewindableTokenReader
     {
         private ILexer lexer;
         private LinkedList<SymbolToken> readInput;
@@ -22,7 +22,7 @@ namespace Hime.Redist.Parsers
         /// Initializes a new instance of the BufferedTokenReader class with the given lexer
         /// </summary>
         /// <param name="lexer">The lexer matching tokens</param>
-        public BufferedTokenReader(ILexer lexer)
+        public RewindableTokenReader(ILexer lexer)
         {
             this.lexer = lexer;
             readInput = new LinkedList<SymbolToken>();
