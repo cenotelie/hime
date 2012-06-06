@@ -52,8 +52,7 @@ namespace Hime.Redist.Parsers
 
         private void PushInRing(char value)
         {
-            ring[ringNextEntry] = value;
-            ringNextEntry++;
+            ring[ringNextEntry++] = value;
             if (ringNextEntry == bufferInitSize)
                 ringNextEntry = 0;
             ringStart = ringNextEntry;
@@ -83,9 +82,7 @@ namespace Hime.Redist.Parsers
                 }
             }
             atEnd = false;
-            char value = buffer[bufferStart];
-            bufferStart++;
-            return value;
+            return buffer[bufferStart++];
         }
 
         /// <summary>

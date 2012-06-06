@@ -136,40 +136,45 @@ namespace Hime.Redist.Parsers
 
         private SymbolTokenText GetNextToken_DFA()
         {
-            SymbolTerminal matched = null;
+            int matchedIndex = 0;
             int matchedLength = 0;
-            int count = 0;
+            int readCount = 0;
             ushort state = 0;
 
-            while (true)
+            while (state != 0xFFFF)
             {
-                ushort terminal = lexAutomaton.GetTerminal(state);
+                int offset = lexAutomaton.GetOffset(state);
+                ushort terminal = lexAutomaton.GetTerminal(offset);
                 if (terminal != 0xFFFF)
                 {
-                    matched = lexTerminals[terminal];
-                    matchedLength = count;
+                    matchedIndex = terminal;
+                    matchedLength = readCount;
                 }
+                if (lexAutomaton.HasNoTransition(offset))
+                    break;
                 bool endOfInput = false;
                 char current = input.Read(out endOfInput);
                 if (endOfInput)
                     break;
-                if (count == bufferSize)
+                if (readCount == bufferSize)
                 {
                     // buffer is too small, create larger buffer
                     bufferSize *= 2;
                     char[] temp = new char[bufferSize];
-                    System.Array.Copy(buffer, temp, count);
+                    System.Array.Copy(buffer, temp, readCount);
                     buffer = temp;
                 }
-                buffer[count] = current;
-                count++;
-                state = lexAutomaton.GetTransition(state, current);
-                if (state == 0xFFFF)
-                    break;
+                buffer[readCount] = current;
+                readCount++;
+                if (current <= 255)
+                    state = lexAutomaton.GetCachedTransition(offset + current + 2);
+                else
+                    state = lexAutomaton.GetFallbackTransition(offset, current);
             }
-            input.Rewind(count - matchedLength);
-            if (matched == null)
+            input.Rewind(readCount - matchedLength);
+            if (matchedLength == 0)
                 return null;
+            SymbolTerminal matched = lexTerminals[matchedIndex];
             return new SymbolTokenText(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine, currentColumn);
         }
     }

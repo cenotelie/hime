@@ -68,23 +68,41 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
-        /// Gets the index of the terminal recognized at the given state
+        /// Get the offset of the given state in the table
         /// </summary>
-        /// <param name="state">A DFA state</param>
-        /// <returns>The index of the terminal recognized at the given state</returns>
-        public ushort GetTerminal(ushort state) { return states.data[table.data[state]]; }
+        /// <param name="state">The DFA which offset shall be retrieved</param>
+        /// <returns>The offset of the given DFA state</returns>
+        public int GetOffset(ushort state) { return table.data[state]; }
 
         /// <summary>
-        /// Gets the transition for the given state and character value
+        /// Gets the recognized terminal index for the DFA at the given index
         /// </summary>
-        /// <param name="state">A DFA state</param>
-        /// <param name="value">The current input value</param>
-        /// <returns>The next DFA state</returns>
-        public ushort GetTransition(ushort state, ushort value)
+        /// <param name="offset">The DFA state's offset</param>
+        /// <returns>The index of the terminal recognized at this state, or 0xFFFF if none</returns>
+        public ushort GetTerminal(int offset) { return states.data[offset]; }
+
+        /// <summary>
+        /// Checks whether the DFA state at the given state has any transition
+        /// </summary>
+        /// <param name="offset">The DFA state's offset</param>
+        /// <returns>True of the state at the given offset has no transition</returns>
+        public bool HasNoTransition(int offset) { return (states.data[offset + 1] == 0); }
+
+        /// <summary>
+        /// Gets the transition corresponding to the given state's index and input value
+        /// </summary>
+        /// <param name="offset">The DFA state's offset</param>
+        /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
+        public ushort GetCachedTransition(int offset) { return states.data[offset]; }
+
+        /// <summary>
+        /// Gets the transition corresponding to the given state's index and input value
+        /// </summary>
+        /// <param name="offset">The DFA state's offset</param>
+        /// <param name="value">The input value</param>
+        /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
+        public ushort GetFallbackTransition(int offset, ushort value)
         {
-            int offset = table.data[state];
-            if (value <= 255)
-                return states.data[offset + value + 2];
             int count = states.data[offset + 1];
             offset += 258;
             for (int i = 0; i != count; i++)
