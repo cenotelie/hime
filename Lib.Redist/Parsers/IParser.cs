@@ -17,11 +17,17 @@ namespace Hime.Redist.Parsers
         /// Gets the errors encountered by the parser
         /// </summary>
         ICollection<ParserError> Errors { get; }
-        
+
         /// <summary>
-        /// Runs the parser and return the root of the abstract syntax tree
+        /// Parses the input and returns the produced AST
         /// </summary>
-        /// <returns>The root of the abstract syntax tree representing the input, or null if errors when encountered</returns>
+        /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         CSTNode Parse();
+
+        /// <summary>
+        /// Parses the input and returns whether the input is recognized
+        /// </summary>
+        /// <returns>True if the input is recognized, false otherwise</returns>
+        bool Recognize();
     }
 }

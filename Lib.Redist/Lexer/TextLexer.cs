@@ -59,6 +59,14 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number
         /// </summary>
         public int CurrentColumn { get { return currentColumn; } }
+        /// <summary>
+        /// Gets the number of recognized terminals
+        /// </summary>
+        public int TerminalsCount { get { return lexTerminals.Length; } }
+        /// <summary>
+        /// Gets the recognized terminals
+        /// </summary>
+        public SymbolTerminal[] Terminals { get { return lexTerminals; } }
 
         /// <summary>
         /// Events for lexical errors

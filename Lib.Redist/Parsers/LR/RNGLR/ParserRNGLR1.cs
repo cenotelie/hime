@@ -163,6 +163,8 @@ namespace Hime.Redist.Parsers
             return match.GetFirstTree().ApplyActions();
         }
 
+        public bool Recognize() { return false; }
+
         protected GSSNode GetInSet(List<GSSNode> StateSet, ushort label)
         {
             foreach (GSSNode node in StateSet)

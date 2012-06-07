@@ -115,14 +115,14 @@ namespace Hime.Redist.Parsers
             this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
             this.lexer = input;
             this.head = 0;
-            this.lexer.OnError += RegisterError;
+            this.lexer.OnError += OnLexicalError;
         }
 
         /// <summary>
         /// Adds the given lexical error emanating from the lexer to the list of errors
         /// </summary>
         /// <param name="error">Lexical error</param>
-        protected void RegisterError(ParserError error)
+        protected void OnLexicalError(ParserError error)
         {
             errors.Add(error);
         }
@@ -131,11 +131,13 @@ namespace Hime.Redist.Parsers
         /// Handles an unexpected token and returns whether is successfuly handled the error
         /// </summary>
         /// <param name="token">The unexpected token</param>
-        /// <returns>True is the error was handled, false otherwise</returns>
-        protected virtual bool OnUnexpectedToken(SymbolToken token)
+        protected void OnUnexpectedToken(SymbolToken token)
         {
-            errors.Add(new UnexpectedTokenError(token, parserAutomaton.GetExpected(stack[head]), lexer.CurrentLine, lexer.CurrentColumn));
-            return false;
+            List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.TerminalsCount);
+            List<SymbolTerminal> expected = new List<SymbolTerminal>();
+            foreach (int index in expectedIDs)
+                expected.Add(lexer.Terminals[index]);
+            errors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
         }
 
         /// <summary>
@@ -156,8 +158,7 @@ namespace Hime.Redist.Parsers
                 }
                 if (nextToken.SymbolID == 0x0001)
                     return nodes[1].ApplyActions();
-                if (!OnUnexpectedToken(nextToken))
-                    return null;
+                OnUnexpectedToken(nextToken);
                 if (errors.Count >= maxErrorCount)
                     return null;
             }
@@ -182,6 +183,7 @@ namespace Hime.Redist.Parsers
                 }
                 if (nextToken.SymbolID == 0x0001)
                     return true;
+                OnUnexpectedToken(nextToken);
                 return false;
             }
         }

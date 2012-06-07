@@ -35,6 +35,7 @@ namespace Hime.Redist.Parsers
 
         private ushort ncols;
         private Utils.BlobUShort table;
+        private Utils.BlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
         private LRkProduction[] productions;
 
@@ -44,12 +45,14 @@ namespace Hime.Redist.Parsers
             this.ncols = reader.ReadUInt16();
             ushort nrows = reader.ReadUInt16();
             ushort nprod = reader.ReadUInt16();
+            
             byte[] cb = new byte[ncols * 2];
             stream.Read(cb, 0, ncols * 2);
-            Utils.BlobUShort tc = new Utils.BlobUShort(cb);
+            this.columnsID = new Utils.BlobUShort(cb);
             this.columns = new Utils.SIDHashMap<ushort>();
             for (ushort i = 0; i != ncols; i++)
-                this.columns.Add(tc.data[i], i);
+                this.columns.Add(columnsID.data[i], i);
+            
             byte[] buffer = new byte[ncols * nrows * 4];
             stream.Read(buffer, 0, buffer.Length);
             this.table = new Utils.BlobUShort(buffer);
@@ -100,13 +103,23 @@ namespace Hime.Redist.Parsers
         public LRkProduction GetProduction(ushort index) { return productions[index]; }
 
         /// <summary>
-        /// Gets a list of the expected terminals 
+        /// Gets a list of the expected terminal indices
         /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public List<SymbolTerminal> GetExpected(ushort state)
+        /// <param name="state">The DFA state</param>
+        /// <param name="terminalCount">The maximal number of terminals</param>
+        /// <returns>The expected terminal indices</returns>
+        public List<int> GetExpected(ushort state, int terminalCount)
         {
-            return null;
+            List<int> result = new List<int>();
+            int offset = ncols * state * 2;
+            for (int i = 0; i != terminalCount; i++)
+            {
+                int action = table.data[offset];
+                if (action != 0)
+                    result.Add(i);
+                offset += 2;
+            }
+            return result;
         }
     }
 }

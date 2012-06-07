@@ -26,6 +26,16 @@ namespace Hime.Redist.Parsers
         int CurrentColumn { get; }
 
         /// <summary>
+        /// Gets the number of recognized terminals
+        /// </summary>
+        int TerminalsCount { get; }
+
+        /// <summary>
+        /// Gets the recognized terminals
+        /// </summary>
+        SymbolTerminal[] Terminals { get; }
+
+        /// <summary>
         /// Gets the next token in the input
         /// </summary>
         /// <returns>The next token in the input</returns>

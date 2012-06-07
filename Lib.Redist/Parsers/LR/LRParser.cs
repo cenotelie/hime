@@ -150,5 +150,7 @@ namespace Hime.Redist.Parsers
                     return null;
             }
         }
+
+        public bool Recognize() { return false; }
     }
 }
