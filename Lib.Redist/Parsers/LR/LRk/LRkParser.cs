@@ -10,65 +10,15 @@ using System.Collections.Generic;
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Delegate for a semantic action on the given subtree for a parser
-    /// </summary>
-    /// <param name="subTree">Sub-Tree on which the action is applied</param>
-    public delegate void ParserAction(CSTNode subTree);
-
-    /// <summary>
-    /// Delegate for a semantic action on the given body for a recognizer
-    /// </summary>
-    /// <param name="body">The current body</param>
-    /// <param name="length">The current body's length</param>
-    public delegate void RecognizerAction(Symbol[] body, int length);
-
-    /// <summary>
     /// Represents a base for all LR(k) parsers
     /// </summary>
-    public abstract class LRkParser : IParser
+    public abstract class LRkParser : BaseLRParser
     {
-        /// <summary>
-        /// Maximal size of the stack
-        /// </summary>
-        private const int stackMaxSize = 100;
-        /// <summary>
-        /// Maximum number of errors
-        /// </summary>
-        private const int maxErrorCount = 100;
-
         /// <summary>
         /// LR(k) parsing table and productions
         /// </summary>
         private LRkAutomaton parserAutomaton;
-        /// <summary>
-        /// Parser's variables
-        /// </summary>
-        private SymbolVariable[] parserVariables;
-        /// <summary>
-        /// Parser's virtuals
-        /// </summary>
-        private SymbolVirtual[] parserVirtuals;
-        /// <summary>
-        /// Parser's actions
-        /// </summary>
-        private ParserAction[] parserActions;
-        /// <summary>
-        /// Recognizer's actions
-        /// </summary>
-        private RecognizerAction[] recognizerActions;
-
-        /// <summary>
-        /// List of the encountered syntaxic errors
-        /// </summary>
-        private List<ParserError> errors;
-        /// <summary>
-        /// Read-only list of the errors
-        /// </summary>
-        private System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
-        /// <summary>
-        /// Lexer associated to this parser
-        /// </summary>
-        private ILexer lexer;
+        
         /// <summary>
         /// Parser's stack
         /// </summary>
@@ -91,11 +41,6 @@ namespace Hime.Redist.Parsers
         private int head;
 
         /// <summary>
-        /// Gets a read-only collection of syntaxic errors encountered by the parser
-        /// </summary>
-        public ICollection<ParserError> Errors { get { return readonlyErrors; } }
-
-        /// <summary>
         /// Initializes a new instance of the LRkParser class with the given lexer
         /// </summary>
         /// <param name="automaton">The parser's automaton</param>
@@ -105,33 +50,16 @@ namespace Hime.Redist.Parsers
         /// <param name="ractions">The parser's actions in recognize mode</param>
         /// <param name="input">The input lexer</param>
         public LRkParser(LRkAutomaton automaton, SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer input)
+            : base(variables, virtuals, pactions, ractions, input)
         {
             this.parserAutomaton = automaton;
-            this.parserVariables = variables;
-            this.parserVirtuals = virtuals;
-            this.parserActions = pactions;
-            this.recognizerActions = ractions;
-            this.errors = new List<ParserError>();
-            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
-            this.lexer = input;
-            this.head = 0;
-            this.lexer.OnError += OnLexicalError;
-        }
-
-        /// <summary>
-        /// Adds the given lexical error emanating from the lexer to the list of errors
-        /// </summary>
-        /// <param name="error">Lexical error</param>
-        protected void OnLexicalError(ParserError error)
-        {
-            errors.Add(error);
         }
 
         /// <summary>
         /// Handles an unexpected token and returns whether is successfuly handled the error
         /// </summary>
         /// <param name="token">The unexpected token</param>
-        protected void OnUnexpectedToken(SymbolToken token)
+        protected override void OnUnexpectedToken(SymbolToken token)
         {
             List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.TerminalsCount);
             List<SymbolTerminal> expected = new List<SymbolTerminal>();
@@ -144,7 +72,7 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public CSTNode Parse()
+        public override CSTNode Parse()
         {
             this.stack = new ushort[stackMaxSize];
             this.nodes = new CSTNode[stackMaxSize];
@@ -168,7 +96,7 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns whether the input is recognized
         /// </summary>
         /// <returns>True if the input is recognized, false otherwise</returns>
-        public bool Recognize()
+        public override bool Recognize()
         {
             this.stack = new ushort[stackMaxSize];
             this.symbols = new Symbol[stackMaxSize];

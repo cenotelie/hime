@@ -62,6 +62,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Lexer\ILexer.cs" />
+    <Compile Include="Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkProduction.cs" />
@@ -87,7 +88,7 @@
     <Compile Include="Symbols\SymbolVirtual.cs" />
     <Compile Include="SyntaxNodes\SPPFFamily.cs" />
     <Compile Include="SyntaxNodes\CSTNode.cs" />
-    <Compile Include="Parsers\RewindableTokenReader.cs" />
+    <Compile Include="Parsers\LR\LRStar\RewindableTokenReader.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Parsers\LR\LRStar\ParserLRStar.cs" />
     <Compile Include="Parsers\LR\RNGLR\ParserRNGLR1.cs" />
