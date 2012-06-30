@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    public abstract class BaseRNGLR1Parser : IParser
+    public abstract class RNGLRParser : BaseLRParser
     {
-        protected delegate void Production(BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes);
+        /*protected delegate void Production(RNGLRParser parser, SPPFNode root, List<SPPFNode> nodes);
         protected struct Rule
         {
             public Production OnReduction;
@@ -84,8 +84,8 @@ namespace Hime.Redist.Parsers
                         return true;
                 return false;
             }
-        }
-
+        }*/
+        /*
         // Parser automata data
         protected SPPFNode[] nullVarsSPPF;
         protected SPPFNode[] nullChoicesSPPF;
@@ -122,6 +122,7 @@ namespace Hime.Redist.Parsers
                 State = state;
             }
         }
+        */
 
         // Parser state data
         protected List<ParserError> errors;
@@ -136,7 +137,7 @@ namespace Hime.Redist.Parsers
 
         protected abstract void setup();
 
-        public BaseRNGLR1Parser(ILexer input)
+        public RNGLRParser(ILexer input)
         {
             setup();
             this.errors = new List<ParserError>();

@@ -15,7 +15,7 @@ namespace Hime.Redist.Parsers
     {
         private int generation;
         private ushort dFAState;
-        private Dictionary<GSSNode, SPPFNode> edges;
+        private Dictionary<GSSNode, GSSLabel> edges;
 
         /// <summary>
         /// Gets the generation of this node
@@ -28,14 +28,14 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the edges coming out of this node
         /// </summary>
-        public Dictionary<GSSNode, SPPFNode> Edges { get { return edges; } }
+        public Dictionary<GSSNode, GSSLabel> Edges { get { return edges; } }
 
         /// <summary>
         /// Adds a new edge from this node
         /// </summary>
         /// <param name="state">The previous GSS node</param>
         /// <param name="label">The label of the edge</param>
-        public void AddEdge(GSSNode state, SPPFNode label) { edges.Add(state, label); }
+        public void AddEdge(GSSNode state, GSSLabel label) { edges.Add(state, label); }
 
         /// <summary>
         /// Initializes a new instance of the GSSNode class with the given DFA state id and generation
@@ -46,7 +46,7 @@ namespace Hime.Redist.Parsers
         {
             this.generation = generation;
             this.dFAState = label;
-            this.edges = new Dictionary<GSSNode, SPPFNode>();
+            this.edges = new Dictionary<GSSNode, GSSLabel>();
         }
 
         /// <summary>

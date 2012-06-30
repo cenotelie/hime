@@ -94,7 +94,7 @@ namespace Hime.Tests
                     parserType = types[i];
                 else if (types[i].BaseType == typeof(LR1BaseParser))
                     parserType = types[i];
-                else if (types[i].BaseType == typeof(BaseRNGLR1Parser))
+                else if (types[i].BaseType == typeof(RNGLRParser))
                     parserType = types[i];
                 else if (types[i].BaseType == typeof(LRStarBaseParser))
                     parserType = types[i];
