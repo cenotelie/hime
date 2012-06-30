@@ -28,14 +28,14 @@ namespace Hime.Demo
             System.Console.Out.WriteLine("Scanned " + count + " in " + (int)span.TotalMilliseconds + "ms");
             System.Console.In.ReadLine();*/
 
-            /*Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(new System.IO.StreamReader("Languages\\FileCentralDogma.gram"));
+            Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(new System.IO.StreamReader("Perf.gram"));
             Generated.CD.FileCentralDogmaParser parser = new Generated.CD.FileCentralDogmaParser(lexer);
             System.DateTime before = System.DateTime.Now;
-            parser.Analyse();
+            parser.Parse();
             System.DateTime after = System.DateTime.Now;
             System.TimeSpan span = after.Subtract(before);
             System.Console.Out.WriteLine((int)span.TotalMilliseconds + "ms");
-            System.Console.In.ReadLine();*/
+            System.Console.In.ReadLine();
 
             //IExecutable executable = new CompileCentralDogma();
             //executable.Execute();
