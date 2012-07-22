@@ -51,6 +51,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="BaseTestSuite.cs" />
+    <Compile Include="Lib.CentralDogma\Suite04_Bugs.cs" />
     <Compile Include="Lib.Redist\Suite00_Bugs.cs" />
     <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
     <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
