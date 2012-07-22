@@ -10,6 +10,8 @@ namespace Hime.Parsers
 {
     class TerminalText : Terminal
     {
+        private string outputValue;
+
         public Automata.NFA NFA { get; set; }
         public string Value { get; private set; }
 
@@ -18,8 +20,24 @@ namespace Hime.Parsers
         {
             this.NFA = nfa;
             this.Value = value;
+            this.outputValue = SanitizedValue(value);
         }
 
-        public override string ToString() { return Value; }
+        private string SanitizedValue(string value)
+        {
+            string result = value;
+            result = result.Replace("\\", "\\\\");
+            result = result.Replace("\0", "\\0");
+            result = result.Replace("\a", "\\a");
+            result = result.Replace("\b", "\\b");
+            result = result.Replace("\f", "\\f");
+            result = result.Replace("\n", "\\n");
+            result = result.Replace("\r", "\\r");
+            result = result.Replace("\t", "\\t");
+            result = result.Replace("\v", "\\v");
+            return result;
+        }
+
+        public override string ToString() { return outputValue; }
     }
 }
