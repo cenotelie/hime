@@ -2,6 +2,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+[assembly: AssemblyCopyright("Copyright ©  2012")]
+
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
