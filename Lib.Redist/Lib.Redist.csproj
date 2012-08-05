@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="Parsers\LexerDFAState.cs" />
     <Compile Include="Parsers\LexerText.cs" />
+    <Compile Include="Parsers\ParserErrorType.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\LR\LR0\LR0State.cs" />
     <Compile Include="Parsers\LR\LR1\LR1State.cs" />

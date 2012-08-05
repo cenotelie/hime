@@ -32,7 +32,7 @@ namespace Hime.Redist.Parsers
 		/// <param name='expected'>The array of expected terminals</param>
         /// <param name="line">The line number of the token</param>
         /// <param name="column">The column number of the token</param>
-        internal UnexpectedTokenError(SymbolToken token, SymbolTerminal[] expected, int line, int column) : base(line, column)
+        internal UnexpectedTokenError(SymbolToken token, SymbolTerminal[] expected, int line, int column) : base(ParserErrorType.UnexpectedToken, line, column)
         {
             this.UnexpectedToken = token;
             this.ExpectedTerminals = new List<SymbolTerminal>(expected);
