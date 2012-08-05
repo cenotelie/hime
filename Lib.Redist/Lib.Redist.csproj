@@ -64,6 +64,7 @@
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
+    <Compile Include="Parsers\ParserErrorType.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkProduction.cs" />
     <Compile Include="Lexer\RewindableTextReader.cs" />

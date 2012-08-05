@@ -14,6 +14,21 @@ namespace Hime.Redist.Parsers
     public class ParserError
     {
         /// <summary>
+        /// Gets the error's type
+        /// </summary>
+        public ParserErrorType Type { get; protected set; }
+
+        /// <summary>
+        /// Gets the error's line in the input
+        /// </summary>
+        public int Line { get; protected set; }
+
+        /// <summary>
+        /// Gets the error's column in the input
+        /// </summary>
+        public int Column { get; protected set; }
+
+        /// <summary>
         /// Gets the error's message
         /// </summary>
         public string Message { get; protected set; }
@@ -29,8 +44,11 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name='line'>Error's line number in the input</param>
 		/// <param name='column'>Error's column in the input</param>
-		protected ParserError(int line, int column)
+		protected ParserError(ParserErrorType type, int line, int column)
 		{
+            this.Type = type;
+            this.Line = line;
+            this.Column = column;
 			this.Message = "@("+ line + ", " + column + ") ";
 		}
     }
