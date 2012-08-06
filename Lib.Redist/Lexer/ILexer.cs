@@ -16,6 +16,11 @@ namespace Hime.Redist.Parsers
     public interface ILexer
     {
         /// <summary>
+        /// Gets the terminals matched by this lexer
+        /// </summary>
+        Utils.SymbolDictionary<SymbolTerminal> Terminals { get; }
+
+        /// <summary>
         /// Gets the current line number
         /// </summary>
         int CurrentLine { get; }
@@ -24,16 +29,6 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number
         /// </summary>
         int CurrentColumn { get; }
-
-        /// <summary>
-        /// Gets the number of recognized terminals
-        /// </summary>
-        int TerminalsCount { get; }
-
-        /// <summary>
-        /// Gets the recognized terminals
-        /// </summary>
-        SymbolTerminal[] Terminals { get; }
 
         /// <summary>
         /// Gets the next token in the input

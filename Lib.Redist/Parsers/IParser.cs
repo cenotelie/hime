@@ -14,6 +14,16 @@ namespace Hime.Redist.Parsers
     public interface IParser
     {
         /// <summary>
+        /// Gets the variable symbols used by this parser
+        /// </summary>
+        Utils.SymbolDictionary<SymbolVariable> Variables { get; }
+
+        /// <summary>
+        /// Gets the virtual symbols used by this parser
+        /// </summary>
+        Utils.SymbolDictionary<SymbolVirtual> Virtuals { get; }
+
+        /// <summary>
         /// Gets the errors encountered by the parser
         /// </summary>
         ICollection<ParserError> Errors { get; }

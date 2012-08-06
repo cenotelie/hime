@@ -61,7 +61,7 @@ namespace Hime.Redist.Parsers
         /// <param name="token">The unexpected token</param>
         protected override void OnUnexpectedToken(SymbolToken token)
         {
-            List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.TerminalsCount);
+            List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
             List<SymbolTerminal> expected = new List<SymbolTerminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);

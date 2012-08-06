@@ -71,10 +71,6 @@
     <Compile Include="Lexer\TextLexer.cs" />
     <Compile Include="Lexer\TextLexerAutomaton.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
-    <Compile Include="Parsers\LR\LRParser.cs" />
-    <Compile Include="Parsers\LR\LRReduction.cs" />
-    <Compile Include="Parsers\LR\LRRule.cs" />
-    <Compile Include="Parsers\LR\LRState.cs" />
     <Compile Include="Parsers\ParserError.cs" />
     <Compile Include="Parsers\UnexpectedTokenError.cs" />
     <Compile Include="Symbols\SymbolAction.cs" />
@@ -93,6 +89,7 @@
     <Compile Include="SyntaxNodes\SPPFNode.cs" />
     <Compile Include="Symbols\Symbol.cs" />
     <Compile Include="Utils\MemoryMaps.cs" />
+    <Compile Include="Utils\ReadonlyDictionary.cs" />
     <Compile Include="Utils\SIDHashMap.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -34,11 +34,11 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's variables
         /// </summary>
-        protected SymbolVariable[] parserVariables;
+        protected Utils.SymbolDictionary<SymbolVariable> parserVariables;
         /// <summary>
         /// Parser's virtuals
         /// </summary>
-        protected SymbolVirtual[] parserVirtuals;
+        protected Utils.SymbolDictionary<SymbolVirtual> parserVirtuals;
         /// <summary>
         /// Parser's actions
         /// </summary>
@@ -62,6 +62,16 @@ namespace Hime.Redist.Parsers
         protected ILexer lexer;
 
         /// <summary>
+        /// Gets the variable symbols used by this parser
+        /// </summary>
+        public Utils.SymbolDictionary<SymbolVariable> Variables { get { return parserVariables; } }
+
+        /// <summary>
+        /// Gets the virtual symbols used by this parser
+        /// </summary>
+        public Utils.SymbolDictionary<SymbolVirtual> Virtuals { get { return parserVirtuals; } }
+
+        /// <summary>
         /// Gets a read-only collection of syntaxic errors encountered by the parser
         /// </summary>
         public ICollection<ParserError> Errors { get { return readonlyErrors; } }
@@ -76,8 +86,8 @@ namespace Hime.Redist.Parsers
         /// <param name="input">The input lexer</param>
         public BaseLRParser(SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer input)
         {
-            this.parserVariables = variables;
-            this.parserVirtuals = virtuals;
+            this.parserVariables = new Utils.SymbolDictionary<SymbolVariable>(variables);
+            this.parserVirtuals = new Utils.SymbolDictionary<SymbolVirtual>(virtuals);
             this.parserActions = pactions;
             this.recognizerActions = ractions;
             this.errors = new List<ParserError>();

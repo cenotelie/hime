@@ -20,7 +20,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// The terminals that can be recognized by this lexer
         /// </summary>
-        private SymbolTerminal[] lexTerminals;
+        private Utils.SymbolDictionary<SymbolTerminal> lexTerminals;
         /// <summary>
         /// ID of the separator
         /// </summary>
@@ -52,6 +52,10 @@ namespace Hime.Redist.Parsers
         private int bufferSize;
 
         /// <summary>
+        /// Gets the terminals matched by this lexer
+        /// </summary>
+        public Utils.SymbolDictionary<SymbolTerminal> Terminals { get { return lexTerminals; } }
+        /// <summary>
         /// Gets the current line number
         /// </summary>
         public int CurrentLine { get { return currentLine; } }
@@ -59,14 +63,6 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number
         /// </summary>
         public int CurrentColumn { get { return currentColumn; } }
-        /// <summary>
-        /// Gets the number of recognized terminals
-        /// </summary>
-        public int TerminalsCount { get { return lexTerminals.Length; } }
-        /// <summary>
-        /// Gets the recognized terminals
-        /// </summary>
-        public SymbolTerminal[] Terminals { get { return lexTerminals; } }
 
         /// <summary>
         /// Events for lexical errors
@@ -83,7 +79,7 @@ namespace Hime.Redist.Parsers
         protected TextLexer(TextLexerAutomaton automaton, SymbolTerminal[] terminals, ushort separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
-            this.lexTerminals = terminals;
+            this.lexTerminals = new Utils.SymbolDictionary<SymbolTerminal>(terminals);
             this.lexSeparator = separator;
             this.input = new RewindableTextReader(input);
             this.currentLine = 1;
