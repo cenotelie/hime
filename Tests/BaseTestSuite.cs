@@ -66,7 +66,7 @@ namespace Hime.Tests
 
         protected Assembly Build(string lexer, string parser)
         {
-            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
+            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.TextLexer)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{
             	CompilerParameters compilerparams = new CompilerParameters();
@@ -88,15 +88,9 @@ namespace Hime.Tests
             Type[] types = assembly.GetTypes();
             for (int i = 0; i != types.Length; i++)
             {
-                if (types[i].BaseType == typeof(LexerText))
+                if (types[i].BaseType == typeof(TextLexer))
                     lexerType = types[i];
-                else if (types[i].BaseType == typeof(LR0BaseParser))
-                    parserType = types[i];
-                else if (types[i].BaseType == typeof(LR1BaseParser))
-                    parserType = types[i];
-                else if (types[i].BaseType == typeof(RNGLRParser))
-                    parserType = types[i];
-                else if (types[i].BaseType == typeof(LRStarBaseParser))
+                else if (types[i].BaseType == typeof(LRkParser))
                     parserType = types[i];
             }
             Type actionType = parserType.GetNestedType("Actions");
