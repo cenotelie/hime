@@ -37,7 +37,7 @@ namespace Hime.Redist.Parsers
         private Utils.BlobUShort table;
         private Utils.BlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
-        private LRkProduction[] productions;
+        private LRProduction[] productions;
 
         private LRkAutomaton(Stream stream)
         {
@@ -56,9 +56,9 @@ namespace Hime.Redist.Parsers
             byte[] buffer = new byte[ncols * nrows * 4];
             stream.Read(buffer, 0, buffer.Length);
             this.table = new Utils.BlobUShort(buffer);
-            this.productions = new LRkProduction[nprod];
+            this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
-                this.productions[i] = new LRkProduction(reader);
+                this.productions[i] = new LRProduction(reader);
             reader.Close();
         }
 
@@ -100,7 +100,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="index">Production's index</param>
         /// <returns>The production a the given index</returns>
-        public LRkProduction GetProduction(ushort index) { return productions[index]; }
+        public LRProduction GetProduction(ushort index) { return productions[index]; }
 
         /// <summary>
         /// Gets a list of the expected terminal indices

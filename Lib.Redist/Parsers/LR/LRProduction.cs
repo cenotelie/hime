@@ -24,7 +24,7 @@ namespace Hime.Redist.Parsers
     * uint16: action's index
     */
 
-    public sealed class LRkProduction
+    public sealed class LRProduction
     {
         private ushort head;
         private byte headAction;
@@ -38,7 +38,7 @@ namespace Hime.Redist.Parsers
         public ushort[] Bytecode { get { return bytecode.data; } }
         public int BytecodeLength { get { return bytecodeLength; } }
 
-        public LRkProduction(BinaryReader stream)
+        public LRProduction(BinaryReader stream)
         {
             this.head = stream.ReadUInt16();
             this.headAction = stream.ReadByte();

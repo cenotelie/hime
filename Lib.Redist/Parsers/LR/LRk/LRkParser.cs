@@ -136,7 +136,7 @@ namespace Hime.Redist.Parsers
                 }
                 else if (action == 1)
                 {
-                    LRkProduction production = parserAutomaton.GetProduction(data);
+                    LRProduction production = parserAutomaton.GetProduction(data);
                     CSTNode sub = new CSTNode(parserVariables[production.Head], (CSTAction)production.HeadAction);
                     head -= production.ReductionLength;
                     int count = 0;
@@ -196,7 +196,7 @@ namespace Hime.Redist.Parsers
                 }
                 else if (action == 1)
                 {
-                    LRkProduction production = parserAutomaton.GetProduction(data);
+                    LRProduction production = parserAutomaton.GetProduction(data);
                     SymbolVariable var = parserVariables[production.Head];
                     head -= production.ReductionLength;
                     int nstack = 0;
