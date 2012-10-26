@@ -59,13 +59,15 @@ namespace Hime.Redist.Parsers
         /// Handles an unexpected token and returns whether is successfuly handled the error
         /// </summary>
         /// <param name="token">The unexpected token</param>
-        protected override void OnUnexpectedToken(SymbolToken token)
+        /// <returns>The next token</returns>
+        protected override SymbolToken OnUnexpectedToken(SymbolToken token)
         {
             List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
             List<SymbolTerminal> expected = new List<SymbolTerminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);
             errors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
+            return lexer.GetNextToken();
         }
 
         /// <summary>
@@ -86,7 +88,7 @@ namespace Hime.Redist.Parsers
                 }
                 if (nextToken.SymbolID == 0x0001)
                     return nodes[1].ApplyActions();
-                OnUnexpectedToken(nextToken);
+                nextToken = OnUnexpectedToken(nextToken);
                 if (errors.Count >= maxErrorCount)
                     return null;
             }
@@ -111,7 +113,7 @@ namespace Hime.Redist.Parsers
                 }
                 if (nextToken.SymbolID == 0x0001)
                     return true;
-                OnUnexpectedToken(nextToken);
+                nextToken = OnUnexpectedToken(nextToken);
                 return false;
             }
         }

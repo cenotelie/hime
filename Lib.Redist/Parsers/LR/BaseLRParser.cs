@@ -109,7 +109,8 @@ namespace Hime.Redist.Parsers
         /// Handles an unexpected token and returns whether is successfuly handled the error
         /// </summary>
         /// <param name="token">The unexpected token</param>
-        protected abstract void OnUnexpectedToken(SymbolToken token);
+        /// <returns>The next token</returns>
+        protected abstract SymbolToken OnUnexpectedToken(SymbolToken token);
 
 
         /// <summary>
