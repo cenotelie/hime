@@ -50,42 +50,9 @@ namespace Hime.Parsers.ContextFree.LR
             this.rules = new List<Rule>(this.grammar.Rules);
         }
 
-		// TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
-        public void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected)
-		{
-	        this.terminals = new List<Terminal>(expected);
-            
-			stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
-            stream.WriteLine("    {");
-            ExportAutomaton(stream, className);
-            ExportVariables(stream);
-            ExportVirtuals(stream);
-            ExportActions(stream);
-            ExportActionsClass(stream);
-            ExportActionHooks(stream);
-            ExportConstructor(stream, className, lexerClassName);
-			stream.WriteLine("    }");
-		}
+        public abstract void ExportData(BinaryWriter stream);
 
-        public void ExportData(BinaryWriter stream)
-        {
-            List<Rule> rules = new List<Rule>(grammar.Rules);
-            stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
-            stream.Write((ushort)graph.States.Count);                   // Nb or rows
-            stream.Write((ushort)rules.Count);                          // Nb or productions
-
-            foreach (Terminal t in terminals)
-                stream.Write(t.SID);
-            foreach (Variable var in variables)
-                stream.Write(var.SID);
-            ExportDataTable(stream);
-            foreach (Rule rule in rules)
-                ExportProduction(stream, rule);
-        }
-
-        protected abstract void ExportDataTable(BinaryWriter stream);
-
-        protected void ExportProduction(BinaryWriter stream, Rule rule)
+        protected void ExportDataProduction(BinaryWriter stream, Rule rule)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
             if (rule.ReplaceOnProduction) stream.Write((byte)1);
@@ -123,14 +90,28 @@ namespace Hime.Parsers.ContextFree.LR
             }
         }
 
-        protected virtual void ExportAutomaton(StreamWriter stream, string className)
+        // TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
+        public void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected)
         {
-            stream.WriteLine("        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(" + className + "));");
+            this.terminals = new List<Terminal>(expected);
+
+            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
+            stream.WriteLine("    {");
+            ExportAutomaton(stream, className);
+            ExportVariables(stream);
+            ExportVirtuals(stream);
+            ExportActions(stream);
+            ExportActionsClass(stream);
+            ExportActionHooks(stream);
+            ExportConstructor(stream, className, lexerClassName);
+            stream.WriteLine("    }");
         }
+
+        protected abstract void ExportAutomaton(StreamWriter stream, string className);
 
         protected void ExportVariables(StreamWriter stream)
         {
-            stream.WriteLine("        public static readonly SymbolVariable[] variables = {");
+            stream.WriteLine("        private static readonly SymbolVariable[] variables = {");
             bool first = true;
             foreach (Variable var in variables)
             {
@@ -140,6 +121,18 @@ namespace Hime.Parsers.ContextFree.LR
                 first = false;
             }
             stream.WriteLine(" };");
+
+            stream.WriteLine("        public enum Variables : int");
+            stream.WriteLine("        {");
+            for (int i = 0; i != variables.Count; i++)
+            {
+                stream.Write("            " + variables[i].Name + " = " + i);
+                if (i == variables.Count - 1)
+                    stream.WriteLine();
+                else
+                    stream.WriteLine(",");
+            }
+            stream.WriteLine("        }");
         }
 
         protected void ExportVirtuals(StreamWriter stream)
@@ -154,6 +147,18 @@ namespace Hime.Parsers.ContextFree.LR
                 first = false;
             }
             stream.WriteLine(" };");
+
+            stream.WriteLine("        public enum Virtuals : int");
+            stream.WriteLine("        {");
+            for (int i = 0; i != virtuals.Count; i++)
+            {
+                stream.Write("            " + virtuals[i].Name + " = " + i);
+                if (i == virtuals.Count - 1)
+                    stream.WriteLine();
+                else
+                    stream.WriteLine(",");
+            }
+            stream.WriteLine("        }");
         }
 
         protected void ExportActions(StreamWriter stream)

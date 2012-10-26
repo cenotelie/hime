@@ -24,9 +24,13 @@ namespace Hime.Parsers.ContextFree.LR
             this.deciders = deciders;
         }
 
-        protected override void ExportDataTable(BinaryWriter stream)
+        public override void ExportData(BinaryWriter stream)
         {
             throw new NotImplementedException();
+        }
+
+        protected override void ExportAutomaton(StreamWriter stream, string className)
+        {
         }
 
         /*protected override void ExportSetup(StreamWriter stream)

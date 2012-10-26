@@ -25,7 +25,7 @@ namespace Hime.Parsers.ContextFree.LR
             nullableChoices = new List<CFRuleBody>();
         }
 
-        protected override void ExportDataTable(BinaryWriter stream)
+        public override void ExportData(BinaryWriter stream)
         {
             throw new NotImplementedException();
         }
@@ -48,6 +48,10 @@ namespace Hime.Parsers.ContextFree.LR
                     }
                 }
             }
+        }
+
+        protected override void ExportAutomaton(StreamWriter stream, string className)
+        {
         }
 
         /*protected override void ExportAdditionalStaticElements(StreamWriter stream, string className)
