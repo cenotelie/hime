@@ -64,12 +64,14 @@
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
+    <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Parsers\ParserErrorType.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRProduction.cs" />
     <Compile Include="Lexer\RewindableTextReader.cs" />
     <Compile Include="Lexer\TextLexer.cs" />
     <Compile Include="Lexer\TextLexerAutomaton.cs" />
+    <Compile Include="Parsers\RewindableTokenStream.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\ParserError.cs" />
     <Compile Include="Parsers\UnexpectedTokenError.cs" />

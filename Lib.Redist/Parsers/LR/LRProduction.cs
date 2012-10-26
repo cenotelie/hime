@@ -26,6 +26,15 @@ namespace Hime.Redist.Parsers
 
     public sealed class LRProduction
     {
+        public const ushort PopNoAction = (ushort)CSTAction.Nothing;
+        public const ushort PopDrop = (ushort)CSTAction.Drop;
+        public const ushort PopPromote = (ushort)CSTAction.Promote;
+        public const ushort Virtual = 4;
+        public const ushort VirtualNoAction = Virtual + (ushort)CSTAction.Nothing;
+        public const ushort VirtualDrop = Virtual + (ushort)CSTAction.Drop;
+        public const ushort VirtualPromote = Virtual + (ushort)CSTAction.Promote;
+        public const ushort SemanticAction = 8;
+
         private ushort head;
         private byte headAction;
         private byte reducLength;

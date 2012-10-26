@@ -3,10 +3,14 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Utils
 {
+    /// <summary>
+    /// Represents an immutable dictionary of symbols
+    /// </summary>
+    /// <typeparam name="T">The type of symbol</typeparam>
     public sealed class SymbolDictionary<T> : IDictionary<string, T> where T : Parsers.Symbol
     {
         private Dictionary<string, T> impl;
-        private T[] raw;
+        internal T[] raw;
 
         public bool IsReadOnly { get { return true; } }
         public int Count { get { return raw.Length; } }

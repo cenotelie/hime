@@ -14,11 +14,27 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public abstract class LRkParser : BaseLRParser
     {
+        private class Simulator : LRkSimulator
+        {
+            public Simulator(LRkParser parser)
+            {
+                this.parserAutomaton = parser.parserAutomaton;
+                this.parserVariables = parser.parserVariables;
+                this.input = parser.input;
+                this.stack = new ushort[maxStackSize];
+                this.head = parser.head;
+                System.Array.Copy(parser.stack, this.stack, parser.head + 1);
+            }
+        }
+
         /// <summary>
         /// LR(k) parsing table and productions
         /// </summary>
         private LRkAutomaton parserAutomaton;
-        
+        /// <summary>
+        /// Parser's input encapsulating the lexer
+        /// </summary>
+        private RewindableTokenStream input;
         /// <summary>
         /// Parser's stack
         /// </summary>
@@ -48,11 +64,12 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="pactions">The parser's actions in parse mode</param>
         /// <param name="ractions">The parser's actions in recognize mode</param>
-        /// <param name="input">The input lexer</param>
-        public LRkParser(LRkAutomaton automaton, SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer input)
-            : base(variables, virtuals, pactions, ractions, input)
+        /// <param name="lexer">The input lexer</param>
+        public LRkParser(LRkAutomaton automaton, SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer lexer)
+            : base(variables, virtuals, pactions, ractions, lexer)
         {
             this.parserAutomaton = automaton;
+            this.input = new RewindableTokenStream(lexer);
         }
 
         /// <summary>
@@ -67,7 +84,43 @@ namespace Hime.Redist.Parsers
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);
             errors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
-            return lexer.GetNextToken();
+            if (!tryRecover) return null;
+            if (TryDrop1Unexpected()) return input.GetNextToken();
+            if (TryDrop2Unexpected()) return input.GetNextToken();
+            foreach (SymbolTerminal terminal in expected)
+            {
+                SymbolTokenText dummy = new SymbolTokenText(terminal.SymbolID, terminal.Name, string.Empty, 0, 0);
+                if (TryInsertExpected(dummy))
+                    return dummy;
+            }
+            return null;
+        }
+
+        private bool TryDrop1Unexpected()
+        {
+            int used = 0;
+            bool success = (new Simulator(this)).TestForLength(3, null, out used);
+            input.Rewind(used);
+            return success;
+        }
+
+        private bool TryDrop2Unexpected()
+        {
+            input.GetNextToken();
+            int used = 0;
+            bool success = (new Simulator(this)).TestForLength(3, null, out used);
+            input.Rewind(used);
+            if (!success)
+                input.Rewind(1);
+            return success;
+        }
+
+        private bool TryInsertExpected(SymbolToken terminal)
+        {
+            int used = 0;
+            bool success = (new Simulator(this)).TestForLength(3, terminal, out used);
+            input.Rewind(used);
+            return success;
         }
 
         /// <summary>
@@ -76,20 +129,21 @@ namespace Hime.Redist.Parsers
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         public override CSTNode Parse()
         {
-            this.stack = new ushort[stackMaxSize];
-            this.nodes = new CSTNode[stackMaxSize];
-            SymbolToken nextToken = lexer.GetNextToken();
+            this.stack = new ushort[maxStackSize];
+            this.nodes = new CSTNode[maxStackSize];
+            SymbolToken nextToken = input.GetNextToken();
             while (true)
             {
-                if (ParseOnToken(nextToken))
+                int action = ParseOnToken(nextToken);
+                if (action == LRkAutomaton.ActionShift)
                 {
-                    nextToken = lexer.GetNextToken();
+                    nextToken = input.GetNextToken();
                     continue;
                 }
-                if (nextToken.SymbolID == 0x0001)
+                if (action == LRkAutomaton.ActionAccept)
                     return nodes[1].ApplyActions();
                 nextToken = OnUnexpectedToken(nextToken);
-                if (errors.Count >= maxErrorCount)
+                if (nextToken == null || errors.Count >= maxErrorCount)
                     return null;
             }
         }
@@ -100,21 +154,23 @@ namespace Hime.Redist.Parsers
         /// <returns>True if the input is recognized, false otherwise</returns>
         public override bool Recognize()
         {
-            this.stack = new ushort[stackMaxSize];
-            this.symbols = new Symbol[stackMaxSize];
-            this.body = new Symbol[stackMaxSize];
-            SymbolToken nextToken = lexer.GetNextToken();
+            this.stack = new ushort[maxStackSize];
+            this.symbols = new Symbol[maxStackSize];
+            this.body = new Symbol[maxStackSize];
+            SymbolToken nextToken = input.GetNextToken();
             while (true)
             {
-                if (RecognizeOnToken(nextToken))
+                int action = RecognizeOnToken(nextToken);
+                if (action == LRkAutomaton.ActionShift)
                 {
-                    nextToken = lexer.GetNextToken();
+                    nextToken = input.GetNextToken();
                     continue;
                 }
-                if (nextToken.SymbolID == 0x0001)
+                if (action == LRkAutomaton.ActionAccept)
                     return true;
                 nextToken = OnUnexpectedToken(nextToken);
-                return false;
+                if (nextToken == null || errors.Count >= maxErrorCount)
+                    return false;
             }
         }
 
@@ -123,7 +179,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="token">Current token</param>
         /// <returns>true if the parser is able to consume the token, false otherwise</returns>
-        private bool ParseOnToken(SymbolToken token)
+        private int ParseOnToken(SymbolToken token)
         {
             while (true)
             {
@@ -134,7 +190,7 @@ namespace Hime.Redist.Parsers
                     head++;
                     stack[head] = data;
                     nodes[head] = new CSTNode(token);
-                    return true;
+                    return action;
                 }
                 else if (action == 1)
                 {
@@ -145,19 +201,19 @@ namespace Hime.Redist.Parsers
                     for (int i = 0; i != production.BytecodeLength; i++)
                     {
                         ushort op = production.Bytecode[i];
-                        if (op == 8)
+                        if (op == LRProduction.SemanticAction)
                         {
                             ushort index = production.Bytecode[i + 1];
                             parserActions[index](sub);
                             i++;
                         }
-                        else if (op > 3)
+                        else if (op >= LRProduction.Virtual)
                         {
                             ushort index = production.Bytecode[i + 1];
                             sub.AppendChild(new CSTNode(parserVirtuals[index], (CSTAction)(op - 4)));
                             i++;
                         }
-                        else if (op == 0)
+                        else if (op == LRProduction.PopNoAction)
                         {
                             sub.AppendChild(nodes[head + count + 1]);
                             count++;
@@ -174,7 +230,7 @@ namespace Hime.Redist.Parsers
                     nodes[head] = sub;
                     continue;
                 }
-                return false;
+                return action;
             }
         }
 
@@ -183,20 +239,20 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="token">Current token</param>
         /// <returns>true if the parser is able to consume the token, false otherwise</returns>
-        private bool RecognizeOnToken(SymbolToken token)
+        private int RecognizeOnToken(SymbolToken token)
         {
             while (true)
             {
                 ushort action = 0;
                 ushort data = parserAutomaton.GetAction(stack[head], token.SymbolID, out action);
-                if (action == 2)
+                if (action == LRkAutomaton.ActionShift)
                 {
                     head++;
                     stack[head] = data;
                     symbols[head] = token;
-                    return true;
+                    return action;
                 }
-                else if (action == 1)
+                else if (action == LRkAutomaton.ActionReduce)
                 {
                     LRProduction production = parserAutomaton.GetProduction(data);
                     SymbolVariable var = parserVariables[production.Head];
@@ -206,16 +262,16 @@ namespace Hime.Redist.Parsers
                     for (int i = 0; i != production.BytecodeLength; i++)
                     {
                         ushort op = production.Bytecode[i];
-                        if (op == 8)
+                        if (op == LRProduction.SemanticAction)
                         {
                             ushort index = production.Bytecode[i + 1];
                             recognizerActions[index](body, length);
                             i++;
                         }
-                        else if (op > 3)
+                        else if (op >= LRProduction.Virtual)
                         {
                             ushort index = production.Bytecode[i + 1];
-                            body[length] = parserVariables[index];
+                            body[length] = parserVirtuals[index];
                             length++;
                             i++;
                         }
@@ -232,7 +288,7 @@ namespace Hime.Redist.Parsers
                     symbols[head] = var;
                     continue;
                 }
-                return false;
+                return action;
             }
         }
     }

@@ -25,7 +25,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Maximal size of the stack
         /// </summary>
-        protected const int stackMaxSize = 100;
+        protected const int maxStackSize = 100;
         /// <summary>
         /// Maximum number of errors
         /// </summary>
@@ -48,6 +48,10 @@ namespace Hime.Redist.Parsers
         /// </summary>
         protected RecognizerAction[] recognizerActions;
 
+        /// <summary>
+        /// Determine whether the parser will try to recover from errors
+        /// </summary>
+        protected bool tryRecover;
         /// <summary>
         /// List of the encountered syntaxic errors
         /// </summary>
@@ -83,16 +87,17 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="pactions">The parser's actions in parse mode</param>
         /// <param name="ractions">The parser's actions in recognize mode</param>
-        /// <param name="input">The input lexer</param>
-        public BaseLRParser(SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer input)
+        /// <param name="lexer">The input lexer</param>
+        public BaseLRParser(SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer lexer)
         {
             this.parserVariables = new Utils.SymbolDictionary<SymbolVariable>(variables);
             this.parserVirtuals = new Utils.SymbolDictionary<SymbolVirtual>(virtuals);
             this.parserActions = pactions;
             this.recognizerActions = ractions;
+            this.tryRecover = true;
             this.errors = new List<ParserError>();
             this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
-            this.lexer = input;
+            this.lexer = lexer;
             this.lexer.OnError += OnLexicalError;
         }
 

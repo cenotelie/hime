@@ -14,6 +14,11 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public sealed class LRkAutomaton
     {
+        public const int ActionNone = 0;
+        public const int ActionReduce = 1;
+        public const int ActionShift = 2;
+        public const int ActionAccept = 3;
+
         /* Binary data of a LR(k) parser
          * uint16: number of columns
          * uint16: number of rows
@@ -101,6 +106,16 @@ namespace Hime.Redist.Parsers
         /// <param name="index">Production's index</param>
         /// <returns>The production a the given index</returns>
         public LRProduction GetProduction(ushort index) { return productions[index]; }
+
+        /// <summary>
+        /// Determine whether the given state is the accepting state
+        /// </summary>
+        /// <param name="state">The DFA state</param>
+        /// <returns>True if the state is the accepting state, false otherwise</returns>
+        public bool IsAcceptingState(ushort state)
+        {
+            return (table.data[ncols * state * 2] == 3);
+        }
 
         /// <summary>
         /// Gets a list of the expected terminal indices
