@@ -218,7 +218,7 @@ namespace Hime.Parsers
             try { root = parser.Parse(); }
             catch (Exception ex)
             {
-                reporter.Fatal("Compiler", "Fatal error while parser the input");
+                reporter.Fatal("Compiler", "Fatal error while parsing the input");
                 reporter.Report(ex);
                 hasErrors = true;
             }
