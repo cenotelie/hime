@@ -25,8 +25,8 @@ namespace Hime.Tests.CentralDogma
             task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             task.Execute();
         }
 
@@ -41,8 +41,8 @@ namespace Hime.Tests.CentralDogma
             task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
 			task.GrammarName = "Test";
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
         }
@@ -85,8 +85,8 @@ namespace Hime.Tests.CentralDogma
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
             task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             task.ExportLog = true;
             Report result = task.Execute();
             Assert.IsFalse(result.HasErrors);
@@ -102,8 +102,8 @@ namespace Hime.Tests.CentralDogma
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
             task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             Report result = task.Execute();
             Assert.AreEqual(1, result.ErrorCount);
         }
@@ -121,8 +121,8 @@ namespace Hime.Tests.CentralDogma
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
             task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             Report result = task.Execute();
             foreach (Entry error in result.Errors)
             {
@@ -141,8 +141,8 @@ namespace Hime.Tests.CentralDogma
             task.Method = ParsingMethod.LR0;
             task.InputRawData.Add(grammar);
             task.GrammarName = "Test";
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             Assert.IsFalse(task.LoadInputs());
         }
 
@@ -156,8 +156,8 @@ namespace Hime.Tests.CentralDogma
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             Assert.IsTrue(task.LoadInputs());
         }
 
@@ -171,8 +171,8 @@ namespace Hime.Tests.CentralDogma
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             Assert.IsFalse(task.LoadInputs());
         }
 
@@ -186,8 +186,8 @@ namespace Hime.Tests.CentralDogma
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR1;
             task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer.cs";
-            task.ParserFile = "parser.cs";
+            task.LexerFile = "lexer";
+            task.ParserFile = "parser";
             task.LoadInputs();
         }
 

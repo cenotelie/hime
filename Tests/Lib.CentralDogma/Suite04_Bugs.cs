@@ -14,8 +14,8 @@ namespace Hime.Tests.CentralDogma
     {
         private Report DoCompile(string grammar, ParsingMethod method, string dir)
         {
-            string lexer = "lexer.cs";
-            string parser = "parser.cs";
+            string lexer = "lexer";
+            string parser = "parser";
             return CompileRaw(grammar, method, lexer, parser);
         }
 

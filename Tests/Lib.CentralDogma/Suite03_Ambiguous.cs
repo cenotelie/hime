@@ -14,8 +14,8 @@ namespace Hime.Tests.CentralDogma
     {
         private Report DoCompile(string grammar, ParsingMethod method, string dir)
         {
-            string lexer = "lexer.cs";
-            string parser = "parser.cs";
+            string lexer = "lexer";
+            string parser = "parser";
             return CompileRaw(grammar, method, lexer, parser);
         }
 
@@ -74,8 +74,8 @@ namespace Hime.Tests.CentralDogma
         public void Test007_FindsAmbigousGrammarLALR1()
         {
             string dir = GetTestDirectory();
-            string lexer = "lexer.cs";
-            string parser = "parser.cs";
+            string lexer = "lexer";
+            string parser = "parser";
             Assert.IsTrue(CompileResource("Lib.CentralDogma.AmbiguousLR1.gram", ParsingMethod.LALR1, lexer, parser).HasErrors);
         }
 
@@ -83,8 +83,8 @@ namespace Hime.Tests.CentralDogma
         public void Test008_FindsAmbigousGrammarLR1()
         {
             string dir = GetTestDirectory();
-            string lexer = "lexer.cs";
-            string parser = "parser.cs";
+            string lexer = "lexer";
+            string parser = "parser";
             Assert.IsTrue(CompileResource("Lib.CentralDogma.AmbiguousLR1.gram", ParsingMethod.LR1, lexer, parser).HasErrors);
         }
         
