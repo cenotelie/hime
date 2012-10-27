@@ -35,11 +35,8 @@ namespace Hime.HimeCC
         [Option("m", "method", Required = false, HelpText = "Name of the parsing method to use: LR0|LR1|LALR1|RNGLR1|RNGLALR1|LRStar")]
         public ParsingMethod method;
 
-        [Option(null, "lexer", Required = false, HelpText = "Path and name of the file for the generated lexer")]
-        public string lexerFile;
-
-        [Option(null, "parser", Required = false, HelpText = "Path and name of the file for the generated parser")]
-        public string parserFile;
+        [Option("o", "output", Required = false, HelpText = "Prefix for the compiler's outputs")]
+        public string output;
 
         [Option("l", "log", Required = false, HelpText = "True to export the generation log (HTML file)")]
         public bool exportLog;
@@ -57,13 +54,14 @@ namespace Hime.HimeCC
             help.AddPreOptionsLine("the LGPL License <http://www.gnu.org/licenses/lgpl.html>.");
             help.AddPreOptionsLine("");
             help.AddPreOptionsLine("+- Usage:  --------------------------------------------------------+");
-            help.AddPreOptionsLine("| For a file MyGram.gram containing grammar Foo,                   |");
-            help.AddPreOptionsLine("|   > himecc MyGram.gram -g Foo -n Bar -m LALR1 --parser MyGram.cs |");
-            help.AddPreOptionsLine("| Default options:                                                 |");
+            help.AddPreOptionsLine("| Default usage:                                                   |");
             help.AddPreOptionsLine("|   > himecc MyGram.gram                                           |");
-            help.AddPreOptionsLine("| is equivalent to                                                 |");
-            help.AddPreOptionsLine("|   > himecc MyGram.gram -g Foo -n Foo -m RNGLALR1                 |");
-            help.AddPreOptionsLine("|    --lexer FooLexer.cs --parser FooParser.cs                     |");
+            help.AddPreOptionsLine("| Export the compilation log and grammar's documentation:          |");
+            help.AddPreOptionsLine("|   > himecc MyGram.gram -l -d                                     |");
+            help.AddPreOptionsLine("| Select the outputs' prefix:                                      |");
+            help.AddPreOptionsLine("|   > himecc MyGram.gram -o mydir/foo                              |");
+            help.AddPreOptionsLine("|   will generate fooLexer.cs, fooParser.cs, fooLexer.bin and      |");
+            help.AddPreOptionsLine("|   fooParser.bin in directory 'mydir'                             |");
             help.AddPreOptionsLine("+------------------------------------------------------------------+");
             help.AddOptions(this);
             return help;
@@ -80,8 +78,7 @@ namespace Hime.HimeCC
             foreach (string input in this.inputs) task.InputFiles.Add(input);
             task.GrammarName = this.grammarName;
             task.Method = this.method;
-            task.LexerFile = this.lexerFile;
-            task.ParserFile = this.parserFile;
+            task.Output = this.output;
             task.ExportLog = this.exportLog;
             task.ExportDocumentation = this.exportDocumentation;
 			return task;
