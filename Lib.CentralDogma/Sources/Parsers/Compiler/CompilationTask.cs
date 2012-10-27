@@ -20,12 +20,12 @@ namespace Hime.Parsers
     /// </summary>
     public sealed class CompilationTask
     {
-        private const string LexerCode = "Lexer.cs";
-        private const string LexerData = "Lexer.bin";
-        private const string ParserCode = "Parser.cs";
-        private const string ParserData = "Parser.bin";
-        private const string Log = "Log.mht";
-        private const string Doc = "Doc";
+        internal const string LexerCode = "Lexer.cs";
+        internal const string LexerData = "Lexer.bin";
+        internal const string ParserCode = "Parser.cs";
+        internal const string ParserData = "Parser.bin";
+        internal const string Log = "Log.mht";
+        internal const string Doc = "Doc";
 
         /// <summary>
         /// Gets the compiler's version
