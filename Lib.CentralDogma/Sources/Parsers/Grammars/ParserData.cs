@@ -15,6 +15,6 @@ namespace Hime.Parsers
     {
         void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected);
         void ExportData(BinaryWriter stream);
-        void Document(string directory, bool exportVisuals, string dotBin);
+        void Document(string directory);
     }
 }

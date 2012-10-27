@@ -15,40 +15,91 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Parsers
 {
+    /// <summary>
+    /// Represents a compilation task for the himecc
+    /// </summary>
     public sealed class CompilationTask
     {
+        private const string LexerCode = "Lexer.cs";
+        private const string LexerData = "Lexer.bin";
+        private const string ParserCode = "Parser.cs";
+        private const string ParserData = "Parser.bin";
+        private const string Log = "Log.mht";
+        private const string Doc = "Doc";
+
+        /// <summary>
+        /// Gets the compiler's version
+        /// </summary>
         public string Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
         
+        /// <summary>
+        /// Gets the raw input strings
+        /// </summary>
         public ICollection<string> InputRawData { get; private set; }
+        /// <summary>
+        /// Gets the input files
+        /// </summary>
         public ICollection<string> InputFiles { get; private set; }
+        /// <summary>
+        /// Gets or sets the name of the grammar to compile in the case where several grammars are loaded.
+        /// If this property is not set, the first grammar to be found will be compiled.
+        /// </summary>
         public string GrammarName { get; set; }
-        public string Namespace { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parsing method to use
+        /// </summary>
         public ParsingMethod Method { get; set; }
-        public string LexerFile { get; set; }
-        public string ParserFile { get; set; }
-        public bool ExportDebug { get; set; }
-        public bool ExportLog { get; set; }
-        public bool ExportDocumentation { get; set; }
-        public bool ExportVisuals { get; set; }
-        public string DOTBinary { get; set; }
-        public AccessModifier GeneratedCodeModifier { get; set; }
+        /// <summary>
+        /// Gets ot sets the compiler's output files' prefix.
+        /// If this property is not set, the name of the compiled grammar will be used as a prefix and the files output into the current directory
+        /// </summary>
+        /// <remarks>
+        /// The compiler will generate the following files:
+        /// Lexer code file:    ${prefix}Lexer.cs
+        /// Lexer data file:    ${prefix}Lexer.bin
+        /// Parser code file:   ${prefix}Parser.cs
+        /// Parser data file:   ${prefix}Parser.bin
+        /// </remarks>
+        public string Output { get; set; }
+        /// <summary>
+        /// Gets or sets the namespace in which the generated Lexer and Parser classes will be put.
+        /// If this property is not set, the namespace will be the name of the grammar.
+        /// </summary>
+        public string Namespace { get; set; }
+        /// <summary>
+        /// Gets or sets the access modifiers for the generated Lexer and Parser classes.
+        /// The default value is Internal.
+        /// </summary>
+        public AccessModifier CodeAccess { get; set; }
         
+        /// <summary>
+        /// Gets or sets the flag to export the compilation log.
+        /// </summary>
+        public bool ExportLog { get; set; }
+        /// <summary>
+        /// Gets ot sets the flag to export the documentation about the compiled grammar.
+        /// </summary>
+        public bool ExportDocumentation { get; set; }
+        
+
         private Dictionary<string, CompilerPlugin> plugins;
         private Reporter reporter;
         private Dictionary<string, Grammar> grammars;
         private Dictionary<string, GrammarLoader> loaders;
         private CSTNode intermediateRoot;
 
+        /// <summary>
+        /// Initializes a new compilation task
+        /// </summary>
         public CompilationTask()
         {
             InputRawData = new List<string>();
             InputFiles = new List<string>();
             Method = ParsingMethod.RNGLALR1;
-            ExportDebug = false;
             ExportLog = false;
             ExportDocumentation = false;
-            ExportVisuals = false;
-            GeneratedCodeModifier = AccessModifier.Public;
+            CodeAccess = AccessModifier.Internal;
 
             plugins = new Dictionary<string, CompilerPlugin>();
             plugins.Add("cf_grammar", new ContextFree.CFPlugin());
@@ -59,114 +110,69 @@ namespace Hime.Parsers
 
         public Report Execute()
         {
-            string gname = null;
-            try { gname = ExecuteDo(); }
-            catch (Exception ex) { reporter.Report(ex); }
+            string prefix = null;
+            try { prefix = ExecuteDo(); }
+            catch (Exception ex)
+            {
+                reporter.Report(ex);
+                prefix = string.Empty;
+            }
             reporter.EndSection();
 
-            if (ExportLog) reporter.ExportMHTML(GetLogName(gname) + ".mht", "Compiler Log");
+            if (ExportLog)
+                reporter.ExportMHTML(prefix + Log, "Compiler Log");
             return reporter.Result;
         }
 
-        private string ExecuteDo()
+        internal string ExecuteDo()
         {
             reporter.Info("Compiler", "CentralDogma " + Version);
             foreach (string name in plugins.Keys)
                 reporter.Info("Compiler", "Registered plugin " + plugins[name].ToString() + " for " + name);
 
             // Load data
-            if (LoadInputs())
+            if (!LoadInputs())
                 return null;
-
             // Solve dependencies and compile
-            int unsolved = 1;
-            while (unsolved != 0)
-            {
-                unsolved = 0;
-                int solved = 0;
-                foreach (GrammarLoader loader in loaders.Values)
-                {
-                    if (loader.IsSolved) continue;
-                    loader.Load(loaders);
-                    if (loader.IsSolved) solved++;
-                    else unsolved++;
-                }
-                if (unsolved != 0 && solved == 0)
-                {
-                    reporter.Fatal("Compiler", "Unable to solve all resource depedencies");
-                    break;
-                }
-            }
-
+            if (!SolveDependencies())
+                return null;
             // Retrieve the grammar to compile
-            Grammar grammar = null;
-            if (GrammarName != null)
-            {
-                if (!loaders.ContainsKey(GrammarName))
-                    reporter.Fatal("Compiler", "Grammar " + GrammarName + " cannot be found");
-                else
-                    grammar = loaders[GrammarName].Grammar;
-            }
-            else
-            {
-                if (loaders.Count != 1)
-                    reporter.Fatal("Compiler", "Inputs contain more than one grammar, cannot decide which one to compile");
-                else
-                {
-                    Dictionary<string, GrammarLoader>.Enumerator enu = loaders.GetEnumerator();
-                    enu.MoveNext();
-                    grammar = enu.Current.Value.Grammar;
-                }
-            }
+            Grammar grammar = RetrieveGrammar();
             if (grammar == null)
                 return null;
-
             // Get the lexer data
             LexerData lexerData = grammar.GetLexerData(reporter);
             // Get the parser data
             ParserData parserData = grammar.GetParserData(reporter, GetParserGenerator(Method));
 
             // Build names
-            string gname = grammar.Name;
-            string lexerFile = GetLexerName(gname);
-            string parserFile = GetParserName(gname);
-            if (LexerFile != null)
-                lexerFile = LexerFile;
-            if (ParserFile != null)
-                parserFile = ParserFile;
-            if (lexerFile == parserFile)
-            {
-                reporter.Fatal("Compiler", "Output files for lexer and parser must be different");
-                return gname;
-            }
-            string nmspace = gname;
-            if (Namespace != null)
-                nmspace = Namespace;
+            string prefix = (Output != null) ? Output : grammar.Name;
+            string nmspace = (Namespace != null) ? Namespace : grammar.Name;
 
             // Export lexer code
-            reporter.Info("Compiler", "Exporting lexer code at " + lexerFile + ".cs ...");
-            StreamWriter txtOutput = OpenOutputStream(lexerFile + ".cs", nmspace);
-            lexerData.ExportCode(txtOutput, GetLexerName(gname), GeneratedCodeModifier);
+            reporter.Info("Compiler", "Exporting lexer code at " + prefix + LexerCode + " ...");
+            StreamWriter txtOutput = OpenOutputStream(prefix + LexerCode, nmspace);
+            lexerData.ExportCode(txtOutput, grammar.Name + "Lexer", CodeAccess);
             CloseOutputStream(txtOutput);
             reporter.Info("Compiler", "Done!");
             
             // Export lexer data
-            reporter.Info("Compiler", "Exporting lexer data at " + lexerFile + " ...");
-            BinaryWriter binOutput = new BinaryWriter(new FileStream(lexerFile, FileMode.Create));
+            reporter.Info("Compiler", "Exporting lexer data at " + prefix + LexerData + " ...");
+            BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + LexerData, FileMode.Create));
             lexerData.ExportData(binOutput);
             binOutput.Close();
             reporter.Info("Compiler", "Done!");
             
             // Export parser code
-            reporter.Info("Compiler", "Exporting parser data at " + parserFile + ".cs ...");
-            txtOutput = OpenOutputStream(parserFile + ".cs", nmspace);
-            parserData.ExportCode(txtOutput, GetParserName(gname), GeneratedCodeModifier, GetLexerName(gname), lexerData.Expected);
+            reporter.Info("Compiler", "Exporting parser data at " + prefix + ParserCode + " ...");
+            txtOutput = OpenOutputStream(prefix + ParserCode, nmspace);
+            parserData.ExportCode(txtOutput, grammar.Name + "Parser", CodeAccess, grammar.Name + "Lexer", lexerData.Expected);
             CloseOutputStream(txtOutput);
             reporter.Info("Compiler", "Done!");
 
             // Export parser data
-            reporter.Info("Compiler", "Exporting parser data at " + parserFile + " ...");
-            binOutput = new BinaryWriter(new FileStream(parserFile, FileMode.Create));
+            reporter.Info("Compiler", "Exporting parser data at " + prefix + ParserData + " ...");
+            binOutput = new BinaryWriter(new FileStream(prefix + ParserData, FileMode.Create));
             parserData.ExportData(binOutput);
             binOutput.Close();
             reporter.Info("Compiler", "Done!");
@@ -174,38 +180,32 @@ namespace Hime.Parsers
             // Export documentation
             if (ExportDocumentation)
             {
-                reporter.Info("Compiler", "Exporting parser documentation at " + GetDocumentationName(gname));
-                parserData.Document(GetDocumentationName(gname), ExportVisuals, DOTBinary);
+                reporter.Info("Compiler", "Exporting parser documentation at " + prefix + Doc);
+                parserData.Document(prefix + Doc);
                 reporter.Info("Compiler", "Done!");
             }
-            return gname;
+            return prefix;
         }
-
-        private string GetLexerName(string grammarName) { return grammarName + "Lexer"; }
-        private string GetParserName(string grammarName) { return grammarName + "Parser"; }
-        private string GetLogName(string grammarName) { return grammarName + "Log"; }
-        private string GetDocumentationName(string grammarName) { return grammarName + "Doc"; }
 
         internal bool LoadInputs()
         {
-            // TODO: they are both streams => could be unified!!
             intermediateRoot = new CSTNode(null);
             foreach (string file in InputFiles)
             {
                 TextReader reader = new StreamReader(file);
-                if (LoadInput(file, reader))
-                    return true;
+                if (!LoadInput(file, reader))
+                    return false;
             }
             foreach (string data in InputRawData)
             {
                 TextReader reader = new StringReader(data);
-                if (LoadInput(null, reader))
-                    return true;
+                if (!LoadInput(null, reader))
+                    return false;
             }
-            return false;
+            return true;
         }
 
-        private bool LoadInput(string file, TextReader reader)
+        internal bool LoadInput(string file, TextReader reader)
         {
             bool hasErrors = false;
             if (file != null)
@@ -242,10 +242,56 @@ namespace Hime.Parsers
                     loaders.Add(loader.Name, loader);
                 }
             }
-            return hasErrors;
+            return !hasErrors;
         }
 
-        private ParserGenerator GetParserGenerator(ParsingMethod method)
+        internal bool SolveDependencies()
+        {
+            int unsolved = 1;
+            while (unsolved != 0)
+            {
+                unsolved = 0;
+                int solved = 0;
+                foreach (GrammarLoader loader in loaders.Values)
+                {
+                    if (loader.IsSolved) continue;
+                    loader.Load(loaders);
+                    if (loader.IsSolved) solved++;
+                    else unsolved++;
+                }
+                if (unsolved != 0 && solved == 0)
+                {
+                    reporter.Fatal("Compiler", "Unable to solve all resource depedencies");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        internal Grammar RetrieveGrammar()
+        {
+            if (GrammarName != null)
+            {
+                if (!loaders.ContainsKey(GrammarName))
+                    reporter.Fatal("Compiler", "Grammar " + GrammarName + " cannot be found");
+                else
+                    return loaders[GrammarName].Grammar;
+            }
+            else
+            {
+                if (loaders.Count != 1)
+                    reporter.Fatal("Compiler", "Inputs contain more than one grammar, cannot decide which one to compile");
+                else
+                {
+                    Dictionary<string, GrammarLoader>.Enumerator enu = loaders.GetEnumerator();
+                    enu.MoveNext();
+                    return enu.Current.Value.Grammar;
+                }
+            }
+            return null;
+        }
+
+        internal ParserGenerator GetParserGenerator(ParsingMethod method)
         {
             switch (method)
             {
@@ -262,12 +308,11 @@ namespace Hime.Parsers
                 case ParsingMethod.RNGLALR1:
                     return new MethodRNGLALR1(this.reporter);
             }
-            string message = "Unsupported parsing method: " + method.ToString();
-            reporter.Error("Compiler", message);
-            throw new ArgumentException(message);
+            // cannot fall here because all possibilities are exhausted in the switch above
+            return null;
         }
 
-        private StreamWriter OpenOutputStream(string fileName, string nmespace)
+        internal StreamWriter OpenOutputStream(string fileName, string nmespace)
         {
             StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8);
             writer.WriteLine("/*");
@@ -283,7 +328,7 @@ namespace Hime.Parsers
             return writer;
         }
 
-        private void CloseOutputStream(StreamWriter writer)
+        internal void CloseOutputStream(StreamWriter writer)
         {
             writer.WriteLine("}");
             writer.Close();

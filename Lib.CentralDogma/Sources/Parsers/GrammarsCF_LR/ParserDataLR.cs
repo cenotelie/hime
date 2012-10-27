@@ -224,7 +224,7 @@ namespace Hime.Parsers.ContextFree.LR
         }
         
 		// TODO: this method could be factored more (look at the similar code)
-        public void Document(string directory, bool exportVisuals, string dotBin)
+        public void Document(string directory)
         {
             if (Directory.Exists(directory))
                 Directory.Delete(directory, true);
@@ -285,34 +285,27 @@ namespace Hime.Parsers.ContextFree.LR
                 transform.Transform(Path.Combine(directory, "data.xml"), Path.Combine(directory, "grammar.html"));
 
             	// export parser data
-            	List<string> files = SerializeVisuals(directory, exportVisuals, dotBin);
+            	List<string> files = SerializeVisuals(directory);
 			}
         }
 
-        protected List<string> SerializeVisuals(string directory, bool exportVisuals, string dotBin)
+        protected List<string> SerializeVisuals(string directory)
         {
             List<string> files = new List<string>();
-            SerializeGraphVisual(directory, exportVisuals, dotBin, files);
-            SerializeSpecifics(directory, exportVisuals, dotBin, files);
+            SerializeGraphVisual(directory, files);
+            SerializeSpecifics(directory, files);
             return files;
         }
 
-        protected void SerializeGraphVisual(string directory, bool exportVisuals, string dotBin, List<string> results)
+        protected void SerializeGraphVisual(string directory, List<string> results)
         {
             DOTSerializer serializer = new DOTSerializer("Parser", Path.Combine(directory, "GraphParser.dot"));
 			graph.SerializeVisual(serializer);
             serializer.Close();
             results.Add(Path.Combine(directory, "GraphParser.dot"));
-
-            if (exportVisuals)
-            {
-                DOTLayoutManager layout = new DOTExternalLayoutManager(dotBin);
-                layout.Render(Path.Combine(directory, "GraphParser.dot"), Path.Combine(directory, "GraphParser.svg"));
-                results.Add(Path.Combine(directory, "GraphParser.svg"));
-            }
         }
 
-        protected virtual void SerializeSpecifics(string directory, bool exportVisuals, string dotBin, List<string> results) { }
+        protected virtual void SerializeSpecifics(string directory, List<string> results) { }
 
         protected XmlNode SerializeGrammar(XmlDocument document)
         {
