@@ -15,13 +15,7 @@ namespace Hime.Demo.Tasks
             task.Namespace = "Hime.Demo.Generated.C";
             task.ExportLog = true;
             task.ExportDocumentation = true;
-            task.ExportVisuals = false;
             task.InputFiles.Add("Languages\\ANSI_C.gram");
-			string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-			path = Path.Combine(path, "Graphviz 2.28");
-			path = Path.Combine(path, "bin");
-			path = Path.Combine(path, "dot.exe");
-            task.DOTBinary = path;
             task.Execute();
         }
     }

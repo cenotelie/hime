@@ -15,14 +15,8 @@ namespace Hime.Demo.Tasks
             task.Namespace = "Hime.Demo.Generated.CD";
             task.ExportLog = true;
             task.ExportDocumentation = true;
-            task.ExportVisuals = false;
             task.InputFiles.Add("Languages\\FileCentralDogma.gram");
             task.GrammarName = "FileCentralDogma";
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            path = Path.Combine(path, "Graphviz 2.28");
-            path = Path.Combine(path, "bin");
-            path = Path.Combine(path, "dot.exe");
-            task.DOTBinary = path;
             task.Execute();
         }
     }
