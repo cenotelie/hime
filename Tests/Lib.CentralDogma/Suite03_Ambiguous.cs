@@ -12,19 +12,12 @@ namespace Hime.Tests.CentralDogma
     [TestFixture]
     public class Suite03_Ambiguous : BaseTestSuite
     {
-        private Report DoCompile(string grammar, ParsingMethod method, string dir)
-        {
-            string lexer = "lexer";
-            string parser = "parser";
-            return CompileRaw(grammar, method, lexer, parser);
-        }
-
     	[Test]
         public void Test001_ConflictuousGrammar_LALR1()
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
-            Assert.IsTrue(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
+            Assert.IsTrue(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
@@ -32,7 +25,7 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->a|b; a->'x'; b->'x'; }  }";
-            Assert.IsTrue(DoCompile(grammar, ParsingMethod.LR1, dir).HasErrors);
+            Assert.IsTrue(CompileRaw(grammar, ParsingMethod.LR1).HasErrors);
         }
 
         // TODO: think about it, but it seems this test sometimes fails, but not always!!!
@@ -42,8 +35,8 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"S\"; } terminals{} rules{ A->'d'; B->'d'; S->A'a'|'b'A'c'|B'c'|'b'B'a'; } }";
-            Assert.IsTrue(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LR1, dir).HasErrors);
+            Assert.IsTrue(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LR1).HasErrors);
         }
 
         [Test]
@@ -51,7 +44,7 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X -> X; } }";
-            Assert.IsTrue(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
+            Assert.IsTrue(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
@@ -59,7 +52,7 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
-            Assert.IsTrue(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
+            Assert.IsTrue(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
@@ -67,25 +60,21 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"X\"; } terminals{} rules{ X->'a'X | 'a'X 'b'X;} }";
-            Assert.IsTrue(DoCompile(grammar, ParsingMethod.LR1, dir).HasErrors);
+            Assert.IsTrue(CompileRaw(grammar, ParsingMethod.LR1).HasErrors);
         }
 
         [Test]
         public void Test007_FindsAmbigousGrammarLALR1()
         {
             string dir = GetTestDirectory();
-            string lexer = "lexer";
-            string parser = "parser";
-            Assert.IsTrue(CompileResource("Lib.CentralDogma.AmbiguousLR1.gram", ParsingMethod.LALR1, lexer, parser).HasErrors);
+            Assert.IsTrue(CompileResource("Lib.CentralDogma.AmbiguousLR1.gram", ParsingMethod.LALR1).HasErrors);
         }
 
         [Test]
         public void Test008_FindsAmbigousGrammarLR1()
         {
             string dir = GetTestDirectory();
-            string lexer = "lexer";
-            string parser = "parser";
-            Assert.IsTrue(CompileResource("Lib.CentralDogma.AmbiguousLR1.gram", ParsingMethod.LR1, lexer, parser).HasErrors);
+            Assert.IsTrue(CompileResource("Lib.CentralDogma.AmbiguousLR1.gram", ParsingMethod.LR1).HasErrors);
         }
         
         [Test]
@@ -93,7 +82,7 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LR0, dir).HasErrors);
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LR0).HasErrors);
         }
 
         [Test]
@@ -101,7 +90,7 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LR1, dir).HasErrors);
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LR1).HasErrors);
         }
 
         // TODO: fix this bug
@@ -110,7 +99,7 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options { Axiom=\"exp\"; } terminals {} rules { exp -> 'x' | 'x'; } }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LR1, dir).HasErrors);
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LR1).HasErrors);
         }
     }
 }

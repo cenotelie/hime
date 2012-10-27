@@ -12,20 +12,13 @@ namespace Hime.Tests.CentralDogma
     [TestFixture]
     public class Suite04_Bugs : BaseTestSuite
     {
-        private Report DoCompile(string grammar, ParsingMethod method, string dir)
-        {
-            string lexer = "lexer";
-            string parser = "parser";
-            return CompileRaw(grammar, method, lexer, parser);
-        }
-
         [Test]
         public void Test001_Bug_InlineEndLine()
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'\\n'; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assert.IsNotNull(Build("lexer.cs", "parser.cs"));
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assert.IsNotNull(Build());
         }
     }
 }

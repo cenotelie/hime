@@ -37,35 +37,28 @@ namespace Hime.Tests.HimeCC
         }
 
         [Test]
-        public void Test003_BuildCompilationTaskFromArguments_DefaultLexer()
+        public void Test003_BuildCompilationTaskFromArguments_DefaultOutput()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
-            Assert.IsNull(task.LexerFile);
+            Assert.IsNull(task.Output);
         }
 
         [Test]
-        public void Test004_BuildCompilationTaskFromArguments_DefaultParser()
-        {
-            CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
-            Assert.IsNull(task.ParserFile);
-        }
-
-        [Test]
-        public void Test005_BuildCompilationTaskFromArguments_DefaultLogExport()
+        public void Test004_BuildCompilationTaskFromArguments_DefaultLogExport()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsFalse(task.ExportLog);
         }
 
         [Test]
-        public void Test006_BuildCompilationTaskFromArguments_DefaultDocExport()
+        public void Test005_BuildCompilationTaskFromArguments_DefaultDocExport()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.IsFalse(task.ExportDocumentation);
         }
 
         [Test]
-        public void Test007_BuildCompilationTaskFromArguments_DefaultInput()
+        public void Test006_BuildCompilationTaskFromArguments_DefaultInput()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
             Assert.AreEqual(task.InputFiles.Count, 1);
@@ -76,22 +69,22 @@ namespace Hime.Tests.HimeCC
         }
 
         [Test]
-        public void Test008_BuildCompilationTaskFromArguments_EmptyCommand()
+        public void Test007_BuildCompilationTaskFromArguments_EmptyCommand()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(new string[] { });
             Assert.IsNull(task);
         }
 
 		[Test]
-        public void Test009_BuildCompilationTaskFromArguments_ShouldNotReturnNullOnParserOption()
+        public void Test008_BuildCompilationTaskFromArguments_ShouldNotReturnNullOnParserOption()
         {
-			string[] command = new string[] { "Test/MathExp.gram", "--lexer", "Test/TestLexer.cs", "--parser", "Test/TestParser.cs" };
+			string[] command = new string[] { "Test/MathExp.gram", "-o", "Test/Test" };
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(command);
             Assert.IsNotNull(task);
         }
 		
 		[Test]
-		public void Test010_GetUsage_HasGrammarOption()
+		public void Test0009_GetUsage_HasGrammarOption()
 		{
 			string usage = this.options.GetUsage();
 			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
@@ -103,7 +96,7 @@ namespace Hime.Tests.HimeCC
 		}
 		
 		[Test]
-		public void Test011_GetUsage_HasNamespaceOption()
+		public void Test010_GetUsage_HasNamespaceOption()
 		{
 			string usage = this.options.GetUsage();
 			foreach (string line in usage.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None))
@@ -145,5 +138,16 @@ namespace Hime.Tests.HimeCC
 			}
 			Assert.Fail();
 		}
+
+        [Test]
+        public void Test014_GetUsage_HasOuputOption()
+        {
+            string usage = this.options.GetUsage();
+            foreach (string line in usage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+            {
+                if (line.Contains("o, output")) Assert.Pass();
+            }
+            Assert.Fail();
+        }
     }
 }

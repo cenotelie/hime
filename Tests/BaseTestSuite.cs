@@ -15,6 +15,7 @@ namespace Hime.Tests
     public abstract class BaseTestSuite
     {
         protected const string log = "Log.txt";
+        protected const string output = "output";
 
         protected ResourceAccessor accessor;
         protected string directory;
@@ -49,22 +50,30 @@ namespace Hime.Tests
         protected string GetResourceContent(string name) { return accessor.GetAllTextFor(name); }
         protected void ExportResource(string name, string file) { accessor.Export(name, file); }
 
-        protected Report CompileResource(string resource, ParsingMethod method, string lexer, string parser)
+        protected Report CompileResource(string resource, ParsingMethod method)
         {
-			return CompileRaw(GetResourceContent(resource), method, lexer, parser);
+			return CompileRaw(GetResourceContent(resource), method);
         }
 
-        protected Report CompileRaw(string rawInput, ParsingMethod method, string lexer, string parser)
+        protected Report CompileRaw(string rawInput, ParsingMethod method)
         {
             CompilationTask task = new CompilationTask();
             task.Method = method;
             task.InputRawData.Add(rawInput);
-            task.LexerFile = lexer;
-            task.ParserFile = parser;
+            task.Output = output;
+            return task.Execute();
+        }
+        protected Report CompileRaw(string rawInput, ParsingMethod method, bool log)
+        {
+            CompilationTask task = new CompilationTask();
+            task.Method = method;
+            task.InputRawData.Add(rawInput);
+            task.Output = output;
+            task.ExportLog = log;
             return task.Execute();
         }
 
-        protected Assembly Build(string lexer, string parser)
+        protected Assembly Build()
         {
             string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.TextLexer)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
@@ -75,7 +84,9 @@ namespace Hime.Tests
             	compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
             	compilerparams.ReferencedAssemblies.Add("System.dll");
                 compilerparams.ReferencedAssemblies.Add(redist);
-            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexer, parser });
+                compilerparams.EmbeddedResources.Add(output + CompilationTask.LexerData);
+                compilerparams.EmbeddedResources.Add(output + CompilationTask.ParserData);
+                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.LexerCode, output + CompilationTask.ParserData });
             	Assert.AreEqual(0, results.Errors.Count);
             	return results.CompiledAssembly;
 			}

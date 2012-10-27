@@ -21,13 +21,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
-			task.GrammarName = "Test";
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            task.Execute();
+            CompileRaw(grammar, ParsingMethod.LR0);
         }
 
         // should stop earlier on error of the lexer => do a test with an syntax error in the input. See if it stops early
@@ -37,13 +31,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
-			task.GrammarName = "Test";
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            Report result = task.Execute();
+            Report result = CompileRaw(grammar, ParsingMethod.LR0);
             Assert.IsFalse(result.HasErrors);
         }
         
@@ -53,11 +41,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
-			task.GrammarName = "Test";
-            task.Execute();
+            CompileRaw(grammar, ParsingMethod.LR0);
             Assert.IsTrue(File.Exists("TestLexer.cs"));
         }
         
@@ -67,11 +51,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
-			task.GrammarName = "Test";
-            task.Execute();
+            CompileRaw(grammar, ParsingMethod.LR0);
             Assert.IsTrue(File.Exists("TestParser.cs"));
         }
 
@@ -81,14 +61,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } terminals { } rules { exp -> 'x'; } }";
-
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LALR1;
-            task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            task.ExportLog = true;
-            Report result = task.Execute();
+            Report result = CompileRaw(grammar, ParsingMethod.LALR1, true);
             Assert.IsFalse(result.HasErrors);
         }
 
@@ -98,13 +71,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "public text grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
-
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LALR1;
-            task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            Report result = task.Execute();
+            Report result = CompileRaw(grammar, ParsingMethod.LALR1);
             Assert.AreEqual(1, result.ErrorCount);
         }
 
@@ -117,13 +84,7 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "grammar test { options { Axiom = \"exp\"; } rules { exp -> 'x'; } }";
-
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LALR1;
-            task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            Report result = task.Execute();
+            Report result = CompileRaw(grammar, ParsingMethod.LALR1);
             foreach (Entry error in result.Errors)
             {
                 // TODO: here should be FATAL: Parser: ...
@@ -137,13 +98,8 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
-            task.GrammarName = "Test";
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            Assert.IsFalse(task.LoadInputs());
+            Report result = CompileRaw(grammar, ParsingMethod.LR0);
+            Assert.AreEqual(result.ErrorCount, 0);
         }
 
         [Test]
@@ -152,13 +108,8 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\" } rules { exp -> 'x'; } }";
-
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR1;
-            task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            Assert.IsTrue(task.LoadInputs());
+            Report result = CompileRaw(grammar, ParsingMethod.LR1);
+            Assert.AreNotEqual(result.ErrorCount, 0);
         }
 
         [Test]
@@ -167,13 +118,8 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR1;
-            task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            Assert.IsFalse(task.LoadInputs());
+            Report result = CompileRaw(grammar, ParsingMethod.LR1);
+            Assert.AreEqual(result.ErrorCount, 0);
         }
 
         [Test]
@@ -182,13 +128,8 @@ namespace Hime.Tests.CentralDogma
             string dir = GetTestDirectory();
             string grammar =
                 "cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
-
-            CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.LR1;
-            task.InputRawData.Add(grammar);
-            task.LexerFile = "lexer";
-            task.ParserFile = "parser";
-            task.LoadInputs();
+            Report result = CompileRaw(grammar, ParsingMethod.LR1);
+            Assert.AreEqual(result.ErrorCount, 0);
         }
 
         // TODO: do a test with incorrect syntax but for which Compile returns false (saying it has no errors) even though errors are dumped

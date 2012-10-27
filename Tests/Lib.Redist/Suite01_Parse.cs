@@ -22,12 +22,10 @@ namespace Hime.Tests.Redist
         private const string grammar2 = "cf grammar Test { options{ Axiom=\"S\"; } terminals {a->'a'; b->'b';} rules{ S->A b | a b b; A->a; } }";
         private const string grammar3 = "cf grammar Test { options{ Axiom=\"S\"; } terminals {a->'a'; b->'b';} rules{ S->a b A a|a B A a|a b a; A->a|a A; B->b; } }";
         
-        private CSTNode TestGrammar(string dir, string grammar, ParsingMethod method, string input)
+        private CSTNode TestGrammar(string grammar, ParsingMethod method, string input)
         {
-            string lexer = "lexer.cs";
-            string parser = "parser.cs";
-            Assert.IsFalse(CompileRaw(grammar, method, lexer, parser).HasErrors, "Grammar compilation failed!");
-            Assembly assembly = Build(lexer, parser);
+            Assert.IsFalse(CompileRaw(grammar, method).HasErrors, "Grammar compilation failed!");
+            Assembly assembly = Build();
             bool errors = false;
             CSTNode node = Parse(assembly, input, out errors);
             Assert.NotNull(node, "Failed to parse input!");
@@ -39,35 +37,35 @@ namespace Hime.Tests.Redist
         public void Test000_SimpleGrammar_LR0()
         {
             string dir = GetTestDirectory();
-            TestGrammar(dir, grammar0, ParsingMethod.LR0, "adbc");
+            TestGrammar(grammar0, ParsingMethod.LR0, "adbc");
         }
 		
 		[Test]
         public void Test001_SimpleList_LR1()
         {
             string dir = GetTestDirectory();
-            TestGrammar(dir, grammar1, ParsingMethod.LR1, "xxx");
+            TestGrammar(grammar1, ParsingMethod.LR1, "xxx");
         }
 
         [Test]
         public void Test002_SimpleList_LALR1()
         {
             string dir = GetTestDirectory();
-            TestGrammar(dir, grammar1, ParsingMethod.LALR1, "xxx");
+            TestGrammar(grammar1, ParsingMethod.LALR1, "xxx");
         }
 
 		[Test]
         public void Test003_SimpleList_LRStar()
         {
             string dir = GetTestDirectory();
-            TestGrammar(dir, grammar1, ParsingMethod.LRStar, "xxx");
+            TestGrammar(grammar1, ParsingMethod.LRStar, "xxx");
         }
 
         [Test]
         public void Test004_Simple_RNGLR()
         {
             string dir = GetTestDirectory();
-            TestGrammar(dir, grammar2, ParsingMethod.RNGLALR1, "abb");
+            TestGrammar(grammar2, ParsingMethod.RNGLALR1, "abb");
         }
     }
 }
