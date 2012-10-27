@@ -52,17 +52,15 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Loads an automaton from a resource
         /// </summary>
-        /// <param name="type">The parent lexer's type</param>
-        /// <returns></returns>
-        public static TextLexerAutomaton FindAutomaton(System.Type type)
+        /// <param name="assembly">The assembly containing the automaton definition</param>
+        /// <param name="resource">The resource's name</param>
+        /// <returns>The automaton</returns>
+        public static TextLexerAutomaton FindAutomaton(System.Type type, string resource)
         {
             System.Reflection.Assembly assembly = type.Assembly;
-            System.IO.Stream stream = assembly.GetManifestResourceStream(type.Name);
-            if (stream != null)
-                return new TextLexerAutomaton(stream);
             string[] resources = assembly.GetManifestResourceNames();
             foreach (string existing in resources)
-                if (existing.EndsWith(type.Name))
+                if (existing.EndsWith(resource))
                     return new TextLexerAutomaton(assembly.GetManifestResourceStream(existing));
             return null;
         }

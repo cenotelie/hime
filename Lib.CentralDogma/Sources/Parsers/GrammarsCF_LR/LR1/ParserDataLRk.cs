@@ -17,9 +17,9 @@ namespace Hime.Parsers.ContextFree.LR
 
 		protected override string GetBaseClassName { get { return "LRkParser"; } }
 
-        protected override void ExportAutomaton(StreamWriter stream, string className)
+        protected override void ExportAutomaton(StreamWriter stream, string name, string resource)
         {
-            stream.WriteLine("        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(" + className + "));");
+            stream.WriteLine("        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(" + name + "Parser), \"" + resource + "\");");
         }
 
         public override void ExportData(BinaryWriter stream)

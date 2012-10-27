@@ -86,7 +86,7 @@ namespace Hime.Tests
                 compilerparams.ReferencedAssemblies.Add(redist);
                 compilerparams.EmbeddedResources.Add(output + CompilationTask.LexerData);
                 compilerparams.EmbeddedResources.Add(output + CompilationTask.ParserData);
-                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.LexerCode, output + CompilationTask.ParserData });
+                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.LexerCode, output + CompilationTask.ParserCode });
             	Assert.AreEqual(0, results.Errors.Count);
             	return results.CompiledAssembly;
 			}

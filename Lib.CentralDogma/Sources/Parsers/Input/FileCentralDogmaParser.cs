@@ -8,9 +8,9 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Parsers.Input
 {
-    public class FileCentralDogmaParser : LRkParser
+    internal class FileCentralDogmaParser : LRkParser
     {
-        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(FileCentralDogmaParser));
+        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(FileCentralDogmaParser), "FileCentralDogmaParser.bin");
         private static readonly SymbolVariable[] variables = {
             new SymbolVariable(0x2E, "option"), 
             new SymbolVariable(0x2F, "terminal_def_atom_any"), 
@@ -50,101 +50,32 @@ namespace Hime.Parsers.Input
             new SymbolVariable(0x51, "grammar_cf_rules"), 
             new SymbolVariable(0x52, "grammar_parency"), 
             new SymbolVariable(0x53, "cf_grammar"), 
-            new SymbolVariable(0x54, "_v1E4D58A6"), 
-            new SymbolVariable(0x55, "_v40E29C76"), 
-            new SymbolVariable(0x56, "_v5A0ECA18"), 
-            new SymbolVariable(0x57, "_v48B54670"), 
-            new SymbolVariable(0x58, "_v6148E6C"), 
-            new SymbolVariable(0x59, "_v3C81D017"), 
-            new SymbolVariable(0x5A, "_v52D7BA12"), 
-            new SymbolVariable(0x5B, "_v9E73740"), 
-            new SymbolVariable(0x5C, "_v7FEFB4C4"), 
-            new SymbolVariable(0x5D, "_v6097DDF3"), 
-            new SymbolVariable(0x5E, "_v3A988012"), 
-            new SymbolVariable(0x5F, "_v40546DB9"), 
+            new SymbolVariable(0x54, "_v43E6DB59"), 
+            new SymbolVariable(0x55, "_v3FDAAF4F"), 
+            new SymbolVariable(0x56, "_v9C9941F"), 
+            new SymbolVariable(0x57, "_v21E1B573"), 
+            new SymbolVariable(0x58, "_v1C8B1D1"), 
+            new SymbolVariable(0x59, "_v3B9EEDE5"), 
+            new SymbolVariable(0x5A, "_v4FDB8B56"), 
+            new SymbolVariable(0x5B, "_v1312F51A"), 
+            new SymbolVariable(0x5C, "_v22495DAA"), 
+            new SymbolVariable(0x5D, "_v3B064C27"), 
+            new SymbolVariable(0x5E, "_v129E9603"), 
+            new SymbolVariable(0x5F, "_v3748470A"), 
             new SymbolVariable(0x63, "cs_rule_context"), 
             new SymbolVariable(0x64, "cs_rule_template"), 
             new SymbolVariable(0x65, "cs_rule_simple"), 
             new SymbolVariable(0x66, "grammar_cs_rules"), 
             new SymbolVariable(0x67, "cs_grammar"), 
-            new SymbolVariable(0x68, "_v3392B13B"), 
+            new SymbolVariable(0x68, "_v45985F59"), 
             new SymbolVariable(0x69, "file_item"), 
             new SymbolVariable(0x6A, "file"), 
-            new SymbolVariable(0x6B, "_v78F1927D"), 
+            new SymbolVariable(0x6B, "_v63850BD5"), 
             new SymbolVariable(0x6C, "_Axiom_") };
-        public enum Variables : int
-        {
-            option = 0,
-            terminal_def_atom_any = 1,
-            terminal_def_atom_unicode = 2,
-            terminal_def_atom_text = 3,
-            terminal_def_atom_set = 4,
-            terminal_def_atom_ublock = 5,
-            terminal_def_atom_ucat = 6,
-            terminal_def_atom_span = 7,
-            terminal_def_atom = 8,
-            terminal_def_element = 9,
-            terminal_def_cardinalilty = 10,
-            terminal_def_repetition = 11,
-            terminal_def_fragment = 12,
-            terminal_def_restrict = 13,
-            terminal_definition = 14,
-            terminal_subgrammar = 15,
-            terminal = 16,
-            rule_sym_action = 17,
-            rule_sym_virtual = 18,
-            rule_sym_ref_params = 19,
-            rule_sym_ref_template = 20,
-            rule_sym_ref_simple = 21,
-            rule_def_atom = 22,
-            rule_def_element = 23,
-            rule_def_tree_action = 24,
-            rule_def_repetition = 25,
-            rule_def_fragment = 26,
-            rule_def_restrict = 27,
-            rule_def_choice = 28,
-            rule_definition = 29,
-            rule_template_params = 30,
-            cf_rule_template = 31,
-            cf_rule_simple = 32,
-            grammar_options = 33,
-            grammar_terminals = 34,
-            grammar_cf_rules = 35,
-            grammar_parency = 36,
-            cf_grammar = 37,
-            _v1E4D58A6 = 38,
-            _v40E29C76 = 39,
-            _v5A0ECA18 = 40,
-            _v48B54670 = 41,
-            _v6148E6C = 42,
-            _v3C81D017 = 43,
-            _v52D7BA12 = 44,
-            _v9E73740 = 45,
-            _v7FEFB4C4 = 46,
-            _v6097DDF3 = 47,
-            _v3A988012 = 48,
-            _v40546DB9 = 49,
-            cs_rule_context = 50,
-            cs_rule_template = 51,
-            cs_rule_simple = 52,
-            grammar_cs_rules = 53,
-            cs_grammar = 54,
-            _v3392B13B = 55,
-            file_item = 56,
-            file = 57,
-            _v78F1927D = 58,
-            _Axiom_ = 59
-        }
         private static readonly SymbolVirtual[] virtuals = {
             new SymbolVirtual("range"), 
             new SymbolVirtual("concat"), 
             new SymbolVirtual("emptypart") };
-        public enum Virtuals : int
-        {
-            range = 0,
-            concat = 1,
-            emptypart = 2
-        }
         private static readonly ParserAction[] pactions = {
  };
         private static readonly RecognizerAction[] ractions = {

@@ -29,7 +29,7 @@ namespace Hime.Parsers.ContextFree.LR
             throw new NotImplementedException();
         }
 
-        protected override void ExportAutomaton(StreamWriter stream, string className)
+        protected override void ExportAutomaton(StreamWriter stream, string name, string className)
         {
         }
 

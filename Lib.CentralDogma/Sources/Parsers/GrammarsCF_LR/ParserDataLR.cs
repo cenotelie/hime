@@ -91,23 +91,23 @@ namespace Hime.Parsers.ContextFree.LR
         }
 
         // TODO: think about it, but shouldn't stream be a field of the class? or create a new class?
-        public void ExportCode(StreamWriter stream, string className, AccessModifier modifier, string lexerClassName, IList<Terminal> expected)
+        public void ExportCode(StreamWriter stream, string name, AccessModifier modifier, string resource, IList<Terminal> expected)
         {
             this.terminals = new List<Terminal>(expected);
 
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + className + " : " + this.GetBaseClassName);
+            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Parser : " + this.GetBaseClassName);
             stream.WriteLine("    {");
-            ExportAutomaton(stream, className);
+            ExportAutomaton(stream, name, resource);
             ExportVariables(stream);
             ExportVirtuals(stream);
             ExportActions(stream);
             ExportActionsClass(stream);
             ExportActionHooks(stream);
-            ExportConstructor(stream, className, lexerClassName);
+            ExportConstructor(stream, name);
             stream.WriteLine("    }");
         }
 
-        protected abstract void ExportAutomaton(StreamWriter stream, string className);
+        protected abstract void ExportAutomaton(StreamWriter stream, string name, string resource);
 
         protected void ExportVariables(StreamWriter stream)
         {
@@ -121,18 +121,6 @@ namespace Hime.Parsers.ContextFree.LR
                 first = false;
             }
             stream.WriteLine(" };");
-
-            stream.WriteLine("        public enum Variables : int");
-            stream.WriteLine("        {");
-            for (int i = 0; i != variables.Count; i++)
-            {
-                stream.Write("            " + variables[i].Name + " = " + i);
-                if (i == variables.Count - 1)
-                    stream.WriteLine();
-                else
-                    stream.WriteLine(",");
-            }
-            stream.WriteLine("        }");
         }
 
         protected void ExportVirtuals(StreamWriter stream)
@@ -147,18 +135,6 @@ namespace Hime.Parsers.ContextFree.LR
                 first = false;
             }
             stream.WriteLine(" };");
-
-            stream.WriteLine("        public enum Virtuals : int");
-            stream.WriteLine("        {");
-            for (int i = 0; i != virtuals.Count; i++)
-            {
-                stream.Write("            " + virtuals[i].Name + " = " + i);
-                if (i == virtuals.Count - 1)
-                    stream.WriteLine();
-                else
-                    stream.WriteLine(",");
-            }
-            stream.WriteLine("        }");
         }
 
         protected void ExportActions(StreamWriter stream)
@@ -211,7 +187,7 @@ namespace Hime.Parsers.ContextFree.LR
                 stream.WriteLine("        private void Recognizer" + action.Name + "(Symbol[] body, int length) { this.userRActions." + action.Name + "(body, length); }");
         }
 
-        protected virtual void ExportConstructor(StreamWriter stream, string className, string lexerClassName)
+        protected virtual void ExportConstructor(StreamWriter stream, string name)
         {
             string argument = "";
             string body = "";
@@ -220,7 +196,7 @@ namespace Hime.Parsers.ContextFree.LR
                 argument = ", ParserActions pacts, RecognizerActions racts";
                 body = "this.userPActions = acts; this.userRActions = racts;";
             }
-            stream.WriteLine("        public " + className + "(" + lexerClassName + " lexer" + argument + ") : base (automaton, variables, virtuals, pactions, ractions, lexer) { " + body + " }");
+            stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer" + argument + ") : base (automaton, variables, virtuals, pactions, ractions, lexer) { " + body + " }");
         }
         
 		// TODO: this method could be factored more (look at the similar code)

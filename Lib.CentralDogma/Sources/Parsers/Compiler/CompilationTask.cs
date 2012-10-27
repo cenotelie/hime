@@ -152,7 +152,7 @@ namespace Hime.Parsers
             // Export lexer code
             reporter.Info("Compiler", "Exporting lexer code at " + prefix + LexerCode + " ...");
             StreamWriter txtOutput = OpenOutputStream(prefix + LexerCode, nmspace);
-            lexerData.ExportCode(txtOutput, grammar.Name + "Lexer", CodeAccess);
+            lexerData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + LexerData);
             CloseOutputStream(txtOutput);
             reporter.Info("Compiler", "Done!");
             
@@ -166,7 +166,7 @@ namespace Hime.Parsers
             // Export parser code
             reporter.Info("Compiler", "Exporting parser data at " + prefix + ParserCode + " ...");
             txtOutput = OpenOutputStream(prefix + ParserCode, nmspace);
-            parserData.ExportCode(txtOutput, grammar.Name + "Parser", CodeAccess, grammar.Name + "Lexer", lexerData.Expected);
+            parserData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + ParserData, lexerData.Expected);
             CloseOutputStream(txtOutput);
             reporter.Info("Compiler", "Done!");
 
