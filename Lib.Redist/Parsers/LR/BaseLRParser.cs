@@ -5,17 +5,12 @@ using System.Text;
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Delegate for a semantic action on the given subtree for a parser
+    /// Delegate for a semantic action on the given body and with the given parent
     /// </summary>
-    /// <param name="subTree">Sub-Tree on which the action is applied</param>
-    public delegate void ParserAction(CSTNode subTree);
-
-    /// <summary>
-    /// Delegate for a semantic action on the given body for a recognizer
-    /// </summary>
-    /// <param name="body">The current body</param>
-    /// <param name="length">The current body's length</param>
-    public delegate void RecognizerAction(Symbol[] body, int length);
+    /// <param name="head">The semantic object for the head</param>
+    /// <param name="body">The current body at the time of the action</param>
+    /// <param name="length">The length of the passed body</param>
+    public delegate void SemanticAction(object head, object[] body, int length);
 
     /// <summary>
     /// Represents a base LR parser
@@ -30,6 +25,10 @@ namespace Hime.Redist.Parsers
         /// Maximum number of errors
         /// </summary>
         protected const int maxErrorCount = 100;
+        /// <summary>
+        /// Maximum lenght of a rule
+        /// </summary>
+        protected const int maxBodyLength = 20;
 
         /// <summary>
         /// Parser's variables
@@ -42,11 +41,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's actions
         /// </summary>
-        protected ParserAction[] parserActions;
-        /// <summary>
-        /// Recognizer's actions
-        /// </summary>
-        protected RecognizerAction[] recognizerActions;
+        protected SemanticAction[] parserActions;
 
         /// <summary>
         /// Determine whether the parser will try to recover from errors
@@ -85,15 +80,13 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="variables">The parser's variables</param>
         /// <param name="virtuals">The parser's virtuals</param>
-        /// <param name="pactions">The parser's actions in parse mode</param>
-        /// <param name="ractions">The parser's actions in recognize mode</param>
+        /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        public BaseLRParser(SymbolVariable[] variables, SymbolVirtual[] virtuals, ParserAction[] pactions, RecognizerAction[] ractions, ILexer lexer)
+        public BaseLRParser(SymbolVariable[] variables, SymbolVirtual[] virtuals, SemanticAction[] actions, ILexer lexer)
         {
             this.parserVariables = new Utils.SymbolDictionary<SymbolVariable>(variables);
             this.parserVirtuals = new Utils.SymbolDictionary<SymbolVirtual>(virtuals);
-            this.parserActions = pactions;
-            this.recognizerActions = ractions;
+            this.parserActions = actions;
             this.tryRecover = true;
             this.errors = new List<ParserError>();
             this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
@@ -116,7 +109,6 @@ namespace Hime.Redist.Parsers
         /// <param name="token">The unexpected token</param>
         /// <returns>The next token</returns>
         protected abstract SymbolToken OnUnexpectedToken(SymbolToken token);
-
 
         /// <summary>
         /// Parses the input and returns the produced AST

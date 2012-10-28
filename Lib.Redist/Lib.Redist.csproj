@@ -62,6 +62,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Lexer\ILexer.cs" />
+    <Compile Include="Lexer\ITokenStream.cs" />
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />

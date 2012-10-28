@@ -13,7 +13,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a lexer
     /// </summary>
-    public interface ILexer
+    public interface ILexer : ITokenStream
     {
         /// <summary>
         /// Gets the terminals matched by this lexer
@@ -29,12 +29,6 @@ namespace Hime.Redist.Parsers
         /// Gets the current column number
         /// </summary>
         int CurrentColumn { get; }
-
-        /// <summary>
-        /// Gets the next token in the input
-        /// </summary>
-        /// <returns>The next token in the input</returns>
-        SymbolToken GetNextToken();
 
         /// <summary>
         /// Events for lexical errors
