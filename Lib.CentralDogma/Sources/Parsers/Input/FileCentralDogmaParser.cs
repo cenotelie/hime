@@ -76,10 +76,7 @@ namespace Hime.Parsers.Input
             new SymbolVirtual("range"), 
             new SymbolVirtual("concat"), 
             new SymbolVirtual("emptypart") };
-        private static readonly ParserAction[] pactions = {
- };
-        private static readonly RecognizerAction[] ractions = {
- };
-        public FileCentralDogmaParser(FileCentralDogmaLexer lexer) : base (automaton, variables, virtuals, pactions, ractions, lexer) {  }
+        private static readonly SemanticAction[] actions = { };
+        public FileCentralDogmaParser(FileCentralDogmaLexer lexer) : base (automaton, variables, virtuals, actions, lexer) {  }
     }
 }
