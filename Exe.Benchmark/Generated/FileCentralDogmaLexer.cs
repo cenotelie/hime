@@ -8,9 +8,9 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Benchmark.Generated.CD
 {
-    public class FileCentralDogmaLexer : TextLexer
+    internal class FileCentralDogmaLexer : TextLexer
     {
-        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(FileCentralDogmaLexer));
+        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(FileCentralDogmaLexer), "FileCentralDogmaLexer.bin");
         public static readonly SymbolTerminal[] terminals = {
             new SymbolTerminal(0x1, "ε"),
             new SymbolTerminal(0x2, "$"),

@@ -45,18 +45,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Generated\FileCentralDogmaLexer" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Generated\FileCentralDogmaParser" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Lib.Redist</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Generated\FileCentralDogmaLexer.bin" />
+    <EmbeddedResource Include="Generated\FileCentralDogmaParser.bin" />
     <None Include="Languages\CSharp4.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
