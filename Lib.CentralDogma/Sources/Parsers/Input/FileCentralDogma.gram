@@ -53,7 +53,7 @@ cf grammar ContextFree : Kernel
 		/* Terminals section definition for text grammars */
 		terminal_def_atom_any		-> '.'^ ;
 		terminal_def_atom_unicode	-> (SYMBOL_VALUE_UINT8 | SYMBOL_VALUE_UINT16)^ ;
-		terminal_def_atom_text		-> SYMBOL_TERMINAL_TEXT^ ;
+		terminal_def_atom_text		-> '~'? SYMBOL_TERMINAL_TEXT ;
 		terminal_def_atom_set		-> SYMBOL_TERMINAL_SET^ ;
 		terminal_def_atom_ublock	-> SYMBOL_TERMINAL_UBLOCK^ ;
 		terminal_def_atom_ucat		-> SYMBOL_TERMINAL_UCAT^ ;

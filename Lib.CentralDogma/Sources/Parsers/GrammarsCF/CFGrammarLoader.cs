@@ -19,6 +19,7 @@ namespace Hime.Parsers.ContextFree
         private string name;
         private List<string> inherited;
         private CFGrammar grammar;
+        private bool caseInsensitive;
 
         public string Name { get { return name; } }
         public Grammar Grammar { get { return grammar; } }
@@ -34,6 +35,7 @@ namespace Hime.Parsers.ContextFree
                 inherited.Add(((SymbolTokenText)child.Symbol).ValueText);
             reporter.Info("Compiler", "Loading grammar " + name);
             this.grammar = new CFGrammar(name);
+            this.caseInsensitive = false;
             if (inherited.Count == 0)
                 Compile_Recognize_grammar_text(syntaxRoot);
         }
@@ -128,13 +130,21 @@ namespace Hime.Parsers.ContextFree
             Automata.NFA final = new Hime.Parsers.Automata.NFA();
             final.StateEntry = final.AddNewState();
             final.StateExit = final.StateEntry;
-            string value = ((Redist.Parsers.SymbolTokenText)node.Symbol).ValueText;
+            string value = ((Redist.Parsers.SymbolTokenText)node.Children[node.Children.Count-1].Symbol).ValueText;
+            bool insensitive = caseInsensitive || (node.Children.Count > 1);
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
             foreach (char c in value)
             {
                 Automata.NFAState Temp = final.AddNewState();
-                final.StateExit.AddTransition(new Automata.CharSpan(c, c), Temp);
+                if (insensitive && char.IsLetter(c))
+                {
+                    char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
+                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), Temp);
+                    final.StateExit.AddTransition(new Automata.CharSpan(c2, c2), Temp);
+                }
+                else
+                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), Temp);
                 final.StateExit = Temp;
             }
             return final;
@@ -292,8 +302,6 @@ namespace Hime.Parsers.ContextFree
                     return Compile_Recognize_terminal_def_atom_unicode(node);
                 if (token.Name == "SYMBOL_VALUE_UINT16")
                     return Compile_Recognize_terminal_def_atom_unicode(node);
-                if (token.Name == "SYMBOL_TERMINAL_TEXT")
-                    return Compile_Recognize_terminal_def_atom_text(node);
                 if (token.Name == "SYMBOL_TERMINAL_SET")
                     return Compile_Recognize_terminal_def_atom_set(node);
                 if (token.Name == "SYMBOL_TERMINAL_UCAT")
@@ -310,7 +318,12 @@ namespace Hime.Parsers.ContextFree
                 final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
                 return final;
             }
-			// TODO: this cast is not nice!!
+            else if (symbol is Redist.Parsers.SymbolVariable)
+            {
+                if (symbol.Name == "terminal_def_atom_text")
+                    return Compile_Recognize_terminal_def_atom_text(node);
+            }
+            // TODO: this cast is not nice!!
             else if (symbol is Redist.Parsers.SymbolVirtual)
             {
                 if (symbol.Name == "range")
@@ -344,7 +357,7 @@ namespace Hime.Parsers.ContextFree
         private CFRuleBodySet Compile_Recognize_grammar_text_terminal(CSTNode node)
         {
             // Construct the terminal name
-            string value = ((Redist.Parsers.SymbolTokenText)node.Symbol).ValueText;
+            string value = ((Redist.Parsers.SymbolTokenText)node.Children[node.Children.Count - 1].Symbol).ValueText;
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
             // Check for previous instance in the grammar's grammar
@@ -439,7 +452,7 @@ namespace Hime.Parsers.ContextFree
                 return Compile_Recognize_rule_sym_ref_simple(context, node);
             if (node.Symbol.Name.StartsWith("rule_sym_ref_template"))
                 return Compile_Recognize_rule_sym_ref_template(context, node);
-            if (node.Symbol.Name == "SYMBOL_TERMINAL_TEXT")
+            if (node.Symbol.Name == "terminal_def_atom_text")
                 return Compile_Recognize_grammar_text_terminal(node);
             return null;
         }
@@ -546,6 +559,7 @@ namespace Hime.Parsers.ContextFree
         {
             foreach (CSTNode node in optionsNode.Children)
                 Compile_Recognize_option(node);
+            caseInsensitive = (grammar.HasOption("CaseSensitive") && grammar.GetOption("CaseSensitive").Equals("false", System.StringComparison.InvariantCultureIgnoreCase));
         }
         private void Compile_Recognize_grammar_terminals(CSTNode terminalsNode)
         {
