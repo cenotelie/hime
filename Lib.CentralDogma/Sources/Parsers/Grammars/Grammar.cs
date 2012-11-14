@@ -67,6 +67,11 @@ namespace Hime.Parsers
             return options[name];
         }
 
+        public bool HasOption(string name)
+        {
+            return options.ContainsKey(name);
+        }
+
         public GrammarSymbol GetSymbol(string name)
         {
             if (terminalsByName.ContainsKey(name)) return terminalsByName[name];
