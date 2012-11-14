@@ -19,6 +19,7 @@ namespace Hime.Parsers.ContextFree
         private string name;
         private List<string> inherited;
         private CFGrammar grammar;
+        private bool caseInsensitive;
 
         public string Name { get { return name; } }
         public Grammar Grammar { get { return grammar; } }
@@ -34,6 +35,7 @@ namespace Hime.Parsers.ContextFree
                 inherited.Add(((SymbolTokenText)child.Symbol).ValueText);
             reporter.Info("Compiler", "Loading grammar " + name);
             this.grammar = new CFGrammar(name);
+            this.caseInsensitive = false;
             if (inherited.Count == 0)
                 Compile_Recognize_grammar_text(syntaxRoot);
         }
@@ -129,7 +131,7 @@ namespace Hime.Parsers.ContextFree
             final.StateEntry = final.AddNewState();
             final.StateExit = final.StateEntry;
             string value = ((Redist.Parsers.SymbolTokenText)node.Children[node.Children.Count-1].Symbol).ValueText;
-            bool insensitive = (node.Children.Count > 1);
+            bool insensitive = caseInsensitive || (node.Children.Count > 1);
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
             foreach (char c in value)
@@ -557,6 +559,7 @@ namespace Hime.Parsers.ContextFree
         {
             foreach (SyntaxTreeNode node in optionsNode.Children)
                 Compile_Recognize_option(node);
+            caseInsensitive = (grammar.HasOption("CaseSensitive") && grammar.GetOption("CaseSensitive").Equals("false", System.StringComparison.InvariantCultureIgnoreCase));
         }
         private void Compile_Recognize_grammar_terminals(SyntaxTreeNode terminalsNode)
         {

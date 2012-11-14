@@ -97,5 +97,41 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
         }
+
+        [Test]
+        public void Test001_Bug_GlobalCaseInsensitive_Terminals()
+        {
+            string dir = GetTestDirectory();
+            string grammar = "cf grammar Test { options{ Axiom=\"test\"; CaseSensitive=\"False\"; } terminals{} rules{ test->'a'; }  }";
+            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
+            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsNotNull(assembly);
+
+            bool errors = false;
+            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            Assert.IsNotNull(ast);
+            Assert.IsFalse(errors);
+            ast = Parse(assembly, "A", out errors);
+            Assert.IsNotNull(ast);
+            Assert.IsFalse(errors);
+        }
+
+        [Test]
+        public void Test001_Bug_GlobalCaseInsensitive_Rules()
+        {
+            string dir = GetTestDirectory();
+            string grammar = "cf grammar Test { options{ Axiom=\"test\"; CaseSensitive=\"False\"; } terminals{ A->'a'; } rules{ test->A; }  }";
+            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
+            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsNotNull(assembly);
+
+            bool errors = false;
+            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            Assert.IsNotNull(ast);
+            Assert.IsFalse(errors);
+            ast = Parse(assembly, "A", out errors);
+            Assert.IsNotNull(ast);
+            Assert.IsFalse(errors);
+        }
     }
 }
