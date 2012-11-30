@@ -12,10 +12,10 @@ namespace Hime.Demo.Tasks
         {
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
-            task.Namespace = "Hime.Demo.Generated.Test2";
+            task.Namespace = "Hime.Demo.Generated.MathExp";
             task.ExportLog = false;
             task.ExportDocumentation = false;
-            task.InputFiles.Add("Languages\\Test2.gram");
+            task.InputFiles.Add("Languages\\MathExp.gram");
             task.Execute();
         }
     }

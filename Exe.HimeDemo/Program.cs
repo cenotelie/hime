@@ -10,7 +10,7 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            IExecutable executable = new CompileCentralDogma();
+            IExecutable executable = new Parse();
             executable.Execute();
         }
     }

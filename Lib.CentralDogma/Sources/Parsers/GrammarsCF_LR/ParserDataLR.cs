@@ -151,6 +151,7 @@ namespace Hime.Parsers.ContextFree.LR
             stream.WriteLine("            SemanticAction[] result = new SemanticAction[" + actions.Count + "];");
             for (int i = 0; i != actions.Count; i++)
                 stream.WriteLine("            result[" + i + "] = new SemanticAction(actions." + actions[i].Name + ");");
+            stream.WriteLine("            return result;");
             stream.WriteLine("        }");
         }
 
