@@ -26,12 +26,12 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{ A->'a'; } rules{ test->A; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
             
             bool errors = false;
-            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            CSTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -43,12 +43,12 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{ A->~'a'; } rules{ test->A; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            CSTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -61,12 +61,12 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->'a'; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            CSTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -78,12 +78,12 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; } terminals{} rules{ test->~'a'; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            CSTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -96,12 +96,12 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; CaseSensitive=\"False\"; } terminals{} rules{ test->'a'; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            CSTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -114,12 +114,12 @@ namespace Hime.Tests.CentralDogma
         {
             string dir = GetTestDirectory();
             string grammar = "cf grammar Test { options{ Axiom=\"test\"; CaseSensitive=\"False\"; } terminals{ A->'a'; } rules{ test->A; }  }";
-            Assert.IsFalse(DoCompile(grammar, ParsingMethod.LALR1, dir).HasErrors);
-            Assembly assembly = Build("lexer.cs", "parser.cs");
+            Assert.IsFalse(CompileRaw(grammar, ParsingMethod.LALR1).HasErrors);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            SyntaxTreeNode ast = Parse(assembly, "a", out errors);
+            CSTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
