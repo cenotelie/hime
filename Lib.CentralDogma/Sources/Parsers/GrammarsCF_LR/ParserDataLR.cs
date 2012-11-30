@@ -101,8 +101,6 @@ namespace Hime.Parsers.ContextFree.LR
             ExportVariables(stream);
             ExportVirtuals(stream);
             ExportActions(stream);
-            ExportActionsClass(stream);
-            ExportActionHooks(stream);
             ExportConstructor(stream, name);
             stream.WriteLine("    }");
         }
@@ -139,64 +137,33 @@ namespace Hime.Parsers.ContextFree.LR
 
         protected void ExportActions(StreamWriter stream)
         {
-            stream.WriteLine("        private static readonly ParserAction[] pactions = {");
-            bool first = true;
-            foreach (Action action in actions)
-            {
-                if (!first) stream.WriteLine(", ");
-                stream.Write("            ");
-                stream.Write("new ParserAction(Parser" + action.Name + ")");
-                first = false;
-            }
-            stream.WriteLine(" };");
-            stream.WriteLine("        private static readonly RecognizerAction[] ractions = {");
-            first = true;
-            foreach (Action action in actions)
-            {
-                if (!first) stream.WriteLine(", ");
-                stream.Write("            ");
-                stream.Write("new RecognizerAction(Recognizer" + action.Name + ")");
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-
-        protected virtual void ExportActionsClass(StreamWriter stream)
-        {
             if (actions.Count == 0)
                 return;
-            stream.WriteLine("        public interface ParserActions");
-            stream.WriteLine("        {");
-            foreach (Action action in actions)
-                stream.WriteLine("           void " + action.Name + "(CSTNode sub);");
-            stream.WriteLine("        }");
-            stream.WriteLine("        public interface RecognizerActions");
-            stream.WriteLine("        {");
-            foreach (Action action in actions)
-                stream.WriteLine("           void " + action.Name + "(Symbol[] body, int length);");
-            stream.WriteLine("        }");
-            stream.WriteLine("        private ParserActions userPActions;");
-            stream.WriteLine("        private RecognizerActions userRActions;");
-        }
 
-        protected virtual void ExportActionHooks(StreamWriter stream)
-        {
+            stream.WriteLine("        public interface Actions");
+            stream.WriteLine("        {");
             foreach (Action action in actions)
-                stream.WriteLine("        private void Parser" + action.Name + "(SyntaxTreeNode sub) { this.userPActions." + action.Name + "(sub); }");
-            foreach (Action action in actions)
-                stream.WriteLine("        private void Recognizer" + action.Name + "(Symbol[] body, int length) { this.userRActions." + action.Name + "(body, length); }");
+                stream.WriteLine("            void " + action.Name + "(object head, object[] body, int length);");
+            stream.WriteLine("        }");
+
+            stream.WriteLine("        private static SemanticAction[] BuildActions(Actions actions)");
+            stream.WriteLine("        {");
+            stream.WriteLine("            SemanticAction[] result = new SemanticAction[" + actions.Count + "];");
+            for (int i = 0; i != actions.Count; i++)
+                stream.WriteLine("            result[" + i + "] = new SemanticAction(actions." + actions[i].Name + ");");
+            stream.WriteLine("        }");
         }
 
         protected virtual void ExportConstructor(StreamWriter stream, string name)
         {
             string argument = "";
-            string body = "";
+            string body = "null";
             if (actions.Count != 0)
             {
-                argument = ", ParserActions pacts, RecognizerActions racts";
-                body = "this.userPActions = acts; this.userRActions = racts;";
+                argument = ", Actions actions";
+                body = "BuildActions(actions)";
             }
-            stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer" + argument + ") : base (automaton, variables, virtuals, pactions, ractions, lexer) { " + body + " }");
+            stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer" + argument + ") : base (automaton, variables, virtuals, " + body + ", lexer) { }");
         }
         
 		// TODO: this method could be factored more (look at the similar code)
