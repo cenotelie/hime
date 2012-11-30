@@ -243,7 +243,7 @@ namespace Hime.Redist.Parsers
                     continue;
                 }
                 if (action == LRkAutomaton.ActionAccept)
-                    return objects[head];
+                    return objects[head - 1];
                 nextToken = OnUnexpectedToken(nextToken);
                 if (nextToken == null || errors.Count >= maxErrorCount)
                     return null;
