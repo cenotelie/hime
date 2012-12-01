@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Hime.Demo</RootNamespace>
-    <AssemblyName>HimeDemo</AssemblyName>
+    <AssemblyName>Hime.Demo</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -57,9 +57,7 @@
   <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <StartupObject>Hime.Demo.Program</StartupObject>
   </PropertyGroup>
@@ -71,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Generated\MathExpLexer.cs" />
     <Compile Include="Generated\MathExpParser.cs" />
     <Compile Include="IExecutable.cs" />
@@ -106,7 +107,6 @@
     <None Include="Languages\Test.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Properties\app.manifest" />
     <Compile Include="Tasks\Parse.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -66,6 +66,7 @@
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
+    <Compile Include="Parsers\LR\RNGLR\GLRAutomaton.cs" />
     <Compile Include="Parsers\ParserErrorType.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRProduction.cs" />
@@ -98,9 +99,7 @@
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Parsers\LR\RNGLR\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

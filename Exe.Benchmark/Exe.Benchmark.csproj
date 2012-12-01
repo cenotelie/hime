@@ -38,6 +38,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Benchmark.cs" />
     <Compile Include="Generated\FileCentralDogmaLexer.cs" />
     <Compile Include="Generated\FileCentralDogmaParser.cs" />

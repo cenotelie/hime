@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Hime.Demo")]
-[assembly: AssemblyDescription("Demonstration project for Hime")]
+[assembly: AssemblyTitle("Hime.Tests")]
+[assembly: AssemblyDescription("Testing solution for the Hime parser generator")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Hime.Demo")]
+[assembly: AssemblyProduct("Hime.Tests")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,4 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2f345d1e-5c5a-4347-ac1c-a809eb09f9e0")]
+[assembly: Guid("9ea6e226-e1bd-4ada-916f-cc26955947c0")]
