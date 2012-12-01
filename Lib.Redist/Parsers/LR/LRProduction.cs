@@ -44,7 +44,7 @@ namespace Hime.Redist.Parsers
         public ushort Head { get { return head; } }
         public byte HeadAction { get { return headAction; } }
         public byte ReductionLength { get { return reducLength; } }
-        public ushort[] Bytecode { get { return bytecode.data; } }
+        public ushort[] Bytecode { get { return bytecode.Data; } }
         public int BytecodeLength { get { return bytecodeLength; } }
 
         public LRProduction(BinaryReader stream)

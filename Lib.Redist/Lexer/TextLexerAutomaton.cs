@@ -70,28 +70,28 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="state">The DFA which offset shall be retrieved</param>
         /// <returns>The offset of the given DFA state</returns>
-        public int GetOffset(ushort state) { return table.data[state]; }
+        public int GetOffset(ushort state) { return table[state]; }
 
         /// <summary>
         /// Gets the recognized terminal index for the DFA at the given index
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>The index of the terminal recognized at this state, or 0xFFFF if none</returns>
-        public ushort GetTerminal(int offset) { return states.data[offset]; }
+        public ushort GetTerminal(int offset) { return states[offset]; }
 
         /// <summary>
         /// Checks whether the DFA state at the given state has any transition
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>True of the state at the given offset has no transition</returns>
-        public bool HasNoTransition(int offset) { return (states.data[offset + 1] == 0); }
+        public bool HasNoTransition(int offset) { return (states[offset + 1] == 0); }
 
         /// <summary>
         /// Gets the transition corresponding to the given state's index and input value
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-        public ushort GetCachedTransition(int offset) { return states.data[offset]; }
+        public ushort GetCachedTransition(int offset) { return states[offset]; }
 
         /// <summary>
         /// Gets the transition corresponding to the given state's index and input value
@@ -101,12 +101,12 @@ namespace Hime.Redist.Parsers
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
         public ushort GetFallbackTransition(int offset, ushort value)
         {
-            int count = states.data[offset + 1];
+            int count = states[offset + 1];
             offset += 258;
             for (int i = 0; i != count; i++)
             {
-                if (value >= states.data[offset] && value <= states.data[offset + 1])
-                    return states.data[offset + 2];
+                if (value >= states[offset] && value <= states[offset + 1])
+                    return states[offset + 2];
                 offset += 3;
             }
             return 0xFFFF;

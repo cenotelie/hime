@@ -11,7 +11,9 @@ namespace Hime.Redist.Utils
         [System.Runtime.InteropServices.FieldOffset(0)]
         private byte[] bytes;
         [System.Runtime.InteropServices.FieldOffset(0)]
-        public ushort[] data;
+        private ushort[] data;
+        public ushort[] Data { get { return data; } }
+        public ushort this[int index] { get { return data[index]; } }
     }
 
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
@@ -21,6 +23,8 @@ namespace Hime.Redist.Utils
         [System.Runtime.InteropServices.FieldOffset(0)]
         private byte[] bytes;
         [System.Runtime.InteropServices.FieldOffset(0)]
-        public int[] data;
+        private int[] data;
+        public int[] Data { get { return data; } }
+        public int this[int index] { get { return data[index]; } }
     }
 }

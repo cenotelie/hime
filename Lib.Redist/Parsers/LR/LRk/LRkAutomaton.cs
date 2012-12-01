@@ -39,9 +39,9 @@ namespace Hime.Redist.Parsers
          */
 
         private ushort ncols;
-        private Utils.BlobUShort table;
         private Utils.BlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
+        private Utils.BlobUShort table;
         private LRProduction[] productions;
 
         private LRkAutomaton(Stream stream)
@@ -56,7 +56,7 @@ namespace Hime.Redist.Parsers
             this.columnsID = new Utils.BlobUShort(cb);
             this.columns = new Utils.SIDHashMap<ushort>();
             for (ushort i = 0; i != ncols; i++)
-                this.columns.Add(columnsID.data[i], i);
+                this.columns.Add(columnsID[i], i);
             
             byte[] buffer = new byte[ncols * nrows * 4];
             stream.Read(buffer, 0, buffer.Length);
@@ -93,8 +93,8 @@ namespace Hime.Redist.Parsers
         public ushort GetAction(ushort state, ushort sid, out ushort action)
         {
             int offset = (ncols * state + columns[sid]) * 2;
-            action = table.data[offset];
-            return table.data[offset + 1];
+            action = table[offset];
+            return table[offset + 1];
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Hime.Redist.Parsers
         /// <returns>True if the state is the accepting state, false otherwise</returns>
         public bool IsAcceptingState(ushort state)
         {
-            return (table.data[ncols * state * 2] == 3);
+            return (table[ncols * state * 2] == ActionAccept);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Hime.Redist.Parsers
             int offset = ncols * state * 2;
             for (int i = 0; i != terminalCount; i++)
             {
-                int action = table.data[offset];
+                int action = table[offset];
                 if (action != 0)
                     result.Add(i);
                 offset += 2;
