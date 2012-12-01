@@ -13,6 +13,8 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public abstract class TextLexer : ILexer
     {
+        internal const int maxTokenLength = 2048;
+
         /// <summary>
         /// Lexer's automaton
         /// </summary>
@@ -46,10 +48,6 @@ namespace Hime.Redist.Parsers
         /// Buffer for currently read text
         /// </summary>
         private char[] buffer;
-        /// <summary>
-        /// Size of the buffer
-        /// </summary>
-        private int bufferSize;
 
         /// <summary>
         /// Gets the terminals matched by this lexer
@@ -81,12 +79,11 @@ namespace Hime.Redist.Parsers
             this.lexAutomaton = automaton;
             this.lexTerminals = new Utils.SymbolDictionary<SymbolTerminal>(terminals);
             this.lexSeparator = separator;
-            this.input = new RewindableTextReader(input);
+            this.input = new RewindableTextReader(input, maxTokenLength, maxTokenLength);
             this.currentLine = 1;
             this.currentColumn = 1;
             this.isDollatEmited = false;
-            this.bufferSize = 100;
-            this.buffer = new char[this.bufferSize];
+            this.buffer = new char[maxTokenLength];
         }
 
         /// <summary>
@@ -160,14 +157,6 @@ namespace Hime.Redist.Parsers
                 char current = input.Read(out endOfInput);
                 if (endOfInput)
                     break;
-                if (readCount == bufferSize)
-                {
-                    // buffer is too small, create larger buffer
-                    bufferSize *= 2;
-                    char[] temp = new char[bufferSize];
-                    System.Array.Copy(buffer, temp, readCount);
-                    buffer = temp;
-                }
                 buffer[readCount] = current;
                 readCount++;
                 if (current <= 255)

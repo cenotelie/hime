@@ -267,7 +267,6 @@ namespace Hime.Redist.Parsers
                 {
                     LRProduction production = parserAutomaton.GetProduction(data);
                     head -= production.ReductionLength;
-                    System.Array.Clear(buffer, 0, maxBodyLength);
                     object result = reducer(production);
                     data = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].SymbolID, out action);
                     head++;

@@ -12,7 +12,7 @@ namespace Hime.Demo.Tasks
         {
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LALR1;
-            task.Namespace = "Hime.Demo.Generated.CD";
+            task.Namespace = "Hime.Benchmark.Generated.CD";
             task.ExportLog = true;
             task.ExportDocumentation = true;
             task.InputFiles.Add("Languages\\FileCentralDogma.gram");

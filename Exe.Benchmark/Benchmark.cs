@@ -23,8 +23,8 @@ namespace Hime.Benchmark
             output = "result.txt";
             size = 600;
             sampleSize = 20;
-            doLexer = false;
-            doRecognizer = true;
+            doLexer = true;
+            doRecognizer = false;
             doParser = false;
         }
 

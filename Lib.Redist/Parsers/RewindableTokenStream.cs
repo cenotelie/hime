@@ -13,7 +13,7 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public sealed class RewindableTokenStream : ITokenStream
     {
-        private const int ringSize = 1024;
+        private const int ringSize = 32;
 
         private ILexer lexer;
         private SymbolToken[] ring;
