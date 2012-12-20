@@ -7,14 +7,12 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Grammars.ContextFree.LR
 {
     class ParserDataRNGLR1 : ParserDataLR
     {
-        private List<Variable> nullableVars;
-        private List<CFRuleBody> nullableChoices;
-
         public ParserDataRNGLR1(Reporting.Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 
 		protected override string BaseClassName { get { return "RNGLRParser"; } }
@@ -26,19 +24,36 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         public override void ExportData(BinaryWriter stream)
         {
-            DetermineNullables();
-
-
-
             List<Rule> rules = new List<Rule>(grammar.Rules);
+            List<ushort> nullables = new List<ushort>();
+            for (ushort i = 0; i != rules.Count; i++)
+            {
+                CFRule rule = rules[i] as CFRule;
+                if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
+                    nullables.Add(i);
+            }
+
+            int total = 0;
+            List<ushort> offsets = new List<ushort>();
+            List<ushort> counts = new List<ushort>();
+            foreach (State state in graph.States)
+                total = ExportDataCountActions(offsets, counts, total, state);
+
             stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
             stream.Write((ushort)graph.States.Count);                   // Nb or rows
+            stream.Write((ushort)total);                                // Nb of actions
             stream.Write((ushort)rules.Count);                          // Nb or rules
 
             foreach (Terminal t in terminals)
                 stream.Write(t.SID);
             foreach (Variable var in variables)
                 stream.Write(var.SID);
+
+            for (int i = 0; i != offsets.Count; i++)
+            {
+                stream.Write(counts[i]);
+                stream.Write(offsets[i]);
+            }
 
             foreach (State state in graph.States)
                 ExportDataTable(stream, state);
@@ -47,27 +62,31 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 ExportDataProduction(stream, rule);
         }
 
-        private void DetermineNullables()
+        private int ExportDataCountActions(List<ushort> offsets, List<ushort> counts, int total, State state)
         {
-            nullableVars = new List<Variable>();
-            nullableChoices = new List<CFRuleBody>();
-
-            nullableChoices.Add(new CFRuleBody());
-            foreach (CFVariable var in variables)
+            Dictionary<Terminal, int> counters = new Dictionary<Terminal, int>();
+            foreach (StateActionReduce reduce in state.Reductions)
             {
-                if (var.Firsts.Contains(Epsilon.Instance))
-                    nullableVars.Add(var);
-                foreach (CFRule rule in var.Rules)
-                {
-                    int length = rule.CFBody.GetChoiceAt(0).Length;
-                    for (int i = 0; i != length; i++)
-                    {
-                        CFRuleBody choice = rule.CFBody.GetChoiceAt(i);
-                        if (choice.Firsts.Contains(Epsilon.Instance))
-                            nullableChoices.Add(choice);
-                    }
-                }
+                if (counters.ContainsKey(reduce.Lookahead))
+                    counters.Add(reduce.Lookahead, counters[reduce.Lookahead]+1);
             }
+            foreach (Terminal t in terminals)
+            {
+                int count = state.Children.Count;
+                if (counters.ContainsKey(t))
+                    count += counters[t];
+                offsets.Add((ushort)total);
+                counts.Add((ushort)count);
+                total += count;
+            }
+            foreach (Variable var in variables)
+            {
+                int count = state.Children.ContainsKey(var) ? 1 : 0;
+                offsets.Add((ushort)total);
+                counts.Add((ushort)count);
+                total += count;
+            }
+            return total;
         }
 
         private void ExportDataTable(BinaryWriter stream, State state)
@@ -76,43 +95,45 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (StateActionReduce reduction in state.Reductions)
                 reductions.Add(reduction.Lookahead, reduction.ToReduceRule);
             if (reductions.ContainsKey(Epsilon.Instance) || reductions.ContainsKey(NullTerminal.Instance))
-                stream.Write((ushort)3);
+                stream.Write(LRkAutomaton.ActionAccept);
             else
-                stream.Write((ushort)0);
-            stream.Write((ushort)0);
+                stream.Write(LRkAutomaton.ActionNone);
+            stream.Write(LRkAutomaton.ActionNone);
             for (int i = 1; i != terminals.Count; i++)
             {
                 Terminal t = terminals[i];
                 if (state.Children.ContainsKey(t))
                 {
-                    stream.Write((ushort)2);
+                    stream.Write(LRkAutomaton.ActionShift);
                     stream.Write((ushort)state.Children[t].ID);
                 }
                 else if (reductions.ContainsKey(t))
                 {
-                    stream.Write((ushort)1);
+                    stream.Write(LRkAutomaton.ActionReduce);
                     stream.Write((ushort)rules.IndexOf(reductions[t]));
                 }
                 else if (reductions.ContainsKey(NullTerminal.Instance))
                 {
-                    stream.Write((ushort)1);
+                    stream.Write(LRkAutomaton.ActionReduce);
                     stream.Write((ushort)rules.IndexOf(reductions[NullTerminal.Instance]));
                 }
                 else
                 {
-                    stream.Write((uint)0);
+                    stream.Write(LRkAutomaton.ActionNone);
+                    stream.Write(LRkAutomaton.ActionNone);
                 }
             }
             foreach (Variable var in variables)
             {
                 if (state.Children.ContainsKey(var))
                 {
-                    stream.Write((ushort)2);
+                    stream.Write(LRkAutomaton.ActionShift);
                     stream.Write((ushort)state.Children[var].ID);
                 }
                 else
                 {
-                    stream.Write((uint)0);
+                    stream.Write(LRkAutomaton.ActionNone);
+                    stream.Write(LRkAutomaton.ActionNone);
                 }
             }
         }

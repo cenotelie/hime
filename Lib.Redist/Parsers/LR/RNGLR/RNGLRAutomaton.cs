@@ -38,6 +38,7 @@ namespace Hime.Redist.Parsers
          * 
          * -- productions table
          * -- null production table
+         * indices of the null productions
          */
 
         private ushort ncols;
@@ -46,9 +47,9 @@ namespace Hime.Redist.Parsers
         private Utils.BinaryBlobUShort table;
         private Utils.BinaryBlobUShort actions;
         private LRProduction[] productions;
-        private LRProduction[] nullProductions;
+        private Utils.BinaryBlobUShort nullables;
 
-        public LRProduction[] NullProductions { get { return nullProductions; } }
+        public Utils.BinaryBlobUShort Nullables { get { return nullables; } }
 
         private RNGLRAutomaton(Stream stream)
         {
@@ -70,9 +71,8 @@ namespace Hime.Redist.Parsers
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);
-            this.nullProductions = new LRProduction[nnprod];
-            for (int i = 0; i != nnprod; i++)
-                this.nullProductions[i] = new LRProduction(reader);
+            this.nullables = new Utils.BinaryBlobUShort(nnprod * 2);
+            reader.Read(this.nullables.Blob, 0, this.nullables.SizeBlob);
             reader.Close();
         }
 
