@@ -14,10 +14,10 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public sealed class LRkAutomaton
     {
-        public const int ActionNone = 0;
-        public const int ActionReduce = 1;
-        public const int ActionShift = 2;
-        public const int ActionAccept = 3;
+        public const ushort ActionNone = 0;
+        public const ushort ActionReduce = 1;
+        public const ushort ActionShift = 2;
+        public const ushort ActionAccept = 3;
 
         /* Binary data of a LR(k) parser
          * uint16: number of columns
