@@ -11,12 +11,12 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Fast rewindable stream of token encapsulating a lexer
     /// </summary>
-    public sealed class RewindableTokenStream : ITokenStream
+    public sealed class RewindableTokenStream : Lexer.ITokenStream
     {
         private const int ringSize = 32;
 
-        private ILexer lexer;
-        private SymbolToken[] ring;
+        private Lexer.ILexer lexer;
+        private Symbols.Token[] ring;
         private int ringStart;      // Start index of the ring in case the stream in rewinded
         private int ringNextEntry;  // Index for inserting new characters in the ring
 
@@ -24,25 +24,25 @@ namespace Hime.Redist.Parsers
         /// Initializes the rewindable stream with the given lexer
         /// </summary>
         /// <param name="lexer">The encapsulated lexer</param>
-        public RewindableTokenStream(ILexer lexer)
+        public RewindableTokenStream(Lexer.ILexer lexer)
         {
             this.lexer = lexer;
-            this.ring = new SymbolToken[ringSize];
+            this.ring = new Symbols.Token[ringSize];
             this.ringStart = 0;
             this.ringNextEntry = 0;
         }
 
         private bool IsRingEmpty() { return (ringStart == ringNextEntry); }
 
-        private SymbolToken ReadRing()
+        private Symbols.Token ReadRing()
         {
-            SymbolToken token = ring[ringStart++];
+            Symbols.Token token = ring[ringStart++];
             if (ringStart == ring.Length)
                 ringStart = 0;
             return token;
         }
 
-        private void PushInRing(SymbolToken value)
+        private void PushInRing(Symbols.Token value)
         {
             ring[ringNextEntry++] = value;
             if (ringNextEntry == ringSize)
@@ -65,11 +65,11 @@ namespace Hime.Redist.Parsers
         /// Gets the next token in the stream
         /// </summary>
         /// <returns>The next token</returns>
-        public SymbolToken GetNextToken()
+        public Symbols.Token GetNextToken()
         {
             if (!IsRingEmpty())
                 return ReadRing();
-            SymbolToken value = lexer.GetNextToken();
+            Symbols.Token value = lexer.GetNextToken();
             PushInRing(value);
             return value;
         }

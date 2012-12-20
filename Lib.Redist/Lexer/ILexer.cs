@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿/*
+ * Author: Laurent Wouters
+ */
 
-namespace Hime.Redist.Parsers
+using System.Collections.Generic;
+
+namespace Hime.Redist.Lexer
 {
     /// <summary>
     /// Handler for lexical errors
     /// </summary>
     /// <param name="error">The new error</param>
-    public delegate void AddLexicalError(ParserError error);
+    public delegate void AddLexicalError(Parsers.ParserError error);
 
     /// <summary>
     /// Represents a lexer
@@ -18,7 +20,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the terminals matched by this lexer
         /// </summary>
-        Utils.SymbolDictionary<SymbolTerminal> Terminals { get; }
+        Utils.SymbolDictionary<Symbols.Terminal> Terminals { get; }
 
         /// <summary>
         /// Gets the current line number

@@ -4,8 +4,8 @@
 
 using System;
 using NUnit.Framework;
-using Hime.HimeCC;
-using Hime.Parsers;
+using Hime.Compiler;
+using Hime.CentralDogma;
 
 namespace Hime.Tests.HimeCC
 {

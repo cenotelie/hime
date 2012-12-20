@@ -16,12 +16,12 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the variable symbols used by this parser
         /// </summary>
-        Utils.SymbolDictionary<SymbolVariable> Variables { get; }
+        Utils.SymbolDictionary<Symbols.Variable> Variables { get; }
 
         /// <summary>
         /// Gets the virtual symbols used by this parser
         /// </summary>
-        Utils.SymbolDictionary<SymbolVirtual> Virtuals { get; }
+        Utils.SymbolDictionary<Symbols.Virtual> Virtuals { get; }
 
         /// <summary>
         /// Gets the errors encountered by the parser
@@ -32,7 +32,7 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        CSTNode Parse();
+        AST.CSTNode Parse();
 
         /// <summary>
         /// Parses the input and returns whether the input is recognized

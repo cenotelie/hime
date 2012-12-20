@@ -5,10 +5,10 @@
  * 
  */
 using System;
-using NUnit.Framework;
-using Hime.Parsers;
-using Hime.Utils.Reporting;
 using System.IO;
+using NUnit.Framework;
+using Hime.CentralDogma;
+using Hime.CentralDogma.Reporting;
 
 namespace Hime.Tests.CentralDogma
 {

@@ -3,6 +3,7 @@
  * */
 
 using Hime.Demo.Tasks;
+using Hime.CentralDogma;
 
 namespace Hime.Demo
 {
@@ -10,7 +11,7 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            IExecutable executable = new CompileCentralDogma();
+            IExecutable executable = new Compile("Languages\\FileCentralDogma.gram", "Hime.Demo.Generated", ParsingMethod.LALR1);
             executable.Execute();
         }
     }

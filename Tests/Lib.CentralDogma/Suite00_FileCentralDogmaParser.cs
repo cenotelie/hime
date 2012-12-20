@@ -7,7 +7,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using Hime.Redist.Parsers;
+using Hime.CentralDogma.Input;
 
 namespace Hime.Tests.CentralDogma
 {
@@ -19,8 +19,8 @@ namespace Hime.Tests.CentralDogma
         {
         	string grammar = "";
 
-            Hime.Parsers.Input.FileCentralDogmaLexer lexer = new Hime.Parsers.Input.FileCentralDogmaLexer(grammar);
-            Hime.Parsers.Input.FileCentralDogmaParser parser = new Hime.Parsers.Input.FileCentralDogmaParser(lexer);
+            FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             if (parser.Parse() != null)
                 Assert.Fail();
         }
@@ -31,8 +31,8 @@ namespace Hime.Tests.CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\" } terminals { } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.Input.FileCentralDogmaLexer lexer = new Hime.Parsers.Input.FileCentralDogmaLexer(grammar);
-            Hime.Parsers.Input.FileCentralDogmaParser parser = new Hime.Parsers.Input.FileCentralDogmaParser(lexer);
+            FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             if (parser.Parse() != null)
                 Assert.Fail();
         }
@@ -43,8 +43,8 @@ namespace Hime.Tests.CentralDogma
         	string grammar = 
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
 
-            Hime.Parsers.Input.FileCentralDogmaLexer lexer = new Hime.Parsers.Input.FileCentralDogmaLexer(grammar);
-            Hime.Parsers.Input.FileCentralDogmaParser parser = new Hime.Parsers.Input.FileCentralDogmaParser(lexer);
+            FileCentralDogmaLexer lexer = new FileCentralDogmaLexer(grammar);
+            FileCentralDogmaParser parser = new FileCentralDogmaParser(lexer);
             parser.Parse();
             Assert.AreEqual(0, parser.Errors.Count);
         }

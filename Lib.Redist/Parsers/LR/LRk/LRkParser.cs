@@ -14,7 +14,7 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public abstract class LRkParser : BaseLRParser
     {
-        private delegate object GetSemObj(Symbol symbol);
+        private delegate object GetSemObj(Symbols.Symbol symbol);
         private delegate object Reduce(LRProduction production);
 
         private class Simulator : LRkSimulator
@@ -71,7 +71,7 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        public LRkParser(LRkAutomaton automaton, SymbolVariable[] variables, SymbolVirtual[] virtuals, SemanticAction[] actions, ILexer lexer)
+        public LRkParser(LRkAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
@@ -83,19 +83,19 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="token">The unexpected token</param>
         /// <returns>The next token</returns>
-        protected override SymbolToken OnUnexpectedToken(SymbolToken token)
+        protected override Symbols.Token OnUnexpectedToken(Symbols.Token token)
         {
             List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
-            List<SymbolTerminal> expected = new List<SymbolTerminal>();
+            List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);
             errors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
             if (!tryRecover) return null;
             if (TryDrop1Unexpected()) return input.GetNextToken();
             if (TryDrop2Unexpected()) return input.GetNextToken();
-            foreach (SymbolTerminal terminal in expected)
+            foreach (Symbols.Terminal terminal in expected)
             {
-                SymbolTokenText dummy = new SymbolTokenText(terminal.SymbolID, terminal.Name, string.Empty, 0, 0);
+                Symbols.TextToken dummy = new Symbols.TextToken(terminal.SymbolID, terminal.Name, string.Empty, 0, 0);
                 if (TryInsertExpected(dummy))
                     return dummy;
             }
@@ -118,7 +118,7 @@ namespace Hime.Redist.Parsers
                 input.Rewind(1);
             return success;
         }
-        private bool TryInsertExpected(SymbolToken terminal)
+        private bool TryInsertExpected(Symbols.Token terminal)
         {
             int used = 0;
             bool success = (new Simulator(this)).TestForLength(3, terminal, out used);
@@ -130,14 +130,14 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public override CSTNode Parse()
+        public override AST.CSTNode Parse()
         {
             this.reducer = new Reduce(ReduceAST);
             this.getSemObj = new GetSemObj(GetSemCST);
             object result = Execute();
             if (result == null)
                 return null;
-            return (result as CSTNode).ApplyActions();
+            return (result as AST.CSTNode).ApplyActions();
         }
 
         /// <summary>
@@ -151,12 +151,12 @@ namespace Hime.Redist.Parsers
             return (Execute() != null);
         }
 
-        private object GetSemCST(Symbol symbol) { return new CSTNode(symbol); }
-        private object GetSemNaked(Symbol symbol) { return symbol; }
+        private object GetSemCST(Symbols.Symbol symbol) { return new AST.CSTNode(symbol); }
+        private object GetSemNaked(Symbols.Symbol symbol) { return symbol; }
 
         private object ReduceAST(LRProduction production)
         {
-            CSTNode sub = new CSTNode(parserVariables[production.Head], (CSTAction)production.HeadAction);
+            AST.CSTNode sub = new AST.CSTNode(parserVariables[production.Head], (AST.CSTAction)production.HeadAction);
             int nextBuffer = 0;
             int nextStack = 0;
             for (int i = 0; i != production.BytecodeLength; i++)
@@ -171,7 +171,7 @@ namespace Hime.Redist.Parsers
                 else if (op >= LRProduction.Virtual)
                 {
                     ushort index = production.Bytecode[i + 1];
-                    CSTNode node = new CSTNode(parserVirtuals[index], (CSTAction)(op - 4));
+                    AST.CSTNode node = new AST.CSTNode(parserVirtuals[index], (AST.CSTAction)(op - 4));
                     sub.AppendChild(node);
                     buffer[nextBuffer] = node;
                     nextBuffer++;
@@ -179,7 +179,7 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op == LRProduction.PopNoAction)
                 {
-                    CSTNode node = objects[head + nextStack + 1] as CSTNode;
+                    AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
                     sub.AppendChild(node);
                     buffer[nextBuffer] = node;
                     nextStack++;
@@ -187,8 +187,8 @@ namespace Hime.Redist.Parsers
                 }
                 else
                 {
-                    CSTNode node = objects[head + nextStack + 1] as CSTNode;
-                    sub.AppendChild(node, (CSTAction)op);
+                    AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
+                    sub.AppendChild(node, (AST.CSTAction)op);
                     buffer[nextBuffer] = node;
                     nextStack++;
                     nextBuffer++;
@@ -233,7 +233,7 @@ namespace Hime.Redist.Parsers
             this.stack = new ushort[maxStackSize];
             this.objects = new object[maxStackSize];
             this.buffer = new object[maxBodyLength];
-            SymbolToken nextToken = input.GetNextToken();
+            Symbols.Token nextToken = input.GetNextToken();
             while (true)
             {
                 int action = ExecuteOnToken(nextToken);
@@ -250,7 +250,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private int ExecuteOnToken(SymbolToken token)
+        private int ExecuteOnToken(Symbols.Token token)
         {
             while (true)
             {

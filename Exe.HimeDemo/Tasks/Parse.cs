@@ -2,12 +2,13 @@
  * Author: Charles Hymans
  * */
 using System;
-using Hime.Redist.Parsers;
 using System.Collections.Generic;
+using Hime.Redist.Symbols;
+using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
-	class Parse : IExecutable
+	class ParseMathExp : IExecutable
 	{
         class Interpreter : Generated.MathExp.MathExpParser.Actions
         {
@@ -19,7 +20,7 @@ namespace Hime.Demo.Tasks
 
             public void OnNumber(object head, object[] body, int length)
             {
-                SymbolTokenText token = body[0] as SymbolTokenText;
+                TextToken token = body[0] as TextToken;
                 stack.Push(Single.Parse(token.ValueText));
             }
             public void OnMult(object head, object[] body, int length)
@@ -48,7 +49,7 @@ namespace Hime.Demo.Tasks
             }
         }
 
-		public Parse() { }
+		public ParseMathExp() { }
 
         public void Execute()
         {
@@ -57,17 +58,10 @@ namespace Hime.Demo.Tasks
             Generated.MathExp.MathExpParser parser = new Generated.MathExp.MathExpParser(lexer, interpreter);
 
             bool result = parser.Recognize();
-
             foreach (ParserError error in parser.Errors)
-			{
                 Console.WriteLine(error.ToString());
-			}
-			
-            /*if (root == null) return;
-            using (LangTest.WinTreeView window = new LangTest.WinTreeView(root))
-			{
-                window.ShowDialog();
-            }*/
+            if (result)
+                Console.WriteLine("Result = " + interpreter.Value);
         }
 	}
 }

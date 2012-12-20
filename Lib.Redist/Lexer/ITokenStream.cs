@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿/*
+ * Author: Laurent Wouters
+ */
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist.Lexer
 {
     public interface ITokenStream
     {
@@ -10,6 +10,6 @@ namespace Hime.Redist.Parsers
         /// Gets the next token in the input
         /// </summary>
         /// <returns>The next token in the input</returns>
-        SymbolToken GetNextToken();
+        Symbols.Token GetNextToken();
     }
 }

@@ -17,7 +17,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's variables
         /// </summary>
-        protected Utils.SymbolDictionary<SymbolVariable> parserVariables;
+        protected Utils.SymbolDictionary<Symbols.Variable> parserVariables;
         /// <summary>
         /// LR(k) parsing table and productions
         /// </summary>
@@ -42,10 +42,10 @@ namespace Hime.Redist.Parsers
         /// <param name="inserted">Token to insert, or null if none should be inserted</param>
         /// <param name="advance">Returns the number of token used from the input</param>
         /// <returns>True of the parser matches the input, false otherwise</returns>
-        public bool TestForLength(int length, SymbolToken inserted, out int advance)
+        public bool TestForLength(int length, Symbols.Token inserted, out int advance)
         {
             int remaining = length;
-            SymbolToken nextToken = (inserted != null) ? inserted : input.GetNextToken();
+            Symbols.Token nextToken = (inserted != null) ? inserted : input.GetNextToken();
             advance = (inserted == null) ? 1 : 0;
             while (true)
             {
@@ -69,7 +69,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="token">Current token</param>
         /// <returns>true if the parser is able to consume the token, false otherwise</returns>
-        private int RecognizeOnToken(SymbolToken token)
+        private int RecognizeOnToken(Symbols.Token token)
         {
             while (true)
             {
@@ -83,7 +83,7 @@ namespace Hime.Redist.Parsers
                 else if (action == LRkAutomaton.ActionReduce)
                 {
                     LRProduction production = parserAutomaton.GetProduction(data);
-                    SymbolVariable var = parserVariables[production.Head];
+                    Symbols.Variable var = parserVariables[production.Head];
                     head -= production.ReductionLength;
                     data = parserAutomaton.GetAction(stack[head], var.SymbolID, out action);
                     stack[++head] = data;

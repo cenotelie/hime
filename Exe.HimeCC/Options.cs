@@ -7,11 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CommandLine;
-using Hime.Parsers;
 using System.Reflection;
+using CommandLine;
+using Hime.CentralDogma;
 
-namespace Hime.HimeCC
+namespace Hime.Compiler
 {
 	// I do not like CommandLine because it forces you to have public fields!!!
     internal class Options

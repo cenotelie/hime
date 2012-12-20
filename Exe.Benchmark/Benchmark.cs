@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Hime.Benchmark
 {
@@ -24,7 +22,7 @@ namespace Hime.Benchmark
             size = 600;
             sampleSize = 20;
             doLexer = true;
-            doRecognizer = false;
+            doRecognizer = true;
             doParser = false;
         }
 
@@ -63,7 +61,7 @@ namespace Hime.Benchmark
                 System.IO.File.AppendAllText(input, content);
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
             Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(reader);
-            Hime.Redist.Parsers.SymbolToken token = lexer.GetNextToken();
+            Hime.Redist.Symbols.Token token = lexer.GetNextToken();
             while (token.SymbolID != 1)
             {
                 token = lexer.GetNextToken();
@@ -79,7 +77,7 @@ namespace Hime.Benchmark
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
             Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(reader);
             System.DateTime before = System.DateTime.Now;
-            Hime.Redist.Parsers.SymbolToken token = lexer.GetNextToken();
+            Hime.Redist.Symbols.Token token = lexer.GetNextToken();
             while (token.SymbolID != 1)
             {
                 token = lexer.GetNextToken();

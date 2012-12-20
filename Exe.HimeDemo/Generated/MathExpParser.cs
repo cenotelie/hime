@@ -5,19 +5,20 @@
 
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
+using Hime.Redist.Symbols;
 
 namespace Hime.Demo.Generated.MathExp
 {
     internal class MathExpParser : LRkParser
     {
         private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(MathExpParser), "MathExpParser.bin");
-        private static readonly SymbolVariable[] variables = {
-            new SymbolVariable(0x8, "exp_atom"), 
-            new SymbolVariable(0x9, "exp_op0"), 
-            new SymbolVariable(0xA, "exp_op1"), 
-            new SymbolVariable(0xB, "exp"), 
-            new SymbolVariable(0x12, "_Axiom_") };
-        private static readonly SymbolVirtual[] virtuals = {
+        private static readonly Variable[] variables = {
+            new Variable(0x8, "exp_atom"), 
+            new Variable(0x9, "exp_op0"), 
+            new Variable(0xA, "exp_op1"), 
+            new Variable(0xB, "exp"), 
+            new Variable(0x12, "_Axiom_") };
+        private static readonly Virtual[] virtuals = {
  };
         public interface Actions
         {

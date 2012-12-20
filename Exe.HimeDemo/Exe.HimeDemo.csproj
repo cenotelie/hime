@@ -78,9 +78,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\Compile.cs" />
-    <Compile Include="Tasks\CompileC.cs" />
-    <Compile Include="Tasks\CompileCentralDogma.cs" />
-    <Compile Include="Tasks\CompileCS.cs" />
     <Compile Include="WinTreeView.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -23,3 +23,4 @@ using System.Runtime.InteropServices;
 
 // added this visibility so that internal classes and methods may be tested in Hime.NUnit
 [assembly: InternalsVisibleTo("Hime.Tests")]
+[assembly: InternalsVisibleTo("Hime.Demo")]

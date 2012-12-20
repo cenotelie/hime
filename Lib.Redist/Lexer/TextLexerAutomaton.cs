@@ -6,7 +6,7 @@
  */
 using System.IO;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist.Lexer
 {
     /* Binary data structure of lexers:
      * uint32: number of entries in the states index table

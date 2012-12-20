@@ -18,12 +18,12 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the unexpected token
         /// </summary>
-        public SymbolToken UnexpectedToken { get; private set; }
+        public Symbols.Token UnexpectedToken { get; private set; }
 
         /// <summary>
         /// Gets a list of the expected terminals
         /// </summary>
-        public List<SymbolTerminal> ExpectedTerminals { get; private set; }
+        public List<Symbols.Terminal> ExpectedTerminals { get; private set; }
 
 		/// <summary>
         /// Initializes a new instance of the UnexpectedTokenError class with a token and an array of expected names
@@ -32,7 +32,8 @@ namespace Hime.Redist.Parsers
 		/// <param name='expected'>The array of expected terminals</param>
         /// <param name="line">The line number of the token</param>
         /// <param name="column">The column number of the token</param>
-        internal UnexpectedTokenError(SymbolToken token, List<SymbolTerminal> expected, int line, int column) : base(ParserErrorType.UnexpectedToken, line, column)
+        internal UnexpectedTokenError(Symbols.Token token, List<Symbols.Terminal> expected, int line, int column)
+            : base(ParserErrorType.UnexpectedToken, line, column)
         {
             this.UnexpectedToken = token;
             this.ExpectedTerminals = expected;

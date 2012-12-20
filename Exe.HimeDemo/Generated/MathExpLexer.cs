@@ -4,24 +4,25 @@
  */
 
 using System.Collections.Generic;
-using Hime.Redist.Parsers;
+using Hime.Redist.Lexer;
+using Hime.Redist.Symbols;
 
 namespace Hime.Demo.Generated.MathExp
 {
     internal class MathExpLexer : TextLexer
     {
         private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(MathExpLexer), "MathExpLexer.bin");
-        public static readonly SymbolTerminal[] terminals = {
-            new SymbolTerminal(0x1, "ε"),
-            new SymbolTerminal(0x2, "$"),
-            new SymbolTerminal(0xC, "("),
-            new SymbolTerminal(0xD, ")"),
-            new SymbolTerminal(0xE, "*"),
-            new SymbolTerminal(0xF, "/"),
-            new SymbolTerminal(0x10, "+"),
-            new SymbolTerminal(0x11, "-"),
-            new SymbolTerminal(0x5, "NUMBER"),
-            new SymbolTerminal(0x7, "SEPARATOR") };
+        public static readonly Terminal[] terminals = {
+            new Terminal(0x1, "ε"),
+            new Terminal(0x2, "$"),
+            new Terminal(0xC, "("),
+            new Terminal(0xD, ")"),
+            new Terminal(0xE, "*"),
+            new Terminal(0xF, "/"),
+            new Terminal(0x10, "+"),
+            new Terminal(0x11, "-"),
+            new Terminal(0x5, "NUMBER"),
+            new Terminal(0x7, "SEPARATOR") };
         public MathExpLexer(string input) : base(automaton, terminals, 0x7, new System.IO.StringReader(input)) {}
         public MathExpLexer(System.IO.TextReader input) : base(automaton, terminals, 0x7, input) {}
     }

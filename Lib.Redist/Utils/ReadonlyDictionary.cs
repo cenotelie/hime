@@ -7,7 +7,7 @@ namespace Hime.Redist.Utils
     /// Represents an immutable dictionary of symbols
     /// </summary>
     /// <typeparam name="T">The type of symbol</typeparam>
-    public sealed class SymbolDictionary<T> : IDictionary<string, T> where T : Parsers.Symbol
+    public sealed class SymbolDictionary<T> : IDictionary<string, T> where T : Symbols.Symbol
     {
         private Dictionary<string, T> impl;
         internal T[] raw;

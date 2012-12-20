@@ -6,7 +6,7 @@
  */
 using System.Collections.Generic;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist.Lexer
 {
     /// <summary>
     /// Represents a lexer for a text stream
@@ -22,7 +22,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// The terminals that can be recognized by this lexer
         /// </summary>
-        private Utils.SymbolDictionary<SymbolTerminal> lexTerminals;
+        private Utils.SymbolDictionary<Symbols.Terminal> lexTerminals;
         /// <summary>
         /// ID of the separator
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the terminals matched by this lexer
         /// </summary>
-        public Utils.SymbolDictionary<SymbolTerminal> Terminals { get { return lexTerminals; } }
+        public Utils.SymbolDictionary<Symbols.Terminal> Terminals { get { return lexTerminals; } }
         /// <summary>
         /// Gets the current line number
         /// </summary>
@@ -74,10 +74,10 @@ namespace Hime.Redist.Parsers
         /// <param name="terminals">Terminals recognized by this lexer</param>
         /// <param name="separator">SID of the separator token</param>
         /// <param name="input">Input to this lexer</param>
-        protected TextLexer(TextLexerAutomaton automaton, SymbolTerminal[] terminals, ushort separator, System.IO.TextReader input)
+        protected TextLexer(TextLexerAutomaton automaton, Symbols.Terminal[] terminals, ushort separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
-            this.lexTerminals = new Utils.SymbolDictionary<SymbolTerminal>(terminals);
+            this.lexTerminals = new Utils.SymbolDictionary<Symbols.Terminal>(terminals);
             this.lexSeparator = separator;
             this.input = new RewindableTextReader(input, maxTokenLength, maxTokenLength);
             this.currentLine = 1;
@@ -90,13 +90,13 @@ namespace Hime.Redist.Parsers
         /// Gets the next token in the input
         /// </summary>
         /// <returns>The next token in the input</returns>
-        public SymbolToken GetNextToken()
+        public Symbols.Token GetNextToken()
         {
             if (isDollatEmited)
-                return SymbolTokenEpsilon.Instance;
+                return Symbols.Epsilon.Instance;
             while (true)
             {
-                SymbolTokenText token = GetNextToken_DFA();
+                Symbols.TextToken token = GetNextToken_DFA();
                 if (token == null)
                 {
                     bool atend = false;
@@ -104,11 +104,11 @@ namespace Hime.Redist.Parsers
                     if (atend)
                     {
                         isDollatEmited = true;
-                        return SymbolTokenDollar.Instance;
+                        return Symbols.Dollar.Instance;
                     }
                     else
                     {
-                        OnError(new UnexpectedCharError(c, currentLine, currentColumn));
+                        OnError(new Parsers.UnexpectedCharError(c, currentLine, currentColumn));
                         AdvanceStats(c.ToString());
                     }
                 }
@@ -135,7 +135,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private SymbolTokenText GetNextToken_DFA()
+        private Symbols.TextToken GetNextToken_DFA()
         {
             int matchedIndex = 0;
             int matchedLength = 0;
@@ -167,8 +167,8 @@ namespace Hime.Redist.Parsers
             input.Rewind(readCount - matchedLength);
             if (matchedLength == 0)
                 return null;
-            SymbolTerminal matched = lexTerminals[matchedIndex];
-            return new SymbolTokenText(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine, currentColumn);
+            Symbols.Terminal matched = lexTerminals[matchedIndex];
+            return new Symbols.TextToken(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine, currentColumn);
         }
     }
 }

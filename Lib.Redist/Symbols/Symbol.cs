@@ -6,7 +6,7 @@
  */
 using System.Collections.Generic;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist.Symbols
 {
     /// <summary>
     /// Represents a symbol in an abstract syntax tree

@@ -7,7 +7,7 @@
 
 using System.IO;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist.Lexer
 {
     /// <summary>
     /// Fast rewindable reader of text

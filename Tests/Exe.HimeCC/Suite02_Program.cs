@@ -5,7 +5,8 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using Hime.HimeCC;
+using Hime.Compiler;
+using Hime.CentralDogma;
 
 namespace Hime.Tests.HimeCC
 {

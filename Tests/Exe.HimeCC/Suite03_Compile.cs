@@ -8,10 +8,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Hime.HimeCC;
-using Hime.Utils.Reporting;
-using Hime.Parsers;
 using NUnit.Framework;
+using Hime.Compiler;
+using Hime.CentralDogma;
 
 namespace Hime.Tests.HimeCC
 {

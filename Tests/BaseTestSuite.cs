@@ -3,12 +3,13 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework;
-using Hime.Parsers;
-using Hime.Utils.Reporting;
-using Hime.Redist.Parsers;
-using Hime.Utils.Resources;
 using System.CodeDom.Compiler;
+using NUnit.Framework;
+using Hime.CentralDogma;
+using Hime.CentralDogma.Reporting;
+using Hime.Redist.Lexer;
+using Hime.Redist.Parsers;
+using Hime.Redist.AST;
 
 namespace Hime.Tests
 {
@@ -75,7 +76,7 @@ namespace Hime.Tests
 
         protected Assembly Build()
         {
-            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.TextLexer)).Location;
+            string redist = Assembly.GetAssembly(typeof(TextLexer)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{
             	CompilerParameters compilerparams = new CompilerParameters();
@@ -87,7 +88,9 @@ namespace Hime.Tests
                 compilerparams.EmbeddedResources.Add(output + CompilationTask.LexerData);
                 compilerparams.EmbeddedResources.Add(output + CompilationTask.ParserData);
                 CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.LexerCode, output + CompilationTask.ParserCode });
-            	Assert.AreEqual(0, results.Errors.Count);
+                foreach (CompilerError error in results.Errors)
+                    Console.WriteLine(error.ToString());
+                Assert.AreEqual(0, results.Errors.Count);
             	return results.CompiledAssembly;
 			}
         }

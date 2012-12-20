@@ -5,12 +5,14 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Hime.Redist.AST;
+using Hime.Redist.Symbols;
 
-namespace LangTest
+namespace Hime.Demo
 {
     partial class WinTreeView : Form
     {
-        public WinTreeView(Hime.Redist.Parsers.CSTNode Root)
+        public WinTreeView(CSTNode Root)
         {
             InitializeComponent();
 
@@ -18,17 +20,17 @@ namespace LangTest
             AddSubTree(VRoot, Root);
         }
 
-        private void AddSubTree(TreeNode VNode, Hime.Redist.Parsers.CSTNode SNode)
+        private void AddSubTree(TreeNode VNode, CSTNode SNode)
         {
-            foreach (Hime.Redist.Parsers.CSTNode Child in SNode.Children)
+            foreach (CSTNode Child in SNode.Children)
             {
                 TreeNode VChild = null;
                 if (Child.Symbol != null)
                 {
                     string name = Child.Symbol.Name;
                     string value = "";
-                    if (Child.Symbol is Hime.Redist.Parsers.SymbolToken)
-                        value = ": \"" + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"";
+                    if (Child.Symbol is Token)
+                        value = ": \"" + (Child.Symbol as Token).Value.ToString() + "\"";
                     string header = name + value;
                     VChild = VNode.Nodes.Add(header);
                 }

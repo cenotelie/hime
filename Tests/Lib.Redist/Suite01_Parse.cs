@@ -2,15 +2,14 @@
  * Author: Charles Hymans
  * */
 using System;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
-using NUnit.Framework;
-using Hime.Parsers;
-using Hime.Utils.Reporting;
-using Hime.Redist.Parsers;
-using System.IO;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using NUnit.Framework;
+using Hime.CentralDogma;
+using Hime.Redist.AST;
 
 namespace Hime.Tests.Redist
 {

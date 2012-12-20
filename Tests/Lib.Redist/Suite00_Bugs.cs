@@ -6,11 +6,10 @@
  */
 using System;
 using System.IO;
-using NUnit.Framework;
-using Hime.Parsers;
-using Hime.Utils.Reporting;
-using Hime.Redist.Parsers;
 using System.Reflection;
+using NUnit.Framework;
+using Hime.CentralDogma;
+using Hime.Redist.AST;
 
 namespace Hime.Tests.Redist
 {

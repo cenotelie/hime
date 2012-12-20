@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
-using Hime.Parsers;
-using Hime.Utils.Reporting;
-using Hime.Redist.Parsers;
+using Hime.CentralDogma;
+using Hime.CentralDogma.Reporting;
 
 namespace Hime.Tests.CentralDogma
 {

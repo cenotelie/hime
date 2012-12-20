@@ -33,11 +33,11 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's variables
         /// </summary>
-        protected Utils.SymbolDictionary<SymbolVariable> parserVariables;
+        protected Utils.SymbolDictionary<Symbols.Variable> parserVariables;
         /// <summary>
         /// Parser's virtuals
         /// </summary>
-        protected Utils.SymbolDictionary<SymbolVirtual> parserVirtuals;
+        protected Utils.SymbolDictionary<Symbols.Virtual> parserVirtuals;
         /// <summary>
         /// Parser's actions
         /// </summary>
@@ -58,17 +58,17 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Lexer associated to this parser
         /// </summary>
-        protected ILexer lexer;
+        protected Lexer.ILexer lexer;
 
         /// <summary>
         /// Gets the variable symbols used by this parser
         /// </summary>
-        public Utils.SymbolDictionary<SymbolVariable> Variables { get { return parserVariables; } }
+        public Utils.SymbolDictionary<Symbols.Variable> Variables { get { return parserVariables; } }
 
         /// <summary>
         /// Gets the virtual symbols used by this parser
         /// </summary>
-        public Utils.SymbolDictionary<SymbolVirtual> Virtuals { get { return parserVirtuals; } }
+        public Utils.SymbolDictionary<Symbols.Virtual> Virtuals { get { return parserVirtuals; } }
 
         /// <summary>
         /// Gets a read-only collection of syntaxic errors encountered by the parser
@@ -82,10 +82,10 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        public BaseLRParser(SymbolVariable[] variables, SymbolVirtual[] virtuals, SemanticAction[] actions, ILexer lexer)
+        public BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
         {
-            this.parserVariables = new Utils.SymbolDictionary<SymbolVariable>(variables);
-            this.parserVirtuals = new Utils.SymbolDictionary<SymbolVirtual>(virtuals);
+            this.parserVariables = new Utils.SymbolDictionary<Symbols.Variable>(variables);
+            this.parserVirtuals = new Utils.SymbolDictionary<Symbols.Virtual>(virtuals);
             this.parserActions = actions;
             this.tryRecover = true;
             this.errors = new List<ParserError>();
@@ -108,13 +108,13 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="token">The unexpected token</param>
         /// <returns>The next token</returns>
-        protected abstract SymbolToken OnUnexpectedToken(SymbolToken token);
+        protected abstract Symbols.Token OnUnexpectedToken(Symbols.Token token);
 
         /// <summary>
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public abstract CSTNode Parse();
+        public abstract AST.CSTNode Parse();
 
         /// <summary>
         /// Parses the input and returns whether the input is recognized
