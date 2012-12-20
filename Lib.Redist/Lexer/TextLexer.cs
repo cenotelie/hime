@@ -13,7 +13,7 @@ namespace Hime.Redist.Lexer
     /// </summary>
     public abstract class TextLexer : ILexer
     {
-        internal const int maxTokenLength = 2048;
+        internal const int readerLength = 128;
 
         /// <summary>
         /// Lexer's automaton
@@ -79,11 +79,11 @@ namespace Hime.Redist.Lexer
             this.lexAutomaton = automaton;
             this.lexTerminals = new Utils.SymbolDictionary<Symbols.Terminal>(terminals);
             this.lexSeparator = separator;
-            this.input = new RewindableTextReader(input, maxTokenLength, maxTokenLength);
+            this.input = new RewindableTextReader(input, readerLength, readerLength);
             this.currentLine = 1;
             this.currentColumn = 1;
             this.isDollatEmited = false;
-            this.buffer = new char[maxTokenLength];
+            this.buffer = new char[readerLength];
         }
 
         /// <summary>
@@ -157,6 +157,12 @@ namespace Hime.Redist.Lexer
                 char current = input.Read(out endOfInput);
                 if (endOfInput)
                     break;
+                if (readCount == buffer.Length)
+                {
+                    char[] temp = new char[buffer.Length * 2];
+                    System.Array.Copy(buffer, temp, buffer.Length);
+                    buffer = temp;
+                }
                 buffer[readCount] = current;
                 readCount++;
                 if (current <= 255)

@@ -159,7 +159,7 @@ namespace Hime.Redist.Parsers
             AST.CSTNode sub = new AST.CSTNode(parserVariables[production.Head], (AST.CSTAction)production.HeadAction);
             int nextBuffer = 0;
             int nextStack = 0;
-            for (int i = 0; i != production.Bytecode.SizeData; i++)
+            for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 ushort op = production.Bytecode[i];
                 if (op == LRProduction.SemanticAction)
@@ -202,7 +202,7 @@ namespace Hime.Redist.Parsers
             object sub = parserVariables[production.Head];
             int nextBuffer = 0;
             int nextStack = 0;
-            for (int i = 0; i != production.BytecodeLength; i++)
+            for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 ushort op = production.Bytecode[i];
                 if (op == LRProduction.SemanticAction)

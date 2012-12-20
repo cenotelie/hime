@@ -39,9 +39,9 @@ namespace Hime.Redist.Parsers
          */
 
         private ushort ncols;
-        private Utils.BinaryBlobUShort columnsID;
+        private Utils.BlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
-        private Utils.BinaryBlobUShort table;
+        private Utils.BlobUShort table;
         private LRProduction[] productions;
 
         private LRkAutomaton(Stream stream)
@@ -50,13 +50,13 @@ namespace Hime.Redist.Parsers
             this.ncols = reader.ReadUInt16();
             ushort nstates = reader.ReadUInt16();
             ushort nprod = reader.ReadUInt16();
-            this.columnsID = new Utils.BinaryBlobUShort(ncols * 2);
-            reader.Read(columnsID.Blob, 0, ncols * 2);
+            this.columnsID = new Utils.BlobUShort(ncols * 2);
+            reader.Read(columnsID.Raw, 0, ncols * 2);
             this.columns = new Utils.SIDHashMap<ushort>();
             for (ushort i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
-            this.table = new Utils.BinaryBlobUShort(ncols * nstates * 4);
-            reader.Read(this.table.Blob, 0, this.table.SizeBlob);
+            this.table = new Utils.BlobUShort(ncols * nstates * 4);
+            reader.Read(this.table.Raw, 0, this.table.RawSize);
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);

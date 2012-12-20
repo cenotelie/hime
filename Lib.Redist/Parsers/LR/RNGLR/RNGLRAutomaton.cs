@@ -42,14 +42,14 @@ namespace Hime.Redist.Parsers
          */
 
         private ushort ncols;
-        private Utils.BinaryBlobUShort columnsID;
+        private Utils.BlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
-        private Utils.BinaryBlobUShort table;
-        private Utils.BinaryBlobUShort actions;
+        private Utils.BlobUShort table;
+        private Utils.BlobUShort actions;
         private LRProduction[] productions;
-        private Utils.BinaryBlobUShort nullables;
+        private Utils.BlobUShort nullables;
 
-        public Utils.BinaryBlobUShort Nullables { get { return nullables; } }
+        internal Utils.BlobUShort Nullables { get { return nullables; } }
 
         private RNGLRAutomaton(Stream stream)
         {
@@ -59,20 +59,20 @@ namespace Hime.Redist.Parsers
             ushort nactions = reader.ReadUInt16();
             ushort nprod = reader.ReadUInt16();
             ushort nnprod = reader.ReadUInt16();
-            this.columnsID = new Utils.BinaryBlobUShort(ncols * 2);
-            reader.Read(columnsID.Blob, 0, ncols * 2);
+            this.columnsID = new Utils.BlobUShort(ncols * 2);
+            reader.Read(columnsID.Raw, 0, ncols * 2);
             this.columns = new Utils.SIDHashMap<ushort>();
             for (ushort i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
-            this.actions = new Utils.BinaryBlobUShort(ncols * nstates * 4);
-            reader.Read(this.actions.Blob, 0, this.actions.SizeBlob);
-            this.table = new Utils.BinaryBlobUShort(nactions * 4);
-            reader.Read(this.table.Blob, 0, this.table.SizeBlob);
+            this.actions = new Utils.BlobUShort(ncols * nstates * 4);
+            reader.Read(this.actions.Raw, 0, this.actions.RawSize);
+            this.table = new Utils.BlobUShort(nactions * 4);
+            reader.Read(this.table.Raw, 0, this.table.RawSize);
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);
-            this.nullables = new Utils.BinaryBlobUShort(nnprod * 2);
-            reader.Read(this.nullables.Blob, 0, this.nullables.SizeBlob);
+            this.nullables = new Utils.BlobUShort(nnprod * 2);
+            reader.Read(this.nullables.Raw, 0, this.nullables.RawSize);
             reader.Close();
         }
 

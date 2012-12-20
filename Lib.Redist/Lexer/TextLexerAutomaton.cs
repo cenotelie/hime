@@ -40,13 +40,11 @@ namespace Hime.Redist.Lexer
         {
             BinaryReader reader = new BinaryReader(stream);
             int count = reader.ReadInt32();
-            byte[] bt = new byte[count * 4];
-            reader.Read(bt, 0, bt.Length);
-            byte[] bd = new byte[stream.Length - bt.Length - 4];
-            reader.Read(bd, 0, bd.Length);
+            table = new Utils.BlobInt(count * 4);
+            reader.Read(table.Raw, 0, table.RawSize);
+            states = new Utils.BlobUShort((int)stream.Length - table.RawSize - 4);
+            reader.Read(states.Raw, 0, states.RawSize);
             reader.Close();
-            table = new Utils.BlobInt(bt);
-            states = new Utils.BlobUShort(bd);
         }
 
         /// <summary>

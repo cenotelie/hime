@@ -45,20 +45,20 @@ namespace Hime.Redist.Parsers
         private ushort head;
         private byte headAction;
         private byte reducLength;
-        private Utils.BinaryBlobUShort bytecode;
+        private Utils.BlobUShort bytecode;
 
         public ushort Head { get { return head; } }
         public byte HeadAction { get { return headAction; } }
         public byte ReductionLength { get { return reducLength; } }
-        public Utils.BinaryBlobUShort Bytecode { get { return bytecode; } }
+        internal Utils.BlobUShort Bytecode { get { return bytecode; } }
 
         public LRProduction(BinaryReader reader)
         {
             this.head = reader.ReadUInt16();
             this.headAction = reader.ReadByte();
             this.reducLength = reader.ReadByte();
-            this.bytecode = new Utils.BinaryBlobUShort(reader.ReadByte());
-            reader.Read(bytecode.Blob, 0, this.bytecode.SizeBlob);
+            this.bytecode = new Utils.BlobUShort(reader.ReadByte());
+            reader.Read(bytecode.Raw, 0, this.bytecode.RawSize);
         }
     }
 }
