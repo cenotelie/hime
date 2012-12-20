@@ -24,17 +24,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected List<Rule> rules;
         protected string terminalsAccessor;
 
-        protected ICollection<Rule> GrammarRules { get { return rules; } }
-        protected string IndexOfRule(Rule rule) 
-		{
-			return "0x" + rules.IndexOf(rule).ToString("X"); 
-		}
-		
-        protected ICollection<Action> GrammarActions { get { return grammar.Actions; } }
-        protected CFVariable GetVariable(string name) { return grammar.GetVariable(name) as CFVariable; }
-        protected string GetOption(string name) { return this.grammar.GetOption(name); }
-        
-		abstract protected string BaseClassName { get; }
+        abstract protected string BaseClassName { get; }
 
         public ParserDataLR(Reporting.Reporter reporter, CFGrammar gram, Graph graph)
         {

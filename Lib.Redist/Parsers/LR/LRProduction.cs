@@ -23,7 +23,7 @@ namespace Hime.Redist.Parsers
     * uint16: 8
     * uint16: action's index
     * --- null variable
-    * uint16: 16
+    * uint16: 16 + action
     * uint16: variable's index
     */
 
@@ -41,6 +41,9 @@ namespace Hime.Redist.Parsers
         public const ushort VirtualPromote = Virtual + PopPromote;
         public const ushort SemanticAction = 8;
         public const ushort NullVariable = 16;
+        public const ushort NullVariableNoAction = NullVariable;
+        public const ushort NullVariableDrop = NullVariable + PopDrop;
+        public const ushort NullVariablePromote = NullVariable + PopPromote;
 
         private ushort head;
         private byte headAction;

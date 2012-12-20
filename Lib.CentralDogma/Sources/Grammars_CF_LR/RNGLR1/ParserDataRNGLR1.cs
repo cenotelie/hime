@@ -24,13 +24,21 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         public override void ExportData(BinaryWriter stream)
         {
-            List<Rule> rules = new List<Rule>(grammar.Rules);
+            List<KeyValuePair<Rule, int>> rules = new List<KeyValuePair<Rule, int>>();
             List<ushort> nullables = new List<ushort>();
-            for (ushort i = 0; i != rules.Count; i++)
+            foreach (CFRule rule in grammar.Rules)
             {
-                CFRule rule = rules[i] as CFRule;
+                rules.Add(new KeyValuePair<Rule, int>(rule, rule.CFBody.GetChoiceAt(0).Length));
                 if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
-                    nullables.Add(i);
+                    nullables.Add((ushort)(rules.Count - 1));
+                for (int i = 1; i < rule.CFBody.GetChoiceAt(0).Length; i++)
+                {
+                    if (rule.CFBody.GetChoiceAt(i).Firsts.Contains(Epsilon.Instance))
+                    {
+                        rules.Add(new KeyValuePair<Rule, int>(rule, i));
+                        nullables.Add((ushort)(rules.Count - 1));
+                    }
+                }
             }
 
             int total = 0;
@@ -42,7 +50,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
             stream.Write((ushort)graph.States.Count);                   // Nb or rows
             stream.Write((ushort)total);                                // Nb of actions
-            stream.Write((ushort)rules.Count);                          // Nb or rules
+            stream.Write((ushort)rules.Count);                          // Nb of rules
+            stream.Write((ushort)nullables.Count);                      // Nb of nullables
 
             foreach (Terminal t in terminals)
                 stream.Write(t.SID);
@@ -56,10 +65,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             }
 
             foreach (State state in graph.States)
-                ExportDataTable(stream, state);
+                ExportDataTable(stream, rules, state);
 
-            foreach (Rule rule in rules)
-                ExportDataProduction(stream, rule);
+            foreach (KeyValuePair<Rule, int> pair in rules)
+                ExportDataProduction(stream, pair.Key, pair.Value);
+
+            foreach (ushort index in nullables)
+                stream.Write(index);
         }
 
         private int ExportDataCountActions(List<ushort> offsets, List<ushort> counts, int total, State state)
@@ -68,7 +80,9 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (StateActionReduce reduce in state.Reductions)
             {
                 if (counters.ContainsKey(reduce.Lookahead))
-                    counters.Add(reduce.Lookahead, counters[reduce.Lookahead]+1);
+                    counters.Add(reduce.Lookahead, counters[reduce.Lookahead] + 1);
+                else
+                    counters.Add(reduce.Lookahead, 1);
             }
             foreach (Terminal t in terminals)
             {
@@ -89,16 +103,21 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             return total;
         }
 
-        private void ExportDataTable(BinaryWriter stream, State state)
+        private void ExportDataTable(BinaryWriter stream, List<KeyValuePair<Rule, int>> rules, State state)
         {
-            Dictionary<Terminal, Rule> reductions = new Dictionary<Terminal, Rule>();
-            foreach (StateActionReduce reduction in state.Reductions)
-                reductions.Add(reduction.Lookahead, reduction.ToReduceRule);
-            if (reductions.ContainsKey(Epsilon.Instance) || reductions.ContainsKey(NullTerminal.Instance))
+            Dictionary<Terminal, List<StateActionRNReduce>> reductions = new Dictionary<Terminal, List<StateActionRNReduce>>();
+            foreach (StateActionReduce reduce in state.Reductions)
+            {
+                if (!reductions.ContainsKey(reduce.Lookahead))
+                    reductions.Add(reduce.Lookahead, new List<StateActionRNReduce>());
+                reductions[reduce.Lookahead].Add(reduce as StateActionRNReduce);
+            }
+            if (reductions.ContainsKey(Epsilon.Instance))
+            {
+                // There can be only one reduction on epsilon
                 stream.Write(LRkAutomaton.ActionAccept);
-            else
                 stream.Write(LRkAutomaton.ActionNone);
-            stream.Write(LRkAutomaton.ActionNone);
+            }
             for (int i = 1; i != terminals.Count; i++)
             {
                 Terminal t = terminals[i];
@@ -107,20 +126,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                     stream.Write(LRkAutomaton.ActionShift);
                     stream.Write((ushort)state.Children[t].ID);
                 }
-                else if (reductions.ContainsKey(t))
+                if (reductions.ContainsKey(t))
                 {
-                    stream.Write(LRkAutomaton.ActionReduce);
-                    stream.Write((ushort)rules.IndexOf(reductions[t]));
-                }
-                else if (reductions.ContainsKey(NullTerminal.Instance))
-                {
-                    stream.Write(LRkAutomaton.ActionReduce);
-                    stream.Write((ushort)rules.IndexOf(reductions[NullTerminal.Instance]));
-                }
-                else
-                {
-                    stream.Write(LRkAutomaton.ActionNone);
-                    stream.Write(LRkAutomaton.ActionNone);
+                    foreach (StateActionRNReduce reduce in reductions[t])
+                    {
+                        stream.Write(LRkAutomaton.ActionReduce);
+                        stream.Write((ushort)rules.IndexOf(new KeyValuePair<Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
+                    }
                 }
             }
             foreach (Variable var in variables)
@@ -130,312 +142,62 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                     stream.Write(LRkAutomaton.ActionShift);
                     stream.Write((ushort)state.Children[var].ID);
                 }
+            }
+        }
+
+        protected void ExportDataProduction(BinaryWriter stream, Rule rule, int length)
+        {
+            stream.Write((ushort)variables.IndexOf(rule.Head));
+            if (rule.ReplaceOnProduction) stream.Write((byte)LRProduction.HeadReplace);
+            else stream.Write((byte)LRProduction.HeadKeep);
+            stream.Write((byte)length);
+            byte bcl = 0;
+            int pop = 0;
+            foreach (RuleBodyElement elem in rule.Body.Parts)
+            {
+                if (elem.Symbol is Virtual || elem.Symbol is Action)
+                    bcl += 4;
+                else if (pop >= length)
+                    bcl += 4;
                 else
                 {
-                    stream.Write(LRkAutomaton.ActionNone);
-                    stream.Write(LRkAutomaton.ActionNone);
+                    bcl += 2;
+                    pop++;
                 }
             }
-        }
-
-        /*protected override void ExportAdditionalStaticElements(StreamWriter stream, string className)
-        {
-            DetermineNullables();
-            Export_NullVars(stream);
-            Export_NullChoices(stream);
-            Export_NullBuilders(stream);
-            Export_StaticConstructor(stream, className);
-        }
-		
-        protected void Export_StaticConstructor(StreamWriter stream, string className)
-        {
-            stream.WriteLine("        static " + className + "()");
-            stream.WriteLine("        {");
-            stream.WriteLine("            BuildNullables();");
-            stream.WriteLine("        }");
-        }
-		
-        protected override void ExportSetup(StreamWriter stream)
-        {
-            string axiomID = GetVariable(GetOption("Axiom")).SID.ToString("X");
-            string _axiom_ID = GetVariable("_Axiom_").SID.ToString("X");
-            int index = nullableVars.IndexOf(GetVariable(GetOption("Axiom")));
-            if (index < 0) index = 0;
-
-            stream.WriteLine("        protected override void setup()");
-            stream.WriteLine("        {");
-            stream.WriteLine("            nullVarsSPPF = staticNullVarsSPPF;");
-            stream.WriteLine("            nullChoicesSPPF = staticNullChoicesSPPF;");
-            stream.WriteLine("            rules = staticRules;");
-            stream.WriteLine("            states = staticStates;");
-            stream.WriteLine("            axiomID = 0x" + axiomID + ";");
-            stream.WriteLine("            axiomNullSPPF = 0x" + index.ToString("X") + ";");
-            stream.WriteLine("            axiomPrimeID = 0x" + _axiom_ID + ";");
-            stream.WriteLine("        }");
-        }
-
-        protected override void ExportActions(StreamWriter stream)
-        {
-            List<string> Names = new List<string>();
-            foreach (Action action in this.GrammarActions)
-                if (!Names.Contains(action.Name))
-                    Names.Add(action.Name);
-
-            if (Names.Count != 0)
+            stream.Write(bcl);
+            pop = 0;
+            foreach (RuleBodyElement elem in rule.Body.Parts)
             {
-                stream.WriteLine("        public interface Actions");
-                stream.WriteLine("        {");
-                foreach (string name in Names)
-                    stream.WriteLine("            void " + name + "(SyntaxTreeNode SubRoot);");
-                stream.WriteLine("        }");
-            }
-        }
-        override protected void ExportProduction(StreamWriter stream, CFRule Rule, string className)
-        {
-            stream.WriteLine("        private static void Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X") + " (BaseRNGLR1Parser parser, SPPFNode root, List<SPPFNode> nodes)");
-            stream.WriteLine("        {");
-            if (Rule.ReplaceOnProduction)
-                stream.WriteLine("            root.Action = SyntaxTreeNodeAction.Replace;");
-            stream.WriteLine("            SPPFNodeFamily family = new SPPFNodeFamily(root);");
-            int i = 0;
-            foreach (RuleBodyElement Part in Rule.CFBody.Parts)
-            {
-                if (Part.Symbol is Action)
+                if (elem.Symbol is Virtual)
                 {
-                    Action action = (Action)Part.Symbol;
-                    stream.WriteLine("            family.AddChild(new SPPFNode(new SymbolAction(\"" + action.Name + "\", ((" + className + ")parser).actions." + action.Name + "), 0));");
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.VirtualPromote);
+                    else stream.Write(LRProduction.VirtualNoAction);
+                    stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
-                else if (Part.Symbol is Virtual)
-                    stream.WriteLine("            family.AddChild(new SPPFNode(new Virtual(\"" + ((Virtual)Part.Symbol).Name + "\"), 0, SyntaxTreeNodeAction." + Part.Action.ToString() + "));");
-                else if (Part.Symbol is Terminal || Part.Symbol is Variable)
+                else if (elem.Symbol is Action)
                 {
-                    if (Part.Action != RuleBodyElementAction.Nothing)
-                        stream.WriteLine("            nodes[" + i.ToString() + "].Action = SyntaxTreeNodeAction." + Part.Action.ToString() + ";");
-                    stream.WriteLine("            family.AddChild(nodes[" + i.ToString() + "]);");
-                    i++;
+                    stream.Write(LRProduction.SemanticAction);
+                    stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
-            }
-            stream.WriteLine("            if (!root.HasEquivalentFamily(family)) root.AddFamily(family);");
-            stream.WriteLine("        }");
-        }
-		
-        override protected void ExportRules(StreamWriter stream)
-        {
-            stream.WriteLine("        private static Rule[] staticRules = {");
-            bool first = true;
-            foreach (CFRule Rule in this.GrammarRules)
-            {
-                stream.Write("           ");
-                if (!first) stream.Write(", ");
-                string production = "Production_" + Rule.Head.SID.ToString("X") + "_" + Rule.ID.ToString("X");
-                string head = "variables[" + this.variables.IndexOf(Rule.Head) + "]";
-                stream.WriteLine("new Rule(" + production + ", " + head + ")");
-                first = false;
-            }
-            stream.WriteLine("        };");
-        }
-        protected void Export_State(StreamWriter stream, State state)
-        {
-            TerminalSet expected = state.Reductions.ExpectedTerminals;
-            foreach (GrammarSymbol Symbol in state.Children.Keys)
-            {
-                if (Symbol is Terminal)
-                    expected.Add((Terminal)Symbol);
-            }
-            bool first = true;
-            stream.WriteLine("new State(");
-            // Write items
-            if (debug)
-            {
-                stream.Write("               new string[" + state.Items.Count + "] {");
-                first = true;
-                foreach (Item item in state.Items)
+                else if (pop >= length)
                 {
-                    if (!first) stream.Write(", ");
-                    stream.Write("\"" + item.ToString(true) + "\"");
-                    first = false;
-                }
-                stream.WriteLine("},");
-            }
-            else
-            {
-                stream.WriteLine("               null,");
-            }
-            // Write terminals
-            stream.Write("               new Terminal[" + expected.Count + "] {");
-            first = true;
-            foreach (Terminal terminal in expected)
-            {
-                int index = terminals.IndexOf(terminal);
-                if (index == -1)
-                    reporter.Error("Grammar", "In state " + state.ID.ToString("X") + " expected terminal " + terminal.ToString() + " cannot be produced by the lexer. Check the regular expressions.");
-                if (!first) stream.Write(", ");
-                stream.Write(terminalsAccessor + "[" + index + "]");
-                first = false;
-            }
-            stream.WriteLine("},");
-
-            int ShitTerminalCount = 0;
-            foreach (GrammarSymbol Symbol in state.Children.Keys)
-            {
-                if (!(Symbol is Terminal))
-                    continue;
-                ShitTerminalCount++;
-            }
-
-            // Write shifts on terminal
-            stream.Write("               new ushort[" + ShitTerminalCount + "] {");
-            first = true;
-            foreach (GrammarSymbol Symbol in state.Children.Keys)
-            {
-                if (!(Symbol is Terminal))
-                    continue;
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + Symbol.SID.ToString("x"));
-                first = false;
-            }
-            stream.WriteLine("},");
-            stream.Write("               new ushort[" + ShitTerminalCount + "] {");
-            first = true;
-            foreach (GrammarSymbol Symbol in state.Children.Keys)
-            {
-                if (!(Symbol is Terminal))
-                    continue;
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + state.Children[Symbol].ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine("},");
-
-            // Write shifts on variable
-            stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
-            first = true;
-            foreach (GrammarSymbol Symbol in state.Children.Keys)
-            {
-                if (!(Symbol is Variable))
-                    continue;
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + Symbol.SID.ToString("x"));
-                first = false;
-            }
-            stream.WriteLine("},");
-            stream.Write("               new ushort[" + (state.Children.Count - ShitTerminalCount).ToString() + "] {");
-            first = true;
-            foreach (GrammarSymbol Symbol in state.Children.Keys)
-            {
-                if (!(Symbol is Variable))
-                    continue;
-                if (!first) stream.Write(", ");
-                stream.Write("0x" + state.Children[Symbol].ID.ToString("X"));
-                first = false;
-            }
-            stream.WriteLine("},");
-            // Write reductions
-            stream.Write("               new Reduction[" + state.Reductions.Count + "] {");
-            first = true;
-            foreach (StateActionRNReduce Reduction in state.Reductions)
-            {
-                if (!first) stream.Write(", ");
-				string tableName;
-                int index = 0;
-				int reductionLength = Reduction.ReduceLength;
-				CFRule reductionRule = Reduction.ToReduceRule;
-                if (reductionLength == 0)
-                {
-                    index = nullableVars.IndexOf(reductionRule.Head);
-					tableName = "staticNullVarsSPPF";
+                    // Here the symbol must be a variable
+                    ushort index = (ushort)variables.IndexOf(elem.Symbol as CFVariable);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.NullVariableDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.NullVariablePromote);
+                    else stream.Write(LRProduction.NullVariableNoAction);
+                    stream.Write(index);
                 }
                 else
                 {
-                    if (reductionRule.CFBody.GetChoiceAt(0).Length != reductionLength)
-                    {
-                        CFRuleBody def = reductionRule.CFBody.GetChoiceAt(reductionLength);
-                        index = nullableChoices.IndexOf(def);
-                    }
-					tableName = "staticNullChoicesSPPF";
-                }
-				// TODO: think about it but many violations of the Demeter rule!!!
-                stream.Write("new Reduction(0x" + Reduction.OnSymbol.SID.ToString("x") + ", staticRules[" + this.IndexOfRule(reductionRule) + "], 0x" + reductionLength.ToString("X") + ", " + tableName + "[0x" + index.ToString("X") + "])");
-                first = false;
-            }
-            stream.WriteLine("})");
-        }
-		// TODO: should factor this method with other
-        protected override void ExportStates(StreamWriter stream)
-        {
-            stream.WriteLine("        private static State[] staticStates = {");
-            bool first = true;
-            foreach (State State in graph.States)
-            {
-                stream.Write("            ");
-                if (!first) stream.Write(", ");
-                Export_State(stream, State);
-                first = false;
-            }
-            stream.WriteLine("        };");
-        }
-
-        protected void Export_NullVars(StreamWriter stream)
-        {
-            stream.Write("        private static SPPFNode[] staticNullVarsSPPF = { ");
-            bool first = true;
-            foreach (Variable var in nullableVars)
-            {
-                string action = ", SyntaxTreeNodeAction.Replace";
-                foreach (CFRule rule in var.Rules)
-                {
-                    if (!rule.ReplaceOnProduction)
-                    {
-                        action = "";
-                        break;
-                    }
-                }
-                if (!first) stream.Write(", ");
-                stream.Write("new SPPFNode(variables[" + variables.IndexOf(var) + "], 0" + action + ")");
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_NullChoices(StreamWriter stream)
-        {
-            stream.Write("        private static SPPFNode[] staticNullChoicesSPPF = { ");
-            bool first = true;
-            foreach (CFRuleBody definition in nullableChoices)
-            {
-                if (!first) stream.Write(", ");
-                stream.Write("new SPPFNode(null, 0, SyntaxTreeNodeAction.Replace)");
-                first = false;
-            }
-            stream.WriteLine(" };");
-        }
-        protected void Export_NullBuilders(StreamWriter stream)
-        {
-            stream.WriteLine("        private static void BuildNullables() { ");
-            stream.WriteLine("            List<SPPFNode> temp = new List<SPPFNode>();");
-            for (int i=0; i!=nullableChoices.Count; i++)
-            {
-                CFRuleBody definition = nullableChoices[i];
-                foreach (RuleBodyElement part in definition.Parts)
-                    stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((Variable)part.Symbol) + "]);");
-                stream.WriteLine("            staticNullChoicesSPPF[" + i + "].AddFamily(temp);");
-                stream.WriteLine("            temp.Clear();");
-            }
-            for (int i = 0; i != nullableVars.Count; i++)
-            {
-                Variable var = nullableVars[i];
-                foreach (CFRule rule in var.Rules)
-                {
-                    CFRuleBody definition = rule.CFBody.GetChoiceAt(0);
-                    if (definition.Firsts.Contains(TerminalEpsilon.Instance))
-                    {
-                        foreach (RuleBodyElement part in definition.Parts)
-                            stream.WriteLine("            temp.Add(staticNullVarsSPPF[" + nullableVars.IndexOf((Variable)part.Symbol) + "]);");
-                        stream.WriteLine("            staticNullVarsSPPF[" + i + "].AddFamily(temp);");
-                        stream.WriteLine("            temp.Clear();");
-                    }
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.PopPromote);
+                    else stream.Write(LRProduction.PopNoAction);
+                    pop++;
                 }
             }
-            stream.WriteLine("        }");
-        }*/
+        }
     }
 }
