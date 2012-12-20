@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Xsl;
 using System.Collections.Generic;
 using System.IO;
+using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Grammars.ContextFree.LR
 {
@@ -33,7 +34,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected CFVariable GetVariable(string name) { return grammar.GetVariable(name) as CFVariable; }
         protected string GetOption(string name) { return this.grammar.GetOption(name); }
         
-		abstract protected string GetBaseClassName { get; }
+		abstract protected string BaseClassName { get; }
 
         public ParserDataLR(Reporting.Reporter reporter, CFGrammar gram, Graph graph)
         {
@@ -51,8 +52,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)1);
-            else stream.Write((byte)0);
+            if (rule.ReplaceOnProduction) stream.Write((byte)LRProduction.HeadReplace);
+            else stream.Write((byte)LRProduction.HeadKeep);
             stream.Write((byte)(rule as CFRule).CFBody.GetChoiceAt(0).Length);
             byte length = 0;
             foreach (RuleBodyElement elem in rule.Body.Parts)
@@ -67,21 +68,21 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)6);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)7);
-                    else stream.Write((ushort)4);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.VirtualPromote);
+                    else stream.Write(LRProduction.VirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
                 {
-                    stream.Write((ushort)8);
+                    stream.Write(LRProduction.SemanticAction);
                     stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)2);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)3);
-                    else stream.Write((ushort)0);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.PopPromote);
+                    else stream.Write(LRProduction.PopNoAction);
                 }
             }
         }
@@ -91,7 +92,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         {
             this.terminals = new List<Terminal>(expected);
 
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Parser : " + this.GetBaseClassName);
+            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Parser : " + this.BaseClassName);
             stream.WriteLine("    {");
             ExportAutomaton(stream, name, resource);
             ExportVariables(stream);

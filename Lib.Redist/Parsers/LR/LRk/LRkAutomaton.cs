@@ -21,7 +21,7 @@ namespace Hime.Redist.Parsers
 
         /* Binary data of a LR(k) parser
          * uint16: number of columns
-         * uint16: number of rows
+         * uint16: number of states
          * uint16: number of productions
          * 
          * -- parse table columns
@@ -39,28 +39,24 @@ namespace Hime.Redist.Parsers
          */
 
         private ushort ncols;
-        private Utils.BlobUShort columnsID;
+        private Utils.BinaryBlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
-        private Utils.BlobUShort table;
+        private Utils.BinaryBlobUShort table;
         private LRProduction[] productions;
 
         private LRkAutomaton(Stream stream)
         {
             BinaryReader reader = new BinaryReader(stream);
             this.ncols = reader.ReadUInt16();
-            ushort nrows = reader.ReadUInt16();
+            ushort nstates = reader.ReadUInt16();
             ushort nprod = reader.ReadUInt16();
-            
-            byte[] cb = new byte[ncols * 2];
-            stream.Read(cb, 0, ncols * 2);
-            this.columnsID = new Utils.BlobUShort(cb);
+            this.columnsID = new Utils.BinaryBlobUShort(ncols * 2);
+            reader.Read(columnsID.Blob, 0, ncols * 2);
             this.columns = new Utils.SIDHashMap<ushort>();
             for (ushort i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
-            
-            byte[] buffer = new byte[ncols * nrows * 4];
-            stream.Read(buffer, 0, buffer.Length);
-            this.table = new Utils.BlobUShort(buffer);
+            this.table = new Utils.BinaryBlobUShort(ncols * nstates * 4);
+            reader.Read(this.table.Blob, 0, this.table.SizeBlob);
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);
@@ -126,8 +122,7 @@ namespace Hime.Redist.Parsers
             int offset = ncols * state * 2;
             for (int i = 0; i != terminalCount; i++)
             {
-                int action = table[offset];
-                if (action != 0)
+                if (table[offset] != ActionNone)
                     result.Add(i);
                 offset += 2;
             }

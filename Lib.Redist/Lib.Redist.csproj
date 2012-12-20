@@ -66,7 +66,7 @@
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
-    <Compile Include="Parsers\LR\RNGLR\GLRAutomaton.cs" />
+    <Compile Include="Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
     <Compile Include="Parsers\ParserErrorType.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRProduction.cs" />

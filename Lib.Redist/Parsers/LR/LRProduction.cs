@@ -22,41 +22,43 @@ namespace Hime.Redist.Parsers
     * -- semantic action
     * uint16: 8
     * uint16: action's index
+    * --- null variable
+    * uint16: 16
+    * uint16: variable's index
     */
 
     public sealed class LRProduction
     {
-        public const ushort PopNoAction = (ushort)AST.CSTAction.Nothing;
-        public const ushort PopDrop = (ushort)AST.CSTAction.Drop;
-        public const ushort PopPromote = (ushort)AST.CSTAction.Promote;
+        public const byte HeadReplace = 1;
+        public const byte HeadKeep = 0;
+
+        public const ushort PopNoAction = 0;
+        public const ushort PopDrop = 2;
+        public const ushort PopPromote = 3;
         public const ushort Virtual = 4;
-        public const ushort VirtualNoAction = Virtual + (ushort)AST.CSTAction.Nothing;
-        public const ushort VirtualDrop = Virtual + (ushort)AST.CSTAction.Drop;
-        public const ushort VirtualPromote = Virtual + (ushort)AST.CSTAction.Promote;
+        public const ushort VirtualNoAction = Virtual + PopNoAction;
+        public const ushort VirtualDrop = Virtual + PopDrop;
+        public const ushort VirtualPromote = Virtual + PopPromote;
         public const ushort SemanticAction = 8;
+        public const ushort NullVariable = 16;
 
         private ushort head;
         private byte headAction;
         private byte reducLength;
-        private byte bytecodeLength;
-        private Utils.BlobUShort bytecode;
+        private Utils.BinaryBlobUShort bytecode;
 
         public ushort Head { get { return head; } }
         public byte HeadAction { get { return headAction; } }
         public byte ReductionLength { get { return reducLength; } }
-        public ushort[] Bytecode { get { return bytecode.Data; } }
-        public int BytecodeLength { get { return bytecodeLength; } }
+        public Utils.BinaryBlobUShort Bytecode { get { return bytecode; } }
 
-        public LRProduction(BinaryReader stream)
+        public LRProduction(BinaryReader reader)
         {
-            this.head = stream.ReadUInt16();
-            this.headAction = stream.ReadByte();
-            this.reducLength = stream.ReadByte();
-            this.bytecodeLength = stream.ReadByte();
-            byte[] buffer = new byte[this.bytecodeLength];
-            stream.Read(buffer, 0, this.bytecodeLength);
-            this.bytecode = new Utils.BlobUShort(buffer);
-            this.bytecodeLength = (byte)(this.bytecodeLength >> 1);
+            this.head = reader.ReadUInt16();
+            this.headAction = reader.ReadByte();
+            this.reducLength = reader.ReadByte();
+            this.bytecode = new Utils.BinaryBlobUShort(reader.ReadByte());
+            reader.Read(bytecode.Blob, 0, this.bytecode.SizeBlob);
         }
     }
 }

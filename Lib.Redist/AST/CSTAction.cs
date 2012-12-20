@@ -14,18 +14,18 @@ namespace Hime.Redist.AST
         /// <summary>
         /// Promote the node to the immediately upper level in the tree
         /// </summary>
-        Promote = 3,
+        Promote = Parsers.LRProduction.PopPromote,
         /// <summary>
         /// Drop the node and all the children from the tree
         /// </summary>
-        Drop = 2,
+        Drop = Parsers.LRProduction.PopDrop,
         /// <summary>
         /// Replace the node by its children
         /// </summary>
-        Replace = 1,
+        Replace = Parsers.LRProduction.HeadReplace,
         /// <summary>
         /// Default action for a node, do nothing
         /// </summary>
-        Nothing = 0
+        Nothing = Parsers.LRProduction.PopNoAction
     }
 }

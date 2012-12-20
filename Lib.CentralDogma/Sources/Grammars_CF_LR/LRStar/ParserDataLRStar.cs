@@ -12,7 +12,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 {
     class ParserDataLRStar : ParserDataLR
     {
-		protected override string GetBaseClassName { get { return "LRStarBaseParser"; } }
+		protected override string BaseClassName { get { return "LRStarParser"; } }
 
         private Dictionary<State, DeciderLRStar> deciders;
 

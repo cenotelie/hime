@@ -7,6 +7,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Grammars.ContextFree.LR
 {
@@ -14,7 +15,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
     {
         public ParserDataLRk(Reporting.Reporter reporter, CFGrammar gram, Graph graph) : base(reporter, gram, graph) { }
 
-		protected override string GetBaseClassName { get { return "LRkParser"; } }
+		protected override string BaseClassName { get { return "LRkParser"; } }
 
         protected override void ExportAutomaton(StreamWriter stream, string name, string resource)
         {
@@ -46,43 +47,45 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (StateActionReduce reduction in state.Reductions)
                 reductions.Add(reduction.Lookahead, reduction.ToReduceRule);
             if (reductions.ContainsKey(Epsilon.Instance) || reductions.ContainsKey(NullTerminal.Instance))
-                stream.Write((ushort)3);
+                stream.Write(LRkAutomaton.ActionAccept);
             else
-                stream.Write((ushort)0);
-            stream.Write((ushort)0);
+                stream.Write(LRkAutomaton.ActionNone);
+            stream.Write(LRkAutomaton.ActionNone);
             for (int i = 1; i != terminals.Count; i++)
             {
                 Terminal t = terminals[i];
                 if (state.Children.ContainsKey(t))
                 {
-                    stream.Write((ushort)2);
+                    stream.Write(LRkAutomaton.ActionShift);
                     stream.Write((ushort)state.Children[t].ID);
                 }
                 else if (reductions.ContainsKey(t))
                 {
-                    stream.Write((ushort)1);
+                    stream.Write(LRkAutomaton.ActionReduce);
                     stream.Write((ushort)rules.IndexOf(reductions[t]));
                 }
                 else if (reductions.ContainsKey(NullTerminal.Instance))
                 {
-                    stream.Write((ushort)1);
+                    stream.Write(LRkAutomaton.ActionReduce);
                     stream.Write((ushort)rules.IndexOf(reductions[NullTerminal.Instance]));
                 }
                 else
                 {
-                    stream.Write((uint)0);
+                    stream.Write(LRkAutomaton.ActionNone);
+                    stream.Write(LRkAutomaton.ActionNone);
                 }
             }
             foreach (Variable var in variables)
             {
                 if (state.Children.ContainsKey(var))
                 {
-                    stream.Write((ushort)2);
+                    stream.Write(LRkAutomaton.ActionShift);
                     stream.Write((ushort)state.Children[var].ID);
                 }
                 else
                 {
-                    stream.Write((uint)0);
+                    stream.Write(LRkAutomaton.ActionNone);
+                    stream.Write(LRkAutomaton.ActionNone);
                 }
             }
         }
