@@ -50,7 +50,7 @@ namespace Hime.Redist.Parsers
             while (true)
             {
                 int action = RecognizeOnToken(nextToken);
-                if (action == LRkAutomaton.ActionShift)
+                if (action == LRActions.Shift)
                 {
                     remaining--;
                     if (remaining == 0) return true;
@@ -58,7 +58,7 @@ namespace Hime.Redist.Parsers
                     advance++;
                     continue;
                 }
-                if (action == LRkAutomaton.ActionAccept)
+                if (action == LRActions.Accept)
                     return true;
                 return false;
             }
@@ -75,12 +75,12 @@ namespace Hime.Redist.Parsers
             {
                 ushort action = 0;
                 ushort data = parserAutomaton.GetAction(stack[head], token.SymbolID, out action);
-                if (action == LRkAutomaton.ActionShift)
+                if (action == LRActions.Shift)
                 {
                     stack[++head] = data;
                     return action;
                 }
-                else if (action == LRkAutomaton.ActionReduce)
+                else if (action == LRActions.Reduce)
                 {
                     LRProduction production = parserAutomaton.GetProduction(data);
                     Symbols.Variable var = parserVariables[production.Head];

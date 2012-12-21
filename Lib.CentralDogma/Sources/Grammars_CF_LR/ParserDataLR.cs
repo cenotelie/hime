@@ -42,8 +42,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)LRProduction.HeadReplace);
-            else stream.Write((byte)LRProduction.HeadKeep);
+            if (rule.ReplaceOnProduction) stream.Write((byte)LRBytecode.HeadReplace);
+            else stream.Write((byte)LRBytecode.HeadKeep);
             stream.Write((byte)(rule as CFRule).CFBody.GetChoiceAt(0).Length);
             byte length = 0;
             foreach (RuleBodyElement elem in rule.Body.Parts)
@@ -58,21 +58,21 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.VirtualDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.VirtualPromote);
-                    else stream.Write(LRProduction.VirtualNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.VirtualPromote);
+                    else stream.Write(LRBytecode.VirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
                 {
-                    stream.Write(LRProduction.SemanticAction);
+                    stream.Write(LRBytecode.SemanticAction);
                     stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.PopDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.PopPromote);
-                    else stream.Write(LRProduction.PopNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.PopPromote);
+                    else stream.Write(LRBytecode.PopNoAction);
                 }
             }
         }

@@ -78,12 +78,7 @@ namespace Hime.Redist.Parsers
             this.input = new RewindableTokenStream(lexer);
         }
 
-        /// <summary>
-        /// Handles an unexpected token and returns whether is successfuly handled the error
-        /// </summary>
-        /// <param name="token">The unexpected token</param>
-        /// <returns>The next token</returns>
-        protected override Symbols.Token OnUnexpectedToken(Symbols.Token token)
+        private Symbols.Token OnUnexpectedToken(Symbols.Token token)
         {
             List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
@@ -162,22 +157,22 @@ namespace Hime.Redist.Parsers
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 ushort op = production.Bytecode[i];
-                if (op == LRProduction.SemanticAction)
+                if (LRBytecode.IsSemAction(op))
                 {
                     ushort index = production.Bytecode[i + 1];
                     parserActions[index](sub, buffer, nextBuffer);
                     i++;
                 }
-                else if (op >= LRProduction.Virtual)
+                else if (LRBytecode.IsAddVirtual(op))
                 {
                     ushort index = production.Bytecode[i + 1];
-                    AST.CSTNode node = new AST.CSTNode(parserVirtuals[index], (AST.CSTAction)(op - 4));
+                    AST.CSTNode node = new AST.CSTNode(parserVirtuals[index], LRBytecode.GetAction(op));
                     sub.AppendChild(node);
                     buffer[nextBuffer] = node;
                     nextBuffer++;
                     i++;
                 }
-                else if (op == LRProduction.PopNoAction)
+                else if (op == LRBytecode.PopNoAction)
                 {
                     AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
                     sub.AppendChild(node);
@@ -188,7 +183,7 @@ namespace Hime.Redist.Parsers
                 else
                 {
                     AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
-                    sub.AppendChild(node, (AST.CSTAction)op);
+                    sub.AppendChild(node, LRBytecode.GetAction(op));
                     buffer[nextBuffer] = node;
                     nextStack++;
                     nextBuffer++;
@@ -205,13 +200,13 @@ namespace Hime.Redist.Parsers
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 ushort op = production.Bytecode[i];
-                if (op == LRProduction.SemanticAction)
+                if (LRBytecode.IsSemAction(op))
                 {
                     ushort index = production.Bytecode[i + 1];
                     parserActions[index](sub, buffer, nextBuffer);
                     i++;
                 }
-                else if (op >= LRProduction.Virtual)
+                else if (LRBytecode.IsAddVirtual(op))
                 {
                     ushort index = production.Bytecode[i + 1];
                     buffer[nextBuffer] = parserVirtuals[index];
@@ -237,12 +232,12 @@ namespace Hime.Redist.Parsers
             while (true)
             {
                 int action = ExecuteOnToken(nextToken);
-                if (action == LRkAutomaton.ActionShift)
+                if (action == LRActions.Shift)
                 {
                     nextToken = input.GetNextToken();
                     continue;
                 }
-                if (action == LRkAutomaton.ActionAccept)
+                if (action == LRActions.Accept)
                     return objects[head - 1];
                 nextToken = OnUnexpectedToken(nextToken);
                 if (nextToken == null || errors.Count >= maxErrorCount)
@@ -254,16 +249,16 @@ namespace Hime.Redist.Parsers
         {
             while (true)
             {
-                ushort action = 0;
+                ushort action = LRActions.None;
                 ushort data = parserAutomaton.GetAction(stack[head], token.SymbolID, out action);
-                if (action == 2)
+                if (action == LRActions.Shift)
                 {
                     head++;
                     stack[head] = data;
                     objects[head] = getSemObj(token);
                     return action;
                 }
-                else if (action == 1)
+                else if (action == LRActions.Reduce)
                 {
                     LRProduction production = parserAutomaton.GetProduction(data);
                     head -= production.ReductionLength;

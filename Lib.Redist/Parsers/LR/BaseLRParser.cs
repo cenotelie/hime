@@ -76,6 +76,15 @@ namespace Hime.Redist.Parsers
         public ICollection<ParserError> Errors { get { return readonlyErrors; } }
 
         /// <summary>
+        /// Gets or sets whether the parser should try to recover from errors or fails immediatly
+        /// </summary>
+        public bool TryRecover
+        {
+            get { return tryRecover; }
+            set { tryRecover = value; }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the LRkParser class with the given lexer
         /// </summary>
         /// <param name="variables">The parser's variables</param>
@@ -102,13 +111,6 @@ namespace Hime.Redist.Parsers
         {
             errors.Add(error);
         }
-
-        /// <summary>
-        /// Handles an unexpected token and returns whether is successfuly handled the error
-        /// </summary>
-        /// <param name="token">The unexpected token</param>
-        /// <returns>The next token</returns>
-        protected abstract Symbols.Token OnUnexpectedToken(Symbols.Token token);
 
         /// <summary>
         /// Parses the input and returns the produced AST

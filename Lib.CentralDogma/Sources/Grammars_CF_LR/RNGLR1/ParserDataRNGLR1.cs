@@ -42,6 +42,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (State state in graph.States)
                 total = ExportDataCountActions(offsets, counts, total, state);
 
+            stream.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption("Axiom"))));
             stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
             stream.Write((ushort)graph.States.Count);                   // Nb or rows
             stream.Write((ushort)total);                                // Nb of actions
@@ -110,22 +111,22 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             if (reductions.ContainsKey(Epsilon.Instance))
             {
                 // There can be only one reduction on epsilon
-                stream.Write(LRkAutomaton.ActionAccept);
-                stream.Write(LRkAutomaton.ActionNone);
+                stream.Write(LRActions.Accept);
+                stream.Write(LRActions.None);
             }
             for (int i = 1; i != terminals.Count; i++)
             {
                 Terminal t = terminals[i];
                 if (state.Children.ContainsKey(t))
                 {
-                    stream.Write(LRkAutomaton.ActionShift);
+                    stream.Write(LRActions.Shift);
                     stream.Write((ushort)state.Children[t].ID);
                 }
                 if (reductions.ContainsKey(t))
                 {
                     foreach (StateActionRNReduce reduce in reductions[t])
                     {
-                        stream.Write(LRkAutomaton.ActionReduce);
+                        stream.Write(LRActions.Reduce);
                         stream.Write((ushort)rules.IndexOf(new KeyValuePair<Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
                     }
                 }
@@ -134,7 +135,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (state.Children.ContainsKey(var))
                 {
-                    stream.Write(LRkAutomaton.ActionShift);
+                    stream.Write(LRActions.Shift);
                     stream.Write((ushort)state.Children[var].ID);
                 }
             }
@@ -143,8 +144,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule, int length)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)LRProduction.HeadReplace);
-            else stream.Write((byte)LRProduction.HeadKeep);
+            if (rule.ReplaceOnProduction) stream.Write((byte)LRBytecode.HeadReplace);
+            else stream.Write((byte)LRBytecode.HeadKeep);
             stream.Write((byte)length);
             byte bcl = 0;
             int pop = 0;
@@ -166,30 +167,30 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.VirtualDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.VirtualPromote);
-                    else stream.Write(LRProduction.VirtualNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.VirtualPromote);
+                    else stream.Write(LRBytecode.VirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
                 {
-                    stream.Write(LRProduction.SemanticAction);
+                    stream.Write(LRBytecode.SemanticAction);
                     stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
                 else if (pop >= length)
                 {
                     // Here the symbol must be a variable
                     ushort index = (ushort)variables.IndexOf(elem.Symbol as CFVariable);
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.NullVariableDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.NullVariablePromote);
-                    else stream.Write(LRProduction.NullVariableNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.NullVariableDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.NullVariablePromote);
+                    else stream.Write(LRBytecode.NullVariableNoAction);
                     stream.Write(index);
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRProduction.PopDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRProduction.PopPromote);
-                    else stream.Write(LRProduction.PopNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.PopPromote);
+                    else stream.Write(LRBytecode.PopNoAction);
                     pop++;
                 }
             }

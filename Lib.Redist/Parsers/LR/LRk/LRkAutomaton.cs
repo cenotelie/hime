@@ -14,11 +14,6 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public sealed class LRkAutomaton
     {
-        public const ushort ActionNone = 0;
-        public const ushort ActionReduce = 1;
-        public const ushort ActionShift = 2;
-        public const ushort ActionAccept = 3;
-
         /* Binary data of a LR(k) parser
          * uint16: number of columns
          * uint16: number of states
@@ -107,7 +102,7 @@ namespace Hime.Redist.Parsers
         /// <returns>True if the state is the accepting state, false otherwise</returns>
         public bool IsAcceptingState(ushort state)
         {
-            return (table[ncols * state * 2] == ActionAccept);
+            return (table[ncols * state * 2] == LRActions.Accept);
         }
 
         /// <summary>
@@ -122,7 +117,7 @@ namespace Hime.Redist.Parsers
             int offset = ncols * state * 2;
             for (int i = 0; i != terminalCount; i++)
             {
-                if (table[offset] != ActionNone)
+                if (table[offset] != LRActions.None)
                     result.Add(i);
                 offset += 2;
             }

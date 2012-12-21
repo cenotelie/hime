@@ -32,19 +32,6 @@ namespace Hime.Redist.Parsers
         public const byte HeadReplace = 1;
         public const byte HeadKeep = 0;
 
-        public const ushort PopNoAction = 0;
-        public const ushort PopDrop = 2;
-        public const ushort PopPromote = 3;
-        public const ushort Virtual = 4;
-        public const ushort VirtualNoAction = Virtual + PopNoAction;
-        public const ushort VirtualDrop = Virtual + PopDrop;
-        public const ushort VirtualPromote = Virtual + PopPromote;
-        public const ushort SemanticAction = 8;
-        public const ushort NullVariable = 16;
-        public const ushort NullVariableNoAction = NullVariable;
-        public const ushort NullVariableDrop = NullVariable + PopDrop;
-        public const ushort NullVariablePromote = NullVariable + PopPromote;
-
         private ushort head;
         private byte headAction;
         private byte reducLength;

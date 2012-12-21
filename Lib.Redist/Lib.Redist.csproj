@@ -64,6 +64,8 @@
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Lexer\ITokenStream.cs" />
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
+    <Compile Include="Parsers\LR\LRActions.cs" />
+    <Compile Include="Parsers\LR\LRBytecode.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Parsers\LR\RNGLR\GSSNode.cs" />

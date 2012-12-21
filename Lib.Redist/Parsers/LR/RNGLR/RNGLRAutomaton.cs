@@ -15,6 +15,7 @@ namespace Hime.Redist.Parsers
     public sealed class RNGLRAutomaton
     {
         /* Binary data of a GLR parser
+         * uint16: index of the axiom's variable
          * uint16: number of columns
          * uint16: number of states
          * uint16: number of actions
@@ -41,6 +42,7 @@ namespace Hime.Redist.Parsers
          * indices of the null productions
          */
 
+        private ushort axiom;
         private ushort ncols;
         private Utils.BlobUShort columnsID;
         private Utils.SIDHashMap<ushort> columns;
@@ -49,11 +51,13 @@ namespace Hime.Redist.Parsers
         private LRProduction[] productions;
         private Utils.BlobUShort nullables;
 
+        internal ushort Axiom { get { return axiom; } }
         internal Utils.BlobUShort Nullables { get { return nullables; } }
 
         private RNGLRAutomaton(Stream stream)
         {
             BinaryReader reader = new BinaryReader(stream);
+            this.axiom = reader.ReadUInt16();
             this.ncols = reader.ReadUInt16();
             ushort nstates = reader.ReadUInt16();
             ushort nactions = reader.ReadUInt16();
@@ -135,7 +139,7 @@ namespace Hime.Redist.Parsers
             int offset = (state * ncols) * 2;
             if (actions[offset] == 0)
                 return false;
-            return (table[actions[offset + 1]] == LRkAutomaton.ActionAccept);
+            return (table[actions[offset + 1]] == LRActions.Accept);
         }
 
         /// <summary>

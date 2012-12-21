@@ -9,30 +9,26 @@ namespace Hime.Redist.Parsers
         private delegate object GetSemObj(Symbols.Symbol symbol);
         private delegate object Reduce(LRProduction production);
 
-        private struct ParserReduction
+        private struct Reduction
         {
-            public GSSNode Node;
-            public Rule Rule;
-            public ushort Length;
-            public AST.SPPFNode NullChoice;
-            public AST.SPPFNode FirstSPPF;
-            public ParserReduction(GSSNode node, Rule rule, ushort length, AST.SPPFNode nullChoice, AST.SPPFNode firstSPPF)
+            public GSSNode node;
+            public LRProduction prod;
+            public AST.SPPFNode first;
+            public Reduction(GSSNode node, LRProduction prod, AST.SPPFNode first)
             {
-                Node = node;
-                Rule = rule;
-                Length = length;
-                NullChoice = nullChoice;
-                FirstSPPF = firstSPPF;
+                this.node = node;
+                this.prod = prod;
+                this.first = first;
             }
         }
-        private struct ParserShift
+        private struct Shift
         {
-            public GSSNode Node;
-            public ushort State;
-            public ParserShift(GSSNode node, ushort state)
+            public GSSNode node;
+            public ushort state;
+            public Shift(GSSNode node, ushort state)
             {
-                Node = node;
-                State = state;
+                this.node = node;
+                this.state = state;
             }
         }
 
@@ -45,10 +41,6 @@ namespace Hime.Redist.Parsers
         /// </summary>
         private RewindableTokenStream input;
         /// <summary>
-        /// Current stack's head
-        /// </summary>
-        private int head;
-        /// <summary>
         /// Delegate reducer
         /// </summary>
         private Reduce reducer;
@@ -58,11 +50,11 @@ namespace Hime.Redist.Parsers
         private GetSemObj getSemObj;
 
         private Symbols.Token nextToken;
-        private LinkedList<ParserReduction> reductions;
-        private LinkedList<ParserShift> q;
-        private List<AST.SPPFNode> n;
+        private LinkedList<Reduction> R;
+        private LinkedList<Shift> Q;
+        private List<AST.SPPFNode> N;
 
-
+        private AST.SPPFNode epsilon;
         private AST.SPPFNode[] nullables;
 
         /// <summary>
@@ -78,43 +70,60 @@ namespace Hime.Redist.Parsers
         {
             this.parserAutomaton = automaton;
             this.input = new RewindableTokenStream(lexer);
-
+            this.epsilon = new AST.SPPFNode(Symbols.Epsilon.Instance, 0);
             this.nullables = new AST.SPPFNode[variables.Length];
+            for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
+            {
+                LRProduction prod = parserAutomaton.GetProduction(i);
+                this.nullables[i] = new AST.SPPFNode(parserVariables[prod.Head], 0, (AST.CSTAction)prod.HeadAction);
+            }
             for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
                 BuildNullable(parserAutomaton.GetProduction(i));
         }
 
         private void BuildNullable(LRProduction production)
         {
-            Symbols.Variable var = parserVariables[production.Head];
-            if (nullables[production.Head] == null)
-                nullables[production.Head] = new AST.SPPFNode(var, 0, (AST.CSTAction)production.HeadAction);
-            AST.SPPFFamily family = new AST.SPPFFamily(nullables[production.Head]);
-            nullables[production.Head].AddFamily(family);
+            AST.SPPFNode head = nullables[production.Head];
+            AST.SPPFFamily family = new AST.SPPFFamily(head);
+            head.AddFamily(family);
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
-                if (production.Bytecode[i] == LRProduction.SemanticAction)
+                ushort op = production.Bytecode[i];
+                if (LRBytecode.IsSemAction(op))
+                {
                     family.AddChild(new AST.SPPFNode(new Symbols.Action(parserActions[production.Bytecode[i + 1]]), 0));
+                    i++;
+                }
+                else if (LRBytecode.IsAddVirtual(op))
+                {
+                    family.AddChild(new AST.SPPFNode(parserVirtuals[production.Bytecode[i + 1]], 0, LRBytecode.GetAction(op)));
+                    i++;
+                }
+                else if (LRBytecode.IsAddNullVariable(op))
+                {
+                    family.AddChild(nullables[production.Bytecode[i + 1]]);
+                    i++;
+                }
             }
         }
 
-
-
-
-
-        /// <summary>
-        /// Handles an unexpected token and returns whether is successfuly handled the error
-        /// </summary>
-        /// <param name="token">The unexpected token</param>
-        /// <returns>The next token</returns>
-        protected override Symbols.Token OnUnexpectedToken(Symbols.Token token)
+        private void OnUnexpectedToken(List<GSSNode> Ui, Symbols.Token token)
         {
-            List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
+            List<int> indices = new List<int>();
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
-            foreach (int index in expectedIDs)
-                expected.Add(lexer.Terminals[index]);
+            foreach (GSSNode node in Ui)
+            {
+                List<int> temp = parserAutomaton.GetExpected(node.State, lexer.Terminals.Count);
+                foreach (int index in temp)
+                {
+                    if (!indices.Contains(index))
+                    {
+                        indices.Add(index);
+                        expected.Add(lexer.Terminals[index]);
+                    }
+                }
+            }
             errors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
-            return null;
         }
 
         /// <summary>
@@ -123,12 +132,12 @@ namespace Hime.Redist.Parsers
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         public override AST.CSTNode Parse()
         {
-            this.reducer = new Reduce(ReduceAST);
+            //this.reducer = new Reduce(ReduceAST);
             this.getSemObj = new GetSemObj(GetSemCST);
             object result = Execute();
             if (result == null)
                 return null;
-            return (result as AST.CSTNode).ApplyActions();
+            return (result as AST.SPPFNode).GetFirstTree().ApplyActions();
         }
 
         /// <summary>
@@ -137,7 +146,7 @@ namespace Hime.Redist.Parsers
         /// <returns>True if the input is recognized, false otherwise</returns>
         public override bool Recognize()
         {
-            this.reducer = new Reduce(ReduceSimple);
+            //this.reducer = new Reduce(ReduceSimple);
             this.getSemObj = new GetSemObj(GetSemNaked);
             return (Execute() != null);
         }
@@ -145,94 +154,58 @@ namespace Hime.Redist.Parsers
         private object GetSemCST(Symbols.Symbol symbol) { return new AST.CSTNode(symbol); }
         private object GetSemNaked(Symbols.Symbol symbol) { return symbol; }
 
-
-        public SyntaxTreeNode Analyse()
-        {
-            AST.SPPFNode match = Match();
-            if (match == null)
-                return null;
-            return match.GetFirstTree().ApplyActions();
-        }
-
-        protected GSSNode GetInSet(List<GSSNode> StateSet, ushort label)
-        {
-            foreach (GSSNode node in StateSet)
-                if (node.DFAState == label)
-                    return node;
-            return null;
-        }
-        protected AST.SPPFNode GetInSet(AST.SPPFNode node)
-        {
-            foreach (AST.SPPFNode potential in n)
-                if (potential.EquivalentTo(node))
-                    return potential;
-            n.Add(node);
-            return node;
-        }
-
-        protected AST.SPPFNode Match()
+        private AST.SPPFNode Execute()
         {
             nextToken = lexer.GetNextToken();
             if (nextToken.SymbolID == Symbols.Dollar.Instance.SymbolID)
             {
-                // Dollar token => empty input
-                if (states[0].HasReduction(2, axiomID, 0))
-                    return nullVarsSPPF[axiomNullSPPF];
-                else
-                    return null; //Grammar do not support empty input
+                // the input is empty!
+                if (parserAutomaton.IsAcceptingState(0))
+                    return nullables[parserAutomaton.Axiom];
+                return null;
             }
-
             GSSNode v0 = new GSSNode(0, 0);
             List<GSSNode> Ui = new List<GSSNode>();
             Ui.Add(v0);
-            reductions = new LinkedList<ParserReduction>();
-            q = new LinkedList<ParserShift>();
-            n = new List<AST.SPPFNode>();
+            R = new LinkedList<Reduction>();
+            Q = new LinkedList<Shift>();
+            N = new List<AST.SPPFNode>();
 
-            ushort k = states[0].GetNextByShiftOnTerminal(nextToken.SymbolID);
-            if (k != 0xFFFF)
-                q.AddLast(new ParserShift(v0, k));
-            foreach (Reduction reduction in states[0].GetReductions(nextToken.SymbolID))
-                reductions.AddLast(new ParserReduction(v0, reduction.ToReduce, 0, reduction.Rest, nullChoicesSPPF[0]));
+            for (int i = 0; i != parserAutomaton.GetActionsCount(0, nextToken.SymbolID); i++)
+            {
+                ushort action = 0;
+                ushort data = parserAutomaton.GetAction(0, nextToken.SymbolID, i, out action);
+                if (action == LRActions.Shift)
+                    Q.AddLast(new Shift(v0, data));
+                else if (action == LRActions.Reduce)
+                    R.AddLast(new Reduction(v0, parserAutomaton.GetProduction(data), epsilon));
+            }
 
             int generation = 0;
-            while (nextToken.SymbolID != 1) // Wait for ε token
+            while (nextToken.SymbolID != Symbols.Epsilon.Instance.SymbolID) // Wait for ε token
             {
-                n.Clear();
-                while (reductions.Count != 0)
+                N.Clear();
+                while (R.Count != 0)
                     Reducer(Ui, generation);
-                SymbolToken oldtoken = nextToken;
+                Symbols.Token oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
                 List<GSSNode> Uj = Shifter(Ui, oldtoken, generation);
                 generation++;
                 if (Uj.Count == 0)
                 {
                     // Generation is empty !
-                    List<ushort> present = new List<ushort>();
-                    List<SymbolTerminal> expected = new List<SymbolTerminal>();
-                    foreach (GSSNode node in Ui)
-                    {
-                        foreach (SymbolTerminal terminal in states[node.DFAState].Expected)
-                        {
-                            if (!present.Contains(terminal.SymbolID))
-                            {
-                                expected.Add(terminal);
-                                present.Add(terminal.SymbolID);
-                            }
-                        }
-                    }
-                    errors.Add(new UnexpectedTokenError(oldtoken, expected.ToArray(), lexer.CurrentLine, lexer.CurrentColumn));
+                    OnUnexpectedToken(Ui, oldtoken);
                     return null;
                 }
                 Ui = Uj;
             }
 
-            foreach (GSSNode state in Ui)
+            foreach (GSSNode node in Ui)
             {
-                if (states[state.DFAState].HasReduction(1, axiomPrimeID, 2))
+                if (parserAutomaton.IsAcceptingState(node.State))
                 {
                     // Has reduction _Axiom_ -> axiom $ . on ε
-                    List<List<GSSNode>> paths = state.GetPaths(2);
+                    List<List<GSSNode>> paths = node.GetPaths(2);
                     List<GSSNode> path = paths[0];
                     AST.SPPFNode root = path[path.Count - 2].Edges[path[path.Count - 1]];
                     return root;
@@ -242,15 +215,14 @@ namespace Hime.Redist.Parsers
             return null;
         }
 
-        protected void Reducer(List<GSSNode> Ui, int generation)
+        private void Reducer(List<GSSNode> Ui, int generation)
         {
-            GSSNode v = reductions.First.Value.Node;
-            Rule rule = reductions.First.Value.Rule;
-            SymbolVariable X = rule.Head;
-            ushort m = reductions.First.Value.Length;
-            AST.SPPFNode f = reductions.First.Value.NullChoice;
-            AST.SPPFNode y = reductions.First.Value.FirstSPPF;
-            reductions.RemoveFirst();
+            GSSNode v = R.First.Value.node;
+            LRProduction rule = R.First.Value.prod;
+            Symbols.Variable X = parserVariables[rule.Head];
+            ushort m = rule.ReductionLength;
+            AST.SPPFNode y = R.First.Value.first;
+            R.RemoveFirst();
             List<List<GSSNode>> chi = null;
             if (m == 0) chi = v.GetPaths(0);
             else chi = v.GetPaths(m - 1);
@@ -261,15 +233,13 @@ namespace Hime.Redist.Parsers
                 for (int i = 0; i != path.Count - 1; i++)
                     ys.Add(path[i].Edges[path[i + 1]]);
                 GSSNode u = path[path.Count - 1];
-                ushort k = u.DFAState;
-                ushort l = states[k].GetNextByShiftOnVariable(X.SymbolID);
+                ushort k = u.State;
+                ushort l = GetNextByVar(k, X.SymbolID);
                 AST.SPPFNode z = null;
-                if (m == 0)
-                    z = f;
-                else
+                if (m != 0)
                 {
                     int c = u.Generation;
-                    z = GetInSet(new AST.SPPFNode(X, c));
+                    z = GetInSet(new AST.SPPFNode(X, c, (AST.CSTAction)rule.HeadAction));
                 }
                 GSSNode w = GetInSet(Ui, l);
                 if (w != null)
@@ -278,9 +248,20 @@ namespace Hime.Redist.Parsers
                     {
                         w.AddEdge(u, z);
                         if (m != 0)
-                            foreach (Reduction r in states[l].GetReductions(nextToken.SymbolID))
-                                if (r.Length != 0)
-                                    reductions.AddLast(new ParserReduction(u, r.ToReduce, r.Length, r.Rest, z));
+                        {
+                            int ac = parserAutomaton.GetActionsCount(l, nextToken.SymbolID);
+                            for (int i = 0; i != ac; i++)
+                            {
+                                ushort action = 0;
+                                ushort data = parserAutomaton.GetAction(l, nextToken.SymbolID, i, out action);
+                                if (action == LRActions.Reduce)
+                                {
+                                    LRProduction prod = parserAutomaton.GetProduction(data);
+                                    if (prod.ReductionLength != 0)
+                                        R.AddLast(new Reduction(u, prod, z));
+                                }
+                            }
+                        }
                     }
                 }
                 else
@@ -288,69 +269,144 @@ namespace Hime.Redist.Parsers
                     w = new GSSNode(l, generation);
                     Ui.Add(w);
                     w.AddEdge(u, z);
-                    ushort h = states[l].GetNextByShiftOnTerminal(nextToken.SymbolID);
-                    if (h != 0xFFFF)
-                        q.AddLast(new ParserShift(w, h));
-                    foreach (Reduction r in states[l].GetReductions(nextToken.SymbolID))
+                    int ac = parserAutomaton.GetActionsCount(l, nextToken.SymbolID);
+                    for (int i = 0; i != ac; i++)
                     {
-                        if (r.Length == 0)
-                            reductions.AddLast(new ParserReduction(w, r.ToReduce, 0, r.Rest, nullChoicesSPPF[0]));
-                        else if (m != 0)
-                            reductions.AddLast(new ParserReduction(u, r.ToReduce, r.Length, r.Rest, z));
+                        ushort action = 0;
+                        ushort data = parserAutomaton.GetAction(l, nextToken.SymbolID, i, out action);
+                        if (action == LRActions.Shift)
+                        {
+                            Q.AddLast(new Shift(w, data));
+                        }
+                        else if (action == LRActions.Reduce)
+                        {
+                            LRProduction prod = parserAutomaton.GetProduction(data);
+                            if (prod.ReductionLength == 0)
+                                R.AddLast(new Reduction(w, prod, epsilon));
+                            else if (m != 0)
+                                R.AddLast(new Reduction(u, prod, z));
+                        }
                     }
                 }
                 if (m != 0)
                 {
                     ys.Reverse();
-                    AddChildren(rule, z, ys, f);
+                    AddChildren(rule, z, ys);
                 }
             }
         }
 
-        protected List<GSSNode> Shifter(List<GSSNode> Ui, SymbolToken oldtoken, int generation)
+        private List<GSSNode> Shifter(List<GSSNode> Ui, Symbols.Token oldtoken, int generation)
         {
             List<GSSNode> Uj = new List<GSSNode>();
-            LinkedList<ParserShift> Qp = new LinkedList<ParserShift>();
+            LinkedList<Shift> Qp = new LinkedList<Shift>();
             AST.SPPFNode z = new AST.SPPFNode(oldtoken, generation);
-            while (q.Count != 0)
+            while (Q.Count != 0)
             {
-                GSSNode v = q.First.Value.Node;
-                ushort k = q.First.Value.State;
-                q.RemoveFirst();
+                GSSNode v = Q.First.Value.node;
+                ushort k = Q.First.Value.state;
+                Q.RemoveFirst();
                 GSSNode w = GetInSet(Uj, k);
                 if (w != null)
                 {
                     w.AddEdge(v, z);
-                    foreach (Reduction r in states[k].GetReductions(nextToken.SymbolID))
-                        if (r.Length != 0)
-                            reductions.AddLast(new ParserReduction(v, r.ToReduce, r.Length, r.Rest, z));
+                    for (int i = 0; i != parserAutomaton.GetActionsCount(k, nextToken.SymbolID); i++)
+                    {
+                        ushort action = 0;
+                        ushort data = parserAutomaton.GetAction(k, nextToken.SymbolID, i, out action);
+                        if (action == LRActions.Reduce)
+                        {
+                            LRProduction prod = parserAutomaton.GetProduction(data);
+                            if (prod.ReductionLength != 0)
+                                R.AddLast(new Reduction(v, prod, z));
+                        }
+                    }
                 }
                 else
                 {
                     w = new GSSNode(k, v.Generation + 1);
                     w.AddEdge(v, z);
                     Uj.Add(w);
-                    ushort h = states[k].GetNextByShiftOnTerminal(nextToken.SymbolID);
-                    if (h != 0xFFFF)
-                        Qp.AddLast(new ParserShift(w, h));
-                    foreach (Reduction r in states[k].GetReductions(nextToken.SymbolID))
+                    int ac = parserAutomaton.GetActionsCount(k, nextToken.SymbolID);
+                    for (int i = 0; i != ac; i++)
                     {
-                        if (r.Length == 0)
-                            reductions.AddLast(new ParserReduction(w, r.ToReduce, 0, r.Rest, nullChoicesSPPF[0]));
-                        else
-                            reductions.AddLast(new ParserReduction(v, r.ToReduce, r.Length, r.Rest, z));
+                        ushort action = 0;
+                        ushort data = parserAutomaton.GetAction(k, nextToken.SymbolID, i, out action);
+                        if (action == LRActions.Shift)
+                            Qp.AddLast(new Shift(w, data));
+                        else if (action == LRActions.Reduce)
+                        {
+                            LRProduction prod = parserAutomaton.GetProduction(data);
+                            if (prod.ReductionLength == 0)
+                                R.AddLast(new Reduction(w, prod, epsilon));
+                            else
+                                R.AddLast(new Reduction(v, prod, z));
+                        }
                     }
                 }
             }
-            q = Qp;
+            Q = Qp;
             return Uj;
         }
 
-        protected void AddChildren(Rule rule, AST.SPPFNode y, List<AST.SPPFNode> ys, AST.SPPFNode f)
+        private void AddChildren(LRProduction rule, AST.SPPFNode y, List<AST.SPPFNode> ys)
         {
-            if (f != null)
-                ys.Add(f);
-            rule.OnReduction.Invoke(this, y, ys);
+            AST.SPPFFamily family = new AST.SPPFFamily(y);
+            y.AddFamily(family);
+            int index = 0;
+            for (int i = 0; i != rule.Bytecode.Length; i++)
+            {
+                ushort op = rule.Bytecode[i];
+                if (LRBytecode.IsPop(op))
+                {
+                    family.AddChild(ys[index++]);
+                }
+                else if (LRBytecode.IsAddVirtual(op))
+                {
+                    family.AddChild(new AST.SPPFNode(parserVirtuals[rule.Bytecode[i + 1]], y.Generation));
+                    i++;
+                }
+                else if (LRBytecode.IsSemAction(op))
+                {
+                    family.AddChild(new AST.SPPFNode(new Symbols.Action(parserActions[rule.Bytecode[i + 1]]), 0));
+                    i++;
+                }
+                else if (LRBytecode.IsAddNullVariable(op))
+                {
+                    family.AddChild(nullables[rule.Bytecode[i + 1]]);
+                    i++;
+                }
+            }
+        }
+
+        private ushort GetNextByVar(ushort state, ushort var)
+        {
+            int ac = parserAutomaton.GetActionsCount(state, var);
+            for (int i=0; i!=ac; i++)
+            {
+                ushort action = 0;
+                ushort data = parserAutomaton.GetAction(state, var, i, out action);
+                if (action == LRActions.Shift)
+                    return data;
+            }
+            return 0xFFFF;
+        }
+
+        private GSSNode GetInSet(List<GSSNode> set, ushort label)
+        {
+            foreach (GSSNode node in set)
+                if (node.State == label)
+                    return node;
+            return null;
+        }
+
+        private AST.SPPFNode GetInSet(AST.SPPFNode node)
+        {
+            foreach (AST.SPPFNode potential in N)
+                if (potential.EquivalentTo(node))
+                    return potential;
+            N.Add(node);
+            return node;
         }
     }
 }
