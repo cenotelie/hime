@@ -106,6 +106,8 @@ namespace Hime.Tests
                     lexerType = types[i];
                 else if (types[i].BaseType == typeof(LRkParser))
                     parserType = types[i];
+                else if (types[i].BaseType == typeof(RNGLRParser))
+                    parserType = types[i];
             }
             Type actionType = parserType.GetNestedType("Actions");
             ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(string) });
