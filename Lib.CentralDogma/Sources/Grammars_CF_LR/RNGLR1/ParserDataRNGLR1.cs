@@ -86,7 +86,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             }
             foreach (Terminal t in terminals)
             {
-                int count = state.Children.Count;
+                int count = state.Children.ContainsKey(t) ? 1 : 0;
                 if (counters.ContainsKey(t))
                     count += counters[t];
                 offsets.Add((ushort)total);

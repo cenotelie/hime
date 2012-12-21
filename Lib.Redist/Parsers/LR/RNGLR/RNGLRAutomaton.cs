@@ -117,7 +117,7 @@ namespace Hime.Redist.Parsers
         /// <returns>The action's data</returns>
         public ushort GetAction(ushort state, ushort sid, int index, out ushort action)
         {
-            int offset = actions[(state * ncols + columns[sid]) * 2 + 1] + index * 2;
+            int offset = (actions[(state * ncols + columns[sid]) * 2 + 1] + index) * 2;
             action = table[offset];
             return table[offset + 1];
         }
@@ -139,7 +139,7 @@ namespace Hime.Redist.Parsers
             int offset = (state * ncols) * 2;
             if (actions[offset] == 0)
                 return false;
-            return (table[actions[offset + 1]] == LRActions.Accept);
+            return (table[actions[offset + 1] * 2] == LRActions.Accept);
         }
 
         /// <summary>
