@@ -363,7 +363,7 @@ namespace Hime.Redist.Parsers
                 }
                 else if (LRBytecode.IsAddVirtual(op))
                 {
-                    family.AddChild(new AST.SPPFNode(parserVirtuals[rule.Bytecode[i + 1]], y.Generation));
+                    family.AddChild(new AST.SPPFNode(parserVirtuals[rule.Bytecode[i + 1]], -1));
                     i++;
                 }
                 else if (LRBytecode.IsSemAction(op))

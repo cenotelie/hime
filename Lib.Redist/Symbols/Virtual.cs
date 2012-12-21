@@ -9,14 +9,14 @@ using System.Collections.Generic;
 namespace Hime.Redist.Symbols
 {
     /// <summary>
-    /// Represents a synthetic symbol in an abstract syntax tree
+    /// Represents a synthetic symbol in a grammar
     /// </summary>
     public sealed class Virtual : Symbol
     {
         /// <summary>
-        /// Initializes a new instance of the SymbolVirtual class with a name
+        /// Initializes a new instance of the Virtual class with a name
         /// </summary>
-        /// <param name="name">Symbol's type name</param>
+        /// <param name="name">Symbol's name</param>
         public Virtual(string name) : base(0, name) { }
 		
         /// <summary>

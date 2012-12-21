@@ -9,15 +9,15 @@ using System.Collections.Generic;
 namespace Hime.Redist.Symbols
 {
     /// <summary>
-    /// Represents a variable in an abstract syntax tree or a grammar
+    /// Represents a variable in a grammar
     /// </summary>
     public sealed class Variable : Symbol
     {
         /// <summary>
-        /// Initializes a new instance of the SymbolVariable class with the given id and name
+        /// Initializes a new instance of the Variable class with the given ID and name
         /// </summary>
-        /// <param name="sid">Symbol's unique type identifier</param>
-        /// <param name="name">Symbol's type name</param>
+        /// <param name="sid">Symbol's unique identifier</param>
+        /// <param name="name">Symbol's name</param>
         public Variable(ushort sid, string name) : base(sid, name) { }
     }
 }

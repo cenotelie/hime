@@ -35,7 +35,7 @@ namespace Hime.Redist.Symbols
         /// </summary>
         public int Column { get { return column; } }
         /// <summary>
-        /// Gets of sets the matched sub-grammar's root AST
+        /// Gets or sets the matched sub-grammar's root AST
         /// </summary>
         public AST.CSTNode SubGrammarRoot
         {
@@ -44,13 +44,13 @@ namespace Hime.Redist.Symbols
         }
 
         /// <summary>
-        /// Initializes a new instance of the SymbolTokenText class with the given name, id, value and line number
+        /// Initializes a new instance of the TextToken class with the given name, id, value and line number
         /// </summary>
-        /// <param name="sid">Token's unique type identifier</param>
-        /// <param name="name">Token's type name</param>
+        /// <param name="sid">ID of the terminal matched by this Token</param>
+        /// <param name="name">Name of the terminal matched by this Token</param>
         /// <param name="value">Token's value</param>
         /// <param name="line">Token's line number</param>
-        /// <param name="column">Token's column in the line</param>
+        /// <param name="column">Token's starting column in the line</param>
         public TextToken(ushort sid, string name, string value, int line, int column)
             : base(sid, name)
         {

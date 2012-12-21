@@ -7,7 +7,7 @@
 namespace Hime.Redist.AST
 {
     /// <summary>
-    /// Specifies the tree action for a given node
+    /// Specifies the tree action for node
     /// </summary>
     public enum CSTAction : ushort
     {
@@ -16,7 +16,7 @@ namespace Hime.Redist.AST
         /// </summary>
         Promote = Parsers.LRBytecode.PopPromote,
         /// <summary>
-        /// Drop the node and all the children from the tree
+        /// Drop the node and all its children from the tree
         /// </summary>
         Drop = Parsers.LRBytecode.PopDrop,
         /// <summary>

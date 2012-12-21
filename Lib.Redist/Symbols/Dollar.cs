@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Hime.Redist.Symbols
 {
     /// <summary>
-    /// Represents a special token for the end of data stream
+    /// Represents a special token for the end of a data stream
     /// </summary>
     public sealed class Dollar : Token
     {

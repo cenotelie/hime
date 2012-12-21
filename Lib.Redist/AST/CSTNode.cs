@@ -9,29 +9,15 @@ using System.Collections.Generic;
 namespace Hime.Redist.AST
 {
     /// <summary>
-    /// Represents an abstract syntax tree node
+    /// Represents a node in a Concrete Syntax Tree
     /// </summary>
     public sealed class CSTNode
     {
-        private Dictionary<string, object> properties;
         private List<CSTNode> children;
         private CSTNode parent;
         private Symbols.Symbol symbol;
         private CSTAction action;
-        private System.Collections.ObjectModel.ReadOnlyCollection<CSTNode> readonlyChildren;
 
-        /// <summary>
-        /// Gets a dictionary of user properties attached to this node
-        /// </summary>
-        public Dictionary<string, object> Properties
-        {
-            get
-            {
-                if (properties == null)
-                    properties = new Dictionary<string, object>();
-                return properties;
-            }
-        }
         /// <summary>
         /// Gets the symbol attached to this node
         /// </summary>
@@ -41,22 +27,14 @@ namespace Hime.Redist.AST
         /// </summary>
         public CSTNode Parent { get { return parent; } }
         /// <summary>
-        /// Gets a read-only list of the children nodes
+        /// Gets a list of the children nodes
         /// </summary>
-        public IList<CSTNode> Children
-        {
-            get
-            {
-                if (readonlyChildren == null)
-                    readonlyChildren = new System.Collections.ObjectModel.ReadOnlyCollection<CSTNode>(children);
-                return readonlyChildren;
-            }
-        }
+        public IList<CSTNode> Children { get { return children; } }
 
         /// <summary>
-        /// Initilizes a new instance of the SyntaxTreeNode class with the given symbol
+        /// Initilizes a new instance of the CSTNode class with the given symbol
         /// </summary>
-        /// <param name="symbol">The symbol to attach to this node</param>
+        /// <param name="symbol">The symbol represented by this node</param>
         public CSTNode(Symbols.Symbol symbol)
         {
             this.children = new List<CSTNode>();
@@ -64,9 +42,9 @@ namespace Hime.Redist.AST
             this.action = CSTAction.Nothing;
         }
         /// <summary>
-        /// Initilizes a new instance of the SyntaxTreeNode class with the given symbol and action
+        /// Initilizes a new instance of the CSTNode class with the given symbol and action
         /// </summary>
-        /// <param name="symbol">The symbol to attach to this node</param>
+        /// <param name="symbol">The symbol represented by this node</param>
         /// <param name="action">The action for this node</param>
         public CSTNode(Symbols.Symbol symbol, CSTAction action)
         {
@@ -124,7 +102,7 @@ namespace Hime.Redist.AST
         }
 
         /// <summary>
-        /// Apply actions to this node and all its children
+        /// Apply tree actions to this node and all its children
         /// </summary>
         /// <returns>The new root</returns>
         internal CSTNode ApplyActions()
@@ -206,31 +184,6 @@ namespace Hime.Redist.AST
                 }
             }
             return current.astNode;
-        }
-
-
-        /// <summary>
-        /// Builds an XML node representing this node in the context of the given XML document
-        /// </summary>
-        /// <param name="doc">The document that will own the XML node</param>
-        /// <returns>The XML node representing this node</returns>
-        public System.Xml.XmlNode GetXMLNode(System.Xml.XmlDocument doc)
-        {
-            System.Xml.XmlNode Node = doc.CreateElement(symbol.Name);
-            if (symbol is Symbols.Token)
-            {
-                Symbols.Token Token = (Symbols.Token)symbol;
-                Node.AppendChild(doc.CreateTextNode(Token.ToString()));
-            }
-            foreach (string Property in properties.Keys)
-            {
-                System.Xml.XmlAttribute Attribute = doc.CreateAttribute(Property);
-                Attribute.Value = properties[Property].ToString();
-                Node.Attributes.Append(Attribute);
-            }
-            foreach (CSTNode Child in children)
-                Node.AppendChild(Child.GetXMLNode(doc));
-            return Node;
         }
 
         /// <summary>

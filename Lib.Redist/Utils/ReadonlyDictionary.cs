@@ -6,7 +6,7 @@ namespace Hime.Redist.Utils
     /// <summary>
     /// Represents an immutable dictionary of symbols
     /// </summary>
-    /// <typeparam name="T">The type of symbol</typeparam>
+    /// <typeparam name="T">The type of the symbols</typeparam>
     public sealed class SymbolDictionary<T> : IDictionary<string, T> where T : Symbols.Symbol
     {
         private Dictionary<string, T> impl;
@@ -23,6 +23,10 @@ namespace Hime.Redist.Utils
         }
         public T this[int index] { get { return raw[index]; } }
 
+        /// <summary>
+        /// Initializes this dictionary from the given array of symbols
+        /// </summary>
+        /// <param name="data">The symbols serving as data for this dictionary</param>
         public SymbolDictionary(T[] data)
         {
             this.raw = data;

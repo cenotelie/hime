@@ -9,19 +9,19 @@ using System.Collections.Generic;
 namespace Hime.Redist.Symbols
 {
     /// <summary>
-    /// Represents an action symbol in a shared packed parse forest
+    /// Represents a semantic action embedded within a Shared Packed Parser Forest
     /// </summary>
     public sealed class Action : Symbol
     {
         /// <summary>
-        /// Gets the callback for the execution of the symbol
+        /// Gets the user callback corresponding to this action
         /// </summary>
         public Parsers.SemanticAction Callback { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the SymbolAction class with the given symbol type name and callback
+        /// Initializes a new instance of the Action class with the given callback
         /// </summary>
-        /// <param name="callback">Callback for the action's execution</param>
+        /// <param name="callback">User callback for this action</param>
         public Action(Parsers.SemanticAction callback) : base(0, callback.Method.Name)
         {
             this.Callback = callback;

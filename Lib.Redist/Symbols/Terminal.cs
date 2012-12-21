@@ -14,10 +14,10 @@ namespace Hime.Redist.Symbols
     public sealed class Terminal : Symbol
     {
         /// <summary>
-        /// Initializes a new instance of the SymbolTerminal class with the given type ID and name
+        /// Initializes a new instance of the Terminal class with the given ID and name
         /// </summary>
-        /// <param name="sid">Symbol's unique type identifier</param>
-        /// <param name="name">Symbol's type name</param>
+        /// <param name="sid">Symbol's unique identifier</param>
+        /// <param name="name">Symbol's name</param>
         public Terminal(ushort sid, string name) : base(sid, name) { }
     }
 }

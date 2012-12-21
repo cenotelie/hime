@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Hime.Redist.Symbols
 {
     /// <summary>
-    /// Represents a symbol in an abstract syntax tree
+    /// Represents a grammar's symbol
     /// </summary>
     public abstract class Symbol
     {
@@ -23,10 +23,10 @@ namespace Hime.Redist.Symbols
         public string Name { get; private set; }
 		
         /// <summary>
-        /// Initializes a new instance of the Symbol class with the given type ID and name
+        /// Initializes a new instance of the Symbol class with the given ID and name
         /// </summary>
-        /// <param name="sid">Symbol's unique type identifier</param>
-        /// <param name="name">Symbol's type name</param>
+        /// <param name="sid">Symbol's unique identifier</param>
+        /// <param name="name">Symbol's name</param>
 		public Symbol(ushort sid, string name)
         {
             this.SymbolID = sid;
@@ -52,10 +52,10 @@ namespace Hime.Redist.Symbols
 		}
 		
         /// <summary>
-        /// Determines whether the specified symbol is equal to the current symbol
+        /// Determines whether the specified object is equal to the current symbol
         /// </summary>
         /// <param name="obj">The symbol to compare with the current symbol</param>
-        /// <returns>true if the specified symbol is equal to the current symbol; otherwise, false</returns>
+        /// <returns>True if the specified symbol is equal to the current symbol; false otherwise</returns>
         public override bool Equals(object obj)
         {
             Symbol symbol = obj as Symbol;

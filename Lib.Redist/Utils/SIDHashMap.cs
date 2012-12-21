@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hime.Redist.Utils
 {
-    internal class SIDHashMap<T>
+    class SIDHashMap<T>
     {
         private T[] cache1;
         private T[] cache2;
