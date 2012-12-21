@@ -24,10 +24,10 @@ namespace Hime.Demo.Tasks
             CompilationTask task = new CompilationTask();
             task.Method = method;
             task.Namespace = nmspce;
-            task.ExportLog = false;
+            task.ExportLog = true;
             task.ExportDocumentation = false;
             task.InputFiles.Add(file);
-            task.ExecuteDo();
+            task.Execute();
         }
     }
 }

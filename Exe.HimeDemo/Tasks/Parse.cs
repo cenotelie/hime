@@ -10,7 +10,7 @@ namespace Hime.Demo.Tasks
 {
 	class ParseMathExp : IExecutable
 	{
-        class Interpreter : Generated.MathExp.MathExpParser.Actions
+        class Interpreter : Generated.MathExpParser.Actions
         {
             private Stack<float> stack;
 
@@ -54,8 +54,8 @@ namespace Hime.Demo.Tasks
         public void Execute()
         {
             Interpreter interpreter = new Interpreter();
-            Generated.MathExp.MathExpLexer lexer = new Generated.MathExp.MathExpLexer("3+5");
-            Generated.MathExp.MathExpParser parser = new Generated.MathExp.MathExpParser(lexer, interpreter);
+            Generated.MathExpLexer lexer = new Generated.MathExpLexer("3+5");
+            Generated.MathExpParser parser = new Generated.MathExpParser(lexer, interpreter);
 
             bool result = parser.Recognize();
             foreach (ParserError error in parser.Errors)

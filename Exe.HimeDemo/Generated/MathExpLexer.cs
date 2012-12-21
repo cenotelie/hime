@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Hime.Redist.Lexer;
 using Hime.Redist.Symbols;
 
-namespace Hime.Demo.Generated.MathExp
+namespace Hime.Demo.Generated
 {
     internal class MathExpLexer : TextLexer
     {
