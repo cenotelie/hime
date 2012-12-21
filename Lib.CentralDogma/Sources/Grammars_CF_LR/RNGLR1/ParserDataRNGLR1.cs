@@ -144,8 +144,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule, int length)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)LRBytecode.HeadReplace);
-            else stream.Write((byte)LRBytecode.HeadKeep);
+            if (rule.ReplaceOnProduction) stream.Write(LRProduction.HeadReplace);
+            else stream.Write(LRProduction.HeadKeep);
             stream.Write((byte)length);
             byte bcl = 0;
             int pop = 0;

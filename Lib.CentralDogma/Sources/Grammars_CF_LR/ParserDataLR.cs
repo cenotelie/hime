@@ -42,8 +42,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)LRBytecode.HeadReplace);
-            else stream.Write((byte)LRBytecode.HeadKeep);
+            if (rule.ReplaceOnProduction) stream.Write(LRProduction.HeadReplace);
+            else stream.Write(LRProduction.HeadKeep);
             stream.Write((byte)(rule as CFRule).CFBody.GetChoiceAt(0).Length);
             byte length = 0;
             foreach (RuleBodyElement elem in rule.Body.Parts)
