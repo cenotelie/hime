@@ -115,9 +115,10 @@ namespace Hime.Redist.AST
             CSTNode me = new CSTNode(symbol, action);
             if (families.Count == 1)
             {
+                CSTNode[] buffer = new CSTNode[families[0].Children.Count];
                 foreach (SPPFNode child in families[0].Children)
                 {
-                    if (child.Symbol is Symbols.Action) ((Symbols.Action)child.Symbol).Code.Invoke(me);
+                    if (child.Symbol is Symbols.Action) ((Symbols.Action)child.Symbol).Callback(me, me.Children.
                     else me.AppendChild(child.GetFirstTree());
                 }
             }

@@ -32,13 +32,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
                     nullables.Add((ushort)(rules.Count - 1));
                 for (int i = 1; i < rule.CFBody.GetChoiceAt(0).Length; i++)
-                {
                     if (rule.CFBody.GetChoiceAt(i).Firsts.Contains(Epsilon.Instance))
-                    {
                         rules.Add(new KeyValuePair<Rule, int>(rule, i));
-                        nullables.Add((ushort)(rules.Count - 1));
-                    }
-                }
             }
 
             int total = 0;
