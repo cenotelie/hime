@@ -76,7 +76,11 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (StateActionReduce reduce in state.Reductions)
             {
                 if (counters.ContainsKey(reduce.Lookahead))
-                    counters.Add(reduce.Lookahead, counters[reduce.Lookahead] + 1);
+                {
+                    int temp = counters[reduce.Lookahead] + 1;
+                    counters.Remove(reduce.Lookahead);
+                    counters.Add(reduce.Lookahead, temp);
+                }
                 else
                     counters.Add(reduce.Lookahead, 1);
             }

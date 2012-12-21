@@ -65,7 +65,7 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Events for lexical errors
         /// </summary>
-        public event AddLexicalError OnError;
+        internal event AddLexicalError OnError;
 
         /// <summary>
         /// Initializes a new instance of the TextLexer class with the given input

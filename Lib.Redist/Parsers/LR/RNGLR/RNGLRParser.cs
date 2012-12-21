@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hime.Redist.Parsers
 {
-    class RNGLRParser : BaseLRParser
+    public class RNGLRParser : BaseLRParser
     {
         private delegate object GetSemObj(Symbols.Symbol symbol);
         private delegate object Reduce(LRProduction production);
@@ -65,7 +65,7 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        public RNGLRParser(RNGLRAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
+        public RNGLRParser(RNGLRAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;

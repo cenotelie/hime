@@ -10,7 +10,7 @@ namespace Hime.Redist.Lexer
     /// Handler for lexical errors
     /// </summary>
     /// <param name="error">The new error</param>
-    public delegate void AddLexicalError(Parsers.ParserError error);
+    internal delegate void AddLexicalError(Parsers.ParserError error);
 
     /// <summary>
     /// Represents a lexer
@@ -31,10 +31,5 @@ namespace Hime.Redist.Lexer
         /// Gets the current column number
         /// </summary>
         int CurrentColumn { get; }
-
-        /// <summary>
-        /// Events for lexical errors
-        /// </summary>
-        event AddLexicalError OnError;
     }
 }
