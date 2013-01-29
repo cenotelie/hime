@@ -90,25 +90,26 @@ namespace Hime.Redist.Lexer
                     else
                     {
                         OnError(new Parsers.UnexpectedCharError(c, currentLine, currentColumn));
-                        AdvanceStats(c.ToString());
+                        switch ((int)c)
+                        {
+                            case 0x0D:
+                            case 0x0A:
+                            case 0x0B:
+                            case 0x0C:
+                            case 0x85:
+                            case 0x2028:
+                            case 0x2029:
+                                currentLine++;
+                                currentColumn = 0;
+                                break;
+                            default:
+                                currentColumn++;
+                                break;
+                        }
                     }
                 }
                 else if (token.SymbolID != lexSeparator)
                     return token;
-            }
-        }
-
-        private void AdvanceStats(string text)
-        {
-            foreach (char c in text)
-            {
-                if (c == '\n')
-                {
-                    currentLine++;
-                    currentColumn = 1;
-                }
-                else
-                    currentColumn++;
             }
         }
 
