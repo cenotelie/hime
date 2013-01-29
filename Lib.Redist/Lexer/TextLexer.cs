@@ -13,41 +13,21 @@ namespace Hime.Redist.Lexer
     /// </summary>
     public abstract class TextLexer : ILexer
     {
-        internal const int readerLength = 128;
+        private const int readerSize = 1024;        // Size of the encapsulated stream's buffer for reading
+        private const int maxRewind = 128;          // Maximum number of character that can be rewound
+        private const int initBufferSize = 128;     // Initial size of the buffer storing tokens' values
 
-        /// <summary>
-        /// Lexer's automaton
-        /// </summary>
-        private TextLexerAutomaton lexAutomaton;
-        /// <summary>
-        /// The terminals that can be recognized by this lexer
-        /// </summary>
-        private Utils.SymbolDictionary<Symbols.Terminal> lexTerminals;
-        /// <summary>
-        /// ID of the separator
-        /// </summary>
-        private ushort lexSeparator;
-
-        /// <summary>
-        /// Lexer's input
-        /// </summary>
-        private RewindableTextReader input;
-        /// <summary>
-        /// Current line number
-        /// </summary>
-        private int currentLine;
-        /// <summary>
-        /// Current column number
-        /// </summary>
-        private int currentColumn;
-        /// <summary>
-        /// True if the end of the input has been reached and the dollar token has been emited
-        /// </summary>
-        private bool isDollatEmited;
-        /// <summary>
-        /// Buffer for currently read text
-        /// </summary>
-        private char[] buffer;
+        // General data
+        private TextLexerAutomaton lexAutomaton;                        // The automaton
+        private Utils.SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
+        private ushort lexSeparator;                                    // Symbol ID of the SEPARATOR terminal
+        // Runtime data
+        private RewindableTextReader input;     // Lexer's input
+        private int currentLine;                // Current line number in the input
+        private int currentColumn;              // Current column in the input
+        private bool isDollatEmited;            // Flags whether the input's end has been reached and the Dollar token emited
+        private char[] buffer;                  // Buffer storing the tokens' values while matching
+        private int bufferSize;                 // Size of the buffer
 
         /// <summary>
         /// Gets the terminals matched by this lexer
@@ -79,11 +59,12 @@ namespace Hime.Redist.Lexer
             this.lexAutomaton = automaton;
             this.lexTerminals = new Utils.SymbolDictionary<Symbols.Terminal>(terminals);
             this.lexSeparator = separator;
-            this.input = new RewindableTextReader(input, readerLength, readerLength);
+            this.input = new RewindableTextReader(input, readerSize, maxRewind);
             this.currentLine = 1;
             this.currentColumn = 1;
             this.isDollatEmited = false;
-            this.buffer = new char[readerLength];
+            this.bufferSize = initBufferSize;
+            this.buffer = new char[initBufferSize];
         }
 
         /// <summary>
@@ -112,12 +93,8 @@ namespace Hime.Redist.Lexer
                         AdvanceStats(c.ToString());
                     }
                 }
-                else
-                {
-                    AdvanceStats(token.ValueText);
-                    if (token.SymbolID != lexSeparator)
-                        return token;
-                }
+                else if (token.SymbolID != lexSeparator)
+                    return token;
             }
         }
 
@@ -137,34 +114,78 @@ namespace Hime.Redist.Lexer
 
         private Symbols.TextToken GetNextToken_DFA()
         {
-            int matchedIndex = 0;
-            int matchedLength = 0;
-            int readCount = 0;
-            ushort state = 0;
+            int matchedIndex = 0;           // Terminal's index of the last match
+            int matchedLength = 0;          // Length of the last match
+            int matchedNewColumn = 0;       // Current column at the end of the last match
+            int matchedNewLine = 0;         // Current line at the end of the last match
+            int readCount = 0;              // Number of read characters
+            int readColumn = currentColumn; // Current column while reading
+            int readLine = currentLine;     // Current line while reading
+            bool flagCR = false;            // flag indicating whether the last read character was a Carriage Return
+            ushort state = 0;               // Current state in the DFA
 
             while (state != 0xFFFF)
             {
                 int offset = lexAutomaton.GetOffset(state);
+                // Is this state a matching state ?
                 ushort terminal = lexAutomaton.GetTerminal(offset);
                 if (terminal != 0xFFFF)
                 {
                     matchedIndex = terminal;
                     matchedLength = readCount;
+                    matchedNewColumn = readColumn;
+                    matchedNewLine = readLine;
                 }
+                // No further transition => exit
                 if (lexAutomaton.HasNoTransition(offset))
                     break;
+                // Read the next character and store it
                 bool endOfInput = false;
                 char current = input.Read(out endOfInput);
                 if (endOfInput)
                     break;
-                if (readCount == buffer.Length)
+                if (readCount == bufferSize)
                 {
-                    char[] temp = new char[buffer.Length * 2];
-                    System.Array.Copy(buffer, temp, buffer.Length);
+                    char[] temp = new char[bufferSize * 2];
+                    System.Array.Copy(buffer, temp, bufferSize);
                     buffer = temp;
+                    bufferSize *= 2;
                 }
                 buffer[readCount] = current;
                 readCount++;
+                // Advance stats (current line and column)
+                switch ((int)current)
+                {
+                    case 0x0D:
+                        flagCR = true;
+                        readLine++;
+                        readColumn = 0;
+                        break;
+                    case 0x0A:
+                        if (!flagCR)
+                        {
+                            readLine++;
+                            readColumn = 0;
+                        }
+                        else
+                            readColumn++;
+                        flagCR = false;
+                        break;
+                    case 0x0B:
+                    case 0x0C:
+                    case 0x85:
+                    case 0x2028:
+                    case 0x2029:
+                        flagCR = false;
+                        readLine++;
+                        readColumn = 0;
+                        break;
+                    default:
+                        flagCR = false;
+                        readColumn++;
+                        break;
+                }
+                // Try to find a transition from this state with the read character
                 if (current <= 255)
                     state = lexAutomaton.GetCachedTransition(offset + current + 2);
                 else
@@ -174,7 +195,10 @@ namespace Hime.Redist.Lexer
             if (matchedLength == 0)
                 return null;
             Symbols.Terminal matched = lexTerminals[matchedIndex];
-            return new Symbols.TextToken(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine, currentColumn);
+            Symbols.TextToken token = new Symbols.TextToken(matched.SymbolID, matched.Name, new string(buffer, 0, matchedLength), currentLine, currentColumn);
+            currentLine = matchedNewLine;
+            currentColumn = matchedNewColumn;
+            return token;
         }
     }
 }
