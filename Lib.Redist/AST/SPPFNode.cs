@@ -36,6 +36,11 @@ namespace Hime.Redist.AST
         public int Generation { get { return generation; } }
 
         /// <summary>
+        /// Gets the families for this node
+        /// </summary>
+        public List<SPPFFamily> Families { get { return families; } }
+
+        /// <summary>
         /// Initializes a new instance of the SPPFNode class with the given symbol and generation
         /// </summary>
         /// <param name="symbol">The symbol represented by this node</param>
@@ -65,12 +70,13 @@ namespace Hime.Redist.AST
         /// Adds a new family for this node
         /// </summary>
         /// <param name="family">The new family for this node</param>
-        public void AddFamily(SPPFFamily family) { families.Add(family); }
-        /// <summary>
-        /// Adds a new family to be constructed from a list of nodes
-        /// </summary>
-        /// <param name="nodes">The list of nodes forming the new family</param>
-        public void AddFamily(IEnumerable<SPPFNode> nodes) { families.Add(new SPPFFamily(this, nodes)); }
+        public void AddFamily(SPPFFamily family)
+        {
+            foreach (SPPFFamily potential in families)
+                if (potential.EquivalentTo(family))
+                    return;
+            families.Add(family);
+        }
 
         /// <summary>
         /// Determines whether this node is equivalent to the given one
@@ -91,19 +97,6 @@ namespace Hime.Redist.AST
                     return false;
                 return (this.generation == node.generation);
             }
-        }
-
-        /// <summary>
-        /// Determines whether this node has a family equivalent to the given one
-        /// </summary>
-        /// <param name="family">The tested family</param>
-        /// <returns>True if this node has an equivalent family, false otherwise</returns>
-        public bool HasEquivalentFamily(SPPFFamily family)
-        {
-            foreach (SPPFFamily potential in families)
-                if (potential.EquivalentTo(family))
-                    return true;
-            return false;
         }
 
         /// <summary>

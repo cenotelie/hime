@@ -74,18 +74,27 @@ namespace Hime.Redist.Parsers
             this.nullables = new AST.SPPFNode[variables.Length];
             for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
             {
-                LRProduction prod = parserAutomaton.GetProduction(i);
-                this.nullables[i] = new AST.SPPFNode(parserVariables[prod.Head], 0, (AST.CSTAction)prod.HeadAction);
+                ushort index = parserAutomaton.Nullables[i];
+                if (index != 0xFFFF)
+                {
+                    LRProduction prod = parserAutomaton.GetProduction(index);
+                    this.nullables[i] = new AST.SPPFNode(parserVariables[prod.Head], 0, (AST.CSTAction)prod.HeadAction);
+                }
             }
             for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
-                BuildNullable(parserAutomaton.GetProduction(i));
+            {
+                ushort index = parserAutomaton.Nullables[i];
+                if (index != 0xFFFF)
+                {
+                    LRProduction prod = parserAutomaton.GetProduction(index);
+                    BuildNullable(nullables[i], prod);
+                }
+            }
         }
 
-        private void BuildNullable(LRProduction production)
+        private void BuildNullable(AST.SPPFNode head, LRProduction production)
         {
-            AST.SPPFNode head = nullables[production.Head];
             AST.SPPFFamily family = new AST.SPPFFamily(head);
-            head.AddFamily(family);
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 ushort op = production.Bytecode[i];
@@ -105,6 +114,7 @@ namespace Hime.Redist.Parsers
                     i++;
                 }
             }
+            head.AddFamily(family);
         }
 
         private void OnUnexpectedToken(List<GSSNode> Ui, Symbols.Token token)
@@ -149,6 +159,15 @@ namespace Hime.Redist.Parsers
             //this.reducer = new Reduce(ReduceSimple);
             this.getSemObj = new GetSemObj(GetSemNaked);
             return (Execute() != null);
+        }
+
+        public AST.SPPFNode ParseSPPF()
+        {
+            this.getSemObj = new GetSemObj(GetSemCST);
+            object result = Execute();
+            if (result == null)
+                return null;
+            return (result as AST.SPPFNode);
         }
 
         private object GetSemCST(Symbols.Symbol symbol) { return new AST.CSTNode(symbol); }
@@ -352,7 +371,6 @@ namespace Hime.Redist.Parsers
         private void AddChildren(LRProduction rule, AST.SPPFNode y, List<AST.SPPFNode> ys)
         {
             AST.SPPFFamily family = new AST.SPPFFamily(y);
-            y.AddFamily(family);
             int index = 0;
             for (int i = 0; i != rule.Bytecode.Length; i++)
             {
@@ -377,6 +395,7 @@ namespace Hime.Redist.Parsers
                     i++;
                 }
             }
+            y.AddFamily(family);
         }
 
         private ushort GetNextByVar(ushort state, ushort var)

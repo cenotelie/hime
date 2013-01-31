@@ -26,14 +26,19 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         {
             List<KeyValuePair<Rule, int>> rules = new List<KeyValuePair<Rule, int>>();
             List<ushort> nullables = new List<ushort>();
-            foreach (CFRule rule in grammar.Rules)
+            foreach (CFVariable var in grammar.Variables)
             {
-                rules.Add(new KeyValuePair<Rule, int>(rule, rule.CFBody.GetChoiceAt(0).Length));
-                if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
-                    nullables.Add((ushort)(rules.Count - 1));
-                for (int i = 1; i < rule.CFBody.GetChoiceAt(0).Length; i++)
-                    if (rule.CFBody.GetChoiceAt(i).Firsts.Contains(Epsilon.Instance))
-                        rules.Add(new KeyValuePair<Rule, int>(rule, i));
+                ushort nullIndex = 0xFFFF;
+                foreach (CFRule rule in var.CFRules)
+                {
+                    rules.Add(new KeyValuePair<Rule, int>(rule, rule.CFBody.GetChoiceAt(0).Length));
+                    if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
+                        nullIndex = (ushort)(rules.Count - 1);
+                    for (int i = 1; i < rule.CFBody.GetChoiceAt(0).Length; i++)
+                        if (rule.CFBody.GetChoiceAt(i).Firsts.Contains(Epsilon.Instance))
+                            rules.Add(new KeyValuePair<Rule, int>(rule, i));
+                }
+                nullables.Add(nullIndex);
             }
 
             int total = 0;
