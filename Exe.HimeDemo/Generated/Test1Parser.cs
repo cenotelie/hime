@@ -18,7 +18,8 @@ namespace Hime.Demo.Generated
             new Variable(0x5, "primary"), 
             new Variable(0x6, "exp"), 
             new Variable(0xA, "_Axiom_") };
-        private static readonly Virtual[] virtuals = { };
+        private static readonly Virtual[] virtuals = {
+ };
         public Test1Parser(Test1Lexer lexer) : base (automaton, variables, virtuals, null, lexer) { }
     }
 }

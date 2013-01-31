@@ -8,14 +8,24 @@ namespace Hime.Demo.Tasks
     {
         public void Execute()
         {
-            Generated.Test1Lexer lexer = new Generated.Test1Lexer("a.b");
-            Generated.Test1Parser parser = new Generated.Test1Parser(lexer);
+            Generated.Test2Lexer lexer = new Generated.Test2Lexer("aa");
+            Generated.Test2Parser parser = new Generated.Test2Parser(lexer);
 
-            Redist.AST.CSTNode root = parser.Parse();
+            Redist.AST.SPPFNode root = parser.ParseSPPF();
             foreach (Redist.Parsers.ParserError error in parser.Errors)
                 System.Console.WriteLine(error);
+            Export(root, "graph.dot");
+        }
+
+        private void Show(Redist.AST.CSTNode root)
+        {
             WinTreeView win = new WinTreeView(root);
             win.ShowDialog();
+        }
+
+        private void Export(Redist.AST.SPPFNode root, string file)
+        {
+            Hime.CentralDogma.ASTExporter.ExportDOT(root, file);
         }
     }
 }

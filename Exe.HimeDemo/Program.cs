@@ -11,7 +11,7 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            //IExecutable executable = new Compile("Languages\\Test1.gram", "Hime.Demo.Generated", ParsingMethod.RNGLALR1);
+            //IExecutable executable = new Compile("Languages\\Test2.gram", "Hime.Demo.Generated", ParsingMethod.RNGLALR1);
             //executable.Execute();
             IExecutable executable = new ParseRNGLR();
             executable.Execute();
