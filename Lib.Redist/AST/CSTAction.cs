@@ -7,7 +7,7 @@
 namespace Hime.Redist.AST
 {
     /// <summary>
-    /// Specifies the tree action for node
+    /// Specifies the tree action for a CST node
     /// </summary>
     public enum CSTAction : ushort
     {

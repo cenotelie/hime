@@ -4,23 +4,46 @@ using System.Collections.Generic;
 namespace Hime.Redist.Utils
 {
     /// <summary>
-    /// Represents an immutable dictionary of symbols
+    /// Represents an immutable dictionary of symbols.
+    /// The symbols can be accessed by name or index.
     /// </summary>
     /// <typeparam name="T">The type of the symbols</typeparam>
     public sealed class SymbolDictionary<T> : IDictionary<string, T> where T : Symbols.Symbol
     {
         private Dictionary<string, T> impl;
-        internal T[] raw;
+        private T[] raw;
 
+        /// <summary>
+        /// Determines whether the collection is read-only. Always true.
+        /// </summary>
         public bool IsReadOnly { get { return true; } }
+        /// <summary>
+        /// Gets the number of symbols in the collection
+        /// </summary>
         public int Count { get { return raw.Length; } }
+        /// <summary>
+        /// Gets the collection of symbols' names
+        /// </summary>
         public ICollection<string> Keys { get { return impl.Keys; } }
+        /// <summary>
+        /// Gets a collection of symbols
+        /// </summary>
         public ICollection<T> Values { get { return impl.Values; } }
+        /// <summary>
+        /// Gets the symbol corresponding to the given name
+        /// </summary>
+        /// <param name="key">A symbol's name</param>
+        /// <returns>The symbol with the given name</returns>
         public T this[string key]
         {
             get { return impl[key]; }
             set { throw new NotImplementedException(); }
         }
+        /// <summary>
+        /// Gets the symbol corresponding to the given index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public T this[int index] { get { return raw[index]; } }
 
         /// <summary>

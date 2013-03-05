@@ -231,7 +231,7 @@ namespace Hime.Redist.Parsers
             Symbols.Token nextToken = input.GetNextToken();
             while (true)
             {
-                int action = ExecuteOnToken(nextToken);
+                ushort action = ExecuteOnToken(nextToken);
                 if (action == LRActions.Shift)
                 {
                     nextToken = input.GetNextToken();
@@ -245,7 +245,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private int ExecuteOnToken(Symbols.Token token)
+        private ushort ExecuteOnToken(Symbols.Token token)
         {
             while (true)
             {
