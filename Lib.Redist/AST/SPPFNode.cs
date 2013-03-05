@@ -106,21 +106,12 @@ namespace Hime.Redist.AST
         public CSTNode GetFirstTree()
         {
             CSTNode me = new CSTNode(symbol, action);
-            if (families.Count == 1)
+            if (families.Count >= 1)
             {
                 CSTNode[] buffer = new CSTNode[families[0].Children.Count];
                 foreach (SPPFNode child in families[0].Children)
                 {
                     me.AppendChild(child.GetFirstTree());
-                }
-            }
-            else if (families.Count >= 1)
-            {
-                // More than one solution => this is an error
-                foreach (SPPFFamily family in families)
-                {
-                    CSTNode subroot = new CSTNode(null, CSTAction.Nothing);
-                    me.AppendChild(subroot);
                 }
             }
             return me;
