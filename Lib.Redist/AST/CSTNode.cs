@@ -77,16 +77,6 @@ namespace Hime.Redist.AST
             node.action = action;
             children.Add(node);
         }
-        /// <summary>
-        /// Adds a range of nodes as children
-        /// </summary>
-        /// <param name="nodes">The nodes to append</param>
-        public void AppendRange(ICollection<CSTNode> nodes)
-        {
-            List<CSTNode> Temp = new List<CSTNode>(nodes);
-            foreach (CSTNode Node in Temp)
-                AppendChild(Node);
-        }
 
         private class StackNode
         {
