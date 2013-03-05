@@ -16,7 +16,6 @@ namespace Hime.Redist.Symbols
         private string value;
         private int line;
         private int column;
-        private AST.CSTNode subRoot;
 
         /// <summary>
         /// Gets the data represented by this symbol
@@ -34,14 +33,6 @@ namespace Hime.Redist.Symbols
         /// Gets the column number where the text begins
         /// </summary>
         public int Column { get { return column; } }
-        /// <summary>
-        /// Gets or sets the matched sub-grammar's root AST
-        /// </summary>
-        public AST.CSTNode SubGrammarRoot
-        {
-            get { return subRoot; }
-            set { subRoot = value; }
-        }
 
         /// <summary>
         /// Initializes a new instance of the TextToken class with the given name, id, value and line number

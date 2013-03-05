@@ -157,16 +157,6 @@ namespace Hime.Redist.AST
                         // if action is drop => drop the child now by not adding it to the stack
                         if (child.action == CSTAction.Drop)
                             continue;
-                        else if (child.symbol is Symbols.TextToken)
-                        {
-                            Symbols.TextToken TokenText = (Symbols.TextToken)child.symbol;
-                            if (TokenText.SubGrammarRoot != null)
-                            {
-                                // there is a subgrammar => build parency and add to the stack
-                                child = TokenText.SubGrammarRoot;
-                                child.parent = current.astNode;
-                            }
-                        }
                         stack.AddLast(new StackNode(child, parentToPush));
                     }
                     // clear the children => rebuild in postorder
