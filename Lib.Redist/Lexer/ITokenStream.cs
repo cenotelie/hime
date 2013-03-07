@@ -4,6 +4,9 @@
 
 namespace Hime.Redist.Lexer
 {
+    /// <summary>
+    /// Represents a stream of tokens that can be accessed sequentially
+    /// </summary>
     public interface ITokenStream
     {
         /// <summary>

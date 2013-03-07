@@ -42,6 +42,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
         /// Initializes a new instance of the ParserError
 		/// </summary>
+        /// <param name="type">Error's type</param>
 		/// <param name='line'>Error's line number in the input</param>
 		/// <param name='column'>Error's column in the input</param>
 		protected ParserError(ParserErrorType type, int line, int column)

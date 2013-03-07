@@ -27,7 +27,9 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Creates a new Rewindable Text Reader encapsulating the given TextReader
         /// </summary>
-        /// <param name="reader">Text reader to encapsulate</param>
+        /// <param name="reader">The text reader to encapsulate</param>
+        /// <param name="bufferSize">The size of the reading buffer</param>
+        /// <param name="ringSize">The maximum number of characters that can be rewound</param>
         public RewindableTextReader(TextReader reader, int bufferSize, int ringSize)
         {
             this.reader = reader;

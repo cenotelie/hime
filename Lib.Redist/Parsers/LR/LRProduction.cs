@@ -27,9 +27,18 @@ namespace Hime.Redist.Parsers
     * uint16: variable's index
     */
 
+    /// <summary>
+    /// Represents a rule's production in a LR parser
+    /// </summary>
     public sealed class LRProduction
     {
+        /// <summary>
+        /// In the CST, the root node will be replaced by its children
+        /// </summary>
         public const byte HeadReplace = 1;
+        /// <summary>
+        /// In the CST, keep the root node
+        /// </summary>
         public const byte HeadKeep = 0;
 
         private ushort head;
@@ -37,11 +46,27 @@ namespace Hime.Redist.Parsers
         private byte reducLength;
         private Utils.BlobUShort bytecode;
 
+        /// <summary>
+        /// Index of the rule's head in the parser's array of variables
+        /// </summary>
         public ushort Head { get { return head; } }
+        /// <summary>
+        /// Action of the rule's head (replace or not)
+        /// </summary>
         public byte HeadAction { get { return headAction; } }
+        /// <summary>
+        /// Size of the rule's body by ony counting terminals and variables
+        /// </summary>
         public byte ReductionLength { get { return reducLength; } }
+        /// <summary>
+        /// Bytecode for the rule's production
+        /// </summary>
         internal Utils.BlobUShort Bytecode { get { return bytecode; } }
 
+        /// <summary>
+        /// Loads a new instance of the LRProduction class from a binary representation
+        /// </summary>
+        /// <param name="reader">The binary reader to read from</param>
         public LRProduction(BinaryReader reader)
         {
             this.head = reader.ReadUInt16();

@@ -61,8 +61,8 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Loads an automaton from a resource
         /// </summary>
-        /// <param name="assembly">The assembly containing the automaton definition</param>
-        /// <param name="resource">The resource's name</param>
+        /// <param name="type">The lexer's type</param>
+        /// <param name="resource">The name of the resource containing the lexer</param>
         /// <returns>The automaton</returns>
         public static LRkAutomaton FindAutomaton(System.Type type, string resource)
         {
