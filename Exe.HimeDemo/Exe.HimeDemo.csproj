@@ -74,10 +74,6 @@
     </Compile>
     <Compile Include="Generated\MathExpLexer.cs" />
     <Compile Include="Generated\MathExpParser.cs" />
-    <Compile Include="Generated\Test1Lexer.cs" />
-    <Compile Include="Generated\Test1Parser.cs" />
-    <Compile Include="Generated\Test2Lexer.cs" />
-    <Compile Include="Generated\Test2Parser.cs" />
     <Compile Include="IExecutable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -91,10 +87,6 @@
     </Compile>
     <EmbeddedResource Include="Generated\MathExpLexer.bin" />
     <EmbeddedResource Include="Generated\MathExpParser.bin" />
-    <EmbeddedResource Include="Generated\Test1Lexer.bin" />
-    <EmbeddedResource Include="Generated\Test1Parser.bin" />
-    <EmbeddedResource Include="Generated\Test2Lexer.bin" />
-    <EmbeddedResource Include="Generated\Test2Parser.bin" />
     <None Include="Languages\ANSI_C.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

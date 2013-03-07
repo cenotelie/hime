@@ -4,8 +4,9 @@
  */
 
 using System.Collections.Generic;
-using Hime.Redist.Lexer;
 using Hime.Redist.Symbols;
+using Hime.Redist.Lexer;
+using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Generated
 {

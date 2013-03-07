@@ -4,8 +4,9 @@
  */
 
 using System.Collections.Generic;
-using Hime.Redist.Parsers;
 using Hime.Redist.Symbols;
+using Hime.Redist.Lexer;
+using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Generated
 {
@@ -20,24 +21,49 @@ namespace Hime.Demo.Generated
             new Variable(0x12, "_Axiom_") };
         private static readonly Virtual[] virtuals = {
  };
-        public interface Actions
+        public sealed class Actions
         {
-            void OnNumber(object head, object[] body, int length);
-            void OnMult(object head, object[] body, int length);
-            void OnDiv(object head, object[] body, int length);
-            void OnPlus(object head, object[] body, int length);
-            void OnMinus(object head, object[] body, int length);
+            private void Null(Variable head, Symbol[] body, int length) { }
+            private SemanticAction nullAction;
+            public SemanticAction NullAction { get { return nullAction; } }
+            private SemanticAction[] raw;
+            public SemanticAction[] RawActions { get { return raw; } }
+            public Actions()
+            {
+                nullAction = new SemanticAction(Null);
+                raw = new SemanticAction[5];
+                raw[0] = nullAction;
+                raw[1] = nullAction;
+                raw[2] = nullAction;
+                raw[3] = nullAction;
+                raw[4] = nullAction;
+            }
+            public SemanticAction OnNumber
+            {
+                get { return raw[0]; }
+                set { raw[0] = value; }
+            }
+            public SemanticAction OnMult
+            {
+                get { return raw[1]; }
+                set { raw[1] = value; }
+            }
+            public SemanticAction OnDiv
+            {
+                get { return raw[2]; }
+                set { raw[2] = value; }
+            }
+            public SemanticAction OnPlus
+            {
+                get { return raw[3]; }
+                set { raw[3] = value; }
+            }
+            public SemanticAction OnMinus
+            {
+                get { return raw[4]; }
+                set { raw[4] = value; }
+            }
         }
-        private static SemanticAction[] BuildActions(Actions actions)
-        {
-            SemanticAction[] result = new SemanticAction[5];
-            result[0] = new SemanticAction(actions.OnNumber);
-            result[1] = new SemanticAction(actions.OnMult);
-            result[2] = new SemanticAction(actions.OnDiv);
-            result[3] = new SemanticAction(actions.OnPlus);
-            result[4] = new SemanticAction(actions.OnMinus);
-            return result;
-        }
-        public MathExpParser(MathExpLexer lexer, Actions actions) : base (automaton, variables, virtuals, BuildActions(actions), lexer) { }
+        public MathExpParser(MathExpLexer lexer, Actions actions) : base (automaton, variables, virtuals, actions.RawActions, lexer) { }
     }
 }
