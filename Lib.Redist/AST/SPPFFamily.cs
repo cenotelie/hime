@@ -26,7 +26,7 @@ namespace Hime.Redist.AST
         public IList<SPPFNode> Children { get { return children; } }
 
         /// <summary>
-        /// Initializes a new instance of the SPPFNodeFamily class with the given parent node
+        /// Initializes a new instance of the SPPFFamily class with the given parent node
         /// </summary>
         /// <param name="parent">The node owning this family</param>
         public SPPFFamily(SPPFNode parent)
@@ -35,7 +35,7 @@ namespace Hime.Redist.AST
             this.children = new List<SPPFNode>();
         }
         /// <summary>
-        /// Initializes a new instance of the SPPFNodeFamily class with the given parent node
+        /// Initializes a new instance of the SPPFFamily class with the given parent node
         /// </summary>
         /// <param name="parent">The node owning this family</param>
         /// <param name="nodes">The list of children for this family</param>

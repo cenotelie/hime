@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Hime.Redist.Symbols
 {
     /// <summary>
-    /// Represents a semantic action embedded within a Shared Packed Parser Forest
+    /// Represents a semantic action embedded within a Shared Packed Parse Forest
     /// </summary>
     public sealed class Action : Symbol
     {
