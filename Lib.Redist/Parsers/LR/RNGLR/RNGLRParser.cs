@@ -6,9 +6,6 @@ namespace Hime.Redist.Parsers
 {
     public class RNGLRParser : BaseLRParser
     {
-        private delegate object GetSemObj(Symbols.Symbol symbol);
-        private delegate object Reduce(LRProduction production);
-
         private struct Reduction
         {
             public GSSNode node;
@@ -32,31 +29,15 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        /// <summary>
-        /// RNGLR parsing table and productions
-        /// </summary>
         private RNGLRAutomaton parserAutomaton;
-        /// <summary>
-        /// Parser's input encapsulating the lexer
-        /// </summary>
         private RewindableTokenStream input;
-        /// <summary>
-        /// Delegate reducer
-        /// </summary>
-        private Reduce reducer;
-        /// <summary>
-        /// Transforms a symbol to a semantic object
-        /// </summary>
-        private GetSemObj getSemObj;
-
         private Symbols.Token nextToken;
         private LinkedList<Reduction> R;
         private LinkedList<Shift> Q;
         private List<AST.SPPFNode> N;
-
         private AST.SPPFNode epsilon;
         private AST.SPPFNode[] nullables;
-
+        
         /// <summary>
         /// Initializes a new instance of the LRkParser class with the given lexer
         /// </summary>
@@ -78,7 +59,7 @@ namespace Hime.Redist.Parsers
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    this.nullables[i] = new AST.SPPFNode(parserVariables[prod.Head], 0, (AST.CSTAction)prod.HeadAction);
+                    this.nullables[i] = new AST.SPPFNode(parserVariables[prod.Head], 0, prod.HeadAction);
                 }
             }
             for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
@@ -100,17 +81,17 @@ namespace Hime.Redist.Parsers
                 ushort op = production.Bytecode[i];
                 if (LRBytecode.IsSemAction(op))
                 {
-                    family.AddChild(new AST.SPPFNode(new Symbols.Action(parserActions[production.Bytecode[i + 1]]), 0));
+                    family.Append(new AST.SPPFNode(new Symbols.Action(parserActions[production.Bytecode[i + 1]]), 0));
                     i++;
                 }
                 else if (LRBytecode.IsAddVirtual(op))
                 {
-                    family.AddChild(new AST.SPPFNode(parserVirtuals[production.Bytecode[i + 1]], 0, LRBytecode.GetAction(op)));
+                    family.Append(new AST.SPPFNode(parserVirtuals[production.Bytecode[i + 1]], 0, op & LRBytecode.MaskAction));
                     i++;
                 }
                 else if (LRBytecode.IsAddNullVariable(op))
                 {
-                    family.AddChild(nullables[production.Bytecode[i + 1]]);
+                    family.Append(nullables[production.Bytecode[i + 1]]);
                     i++;
                 }
             }
@@ -142,12 +123,10 @@ namespace Hime.Redist.Parsers
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         public override AST.CSTNode Parse()
         {
-            //this.reducer = new Reduce(ReduceAST);
-            this.getSemObj = new GetSemObj(GetSemCST);
             object result = Execute();
             if (result == null)
                 return null;
-            return (result as AST.SPPFNode).GetFirstTree().ApplyActions();
+            return (result as AST.SPPFNode).GetFirstTree();
         }
 
         /// <summary>
@@ -156,22 +135,8 @@ namespace Hime.Redist.Parsers
         /// <returns>True if the input is recognized, false otherwise</returns>
         public override bool Recognize()
         {
-            //this.reducer = new Reduce(ReduceSimple);
-            this.getSemObj = new GetSemObj(GetSemNaked);
             return (Execute() != null);
         }
-
-        public AST.SPPFNode ParseSPPF()
-        {
-            this.getSemObj = new GetSemObj(GetSemCST);
-            object result = Execute();
-            if (result == null)
-                return null;
-            return (result as AST.SPPFNode);
-        }
-
-        private object GetSemCST(Symbols.Symbol symbol) { return new AST.CSTNode(symbol); }
-        private object GetSemNaked(Symbols.Symbol symbol) { return symbol; }
 
         private AST.SPPFNode Execute()
         {
@@ -258,7 +223,7 @@ namespace Hime.Redist.Parsers
                 if (m != 0)
                 {
                     int c = u.Generation;
-                    z = GetInSet(new AST.SPPFNode(X, c, (AST.CSTAction)rule.HeadAction));
+                    z = GetInSet(new AST.SPPFNode(X, c, rule.HeadAction));
                 }
                 GSSNode w = GetInSet(Ui, l);
                 if (w != null)
@@ -368,31 +333,37 @@ namespace Hime.Redist.Parsers
             return Uj;
         }
 
-        private void AddChildren(LRProduction rule, AST.SPPFNode y, List<AST.SPPFNode> ys)
+        private void AddChildren(LRProduction production, AST.SPPFNode y, List<AST.SPPFNode> ys)
         {
             AST.SPPFFamily family = new AST.SPPFFamily(y);
             int index = 0;
-            for (int i = 0; i != rule.Bytecode.Length; i++)
+            for (int i = 0; i != production.Bytecode.Length; i++)
             {
-                ushort op = rule.Bytecode[i];
-                if (LRBytecode.IsPop(op))
+                ushort op = production.Bytecode[i];
+                if (LRBytecode.IsSemAction(op))
                 {
-                    family.AddChild(ys[index++]);
+                    family.Append(new AST.SPPFNode(new Symbols.Action(parserActions[production.Bytecode[i + 1]]), 0)); 
+                    i++;
                 }
                 else if (LRBytecode.IsAddVirtual(op))
                 {
-                    family.AddChild(new AST.SPPFNode(parserVirtuals[rule.Bytecode[i + 1]], -1));
-                    i++;
-                }
-                else if (LRBytecode.IsSemAction(op))
-                {
-                    family.AddChild(new AST.SPPFNode(new Symbols.Action(parserActions[rule.Bytecode[i + 1]]), 0));
+                    AST.SPPFNode node = new AST.SPPFNode(parserVirtuals[production.Bytecode[i + 1]], -1);
+                    node.SetAction(op & LRBytecode.MaskAction);
+                    family.Append(node);
                     i++;
                 }
                 else if (LRBytecode.IsAddNullVariable(op))
                 {
-                    family.AddChild(nullables[rule.Bytecode[i + 1]]);
+                    AST.SPPFNode node = nullables[production.Bytecode[i + 1]];
+                    node.SetAction(op & LRBytecode.MaskAction);
+                    family.Append(node);
                     i++;
+                }
+                else
+                {
+                    AST.SPPFNode node = ys[index++];
+                    node.SetAction(op & LRBytecode.MaskAction);
+                    family.Append(node);
                 }
             }
             y.AddFamily(family);

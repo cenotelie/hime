@@ -6,6 +6,11 @@
     public static class LRBytecode
     {
         /// <summary>
+        /// Mask for CST action in bytecodes
+        /// </summary>
+        public const ushort MaskAction = 3;
+
+        /// <summary>
         /// Gets the next element in the stack and apply no action
         /// </summary>
         public const ushort PopNoAction = 0;
@@ -81,12 +86,5 @@
         /// <param name="code">The bytecode</param>
         /// <returns>True if this is a Add Null Variable action</returns>
         public static bool IsAddNullVariable(ushort code) { return ((code & NullVariable) == NullVariable); }
-
-        /// <summary>
-        /// Gets the CST node action corresponding to the given bytecode
-        /// </summary>
-        /// <param name="code">The bytecode</param>
-        /// <returns>The CST node action</returns>
-        public static AST.CSTAction GetAction(ushort code) { return (AST.CSTAction)(code & 0x3); }
     }
 }

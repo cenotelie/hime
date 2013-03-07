@@ -128,14 +128,14 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 return;
             stream.WriteLine("        public sealed class Actions");
             stream.WriteLine("        {");
-            stream.WriteLine("            private void NullAction(Symbols.Variable head, Symbols.Symbol[] body, int length) { }");
+            stream.WriteLine("            private void DoNothing(Variable head, Symbol[] body, int length) { }");
             stream.WriteLine("            private SemanticAction nullAction;");
-            stream.WriteLine("            public SemanticAction NullAction { get { return nullAction; } };");
+            stream.WriteLine("            public SemanticAction NullAction { get { return nullAction; } }");
             stream.WriteLine("            private SemanticAction[] raw;");
-            stream.WriteLine("            public SemanticAction[] RawActions { get { return raw; } };");
+            stream.WriteLine("            public SemanticAction[] RawActions { get { return raw; } }");
             stream.WriteLine("            public Actions()");
             stream.WriteLine("            {");
-            stream.WriteLine("                nullAction = new SemanticAction(NullAction);");
+            stream.WriteLine("                nullAction = new SemanticAction(DoNothing);");
             stream.WriteLine("                raw = new SemanticAction[" + actions.Count + "];");
             for (int i = 0; i != actions.Count; i++)
                 stream.WriteLine("                raw[" + i + "] = nullAction;");

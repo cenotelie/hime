@@ -11,45 +11,32 @@ namespace Hime.Redist.AST
     /// <summary>
     /// Represents a family of children for a SPPF node
     /// </summary>
-    public sealed class SPPFFamily
+    internal class SPPFFamily : List<SPPFNode>
     {
+        /// <summary>
+        /// Parent SPPF node for this family
+        /// </summary>
         private SPPFNode parent;
-        private List<SPPFNode> children;
 
         /// <summary>
-        /// Gets the SPPF node owning this family
+        /// Initializes a new instance of the SPPFFamily class with the given parent
         /// </summary>
-        public SPPFNode Parent { get { return parent; } }
-        /// <summary>
-        /// Gets the list of children in this family
-        /// </summary>
-        public IList<SPPFNode> Children { get { return children; } }
-
-        /// <summary>
-        /// Initializes a new instance of the SPPFFamily class with the given parent node
-        /// </summary>
-        /// <param name="parent">The node owning this family</param>
+        /// <param name="parent">Parent of this family</param>
         public SPPFFamily(SPPFNode parent)
         {
             this.parent = parent;
-            this.children = new List<SPPFNode>();
-        }
-        /// <summary>
-        /// Initializes a new instance of the SPPFFamily class with the given parent node
-        /// </summary>
-        /// <param name="parent">The node owning this family</param>
-        /// <param name="nodes">The list of children for this family</param>
-        public SPPFFamily(SPPFNode parent, IEnumerable<SPPFNode> nodes)
-        {
-            this.parent = parent;
-            this.children = new List<SPPFNode>(nodes);
         }
 
         /// <summary>
-        /// Adds a new child to this family
+        /// Appends a new child to this family
         /// </summary>
-        /// <param name="child">The child to add to this family</param>
-        public void AddChild(SPPFNode child) { children.Add(child); }
+        /// <param name="child">The new child</param>
+        public void Append(SPPFNode child)
+        {
+            child.parent = this.parent;
+            child.originalParent = parent.value;
+            this.Add(child);
+        }
 
         /// <summary>
         /// Determines whether this family is equivalent to the tested one
@@ -58,10 +45,10 @@ namespace Hime.Redist.AST
         /// <returns>True if this family is equivalent to the tested one, false otherwise</returns>
         public bool EquivalentTo(SPPFFamily family)
         {
-            if (children.Count != family.children.Count)
+            if (this.Count != family.Count)
                 return false;
-            for (int i = 0; i != children.Count; i++)
-                if (!children[i].EquivalentTo(family.children[i]))
+            for (int i = 0; i != this.Count; i++)
+                if (!this[i].EquivalentTo(family[i]))
                     return false;
             return true;
         }

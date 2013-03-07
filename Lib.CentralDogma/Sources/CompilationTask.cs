@@ -85,7 +85,6 @@ namespace Hime.CentralDogma
         private Reporting.Reporter reporter;
         private Dictionary<string, Grammars.Grammar> grammars;
         private Dictionary<string, Grammars.GrammarLoader> loaders;
-        private CSTNode intermediateRoot;
 
         /// <summary>
         /// Initializes a new compilation task
@@ -187,7 +186,6 @@ namespace Hime.CentralDogma
 
         internal bool LoadInputs()
         {
-            intermediateRoot = new CSTNode(null);
             foreach (string file in InputFiles)
             {
                 TextReader reader = new StreamReader(file);

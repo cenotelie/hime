@@ -30,37 +30,13 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        /// <summary>
-        /// LR(k) parsing table and productions
-        /// </summary>
         private LRkAutomaton parserAutomaton;
-        /// <summary>
-        /// Parser's input encapsulating the lexer
-        /// </summary>
         private RewindableTokenStream input;
-        /// <summary>
-        /// Parser's stack
-        /// </summary>
         private ushort[] stack;
-        /// <summary>
-        /// Semantic symbols' stack
-        /// </summary>
         private object[] objects;
-        /// <summary>
-        /// Buffer for the rules' body
-        /// </summary>
         private Symbols.Symbol[] buffer;
-        /// <summary>
-        /// Current stack's head
-        /// </summary>
         private int head;
-        /// <summary>
-        /// Delegate reducer
-        /// </summary>
         private Reduce reducer;
-        /// <summary>
-        /// Transforms a symbol to a semantic object
-        /// </summary>
         private GetSemObj getSemObj;
 
         /// <summary>
@@ -132,7 +108,7 @@ namespace Hime.Redist.Parsers
             object result = Execute();
             if (result == null)
                 return null;
-            return (result as AST.CSTNode).ApplyActions();
+            return (result as AST.BuildNode).GetTree();
         }
 
         /// <summary>
@@ -146,13 +122,14 @@ namespace Hime.Redist.Parsers
             return (Execute() != null);
         }
 
-        private object GetSemCST(Symbols.Symbol symbol) { return new AST.CSTNode(symbol); }
+        private object GetSemCST(Symbols.Symbol symbol) { return new AST.BuildNode(symbol); }
         private object GetSemNaked(Symbols.Symbol symbol) { return symbol; }
 
         private object ReduceAST(LRProduction production)
         {
             Symbols.Variable var = parserVariables[production.Head];
-            AST.CSTNode sub = new AST.CSTNode(var, (AST.CSTAction)production.HeadAction);
+            AST.BuildNode sub = new AST.BuildNode(var);
+            sub.SetAction(production.HeadAction);
             int nextBuffer = 0;
             int nextStack = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -166,24 +143,18 @@ namespace Hime.Redist.Parsers
                 else if (LRBytecode.IsAddVirtual(op))
                 {
                     Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1]];
-                    AST.CSTNode node = new AST.CSTNode(symbol, LRBytecode.GetAction(op));
+                    AST.BuildNode node = new AST.BuildNode(symbol);
+                    node.SetAction(op & LRBytecode.MaskAction);
                     sub.AppendChild(node);
                     buffer[nextBuffer] = symbol;
                     nextBuffer++;
                     i++;
                 }
-                else if (op == LRBytecode.PopNoAction)
-                {
-                    AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
-                    sub.AppendChild(node);
-                    buffer[nextBuffer] = node.Symbol;
-                    nextStack++;
-                    nextBuffer++;
-                }
                 else
                 {
-                    AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
-                    sub.AppendChild(node, LRBytecode.GetAction(op));
+                    AST.BuildNode node = objects[head + nextStack + 1] as AST.BuildNode;
+                    sub.AppendChild(node);
+                    node.SetAction(op & LRBytecode.MaskAction);
                     buffer[nextBuffer] = node.Symbol;
                     nextStack++;
                     nextBuffer++;
