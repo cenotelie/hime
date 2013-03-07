@@ -49,7 +49,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Buffer for the rules' body
         /// </summary>
-        private object[] buffer;
+        private Symbols.Symbol[] buffer;
         /// <summary>
         /// Current stack's head
         /// </summary>
@@ -151,7 +151,8 @@ namespace Hime.Redist.Parsers
 
         private object ReduceAST(LRProduction production)
         {
-            AST.CSTNode sub = new AST.CSTNode(parserVariables[production.Head], (AST.CSTAction)production.HeadAction);
+            Symbols.Variable var = parserVariables[production.Head];
+            AST.CSTNode sub = new AST.CSTNode(var, (AST.CSTAction)production.HeadAction);
             int nextBuffer = 0;
             int nextStack = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -159,16 +160,15 @@ namespace Hime.Redist.Parsers
                 ushort op = production.Bytecode[i];
                 if (LRBytecode.IsSemAction(op))
                 {
-                    ushort index = production.Bytecode[i + 1];
-                    parserActions[index](sub, buffer, nextBuffer);
+                    parserActions[production.Bytecode[i + 1]](var, buffer, nextBuffer);
                     i++;
                 }
                 else if (LRBytecode.IsAddVirtual(op))
                 {
-                    ushort index = production.Bytecode[i + 1];
-                    AST.CSTNode node = new AST.CSTNode(parserVirtuals[index], LRBytecode.GetAction(op));
+                    Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1]];
+                    AST.CSTNode node = new AST.CSTNode(symbol, LRBytecode.GetAction(op));
                     sub.AppendChild(node);
-                    buffer[nextBuffer] = node;
+                    buffer[nextBuffer] = symbol;
                     nextBuffer++;
                     i++;
                 }
@@ -176,7 +176,7 @@ namespace Hime.Redist.Parsers
                 {
                     AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
                     sub.AppendChild(node);
-                    buffer[nextBuffer] = node;
+                    buffer[nextBuffer] = node.Symbol;
                     nextStack++;
                     nextBuffer++;
                 }
@@ -184,7 +184,7 @@ namespace Hime.Redist.Parsers
                 {
                     AST.CSTNode node = objects[head + nextStack + 1] as AST.CSTNode;
                     sub.AppendChild(node, LRBytecode.GetAction(op));
-                    buffer[nextBuffer] = node;
+                    buffer[nextBuffer] = node.Symbol;
                     nextStack++;
                     nextBuffer++;
                 }
@@ -194,7 +194,7 @@ namespace Hime.Redist.Parsers
 
         private object ReduceSimple(LRProduction production)
         {
-            object sub = parserVariables[production.Head];
+            Symbols.Variable var = parserVariables[production.Head];
             int nextBuffer = 0;
             int nextStack = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -202,32 +202,30 @@ namespace Hime.Redist.Parsers
                 ushort op = production.Bytecode[i];
                 if (LRBytecode.IsSemAction(op))
                 {
-                    ushort index = production.Bytecode[i + 1];
-                    parserActions[index](sub, buffer, nextBuffer);
+                    parserActions[production.Bytecode[i + 1]](var, buffer, nextBuffer);
                     i++;
                 }
                 else if (LRBytecode.IsAddVirtual(op))
                 {
-                    ushort index = production.Bytecode[i + 1];
-                    buffer[nextBuffer] = parserVirtuals[index];
+                    buffer[nextBuffer] = parserVirtuals[production.Bytecode[i + 1]];
                     nextBuffer++;
                     i++;
                 }
                 else
                 {
-                    buffer[nextBuffer] = objects[head + nextStack + 1];
+                    buffer[nextBuffer] = objects[head + nextStack + 1] as Symbols.Symbol;
                     nextStack++;
                     nextBuffer++;
                 }
             }
-            return sub;
+            return var;
         }
 
         private object Execute()
         {
             this.stack = new ushort[maxStackSize];
             this.objects = new object[maxStackSize];
-            this.buffer = new object[maxBodyLength];
+            this.buffer = new Symbols.Symbol[maxBodyLength];
             Symbols.Token nextToken = input.GetNextToken();
             while (true)
             {

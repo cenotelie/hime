@@ -126,19 +126,28 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         {
             if (actions.Count == 0)
                 return;
-
-            stream.WriteLine("        public interface Actions");
+            stream.WriteLine("        public sealed class Actions");
             stream.WriteLine("        {");
-            foreach (Action action in actions)
-                stream.WriteLine("            void " + action.Name + "(object head, object[] body, int length);");
-            stream.WriteLine("        }");
-
-            stream.WriteLine("        private static SemanticAction[] BuildActions(Actions actions)");
-            stream.WriteLine("        {");
-            stream.WriteLine("            SemanticAction[] result = new SemanticAction[" + actions.Count + "];");
+            stream.WriteLine("            private void NullAction(Symbols.Variable head, Symbols.Symbol[] body, int length) { }");
+            stream.WriteLine("            private SemanticAction nullAction;");
+            stream.WriteLine("            public SemanticAction NullAction { get { return nullAction; } };");
+            stream.WriteLine("            private SemanticAction[] raw;");
+            stream.WriteLine("            public SemanticAction[] RawActions { get { return raw; } };");
+            stream.WriteLine("            public Actions()");
+            stream.WriteLine("            {");
+            stream.WriteLine("                nullAction = new SemanticAction(NullAction);");
+            stream.WriteLine("                raw = new SemanticAction[" + actions.Count + "];");
             for (int i = 0; i != actions.Count; i++)
-                stream.WriteLine("            result[" + i + "] = new SemanticAction(actions." + actions[i].Name + ");");
-            stream.WriteLine("            return result;");
+                stream.WriteLine("                raw[" + i + "] = nullAction;");
+            stream.WriteLine("            }");
+            for (int i = 0; i != actions.Count; i++)
+            {
+                stream.WriteLine("            public SemanticAction " + actions[i].Name);
+                stream.WriteLine("            {");
+                stream.WriteLine("                get { return raw[" + i + "]; }");
+                stream.WriteLine("                set { raw[" + i + "] = value; }");
+                stream.WriteLine("            }");
+            }
             stream.WriteLine("        }");
         }
 
@@ -149,7 +158,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             if (actions.Count != 0)
             {
                 argument = ", Actions actions";
-                body = "BuildActions(actions)";
+                body = "actions.RawActions";
             }
             stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer" + argument + ") : base (automaton, variables, virtuals, " + body + ", lexer) { }");
         }

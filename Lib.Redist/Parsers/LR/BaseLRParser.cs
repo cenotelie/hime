@@ -10,7 +10,7 @@ namespace Hime.Redist.Parsers
     /// <param name="head">The semantic object for the head</param>
     /// <param name="body">The current body at the time of the action</param>
     /// <param name="length">The length of the passed body</param>
-    public delegate void SemanticAction(object head, object[] body, int length);
+    public delegate void SemanticAction(Symbols.Variable head, Symbols.Symbol[] body, int length);
 
     /// <summary>
     /// Represents a base LR parser
