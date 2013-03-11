@@ -8,10 +8,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Hime.HimeCC;
-using Hime.Utils.Reporting;
-using Hime.Parsers;
 using NUnit.Framework;
+using Hime.Compiler;
+using Hime.CentralDogma;
 
 namespace Hime.Tests.HimeCC
 {
@@ -19,13 +18,11 @@ namespace Hime.Tests.HimeCC
     public class Suite03_Compile: BaseTestSuite
     {
         private static string defaultGrammar = "MathExp.gram";
-        private static string defaultLexer = "lexer.cs";
-        private static string defaultParser = "parser.cs";
 
         private string[] BuildDefaultCommand(string grammar)
         {
             ExportResource("Exe.HimeCC." + grammar, grammar);
-            string[] command = new String[] { grammar, "--lexer", defaultLexer, "--parser", defaultParser };
+            string[] command = new String[] { grammar, "-o", output };
             return command;
         }
         
@@ -34,7 +31,7 @@ namespace Hime.Tests.HimeCC
         {
             string dir = GetTestDirectory();
             Program.Main(BuildDefaultCommand(defaultGrammar));
-            File.ReadAllText(defaultLexer);
+            File.ReadAllText("outputLexer.cs");
         }
 
         [Test]
@@ -42,7 +39,7 @@ namespace Hime.Tests.HimeCC
         {
             string dir = GetTestDirectory();
             Program.Main(BuildDefaultCommand(defaultGrammar));
-            File.ReadAllText(defaultParser);
+            File.ReadAllText("outputParser.cs");
         }
 
         [Test]
@@ -50,7 +47,7 @@ namespace Hime.Tests.HimeCC
         {
             string dir = GetTestDirectory();
             Program.Main(BuildDefaultCommand(defaultGrammar));
-            Assembly assembly = Build(defaultLexer, defaultParser);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
         }
 
@@ -59,7 +56,7 @@ namespace Hime.Tests.HimeCC
         {
             string dir = GetTestDirectory();
             Program.Main(BuildDefaultCommand(defaultGrammar));
-            Assembly assembly = Build(defaultLexer, defaultParser);
+            Assembly assembly = Build();
             System.Type lexer = assembly.GetType("MathExp.MathExpLexer");
             Assert.IsNotNull(lexer);
         }
@@ -69,7 +66,7 @@ namespace Hime.Tests.HimeCC
         {
             string dir = GetTestDirectory();
             Program.Main(BuildDefaultCommand(defaultGrammar));
-            Assembly assembly = Build(defaultLexer, defaultParser);
+            Assembly assembly = Build();
             System.Type lexer = assembly.GetType("MathExp.MathExpParser");
             Assert.IsNotNull(lexer);
         }
@@ -87,10 +84,10 @@ namespace Hime.Tests.HimeCC
             string dir = GetTestDirectory();
             string source = "FileCentralDogma.gram";
             ExportResource("Exe.HimeCC.FileCentralDogma.gram", source);
-            string[] command = new String[] { source, "-g", "FileCentralDogma", "--lexer", defaultLexer, "--parser", defaultParser, "-m", "LALR1" };
+            string[] command = new String[] { source, "-g", "FileCentralDogma", "-o", output, "-m", "LALR1" };
             int result = Program.Main(command);
             Assert.AreEqual(0, result);
-            Assembly assembly = Build(defaultLexer, defaultParser);
+            Assembly assembly = Build();
             Assert.IsNotNull(assembly);
         }
 	}

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Hime.Redist")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Redistributable runtime library for parser generated with Hime")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Hime.Redist")]

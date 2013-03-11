@@ -5,7 +5,8 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using Hime.HimeCC;
+using Hime.Compiler;
+using Hime.CentralDogma;
 
 namespace Hime.Tests.HimeCC
 {
@@ -25,7 +26,7 @@ namespace Hime.Tests.HimeCC
             string dir = GetTestDirectory();
             string file = "MathExp.gram";
             ExportResource("Exe.HimeCC.MathExp.gram", file);
-            string[] command = new String[] { file };
+            string[] command = new String[] { file, "-m", "LALR1" };
             Assert.AreEqual(0, Program.Main(command));
         }
     }

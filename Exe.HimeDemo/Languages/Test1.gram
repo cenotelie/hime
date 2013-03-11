@@ -1,0 +1,21 @@
+﻿cf grammar Test1
+{
+	options
+	{
+		Axiom = "exp";
+	}
+	terminals {
+		NAME	-> [a-zA-Z_] [a-zA-Z_0-9]* ;
+	}
+	rules {
+		type	-> NAME ;
+		type	-> NAME '.' type ;
+
+		primary	-> NAME ;
+		primary	-> '(' exp ')' ;
+		primary	-> primary '.' NAME ;
+
+		exp		-> primary ;
+		exp		-> '(' type ')' exp ;
+	}
+}

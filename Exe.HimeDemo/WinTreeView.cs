@@ -5,38 +5,39 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Hime.Redist.AST;
+using Hime.Redist.Symbols;
 
-namespace LangTest
+namespace Hime.Demo
 {
     partial class WinTreeView : Form
     {
-        public WinTreeView(Hime.Redist.Parsers.SyntaxTreeNode Root)
+        public WinTreeView(CSTNode root)
         {
             InitializeComponent();
-
-            TreeNode VRoot = View.Nodes.Add(Root.Symbol.Name);
-            AddSubTree(VRoot, Root);
+            TreeNode vroot = View.Nodes.Add(root.Symbol.Name);
+            AddSubTree(vroot, root);
         }
 
-        private void AddSubTree(TreeNode VNode, Hime.Redist.Parsers.SyntaxTreeNode SNode)
+        private void AddSubTree(TreeNode vnode, CSTNode snode)
         {
-            foreach (Hime.Redist.Parsers.SyntaxTreeNode Child in SNode.Children)
+            foreach (CSTNode child in snode.Children)
             {
-                TreeNode VChild = null;
-                if (Child.Symbol != null)
+                TreeNode vchild = null;
+                if (child.Symbol != null)
                 {
-                    string name = Child.Symbol.Name;
+                    string name = child.Symbol.Name;
                     string value = "";
-                    if (Child.Symbol is Hime.Redist.Parsers.SymbolToken)
-                        value = ": \"" + ((Hime.Redist.Parsers.SymbolToken)Child.Symbol).Value.ToString() + "\"";
+                    if (child.Symbol is Token)
+                        value = ": \"" + (child.Symbol as Token).Value.ToString() + "\"";
                     string header = name + value;
-                    VChild = VNode.Nodes.Add(header);
+                    vchild = vnode.Nodes.Add(header);
                 }
                 else
                 {
-                    VChild = VNode.Nodes.Add("<null>");
+                    vchild = vnode.Nodes.Add("<null>");
                 }
-                AddSubTree(VChild, Child);
+                AddSubTree(vchild, child);
             }
         }
     }

@@ -50,6 +50,9 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="BaseTestSuite.cs" />
     <Compile Include="Lib.CentralDogma\Suite04_Bugs.cs" />
     <Compile Include="Lib.Redist\Suite00_Bugs.cs" />
@@ -61,6 +64,7 @@
     <Compile Include="Lib.CentralDogma\Suite02_CompilationTask.cs" />
     <Compile Include="Lib.Redist\Suite01_Parse.cs" />
     <Compile Include="Lib.CentralDogma\Suite03_Ambiguous.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -82,9 +86,7 @@
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Resources\Exe.HimeCC\Empty.gram" />
     <EmbeddedResource Include="Resources\Exe.HimeCC\FileCentralDogma.gram" />

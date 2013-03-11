@@ -3,18 +3,20 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework;
-using Hime.Parsers;
-using Hime.Utils.Reporting;
-using Hime.Redist.Parsers;
-using Hime.Utils.Resources;
 using System.CodeDom.Compiler;
+using NUnit.Framework;
+using Hime.CentralDogma;
+using Hime.CentralDogma.Reporting;
+using Hime.Redist.Lexer;
+using Hime.Redist.Parsers;
+using Hime.Redist.AST;
 
 namespace Hime.Tests
 {
     public abstract class BaseTestSuite
     {
         protected const string log = "Log.txt";
+        protected const string output = "output";
 
         protected ResourceAccessor accessor;
         protected string directory;
@@ -49,24 +51,32 @@ namespace Hime.Tests
         protected string GetResourceContent(string name) { return accessor.GetAllTextFor(name); }
         protected void ExportResource(string name, string file) { accessor.Export(name, file); }
 
-        protected Report CompileResource(string resource, ParsingMethod method, string lexer, string parser)
+        protected Report CompileResource(string resource, ParsingMethod method)
         {
-			return CompileRaw(GetResourceContent(resource), method, lexer, parser);
+			return CompileRaw(GetResourceContent(resource), method);
         }
 
-        protected Report CompileRaw(string rawInput, ParsingMethod method, string lexer, string parser)
+        protected Report CompileRaw(string rawInput, ParsingMethod method)
         {
             CompilationTask task = new CompilationTask();
             task.Method = method;
             task.InputRawData.Add(rawInput);
-            task.LexerFile = lexer;
-            task.ParserFile = parser;
+            task.Output = output;
+            return task.Execute();
+        }
+        protected Report CompileRaw(string rawInput, ParsingMethod method, bool log)
+        {
+            CompilationTask task = new CompilationTask();
+            task.Method = method;
+            task.InputRawData.Add(rawInput);
+            task.Output = output;
+            task.ExportLog = log;
             return task.Execute();
         }
 
-        protected Assembly Build(string lexer, string parser)
+        protected Assembly Build()
         {
-            string redist = Assembly.GetAssembly(typeof(Hime.Redist.Parsers.LexerText)).Location;
+            string redist = Assembly.GetAssembly(typeof(TextLexer)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{
             	CompilerParameters compilerparams = new CompilerParameters();
@@ -75,28 +85,28 @@ namespace Hime.Tests
             	compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
             	compilerparams.ReferencedAssemblies.Add("System.dll");
                 compilerparams.ReferencedAssemblies.Add(redist);
-            	CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { lexer, parser });
-            	Assert.AreEqual(0, results.Errors.Count);
+                compilerparams.EmbeddedResources.Add(output + CompilationTask.LexerData);
+                compilerparams.EmbeddedResources.Add(output + CompilationTask.ParserData);
+                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.LexerCode, output + CompilationTask.ParserCode });
+                foreach (CompilerError error in results.Errors)
+                    Console.WriteLine(error.ToString());
+                Assert.AreEqual(0, results.Errors.Count);
             	return results.CompiledAssembly;
 			}
         }
 
-        protected SyntaxTreeNode Parse(Assembly assembly, string input, out bool errors)
+        protected CSTNode Parse(Assembly assembly, string input, out bool errors)
         {
             Type lexerType = null;
             Type parserType = null;
             Type[] types = assembly.GetTypes();
             for (int i = 0; i != types.Length; i++)
             {
-                if (types[i].BaseType == typeof(LexerText))
+                if (types[i].BaseType == typeof(TextLexer))
                     lexerType = types[i];
-                else if (types[i].BaseType == typeof(LR0BaseParser))
+                else if (types[i].BaseType == typeof(LRkParser))
                     parserType = types[i];
-                else if (types[i].BaseType == typeof(LR1BaseParser))
-                    parserType = types[i];
-                else if (types[i].BaseType == typeof(BaseRNGLR1Parser))
-                    parserType = types[i];
-                else if (types[i].BaseType == typeof(LRStarBaseParser))
+                else if (types[i].BaseType == typeof(RNGLRParser))
                     parserType = types[i];
             }
             Type actionType = parserType.GetNestedType("Actions");
@@ -113,7 +123,7 @@ namespace Hime.Tests
                 parser = parserConstructor.Invoke(new object[] { lexer }) as IParser;
             else
                 parser = parserConstructor.Invoke(new object[] { lexer, null }) as IParser;
-            SyntaxTreeNode root = parser.Analyse();
+            CSTNode root = parser.Parse();
             errors = (parser.Errors.Count != 0);
             return root;
         }

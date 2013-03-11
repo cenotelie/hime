@@ -1,27 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Hime.Parsers;
 using System.IO;
+using Hime.CentralDogma;
 
 namespace Hime.Demo.Tasks
 {
     class Compile : IExecutable
     {
+        private string file;
+        private string grammar;
+        private string nmspce;
+        private ParsingMethod method;
+
+        public Compile(string file, string grammar, string nmspce, ParsingMethod method)
+        {
+            this.file = file;
+            this.grammar = grammar;
+            this.nmspce = nmspce;
+            this.method = method;
+        }
+
         public void Execute()
         {
             CompilationTask task = new CompilationTask();
-            task.Method = ParsingMethod.RNGLALR1;
-            task.Namespace = "Hime.Demo.Generated.ECMA";
+            task.Method = method;
+            task.Namespace = nmspce;
             task.ExportLog = true;
-            task.ExportDocumentation = true;
-            task.ExportVisuals = false;
-            task.InputFiles.Add("Languages\\ECMAScript.gram");
-			string path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-			path = Path.Combine(path, "Graphviz 2.28");
-			path = Path.Combine(path, "bin");
-			path = Path.Combine(path, "dot.exe");
-            task.DOTBinary = path;
+            task.ExportDocumentation = false;
+            task.InputFiles.Add(file);
+            task.GrammarName = this.grammar;
             task.Execute();
         }
     }

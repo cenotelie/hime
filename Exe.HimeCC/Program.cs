@@ -7,11 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Hime.Parsers;
 using CommandLine;
-using Hime.Utils.Reporting;
+using Hime.CentralDogma;
+using Hime.CentralDogma.Reporting;
 
-namespace Hime.HimeCC
+namespace Hime.Compiler
 {
     public static class Program
     {

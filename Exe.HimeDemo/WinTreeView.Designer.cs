@@ -1,4 +1,4 @@
-namespace LangTest
+namespace Hime.Demo
 {
     partial class WinTreeView
     {

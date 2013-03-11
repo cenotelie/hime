@@ -1,0 +1,14 @@
+﻿cf grammar Test2
+{
+	options
+	{
+		Axiom = "X";
+	}
+	terminals { }
+	rules {
+		A	-> 'a' ;
+		X	-> 'a' X ;
+		X	-> A X ;
+		X	->  ;
+	}
+}
