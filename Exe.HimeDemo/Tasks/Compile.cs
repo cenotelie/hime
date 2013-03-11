@@ -9,12 +9,14 @@ namespace Hime.Demo.Tasks
     class Compile : IExecutable
     {
         private string file;
+        private string grammar;
         private string nmspce;
         private ParsingMethod method;
 
-        public Compile(string file, string nmspce, ParsingMethod method)
+        public Compile(string file, string grammar, string nmspce, ParsingMethod method)
         {
             this.file = file;
+            this.grammar = grammar;
             this.nmspce = nmspce;
             this.method = method;
         }
@@ -27,6 +29,7 @@ namespace Hime.Demo.Tasks
             task.ExportLog = true;
             task.ExportDocumentation = false;
             task.InputFiles.Add(file);
+            task.GrammarName = this.grammar;
             task.Execute();
         }
     }

@@ -10,7 +10,6 @@ namespace Hime.Benchmark
         private int size;
         private int sampleSize;
         private bool doLexer;
-        private bool doRecognizer;
         private bool doParser;
         private int tokenCount;
 
@@ -21,25 +20,18 @@ namespace Hime.Benchmark
             output = "result.txt";
             size = 600;
             sampleSize = 20;
-            doLexer = true;
-            doRecognizer = true;
-            doParser = false;
+            doLexer = false;
+            doParser = true;
         }
 
         public void Run()
         {
-            Setup();
+            //Setup();
             if (doLexer)
             {
                 Console.WriteLine("-- lexer");
                 for (int i = 0; i != sampleSize; i++)
                     BenchmarkLexer(i);
-            }
-            if (doRecognizer)
-            {
-                Console.WriteLine("-- recognizer");
-                for (int i = 0; i != sampleSize; i++)
-                    BenchmarkRecognizer(i);
             }
             if (doParser)
             {
@@ -88,20 +80,6 @@ namespace Hime.Benchmark
             reader.Close();
             System.IO.File.AppendAllText(output, (int)span.TotalMilliseconds + "\n");
             Console.WriteLine("completed lexer[" + index + "]: " + (int)span.TotalMilliseconds + " ms");
-        }
-
-        private void BenchmarkRecognizer(int index)
-        {
-            System.IO.StreamReader reader = new System.IO.StreamReader(input);
-            Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(reader);
-            Generated.CD.FileCentralDogmaParser parser = new Generated.CD.FileCentralDogmaParser(lexer);
-            System.DateTime before = System.DateTime.Now;
-            parser.Recognize();
-            System.DateTime after = System.DateTime.Now;
-            System.TimeSpan span = after.Subtract(before);
-            reader.Close();
-            System.IO.File.AppendAllText(output, (int)span.TotalMilliseconds + "\n");
-            Console.WriteLine("completed recognizer[" + index + "]: " + (int)span.TotalMilliseconds + " ms");
         }
 
         private void BenchmarkParser(int index)

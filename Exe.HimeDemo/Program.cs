@@ -11,9 +11,8 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            //IExecutable executable = new Compile("Languages\\MathExp.gram", "Hime.Demo.Generated", ParsingMethod.LALR1);
-            //executable.Execute();
-            IExecutable executable = new ParseMathExp();
+            //IExecutable executable = new Compile("Languages\\FileCentralDogma.gram", "FileCentralDogma", "Hime.Demo.Generated", ParsingMethod.LALR1);
+            IExecutable executable = new ParseGrammar();
             executable.Execute();
         }
     }
