@@ -4,25 +4,20 @@
  * Time: 17:25
  * 
  */
-using System.Collections.Generic;
 
 namespace Hime.Redist.AST
 {
     class BuildNode
     {
         private CSTNode value;
-        private BuildNode parent;
-        private CSTNode originalParent;
+        private BuildNode[] children;
         private int action;
-        private bool visited;
-        private List<BuildNode> children;
 
-        public Symbols.Symbol Symbol { get { return value.Symbol; } }
+        public CSTNode Value { get { return value; } }
 
         public BuildNode(Symbols.Symbol symbol)
         {
             this.value = new CSTNode(symbol);
-            this.children = new List<BuildNode>();
         }
 
         public void SetAction(int action)
@@ -31,68 +26,108 @@ namespace Hime.Redist.AST
                 this.action = action;
         }
 
-        public void AppendChild(BuildNode child)
+        public void Build(BuildNode[] children, int length)
         {
-            child.parent = this;
-            child.originalParent = this.value;
-            this.children.Add(child);
+            if (action == Parsers.LRProduction.HeadReplace)
+                BuildReplaceable(children, length);
+            else
+                BuildNormal(children, length);
         }
 
-        public CSTNode GetTree()
+        private void BuildReplaceable(BuildNode[] children, int length)
         {
-            Stack<BuildNode> stack = new Stack<BuildNode>();
-            stack.Push(this);
-            BuildNode current = null;
-            while (stack.Count != 0)
+            int size = 0;
+            for (int i = 0; i != length; i++)
             {
-                current = stack.Peek();
-                if (current.visited)
+                BuildNode child = children[i];
+                switch (child.action)
                 {
-                    stack.Pop();
-                    // post-order
-                    // Drop replaced node
-                    if (current.action == Parsers.LRProduction.HeadReplace)
-                        continue;
-                    else if (current.action == Parsers.LRBytecode.PopPromote)
-                    {
-                        if (current.originalParent == current.parent.value)
+                    case Parsers.LRProduction.HeadReplace:
+                        size += child.children.Length;
+                        break;
+                    case Parsers.LRBytecode.PopDrop:
+                        break;
+                    default:
+                        size++;
+                        break;
+                }
+            }
+            BuildNode[] replacement = new BuildNode[size];
+            int index = 0;
+            for (int i = 0; i != length; i++)
+            {
+                BuildNode child = children[i];
+                switch (child.action)
+                {
+                    case Parsers.LRProduction.HeadReplace:
+                        System.Array.Copy(child.children, 0, replacement, index, child.children.Length);
+                        index += child.children.Length;
+                        child.children = null;
+                        break;
+                    case Parsers.LRBytecode.PopDrop:
+                        break;
+                    default:
+                        replacement[index] = child;
+                        index++;
+                        break;
+                }
+            }
+            this.children = replacement;
+        }
+
+        private void BuildNormal(BuildNode[] children, int length)
+        {
+            bool firstPromote = true;
+            for (int i = 0; i != length; i++)
+            {
+                BuildNode child = children[i];
+                switch (child.action)
+                {
+                    case Parsers.LRProduction.HeadReplace:
+                        foreach (BuildNode subchild in child.children)
+                            firstPromote = ExecuteReplacement(subchild, firstPromote);
+                        child.children = null;
+                        break;
+                    case Parsers.LRBytecode.PopDrop:
+                        break;
+                    case Parsers.LRBytecode.PopPromote:
+                        if (firstPromote)
                         {
-                            // This is the first promote action found for this level
-                            // move the parent's children onto self's children
-                            current.value.Children.InsertRange(0, current.originalParent.Children);
-                            // replace the parent by self
-                            current.parent.value = current.value;
+                            child.value.Children.InsertRange(0, this.value.Children);
+                            this.value = child.value;
+                            firstPromote = false;
                         }
                         else
                         {
-                            // The original parent is not the same as the current parent, a promote action has already been executed
-                            // move the parent onto self's children
-                            current.value.Children.Insert(0, current.parent.value);
-                            // replace the parent by self
-                            current.parent.value = current.value;
+                            child.value.Children.Insert(0, this.value);
+                            this.value = child.value;
                         }
-                    }
-                    else if (current.parent != null) // current is not the root => setup as child
-                        current.parent.value.Children.Add(current.value);
-                }
-                else
-                {
-                    current.visited = true;
-                    // Pre-order
-                    for (int i = current.children.Count - 1; i != -1; i--)
-                    {
-                        BuildNode child = current.children[i];
-                        // prepare replace => setup parency
-                        if (current.action == Parsers.LRProduction.HeadReplace)
-                            child.parent = current.parent;
-                        // if action is drop => drop the child now by not adding it to the stack
-                        if (child.action == Parsers.LRBytecode.PopDrop)
-                            continue;
-                        stack.Push(child);
-                    }
+                        break;
+                    default:
+                        this.value.Children.Add(child.value);
+                        break;
                 }
             }
-            return current.value;
+        }
+
+        private bool ExecuteReplacement(BuildNode child, bool firstPromote)
+        {
+            if (child.action != Parsers.LRBytecode.PopPromote)
+            {
+                this.value.Children.Add(child.value);
+                return firstPromote;
+            }
+            else if (firstPromote)
+            {
+                child.value.Children.InsertRange(0, this.value.Children);
+                this.value = child.value;
+            }
+            else
+            {
+                child.value.Children.Insert(0, this.value);
+                this.value = child.value;
+            }
+            return false;
         }
     }
 }

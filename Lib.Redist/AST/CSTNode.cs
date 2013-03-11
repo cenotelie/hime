@@ -31,8 +31,8 @@ namespace Hime.Redist.AST
         /// <param name="symbol">The symbol represented by this node</param>
         public CSTNode(Symbols.Symbol symbol)
         {
-            this.children = new List<CSTNode>();
             this.symbol = symbol;
+            this.children = new List<CSTNode>();
         }
 
         /// <summary>

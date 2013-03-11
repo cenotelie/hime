@@ -23,11 +23,5 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         AST.CSTNode Parse();
-
-        /// <summary>
-        /// Parses the input and returns whether the input is recognized
-        /// </summary>
-        /// <returns>True if the input is recognized, false otherwise</returns>
-        bool Recognize();
     }
 }

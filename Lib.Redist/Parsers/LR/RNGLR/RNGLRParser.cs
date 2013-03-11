@@ -129,15 +129,6 @@ namespace Hime.Redist.Parsers
             return (result as AST.SPPFNode).GetFirstTree();
         }
 
-        /// <summary>
-        /// Parses the input and returns whether the input is recognized
-        /// </summary>
-        /// <returns>True if the input is recognized, false otherwise</returns>
-        public override bool Recognize()
-        {
-            return (Execute() != null);
-        }
-
         private AST.SPPFNode Execute()
         {
             nextToken = lexer.GetNextToken();

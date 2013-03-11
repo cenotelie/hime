@@ -20,15 +20,23 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Maximal size of the stack
         /// </summary>
-        protected const int maxStackSize = 100;
+        protected int maxStackSize = 100;
         /// <summary>
         /// Maximum number of errors
         /// </summary>
-        protected const int maxErrorCount = 100;
+        protected int maxErrorCount = 100;
         /// <summary>
         /// Maximum lenght of a rule
         /// </summary>
-        protected const int maxBodyLength = 20;
+        protected int maxBodyLength = 20;
+        /// <summary>
+        /// Determines whether the parser will try to recover from errors
+        /// </summary>
+        protected bool tryRecover = true;
+        /// <summary>
+        /// Determines whether the parser will execute the semantic actions
+        /// </summary>
+        protected bool executeActions = true;
 
         /// <summary>
         /// Parser's variables
@@ -42,11 +50,6 @@ namespace Hime.Redist.Parsers
         /// Parser's actions
         /// </summary>
         protected SemanticAction[] parserActions;
-
-        /// <summary>
-        /// Determine whether the parser will try to recover from errors
-        /// </summary>
-        protected bool tryRecover;
         /// <summary>
         /// List of the encountered syntaxic errors
         /// </summary>
@@ -60,21 +63,19 @@ namespace Hime.Redist.Parsers
         /// </summary>
         protected Lexer.TextLexer lexer;
 
+        
         /// <summary>
         /// Gets the variable symbols used by this parser
         /// </summary>
         public Utils.SymbolDictionary<Symbols.Variable> Variables { get { return parserVariables; } }
-
         /// <summary>
         /// Gets the virtual symbols used by this parser
         /// </summary>
         public Utils.SymbolDictionary<Symbols.Virtual> Virtuals { get { return parserVirtuals; } }
-
         /// <summary>
         /// Gets a read-only collection of syntaxic errors encountered by the parser
         /// </summary>
         public ICollection<ParserError> Errors { get { return readonlyErrors; } }
-
         /// <summary>
         /// Gets or sets whether the parser should try to recover from errors or fails immediatly
         /// </summary>
@@ -117,11 +118,5 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         public abstract AST.CSTNode Parse();
-
-        /// <summary>
-        /// Parses the input and returns whether the input is recognized
-        /// </summary>
-        /// <returns>True if the input is recognized, false otherwise</returns>
-        public abstract bool Recognize();
     }
 }
