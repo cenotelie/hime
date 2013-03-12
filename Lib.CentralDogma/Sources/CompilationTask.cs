@@ -5,8 +5,10 @@
  * 
  */
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Hime.Redist.AST;
 using Hime.Redist.Parsers;
@@ -18,26 +20,24 @@ namespace Hime.CentralDogma
     /// </summary>
     public sealed class CompilationTask
     {
-        internal const string LexerCode = "Lexer.cs";
-        internal const string LexerData = "Lexer.bin";
-        internal const string ParserCode = "Parser.cs";
-        internal const string ParserData = "Parser.bin";
-        internal const string Log = "Log.mht";
-        internal const string Doc = "Doc";
+        internal const string PostfixLexerCode = "Lexer.cs";
+        internal const string PostfixLexerData = "Lexer.bin";
+        internal const string PostfixParserCode = "Parser.cs";
+        internal const string PostfixParserData = "Parser.bin";
+        internal const string PostfixAssembly = ".dll";
+        internal const string PostfixLog = "Log.mht";
+        internal const string PostfixDoc = "Doc";
 
         /// <summary>
         /// Gets the compiler's version
         /// </summary>
         public string Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
-        
+
         /// <summary>
-        /// Gets the raw input strings
+        /// Gets ot sets the compiler's mode
         /// </summary>
-        public ICollection<string> InputRawData { get; private set; }
-        /// <summary>
-        /// Gets the input files
-        /// </summary>
-        public ICollection<string> InputFiles { get; private set; }
+        public CompilationMode Mode { get; set; }
+
         /// <summary>
         /// Gets or sets the name of the grammar to compile in the case where several grammars are loaded.
         /// If this property is not set, the first grammar to be found will be compiled.
@@ -48,6 +48,7 @@ namespace Hime.CentralDogma
         /// Gets or sets the parsing method to use
         /// </summary>
         public ParsingMethod Method { get; set; }
+        
         /// <summary>
         /// Gets ot sets the compiler's output files' prefix.
         /// If this property is not set, the name of the compiled grammar will be used as a prefix and the files output into the current directory
@@ -58,8 +59,18 @@ namespace Hime.CentralDogma
         /// Lexer data file:    ${prefix}Lexer.bin
         /// Parser code file:   ${prefix}Parser.cs
         /// Parser data file:   ${prefix}Parser.bin
+        /// Assembly:           ${prefix}.dll
         /// </remarks>
-        public string Output { get; set; }
+        public string OutputPrefix { get; set; }
+        /// <summary>
+        /// Gets or sets the flag to export the compilation log.
+        /// </summary>
+        public bool OutputLog { get; set; }
+        /// <summary>
+        /// Gets ot sets the flag to export the documentation about the compiled grammar.
+        /// </summary>
+        public bool OutputDocumentation { get; set; }
+
         /// <summary>
         /// Gets or sets the namespace in which the generated Lexer and Parser classes will be put.
         /// If this property is not set, the namespace will be the name of the grammar.
@@ -70,40 +81,39 @@ namespace Hime.CentralDogma
         /// The default value is Internal.
         /// </summary>
         public AccessModifier CodeAccess { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the flag to export the compilation log.
-        /// </summary>
-        public bool ExportLog { get; set; }
-        /// <summary>
-        /// Gets ot sets the flag to export the documentation about the compiled grammar.
-        /// </summary>
-        public bool ExportDocumentation { get; set; }
-        
 
-        private Dictionary<string, CompilerPlugin> plugins;
-        private Reporting.Reporter reporter;
-        private Dictionary<string, Grammars.Grammar> grammars;
-        private Dictionary<string, Grammars.GrammarLoader> loaders;
+        internal Dictionary<string, CompilerPlugin> plugins;
+        internal Reporting.Reporter reporter;
+        internal List<KeyValuePair<string, TextReader>> inputs;
+        internal Dictionary<string, Grammars.Grammar> grammars;
+        internal Dictionary<string, Grammars.GrammarLoader> loaders;
 
         /// <summary>
         /// Initializes a new compilation task
         /// </summary>
         public CompilationTask()
         {
-            InputRawData = new List<string>();
-            InputFiles = new List<string>();
-            Method = ParsingMethod.RNGLALR1;
-            ExportLog = false;
-            ExportDocumentation = false;
+            Mode = CompilationMode.Source;
+            Method = ParsingMethod.LALR1;
+            OutputLog = false;
+            OutputDocumentation = false;
             CodeAccess = AccessModifier.Internal;
 
             plugins = new Dictionary<string, CompilerPlugin>();
             plugins.Add("cf_grammar", new Grammars.ContextFree.CFPlugin());
             reporter = new Reporting.Reporter(typeof(CompilationTask));
+            inputs = new List<KeyValuePair<string, TextReader>>();
             grammars = new Dictionary<string, Grammars.Grammar>();
             loaders = new Dictionary<string, Grammars.GrammarLoader>();
         }
+
+        public void AddInputFile(string file) { inputs.Add(new KeyValuePair<string, TextReader>(file, new StreamReader(file))); }
+        public void AddInputRaw(string data) { inputs.Add(new KeyValuePair<string, TextReader>(null, new StringReader(data))); }
+        public void AddInputRaw(string name, string data) { inputs.Add(new KeyValuePair<string, TextReader>(name, new StringReader(data))); }
+        public void AddInputRaw(Stream stream) { inputs.Add(new KeyValuePair<string, TextReader>(null, new StreamReader(stream))); }
+        public void AddInputRaw(string name, Stream stream) { inputs.Add(new KeyValuePair<string, TextReader>(name, new StreamReader(stream))); }
+        public void AddInputRaw(TextReader reader) { inputs.Add(new KeyValuePair<string, TextReader>(null, reader)); }
+        public void AddInputRaw(string name, TextReader reader) { inputs.Add(new KeyValuePair<string, TextReader>(name, reader)); }
 
         public Reporting.Report Execute()
         {
@@ -116,8 +126,8 @@ namespace Hime.CentralDogma
             }
             reporter.EndSection();
 
-            if (ExportLog)
-                reporter.ExportMHTML(prefix + Log, "Compiler Log");
+            if (OutputLog)
+                reporter.ExportMHTML(prefix + PostfixLog, "Compiler Log");
             return reporter.Result;
         }
 
@@ -143,42 +153,54 @@ namespace Hime.CentralDogma
             Grammars.ParserData parserData = grammar.GetParserData(reporter, GetParserGenerator(Method));
 
             // Build names
-            string prefix = (Output != null) ? Output : grammar.Name;
+            string prefix = (OutputPrefix != null) ? OutputPrefix : grammar.Name;
             string nmspace = (Namespace != null) ? Namespace : grammar.Name;
 
             // Export lexer code
-            reporter.Info("Compiler", "Exporting lexer code at " + prefix + LexerCode + " ...");
-            StreamWriter txtOutput = OpenOutputStream(prefix + LexerCode, nmspace);
-            lexerData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + LexerData);
+            reporter.Info("Compiler", "Exporting lexer code at " + prefix + PostfixLexerCode + " ...");
+            StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace);
+            lexerData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
             CloseOutputStream(txtOutput);
             reporter.Info("Compiler", "Done!");
             
             // Export lexer data
-            reporter.Info("Compiler", "Exporting lexer data at " + prefix + LexerData + " ...");
-            BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + LexerData, FileMode.Create));
+            reporter.Info("Compiler", "Exporting lexer data at " + prefix + PostfixLexerData + " ...");
+            BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixLexerData, FileMode.Create));
             lexerData.ExportData(binOutput);
             binOutput.Close();
             reporter.Info("Compiler", "Done!");
             
             // Export parser code
-            reporter.Info("Compiler", "Exporting parser data at " + prefix + ParserCode + " ...");
-            txtOutput = OpenOutputStream(prefix + ParserCode, nmspace);
-            parserData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + ParserData, lexerData.Expected);
+            reporter.Info("Compiler", "Exporting parser data at " + prefix + PostfixParserCode + " ...");
+            txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace);
+            parserData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixParserData, lexerData.Expected);
             CloseOutputStream(txtOutput);
             reporter.Info("Compiler", "Done!");
 
             // Export parser data
-            reporter.Info("Compiler", "Exporting parser data at " + prefix + ParserData + " ...");
-            binOutput = new BinaryWriter(new FileStream(prefix + ParserData, FileMode.Create));
+            reporter.Info("Compiler", "Exporting parser data at " + prefix + PostfixParserData + " ...");
+            binOutput = new BinaryWriter(new FileStream(prefix + PostfixParserData, FileMode.Create));
             parserData.ExportData(binOutput);
             binOutput.Close();
             reporter.Info("Compiler", "Done!");
-            
-            // Export documentation
-            if (ExportDocumentation)
+
+            // Build assembly
+            if (Mode != CompilationMode.Source)
+                BuildAssembly(prefix);
+            // Cleanup
+            if (Mode == CompilationMode.Assembly)
             {
-                reporter.Info("Compiler", "Exporting parser documentation at " + prefix + Doc);
-                parserData.Document(prefix + Doc);
+                File.Delete(prefix + PostfixLexerCode);
+                File.Delete(prefix + PostfixLexerData);
+                File.Delete(prefix + PostfixParserCode);
+                File.Delete(prefix + PostfixParserData);
+            }
+
+            // Export documentation
+            if (OutputDocumentation)
+            {
+                reporter.Info("Compiler", "Exporting parser documentation at " + prefix + PostfixDoc);
+                parserData.Document(prefix + PostfixDoc);
                 reporter.Info("Compiler", "Done!");
             }
             return prefix;
@@ -186,28 +208,19 @@ namespace Hime.CentralDogma
 
         internal bool LoadInputs()
         {
-            foreach (string file in InputFiles)
-            {
-                TextReader reader = new StreamReader(file);
-                if (!LoadInput(file, reader))
+            foreach (KeyValuePair<string, TextReader> pair in inputs)
+                if (!LoadInput(pair.Key, pair.Value))
                     return false;
-            }
-            foreach (string data in InputRawData)
-            {
-                TextReader reader = new StringReader(data);
-                if (!LoadInput(null, reader))
-                    return false;
-            }
             return true;
         }
 
-        internal bool LoadInput(string file, TextReader reader)
+        internal bool LoadInput(string name, TextReader reader)
         {
             bool hasErrors = false;
-            if (file != null)
-                reporter.Info("Compiler", "Loading compilation unit " + file);
+            if (name != null)
+                reporter.Info("Compiler", "Loading compilation unit " + name);
             else
-                reporter.Info("Compiler", "Loading compilation unit from raw resources");
+                reporter.Info("Compiler", "Loading compilation unit from unnamed resources");
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
             CSTNode root = null;
@@ -238,6 +251,7 @@ namespace Hime.CentralDogma
                     loaders.Add(loader.Name, loader);
                 }
             }
+            reader.Close();
             return !hasErrors;
         }
 
@@ -330,6 +344,28 @@ namespace Hime.CentralDogma
         {
             writer.WriteLine("}");
             writer.Close();
+        }
+
+        internal void BuildAssembly(string prefix)
+        {
+            reporter.Info("Compiler", "Building assembly " + prefix + PostfixAssembly + " ...");
+            string redist = Assembly.GetAssembly(typeof(BaseLRParser)).Location;
+            using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
+            {
+                CompilerParameters compilerparams = new CompilerParameters();
+                compilerparams.GenerateExecutable = false;
+                compilerparams.GenerateInMemory = false;
+                compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
+                compilerparams.ReferencedAssemblies.Add("System.dll");
+                compilerparams.ReferencedAssemblies.Add(redist);
+                compilerparams.EmbeddedResources.Add(prefix + PostfixLexerData);
+                compilerparams.EmbeddedResources.Add(prefix + PostfixParserData);
+                compilerparams.OutputAssembly = prefix + PostfixAssembly;
+                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { prefix + PostfixLexerCode, prefix + PostfixParserCode });
+                foreach (CompilerError error in results.Errors)
+                    reporter.Error("Compiler", error.ToString());
+            }
+            reporter.Info("Compiler", "Done!");
         }
     }
 }

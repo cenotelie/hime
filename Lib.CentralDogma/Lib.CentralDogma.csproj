@@ -89,6 +89,7 @@
     <Compile Include="Sources\Automata\NFAStateSet.cs" />
     <Compile Include="Sources\Automata\NFATransition.cs" />
     <Compile Include="Sources\AccessModifier.cs" />
+    <Compile Include="Sources\CompilationMode.cs" />
     <Compile Include="Sources\CompilationTask.cs" />
     <Compile Include="Sources\CompilerPlugin.cs" />
     <Compile Include="Sources\Grammars\GrammarLoader.cs" />
@@ -217,7 +218,7 @@
     <EmbeddedResource Include="Resources\Transforms\Doc.Grammar.xslt">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="Sources\Input\FileCentralDogma.gram" />
+    <EmbeddedResource Include="Sources\Input\FileCentralDogma.gram" />
     <EmbeddedResource Include="Sources\Input\FileCentralDogmaLexer.bin" />
     <EmbeddedResource Include="Sources\Input\FileCentralDogmaParser.bin" />
     <None Include="Sources\Input\generate.bat" />
