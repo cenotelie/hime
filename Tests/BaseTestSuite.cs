@@ -60,17 +60,17 @@ namespace Hime.Tests
         {
             CompilationTask task = new CompilationTask();
             task.Method = method;
-            task.InputRawData.Add(rawInput);
-            task.Output = output;
+            task.AddInputRaw(rawInput);
+            task.OutputPrefix = output;
             return task.Execute();
         }
         protected Report CompileRaw(string rawInput, ParsingMethod method, bool log)
         {
             CompilationTask task = new CompilationTask();
             task.Method = method;
-            task.InputRawData.Add(rawInput);
-            task.Output = output;
-            task.ExportLog = log;
+            task.AddInputRaw(rawInput);
+            task.OutputPrefix = output;
+            task.OutputLog = log;
             return task.Execute();
         }
 
@@ -85,9 +85,9 @@ namespace Hime.Tests
             	compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
             	compilerparams.ReferencedAssemblies.Add("System.dll");
                 compilerparams.ReferencedAssemblies.Add(redist);
-                compilerparams.EmbeddedResources.Add(output + CompilationTask.LexerData);
-                compilerparams.EmbeddedResources.Add(output + CompilationTask.ParserData);
-                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.LexerCode, output + CompilationTask.ParserCode });
+                compilerparams.EmbeddedResources.Add(output + CompilationTask.PostfixLexerData);
+                compilerparams.EmbeddedResources.Add(output + CompilationTask.PostfixParserData);
+                CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { output + CompilationTask.PostfixLexerCode, output + CompilationTask.PostfixParserCode });
                 foreach (CompilerError error in results.Errors)
                     Console.WriteLine(error.ToString());
                 Assert.AreEqual(0, results.Errors.Count);

@@ -26,9 +26,9 @@ namespace Hime.Demo.Tasks
             CompilationTask task = new CompilationTask();
             task.Method = method;
             task.Namespace = nmspce;
-            task.ExportLog = true;
-            task.ExportDocumentation = false;
-            task.InputFiles.Add(file);
+            task.OutputLog = true;
+            task.OutputDocumentation = false;
+            task.AddInputFile(file);
             task.GrammarName = this.grammar;
             task.Execute();
         }

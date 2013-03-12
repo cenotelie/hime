@@ -75,12 +75,12 @@ namespace Hime.Compiler
 
 			CompilationTask task = new CompilationTask();
             task.Namespace = this.outputNamespace;
-            foreach (string input in this.inputs) task.InputFiles.Add(input);
+            foreach (string input in this.inputs) task.AddInputFile(input);
             task.GrammarName = this.grammarName;
             task.Method = this.method;
-            task.Output = this.output;
-            task.ExportLog = this.exportLog;
-            task.ExportDocumentation = this.exportDocumentation;
+            task.OutputPrefix = this.output;
+            task.OutputLog = this.exportLog;
+            task.OutputDocumentation = this.exportDocumentation;
 			return task;
 		}
 	}

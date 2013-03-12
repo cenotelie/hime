@@ -40,31 +40,31 @@ namespace Hime.Tests.HimeCC
         public void Test003_BuildCompilationTaskFromArguments_DefaultOutput()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
-            Assert.IsNull(task.Output);
+            Assert.IsNull(task.OutputPrefix);
         }
 
         [Test]
         public void Test004_BuildCompilationTaskFromArguments_DefaultLogExport()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
-            Assert.IsFalse(task.ExportLog);
+            Assert.IsFalse(task.OutputLog);
         }
 
         [Test]
         public void Test005_BuildCompilationTaskFromArguments_DefaultDocExport()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
-            Assert.IsFalse(task.ExportDocumentation);
+            Assert.IsFalse(task.OutputDocumentation);
         }
 
         [Test]
         public void Test006_BuildCompilationTaskFromArguments_DefaultInput()
         {
             CompilationTask task = this.options.BuildCompilationTaskFromArguments(defaultCommand);
-            Assert.AreEqual(task.InputFiles.Count, 1);
-			foreach (string input in task.InputFiles)
+            Assert.AreEqual(task.inputs.Count, 1);
+			foreach (System.Collections.Generic.KeyValuePair<string, System.IO.TextReader> input in task.inputs)
 			{
-            	Assert.AreEqual(input, defaultCommand[0]);
+            	Assert.AreEqual(input.Key, defaultCommand[0]);
 			}
         }
 

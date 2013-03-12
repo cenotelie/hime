@@ -43,7 +43,7 @@ namespace Hime.Tests.CentralDogma
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
+            task.AddInputRaw(grammar);
             task.Execute();
             Assert.IsTrue(File.Exists("TestLexer.cs"));
         }
@@ -56,7 +56,7 @@ namespace Hime.Tests.CentralDogma
         		"cf grammar Test { options { Axiom=\"exp\"; } rules { exp -> 'x'; } }";
             CompilationTask task = new CompilationTask();
             task.Method = ParsingMethod.LR0;
-            task.InputRawData.Add(grammar);
+            task.AddInputRaw(grammar);
             task.Execute();
             Assert.IsTrue(File.Exists("TestParser.cs"));
         }
