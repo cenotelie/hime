@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Reflection;
+using Hime.CentralDogma;
+using System.IO;
 
 namespace Hime.Benchmark
 {
     class Benchmark
     {
+        private ParsingMethod method;
         private string language;
         private string input;
         private string output;
@@ -12,21 +16,23 @@ namespace Hime.Benchmark
         private bool doLexer;
         private bool doParser;
         private int tokenCount;
-
-        public Benchmark()
+        private Assembly assembly;
+        
+        public Benchmark(ParsingMethod method, bool lexer, bool parser)
         {
-            language = "CSharp4.gram";
-            input = "Perf.gram";
-            output = "result.txt";
-            size = 600;
-            sampleSize = 20;
-            doLexer = false;
-            doParser = true;
+            this.method = method;
+            this.language = "CSharp4.gram";
+            this.input = "Perf.gram";
+            this.output = "result.txt";
+            this.size = 600;
+            this.sampleSize = 20;
+            this.doLexer = lexer;
+            this.doParser = parser;
         }
 
         public void Run()
         {
-            //Setup();
+            Setup();
             if (doLexer)
             {
                 Console.WriteLine("-- lexer");
@@ -43,16 +49,34 @@ namespace Hime.Benchmark
 
         private void Setup()
         {
-            if (System.IO.File.Exists(input))
-                System.IO.File.Delete(input);
+            // Build parser assembly
+            System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+            CompilationTask task = new CompilationTask();
+            task.Mode = CompilationMode.Assembly;
+            task.AddInputRaw(stream);
+            task.Namespace = "Hime.Benchmark.Generated";
+            task.GrammarName = "FileCentralDogma";
+            task.CodeAccess = AccessModifier.Public;
+            task.Method = method;
+            task.Execute();
+            assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
+
             if (System.IO.File.Exists(output))
                 System.IO.File.Delete(output);
 
-            string content = System.IO.File.ReadAllText("Languages\\" + language);
+            // Build input
+            stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Hime.Benchmark.Languages." + language);
+            System.IO.StreamReader reader = new System.IO.StreamReader(stream);
+            string content = reader.ReadToEnd();
+            reader.Close();
+            if (System.IO.File.Exists(input))
+                System.IO.File.Delete(input);
             for (int i = 0; i != size; i++)
                 System.IO.File.AppendAllText(input, content);
-            System.IO.StreamReader reader = new System.IO.StreamReader(input);
-            Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(reader);
+            
+            // Get input's statistics
+            reader = new System.IO.StreamReader(input);
+            Hime.Redist.Lexer.TextLexer lexer = GetLexer(reader);
             Hime.Redist.Symbols.Token token = lexer.GetNextToken();
             while (token.SymbolID != 1)
             {
@@ -64,10 +88,28 @@ namespace Hime.Benchmark
             Console.WriteLine("-- completed setup: " + tokenCount + " tokens");
         }
 
+        private Hime.Redist.Lexer.TextLexer GetLexer(System.IO.StreamReader reader)
+        {
+            Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
+            ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
+            object lexer = lexerConstructor.Invoke(new object[] { reader });
+            return lexer as Hime.Redist.Lexer.TextLexer;
+        }
+
+        private Hime.Redist.Parsers.BaseLRParser GetParser(System.IO.StreamReader reader)
+        {
+            Hime.Redist.Lexer.TextLexer lexer = GetLexer(reader);
+            Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
+            Type parserType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaParser");
+            ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
+            object parser = parserConstructor.Invoke(new object[] { lexer });
+            return parser as Hime.Redist.Parsers.BaseLRParser;
+        }
+
         private void BenchmarkLexer(int index)
         {
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
-            Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(reader);
+            Hime.Redist.Lexer.TextLexer lexer = GetLexer(reader);
             System.DateTime before = System.DateTime.Now;
             Hime.Redist.Symbols.Token token = lexer.GetNextToken();
             while (token.SymbolID != 1)
@@ -85,8 +127,7 @@ namespace Hime.Benchmark
         private void BenchmarkParser(int index)
         {
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
-            Generated.CD.FileCentralDogmaLexer lexer = new Generated.CD.FileCentralDogmaLexer(reader);
-            Generated.CD.FileCentralDogmaParser parser = new Generated.CD.FileCentralDogmaParser(lexer);
+            Hime.Redist.Parsers.BaseLRParser parser = GetParser(reader);
             System.DateTime before = System.DateTime.Now;
             parser.Parse();
             System.DateTime after = System.DateTime.Now;
