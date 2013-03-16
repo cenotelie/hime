@@ -8,13 +8,31 @@ using System.Xml;
 
 namespace Hime.CentralDogma.Reporting
 {
+    /// <summary>
+    /// Represents an entry in a report
+    /// </summary>
     public class Entry
     {
 		// TODO: maybe could add position in file
+        /// <summary>
+        /// Gets the entry's level
+        /// </summary>
         public virtual ELevel Level { get; set; }
+        /// <summary>
+        /// Gets the component that emited this entry
+        /// </summary>
         public virtual string Component { get; set; }
+        /// <summary>
+        /// Gets the entry's message
+        /// </summary>
         public virtual string Message { get; private set; }
 		
+        /// <summary>
+        /// Initializes the entry
+        /// </summary>
+        /// <param name="level">The entry's level</param>
+        /// <param name="component">The emiting component</param>
+        /// <param name="message">The entry's message</param>
 		public Entry(ELevel level, string component, string message)
 		{
             this.Level = level;
@@ -22,6 +40,11 @@ namespace Hime.CentralDogma.Reporting
             this.Message = message;
         }
 
+        /// <summary>
+        /// Buils the XML node corresponding to the entry
+        /// </summary>
+        /// <param name="document">The parent XML document</param>
+        /// <returns>The XML node</returns>
         public virtual XmlNode GetMessageNode(XmlDocument document)
         {
             XmlNode element = document.CreateElement("Message");
@@ -29,6 +52,10 @@ namespace Hime.CentralDogma.Reporting
             return element;
         }
 		
+        /// <summary>
+        /// Gets a string representation of this entry
+        /// </summary>
+        /// <returns>A string representation of this entry</returns>
 		public override string ToString ()
 		{
 			return this.Level + ": " + this.Component + ": " + this.Message;

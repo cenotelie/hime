@@ -107,14 +107,49 @@ namespace Hime.CentralDogma
             loaders = new Dictionary<string, Grammars.GrammarLoader>();
         }
 
+        /// <summary>
+        /// Adds a new file as input
+        /// </summary>
+        /// <param name="file">The input file</param>
         public void AddInputFile(string file) { inputs.Add(new KeyValuePair<string, TextReader>(file, new StreamReader(file))); }
+        /// <summary>
+        /// Adds a new data string as input
+        /// </summary>
+        /// <param name="data">The data string</param>
         public void AddInputRaw(string data) { inputs.Add(new KeyValuePair<string, TextReader>(null, new StringReader(data))); }
+        /// <summary>
+        /// Adds a new named data string as input
+        /// </summary>
+        /// <param name="name">The input's name</param>
+        /// <param name="data">The data string</param>
         public void AddInputRaw(string name, string data) { inputs.Add(new KeyValuePair<string, TextReader>(name, new StringReader(data))); }
+        /// <summary>
+        /// Adds a new data stream as input
+        /// </summary>
+        /// <param name="stream">The input stream</param>
         public void AddInputRaw(Stream stream) { inputs.Add(new KeyValuePair<string, TextReader>(null, new StreamReader(stream))); }
+        /// <summary>
+        /// Adds a new named data stream as input
+        /// </summary>
+        /// <param name="name">The input's name</param>
+        /// <param name="stream">The input stream</param>
         public void AddInputRaw(string name, Stream stream) { inputs.Add(new KeyValuePair<string, TextReader>(name, new StreamReader(stream))); }
+        /// <summary>
+        /// Adds a new data reader as input
+        /// </summary>
+        /// <param name="reader">The input reader</param>
         public void AddInputRaw(TextReader reader) { inputs.Add(new KeyValuePair<string, TextReader>(null, reader)); }
+        /// <summary>
+        /// Adds a new named data reader as input
+        /// </summary>
+        /// <param name="name">The input's name</param>
+        /// <param name="reader">The input reader</param>
         public void AddInputRaw(string name, TextReader reader) { inputs.Add(new KeyValuePair<string, TextReader>(name, reader)); }
 
+        /// <summary>
+        /// Executes this compilation task
+        /// </summary>
+        /// <returns>The compilation report</returns>
         public Reporting.Report Execute()
         {
             string prefix = null;

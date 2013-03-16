@@ -9,15 +9,27 @@ using System.Xml;
 
 namespace Hime.CentralDogma.Reporting
 {
+    /// <summary>
+    /// Represents an entry corresponding to an exception
+    /// </summary>
     public sealed class ExceptionEntry : Entry
     {
         private Exception exception;
 
+        /// <summary>
+        /// Initializes the entry with an exception
+        /// </summary>
+        /// <param name="exception">The exception to report</param>
         public ExceptionEntry(Exception exception) : base(ELevel.Error, "Compiler", "Exception " + exception.Message)
 		{ 
 			this.exception = exception;
 		}
 
+        /// <summary>
+        /// Buils the XML node corresponding to the entry
+        /// </summary>
+        /// <param name="doc">The parent XML document</param>
+        /// <returns>The XML node</returns>
         public override XmlNode GetMessageNode(XmlDocument doc)
         {
             XmlNode element = doc.CreateElement("Exception");

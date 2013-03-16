@@ -10,26 +10,47 @@ using System.Xml;
 
 namespace Hime.CentralDogma.Reporting
 {
+    /// <summary>
+    /// Represents a group of entries in a report
+    /// </summary>
     public sealed class Section
     {
         private List<Entry> entries;
         private string name;
 
+        /// <summary>
+        /// Gets the collection of entries in this section
+        /// </summary>
         public ICollection<Entry> Entries { get { return entries; } }
+        /// <summary>
+        /// Gets the name of this section
+        /// </summary>
         public string Name { get { return name; } }
 
+        /// <summary>
+        /// Initializes a new section with the given name
+        /// </summary>
+        /// <param name="name">Name of the section</param>
         public Section(string name)
         {
             this.name = name;
             this.entries = new List<Entry>();
         }
 
+        /// <summary>
+        /// Adds a new entry in this section
+        /// </summary>
+        /// <param name="entry">Entry to add</param>
         public void AddEntry(Entry entry)
         {
             this.entries.Add(entry);
         }
 
-
+        /// <summary>
+        /// Gets the XML serialization of this section
+        /// </summary>
+        /// <param name="doc">The parent XML document</param>
+        /// <returns>The XML node corresponding to this section</returns>
         public XmlNode GetXMLNode(XmlDocument doc)
         {
             XmlNode node = doc.CreateElement("Section");

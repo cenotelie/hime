@@ -12,7 +12,9 @@ using System.Text;
 
 namespace Hime.CentralDogma
 {
-	// TODO: why is this class needed? Think about it
+	/// <summary>
+	/// Provides an API for the access to the resources embedded within an assembly and keeps track of which resource has been exported
+	/// </summary>
     public sealed class ResourceAccessor : IDisposable
 	{
         private static List<ResourceAccessor> accessors = new List<ResourceAccessor>();
@@ -23,9 +25,21 @@ namespace Hime.CentralDogma
         private List<string> files;
         private List<Stream> streams;
 
+        /// <summary>
+        /// Gets a collection of the files that have been exported
+        /// </summary>
         public ICollection<string> Files { get { return files; } }
 
-        public ResourceAccessor() : this(Assembly.GetExecutingAssembly(), "Resources") { }
+        /// <summary>
+        /// Initializes the accessor for the CentralDogma assembly
+        /// </summary>
+        internal ResourceAccessor() : this(Assembly.GetExecutingAssembly(), "Resources") { }
+
+        /// <summary>
+        /// Initializes an accessor for the given assembly
+        /// </summary>
+        /// <param name="assembly">The assembly to explore</param>
+        /// <param name="defaultPath">The default path to resources within the assembly</param>
         public ResourceAccessor(Assembly assembly, string defaultPath)
         {
             accessors.Add(this);
@@ -36,6 +50,9 @@ namespace Hime.CentralDogma
             this.streams = new List<Stream>();
         }
 
+        /// <summary>
+        /// Disposes of the exported files and closes the open streams to the resources
+        /// </summary>
         public void Dispose()
         {
             foreach (string file in files) File.Delete(file);
@@ -43,11 +60,20 @@ namespace Hime.CentralDogma
             accessors.Remove(this);
         }
 
+        /// <summary>
+        /// Register an external file as an exported resource so that it can be removed on disposal
+        /// </summary>
+        /// <param name="fileName">The path and file name</param>
         public void AddCheckoutFile(string fileName)
         {
             files.Add(fileName);
         }
 
+        /// <summary>
+        /// Checks out a resource and exports it as a file
+        /// </summary>
+        /// <param name="resourceName">The resource to export</param>
+        /// <param name="fileName">The file that will contain the resource</param>
         public void CheckOut(string resourceName, string fileName)
         {
 			Export(resourceName, fileName);
@@ -64,12 +90,22 @@ namespace Hime.CentralDogma
 			}
 		}
 		
+        /// <summary>
+        /// Exports a resource to a file without keeping a record of it
+        /// </summary>
+        /// <param name="resourceName">The resource to export</param>
+        /// <param name="fileName">The file that will contain the resource</param>
         public void Export(string resourceName, string fileName)
         {
             byte[] buffer = this.ReadResource(resourceName);
             File.WriteAllBytes(fileName, buffer);
         }
 
+        /// <summary>
+        /// Gets a stream on a resource
+        /// </summary>
+        /// <param name="resourceName">the resource</param>
+        /// <returns>A stream to the required resource, or null if it does not exists</returns>
         public Stream GetStreamFor(string resourceName)
         {
             Stream stream = this.assembly.GetManifestResourceStream(defaultPath + resourceName);
@@ -78,6 +114,11 @@ namespace Hime.CentralDogma
             return stream;
         }
 
+        /// <summary>
+        /// Exports a resource as a string
+        /// </summary>
+        /// <param name="resourceName">The resource</param>
+        /// <returns>The string representation of the resource</returns>
         public string GetAllTextFor(string resourceName)
 		{
 			byte[] buffer = ReadResource(resourceName);

@@ -16,13 +16,24 @@ namespace Hime.CentralDogma.Reporting
 	public sealed class Report
 	{
 		// TODO: maybe would be more convenient to have a dictionary from section name to sections
+        /// <summary>
+        /// Gets a list of the sections in this report
+        /// </summary>
         public List<Section> Sections { get; private set; }
 
+        /// <summary>
+        /// Initializes a new report
+        /// </summary>
         public Report()
         {
             this.Sections = new List<Section>();
         }
 
+        /// <summary>
+        /// Adds a new section to this report
+        /// </summary>
+        /// <param name="name">The new section's name</param>
+        /// <returns>The new section</returns>
         public Section AddSection(string name)
         {
             Section section = new Section(name);
@@ -31,6 +42,11 @@ namespace Hime.CentralDogma.Reporting
         }
 		
 		// TODO: maybe the title could be passed to the Report constructor instead? think about it
+        /// <summary>
+        /// Export the report to an XML document
+        /// </summary>
+        /// <param name="title">Title of the report</param>
+        /// <returns>The XML document</returns>
         public XmlDocument ToXmlDocument(string title)
         {
             XmlDocument result = new XmlDocument();
@@ -46,6 +62,9 @@ namespace Hime.CentralDogma.Reporting
             return result;
         }
         
+        /// <summary>
+        /// Gets whether the report contains errors
+        /// </summary>
         public bool HasErrors
         {
         	get 
@@ -61,6 +80,9 @@ namespace Hime.CentralDogma.Reporting
         	}
         }
 		
+        /// <summary>
+        /// Gets the number of errors in the report
+        /// </summary>
 		public int ErrorCount
 		{
 			get
@@ -77,6 +99,9 @@ namespace Hime.CentralDogma.Reporting
 			}
 		}
 		
+        /// <summary>
+        /// Gets a list of the errors in the report
+        /// </summary>
 		public IEnumerable<Entry> Errors
 		{
 			get

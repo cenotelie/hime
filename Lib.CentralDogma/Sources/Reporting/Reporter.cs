@@ -12,6 +12,9 @@ using System.IO;
 
 namespace Hime.CentralDogma.Reporting
 {
+    /// <summary>
+    /// Represents a logger for the CentralDogma assembly
+    /// </summary>
     public sealed class Reporter
     {
         private Report report;
@@ -19,6 +22,9 @@ namespace Hime.CentralDogma.Reporting
         private Section currentSection;
         private ILog log;
 
+        /// <summary>
+        /// Gets the current log
+        /// </summary>
         public Report Result { get { return report; } }
 
         private static bool configured = false;
@@ -32,6 +38,10 @@ namespace Hime.CentralDogma.Reporting
             configured = true;
         }
 
+        /// <summary>
+        /// Initializes the reporter for the given type
+        /// </summary>
+        /// <param name="type"></param>
         public Reporter(System.Type type)
         {
             Configure();
@@ -39,30 +49,61 @@ namespace Hime.CentralDogma.Reporting
             report = new Report();
         }
 
+        /// <summary>
+        /// Begins a new section in the log
+        /// </summary>
+        /// <param name="name">The new section's name</param>
         public void BeginSection(string name) { currentSection = report.AddSection(name); }
+        /// <summary>
+        /// Ends the current section in the log
+        /// </summary>
         public void EndSection() { currentSection = null; }
 
+        /// <summary>
+        /// Adds a new info entry to the log
+        /// </summary>
+        /// <param name="component">The component's emiting the entry</param>
+        /// <param name="message">The info message</param>
         public void Info(string component, string message)
         {
             AddEntry(new Entry(ELevel.Info, component, message));
             log.Info(component + ": " + message);
         }
+        /// <summary>
+        /// Adds a new warning entry in the log
+        /// </summary>
+        /// <param name="component">The component's emiting the entry</param>
+        /// <param name="message">The info message</param>
         public void Warn(string component, string message)
         {
             AddEntry(new Entry(ELevel.Warning, component, message));
             log.Warn(component + ": " + message);
         }
+        /// <summary>
+        /// Adds a new error entry in the log
+        /// </summary>
+        /// <param name="component">The component's emiting the entry</param>
+        /// <param name="message">The info message</param>
         public void Error(string component, string message)
         {
             AddEntry(new Entry(ELevel.Error, component, message));
             log.Error(component + ": " + message);
         }
+        /// <summary>
+        /// Adds a new fatal error in the log
+        /// </summary>
+        /// <param name="component">The component's emiting the entry</param>
+        /// <param name="message">The info message</param>
         public void Fatal(string component, string message)
         {
             AddEntry(new Entry(ELevel.Error, component, message));
             log.Fatal(component + ": " + message);
         }
 		
+        /// <summary>
+        /// Adds a new entry in the log
+        /// </summary>
+        /// <param name="entry">The entry to add</param>
         public void Report(Entry entry)
         {
             AddEntry(entry);
@@ -74,6 +115,10 @@ namespace Hime.CentralDogma.Reporting
             }
         }
 		
+        /// <summary>
+        /// Adds a new entry reporting an exception in the log
+        /// </summary>
+        /// <param name="exception">The exception to report</param>
         public void Report(Exception exception)
         {
             Report(new ExceptionEntry(exception));
@@ -95,6 +140,11 @@ namespace Hime.CentralDogma.Reporting
 			section.AddEntry(entry);
         }
 
+        /// <summary>
+        /// Export the current log as an MHTML file
+        /// </summary>
+        /// <param name="fileName">Name of the file to export to</param>
+        /// <param name="title">Title of the log</param>
         public void ExportMHTML(string fileName, string title)
         {
             XmlDocument document = report.ToXmlDocument(title);
