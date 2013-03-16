@@ -72,26 +72,17 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Generated\FileCentralDogmaLexer.cs" />
-    <Compile Include="Generated\FileCentralDogmaParser.cs" />
-    <Compile Include="Generated\MathExpLexer.cs" />
-    <Compile Include="Generated\MathExpParser.cs" />
     <Compile Include="IExecutable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\Compile.cs" />
+    <Compile Include="Tasks\ParseTest.cs" />
     <Compile Include="Tasks\ParseGrammar.cs" />
-    <Compile Include="Tasks\ParseRNGLR.cs" />
     <Compile Include="WinTreeView.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="WinTreeView.Designer.cs">
       <DependentUpon>WinTreeView.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Generated\MathExpLexer.bin" />
-    <EmbeddedResource Include="Generated\MathExpParser.bin" />
-    <EmbeddedResource Include="Generated\FileCentralDogmaLexer.bin" />
-    <EmbeddedResource Include="Generated\FileCentralDogmaParser.bin" />
     <None Include="Languages\ANSI_C.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

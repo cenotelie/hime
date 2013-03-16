@@ -44,7 +44,7 @@ namespace Hime.Demo.Tasks
 
         public void Execute()
         {
-            stack = new Stack<float>();
+            /*stack = new Stack<float>();
             Generated.MathExpParser.Actions actions = new Generated.MathExpParser.Actions();
             actions.OnNumber = new SemanticAction(OnNumber);
             actions.OnMult = new SemanticAction(OnMult);
@@ -62,7 +62,7 @@ namespace Hime.Demo.Tasks
             else
                 Console.WriteLine("Result = " + stack.Peek());
             WinTreeView win = new WinTreeView(root);
-            win.ShowDialog();
+            win.ShowDialog();*/
         }
     }
 }

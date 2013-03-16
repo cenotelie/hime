@@ -9,24 +9,23 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
-    class ParseGrammar : IExecutable
+    class ParseTest : IExecutable
     {
         public void Execute()
         {
             // Build parser assembly
-            System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
             CompilationTask task = new CompilationTask();
             task.Mode = CompilationMode.Assembly;
-            task.AddInputRaw(stream);
-            task.Namespace = "Hime.Benchmark.Generated";
-            task.GrammarName = "FileCentralDogma";
+            task.AddInputFile("Languages\\Test2.gram");
+            task.Namespace = "Hime.Demo.Generated";
+            task.GrammarName = "Test2";
             task.CodeAccess = AccessModifier.Public;
             task.Method = ParsingMethod.RNGLALR1;
             task.Execute();
-            Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
+            Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "Test2.dll"));
 
             System.IO.StreamReader reader = new System.IO.StreamReader("Languages\\FileCentralDogma.gram");
-            Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, reader);
+            Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, new StringReader("aa"));
             Redist.AST.CSTNode root = parser.Parse();
             reader.Close();
             
@@ -38,19 +37,19 @@ namespace Hime.Demo.Tasks
             win.ShowDialog();
         }
 
-        private Hime.Redist.Lexer.TextLexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
+        private Hime.Redist.Lexer.TextLexer GetLexer(Assembly assembly, System.IO.TextReader reader)
         {
-            Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
+            Type lexerType = assembly.GetType("Hime.Demo.Generated.Test2Lexer");
             ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
             object lexer = lexerConstructor.Invoke(new object[] { reader });
             return lexer as Hime.Redist.Lexer.TextLexer;
         }
 
-        private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
+        private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.TextReader reader)
         {
             Hime.Redist.Lexer.TextLexer lexer = GetLexer(assembly, reader);
-            Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
-            Type parserType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaParser");
+            Type lexerType = assembly.GetType("Hime.Demo.Generated.Test2Lexer");
+            Type parserType = assembly.GetType("Hime.Demo.Generated.Test2Parser");
             ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
             object parser = parserConstructor.Invoke(new object[] { lexer });
             return parser as Hime.Redist.Parsers.BaseLRParser;
