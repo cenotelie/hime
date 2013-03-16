@@ -11,109 +11,87 @@ using System.Xml;
 namespace Hime.CentralDogma.Reporting
 {
 	/// <summary>
-	/// Description of Report.
+	/// Represents a compilation report
 	/// </summary>
 	public sealed class Report
 	{
-		// TODO: maybe would be more convenient to have a dictionary from section name to sections
+        private List<Entry> infos;
+        private List<Entry> warnings;
+        private List<Entry> errors;
+        private List<Entry> entries;
+        private string title;
+
         /// <summary>
-        /// Gets a list of the sections in this report
+        /// Gets whether the report contains errors
         /// </summary>
-        public List<Section> Sections { get; private set; }
+        public bool HasErrors { get { return (errors.Count > 0); } }
+        /// <summary>
+        /// Gets the number of errors in the report
+        /// </summary>
+        public int ErrorCount { get { return errors.Count; } }
+        /// <summary>
+        /// Gets a list of the errors in the report
+        /// </summary>
+        public IEnumerable<Entry> Errors { get { return errors; } }
+        /// <summary>
+        /// Gets a list of all the entries in order
+        /// </summary>
+        public IEnumerable<Entry> Entries { get { return entries; } }
+        /// <summary>
+        /// Gets the report's title
+        /// </summary>
+        public string Title { get { return title; } }
 
         /// <summary>
         /// Initializes a new report
         /// </summary>
-        public Report()
+        public Report(string title)
         {
-            this.Sections = new List<Section>();
+            this.infos = new List<Entry>();
+            this.warnings = new List<Entry>();
+            this.errors = new List<Entry>();
+            this.entries = new List<Entry>();
+            this.title = title;
         }
 
         /// <summary>
-        /// Adds a new section to this report
+        /// Adds a new entry to the report
         /// </summary>
-        /// <param name="name">The new section's name</param>
-        /// <returns>The new section</returns>
-        public Section AddSection(string name)
+        /// <param name="entry">Entry to add</param>
+        public void AddEntry(Entry entry)
         {
-            Section section = new Section(name);
-            this.Sections.Add(section);
-            return section;
+            this.entries.Add(entry);
+            switch (entry.Level)
+            {
+                case ELevel.Info: infos.Add(entry); break;
+                case ELevel.Warning: warnings.Add(entry); break;
+                case ELevel.Error: errors.Add(entry); break;
+            }
         }
-		
-		// TODO: maybe the title could be passed to the Report constructor instead? think about it
+
         /// <summary>
         /// Export the report to an XML document
         /// </summary>
-        /// <param name="title">Title of the report</param>
         /// <returns>The XML document</returns>
-        public XmlDocument ToXmlDocument(string title)
+        public XmlDocument ExportXML()
         {
             XmlDocument result = new XmlDocument();
             result.AppendChild(result.CreateXmlDeclaration("1.0", "utf-8", "yes"));
             result.AppendChild(result.CreateElement("Log"));
             result.ChildNodes[1].Attributes.Append(result.CreateAttribute("title"));
             result.ChildNodes[1].Attributes["title"].Value = title;
-            foreach (Section section in this.Sections)
-			{
-                result.ChildNodes[1].AppendChild(section.GetXMLNode(result));
-			}
-            result.ChildNodes[1].Attributes["title"].Value = title;
+            foreach (Entry entry in entries)
+                result.ChildNodes[1].AppendChild(GetXMLNode_Entry(result, entry));
             return result;
         }
-        
-        /// <summary>
-        /// Gets whether the report contains errors
-        /// </summary>
-        public bool HasErrors
+
+        private XmlNode GetXMLNode_Entry(XmlDocument doc, Entry entry)
         {
-        	get 
-			{
-	        	foreach (Section section in this.Sections)
-	            {
-	                foreach (Entry entry in section.Entries)
-	                {
-	                    if (entry.Level == ELevel.Error) return true;
-	                }
-	            }
-	            return false;
-        	}
+            XmlNode node = doc.CreateElement("Entry");
+            node.Attributes.Append(doc.CreateAttribute("mark"));
+            node.Attributes["mark"].Value = entry.Level.ToString();
+            node.AppendChild(entry.GetMessageNode(doc));
+            return node;
         }
-		
-        /// <summary>
-        /// Gets the number of errors in the report
-        /// </summary>
-		public int ErrorCount
-		{
-			get
-			{
-				int result = 0;
-				foreach (Section section in this.Sections)
-	            {
-	                foreach (Entry entry in section.Entries)
-	                {
-	                    if (entry.Level == ELevel.Error) result++;
-	                }
-	            }
-	            return result;
-			}
-		}
-		
-        /// <summary>
-        /// Gets a list of the errors in the report
-        /// </summary>
-		public IEnumerable<Entry> Errors
-		{
-			get
-			{
-				foreach (Section section in this.Sections)
-	            {
-	                foreach (Entry entry in section.Entries)
-	                {
-	                    if (entry.Level == ELevel.Error) yield return entry;
-	                }
-	            }
-			}
-		}
 	}
 }

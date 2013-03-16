@@ -29,7 +29,7 @@ namespace Hime.Tests.CentralDogma
 		{
 			Report report = new Report();
 			Section section = report.AddSection("Parser");
-			section.AddEntry(new Entry(ELevel.Error, "", ""));
+			section.AddEntry(new Entry(ELevel.Error, ""));
 			int count = 0;
 			foreach (Entry error in report.Errors)
 			{
@@ -37,9 +37,6 @@ namespace Hime.Tests.CentralDogma
 			}
 			Assert.AreEqual(1, count);
 		}
-		
-		// TODO: I find the system of section not easy to use for report!!!
-		// would be better to have a linear collection of errors
 	}
 }
 

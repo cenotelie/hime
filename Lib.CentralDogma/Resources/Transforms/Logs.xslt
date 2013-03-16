@@ -2,12 +2,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
   <xsl:output method="xml" indent="yes"/>
 
-  <xsl:template match="Component">
-    <td class="HimeData" style="width: 75;">
-      <xsl:value-of select="."/>
-    </td>
-  </xsl:template>
-
   <xsl:template match="Message">
     <td class="HimeData">
       <xsl:value-of select="."/>
@@ -210,39 +204,7 @@
       <xsl:apply-templates/>
     </tr>
   </xsl:template>
-
-  <xsl:template match="Section">
-    <div class="HimeSection">
-      <div class="HimeSectionTitle">
-        <img src="hime_data/button_minus.gif">
-          <xsl:attribute name="id">
-            <xsl:value-of select="@id"/>
-            <xsl:text>_button</xsl:text>
-          </xsl:attribute>
-          <xsl:attribute name="onclick">
-            <xsl:text>toggle(</xsl:text>
-            <xsl:value-of select="@id"/>
-            <xsl:text>_button,</xsl:text>
-            <xsl:value-of select="@id"/>
-            <xsl:text>_content)</xsl:text>
-          </xsl:attribute>
-        </img>
-        <span>
-          <xsl:value-of select="@name"/>
-        </span>
-      </div>
-      <div class="HimeSectionContent">
-        <xsl:attribute name="id">
-          <xsl:value-of select="@id"/>
-          <xsl:text>_content</xsl:text>
-        </xsl:attribute>
-        <table cellspacing="0" cellpadding="0" style="width: 100%;" border="1px" rules="all" frame="void" bordercolor="gray">
-          <xsl:apply-templates select="Entry" />
-        </table>
-      </div>
-    </div>
-  </xsl:template>
-
+  
   <xsl:template match="Log">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://www.w3.org/MarkUp/SCHEMA/xhtml11.xsd" xml:lang="en">
       <head>
@@ -260,7 +222,13 @@
           </span>
         </div>
         <div class="HimeBody">
-          <xsl:apply-templates select="Section"/>
+          <div class="HimeSection">
+            <div class="HimeSectionContent">
+              <table cellspacing="0" cellpadding="0" style="width: 100%;" border="1px" rules="all" frame="void" bordercolor="gray">
+                <xsl:apply-templates select="Entry" />
+              </table>
+            </div>
+          </div>
         </div>
       </body>
     </html>

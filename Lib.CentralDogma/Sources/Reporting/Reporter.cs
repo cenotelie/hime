@@ -18,8 +18,6 @@ namespace Hime.CentralDogma.Reporting
     public sealed class Reporter
     {
         private Report report;
-        private Section topSection;
-        private Section currentSection;
         private ILog log;
 
         /// <summary>
@@ -41,23 +39,14 @@ namespace Hime.CentralDogma.Reporting
         /// <summary>
         /// Initializes the reporter for the given type
         /// </summary>
-        /// <param name="type"></param>
-        public Reporter(System.Type type)
+        /// <param name="type">The reporting component's type</param>
+        /// <param name="title">The report's title</param>
+        public Reporter(System.Type type, string title)
         {
             Configure();
             log = log4net.LogManager.GetLogger(type);
-            report = new Report();
+            report = new Report(title);
         }
-
-        /// <summary>
-        /// Begins a new section in the log
-        /// </summary>
-        /// <param name="name">The new section's name</param>
-        public void BeginSection(string name) { currentSection = report.AddSection(name); }
-        /// <summary>
-        /// Ends the current section in the log
-        /// </summary>
-        public void EndSection() { currentSection = null; }
 
         /// <summary>
         /// Adds a new info entry to the log
@@ -65,7 +54,7 @@ namespace Hime.CentralDogma.Reporting
         /// <param name="message">The info message</param>
         public void Info(string message)
         {
-            AddEntry(new Entry(ELevel.Info, message));
+            report.AddEntry(new Entry(ELevel.Info, message));
             log.Info(message);
         }
         /// <summary>
@@ -74,7 +63,7 @@ namespace Hime.CentralDogma.Reporting
         /// <param name="message">The info message</param>
         public void Warn(string message)
         {
-            AddEntry(new Entry(ELevel.Warning, message));
+            report.AddEntry(new Entry(ELevel.Warning, message));
             log.Warn(message);
         }
         /// <summary>
@@ -83,7 +72,7 @@ namespace Hime.CentralDogma.Reporting
         /// <param name="message">The info message</param>
         public void Error(string message)
         {
-            AddEntry(new Entry(ELevel.Error, message));
+            report.AddEntry(new Entry(ELevel.Error, message));
             log.Error(message);
         }
 		
@@ -93,7 +82,7 @@ namespace Hime.CentralDogma.Reporting
         /// <param name="entry">The entry to add</param>
         public void Report(Entry entry)
         {
-            AddEntry(entry);
+            report.AddEntry(entry);
             switch (entry.Level)
             {
                 case ELevel.Info: log.Info(entry.Message); break;
@@ -111,30 +100,13 @@ namespace Hime.CentralDogma.Reporting
             Report(new ExceptionEntry(exception));
         }
 
-        private void AddEntry(Entry entry)
-        {
-			Section section = currentSection;
-            if (section == null)
-            {
-				// TODO: shouldn't it be an invariant that it is never null?
-                if (topSection == null)
-                {
-                    topSection = new Section("global");
-                    report.Sections.Insert(0, topSection);
-                }
-                section = topSection;
-            }
-			section.AddEntry(entry);
-        }
-
         /// <summary>
         /// Export the current log as an MHTML file
         /// </summary>
         /// <param name="fileName">Name of the file to export to</param>
-        /// <param name="title">Title of the log</param>
-        public void ExportMHTML(string fileName, string title)
+        public void ExportMHTML(string fileName)
         {
-            XmlDocument document = report.ToXmlDocument(title);
+            XmlDocument document = report.ExportXML();
             FileInfo File = new FileInfo(fileName);
 			string xmlFileName = fileName + ".xml";
 			string htmlFileName = fileName + ".html";
@@ -150,7 +122,7 @@ namespace Hime.CentralDogma.Reporting
         	    Transform.Transform(xmlFileName, htmlFileName);
             	session.AddCheckoutFile(htmlFileName);
 
-	            Documentation.MHTMLCompiler compiler = new Documentation.MHTMLCompiler(title);
+	            Documentation.MHTMLCompiler compiler = new Documentation.MHTMLCompiler(report.Title);
 
                 compiler.AddSource(new Documentation.MHTMLSource("text/html", "Grammar.html", htmlFileName));
                 compiler.AddSource(new Documentation.MHTMLSource("text/css", "hime_data/Hime.css", session.GetStreamFor("Transforms.Hime.css")));

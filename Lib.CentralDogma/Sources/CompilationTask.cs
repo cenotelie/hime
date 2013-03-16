@@ -101,7 +101,7 @@ namespace Hime.CentralDogma
 
             plugins = new Dictionary<string, CompilerPlugin>();
             plugins.Add("cf_grammar", new Grammars.ContextFree.CFPlugin());
-            reporter = new Reporting.Reporter(typeof(CompilationTask));
+            reporter = new Reporting.Reporter(typeof(CompilationTask), "Compilation log");
             inputs = new List<KeyValuePair<string, TextReader>>();
             grammars = new Dictionary<string, Grammars.Grammar>();
             loaders = new Dictionary<string, Grammars.GrammarLoader>();
@@ -159,10 +159,9 @@ namespace Hime.CentralDogma
                 reporter.Report(ex);
                 prefix = string.Empty;
             }
-            reporter.EndSection();
 
             if (OutputLog)
-                reporter.ExportMHTML(prefix + PostfixLog, "Compiler Log");
+                reporter.ExportMHTML(prefix + PostfixLog);
             return reporter.Result;
         }
 

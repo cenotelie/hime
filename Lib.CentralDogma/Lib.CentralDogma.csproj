@@ -178,7 +178,6 @@
     <Compile Include="Sources\Reporting\ExceptionEntry.cs" />
     <Compile Include="Sources\Reporting\Report.cs" />
     <Compile Include="Sources\Reporting\Reporter.cs" />
-    <Compile Include="Sources\Reporting\Section.cs" />
     <Compile Include="Sources\ResourceAccessor.cs" />
     <Compile Include="Sources\Unicode\Block.cs" />
     <Compile Include="Sources\Unicode\Category.cs" />
