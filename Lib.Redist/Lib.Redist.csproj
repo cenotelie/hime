@@ -69,7 +69,9 @@
     <Compile Include="Parsers\LR\LRBytecode.cs" />
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
+    <Compile Include="Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Parsers\LR\RNGLR\GSSNode.cs" />
+    <Compile Include="Parsers\LR\RNGLR\GSSPath.cs" />
     <Compile Include="Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
     <Compile Include="Parsers\LR\RNGLR\RNGLRParser.cs" />
     <Compile Include="Parsers\ParserErrorType.cs" />
@@ -90,7 +92,6 @@
     <Compile Include="Symbols\TextToken.cs" />
     <Compile Include="Symbols\Variable.cs" />
     <Compile Include="Symbols\Virtual.cs" />
-    <Compile Include="AST\SPPFFamily.cs" />
     <Compile Include="AST\CSTNode.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

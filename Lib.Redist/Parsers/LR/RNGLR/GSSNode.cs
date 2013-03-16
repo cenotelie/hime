@@ -8,97 +8,118 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
-    /// <summary>
-    /// Represents a node in a graph structured stack
-    /// </summary>
     class GSSNode
     {
-        private int generation;
+        private const int initEdgesCount = 5;
+        private const int initPathsCount = 10;
+
         private ushort state;
-        private Dictionary<GSSNode, AST.SPPFNode> edges;
+        private int generation;
+        private GSSEdge[] edges;
+        private int edgesCount;
 
-        /// <summary>
-        /// Gets the generation of this node
-        /// </summary>
-        public int Generation { get { return generation; } }
-        /// <summary>
-        /// Gets the id of the DFA state represented by this GSS node
-        /// </summary>
         public ushort State { get { return state; } }
-        /// <summary>
-        /// Gets the edges coming out of this node
-        /// </summary>
-        public Dictionary<GSSNode, AST.SPPFNode> Edges { get { return edges; } }
+        public int Generation { get { return generation; } }
 
-        /// <summary>
-        /// Adds a new edge from this node
-        /// </summary>
-        /// <param name="state">The previous GSS node</param>
-        /// <param name="label">The label of the edge</param>
-        public void AddEdge(GSSNode state, AST.SPPFNode label) { edges.Add(state, label); }
-
-        /// <summary>
-        /// Initializes a new instance of the GSSNode class with the given DFA state id and generation
-        /// </summary>
-        /// <param name="label">The ID of the represented DFA state</param>
-        /// <param name="generation">The generation of the node</param>
         public GSSNode(ushort label, int generation)
         {
-            this.generation = generation;
             this.state = label;
-            this.edges = new Dictionary<GSSNode, AST.SPPFNode>();
+            this.generation = generation;
+            this.edges = new GSSEdge[initEdgesCount];
+            this.edgesCount = 0;
         }
 
-        /// <summary>
-        /// Gets all the node at a given distance from this node
-        /// </summary>
-        /// <param name="length">The distance</param>
-        /// <returns>The list of nodes a the given distance</returns>
-        public List<GSSNode> NodesAt(int length)
+        public void AddEdge(GSSNode state, AST.SPPFNode label)
         {
-            List<GSSNode> nodes = new List<GSSNode>();
-            nodes.Add(this);
-            while (length != 0)
+            if (edgesCount == edges.Length)
             {
-                List<GSSNode> nexts = new List<GSSNode>();
-                foreach (GSSNode current in nodes)
-                    foreach (GSSNode next in current.edges.Keys)
-                        if (!nexts.Contains(next))
-                            nexts.Add(next);
-                nodes = nexts;
-                if (nodes.Count == 0)
-                    return nodes;
-                length--;
+                GSSEdge[] temp = new GSSEdge[edges.Length + initEdgesCount];
+                System.Array.Copy(edges, temp, edgesCount);
+                edges = temp;
             }
-            return nodes;
+            edges[edgesCount].to = state;
+            edges[edgesCount].label = label;
+            edgesCount++;
         }
 
-        /// <summary>
-        /// Gets all the paths of the given length starting at this node
-        /// </summary>
-        /// <param name="length">The length of paths</param>
-        /// <returns>The paths of the given length starting at this node</returns>
-        public List<List<GSSNode>> GetPaths(int length)
+        public bool HasEdgeTo(GSSNode node)
         {
-            List<List<GSSNode>> paths = new List<List<GSSNode>>();
-            List<GSSNode> first = new List<GSSNode>();
-            first.Add(this);
-            paths.Add(first);
-            while (length != 0)
+            for (int i = 0; i != edgesCount; i++)
+                if (edges[i].to == node)
+                    return true;
+            return false;
+        }
+
+        public AST.SPPFNode GetLabelTo(GSSNode node)
+        {
+            for (int i = 0; i != edgesCount; i++)
+                if (edges[i].to == node)
+                    return edges[i].label;
+            return null;
+        }
+
+        public GSSPath[] GetPaths0()
+        {
+            GSSPath[] paths = new GSSPath[1];
+            paths[0].last = this;
+            return paths;
+        }
+
+        public GSSPath[] GetPaths(int length, out int count)
+        {
+            GSSPath[] paths = new GSSPath[initPathsCount];
+            paths[0].last = this;
+            paths[0].labels = new AST.SPPFNode[length];
+            // The number of paths in the list
+            count = 1;
+            // For the remaining hops
+            for (int i = 0; i != length; i++)
             {
-                List<List<GSSNode>> nexts = new List<List<GSSNode>>();
-                foreach (List<GSSNode> path in paths)
+                int m = 0;          // Insertion index for the compaction process
+                int next = count;   // Insertion index for new paths
+                for (int p = 0; p != count; p++)
                 {
-                    GSSNode last = path[path.Count - 1];
-                    foreach (GSSNode next in last.edges.Keys)
+                    GSSNode last = paths[p].last;
+                    // The path stops here
+                    if (last.edgesCount == 0)
                     {
-                        List<GSSNode> newPath = new List<GSSNode>(path);
-                        newPath.Add(next);
-                        nexts.Add(newPath);
+                        // Cleanup
+                        paths[p].labels = null;
+                        continue;
                     }
+                    // Look for new additional paths
+                    for (int j = 1; j != last.edgesCount; j++)
+                    {
+                        // Extend the list of paths if necessary
+                        if (next == paths.Length)
+                        {
+                            GSSPath[] temp = new GSSPath[paths.Length + initPathsCount];
+                            System.Array.Copy(paths, temp, next);
+                            paths = temp;
+                        }
+                        // Clone and extend the new path
+                        paths[next].last = last.edges[j].to;
+                        paths[next].labels = new AST.SPPFNode[length];
+                        System.Array.Copy(paths[p].labels, paths[next].labels, i);
+                        paths[next].labels[i] = last.edges[j].label;
+                        // Go to next insert
+                        next++;
+                    }
+                    // Continue the current path
+                    paths[m].last = last.edges[0].to;
+                    paths[m].labels = paths[p].labels;
+                    paths[m].labels[i] = last.edges[0].label;
+                    // goto next
+                    m++;
                 }
-                paths = nexts;
-                length--;
+                // If Some previous paths have been removed (m != count)
+                //    and some have been added (next != cout)
+                // => Compact the list
+                if (m != count && next != count)
+                    for (int p = count; p != next; p++)
+                        paths[m++] = paths[p];
+                // m is now the exact number of paths
+                count = m;
             }
             return paths;
         }
