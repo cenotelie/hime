@@ -62,42 +62,29 @@ namespace Hime.CentralDogma.Reporting
         /// <summary>
         /// Adds a new info entry to the log
         /// </summary>
-        /// <param name="component">The component's emiting the entry</param>
         /// <param name="message">The info message</param>
-        public void Info(string component, string message)
+        public void Info(string message)
         {
-            AddEntry(new Entry(ELevel.Info, component, message));
-            log.Info(component + ": " + message);
+            AddEntry(new Entry(ELevel.Info, message));
+            log.Info(message);
         }
         /// <summary>
         /// Adds a new warning entry in the log
         /// </summary>
-        /// <param name="component">The component's emiting the entry</param>
         /// <param name="message">The info message</param>
-        public void Warn(string component, string message)
+        public void Warn(string message)
         {
-            AddEntry(new Entry(ELevel.Warning, component, message));
-            log.Warn(component + ": " + message);
+            AddEntry(new Entry(ELevel.Warning, message));
+            log.Warn(message);
         }
         /// <summary>
         /// Adds a new error entry in the log
         /// </summary>
-        /// <param name="component">The component's emiting the entry</param>
         /// <param name="message">The info message</param>
-        public void Error(string component, string message)
+        public void Error(string message)
         {
-            AddEntry(new Entry(ELevel.Error, component, message));
-            log.Error(component + ": " + message);
-        }
-        /// <summary>
-        /// Adds a new fatal error in the log
-        /// </summary>
-        /// <param name="component">The component's emiting the entry</param>
-        /// <param name="message">The info message</param>
-        public void Fatal(string component, string message)
-        {
-            AddEntry(new Entry(ELevel.Error, component, message));
-            log.Fatal(component + ": " + message);
+            AddEntry(new Entry(ELevel.Error, message));
+            log.Error(message);
         }
 		
         /// <summary>
@@ -109,9 +96,9 @@ namespace Hime.CentralDogma.Reporting
             AddEntry(entry);
             switch (entry.Level)
             {
-                case ELevel.Info: log.Info(entry.Component + ": " + entry.Message); break;
-                case ELevel.Warning: log.Warn(entry.Component + ": " + entry.Message); break;
-                case ELevel.Error: log.Error(entry.Component + ": " + entry.Message); break;
+                case ELevel.Info: log.Info(entry.Message); break;
+                case ELevel.Warning: log.Warn(entry.Message); break;
+                case ELevel.Error: log.Error(entry.Message); break;
             }
         }
 		

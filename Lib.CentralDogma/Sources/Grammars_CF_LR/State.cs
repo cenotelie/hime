@@ -16,15 +16,9 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected List<Item> items;
         protected Dictionary<Symbol, State> children;
         protected StateReductions reductions;
-        
-		// TODO: at least set should be protected!!!!
-        public int ID
-        {
-            get;
-            set;
-        }
-		
-        public StateKernel Kernel { get { return kernel; } }
+
+        public int ID { get; set; }
+		public StateKernel Kernel { get { return kernel; } }
         public StateReductions Reductions { get { return reductions; } }
         public ICollection<Item> Items { get { return items; } }
         public Dictionary<Symbol, State> Children { get { return children; } }

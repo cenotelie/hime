@@ -31,7 +31,6 @@ namespace Hime.CentralDogma.Grammars
             return node;
         }
 		
-		// TODO: maybe should wrap Node in our own class and put this method in there instead
 		protected void AddAttributeToNode(XmlDocument document, XmlNode node, string attributeName, string attributeValue)
 		{
 			XmlAttribute attribute = document.CreateAttribute(attributeName);

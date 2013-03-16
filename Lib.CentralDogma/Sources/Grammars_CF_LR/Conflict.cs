@@ -43,7 +43,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         public Conflict(string component, State state, ConflictType type, Terminal lookahead)
 			// TODO: this is a bit strange, not ideal...
-            : base(Reporting.ELevel.Error, component, "")
+            : base(Reporting.ELevel.Error, "")
         {
             this.state = state;
             this.type = type;
@@ -54,7 +54,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         }
 		
         public Conflict(string component, State state, ConflictType type)
-            : base(Reporting.ELevel.Error, component, "")
+            : base(Reporting.ELevel.Error, "")
         {
             this.state = state;
             this.type = type;

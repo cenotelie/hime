@@ -107,7 +107,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         private Automata.DFA PrepareDFA(Reporting.Reporter log)
         {
-            log.Info("CFGrammar", "Generating DFA for Terminals ...");
+            log.Info("Generating DFA for Terminals ...");
 
             // Construct a global NFA for all the terminals
             Automata.NFA final = new Automata.NFA();
@@ -123,7 +123,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             finalDFA = finalDFA.Minimize();
             finalDFA.RepackTransitions();
 
-            log.Info("CFGrammar", "Done !");
+            log.Info("Done !");
             return finalDFA;
         }
 
@@ -138,19 +138,19 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         protected bool AddRealAxiom(Reporting.Reporter reporter)
         {
-            reporter.Info("CFGrammar", "Creating axiom ...");
+            reporter.Info("Creating axiom ...");
 
             // Search for Axiom option
             if (!options.ContainsKey("Axiom"))
             {
-                reporter.Error("CFGrammar", "Axiom option is undefined");
+                reporter.Error("Axiom option is undefined");
                 return false;
             }
             // Search for the variable specified as the Axiom
             string name = options["Axiom"];
             if (!variables.ContainsKey(name))
             {
-                reporter.Error("CFGrammar", "Cannot find axiom variable " + name);
+                reporter.Error("Cannot find axiom variable " + name);
                 return false;
             }
 
@@ -161,13 +161,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             parts.Add(new RuleBodyElement(Dollar.Instance, RuleBodyElementAction.Drop));
             axiom.AddRule(new CFRule(axiom, new CFRuleBody(parts), false));
 
-            reporter.Info("CFGrammar", "Done !");
+            reporter.Info("Done !");
             return true;
         }
 
         protected bool ComputeFirsts(Reporting.Reporter reporter)
         {
-            reporter.Info("CFGrammar", "Computing Firsts sets ...");
+            reporter.Info("Computing Firsts sets ...");
 
             bool mod = true;
             // While some modification has occured, repeat the process
@@ -179,13 +179,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                         mod = true;
             }
 
-            reporter.Info("CFGrammar", "Done !");
+            reporter.Info("Done !");
             return true;
         }
 
         protected bool ComputeFollowers(Reporting.Reporter reporter)
         {
-            reporter.Info("CFGrammar", "Computing Followers sets ...");
+            reporter.Info("Computing Followers sets ...");
 
             bool mod = true;
             // Apply step 1 to each variable
@@ -200,7 +200,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                         mod = true;
             }
 
-            reporter.Info("CFGrammar", "Done !");
+            reporter.Info("Done !");
             return true;
         }
 

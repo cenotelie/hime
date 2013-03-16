@@ -32,7 +32,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             this.inherited = new List<string>();
             foreach (CSTNode child in syntaxRoot.Children[1].Children)
                 inherited.Add(((TextToken)child.Symbol).ValueText);
-            reporter.Info("Compiler", "Loading grammar " + name);
+            reporter.Info("Loading grammar " + name);
             this.grammar = new CFGrammar(name);
             this.caseInsensitive = false;
             if (inherited.Count == 0)
@@ -46,7 +46,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             {
                 if (!loaders.ContainsKey(parent))
                 {
-                    reporter.Fatal("Compiler", "Grammar " + parent + " inherited by " + name + " cannot be found");
+                    reporter.Error("Grammar " + parent + " inherited by " + name + " cannot be found");
                     inherited.Remove(parent);
                 }
                 GrammarLoader loader = loaders[parent];
@@ -247,7 +247,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Terminal Ref = grammar.GetTerminalByName(token.ValueText);
             if (Ref == null)
             {
-                reporter.Error("Compiler", "@" + token.Line + " Cannot find terminal " + token.ValueText);
+                reporter.Error("@" + token.Line + " Cannot find terminal " + token.ValueText);
                 Automata.NFA Final = new Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -408,7 +408,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     defs.Add(new CFRuleBody(symbol));
                 else
                 {
-                    reporter.Error("Compiler", "@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
+                    reporter.Error("@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
                     defs.Add(new CFRuleBody());
                 }
             }
@@ -424,7 +424,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             // check for meta-rule existence
             if (!context.IsTemplateRule(name, paramCount))
             {
-                reporter.Error("Compiler", "Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
+                reporter.Error("Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
                 defs.Add(new CFRuleBody());
                 return defs;
             }

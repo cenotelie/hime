@@ -13,15 +13,10 @@ namespace Hime.CentralDogma.Reporting
     /// </summary>
     public class Entry
     {
-		// TODO: maybe could add position in file
-        /// <summary>
+		/// <summary>
         /// Gets the entry's level
         /// </summary>
         public virtual ELevel Level { get; set; }
-        /// <summary>
-        /// Gets the component that emited this entry
-        /// </summary>
-        public virtual string Component { get; set; }
         /// <summary>
         /// Gets the entry's message
         /// </summary>
@@ -31,12 +26,10 @@ namespace Hime.CentralDogma.Reporting
         /// Initializes the entry
         /// </summary>
         /// <param name="level">The entry's level</param>
-        /// <param name="component">The emiting component</param>
         /// <param name="message">The entry's message</param>
-		public Entry(ELevel level, string component, string message)
+		public Entry(ELevel level, string message)
 		{
             this.Level = level;
-            this.Component = component;
             this.Message = message;
         }
 
@@ -58,7 +51,7 @@ namespace Hime.CentralDogma.Reporting
         /// <returns>A string representation of this entry</returns>
 		public override string ToString ()
 		{
-			return this.Level + ": " + this.Component + ": " + this.Message;
+			return this.Level + ": " + this.Message;
 		}
     }
 }

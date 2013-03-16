@@ -68,7 +68,7 @@ namespace Hime.CentralDogma.Reporting
             node.Attributes.Append(doc.CreateAttribute("mark"));
             node.Attributes["mark"].Value = entry.Level.ToString();
             System.Xml.XmlNode nodeComponent = doc.CreateElement("Component");
-            nodeComponent.InnerText = entry.Component;
+            nodeComponent.InnerText = "CentralDogma";
             node.AppendChild(nodeComponent);
             node.AppendChild(entry.GetMessageNode(doc));
             return node;

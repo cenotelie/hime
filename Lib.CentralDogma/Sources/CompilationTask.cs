@@ -168,9 +168,9 @@ namespace Hime.CentralDogma
 
         internal string ExecuteDo()
         {
-            reporter.Info("Compiler", "CentralDogma " + Version);
+            reporter.Info("CentralDogma " + Version);
             foreach (string name in plugins.Keys)
-                reporter.Info("Compiler", "Registered plugin " + plugins[name].ToString() + " for " + name);
+                reporter.Info("Registered plugin " + plugins[name].ToString() + " for " + name);
 
             // Load data
             if (!LoadInputs())
@@ -192,32 +192,32 @@ namespace Hime.CentralDogma
             string nmspace = (Namespace != null) ? Namespace : grammar.Name;
 
             // Export lexer code
-            reporter.Info("Compiler", "Exporting lexer code at " + prefix + PostfixLexerCode + " ...");
+            reporter.Info("Exporting lexer code at " + prefix + PostfixLexerCode + " ...");
             StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace);
             lexerData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
             CloseOutputStream(txtOutput);
-            reporter.Info("Compiler", "Done!");
+            reporter.Info("Done!");
             
             // Export lexer data
-            reporter.Info("Compiler", "Exporting lexer data at " + prefix + PostfixLexerData + " ...");
+            reporter.Info("Exporting lexer data at " + prefix + PostfixLexerData + " ...");
             BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixLexerData, FileMode.Create));
             lexerData.ExportData(binOutput);
             binOutput.Close();
-            reporter.Info("Compiler", "Done!");
+            reporter.Info("Done!");
             
             // Export parser code
-            reporter.Info("Compiler", "Exporting parser data at " + prefix + PostfixParserCode + " ...");
+            reporter.Info("Exporting parser data at " + prefix + PostfixParserCode + " ...");
             txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace);
             parserData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixParserData, lexerData.Expected);
             CloseOutputStream(txtOutput);
-            reporter.Info("Compiler", "Done!");
+            reporter.Info("Done!");
 
             // Export parser data
-            reporter.Info("Compiler", "Exporting parser data at " + prefix + PostfixParserData + " ...");
+            reporter.Info("Exporting parser data at " + prefix + PostfixParserData + " ...");
             binOutput = new BinaryWriter(new FileStream(prefix + PostfixParserData, FileMode.Create));
             parserData.ExportData(binOutput);
             binOutput.Close();
-            reporter.Info("Compiler", "Done!");
+            reporter.Info("Done!");
 
             // Build assembly
             if (Mode != CompilationMode.Source)
@@ -234,9 +234,9 @@ namespace Hime.CentralDogma
             // Export documentation
             if (OutputDocumentation)
             {
-                reporter.Info("Compiler", "Exporting parser documentation at " + prefix + PostfixDoc);
+                reporter.Info("Exporting parser documentation at " + prefix + PostfixDoc);
                 parserData.Document(prefix + PostfixDoc);
-                reporter.Info("Compiler", "Done!");
+                reporter.Info("Done!");
             }
             return prefix;
         }
@@ -253,22 +253,22 @@ namespace Hime.CentralDogma
         {
             bool hasErrors = false;
             if (name != null)
-                reporter.Info("Compiler", "Loading compilation unit " + name);
+                reporter.Info("Loading compilation unit " + name);
             else
-                reporter.Info("Compiler", "Loading compilation unit from unnamed resources");
+                reporter.Info("Loading compilation unit from unnamed resources");
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
             CSTNode root = null;
             try { root = parser.Parse(); }
             catch (Exception ex)
             {
-                reporter.Fatal("Compiler", "Fatal error while parsing the input");
+                reporter.Error("Error error while parsing the input");
                 reporter.Report(ex);
                 hasErrors = true;
             }
             foreach (ParserError error in parser.Errors)
             {
-                reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, "Parser", error.Message));
+                reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, error.Message));
                 hasErrors = true;
             }
             if (root != null)
@@ -277,7 +277,7 @@ namespace Hime.CentralDogma
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {
-                        reporter.Fatal("Compiler", "No compiler plugin found for resource " + gnode.Symbol.Name);
+                        reporter.Error("No compiler plugin found for resource " + gnode.Symbol.Name);
                         hasErrors = true;
                         continue;
                     }
@@ -306,7 +306,7 @@ namespace Hime.CentralDogma
                 }
                 if (unsolved != 0 && solved == 0)
                 {
-                    reporter.Fatal("Compiler", "Unable to solve all resource depedencies");
+                    reporter.Error("Unable to solve all resource depedencies");
                     return false;
                 }
             }
@@ -318,14 +318,14 @@ namespace Hime.CentralDogma
             if (GrammarName != null)
             {
                 if (!loaders.ContainsKey(GrammarName))
-                    reporter.Fatal("Compiler", "Grammar " + GrammarName + " cannot be found");
+                    reporter.Error("Grammar " + GrammarName + " cannot be found");
                 else
                     return loaders[GrammarName].Grammar;
             }
             else
             {
                 if (loaders.Count != 1)
-                    reporter.Fatal("Compiler", "Inputs contain more than one grammar, cannot decide which one to compile");
+                    reporter.Error("Inputs contain more than one grammar, cannot decide which one to compile");
                 else
                 {
                     Dictionary<string, Grammars.GrammarLoader>.Enumerator enu = loaders.GetEnumerator();
@@ -383,7 +383,7 @@ namespace Hime.CentralDogma
 
         internal void BuildAssembly(string prefix)
         {
-            reporter.Info("Compiler", "Building assembly " + prefix + PostfixAssembly + " ...");
+            reporter.Info("Building assembly " + prefix + PostfixAssembly + " ...");
             string redist = Assembly.GetAssembly(typeof(BaseLRParser)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
             {
@@ -398,9 +398,9 @@ namespace Hime.CentralDogma
                 compilerparams.OutputAssembly = prefix + PostfixAssembly;
                 CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] { prefix + PostfixLexerCode, prefix + PostfixParserCode });
                 foreach (CompilerError error in results.Errors)
-                    reporter.Error("Compiler", error.ToString());
+                    reporter.Error(error.ToString());
             }
-            reporter.Info("Compiler", "Done!");
+            reporter.Info("Done!");
         }
     }
 }

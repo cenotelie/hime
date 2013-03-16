@@ -44,7 +44,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 		
 		protected void ReportInfo(string message)
 		{
-			this.reporter.Info(this.name, message);
+			this.reporter.Info(message);
 		}
 
         protected virtual void OnBeginState(State state) { }

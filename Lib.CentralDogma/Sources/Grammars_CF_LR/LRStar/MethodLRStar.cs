@@ -65,7 +65,6 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                     example.Rest.AddRange(rest);
                 }
             }
-            conflict.Component = "LR(*)";
         }
 
         private int CompareLookaheads(ICollection<Terminal> left, ICollection<Terminal> right)

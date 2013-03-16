@@ -20,7 +20,7 @@ namespace Hime.CentralDogma.Reporting
         /// Initializes the entry with an exception
         /// </summary>
         /// <param name="exception">The exception to report</param>
-        public ExceptionEntry(Exception exception) : base(ELevel.Error, "Compiler", "Exception " + exception.Message)
+        public ExceptionEntry(Exception exception) : base(ELevel.Error, "Exception " + exception.Message)
 		{ 
 			this.exception = exception;
 		}
