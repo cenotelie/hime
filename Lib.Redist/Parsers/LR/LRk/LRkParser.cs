@@ -97,7 +97,7 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public override AST.CSTNode Parse()
+        public override AST.ASTNode Parse()
         {
             this.stack = new ushort[maxStackSize];
             this.objects = new AST.BuildNode[maxStackSize];

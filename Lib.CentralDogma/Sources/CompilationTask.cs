@@ -257,7 +257,7 @@ namespace Hime.CentralDogma
                 reporter.Info("Loading compilation unit from unnamed resources");
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
-            CSTNode root = null;
+            ASTNode root = null;
             try { root = parser.Parse(); }
             catch (Exception ex)
             {
@@ -272,7 +272,7 @@ namespace Hime.CentralDogma
             }
             if (root != null)
             {
-                foreach (CSTNode gnode in root.Children)
+                foreach (ASTNode gnode in root.Children)
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {

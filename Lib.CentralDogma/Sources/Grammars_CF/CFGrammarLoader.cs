@@ -14,7 +14,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
     class CFGrammarLoader : GrammarLoader
     {
         private Reporting.Reporter reporter;
-        private CSTNode syntaxRoot;
+        private ASTNode syntaxRoot;
         private string name;
         private List<string> inherited;
         private CFGrammar grammar;
@@ -24,13 +24,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         public Grammar Grammar { get { return grammar; } }
         public bool IsSolved { get { return (inherited.Count == 0); } }
 
-        public CFGrammarLoader(CSTNode root, Reporting.Reporter reporter)
+        public CFGrammarLoader(ASTNode root, Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             this.syntaxRoot = root;
             this.name = ((TextToken)root.Children[0].Symbol).ValueText;
             this.inherited = new List<string>();
-            foreach (CSTNode child in syntaxRoot.Children[1].Children)
+            foreach (ASTNode child in syntaxRoot.Children[1].Children)
                 inherited.Add(((TextToken)child.Symbol).ValueText);
             reporter.Info("Loading grammar " + name);
             this.grammar = new CFGrammar(name);
@@ -66,7 +66,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return grammar.GetSymbol(name);
         }
 
-        private void Compile_Recognize_option(CSTNode node)
+        private void Compile_Recognize_option(ASTNode node)
         {
             string Name = ((TextToken)node.Children[0].Symbol).ValueText;
             string Value = ((TextToken)node.Children[1].Symbol).ValueText;
@@ -74,7 +74,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             grammar.AddOption(Name, Value);
         }
 
-        private Automata.NFA Compile_Recognize_terminal_def_atom_any(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_any(ASTNode node)
         {
             Automata.NFA Final = new Automata.NFA();
             Final.StateEntry = Final.AddNewState();
@@ -84,7 +84,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Final.StateEntry.AddTransition(new Automata.CharSpan(begin, end), Final.StateExit);
             return Final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(ASTNode node)
         {
             Automata.NFA Final = new Automata.NFA();
             Final.StateEntry = Final.AddNewState();
@@ -124,7 +124,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             return builder.ToString();
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_text(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_text(ASTNode node)
         {
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
@@ -148,7 +148,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             return final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_set(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_set(ASTNode node)
         {
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
@@ -192,7 +192,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             return final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(ASTNode node)
         {
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
@@ -204,7 +204,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), final.StateExit);
             return final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(ASTNode node)
         {
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
@@ -217,7 +217,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), final.StateExit);
             return final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_span(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_span(ASTNode node)
         {
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
@@ -241,7 +241,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(spanBegin), System.Convert.ToChar(spanEnd)), final.StateExit);
             return final;
         }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_name(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_def_atom_name(ASTNode node)
         {
             TextToken token = (TextToken)node.Symbol;
             Terminal Ref = grammar.GetTerminalByName(token.ValueText);
@@ -257,7 +257,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return ((TextTerminal)Ref).NFA.Clone(false);
         }
 		
-        private Automata.NFA Compile_Recognize_terminal_definition(CSTNode node)
+        private Automata.NFA Compile_Recognize_terminal_definition(ASTNode node)
         {
 			Hime.Redist.Symbols.Symbol symbol = node.Symbol;
             // Symbol is a token
@@ -342,7 +342,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return null;
         }
 		
-        private Terminal Compile_Recognize_terminal(CSTNode node)
+        private Terminal Compile_Recognize_terminal(ASTNode node)
         {
             string name = ((TextToken)node.Children[0].Symbol).ValueText;
             Automata.NFA nfa = Compile_Recognize_terminal_definition(node.Children[1]);
@@ -351,7 +351,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return terminal;
         }
 
-        private CFRuleBodySet Compile_Recognize_grammar_text_terminal(CSTNode node)
+        private CFRuleBodySet Compile_Recognize_grammar_text_terminal(ASTNode node)
         {
             // Construct the terminal name
             string value = ((TextToken)node.Children[node.Children.Count - 1].Symbol).ValueText;
@@ -372,7 +372,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return set;
         }
 
-        private CFRuleBodySet Compile_Recognize_rule_sym_action(CSTNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_action(ASTNode node)
         {
             CFRuleBodySet set = new CFRuleBodySet();
             string name = ((TextToken)node.Children[0].Symbol).ValueText;
@@ -382,7 +382,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             set.Add(new CFRuleBody(action));
             return set;
         }
-        private CFRuleBodySet Compile_Recognize_rule_sym_virtual(CSTNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_virtual(ASTNode node)
         {
             CFRuleBodySet set = new CFRuleBodySet();
             string name = ((TextToken)node.Children[0].Symbol).ValueText;
@@ -393,7 +393,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             set.Add(new CFRuleBody(vir));
             return set;
         }
-        private CFRuleBodySet Compile_Recognize_rule_sym_ref_simple(CompilerContext context, CSTNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_ref_simple(CompilerContext context, ASTNode node)
         {
             TextToken token = ((TextToken)node.Children[0].Symbol);
             CFRuleBodySet defs = new CFRuleBodySet();
@@ -414,7 +414,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             return defs;
         }
-        private CFRuleBodySet Compile_Recognize_rule_sym_ref_template(CompilerContext context, CSTNode node)
+        private CFRuleBodySet Compile_Recognize_rule_sym_ref_template(CompilerContext context, ASTNode node)
         {
             TextToken token = ((TextToken)node.Children[0].Symbol);
             CFRuleBodySet defs = new CFRuleBodySet();
@@ -430,7 +430,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             // Recognize the parameters
             List<Symbol> parameters = new List<Symbol>();
-            foreach (CSTNode symbolNode in node.Children[1].Children)
+            foreach (ASTNode symbolNode in node.Children[1].Children)
                 parameters.Add(Compile_Recognize_rule_def_atom(context, symbolNode)[0].Parts[0].Symbol);
             // Get the corresponding variable
             Variable variable = context.GetVariableFromMetaRule(name, parameters, context);
@@ -439,7 +439,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return defs;
         }
 
-        private CFRuleBodySet Compile_Recognize_rule_def_atom(CompilerContext context, CSTNode node)
+        private CFRuleBodySet Compile_Recognize_rule_def_atom(CompilerContext context, ASTNode node)
         {
             if (node.Symbol.Name == "rule_sym_action")
                 return Compile_Recognize_rule_sym_action(node);
@@ -453,7 +453,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 return Compile_Recognize_grammar_text_terminal(node);
             return null;
         }
-        public CFRuleBodySet Compile_Recognize_rule_definition(CompilerContext context, CSTNode node)
+        public CFRuleBodySet Compile_Recognize_rule_definition(CompilerContext context, ASTNode node)
         {
             if (node.Symbol is TextToken)
             {
@@ -543,7 +543,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             else
                 return Compile_Recognize_rule_def_atom(context, node);
         }
-        private void Compile_Recognize_rule(CompilerContext context, CSTNode node)
+        private void Compile_Recognize_rule(CompilerContext context, ASTNode node)
         {
             string name = ((TextToken)node.Children[0].Symbol).ValueText;
             CFVariable var = grammar.GetCFVariable(name);
@@ -552,18 +552,18 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 var.AddRule(new CFRule(var, def, false));
         }
 
-        private void Compile_Recognize_grammar_options(CSTNode optionsNode)
+        private void Compile_Recognize_grammar_options(ASTNode optionsNode)
         {
-            foreach (CSTNode node in optionsNode.Children)
+            foreach (ASTNode node in optionsNode.Children)
                 Compile_Recognize_option(node);
             caseInsensitive = (grammar.HasOption("CaseSensitive") && grammar.GetOption("CaseSensitive").Equals("false", System.StringComparison.InvariantCultureIgnoreCase));
         }
-        private void Compile_Recognize_grammar_terminals(CSTNode terminalsNode)
+        private void Compile_Recognize_grammar_terminals(ASTNode terminalsNode)
         {
-            foreach (CSTNode node in terminalsNode.Children)
+            foreach (ASTNode node in terminalsNode.Children)
                 Compile_Recognize_terminal(node);
         }
-        private void Compile_Recognize_grammar_rules(CSTNode rulesNode)
+        private void Compile_Recognize_grammar_rules(ASTNode rulesNode)
         {
             // Create a new context
             CompilerContext context = new CompilerContext(this);
@@ -571,7 +571,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             foreach (TemplateRule templateRule in grammar.TemplateRules)
                 context.AddTemplateRule(templateRule);
             // Load new variables for the rules' head
-            foreach (CSTNode node in rulesNode.Children)
+            foreach (ASTNode node in rulesNode.Children)
             {
                 if (node.Symbol.Name.StartsWith("cf_rule_simple"))
                 {
@@ -584,18 +584,18 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     context.AddTemplateRule(grammar.AddTemplateRule(node));
             }
             // Load the grammar rules
-            foreach (CSTNode node in rulesNode.Children)
+            foreach (ASTNode node in rulesNode.Children)
             {
                 if (node.Symbol.Name.StartsWith("cf_rule_simple"))
                     Compile_Recognize_rule(context, node);
             }
         }
 
-        private void Compile_Recognize_grammar_text(CSTNode node)
+        private void Compile_Recognize_grammar_text(ASTNode node)
         {
             for (int i = 2; i < node.Children.Count; i++)
             {
-                CSTNode child = node.Children[i];
+                ASTNode child = node.Children[i];
                 if (child.Symbol.Name == "options")
                     Compile_Recognize_grammar_options(child);
                 else if (child.Symbol.Name == "terminals")

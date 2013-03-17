@@ -21,12 +21,14 @@ namespace Hime.Demo.Tasks
             task.GrammarName = "Test2";
             task.CodeAccess = AccessModifier.Public;
             task.Method = ParsingMethod.RNGLALR1;
+            task.OutputDocumentation = true;
+            task.OutputLog = true;
             task.Execute();
             Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "Test2.dll"));
 
             System.IO.StreamReader reader = new System.IO.StreamReader("Languages\\FileCentralDogma.gram");
             Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, new StringReader("aa"));
-            Redist.AST.CSTNode root = parser.Parse();
+            Redist.AST.ASTNode root = parser.Parse();
             reader.Close();
             
             foreach (ParserError error in parser.Errors)

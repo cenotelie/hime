@@ -27,7 +27,7 @@ namespace Hime.Demo.Tasks
 
             System.IO.StreamReader reader = new System.IO.StreamReader("Languages\\FileCentralDogma.gram");
             Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, reader);
-            Redist.AST.CSTNode root = parser.Parse();
+            Redist.AST.ASTNode root = parser.Parse();
             reader.Close();
             
             foreach (ParserError error in parser.Errors)

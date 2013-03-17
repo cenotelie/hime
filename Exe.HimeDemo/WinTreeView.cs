@@ -12,16 +12,16 @@ namespace Hime.Demo
 {
     partial class WinTreeView : Form
     {
-        public WinTreeView(CSTNode root)
+        public WinTreeView(ASTNode root)
         {
             InitializeComponent();
             TreeNode vroot = View.Nodes.Add(root.Symbol.Name);
             AddSubTree(vroot, root);
         }
 
-        private void AddSubTree(TreeNode vnode, CSTNode snode)
+        private void AddSubTree(TreeNode vnode, ASTNode snode)
         {
-            foreach (CSTNode child in snode.Children)
+            foreach (ASTNode child in snode.Children)
             {
                 TreeNode vchild = null;
                 if (child.Symbol != null)

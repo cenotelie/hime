@@ -5,6 +5,6 @@ namespace Hime.CentralDogma
 {
     interface CompilerPlugin
     {
-        Grammars.GrammarLoader GetLoader(CSTNode node, Reporting.Reporter log);
+        Grammars.GrammarLoader GetLoader(ASTNode node, Reporting.Reporter log);
     }
 }

@@ -13,14 +13,14 @@ namespace Hime.CentralDogma
         /// </summary>
         /// <param name="root">Root of the tree to export</param>
         /// <param name="file">DOT file to export to</param>
-        public static void ExportDOT(CSTNode root, string file)
+        public static void ExportDOT(ASTNode root, string file)
         {
             Documentation.DOTSerializer serializer = new Documentation.DOTSerializer("CST", file);
             ExportDOT_CST(serializer, null, 0, root);
             serializer.Close();
         }
 
-        private static int ExportDOT_CST(Documentation.DOTSerializer serializer, string parent, int nextID, CSTNode node)
+        private static int ExportDOT_CST(Documentation.DOTSerializer serializer, string parent, int nextID, ASTNode node)
         {
             string name = "node" + nextID;
             string label = node.Symbol.ToString();
@@ -28,7 +28,7 @@ namespace Hime.CentralDogma
             if (parent != null)
                 serializer.WriteEdge(parent, name, string.Empty);
             int result = nextID + 1;
-            foreach (CSTNode child in node.Children)
+            foreach (ASTNode child in node.Children)
                 result = ExportDOT_CST(serializer, name, result, child);
             return result;
         }

@@ -23,7 +23,7 @@ namespace Hime.Tests.Redist
             Assert.IsFalse(CompileResource("Lib.Redist.Bug494.gram", ParsingMethod.LALR1).HasErrors, "Grammar compilation failed!");
             Assembly assembly = Build();
             bool errors = false;
-            CSTNode node = Parse(assembly, "aa", out errors);
+            ASTNode node = Parse(assembly, "aa", out errors);
             Assert.AreEqual(node.Children.Count, 2);
         }
     }

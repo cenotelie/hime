@@ -9,15 +9,15 @@ namespace Hime.Redist.AST
 {
     class BuildNode
     {
-        private CSTNode value;
+        private ASTNode value;
         private BuildNode[] children;
         private int action;
 
-        public CSTNode Value { get { return value; } }
+        public ASTNode Value { get { return value; } }
 
         public BuildNode(Symbols.Symbol symbol)
         {
-            this.value = new CSTNode(symbol);
+            this.value = new ASTNode(symbol);
         }
 
         public void SetAction(int action)

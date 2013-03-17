@@ -22,6 +22,6 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        AST.CSTNode Parse();
+        AST.ASTNode Parse();
     }
 }

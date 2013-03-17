@@ -11,17 +11,17 @@ namespace Hime.Redist.AST
     class SPPFNode
     {
         private ushort originalSID;
-        private CSTNode value;
+        private ASTNode value;
         private SPPFNode[] children;
         private int action;
         
-        public CSTNode Value { get { return value; } }
+        public ASTNode Value { get { return value; } }
         public ushort SymbolID { get { return originalSID; } }
         
         public SPPFNode(Symbols.Symbol symbol)
         {
             this.originalSID = symbol.SymbolID;
-            this.value = new CSTNode(symbol);
+            this.value = new ASTNode(symbol);
         }
 
         public void SetAction(int action)

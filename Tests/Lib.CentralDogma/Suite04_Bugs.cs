@@ -30,7 +30,7 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(assembly);
             
             bool errors = false;
-            CSTNode ast = Parse(assembly, "a", out errors);
+            ASTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -47,7 +47,7 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            CSTNode ast = Parse(assembly, "a", out errors);
+            ASTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -65,7 +65,7 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            CSTNode ast = Parse(assembly, "a", out errors);
+            ASTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -82,7 +82,7 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            CSTNode ast = Parse(assembly, "a", out errors);
+            ASTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -100,7 +100,7 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            CSTNode ast = Parse(assembly, "a", out errors);
+            ASTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);
@@ -118,7 +118,7 @@ namespace Hime.Tests.CentralDogma
             Assert.IsNotNull(assembly);
 
             bool errors = false;
-            CSTNode ast = Parse(assembly, "a", out errors);
+            ASTNode ast = Parse(assembly, "a", out errors);
             Assert.IsNotNull(ast);
             Assert.IsFalse(errors);
             ast = Parse(assembly, "A", out errors);

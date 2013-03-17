@@ -17,10 +17,10 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         internal string HeadName { get; private set; }
         internal List<string> Parameters { get; private set; }
         internal int ParametersCount { get { return this.Parameters.Count; } }
-		internal CSTNode RuleNode { get; private set; }
-        internal CSTNode DefinitionNode { get; private set; }
+		internal ASTNode RuleNode { get; private set; }
+        internal ASTNode DefinitionNode { get; private set; }
 
-        public TemplateRule(CFGrammar grammar, CSTNode ruleNode)
+        public TemplateRule(CFGrammar grammar, ASTNode ruleNode)
         {
             this.HeadName = ((Hime.Redist.Symbols.TextToken)ruleNode.Children[0].Symbol).ValueText;
             this.Parameters = new List<string>();
@@ -28,7 +28,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             this.grammar = grammar;
             this.RuleNode = ruleNode;
             this.DefinitionNode = ruleNode.Children[2];
-            foreach (CSTNode Node in ruleNode.Children[1].Children)
+            foreach (ASTNode Node in ruleNode.Children[1].Children)
 			{
                 this.Parameters.Add(((Hime.Redist.Symbols.TextToken)Node.Symbol).ValueText);
 			}

@@ -9,12 +9,12 @@ using System.Collections.Generic;
 namespace Hime.Redist.AST
 {
     /// <summary>
-    /// Represents a node in a Concrete Syntax Tree
+    /// Represents a node in an Abstract Syntax Tree
     /// </summary>
-    public sealed class CSTNode
+    public sealed class ASTNode
     {
         private Symbols.Symbol symbol;
-        private List<CSTNode> children;
+        private List<ASTNode> children;
         
         /// <summary>
         /// Gets the symbol attached to this node
@@ -23,16 +23,16 @@ namespace Hime.Redist.AST
         /// <summary>
         /// Gets a list of the children nodes
         /// </summary>
-        public List<CSTNode> Children { get { return children; } }
+        public List<ASTNode> Children { get { return children; } }
 
         /// <summary>
         /// Initilizes a new instance of the CSTNode class with the given symbol
         /// </summary>
         /// <param name="symbol">The symbol represented by this node</param>
-        public CSTNode(Symbols.Symbol symbol)
+        public ASTNode(Symbols.Symbol symbol)
         {
             this.symbol = symbol;
-            this.children = new List<CSTNode>();
+            this.children = new List<ASTNode>();
         }
 
         /// <summary>

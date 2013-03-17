@@ -98,7 +98,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return new CFRule(head as CFVariable, new CFRuleBody(body), false);
         }
 
-        public TemplateRule AddTemplateRule(Redist.AST.CSTNode ruleNode)
+        public TemplateRule AddTemplateRule(Redist.AST.ASTNode ruleNode)
         {
             TemplateRule Rule = new TemplateRule(this, ruleNode);
             templateRules.Add(Rule);
