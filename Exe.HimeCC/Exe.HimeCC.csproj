@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -71,16 +71,13 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="CommandLine, Version=1.8.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\CommandLine\CommandLine.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Options.cs" />
+    <Compile Include="CommandLineLexer.cs" />
+    <Compile Include="CommandLineParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -92,6 +89,17 @@
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
       <Name>Lib.CentralDogma</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
+      <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
+      <Name>Lib.Redist</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CommandLine.gram" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CommandLineLexer.bin" />
+    <EmbeddedResource Include="CommandLineParser.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

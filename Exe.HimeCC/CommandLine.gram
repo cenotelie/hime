@@ -1,0 +1,31 @@
+﻿cf grammar CommandLine
+{
+	options
+	{
+		Axiom = "line";
+		Separator = "WHITE_SPACE";
+	}
+	terminals
+	{
+		WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		
+		ARG_NAME_SHORT		-> '-' [a-zA-Z] ;
+		ARG_NAME_LONG		-> '--' [a-zA-Z] ([a-zA-Z0-9_] | '-')* ;
+
+		ARG_VALUE_QUOTE		-> '"' [^"]* '"';
+		ARG_VALUE_NAME_CHAR	-> [a-zA-Z0-9_.:;,~&%\\/#];
+		ARG_VALUE_NAME		-> ARG_VALUE_NAME_CHAR (ARG_VALUE_NAME_CHAR | '-')* ;
+		ARG_VALUE_NUMBER	-> [1-9] [0-9]* | '0' ;
+	}
+	rules
+	{
+		value		-> (ARG_VALUE_QUOTE | ARG_VALUE_NAME | ARG_VALUE_NUMBER)^ ;
+		name		-> (ARG_NAME_SHORT | ARG_NAME_LONG)^ ;
+		argument	-> name^ value* ;
+
+		values		-> value* ;
+		arguments	-> argument* ;
+
+		line		-> values arguments ;
+	}
+}
