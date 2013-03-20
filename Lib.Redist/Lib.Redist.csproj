@@ -92,7 +92,7 @@
     <Compile Include="Symbols\TextToken.cs" />
     <Compile Include="Symbols\Variable.cs" />
     <Compile Include="Symbols\Virtual.cs" />
-    <Compile Include="AST\CSTNode.cs" />
+    <Compile Include="AST\ASTNode.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AST\SPPFNode.cs" />

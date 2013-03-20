@@ -38,7 +38,7 @@ namespace Hime.Redist.AST
         /// <summary>
         /// Gets a string representation of this node
         /// </summary>
-        /// <returns>The name of the current node's symbol; or "null" if there the node does not have a symbol</returns>
+        /// <returns>The name of the current node's symbol; or "null" if the node does not have a symbol</returns>
         public override string ToString()
         {
             if (symbol != null)
