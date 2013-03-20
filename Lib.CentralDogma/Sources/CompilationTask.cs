@@ -323,8 +323,10 @@ namespace Hime.CentralDogma
             }
             else
             {
-                if (loaders.Count != 1)
+                if (loaders.Count > 1)
                     reporter.Error("Inputs contain more than one grammar, cannot decide which one to compile");
+                else if (loaders.Count == 0)
+                    reporter.Error("No grammar in inputs");
                 else
                 {
                     Dictionary<string, Grammars.GrammarLoader>.Enumerator enu = loaders.GetEnumerator();
