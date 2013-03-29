@@ -14,16 +14,15 @@ namespace Hime.HimeCC.CL
     {
         private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(CommandLineParser), "CommandLineParser.bin");
         private static readonly Variable[] variables = {
-            new Variable(0xA, "value"), 
-            new Variable(0xB, "name"), 
-            new Variable(0xC, "argument"), 
-            new Variable(0xD, "values"), 
-            new Variable(0xE, "arguments"), 
-            new Variable(0xF, "line"), 
-            new Variable(0x10, "_v7345D94"), 
-            new Variable(0x11, "_v8EAB058"), 
-            new Variable(0x12, "_vE5FF4AC"), 
-            new Variable(0x13, "_Axiom_") };
+            new Variable(0x9, "value"), 
+            new Variable(0xA, "argument"), 
+            new Variable(0xB, "values"), 
+            new Variable(0xC, "arguments"), 
+            new Variable(0xD, "line"), 
+            new Variable(0xE, "_v43A72D99"), 
+            new Variable(0xF, "_v2EA3EB72"), 
+            new Variable(0x10, "_v65207E07"), 
+            new Variable(0x11, "_Axiom_") };
         private static readonly Virtual[] virtuals = {
  };
         public CommandLineParser(CommandLineLexer lexer) : base (automaton, variables, virtuals, null, lexer) { }

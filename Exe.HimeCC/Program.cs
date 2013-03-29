@@ -14,29 +14,49 @@ using Hime.Redist.AST;
 using Hime.Redist.Parsers;
 using Hime.Redist.Symbols;
 
-namespace Hime.Compiler
+namespace Hime.HimeCC
 {
     /// <summary>
     /// Entry class for the himecc program
     /// </summary>
     public sealed class Program
     {
-        private const string ArgOutputShort = "-o";
-        private const string ArgOutputLong = "--output";
-        private const string ArgGrammarShort = "-g";
-        private const string ArgGrammarLong = "--grammar";
-        private const string ArgPrefixShort = "-p";
-        private const string ArgPrefixLong = "--prefix";
-        private const string ArgMethodShort = "-m";
-        private const string ArgMethodLong = "--method";
-        private const string ArgNamespaceShort = "-n";
-        private const string ArgNamespaceLong = "--namespace";
-        private const string ArgAccessShort = "-a";
-        private const string ArgAccessLong = "--access";
-        private const string ArgLogShort = "-l";
-        private const string ArgLogLong = "--log";
-        private const string ArgDocShort = "-d";
-        private const string ArgDocLong = "--doc";
+        private const string ArgHelpShort = "-h";
+        private const string ArgHelpLong = "--help";
+        private const string ArgRegenerateShort = "-r";
+        private const string ArgRegenerateLong = "--regenerate";
+        private const string ArgOutputAssembly = "-o:assembly";
+        private const string ArgOutputNoSources = "-o:nosources";
+        private const string ArgGrammar = "-g";
+        private const string ArgPrefix = "-p";
+        private const string ArgMethodRNGLR = "-m:rnglr";
+        private const string ArgNamespace = "-n";
+        private const string ArgAccessPublic = "-a:public";
+        private const string ArgLog = "-l";
+        private const string ArgDoc = "-d";
+
+        private const string ErrorParsingArgs = "Error while parsing the arguments.";
+        private const string ErrorBadArgs = "Incorrect arguments.";
+        private const string ErrorPointHelp = "Run without arguments for help.";
+
+        /// <summary>
+        /// The program ran without errors
+        /// </summary>
+        public const int ResultOK = 0;
+        /// <summary>
+        /// Error while parsing the arguments
+        /// </summary>
+        public const int ResultErrorParsingArgs = 1;
+        /// <summary>
+        /// Incorrect arguments
+        /// </summary>
+        public const int ResultErrorBadArgs = 2;
+        /// <summary>
+        /// Error while compiling the grammar
+        /// </summary>
+        public const int ResultErrorCompiling = 3;
+
+
 
         /// <summary>
         /// Executes the himecc program
@@ -54,15 +74,56 @@ namespace Hime.Compiler
             if (args == null || args.Length == 0)
             {
                 PrintHelp();
-                return 0;
+                return ResultOK;
             }
+
+            // Parse the arguments
             ASTNode line = ParseArguments(args);
             if (line == null)
             {
-                PrintHelp();
-                return 0;
+                Console.WriteLine(ErrorParsingArgs);
+                Console.WriteLine(ErrorPointHelp);
+                return ResultErrorParsingArgs;
             }
+            
+            // Check for special switches
+            string special = GetSpecialCommand(line);
+            if (special == ArgHelpShort || special == ArgHelpLong)
+            {
+                PrintHelp();
+                return ResultOK;
+            }
+            else if (special == ArgRegenerateShort || special == ArgRegenerateLong)
+            {
+                GenerateCLParser();
+                return ResultOK;
+            }
+
+            // Build the compilation task
             CompilationTask task = BuildTask(line);
+            if (task == null)
+            {
+                Console.WriteLine(ErrorBadArgs);
+                Console.WriteLine(ErrorPointHelp);
+                return ResultErrorBadArgs;
+            }
+
+            // Execute the task
+            Report report = task.Execute();
+            if (report.HasErrors)
+                return ResultErrorCompiling;
+            return ResultOK;
+        }
+
+        private int GenerateCLParser()
+        {
+            System.IO.Stream stream = typeof(Program).Assembly.GetManifestResourceStream("himecc.CommandLine.gram");
+            CompilationTask task = new CompilationTask();
+            task.Mode = CompilationMode.Source;
+            task.AddInputRaw(stream);
+            task.Namespace = "Hime.HimeCC.CL";
+            task.CodeAccess = AccessModifier.Internal;
+            task.Method = ParsingMethod.LALR1;
             Report report = task.Execute();
             return report.ErrorCount;
         }
@@ -85,6 +146,13 @@ namespace Hime.Compiler
             return root;
         }
 
+        private string GetSpecialCommand(ASTNode line)
+        {
+            if (line.Children[0].Children.Count == 0 && line.Children[1].Children.Count == 1)
+                return (line.Children[1].Children[0].Symbol as TextToken).ValueText;
+            return null;
+        }
+
         private CompilationTask BuildTask(ASTNode line)
         {
             CompilationTask task = new CompilationTask();
@@ -94,38 +162,43 @@ namespace Hime.Compiler
             {
                 switch ((arg.Symbol as TextToken).ValueText)
                 {
-                    case ArgOutputShort:
-                    case ArgOutputLong:
-                        SelectArgOutput(task, arg);
+                    case ArgOutputAssembly:
+                        if (task.Mode == CompilationMode.Source)
+                            task.Mode = CompilationMode.SourceAndAssembly;
                         break;
-                    case ArgGrammarShort:
-                    case ArgGrammarLong:
-                        SelectArgGrammar(task, arg);
+                    case ArgOutputNoSources:
+                        task.Mode = CompilationMode.Assembly;
                         break;
-                    case ArgPrefixShort:
-                    case ArgPrefixLong:
-                        SelectArgPrefix(task, arg);
+                    case ArgGrammar:
+                        if (arg.Children.Count != 1)
+                            return null;
+                        task.GrammarName = GetValue(arg);
                         break;
-                    case ArgMethodShort:
-                    case ArgMethodLong:
-                        SelectArgMethod(task, arg);
+                    case ArgPrefix:
+                        if (arg.Children.Count != 1)
+                            return null;
+                        task.OutputPrefix = GetValue(arg);
                         break;
-                    case ArgNamespaceShort:
-                    case ArgNamespaceLong:
-                        SelectArgNamespace(task, arg);
+                    case ArgMethodRNGLR:
+                        task.Method = ParsingMethod.RNGLALR1;
                         break;
-                    case ArgAccessShort:
-                    case ArgAccessLong:
-                        SelectArgAccess(task, arg);
+                    case ArgNamespace:
+                        if (arg.Children.Count != 1)
+                            return null;
+                        task.Namespace = GetValue(arg);
                         break;
-                    case ArgLogShort:
-                    case ArgLogLong:
-                        SelectArgLog(task, arg);
+                    case ArgAccessPublic:
+                        task.CodeAccess = AccessModifier.Public;
                         break;
-                    case ArgDocShort:
-                    case ArgDocLong:
-                        SelectArgDoc(task, arg);
+                    case ArgLog:
+                        task.OutputLog = true;
                         break;
+                    case ArgDoc:
+                        task.OutputDocumentation = true;
+                        break;
+                    default:
+                        Console.WriteLine("Unknown argument " + (arg.Symbol as TextToken).ValueText);
+                        return null;
                 }
             }
             return task;
@@ -141,70 +214,6 @@ namespace Hime.Compiler
             task.AddInputFile(value);
         }
 
-        private void SelectArgOutput(CompilationTask task, ASTNode node)
-        {
-            string value = GetValue(node);
-            if (value == null)
-                return;
-            switch (value)
-            {
-                case "Assembly": task.Mode = CompilationMode.Assembly; break;
-                case "Sources": task.Mode = CompilationMode.Source; break;
-                case "All": task.Mode = CompilationMode.SourceAndAssembly; break;
-            }
-        }
-
-        private void SelectArgGrammar(CompilationTask task, ASTNode node)
-        {
-            string value = GetValue(node);
-            if (value == null)
-                return;
-            task.GrammarName = value;
-        }
-
-        private void SelectArgPrefix(CompilationTask task, ASTNode node) {
-            string value = GetValue(node);
-            if (value == null)
-                return;
-            task.OutputPrefix = value;
-        }
-
-        private void SelectArgMethod(CompilationTask task, ASTNode node)
-        {
-            string value = GetValue(node);
-            if (value == null)
-                return;
-            switch (value)
-            {
-                case "LALR": task.Method = ParsingMethod.LALR1; break;
-                case "RNGLR": task.Method = ParsingMethod.RNGLALR1; break;
-            }
-        }
-
-        private void SelectArgNamespace(CompilationTask task, ASTNode node)
-        {
-            string value = GetValue(node);
-            if (value == null)
-                return;
-            task.Namespace = value;
-        }
-
-        private void SelectArgAccess(CompilationTask task, ASTNode node)
-        {
-            string value = GetValue(node);
-            if (value == null)
-                return;
-            switch (value)
-            {
-                case "Public": task.CodeAccess = AccessModifier.Public; break;
-                case "Internal": task.CodeAccess = AccessModifier.Internal; break;
-            }
-        }
-
-        private void SelectArgLog(CompilationTask task, ASTNode node) { task.OutputLog = true; }
-
-        private void SelectArgDoc(CompilationTask task, ASTNode node) { task.OutputDocumentation = true; }
-
         private string GetValue(ASTNode argument)
         {
             if (argument.Children.Count == 0)
@@ -217,39 +226,30 @@ namespace Hime.Compiler
 
         private void PrintHelp()
         {
-            Console.WriteLine(Assembly.GetExecutingAssembly().FullName);
-            Console.WriteLine("This is free software. You may redistribute copies of it under the terms of");
-            Console.WriteLine("the LGPL License <http://www.gnu.org/licenses/lgpl.html>.");
-            Console.WriteLine("");
-            Console.WriteLine("Default usage:");
-            Console.WriteLine(" > himecc MyGram.gram");
-            Console.WriteLine("Use the RNGLR algorithm:");
-            Console.WriteLine(" > himecc MyGram.gram -p RNGLALR1");
-            Console.WriteLine("");
-            Console.WriteLine("Parameters:");
-            Console.WriteLine(ArgOutputShort + "\tSelect the output mode: Assembly, Sources, All");
-            Console.WriteLine(ArgOutputLong + "\tdefault: Sources");
-            Console.WriteLine("");
-            Console.WriteLine(ArgGrammarShort + "\tSelect the top grammar to compile");
-            Console.WriteLine(ArgGrammarLong + "\tdefault: <empty>");
-            Console.WriteLine("");
-            Console.WriteLine(ArgPrefixShort + "\tPath for the outputs");
-            Console.WriteLine(ArgPrefixLong + "\tdefault: current directory");
-            Console.WriteLine("");
-            Console.WriteLine(ArgMethodShort + "\tSelect the parsing method: LALR, RNGLR");
-            Console.WriteLine(ArgMethodLong + "\tdefault: LALR");
-            Console.WriteLine("");
-            Console.WriteLine(ArgNamespaceShort + "\tNamespace for the generated code");
-            Console.WriteLine(ArgNamespaceLong + "\tdefault: compiled grammar's name");
-            Console.WriteLine("");
-            Console.WriteLine(ArgAccessShort + "\tAccess modifier for the generated code: Public, Internal");
-            Console.WriteLine(ArgAccessLong + "\tdefault: Internal");
-            Console.WriteLine("");
-            Console.WriteLine(ArgLogShort + "\tOutput the log as a MHTML file");
-            Console.WriteLine(ArgLogLong);
-            Console.WriteLine("");
-            Console.WriteLine(ArgDocShort + "\tOutput the documentation for the compiled grammar");
-            Console.WriteLine(ArgDocLong);
+            Console.WriteLine("himecc " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (LGPL 3)");
+            Console.WriteLine("Hime parser generator, generates lexers and parsers in C# 2.0.");
+            Console.WriteLine();
+            Console.WriteLine("usage: himecc <files> [options]");
+            Console.WriteLine("options:");
+            Console.WriteLine(ArgHelpShort + ", "+ArgHelpLong + "\tShow this text");
+            Console.WriteLine();
+            Console.WriteLine(ArgOutputAssembly + "\tCompile the generated parser code in an assembly");
+            Console.WriteLine();
+            Console.WriteLine(ArgOutputNoSources + "\tOnly generate the assembly, do not keep the sources");
+            Console.WriteLine();
+            Console.WriteLine(ArgGrammar + " <grammar>\tSelect the top grammar to compile if more than one are given");
+            Console.WriteLine();
+            Console.WriteLine(ArgPrefix + " <prefix>\tSet the path for the outputs, default is the current directory");
+            Console.WriteLine();
+            Console.WriteLine(ArgMethodRNGLR + "\tUse the RNGLR parsing algorithm, default is LALR");
+            Console.WriteLine();
+            Console.WriteLine(ArgNamespace + " <namespace>\tNamespace for the generated code, default is the grammar's name");
+            Console.WriteLine();
+            Console.WriteLine(ArgAccessPublic + "\tPublic modifier for the generated code, default is internal");
+            Console.WriteLine();
+            Console.WriteLine(ArgLog + "\t\tOutput the log as a MHTML file");
+            Console.WriteLine();
+            Console.WriteLine(ArgDoc + "\t\tOutput the documentation for the compiled grammar");
         }
     }
 }
