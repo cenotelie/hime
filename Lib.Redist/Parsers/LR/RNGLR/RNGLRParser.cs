@@ -42,7 +42,6 @@ namespace Hime.Redist.Parsers
         }
 
         private RNGLRAutomaton parserAutomaton;
-        private RewindableTokenStream input;
         private AST.SPPFNode epsilon;
         private AST.SPPFNode[] nullProds;
         private Dictionary<ushort, AST.SPPFNode> nullVars;
@@ -65,7 +64,6 @@ namespace Hime.Redist.Parsers
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
-            this.input = new RewindableTokenStream(lexer);
             this.epsilon = new AST.SPPFNode(Symbols.Epsilon.Instance);
             this.nullProds = new AST.SPPFNode[variables.Length];
             this.nullVars = new Dictionary<ushort, AST.SPPFNode>();
