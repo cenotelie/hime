@@ -1,0 +1,14 @@
+﻿cf grammar Error
+{
+	options
+	{
+		Axiom = "exp";
+		Separator = "SEPARATOR";
+	}
+	terminals {
+		SEPARATOR	-> WHITE_SPACE+;
+	}
+	rules {
+		exp -> AA;
+	}
+}

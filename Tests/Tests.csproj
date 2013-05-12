@@ -54,17 +54,9 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="BaseTestSuite.cs" />
-    <Compile Include="Lib.CentralDogma\Suite04_Bugs.cs" />
-    <Compile Include="Lib.Redist\Suite00_Bugs.cs" />
-    <Compile Include="Exe.HimeCC\Suite01_Options.cs" />
-    <Compile Include="Exe.HimeCC\Suite03_Compile.cs" />
-    <Compile Include="Exe.HimeCC\Suite02_Program.cs" />
-    <Compile Include="Lib.CentralDogma\Suite00_FileCentralDogmaParser.cs" />
-    <Compile Include="Lib.CentralDogma\Suite01_Report.cs" />
-    <Compile Include="Lib.CentralDogma\Suite02_CompilationTask.cs" />
-    <Compile Include="Lib.Redist\Suite01_Parse.cs" />
-    <Compile Include="Lib.CentralDogma\Suite03_Ambiguous.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\HimeCCOptions.cs" />
+    <Compile Include="Tests\HimeCCReturn.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -86,12 +78,13 @@
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Exe.HimeCC\Empty.gram" />
-    <EmbeddedResource Include="Resources\Exe.HimeCC\FileCentralDogma.gram" />
-    <EmbeddedResource Include="Resources\Exe.HimeCC\MathExp.gram" />
-    <EmbeddedResource Include="Resources\Lib.CentralDogma\AmbiguousLR1.gram" />
-    <EmbeddedResource Include="Resources\Lib.Redist\Bug494.gram" />
+    <EmbeddedResource Include="Resources\Error.gram" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Empty.gram" />
+    <EmbeddedResource Include="Resources\MathExp.gram" />
+    <EmbeddedResource Include="Resources\AmbiguousLR1.gram" />
+  </ItemGroup>
+  <ItemGroup />
 </Project>

@@ -3,7 +3,6 @@
  * */
 
 using Hime.Demo.Tasks;
-using Hime.CentralDogma;
 
 namespace Hime.Demo
 {

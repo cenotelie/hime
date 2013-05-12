@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
 using System.IO;
-using System.CodeDom.Compiler;
-using NUnit.Framework;
+using System.Reflection;
 using Hime.CentralDogma;
-using Hime.CentralDogma.Reporting;
-using Hime.Redist.Lexer;
-using Hime.Redist.Parsers;
-using Hime.Redist.AST;
 
 namespace Hime.Tests
 {
@@ -37,7 +29,7 @@ namespace Hime.Tests
             }
         }
 
-        protected string GetTestDirectory() {
+        protected void SetTestDirectory() {
             System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
             System.Diagnostics.StackFrame caller = trace.GetFrame(1);
             string dir = Path.Combine(directory, caller.GetMethod().Name);
@@ -45,13 +37,13 @@ namespace Hime.Tests
                 Directory.Delete(dir, true);
             Directory.CreateDirectory(dir);
             Environment.CurrentDirectory = dir;
-            return dir;
         }
 
-        protected string GetResourceContent(string name) { return accessor.GetAllTextFor(name); }
         protected void ExportResource(string name, string file) { accessor.Export(name, file); }
 
-        protected Report CompileResource(string resource, ParsingMethod method)
+        //protected string GetResourceContent(string name) { return accessor.GetAllTextFor(name); }
+        
+        /*protected Report CompileResource(string resource, ParsingMethod method)
         {
 			return CompileRaw(GetResourceContent(resource), method);
         }
@@ -126,6 +118,6 @@ namespace Hime.Tests
             ASTNode root = parser.Parse();
             errors = (parser.Errors.Count != 0);
             return root;
-        }
+        }*/
     }
 }
