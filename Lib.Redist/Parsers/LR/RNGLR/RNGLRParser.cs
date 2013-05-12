@@ -185,7 +185,7 @@ namespace Hime.Redist.Parsers
                 Reducer(Ui, generation);
                 Symbols.Token oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
-                Dictionary<ushort, GSSNode> Uj = Shifter(Ui, oldtoken);
+                Dictionary<ushort, GSSNode> Uj = Shifter(oldtoken);
                 generation++;
                 if (Uj.Count == 0)
                 {
@@ -349,7 +349,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private Dictionary<ushort, GSSNode> Shifter(Dictionary<ushort, GSSNode> Ui, Symbols.Token oldtoken)
+        private Dictionary<ushort, GSSNode> Shifter(Symbols.Token oldtoken)
         {
             // Create next generation
             Dictionary<ushort, GSSNode> Uj = new Dictionary<ushort, GSSNode>();

@@ -92,7 +92,7 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        public BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
+        protected BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
         {
             this.parserVariables = new Utils.SymbolDictionary<Symbols.Variable>(variables);
             this.parserVirtuals = new Utils.SymbolDictionary<Symbols.Virtual>(virtuals);

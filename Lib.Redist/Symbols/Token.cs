@@ -23,6 +23,6 @@ namespace Hime.Redist.Symbols
         /// </summary>
         /// <param name="sid">ID of the terminal matched by this Token</param>
         /// <param name="name">Name of the terminal matched by this Token</param>
-        public Token(ushort sid, string name): base(sid, name) { }
+        protected Token(ushort sid, string name): base(sid, name) { }
     }
 }
