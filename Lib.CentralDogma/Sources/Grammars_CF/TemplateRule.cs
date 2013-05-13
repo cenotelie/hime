@@ -22,7 +22,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         public TemplateRule(CFGrammar grammar, ASTNode ruleNode)
         {
-            this.HeadName = ((Hime.Redist.Symbols.TextToken)ruleNode.Children[0].Symbol).ValueText;
+            this.HeadName = ((Hime.Redist.Symbols.TextToken)ruleNode.Children[0].Symbol).Value;
             this.Parameters = new List<string>();
             this.instances = new List<TemplateRuleInstance>();
             this.grammar = grammar;
@@ -30,7 +30,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             this.DefinitionNode = ruleNode.Children[2];
             foreach (ASTNode Node in ruleNode.Children[1].Children)
 			{
-                this.Parameters.Add(((Hime.Redist.Symbols.TextToken)Node.Symbol).ValueText);
+                this.Parameters.Add(((Hime.Redist.Symbols.TextToken)Node.Symbol).Value);
 			}
         }
 
