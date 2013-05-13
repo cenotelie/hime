@@ -96,6 +96,7 @@ namespace Hime.HimeCC
             else if (special == ArgRegenerateShort || special == ArgRegenerateLong)
             {
                 GenerateCLParser();
+                GenerateCDParser();
                 return ResultOK;
             }
 
@@ -122,6 +123,20 @@ namespace Hime.HimeCC
             task.Mode = CompilationMode.Source;
             task.AddInputRaw(stream);
             task.Namespace = "Hime.HimeCC.CL";
+            task.CodeAccess = AccessModifier.Internal;
+            task.Method = ParsingMethod.LALR1;
+            Report report = task.Execute();
+            return report.ErrorCount;
+        }
+
+        private int GenerateCDParser()
+        {
+            System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+            CompilationTask task = new CompilationTask();
+            task.Mode = CompilationMode.Source;
+            task.AddInputRaw(stream);
+            task.GrammarName = "FileCentralDogma";
+            task.Namespace = "Hime.CentralDogma.Input";
             task.CodeAccess = AccessModifier.Internal;
             task.Method = ParsingMethod.LALR1;
             Report report = task.Execute();

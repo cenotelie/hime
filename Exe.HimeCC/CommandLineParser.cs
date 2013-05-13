@@ -19,9 +19,9 @@ namespace Hime.HimeCC.CL
             new Variable(0xB, "values"), 
             new Variable(0xC, "arguments"), 
             new Variable(0xD, "line"), 
-            new Variable(0xE, "_v43A72D99"), 
-            new Variable(0xF, "_v2EA3EB72"), 
-            new Variable(0x10, "_v65207E07"), 
+            new Variable(0xE, "_vC9A6F"), 
+            new Variable(0xF, "_v3D795EB6"), 
+            new Variable(0x10, "_v4C95075B"), 
             new Variable(0x11, "_Axiom_") };
         private static readonly Virtual[] virtuals = {
  };
