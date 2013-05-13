@@ -9,7 +9,7 @@ namespace Hime.Tests
         public void Test_MathExp()
         {
             SetTestDirectory();
-            TestInput("MathExp", "2 + 5", "PLUS(NUMBER NUMBER)");
+            Assert.IsTrue(TestInput("MathExp", "2 + 5", "PLUS(NUMBER=\"2\" NUMBER=\"5\")"));
         }
     }
 }

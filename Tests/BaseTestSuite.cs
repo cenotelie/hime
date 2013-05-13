@@ -43,6 +43,7 @@ namespace Hime.Tests
             if (check.Children[0].Children.Count != 0)
             {
                 string vRef = (check.Children[0].Children[0].Symbol as Token).Value;
+                vRef = vRef.Substring(1, vRef.Length - 2);
                 string vReal = (node.Symbol as Token).Value;
                 if (vReal != vRef)
                     return false;
