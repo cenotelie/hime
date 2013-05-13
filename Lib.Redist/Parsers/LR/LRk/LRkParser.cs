@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
 
         private Symbols.Token OnUnexpectedToken(Symbols.Token token)
         {
-            List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
+            ICollection<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);

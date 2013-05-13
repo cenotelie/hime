@@ -132,7 +132,7 @@ namespace Hime.Redist.Parsers
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (ushort state in Ui.Keys)
             {
-                List<int> temp = parserAutomaton.GetExpected(state, lexer.Terminals.Count);
+                ICollection<int> temp = parserAutomaton.GetExpected(state, lexer.Terminals.Count);
                 foreach (int index in temp)
                 {
                     if (!indices.Contains(index))
