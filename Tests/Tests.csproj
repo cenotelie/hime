@@ -88,6 +88,9 @@
     <EmbeddedResource Include="Resources\AmbiguousLR1.gram" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ASTCheck.gram" />
+    <EmbeddedResource Include="Resources\TestScript.gram" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Integration.tests" />
   </ItemGroup>
 </Project>

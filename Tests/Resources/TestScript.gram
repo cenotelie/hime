@@ -1,8 +1,8 @@
-﻿cf grammar ASTCheck
+﻿cf grammar TestScript
 {
 	options
 	{
-		Axiom = "ast";
+		Axiom = "script";
 		Separator = "SEPARATOR";
 	}
 	terminals
@@ -18,6 +18,10 @@
 	}
 	rules
 	{
+		script		-> test* ;
+
+		test		-> '['! NAME^ ']'! NAME QUOTED_DATA '=>'! ast ;
+
 		ast			-> NAME^ check children ;
 
 		check		-> ;
