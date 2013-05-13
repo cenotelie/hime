@@ -59,29 +59,5 @@ namespace Hime.Tests
             Assert.IsTrue(System.IO.File.Exists("MathExpParser.cs"));
             Assert.IsTrue(System.IO.File.Exists("MathExpParser.bin"));
         }
-
-        [Test]
-        public void Test_HelpSwitch()
-        {
-            SetTestDirectory();
-            int result = Hime.HimeCC.Program.Main(new string[] { "--help" });
-            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
-        }
-
-        [Test]
-        public void Test_Regeneration()
-        {
-            SetTestDirectory();
-            int result = Hime.HimeCC.Program.Main(new string[] { "--regenerate" });
-            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
-            Assert.IsTrue(System.IO.File.Exists("CommandLineLexer.cs"));
-            Assert.IsTrue(System.IO.File.Exists("CommandLineLexer.bin"));
-            Assert.IsTrue(System.IO.File.Exists("CommandLineParser.cs"));
-            Assert.IsTrue(System.IO.File.Exists("CommandLineParser.bin"));
-            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaLexer.cs"));
-            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaLexer.bin"));
-            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaParser.cs"));
-            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaParser.bin"));
-        }
     }
 }

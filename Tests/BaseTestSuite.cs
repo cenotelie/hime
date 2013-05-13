@@ -49,11 +49,20 @@ namespace Hime.Tests
 
         protected void ExportResource(string name, string file) { accessor.Export(name, file); }
 
+        protected bool CheckFile(string file)
+        {
+            if (!System.IO.File.Exists(file))
+                return false;
+            System.IO.FileInfo fi = new FileInfo(file);
+            return (fi.Length > 0);
+        }
+
         protected Assembly CompileResource(string resource, ParsingMethod method)
         {
             string gram = accessor.GetAllTextFor(resource + ".gram");
             CompilationTask task = new CompilationTask();
             task.AddInputRaw(gram);
+            task.GrammarName = resource;
             task.CodeAccess = AccessModifier.Public;
             task.Method = method;
             task.Mode = CompilationMode.Assembly;
