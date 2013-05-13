@@ -11,7 +11,7 @@ namespace Hime.Tests
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
             Assert.IsTrue(System.IO.File.Exists("MathExpLexer.cs"));
             Assert.IsTrue(System.IO.File.Exists("MathExpLexer.bin"));
             Assert.IsTrue(System.IO.File.Exists("MathExpParser.cs"));
@@ -24,8 +24,8 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o Assembly" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly" });
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
             Assert.IsTrue(System.IO.File.Exists("MathExpLexer.cs"));
             Assert.IsTrue(System.IO.File.Exists("MathExpLexer.bin"));
             Assert.IsTrue(System.IO.File.Exists("MathExpParser.cs"));

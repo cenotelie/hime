@@ -9,16 +9,16 @@ namespace Hime.Tests
         public void Test_NoArgument()
         {
             int result = Hime.HimeCC.Program.Main(null);
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
             result = Hime.HimeCC.Program.Main(new string[0]);
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
         }
 
         [Test]
         public void Test_GibberishCommandLine()
         {
             int result = Hime.HimeCC.Program.Main(new string[] { "'\"ç" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultErrorParsingArgs);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultErrorParsingArgs, result);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace Hime.Tests
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -x aa" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultErrorBadArgs);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultErrorBadArgs, result);
             Assert.IsFalse(System.IO.File.Exists("MathExpLexer.cs"));
             Assert.IsFalse(System.IO.File.Exists("MathExpLexer.bin"));
             Assert.IsFalse(System.IO.File.Exists("MathExpParser.cs"));
@@ -40,11 +40,11 @@ namespace Hime.Tests
             SetTestDirectory();
             ExportResource("Error.gram", "Error.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "Error.gram" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultErrorCompiling);
-            Assert.IsFalse(System.IO.File.Exists("ErrorLexer.cs"));
-            Assert.IsFalse(System.IO.File.Exists("ErrorLexer.bin"));
-            Assert.IsFalse(System.IO.File.Exists("ErrorParser.cs"));
-            Assert.IsFalse(System.IO.File.Exists("ErrorParser.bin"));
+            Assert.AreEqual(Hime.HimeCC.Program.ResultErrorCompiling, result);
+            Assert.IsTrue(System.IO.File.Exists("ErrorLexer.cs"));
+            Assert.IsTrue(System.IO.File.Exists("ErrorLexer.bin"));
+            Assert.IsTrue(System.IO.File.Exists("ErrorParser.cs"));
+            Assert.IsTrue(System.IO.File.Exists("ErrorParser.bin"));
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Hime.Tests
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
             Assert.IsTrue(System.IO.File.Exists("MathExpLexer.cs"));
             Assert.IsTrue(System.IO.File.Exists("MathExpLexer.bin"));
             Assert.IsTrue(System.IO.File.Exists("MathExpParser.cs"));
@@ -65,7 +65,7 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             int result = Hime.HimeCC.Program.Main(new string[] { "--help" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             int result = Hime.HimeCC.Program.Main(new string[] { "--regenerate" });
-            Assert.AreEqual(result, Hime.HimeCC.Program.ResultOK);
+            Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result);
             Assert.IsTrue(System.IO.File.Exists("CommandLineLexer.cs"));
             Assert.IsTrue(System.IO.File.Exists("CommandLineLexer.bin"));
             Assert.IsTrue(System.IO.File.Exists("CommandLineParser.cs"));
