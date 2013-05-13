@@ -123,7 +123,7 @@ namespace Hime.Redist.Parsers
                     i++;
                 }
             }
-            subRoot.AddFamily(bufferNodes, nextBuffer);
+            subRoot.Build(bufferNodes, nextBuffer);
         }
 
         private void OnUnexpectedToken(Dictionary<ushort, GSSNode> Ui, Symbols.Token token)
@@ -290,7 +290,7 @@ namespace Hime.Redist.Parsers
                 }
             }
             if (isNewRoot)
-                subRoot.AddFamily(bufferNodes, nextBuffer);
+                subRoot.Build(bufferNodes, nextBuffer);
 
             // Get the target state by transition on the rule's head
             ushort to = GetNextByVar(path.last.State, head.SymbolID);
