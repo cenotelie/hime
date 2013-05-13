@@ -15,7 +15,7 @@ namespace Hime.Demo.Tasks
         public void OnNumber(object head, object[] body, int length)
         {
             TextToken token = body[0] as TextToken;
-            stack.Push(Single.Parse(token.ValueText));
+            stack.Push(Single.Parse(token.Value));
         }
         public void OnMult(object head, object[] body, int length)
         {
