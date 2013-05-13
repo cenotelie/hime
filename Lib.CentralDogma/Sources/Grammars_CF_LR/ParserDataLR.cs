@@ -132,7 +132,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             stream.WriteLine("            private SemanticAction nullAction;");
             stream.WriteLine("            public SemanticAction NullAction { get { return nullAction; } }");
             stream.WriteLine("            private SemanticAction[] raw;");
-            stream.WriteLine("            public SemanticAction[] RawActions { get { return raw; } }");
+            stream.WriteLine("            internal SemanticAction[] RawActions { get { return raw; } }");
             stream.WriteLine("            public Actions()");
             stream.WriteLine("            {");
             stream.WriteLine("                nullAction = new SemanticAction(DoNothing);");
@@ -153,14 +153,15 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         protected virtual void ExportConstructor(StreamWriter stream, string name)
         {
-            string argument = "";
-            string body = "null";
-            if (actions.Count != 0)
+            if (actions.Count == 0)
             {
-                argument = ", Actions actions";
-                body = "actions.RawActions";
+                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, null, lexer) { }");
             }
-            stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer" + argument + ") : base (automaton, variables, virtuals, " + body + ", lexer) { }");
+            else
+            {
+                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, (new Actions()).RawActions, lexer) { }");
+                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, actions.RawActions, lexer) { }");
+            }
         }
         
 		// TODO: this method could be factored more (look at the similar code)
