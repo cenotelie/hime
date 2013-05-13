@@ -1,0 +1,29 @@
+﻿cf grammar ASTCheck
+{
+	options
+	{
+		Axiom = "ast";
+		Separator = "SEPARATOR";
+	}
+	terminals
+	{
+		NAME_CHARACTER_FIRST	-> [_a-zA-Z] | \ub{IsGreek};
+		NAME_CHARACTER			-> NAME_CHARACTER_FIRST | [0-9] ;
+		NAME					-> '@'? NAME_CHARACTER_FIRST NAME_CHARACTER* ;
+		
+		QUOTED_DATA				-> '"' [^"]* '"';
+		
+		WHITE_SPACE	-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		SEPARATOR	-> WHITE_SPACE+;
+	}
+	rules
+	{
+		ast			-> NAME^ check children ;
+
+		check		-> ;
+		check		-> '='! QUOTED_DATA ;
+
+		children	-> ;
+		children	-> '('! ast* ')'! ;
+	}
+}

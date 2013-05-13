@@ -78,6 +78,10 @@ namespace Hime.Tests
             Assert.IsTrue(System.IO.File.Exists("CommandLineLexer.bin"));
             Assert.IsTrue(System.IO.File.Exists("CommandLineParser.cs"));
             Assert.IsTrue(System.IO.File.Exists("CommandLineParser.bin"));
+            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaLexer.cs"));
+            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaLexer.bin"));
+            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaParser.cs"));
+            Assert.IsTrue(System.IO.File.Exists("FileCentralDogmaParser.bin"));
         }
     }
 }
