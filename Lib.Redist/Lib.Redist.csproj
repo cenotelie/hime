@@ -82,7 +82,6 @@
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\ParserError.cs" />
     <Compile Include="Parsers\UnexpectedTokenError.cs" />
-    <Compile Include="Symbols\Action.cs" />
     <Compile Include="Symbols\Terminal.cs" />
     <Compile Include="Symbols\Token.cs" />
     <Compile Include="Symbols\Dollar.cs" />

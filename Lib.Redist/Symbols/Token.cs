@@ -16,7 +16,7 @@ namespace Hime.Redist.Symbols
         /// <summary>
         /// Gets the data represented by this symbol
         /// </summary>
-        public abstract object Value { get; }
+        public abstract string Value { get; }
 		
         /// <summary>
         /// Initializes a new instance of the Token class with the given ID and name

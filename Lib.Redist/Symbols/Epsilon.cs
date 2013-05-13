@@ -22,6 +22,6 @@ namespace Hime.Redist.Symbols
         /// <summary>
         /// Gets the data represented by this symbol
         /// </summary>
-        public override object Value { get { return string.Empty; } }
+        public override string Value { get { return string.Empty; } }
     }
 }
