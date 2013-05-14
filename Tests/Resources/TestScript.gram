@@ -20,12 +20,16 @@
 	{
 		script		-> test* ;
 
-		test		-> '['! NAME^ ']'! NAME QUOTED_DATA '=>'! ast ;
+		test		-> '['! NAME^ ']'! NAME QUOTED_DATA test_op ;
+		test_op		-> '=>'^ ;
+		test_op		-> '=>'^ ast ;
+		test_op		-> '#'^ ;
 
 		ast			-> NAME^ check children ;
 
 		check		-> ;
-		check		-> '='! QUOTED_DATA ;
+		check		-> '='^ QUOTED_DATA ;
+		check		-> '!=' QUOTED_DATA ;
 
 		children	-> ;
 		children	-> '('! ast* ')'! ;

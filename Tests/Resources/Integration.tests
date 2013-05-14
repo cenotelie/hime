@@ -1,2 +1,6 @@
-﻿[Simple_MathExp]	MathExp		"2 + 5"			=> PLUS(NUMBER NUMBER)
+﻿
+
+
+
+[Simple_MathExp]	MathExp		"2 + 5"			=> PLUS(NUMBER NUMBER)
 [Composed_MathExp]	MathExp		"3 * 2 + 5"		=> PLUS(MULT(NUMBER="3" NUMBER="2") NUMBER="5")
