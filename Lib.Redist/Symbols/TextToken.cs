@@ -20,11 +20,7 @@ namespace Hime.Redist.Symbols
         /// <summary>
         /// Gets the data represented by this symbol
         /// </summary>
-        public override object Value { get { return value; } }
-        /// <summary>
-        /// Gets the text represented by this symbol
-        /// </summary>
-        public string ValueText { get { return value; } }
+        public override string Value { get { return value; } }
         /// <summary>
         /// Gets the line number where the text begins
         /// </summary>

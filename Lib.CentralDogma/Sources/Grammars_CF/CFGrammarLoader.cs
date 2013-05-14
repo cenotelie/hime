@@ -28,10 +28,10 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         {
             this.reporter = reporter;
             this.syntaxRoot = root;
-            this.name = ((TextToken)root.Children[0].Symbol).ValueText;
+            this.name = ((TextToken)root.Children[0].Symbol).Value;
             this.inherited = new List<string>();
             foreach (ASTNode child in syntaxRoot.Children[1].Children)
-                inherited.Add(((TextToken)child.Symbol).ValueText);
+                inherited.Add(((TextToken)child.Symbol).Value);
             reporter.Info("Loading grammar " + name);
             this.grammar = new CFGrammar(name);
             this.caseInsensitive = false;
@@ -68,8 +68,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         private void Compile_Recognize_option(ASTNode node)
         {
-            string Name = ((TextToken)node.Children[0].Symbol).ValueText;
-            string Value = ((TextToken)node.Children[1].Symbol).ValueText;
+            string Name = ((TextToken)node.Children[0].Symbol).Value;
+            string Value = ((TextToken)node.Children[1].Symbol).Value;
             Value = Value.Substring(1, Value.Length - 2);
             grammar.AddOption(Name, Value);
         }
@@ -89,7 +89,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Automata.NFA Final = new Automata.NFA();
             Final.StateEntry = Final.AddNewState();
             Final.StateExit = Final.AddNewState();
-            string value = ((TextToken)node.Symbol).ValueText;
+            string value = ((TextToken)node.Symbol).Value;
             value = value.Substring(2, value.Length - 2);
             int charInt = System.Convert.ToInt32(value, 16);
             char c = System.Convert.ToChar(charInt);
@@ -129,7 +129,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
             final.StateExit = final.StateEntry;
-            string value = ((TextToken)node.Children[node.Children.Count-1].Symbol).ValueText;
+            string value = ((TextToken)node.Children[node.Children.Count-1].Symbol).Value;
             bool insensitive = caseInsensitive || (node.Children.Count > 1);
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
@@ -153,7 +153,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Automata.NFA final = new Automata.NFA();
             final.StateEntry = final.AddNewState();
             final.StateExit = final.AddNewState();
-            string value = ((TextToken)node.Symbol).ValueText;
+            string value = ((TextToken)node.Symbol).Value;
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
             bool positive = true;
@@ -198,7 +198,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             final.StateEntry = final.AddNewState();
             final.StateExit = final.AddNewState();
             TextToken token = (TextToken)node.Symbol;
-            string value = token.ValueText.Substring(4, token.ValueText.Length - 5);
+            string value = token.Value.Substring(4, token.Value.Length - 5);
             Unicode.Block block = Unicode.Block.Categories[value];
             // Create transition and return
             final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), final.StateExit);
@@ -210,7 +210,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             final.StateEntry = final.AddNewState();
             final.StateExit = final.AddNewState();
             TextToken token = (TextToken)node.Symbol;
-            string value = token.ValueText.Substring(4, token.ValueText.Length - 5);
+            string value = token.Value.Substring(4, token.Value.Length - 5);
             Unicode.Category category = Unicode.Category.Classes[value];
             // Create transitions and return
             foreach (Unicode.Span span in category.Spans)
@@ -226,10 +226,10 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             int spanEnd = 0;
             // Get span begin
             TextToken child = (TextToken)node.Children[0].Symbol;
-            spanBegin = System.Convert.ToInt32(child.ValueText.Substring(2), 16);
+            spanBegin = System.Convert.ToInt32(child.Value.Substring(2), 16);
             // Get span end
             child = (TextToken)node.Children[1].Symbol;
-            spanEnd = System.Convert.ToInt32(child.ValueText.Substring(2), 16);
+            spanEnd = System.Convert.ToInt32(child.Value.Substring(2), 16);
             // If span end is before beginning: reverse
             if (spanBegin > spanEnd)
             {
@@ -244,10 +244,10 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         private Automata.NFA Compile_Recognize_terminal_def_atom_name(ASTNode node)
         {
             TextToken token = (TextToken)node.Symbol;
-            Terminal Ref = grammar.GetTerminalByName(token.ValueText);
+            Terminal Ref = grammar.GetTerminalByName(token.Value);
             if (Ref == null)
             {
-                reporter.Error("@" + token.Line + " Cannot find terminal " + token.ValueText);
+                reporter.Error("@" + token.Line + " Cannot find terminal " + token.Value);
                 Automata.NFA Final = new Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -267,34 +267,34 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             if (symbol is Hime.Redist.Symbols.TextToken)
             {
                 TextToken token = (TextToken)node.Symbol;
-                if (token.ValueText == "?")
+                if (token.Value == "?")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
                     return Automata.NFA.OperatorOption(inner, false);
                 }
-                if (token.ValueText == "*")
+                if (token.Value == "*")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
                     return Automata.NFA.OperatorStar(inner, false);
                 }
-                if (token.ValueText == "+")
+                if (token.Value == "+")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
                     return Automata.NFA.OperatorPlus(inner, false);
                 }
-                if (token.ValueText == "|")
+                if (token.Value == "|")
                 {
                     Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
                     Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
                     return Automata.NFA.OperatorUnion(left, right, false);
                 }
-                if (token.ValueText == "-")
+                if (token.Value == "-")
                 {
                     Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
                     Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
                     return Automata.NFA.OperatorDifference(left, right, false);
                 }
-                if (token.ValueText == ".")
+                if (token.Value == ".")
                     return Compile_Recognize_terminal_def_atom_any(node);
                 if (token.Name == "SYMBOL_VALUE_UINT8")
                     return Compile_Recognize_terminal_def_atom_unicode(node);
@@ -306,7 +306,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     return Compile_Recognize_terminal_def_atom_ucat(node);
                 if (token.Name == "SYMBOL_TERMINAL_UBLOCK")
                     return Compile_Recognize_terminal_def_atom_ublock(node);
-                if (token.ValueText == "..")
+                if (token.Value == "..")
                     return Compile_Recognize_terminal_def_atom_span(node);
                 if (token.Name == "NAME")
                     return Compile_Recognize_terminal_def_atom_name(node);
@@ -326,10 +326,10 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 if (symbol.Name == "range")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-                    uint min = System.Convert.ToUInt32(((TextToken)node.Children[1].Symbol).ValueText);
+                    uint min = System.Convert.ToUInt32(((TextToken)node.Children[1].Symbol).Value);
                     uint max = min;
                     if (node.Children.Count > 2)
-                        max = System.Convert.ToUInt32(((TextToken)node.Children[2].Symbol).ValueText);
+                        max = System.Convert.ToUInt32(((TextToken)node.Children[2].Symbol).Value);
                     return Automata.NFA.OperatorRange(inner, false, min, max);
                 }
                 if (symbol.Name == "concat")
@@ -344,7 +344,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 		
         private Terminal Compile_Recognize_terminal(ASTNode node)
         {
-            string name = ((TextToken)node.Children[0].Symbol).ValueText;
+            string name = ((TextToken)node.Children[0].Symbol).Value;
             Automata.NFA nfa = Compile_Recognize_terminal_definition(node.Children[1]);
             Terminal terminal = grammar.AddTerminalNamed(name, nfa);
             nfa.StateExit.Item = terminal;
@@ -354,7 +354,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         private CFRuleBodySet Compile_Recognize_grammar_text_terminal(ASTNode node)
         {
             // Construct the terminal name
-            string value = ((TextToken)node.Children[node.Children.Count - 1].Symbol).ValueText;
+            string value = ((TextToken)node.Children[node.Children.Count - 1].Symbol).Value;
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
             // Check for previous instance in the grammar's grammar
@@ -375,7 +375,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         private CFRuleBodySet Compile_Recognize_rule_sym_action(ASTNode node)
         {
             CFRuleBodySet set = new CFRuleBodySet();
-            string name = ((TextToken)node.Children[0].Symbol).ValueText;
+            string name = ((TextToken)node.Children[0].Symbol).Value;
             Action action = grammar.GetAction(name);
             if (action == null)
                 action = grammar.AddAction(name);
@@ -385,7 +385,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         private CFRuleBodySet Compile_Recognize_rule_sym_virtual(ASTNode node)
         {
             CFRuleBodySet set = new CFRuleBodySet();
-            string name = ((TextToken)node.Children[0].Symbol).ValueText;
+            string name = ((TextToken)node.Children[0].Symbol).Value;
             name = name.Substring(1, name.Length - 2);
             Virtual vir = grammar.GetVirtual(name);
             if (vir == null)
@@ -397,18 +397,18 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         {
             TextToken token = ((TextToken)node.Children[0].Symbol);
             CFRuleBodySet defs = new CFRuleBodySet();
-            if (token.ValueText == "ε")
+            if (token.Value == "ε")
             {
                 defs.Add(new CFRuleBody());
             }
             else
             {
-                Symbol symbol = Compile_Tool_NameToSymbol(token.ValueText, context);
+                Symbol symbol = Compile_Tool_NameToSymbol(token.Value, context);
                 if (symbol != null)
                     defs.Add(new CFRuleBody(symbol));
                 else
                 {
-                    reporter.Error("@" + token.Line + " Unrecognized symbol " + token.ValueText + " in rule definition");
+                    reporter.Error("@" + token.Line + " Unrecognized symbol " + token.Value + " in rule definition");
                     defs.Add(new CFRuleBody());
                 }
             }
@@ -419,7 +419,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             TextToken token = ((TextToken)node.Children[0].Symbol);
             CFRuleBodySet defs = new CFRuleBodySet();
             // Get the information
-            string name = token.ValueText;
+            string name = token.Value;
             int paramCount = node.Children[1].Children.Count;
             // check for meta-rule existence
             if (!context.IsTemplateRule(name, paramCount))
@@ -458,13 +458,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             if (node.Symbol is TextToken)
             {
                 TextToken token = (TextToken)node.Symbol;
-                if (token.ValueText == "?")
+                if (token.Value == "?")
                 {
                     CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
                     setInner.Insert(0, new CFRuleBody());
                     return setInner;
                 }
-                else if (token.ValueText == "*")
+                else if (token.Value == "*")
                 {
                     CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
                     CFVariable subVar = grammar.NewCFVariable();
@@ -480,7 +480,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     setVar.Add(new CFRuleBody(subVar));
                     return setVar;
                 }
-                else if (token.ValueText == "+")
+                else if (token.Value == "+")
                 {
                     CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
                     CFVariable subVar = grammar.NewCFVariable();
@@ -495,25 +495,25 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     setVar.Add(new CFRuleBody(subVar));
                     return setVar;
                 }
-                else if (token.ValueText == "^")
+                else if (token.Value == "^")
                 {
                     CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
                     setInner.SetActionPromote();
                     return setInner;
                 }
-                else if (token.ValueText == "!")
+                else if (token.Value == "!")
                 {
                     CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
                     setInner.SetActionDrop();
                     return setInner;
                 }
-                else if (token.ValueText == "|")
+                else if (token.Value == "|")
                 {
                     CFRuleBodySet setLeft = Compile_Recognize_rule_definition(context, node.Children[0]);
                     CFRuleBodySet setRight = Compile_Recognize_rule_definition(context, node.Children[1]);
                     return (setLeft + setRight);
                 }
-                else if (token.ValueText == "-")
+                else if (token.Value == "-")
                 {
                     CFRuleBodySet setLeft = Compile_Recognize_rule_definition(context, node.Children[0]);
                     CFRuleBodySet setRight = Compile_Recognize_rule_definition(context, node.Children[1]);
@@ -545,7 +545,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         }
         private void Compile_Recognize_rule(CompilerContext context, ASTNode node)
         {
-            string name = ((TextToken)node.Children[0].Symbol).ValueText;
+            string name = ((TextToken)node.Children[0].Symbol).Value;
             CFVariable var = grammar.GetCFVariable(name);
             CFRuleBodySet defs = Compile_Recognize_rule_definition(context, node.Children[1]);
             foreach (CFRuleBody def in defs)
@@ -575,7 +575,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             {
                 if (node.Symbol.Name.StartsWith("cf_rule_simple"))
                 {
-                    string name = ((TextToken)node.Children[0].Symbol).ValueText;
+                    string name = ((TextToken)node.Children[0].Symbol).Value;
                     Variable var = grammar.GetVariable(name);
                     if (var == null)
                         var = grammar.AddVariable(name);

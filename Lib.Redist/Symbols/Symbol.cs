@@ -27,7 +27,7 @@ namespace Hime.Redist.Symbols
         /// </summary>
         /// <param name="sid">Symbol's unique identifier</param>
         /// <param name="name">Symbol's name</param>
-		public Symbol(ushort sid, string name)
+		protected Symbol(ushort sid, string name)
         {
             this.SymbolID = sid;
             this.Name = name;

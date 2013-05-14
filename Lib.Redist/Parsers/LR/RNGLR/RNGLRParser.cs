@@ -42,7 +42,6 @@ namespace Hime.Redist.Parsers
         }
 
         private RNGLRAutomaton parserAutomaton;
-        private RewindableTokenStream input;
         private AST.SPPFNode epsilon;
         private AST.SPPFNode[] nullProds;
         private Dictionary<ushort, AST.SPPFNode> nullVars;
@@ -65,7 +64,6 @@ namespace Hime.Redist.Parsers
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
-            this.input = new RewindableTokenStream(lexer);
             this.epsilon = new AST.SPPFNode(Symbols.Epsilon.Instance);
             this.nullProds = new AST.SPPFNode[variables.Length];
             this.nullVars = new Dictionary<ushort, AST.SPPFNode>();
@@ -125,7 +123,7 @@ namespace Hime.Redist.Parsers
                     i++;
                 }
             }
-            subRoot.AddFamily(bufferNodes, nextBuffer);
+            subRoot.Build(bufferNodes, nextBuffer);
         }
 
         private void OnUnexpectedToken(Dictionary<ushort, GSSNode> Ui, Symbols.Token token)
@@ -134,7 +132,7 @@ namespace Hime.Redist.Parsers
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (ushort state in Ui.Keys)
             {
-                List<int> temp = parserAutomaton.GetExpected(state, lexer.Terminals.Count);
+                ICollection<int> temp = parserAutomaton.GetExpected(state, lexer.Terminals.Count);
                 foreach (int index in temp)
                 {
                     if (!indices.Contains(index))
@@ -187,7 +185,7 @@ namespace Hime.Redist.Parsers
                 Reducer(Ui, generation);
                 Symbols.Token oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
-                Dictionary<ushort, GSSNode> Uj = Shifter(Ui, oldtoken);
+                Dictionary<ushort, GSSNode> Uj = Shifter(oldtoken);
                 generation++;
                 if (Uj.Count == 0)
                 {
@@ -292,7 +290,7 @@ namespace Hime.Redist.Parsers
                 }
             }
             if (isNewRoot)
-                subRoot.AddFamily(bufferNodes, nextBuffer);
+                subRoot.Build(bufferNodes, nextBuffer);
 
             // Get the target state by transition on the rule's head
             ushort to = GetNextByVar(path.last.State, head.SymbolID);
@@ -351,7 +349,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private Dictionary<ushort, GSSNode> Shifter(Dictionary<ushort, GSSNode> Ui, Symbols.Token oldtoken)
+        private Dictionary<ushort, GSSNode> Shifter(Symbols.Token oldtoken)
         {
             // Create next generation
             Dictionary<ushort, GSSNode> Uj = new Dictionary<ushort, GSSNode>();

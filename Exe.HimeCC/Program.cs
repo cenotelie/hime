@@ -96,6 +96,7 @@ namespace Hime.HimeCC
             else if (special == ArgRegenerateShort || special == ArgRegenerateLong)
             {
                 GenerateCLParser();
+                GenerateCDParser();
                 return ResultOK;
             }
 
@@ -128,6 +129,20 @@ namespace Hime.HimeCC
             return report.ErrorCount;
         }
 
+        private int GenerateCDParser()
+        {
+            System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+            CompilationTask task = new CompilationTask();
+            task.Mode = CompilationMode.Source;
+            task.AddInputRaw(stream);
+            task.GrammarName = "FileCentralDogma";
+            task.Namespace = "Hime.CentralDogma.Input";
+            task.CodeAccess = AccessModifier.Internal;
+            task.Method = ParsingMethod.LALR1;
+            Report report = task.Execute();
+            return report.ErrorCount;
+        }
+
         private ASTNode ParseArguments(string[] args)
         {
             StringBuilder builder = new StringBuilder();
@@ -149,7 +164,7 @@ namespace Hime.HimeCC
         private string GetSpecialCommand(ASTNode line)
         {
             if (line.Children[0].Children.Count == 0 && line.Children[1].Children.Count == 1)
-                return (line.Children[1].Children[0].Symbol as TextToken).ValueText;
+                return (line.Children[1].Children[0].Symbol as TextToken).Value;
             return null;
         }
 
@@ -160,7 +175,7 @@ namespace Hime.HimeCC
                 AddInput(task, value);
             foreach (ASTNode arg in line.Children[1].Children)
             {
-                switch ((arg.Symbol as TextToken).ValueText)
+                switch ((arg.Symbol as TextToken).Value)
                 {
                     case ArgOutputAssembly:
                         if (task.Mode == CompilationMode.Source)
@@ -197,7 +212,7 @@ namespace Hime.HimeCC
                         task.OutputDocumentation = true;
                         break;
                     default:
-                        Console.WriteLine("Unknown argument " + (arg.Symbol as TextToken).ValueText);
+                        Console.WriteLine("Unknown argument " + (arg.Symbol as TextToken).Value);
                         return null;
                 }
             }
@@ -206,7 +221,7 @@ namespace Hime.HimeCC
 
         private void AddInput(CompilationTask task, ASTNode node)
         {
-            string value = (node.Symbol as TextToken).ValueText;
+            string value = (node.Symbol as TextToken).Value;
             if (value == null)
                 return;
             if (value.StartsWith("\""))
@@ -218,7 +233,7 @@ namespace Hime.HimeCC
         {
             if (argument.Children.Count == 0)
                 return null;
-            string value = (argument.Children[0].Symbol as TextToken).ValueText;
+            string value = (argument.Children[0].Symbol as TextToken).Value;
             if (value.StartsWith("\""))
                 return value.Substring(1, value.Length - 2);
             return value;

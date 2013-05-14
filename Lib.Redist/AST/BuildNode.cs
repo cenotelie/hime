@@ -7,26 +7,56 @@
 
 namespace Hime.Redist.AST
 {
+    /// <summary>
+    /// Represents a node in the raw AST produced by a LR(k) parser before tree actions
+    /// Tree actions are directly executed on this structure, producing the final AST
+    /// </summary>
     class BuildNode
     {
-        private ASTNode value;
-        private BuildNode[] children;
-        private int action;
+        /// <summary>
+        /// The final AST node that would correspond to this node
+        /// </summary>
+        protected ASTNode value;
+        /// <summary>
+        /// The children of this node
+        /// </summary>
+        protected BuildNode[] children;
+        /// <summary>
+        /// The AST action for this node
+        /// </summary>
+        protected int action;
 
+        /// <summary>
+        /// Gets the final AST node for this node
+        /// </summary>
         public ASTNode Value { get { return value; } }
 
+        /// <summary>
+        /// Initializes this build node with the given symbol
+        /// </summary>
+        /// <param name="symbol">The symbol for this node</param>
         public BuildNode(Symbols.Symbol symbol)
         {
             this.value = new ASTNode(symbol);
         }
 
+        /// <summary>
+        /// Sets the tree action for this node, provided it is not 0 (no action)
+        /// </summary>
+        /// <param name="action">The tree action for this node</param>
         public void SetAction(int action)
         {
             if (action != 0)
                 this.action = action;
         }
 
-        public void Build(BuildNode[] children, int length)
+        /// <summary>
+        /// Builds the AST at this level with the given children
+        /// </summary>
+        /// <typeparam name="T">The type of children</typeparam>
+        /// <param name="children">Array of children</param>
+        /// <param name="length">Number of children</param>
+        public void Build<T>(T[] children, int length) where T : BuildNode
         {
             if (action == Parsers.LRProduction.HeadReplace)
                 BuildReplaceable(children, length);
@@ -34,7 +64,12 @@ namespace Hime.Redist.AST
                 BuildNormal(children, length);
         }
 
-        private void BuildReplaceable(BuildNode[] children, int length)
+        /// <summary>
+        /// Builds the AST at this level as a replaceable node
+        /// </summary>
+        /// <param name="children">Array of children</param>
+        /// <param name="length">Number of children</param>
+        private void BuildReplaceable<T>(T[] children, int length) where T : BuildNode
         {
             int size = 0;
             for (int i = 0; i != length; i++)
@@ -75,7 +110,12 @@ namespace Hime.Redist.AST
             this.children = replacement;
         }
 
-        private void BuildNormal(BuildNode[] children, int length)
+        /// <summary>
+        /// Builds the AST at this level as a normal node
+        /// </summary>
+        /// <param name="children">Array of children</param>
+        /// <param name="length">Number of children</param>
+        private void BuildNormal<T>(T[] children, int length) where T : BuildNode
         {
             bool firstPromote = true;
             for (int i = 0; i != length; i++)

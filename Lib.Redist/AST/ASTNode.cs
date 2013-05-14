@@ -26,7 +26,7 @@ namespace Hime.Redist.AST
         public List<ASTNode> Children { get { return children; } }
 
         /// <summary>
-        /// Initilizes a new instance of the CSTNode class with the given symbol
+        /// Initializes a new instance of the ASTNode class with the given symbol
         /// </summary>
         /// <param name="symbol">The symbol represented by this node</param>
         public ASTNode(Symbols.Symbol symbol)

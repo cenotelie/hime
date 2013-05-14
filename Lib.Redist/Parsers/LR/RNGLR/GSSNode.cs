@@ -50,14 +50,6 @@ namespace Hime.Redist.Parsers
             return false;
         }
 
-        public AST.SPPFNode GetLabelTo(GSSNode node)
-        {
-            for (int i = 0; i != edgesCount; i++)
-                if (edges[i].to == node)
-                    return edges[i].label;
-            return null;
-        }
-
         public GSSPath[] GetPaths0()
         {
             GSSPath[] paths = new GSSPath[1];

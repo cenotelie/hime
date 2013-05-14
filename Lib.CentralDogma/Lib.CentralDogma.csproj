@@ -219,7 +219,6 @@
     <EmbeddedResource Include="Sources\Input\FileCentralDogma.gram" />
     <EmbeddedResource Include="Sources\Input\FileCentralDogmaLexer.bin" />
     <EmbeddedResource Include="Sources\Input\FileCentralDogmaParser.bin" />
-    <None Include="Sources\Input\generate.bat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">

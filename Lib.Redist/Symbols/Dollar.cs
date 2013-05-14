@@ -14,7 +14,7 @@ namespace Hime.Redist.Symbols
     public sealed class Dollar : Token
     {
         private static Dollar instance = new Dollar();
-        private Dollar() : base(2, "EOF") { }
+        private Dollar() : base(2, "$") { }
         /// <summary>
         /// Gets the dollar token
         /// </summary>
@@ -22,6 +22,6 @@ namespace Hime.Redist.Symbols
         /// <summary>
         /// Gets the data represented by this symbol
         /// </summary>
-        public override object Value { get { return "EOF"; } }
+        public override string Value { get { return string.Empty; } }
     }
 }

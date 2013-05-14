@@ -43,7 +43,7 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        public LRkParser(LRkAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
+        protected LRkParser(LRkAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
 
         private Symbols.Token OnUnexpectedToken(Symbols.Token token)
         {
-            List<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
+            ICollection<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);

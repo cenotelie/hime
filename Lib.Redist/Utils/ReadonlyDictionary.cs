@@ -42,8 +42,8 @@ namespace Hime.Redist.Utils
         /// <summary>
         /// Gets the symbol corresponding to the given index
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index">A symbol's index</param>
+        /// <returns>The symbol at the given index</returns>
         public T this[int index] { get { return raw[index]; } }
 
         /// <summary>
@@ -58,18 +58,75 @@ namespace Hime.Redist.Utils
                 this.impl.Add(item.Name, item);
         }
 
+        /// <summary>
+        /// Gets an enumerator of key-value pairs of symbols with their name
+        /// </summary>
+        /// <returns>An enumerator of key-value pairs of symbols with their name</returns>
         public IEnumerator<KeyValuePair<string, T>> GetEnumerator() { return impl.GetEnumerator(); }
+        /// <summary>
+        /// Gets an enumerator of key-value pairs of symbols with their name
+        /// </summary>
+        /// <returns>An enumerator of key-value pairs of symbols with their name</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return impl.GetEnumerator(); }
+        /// <summary>
+        /// Tries to get a symbol for the given name
+        /// </summary>
+        /// <param name="key">The name to search for</param>
+        /// <param name="value">The symbol with the given name, or null if none is found</param>
+        /// <returns>True if a symbol is found</returns>
         public bool TryGetValue(string key, out T value) { return impl.TryGetValue(key, out value); }
 
+        /// <summary>
+        /// Determines whether a symbol with the given name exists
+        /// </summary>
+        /// <param name="key">A symbol's name</param>
+        /// <returns>True if a symbol with the given name exists</returns>
         public bool ContainsKey(string key) { return impl.ContainsKey(key); }
+        /// <summary>
+        /// Determines whether a pair of name and symbol is in the collection
+        /// </summary>
+        /// <param name="item">A pair of name and symbol</param>
+        /// <returns>True if the pair is in the collection</returns>
         public bool Contains(KeyValuePair<string, T> item) { return (impl.ContainsKey(item.Key) && impl[item.Key] == item.Value); }
 
+        /// <summary>
+        /// Adds a symbol with its name in the collection.
+        /// This method is not implemented.
+        /// </summary>
+        /// <param name="key">The name of the symbol</param>
+        /// <param name="value">The symbol</param>
         public void Add(string key, T value) { throw new NotImplementedException(); }
+        /// <summary>
+        /// Adds a pair of name and symbol in the collection
+        /// This method is not implemented
+        /// </summary>
+        /// <param name="item">The pair to add to the collection</param>
         public void Add(KeyValuePair<string, T> item) { throw new NotImplementedException(); }
+        /// <summary>
+        /// Removes the symbol with the given name from the collection
+        /// This method is not implemented
+        /// </summary>
+        /// <param name="key">The name if the symbol to remove from the collection</param>
+        /// <returns>True if the corresponding symbol was found and removed</returns>
         public bool Remove(string key) { throw new NotImplementedException(); }
+        /// <summary>
+        /// Removes a pair of name and symbol from the collection
+        /// This method is not implemented
+        /// </summary>
+        /// <param name="item">The pair of name and symbol to remove</param>
+        /// <returns>True if the corresponding pair was removed</returns>
         public bool Remove(KeyValuePair<string, T> item) { throw new NotImplementedException(); }
+        /// <summary>
+        /// Removes all data in this collection
+        /// This method is not implemented
+        /// </summary>
         public void Clear() { throw new NotImplementedException(); }
+        /// <summary>
+        /// Copies the content of this collection to the given array, starting at the given index
+        /// This method is not implemented
+        /// </summary>
+        /// <param name="array">The array to copy to</param>
+        /// <param name="arrayIndex">The starting index in the array</param>
         public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex) { throw new NotImplementedException(); }
     }
 }

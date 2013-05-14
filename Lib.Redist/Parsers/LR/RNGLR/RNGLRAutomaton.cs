@@ -143,12 +143,12 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
-        /// Gets a list of the expected terminal indices
+        /// Gets a collection of the expected terminal indices
         /// </summary>
         /// <param name="state">The DFA state</param>
         /// <param name="terminalCount">The maximal number of terminals</param>
         /// <returns>The expected terminal indices</returns>
-        public List<int> GetExpected(ushort state, int terminalCount)
+        public ICollection<int> GetExpected(ushort state, int terminalCount)
         {
             List<int> result = new List<int>();
             int offset = ncols * state * 2;
