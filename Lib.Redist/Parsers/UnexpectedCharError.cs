@@ -26,10 +26,16 @@ namespace Hime.Redist.Parsers
         /// <param name="unexpected">The errorneous character</param>
         /// <param name="line">The line number of the character</param>
         /// <param name="column">The column number of the character</param>
-        internal UnexpectedCharError(char unexpected, int line, int column) : base(ParserErrorType.UnexpectedChar, line, column)
+        internal UnexpectedCharError(char unexpected, int line, int column)
+            : base(ParserErrorType.UnexpectedChar, line, column)
         {
             this.UnexpectedChar = unexpected;
-            this.Message += "Unexpected character '" + unexpected.ToString() + "' (0x" + Convert.ToInt32(unexpected).ToString("X") + ")";
+            StringBuilder Builder = new StringBuilder("Unexpected character '");
+            Builder.Append(unexpected);
+            Builder.Append("' (0x");
+            Builder.Append(Convert.ToInt32(unexpected).ToString("X"));
+            Builder.Append(")");
+            this.Message += Builder.ToString();
         }
     }
 }
