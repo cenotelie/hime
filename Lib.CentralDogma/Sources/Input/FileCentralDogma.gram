@@ -1,4 +1,4 @@
-﻿cf grammar Kernel
+cf grammar Kernel
 {
 	options {}
 	terminals
