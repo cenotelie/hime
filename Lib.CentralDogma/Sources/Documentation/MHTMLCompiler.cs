@@ -46,8 +46,7 @@ namespace Hime.CentralDogma.Documentation
 	                writer.WriteLine();
     	            writer.WriteLine();
         	        writer.WriteLine("--" + boundary);
-
-					writer.Write(source.ToMHTML(linebreak));
+                    source.ToMHTML(writer, linebreak);
             	}
 
 	            writer.WriteLine();

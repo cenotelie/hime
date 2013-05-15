@@ -27,13 +27,12 @@ namespace Hime.CentralDogma.Documentation
         {
         }
 
-        public string ToMHTML(int linebreak)
+        public void ToMHTML(StreamWriter writer, int linebreak)
 		{
-			StringBuilder result = new StringBuilder();
-			result.AppendLine("Content-Type: " + this.contentType);
-			result.AppendLine("Content-Transfer-Encoding: " + contentTransferEncoding);
-			result.AppendLine("Content-Location: " + this.contentLocation);
-			result.AppendLine();
+			writer.WriteLine("Content-Type: " + this.contentType);
+            writer.WriteLine("Content-Transfer-Encoding: " + contentTransferEncoding);
+            writer.WriteLine("Content-Location: " + this.contentLocation);
+            writer.WriteLine();
 			
 			int length = 0;
         	while (true)
@@ -45,15 +44,13 @@ namespace Hime.CentralDogma.Documentation
 				{
 	            	string part1 = text.Substring(0, linebreak - length);
     	            text = text.Substring(linebreak - length);
-        	        result.AppendLine(part1);
+                    writer.WriteLine(part1);
             	    length = 0;
                	}
                 length += text.Length;
-	            result.Append(text);
+                writer.Write(text);
         	}
-			
 			this.stream.Close();
-			return result.ToString();
 		}
 	}
 }

@@ -101,7 +101,7 @@ namespace Hime.CentralDogma.Reporting
         public void ExportMHTML(string fileName)
         {
             XmlDocument document = report.ExportXML();
-            FileInfo File = new FileInfo(fileName);
+            FileInfo fileInfo = new FileInfo(fileName);
 			string xmlFileName = fileName + ".xml";
 			string htmlFileName = fileName + ".html";
             document.Save(xmlFileName);
@@ -109,11 +109,11 @@ namespace Hime.CentralDogma.Reporting
             using (ResourceAccessor session = new ResourceAccessor())
 			{
 	            session.AddCheckoutFile(xmlFileName);
-    	        session.CheckOut("Transforms.Logs.xslt", File.DirectoryName + "Logs.xslt");
+    	        session.CheckOut("Transforms.Logs.xslt", fileInfo.DirectoryName + "Logs.xslt");
 
-	            XslCompiledTransform Transform = new XslCompiledTransform();
-    	        Transform.Load(File.DirectoryName + "Logs.xslt");
-        	    Transform.Transform(xmlFileName, htmlFileName);
+	            XslCompiledTransform transform = new XslCompiledTransform();
+    	        transform.Load(fileInfo.DirectoryName + "Logs.xslt");
+        	    transform.Transform(xmlFileName, htmlFileName);
             	session.AddCheckoutFile(htmlFileName);
 
 	            Documentation.MHTMLCompiler compiler = new Documentation.MHTMLCompiler(report.Title);
