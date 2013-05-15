@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using Hime.Redist.AST;
 using Hime.Redist.Parsers;
+using Hime.Redist.Symbols;
 
 namespace Hime.CentralDogma
 {
@@ -82,11 +83,12 @@ namespace Hime.CentralDogma
         /// </summary>
         public AccessModifier CodeAccess { get; set; }
 
-        internal Dictionary<string, CompilerPlugin> plugins;
-        internal Reporting.Reporter reporter;
-        internal List<KeyValuePair<string, TextReader>> inputs;
-        internal Dictionary<string, Grammars.Grammar> grammars;
-        internal Dictionary<string, Grammars.GrammarLoader> loaders;
+        private int nextRawID;
+        private Dictionary<string, CompilerPlugin> plugins;
+        private Reporting.Reporter reporter;
+        private List<KeyValuePair<string, TextReader>> inputs;
+        private Dictionary<string, Grammars.Grammar> grammars;
+        private Dictionary<string, Grammars.GrammarLoader> loaders;
 
         /// <summary>
         /// Initializes a new compilation task
@@ -99,6 +101,7 @@ namespace Hime.CentralDogma
             OutputDocumentation = false;
             CodeAccess = AccessModifier.Internal;
 
+            nextRawID = 0;
             plugins = new Dictionary<string, CompilerPlugin>();
             plugins.Add("cf_grammar", new Grammars.ContextFree.CFPlugin());
             reporter = new Reporting.Reporter(typeof(CompilationTask), "Compilation log");
@@ -106,6 +109,8 @@ namespace Hime.CentralDogma
             grammars = new Dictionary<string, Grammars.Grammar>();
             loaders = new Dictionary<string, Grammars.GrammarLoader>();
         }
+
+        private string GetRawInputID() { return "raw" + (nextRawID++); }
 
         /// <summary>
         /// Adds a new file as input
@@ -116,7 +121,7 @@ namespace Hime.CentralDogma
         /// Adds a new data string as input
         /// </summary>
         /// <param name="data">The data string</param>
-        public void AddInputRaw(string data) { inputs.Add(new KeyValuePair<string, TextReader>(null, new StringReader(data))); }
+        public void AddInputRaw(string data) { inputs.Add(new KeyValuePair<string, TextReader>(GetRawInputID(), new StringReader(data))); }
         /// <summary>
         /// Adds a new named data string as input
         /// </summary>
@@ -127,7 +132,7 @@ namespace Hime.CentralDogma
         /// Adds a new data stream as input
         /// </summary>
         /// <param name="stream">The input stream</param>
-        public void AddInputRaw(Stream stream) { inputs.Add(new KeyValuePair<string, TextReader>(null, new StreamReader(stream))); }
+        public void AddInputRaw(Stream stream) { inputs.Add(new KeyValuePair<string, TextReader>(GetRawInputID(), new StreamReader(stream))); }
         /// <summary>
         /// Adds a new named data stream as input
         /// </summary>
@@ -138,7 +143,7 @@ namespace Hime.CentralDogma
         /// Adds a new data reader as input
         /// </summary>
         /// <param name="reader">The input reader</param>
-        public void AddInputRaw(TextReader reader) { inputs.Add(new KeyValuePair<string, TextReader>(null, reader)); }
+        public void AddInputRaw(TextReader reader) { inputs.Add(new KeyValuePair<string, TextReader>(GetRawInputID(), reader)); }
         /// <summary>
         /// Adds a new named data reader as input
         /// </summary>
@@ -251,23 +256,19 @@ namespace Hime.CentralDogma
         internal bool LoadInput(string name, TextReader reader)
         {
             bool hasErrors = false;
-            if (name != null)
-                reporter.Info("Loading compilation unit " + name);
-            else
-                reporter.Info("Loading compilation unit from unnamed resources");
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
             ASTNode root = null;
             try { root = parser.Parse(); }
             catch (Exception ex)
             {
-                reporter.Error("Error error while parsing the input");
+                reporter.Error("Fatal error in " + name);
                 reporter.Report(ex);
                 hasErrors = true;
             }
             foreach (ParserError error in parser.Errors)
             {
-                reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, error.Message));
+                reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
                 hasErrors = true;
             }
             if (root != null)
@@ -276,13 +277,14 @@ namespace Hime.CentralDogma
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {
-                        reporter.Error("No compiler plugin found for resource " + gnode.Symbol.Name);
+                        TextToken token = gnode.Symbol as TextToken;
+                        reporter.Error(name + " @(" + token.Line + ", " + token.Column + ") No compiler plugin found for resource " + gnode.Symbol.Name);
                         hasErrors = true;
                         continue;
                     }
                     CompilerPlugin plugin = plugins[gnode.Symbol.Name];
-                    Grammars.GrammarLoader loader = plugin.GetLoader(gnode, reporter);
-                    loaders.Add(loader.Name, loader);
+                    Grammars.GrammarLoader loader = plugin.GetLoader(name, gnode, reporter);
+                    loaders.Add(name, loader);
                 }
             }
             reader.Close();

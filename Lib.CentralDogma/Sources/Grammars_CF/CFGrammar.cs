@@ -53,7 +53,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                         if (part.Symbol is Variable)
                             symbol = variables[part.Symbol.Name];
                         else if (part.Symbol is Terminal)
-                            symbol = terminalsByName[part.Symbol.Name];
+                        {
+                            // If this is a named terminal, just pick the one with the same name
+                            if (terminalsByName.ContainsKey(part.Symbol.Name))
+                                symbol = terminalsByName[part.Symbol.Name];
+                            else // this is an inline terminal, pick the one with the same value
+                                symbol = terminalsByValue[(part.Symbol as TextTerminal).Value];
+                        }
                         else if (part.Symbol is Virtual)
                             symbol = virtuals[part.Symbol.Name];
                         else if (part.Symbol is Action)
@@ -143,14 +149,14 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             // Search for Axiom option
             if (!options.ContainsKey("Axiom"))
             {
-                reporter.Error("Axiom option is undefined");
+                reporter.Error("No axiom variable has been defined for grammar " + this.name);
                 return false;
             }
             // Search for the variable specified as the Axiom
             string name = options["Axiom"];
             if (!variables.ContainsKey(name))
             {
-                reporter.Error("Cannot find axiom variable " + name);
+                reporter.Error("The specified axiom variable " + name + " is undefined");
                 return false;
             }
 

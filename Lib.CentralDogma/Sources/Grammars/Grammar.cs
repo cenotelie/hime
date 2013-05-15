@@ -10,7 +10,7 @@ namespace Hime.CentralDogma.Grammars
 {
     abstract class Grammar
     {
-        private static System.Random rand = new System.Random();
+        private static int unique = 0;
 
         protected string name;
         protected ushort nextSID;
@@ -51,7 +51,7 @@ namespace Hime.CentralDogma.Grammars
             this.nextSID = 3;
         }
 
-        protected string GenerateID() { return rand.Next().ToString("X"); }
+        protected string GenerateID() { return (unique++).ToString("X"); }
 
         public void AddOption(string name, string value)
         {
@@ -159,9 +159,21 @@ namespace Hime.CentralDogma.Grammars
 
         protected void InheritTerminals(Grammar parent)
         {
-            foreach (TextTerminal terminal in parent.terminalsByName.Values)
+            List<Terminal> inherited = new List<Terminal>(parent.terminalsByName.Values);
+            inherited.Sort(Terminal.PriorityComparer.Instance);
+            foreach (TextTerminal terminal in inherited)
             {
-                if (!terminalsByName.ContainsKey(terminal.Name) && !terminalsByValue.ContainsKey(terminal.Value))
+                if (terminalsByName.ContainsKey(terminal.Name))
+                {
+                    // this is a redefinition of a named terminal
+                    // TODO: Output an error in the log
+                }
+                else if (terminalsByValue.ContainsKey(terminal.Value))
+                {
+                    // this is a redefinition of an inline terminal
+                    // => do nothing, simply reuse the one with the same value
+                }
+                else
                 {
                     TextTerminal clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false));
                     clone.NFA.StateExit.Item = clone;

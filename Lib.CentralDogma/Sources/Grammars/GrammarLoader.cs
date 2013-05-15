@@ -10,10 +10,8 @@ namespace Hime.CentralDogma.Grammars
 {
 	interface GrammarLoader
     {
-        string Name { get; }
         Grammar Grammar { get; }
         bool IsSolved { get; }
-
         void Load(Dictionary<string, GrammarLoader> loaders);
     }
 }

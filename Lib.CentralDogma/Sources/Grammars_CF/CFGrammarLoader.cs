@@ -13,27 +13,25 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 {
     class CFGrammarLoader : GrammarLoader
     {
-        private Reporting.Reporter reporter;
+        private string resName;
         private ASTNode syntaxRoot;
-        private string name;
+        private Reporting.Reporter reporter;
         private List<string> inherited;
         private CFGrammar grammar;
         private bool caseInsensitive;
 
-        public string Name { get { return name; } }
         public Grammar Grammar { get { return grammar; } }
         public bool IsSolved { get { return (inherited.Count == 0); } }
 
-        public CFGrammarLoader(ASTNode root, Reporting.Reporter reporter)
+        public CFGrammarLoader(string resName, ASTNode root, Reporting.Reporter reporter)
         {
             this.reporter = reporter;
             this.syntaxRoot = root;
-            this.name = ((TextToken)root.Children[0].Symbol).Value;
+            this.resName = resName;
             this.inherited = new List<string>();
             foreach (ASTNode child in syntaxRoot.Children[1].Children)
                 inherited.Add(((TextToken)child.Symbol).Value);
-            reporter.Info("Loading grammar " + name);
-            this.grammar = new CFGrammar(name);
+            this.grammar = new CFGrammar(((TextToken)root.Children[0].Symbol).Value);
             this.caseInsensitive = false;
             if (inherited.Count == 0)
                 Compile_Recognize_grammar_text(syntaxRoot);
@@ -46,7 +44,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             {
                 if (!loaders.ContainsKey(parent))
                 {
-                    reporter.Error("Grammar " + parent + " inherited by " + name + " cannot be found");
+                    reporter.Error("Grammar " + parent + " inherited by " + grammar.Name + " cannot be found");
                     inherited.Remove(parent);
                 }
                 GrammarLoader loader = loaders[parent];
@@ -247,7 +245,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Terminal Ref = grammar.GetTerminalByName(token.Value);
             if (Ref == null)
             {
-                reporter.Error("@" + token.Line + " Cannot find terminal " + token.Value);
+                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Cannot find terminal " + token.Value);
                 Automata.NFA Final = new Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -344,10 +342,18 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 		
         private Terminal Compile_Recognize_terminal(ASTNode node)
         {
-            string name = ((TextToken)node.Children[0].Symbol).Value;
-            Automata.NFA nfa = Compile_Recognize_terminal_definition(node.Children[1]);
-            Terminal terminal = grammar.AddTerminalNamed(name, nfa);
-            nfa.StateExit.Item = terminal;
+            TextToken token = node.Children[0].Symbol as TextToken;
+            TextTerminal terminal = grammar.GetTerminalByName(token.Value) as TextTerminal;
+            if (terminal == null)
+            {
+                Automata.NFA nfa = Compile_Recognize_terminal_definition(node.Children[1]);
+                terminal = grammar.AddTerminalNamed(token.Value, nfa);
+                nfa.StateExit.Item = terminal;
+            }
+            else
+            {
+                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Overriding the definition of terminal " + token.Value);
+            }
             return terminal;
         }
 
@@ -357,7 +363,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             string value = ((TextToken)node.Children[node.Children.Count - 1].Symbol).Value;
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
-            // Check for previous instance in the grammar's grammar
+            // Check for previous instance in the grammar
             Terminal terminal = grammar.GetTerminalByValue(value);
             if (terminal == null)
             {
@@ -408,7 +414,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     defs.Add(new CFRuleBody(symbol));
                 else
                 {
-                    reporter.Error("@" + token.Line + " Unrecognized symbol " + token.Value + " in rule definition");
+                    reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Unrecognized symbol " + token.Value + " in rule definition");
                     defs.Add(new CFRuleBody());
                 }
             }
@@ -424,7 +430,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             // check for meta-rule existence
             if (!context.IsTemplateRule(name, paramCount))
             {
-                reporter.Error("Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
+                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
                 defs.Add(new CFRuleBody());
                 return defs;
             }
