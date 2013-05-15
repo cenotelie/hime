@@ -1,10 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- * Date: 03/06/2012
- * Time: 09:20
- * 
- */
-
 using System.IO;
 
 namespace Hime.Redist.Lexer

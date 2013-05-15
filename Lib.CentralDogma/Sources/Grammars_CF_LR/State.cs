@@ -1,9 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- * Date: 14/09/2011
- * Time: 17:22
- * 
- */
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;

@@ -1,10 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- * Date: 07/03/2013
- * Time: 17:25
- * 
- */
-
 namespace Hime.Redist.AST
 {
     /// <summary>

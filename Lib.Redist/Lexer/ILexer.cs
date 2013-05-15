@@ -1,7 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- */
-
 using System.Collections.Generic;
 
 namespace Hime.Redist.Lexer

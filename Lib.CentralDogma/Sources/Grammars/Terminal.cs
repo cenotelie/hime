@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 /*
  * Author: Charles Hymans
  * Date: 19/07/2011

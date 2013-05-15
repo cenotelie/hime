@@ -1,9 +1,3 @@
-﻿/*
- * Author: Charles Hymans
- * Date: 06/08/2011
- * Time: 23:03
- * 
- */
 using System.Collections.Generic;
 using System.IO;
 

@@ -1,4 +1,4 @@
-﻿namespace Hime.CentralDogma.Automata
+namespace Hime.CentralDogma.Automata
 {
     class DummyItem : FinalItem
     {

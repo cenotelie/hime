@@ -1,7 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- */
-
 namespace Hime.Redist.Lexer
 {
     /// <summary>

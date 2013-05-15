@@ -1,6 +1,3 @@
-﻿/*
- * Author: Laurent WOUTERS
- * */
 using System;
 using System.IO;
 using System.Reflection;

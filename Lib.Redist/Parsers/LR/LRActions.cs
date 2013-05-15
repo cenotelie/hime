@@ -1,4 +1,4 @@
-﻿namespace Hime.Redist.Parsers
+namespace Hime.Redist.Parsers
 {
     /// <summary>
     /// Actions values for LR parsers

@@ -1,9 +1,3 @@
-﻿/*
- * Author: Charles Hymans
- * Date: 17/07/2011
- * Time: 20:28
- * 
- */
 using System;
 using log4net;
 using System.Xml;

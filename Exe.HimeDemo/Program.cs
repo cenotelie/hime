@@ -1,7 +1,3 @@
-﻿/*
- * @author Charles Hymans
- * */
-
 using Hime.Demo.Tasks;
 
 namespace Hime.Demo

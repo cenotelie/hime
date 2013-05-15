@@ -1,6 +1,3 @@
-/*
- * Author: Charles Hymans
- * */
 using System;
 using System.Collections.Generic;
 using Hime.Redist.Symbols;

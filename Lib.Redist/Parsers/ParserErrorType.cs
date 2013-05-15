@@ -1,10 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- * Date: 05/08/2012
- * Time: 18:30
- * 
- */
-
 namespace Hime.Redist.Parsers
 {
     /// <summary>

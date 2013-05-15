@@ -1,4 +1,4 @@
-﻿namespace Hime.Redist.Parsers
+namespace Hime.Redist.Parsers
 {
     /// <summary>
     /// Bytecode values for the LR productions

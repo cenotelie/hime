@@ -1,10 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- * Date: 12/03/2013
- * Time: 17:22
- * 
- */
-
 namespace Hime.CentralDogma
 {
     /// <summary>

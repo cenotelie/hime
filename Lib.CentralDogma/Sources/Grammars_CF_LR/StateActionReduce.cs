@@ -1,9 +1,3 @@
-﻿/*
- * Author: Charles Hymans
- * Date: 19/07/2011
- * Time: 21:11
- * 
- */
 using System;
 
 namespace Hime.CentralDogma.Grammars.ContextFree.LR

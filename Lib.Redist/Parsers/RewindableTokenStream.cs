@@ -1,9 +1,3 @@
-﻿/*
- * Author: Laurent Wouters
- * Date: 26/10/2012
- * Time: 17:25
- * 
- */
 using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers

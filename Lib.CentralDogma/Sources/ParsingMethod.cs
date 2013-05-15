@@ -1,10 +1,3 @@
-﻿/*
- * Author: Charles Hymans
- * Date: 06/08/2011
- * Time: 22:30
- * 
- */
-
 namespace Hime.CentralDogma
 {
     /// <summary>
