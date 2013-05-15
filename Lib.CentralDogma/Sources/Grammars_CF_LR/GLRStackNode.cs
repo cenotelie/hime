@@ -22,7 +22,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         {
             this.id = GetHashCode();
             this.state = state;
-            this.previous = new Dictionary<Symbol, Dictionary<int, GLRStackNode>>(Symbol.Comparer.Instance);
+            this.previous = new Dictionary<Symbol, Dictionary<int, GLRStackNode>>(Symbol.EqualityComparer.Instance);
         }
 
         public void AddPrevious(Symbol symbol, GLRStackNode node)

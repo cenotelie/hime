@@ -28,7 +28,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         {
             kernel = Kernel;
             items = Items;
-            children = new Dictionary<Symbol, State>(Symbol.Comparer.Instance);
+            children = new Dictionary<Symbol, State>(Symbol.EqualityComparer.Instance);
         }
 
         public void BuildGraph(Graph Graph)

@@ -38,13 +38,13 @@ namespace Hime.CentralDogma.Grammars
 			node.Attributes[attributeName].Value = attributeValue;
 		}
 
-        public sealed class Comparer : IEqualityComparer<Symbol>
+        public sealed class EqualityComparer : IEqualityComparer<Symbol>
         {
             public bool Equals(Symbol x, Symbol y) { return (x.SID == y.SID); }
             public int GetHashCode(Symbol obj) { return obj.SID; }
-            private Comparer() { }
-            private static Comparer instance = new Comparer();
-            public static Comparer Instance { get { return instance; } }
+            private EqualityComparer() { }
+            private static EqualityComparer instance = new EqualityComparer();
+            public static EqualityComparer Instance { get { return instance; } }
         }
 
         public override string ToString() { return Name; }
