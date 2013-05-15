@@ -175,7 +175,7 @@ namespace Hime.Redist.Parsers
                 }
                 else
                 {
-                    AST.BuildNode node = objects[head + nextStack + 1] as AST.BuildNode;
+                    AST.BuildNode node = objects[head + nextStack + 1];
                     node.SetAction(op & LRBytecode.MaskAction);
                     bufferSymbols[nextBuffer] = node.Value.Symbol;
                     bufferNodes[nextBuffer] = node;
