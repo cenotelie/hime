@@ -15,7 +15,7 @@ namespace Hime.Demo
         public WinTreeView(ASTNode root)
         {
             InitializeComponent();
-            TreeNode vroot = View.Nodes.Add(root.Symbol.Name);
+            TreeNode vroot = View.Nodes.Add(GetString(root));
             AddSubTree(vroot, root);
         }
 
@@ -24,21 +24,19 @@ namespace Hime.Demo
             foreach (ASTNode child in snode.Children)
             {
                 TreeNode vchild = null;
-                if (child.Symbol != null)
-                {
-                    string name = child.Symbol.Name;
-                    string value = "";
-                    if (child.Symbol is Token)
-                        value = ": \"" + (child.Symbol as Token).Value.ToString() + "\"";
-                    string header = name + value;
-                    vchild = vnode.Nodes.Add(header);
-                }
-                else
-                {
-                    vchild = vnode.Nodes.Add("<null>");
-                }
+                vchild = vnode.Nodes.Add(GetString(child));
                 AddSubTree(vchild, child);
             }
+        }
+
+        private string GetString(ASTNode node)
+        {
+            if (node.Symbol == null)
+                return "<null>";
+            string value = node.Symbol.Name;
+            if (node.Symbol is Token)
+                value += ": \"" + (node.Symbol as Token).Value + "\"";
+            return value;
         }
     }
 }
