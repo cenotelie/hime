@@ -6,7 +6,7 @@
     public static class LRBytecode
     {
         /// <summary>
-        /// Mask for CST action in bytecodes
+        /// Mask for AST action in bytecodes
         /// </summary>
         public const ushort MaskAction = 3;
 

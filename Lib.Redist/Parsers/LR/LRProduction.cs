@@ -33,11 +33,11 @@ namespace Hime.Redist.Parsers
     public sealed class LRProduction
     {
         /// <summary>
-        /// In the CST, the root node will be replaced by its children
+        /// In the AST, the root node will be replaced by its children
         /// </summary>
         public const byte HeadReplace = 1;
         /// <summary>
-        /// In the CST, keep the root node
+        /// In the AST, keep the root node
         /// </summary>
         public const byte HeadKeep = 0;
 
