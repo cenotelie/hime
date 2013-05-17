@@ -12,7 +12,7 @@ namespace Hime.Redist.Lexer
         private const int initBufferSize = 128;     // Initial size of the buffer storing tokens' values
 
         // General data
-        private TextLexerAutomaton lexAutomaton;                        // The automaton
+        private Automaton lexAutomaton;                        // The automaton
         private Utils.SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
         private int lexSeparator;                                       // Symbol ID of the SEPARATOR terminal
         // Runtime data
@@ -48,7 +48,7 @@ namespace Hime.Redist.Lexer
         /// <param name="terminals">Terminals recognized by this lexer</param>
         /// <param name="separator">SID of the separator token</param>
         /// <param name="input">Input to this lexer</param>
-        protected TextLexer(TextLexerAutomaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
+        protected TextLexer(Automaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
             this.lexTerminals = new Utils.SymbolDictionary<Symbols.Terminal>(terminals);

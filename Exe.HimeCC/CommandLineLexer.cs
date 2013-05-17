@@ -12,7 +12,7 @@ namespace Hime.HimeCC.CL
 {
     internal class CommandLineLexer : TextLexer
     {
-        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(CommandLineLexer), "CommandLineLexer.bin");
+        private static readonly Automaton automaton = Automaton.Find(typeof(CommandLineLexer), "CommandLineLexer.bin");
         public static readonly Terminal[] terminals = {
             new Terminal(0x1, "ε"),
             new Terminal(0x2, "$"),

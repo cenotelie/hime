@@ -12,7 +12,7 @@ namespace Hime.CentralDogma.Input
 {
     internal class FileCentralDogmaLexer : TextLexer
     {
-        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(FileCentralDogmaLexer), "FileCentralDogmaLexer.bin");
+        private static readonly Automaton automaton = Automaton.Find(typeof(FileCentralDogmaLexer), "FileCentralDogmaLexer.bin");
         public static readonly Terminal[] terminals = {
             new Terminal(0x1, "ε"),
             new Terminal(0x2, "$"),

@@ -82,7 +82,7 @@
     <Compile Include="Parsers\LR\LRProduction.cs" />
     <Compile Include="Lexer\RewindableTextReader.cs" />
     <Compile Include="Lexer\TextLexer.cs" />
-    <Compile Include="Lexer\TextLexerAutomaton.cs" />
+    <Compile Include="Lexer\Automaton.cs" />
     <Compile Include="Parsers\RewindableTokenStream.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\ParserError.cs" />

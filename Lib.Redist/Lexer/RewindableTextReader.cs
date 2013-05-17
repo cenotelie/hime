@@ -5,7 +5,7 @@ namespace Hime.Redist.Lexer
     /// <summary>
     /// Fast rewindable reader of text
     /// </summary>
-    public sealed class RewindableTextReader
+    class RewindableTextReader
     {
         private TextReader reader;  // Encapsulated text reader
         private char[] buffer;      // First stage buffer for reading batch reading of the stream

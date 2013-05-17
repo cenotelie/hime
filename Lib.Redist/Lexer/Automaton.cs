@@ -24,12 +24,12 @@ namespace Hime.Redist.Lexer
     /// uint16: end of the range
     /// uint16: next state's index
     /// </remarks>
-    public sealed class TextLexerAutomaton
+    public sealed class Automaton
     {
         private Utils.BlobUInt table;
         private Utils.BlobUShort states;
 
-        private TextLexerAutomaton(Stream stream)
+        private Automaton(Stream stream)
         {
             BinaryReader reader = new BinaryReader(stream);
             int count = reader.ReadInt32();
@@ -46,13 +46,13 @@ namespace Hime.Redist.Lexer
         /// <param name="type">The lexer's type</param>
         /// <param name="resource">The name of the resource containing the lexer</param>
         /// <returns>The automaton</returns>
-        public static TextLexerAutomaton FindAutomaton(System.Type type, string resource)
+        public static Automaton Find(System.Type type, string resource)
         {
             System.Reflection.Assembly assembly = type.Assembly;
             string[] resources = assembly.GetManifestResourceNames();
             foreach (string existing in resources)
                 if (existing.EndsWith(resource))
-                    return new TextLexerAutomaton(assembly.GetManifestResourceStream(existing));
+                    return new Automaton(assembly.GetManifestResourceStream(existing));
             return null;
         }
 
@@ -61,28 +61,28 @@ namespace Hime.Redist.Lexer
         /// </summary>
         /// <param name="state">The DFA which offset shall be retrieved</param>
         /// <returns>The offset of the given DFA state</returns>
-        public int GetOffset(int state) { return (int)table[state]; }
+        internal int GetOffset(int state) { return (int)table[state]; }
 
         /// <summary>
         /// Gets the recognized terminal index for the DFA at the given index
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>The index of the terminal recognized at this state, or 0xFFFF if none</returns>
-        public int GetTerminalIndex(int offset) { return states[offset]; }
+        internal int GetTerminalIndex(int offset) { return states[offset]; }
 
         /// <summary>
         /// Checks whether the DFA state at the given state has any transition
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>True of the state at the given offset has no transition</returns>
-        public bool HasNoTransition(int offset) { return (states[offset + 1] == 0); }
+        internal bool HasNoTransition(int offset) { return (states[offset + 1] == 0); }
 
         /// <summary>
         /// Gets the transition corresponding to the given state's index and input value
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-        public int GetCachedTransition(int offset) { return states[offset]; }
+        internal int GetCachedTransition(int offset) { return states[offset]; }
 
         /// <summary>
         /// Gets the transition corresponding to the given state's index and input value
@@ -90,7 +90,7 @@ namespace Hime.Redist.Lexer
         /// <param name="offset">The DFA state's offset</param>
         /// <param name="value">The input value</param>
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-        public int GetFallbackTransition(int offset, int value)
+        internal int GetFallbackTransition(int offset, int value)
         {
             int count = states[offset + 1];
             offset += 258;
