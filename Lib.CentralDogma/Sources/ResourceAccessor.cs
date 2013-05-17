@@ -6,8 +6,9 @@ using System.Text;
 
 namespace Hime.CentralDogma
 {
+    // TODO: Remove this class
 	/// <summary>
-	/// Provides an API for the access to the resources embedded within an assembly and keeps track of which resource has been exported
+	/// Provides an API for accessing to the resources embedded within an assembly and keeps track of which resources have been exported
 	/// </summary>
     public sealed class ResourceAccessor : IDisposable
 	{
