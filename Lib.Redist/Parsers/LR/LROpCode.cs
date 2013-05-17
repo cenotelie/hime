@@ -27,7 +27,7 @@ namespace Hime.Redist.Parsers
         public LRTreeAction TreeAction { get { return (LRTreeAction)(code & MaskAction); } }
 
         /// <summary>
-        /// Gets whether is a Pop action
+        /// Gets whether this is a Pop action
         /// </summary>
         public bool IsPop { get { return (code < Virtual); } }
 
