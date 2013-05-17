@@ -8,14 +8,15 @@ namespace Hime.Redist.Lexer
     /// <remarks>
     /// Binary data structure of lexers:
     /// uint32: number of entries in the states index table
-    /// -- states index table
+    /// -- states offset table
     /// each entry is of the form:
     /// uint32: offset of the state from the beginning of the states table in number of uint16
     /// 
     /// -- states table
     /// each entry is of the form:
     /// uint16: recognized terminal's index
-    /// uint16: number of transitions
+    /// uint16: total number of transitions
+    /// uint16: number of non-cached transitions
     /// -- cache: 256 entries
     /// uint16: next state's index for index of the entry
     /// -- transitions
@@ -92,8 +93,8 @@ namespace Hime.Redist.Lexer
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
         internal int GetFallbackTransition(int offset, int value)
         {
-            int count = states[offset + 1];
-            offset += 258;
+            int count = states[offset + 2];
+            offset += 259;
             for (int i = 0; i != count; i++)
             {
                 if (value >= states[offset] && value <= states[offset + 1])

@@ -182,7 +182,7 @@ namespace Hime.Redist.Lexer
                 }
                 // Try to find a transition from this state with the read character
                 if (current <= 255)
-                    state = lexAutomaton.GetCachedTransition(offset + current + 2);
+                    state = lexAutomaton.GetCachedTransition(offset + current + 3);
                 else
                     state = lexAutomaton.GetFallbackTransition(offset, current);
             }

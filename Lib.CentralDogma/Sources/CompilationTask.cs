@@ -191,7 +191,7 @@ namespace Hime.CentralDogma
 
             // Export lexer code
             reporter.Info("Exporting lexer code at " + prefix + PostfixLexerCode + " ...");
-            StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace);
+            StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace, true);
             lexerData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
             CloseOutputStream(txtOutput);
             reporter.Info("Done!");
@@ -205,7 +205,7 @@ namespace Hime.CentralDogma
             
             // Export parser code
             reporter.Info("Exporting parser data at " + prefix + PostfixParserCode + " ...");
-            txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace);
+            txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace, false);
             parserData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixParserData, lexerData.Expected);
             CloseOutputStream(txtOutput);
             reporter.Info("Done!");
@@ -354,7 +354,7 @@ namespace Hime.CentralDogma
             return null;
         }
 
-        internal StreamWriter OpenOutputStream(string fileName, string nmespace)
+        internal StreamWriter OpenOutputStream(string fileName, string nmespace, bool lexer)
         {
             StreamWriter writer = new StreamWriter(fileName, false, new UTF8Encoding(false));
             writer.WriteLine("/*");
@@ -364,8 +364,10 @@ namespace Hime.CentralDogma
             writer.WriteLine();
             writer.WriteLine("using System.Collections.Generic;");
             writer.WriteLine("using Hime.Redist.Symbols;");
-            writer.WriteLine("using Hime.Redist.Lexer;");
-            writer.WriteLine("using Hime.Redist.Parsers;");
+            if (lexer)
+                writer.WriteLine("using Hime.Redist.Lexer;");
+            else
+                writer.WriteLine("using Hime.Redist.Parsers;");
             writer.WriteLine();
             writer.WriteLine("namespace " + nmespace);
             writer.WriteLine("{");

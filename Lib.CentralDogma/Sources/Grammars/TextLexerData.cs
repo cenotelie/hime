@@ -49,7 +49,7 @@ namespace Hime.CentralDogma.Grammars
         }
         private void ExportStatics(StreamWriter stream, string name, string resource)
         {
-            stream.WriteLine("        private static readonly TextLexerAutomaton automaton = TextLexerAutomaton.FindAutomaton(typeof(" + name + "Lexer), \"" + resource + "\");");
+            stream.WriteLine("        private static readonly Automaton automaton = Automaton.Find(typeof(" + name + "Lexer), \"" + resource + "\");");
             stream.WriteLine("        public static readonly Terminal[] terminals = {");
             bool first = true;
             foreach (Terminal terminal in terminals)
@@ -66,22 +66,32 @@ namespace Hime.CentralDogma.Grammars
             ushort[] cache = new ushort[256];
             for (int i = 0; i != 256; i++)
                 cache[i] = 0xFFFF;
-
+            ushort cached = 0;
+            ushort slow = 0;
             foreach (Automata.CharSpan span in state.Transitions.Keys)
             {
                 if (span.Begin <= 255)
                 {
-                    int end = (span.End < 255 ? span.End : 255);
-                    for (int i = span.Begin; i != end + 1; i++)
+                    cached++;
+                    int end = span.End;
+                    if (end >= 256)
+                    {
+                        end = 255;
+                        slow++;
+                    }
+                    for (int i = span.Begin; i <= end; i++)
                         cache[i] = (ushort)state.Transitions[span].ID;
                 }
+                else
+                    slow++;
             }
 
             if (state.TopItem != null)
                 stream.Write((ushort)terminals.IndexOf(state.TopItem as Terminal));
             else
                 stream.Write((ushort)0xFFFF);
-            stream.Write((ushort)state.TransitionsCount);
+            stream.Write((ushort)(slow + cached));
+            stream.Write(slow);
 
             for (int i = 0; i != 256; i++)
                 stream.Write(cache[i]);
@@ -90,19 +100,28 @@ namespace Hime.CentralDogma.Grammars
             keys.Sort(new Comparison<Automata.CharSpan>(Automata.CharSpan.CompareReverse));
             foreach (Automata.CharSpan span in keys)
             {
-                stream.Write(System.Convert.ToUInt16(span.Begin));
+                if (span.End <= 255)
+                    break; // the rest of the transitions are in the cache
+                ushort begin = span.Begin;
+                if (begin <= 255)
+                    begin = 256;
+                stream.Write(begin);
                 stream.Write(System.Convert.ToUInt16(span.End));
                 stream.Write((ushort)state.Transitions[span].ID);
+                slow--;
             }
         }
         private void ExportStates(BinaryWriter stream)
         {
-            stream.Write(dfa.States.Count);
-            int offset = 0;
+            stream.Write((uint)dfa.States.Count);
+            uint offset = 0;
             foreach (Automata.DFAState state in dfa.States)
             {
                 stream.Write(offset);
-                offset += state.TransitionsCount * 3 + 258;
+                offset += 3 + 256;
+                foreach (Automata.CharSpan key in state.Transitions.Keys)
+                    if (key.End >= 256)
+                        offset += 3;
             }
             foreach (Automata.DFAState state in dfa.States)
                 ExportState(stream, state);
