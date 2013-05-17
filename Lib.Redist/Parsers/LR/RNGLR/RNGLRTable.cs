@@ -43,8 +43,8 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the cell for the given row and column
         /// </summary>
-        /// <param name="state">The row in the table</param>
-        /// <param name="sid">The column in the table</param>
+        /// <param name="row">The row in the table</param>
+        /// <param name="col">The column in the table</param>
         /// <returns>The Cell for the given row and column</returns>
         public Cell this[int row, int col]
         {

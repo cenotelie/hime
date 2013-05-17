@@ -1,5 +1,8 @@
 namespace Hime.Redist.Parsers
 {
+    /// <summary>
+    /// Represents an action in a LR parser
+    /// </summary>
     public enum LRActionCode : ushort
     {
         /// <summary>

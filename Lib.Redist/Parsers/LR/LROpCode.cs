@@ -8,18 +8,63 @@ namespace Hime.Redist.Parsers
     [StructLayout(LayoutKind.Explicit, Size = 2)]
     public struct LROpCode
     {
-        public const ushort MaskAction = 3;
+        private const ushort MaskAction = 3;
+        
+        /// <summary>
+        /// Pop an AST from the stack without applying any tree action
+        /// </summary>
         public const ushort PopNoAction = 0;
+        /// <summary>
+        /// Pop an AST from the stack and apply the drop tree action
+        /// </summary>
         public const ushort PopDrop = 2;
+        /// <summary>
+        /// Pop an AST from the stack and apply the promote tree action
+        /// </summary>
         public const ushort PopPromote = 3;
-        public const ushort Virtual = 4;
+        
+        private const ushort Virtual = 4;
+        /// <summary>
+        /// Add a virtual symbol without tree action
+        /// </summary>
         public const ushort VirtualNoAction = Virtual + PopNoAction;
+        /// <summary>
+        /// Add a virtual symbol and apply the drop tree action
+        /// </summary>
+        /// <remarks>
+        /// This doesn't make any sense, but it is possible!
+        /// </remarks>
         public const ushort VirtualDrop = Virtual + PopDrop;
+        /// <summary>
+        /// Add a virtual symbol and apply the promote tree action
+        /// </summary>
         public const ushort VirtualPromote = Virtual + PopPromote;
+        /// <summary>
+        /// Execute a semantic action
+        /// </summary>
         public const ushort SemanticAction = 8;
-        public const ushort NullVariable = 16;
+        
+        private const ushort NullVariable = 16;
+        /// <summary>
+        /// Add a null variable without any tree action
+        /// </summary>
+        /// <remarks>
+        /// This can be found only in RNGLR productions
+        /// </remarks>
         public const ushort NullVariableNoAction = NullVariable;
+        /// <summary>
+        /// Add a null variable and apply the drop tree action
+        /// </summary>
+        /// <remarks>
+        /// This can be found only in RNGLR productions
+        /// </remarks>
         public const ushort NullVariableDrop = NullVariable + PopDrop;
+        /// <summary>
+        /// Add a null variable and apply the promote action
+        /// </summary>
+        /// <remarks>
+        /// This can be found only in RNGLR productions
+        /// </remarks>
         public const ushort NullVariablePromote = NullVariable + PopPromote;
 
         [FieldOffset(0)]
