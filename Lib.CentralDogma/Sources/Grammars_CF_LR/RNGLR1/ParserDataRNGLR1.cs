@@ -35,8 +35,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 nullables.Add(nullIndex);
             }
 
-            int total = 0;
-            List<ushort> offsets = new List<ushort>();
+            uint total = 0;
+            List<uint> offsets = new List<uint>();
             List<ushort> counts = new List<ushort>();
             foreach (State state in graph.States)
                 total = ExportDataCountActions(offsets, counts, total, state);
@@ -44,7 +44,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             stream.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption("Axiom"))));
             stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
             stream.Write((ushort)graph.States.Count);                   // Nb or rows
-            stream.Write((ushort)total);                                // Nb of actions
+            stream.Write((uint)total);                                  // Nb of actions
             stream.Write((ushort)rules.Count);                          // Nb of rules
             stream.Write((ushort)nullables.Count);                      // Nb of nullables
 
@@ -69,35 +69,31 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 stream.Write(index);
         }
 
-        private int ExportDataCountActions(List<ushort> offsets, List<ushort> counts, int total, State state)
+        private uint ExportDataCountActions(List<uint> offsets, List<ushort> counts, uint total, State state)
         {
-            Dictionary<Terminal, int> counters = new Dictionary<Terminal, int>();
+            Dictionary<Terminal, int> reductionCounters = new Dictionary<Terminal, int>();
             foreach (StateActionReduce reduce in state.Reductions)
             {
-                if (counters.ContainsKey(reduce.Lookahead))
-                {
-                    int temp = counters[reduce.Lookahead] + 1;
-                    counters.Remove(reduce.Lookahead);
-                    counters.Add(reduce.Lookahead, temp);
-                }
+                if (reductionCounters.ContainsKey(reduce.Lookahead))
+                    reductionCounters[reduce.Lookahead] = reductionCounters[reduce.Lookahead] + 1;
                 else
-                    counters.Add(reduce.Lookahead, 1);
+                    reductionCounters.Add(reduce.Lookahead, 1);
             }
             foreach (Terminal t in terminals)
             {
                 int count = state.Children.ContainsKey(t) ? 1 : 0;
-                if (counters.ContainsKey(t))
-                    count += counters[t];
-                offsets.Add((ushort)total);
+                if (reductionCounters.ContainsKey(t))
+                    count += reductionCounters[t];
+                offsets.Add(total);
                 counts.Add((ushort)count);
-                total += count;
+                total += (uint)count;
             }
             foreach (Variable var in variables)
             {
                 int count = state.Children.ContainsKey(var) ? 1 : 0;
-                offsets.Add((ushort)total);
+                offsets.Add(total);
                 counts.Add((ushort)count);
-                total += count;
+                total += (uint)count;
             }
             return total;
         }
@@ -114,22 +110,22 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             if (reductions.ContainsKey(Epsilon.Instance))
             {
                 // There can be only one reduction on epsilon
-                stream.Write(LRActions.Accept);
-                stream.Write(LRActions.None);
+                stream.Write((ushort)LRActionCode.Accept);
+                stream.Write((ushort)LRActionCode.None);
             }
             for (int i = 1; i != terminals.Count; i++)
             {
                 Terminal t = terminals[i];
                 if (state.Children.ContainsKey(t))
                 {
-                    stream.Write(LRActions.Shift);
+                    stream.Write((ushort)LRActionCode.Shift);
                     stream.Write((ushort)state.Children[t].ID);
                 }
                 if (reductions.ContainsKey(t))
                 {
                     foreach (StateActionRNReduce reduce in reductions[t])
                     {
-                        stream.Write(LRActions.Reduce);
+                        stream.Write((ushort)LRActionCode.Reduce);
                         stream.Write((ushort)rules.IndexOf(new KeyValuePair<Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
                     }
                 }
@@ -138,7 +134,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (state.Children.ContainsKey(var))
                 {
-                    stream.Write(LRActions.Shift);
+                    stream.Write((ushort)LRActionCode.Shift);
                     stream.Write((ushort)state.Children[var].ID);
                 }
             }
@@ -147,20 +143,20 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule, int length)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write(LRProduction.HeadReplace);
-            else stream.Write(LRProduction.HeadKeep);
+            if (rule.ReplaceOnProduction) stream.Write((byte)LRTreeAction.Replace);
+            else stream.Write((byte)LRTreeAction.None);
             stream.Write((byte)length);
             byte bcl = 0;
             int pop = 0;
             foreach (RuleBodyElement elem in rule.Body.Parts)
             {
                 if (elem.Symbol is Virtual || elem.Symbol is Action)
-                    bcl += 4;
+                    bcl += 2;
                 else if (pop >= length)
-                    bcl += 4;
+                    bcl += 2;
                 else
                 {
-                    bcl += 2;
+                    bcl += 1;
                     pop++;
                 }
             }
@@ -170,30 +166,30 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.VirtualDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.VirtualPromote);
-                    else stream.Write(LRBytecode.VirtualNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.VirtualPromote);
+                    else stream.Write((ushort)LROpCode.VirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
                 {
-                    stream.Write(LRBytecode.SemanticAction);
+                    stream.Write((ushort)LROpCode.SemanticAction);
                     stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
                 else if (pop >= length)
                 {
                     // Here the symbol must be a variable
                     ushort index = (ushort)variables.IndexOf(elem.Symbol as CFVariable);
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.NullVariableDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.NullVariablePromote);
-                    else stream.Write(LRBytecode.NullVariableNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.NullVariableDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.NullVariablePromote);
+                    else stream.Write((ushort)LROpCode.NullVariableNoAction);
                     stream.Write(index);
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.PopDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.PopPromote);
-                    else stream.Write(LRBytecode.PopNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.PopPromote);
+                    else stream.Write((ushort)LROpCode.PopNoAction);
                     pop++;
                 }
             }

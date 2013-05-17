@@ -41,45 +41,45 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (StateActionReduce reduction in state.Reductions)
                 reductions.Add(reduction.Lookahead, reduction.ToReduceRule);
             if (reductions.ContainsKey(Epsilon.Instance) || reductions.ContainsKey(NullTerminal.Instance))
-                stream.Write(LRActions.Accept);
+                stream.Write((ushort)LRActionCode.Accept);
             else
-                stream.Write(LRActions.None);
-            stream.Write(LRActions.None);
+                stream.Write((ushort)LRActionCode.None);
+            stream.Write((ushort)LRActionCode.None);
             for (int i = 1; i != terminals.Count; i++)
             {
                 Terminal t = terminals[i];
                 if (state.Children.ContainsKey(t))
                 {
-                    stream.Write(LRActions.Shift);
+                    stream.Write((ushort)LRActionCode.Shift);
                     stream.Write((ushort)state.Children[t].ID);
                 }
                 else if (reductions.ContainsKey(t))
                 {
-                    stream.Write(LRActions.Reduce);
+                    stream.Write((ushort)LRActionCode.Reduce);
                     stream.Write((ushort)rules.IndexOf(reductions[t]));
                 }
                 else if (reductions.ContainsKey(NullTerminal.Instance))
                 {
-                    stream.Write(LRActions.Reduce);
+                    stream.Write((ushort)LRActionCode.Reduce);
                     stream.Write((ushort)rules.IndexOf(reductions[NullTerminal.Instance]));
                 }
                 else
                 {
-                    stream.Write(LRActions.None);
-                    stream.Write(LRActions.None);
+                    stream.Write((ushort)LRActionCode.None);
+                    stream.Write((ushort)LRActionCode.None);
                 }
             }
             foreach (Variable var in variables)
             {
                 if (state.Children.ContainsKey(var))
                 {
-                    stream.Write(LRActions.Shift);
+                    stream.Write((ushort)LRActionCode.Shift);
                     stream.Write((ushort)state.Children[var].ID);
                 }
                 else
                 {
-                    stream.Write(LRActions.None);
-                    stream.Write(LRActions.None);
+                    stream.Write((ushort)LRActionCode.None);
+                    stream.Write((ushort)LRActionCode.None);
                 }
             }
         }

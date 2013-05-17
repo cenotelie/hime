@@ -36,37 +36,37 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write(LRProduction.HeadReplace);
-            else stream.Write(LRProduction.HeadKeep);
+            if (rule.ReplaceOnProduction) stream.Write((byte)LRTreeAction.Replace);
+            else stream.Write((byte)LRTreeAction.None);
             stream.Write((byte)(rule as CFRule).CFBody.GetChoiceAt(0).Length);
             byte length = 0;
             foreach (RuleBodyElement elem in rule.Body.Parts)
             {
                 if (elem.Symbol is Virtual || elem.Symbol is Action)
-                    length += 4;
-                else
                     length += 2;
+                else
+                    length += 1;
             }
             stream.Write(length);
             foreach (RuleBodyElement elem in rule.Body.Parts)
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.VirtualDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.VirtualPromote);
-                    else stream.Write(LRBytecode.VirtualNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.VirtualPromote);
+                    else stream.Write((ushort)LROpCode.VirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
                 {
-                    stream.Write(LRBytecode.SemanticAction);
+                    stream.Write((ushort)LROpCode.SemanticAction);
                     stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write(LRBytecode.PopDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write(LRBytecode.PopPromote);
-                    else stream.Write(LRBytecode.PopNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.PopPromote);
+                    else stream.Write((ushort)LROpCode.PopNoAction);
                 }
             }
         }
