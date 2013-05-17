@@ -65,7 +65,7 @@ namespace Hime.Redist.Utils
                 if (key <= 0xFF)
                     return cache1[key];
                 else if (key <= 0x1FF)
-                    return cache2[key];
+                    return cache2[key - 0x100];
                 return others[key];
             }
         }
