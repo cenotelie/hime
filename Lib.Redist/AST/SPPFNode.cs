@@ -15,11 +15,11 @@ namespace Hime.Redist.AST
         /// <summary>
         /// The original SID retained by this SPPF node (even though the final AST node may change due to tree actions)
         /// </summary>
-        private ushort originalSID;
+        private int originalSID;
         /// <summary>
         /// Gets the original SID of this SPPF node
         /// </summary>
-        public ushort SymbolID { get { return originalSID; } }
+        public int SymbolID { get { return originalSID; } }
         
         /// <summary>
         /// Initializes this node with the given symbol

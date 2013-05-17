@@ -14,7 +14,7 @@ namespace Hime.Redist.Lexer
         // General data
         private TextLexerAutomaton lexAutomaton;                        // The automaton
         private Utils.SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
-        private ushort lexSeparator;                                    // Symbol ID of the SEPARATOR terminal
+        private int lexSeparator;                                       // Symbol ID of the SEPARATOR terminal
         // Runtime data
         private RewindableTextReader input;     // Lexer's input
         private int currentLine;                // Current line number in the input
@@ -48,7 +48,7 @@ namespace Hime.Redist.Lexer
         /// <param name="terminals">Terminals recognized by this lexer</param>
         /// <param name="separator">SID of the separator token</param>
         /// <param name="input">Input to this lexer</param>
-        protected TextLexer(TextLexerAutomaton automaton, Symbols.Terminal[] terminals, ushort separator, System.IO.TextReader input)
+        protected TextLexer(TextLexerAutomaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
             this.lexTerminals = new Utils.SymbolDictionary<Symbols.Terminal>(terminals);
@@ -117,13 +117,13 @@ namespace Hime.Redist.Lexer
             int readColumn = currentColumn; // Current column while reading
             int readLine = currentLine;     // Current line while reading
             bool flagCR = false;            // flag indicating whether the last read character was a Carriage Return
-            ushort state = 0;               // Current state in the DFA
+            int state = 0;                  // Current state in the DFA
 
             while (state != 0xFFFF)
             {
                 int offset = lexAutomaton.GetOffset(state);
                 // Is this state a matching state ?
-                ushort terminal = lexAutomaton.GetTerminal(offset);
+                int terminal = lexAutomaton.GetTerminalIndex(offset);
                 if (terminal != 0xFFFF)
                 {
                     matchedIndex = terminal;

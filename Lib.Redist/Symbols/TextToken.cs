@@ -32,7 +32,7 @@ namespace Hime.Redist.Symbols
         /// <param name="value">Token's value</param>
         /// <param name="line">Token's line number</param>
         /// <param name="column">Token's starting column in the line</param>
-        public TextToken(ushort sid, string name, string value, int line, int column)
+        public TextToken(int sid, string name, string value, int line, int column)
             : base(sid, name)
         {
             this.value = value;

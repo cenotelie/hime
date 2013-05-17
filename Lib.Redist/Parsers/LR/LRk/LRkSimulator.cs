@@ -23,7 +23,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's stack
         /// </summary>
-        protected ushort[] stack;
+        protected int[] stack;
         /// <summary>
         /// Current stack's head
         /// </summary>
@@ -43,8 +43,8 @@ namespace Hime.Redist.Parsers
             advance = (inserted == null) ? 1 : 0;
             while (true)
             {
-                int action = RecognizeOnToken(nextToken);
-                if (action == LRActions.Shift)
+                LRActionCode action = RecognizeOnToken(nextToken);
+                if (action == LRActionCode.Shift)
                 {
                     remaining--;
                     if (remaining == 0) return true;
@@ -52,38 +52,32 @@ namespace Hime.Redist.Parsers
                     advance++;
                     continue;
                 }
-                if (action == LRActions.Accept)
+                if (action == LRActionCode.Accept)
                     return true;
                 return false;
             }
         }
 
-        /// <summary>
-        /// Runs the parser for the given state and token
-        /// </summary>
-        /// <param name="token">Current token</param>
-        /// <returns>true if the parser is able to consume the token, false otherwise</returns>
-        private int RecognizeOnToken(Symbols.Token token)
+        private LRActionCode RecognizeOnToken(Symbols.Token token)
         {
             while (true)
             {
-                ushort action = 0;
-                ushort data = parserAutomaton.GetAction(stack[head], token.SymbolID, out action);
-                if (action == LRActions.Shift)
+                LRAction action = parserAutomaton.GetAction(stack[head], token.SymbolID);
+                if (action.Code == LRActionCode.Shift)
                 {
-                    stack[++head] = data;
-                    return action;
+                    stack[++head] = action.Data;
+                    return action.Code;
                 }
-                else if (action == LRActions.Reduce)
+                else if (action.Code == LRActionCode.Reduce)
                 {
-                    LRProduction production = parserAutomaton.GetProduction(data);
+                    LRProduction production = parserAutomaton.GetProduction(action.Data);
                     Symbols.Variable var = parserVariables[production.Head];
                     head -= production.ReductionLength;
-                    data = parserAutomaton.GetAction(stack[head], var.SymbolID, out action);
-                    stack[++head] = data;
+                    action = parserAutomaton.GetAction(stack[head], var.SymbolID);
+                    stack[++head] = action.Data;
                     continue;
                 }
-                return action;
+                return action.Code;
             }
         }
     }

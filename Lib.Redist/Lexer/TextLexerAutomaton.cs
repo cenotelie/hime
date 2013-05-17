@@ -2,42 +2,41 @@ using System.IO;
 
 namespace Hime.Redist.Lexer
 {
-    /* Binary data structure of lexers:
-     * uint32: number of entries in the states index table
-     * 
-     * -- states index table
-     * each entry is of the form:
-     * uint32: offset of the state from the beginning of the states table in number of uint16
-     * 
-     * -- states table
-     * each entry is of the form:
-     * uint16: recognized terminal's index
-     * uint16: number of transitions
-     * -- cache: 256 entries
-     * uint16: next state's index for index of the entry
-     * -- transitions
-     * each transition is of the form:
-     * uint16: start of the range
-     * uint16: end of the range
-     * uint16: next state's index
-     */
-
     /// <summary>
     /// Data structure for a text lexer automaton
     /// </summary>
+    /// <remarks>
+    /// Binary data structure of lexers:
+    /// uint32: number of entries in the states index table
+    /// -- states index table
+    /// each entry is of the form:
+    /// uint32: offset of the state from the beginning of the states table in number of uint16
+    /// 
+    /// -- states table
+    /// each entry is of the form:
+    /// uint16: recognized terminal's index
+    /// uint16: number of transitions
+    /// -- cache: 256 entries
+    /// uint16: next state's index for index of the entry
+    /// -- transitions
+    /// each transition is of the form:
+    /// uint16: start of the range
+    /// uint16: end of the range
+    /// uint16: next state's index
+    /// </remarks>
     public sealed class TextLexerAutomaton
     {
-        private Utils.BlobInt table;
+        private Utils.BlobUInt table;
         private Utils.BlobUShort states;
 
         private TextLexerAutomaton(Stream stream)
         {
             BinaryReader reader = new BinaryReader(stream);
             int count = reader.ReadInt32();
-            table = new Utils.BlobInt(count * 4);
-            reader.Read(table.Raw, 0, table.RawSize);
-            states = new Utils.BlobUShort((int)stream.Length - table.RawSize - 4);
-            reader.Read(states.Raw, 0, states.RawSize);
+            table = new Utils.BlobUInt(count);
+            reader.Read(table.Raw, 0, table.Raw.Length);
+            states = new Utils.BlobUShort((int)((stream.Length - table.Raw.Length - 4) / 2));
+            reader.Read(states.Raw, 0, states.Raw.Length);
             reader.Close();
         }
 
@@ -62,14 +61,14 @@ namespace Hime.Redist.Lexer
         /// </summary>
         /// <param name="state">The DFA which offset shall be retrieved</param>
         /// <returns>The offset of the given DFA state</returns>
-        public int GetOffset(ushort state) { return table[state]; }
+        public int GetOffset(int state) { return (int)table[state]; }
 
         /// <summary>
         /// Gets the recognized terminal index for the DFA at the given index
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>The index of the terminal recognized at this state, or 0xFFFF if none</returns>
-        public ushort GetTerminal(int offset) { return states[offset]; }
+        public int GetTerminalIndex(int offset) { return states[offset]; }
 
         /// <summary>
         /// Checks whether the DFA state at the given state has any transition
@@ -83,7 +82,7 @@ namespace Hime.Redist.Lexer
         /// </summary>
         /// <param name="offset">The DFA state's offset</param>
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-        public ushort GetCachedTransition(int offset) { return states[offset]; }
+        public int GetCachedTransition(int offset) { return states[offset]; }
 
         /// <summary>
         /// Gets the transition corresponding to the given state's index and input value
@@ -91,7 +90,7 @@ namespace Hime.Redist.Lexer
         /// <param name="offset">The DFA state's offset</param>
         /// <param name="value">The input value</param>
         /// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-        public ushort GetFallbackTransition(int offset, ushort value)
+        public int GetFallbackTransition(int offset, int value)
         {
             int count = states[offset + 1];
             offset += 258;

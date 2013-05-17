@@ -1,90 +1,46 @@
+using System.Runtime.InteropServices;
+
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Bytecode values for the LR productions
+    /// Represents a LRBytecode stored as a binary blob
     /// </summary>
-    public static class LRBytecode
+    [StructLayout(LayoutKind.Explicit)]
+    public sealed class LRBytecode
     {
-        /// <summary>
-        /// Mask for AST action in bytecodes
-        /// </summary>
-        public const ushort MaskAction = 3;
+        [FieldOffset(0)]
+        private byte[] blob;
+        [FieldOffset(0)]
+        private LROpCode[] data;
+        [FieldOffset(8)]
+        private int length;
 
         /// <summary>
-        /// Gets the next element in the stack and apply no action
+        /// Gets the raw array of bytes
         /// </summary>
-        public const ushort PopNoAction = 0;
+        public byte[] Raw { get { return blob; } }
         /// <summary>
-        /// Gets the next element in the stack and apply the drop action
+        /// Gets the length of the bytecode
         /// </summary>
-        public const ushort PopDrop = 2;
+        public int Length { get { return length; } }
         /// <summary>
-        /// Gets the next element in the stack and apply the promote action
+        /// Gets the opcode at the given index
         /// </summary>
-        public const ushort PopPromote = 3;
+        /// <param name="index">Index of the opcode</param>
+        /// <returns>The opcode at the given index</returns>
+        public LROpCode this[int index]
+        {
+            get { return data[index]; }
+        }
 
         /// <summary>
-        /// Radical for bytecodes dealing with virtual symbols
+        /// Initializes a new blob of the given length
         /// </summary>
-        public const ushort Virtual = 4;
-        /// <summary>
-        /// Add a virtual symbol and apply no action
-        /// </summary>
-        public const ushort VirtualNoAction = Virtual + PopNoAction;
-        /// <summary>
-        /// Add a virtual symbol and apply the drop action
-        /// </summary>
-        public const ushort VirtualDrop = Virtual + PopDrop;
-        /// <summary>
-        /// Add a virtual symbol and apply the promote action
-        /// </summary>
-        public const ushort VirtualPromote = Virtual + PopPromote;
-
-        /// <summary>
-        /// Apply a semantic action
-        /// </summary>
-        public const ushort SemanticAction = 8;
-
-        /// <summary>
-        /// Radical for bytecodes dealing with nullable variables in a RNGLR parser
-        /// </summary>
-        public const ushort NullVariable = 16;
-        /// <summary>
-        /// Add a nullable variable and apply no action
-        /// </summary>
-        public const ushort NullVariableNoAction = NullVariable;
-        /// <summary>
-        /// Add a nullable variable and apply the drop action
-        /// </summary>
-        public const ushort NullVariableDrop = NullVariable + PopDrop;
-        /// <summary>
-        /// Add a nullable variable and apply the promote action
-        /// </summary>
-        public const ushort NullVariablePromote = NullVariable + PopPromote;
-
-        /// <summary>
-        /// Determines whether the given bytecode is a Pop action
-        /// </summary>
-        /// <param name="code">The bytecode</param>
-        /// <returns>True if this is a Pop action</returns>
-        public static bool IsPop(ushort code) { return (code <= PopPromote); }
-        /// <summary>
-        /// Determines whether the given bytecode is to add a virtual symbol
-        /// </summary>
-        /// <param name="code">The bytecode</param>
-        /// <returns>True if this is a Add Virtual action</returns>
-        public static bool IsAddVirtual(ushort code) { return ((code & Virtual) == Virtual); }
-        /// <summary>
-        /// Determines whether the given bytecode is a Semantic action
-        /// </summary>
-        /// <param name="code">The bytecode</param>
-        /// <returns>True if this is a Semantic action</returns>
-        public static bool IsSemAction(ushort code) { return (code == SemanticAction); }
-        /// <summary>
-        /// Determines whether the given bytecode is to add a null variable
-        /// </summary>
-        /// <param name="code">The bytecode</param>
-        /// <returns>True if this is a Add Null Variable action</returns>
-        public static bool IsAddNullVariable(ushort code) { return ((code & NullVariable) == NullVariable); }
+        /// <param name="length">The length of the bytecode</param>
+        public LRBytecode(int length)
+        {
+            this.blob = new byte[length * 2];
+            this.length = length;
+        }
     }
 }

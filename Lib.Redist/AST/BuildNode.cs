@@ -17,7 +17,7 @@ namespace Hime.Redist.AST
         /// <summary>
         /// The AST action for this node
         /// </summary>
-        protected int action;
+        protected Parsers.LRTreeAction action;
 
         /// <summary>
         /// Gets the final AST node for this node
@@ -37,9 +37,9 @@ namespace Hime.Redist.AST
         /// Sets the tree action for this node, provided it is not 0 (no action)
         /// </summary>
         /// <param name="action">The tree action for this node</param>
-        public void SetAction(int action)
+        public void SetAction(Parsers.LRTreeAction action)
         {
-            if (action != 0)
+            if (action != Parsers.LRTreeAction.None)
                 this.action = action;
         }
 
@@ -51,7 +51,7 @@ namespace Hime.Redist.AST
         /// <param name="length">Number of children</param>
         public void Build<T>(T[] children, int length) where T : BuildNode
         {
-            if (action == Parsers.LRProduction.HeadReplace)
+            if (action == Parsers.LRTreeAction.Replace)
                 BuildReplaceable(children, length);
             else
                 BuildNormal(children, length);
@@ -70,10 +70,10 @@ namespace Hime.Redist.AST
                 BuildNode child = children[i];
                 switch (child.action)
                 {
-                    case Parsers.LRProduction.HeadReplace:
+                    case Parsers.LRTreeAction.Replace:
                         size += child.children.Length;
                         break;
-                    case Parsers.LRBytecode.PopDrop:
+                    case Parsers.LRTreeAction.Drop:
                         break;
                     default:
                         size++;
@@ -87,12 +87,12 @@ namespace Hime.Redist.AST
                 BuildNode child = children[i];
                 switch (child.action)
                 {
-                    case Parsers.LRProduction.HeadReplace:
+                    case Parsers.LRTreeAction.Replace:
                         System.Array.Copy(child.children, 0, replacement, index, child.children.Length);
                         index += child.children.Length;
                         child.children = null;
                         break;
-                    case Parsers.LRBytecode.PopDrop:
+                    case Parsers.LRTreeAction.Drop:
                         break;
                     default:
                         replacement[index] = child;
@@ -116,14 +116,14 @@ namespace Hime.Redist.AST
                 BuildNode child = children[i];
                 switch (child.action)
                 {
-                    case Parsers.LRProduction.HeadReplace:
+                    case Parsers.LRTreeAction.Replace:
                         foreach (BuildNode subchild in child.children)
                             firstPromote = ExecuteReplacement(subchild, firstPromote);
                         child.children = null;
                         break;
-                    case Parsers.LRBytecode.PopDrop:
+                    case Parsers.LRTreeAction.Drop:
                         break;
-                    case Parsers.LRBytecode.PopPromote:
+                    case Parsers.LRTreeAction.Promote:
                         if (firstPromote)
                         {
                             child.value.Children.InsertRange(0, this.value.Children);
@@ -145,7 +145,7 @@ namespace Hime.Redist.AST
 
         private bool ExecuteReplacement(BuildNode child, bool firstPromote)
         {
-            if (child.action != Parsers.LRBytecode.PopPromote)
+            if (child.action != Parsers.LRTreeAction.Promote)
             {
                 this.value.Children.Add(child.value);
                 return firstPromote;

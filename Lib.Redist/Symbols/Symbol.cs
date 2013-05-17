@@ -10,7 +10,7 @@ namespace Hime.Redist.Symbols
         /// <summary>
         /// Gets the symbol's unique type ID
         /// </summary>
-        public ushort SymbolID { get; private set; }
+        public int SymbolID { get; private set; }
         /// <summary>
         /// Gets the symbol's type name
         /// </summary>
@@ -21,7 +21,7 @@ namespace Hime.Redist.Symbols
         /// </summary>
         /// <param name="sid">Symbol's unique identifier</param>
         /// <param name="name">Symbol's name</param>
-		protected Symbol(ushort sid, string name)
+		protected Symbol(int sid, string name)
         {
             this.SymbolID = sid;
             this.Name = name;

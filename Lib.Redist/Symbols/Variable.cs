@@ -12,6 +12,6 @@ namespace Hime.Redist.Symbols
         /// </summary>
         /// <param name="sid">Symbol's unique identifier</param>
         /// <param name="name">Symbol's name</param>
-        public Variable(ushort sid, string name) : base(sid, name) { }
+        public Variable(int sid, string name) : base(sid, name) { }
     }
 }

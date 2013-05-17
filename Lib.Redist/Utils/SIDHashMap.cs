@@ -20,7 +20,7 @@ namespace Hime.Redist.Utils
         /// <summary>
         /// Hashmap for the other ids
         /// </summary>
-        private Dictionary<ushort, T> others;
+        private Dictionary<int, T> others;
 
         /// <summary>
         /// Initializes the structure
@@ -35,7 +35,7 @@ namespace Hime.Redist.Utils
         /// </summary>
         /// <param name="key">The key for the data</param>
         /// <param name="value">The data</param>
-        public void Add(ushort key, T value)
+        public void Add(int key, T value)
         {
             if (key <= 0xFF)
                 cache1[key] = value;
@@ -48,7 +48,7 @@ namespace Hime.Redist.Utils
             else
             {
                 if (others != null)
-                    others = new Dictionary<ushort, T>();
+                    others = new Dictionary<int, T>();
                 others.Add(key, value);
             }
         }
@@ -58,7 +58,7 @@ namespace Hime.Redist.Utils
         /// </summary>
         /// <param name="key">The key for the data</param>
         /// <returns>The data corresponding to the key</returns>
-        public T this[ushort key]
+        public T this[int key]
         {
             get
             {

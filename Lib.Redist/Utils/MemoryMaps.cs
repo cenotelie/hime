@@ -3,32 +3,32 @@ using System.Runtime.InteropServices;
 namespace Hime.Redist.Utils
 {
     /// <summary>
-    /// Represents a blob of binary data that can be accessed as an array of signed 32-bits integers
+    /// Represents a blob of binary data that can be accessed as an array of unsigned 32-bits integers
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    class BlobInt
+    class BlobUInt
     {
         [FieldOffset(0)]
         private byte[] blob;
         [FieldOffset(0)]
-        private int[] data;
+        private uint[] data;
         [FieldOffset(8)]
-        private int sizeBlob;
+        private int count;
 
         /// <summary>
         /// Gets the raw array of bytes
         /// </summary>
         public byte[] Raw { get { return blob; } }
         /// <summary>
-        /// Gets the size of the binary blob in bytes
+        /// Gets the number of unsigned 32-bits integer in this blob
         /// </summary>
-        public int RawSize { get { return sizeBlob; } }
+        public int Count { get { return count; } }
         /// <summary>
-        /// Gets the 32-bits signed integer at the given index
+        /// Gets the 32-bits unsigned integer at the given index
         /// </summary>
         /// <param name="index">Index of the integer</param>
-        /// <returns>The 32-bits signed integer at the given index</returns>
-        public int this[int index]
+        /// <returns>The 32-bits unsigned integer at the given index</returns>
+        public uint this[int index]
         {
             get { return data[index]; }
         }
@@ -36,11 +36,11 @@ namespace Hime.Redist.Utils
         /// <summary>
         /// Initializes a new blob with the given size in bytes
         /// </summary>
-        /// <param name="sizeBlob">The size of the blob in bytes</param>
-        public BlobInt(int sizeBlob)
+        /// <param name="count">The number of items</param>
+        public BlobUInt(int count)
         {
-            this.blob = new byte[sizeBlob];
-            this.sizeBlob = sizeBlob;
+            this.blob = new byte[count * 4];
+            this.count = count;
         }
     }
 
@@ -55,20 +55,16 @@ namespace Hime.Redist.Utils
         [FieldOffset(0)]
         private ushort[] data;
         [FieldOffset(8)]
-        private int sizeBlob;
+        private int count;
 
         /// <summary>
         /// Gets the raw array of bytes
         /// </summary>
         public byte[] Raw { get { return blob; } }
         /// <summary>
-        /// Gets the size of the binary blob in bytes
-        /// </summary>
-        public int RawSize { get { return sizeBlob; } }
-        /// <summary>
         /// Gets the number of unsigned 16-bits integer in this blob
         /// </summary>
-        public int Length { get { return sizeBlob / 2; } }
+        public int Count { get { return count; } }
         /// <summary>
         /// Gets the 16-bits unsigned integer at the given index
         /// </summary>
@@ -82,11 +78,11 @@ namespace Hime.Redist.Utils
         /// <summary>
         /// Initializes a new blob with the given size in bytes
         /// </summary>
-        /// <param name="sizeBlob">The size of the blob in bytes</param>
-        public BlobUShort(int sizeBlob)
+        /// <param name="count">The number of items</param>
+        public BlobUShort(int count)
         {
-            this.blob = new byte[sizeBlob];
-            this.sizeBlob = sizeBlob;
+            this.blob = new byte[count * 2];
+            this.count = count;
         }
     }
 }

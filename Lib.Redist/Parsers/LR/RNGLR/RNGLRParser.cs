@@ -27,8 +27,8 @@ namespace Hime.Redist.Parsers
         private struct Shift
         {
             public GSSNode from;
-            public ushort to;
-            public Shift(GSSNode from, ushort to)
+            public int to;
+            public Shift(GSSNode from, int to)
             {
                 this.from = from;
                 this.to = to;
@@ -44,7 +44,7 @@ namespace Hime.Redist.Parsers
         private RNGLRAutomaton parserAutomaton;
         private AST.SPPFNode epsilon;
         private AST.SPPFNode[] nullProds;
-        private Dictionary<ushort, AST.SPPFNode> nullVars;
+        private Dictionary<int, AST.SPPFNode> nullVars;
         private Symbols.Token nextToken;
         private Queue<Reduction> queueReductions;
         private Queue<Shift> queueShifts;
@@ -66,10 +66,10 @@ namespace Hime.Redist.Parsers
             this.parserAutomaton = automaton;
             this.epsilon = new AST.SPPFNode(Symbols.Epsilon.Instance);
             this.nullProds = new AST.SPPFNode[variables.Length];
-            this.nullVars = new Dictionary<ushort, AST.SPPFNode>();
+            this.nullVars = new Dictionary<int, AST.SPPFNode>();
             this.bufferNodes = new AST.SPPFNode[maxBodyLength];
             this.bufferSymbols = new Symbols.Symbol[maxBodyLength];
-            for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
+            for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
                 ushort index = parserAutomaton.Nullables[i];
                 if (index != 0xFFFF)
@@ -81,7 +81,7 @@ namespace Hime.Redist.Parsers
                         nullVars.Add(nullProds[i].SymbolID, nullProds[i]);
                 }
             }
-            for (ushort i = 0; i != parserAutomaton.Nullables.Length; i++)
+            for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
                 ushort index = parserAutomaton.Nullables[i];
                 if (index != 0xFFFF)
@@ -97,26 +97,26 @@ namespace Hime.Redist.Parsers
             int nextBuffer = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
-                ushort op = production.Bytecode[i];
-                if (LRBytecode.IsSemAction(op))
+                LROpCode op = production.Bytecode[i];
+                if (op.IsSemAction)
                 {
-                    parserActions[production.Bytecode[i + 1]](subRoot.Value.Symbol as Symbols.Variable, bufferSymbols, nextBuffer);
+                    parserActions[production.Bytecode[i + 1].Value](subRoot.Value.Symbol as Symbols.Variable, bufferSymbols, nextBuffer);
                     i++;
                 }
-                else if (LRBytecode.IsAddVirtual(op))
+                else if (op.IsAddVirtual)
                 {
-                    Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1]];
+                    Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1].Value];
                     AST.SPPFNode node = new AST.SPPFNode(symbol);
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
                     i++;
                 }
-                else if (LRBytecode.IsAddNullVariable(op))
+                else if (op.IsAddNullVar)
                 {
-                    AST.SPPFNode node = nullProds[production.Bytecode[i + 1]];
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    AST.SPPFNode node = nullProds[production.Bytecode[i + 1].Value];
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = node.Value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -126,11 +126,11 @@ namespace Hime.Redist.Parsers
             subRoot.Build(bufferNodes, nextBuffer);
         }
 
-        private void OnUnexpectedToken(Dictionary<ushort, GSSNode> Ui, Symbols.Token token)
+        private void OnUnexpectedToken(Dictionary<int, GSSNode> Ui, Symbols.Token token)
         {
             List<int> indices = new List<int>();
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
-            foreach (ushort state in Ui.Keys)
+            foreach (int state in Ui.Keys)
             {
                 ICollection<int> temp = parserAutomaton.GetExpected(state, lexer.Terminals.Count);
                 foreach (int index in temp)
@@ -164,18 +164,17 @@ namespace Hime.Redist.Parsers
             queueShifts = new Queue<Shift>();
             objects = new List<NodeDic>();
             GSSNode v0 = new GSSNode(0, 0);
-            Dictionary<ushort, GSSNode> Ui = new Dictionary<ushort, GSSNode>();
+            Dictionary<int, GSSNode> Ui = new Dictionary<int, GSSNode>();
             Ui.Add(0, v0);
 
             int count = parserAutomaton.GetActionsCount(0, nextToken.SymbolID);
             for (int i = 0; i != count; i++)
             {
-                ushort action = 0;
-                ushort data = parserAutomaton.GetAction(0, nextToken.SymbolID, i, out action);
-                if (action == LRActions.Shift)
-                    queueShifts.Enqueue(new Shift(v0, data));
-                else if (action == LRActions.Reduce)
-                    queueReductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(data), epsilon));
+                LRAction action = parserAutomaton.GetAction(0, nextToken.SymbolID, i);
+                if (action.Code == LRActionCode.Shift)
+                    queueShifts.Enqueue(new Shift(v0, action.Data));
+                else if (action.Code == LRActionCode.Reduce)
+                    queueReductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), epsilon));
             }
 
             int generation = 0;
@@ -185,7 +184,7 @@ namespace Hime.Redist.Parsers
                 Reducer(Ui, generation);
                 Symbols.Token oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
-                Dictionary<ushort, GSSNode> Uj = Shifter(oldtoken);
+                Dictionary<int, GSSNode> Uj = Shifter(oldtoken);
                 generation++;
                 if (Uj.Count == 0)
                 {
@@ -209,13 +208,13 @@ namespace Hime.Redist.Parsers
             return null;
         }
 
-        private void Reducer(Dictionary<ushort, GSSNode> Ui, int generation)
+        private void Reducer(Dictionary<int, GSSNode> Ui, int generation)
         {
             while (queueReductions.Count != 0)
                 ExecuteReduction(Ui, generation, queueReductions.Dequeue());
         }
 
-        private void ExecuteReduction(Dictionary<ushort, GSSNode> Ui, int generation, Reduction reduction)
+        private void ExecuteReduction(Dictionary<int, GSSNode> Ui, int generation, Reduction reduction)
         {
             // Get all path from the reduction node
             GSSPath[] paths = null;
@@ -230,7 +229,7 @@ namespace Hime.Redist.Parsers
                 ExecuteReduction(Ui, generation, reduction, paths[i]);
         }
 
-        private void ExecuteReduction(Dictionary<ushort, GSSNode> Ui, int generation, Reduction reduction, GSSPath path)
+        private void ExecuteReduction(Dictionary<int, GSSNode> Ui, int generation, Reduction reduction, GSSPath path)
         {
             // Get the rule's head
             Symbols.Variable head = parserVariables[reduction.prod.Head];
@@ -252,26 +251,26 @@ namespace Hime.Redist.Parsers
             int nextStack = 0;
             for (int i = 0; i != reduction.prod.Bytecode.Length; i++)
             {
-                ushort op = reduction.prod.Bytecode[i];
-                if (LRBytecode.IsSemAction(op))
+                LROpCode op = reduction.prod.Bytecode[i];
+                if (op.IsSemAction)
                 {
-                    parserActions[reduction.prod.Bytecode[i + 1]](head, bufferSymbols, nextBuffer);
+                    parserActions[reduction.prod.Bytecode[i + 1].Value](head, bufferSymbols, nextBuffer);
                     i++;
                 }
-                else if (LRBytecode.IsAddVirtual(op))
+                else if (op.IsAddVirtual)
                 {
-                    Symbols.Symbol symbol = parserVirtuals[reduction.prod.Bytecode[i + 1]];
+                    Symbols.Symbol symbol = parserVirtuals[reduction.prod.Bytecode[i + 1].Value];
                     AST.SPPFNode node = new AST.SPPFNode(symbol);
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
                     i++;
                 }
-                else if (LRBytecode.IsAddNullVariable(op))
+                else if (op.IsAddNullVar)
                 {
-                    AST.SPPFNode node = nullProds[reduction.prod.Bytecode[i + 1]];
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    AST.SPPFNode node = nullProds[reduction.prod.Bytecode[i + 1].Value];
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = node.Value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -282,7 +281,7 @@ namespace Hime.Redist.Parsers
                     AST.SPPFNode node = null;
                     if (nextStack >= path.labels.Length) node = reduction.first;
                     else node = path.labels[path.labels.Length - nextStack - 1];
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = node.Value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextStack++;
@@ -293,7 +292,7 @@ namespace Hime.Redist.Parsers
                 subRoot.Build(bufferNodes, nextBuffer);
 
             // Get the target state by transition on the rule's head
-            ushort to = GetNextByVar(path.last.State, head.SymbolID);
+            int to = GetNextByVar(path.last.State, head.SymbolID);
             if (Ui.ContainsKey(to))
             {
                 // A node for the target state is already in the GSS
@@ -308,11 +307,10 @@ namespace Hime.Redist.Parsers
                         int count = parserAutomaton.GetActionsCount(to, nextToken.SymbolID);
                         for (int i = 0; i != count; i++)
                         {
-                            ushort action = 0;
-                            ushort data = parserAutomaton.GetAction(to, nextToken.SymbolID, i, out action);
-                            if (action == LRActions.Reduce)
+                            LRAction action = parserAutomaton.GetAction(to, nextToken.SymbolID, i);
+                            if (action.Code == LRActionCode.Reduce)
                             {
-                                LRProduction prod = parserAutomaton.GetProduction(data);
+                                LRProduction prod = parserAutomaton.GetProduction(action.Data);
                                 // length 0 reduction are not considered here because they already exist at this point
                                 if (prod.ReductionLength != 0)
                                     queueReductions.Enqueue(new Reduction(path.last, prod, subRoot));
@@ -331,15 +329,14 @@ namespace Hime.Redist.Parsers
                 int count = parserAutomaton.GetActionsCount(to, nextToken.SymbolID);
                 for (int i = 0; i != count; i++)
                 {
-                    ushort action = 0;
-                    ushort data = parserAutomaton.GetAction(to, nextToken.SymbolID, i, out action);
-                    if (action == LRActions.Shift)
+                    LRAction action = parserAutomaton.GetAction(to, nextToken.SymbolID, i);
+                    if (action.Code == LRActionCode.Shift)
                     {
-                        queueShifts.Enqueue(new Shift(w, data));
+                        queueShifts.Enqueue(new Shift(w, action.Data));
                     }
-                    else if (action == LRActions.Reduce)
+                    else if (action.Code == LRActionCode.Reduce)
                     {
-                        LRProduction prod = parserAutomaton.GetProduction(data);
+                        LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         if (prod.ReductionLength == 0)
                             queueReductions.Enqueue(new Reduction(w, prod, epsilon));
                         else if (reduction.prod.ReductionLength != 0)
@@ -349,10 +346,10 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private Dictionary<ushort, GSSNode> Shifter(Symbols.Token oldtoken)
+        private Dictionary<int, GSSNode> Shifter(Symbols.Token oldtoken)
         {
             // Create next generation
-            Dictionary<ushort, GSSNode> Uj = new Dictionary<ushort, GSSNode>();
+            Dictionary<int, GSSNode> Uj = new Dictionary<int, GSSNode>();
             // Create the AST for the old token
             AST.SPPFNode ast = new AST.SPPFNode(oldtoken);
 
@@ -363,7 +360,7 @@ namespace Hime.Redist.Parsers
             return Uj;
         }
 
-        private void ExecuteShift(Dictionary<ushort, GSSNode> Uj, AST.SPPFNode ast, Shift shift)
+        private void ExecuteShift(Dictionary<int, GSSNode> Uj, AST.SPPFNode ast, Shift shift)
         {
             if (Uj.ContainsKey(shift.to))
             {
@@ -374,11 +371,10 @@ namespace Hime.Redist.Parsers
                 int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
                 for (int i = 0; i != count; i++)
                 {
-                    ushort action = 0;
-                    ushort data = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i, out action);
-                    if (action == LRActions.Reduce)
+                    LRAction action = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i);
+                    if (action.Code == LRActionCode.Reduce)
                     {
-                        LRProduction prod = parserAutomaton.GetProduction(data);
+                        LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         // length 0 reduction are not considered here because they already exist at this point
                         if (prod.ReductionLength != 0)
                             queueReductions.Enqueue(new Reduction(shift.from, prod, ast));
@@ -395,13 +391,12 @@ namespace Hime.Redist.Parsers
                 int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
                 for (int i = 0; i != count; i++)
                 {
-                    ushort action = 0;
-                    ushort data = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i, out action);
-                    if (action == LRActions.Shift)
-                        queueShifts.Enqueue(new Shift(w, data));
-                    else if (action == LRActions.Reduce)
+                    LRAction action = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i);
+                    if (action.Code == LRActionCode.Shift)
+                        queueShifts.Enqueue(new Shift(w, action.Data));
+                    else if (action.Code == LRActionCode.Reduce)
                     {
-                        LRProduction prod = parserAutomaton.GetProduction(data);
+                        LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         if (prod.ReductionLength == 0) // Length 0 => reduce from the head
                             queueReductions.Enqueue(new Reduction(w, prod, epsilon));
                         else // reduce from the second node on the path
@@ -411,15 +406,14 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private ushort GetNextByVar(ushort state, ushort var)
+        private int GetNextByVar(int state, int var)
         {
             int ac = parserAutomaton.GetActionsCount(state, var);
             for (int i = 0; i != ac; i++)
             {
-                ushort action = 0;
-                ushort data = parserAutomaton.GetAction(state, var, i, out action);
-                if (action == LRActions.Shift)
-                    return data;
+                LRAction action = parserAutomaton.GetAction(state, var, i);
+                if (action.Code == LRActionCode.Shift)
+                    return action.Data;
             }
             return 0xFFFF;
         }

@@ -1,25 +1,46 @@
+using System.Runtime.InteropServices;
+
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Actions values for LR parsers
+    /// Represents a collection of LRAction stored as a binary blob
     /// </summary>
-    public static class LRActions
+    [StructLayout(LayoutKind.Explicit)]
+    public sealed class LRActions
     {
+        [FieldOffset(0)]
+        private byte[] blob;
+        [FieldOffset(0)]
+        private LRAction[] data;
+        [FieldOffset(8)]
+        private int count;
+
         /// <summary>
-        /// No possible action => Error
+        /// Gets the raw array of bytes
         /// </summary>
-        public const ushort None = 0;
+        public byte[] Raw { get { return blob; } }
         /// <summary>
-        /// Apply a reduction
+        /// Gets the number of actions in this collection
         /// </summary>
-        public const ushort Reduce = 1;
+        public int Count { get { return count; } }
         /// <summary>
-        /// Shift to another state
+        /// Gets the action at the given index
         /// </summary>
-        public const ushort Shift = 2;
+        /// <param name="index">Index of the action</param>
+        /// <returns>The action at the given index</returns>
+        public LRAction this[int index]
+        {
+            get { return data[index]; }
+        }
+
         /// <summary>
-        /// Accept the input
+        /// Initializes a new blob for the given number of items
         /// </summary>
-        public const ushort Accept = 3;
+        /// <param name="count">The number of items</param>
+        public LRActions(int count)
+        {
+            this.blob = new byte[count * 4];
+            this.count = count;
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace Hime.Redist.Parsers
                 this.parserAutomaton = parser.parserAutomaton;
                 this.parserVariables = parser.parserVariables;
                 this.input = parser.input;
-                this.stack = new ushort[parser.maxStackSize];
+                this.stack = new int[parser.maxStackSize];
                 this.head = parser.head;
                 System.Array.Copy(parser.stack, this.stack, parser.head + 1);
             }
@@ -23,7 +23,7 @@ namespace Hime.Redist.Parsers
 
         private LRkAutomaton parserAutomaton;
         private RewindableTokenStream input;
-        private ushort[] stack;
+        private int[] stack;
         private AST.BuildNode[] objects;
         private AST.BuildNode[] bufferNodes;
         private Symbols.Symbol[] bufferSymbols;
@@ -93,20 +93,20 @@ namespace Hime.Redist.Parsers
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
         public override AST.ASTNode Parse()
         {
-            this.stack = new ushort[maxStackSize];
+            this.stack = new int[maxStackSize];
             this.objects = new AST.BuildNode[maxStackSize];
             this.bufferNodes = new AST.BuildNode[maxBodyLength];
             this.bufferSymbols = new Symbols.Symbol[maxBodyLength];
             Symbols.Token nextToken = input.GetNextToken();
             while (true)
             {
-                ushort action = ParseOnToken(nextToken);
-                if (action == LRActions.Shift)
+                LRActionCode action = ParseOnToken(nextToken);
+                if (action == LRActionCode.Shift)
                 {
                     nextToken = input.GetNextToken();
                     continue;
                 }
-                if (action == LRActions.Accept)
+                if (action == LRActionCode.Accept)
                     return objects[head - 1].Value;
                 nextToken = OnUnexpectedToken(nextToken);
                 if (nextToken == null || errors.Count >= maxErrorCount)
@@ -114,31 +114,30 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private ushort ParseOnToken(Symbols.Token token)
+        private LRActionCode ParseOnToken(Symbols.Token token)
         {
             while (true)
             {
-                ushort action = LRActions.None;
-                ushort data = parserAutomaton.GetAction(stack[head], token.SymbolID, out action);
-                if (action == LRActions.Shift)
+                LRAction action = parserAutomaton.GetAction(stack[head], token.SymbolID);
+                if (action.Code == LRActionCode.Shift)
                 {
                     head++;
-                    stack[head] = data;
+                    stack[head] = action.Data;
                     objects[head] = new AST.BuildNode(token);
-                    return action;
+                    return action.Code;
                 }
-                else if (action == LRActions.Reduce)
+                else if (action.Code == LRActionCode.Reduce)
                 {
-                    LRProduction production = parserAutomaton.GetProduction(data);
+                    LRProduction production = parserAutomaton.GetProduction(action.Data);
                     head -= production.ReductionLength;
                     AST.BuildNode result = Reduce(production);
-                    data = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].SymbolID, out action);
+                    action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].SymbolID);
                     head++;
-                    stack[head] = data;
+                    stack[head] = action.Data;
                     objects[head] = result;
                     continue;
                 }
-                return action;
+                return action.Code;
             }
         }
 
@@ -151,17 +150,17 @@ namespace Hime.Redist.Parsers
             int nextStack = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
-                ushort op = production.Bytecode[i];
-                if (LRBytecode.IsSemAction(op))
+                LROpCode op = production.Bytecode[i];
+                if (op.IsSemAction)
                 {
-                    parserActions[production.Bytecode[i + 1]](var, bufferSymbols, nextBuffer);
+                    parserActions[production.Bytecode[i + 1].Value](var, bufferSymbols, nextBuffer);
                     i++;
                 }
-                else if (LRBytecode.IsAddVirtual(op))
+                else if (op.IsAddVirtual)
                 {
-                    Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1]];
+                    Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1].Value];
                     AST.BuildNode node = new AST.BuildNode(symbol);
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -170,7 +169,7 @@ namespace Hime.Redist.Parsers
                 else
                 {
                     AST.BuildNode node = objects[head + nextStack + 1];
-                    node.SetAction(op & LRBytecode.MaskAction);
+                    node.SetAction(op.TreeAction);
                     bufferSymbols[nextBuffer] = node.Value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextStack++;

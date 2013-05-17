@@ -2,60 +2,42 @@ using System.IO;
 
 namespace Hime.Redist.Parsers
 {
-    /* 
-    * uint16: head's index
-    * uint8: 1=replace, 0=nothing
-    * uint8: reduction length
-    * uint8: bytecode length
-    * List of elements of the form:
-    * -- ast pop
-    * uint16: 0=no action, 2=drop, 3=promote
-    * -- add virtual
-    * uint16: 4=no action, 6=drop, 7=promote
-    * uint16: virtual's index
-    * -- semantic action
-    * uint16: 8
-    * uint16: action's index
-    * --- null variable
-    * uint16: 16 + action
-    * uint16: variable's index
-    */
-
     /// <summary>
     /// Represents a rule's production in a LR parser
     /// </summary>
+    /// <remarks>
+    /// The binary representation of a LR Production is as follow:
+    /// --- header
+    /// uint16: head's index
+    /// uint8: 1=replace, 0=nothing
+    /// uint8: reduction length
+    /// uint8: bytecode length in bytes
+    /// --- production's bytecode
+    /// See LRBytecode
+    /// </remarks>
     public sealed class LRProduction
     {
-        /// <summary>
-        /// In the AST, the root node will be replaced by its children
-        /// </summary>
-        public const byte HeadReplace = 1;
-        /// <summary>
-        /// In the AST, keep the root node
-        /// </summary>
-        public const byte HeadKeep = 0;
-
-        private ushort head;
-        private byte headAction;
-        private byte reducLength;
-        private Utils.BlobUShort bytecode;
+        private int head;
+        private LRTreeAction headAction;
+        private int reducLength;
+        private LRBytecode bytecode;
 
         /// <summary>
         /// Index of the rule's head in the parser's array of variables
         /// </summary>
-        public ushort Head { get { return head; } }
+        public int Head { get { return head; } }
         /// <summary>
         /// Action of the rule's head (replace or not)
         /// </summary>
-        public byte HeadAction { get { return headAction; } }
+        public LRTreeAction HeadAction { get { return headAction; } }
         /// <summary>
         /// Size of the rule's body by ony counting terminals and variables
         /// </summary>
-        public byte ReductionLength { get { return reducLength; } }
+        public int ReductionLength { get { return reducLength; } }
         /// <summary>
         /// Bytecode for the rule's production
         /// </summary>
-        internal Utils.BlobUShort Bytecode { get { return bytecode; } }
+        public LRBytecode Bytecode { get { return bytecode; } }
 
         /// <summary>
         /// Loads a new instance of the LRProduction class from a binary representation
@@ -64,10 +46,10 @@ namespace Hime.Redist.Parsers
         public LRProduction(BinaryReader reader)
         {
             this.head = reader.ReadUInt16();
-            this.headAction = reader.ReadByte();
+            this.headAction = (LRTreeAction)reader.ReadByte();
             this.reducLength = reader.ReadByte();
-            this.bytecode = new Utils.BlobUShort(reader.ReadByte());
-            reader.Read(bytecode.Raw, 0, this.bytecode.RawSize);
+            this.bytecode = new LRBytecode(reader.ReadByte());
+            reader.Read(bytecode.Raw, 0, this.bytecode.Raw.Length);
         }
     }
 }

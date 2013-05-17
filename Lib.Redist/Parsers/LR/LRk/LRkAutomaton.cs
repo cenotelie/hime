@@ -1,51 +1,45 @@
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Hime.Redist.Parsers
 {
     /// <summary>
     /// Represents the LR(k) parsing table and productions
     /// </summary>
+    /// <remarks>
+    /// Binary data of a LR(k) parser
+    /// --- header
+    /// uint16: number of columns
+    /// uint16: number of states
+    /// uint16: number of productions
+    /// --- parse table columns
+    /// uint16: sid of the column
+    /// --- parse table
+    /// See LRActions
+    /// --- productions table
+    /// See LRProduction
+    /// </remarks>
     public sealed class LRkAutomaton
     {
-        /* Binary data of a LR(k) parser
-         * uint16: number of columns
-         * uint16: number of states
-         * uint16: number of productions
-         * 
-         * -- parse table columns
-         * uint16: sid of the column
-         * 
-         * -- parse table
-         * Each reduction is of the form:
-         * uint16: =1
-         * uint16: index of the production
-         * Each shift is of the form:
-         * uint16: =2
-         * uint16: new state
-         * 
-         * -- productions table
-         */
-
         private ushort ncols;
         private Utils.BlobUShort columnsID;
-        private Utils.SIDHashMap<ushort> columns;
-        private Utils.BlobUShort table;
+        private Utils.SIDHashMap<int> columns;
+        private LRActions table;
         private LRProduction[] productions;
 
         private LRkAutomaton(Stream stream)
         {
             BinaryReader reader = new BinaryReader(stream);
             this.ncols = reader.ReadUInt16();
-            ushort nstates = reader.ReadUInt16();
-            ushort nprod = reader.ReadUInt16();
-            this.columnsID = new Utils.BlobUShort(ncols * 2);
-            reader.Read(columnsID.Raw, 0, ncols * 2);
-            this.columns = new Utils.SIDHashMap<ushort>();
-            for (ushort i = 0; i != ncols; i++)
+            int nstates = reader.ReadUInt16();
+            int nprod = reader.ReadUInt16();
+            this.columnsID = new Utils.BlobUShort(ncols);
+            reader.Read(columnsID.Raw, 0, columnsID.Raw.Length);
+            this.columns = new Utils.SIDHashMap<int>();
+            for (int i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
-            this.table = new Utils.BlobUShort(ncols * nstates * 4);
-            reader.Read(this.table.Raw, 0, this.table.RawSize);
+            this.table = new LRActions(nstates * ncols);
+            reader.Read(this.table.Raw, 0, this.table.Raw.Length);
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);
@@ -71,15 +65,12 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the LR(k) action for the given state and sid
         /// </summary>
-        /// <param name="state">A automaton's state</param>
-        /// <param name="sid">A symbol ID</param>
-        /// <param name="action">The action as the given state for the given sid</param>
-        /// <returns>The action's data</returns>
-        public ushort GetAction(ushort state, ushort sid, out ushort action)
+        /// <param name="state">State in the LR(k) automaton</param>
+        /// <param name="sid">Symbol's ID</param>
+        /// <returns>The LR(k) action for the state and sid</returns>
+        public LRAction GetAction(int state, int sid)
         {
-            int offset = (ncols * state + columns[sid]) * 2;
-            action = table[offset];
-            return table[offset + 1];
+            return table[state * ncols + columns[sid]];
         }
 
         /// <summary>
@@ -87,17 +78,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="index">Production's index</param>
         /// <returns>The production a the given index</returns>
-        public LRProduction GetProduction(ushort index) { return productions[index]; }
-
-        /// <summary>
-        /// Determine whether the given state is the accepting state
-        /// </summary>
-        /// <param name="state">The DFA state</param>
-        /// <returns>True if the state is the accepting state, false otherwise</returns>
-        public bool IsAcceptingState(ushort state)
-        {
-            return (table[ncols * state * 2] == LRActions.Accept);
-        }
+        public LRProduction GetProduction(int index) { return productions[index]; }
 
         /// <summary>
         /// Gets a collection of the expected terminal indices
@@ -105,15 +86,15 @@ namespace Hime.Redist.Parsers
         /// <param name="state">The DFA state</param>
         /// <param name="terminalCount">The maximal number of terminals</param>
         /// <returns>The expected terminal indices</returns>
-        public ICollection<int> GetExpected(ushort state, int terminalCount)
+        public ICollection<int> GetExpected(int state, int terminalCount)
         {
             List<int> result = new List<int>();
-            int offset = ncols * state * 2;
+            int offset = ncols * state;
             for (int i = 0; i != terminalCount; i++)
             {
-                if (table[offset] != LRActions.None)
+                if (table[offset].Code != LRActionCode.None)
                     result.Add(i);
-                offset += 2;
+                offset++;
             }
             return result;
         }

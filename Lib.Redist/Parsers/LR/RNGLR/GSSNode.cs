@@ -7,15 +7,15 @@ namespace Hime.Redist.Parsers
         private const int initEdgesCount = 5;
         private const int initPathsCount = 10;
 
-        private ushort state;
+        private int state;
         private int generation;
         private GSSEdge[] edges;
         private int edgesCount;
 
-        public ushort State { get { return state; } }
+        public int State { get { return state; } }
         public int Generation { get { return generation; } }
 
-        public GSSNode(ushort label, int generation)
+        public GSSNode(int label, int generation)
         {
             this.state = label;
             this.generation = generation;
