@@ -29,7 +29,7 @@ namespace Hime.CentralDogma.Grammars
 
         public sealed class PriorityComparer : IComparer<Terminal>
         {
-            public int Compare(Terminal x, Terminal y) { return (y.Priority - x.Priority); }
+            public int Compare(Terminal x, Terminal y) { return (x.Priority - y.Priority); }
             private PriorityComparer() { }
             private static PriorityComparer instance = new PriorityComparer();
             public static PriorityComparer Instance { get { return instance; } }
