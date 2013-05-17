@@ -15,7 +15,7 @@ namespace Hime.Redist.Parsers
     /// --- production's bytecode
     /// See LRBytecode
     /// </remarks>
-    public sealed class LRProduction
+    class LRProduction
     {
         private int head;
         private LRTreeAction headAction;

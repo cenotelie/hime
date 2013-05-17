@@ -72,7 +72,7 @@ namespace Hime.Redist.Parsers
         /// <param name="type">The lexer's type</param>
         /// <param name="resource">The name of the resource containing the lexer</param>
         /// <returns>The automaton</returns>
-        public static RNGLRAutomaton FindAutomaton(System.Type type, string resource)
+        public static RNGLRAutomaton Find(System.Type type, string resource)
         {
             System.Reflection.Assembly assembly = type.Assembly;
             string[] resources = assembly.GetManifestResourceNames();
@@ -88,7 +88,7 @@ namespace Hime.Redist.Parsers
         /// <param name="state">An automaton's state</param>
         /// <param name="sid">A symbol ID</param>
         /// <returns>The number of GLR actions</returns>
-        public int GetActionsCount(int state, int sid)
+        internal int GetActionsCount(int state, int sid)
         {
             return table[state, columns[sid]].ActionsCount;
         }
@@ -100,7 +100,7 @@ namespace Hime.Redist.Parsers
         /// <param name="sid">A symbol ID</param>
         /// <param name="index">The action index</param>
         /// <returns>The GLR action</returns>
-        public LRAction GetAction(int state, int sid, int index)
+        internal LRAction GetAction(int state, int sid, int index)
         {
             return actions[table[state, columns[sid]].ActionsIndex + index];
         }
@@ -110,14 +110,14 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="index">Production's index</param>
         /// <returns>The production a the given index</returns>
-        public LRProduction GetProduction(int index) { return productions[index]; }
+        internal LRProduction GetProduction(int index) { return productions[index]; }
 
         /// <summary>
         /// Determine whether the given state is the accepting state
         /// </summary>
         /// <param name="state">The DFA state</param>
         /// <returns>True if the state is the accepting state, false otherwise</returns>
-        public bool IsAcceptingState(int state)
+        internal bool IsAcceptingState(int state)
         {
             if (table[state, 0].ActionsCount != 1)
                 return false;
@@ -130,7 +130,7 @@ namespace Hime.Redist.Parsers
         /// <param name="state">The DFA state</param>
         /// <param name="terminalCount">The maximal number of terminals</param>
         /// <returns>The expected terminal indices</returns>
-        public ICollection<int> GetExpected(int state, int terminalCount)
+        internal ICollection<int> GetExpected(int state, int terminalCount)
         {
             List<int> result = new List<int>();
             for (ushort i = 0; i != terminalCount; i++)

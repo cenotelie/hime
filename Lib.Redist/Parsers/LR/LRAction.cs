@@ -6,7 +6,7 @@ namespace Hime.Redist.Parsers
     /// Represents a LR action in a LR parse table
     /// </summary>
     [StructLayout(LayoutKind.Explicit, Size = 4)]
-    public struct LRAction
+    struct LRAction
     {
         [FieldOffset(0)]
         private LRActionCode code;

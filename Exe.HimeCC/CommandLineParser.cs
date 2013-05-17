@@ -11,7 +11,7 @@ namespace Hime.HimeCC.CL
 {
     internal class CommandLineParser : LRkParser
     {
-        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(CommandLineParser), "CommandLineParser.bin");
+        private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
         private static readonly Variable[] variables = {
             new Variable(0x9, "value"), 
             new Variable(0xA, "argument"), 

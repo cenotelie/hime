@@ -13,7 +13,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         protected override void ExportAutomaton(StreamWriter stream, string name, string resource)
         {
-            stream.WriteLine("        private static readonly RNGLRAutomaton automaton = RNGLRAutomaton.FindAutomaton(typeof(" + name + "Parser), \"" + resource + "\");");
+            stream.WriteLine("        private static readonly RNGLRAutomaton automaton = RNGLRAutomaton.Find(typeof(" + name + "Parser), \"" + resource + "\");");
         }
 
         public override void ExportData(BinaryWriter stream)

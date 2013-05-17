@@ -6,7 +6,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Represents a base simulator for all LR(k) parsers
     /// </summary>
-    public abstract class LRkSimulator
+    abstract class LRkSimulator
     {
         /// <summary>
         /// Parser's variables

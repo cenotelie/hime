@@ -6,7 +6,7 @@ namespace Hime.Redist.Parsers
     /// Represents a collection of LRAction stored as a binary blob
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    public sealed class LRActions
+    class LRActions
     {
         [FieldOffset(0)]
         private byte[] blob;

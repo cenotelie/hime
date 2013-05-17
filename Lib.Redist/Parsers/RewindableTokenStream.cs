@@ -5,7 +5,7 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Fast rewindable stream of token encapsulating a lexer
     /// </summary>
-    public sealed class RewindableTokenStream : Lexer.ITokenStream
+    class RewindableTokenStream : Lexer.ITokenStream
     {
         private const int ringSize = 32;
 

@@ -11,7 +11,7 @@ namespace Hime.CentralDogma.Input
 {
     internal class FileCentralDogmaParser : LRkParser
     {
-        private static readonly LRkAutomaton automaton = LRkAutomaton.FindAutomaton(typeof(FileCentralDogmaParser), "FileCentralDogmaParser.bin");
+        private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(FileCentralDogmaParser), "FileCentralDogmaParser.bin");
         private static readonly Variable[] variables = {
             new Variable(0x2F, "option"), 
             new Variable(0x30, "terminal_def_atom_any"), 

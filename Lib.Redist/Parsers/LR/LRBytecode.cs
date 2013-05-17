@@ -6,7 +6,7 @@ namespace Hime.Redist.Parsers
     /// Represents a LRBytecode stored as a binary blob
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    public sealed class LRBytecode
+    class LRBytecode
     {
         [FieldOffset(0)]
         private byte[] blob;

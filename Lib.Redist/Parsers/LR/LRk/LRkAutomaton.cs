@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
         /// <param name="type">The lexer's type</param>
         /// <param name="resource">The name of the resource containing the lexer</param>
         /// <returns>The automaton</returns>
-        public static LRkAutomaton FindAutomaton(System.Type type, string resource)
+        public static LRkAutomaton Find(System.Type type, string resource)
         {
             System.Reflection.Assembly assembly = type.Assembly;
             string[] resources = assembly.GetManifestResourceNames();
@@ -68,7 +68,7 @@ namespace Hime.Redist.Parsers
         /// <param name="state">State in the LR(k) automaton</param>
         /// <param name="sid">Symbol's ID</param>
         /// <returns>The LR(k) action for the state and sid</returns>
-        public LRAction GetAction(int state, int sid)
+        internal LRAction GetAction(int state, int sid)
         {
             return table[state * ncols + columns[sid]];
         }
@@ -78,7 +78,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="index">Production's index</param>
         /// <returns>The production a the given index</returns>
-        public LRProduction GetProduction(int index) { return productions[index]; }
+        internal LRProduction GetProduction(int index) { return productions[index]; }
 
         /// <summary>
         /// Gets a collection of the expected terminal indices
@@ -86,7 +86,7 @@ namespace Hime.Redist.Parsers
         /// <param name="state">The DFA state</param>
         /// <param name="terminalCount">The maximal number of terminals</param>
         /// <returns>The expected terminal indices</returns>
-        public ICollection<int> GetExpected(int state, int terminalCount)
+        internal ICollection<int> GetExpected(int state, int terminalCount)
         {
             List<int> result = new List<int>();
             int offset = ncols * state;
