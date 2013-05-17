@@ -70,6 +70,7 @@
     <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Parsers\LR\LROpCode.cs" />
+    <Compile Include="Parsers\LR\LROpCodeValues.cs" />
     <Compile Include="Parsers\LR\LRTreeAction.cs" />
     <Compile Include="Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Parsers\LR\RNGLR\GSSNode.cs" />

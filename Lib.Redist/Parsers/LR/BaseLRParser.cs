@@ -32,7 +32,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Determines whether the parser will try to recover from errors
         /// </summary>
-        protected bool tryRecover = true;
+        protected bool recover = true;
         /// <summary>
         /// Determines whether the parser will execute the semantic actions
         /// </summary>
@@ -53,7 +53,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// List of the encountered syntaxic errors
         /// </summary>
-        protected List<ParserError> errors;
+        protected List<ParserError> allErrors;
         /// <summary>
         /// Read-only list of the errors
         /// </summary>
@@ -81,8 +81,8 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public bool TryRecover
         {
-            get { return tryRecover; }
-            set { tryRecover = value; }
+            get { return recover; }
+            set { recover = value; }
         }
 
         /// <summary>
@@ -97,9 +97,9 @@ namespace Hime.Redist.Parsers
             this.parserVariables = new Utils.SymbolDictionary<Symbols.Variable>(variables);
             this.parserVirtuals = new Utils.SymbolDictionary<Symbols.Virtual>(virtuals);
             this.parserActions = actions;
-            this.tryRecover = true;
-            this.errors = new List<ParserError>();
-            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(errors);
+            this.recover = true;
+            this.allErrors = new List<ParserError>();
+            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(allErrors);
             this.lexer = lexer;
             this.lexer.OnError += OnLexicalError;
         }
@@ -110,7 +110,7 @@ namespace Hime.Redist.Parsers
         /// <param name="error">Lexical error</param>
         protected void OnLexicalError(ParserError error)
         {
-            errors.Add(error);
+            allErrors.Add(error);
         }
 
         /// <summary>

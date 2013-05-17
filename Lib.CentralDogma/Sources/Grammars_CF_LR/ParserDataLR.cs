@@ -52,21 +52,21 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.VirtualDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.VirtualPromote);
-                    else stream.Write((ushort)LROpCode.VirtualNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.VirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.VirtualPromote);
+                    else stream.Write((ushort)LROpCodeValues.VirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
                 {
-                    stream.Write((ushort)LROpCode.SemanticAction);
+                    stream.Write((ushort)LROpCodeValues.SemanticAction);
                     stream.Write((ushort)actions.IndexOf(elem.Symbol as Action));
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCode.PopDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCode.PopPromote);
-                    else stream.Write((ushort)LROpCode.PopNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.PopDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.PopPromote);
+                    else stream.Write((ushort)LROpCodeValues.PopNoAction);
                 }
             }
         }

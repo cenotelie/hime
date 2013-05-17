@@ -50,8 +50,8 @@ namespace Hime.Redist.Parsers
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);
-            errors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
-            if (!tryRecover) return null;
+            allErrors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
+            if (!recover) return null;
             if (TryDrop1Unexpected()) return input.GetNextToken();
             if (TryDrop2Unexpected()) return input.GetNextToken();
             foreach (Symbols.Terminal terminal in expected)
@@ -109,7 +109,7 @@ namespace Hime.Redist.Parsers
                 if (action == LRActionCode.Accept)
                     return objects[head - 1].Value;
                 nextToken = OnUnexpectedToken(nextToken);
-                if (nextToken == null || errors.Count >= maxErrorCount)
+                if (nextToken == null || allErrors.Count >= maxErrorCount)
                     return null;
             }
         }

@@ -1,9 +1,12 @@
+using System;
+
 namespace Hime.Redist.Parsers
 {
     /// <summary>
     /// Represents an action in a LR parser
     /// </summary>
-    enum LRActionCode : ushort
+    [CLSCompliant(false)]
+    public enum LRActionCode : ushort
     {
         /// <summary>
         /// No possible action => Error
