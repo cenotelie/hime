@@ -90,7 +90,6 @@ namespace Hime.Redist.AST
                     case Parsers.LRTreeAction.Replace:
                         System.Array.Copy(child.children, 0, replacement, index, child.children.Length);
                         index += child.children.Length;
-                        child.children = null;
                         break;
                     case Parsers.LRTreeAction.Drop:
                         break;
@@ -119,7 +118,6 @@ namespace Hime.Redist.AST
                     case Parsers.LRTreeAction.Replace:
                         foreach (BuildNode subchild in child.children)
                             firstPromote = ExecuteReplacement(subchild, firstPromote);
-                        child.children = null;
                         break;
                     case Parsers.LRTreeAction.Drop:
                         break;
