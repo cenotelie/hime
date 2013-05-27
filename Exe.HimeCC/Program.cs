@@ -4,7 +4,6 @@ using System.Text;
 using Hime.CentralDogma;
 using Hime.CentralDogma.Reporting;
 using Hime.HimeCC.CL;
-using Hime.Redist.AST;
 using Hime.Redist.Parsers;
 using Hime.Redist.Symbols;
 
@@ -72,7 +71,7 @@ namespace Hime.HimeCC
             }
 
             // Parse the arguments
-            ASTNode line = ParseArguments(args);
+            ParseTree line = ParseArguments(args);
             if (line == null)
             {
                 Console.WriteLine(ErrorParsingArgs);
@@ -81,7 +80,7 @@ namespace Hime.HimeCC
             }
             
             // Check for special switches
-            string special = GetSpecialCommand(line);
+            string special = GetSpecialCommand(line.Root);
             if (special == ArgHelpShort || special == ArgHelpLong)
             {
                 PrintHelp();
@@ -95,7 +94,7 @@ namespace Hime.HimeCC
             }
 
             // Build the compilation task
-            CompilationTask task = BuildTask(line);
+            CompilationTask task = BuildTask(line.Root);
             if (task == null)
             {
                 Console.WriteLine(ErrorBadArgs);
@@ -137,7 +136,7 @@ namespace Hime.HimeCC
             return report.ErrorCount;
         }
 
-        private ASTNode ParseArguments(string[] args)
+        private ParseTree ParseArguments(string[] args)
         {
             StringBuilder builder = new StringBuilder();
             foreach (string arg in args)
@@ -147,7 +146,7 @@ namespace Hime.HimeCC
             }
             CommandLineLexer lexer = new CommandLineLexer(builder.ToString());
             CommandLineParser parser = new CommandLineParser(lexer);
-            ASTNode root = parser.Parse();
+            ParseTree root = parser.Parse();
             foreach (ParserError error in parser.Errors)
                 Console.WriteLine(error.Message);
             if (parser.Errors.Count > 0)

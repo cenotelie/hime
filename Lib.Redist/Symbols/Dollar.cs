@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Hime.Redist.Symbols
 {
     /// <summary>

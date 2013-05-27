@@ -15,8 +15,8 @@ namespace Hime.Redist.Parsers
         {
             public GSSNode node;
             public LRProduction prod;
-            public AST.SPPFNode first;
-            public Reduction(GSSNode node, LRProduction prod, AST.SPPFNode first)
+            public SPPFNode first;
+            public Reduction(GSSNode node, LRProduction prod, SPPFNode first)
             {
                 this.node = node;
                 this.prod = prod;
@@ -38,18 +38,19 @@ namespace Hime.Redist.Parsers
         private struct NodeDic
         {
             public int generation;
-            public List<AST.SPPFNode> nodes;
+            public List<SPPFNode> nodes;
         }
 
         private RNGLRAutomaton parserAutomaton;
-        private AST.SPPFNode epsilon;
-        private AST.SPPFNode[] nullProds;
-        private Dictionary<int, AST.SPPFNode> nullVars;
+        private SPPFBuilder builder;
+        private SPPFNode epsilon;
+        private SPPFNode[] nullProds;
+        private Dictionary<int, SPPFNode> nullVars;
         private Symbols.Token nextToken;
         private Queue<Reduction> queueReductions;
         private Queue<Shift> queueShifts;
         private List<NodeDic> objects;
-        private AST.SPPFNode[] bufferNodes;
+        private SPPFNode[] bufferNodes;
         private Symbols.Symbol[] bufferSymbols;
 
         /// <summary>
@@ -64,10 +65,11 @@ namespace Hime.Redist.Parsers
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
-            this.epsilon = new AST.SPPFNode(Symbols.Epsilon.Instance);
-            this.nullProds = new AST.SPPFNode[variables.Length];
-            this.nullVars = new Dictionary<int, AST.SPPFNode>();
-            this.bufferNodes = new AST.SPPFNode[maxBodyLength];
+            this.builder = new SPPFBuilder();
+            this.epsilon = new SPPFNode(Symbols.Epsilon.Instance, LRTreeAction.None);
+            this.nullProds = new SPPFNode[variables.Length];
+            this.nullVars = new Dictionary<int, SPPFNode>();
+            this.bufferNodes = new SPPFNode[maxBodyLength];
             this.bufferSymbols = new Symbols.Symbol[maxBodyLength];
             for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
@@ -75,10 +77,9 @@ namespace Hime.Redist.Parsers
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    nullProds[i] = new AST.SPPFNode(parserVariables[prod.Head]);
-                    nullProds[i].SetAction(prod.HeadAction);
-                    if (!nullVars.ContainsKey(nullProds[i].SymbolID))
-                        nullVars.Add(nullProds[i].SymbolID, nullProds[i]);
+                    nullProds[i] = new SPPFNode(parserVariables[prod.Head], prod.HeadAction);
+                    if (!nullVars.ContainsKey(nullProds[i].originalSID))
+                        nullVars.Add(nullProds[i].originalSID, nullProds[i]);
                 }
             }
             for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
@@ -92,7 +93,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private void BuildNullable(AST.SPPFNode subRoot, LRProduction production)
+        private void BuildNullable(SPPFNode subRoot, LRProduction production)
         {
             int nextBuffer = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -100,14 +101,13 @@ namespace Hime.Redist.Parsers
                 LROpCode op = production.Bytecode[i];
                 if (op.IsSemAction)
                 {
-                    parserActions[production.Bytecode[i + 1].Value](subRoot.Value.Symbol as Symbols.Variable, bufferSymbols, nextBuffer);
+                    parserActions[production.Bytecode[i + 1].Value](subRoot.value.Symbol as Symbols.Variable, bufferSymbols, nextBuffer);
                     i++;
                 }
                 else if (op.IsAddVirtual)
                 {
                     Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1].Value];
-                    AST.SPPFNode node = new AST.SPPFNode(symbol);
-                    node.SetAction(op.TreeAction);
+                    SPPFNode node = new SPPFNode(symbol, op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -115,15 +115,16 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddNullVar)
                 {
-                    AST.SPPFNode node = nullProds[production.Bytecode[i + 1].Value];
-                    node.SetAction(op.TreeAction);
-                    bufferSymbols[nextBuffer] = node.Value.Symbol;
+                    SPPFNode node = nullProds[production.Bytecode[i + 1].Value];
+                    if (op.TreeAction != LRTreeAction.None)
+                        node.action = op.TreeAction;
+                    bufferSymbols[nextBuffer] = node.value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
                     i++;
                 }
             }
-            subRoot.Build(bufferNodes, nextBuffer);
+            builder.Build(subRoot, bufferNodes, nextBuffer);
         }
 
         private void OnUnexpectedToken(Dictionary<int, GSSNode> Ui, Symbols.Token token)
@@ -149,14 +150,14 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public override AST.ASTNode Parse()
+        public override ParseTree Parse()
         {
             nextToken = lexer.GetNextToken();
             if (nextToken.SymbolID == Symbols.Dollar.Instance.SymbolID)
             {
                 // the input is empty!
                 if (parserAutomaton.IsAcceptingState(0))
-                    return nullProds[parserAutomaton.Axiom].Value;
+                    return null; // return nullProds[parserAutomaton.Axiom].value;
                 return null;
             }
 
@@ -201,7 +202,8 @@ namespace Hime.Redist.Parsers
                 {
                     // Has reduction _Axiom_ -> axiom $ . on ε
                     GSSPath[] paths = node.GetPaths(2, out count);
-                    return paths[0].labels[1].Value;
+                    //return builder.GetRoot(paths[0].labels[1]);
+                    return null;
                 }
             }
             // At end of input but was still waiting for tokens
@@ -234,12 +236,13 @@ namespace Hime.Redist.Parsers
             // Get the rule's head
             Symbols.Variable head = parserVariables[reduction.prod.Head];
             // Find or build the sub root SPPF
-            AST.SPPFNode subRoot = null;
+            SPPFNode subRoot = null;
             bool isNewRoot = false;
             if (reduction.prod.ReductionLength != 0)
             {
                 subRoot = ResolveSPPF(path.last.Generation, head, out isNewRoot);
-                subRoot.SetAction(reduction.prod.HeadAction);
+                if (reduction.prod.HeadAction != LRTreeAction.None)
+                    subRoot.action = reduction.prod.HeadAction;
             }
             else
             {
@@ -260,8 +263,7 @@ namespace Hime.Redist.Parsers
                 else if (op.IsAddVirtual)
                 {
                     Symbols.Symbol symbol = parserVirtuals[reduction.prod.Bytecode[i + 1].Value];
-                    AST.SPPFNode node = new AST.SPPFNode(symbol);
-                    node.SetAction(op.TreeAction);
+                    SPPFNode node = builder.NewNode(symbol, op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -269,27 +271,29 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddNullVar)
                 {
-                    AST.SPPFNode node = nullProds[reduction.prod.Bytecode[i + 1].Value];
-                    node.SetAction(op.TreeAction);
-                    bufferSymbols[nextBuffer] = node.Value.Symbol;
+                    SPPFNode node = nullProds[reduction.prod.Bytecode[i + 1].Value];
+                    if (op.TreeAction != LRTreeAction.None)
+                        node.action = op.TreeAction;
+                    bufferSymbols[nextBuffer] = node.value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
                     i++;
                 }
                 else
                 {
-                    AST.SPPFNode node = null;
+                    SPPFNode node = null;
                     if (nextStack >= path.labels.Length) node = reduction.first;
                     else node = path.labels[path.labels.Length - nextStack - 1];
-                    node.SetAction(op.TreeAction);
-                    bufferSymbols[nextBuffer] = node.Value.Symbol;
+                    if (op.TreeAction != LRTreeAction.None)
+                        node.action = op.TreeAction;
+                    bufferSymbols[nextBuffer] = node.value.Symbol;
                     bufferNodes[nextBuffer] = node;
                     nextStack++;
                     nextBuffer++;
                 }
             }
             if (isNewRoot)
-                subRoot.Build(bufferNodes, nextBuffer);
+                builder.Build(subRoot, bufferNodes, nextBuffer);
 
             // Get the target state by transition on the rule's head
             int to = GetNextByVar(path.last.State, head.SymbolID);
@@ -351,7 +355,7 @@ namespace Hime.Redist.Parsers
             // Create next generation
             Dictionary<int, GSSNode> Uj = new Dictionary<int, GSSNode>();
             // Create the AST for the old token
-            AST.SPPFNode ast = new AST.SPPFNode(oldtoken);
+            SPPFNode ast = builder.NewNode(oldtoken, LRTreeAction.None);
 
             // Execute all shifts in the queue at this point
             int count = queueShifts.Count;
@@ -360,7 +364,7 @@ namespace Hime.Redist.Parsers
             return Uj;
         }
 
-        private void ExecuteShift(Dictionary<int, GSSNode> Uj, AST.SPPFNode ast, Shift shift)
+        private void ExecuteShift(Dictionary<int, GSSNode> Uj, SPPFNode ast, Shift shift)
         {
             if (Uj.ContainsKey(shift.to))
             {
@@ -418,29 +422,29 @@ namespace Hime.Redist.Parsers
             return 0xFFFF;
         }
 
-        private AST.SPPFNode ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
+        private SPPFNode ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
         {
             isNew = false;
             foreach (NodeDic dic in objects)
             {
                 if (dic.generation == generation)
                 {
-                    foreach (AST.SPPFNode node in dic.nodes)
+                    foreach (SPPFNode node in dic.nodes)
                     {
-                        if (node.SymbolID == symbol.SymbolID)
+                        if (node.originalSID == symbol.SymbolID)
                             return node;
                     }
                     isNew = true;
-                    AST.SPPFNode sppf = new AST.SPPFNode(symbol);
+                    SPPFNode sppf = builder.NewNode(symbol, LRTreeAction.None);
                     dic.nodes.Add(sppf);
                     return sppf;
                 }
             }
             isNew = true;
-            AST.SPPFNode nn = new AST.SPPFNode(symbol);
+            SPPFNode nn = builder.NewNode(symbol, LRTreeAction.None);
             NodeDic nd = new NodeDic();
             nd.generation = generation;
-            nd.nodes = new List<AST.SPPFNode>();
+            nd.nodes = new List<SPPFNode>();
             nd.nodes.Add(nn);
             return nn;
         }

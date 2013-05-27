@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
-using Hime.Redist.AST;
 using Hime.Redist.Symbols;
 
 namespace Hime.CentralDogma.Grammars.ContextFree

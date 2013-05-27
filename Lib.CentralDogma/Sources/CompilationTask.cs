@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Hime.Redist.AST;
 using Hime.Redist.Parsers;
 using Hime.Redist.Symbols;
 
@@ -252,8 +251,8 @@ namespace Hime.CentralDogma
             bool hasErrors = false;
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
-            ASTNode root = null;
-            try { root = parser.Parse(); }
+            ParseTree ast = null;
+            try { ast = parser.Parse(); }
             catch (Exception ex)
             {
                 reporter.Error("Fatal error in " + name);
@@ -265,9 +264,9 @@ namespace Hime.CentralDogma
                 reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
                 hasErrors = true;
             }
-            if (root != null)
+            if (ast != null)
             {
-                foreach (ASTNode gnode in root.Children)
+                foreach (ASTNode gnode in ast.Root.Children)
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {

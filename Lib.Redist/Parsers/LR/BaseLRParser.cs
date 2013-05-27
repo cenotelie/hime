@@ -20,23 +20,19 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Maximal size of the stack
         /// </summary>
-        protected int maxStackSize = 100;
+        protected const int maxStackSize = 128;
         /// <summary>
         /// Maximum number of errors
         /// </summary>
-        protected int maxErrorCount = 100;
+        protected const int maxErrorCount = 100;
         /// <summary>
         /// Maximum lenght of a rule
         /// </summary>
-        protected int maxBodyLength = 20;
+        protected const int maxBodyLength = 128;
         /// <summary>
         /// Determines whether the parser will try to recover from errors
         /// </summary>
         protected bool recover = true;
-        /// <summary>
-        /// Determines whether the parser will execute the semantic actions
-        /// </summary>
-        protected bool executeActions = true;
 
         /// <summary>
         /// Parser's variables
@@ -117,6 +113,6 @@ namespace Hime.Redist.Parsers
         /// Parses the input and returns the produced AST
         /// </summary>
         /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public abstract AST.ASTNode Parse();
+        public abstract ParseTree Parse();
     }
 }

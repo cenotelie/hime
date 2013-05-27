@@ -23,7 +23,7 @@ namespace Hime.Redist.Parsers
             this.edgesCount = 0;
         }
 
-        public void AddEdge(GSSNode state, AST.SPPFNode label)
+        public void AddEdge(GSSNode state, SPPFNode label)
         {
             if (edgesCount == edges.Length)
             {
@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
         {
             GSSPath[] paths = new GSSPath[initPathsCount];
             paths[0].last = this;
-            paths[0].labels = new AST.SPPFNode[length];
+            paths[0].labels = new SPPFNode[length];
             // The number of paths in the list
             count = 1;
             // For the remaining hops
@@ -85,7 +85,7 @@ namespace Hime.Redist.Parsers
                         }
                         // Clone and extend the new path
                         paths[next].last = last.edges[j].to;
-                        paths[next].labels = new AST.SPPFNode[length];
+                        paths[next].labels = new SPPFNode[length];
                         System.Array.Copy(paths[p].labels, paths[next].labels, i);
                         paths[next].labels[i] = last.edges[j].label;
                         // Go to next insert

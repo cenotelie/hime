@@ -59,7 +59,8 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="AST\BuildNode.cs" />
+    <Compile Include="Parsers\ASTFamily.cs" />
+    <Compile Include="Parsers\LR\LRk\LRkASTBuilder.cs" />
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Lexer\ITokenStream.cs" />
     <Compile Include="Parsers\LR\BaseLRParser.cs" />
@@ -78,16 +79,19 @@
     <Compile Include="Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
     <Compile Include="Parsers\LR\RNGLR\RNGLRParser.cs" />
     <Compile Include="Parsers\LR\RNGLR\RNGLRTable.cs" />
+    <Compile Include="Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Parsers\ParserErrorType.cs" />
     <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Parsers\LR\LRProduction.cs" />
     <Compile Include="Lexer\RewindableTextReader.cs" />
     <Compile Include="Lexer\TextLexer.cs" />
     <Compile Include="Lexer\Automaton.cs" />
+    <Compile Include="Parsers\ParseTree.cs" />
     <Compile Include="Parsers\RewindableTokenStream.cs" />
     <Compile Include="Parsers\UnexpectedCharError.cs" />
     <Compile Include="Parsers\ParserError.cs" />
     <Compile Include="Parsers\UnexpectedTokenError.cs" />
+    <Compile Include="Symbols\Action.cs" />
     <Compile Include="Symbols\Terminal.cs" />
     <Compile Include="Symbols\Token.cs" />
     <Compile Include="Symbols\Dollar.cs" />
@@ -95,12 +99,13 @@
     <Compile Include="Symbols\TextToken.cs" />
     <Compile Include="Symbols\Variable.cs" />
     <Compile Include="Symbols\Virtual.cs" />
-    <Compile Include="AST\ASTNode.cs" />
+    <Compile Include="Parsers\ASTNode.cs" />
     <Compile Include="Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AST\SPPFNode.cs" />
+    <Compile Include="Parsers\LR\RNGLR\SPPFNode.cs" />
     <Compile Include="Symbols\Symbol.cs" />
     <Compile Include="Utils\MemoryMaps.cs" />
+    <Compile Include="Utils\Pool.cs" />
     <Compile Include="Utils\SymbolDictionary.cs" />
     <Compile Include="Utils\SIDHashMap.cs" />
   </ItemGroup>

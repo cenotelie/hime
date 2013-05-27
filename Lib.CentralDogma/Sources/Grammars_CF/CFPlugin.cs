@@ -1,4 +1,4 @@
-using Hime.Redist.AST;
+using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Grammars.ContextFree
 {

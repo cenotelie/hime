@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
-using Hime.Redist.AST;
 using Hime.Redist.Lexer;
 using Hime.Redist.Parsers;
 using Hime.Redist.Symbols;
@@ -78,7 +77,7 @@ namespace Hime.Tests
             ResolveParserFor(resource, method);
             ILexer lc = resLexer[resource].Invoke(new object[] { input }) as ILexer;
             IParser pc = resParser[resource].Invoke(new object[] { lc }) as IParser;
-            bool result = Compare(pc.Parse(), check);
+            bool result = Compare(pc.Parse().Root, check);
             if (!result)
                 Log("Test " + name + " failed");
             return result;
@@ -90,7 +89,7 @@ namespace Hime.Tests
             ExportResource(script, script);
             ILexer lc = scriptLexer.Invoke(new object[] { File.ReadAllText(script) }) as ILexer;
             IParser pc = scriptParser.Invoke(new object[] { lc }) as IParser;
-            ASTNode root = pc.Parse();
+            ASTNode root = pc.Parse().Root;
             int succeeded = 0;
             int failed = 0;
             foreach (ASTNode test in root.Children)
