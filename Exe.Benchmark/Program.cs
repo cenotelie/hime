@@ -10,7 +10,7 @@ namespace Hime.Benchmark
     {
         static void Main(string[] args)
         {
-            Benchmark bench = new Benchmark(ParsingMethod.LALR1, false, true);
+            Benchmark bench = new Benchmark();
             bench.Run();
         }
     }
