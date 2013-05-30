@@ -4,104 +4,236 @@ namespace Hime.Redist.Parsers
 {
     class LRkASTBuilder
     {
-        private const int bufferSize = 2048;
+        private const int handleSize = 1024;
+        private const int estimationBias = 5;
 
-        private struct StackElem
+        private class SubTree
         {
-            public Symbols.Symbol symbol;
-            public int index;
+            private Pool pool;
+            private ParseTree.Cell[] items;
+            private LRTreeAction[] actions;
+
+            public Symbols.Symbol Head
+            {
+                get { return items[0].symbol; }
+                set { items[0].symbol = value; }
+            }
+            public int ChildrenCount
+            {
+                get { return items[0].count; }
+                set { items[0].count = value; }
+            }
+            public LRTreeAction Action
+            {
+                get { return actions[0]; }
+                set { actions[0] = value; }
+            }
+            public ParseTree.Cell this[int index]
+            {
+                get { return items[index]; }
+                set { items[index] = value; }
+            }
+
+            public LRTreeAction GetAction(int index) { return actions[index]; }
+
+            public SubTree(Pool pool, int capacity)
+            {
+                this.pool = pool;
+                this.items = new ParseTree.Cell[capacity];
+                this.actions = new LRTreeAction[capacity];
+            }
+
+            public int GetSize()
+            {
+                int size = 1;
+                for (int i = 0; i != items[0].count; i++)
+                    size += items[size].count + 1;
+                return size;
+            }
+
+            public void CopyTo(SubTree destination, int index)
+            {
+                if (this.items[0].count == 0)
+                {
+                    destination.items[index] = this.items[0];
+                    destination.actions[index] = this.actions[0];
+                }
+                else
+                {
+                    Array.Copy(this.items, 0, destination.items, index, this.items[0].count + 1);
+                    Array.Copy(this.actions, 0, destination.actions, index, this.items[0].count + 1);
+                }
+            }
+
+            public void CopyChildrenTo(SubTree destination, int index)
+            {
+                if (this.items[0].count == 0)
+                    return;
+                int size = GetSize() - 1;
+                Array.Copy(this.items, 1, destination.items, index, size);
+                Array.Copy(this.actions, 1, destination.actions, index, size);
+            }
+
+            public void CommitTo(int index, ParseTree tree)
+            {
+                if (this.items[index].count != 0)
+                    this.items[index].first = tree.Store(this.items, index + 1, this.items[index].count);
+            }
+
+            public void SetAt(int index, Symbols.Symbol symbol, LRTreeAction action)
+            {
+                this.items[index].symbol = symbol;
+                this.items[index].count = 0;
+                this.actions[index] = action;
+            }
+
+            public void Move(int from, int to)
+            {
+                this.items[to] = this.items[from];
+            }
+
+            public void MoveRange(int from, int to, int length)
+            {
+                if (length != 0)
+                {
+                    Array.Copy(items, from, items, to, length);
+                    Array.Copy(actions, from, actions, to, length);
+                }
+            }
+
+            public void Free()
+            {
+                if (pool != null)
+                    pool.Free(this);
+            }
         }
 
-        // stack of semantic objects
-        private StackElem[] stack;
+        private class Pool
+        {
+            private int itemsCapacity;
+            private SubTree[] free;
+            private int nextFree;
+            private int allocated;
+
+            public Pool(int itemsCapacity, int size)
+            {
+                this.itemsCapacity = itemsCapacity;
+                this.free = new SubTree[size];
+                this.nextFree = -1;
+                this.allocated = 0;
+            }
+
+            public SubTree Acquire()
+            {
+                if (nextFree == -1)
+                {
+                    // Create new one
+                    SubTree result = new SubTree(this, itemsCapacity);
+                    allocated++;
+                    return result;
+                }
+                else
+                {
+                    return free[nextFree--];
+                }
+            }
+
+            public void Free(SubTree subTree)
+            {
+                nextFree++;
+                if (nextFree == free.Length)
+                {
+                    SubTree[] temp = new SubTree[allocated];
+                    Array.Copy(free, temp, free.Length);
+                    free = temp;
+                }
+                free[nextFree] = subTree;
+            }
+        }
+
+        // Sub-tree pools
+        private Pool poolSingle;
+        private Pool pool128;
+        private Pool pool1024;
+        // Stack of semantic objects
+        private SubTree[] stack;
         private int stackNext;
-        // Buffer of sub-trees not yet commited to the final AST
-        private ParseTree.Cell[] subs;
-        private LRTreeAction[] subsActions;
-        private int subsNext;
-        // Cache of sub-trees that are currently in use in a reduction
-        private ParseTree.Cell[] cache;
-        private LRTreeAction[] cacheActions;
+        // Cache for the reductions
+        private SubTree cache;
         private int cacheNext;
-        // Reduction info
+        private int popCount;
+        // Reduction data
         private int[] handle;
         private int handleNext;
-        private int popCount;
         // Final AST
         private ParseTree tree;
 
         internal LRkASTBuilder(int stackSize)
         {
-            this.stack = new StackElem[stackSize];
-            this.subs = new ParseTree.Cell[bufferSize];
-            this.subsActions = new LRTreeAction[bufferSize];
-            this.cache = new ParseTree.Cell[bufferSize];
-            this.cacheActions = new LRTreeAction[bufferSize];
-            this.handle = new int[bufferSize];
+            this.poolSingle = new Pool(1, 512);
+            this.pool128 = new Pool(128, 128);
+            this.pool1024 = new Pool(1024, 16);
+            this.stack = new SubTree[stackSize];
+            this.handle = new int[handleSize];
             this.tree = new ParseTree();
         }
 
         public void StackPush(Symbols.Symbol symbol)
         {
-            stack[stackNext].symbol = symbol;
-            stack[stackNext].index = -1;
-            stackNext++;
+            SubTree single = poolSingle.Acquire();
+            single.Head = symbol;
+            single.Action = LRTreeAction.None;
+            stack[stackNext++] = single;
         }
 
         public void ReductionPrepare(int length)
         {
             stackNext -= length;
-            cacheNext = 0;
+            int estimation = estimationBias;
+            for (int i = 0; i != length; i++)
+                estimation += stack[stackNext + i].GetSize();
+            if (estimation <= 128)
+                cache = pool128.Acquire();
+            else if (estimation <= 1024)
+                cache = pool1024.Acquire();
+            else
+                cache = new SubTree(null, estimation);
+            cacheNext = 1;
             handleNext = 0;
             popCount = 0;
         }
 
         public void ReductionPop(LRTreeAction action)
         {
-            if (stack[stackNext + popCount].index == -1)
+            SubTree sub = stack[stackNext + popCount];
+            if (sub.Action == LRTreeAction.Replace)
             {
-                // This is an individual symbol (token)
-                if (action != LRTreeAction.Drop)
+                // copy the children to the cache
+                sub.CopyChildrenTo(cache, cacheNext);
+                // setup the handle
+                int index = 1;
+                for (int i = 0; i != sub.ChildrenCount; i++)
                 {
-                    // If it should be kept
-                    EnsureCache(cacheNext + 1);
-                    cache[cacheNext].symbol = stack[stackNext + popCount].symbol;
-                    cache[cacheNext].count = 0;
-                    cacheActions[cacheNext] = action;
-                    handle[handleNext] = cacheNext;
-                    cacheNext++;
-                    handleNext++;
+                    int size = sub[index].count + 1;
+                    handle[handleNext++] = cacheNext;
+                    cacheNext += size;
+                    index += size;
                 }
+                sub.Free();
+            }
+            else if (action == LRTreeAction.Drop)
+            {
+                sub.Free();
             }
             else
             {
-                // This is a sub-tree
-                int current = stack[stackNext + popCount].index;
-                ParseTree.Cell sub = subs[current];
-                if (subsActions[current] == LRTreeAction.Replace)
-                {
-                    // Replace this node by its children
-                    current++;
-                    for (int i = 0; i != sub.count; i++)
-                    {
-                        handle[handleNext++] = cacheNext;
-                        current += MoveToCache(current);
-                    }
-                    subsNext--; // This is to account for the replaced node
-                }
-                else if (action == LRTreeAction.Drop)
-                {
-                    // Drop now
-                    subsNext -= sub.count + 1;
-                }
-                else
-                {
-                    EnsureCache(cacheNext + 1);
-                    handle[handleNext] = cacheNext;
-                    MoveToCache(current);
-                    cacheActions[handle[handleNext]] = (action != LRTreeAction.None ? action : subsActions[current]);
-                    handleNext++;
-                }
+                if (action != LRTreeAction.None)
+                    sub.Action = action;
+                // copy the complete sub-tree to the cache
+                sub.CopyTo(cache, cacheNext);
+                handle[handleNext++] = cacheNext;
+                cacheNext += sub.ChildrenCount + 1;
+                sub.Free();
             }
             popCount++;
         }
@@ -110,188 +242,89 @@ namespace Hime.Redist.Parsers
         {
             if (action == LRTreeAction.Drop)
                 return; // why would you do this?
-            EnsureCache(cacheNext + 1);
-            cache[cacheNext].symbol = symbol;
-            cache[cacheNext].count = 0;
-            cacheActions[cacheNext] = action;
-            handle[handleNext] = cacheNext;
-            cacheNext++;
-            handleNext++;
+            cache.SetAt(cacheNext, symbol, action);
+            handle[handleNext++] = cacheNext++;
         }
 
         public void ReductionSemantic(SemanticAction callback)
         {
-            EnsureCache(cacheNext + 1);
-            cache[cacheNext].symbol = new Symbols.Action(callback);
-            cache[cacheNext].count = 0;
-            cacheActions[cacheNext] = LRTreeAction.Semantic;
-            handle[handleNext] = cacheNext;
-            cacheNext++;
-            handleNext++;
+            cache.SetAt(cacheNext, new Symbols.Action(callback), LRTreeAction.Semantic);
+            handle[handleNext++] = cacheNext++;
         }
 
         public void Reduce(Symbols.Variable var, LRTreeAction action)
         {
-            // Put the variable on the stack
-            stack[stackNext].symbol = var;
-            stack[stackNext].index = subsNext;
-            stackNext++;
             // Build the subtree
             if (action == LRTreeAction.Replace)
                 ReduceReplaceable(var);
             else
                 ReduceNormal(var);
+            // Put it on the stack
+            stack[stackNext++] = cache;
         }
 
         private void ReduceReplaceable(Symbols.Variable var)
         {
-            EnsureSubs(subsNext + 1);
-            subs[subsNext].symbol = var;
-            subs[subsNext].count = handleNext;
-            subsActions[subsNext] = LRTreeAction.Replace;
-            subsNext++;
-            if (handleNext != 0)
-            {
-                EnsureSubs(subsNext + cacheNext);
-                Array.Copy(cache, 0, subs, subsNext, cacheNext);
-                Array.Copy(cacheActions, 0, subsActions, subsNext, cacheNext);
-                subsNext += cacheNext;
-            }
+            cache.Head = var;
+            cache.ChildrenCount = handleNext;
+            cache.Action = LRTreeAction.Replace;
         }
 
         private void ReduceNormal(Symbols.Variable var)
         {
             // write the sub-tree root
-            int top = subsNext;
-            EnsureSubs(subsNext + 1);
-            subs[subsNext].symbol = var;
-            subsActions[subsNext] = LRTreeAction.None;
-            subsNext++;
+            cache.Head = var;
+            cache.Action = LRTreeAction.None;
             // promotion data
-            ParseTree.Cell promoted = new ParseTree.Cell();
             bool promotion = false;
-            int insertion = 0;
+            int insertion = 1;
             for (int i = 0; i != handleNext; i++)
             {
-                switch (cacheActions[handle[i]])
+                switch (cache.GetAction(handle[i]))
                 {
                     case LRTreeAction.Promote:
                         if (promotion)
                         {
                             // This is not the first promotion
-                            promoted.count = insertion;
                             // Commit the previously promoted node's children
-                            if (insertion != 0)
-                                promoted.first = tree.Store(cache, 0, insertion);
+                            cache.ChildrenCount = insertion - 1;
+                            cache.CommitTo(0, tree);
                             // Reput the previously promoted node in the cache
-                            cache[0] = promoted;
-                            cacheActions[0] = LRTreeAction.None;
-                            insertion = 1;
+                            cache.Move(0, 1);
+                            insertion = 2;
                         }
                         promotion = true;    
                         // Save the new promoted node
-                        promoted = cache[handle[i]];
+                        cache.Move(handle[i], 0);
                         // Repack the children on the left if any
-                        if (promoted.count != 0)
-                        {
-                            Array.Copy(cache, handle[i] + 1, cache, insertion, promoted.count);
-                            Array.Copy(cacheActions, handle[i] + 1, cacheActions, insertion, promoted.count);
-                            insertion += promoted.count;
-                        }
+                        cache.MoveRange(handle[i] + 1, insertion, cache.ChildrenCount);
+                        insertion += cache.ChildrenCount;
                         break;
                     case LRTreeAction.Semantic:
                         // TODO: something !
                         break;
                     default:
                         // Commit the children if any
-                        if (cache[handle[i]].count != 0)
-                            cache[handle[i]].first = tree.Store(cache, handle[i] + 1, cache[handle[i]].count);
+                        cache.CommitTo(handle[i], tree);
                         // Repack the sub-root on the left
                         if (insertion != handle[i])
-                        {
-                            cache[insertion] = cache[handle[i]];
-                            cacheActions[insertion] = cacheActions[handle[i]];
-                        }
+                            cache.Move(handle[i], insertion);
                         insertion++;
                         break;
                 }
             }
             // finalize the sub-tree data
-            subs[top].count = insertion;
-            if (promotion)
-                subs[top].symbol = promoted.symbol;
-            // write the children back in the sub-trees, if any
-            if (insertion != 0)
-            {
-                EnsureSubs(subsNext + insertion);
-                Array.Copy(cache, 0, subs, subsNext, insertion);
-                Array.Copy(cacheActions, 0, subsActions, subsNext, insertion);
-                subsNext += insertion;
-            }
-        }
-
-        private int MoveToCache(int index)
-        {
-            if (subs[index].count == 0)
-            {
-                EnsureCache(cacheNext + 1);
-                cache[cacheNext] = subs[index];
-                cacheActions[cacheNext] = subsActions[index];
-                cacheNext++;
-                subsNext--;
-                return 1;
-            }
-            else
-            {
-                int length = subs[index].count + 1;
-                EnsureCache(cacheNext + length);
-                Array.Copy(subs, index, cache, cacheNext, length);
-                Array.Copy(subsActions, index, cacheActions, cacheNext, length);
-                cacheNext += length;
-                subsNext -= length;
-                return length;
-            }
-        }
-
-        private void EnsureSubs(int size)
-        {
-            if (subs.Length >= size)
-                return;
-            int s = subs.Length + bufferSize;
-            while (s < size)
-                s += bufferSize;
-            ParseTree.Cell[] t1 = new ParseTree.Cell[s];
-            LRTreeAction[] t2 = new LRTreeAction[s];
-            Array.Copy(subs, t1, subs.Length);
-            Array.Copy(subsActions, t2, subs.Length);
-            subs = t1;
-            subsActions = t2;
-        }
-
-        private void EnsureCache(int size)
-        {
-            if (cache.Length >= size)
-                return;
-            int s = cache.Length + bufferSize;
-            while (s < size)
-                s += bufferSize;
-            ParseTree.Cell[] t1 = new ParseTree.Cell[s];
-            LRTreeAction[] t2 = new LRTreeAction[s];
-            Array.Copy(cache, t1, cache.Length);
-            Array.Copy(cacheActions, t2, cache.Length);
-            cache = t1;
-            cacheActions = t2;
+            cache.ChildrenCount = insertion - 1;
         }
 
         public ParseTree GetTree()
         {
-            int index = stack[stackNext - 2].index;
-            ParseTree.Cell rootCell = subs[index];
-            // commit the children if any
-            if (rootCell.count != 0)
-                rootCell.first = tree.Store(subs, index + 1, rootCell.count);
-            // commit the root
-            tree.StoreRoot(rootCell);
+            // Get the axiom's sub tree
+            SubTree sub = stack[stackNext - 2];
+            // Commit the children
+            sub.CommitTo(0, tree);
+            // Commit the root
+            tree.StoreRoot(sub[0]);
             return tree;
         }
     }
