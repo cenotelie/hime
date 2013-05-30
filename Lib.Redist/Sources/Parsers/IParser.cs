@@ -10,7 +10,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the errors encountered by the parser
         /// </summary>
-        ICollection<ParserError> Errors { get; }
+        ICollection<Error> Errors { get; }
 
         /// <summary>
         /// Parses the input and returns the produced AST

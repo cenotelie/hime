@@ -143,7 +143,7 @@ namespace Hime.Redist.Parsers
                     }
                 }
             }
-            allErrors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
+            allErrors.Add(new UnexpectedTokenError(token, expected));
         }
 
         /// <summary>

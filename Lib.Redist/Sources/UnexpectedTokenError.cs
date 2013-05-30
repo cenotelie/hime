@@ -1,13 +1,13 @@
-using System.Text;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents an unexpected token error in a parser
     /// </summary>
-    public sealed class UnexpectedTokenError : ParserError
+    public sealed class UnexpectedTokenError : Error
     {
         /// <summary>
         /// Gets the unexpected token
@@ -24,10 +24,8 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name='token'>The unexpected token</param>
 		/// <param name='expected'>The expected terminals</param>
-        /// <param name="line">The line number of the token</param>
-        /// <param name="column">The column number of the token</param>
-        internal UnexpectedTokenError(Symbols.Token token, IList<Symbols.Terminal> expected, int line, int column)
-            : base(ParserErrorType.UnexpectedToken, line, column)
+        internal UnexpectedTokenError(Symbols.Token token, IList<Symbols.Terminal> expected)
+            : base(ErrorType.UnexpectedToken, token.Position)
         {
             this.UnexpectedToken = token;
             this.ExpectedTerminals = new ReadOnlyCollection<Symbols.Terminal>(expected);

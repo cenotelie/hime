@@ -1,9 +1,9 @@
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
     /// Specifies the type of error
     /// </summary>
-    public enum ParserErrorType
+    public enum ErrorType
     {
         /// <summary>
         /// Lexical error occuring when an unexpected character is encountered in the input preventing to match tokens

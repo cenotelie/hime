@@ -49,11 +49,11 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// List of the encountered syntaxic errors
         /// </summary>
-        protected List<ParserError> allErrors;
+        protected List<Error> allErrors;
         /// <summary>
         /// Read-only list of the errors
         /// </summary>
-        protected System.Collections.ObjectModel.ReadOnlyCollection<ParserError> readonlyErrors;
+        protected System.Collections.ObjectModel.ReadOnlyCollection<Error> readonlyErrors;
         /// <summary>
         /// Lexer associated to this parser
         /// </summary>
@@ -71,7 +71,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets a read-only collection of syntaxic errors encountered by the parser
         /// </summary>
-        public ICollection<ParserError> Errors { get { return readonlyErrors; } }
+        public ICollection<Error> Errors { get { return readonlyErrors; } }
         /// <summary>
         /// Gets or sets whether the parser should try to recover from errors or fails immediatly
         /// </summary>
@@ -94,8 +94,8 @@ namespace Hime.Redist.Parsers
             this.parserVirtuals = new Utils.SymbolDictionary<Symbols.Virtual>(virtuals);
             this.parserActions = actions;
             this.recover = true;
-            this.allErrors = new List<ParserError>();
-            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<ParserError>(allErrors);
+            this.allErrors = new List<Error>();
+            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<Error>(allErrors);
             this.lexer = lexer;
             this.lexer.OnError += OnLexicalError;
         }
@@ -104,7 +104,7 @@ namespace Hime.Redist.Parsers
         /// Adds the given lexical error emanating from the lexer to the list of errors
         /// </summary>
         /// <param name="error">Lexical error</param>
-        protected void OnLexicalError(ParserError error)
+        protected void OnLexicalError(Error error)
         {
             allErrors.Add(error);
         }

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Hime.Redist.Parsers;
+using Hime.Redist;
 
 namespace Hime.CentralDogma
 {

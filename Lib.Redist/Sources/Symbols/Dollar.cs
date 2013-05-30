@@ -15,5 +15,13 @@ namespace Hime.Redist.Symbols
         /// Gets the data represented by this symbol
         /// </summary>
         public override string Value { get { return string.Empty; } }
+        /// <summary>
+        /// Gets the position of this token in the input
+        /// </summary>
+        public override TextPosition Position { get { return new TextPosition(); } }
+        /// <summary>
+        /// Gets the length of the text in this token
+        /// </summary>
+        public override int Length { get { return 0; } }
     }
 }

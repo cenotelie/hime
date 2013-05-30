@@ -4,7 +4,7 @@ using System.Text;
 using Hime.CentralDogma;
 using Hime.CentralDogma.Reporting;
 using Hime.HimeCC.CL;
-using Hime.Redist.Parsers;
+using Hime.Redist;
 using Hime.Redist.Symbols;
 
 namespace Hime.HimeCC
@@ -147,7 +147,7 @@ namespace Hime.HimeCC
             CommandLineLexer lexer = new CommandLineLexer(builder.ToString());
             CommandLineParser parser = new CommandLineParser(lexer);
             ParseTree root = parser.Parse();
-            foreach (ParserError error in parser.Errors)
+            foreach (Error error in parser.Errors)
                 Console.WriteLine(error.Message);
             if (parser.Errors.Count > 0)
                 return null;

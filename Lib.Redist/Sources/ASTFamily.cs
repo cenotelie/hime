@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents a family of children for an ASTNode

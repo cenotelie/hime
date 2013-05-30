@@ -49,13 +49,13 @@ namespace Hime.Redist.Parsers
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);
-            allErrors.Add(new UnexpectedTokenError(token, expected, lexer.CurrentLine, lexer.CurrentColumn));
+            allErrors.Add(new UnexpectedTokenError(token, expected));
             if (!recover) return null;
             if (TryDrop1Unexpected()) return input.GetNextToken();
             if (TryDrop2Unexpected()) return input.GetNextToken();
             foreach (Symbols.Terminal terminal in expected)
             {
-                Symbols.TextToken dummy = new Symbols.TextToken(terminal.SymbolID, terminal.Name, string.Empty, 0, 0);
+                Symbols.TextToken dummy = new Symbols.TextToken(terminal.SymbolID, terminal.Name, null, 0, 0);
                 if (TryInsertExpected(dummy))
                     return dummy;
             }

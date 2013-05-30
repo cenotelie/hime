@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Hime.Redist.Parsers;
+using Hime.Redist;
 using Hime.Redist.Symbols;
 
 namespace Hime.CentralDogma
@@ -259,7 +259,7 @@ namespace Hime.CentralDogma
                 reporter.Report(ex);
                 hasErrors = true;
             }
-            foreach (ParserError error in parser.Errors)
+            foreach (Error error in parser.Errors)
             {
                 reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
                 hasErrors = true;
@@ -271,7 +271,7 @@ namespace Hime.CentralDogma
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {
                         TextToken token = gnode.Symbol as TextToken;
-                        reporter.Error(name + " @(" + token.Line + ", " + token.Column + ") No compiler plugin found for resource " + gnode.Symbol.Name);
+                        reporter.Error(name + " @" + token.Position + " No compiler plugin found for resource " + gnode.Symbol.Name);
                         hasErrors = true;
                         continue;
                     }
@@ -382,7 +382,7 @@ namespace Hime.CentralDogma
         internal void BuildAssembly(string prefix)
         {
             reporter.Info("Building assembly " + prefix + PostfixAssembly + " ...");
-            string redist = Assembly.GetAssembly(typeof(BaseLRParser)).Location;
+            string redist = Assembly.GetAssembly(typeof(ParseTree)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
             {
                 CompilerParameters compilerparams = new CompilerParameters();

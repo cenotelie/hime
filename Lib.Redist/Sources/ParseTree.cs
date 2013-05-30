@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents an Abstract Syntax Tree produced by a parser

@@ -1,5 +1,5 @@
+using Hime.Redist;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace Hime.CentralDogma.Grammars.ContextFree
 {
@@ -98,7 +98,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             return new CFRule(head as CFVariable, new CFRuleBody(body), false);
         }
 
-        public TemplateRule AddTemplateRule(Redist.Parsers.ASTNode ruleNode)
+        public TemplateRule AddTemplateRule(ASTNode ruleNode)
         {
             TemplateRule Rule = new TemplateRule(this, ruleNode);
             templateRules.Add(Rule);

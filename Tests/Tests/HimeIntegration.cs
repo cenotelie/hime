@@ -1,12 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using Hime.CentralDogma;
+using Hime.Redist;
 using Hime.Redist.Lexer;
 using Hime.Redist.Parsers;
 using Hime.Redist.Symbols;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace Hime.Tests
 {

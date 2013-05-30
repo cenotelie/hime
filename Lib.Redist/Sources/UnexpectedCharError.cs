@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents an unexpected character error in the input stream of a lexer
     /// </summary>
-    public sealed class UnexpectedCharError : ParserError
+    public sealed class UnexpectedCharError : Error
     {
         /// <summary>
         /// Gets the unexpected char
@@ -15,13 +14,12 @@ namespace Hime.Redist.Parsers
         public char UnexpectedChar { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the UnexpectedCharError class for the given character at the given line and column number
+        /// Initializes a new instance of the UnexpectedCharError class for the given character
         /// </summary>
         /// <param name="unexpected">The errorneous character</param>
-        /// <param name="line">The line number of the character</param>
-        /// <param name="column">The column number of the character</param>
-        internal UnexpectedCharError(char unexpected, int line, int column)
-            : base(ParserErrorType.UnexpectedChar, line, column)
+        /// <param name='position'>Error's position in the input</param>
+        internal UnexpectedCharError(char unexpected, TextPosition position)
+            : base(ErrorType.UnexpectedChar, position)
         {
             this.UnexpectedChar = unexpected;
             StringBuilder Builder = new StringBuilder("Unexpected character '");

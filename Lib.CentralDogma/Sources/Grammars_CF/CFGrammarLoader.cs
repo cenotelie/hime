@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Hime.Redist.Parsers;
+using Hime.Redist;
 using Hime.Redist.Symbols;
 
 namespace Hime.CentralDogma.Grammars.ContextFree
@@ -238,7 +238,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Terminal Ref = grammar.GetTerminalByName(token.Value);
             if (Ref == null)
             {
-                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Cannot find terminal " + token.Value);
+                reporter.Error(resName + " @" + token.Position + " Cannot find terminal " + token.Value);
                 Automata.NFA Final = new Automata.NFA();
                 Final.StateEntry = Final.AddNewState();
                 Final.StateExit = Final.AddNewState();
@@ -345,7 +345,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             else
             {
-                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Overriding the definition of terminal " + token.Value);
+                reporter.Error(resName + " @" + token.Position + " Overriding the definition of terminal " + token.Value);
             }
             return terminal;
         }
@@ -407,7 +407,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     defs.Add(new CFRuleBody(symbol));
                 else
                 {
-                    reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Unrecognized symbol " + token.Value + " in rule definition");
+                    reporter.Error(resName + " @" + token.Position + " Unrecognized symbol " + token.Value + " in rule definition");
                     defs.Add(new CFRuleBody());
                 }
             }
@@ -423,7 +423,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             // check for meta-rule existence
             if (!context.IsTemplateRule(name, paramCount))
             {
-                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
+                reporter.Error(resName + " @" + token.Position + " Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
                 defs.Add(new CFRuleBody());
                 return defs;
             }

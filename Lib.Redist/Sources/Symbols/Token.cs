@@ -9,7 +9,15 @@ namespace Hime.Redist.Symbols
         /// Gets the data represented by this symbol
         /// </summary>
         public abstract string Value { get; }
-		
+        /// <summary>
+        /// Gets the position of this token in the input
+        /// </summary>
+        public abstract TextPosition Position { get; }
+        /// <summary>
+        /// Gets the length of the text in this token
+        /// </summary>
+        public abstract int Length { get; }
+
         /// <summary>
         /// Initializes a new instance of the Token class with the given ID and name
         /// </summary>
