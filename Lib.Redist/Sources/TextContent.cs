@@ -8,6 +8,9 @@ namespace Hime.Redist
     /// </summary>
     class TextContent
     {
+        private const int initLineCount = 10000;
+        private const int initChunckCapacity = 1024;
+
         // Actual text content
         private char[][] chunks;
         private int chunkIndex;
@@ -22,9 +25,9 @@ namespace Hime.Redist
         /// </summary>
         public TextContent()
         {
-            this.chunks = new char[1024][];
+            this.chunks = new char[initChunckCapacity][];
             this.chunkIndex = 0;
-            this.lines = new int[1024];
+            this.lines = new int[initLineCount];
             this.line = 0;
         }
 
@@ -122,18 +125,26 @@ namespace Hime.Redist
                 chunks = r;
             }
             chunks[chunkIndex] = buffer;
+            // Ensure enough storage
+            if (line + 1024 >= lines.Length)
+            {
+                int[] t = new int[lines.Length + initLineCount];
+                Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
+                lines = t;
+            }
             // Run the state-machine for line endings
+            int part = chunkIndex << 10;
             for (int i = 0; i != count; i++)
             {
                 switch ((int)buffer[i])
                 {
                     case 0x0D:
                         flagCR = true;
-                        NextLine(i);
+                        lines[++line] = part | i;
                         break;
                     case 0x0A:
                         if (!flagCR)
-                            NextLine(i);
+                            lines[++line] = part | i;
                         flagCR = false;
                         break;
                     case 0x0B:
@@ -142,7 +153,7 @@ namespace Hime.Redist
                     case 0x2028:
                     case 0x2029:
                         flagCR = false;
-                        NextLine(i);
+                        lines[++line] = part | i;
                         break;
                     default:
                         flagCR = false;
@@ -150,18 +161,6 @@ namespace Hime.Redist
                 }
             }
             chunkIndex++;
-        }
-
-        private void NextLine(int sub)
-        {
-            int index = chunkIndex << 10 | sub;
-            if (line == lines.Length - 1)
-            {
-                int[] t = new int[lines.Length + 1024];
-                Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
-                lines = t;
-            }
-            lines[++line] = index;
         }
     }
 }

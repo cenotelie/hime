@@ -21,7 +21,7 @@ namespace Hime.Benchmark
 
         public Benchmark()
         {
-            SetupProfilePerfLALR();
+            SetupProfileFull();
         }
 
         private void SetupProfileFull()
@@ -30,13 +30,28 @@ namespace Hime.Benchmark
             this.input = "Perf.gram";
             this.output = "result.txt";
             this.sampleFactor = 600;
-            this.expCount = 20;
+            this.expCount = 50;
             this.rebuildInput = true;
             this.rebuildParsers = true;
             this.doStats = true;
             this.doLexer = true;
             this.doParserLALR = true;
-            this.doParserRNGLR = true;
+            this.doParserRNGLR = false;
+        }
+
+        private void SetupProfilePerfLexer()
+        {
+            this.language = "CSharp4.gram";
+            this.input = "Perf.gram";
+            this.output = "result.txt";
+            this.sampleFactor = 600;
+            this.expCount = 20;
+            this.rebuildInput = false;
+            this.rebuildParsers = false;
+            this.doStats = false;
+            this.doLexer = true;
+            this.doParserLALR = false;
+            this.doParserRNGLR = false;
         }
 
         private void SetupProfilePerfLALR()
