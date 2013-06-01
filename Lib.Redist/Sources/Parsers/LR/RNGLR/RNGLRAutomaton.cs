@@ -31,7 +31,7 @@ namespace Hime.Redist.Parsers
         private int axiom;
         private int ncols;
         private Utils.BlobUShort columnsID;
-        private Utils.SIDHashMap<int> columns;
+        private ColumnMap columns;
         private RNGLRTable table;
         private LRActions actions;
         private LRProduction[] productions;
@@ -51,7 +51,7 @@ namespace Hime.Redist.Parsers
             int nnprod = reader.ReadUInt16();
             this.columnsID = new Utils.BlobUShort(ncols);
             reader.Read(columnsID.Raw, 0, columnsID.Raw.Length);
-            this.columns = new Utils.SIDHashMap<int>();
+            this.columns = new ColumnMap();
             for (int i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
             this.table = new RNGLRTable(nstates, ncols);

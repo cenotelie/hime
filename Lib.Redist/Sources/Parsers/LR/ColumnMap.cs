@@ -1,33 +1,33 @@
 using System;
 using System.Collections.Generic;
 
-namespace Hime.Redist.Utils
+namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Optimized hashmap for data accessed by ids from 0x0000 to 0x01FF
+    /// Represent a map from symbols' IDs to the index of their corresponding column in an LR table.
+    /// It is optimized for IDs from 0x0000 to 0x01FF (the first 512 symbols) with hope they are the most frequent.
     /// </summary>
-    /// <typeparam name="T">The type of data to be stored</typeparam>
-    class SIDHashMap<T>
+    class ColumnMap
     {
         /// <summary>
         /// Cache for ids from 0x00 to 0xFF
         /// </summary>
-        private T[] cache1;
+        private int[] cache1;
         /// <summary>
         /// Cache for ids from 0x100 to 0x1FF
         /// </summary>
-        private T[] cache2;
+        private int[] cache2;
         /// <summary>
         /// Hashmap for the other ids
         /// </summary>
-        private Dictionary<int, T> others;
+        private Dictionary<int, int> others;
 
         /// <summary>
         /// Initializes the structure
         /// </summary>
-        public SIDHashMap()
+        public ColumnMap()
         {
-            cache1 = new T[256];
+            cache1 = new int[256];
         }
 
         /// <summary>
@@ -35,20 +35,20 @@ namespace Hime.Redist.Utils
         /// </summary>
         /// <param name="key">The key for the data</param>
         /// <param name="value">The data</param>
-        public void Add(int key, T value)
+        public void Add(int key, int value)
         {
             if (key <= 0xFF)
                 cache1[key] = value;
             else if (key <= 0x1FF)
             {
                 if (cache2 == null)
-                    cache2 = new T[256];
+                    cache2 = new int[256];
                 cache2[key - 0x100] = value;
             }
             else
             {
                 if (others != null)
-                    others = new Dictionary<int, T>();
+                    others = new Dictionary<int, int>();
                 others.Add(key, value);
             }
         }
@@ -58,7 +58,7 @@ namespace Hime.Redist.Utils
         /// </summary>
         /// <param name="key">The key for the data</param>
         /// <returns>The data corresponding to the key</returns>
-        public T this[int key]
+        public int this[int key]
         {
             get
             {

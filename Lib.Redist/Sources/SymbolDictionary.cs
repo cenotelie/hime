@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Hime.Redist.Utils
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents an immutable dictionary of symbols.

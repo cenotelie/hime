@@ -11,7 +11,7 @@ namespace Hime.Redist.Lexer
 
         // General data
         private Automaton lexAutomaton;                        // The automaton
-        private Utils.SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
+        private SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
         private int lexSeparator;                                       // Symbol ID of the SEPARATOR terminal
         // Runtime data
         private TextContent content;            // Container for all read text
@@ -22,7 +22,7 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Gets the terminals matched by this lexer
         /// </summary>
-        public Utils.SymbolDictionary<Symbols.Terminal> Terminals { get { return lexTerminals; } }
+        public SymbolDictionary<Symbols.Terminal> Terminals { get { return lexTerminals; } }
 
         /// <summary>
         /// Events for lexical errors
@@ -39,7 +39,7 @@ namespace Hime.Redist.Lexer
         protected TextLexer(Automaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
-            this.lexTerminals = new Utils.SymbolDictionary<Symbols.Terminal>(terminals);
+            this.lexTerminals = new SymbolDictionary<Symbols.Terminal>(terminals);
             this.lexSeparator = separator;
             this.content = new TextContent();
             this.input = new RewindableTextReader(input, content, maxRewind);

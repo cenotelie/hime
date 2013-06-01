@@ -16,6 +16,6 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Gets the terminals matched by this lexer
         /// </summary>
-        Utils.SymbolDictionary<Symbols.Terminal> Terminals { get; }
+        SymbolDictionary<Symbols.Terminal> Terminals { get; }
     }
 }
