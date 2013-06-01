@@ -59,6 +59,10 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFPool.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFSubTree.cs" />
+    <Compile Include="Sources\Parsers\ParseTree.cs" />
+    <Compile Include="Sources\Parsers\ParseTreePool.cs" />
     <Compile Include="Sources\TextContent.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
@@ -74,7 +78,7 @@
     <Compile Include="Sources\Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCode.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCodeValues.cs" />
-    <Compile Include="Sources\Parsers\LR\LRTreeAction.cs" />
+    <Compile Include="Sources\TreeAction.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSNode.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPath.cs" />
@@ -104,7 +108,6 @@
     <Compile Include="Sources\ASTNode.cs" />
     <Compile Include="Sources\Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFNode.cs" />
     <Compile Include="Sources\Symbols\Symbol.cs" />
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\Utils\Pool.cs" />

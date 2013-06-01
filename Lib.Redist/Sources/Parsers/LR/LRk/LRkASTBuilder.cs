@@ -7,154 +7,10 @@ namespace Hime.Redist.Parsers
         private const int handleSize = 1024;
         private const int estimationBias = 5;
 
-        private class SubTree
-        {
-            private Pool pool;
-            private ParseTree.Cell[] items;
-            private LRTreeAction[] actions;
-
-            public Symbols.Symbol Head
-            {
-                get { return items[0].symbol; }
-                set { items[0].symbol = value; }
-            }
-            public int ChildrenCount
-            {
-                get { return items[0].count; }
-                set { items[0].count = value; }
-            }
-            public LRTreeAction Action
-            {
-                get { return actions[0]; }
-                set { actions[0] = value; }
-            }
-            public ParseTree.Cell this[int index]
-            {
-                get { return items[index]; }
-                set { items[index] = value; }
-            }
-
-            public LRTreeAction GetAction(int index) { return actions[index]; }
-
-            public SubTree(Pool pool, int capacity)
-            {
-                this.pool = pool;
-                this.items = new ParseTree.Cell[capacity];
-                this.actions = new LRTreeAction[capacity];
-            }
-
-            public int GetSize()
-            {
-                int size = 1;
-                for (int i = 0; i != items[0].count; i++)
-                    size += items[size].count + 1;
-                return size;
-            }
-
-            public void CopyTo(SubTree destination, int index)
-            {
-                if (this.items[0].count == 0)
-                {
-                    destination.items[index] = this.items[0];
-                    destination.actions[index] = this.actions[0];
-                }
-                else
-                {
-                    Array.Copy(this.items, 0, destination.items, index, this.items[0].count + 1);
-                    Array.Copy(this.actions, 0, destination.actions, index, this.items[0].count + 1);
-                }
-            }
-
-            public void CopyChildrenTo(SubTree destination, int index)
-            {
-                if (this.items[0].count == 0)
-                    return;
-                int size = GetSize() - 1;
-                Array.Copy(this.items, 1, destination.items, index, size);
-                Array.Copy(this.actions, 1, destination.actions, index, size);
-            }
-
-            public void CommitTo(int index, ParseTree tree)
-            {
-                if (this.items[index].count != 0)
-                    this.items[index].first = tree.Store(this.items, index + 1, this.items[index].count);
-            }
-
-            public void SetAt(int index, Symbols.Symbol symbol, LRTreeAction action)
-            {
-                this.items[index].symbol = symbol;
-                this.items[index].count = 0;
-                this.actions[index] = action;
-            }
-
-            public void Move(int from, int to)
-            {
-                this.items[to] = this.items[from];
-            }
-
-            public void MoveRange(int from, int to, int length)
-            {
-                if (length != 0)
-                {
-                    Array.Copy(items, from, items, to, length);
-                    Array.Copy(actions, from, actions, to, length);
-                }
-            }
-
-            public void Free()
-            {
-                if (pool != null)
-                    pool.Free(this);
-            }
-        }
-
-        private class Pool
-        {
-            private int itemsCapacity;
-            private SubTree[] free;
-            private int nextFree;
-            private int allocated;
-
-            public Pool(int itemsCapacity, int size)
-            {
-                this.itemsCapacity = itemsCapacity;
-                this.free = new SubTree[size];
-                this.nextFree = -1;
-                this.allocated = 0;
-            }
-
-            public SubTree Acquire()
-            {
-                if (nextFree == -1)
-                {
-                    // Create new one
-                    SubTree result = new SubTree(this, itemsCapacity);
-                    allocated++;
-                    return result;
-                }
-                else
-                {
-                    return free[nextFree--];
-                }
-            }
-
-            public void Free(SubTree subTree)
-            {
-                nextFree++;
-                if (nextFree == free.Length)
-                {
-                    SubTree[] temp = new SubTree[allocated];
-                    Array.Copy(free, temp, free.Length);
-                    free = temp;
-                }
-                free[nextFree] = subTree;
-            }
-        }
-
         // Sub-tree pools
-        private Pool poolSingle;
-        private Pool pool128;
-        private Pool pool1024;
+        private SubTreePool poolSingle;
+        private SubTreePool pool128;
+        private SubTreePool pool1024;
         // Stack of semantic objects
         private SubTree[] stack;
         private int stackNext;
@@ -170,9 +26,9 @@ namespace Hime.Redist.Parsers
 
         internal LRkASTBuilder(int stackSize)
         {
-            this.poolSingle = new Pool(1, 512);
-            this.pool128 = new Pool(128, 128);
-            this.pool1024 = new Pool(1024, 16);
+            this.poolSingle = new SubTreePool(1, 512);
+            this.pool128 = new SubTreePool(128, 128);
+            this.pool1024 = new SubTreePool(1024, 16);
             this.stack = new SubTree[stackSize];
             this.handle = new int[handleSize];
             this.tree = new ParseTree();
@@ -181,8 +37,7 @@ namespace Hime.Redist.Parsers
         public void StackPush(Symbols.Symbol symbol)
         {
             SubTree single = poolSingle.Acquire();
-            single.Head = symbol;
-            single.Action = LRTreeAction.None;
+            single.Initialize(symbol, 0, TreeAction.None);
             stack[stackNext++] = single;
         }
 
@@ -203,10 +58,10 @@ namespace Hime.Redist.Parsers
             popCount = 0;
         }
 
-        public void ReductionPop(LRTreeAction action)
+        public void ReductionPop(TreeAction action)
         {
             SubTree sub = stack[stackNext + popCount];
-            if (sub.Action == LRTreeAction.Replace)
+            if (sub.Action == TreeAction.Replace)
             {
                 // copy the children to the cache
                 sub.CopyChildrenTo(cache, cacheNext);
@@ -214,20 +69,20 @@ namespace Hime.Redist.Parsers
                 int index = 1;
                 for (int i = 0; i != sub.ChildrenCount; i++)
                 {
-                    int size = sub[index].count + 1;
+                    int size = sub.GetItem(index).count + 1;
                     handle[handleNext++] = cacheNext;
                     cacheNext += size;
                     index += size;
                 }
                 sub.Free();
             }
-            else if (action == LRTreeAction.Drop)
+            else if (action == TreeAction.Drop)
             {
                 sub.Free();
             }
             else
             {
-                if (action != LRTreeAction.None)
+                if (action != TreeAction.None)
                     sub.Action = action;
                 // copy the complete sub-tree to the cache
                 sub.CopyTo(cache, cacheNext);
@@ -238,9 +93,9 @@ namespace Hime.Redist.Parsers
             popCount++;
         }
 
-        public void ReductionVirtual(Symbols.Virtual symbol, LRTreeAction action)
+        public void ReductionVirtual(Symbols.Virtual symbol, TreeAction action)
         {
-            if (action == LRTreeAction.Drop)
+            if (action == TreeAction.Drop)
                 return; // why would you do this?
             cache.SetAt(cacheNext, symbol, action);
             handle[handleNext++] = cacheNext++;
@@ -248,14 +103,14 @@ namespace Hime.Redist.Parsers
 
         public void ReductionSemantic(SemanticAction callback)
         {
-            cache.SetAt(cacheNext, new Symbols.Action(callback), LRTreeAction.Semantic);
+            cache.SetAt(cacheNext, new Symbols.Action(callback), TreeAction.Semantic);
             handle[handleNext++] = cacheNext++;
         }
 
-        public void Reduce(Symbols.Variable var, LRTreeAction action)
+        public void Reduce(Symbols.Variable var, TreeAction action)
         {
             // Build the subtree
-            if (action == LRTreeAction.Replace)
+            if (action == TreeAction.Replace)
                 ReduceReplaceable(var);
             else
                 ReduceNormal(var);
@@ -265,16 +120,14 @@ namespace Hime.Redist.Parsers
 
         private void ReduceReplaceable(Symbols.Variable var)
         {
-            cache.Head = var;
-            cache.ChildrenCount = handleNext;
-            cache.Action = LRTreeAction.Replace;
+            cache.Initialize(var, handleNext, TreeAction.Replace);
         }
 
         private void ReduceNormal(Symbols.Variable var)
         {
             // write the sub-tree root
-            cache.Head = var;
-            cache.Action = LRTreeAction.None;
+            cache.Initialize(var, 0, TreeAction.None);
+
             // promotion data
             bool promotion = false;
             int insertion = 1;
@@ -282,7 +135,7 @@ namespace Hime.Redist.Parsers
             {
                 switch (cache.GetAction(handle[i]))
                 {
-                    case LRTreeAction.Promote:
+                    case TreeAction.Promote:
                         if (promotion)
                         {
                             // This is not the first promotion
@@ -300,7 +153,7 @@ namespace Hime.Redist.Parsers
                         cache.MoveRange(handle[i] + 1, insertion, cache.ChildrenCount);
                         insertion += cache.ChildrenCount;
                         break;
-                    case LRTreeAction.Semantic:
+                    case TreeAction.Semantic:
                         // TODO: something !
                         break;
                     default:
@@ -324,7 +177,7 @@ namespace Hime.Redist.Parsers
             // Commit the children
             sub.CommitTo(0, tree);
             // Commit the root
-            tree.StoreRoot(sub[0]);
+            tree.StoreRoot(sub.GetItem(0));
             return tree;
         }
     }

@@ -18,7 +18,7 @@ namespace Hime.Redist.Parsers
     class LRProduction
     {
         private int head;
-        private LRTreeAction headAction;
+        private TreeAction headAction;
         private int reducLength;
         private LRBytecode bytecode;
 
@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Action of the rule's head (replace or not)
         /// </summary>
-        public LRTreeAction HeadAction { get { return headAction; } }
+        public TreeAction HeadAction { get { return headAction; } }
         /// <summary>
         /// Size of the rule's body by ony counting terminals and variables
         /// </summary>
@@ -46,7 +46,7 @@ namespace Hime.Redist.Parsers
         public LRProduction(BinaryReader reader)
         {
             this.head = reader.ReadUInt16();
-            this.headAction = (LRTreeAction)reader.ReadByte();
+            this.headAction = (TreeAction)reader.ReadByte();
             this.reducLength = reader.ReadByte();
             this.bytecode = new LRBytecode(reader.ReadByte());
             reader.Read(bytecode.Raw, 0, this.bytecode.Raw.Length);

@@ -1,9 +1,9 @@
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents a tree action
     /// </summary>
-    public enum LRTreeAction : byte
+    public enum TreeAction : byte
     {
         /// <summary>
         /// Keep the node as is

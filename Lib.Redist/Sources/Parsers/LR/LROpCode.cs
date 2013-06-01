@@ -24,7 +24,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the tree action included in this code
         /// </summary>
-        public LRTreeAction TreeAction { get { return (LRTreeAction)(code & MaskAction); } }
+        public TreeAction TreeAction { get { return (TreeAction)(code & MaskAction); } }
 
         /// <summary>
         /// Gets whether this is a Pop action

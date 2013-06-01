@@ -15,8 +15,8 @@ namespace Hime.Redist.Parsers
         {
             public GSSNode node;
             public LRProduction prod;
-            public SPPFNode first;
-            public Reduction(GSSNode node, LRProduction prod, SPPFNode first)
+            public SPPFSubTree first;
+            public Reduction(GSSNode node, LRProduction prod, SPPFSubTree first)
             {
                 this.node = node;
                 this.prod = prod;
@@ -38,19 +38,19 @@ namespace Hime.Redist.Parsers
         private struct NodeDic
         {
             public int generation;
-            public List<SPPFNode> nodes;
+            public List<SPPFSubTree> nodes;
         }
 
         private RNGLRAutomaton parserAutomaton;
         private SPPFBuilder builder;
-        private SPPFNode epsilon;
-        private SPPFNode[] nullProds;
-        private Dictionary<int, SPPFNode> nullVars;
+        private SPPFSubTree epsilon;
+        private SPPFSubTree[] nullProds;
+        private Dictionary<int, SPPFSubTree> nullVars;
         private Symbols.Token nextToken;
         private Queue<Reduction> queueReductions;
         private Queue<Shift> queueShifts;
         private List<NodeDic> objects;
-        private SPPFNode[] bufferNodes;
+        private SPPFSubTree[] bufferNodes;
         private Symbols.Symbol[] bufferSymbols;
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Hime.Redist.Parsers
         {
             this.parserAutomaton = automaton;
             this.builder = new SPPFBuilder();
-            this.epsilon = new SPPFNode(Symbols.Epsilon.Instance, LRTreeAction.None);
-            this.nullProds = new SPPFNode[variables.Length];
-            this.nullVars = new Dictionary<int, SPPFNode>();
-            this.bufferNodes = new SPPFNode[maxBodyLength];
+            this.epsilon = new SPPFSubTree(Symbols.Epsilon.Instance, TreeAction.None);
+            this.nullProds = new SPPFSubTree[variables.Length];
+            this.nullVars = new Dictionary<int, SPPFSubTree>();
+            this.bufferNodes = new SPPFSubTree[maxBodyLength];
             this.bufferSymbols = new Symbols.Symbol[maxBodyLength];
             for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
@@ -77,7 +77,7 @@ namespace Hime.Redist.Parsers
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    nullProds[i] = new SPPFNode(parserVariables[prod.Head], prod.HeadAction);
+                    nullProds[i] = new SPPFSubTree(parserVariables[prod.Head], prod.HeadAction);
                     if (!nullVars.ContainsKey(nullProds[i].originalSID))
                         nullVars.Add(nullProds[i].originalSID, nullProds[i]);
                 }
@@ -93,7 +93,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private void BuildNullable(SPPFNode subRoot, LRProduction production)
+        private void BuildNullable(SPPFSubTree subRoot, LRProduction production)
         {
             int nextBuffer = 0;
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -107,7 +107,7 @@ namespace Hime.Redist.Parsers
                 else if (op.IsAddVirtual)
                 {
                     Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1].Value];
-                    SPPFNode node = new SPPFNode(symbol, op.TreeAction);
+                    SPPFSubTree node = new SPPFSubTree(symbol, op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -115,8 +115,8 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddNullVar)
                 {
-                    SPPFNode node = nullProds[production.Bytecode[i + 1].Value];
-                    if (op.TreeAction != LRTreeAction.None)
+                    SPPFSubTree node = nullProds[production.Bytecode[i + 1].Value];
+                    if (op.TreeAction != TreeAction.None)
                         node.action = op.TreeAction;
                     bufferSymbols[nextBuffer] = node.value.Symbol;
                     bufferNodes[nextBuffer] = node;
@@ -236,12 +236,12 @@ namespace Hime.Redist.Parsers
             // Get the rule's head
             Symbols.Variable head = parserVariables[reduction.prod.Head];
             // Find or build the sub root SPPF
-            SPPFNode subRoot = null;
+            SPPFSubTree subRoot = null;
             bool isNewRoot = false;
             if (reduction.prod.ReductionLength != 0)
             {
                 subRoot = ResolveSPPF(path.last.Generation, head, out isNewRoot);
-                if (reduction.prod.HeadAction != LRTreeAction.None)
+                if (reduction.prod.HeadAction != TreeAction.None)
                     subRoot.action = reduction.prod.HeadAction;
             }
             else
@@ -263,7 +263,7 @@ namespace Hime.Redist.Parsers
                 else if (op.IsAddVirtual)
                 {
                     Symbols.Symbol symbol = parserVirtuals[reduction.prod.Bytecode[i + 1].Value];
-                    SPPFNode node = builder.NewNode(symbol, op.TreeAction);
+                    SPPFSubTree node = builder.NewNode(symbol, op.TreeAction);
                     bufferSymbols[nextBuffer] = symbol;
                     bufferNodes[nextBuffer] = node;
                     nextBuffer++;
@@ -271,8 +271,8 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddNullVar)
                 {
-                    SPPFNode node = nullProds[reduction.prod.Bytecode[i + 1].Value];
-                    if (op.TreeAction != LRTreeAction.None)
+                    SPPFSubTree node = nullProds[reduction.prod.Bytecode[i + 1].Value];
+                    if (op.TreeAction != TreeAction.None)
                         node.action = op.TreeAction;
                     bufferSymbols[nextBuffer] = node.value.Symbol;
                     bufferNodes[nextBuffer] = node;
@@ -281,10 +281,10 @@ namespace Hime.Redist.Parsers
                 }
                 else
                 {
-                    SPPFNode node = null;
+                    SPPFSubTree node = null;
                     if (nextStack >= path.labels.Length) node = reduction.first;
                     else node = path.labels[path.labels.Length - nextStack - 1];
-                    if (op.TreeAction != LRTreeAction.None)
+                    if (op.TreeAction != TreeAction.None)
                         node.action = op.TreeAction;
                     bufferSymbols[nextBuffer] = node.value.Symbol;
                     bufferNodes[nextBuffer] = node;
@@ -355,7 +355,7 @@ namespace Hime.Redist.Parsers
             // Create next generation
             Dictionary<int, GSSNode> Uj = new Dictionary<int, GSSNode>();
             // Create the AST for the old token
-            SPPFNode ast = builder.NewNode(oldtoken, LRTreeAction.None);
+            SPPFSubTree ast = builder.NewNode(oldtoken, TreeAction.None);
 
             // Execute all shifts in the queue at this point
             int count = queueShifts.Count;
@@ -364,7 +364,7 @@ namespace Hime.Redist.Parsers
             return Uj;
         }
 
-        private void ExecuteShift(Dictionary<int, GSSNode> Uj, SPPFNode ast, Shift shift)
+        private void ExecuteShift(Dictionary<int, GSSNode> Uj, SPPFSubTree ast, Shift shift)
         {
             if (Uj.ContainsKey(shift.to))
             {
@@ -422,29 +422,29 @@ namespace Hime.Redist.Parsers
             return 0xFFFF;
         }
 
-        private SPPFNode ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
+        private SPPFSubTree ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
         {
             isNew = false;
             foreach (NodeDic dic in objects)
             {
                 if (dic.generation == generation)
                 {
-                    foreach (SPPFNode node in dic.nodes)
+                    foreach (SPPFSubTree node in dic.nodes)
                     {
                         if (node.originalSID == symbol.SymbolID)
                             return node;
                     }
                     isNew = true;
-                    SPPFNode sppf = builder.NewNode(symbol, LRTreeAction.None);
+                    SPPFSubTree sppf = builder.NewNode(symbol, TreeAction.None);
                     dic.nodes.Add(sppf);
                     return sppf;
                 }
             }
             isNew = true;
-            SPPFNode nn = builder.NewNode(symbol, LRTreeAction.None);
+            SPPFSubTree nn = builder.NewNode(symbol, TreeAction.None);
             NodeDic nd = new NodeDic();
             nd.generation = generation;
-            nd.nodes = new List<SPPFNode>();
+            nd.nodes = new List<SPPFSubTree>();
             nd.nodes.Add(nn);
             return nn;
         }
