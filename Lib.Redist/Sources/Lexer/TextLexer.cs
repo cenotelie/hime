@@ -74,6 +74,7 @@ namespace Hime.Redist.Lexer
                     else
                     {
                         OnError(new UnexpectedCharError(c, content.GetPositionAt(index)));
+                        index++;
                     }
                 }
                 else if (token.SymbolID != lexSeparator)
