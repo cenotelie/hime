@@ -6,7 +6,11 @@ namespace Hime.Redist
     /// <summary>
     /// Stores the content of the text read by a lexer
     /// </summary>
-    class TextContent
+    /// <remarks>
+    /// All line numbers and column numbers are 1-based.
+    /// Indices in the content are 0-based.
+    /// </remarks>
+    public sealed class TextContent
     {
         private const int initLineCount = 10000;
         private const int initChunckCapacity = 1024;
@@ -14,12 +18,24 @@ namespace Hime.Redist
         // Actual text content
         private char[][] chunks;
         private int chunkIndex;
-        // Start index of the line
+        // Start indices of the lines
         private int[] lines;
         private int line;
         // Line ending state
         private bool flagCR;
+        // Additional meta-data
+        private int size;
 
+        /// <summary>
+        /// Gets the number of lines
+        /// </summary>
+        public int LineCount { get { return line + 1; } }
+        
+        /// <summary>
+        /// Gets the size in number of characters
+        /// </summary>
+        public int Size { get { return size; } }
+        
         /// <summary>
         /// Initializes the storage
         /// </summary>
@@ -29,6 +45,7 @@ namespace Hime.Redist
             this.chunkIndex = 0;
             this.lines = new int[initLineCount];
             this.line = 0;
+            this.size = 0;
         }
 
         /// <summary>
@@ -36,7 +53,7 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="index">Index of the substring from the start</param>
         /// <param name="length">Length of the substring</param>
-        /// <returns></returns>
+        /// <returns>The substring</returns>
         public string GetValue(int index, int length)
         {
             int chunck = index >> 10;  // index of the chunck
@@ -64,6 +81,38 @@ namespace Hime.Redist
             // Add the last part and return
             builder.Append(chunks[chunck], 0, remaining);
             return builder.ToString();
+        }
+        
+        /// <summary>
+        /// Gets the starting index of the i-th line
+        /// </summary>
+        /// <param name="line">The line number</param>
+        /// <returns>The starting index of the line</returns>
+        /// <remarks>The line numbering is 1-based</remarks>
+        public int GetLineIndex(int line) { return lines[line - 1]; }
+        
+        /// <summary>
+        /// Gets the length of the i-th line
+        /// </summary>
+        /// <param name="line">The line number</param>
+        /// <returns>The length of the line</returns>
+        /// <remarks>The line numbering is 1-based</remarks>
+        public int GetLineLength(int line)
+        {
+        	if (this.line == line - 1)
+        		return (size - lines[line - 1]);
+        	return (lines[line] - lines[line - 1]);
+        }
+        
+        /// <summary>
+        /// Gets the string content of the i-th line
+        /// </summary>
+        /// <param name="line">The line number</param>
+        /// <returns>The string content of the line</returns>
+        /// <remarks>The line numbering is 1-based</remarks>
+        public string GetLineContent(int line)
+        {
+        	return GetValue(GetLineIndex(line), GetLineLength(line));
         }
 
         /// <summary>
@@ -125,7 +174,7 @@ namespace Hime.Redist
                 chunks = r;
             }
             chunks[chunkIndex] = buffer;
-            // Ensure enough storage
+            // Ensure enough storage for lines data
             if (line + 1024 >= lines.Length)
             {
                 int[] t = new int[lines.Length + initLineCount];
@@ -161,6 +210,7 @@ namespace Hime.Redist
                 }
             }
             chunkIndex++;
+            size += count;
         }
     }
 }

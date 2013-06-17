@@ -59,6 +59,7 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFPool.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFSubTree.cs" />
     <Compile Include="Sources\Parsers\SubTree.cs" />
@@ -111,7 +112,6 @@
     <Compile Include="Sources\Symbols\Symbol.cs" />
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />
-    <Compile Include="Sources\Parsers\LR\SIDHashMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

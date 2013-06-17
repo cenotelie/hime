@@ -17,5 +17,10 @@ namespace Hime.Redist.Lexer
         /// Gets the terminals matched by this lexer
         /// </summary>
         SymbolDictionary<Symbols.Terminal> Terminals { get; }
+        
+        /// <summary>
+        /// Gets the text content that served as input
+        /// </summary>
+        TextContent Input { get; }
     }
 }

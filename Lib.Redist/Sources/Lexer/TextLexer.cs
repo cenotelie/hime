@@ -25,6 +25,11 @@ namespace Hime.Redist.Lexer
         public SymbolDictionary<Symbols.Terminal> Terminals { get { return lexTerminals; } }
 
         /// <summary>
+        /// Gets the text content that served as input
+        /// </summary>
+        public TextContent Input { get { return content; } }
+        
+        /// <summary>
         /// Events for lexical errors
         /// </summary>
         internal event AddLexicalError OnError;
