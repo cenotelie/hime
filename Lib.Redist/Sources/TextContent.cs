@@ -13,7 +13,9 @@ namespace Hime.Redist
     public sealed class TextContent
     {
         private const int initLineCount = 10000;
-        private const int initChunckCapacity = 1024;
+        private const int upperShift = 10;
+    	internal const int chuncksSize = 1 << upperShift;
+    	private const int lowerMask = chuncksSize - 1;
 
         // Actual text content
         private char[][] chunks;
@@ -41,7 +43,7 @@ namespace Hime.Redist
         /// </summary>
         public TextContent()
         {
-            this.chunks = new char[initChunckCapacity][];
+            this.chunks = new char[chuncksSize][];
             this.chunkIndex = 0;
             this.lines = new int[initLineCount];
             this.line = 0;
@@ -56,10 +58,10 @@ namespace Hime.Redist
         /// <returns>The substring</returns>
         public string GetValue(int index, int length)
         {
-            int chunck = index >> 10;  // index of the chunck
-            int start = index & 0x3FF; // start index in the chunck
+            int chunck = index >> upperShift;  // index of the chunck
+            int start = index & lowerMask; // start index in the chunck
 
-            if (start + length <= 1024)
+            if (start + length <= chuncksSize)
             {
                 // The substring is contained within only one chunck
                 return new string(chunks[chunck], start, length);
@@ -68,14 +70,14 @@ namespace Hime.Redist
             // Now we need a string builder
             StringBuilder builder = new StringBuilder(length);
             // Finish the current chunck
-            builder.Append(chunks[chunck], start, 1024 - start);
-            int remaining = length - 1024 + start;
+            builder.Append(chunks[chunck], start, chuncksSize - start);
+            int remaining = length - chuncksSize + start;
             chunck++;
             // While we can still add complete chuncks
-            while (remaining > 1024)
+            while (remaining > chuncksSize)
             {
-                builder.Append(chunks[chunck], 0, 1024);
-                remaining -= 1024;
+                builder.Append(chunks[chunck], 0, chuncksSize);
+                remaining -= chuncksSize;
                 chunck++;
             }
             // Add the last part and return
@@ -169,20 +171,20 @@ namespace Hime.Redist
             // Append the new chunck
             if (chunkIndex == chunks.Length - 1)
             {
-                char[][] r = new char[chunks.Length + 1024][];
+                char[][] r = new char[chunks.Length + chuncksSize][];
                 Array.Copy(chunks, r, chunks.Length);
                 chunks = r;
             }
             chunks[chunkIndex] = buffer;
             // Ensure enough storage for lines data
-            if (line + 1024 >= lines.Length)
+            if (line + chuncksSize >= lines.Length)
             {
                 int[] t = new int[lines.Length + initLineCount];
                 Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
                 lines = t;
             }
             // Run the state-machine for line endings
-            int part = chunkIndex << 10;
+            int part = chunkIndex << upperShift;
             for (int i = 0; i != count; i++)
             {
                 switch ((int)buffer[i])

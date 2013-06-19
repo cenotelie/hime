@@ -50,8 +50,8 @@ namespace Hime.Redist.Lexer
         {
             if (bufferStart == bufferLength)
             {
-                buffer = new char[1024];
-                bufferLength = reader.Read(buffer, 0, 1024);
+                buffer = new char[TextContent.chuncksSize];
+                bufferLength = reader.Read(buffer, 0, TextContent.chuncksSize);
                 bufferStart = 0;
                 if (bufferLength == 0)
                 {
