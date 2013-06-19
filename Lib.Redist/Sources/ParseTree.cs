@@ -9,8 +9,8 @@ namespace Hime.Redist
     public sealed class ParseTree
     {
     	private const int upperShift = 10;
-    	private const int chuncksSize = 1 << upperShift;
-    	private const int lowerMask = chuncksSize - 1;
+    	private const int chunksSize = 1 << upperShift;
+    	private const int lowerMask = chunksSize - 1;
     	
         /// <summary>
         /// Represents the data of a node in this AST
@@ -23,8 +23,8 @@ namespace Hime.Redist
         }
 
         private Cell[][] chunks; // The content of the tree
-        private int chunkIndex;  // The index of the current chunck being filled
-        private int cellIndex;   // The index of the next cell to be filled (relatively to the selected chunck)
+        private int chunkIndex;  // The index of the current chunk being filled
+        private int cellIndex;   // The index of the next cell to be filled (relatively to the selected chunk)
         private int root;        // The index of the AST's root
 
         /// <summary>
@@ -37,8 +37,8 @@ namespace Hime.Redist
         /// </summary>
         internal ParseTree()
         {
-            this.chunks = new Cell[chuncksSize][];
-            this.chunks[0] = new Cell[chuncksSize];
+            this.chunks = new Cell[chunksSize][];
+            this.chunks[0] = new Cell[chunksSize];
             this.chunkIndex = 0;
             this.cellIndex = 0;
             this.root = -1;
@@ -96,9 +96,9 @@ namespace Hime.Redist
         internal int Store(Cell[] cells, int index, int length)
         {
             int start = (chunkIndex << upperShift | cellIndex);
-            while (cellIndex + length > chuncksSize)
+            while (cellIndex + length > chunksSize)
             {
-                int count = chuncksSize - cellIndex;
+                int count = chunksSize - cellIndex;
                 if (count == 0)
                 {
                     AddChunk();
@@ -120,7 +120,7 @@ namespace Hime.Redist
         /// <param name="cell">The root</param>
         internal void StoreRoot(Cell cell)
         {
-            if (cellIndex == chuncksSize)
+            if (cellIndex == chunksSize)
                 AddChunk();
             chunks[chunkIndex][cellIndex] = cell;
             root = (chunkIndex << upperShift | cellIndex);
@@ -129,10 +129,10 @@ namespace Hime.Redist
 
         private void AddChunk()
         {
-            Cell[] t = new Cell[chuncksSize];
+            Cell[] t = new Cell[chunksSize];
             if (chunkIndex == chunks.Length - 1)
             {
-                Cell[][] r = new Cell[chunks.Length + chuncksSize][];
+                Cell[][] r = new Cell[chunks.Length + chunksSize][];
                 Array.Copy(chunks, r, chunks.Length);
                 chunks = r;
             }
