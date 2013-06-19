@@ -8,6 +8,10 @@ namespace Hime.Redist
     /// </summary>
     public sealed class ParseTree
     {
+    	private const int upperShift = 10;
+    	private const int chunksSize = 1 << upperShift;
+    	private const int lowerMask = chunksSize - 1;
+    	
         /// <summary>
         /// Represents the data of a node in this AST
         /// </summary>
@@ -33,8 +37,8 @@ namespace Hime.Redist
         /// </summary>
         internal ParseTree()
         {
-            this.chunks = new Cell[1024][];
-            this.chunks[0] = new Cell[1024];
+            this.chunks = new Cell[chunksSize][];
+            this.chunks[0] = new Cell[chunksSize];
             this.chunkIndex = 0;
             this.cellIndex = 0;
             this.root = -1;
@@ -47,7 +51,7 @@ namespace Hime.Redist
         /// <returns>The node's symbol</returns>
         internal Symbols.Symbol GetSymbolAt(int index)
         {
-            return chunks[index >> 10][index & 0x3FF].symbol;
+            return chunks[index >> upperShift][index & lowerMask].symbol;
         }
 
         /// <summary>
@@ -57,7 +61,7 @@ namespace Hime.Redist
         /// <returns>The node's numer of children</returns>
         internal int GetChildrenCountAt(int index)
         {
-            return chunks[index >> 10][index & 0x3FF].count;
+            return chunks[index >> upperShift][index & lowerMask].count;
         }
 
         /// <summary>
@@ -68,7 +72,7 @@ namespace Hime.Redist
         /// <returns>The i-th child</returns>
         internal ASTNode GetChildrenAt(int parentIndex, int i)
         {
-            return new ASTNode(this, chunks[parentIndex >> 10][parentIndex & 0x3FF].first + i);
+            return new ASTNode(this, chunks[parentIndex >> upperShift][parentIndex & lowerMask].first + i);
         }
 
         /// <summary>
@@ -78,7 +82,7 @@ namespace Hime.Redist
         /// <returns>An enumerator for the children</returns>
         internal IEnumerator<ASTNode> GetEnumeratorAt(int index)
         {
-            Cell cell = chunks[index >> 10][index & 0x3FF];
+            Cell cell = chunks[index >> upperShift][index & lowerMask];
             return new Enumerator(this, cell.first - 1, cell.first + cell.count);
         }
 
@@ -91,10 +95,10 @@ namespace Hime.Redist
         /// <returns>The index within this tree at which the items have been inserted</returns>
         internal int Store(Cell[] cells, int index, int length)
         {
-            int start = (chunkIndex << 10 | cellIndex);
-            while (cellIndex + length > 1024)
+            int start = (chunkIndex << upperShift | cellIndex);
+            while (cellIndex + length > chunksSize)
             {
-                int count = 1024 - cellIndex;
+                int count = chunksSize - cellIndex;
                 if (count == 0)
                 {
                     AddChunk();
@@ -116,19 +120,19 @@ namespace Hime.Redist
         /// <param name="cell">The root</param>
         internal void StoreRoot(Cell cell)
         {
-            if (cellIndex == 1024)
+            if (cellIndex == chunksSize)
                 AddChunk();
             chunks[chunkIndex][cellIndex] = cell;
-            root = (chunkIndex << 10 | cellIndex);
+            root = (chunkIndex << upperShift | cellIndex);
             cellIndex++;
         }
 
         private void AddChunk()
         {
-            Cell[] t = new Cell[1024];
+            Cell[] t = new Cell[chunksSize];
             if (chunkIndex == chunks.Length - 1)
             {
-                Cell[][] r = new Cell[chunks.Length + 1024][];
+                Cell[][] r = new Cell[chunks.Length + chunksSize][];
                 Array.Copy(chunks, r, chunks.Length);
                 chunks = r;
             }
