@@ -1,4 +1,4 @@
-﻿namespace Hime.Redist
+namespace Hime.Redist
 {
     /// <summary>
     /// Represents a position in term of line and column in a text input

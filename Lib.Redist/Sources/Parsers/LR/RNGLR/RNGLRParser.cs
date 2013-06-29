@@ -15,8 +15,8 @@ namespace Hime.Redist.Parsers
         {
             public GSSNode node;
             public LRProduction prod;
-            public SPPFSubTree first;
-            public Reduction(GSSNode node, LRProduction prod, SPPFSubTree first)
+            public SPPF first;
+            public Reduction(GSSNode node, LRProduction prod, SPPF first)
             {
                 this.node = node;
                 this.prod = prod;
@@ -38,20 +38,19 @@ namespace Hime.Redist.Parsers
         private struct NodeDic
         {
             public int generation;
-            public List<SPPFSubTree> nodes;
+            public List<SPPF> nodes;
         }
-
+        
         private RNGLRAutomaton parserAutomaton;
+        private GSS stack;
         private SPPFBuilder builder;
-        private SPPFSubTree epsilon;
-        private SPPFSubTree[] nullProds;
-        private Dictionary<int, SPPFSubTree> nullVars;
+        private SPPF epsilon;
+        private SPPF[] nullProds; // SPPF for null variables in order of appearance in parserVariables
+        private Dictionary<int, SPPF> nullVars; // Dictionary of null variables to their respective SPPF
         private Symbols.Token nextToken;
-        private Queue<Reduction> queueReductions;
-        private Queue<Shift> queueShifts;
+        private Queue<Reduction> reductions;
+        private Queue<Shift> shifts;
         private List<NodeDic> objects;
-        private SPPFSubTree[] bufferNodes;
-        private Symbols.Symbol[] bufferSymbols;
 
         /// <summary>
         /// Initializes a new instance of the LRkParser class with the given lexer
@@ -65,24 +64,24 @@ namespace Hime.Redist.Parsers
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
+            this.stack = new GSS(automaton.StatesCount);
             this.builder = new SPPFBuilder();
-            this.epsilon = new SPPFSubTree(Symbols.Epsilon.Instance, TreeAction.None);
-            this.nullProds = new SPPFSubTree[variables.Length];
-            this.nullVars = new Dictionary<int, SPPFSubTree>();
-            this.bufferNodes = new SPPFSubTree[maxBodyLength];
-            this.bufferSymbols = new Symbols.Symbol[maxBodyLength];
-            for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
+            this.epsilon = builder.AcquireNode(Symbols.Epsilon.Instance);
+            this.nullProds = new SPPF[variables.Length];
+            this.nullVars = new Dictionary<int, SPPF>();
+            for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
                 ushort index = parserAutomaton.Nullables[i];
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    nullProds[i] = new SPPFSubTree(parserVariables[prod.Head], prod.HeadAction);
-                    if (!nullVars.ContainsKey(nullProds[i].originalSID))
-                        nullVars.Add(nullProds[i].originalSID, nullProds[i]);
+                    nullProds[i] = builder.AcquireNode(parserVariables[prod.Head]);
+                    nullProds[i].SetHeadAction(prod.HeadAction);
+                    if (!nullVars.ContainsKey(nullProds[i].OriginalSID))
+                        nullVars.Add(nullProds[i].OriginalSID, nullProds[i]);
                 }
             }
-            for (ushort i = 0; i != parserAutomaton.Nullables.Count; i++)
+            for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
                 ushort index = parserAutomaton.Nullables[i];
                 if (index != 0xFFFF)
@@ -93,47 +92,40 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private void BuildNullable(SPPFSubTree subRoot, LRProduction production)
+        private void BuildNullable(SPPF subRoot, LRProduction production)
         {
-            int nextBuffer = 0;
+            builder.ReductionPrepare();
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 LROpCode op = production.Bytecode[i];
                 if (op.IsSemAction)
                 {
-                    parserActions[production.Bytecode[i + 1].Value](subRoot.value.Symbol as Symbols.Variable, bufferSymbols, nextBuffer);
+                    builder.ReductionSemantic(parserActions[production.Bytecode[i + 1].Value]);
                     i++;
                 }
                 else if (op.IsAddVirtual)
                 {
-                    Symbols.Symbol symbol = parserVirtuals[production.Bytecode[i + 1].Value];
-                    SPPFSubTree node = new SPPFSubTree(symbol, op.TreeAction);
-                    bufferSymbols[nextBuffer] = symbol;
-                    bufferNodes[nextBuffer] = node;
-                    nextBuffer++;
+                    Symbols.Virtual symbol = parserVirtuals[production.Bytecode[i + 1].Value];
+                    builder.ReductionVirtual(symbol, op.TreeAction);
                     i++;
                 }
                 else if (op.IsAddNullVar)
                 {
-                    SPPFSubTree node = nullProds[production.Bytecode[i + 1].Value];
-                    if (op.TreeAction != TreeAction.None)
-                        node.action = op.TreeAction;
-                    bufferSymbols[nextBuffer] = node.value.Symbol;
-                    bufferNodes[nextBuffer] = node;
-                    nextBuffer++;
+                    SPPF node = nullProds[production.Bytecode[i + 1].Value];
+                    builder.ReductionNullVariable(node, op.TreeAction);
                     i++;
                 }
             }
-            builder.Build(subRoot, bufferNodes, nextBuffer);
+            builder.Reduce(subRoot, true);
         }
 
-        private void OnUnexpectedToken(Dictionary<int, GSSNode> Ui, Symbols.Token token)
+        private void OnUnexpectedToken(GSSGeneration gen, Symbols.Token token)
         {
             List<int> indices = new List<int>();
             List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
-            foreach (int state in Ui.Keys)
+            foreach (GSSNode node in gen)
             {
-                ICollection<int> temp = parserAutomaton.GetExpected(state, lexer.Terminals.Count);
+                ICollection<int> temp = parserAutomaton.GetExpected(node.State, lexer.Terminals.Count);
                 foreach (int index in temp)
                 {
                     if (!indices.Contains(index))
@@ -161,88 +153,84 @@ namespace Hime.Redist.Parsers
                 return null;
             }
 
-            queueReductions = new Queue<Reduction>();
-            queueShifts = new Queue<Shift>();
+            reductions = new Queue<Reduction>();
+            shifts = new Queue<Shift>();
             objects = new List<NodeDic>();
-            GSSNode v0 = new GSSNode(0, 0);
-            Dictionary<int, GSSNode> Ui = new Dictionary<int, GSSNode>();
-            Ui.Add(0, v0);
+            GSSGeneration Ui = stack.GetNextGen();
+            GSSNode v0 = Ui.CreateNode(0);
 
             int count = parserAutomaton.GetActionsCount(0, nextToken.SymbolID);
             for (int i = 0; i != count; i++)
             {
                 LRAction action = parserAutomaton.GetAction(0, nextToken.SymbolID, i);
                 if (action.Code == LRActionCode.Shift)
-                    queueShifts.Enqueue(new Shift(v0, action.Data));
+                    shifts.Enqueue(new Shift(v0, action.Data));
                 else if (action.Code == LRActionCode.Reduce)
-                    queueReductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), epsilon));
+                    reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), epsilon));
             }
 
-            int generation = 0;
             while (nextToken.SymbolID != Symbols.Epsilon.Instance.SymbolID) // Wait for ε token
             {
                 objects.Clear();
-                Reducer(Ui, generation);
+                Reducer(Ui);
                 Symbols.Token oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
-                Dictionary<int, GSSNode> Uj = Shifter(oldtoken);
-                generation++;
-                if (Uj.Count == 0)
+                GSSGeneration Uj = Shifter(oldtoken);
+                if (Uj.Size == 0)
                 {
                     // Generation is empty !
                     OnUnexpectedToken(Ui, oldtoken);
                     return null;
                 }
+                Ui.Sweep();
                 Ui = Uj;
             }
 
-            foreach (GSSNode node in Ui.Values)
+            foreach (GSSNode node in Ui)
             {
                 if (parserAutomaton.IsAcceptingState(node.State))
                 {
                     // Has reduction _Axiom_ -> axiom $ . on ε
-                    GSSPath[] paths = node.GetPaths(2, out count);
-                    //return builder.GetRoot(paths[0].labels[1]);
-                    return null;
+                    GSSPaths paths = stack.GetPaths(node, 2);
+                    return builder.GetTree(paths[0][1]);
                 }
             }
             // At end of input but was still waiting for tokens
             return null;
         }
 
-        private void Reducer(Dictionary<int, GSSNode> Ui, int generation)
+        private void Reducer(GSSGeneration generation)
         {
-            while (queueReductions.Count != 0)
-                ExecuteReduction(Ui, generation, queueReductions.Dequeue());
+            while (reductions.Count != 0)
+                ExecuteReduction(generation, reductions.Dequeue());
         }
 
-        private void ExecuteReduction(Dictionary<int, GSSNode> Ui, int generation, Reduction reduction)
+        private void ExecuteReduction(GSSGeneration generation, Reduction reduction)
         {
             // Get all path from the reduction node
-            GSSPath[] paths = null;
-            int count = 1;
+            GSSPaths paths = new GSSPaths();
             if (reduction.prod.ReductionLength == 0)
-                paths = reduction.node.GetPaths0();
+                paths = stack.GetPaths(reduction.node, 0);
             else
-                // The given GSS node is the second on the path, so start from it with length -1
-                paths = reduction.node.GetPaths(reduction.prod.ReductionLength - 1, out count);
+                // The given GSS node is the second on the path, so start from it with length - 1
+                paths = stack.GetPaths(reduction.node, reduction.prod.ReductionLength - 1);
+            
             // Execute the reduction on all paths
-            for (int i = 0; i != count; i++)
-                ExecuteReduction(Ui, generation, reduction, paths[i]);
+            for (int i = 0; i != paths.Count; i++)
+                ExecuteReduction(generation, reduction, paths[i]);
         }
 
-        private void ExecuteReduction(Dictionary<int, GSSNode> Ui, int generation, Reduction reduction, GSSPath path)
+        private void ExecuteReduction(GSSGeneration generation, Reduction reduction, GSSPath path)
         {
             // Get the rule's head
             Symbols.Variable head = parserVariables[reduction.prod.Head];
             // Find or build the sub root SPPF
-            SPPFSubTree subRoot = null;
+            SPPF subRoot = null;
             bool isNewRoot = false;
             if (reduction.prod.ReductionLength != 0)
             {
-                subRoot = ResolveSPPF(path.last.Generation, head, out isNewRoot);
-                if (reduction.prod.HeadAction != TreeAction.None)
-                    subRoot.action = reduction.prod.HeadAction;
+                subRoot = ResolveSPPF(path.Last.Generation, head, out isNewRoot);
+                subRoot.SetHeadAction(reduction.prod.HeadAction);
             }
             else
             {
@@ -250,61 +238,44 @@ namespace Hime.Redist.Parsers
                 subRoot = nullVars[head.SymbolID];
             }
             // Build the SPPF
-            int nextBuffer = 0;
-            int nextStack = 0;
+            builder.ReductionPrepare(path, reduction.first);
             for (int i = 0; i != reduction.prod.Bytecode.Length; i++)
             {
                 LROpCode op = reduction.prod.Bytecode[i];
                 if (op.IsSemAction)
                 {
-                    parserActions[reduction.prod.Bytecode[i + 1].Value](head, bufferSymbols, nextBuffer);
+                    builder.ReductionSemantic(parserActions[reduction.prod.Bytecode[i + 1].Value]);
                     i++;
                 }
                 else if (op.IsAddVirtual)
                 {
-                    Symbols.Symbol symbol = parserVirtuals[reduction.prod.Bytecode[i + 1].Value];
-                    SPPFSubTree node = builder.NewNode(symbol, op.TreeAction);
-                    bufferSymbols[nextBuffer] = symbol;
-                    bufferNodes[nextBuffer] = node;
-                    nextBuffer++;
+                    Symbols.Virtual symbol = parserVirtuals[reduction.prod.Bytecode[i + 1].Value];
+                    builder.ReductionVirtual(symbol, op.TreeAction);
                     i++;
                 }
                 else if (op.IsAddNullVar)
                 {
-                    SPPFSubTree node = nullProds[reduction.prod.Bytecode[i + 1].Value];
-                    if (op.TreeAction != TreeAction.None)
-                        node.action = op.TreeAction;
-                    bufferSymbols[nextBuffer] = node.value.Symbol;
-                    bufferNodes[nextBuffer] = node;
-                    nextBuffer++;
+                    SPPF node = nullProds[reduction.prod.Bytecode[i + 1].Value];
+                    builder.ReductionNullVariable(node, op.TreeAction);
                     i++;
                 }
                 else
                 {
-                    SPPFSubTree node = null;
-                    if (nextStack >= path.labels.Length) node = reduction.first;
-                    else node = path.labels[path.labels.Length - nextStack - 1];
-                    if (op.TreeAction != TreeAction.None)
-                        node.action = op.TreeAction;
-                    bufferSymbols[nextBuffer] = node.value.Symbol;
-                    bufferNodes[nextBuffer] = node;
-                    nextStack++;
-                    nextBuffer++;
+                    builder.ReductionPop(op.TreeAction);
                 }
             }
-            if (isNewRoot)
-                builder.Build(subRoot, bufferNodes, nextBuffer);
+            builder.Reduce(subRoot, isNewRoot);
 
             // Get the target state by transition on the rule's head
-            int to = GetNextByVar(path.last.State, head.SymbolID);
-            if (Ui.ContainsKey(to))
+            int to = GetNextByVar(path.Last.State, head.SymbolID);
+            if (generation.Contains(to))
             {
                 // A node for the target state is already in the GSS
-                GSSNode w = Ui[to];
+                GSSNode w = generation[to];
                 // But the new edge does not exist
-                if (!w.HasEdgeTo(path.last))
+                if (!w.HasEdgeTo(path.Last))
                 {
-                    w.AddEdge(path.last, subRoot);
+                    w.AddEdge(path.Last, subRoot);
                     // Look for the new reductions at this state
                     if (reduction.prod.ReductionLength != 0)
                     {
@@ -317,7 +288,7 @@ namespace Hime.Redist.Parsers
                                 LRProduction prod = parserAutomaton.GetProduction(action.Data);
                                 // length 0 reduction are not considered here because they already exist at this point
                                 if (prod.ReductionLength != 0)
-                                    queueReductions.Enqueue(new Reduction(path.last, prod, subRoot));
+                                    reductions.Enqueue(new Reduction(path.Last, prod, subRoot));
                             }
                         }
                     }
@@ -326,9 +297,8 @@ namespace Hime.Redist.Parsers
             else
             {
                 // Create the new corresponding node in the GSS
-                GSSNode w = new GSSNode(to, generation);
-                Ui.Add(to, w);
-                w.AddEdge(path.last, subRoot);
+                GSSNode w = generation.CreateNode(to);
+                w.AddEdge(path.Last, subRoot);
                 // Look for all the reductions and shifts at this state
                 int count = parserAutomaton.GetActionsCount(to, nextToken.SymbolID);
                 for (int i = 0; i != count; i++)
@@ -336,40 +306,40 @@ namespace Hime.Redist.Parsers
                     LRAction action = parserAutomaton.GetAction(to, nextToken.SymbolID, i);
                     if (action.Code == LRActionCode.Shift)
                     {
-                        queueShifts.Enqueue(new Shift(w, action.Data));
+                        shifts.Enqueue(new Shift(w, action.Data));
                     }
                     else if (action.Code == LRActionCode.Reduce)
                     {
                         LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         if (prod.ReductionLength == 0)
-                            queueReductions.Enqueue(new Reduction(w, prod, epsilon));
+                            reductions.Enqueue(new Reduction(w, prod, epsilon));
                         else if (reduction.prod.ReductionLength != 0)
-                            queueReductions.Enqueue(new Reduction(path.last, prod, subRoot));
+                            reductions.Enqueue(new Reduction(path.Last, prod, subRoot));
                     }
                 }
             }
         }
 
-        private Dictionary<int, GSSNode> Shifter(Symbols.Token oldtoken)
+        private GSSGeneration Shifter(Symbols.Token oldtoken)
         {
             // Create next generation
-            Dictionary<int, GSSNode> Uj = new Dictionary<int, GSSNode>();
+            GSSGeneration gen = stack.GetNextGen();
             // Create the AST for the old token
-            SPPFSubTree ast = builder.NewNode(oldtoken, TreeAction.None);
+            SPPF ast = builder.AcquireNode(oldtoken);
 
             // Execute all shifts in the queue at this point
-            int count = queueShifts.Count;
-            for (int x = 0; x != count; x++)
-                ExecuteShift(Uj, ast, queueShifts.Dequeue());
-            return Uj;
+            int count = shifts.Count;
+            for (int i = 0; i != count; i++)
+                ExecuteShift(gen, ast, shifts.Dequeue());
+            return gen;
         }
 
-        private void ExecuteShift(Dictionary<int, GSSNode> Uj, SPPFSubTree ast, Shift shift)
+        private void ExecuteShift(GSSGeneration gen, SPPF ast, Shift shift)
         {
-            if (Uj.ContainsKey(shift.to))
+            if (gen.Contains(shift.to))
             {
                 // A node for the target state is already in the GSS
-                GSSNode w = Uj[shift.to];
+                GSSNode w = gen[shift.to];
                 w.AddEdge(shift.from, ast);
                 // Look for the new reductions at this state
                 int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
@@ -381,15 +351,14 @@ namespace Hime.Redist.Parsers
                         LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         // length 0 reduction are not considered here because they already exist at this point
                         if (prod.ReductionLength != 0)
-                            queueReductions.Enqueue(new Reduction(shift.from, prod, ast));
+                            reductions.Enqueue(new Reduction(shift.from, prod, ast));
                     }
                 }
             }
             else
             {
                 // Create the new corresponding node in the GSS
-                GSSNode w = new GSSNode(shift.to, shift.from.Generation + 1);
-                Uj.Add(shift.to, w);
+                GSSNode w = gen.CreateNode(shift.to);
                 w.AddEdge(shift.from, ast);
                 // Look for all the reductions and shifts at this state
                 int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
@@ -397,14 +366,14 @@ namespace Hime.Redist.Parsers
                 {
                     LRAction action = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i);
                     if (action.Code == LRActionCode.Shift)
-                        queueShifts.Enqueue(new Shift(w, action.Data));
+                        shifts.Enqueue(new Shift(w, action.Data));
                     else if (action.Code == LRActionCode.Reduce)
                     {
                         LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         if (prod.ReductionLength == 0) // Length 0 => reduce from the head
-                            queueReductions.Enqueue(new Reduction(w, prod, epsilon));
+                            reductions.Enqueue(new Reduction(w, prod, epsilon));
                         else // reduce from the second node on the path
-                            queueReductions.Enqueue(new Reduction(shift.from, prod, ast));
+                            reductions.Enqueue(new Reduction(shift.from, prod, ast));
                     }
                 }
             }
@@ -422,30 +391,31 @@ namespace Hime.Redist.Parsers
             return 0xFFFF;
         }
 
-        private SPPFSubTree ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
+        private SPPF ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
         {
             isNew = false;
             foreach (NodeDic dic in objects)
             {
                 if (dic.generation == generation)
                 {
-                    foreach (SPPFSubTree node in dic.nodes)
+                    foreach (SPPF node in dic.nodes)
                     {
-                        if (node.originalSID == symbol.SymbolID)
+                        if (node.OriginalSID == symbol.SymbolID)
                             return node;
                     }
                     isNew = true;
-                    SPPFSubTree sppf = builder.NewNode(symbol, TreeAction.None);
+                    SPPF sppf = builder.AcquireNode(symbol);
                     dic.nodes.Add(sppf);
                     return sppf;
                 }
             }
             isNew = true;
-            SPPFSubTree nn = builder.NewNode(symbol, TreeAction.None);
+            SPPF nn = builder.AcquireNode(symbol);
             NodeDic nd = new NodeDic();
             nd.generation = generation;
-            nd.nodes = new List<SPPFSubTree>();
+            nd.nodes = new List<SPPF>();
             nd.nodes.Add(nn);
+            objects.Add(nd);
             return nn;
         }
     }

@@ -30,6 +30,7 @@ namespace Hime.Redist.Parsers
     {
         private int axiom;
         private int ncols;
+        private int nstates;
         private Utils.BlobUShort columnsID;
         private ColumnMap columns;
         private RNGLRTable table;
@@ -38,6 +39,7 @@ namespace Hime.Redist.Parsers
         private Utils.BlobUShort nullables;
 
         internal int Axiom { get { return axiom; } }
+        internal int StatesCount { get { return nstates; } }
         internal Utils.BlobUShort Nullables { get { return nullables; } }
 
         private RNGLRAutomaton(Stream stream)
@@ -45,7 +47,7 @@ namespace Hime.Redist.Parsers
             BinaryReader reader = new BinaryReader(stream);
             this.axiom = reader.ReadUInt16();
             this.ncols = reader.ReadUInt16();
-            int nstates = reader.ReadUInt16();
+            this.nstates = reader.ReadUInt16();
             int nactions = (int)reader.ReadUInt32();
             int nprod = reader.ReadUInt16();
             int nnprod = reader.ReadUInt16();

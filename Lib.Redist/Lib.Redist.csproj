@@ -60,8 +60,11 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFPool.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFSubTree.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\Parsers\SubTree.cs" />
     <Compile Include="Sources\Parsers\SubTreePool.cs" />
     <Compile Include="Sources\TextContent.cs" />
@@ -86,7 +89,6 @@
     <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRParser.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRTable.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\ErrorType.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRProduction.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Sources\Symbols\Symbol.cs" />
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />
+    <Compile Include="Sources\Utils\ArrayPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
