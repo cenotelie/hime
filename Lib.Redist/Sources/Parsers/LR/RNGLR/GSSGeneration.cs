@@ -17,6 +17,7 @@ namespace Hime.Redist.Parsers
         public GSSGeneration(GSS stack, int index, int nbstates)
         {
             this.stack = stack;
+            this.index = index;
             this.data = new GSSNode[nbstates];
             this.marks = new BitArray(nbstates);
         }
