@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Hime.Redist;
 using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Grammars.ContextFree.LR
