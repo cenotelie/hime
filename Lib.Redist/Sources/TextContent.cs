@@ -13,7 +13,7 @@ namespace Hime.Redist
     public sealed class TextContent
     {
         private const int initLineCount = 10000;
-        private const int upperShift = 10;
+        private const int upperShift = 12;
     	internal const int chunksSize = 1 << upperShift;
     	private const int lowerMask = chunksSize - 1;
 
