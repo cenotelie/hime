@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
-using Hime.Redist.Parsers;
+using Hime.Redist;
 
 namespace Hime.Demo.Tasks
 {
@@ -15,7 +15,6 @@ namespace Hime.Demo.Tasks
             task.Mode = CompilationMode.Assembly;
             task.AddInputFile("Languages\\Test2.gram");
             task.Namespace = "Hime.Demo.Generated";
-            task.GrammarName = "Test2";
             task.CodeAccess = AccessModifier.Public;
             task.Method = ParsingMethod.RNGLALR1;
             task.OutputDocumentation = true;
@@ -25,14 +24,14 @@ namespace Hime.Demo.Tasks
 
             System.IO.StreamReader reader = new System.IO.StreamReader("Languages\\FileCentralDogma.gram");
             Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, new StringReader("aa"));
-            Redist.AST.ASTNode root = parser.Parse();
+            ParseTree ast = parser.Parse();
             reader.Close();
             
-            foreach (ParserError error in parser.Errors)
+            foreach (Error error in parser.Errors)
                 Console.WriteLine(error.ToString());
-            if (root == null)
+            if (ast == null)
                 return;
-            WinTreeView win = new WinTreeView(root);
+            WinTreeView win = new WinTreeView(ast);
             win.ShowDialog();
         }
 

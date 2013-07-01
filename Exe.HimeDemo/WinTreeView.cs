@@ -5,18 +5,18 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Hime.Redist.AST;
+using Hime.Redist;
 using Hime.Redist.Symbols;
 
 namespace Hime.Demo
 {
     partial class WinTreeView : Form
     {
-        public WinTreeView(ASTNode root)
+        public WinTreeView(ParseTree ast)
         {
             InitializeComponent();
-            TreeNode vroot = View.Nodes.Add(GetString(root));
-            AddSubTree(vroot, root);
+            TreeNode vroot = View.Nodes.Add(GetString(ast.Root));
+            AddSubTree(vroot, ast.Root);
         }
 
         private void AddSubTree(TreeNode vnode, ASTNode snode)

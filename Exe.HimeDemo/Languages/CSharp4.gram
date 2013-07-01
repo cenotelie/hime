@@ -437,7 +437,7 @@ cf grammar CSharp4
 		type_parameter_list				-> '<' type_parameters '>' ;
 		type_parameters					-> attributes type_parameter (',' attributes type_parameter)* ;
 		type_parameter					-> IDENTIFIER ;
-		class_base						-> ':' type_class (
+		class_base						-> ':' (type_class | name_nmspce_type) (
 												(',' (type_class | name_nmspce_type))*
 											)? ;
 		type_param_cnstr_clauses		-> type_param_cnstr_clause+ ;
@@ -503,7 +503,7 @@ cf grammar CSharp4
 		class_method_param_default		-> '=' expression ;
 		param_array						-> attributes 'params' type_array IDENTIFIER ;
 		class_method_body				-> stmt_block | ';' ;
-		class_property					-> attributes class_access? class_method_modifier
+		class_property					-> attributes class_access? class_method_modifiers
 											type name_nmspce_type
 											'{' class_property_accessors '}' ;
 		class_property_accessors		-> class_property_get
@@ -518,9 +518,9 @@ cf grammar CSharp4
 										|  'protected' 'internal'
 										|  'internal' 'protected' ;
 		class_accessor_body				-> stmt_block | ';' ;
-		class_event						-> attributes class_access? class_method_modifier
+		class_event						-> attributes class_access? class_method_modifiers
 											'event' type var_declarators ';'
-										|  attributes class_access? class_method_modifier
+										|  attributes class_access? class_method_modifiers
 											'event' type name_nmspce_type
 											'{' class_event_accessors '}' ;
 		class_event_accessors			-> class_event_add
@@ -529,7 +529,7 @@ cf grammar CSharp4
 										|  class_event_remove class_event_add ;
 		class_event_add					-> attributes 'add' stmt_block ;
 		class_event_remove				-> attributes 'remove' stmt_block ;
-		class_indexer					-> attributes class_access? class_method_modifier
+		class_indexer					-> attributes class_access? class_method_modifiers
 											class_indexer_decl
 											'{' class_property_accessors '}' ;
 		class_indexer_decl				-> type 'this' '[' class_method_param_list ']'

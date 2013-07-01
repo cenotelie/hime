@@ -6,7 +6,7 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            IExecutable executable = new ParseTest();
+            IExecutable executable = new ParseGrammar();
             executable.Execute();
         }
     }
