@@ -7,8 +7,6 @@ namespace Hime.Redist.Lexer
     /// </summary>
     public abstract class TextLexer : ILexer
     {
-        private const int maxRewind = 128;          // Maximum number of character that can be rewound
-
         // General data
         private Automaton lexAutomaton;                        // The automaton
         private SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
@@ -47,7 +45,7 @@ namespace Hime.Redist.Lexer
             this.lexTerminals = new SymbolDictionary<Symbols.Terminal>(terminals);
             this.lexSeparator = separator;
             this.content = new TextContent();
-            this.input = new RewindableTextReader(input, content, maxRewind);
+            this.input = new RewindableTextReader(input, content);
             this.isDollatEmited = false;
         }
 
@@ -64,16 +62,15 @@ namespace Hime.Redist.Lexer
                 Symbols.TextToken token = GetNextToken_DFA();
                 if (token == null)
                 {
-                    bool atend = false;
-                    char c = input.Read(out atend);
-                    if (atend)
+                    RewindableTextReader.Single s = input.ReadOne();
+                    if (s.AtEnd)
                     {
                         isDollatEmited = true;
                         return Symbols.Dollar.Instance;
                     }
                     else
                     {
-                        OnError(new UnexpectedCharError(c, content.GetPositionAt(index)));
+                        OnError(new UnexpectedCharError(s.Value, content.GetPositionAt(index)));
                         index++;
                     }
                 }
@@ -86,8 +83,13 @@ namespace Hime.Redist.Lexer
         {
             int matchedIndex = 0;           // Terminal's index of the last match
             int matchedLength = 0;          // Length of the last match
-            int length = 0;
+            int length = 0;                 // Current number of character
             int state = 0;                  // Current state in the DFA
+
+            TextBuffer buffer = input.Read();
+            if (buffer.IsEmpty)
+                return null; // At the end of input
+            int i = buffer.Start;
 
             while (state != 0xFFFF)
             {
@@ -102,11 +104,15 @@ namespace Hime.Redist.Lexer
                 // No further transition => exit
                 if (lexAutomaton.HasNoTransition(offset))
                     break;
-                // Read the next character and store it
-                bool endOfInput = false;
-                char current = input.Read(out endOfInput);
-                if (endOfInput)
-                    break;
+                // At the end of the buffer
+                if (i == buffer.End)
+                {
+                    buffer = input.Read();
+                    if (buffer.IsEmpty)
+                        break;
+                    i = buffer.Start;
+                }
+                char current = buffer[i++];
                 length++;
                 // Try to find a transition from this state with the read character
                 if (current <= 255)
@@ -114,7 +120,7 @@ namespace Hime.Redist.Lexer
                 else
                     state = lexAutomaton.GetFallbackTransition(offset, current);
             }
-            input.Rewind(length - matchedLength);
+            input.GoTo(i - (length - matchedLength));
             if (matchedLength == 0)
                 return null;
             Symbols.Terminal matched = lexTerminals[matchedIndex];

@@ -48,6 +48,7 @@
     <DocumentationFile>bin\Release\Hime.Redist.XML</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentation>true</GenerateDocumentation>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
@@ -59,6 +60,7 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Sources\Lexer\TextBuffer.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />

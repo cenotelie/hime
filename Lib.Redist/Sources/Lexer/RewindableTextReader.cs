@@ -7,84 +7,123 @@ namespace Hime.Redist.Lexer
     /// </summary>
     class RewindableTextReader
     {
-        private TextReader reader;  // Encapsulated text reader
-        private TextContent content;// Full text already read
-        private char[] buffer;      // First stage buffer for batch reading of the stream
-        private int bufferStart;    // Index where the next character shall be read in the buffer
-        private int bufferLength;   // Current length of the buffer
-        private char[] ring;        // Ring memory of this reader storing the already read characters
-        private int ringStart;      // Start index of the ring in case the stream in rewinded
-        private int ringNextEntry;  // Index for inserting new characters in the ring
-        private int ringSize;       // Size of the ring
+        public struct Single
+        {
+            private char value;
+            private bool atEnd;
+            public char Value { get { return value; } }
+            public bool AtEnd { get { return atEnd; } }
+            public Single(char value, bool atEnd)
+            {
+                this.value = value;
+                this.atEnd = atEnd;
+            }
+        }
+
+        private TextReader reader;
+        private TextContent content;
+        private char[] previous;
+        private char[] next;
+        private int nextLength;
+        private char[] buffer;
+        private int bufferStart;
+        private int bufferLength;
 
         /// <summary>
         /// Creates a new Rewindable Text Reader encapsulating the given TextReader
         /// </summary>
         /// <param name="reader">The text reader to encapsulate</param>
         /// <param name="content">The container that will store all read text</param>
-        /// <param name="ringSize">The maximum number of characters that can be rewound</param>
-        public RewindableTextReader(TextReader reader, TextContent content, int ringSize)
+        public RewindableTextReader(TextReader reader, TextContent content)
         {
             this.reader = reader;
             this.content = content;
-            this.bufferStart = 0;
-            this.bufferLength = 0;
-            this.ring = new char[ringSize];
-            this.ringStart = 0;
-            this.ringNextEntry = 0;
-            this.ringSize = ringSize;
         }
 
         /// <summary>
         /// Goes back in the stream of text already read
         /// </summary>
-        /// <param name="count">Number of characters to rewind</param>
-        public void Rewind(int count)
+        /// <param name="index">Index in the current buffer to go back to</param>
+        public void GoTo(int index)
         {
-            ringStart -= count;
-            if (ringStart < 0)
-                ringStart += ringSize;
-        }
-
-        private char ReadBuffer(out bool atEnd)
-        {
-            if (bufferStart == bufferLength)
+            bufferStart = index;
+            if (bufferStart < 0)
             {
-                buffer = new char[TextContent.chunksSize];
-                bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
-                bufferStart = 0;
-                if (bufferLength == 0)
-                {
-                    atEnd = true;
-                    return char.MinValue;
-                }
-                content.Append(buffer, bufferLength);
+                next = buffer;
+                nextLength = bufferLength;
+                buffer = previous;
+                bufferStart += TextContent.chunksSize;
+                bufferLength = TextContent.chunksSize;
             }
-            atEnd = false;
-            char c = buffer[bufferStart++];
-            ring[ringNextEntry++] = c;
-            if (ringNextEntry == ringSize)
-                ringNextEntry = 0;
-            ringStart = ringNextEntry;
-            return c;
         }
 
         /// <summary>
-        /// Reads the next character
+        /// Reads text in the input
         /// </summary>
-        /// <param name="atEnd">Out parameter set to true if no more character can be read</param>
-        /// <returns>The read character</returns>
-        public char Read(out bool atEnd)
+        /// <returns>A buffer of text</returns>
+        public TextBuffer Read()
         {
-            if (ringStart != ringNextEntry)
+            if (bufferStart != bufferLength)
             {
-                atEnd = false;
-                char value = ring[ringStart++];
-                if (ringStart == ringSize)
-                    ringStart = 0;
-                return value;
+                int start = bufferStart;
+                bufferStart = bufferLength;
+                return new TextBuffer(buffer, start, bufferLength);
             }
-            return ReadBuffer(out atEnd);
+            // We need to go to the next chunck
+            previous = buffer;
+            // Is-il already here?
+            if (next != null)
+            {
+                buffer = next;
+                bufferLength = nextLength;
+                next = null;
+            }
+            else
+            {
+                buffer = new char[TextContent.chunksSize];
+                bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
+                if (bufferLength != 0)
+                    content.Append(buffer, bufferLength);
+            }
+            bufferStart = bufferLength;
+            return new TextBuffer(buffer, 0, bufferLength);
+        }
+
+        /// <summary>
+        /// Reads a single character in the input
+        /// </summary>
+        /// <returns>The single character with meta-data</returns>
+        public Single ReadOne()
+        {
+            if (bufferStart != bufferLength)
+                return new Single(buffer[bufferStart++], false);
+            // We need to go to the next chunck
+            previous = buffer;
+            // Is-il already here?
+            if (next != null)
+            {
+                buffer = next;
+                bufferLength = nextLength;
+                next = null;
+                bufferStart = 1;
+                return new Single(buffer[0], false);
+            }
+            else
+            {
+                buffer = new char[TextContent.chunksSize];
+                bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
+                if (bufferLength != 0)
+                {
+                    content.Append(buffer, bufferLength);
+                    bufferStart = 1;
+                    return new Single(buffer[0], false);
+                }
+                else
+                {
+                    bufferStart = 0;
+                    return new Single('\0', true);
+                }
+            }
         }
     }
 }
