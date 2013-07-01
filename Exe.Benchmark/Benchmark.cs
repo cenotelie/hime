@@ -31,11 +31,11 @@ namespace Hime.Benchmark
             this.output = "result.txt";
             this.sampleFactor = 600;
             this.expCount = 50;
-            this.rebuildInput = true;
-            this.rebuildParsers = true;
-            this.doStats = true;
+            this.rebuildInput = false;
+            this.rebuildParsers = false;
+            this.doStats = false;
             this.doLexer = true;
-            this.doParserLALR = true;
+            this.doParserLALR = false;
             this.doParserRNGLR = false;
         }
 
