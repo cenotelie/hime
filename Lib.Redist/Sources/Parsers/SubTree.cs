@@ -13,9 +13,9 @@ namespace Hime.Redist.Parsers
     /// The organization is that a node's children are immediately following it in the array.
     /// For example, the tree A(B(CD)E(FG)) is represented as [ABCDEFG].
     /// </remarks>
-    class SubTree
+    class SubTree : Utils.PooledObject
     {
-        private SubTreePool pool;
+        private Utils.ObjectPool<SubTree> pool;
         private ParseTree.Cell[] items;
         private TreeAction[] actions;
 
@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="pool">The pool to which this sub-tree is attached</param>
         /// <param name="capacity">The capacity of the internal buffer of this sub-tree</param>
-        public SubTree(SubTreePool pool, int capacity)
+        public SubTree(Utils.ObjectPool<SubTree> pool, int capacity)
         {
             this.pool = pool;
             this.items = new ParseTree.Cell[capacity];
@@ -187,7 +187,7 @@ namespace Hime.Redist.Parsers
         public void Free()
         {
             if (pool != null)
-                pool.Free(this);
+                pool.Returns(this);
         }
     }
 }

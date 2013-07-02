@@ -67,8 +67,8 @@
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
+    <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
     <Compile Include="Sources\Parsers\SubTree.cs" />
-    <Compile Include="Sources\Parsers\SubTreePool.cs" />
     <Compile Include="Sources\TextContent.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
@@ -117,6 +117,9 @@
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />
     <Compile Include="Sources\Utils\ArrayPool.cs" />
+    <Compile Include="Sources\Utils\ObjectPool.cs" />
+    <Compile Include="Sources\Utils\PooledObject.cs" />
+    <Compile Include="Sources\Utils\PooledObjectFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

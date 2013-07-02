@@ -9,7 +9,7 @@ namespace Hime.Redist
     public sealed class ParseTree
     {
     	private const int upperShift = 10;
-    	private const int chunksSize = 1 << upperShift;
+    	internal const int chunksSize = 1 << upperShift;
     	private const int lowerMask = chunksSize - 1;
     	
         /// <summary>
