@@ -49,7 +49,7 @@ namespace Hime.Redist.Parsers
         public void Free()
         {
         	if (pool != null)
-        		pool.Free(labels);
+        		pool.Returns(labels);
         }
     }
 }

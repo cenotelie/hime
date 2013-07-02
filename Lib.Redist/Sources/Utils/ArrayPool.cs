@@ -31,7 +31,7 @@ namespace Hime.Redist.Utils
             }
         }
 
-        public void Free(T[] item)
+        public void Returns(T[] item)
         {
             nextFree++;
             if (nextFree == free.Length)
