@@ -1,4 +1,5 @@
 using System;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
@@ -15,7 +16,7 @@ namespace Hime.Redist.Parsers
     /// </remarks>
     class SubTree
     {
-        private Utils.Pool<SubTree> pool;
+        private Pool<SubTree> pool;
         private ParseTree.Cell[] items;
         private TreeAction[] actions;
 
@@ -55,7 +56,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="pool">The pool to which this sub-tree is attached</param>
         /// <param name="capacity">The capacity of the internal buffer of this sub-tree</param>
-        public SubTree(Utils.Pool<SubTree> pool, int capacity)
+        public SubTree(Pool<SubTree> pool, int capacity)
         {
             this.pool = pool;
             this.items = new ParseTree.Cell[capacity];

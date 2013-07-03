@@ -62,13 +62,12 @@
     </Compile>
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
+    <Compile Include="Sources\Parsers\LR\LRk\SubTree.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
-    <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
-    <Compile Include="Sources\Parsers\SubTree.cs" />
     <Compile Include="Sources\TextContent.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
