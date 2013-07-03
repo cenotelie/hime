@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
+	/// <summary>
+	/// Represents a generation of nodes in a GSS
+	/// </summary>
     class GSSGeneration : IEnumerable<GSSNode>
     {
         private GSS stack;
@@ -11,9 +14,21 @@ namespace Hime.Redist.Parsers
         private GSSNode[] data;
         private BitArray marks;
 
+        /// <summary>
+        /// Gets the index of this generation
+        /// </summary>
         public int Index { get { return index; } }
+        /// <summary>
+        /// Gets the size of this generation, i.e. the number of nodes it contains
+        /// </summary>
         public int Size { get { return size; } }
 
+        /// <summary>
+        /// Initializes this generation
+        /// </summary>
+        /// <param name="stack">The parent GSS</param>
+        /// <param name="index">The generation's index</param>
+        /// <param name="nbstates">The number of states in the parent RNGLR automaton</param>
         public GSSGeneration(GSS stack, int index, int nbstates)
         {
             this.stack = stack;
@@ -22,10 +37,23 @@ namespace Hime.Redist.Parsers
             this.marks = new BitArray(nbstates);
         }
 
+       	/// <summary>
+       	/// Gets the GSS in this generation for the given RNGLR state, or null if there is none
+       	/// </summary>
         public GSSNode this[int state] { get { return data[state]; } }
 
+        /// <summary>
+        /// Gets whether this generation contains a node for the given RNGLR state
+        /// </summary>
+        /// <param name="state">The RNGLR state</param>
+        /// <returns>True if there is a node, false otherwise</returns>
         public bool Contains(int state) { return (data[state] == null); }
 
+        /// <summary>
+        /// Creates the GSS node in this generation for the given RNGLR state
+        /// </summary>
+        /// <param name="state">The RNGLR state</param>
+        /// <returns>The corresponding GSS node</returns>
         public GSSNode CreateNode(int state)
         {
             GSSNode node = stack.AcquireNode();
@@ -34,12 +62,19 @@ namespace Hime.Redist.Parsers
             size++;
             return node;
         }
-
+        
+        /// <summary>
+        /// Marks the given GSS node in this generation as having children in later generations
+        /// </summary>
+        /// <param name="node">The GSS node to be marked</param>
         public void Mark(GSSNode node)
         {
             marks.Set(node.State, true);
         }
 
+        /// <summary>
+        /// Collects unmarked GSS nodes in this generation and return them to the common pool
+        /// </summary>
         public void Sweep()
         {
             int found = 0;
@@ -59,8 +94,16 @@ namespace Hime.Redist.Parsers
             }
         }
 
+        /// <summary>
+        /// Gets an enumerator of the GSS nodes in this generation
+        /// </summary>
+        /// <returns>An enumerator of GSS nodes</returns>
         public IEnumerator<GSSNode> GetEnumerator() { return new Iterator(data); }
 
+        /// <summary>
+        /// Gets an enumerator of the GSS nodes in this generation
+        /// </summary>
+        /// <returns>An enumerator of GSS nodes</returns>
         IEnumerator IEnumerable.GetEnumerator() { return new Iterator(data); }
 
         private class Iterator : IEnumerator<GSSNode>

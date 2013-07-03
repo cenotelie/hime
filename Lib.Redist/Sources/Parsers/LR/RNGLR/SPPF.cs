@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
 {
+	/// <summary>
+	/// Represents a node and its children families in a Shared-Packed Parse Forest
+	/// </summary>
     class SPPF
     {
         private int originalSID;
@@ -11,6 +14,9 @@ namespace Hime.Redist.Parsers
         private List<ParseTree.Cell> children;
         private List<TreeAction> actions;
 
+        /// <summary>
+        /// Gets the original ID of this SPPF's node symbol
+        /// </summary>
         public int OriginalSID { get { return originalSID; } }
 
         public SPPF(Symbols.Symbol symbol, TreeAction action)

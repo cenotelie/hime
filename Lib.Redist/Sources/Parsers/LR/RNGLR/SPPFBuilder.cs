@@ -22,7 +22,7 @@ namespace Hime.Redist.Parsers
 		public void ReductionPrepare() { }
 
         // Prepare a normal reduction
-        public void ReductionPrepare(GSSPath path, SPPF first) { }
+        public void ReductionPrepare(GSSPath path, int length, SPPF first) { }
 
         public void ReductionPop(TreeAction action) { }
 

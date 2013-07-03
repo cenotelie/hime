@@ -3,6 +3,9 @@ using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
+	/// <summary>
+	/// Represents the builder of Parse Trees for LR(k) parsers
+	/// </summary>
     class LRkASTBuilder
     {
     	private class SubTreeFactory : Factory<SubTree>
@@ -32,7 +35,11 @@ namespace Hime.Redist.Parsers
         // Final AST
         private ParseTree tree;
 
-        internal LRkASTBuilder(int stackSize)
+        /// <summary>
+        /// Initializes the builder with the given stack size
+        /// </summary>
+        /// <param name="stackSize">The maximal size of the stack</param>
+        public LRkASTBuilder(int stackSize)
         {
             this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
             this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
@@ -42,6 +49,10 @@ namespace Hime.Redist.Parsers
             this.tree = new ParseTree();
         }
 
+        /// <summary>
+        /// Push a symbol onto the stack
+        /// </summary>
+        /// <param name="symbol">The symbol to push onto the stack</param>
         public void StackPush(Symbols.Symbol symbol)
         {
             SubTree single = poolSingle.Acquire();
@@ -49,6 +60,10 @@ namespace Hime.Redist.Parsers
             stack[stackNext++] = single;
         }
 
+        /// <summary>
+        /// Prepares for the forthcoming reduction operations
+        /// </summary>
+        /// <param name="length">The length of the reduction</param>
         public void ReductionPrepare(int length)
         {
             stackNext -= length;
@@ -66,6 +81,10 @@ namespace Hime.Redist.Parsers
             popCount = 0;
         }
 
+        /// <summary>
+        /// During a redution, pops the top symbol from the stack and gives it a tree action
+        /// </summary>
+        /// <param name="action">The tree action to apply to the symbol</param>
         public void ReductionPop(TreeAction action)
         {
             SubTree sub = stack[stackNext + popCount];
@@ -101,6 +120,11 @@ namespace Hime.Redist.Parsers
             popCount++;
         }
 
+        /// <summary>
+        /// During a reduction, inserts a virtual symbol
+        /// </summary>
+        /// <param name="symbol">The virtual symbol</param>
+        /// <param name="action">The tree action applied onto the symbol</param>
         public void ReductionVirtual(Symbols.Virtual symbol, TreeAction action)
         {
             if (action == TreeAction.Drop)
@@ -109,12 +133,21 @@ namespace Hime.Redist.Parsers
             handle[handleNext++] = cacheNext++;
         }
 
+        /// <summary>
+        /// During a reduction, inserts a semantic action
+        /// </summary>
+        /// <param name="callback">The semantic action</param>
         public void ReductionSemantic(SemanticAction callback)
         {
             cache.SetAt(cacheNext, new Symbols.Action(callback), TreeAction.Semantic);
             handle[handleNext++] = cacheNext++;
         }
 
+        /// <summary>
+        /// Finalizes the reduction opration
+        /// </summary>
+        /// <param name="var">The reduced variable</param>
+        /// <param name="action">The tree action applied onto the variable</param>
         public void Reduce(Symbols.Variable var, TreeAction action)
         {
             // Build the subtree
@@ -178,6 +211,10 @@ namespace Hime.Redist.Parsers
             cache.ChildrenCount = insertion - 1;
         }
 
+        /// <summary>
+        /// Finalizes the parse tree and returns it
+        /// </summary>
+        /// <returns>The final parse tree</returns>
         public ParseTree GetTree()
         {
             // Get the axiom's sub tree

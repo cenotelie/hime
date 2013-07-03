@@ -3,6 +3,9 @@ using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
+	/// <summary>
+	/// Represents a structure for Graph-Structured Stacks in RNGLR parsers
+	/// </summary>
     class GSS
     {
     	private class GSSPathFactory : Factory<GSSPath>
@@ -28,6 +31,10 @@ namespace Hime.Redist.Parsers
         private Pool<GSSNode> nodesPool;
     	private GSSPath[] paths;
     	
+    	/// <summary>
+    	/// Initializes the GSS
+    	/// </summary>
+    	/// <param name="nbstates">The number of states in the RNGLR automaton</param>
     	public GSS(int nbstates)
     	{
             this.nbstates = nbstates;
@@ -39,12 +46,24 @@ namespace Hime.Redist.Parsers
     		this.paths = new GSSPath[initPathsCount];
     	}
 
+    	/// <summary>
+    	/// Gets the next generation for this stack
+    	/// </summary>
+    	/// <returns></returns>
         public GSSGeneration GetNextGen() { return new GSSGeneration(this, nextIndex++, nbstates); }
 
+        /// <summary>
+        /// Acquire a GSS node from a pool of reusable ones
+        /// </summary>
+        /// <returns>A usable GSS node</returns>
         public GSSNode AcquireNode() { return nodesPool.Acquire(); }
 
+        /// <summary>
+        /// Returns the given GSS node to the common pool
+        /// </summary>
+        /// <param name="node">The GSS node to return</param>
         public void ReturnsNode(GSSNode node) { nodesPool.Returns(node); }
-
+        
     	private GSSPath AcquirePath(GSSNode last, int length)
     	{
     		GSSPath p = null;
@@ -55,7 +74,6 @@ namespace Hime.Redist.Parsers
             else
             	p = new GSSPath(length);
     		p.Last = last;
-    		p.Length = length;
     		return p;
     	}
     	
@@ -66,6 +84,12 @@ namespace Hime.Redist.Parsers
             paths = temp;
     	}
     	
+    	/// <summary>
+    	/// Gets all paths in the GSS starting at the given node and with the given length
+    	/// </summary>
+    	/// <param name="from">The starting node</param>
+    	/// <param name="length">The length of the requested paths</param>
+    	/// <returns>A collection of paths in this GSS</returns>
     	public GSSPaths GetPaths(GSSNode from, int length)
     	{
     		if (length == 0)
