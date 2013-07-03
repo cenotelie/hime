@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -238,7 +238,7 @@ namespace Hime.Redist.Parsers
                 subRoot = nullVars[head.SymbolID];
             }
             // Build the SPPF
-            builder.ReductionPrepare(path, reduction.first);
+            builder.ReductionPrepare(path, reduction.prod.ReductionLength, reduction.first);
             for (int i = 0; i != reduction.prod.Bytecode.Length; i++)
             {
                 LROpCode op = reduction.prod.Bytecode[i];
