@@ -1,68 +1,62 @@
 using System;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
     class GSS
     {
+    	private class GSSPathFactory : Factory<GSSPath>
+	    {
+	        private int capacity;
+	        public GSSPathFactory(int capacity) { this.capacity = capacity; }
+	        public GSSPath CreateNew(Pool<GSSPath> pool) { return new GSSPath(pool, capacity); }
+	    }
+    	
+    	private class GSSNodeFactory : Factory<GSSNode>
+    	{
+    		public GSSNode CreateNew(Pool<GSSNode> pool) { return new GSSNode(); }
+    	}
+    	
     	private const int initPathsCount = 64;
         private const int initNodePoolSize = 256;
 
         private int nbstates;
         private int nextIndex;
-    	private Utils.ArrayPool<SPPF> pool128;
-        private Utils.ArrayPool<SPPF> pool1024;
-        private GSSNode[] free;
-        private int nextFree;
-        private int allocated;
+        private GSSPath path0;
+    	private Pool<GSSPath> pathsPool128;
+        private Pool<GSSPath> pathsPool1024;
+        private Pool<GSSNode> nodesPool;
     	private GSSPath[] paths;
     	
     	public GSS(int nbstates)
     	{
             this.nbstates = nbstates;
             this.nextIndex = 0;
-            this.pool128 = new Utils.ArrayPool<SPPF>(128, 128);
-            this.pool1024 = new Utils.ArrayPool<SPPF>(1024, 128);
-            this.free = new GSSNode[initNodePoolSize];
-            this.nextFree = -1;
-            this.allocated = 0;
+            this.path0 = new GSSPath();
+            this.pathsPool128 = new Pool<GSSPath>(new GSSPathFactory(128), 128);
+            this.pathsPool1024 = new Pool<GSSPath>(new GSSPathFactory(1024), 128);
+            this.nodesPool = new Pool<GSSNode>(new GSSNodeFactory(), 1024);
     		this.paths = new GSSPath[initPathsCount];
     	}
 
         public GSSGeneration GetNextGen() { return new GSSGeneration(this, nextIndex++, nbstates); }
 
-        public GSSNode Acquire()
-        {
-            if (nextFree == -1)
-            {
-                // Create new one
-                allocated++;
-                return new GSSNode();
-            }
-            else
-            {
-                return free[nextFree--];
-            }
-        }
+        public GSSNode AcquireNode() { return nodesPool.Acquire(); }
 
-        public void Free(GSSNode node)
-        {
-            nextFree++;
-            if (nextFree == free.Length)
-            {
-                GSSNode[] temp = new GSSNode[allocated];
-                Array.Copy(free, temp, free.Length);
-                free = temp;
-            }
-            free[nextFree] = node;
-        }
+        public void ReturnsNode(GSSNode node) { nodesPool.Returns(node); }
 
-    	private GSSPath AcquirePath(int length)
+    	private GSSPath AcquirePath(GSSNode last, int length)
     	{
+    		GSSPath p = null;
             if (length <= 128)
-                return new GSSPath(pool128);
+            	p = pathsPool128.Acquire();
             else if (length <= 1024)
-                return new GSSPath(pool1024);
-    		return new GSSPath(new SPPF[length]);
+            	p = pathsPool1024.Acquire();
+            else
+            	p = new GSSPath(length);
+    		p.Last = last;
+    		p.Length = length;
+    		return p;
     	}
     	
     	private void GrowBuffer()
@@ -76,12 +70,12 @@ namespace Hime.Redist.Parsers
     	{
     		if (length == 0)
     		{
-    			paths[0] = new GSSPath(from);
+    			path0.Last = from;
+    			paths[0] = path0;
     			return new GSSPaths(1, paths);
     		}
     		
-    		paths[0] = AcquirePath(length);
-    		paths[0].Last = from;
+    		paths[0] = AcquirePath(from, length);
     		
             // The number of paths in the list
             int count = 1;
@@ -108,8 +102,7 @@ namespace Hime.Redist.Parsers
                         if (next == paths.Length)
                         	GrowBuffer();
                         // Clone and extend the new path
-                        paths[next] = AcquirePath(length);
-                        paths[next].Last = edge.To;
+                        paths[next] = AcquirePath(edge.To, length);
                         paths[next].CopyLabelsFrom(paths[p], i);
                         paths[next][i] = edge.Label;
                         // Go to next insert

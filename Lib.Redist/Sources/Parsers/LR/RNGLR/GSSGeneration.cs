@@ -28,7 +28,7 @@ namespace Hime.Redist.Parsers
 
         public GSSNode CreateNode(int state)
         {
-            GSSNode node = stack.Acquire();
+            GSSNode node = stack.AcquireNode();
             node.Initialize(this, state);
             data[state] = node;
             size++;
@@ -51,7 +51,7 @@ namespace Hime.Redist.Parsers
                 found++;
                 if (!marks[i])
                 {
-                    stack.Free(node);
+                    stack.ReturnsNode(node);
                     data[i] = null;
                 }
                 if (found == size)

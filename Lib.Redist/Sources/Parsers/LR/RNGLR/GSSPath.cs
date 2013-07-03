@@ -1,17 +1,25 @@
 using System;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
-    struct GSSPath
+    class GSSPath
     {
-    	private Utils.ArrayPool<SPPF> pool;
+    	private Pool<GSSPath> pool;
         private GSSNode last;
         private SPPF[] labels;
+        private int length;
         
         public GSSNode Last
         {
         	get { return last; }
         	set { last = value; }
+        }
+        
+        public int Length
+        {
+        	get { return length; }
+        	set { length = value; }
         }
         
         public SPPF this[int index]
@@ -20,25 +28,28 @@ namespace Hime.Redist.Parsers
         	set { labels[index] = value; }
         }
 
-        public GSSPath(Utils.ArrayPool<SPPF> pool)
+        public GSSPath(Pool<GSSPath> pool, int capacity)
         {
         	this.pool = pool;
         	this.last = null;
-        	this.labels = pool.Acquire();
+        	this.labels = new SPPF[capacity];
+        	this.length = 0;
         }
 
-        public GSSPath(SPPF[] labels)
+        public GSSPath(int capacity)
         {
             this.pool = null;
             this.last = null;
-            this.labels = labels;
+            this.labels = new SPPF[capacity];
+        	this.length = 0;
         }
 
-        public GSSPath(GSSNode node)
+        public GSSPath()
         {
         	this.pool = null;
-        	this.last = node;
+        	this.last = null;
         	this.labels = null;
+        	this.length = 0;
         }
         
         public void CopyLabelsFrom(GSSPath path, int length)
@@ -49,7 +60,7 @@ namespace Hime.Redist.Parsers
         public void Free()
         {
         	if (pool != null)
-        		pool.Returns(labels);
+        		pool.Returns(this);
         }
     }
 }
