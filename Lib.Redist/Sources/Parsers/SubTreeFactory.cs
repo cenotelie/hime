@@ -2,7 +2,7 @@
 
 namespace Hime.Redist.Parsers
 {
-    class SubTreeFactory : Utils.PooledObjectFactory<SubTree>
+    class SubTreeFactory : Utils.Factory<SubTree>
     {
         private int capacity;
 
@@ -11,7 +11,7 @@ namespace Hime.Redist.Parsers
             this.capacity = capacity;
         }
 
-        public SubTree CreateNew(Utils.ObjectPool<SubTree> pool)
+        public SubTree CreateNew(Utils.Pool<SubTree> pool)
         {
             return new SubTree(pool, capacity);
         }

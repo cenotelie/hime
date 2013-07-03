@@ -6,9 +6,9 @@ namespace Hime.Redist.Utils
     /// Represents a pool of reusable objects
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    class ObjectPool<T> where T : PooledObject
+    class Pool<T>
     {
-        private PooledObjectFactory<T> factory;
+        private Factory<T> factory;
         private T[] free;
         private int nextFree;
         private int allocated;
@@ -18,7 +18,7 @@ namespace Hime.Redist.Utils
         /// </summary>
         /// <param name="factory">The factory for the pooled objects</param>
         /// <param name="initSize">The initial size of the pool</param>
-        public ObjectPool(PooledObjectFactory<T> factory, int initSize)
+        public Pool(Factory<T> factory, int initSize)
         {
             this.factory = factory;
             this.free = new T[initSize];

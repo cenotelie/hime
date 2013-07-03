@@ -8,9 +8,9 @@ namespace Hime.Redist.Parsers
         private const int estimationBias = 5;
 
         // Sub-tree pools
-        private Utils.ObjectPool<SubTree> poolSingle;
-        private Utils.ObjectPool<SubTree> pool128;
-        private Utils.ObjectPool<SubTree> pool1024;
+        private Utils.Pool<SubTree> poolSingle;
+        private Utils.Pool<SubTree> pool128;
+        private Utils.Pool<SubTree> pool1024;
         // Stack of semantic objects
         private SubTree[] stack;
         private int stackNext;
@@ -26,9 +26,9 @@ namespace Hime.Redist.Parsers
 
         internal LRkASTBuilder(int stackSize)
         {
-            this.poolSingle = new Utils.ObjectPool<SubTree>(new SubTreeFactory(1), 512);
-            this.pool128 = new Utils.ObjectPool<SubTree>(new SubTreeFactory(128), 128);
-            this.pool1024 = new Utils.ObjectPool<SubTree>(new SubTreeFactory(1024), 16);
+            this.poolSingle = new Utils.Pool<SubTree>(new SubTreeFactory(1), 512);
+            this.pool128 = new Utils.Pool<SubTree>(new SubTreeFactory(128), 128);
+            this.pool1024 = new Utils.Pool<SubTree>(new SubTreeFactory(1024), 16);
             this.stack = new SubTree[stackSize];
             this.handle = new int[handleSize];
             this.tree = new ParseTree();
