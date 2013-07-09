@@ -49,7 +49,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="target">The edge's target</param>
         /// <param name="label">The edge's label</param>
-        public void AddEdge(GSSNode target, SPPF label)
+        public void AddEdge(GSSNode target, SubSPPF label)
         {
             if (edgesCount == edges.Length)
             {

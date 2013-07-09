@@ -5,7 +5,7 @@ namespace Hime.Redist.Utils
     /// <summary>
     /// Represents a pool of reusable objects
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Type of the pooled objects</typeparam>
     class Pool<T>
     {
         private Factory<T> factory;
@@ -49,7 +49,7 @@ namespace Hime.Redist.Utils
         /// Returns the given object to this pool
         /// </summary>
         /// <param name="obj">The returned object</param>
-        public void Returns(T obj)
+        public void Return(T obj)
         {
             nextFree++;
             if (nextFree == free.Length)

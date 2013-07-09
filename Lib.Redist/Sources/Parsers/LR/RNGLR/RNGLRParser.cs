@@ -15,8 +15,8 @@ namespace Hime.Redist.Parsers
         {
             public GSSNode node;
             public LRProduction prod;
-            public SPPF first;
-            public Reduction(GSSNode node, LRProduction prod, SPPF first)
+            public SubSPPF first;
+            public Reduction(GSSNode node, LRProduction prod, SubSPPF first)
             {
                 this.node = node;
                 this.prod = prod;
@@ -35,22 +35,12 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private struct NodeDic
-        {
-            public int generation;
-            public List<SPPF> nodes;
-        }
-        
         private RNGLRAutomaton parserAutomaton;
         private GSS stack;
         private SPPFBuilder builder;
-        private SPPF epsilon;
-        private SPPF[] nullProds; // SPPF for null variables in order of appearance in parserVariables
-        private Dictionary<int, SPPF> nullVars; // Dictionary of null variables to their respective SPPF
         private Symbols.Token nextToken;
         private Queue<Reduction> reductions;
         private Queue<Shift> shifts;
-        private List<NodeDic> objects;
 
         /// <summary>
         /// Initializes a new instance of the LRkParser class with the given lexer
@@ -65,20 +55,14 @@ namespace Hime.Redist.Parsers
         {
             this.parserAutomaton = automaton;
             this.stack = new GSS(automaton.StatesCount);
-            this.builder = new SPPFBuilder();
-            this.epsilon = builder.AcquireNode(Symbols.Epsilon.Instance);
-            this.nullProds = new SPPF[variables.Length];
-            this.nullVars = new Dictionary<int, SPPF>();
+            this.builder = new SPPFBuilder(variables.Length);
             for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
                 ushort index = parserAutomaton.Nullables[i];
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    nullProds[i] = builder.AcquireNode(parserVariables[prod.Head]);
-                    nullProds[i].SetHeadAction(prod.HeadAction);
-                    if (!nullVars.ContainsKey(nullProds[i].OriginalSID))
-                        nullVars.Add(nullProds[i].OriginalSID, nullProds[i]);
+                    builder.CreateNullProduction(prod, parserVariables[i]);
                 }
             }
             for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
@@ -87,12 +71,12 @@ namespace Hime.Redist.Parsers
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    BuildNullable(nullProds[i], prod);
+                    BuildNullable(i, prod);
                 }
             }
         }
 
-        private void BuildNullable(SPPF subRoot, LRProduction production)
+        private void BuildNullable(int index, LRProduction production)
         {
             builder.ReductionPrepare();
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -111,12 +95,15 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddNullVar)
                 {
-                    SPPF node = nullProds[production.Bytecode[i + 1].Value];
-                    builder.ReductionNullVariable(node, op.TreeAction);
+                    builder.ReductionNullVariable(parserVariables[production.Bytecode[i + 1].Value], op.TreeAction);
                     i++;
                 }
+                else
+                {
+                    builder.ReductionPop(op.TreeAction);
+                }
             }
-            builder.Reduce(subRoot, true);
+            builder.Reduce(index, production.HeadAction);
         }
 
         private void OnUnexpectedToken(GSSGeneration gen, Symbols.Token token)
@@ -155,7 +142,6 @@ namespace Hime.Redist.Parsers
 
             reductions = new Queue<Reduction>();
             shifts = new Queue<Shift>();
-            objects = new List<NodeDic>();
             GSSGeneration Ui = stack.GetNextGen();
             GSSNode v0 = Ui.CreateNode(0);
 
@@ -166,12 +152,11 @@ namespace Hime.Redist.Parsers
                 if (action.Code == LRActionCode.Shift)
                     shifts.Enqueue(new Shift(v0, action.Data));
                 else if (action.Code == LRActionCode.Reduce)
-                    reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), epsilon));
+                    reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), builder.Epsilon));
             }
 
             while (nextToken.SymbolID != Symbols.Epsilon.Instance.SymbolID) // Wait for ε token
             {
-                objects.Clear();
                 Reducer(Ui);
                 Symbols.Token oldtoken = nextToken;
                 nextToken = lexer.GetNextToken();
@@ -201,6 +186,7 @@ namespace Hime.Redist.Parsers
 
         private void Reducer(GSSGeneration generation)
         {
+            builder.ClearHistory();
             while (reductions.Count != 0)
                 ExecuteReduction(generation, reductions.Dequeue());
         }
@@ -224,21 +210,8 @@ namespace Hime.Redist.Parsers
         {
             // Get the rule's head
             Symbols.Variable head = parserVariables[reduction.prod.Head];
-            // Find or build the sub root SPPF
-            SPPF subRoot = null;
-            bool isNewRoot = false;
-            if (reduction.prod.ReductionLength != 0)
-            {
-                subRoot = ResolveSPPF(path.Last.Generation, head, out isNewRoot);
-                subRoot.SetHeadAction(reduction.prod.HeadAction);
-            }
-            else
-            {
-                // find the nullable sub root
-                subRoot = nullVars[head.SymbolID];
-            }
             // Build the SPPF
-            builder.ReductionPrepare(path, reduction.prod.ReductionLength, reduction.first);
+            builder.ReductionPrepare(path, reduction.first);
             for (int i = 0; i != reduction.prod.Bytecode.Length; i++)
             {
                 LROpCode op = reduction.prod.Bytecode[i];
@@ -255,8 +228,7 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddNullVar)
                 {
-                    SPPF node = nullProds[reduction.prod.Bytecode[i + 1].Value];
-                    builder.ReductionNullVariable(node, op.TreeAction);
+                    builder.ReductionNullVariable(parserVariables[reduction.prod.Bytecode[i + 1].Value], op.TreeAction);
                     i++;
                 }
                 else
@@ -264,7 +236,7 @@ namespace Hime.Redist.Parsers
                     builder.ReductionPop(op.TreeAction);
                 }
             }
-            builder.Reduce(subRoot, isNewRoot);
+            SubSPPF subRoot = builder.Reduce(head, reduction.prod.HeadAction);
 
             // Get the target state by transition on the rule's head
             int to = GetNextByVar(path.Last.State, head.SymbolID);
@@ -312,7 +284,7 @@ namespace Hime.Redist.Parsers
                     {
                         LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         if (prod.ReductionLength == 0)
-                            reductions.Enqueue(new Reduction(w, prod, epsilon));
+                            reductions.Enqueue(new Reduction(w, prod, builder.Epsilon));
                         else if (reduction.prod.ReductionLength != 0)
                             reductions.Enqueue(new Reduction(path.Last, prod, subRoot));
                     }
@@ -325,7 +297,7 @@ namespace Hime.Redist.Parsers
             // Create next generation
             GSSGeneration gen = stack.GetNextGen();
             // Create the AST for the old token
-            SPPF ast = builder.AcquireNode(oldtoken);
+            SubSPPF ast = builder.AcquireSingleNode(oldtoken);
 
             // Execute all shifts in the queue at this point
             int count = shifts.Count;
@@ -334,7 +306,7 @@ namespace Hime.Redist.Parsers
             return gen;
         }
 
-        private void ExecuteShift(GSSGeneration gen, SPPF ast, Shift shift)
+        private void ExecuteShift(GSSGeneration gen, SubSPPF ast, Shift shift)
         {
             if (gen.Contains(shift.to))
             {
@@ -371,7 +343,7 @@ namespace Hime.Redist.Parsers
                     {
                         LRProduction prod = parserAutomaton.GetProduction(action.Data);
                         if (prod.ReductionLength == 0) // Length 0 => reduce from the head
-                            reductions.Enqueue(new Reduction(w, prod, epsilon));
+                            reductions.Enqueue(new Reduction(w, prod, builder.Epsilon));
                         else // reduce from the second node on the path
                             reductions.Enqueue(new Reduction(shift.from, prod, ast));
                     }
@@ -389,34 +361,6 @@ namespace Hime.Redist.Parsers
                     return action.Data;
             }
             return 0xFFFF;
-        }
-
-        private SPPF ResolveSPPF(int generation, Symbols.Symbol symbol, out bool isNew)
-        {
-            isNew = false;
-            foreach (NodeDic dic in objects)
-            {
-                if (dic.generation == generation)
-                {
-                    foreach (SPPF node in dic.nodes)
-                    {
-                        if (node.OriginalSID == symbol.SymbolID)
-                            return node;
-                    }
-                    isNew = true;
-                    SPPF sppf = builder.AcquireNode(symbol);
-                    dic.nodes.Add(sppf);
-                    return sppf;
-                }
-            }
-            isNew = true;
-            SPPF nn = builder.AcquireNode(symbol);
-            NodeDic nd = new NodeDic();
-            nd.generation = generation;
-            nd.nodes = new List<SPPF>();
-            nd.nodes.Add(nn);
-            objects.Add(nd);
-            return nn;
         }
     }
 }

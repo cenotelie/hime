@@ -62,7 +62,7 @@ namespace Hime.Redist.Parsers
         /// Returns the given GSS node to the common pool
         /// </summary>
         /// <param name="node">The GSS node to return</param>
-        public void ReturnsNode(GSSNode node) { nodesPool.Returns(node); }
+        public void ReturnsNode(GSSNode node) { nodesPool.Return(node); }
         
     	private GSSPath AcquirePath(GSSNode last, int length)
     	{

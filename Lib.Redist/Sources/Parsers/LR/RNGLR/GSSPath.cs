@@ -10,7 +10,7 @@ namespace Hime.Redist.Parsers
     {
     	private Pool<GSSPath> pool;
         private GSSNode last;
-        private SPPF[] labels;
+        private SubSPPF[] labels;
         
         /// <summary>
         /// Gets or sets the final target of this path
@@ -24,7 +24,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets or sets the i-th label of the edges traversed by this path
         /// </summary>
-        public SPPF this[int index]
+        public SubSPPF this[int index]
         {
         	get { return labels[index]; }
         	set { labels[index] = value; }
@@ -39,7 +39,7 @@ namespace Hime.Redist.Parsers
         {
         	this.pool = pool;
         	this.last = null;
-        	this.labels = new SPPF[capacity];
+        	this.labels = new SubSPPF[capacity];
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Hime.Redist.Parsers
         {
             this.pool = null;
             this.last = null;
-            this.labels = new SPPF[capacity];
+            this.labels = new SubSPPF[capacity];
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Hime.Redist.Parsers
         public void Free()
         {
         	if (pool != null)
-        		pool.Returns(this);
+        		pool.Return(this);
         }
     }
 }
