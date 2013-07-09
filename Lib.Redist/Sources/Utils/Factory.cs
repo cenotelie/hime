@@ -1,4 +1,4 @@
-﻿namespace Hime.Redist.Utils
+namespace Hime.Redist.Utils
 {
     /// <summary>
     /// Represents a factory of objects for a pool
