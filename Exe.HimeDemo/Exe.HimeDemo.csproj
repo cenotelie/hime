@@ -92,9 +92,6 @@
     <None Include="Languages\ECMAScript.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Languages\MathExp.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Languages\Test1.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
