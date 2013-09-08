@@ -80,6 +80,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\License.txt">
+      <Link>Properties\License.txt</Link>
+    </Content>
     <Content Include="Hime.Logo.ico" />
   </ItemGroup>
   <ItemGroup>

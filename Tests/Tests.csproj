@@ -93,4 +93,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Integration.tests" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\License.txt">
+      <Link>Properties\License.txt</Link>
+    </Content>
+  </ItemGroup>
 </Project>
