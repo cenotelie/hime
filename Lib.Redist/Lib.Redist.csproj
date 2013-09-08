@@ -66,6 +66,7 @@
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\NullSPPFNode.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SubSPPF.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\TextContent.cs" />

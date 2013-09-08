@@ -80,9 +80,7 @@ namespace Hime.Redist.Parsers
         private Pool<SubSPPF> poolSPPF1024;
         // Constant SPPFs for nullable variables
         private SubSPPF epsilon;
-        private SubSPPF[] nullProds;
         private Dictionary<int, SubSPPF> nullVars;
-        private int nextNull;
         // History data
         private Pool<HistoryPart> poolHP;
         private HistoryPart[] history;
@@ -90,11 +88,11 @@ namespace Hime.Redist.Parsers
         private bool hitHistory;
         // Stack of semantic objects
         private GSSPath stack;
+        private SubSPPF stackFirst;
         private int stackNext;
         // Cache for the reductions
-        private SubTree cache;
+        private SubSPPF cache;
         private int cacheNext;
-        private int popCount;
         // Reduction data
         private int[] handle;
         private int handleNext;
@@ -108,34 +106,18 @@ namespace Hime.Redist.Parsers
             return nullVars[sid];
         }
 
-        public SPPFBuilder(int varCount)
+        public SPPFBuilder()
         {
             this.poolSingle = new Pool<SubSPPF>(new SubTreeFactory(1), 512);
             this.poolSPPF128 = new Pool<SubSPPF>(new SubTreeFactory(128), 128);
             this.poolSPPF1024 = new Pool<SubSPPF>(new SubTreeFactory(1024), 16);
-
             this.epsilon = AcquireSingleNode(Symbols.Epsilon.Instance);
-            this.nullProds = new SubSPPF[varCount];
             this.nullVars = new Dictionary<int, SubSPPF>();
-            this.nextNull = 0;
-
             this.poolHP = new Pool<HistoryPart>(new HistoryPartFactory(this), initHistorySize);
             this.history = new HistoryPart[initHistorySize];
             this.hitHistory = false;
-
+            this.handle = new int[handleSize];
             this.tree = new ParseTree();
-        }
-
-
-        public void CreateNullProduction(LRProduction production, Symbols.Variable head)
-        {
-            SubSPPF sppf = this.AcquireNode(head, production.ReductionLength);
-            if (production.HeadAction != TreeAction.None)
-                sppf.Action = production.HeadAction;
-            if (!nullVars.ContainsKey(head.SymbolID))
-                nullVars.Add(head.SymbolID, sppf);
-            nullProds[nextNull] = sppf;
-            nextNull++;
         }
 
         public void ClearHistory()
@@ -184,32 +166,30 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="path">The path in the GSS</param>
         /// <param name="first">The first SPPF node, or epsilon</param>
-        public void ReductionPrepare(GSSPath path, SubSPPF first)
+        /// <param name="length">The length of the reduction</param>
+        public void ReductionPrepare(GSSPath path, SubSPPF first, int length)
         {
-            SubSPPF subRoot = null;
-            if (reduction.prod.ReductionLength != 0)
-            {
-                subRoot = builder.ResolveSPPF(generation.Index, head, reduction.prod.ReductionLength);
-                if (reduction.prod.HeadAction != TreeAction.None)
-                    subRoot.Action = reduction.prod.HeadAction;
-            }
-            else
-            {
-                // find the nullable sub root
-                subRoot = builder.GetNullSPPF(head.SymbolID);
-            }
-
-
-            stackNext -= length;
             int estimation = estimationBias;
-            for (int i = 0; i != length; i++)
-                estimation += stack[stackNext + i].GetSize();
-            if (estimation <= 128)
-                cache = pool128.Acquire();
-            else if (estimation <= 1024)
-                cache = pool1024.Acquire();
+            stack = path;
+            stackFirst = first;
+            if (length == 0)
+            {
+                stackNext = -1;
+                cache = null;
+            }
             else
-                cache = new SubTree(null, estimation);
+            {
+                stackNext = length - 2;
+                estimation += first.GetSize();
+                for (int i = 0; i != length - 2; i++)
+                    estimation += stack[i].GetSize();
+                if (estimation <= 128)
+                    cache = poolSPPF128.Acquire();
+                else if (estimation <= 1024)
+                    cache = poolSPPF1024.Acquire();
+                else
+                    cache = new SubSPPF(null, estimation);
+            }
             cacheNext = 1;
             handleNext = 0;
             popCount = 0;
@@ -221,7 +201,11 @@ namespace Hime.Redist.Parsers
         /// <param name="action">The tree action to apply to the symbol</param>
         public void ReductionPop(TreeAction action)
         {
-            SubTree sub = stack[stackNext + popCount];
+            SubSPPF sub = null;
+            if (stackNext < 0)
+                sub = stackFirst;
+            else
+                sub = stack[stackNext--];
             if (sub.Action == TreeAction.Replace)
             {
                 // copy the children to the cache
@@ -238,9 +222,7 @@ namespace Hime.Redist.Parsers
                 sub.Free();
             }
             else if (action == TreeAction.Drop)
-            {
-                sub.Free();
-            }
+            { }
             else
             {
                 if (action != TreeAction.None)
@@ -249,9 +231,7 @@ namespace Hime.Redist.Parsers
                 sub.CopyTo(cache, cacheNext);
                 handle[handleNext++] = cacheNext;
                 cacheNext += sub.ChildrenCount + 1;
-                sub.Free();
             }
-            popCount++;
         }
 
         /// <summary>
@@ -261,6 +241,8 @@ namespace Hime.Redist.Parsers
         /// <param name="action">The tree action applied onto the symbol</param>
         public void ReductionVirtual(Symbols.Virtual symbol, TreeAction action)
         {
+            if (cache == null)
+                return; // do not modify an existing nullable SPPF
             if (action == TreeAction.Drop)
                 return; // why would you do this?
             cache.SetAt(cacheNext, symbol, action);
@@ -274,7 +256,15 @@ namespace Hime.Redist.Parsers
         /// <param name="action">The tree action applied onto the symbol</param>
         public void ReductionNullVariable(Symbols.Variable var, TreeAction action)
         {
-
+            if (action == TreeAction.Drop)
+                return;
+            SubSPPF sub = nullVars[var.SymbolID];
+            // copy the complete sub-tree to the cache
+            sub.CopyTo(cache, cacheNext);
+            if (action != TreeAction.None)
+                sub.Action = action; // FIXME do NOT modify sub
+            handle[handleNext++] = cacheNext;
+            cacheNext += sub.ChildrenCount + 1;
         }
 
         /// <summary>

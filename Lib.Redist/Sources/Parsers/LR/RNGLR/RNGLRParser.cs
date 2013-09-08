@@ -55,14 +55,16 @@ namespace Hime.Redist.Parsers
         {
             this.parserAutomaton = automaton;
             this.stack = new GSS(automaton.StatesCount);
-            this.builder = new SPPFBuilder(variables.Length);
+            this.builder = new SPPFBuilder();
+
+            List<NullSPPFNode> nullables = new List<NullSPPFNode>(variables.Length);
             for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
             {
                 ushort index = parserAutomaton.Nullables[i];
                 if (index != 0xFFFF)
                 {
                     LRProduction prod = parserAutomaton.GetProduction(index);
-                    builder.CreateNullProduction(prod, parserVariables[i]);
+                    nullables.Add(new NullSPPFNode(parserVariables[i], prod.HeadAction));
                 }
             }
             for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
@@ -76,7 +78,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private void BuildNullable(int index, LRProduction production)
+        private void BuildNullable(NullSPPFNode node, LRProduction production)
         {
             builder.ReductionPrepare();
             for (int i = 0; i != production.Bytecode.Length; i++)
@@ -211,7 +213,7 @@ namespace Hime.Redist.Parsers
             // Get the rule's head
             Symbols.Variable head = parserVariables[reduction.prod.Head];
             // Build the SPPF
-            builder.ReductionPrepare(path, reduction.first);
+            builder.ReductionPrepare(path, reduction.first, reduction.prod.ReductionLength);
             for (int i = 0; i != reduction.prod.Bytecode.Length; i++)
             {
                 LROpCode op = reduction.prod.Bytecode[i];
