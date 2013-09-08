@@ -7,12 +7,26 @@ namespace Hime.Redist.Lexer
     /// </summary>
     class RewindableTextReader
     {
+        /// <summary>
+        /// Represents a sinle character in a stream of text
+        /// </summary>
         public struct Single
         {
             private char value;
             private bool atEnd;
+            /// <summary>
+            /// Gets the character's value
+            /// </summary>
             public char Value { get { return value; } }
+            /// <summary>
+            /// Gets whether the end of the stream has been reached
+            /// </summary>
             public bool AtEnd { get { return atEnd; } }
+            /// <summary>
+            /// Initializes the character data
+            /// </summary>
+            /// <param name="value">The character's value</param>
+            /// <param name="atEnd">True if the end of the stream has been reached</param>
             public Single(char value, bool atEnd)
             {
                 this.value = value;
