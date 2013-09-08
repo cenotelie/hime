@@ -41,8 +41,9 @@ namespace Hime.Demo.Tasks
             task.Method = ParsingMethod.RNGLALR1;
             task.Execute();
             Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
+            stream.Close();
 
-            System.IO.StreamReader reader = new System.IO.StreamReader("Languages\\FileCentralDogma.gram");
+            System.IO.StreamReader reader = new System.IO.StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
             Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, reader);
             Redist.AST.ASTNode root = parser.Parse();
             reader.Close();

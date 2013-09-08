@@ -86,9 +86,6 @@
     <None Include="Languages\ANSI_C.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Languages\FileCentralDogma.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Languages\CSharp4.gram">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
