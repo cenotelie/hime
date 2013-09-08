@@ -8,6 +8,11 @@ namespace Hime.Redist.Parsers
     public interface IParser
     {
         /// <summary>
+        /// Gets or sets whether the paser should try to recover from errors
+        /// </summary>
+        bool RecoverErrors { get; set; }
+
+        /// <summary>
         /// Gets the errors encountered by the parser
         /// </summary>
         ICollection<Error> Errors { get; }

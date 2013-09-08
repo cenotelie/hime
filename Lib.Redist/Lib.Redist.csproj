@@ -115,7 +115,6 @@
     <Compile Include="Sources\Symbols\Symbol.cs" />
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />
-    <Compile Include="Sources\Utils\ArrayPool.cs" />
     <Compile Include="Sources\Utils\Pool.cs" />
     <Compile Include="Sources\Utils\Factory.cs" />
   </ItemGroup>

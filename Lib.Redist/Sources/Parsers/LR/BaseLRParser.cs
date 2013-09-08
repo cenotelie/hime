@@ -26,10 +26,6 @@ namespace Hime.Redist.Parsers
         /// </summary>
         protected const int maxErrorCount = 100;
         /// <summary>
-        /// Maximum lenght of a rule
-        /// </summary>
-        protected const int maxBodyLength = 128;
-        /// <summary>
         /// Determines whether the parser will try to recover from errors
         /// </summary>
         protected bool recover = true;
@@ -73,9 +69,9 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public ICollection<Error> Errors { get { return readonlyErrors; } }
         /// <summary>
-        /// Gets or sets whether the parser should try to recover from errors or fails immediatly
+        /// Gets or sets whether the paser should try to recover from errors
         /// </summary>
-        public bool TryRecover
+        public bool RecoverErrors
         {
             get { return recover; }
             set { recover = value; }
