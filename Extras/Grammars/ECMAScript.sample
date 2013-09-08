@@ -1,0 +1,155 @@
+/**
+  DISCLAIMER: This sample is extracted from Wikipedia
+  https://en.wikipedia.org/wiki/ECMAScript_syntax
+**/
+
+var x = 0; // A global variable, because it is not in any function
+ 
+function f() {
+  var z = 'foxes', r = 'birds'; // 2 local variables
+  m = 'fish'; // global because it wasn't declared anywhere before
+  function child() {
+     var r = 'monkeys'; // This variable is local and does not affect the "birds" r of the parent function.
+     z = 'penguins'; // The child function is able to access the variables of the parent function, this is called closure.
+  }
+  twenty = 20; // This variable is declared on the next line, but usable anywhere in the function, even before, as here
+  var twenty;
+  child();
+  return x; // We can use x here because it is global
+}
+f();
+alert(z); // This line will raise a ReferenceError exception because the value of z is no longer available
+
+
+
+var test;                  // variable declared but not defined, ...
+                           // ... set to value of undefined
+var testObj = {};
+alert(test);               // test variable exists but value not ...
+                           // ... defined, displays undefined
+alert(testObj.myProp);     // testObj exists, property does not, ...
+                           // ... displays undefined
+alert(undefined == null);  // unenforced type during check, displays true
+alert(undefined === null); // enforce type during check, displays false
+
+
+
+
+function isUndefined(x) { var u; return x === u; } // like this...
+function isUndefined(x) { return x === void 0; }   // ... or that second one
+function isUndefined(x) { return (typeof x) === "undefined"; } // ... or that third one
+
+
+
+var s = new String("Hello !");
+typeof s; // Is 'object'.
+typeof s.valueOf(); // Is 'string'.
+
+
+
+var s1 = new String("Hello !");
+var s2 = new String("Hello !");
+s1 == s2; // Is false, because they are two distinct objects.
+s1.valueOf() == s2.valueOf(); // Is true.
+
+
+
+
+var b = new Boolean(false);   // Object  false {}
+var t = Boolean(b);           // Boolean true
+var f = Boolean(b.valueOf()); // Boolean false
+var n = new Boolean(b);       // Not recommended
+n = new Boolean(b.valueOf()); // Preferred
+ 
+if (0 || -0 || "" || null || undefined || b.valueOf() || !new Boolean() || !t) {
+    alert("Never this");
+} else if ([] && {} && b && typeof b === "object" && b.toString() === "false") {
+    alert("Always this");
+}
+
+
+
+
+
+
+loop1: for (var a = 0; a < 10; a++) {
+   if (a == 4) {
+       break loop1; // Stops after the 4th attempt
+   }
+   alert('a = ' + a);
+   loop2: for (var b = 0; b < 10; ++b) {
+      if (b == 3) {
+         continue loop2; // Number 3 is skipped
+      }
+      if (b == 6) {
+         continue loop1; // Continues the first loop, 'finished' is not shown
+      }
+      alert('b = ' + b);
+   }
+   alert('finished');
+}
+block1: {
+    alert('hello'); // Displays 'hello'
+    break block1;
+    alert('world'); // Will never get here
+}
+goto block1; // Parse error.
+
+
+
+
+
+
+function gcd(segmentA, segmentB) {
+    var diff = segmentA - segmentB;
+    if (diff == 0) 
+        return segmentA;
+    return diff > 0 ? gcd(segmentB, diff) : gcd(segmentA, -diff);
+}
+alert(gcd(60, 40)); // 20
+ 
+var mygcd=gcd; // mygcd is a reference to the same function as gcd. Note no argument ()s.
+alert(mygcd(60, 40)); // 20
+
+
+
+
+
+var myStructure = {
+  name: {
+    first: "Mel",
+    last: "Smith"
+  },
+  age: 33,
+  hobbies: ["chess", "jogging"]
+};
+
+
+
+function px() {return this.prefix + "X";}
+ 
+function Foo(yz) {
+  this.prefix = "a-";
+  if (yz > 0) {
+    this.pyz = function() {return this.prefix + "Y";};
+  } else {
+    this.pyz = function() {return this.prefix + "Z";};
+  }
+  this.m1 = px;
+}
+ 
+var foo1 = new Foo(1);
+var foo2 = new Foo(0);
+foo2.prefix = "b-";
+ 
+alert("foo1/2 " + foo1.pyz() + foo2.pyz());
+// foo1/2 a-Y b-Z
+ 
+foo1.m3 = px; // Assigns the function itself, not its evaluated result, i.e. not px()
+var baz = {"prefix": "c-"};
+baz.m4 = px; // No need for a constructor to make an object.
+ 
+alert("m1/m3/m4 " + foo1.m1() + foo1.m3() + baz.m4());
+// m1/m3/m4 a-X a-X c-X
+ 
+foo1.m2(); // Throws an exception, because foo1.m2 doesn't exist.
