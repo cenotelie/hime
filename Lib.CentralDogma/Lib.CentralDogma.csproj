@@ -179,6 +179,9 @@
     <Compile Include="Sources\Unicode\Span.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\License.txt">
+      <Link>Properties\License.txt</Link>
+    </Content>
     <Content Include="Hime.Logo.ico" />
     <Content Include="Resources\Icons\Hime.Logo.ico" />
     <Content Include="Resources\Visuals\svg\Hime.GoTo.svg" />

@@ -106,6 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
+    <Content Include="..\License.txt">
+        <Link>Properties\License.txt</Link>
+	</Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
