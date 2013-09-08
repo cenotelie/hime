@@ -8,9 +8,9 @@ namespace Hime.Redist.Lexer
     public abstract class TextLexer : ILexer
     {
         // General data
-        private Automaton lexAutomaton;                        // The automaton
-        private SymbolDictionary<Symbols.Terminal> lexTerminals;  // The dictionary of symbols
-        private int lexSeparator;                                       // Symbol ID of the SEPARATOR terminal
+        private Automaton lexAutomaton;                             // The automaton
+        private SymbolDictionary<Symbols.Terminal> lexTerminals;    // The dictionary of symbols
+        private int lexSeparator;                                   // Symbol ID of the SEPARATOR terminal
         // Runtime data
         private TextContent content;            // Container for all read text
         private RewindableTextReader input;     // Lexer's input

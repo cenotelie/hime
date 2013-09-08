@@ -34,14 +34,14 @@ namespace Hime.Redist.Lexer
             }
         }
 
-        private TextReader reader;
-        private TextContent content;
-        private char[] previous;
-        private char[] next;
-        private int nextLength;
-        private char[] buffer;
-        private int bufferStart;
-        private int bufferLength;
+        private TextReader reader;      // The proxied text reader
+        private TextContent content;    // The text content read so far
+        private char[] previous;        // The previous buffer
+        private char[] next;            // The next buffer
+        private int nextLength;         // The length of the next buffer
+        private char[] buffer;          // The current buffer
+        private int bufferStart;        // The starting index of the current buffer
+        private int bufferLength;       // The lenght of the current buffer
 
         /// <summary>
         /// Creates a new Rewindable Text Reader encapsulating the given TextReader
@@ -63,8 +63,11 @@ namespace Hime.Redist.Lexer
             bufferStart = index;
             if (bufferStart < 0)
             {
+                // The index was negative, go back to the previous buffer
+                // Save the current buffer as the next buffer
                 next = buffer;
                 nextLength = bufferLength;
+                // Reset the previous buffer as the current buffer
                 buffer = previous;
                 bufferStart += TextContent.chunksSize;
                 bufferLength = TextContent.chunksSize;
@@ -79,26 +82,31 @@ namespace Hime.Redist.Lexer
         {
             if (bufferStart != bufferLength)
             {
+                // Still not at the end of the current buffer
+                // Return the content from the start to the end of the current buffer
                 int start = bufferStart;
                 bufferStart = bufferLength;
                 return new TextBuffer(buffer, start, bufferLength);
             }
             // We need to go to the next chunck
             previous = buffer;
-            // Is-il already here?
+            // Is-il already here (from a previous call to GoTo)?
             if (next != null)
             {
+                // Reset the current buffer from the saved next buffer
                 buffer = next;
                 bufferLength = nextLength;
                 next = null;
             }
             else
             {
+                // Read the next buffer from the input
                 buffer = new char[TextContent.chunksSize];
                 bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
                 if (bufferLength != 0)
                     content.Append(buffer, bufferLength);
             }
+            // Return the entire current buffer
             bufferStart = bufferLength;
             return new TextBuffer(buffer, 0, bufferLength);
         }
@@ -109,13 +117,15 @@ namespace Hime.Redist.Lexer
         /// <returns>The single character with meta-data</returns>
         public Single ReadOne()
         {
+            // Still not at the end of the current buffer => return a single character
             if (bufferStart != bufferLength)
                 return new Single(buffer[bufferStart++], false);
             // We need to go to the next chunck
             previous = buffer;
-            // Is-il already here?
+            // Is-il already here (from a previous call to GoTo)?
             if (next != null)
             {
+                // Reset the current buffer from the saved next buffer
                 buffer = next;
                 bufferLength = nextLength;
                 next = null;
@@ -124,6 +134,7 @@ namespace Hime.Redist.Lexer
             }
             else
             {
+                // Read the next buffer from the input
                 buffer = new char[TextContent.chunksSize];
                 bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
                 if (bufferLength != 0)
