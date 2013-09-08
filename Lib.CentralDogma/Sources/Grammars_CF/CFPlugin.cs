@@ -18,8 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using Hime.Redist.AST;
-
+using Hime.Redist;
 
 namespace Hime.CentralDogma.Grammars.ContextFree
 {
