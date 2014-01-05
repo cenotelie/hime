@@ -103,7 +103,7 @@ namespace Hime.Redist
         internal IEnumerator<ASTNode> GetEnumeratorAt(int index)
         {
             Cell cell = chunks[index >> upperShift][index & lowerMask];
-            return new Enumerator(this, cell.first - 1, cell.first + cell.count);
+            return new ASTNodeEnumerator(this, cell.first - 1, cell.first + cell.count);
         }
 
         /// <summary>
@@ -147,6 +147,9 @@ namespace Hime.Redist
             cellIndex++;
         }
 
+        /// <summary>
+        /// Adds a new (empty) chunk of cells
+        /// </summary>
         private void AddChunk()
         {
             Cell[] t = new Cell[chunksSize];
@@ -158,41 +161,6 @@ namespace Hime.Redist
             }
             chunks[++chunkIndex] = t;
             cellIndex = 0;
-        }
-
-        private class Enumerator : IEnumerator<ASTNode>
-        {
-            private ParseTree tree;
-            private int start;
-            private int end;
-            private int current;
-
-            public ASTNode Current { get { return new ASTNode(tree, current); } }
-            object System.Collections.IEnumerator.Current { get { return new ASTNode(tree, current); } }
-
-            public Enumerator(ParseTree tree, int start, int end)
-            {
-                this.tree = tree;
-                this.start = start;
-                this.end = end;
-                this.current = start;
-            }
-
-            public void Dispose()
-            {
-                tree = null;
-            }
-
-            public bool MoveNext()
-            {
-                current++;
-                return (current != end);
-            }
-
-            public void Reset()
-            {
-                current = start;
-            }
         }
     }
 }

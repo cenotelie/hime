@@ -60,6 +60,7 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Sources\ASTNodeEnumerator.cs" />
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\SubTree.cs" />
@@ -122,8 +123,8 @@
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
     <Content Include="..\License.txt">
-        <Link>Properties\License.txt</Link>
-	</Content>
+      <Link>Properties\License.txt</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

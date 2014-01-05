@@ -27,7 +27,13 @@ namespace Hime.Redist
     /// </summary>
     public struct ASTFamily : IEnumerable<ASTNode>
     {
+        /// <summary>
+        /// The original parse tree
+        /// </summary>
         private ParseTree tree;
+        /// <summary>
+        /// The index of the parent node in the parse tree
+        /// </summary>
         private int parent;
 
         /// <summary>
@@ -54,6 +60,11 @@ namespace Hime.Redist
         /// <returns>An enumeration of the children</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return tree.GetEnumeratorAt(parent); }
 
+        /// <summary>
+        /// Initializes this family
+        /// </summary>
+        /// <param name="tree">The parent parse tree</param>
+        /// <param name="parent">The index of the parent node in the parse tree</param>
         internal ASTFamily(ParseTree tree, int parent)
         {
             this.tree = tree;

@@ -27,7 +27,13 @@ namespace Hime.Redist
     /// </summary>
     public struct ASTNode
     {
+        /// <summary>
+        /// The parent parse tree
+        /// </summary>
         private ParseTree tree;
+        /// <summary>
+        /// The index of this node in the parse tree
+        /// </summary>
         private int index;
 
         /// <summary>
@@ -40,6 +46,11 @@ namespace Hime.Redist
         /// </summary>
         public ASTFamily Children { get { return new ASTFamily(tree, index); } }
 
+        /// <summary>
+        /// Initializes this node
+        /// </summary>
+        /// <param name="tree">The parent parse tree</param>
+        /// <param name="index">The index of this node in the parse tree</param>
         internal ASTNode(ParseTree tree, int index)
         {
             this.tree = tree;
