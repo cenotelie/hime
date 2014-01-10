@@ -23,17 +23,24 @@ using System.Collections.Generic;
 namespace Hime.Redist.Lexer
 {
     /// <summary>
+    /// Handler for lexical errors
+    /// </summary>
+    /// <param name="error">The new error</param>
+    internal delegate void AddLexicalError(Error error);
+
+
+    /// <summary>
     /// Represents a lexer for a text stream
     /// </summary>
-    public abstract class TextLexer : ILexer
+    public abstract class Lexer
     {
         // General data
         private Automaton lexAutomaton;                             // The automaton
         private SymbolDictionary<Symbols.Terminal> lexTerminals;    // The dictionary of symbols
         private int lexSeparator;                                   // Symbol ID of the SEPARATOR terminal
         // Runtime data
-        private TextContent content;            // Container for all read text
-        private RewindableTextReader input;     // Lexer's input
+        private Content content;            // Container for all read text
+        private RewindableReader input;     // Lexer's input
         private bool isDollatEmited;            // Flags whether the input's end has been reached and the Dollar token emited
         private int index;                      // The current index in the input
 
@@ -45,7 +52,7 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Gets the text content that served as input
         /// </summary>
-        internal TextContent Input { get { return content; } }
+        internal Content Input { get { return content; } }
         
         /// <summary>
         /// Events for lexical errors
@@ -59,13 +66,13 @@ namespace Hime.Redist.Lexer
         /// <param name="terminals">Terminals recognized by this lexer</param>
         /// <param name="separator">SID of the separator token</param>
         /// <param name="input">Input to this lexer</param>
-        protected TextLexer(Automaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
+        protected Lexer(Automaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
         {
             this.lexAutomaton = automaton;
             this.lexTerminals = new SymbolDictionary<Symbols.Terminal>(terminals);
             this.lexSeparator = separator;
-            this.content = new TextContent();
-            this.input = new RewindableTextReader(input, content);
+            this.content = new Content();
+            this.input = new RewindableReader(input, content);
             this.isDollatEmited = false;
         }
 
@@ -82,7 +89,7 @@ namespace Hime.Redist.Lexer
                 Symbols.TextToken token = GetNextToken_DFA();
                 if (token == null)
                 {
-                    RewindableTextReader.Single s = input.ReadOne();
+                    RewindableReader.Single s = input.ReadOne();
                     if (s.AtEnd)
                     {
                         isDollatEmited = true;

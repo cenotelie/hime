@@ -55,17 +55,17 @@ namespace Hime.Demo.Tasks
             win.ShowDialog();
         }
 
-        private Hime.Redist.Lexer.TextLexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
+        private Hime.Redist.Lexer.Lexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
         {
             Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
             ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
             object lexer = lexerConstructor.Invoke(new object[] { reader });
-            return lexer as Hime.Redist.Lexer.TextLexer;
+            return lexer as Hime.Redist.Lexer.Lexer;
         }
 
         private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
         {
-            Hime.Redist.Lexer.TextLexer lexer = GetLexer(assembly, reader);
+            Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
             Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
             Type parserType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaParser");
             ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });

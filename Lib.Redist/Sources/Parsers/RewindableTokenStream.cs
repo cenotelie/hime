@@ -25,11 +25,11 @@ namespace Hime.Redist.Parsers
     /// <summary>
     /// Fast rewindable stream of token encapsulating a lexer
     /// </summary>
-    class RewindableTokenStream : Lexer.ITokenStream
+    class RewindableTokenStream
     {
         private const int ringSize = 32;
 
-        private Lexer.ILexer lexer;
+        private Lexer.Lexer lexer;
         private Symbols.Token[] ring;
         private int ringStart;      // Start index of the ring in case the stream in rewinded
         private int ringNextEntry;  // Index for inserting new characters in the ring
@@ -38,7 +38,7 @@ namespace Hime.Redist.Parsers
         /// Initializes the rewindable stream with the given lexer
         /// </summary>
         /// <param name="lexer">The encapsulated lexer</param>
-        public RewindableTokenStream(Lexer.ILexer lexer)
+        public RewindableTokenStream(Lexer.Lexer lexer)
         {
             this.lexer = lexer;
             this.ring = new Symbols.Token[ringSize];

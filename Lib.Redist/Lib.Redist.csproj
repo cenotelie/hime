@@ -72,12 +72,10 @@
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\NullSPPFNode.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
-    <Compile Include="Sources\Lexer\TextContent.cs" />
+    <Compile Include="Sources\Lexer\Content.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkASTBuilder.cs" />
-    <Compile Include="Sources\Lexer\ILexer.cs" />
-    <Compile Include="Sources\Lexer\ITokenStream.cs" />
     <Compile Include="Sources\Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRAction.cs" />
     <Compile Include="Sources\Parsers\LR\LRActionCode.cs" />
@@ -97,8 +95,8 @@
     <Compile Include="Sources\ErrorType.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRProduction.cs" />
-    <Compile Include="Sources\Lexer\RewindableTextReader.cs" />
-    <Compile Include="Sources\Lexer\TextLexer.cs" />
+    <Compile Include="Sources\Lexer\RewindableReader.cs" />
+    <Compile Include="Sources\Lexer\Lexer.cs" />
     <Compile Include="Sources\Lexer\Automaton.cs" />
     <Compile Include="Sources\ParseTree.cs" />
     <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />

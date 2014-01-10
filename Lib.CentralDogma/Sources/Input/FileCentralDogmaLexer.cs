@@ -29,7 +29,7 @@ using Hime.Redist.Lexer;
 
 namespace Hime.CentralDogma.Input
 {
-    internal class FileCentralDogmaLexer : TextLexer
+    internal class FileCentralDogmaLexer : Lexer
     {
         private static readonly Automaton automaton = Automaton.Find(typeof(FileCentralDogmaLexer), "FileCentralDogmaLexer.bin");
         public static readonly Terminal[] terminals = {

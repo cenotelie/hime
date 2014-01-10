@@ -29,7 +29,7 @@ using Hime.Redist.Lexer;
 
 namespace Hime.HimeCC.CL
 {
-    internal class CommandLineLexer : TextLexer
+    internal class CommandLineLexer : Lexer
     {
         private static readonly Automaton automaton = Automaton.Find(typeof(CommandLineLexer), "CommandLineLexer.bin");
         public static readonly Terminal[] terminals = {

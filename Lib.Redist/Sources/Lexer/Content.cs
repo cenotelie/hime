@@ -30,7 +30,7 @@ namespace Hime.Redist.Lexer
     /// All line numbers and column numbers are 1-based.
     /// Indices in the content are 0-based.
     /// </remarks>
-    class TextContent : ParseResult.Text
+    class Content : ParseResult.Text
     {
         private const int initLineCount = 10000;
         private const int upperShift = 12;
@@ -61,7 +61,7 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Initializes the storage
         /// </summary>
-        public TextContent()
+        public Content()
         {
             this.chunks = new char[chunksSize][];
             this.chunkIndex = 0;

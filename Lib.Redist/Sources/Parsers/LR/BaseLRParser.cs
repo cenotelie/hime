@@ -61,7 +61,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Lexer associated to this parser
         /// </summary>
-        protected Lexer.TextLexer lexer;
+        protected Lexer.Lexer lexer;
 
         
         /// <summary>
@@ -89,7 +89,7 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        protected BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, UserAction[] actions, Lexer.TextLexer lexer)
+        protected BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
         {
             this.parserVariables = new SymbolDictionary<Symbols.Variable>(variables);
             this.parserVirtuals = new SymbolDictionary<Symbols.Virtual>(virtuals);

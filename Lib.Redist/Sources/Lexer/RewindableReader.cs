@@ -25,7 +25,7 @@ namespace Hime.Redist.Lexer
     /// <summary>
     /// Fast rewindable reader of text
     /// </summary>
-    class RewindableTextReader
+    class RewindableReader
     {
         /// <summary>
         /// Represents a sinle character in a stream of text
@@ -55,7 +55,7 @@ namespace Hime.Redist.Lexer
         }
 
         private TextReader reader;      // The proxied text reader
-        private TextContent content;    // The text content read so far
+        private Content content;    // The text content read so far
         private char[] previous;        // The previous buffer
         private char[] next;            // The next buffer
         private int nextLength;         // The length of the next buffer
@@ -68,7 +68,7 @@ namespace Hime.Redist.Lexer
         /// </summary>
         /// <param name="reader">The text reader to encapsulate</param>
         /// <param name="content">The container that will store all read text</param>
-        public RewindableTextReader(TextReader reader, TextContent content)
+        public RewindableReader(TextReader reader, Content content)
         {
             this.reader = reader;
             this.content = content;
@@ -89,8 +89,8 @@ namespace Hime.Redist.Lexer
                 nextLength = bufferLength;
                 // Reset the previous buffer as the current buffer
                 buffer = previous;
-                bufferStart += TextContent.chunksSize;
-                bufferLength = TextContent.chunksSize;
+                bufferStart += Content.chunksSize;
+                bufferLength = Content.chunksSize;
             }
         }
 
@@ -121,8 +121,8 @@ namespace Hime.Redist.Lexer
             else
             {
                 // Read the next buffer from the input
-                buffer = new char[TextContent.chunksSize];
-                bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
+                buffer = new char[Content.chunksSize];
+                bufferLength = reader.Read(buffer, 0, Content.chunksSize);
                 if (bufferLength != 0)
                     content.Append(buffer, bufferLength);
             }
@@ -155,8 +155,8 @@ namespace Hime.Redist.Lexer
             else
             {
                 // Read the next buffer from the input
-                buffer = new char[TextContent.chunksSize];
-                bufferLength = reader.Read(buffer, 0, TextContent.chunksSize);
+                buffer = new char[Content.chunksSize];
+                bufferLength = reader.Read(buffer, 0, Content.chunksSize);
                 if (bufferLength != 0)
                 {
                     content.Append(buffer, bufferLength);

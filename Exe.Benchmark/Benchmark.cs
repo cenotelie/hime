@@ -168,7 +168,7 @@ namespace Hime.Benchmark
         private void OutputInputStats(Assembly assembly)
         {
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
-            Hime.Redist.Lexer.TextLexer lexer = GetLexer(assembly, reader);
+            Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
             Hime.Redist.Symbols.Token token = lexer.GetNextToken();
             int count = 0;
             while (token.SymbolID != 1)
@@ -182,17 +182,17 @@ namespace Hime.Benchmark
             Console.WriteLine("-- tokens: " + count);
         }
 
-        private Hime.Redist.Lexer.TextLexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
+        private Hime.Redist.Lexer.Lexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
         {
             Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
             ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
             object lexer = lexerConstructor.Invoke(new object[] { reader });
-            return lexer as Hime.Redist.Lexer.TextLexer;
+            return lexer as Hime.Redist.Lexer.Lexer;
         }
 
         private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
         {
-            Hime.Redist.Lexer.TextLexer lexer = GetLexer(assembly, reader);
+            Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
             Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
             Type parserType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaParser");
             ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
@@ -203,7 +203,7 @@ namespace Hime.Benchmark
         private void BenchmarkLexer(Assembly assembly, int index)
         {
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
-            Hime.Redist.Lexer.TextLexer lexer = GetLexer(assembly, reader);
+            Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
             System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
             watch.Start();
             Hime.Redist.Symbols.Token token = lexer.GetNextToken();
