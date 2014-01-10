@@ -1,4 +1,4 @@
-/**********************************************************************
+﻿/**********************************************************************
 * Copyright (c) 2013 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
@@ -18,24 +18,31 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System.Collections.Generic;
-
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
     /// <summary>
-    /// Represents a parser
+    /// Reprensents the semantic body of a rule being reduced
     /// </summary>
-    public interface IParser
+    public interface SemanticBody
     {
         /// <summary>
-        /// Gets or sets whether the paser should try to recover from errors
+        /// Gets the symbol at the i-th index
         /// </summary>
-        bool RecoverErrors { get; set; }
+        /// <param name="index">Index of the symbol</param>
+        /// <returns>The symbol at the given index</returns>
+        Symbols.Symbol this[int index] { get; }
 
         /// <summary>
-        /// Parses the input and returns the result
+        /// Gets the length of this body
         /// </summary>
-        /// <returns>A ParseResult object containing the data about the result</returns>
-        ParseResult Parse();
+        int Length { get; }
     }
+
+    /// <summary>
+    /// Delegate for a user-defined semantic action on the given body and with the given parent
+    /// </summary>
+    /// <param name="head">The semantic object for the head</param>
+    /// <param name="body">The current body at the time of the action</param>
+    /// <param name="length">The length of the passed body</param>
+    public delegate void UserAction(Symbols.Variable head, SemanticBody body);
 }

@@ -45,7 +45,7 @@ namespace Hime.Redist.Lexer
         /// <summary>
         /// Gets the text content that served as input
         /// </summary>
-        public TextContent Input { get { return content; } }
+        internal TextContent Input { get { return content; } }
         
         /// <summary>
         /// Events for lexical errors

@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        protected LRkParser(LRkAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
+        protected LRkParser(LRkAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, UserAction[] actions, Lexer.TextLexer lexer)
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
@@ -107,10 +107,10 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
-        /// Parses the input and returns the produced AST
+        /// Parses the input and returns the result
         /// </summary>
-        /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public override ParseTree Parse()
+        /// <returns>A ParseResult object containing the data about the result</returns>
+        public override ParseResult Parse()
         {
             this.stack = new int[maxStackSize];
             Symbols.Token nextToken = input.GetNextToken();
@@ -123,10 +123,10 @@ namespace Hime.Redist.Parsers
                     continue;
                 }
                 if (action == LRActionCode.Accept)
-                    return builder.GetTree();
+                    return new ParseResult(allErrors, lexer.Input, builder.GetTree());
                 nextToken = OnUnexpectedToken(nextToken);
                 if (nextToken == null || allErrors.Count >= maxErrorCount)
-                    return null;
+                    return new ParseResult(allErrors, lexer.Input);
             }
         }
 
@@ -156,7 +156,7 @@ namespace Hime.Redist.Parsers
 
         private void Reduce(LRProduction production)
         {
-            builder.ReductionPrepare(production.ReductionLength);
+            builder.ReductionPrepare(parserVariables[production.Head], production.ReductionLength, production.HeadAction);
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 LROpCode op = production.Bytecode[i];
@@ -175,7 +175,7 @@ namespace Hime.Redist.Parsers
                     builder.ReductionPop(op.TreeAction);
                 }
             }
-            builder.Reduce(parserVariables[production.Head], production.HeadAction);
+            builder.Reduce();
         }
     }
 }

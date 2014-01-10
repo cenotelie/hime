@@ -26,7 +26,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents the builder of Parse Trees for LR(k) parsers
 	/// </summary>
-    class LRkASTBuilder
+    class LRkASTBuilder : SemanticBody
     {
     	private class SubTreeFactory : Factory<SubTree>
 	    {
@@ -55,6 +55,25 @@ namespace Hime.Redist.Parsers
         // Final AST
         private ParseTree tree;
 
+        #region SemanticBody
+        /// <summary>
+        /// Gets the symbol at the i-th index in the cache
+        /// </summary>
+        /// <param name="index">Index of the symbol</param>
+        /// <returns>The symbol at the given index</returns>
+        public Symbols.Symbol this[int index]
+        {
+            get
+            {
+                return cache.GetItem(handle[index]).symbol;
+            }
+        }
+        /// <summary>
+        /// Gets the length of this body
+        /// </summary>
+        public int Length { get { return handleNext; } }
+        #endregion
+
         /// <summary>
         /// Initializes the builder with the given stack size
         /// </summary>
@@ -76,15 +95,17 @@ namespace Hime.Redist.Parsers
         public void StackPush(Symbols.Symbol symbol)
         {
             SubTree single = poolSingle.Acquire();
-            single.Initialize(symbol, 0, TreeAction.None);
+            single.SetupRoot(symbol, 0, TreeAction.None);
             stack[stackNext++] = single;
         }
 
         /// <summary>
         /// Prepares for the forthcoming reduction operations
         /// </summary>
+        /// <param name="var">The reduced variable</param>
         /// <param name="length">The length of the reduction</param>
-        public void ReductionPrepare(int length)
+        /// <param name="action">The tree action applied onto the symbol</param>
+        public void ReductionPrepare(Symbols.Variable var, int length, TreeAction action)
         {
             stackNext -= length;
             int estimation = estimationBias;
@@ -96,6 +117,7 @@ namespace Hime.Redist.Parsers
                 cache = pool1024.Acquire();
             else
                 cache = new SubTree(null, estimation);
+            cache.SetupRoot(var, 0, action);
             cacheNext = 1;
             handleNext = 0;
             popCount = 0;
@@ -108,13 +130,13 @@ namespace Hime.Redist.Parsers
         public void ReductionPop(TreeAction action)
         {
             SubTree sub = stack[stackNext + popCount];
-            if (sub.Action == TreeAction.Replace)
+            if (sub.RootAction == TreeAction.Replace)
             {
                 // copy the children to the cache
                 sub.CopyChildrenTo(cache, cacheNext);
                 // setup the handle
                 int index = 1;
-                for (int i = 0; i != sub.ChildrenCount; i++)
+                for (int i = 0; i != sub.RootChildrenCount; i++)
                 {
                     int size = sub.GetItem(index).count + 1;
                     handle[handleNext++] = cacheNext;
@@ -130,11 +152,11 @@ namespace Hime.Redist.Parsers
             else
             {
                 if (action != TreeAction.None)
-                    sub.Action = action;
+                    sub.RootAction = action;
                 // copy the complete sub-tree to the cache
                 sub.CopyTo(cache, cacheNext);
                 handle[handleNext++] = cacheNext;
-                cacheNext += sub.ChildrenCount + 1;
+                cacheNext += sub.RootChildrenCount + 1;
                 sub.Free();
             }
             popCount++;
@@ -157,78 +179,62 @@ namespace Hime.Redist.Parsers
         /// During a reduction, inserts a semantic action
         /// </summary>
         /// <param name="callback">The semantic action</param>
-        public void ReductionSemantic(SemanticAction callback)
+        public void ReductionSemantic(UserAction callback)
         {
-            cache.SetAt(cacheNext, new Symbols.Action(callback), TreeAction.Semantic);
-            handle[handleNext++] = cacheNext++;
+            callback(cache.RootSymbol as Symbols.Variable, this);
         }
 
         /// <summary>
-        /// Finalizes the reduction opration
+        /// Finalizes the reduction operation
         /// </summary>
-        /// <param name="var">The reduced variable</param>
-        /// <param name="action">The tree action applied onto the variable</param>
-        public void Reduce(Symbols.Variable var, TreeAction action)
+        public void Reduce()
         {
-            // Build the subtree
-            if (action == TreeAction.Replace)
-                ReduceReplaceable(var);
+            if (cache.RootAction == TreeAction.Replace)
+            {
+                cache.RootChildrenCount = handleNext;
+            }
             else
-                ReduceNormal(var);
+            {
+                // promotion data
+                bool promotion = false;
+                int insertion = 1;
+                for (int i = 0; i != handleNext; i++)
+                {
+                    switch (cache.GetAction(handle[i]))
+                    {
+                        case TreeAction.Promote:
+                            if (promotion)
+                            {
+                                // This is not the first promotion
+                                // Commit the previously promoted node's children
+                                cache.RootChildrenCount = insertion - 1;
+                                cache.CommitTo(0, tree);
+                                // Reput the previously promoted node in the cache
+                                cache.Move(0, 1);
+                                insertion = 2;
+                            }
+                            promotion = true;
+                            // Save the new promoted node
+                            cache.Move(handle[i], 0);
+                            // Repack the children on the left if any
+                            cache.MoveRange(handle[i] + 1, insertion, cache.RootChildrenCount);
+                            insertion += cache.RootChildrenCount;
+                            break;
+                        default:
+                            // Commit the children if any
+                            cache.CommitTo(handle[i], tree);
+                            // Repack the sub-root on the left
+                            if (insertion != handle[i])
+                                cache.Move(handle[i], insertion);
+                            insertion++;
+                            break;
+                    }
+                }
+                // finalize the sub-tree data
+                cache.RootChildrenCount = insertion - 1;
+            }
             // Put it on the stack
             stack[stackNext++] = cache;
-        }
-
-        private void ReduceReplaceable(Symbols.Variable var)
-        {
-            cache.Initialize(var, handleNext, TreeAction.Replace);
-        }
-
-        private void ReduceNormal(Symbols.Variable var)
-        {
-            // write the sub-tree root
-            cache.Initialize(var, 0, TreeAction.None);
-
-            // promotion data
-            bool promotion = false;
-            int insertion = 1;
-            for (int i = 0; i != handleNext; i++)
-            {
-                switch (cache.GetAction(handle[i]))
-                {
-                    case TreeAction.Promote:
-                        if (promotion)
-                        {
-                            // This is not the first promotion
-                            // Commit the previously promoted node's children
-                            cache.ChildrenCount = insertion - 1;
-                            cache.CommitTo(0, tree);
-                            // Reput the previously promoted node in the cache
-                            cache.Move(0, 1);
-                            insertion = 2;
-                        }
-                        promotion = true;    
-                        // Save the new promoted node
-                        cache.Move(handle[i], 0);
-                        // Repack the children on the left if any
-                        cache.MoveRange(handle[i] + 1, insertion, cache.ChildrenCount);
-                        insertion += cache.ChildrenCount;
-                        break;
-                    case TreeAction.Semantic:
-                        // TODO: something !
-                        break;
-                    default:
-                        // Commit the children if any
-                        cache.CommitTo(handle[i], tree);
-                        // Repack the sub-root on the left
-                        if (insertion != handle[i])
-                            cache.Move(handle[i], insertion);
-                        insertion++;
-                        break;
-                }
-            }
-            // finalize the sub-tree data
-            cache.ChildrenCount = insertion - 1;
         }
 
         /// <summary>

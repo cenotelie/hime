@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Hime.Redist
@@ -58,7 +59,7 @@ namespace Hime.Redist
         /// Gets an enumeration of the children
         /// </summary>
         /// <returns>An enumeration of the children</returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return tree.GetEnumeratorAt(parent); }
+        IEnumerator IEnumerable.GetEnumerator() { return tree.GetEnumeratorAt(parent); }
 
         /// <summary>
         /// Initializes this family

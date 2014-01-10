@@ -21,7 +21,7 @@
 using System;
 using System.Text;
 
-namespace Hime.Redist
+namespace Hime.Redist.Lexer
 {
     /// <summary>
     /// Stores the content of the text read by a lexer
@@ -30,11 +30,11 @@ namespace Hime.Redist
     /// All line numbers and column numbers are 1-based.
     /// Indices in the content are 0-based.
     /// </remarks>
-    public sealed class TextContent
+    class TextContent : ParseResult.Text
     {
         private const int initLineCount = 10000;
         private const int upperShift = 12;
-    	internal const int chunksSize = 1 << upperShift;
+    	public const int chunksSize = 1 << upperShift;
     	private const int lowerMask = chunksSize - 1;
 
         // Actual text content

@@ -62,15 +62,17 @@
     </Compile>
     <Compile Include="Sources\ASTNodeEnumerator.cs" />
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
+    <Compile Include="Sources\ParseResult.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
+    <Compile Include="Sources\Semantics.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\SubTree.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\NullSPPFNode.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\SubSPPF.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
-    <Compile Include="Sources\TextContent.cs" />
+    <Compile Include="Sources\Lexer\TextContent.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkASTBuilder.cs" />

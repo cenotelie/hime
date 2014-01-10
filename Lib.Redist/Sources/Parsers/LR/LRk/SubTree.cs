@@ -41,9 +41,18 @@ namespace Hime.Redist.Parsers
         private TreeAction[] actions;
 
         /// <summary>
-        /// Gets ot sets the number of children of the root
+        /// Gets ot sets the symbol of the root
         /// </summary>
-        public int ChildrenCount
+        public Symbols.Symbol RootSymbol
+        {
+            get { return items[0].symbol; }
+            set { items[0].symbol = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of children of the root
+        /// </summary>
+        public int RootChildrenCount
         {
             get { return items[0].count; }
             set { items[0].count = value; }
@@ -52,7 +61,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets or sets the action applied to the root
         /// </summary>
-        public TreeAction Action
+        public TreeAction RootAction
         {
             get { return actions[0]; }
             set { actions[0] = value; }
@@ -64,6 +73,7 @@ namespace Hime.Redist.Parsers
         /// <param name="index">The index within the buffer</param>
         /// <returns>The i-th item in the buffer</returns>
         public ParseTree.Cell GetItem(int index) { return items[index]; }
+
         /// <summary>
         /// Gets tree action applied to the i-th item in this sub-tree's buffer
         /// </summary>
@@ -84,12 +94,12 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
-        /// Initializes the content of this sub-tree
+        /// Initializes the root of this sub-tree
         /// </summary>
         /// <param name="symbol">The root's symbol</param>
         /// <param name="childrenCount">The root's number of children</param>
         /// <param name="action">The tree action applied on the root</param>
-        public void Initialize(Symbols.Symbol symbol, int childrenCount, TreeAction action)
+        public void SetupRoot(Symbols.Symbol symbol, int childrenCount, TreeAction action)
         {
             items[0].symbol = symbol;
             items[0].count = childrenCount;

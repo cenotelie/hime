@@ -25,14 +25,6 @@ using System.Text;
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Delegate for a semantic action on the given body and with the given parent
-    /// </summary>
-    /// <param name="head">The semantic object for the head</param>
-    /// <param name="body">The current body at the time of the action</param>
-    /// <param name="length">The length of the passed body</param>
-    public delegate void SemanticAction(Symbols.Variable head, Symbols.Symbol[] body, int length);
-
-    /// <summary>
     /// Represents a base LR parser
     /// </summary>
     public abstract class BaseLRParser : IParser
@@ -61,15 +53,11 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's actions
         /// </summary>
-        protected SemanticAction[] parserActions;
+        protected UserAction[] parserActions;
         /// <summary>
         /// List of the encountered syntaxic errors
         /// </summary>
         protected List<Error> allErrors;
-        /// <summary>
-        /// Read-only list of the errors
-        /// </summary>
-        protected System.Collections.ObjectModel.ReadOnlyCollection<Error> readonlyErrors;
         /// <summary>
         /// Lexer associated to this parser
         /// </summary>
@@ -84,10 +72,7 @@ namespace Hime.Redist.Parsers
         /// Gets the virtual symbols used by this parser
         /// </summary>
         public SymbolDictionary<Symbols.Virtual> Virtuals { get { return parserVirtuals; } }
-        /// <summary>
-        /// Gets a read-only collection of syntaxic errors encountered by the parser
-        /// </summary>
-        public ICollection<Error> Errors { get { return readonlyErrors; } }
+
         /// <summary>
         /// Gets or sets whether the paser should try to recover from errors
         /// </summary>
@@ -104,14 +89,13 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        protected BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, SemanticAction[] actions, Lexer.TextLexer lexer)
+        protected BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, UserAction[] actions, Lexer.TextLexer lexer)
         {
             this.parserVariables = new SymbolDictionary<Symbols.Variable>(variables);
             this.parserVirtuals = new SymbolDictionary<Symbols.Virtual>(virtuals);
             this.parserActions = actions;
             this.recover = true;
             this.allErrors = new List<Error>();
-            this.readonlyErrors = new System.Collections.ObjectModel.ReadOnlyCollection<Error>(allErrors);
             this.lexer = lexer;
             this.lexer.OnError += OnLexicalError;
         }
@@ -126,9 +110,9 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
-        /// Parses the input and returns the produced AST
+        /// Parses the input and returns the result
         /// </summary>
-        /// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
-        public abstract ParseTree Parse();
+        /// <returns>A ParseResult object containing the data about the result</returns>
+        public abstract ParseResult Parse();
     }
 }

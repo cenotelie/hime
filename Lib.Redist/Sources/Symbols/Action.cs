@@ -22,10 +22,10 @@ namespace Hime.Redist.Symbols
 {
     class Action : Symbol
     {
-        private Parsers.SemanticAction callback;
+        private UserAction callback;
 
-        public Parsers.SemanticAction Callback { get { return callback; } }
+        public UserAction Callback { get { return callback; } }
 
-        public Action(Parsers.SemanticAction callback) : base(-1, string.Empty) { this.callback = callback; }
+        public Action(UserAction callback) : base(-1, string.Empty) { this.callback = callback; }
     }
 }

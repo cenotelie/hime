@@ -1,4 +1,4 @@
-/**********************************************************************
+﻿/**********************************************************************
 * Copyright (c) 2013 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
@@ -18,24 +18,20 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System.Collections.Generic;
+using System;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
-    /// <summary>
-    /// Represents a parser
-    /// </summary>
-    public interface IParser
+    class SPPF
     {
-        /// <summary>
-        /// Gets or sets whether the paser should try to recover from errors
-        /// </summary>
-        bool RecoverErrors { get; set; }
+        public struct Node
+        {
+            Symbols.Symbol Symbol { get { return null; } }
 
-        /// <summary>
-        /// Parses the input and returns the result
-        /// </summary>
-        /// <returns>A ParseResult object containing the data about the result</returns>
-        ParseResult Parse();
+            TreeAction Action { get { return TreeAction.None; } }
+
+        }
+
     }
 }
