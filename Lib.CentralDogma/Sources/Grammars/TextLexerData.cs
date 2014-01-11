@@ -49,7 +49,7 @@ namespace Hime.CentralDogma.Grammars
 
         public void ExportCode(StreamWriter stream, string name, AccessModifier modifier, string resource)
         {
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Lexer : TextLexer");
+            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Lexer : Lexer");
             stream.WriteLine("    {");
             ExportStatics(stream, name, resource);
             ExportConstructor(stream, name);
