@@ -25,7 +25,7 @@ namespace Hime.Redist
     /// <summary>
     /// Represents an enumerator of AST nodes that are children of the same parent
     /// </summary>
-    internal class ASTNodeEnumerator : IEnumerator<ASTNode>
+    class ASTNodeEnumerator : IEnumerator<ASTNode>
     {
         private ParseTree tree;
         private int start;

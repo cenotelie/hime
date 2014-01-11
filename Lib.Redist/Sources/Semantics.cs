@@ -21,7 +21,7 @@
 namespace Hime.Redist
 {
     /// <summary>
-    /// Reprensents the semantic body of a rule being reduced
+    /// Represents the semantic body of a rule being reduced
     /// </summary>
     public interface SemanticBody
     {

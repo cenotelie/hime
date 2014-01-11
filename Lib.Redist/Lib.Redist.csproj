@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="Sources\ASTNodeEnumerator.cs" />
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
+    <Compile Include="Sources\ParsedText.cs" />
     <Compile Include="Sources\ParseResult.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
     <Compile Include="Sources\Semantics.cs" />

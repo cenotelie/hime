@@ -25,7 +25,7 @@ namespace Hime.Redist.Symbols
     /// </summary>
     public sealed class TextToken : Token
     {
-        private ParseResult.Text content;
+        private ParsedText content;
         private int index;
         private int length;
 
@@ -58,7 +58,7 @@ namespace Hime.Redist.Symbols
         /// <param name="content">The data content for this token</param>
         /// <param name="index">The token's index</param>
         /// <param name="length">The token's length</param>
-        internal TextToken(int sid, string name, ParseResult.Text content, int index, int length)
+        internal TextToken(int sid, string name, ParsedText content, int index, int length)
             : base(sid, name)
         {
             this.content = content;

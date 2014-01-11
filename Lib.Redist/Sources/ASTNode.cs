@@ -18,8 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System.Collections.Generic;
-
 namespace Hime.Redist
 {
     /// <summary>

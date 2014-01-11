@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -29,81 +28,8 @@ namespace Hime.Redist
     /// </summary>
     public sealed class ParseResult
     {
-        /// <summary>
-        /// Represents the content of the text read by a lexer
-        /// </summary>
-        /// <remarks>
-        /// All line numbers and column numbers are 1-based.
-        /// Indices in the content are 0-based.
-        /// </remarks>
-        public interface Text
-        {
-            /// <summary>
-            /// Gets the number of lines
-            /// </summary>
-            int LineCount { get; }
-
-            /// <summary>
-            /// Gets the size in number of characters
-            /// </summary>
-            int Size { get; }
-
-            /// <summary>
-            /// Gets the substring beginning at the given index with the given length
-            /// </summary>
-            /// <param name="index">Index of the substring from the start</param>
-            /// <param name="length">Length of the substring</param>
-            /// <returns>The substring</returns>
-            string GetValue(int index, int length);
-
-            /// <summary>
-            /// Gets the starting index of the i-th line
-            /// </summary>
-            /// <param name="line">The line number</param>
-            /// <returns>The starting index of the line</returns>
-            /// <remarks>The line numbering is 1-based</remarks>
-            int GetLineIndex(int line);
-
-            /// <summary>
-            /// Gets the length of the i-th line
-            /// </summary>
-            /// <param name="line">The line number</param>
-            /// <returns>The length of the line</returns>
-            /// <remarks>The line numbering is 1-based</remarks>
-            int GetLineLength(int line);
-
-            /// <summary>
-            /// Gets the string content of the i-th line
-            /// </summary>
-            /// <param name="line">The line number</param>
-            /// <returns>The string content of the line</returns>
-            /// <remarks>The line numbering is 1-based</remarks>
-            string GetLineContent(int line);
-
-            /// <summary>
-            /// Gets the line number at the given index
-            /// </summary>
-            /// <param name="index">Index from the start</param>
-            /// <returns>The line number at the index</returns>
-            int GetLineAt(int index);
-
-            /// <summary>
-            /// Gets the column number at the given index
-            /// </summary>
-            /// <param name="index">Index from the start</param>
-            /// <returns>The column number at the index</returns>
-            int GetColumnAt(int index);
-
-            /// <summary>
-            /// Gets the position at the given index
-            /// </summary>
-            /// <param name="index">Index from the start</param>
-            /// <returns>The position (line and column) at the index</returns>
-            TextPosition GetPositionAt(int index);
-        }
-
         private IList<Error> errors;
-        private Text text;
+        private ParsedText text;
         private ParseTree ast;
 
         /// <summary>
@@ -111,7 +37,7 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="errors">The list of errors</param>
         /// <param name="text">The parsed text</param>
-        internal ParseResult(List<Error> errors, Text text)
+        internal ParseResult(List<Error> errors, ParsedText text)
         {
             this.errors = new ReadOnlyCollection<Error>(errors);
             this.text = text;
@@ -123,7 +49,7 @@ namespace Hime.Redist
         /// <param name="errors">The list of errors</param>
         /// <param name="text">The parsed text</param>
         /// <param name="ast">The produced AST</param>
-        internal ParseResult(List<Error> errors, Text text, ParseTree ast)
+        internal ParseResult(List<Error> errors, ParsedText text, ParseTree ast)
         {
             this.errors = new ReadOnlyCollection<Error>(errors);
             this.text = text;
@@ -143,7 +69,7 @@ namespace Hime.Redist
         /// <summary>
         /// Gets the text that has been parse
         /// </summary>
-        public Text Input { get { return text; } }
+        public ParsedText Input { get { return text; } }
 
         /// <summary>
         /// Gets the root of the produced parse tree
