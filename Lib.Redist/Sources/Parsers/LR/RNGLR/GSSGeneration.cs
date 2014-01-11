@@ -89,7 +89,7 @@ namespace Hime.Redist.Parsers
         /// <param name="node">The GSS node to be marked</param>
         public void Mark(GSSNode node)
         {
-            marks.Set(node.State, true);
+            marks[node.State] = true;
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Hime.Redist.Parsers
                 found++;
                 if (!marks[i])
                 {
-                    stack.ReturnsNode(node);
+                    stack.ReturnNode(node);
                     data[i] = null;
                 }
                 if (found == size)

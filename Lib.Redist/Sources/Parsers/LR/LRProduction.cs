@@ -51,7 +51,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public TreeAction HeadAction { get { return headAction; } }
         /// <summary>
-        /// Size of the rule's body by ony counting terminals and variables
+        /// Size of the rule's body by only counting terminals and variables
         /// </summary>
         public int ReductionLength { get { return reducLength; } }
         /// <summary>
