@@ -19,31 +19,31 @@
 **********************************************************************/
 
 using System;
+using System.Collections;
 
 namespace Hime.Redist.Utils
 {
     /// <summary>
-    /// Represents a list of items that is efficient in storage and addition.
+    /// Represents a list of booleans that is efficient in storage and addition.
     /// Items cannot be removed or inserted.
     /// </summary>
-    /// <typeparam name="T">The type of the stored items</typeparam>
-    class BigList<T>
+    class BitList
     {
         private const int upperShift = 10;
         private const int chunksSize = 1 << upperShift;
         private const int lowerMask = chunksSize - 1;
-
-        private T[][] chunks;   // The data
+        
+        private BitArray[] chunks;   // The data
         private int chunkIndex; // The index of the current chunk being filled
         private int cellIndex;  // The index of the next cell to be filled (relatively to the selected chunk)
 
         /// <summary>
         /// Initializes this list
         /// </summary>
-        public BigList()
+        public BitList()
         {
-            this.chunks = new T[chunksSize][];
-            this.chunks[0] = new T[chunksSize];
+            this.chunks = new BitArray[chunksSize];
+            this.chunks[0] = new BitArray(chunksSize);
             this.chunkIndex = 0;
             this.cellIndex = 0;
         }
@@ -61,7 +61,7 @@ namespace Hime.Redist.Utils
         /// </summary>
         /// <param name="index">Index of an item</param>
         /// <returns>The value of the item at the given index</returns>
-        public T this[int index]
+        public bool this[int index]
         {
             get { return chunks[index >> upperShift][index & lowerMask]; }
             set { chunks[index >> upperShift][index & lowerMask] = value; }
@@ -71,43 +71,12 @@ namespace Hime.Redist.Utils
         /// Adds the given value at the end of this list
         /// </summary>
         /// <param name="value">The value to add</param>
-        /// <returns>The index of the value in this list</returns>
-        public int Add(T value)
+        public void Add(bool value)
         {
             if (cellIndex == chunksSize)
                 AddChunk();
             chunks[chunkIndex][cellIndex] = value;
-            int index = (chunkIndex << upperShift | cellIndex);
             cellIndex++;
-            return index;
-        }
-
-        /// <summary>
-        /// Copies the given values at the end of this list
-        /// </summary>
-        /// <param name="values">The values to add</param>
-        /// <param name="index">The starting index of the values to store</param>
-        /// <param name="length">The number of values to store</param>
-        /// <returns>The index within this list at which the values have been added</returns>
-        public int Add(T[] values, int index, int length)
-        {
-            int start = (chunkIndex << upperShift | cellIndex);
-            while (cellIndex + length > chunksSize)
-            {
-                int count = chunksSize - cellIndex;
-                if (count == 0)
-                {
-                    AddChunk();
-                    continue;
-                }
-                Array.Copy(values, index, chunks[chunkIndex], cellIndex, count);
-                index += count;
-                length -= count;
-                AddChunk();
-            }
-            Array.Copy(values, index, chunks[chunkIndex], cellIndex, length);
-            cellIndex += length;
-            return start;
         }
 
         /// <summary>
@@ -115,10 +84,10 @@ namespace Hime.Redist.Utils
         /// </summary>
         private void AddChunk()
         {
-            T[] t = new T[chunksSize];
+            BitArray t = new BitArray(chunksSize);
             if (chunkIndex == chunks.Length - 1)
             {
-                T[][] r = new T[chunks.Length + chunksSize][];
+                BitArray[] r = new BitArray[chunks.Length + chunksSize];
                 Array.Copy(chunks, r, chunks.Length);
                 chunks = r;
             }
