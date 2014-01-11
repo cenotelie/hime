@@ -18,32 +18,36 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-cf grammar CommandLine
+cf grammar MathExp
 {
 	options
 	{
-		Axiom = "line";
-		Separator = "WHITE_SPACE";
+		Axiom = "exp";
+		Separator = "SEPARATOR";
 	}
 	terminals
 	{
-		WHITE_SPACE			-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
-		
-		ARG_NAME			-> '-' '-'? [a-zA-Z] ([a-zA-Z0-9_:] | '-')* ;
+		INTEGER	-> [1-9] [0-9]* | '0' ;
+		REAL	-> INTEGER? '.' INTEGER  (('e' | 'E') ('+' | '-')? INTEGER)?
+				|  INTEGER ('e' | 'E') ('+' | '-')? INTEGER ;
+		NUMBER	-> INTEGER | REAL ;
 
-		ARG_VALUE_QUOTE		-> '"' [^"]* '"';
-		ARG_VALUE_NAME_CHAR	-> [a-zA-Z0-9_.:;,~&%\\/#];
-		ARG_VALUE_NAME		-> ARG_VALUE_NAME_CHAR (ARG_VALUE_NAME_CHAR | '-')* ;
-		ARG_VALUE_NUMBER	-> [1-9] [0-9]* | '0' ;
+		WHITE_SPACE	-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		SEPARATOR	-> WHITE_SPACE+;
 	}
 	rules
 	{
-		value		-> (ARG_VALUE_QUOTE | ARG_VALUE_NAME | ARG_VALUE_NUMBER)^ ;
-		argument	-> ARG_NAME^ value* ;
+		exp_atom-> NUMBER {OnNumber}
+			| '('exp ')' ;
 
-		values		-> value* ;
-		arguments	-> argument* ;
+		exp_op0	-> exp_atom
+			|  exp_op0 '*' exp_atom {OnMult}
+			|  exp_op0 '/' exp_atom {OnDiv};
+		
+		exp_op1	-> exp_op0
+			|  exp_op1 '+' exp_op0 {OnPlus}
+			|  exp_op1 '-' exp_op0 {OnMinus};
 
-		line		-> values arguments ;
+		exp	-> exp_op1 ;
 	}
 }

@@ -26,7 +26,7 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            IExecutable executable = new ParseGrammar();
+            IExecutable executable = new ParseTest("EBNF");
             executable.Execute();
         }
     }

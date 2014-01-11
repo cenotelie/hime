@@ -1,3 +1,23 @@
+/**********************************************************************
+* Copyright (c) 2013 Laurent Wouters and others
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation, either version 3
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General
+* Public License along with this program.
+* If not, see <http://www.gnu.org/licenses/>.
+* 
+* Contributors:
+*     Laurent Wouters - lwouters@xowl.org
+**********************************************************************/
+
 cf grammar ECMAScript
 {
 	options
@@ -12,14 +32,14 @@ cf grammar ECMAScript
 						|  0x2028 /* LS */
 						|  0x2029 /* PS */ ;
 		
-		WhiteSpace  	-> 0x0009 | \uc{Zs} ;
+		WhiteSpace  	-> 0x0020 | 0x0009 | 0x000B | 0x000C ; // 0x0009 | \uc{Zs} ;
 		CommentLine		-> '//' (.* - (.* LineTerminator .*)) LineTerminator ;
 		CommentBlock	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 		
 		Separator		-> (WhiteSpace | CommentLine | CommentBlock | LineTerminator)+;
 		
-		IdStart			-> \uc{Lu} | \uc{Ll} | '_' | '$' ;
-		Identifier		-> IdStart (IdStart | \uc{Nd})* ;
+		IdStart			-> [a-zA-Z_$] ; // \uc{Lu} | \uc{Ll} | '_' | '$' ;
+		Identifier		-> IdStart (IdStart | [0-9])* ; // IdStart (IdStart | \uc{Nd})* ;
 		
 		DecimalInteger	-> '0' | [1-9] [0-9]* ;
 		DecimalLiteral	-> DecimalInteger? '.' [0-9]* ([eE] ('+'|'-')? [0-9]+)?
@@ -59,7 +79,7 @@ cf grammar ECMAScript
 										)* ']'
 									
 								)*
-								'/' (IdStart | \uc{Nd})* ;
+								'/' (IdStart | [0-9])* ;
 		
 	}
 	rules {
@@ -181,6 +201,7 @@ cf grammar ECMAScript
 							|  stmt_iterartion
 							|  stmt_continue
 							|  stmt_break
+							|  stmt_goto
 							|  stmt_return
 							|  stmt_with
 							|  stmt_labelled
@@ -209,6 +230,7 @@ cf grammar ECMAScript
 							|  'continue' Identifier ';' ;
 		stmt_break			-> 'break' ';'
 							|  'break' Identifier ';' ;
+		stmt_goto			-> 'goto' Identifier ';' ;
 		stmt_return			-> 'return' ';'
 							|  'return' expression ';' ;
 		stmt_with			-> 'with' '(' expression ')' statement ;
