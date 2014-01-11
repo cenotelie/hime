@@ -55,11 +55,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Languages\CSharp4.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>

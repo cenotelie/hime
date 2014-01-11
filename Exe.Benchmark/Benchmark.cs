@@ -27,6 +27,9 @@ namespace Hime.Benchmark
 {
     class Benchmark
     {
+        private const string dirExtras = "Extras";
+        private const string dirGrammars = "Grammars";
+
         private string language;
         private string input;
         private string output;
@@ -41,50 +44,15 @@ namespace Hime.Benchmark
 
         public Benchmark()
         {
-            SetupProfileFull();
-        }
-
-        private void SetupProfileFull()
-        {
-            this.language = "CSharp4.gram";
+            this.language = "CSharp4";
             this.input = "Perf.gram";
             this.output = "result.txt";
             this.sampleFactor = 600;
             this.expCount = 50;
-            this.rebuildInput = false;
-            this.rebuildParsers = false;
-            this.doStats = false;
-            this.doLexer = true;
-            this.doParserLALR = false;
-            this.doParserRNGLR = false;
-        }
-
-        private void SetupProfilePerfLexer()
-        {
-            this.language = "CSharp4.gram";
-            this.input = "Perf.gram";
-            this.output = "result.txt";
-            this.sampleFactor = 600;
-            this.expCount = 20;
-            this.rebuildInput = false;
-            this.rebuildParsers = false;
-            this.doStats = false;
-            this.doLexer = true;
-            this.doParserLALR = false;
-            this.doParserRNGLR = false;
-        }
-
-        private void SetupProfilePerfLALR()
-        {
-            this.language = "CSharp4.gram";
-            this.input = "Perf.gram";
-            this.output = "result.txt";
-            this.sampleFactor = 600;
-            this.expCount = 20;
             this.rebuildInput = true;
-            this.rebuildParsers = false;
+            this.rebuildParsers = true;
             this.doStats = false;
-            this.doLexer = false;
+            this.doLexer = true;
             this.doParserLALR = true;
             this.doParserRNGLR = false;
         }
@@ -140,8 +108,17 @@ namespace Hime.Benchmark
 
         private void BuildInput()
         {
-            System.IO.Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Hime.Benchmark.Languages." + language);
-            System.IO.StreamReader reader = new System.IO.StreamReader(stream);
+            DirectoryInfo current = new DirectoryInfo(Environment.CurrentDirectory);
+            DirectoryInfo[] subs = current.GetDirectories(dirExtras);
+            while (subs == null || subs.Length == 0)
+            {
+                current = current.Parent;
+                subs = current.GetDirectories(dirExtras);
+            }
+            DirectoryInfo extras = subs[0];
+            DirectoryInfo grammars = extras.GetDirectories(dirGrammars)[0];
+
+            System.IO.StreamReader reader = new System.IO.StreamReader(Path.Combine(grammars.FullName, language + ".gram"));
             string content = reader.ReadToEnd();
             reader.Close();
             if (System.IO.File.Exists(input))
