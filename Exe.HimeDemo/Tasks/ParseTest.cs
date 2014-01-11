@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
+using Hime.Redist;
 using Hime.Redist.Parsers;
 using Hime.Redist.Lexer;
 
@@ -29,11 +30,13 @@ namespace Hime.Demo.Tasks
 {
     class ParseTest : IExecutable
     {
-        private string name;
+        private string path;
+        private string input;
 
-        public ParseTest(string name)
+        public ParseTest(string path, string input)
         {
-            this.name = name;
+            this.path = path;
+            this.input = input;
         }
 
         public void Execute()
@@ -41,37 +44,41 @@ namespace Hime.Demo.Tasks
             // Build parser assembly
             CompilationTask task = new CompilationTask();
             task.Mode = CompilationMode.Assembly;
-            task.AddInputFile("D:\\Dev\\VisualStudioProjects\\Hime\\Extras\\Grammars\\" + name + ".gram");
+            task.AddInputFile(path + ".gram");
             task.Namespace = "Hime.Demo.Generated";
             task.CodeAccess = AccessModifier.Public;
             task.Method = ParsingMethod.LALR1;
             task.Execute();
-            Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, name + ".dll"));
+            Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, Path.GetFileName(path) + ".dll"));
 
-            TextReader reader = new StreamReader("D:\\Dev\\VisualStudioProjects\\Hime\\Extras\\Grammars\\" + name + ".sample");
-            BaseLRParser parser = GetParser(assembly, reader, name);
-            Redist.AST.ASTNode root = parser.Parse();
+            TextReader reader = null;
+            if (input != null)
+                reader = new StringReader(input);
+            else
+                reader = new StreamReader(path + ".sample");
+            BaseLRParser parser = GetParser(assembly, reader, Path.GetFileName(path));
+            ParseResult result = parser.Parse();
             reader.Close();
-            
-            foreach (ParserError error in parser.Errors)
+
+            foreach (Error error in result.Errors)
                 Console.WriteLine(error.ToString());
-            if (root == null)
+            if (!result.IsSucess)
                 return;
-            WinTreeView win = new WinTreeView(root);
+            WinTreeView win = new WinTreeView(result.Root);
             win.ShowDialog();
         }
 
-        private TextLexer GetLexer(Assembly assembly, TextReader reader, string name)
+        private Lexer GetLexer(Assembly assembly, TextReader reader, string name)
         {
             Type lexerType = assembly.GetType("Hime.Demo.Generated." + name + "Lexer");
             ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(TextReader) });
             object lexer = lexerConstructor.Invoke(new object[] { reader });
-            return lexer as TextLexer;
+            return lexer as Lexer;
         }
 
         private BaseLRParser GetParser(Assembly assembly, TextReader reader, string name)
         {
-            TextLexer lexer = GetLexer(assembly, reader, name);
+            Lexer lexer = GetLexer(assembly, reader, name);
             Type lexerType = assembly.GetType("Hime.Demo.Generated." + name + "Lexer");
             Type parserType = assembly.GetType("Hime.Demo.Generated." + name + "Parser");
             ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });

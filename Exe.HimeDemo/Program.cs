@@ -18,16 +18,38 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
+using System;
+using System.IO;
 using Hime.Demo.Tasks;
 
 namespace Hime.Demo
 {
     public class Program
     {
+        private const string dirExtras = "Extras";
+        private const string dirGrammars = "Grammars";
+
         static void Main()
         {
-            IExecutable executable = new ParseTest("EBNF");
+            string name = "EBNF";
+            string input = null;
+
+            DirectoryInfo extras = FindExtras();
+            DirectoryInfo grammars = extras.GetDirectories(dirGrammars)[0];
+            IExecutable executable = new ParseTest(Path.Combine(grammars.FullName, name), input);
             executable.Execute();
+        }
+
+        private static DirectoryInfo FindExtras()
+        {
+            DirectoryInfo current = new DirectoryInfo(Environment.CurrentDirectory);
+            DirectoryInfo[] subs = current.GetDirectories(dirExtras);
+            while (subs == null || subs.Length == 0)
+            {
+                current = current.Parent;
+                subs = current.GetDirectories(dirExtras);
+            }
+            return subs[0];
         }
     }
 }

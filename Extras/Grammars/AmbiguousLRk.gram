@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -18,21 +18,17 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using Hime.CentralDogma;
-
-namespace Hime.Demo.Tasks
+cf grammar AmbiguousLRk
 {
-    class Compile : IExecutable
-    {
-        public void Execute()
-        {
-            CompilationTask task = new CompilationTask();
-            task.AddInputFile("Languages\\ECMAScript.gram");
-            task.Method = ParsingMethod.RNGLALR1;
-            task.Namespace = "Hime.Demo.Generated";
-            task.OutputLog = true;
-            task.OutputDocumentation = true;
-            task.Execute();
-        }
-    }
+	options
+	{
+		Axiom = "X";
+	}
+	terminals { }
+	rules {
+		A	-> 'a' ;
+		X	-> 'a' X ;
+		X	-> A X ;
+		X	->  ;
+	}
 }
