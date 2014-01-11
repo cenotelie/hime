@@ -44,14 +44,14 @@ namespace Hime.Demo.Tasks
 
             System.IO.StreamReader reader = new System.IO.StreamReader("Languages\\FileCentralDogma.gram");
             Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, new StringReader("aa"));
-            ParseTree ast = parser.Parse();
+            ParseResult result = parser.Parse();
             reader.Close();
-            
-            foreach (Error error in parser.Errors)
+
+            foreach (Error error in result.Errors)
                 Console.WriteLine(error.ToString());
-            if (ast == null)
+            if (!result.IsSucess)
                 return;
-            WinTreeView win = new WinTreeView(ast);
+            WinTreeView win = new WinTreeView(result.Root);
             win.ShowDialog();
         }
 

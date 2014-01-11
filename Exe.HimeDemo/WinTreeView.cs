@@ -32,11 +32,11 @@ namespace Hime.Demo
 {
     partial class WinTreeView : Form
     {
-        public WinTreeView(ParseTree ast)
+        public WinTreeView(ASTNode root)
         {
             InitializeComponent();
-            TreeNode vroot = View.Nodes.Add(GetString(ast.Root));
-            AddSubTree(vroot, ast.Root);
+            TreeNode vroot = View.Nodes.Add(GetString(root));
+            AddSubTree(vroot, root);
         }
 
         private void AddSubTree(TreeNode vnode, ASTNode snode)
