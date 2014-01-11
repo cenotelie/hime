@@ -91,8 +91,8 @@ namespace Hime.HimeCC
             }
 
             // Parse the arguments
-            ParseTree line = ParseArguments(args);
-            if (line == null)
+            ParseResult line = ParseArguments(args);
+            if (!line.IsSucess)
             {
                 Console.WriteLine(ErrorParsingArgs);
                 Console.WriteLine(ErrorPointHelp);
@@ -156,7 +156,7 @@ namespace Hime.HimeCC
             return report.ErrorCount;
         }
 
-        private ParseTree ParseArguments(string[] args)
+        private ParseResult ParseArguments(string[] args)
         {
             StringBuilder builder = new StringBuilder();
             foreach (string arg in args)
@@ -166,12 +166,10 @@ namespace Hime.HimeCC
             }
             CommandLineLexer lexer = new CommandLineLexer(builder.ToString());
             CommandLineParser parser = new CommandLineParser(lexer);
-            ParseTree root = parser.Parse();
-            foreach (Error error in parser.Errors)
+            ParseResult result = parser.Parse();
+            foreach (Error error in result.Errors)
                 Console.WriteLine(error.Message);
-            if (parser.Errors.Count > 0)
-                return null;
-            return root;
+            return result;
         }
 
         private string GetSpecialCommand(ASTNode line)
