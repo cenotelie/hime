@@ -28,10 +28,6 @@ namespace Hime.Redist
     /// </summary>
     class ParseTree
     {
-    	private const int upperShift = 10;
-    	public const int chunksSize = 1 << upperShift;
-    	private const int lowerMask = chunksSize - 1;
-    	
         /// <summary>
         /// Represents the data of a node in this AST
         /// </summary>
@@ -40,12 +36,24 @@ namespace Hime.Redist
             public Symbols.Symbol symbol;
             public int first;
             public int count;
+
+            public Cell(Symbols.Symbol symbol)
+            {
+                this.symbol = symbol;
+                this.first = 0;
+                this.count = 0;
+            }
+
+            public Cell(Symbols.Symbol symbol, int first, int count)
+            {
+                this.symbol = symbol;
+                this.first = first;
+                this.count = count;
+            }
         }
 
-        private Cell[][] chunks; // The content of the tree
-        private int chunkIndex;  // The index of the current chunk being filled
-        private int cellIndex;   // The index of the next cell to be filled (relatively to the selected chunk)
-        private int root;        // The index of the AST's root
+        private Utils.BigList<Cell> cells;
+        private int root;
 
         /// <summary>
         /// Gets the root node of this tree
@@ -57,10 +65,7 @@ namespace Hime.Redist
         /// </summary>
         public ParseTree()
         {
-            this.chunks = new Cell[chunksSize][];
-            this.chunks[0] = new Cell[chunksSize];
-            this.chunkIndex = 0;
-            this.cellIndex = 0;
+            this.cells = new Utils.BigList<Cell>();
             this.root = -1;
         }
 
@@ -71,7 +76,7 @@ namespace Hime.Redist
         /// <returns>The node's symbol</returns>
         public Symbols.Symbol GetSymbolAt(int index)
         {
-            return chunks[index >> upperShift][index & lowerMask].symbol;
+            return cells[index].symbol;
         }
 
         /// <summary>
@@ -81,7 +86,7 @@ namespace Hime.Redist
         /// <returns>The node's numer of children</returns>
         public int GetChildrenCountAt(int index)
         {
-            return chunks[index >> upperShift][index & lowerMask].count;
+            return cells[index].count;
         }
 
         /// <summary>
@@ -92,7 +97,7 @@ namespace Hime.Redist
         /// <returns>The i-th child</returns>
         public ASTNode GetChildrenAt(int parentIndex, int i)
         {
-            return new ASTNode(this, chunks[parentIndex >> upperShift][parentIndex & lowerMask].first + i);
+            return new ASTNode(this, cells[parentIndex].first + i);
         }
 
         /// <summary>
@@ -102,7 +107,7 @@ namespace Hime.Redist
         /// <returns>An enumerator for the children</returns>
         public IEnumerator<ASTNode> GetEnumeratorAt(int index)
         {
-            Cell cell = chunks[index >> upperShift][index & lowerMask];
+            Cell cell = cells[index];
             return new ASTNodeEnumerator(this, cell.first - 1, cell.first + cell.count);
         }
 
@@ -115,23 +120,7 @@ namespace Hime.Redist
         /// <returns>The index within this tree at which the items have been inserted</returns>
         public int Store(Cell[] cells, int index, int length)
         {
-            int start = (chunkIndex << upperShift | cellIndex);
-            while (cellIndex + length > chunksSize)
-            {
-                int count = chunksSize - cellIndex;
-                if (count == 0)
-                {
-                    AddChunk();
-                    continue;
-                }
-                Array.Copy(cells, index, chunks[chunkIndex], cellIndex, count);
-                index += count;
-                length -= count;
-                AddChunk();
-            }
-            Array.Copy(cells, index, chunks[chunkIndex], cellIndex, length);
-            cellIndex += length;
-            return start;
+            return this.cells.Add(cells, index, length);
         }
 
         /// <summary>
@@ -140,27 +129,7 @@ namespace Hime.Redist
         /// <param name="cell">The root</param>
         public void StoreRoot(Cell cell)
         {
-            if (cellIndex == chunksSize)
-                AddChunk();
-            chunks[chunkIndex][cellIndex] = cell;
-            root = (chunkIndex << upperShift | cellIndex);
-            cellIndex++;
-        }
-
-        /// <summary>
-        /// Adds a new (empty) chunk of cells
-        /// </summary>
-        public void AddChunk()
-        {
-            Cell[] t = new Cell[chunksSize];
-            if (chunkIndex == chunks.Length - 1)
-            {
-                Cell[][] r = new Cell[chunks.Length + chunksSize][];
-                Array.Copy(chunks, r, chunks.Length);
-                chunks = r;
-            }
-            chunks[++chunkIndex] = t;
-            cellIndex = 0;
+            this.root = cells.Add(cell);
         }
     }
 }
