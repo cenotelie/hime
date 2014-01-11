@@ -20,12 +20,22 @@
 
 namespace Hime.Redist.Symbols
 {
+    /// <summary>
+    /// Represents a user action as a symbol
+    /// </summary>
     class Action : Symbol
     {
         private UserAction callback;
 
+        /// <summary>
+        /// Gets the user action's callback
+        /// </summary>
         public UserAction Callback { get { return callback; } }
 
+        /// <summary>
+        /// Initializes this symbol
+        /// </summary>
+        /// <param name="callback"></param>
         public Action(UserAction callback) : base(-1, string.Empty) { this.callback = callback; }
     }
 }
