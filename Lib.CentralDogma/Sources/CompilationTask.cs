@@ -271,22 +271,22 @@ namespace Hime.CentralDogma
             bool hasErrors = false;
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
-            ParseTree ast = null;
-            try { ast = parser.Parse(); }
+            ParseResult result = null;
+            try { result = parser.Parse(); }
             catch (Exception ex)
             {
                 reporter.Error("Fatal error in " + name);
                 reporter.Report(ex);
                 hasErrors = true;
             }
-            foreach (Error error in parser.Errors)
+            foreach (Error error in result.Errors)
             {
                 reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
                 hasErrors = true;
             }
-            if (ast != null)
+            if (result.IsSucess)
             {
-                foreach (ASTNode gnode in ast.Root.Children)
+                foreach (ASTNode gnode in result.Root.Children)
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {
@@ -402,7 +402,7 @@ namespace Hime.CentralDogma
         internal void BuildAssembly(string prefix)
         {
             reporter.Info("Building assembly " + prefix + PostfixAssembly + " ...");
-            string redist = Assembly.GetAssembly(typeof(ParseTree)).Location;
+            string redist = Assembly.GetAssembly(typeof(ParseResult)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
             {
                 CompilerParameters compilerparams = new CompilerParameters();
