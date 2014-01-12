@@ -31,7 +31,7 @@ namespace Hime.Redist
         /// <summary>
         /// The original parse tree
         /// </summary>
-        private ParseTree tree;
+        private AST tree;
         /// <summary>
         /// The index of the parent node in the parse tree
         /// </summary>
@@ -40,33 +40,33 @@ namespace Hime.Redist
         /// <summary>
         /// Gets the number of children
         /// </summary>
-        public int Count { get { return tree.GetChildrenCountAt(parent); } }
+        public int Count { get { return tree.GetChildrenCount(parent); } }
 
         /// <summary>
         /// Gets the i-th child
         /// </summary>
         /// <param name="index">The index of the child</param>
         /// <returns>The child at the given index</returns>
-        public ASTNode this[int index] { get { return tree.GetChildrenAt(parent, index); } }
+        public ASTNode this[int index] { get { return tree.GetChild(parent, index); } }
 
         /// <summary>
         /// Gets an enumeration of the children
         /// </summary>
         /// <returns>An enumeration of the children</returns>
-        public IEnumerator<ASTNode> GetEnumerator() { return tree.GetEnumeratorAt(parent); }
+        public IEnumerator<ASTNode> GetEnumerator() { return tree.GetChildren(parent); }
 
         /// <summary>
         /// Gets an enumeration of the children
         /// </summary>
         /// <returns>An enumeration of the children</returns>
-        IEnumerator IEnumerable.GetEnumerator() { return tree.GetEnumeratorAt(parent); }
+        IEnumerator IEnumerable.GetEnumerator() { return tree.GetChildren(parent); }
 
         /// <summary>
         /// Initializes this family
         /// </summary>
         /// <param name="tree">The parent parse tree</param>
         /// <param name="parent">The index of the parent node in the parse tree</param>
-        internal ASTFamily(ParseTree tree, int parent)
+        internal ASTFamily(AST tree, int parent)
         {
             this.tree = tree;
             this.parent = parent;

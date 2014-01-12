@@ -26,7 +26,7 @@ namespace Hime.Redist.Parsers
     struct GSSEdge
     {
         private GSSNode to;
-        private SPPF.Node label;
+        private int label;
         
         /// <summary>
         /// Gets the target node of this edge
@@ -35,14 +35,14 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the label attached to this edge
         /// </summary>
-        public SPPF.Node Label { get { return label; } }
+        public int Label { get { return label; } }
         
         /// <summary>
         /// Initializes this edge
         /// </summary>
         /// <param name="node">The edge's target</param>
         /// <param name="label">The edge's label</param>
-        public GSSEdge(GSSNode node, SPPF.Node label)
+        public GSSEdge(GSSNode node, int label)
         {
         	this.to = node;
         	this.label = label;

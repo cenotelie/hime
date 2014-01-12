@@ -60,14 +60,14 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Sources\ASTNodeEnumerator.cs" />
+    <Compile Include="Sources\AST.cs" />
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
     <Compile Include="Sources\ParsedText.cs" />
     <Compile Include="Sources\ParseResult.cs" />
+    <Compile Include="Sources\Parsers\ASTGraph.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
     <Compile Include="Sources\Semantics.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
-    <Compile Include="Sources\Parsers\LR\LRk\SubTree.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
@@ -97,8 +97,7 @@
     <Compile Include="Sources\Lexer\RewindableReader.cs" />
     <Compile Include="Sources\Lexer\Lexer.cs" />
     <Compile Include="Sources\Lexer\Automaton.cs" />
-    <Compile Include="Sources\ParseTree.cs" />
-    <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />
+    <Compile Include="Sources\Utils\RewindableTokenStream.cs" />
     <Compile Include="Sources\UnexpectedCharError.cs" />
     <Compile Include="Sources\Error.cs" />
     <Compile Include="Sources\UnexpectedTokenError.cs" />
@@ -115,7 +114,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sources\Symbols\Symbol.cs" />
     <Compile Include="Sources\Utils\BigList.cs" />
-    <Compile Include="Sources\Utils\BitList.cs" />
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />
     <Compile Include="Sources\Utils\Pool.cs" />

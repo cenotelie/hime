@@ -28,32 +28,16 @@ namespace Hime.Redist.Parsers
 	/// </summary>
     class LRkASTBuilder : SemanticBody
     {
-    	private class SubTreeFactory : Factory<SubTree>
-	    {
-	        private int capacity;
-	        public SubTreeFactory(int capacity) { this.capacity = capacity; }
-	        public SubTree CreateNew(Pool<SubTree> pool) { return new SubTree(pool, capacity); }
-	    }
-    	
-        private const int handleSize = 1024;
-        private const int estimationBias = 5;
+        // The graph being built
+        private ASTGraph graph;
 
-        // Sub-tree pools
-        private Pool<SubTree> poolSingle;
-        private Pool<SubTree> pool128;
-        private Pool<SubTree> pool1024;
         // Stack of semantic objects
-        private SubTree[] stack;
+        private int[] stack;
         private int stackNext;
-        // Cache for the reductions
-        private SubTree cache;
-        private int cacheNext;
-        private int popCount;
+
         // Reduction data
-        private int[] handle;
-        private int handleNext;
-        // Final AST
-        private ParseTree tree;
+        private int subRoot;
+        private int popCount;
 
         #region SemanticBody
         /// <summary>
@@ -65,13 +49,13 @@ namespace Hime.Redist.Parsers
         {
             get
             {
-                return cache.GetItem(handle[index]).symbol;
+                return graph.GetChild(subRoot, index).Symbol;
             }
         }
         /// <summary>
         /// Gets the length of this body
         /// </summary>
-        public int Length { get { return handleNext; } }
+        public int Length { get { return graph.GetChildrenCount(subRoot); } }
         #endregion
 
         /// <summary>
@@ -80,12 +64,9 @@ namespace Hime.Redist.Parsers
         /// <param name="stackSize">The maximal size of the stack</param>
         public LRkASTBuilder(int stackSize)
         {
-            this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
-            this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
-            this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
-            this.stack = new SubTree[stackSize];
-            this.handle = new int[handleSize];
-            this.tree = new ParseTree();
+            this.graph = new ASTGraph();
+            this.stack = new int[stackSize];
+            this.stackNext = 0;
         }
 
         /// <summary>
@@ -94,9 +75,8 @@ namespace Hime.Redist.Parsers
         /// <param name="symbol">The symbol to push onto the stack</param>
         public void StackPush(Symbols.Symbol symbol)
         {
-            SubTree single = poolSingle.Acquire();
-            single.SetupRoot(symbol, 0, TreeAction.None);
-            stack[stackNext++] = single;
+            int key = graph.CreateNode(symbol);
+            stack[stackNext++] = key;
         }
 
         /// <summary>
@@ -107,20 +87,9 @@ namespace Hime.Redist.Parsers
         /// <param name="action">The tree action applied onto the symbol</param>
         public void ReductionPrepare(Symbols.Variable var, int length, TreeAction action)
         {
-            stackNext -= length;
-            int estimation = estimationBias;
-            for (int i = 0; i != length; i++)
-                estimation += stack[stackNext + i].GetSize();
-            if (estimation <= 128)
-                cache = pool128.Acquire();
-            else if (estimation <= 1024)
-                cache = pool1024.Acquire();
-            else
-                cache = new SubTree(null, estimation);
-            cache.SetupRoot(var, 0, action);
-            cacheNext = 1;
-            handleNext = 0;
+            subRoot = graph.CreateNode(var, action);
             popCount = 0;
+            stackNext -= length;
         }
 
         /// <summary>
@@ -129,35 +98,21 @@ namespace Hime.Redist.Parsers
         /// <param name="action">The tree action to apply to the symbol</param>
         public void ReductionPop(TreeAction action)
         {
-            SubTree sub = stack[stackNext + popCount];
-            if (sub.RootAction == TreeAction.Replace)
+            int sub = stack[stackNext + popCount];
+            TreeAction subAction = graph.GetAction(sub);
+
+            if (subAction == TreeAction.Replace)
             {
-                // copy the children to the cache
-                sub.CopyChildrenTo(cache, cacheNext);
-                // setup the handle
-                int index = 1;
-                for (int i = 0; i != sub.RootChildrenCount; i++)
-                {
-                    int size = sub.GetItem(index).count + 1;
-                    handle[handleNext++] = cacheNext;
-                    cacheNext += size;
-                    index += size;
-                }
-                sub.Free();
+                // Copy the adjacency data
+                graph.AddChildren(subRoot, sub);
             }
             else if (action == TreeAction.Drop)
             {
-                sub.Free();
+                // Do nothing to drop the child
             }
             else
             {
-                if (action != TreeAction.None)
-                    sub.RootAction = action;
-                // copy the complete sub-tree to the cache
-                sub.CopyTo(cache, cacheNext);
-                handle[handleNext++] = cacheNext;
-                cacheNext += sub.RootChildrenCount + 1;
-                sub.Free();
+                graph.AddChild(subRoot, sub, (action != TreeAction.None) ? action : subAction);
             }
             popCount++;
         }
@@ -171,8 +126,7 @@ namespace Hime.Redist.Parsers
         {
             if (action == TreeAction.Drop)
                 return; // why would you do this?
-            cache.SetAt(cacheNext, symbol, action);
-            handle[handleNext++] = cacheNext++;
+            graph.AddChild(subRoot, graph.CreateNode(symbol), action);
         }
 
         /// <summary>
@@ -181,7 +135,7 @@ namespace Hime.Redist.Parsers
         /// <param name="callback">The semantic action</param>
         public void ReductionSemantic(UserAction callback)
         {
-            callback(cache.RootSymbol as Symbols.Variable, this);
+            callback(graph.GetSymbol(subRoot) as Symbols.Variable, this);
         }
 
         /// <summary>
@@ -189,67 +143,20 @@ namespace Hime.Redist.Parsers
         /// </summary>
         public void Reduce()
         {
-            if (cache.RootAction == TreeAction.Replace)
-            {
-                cache.RootChildrenCount = handleNext;
-            }
-            else
-            {
-                // promotion data
-                bool promotion = false;
-                int insertion = 1;
-                for (int i = 0; i != handleNext; i++)
-                {
-                    switch (cache.GetAction(handle[i]))
-                    {
-                        case TreeAction.Promote:
-                            if (promotion)
-                            {
-                                // This is not the first promotion
-                                // Commit the previously promoted node's children
-                                cache.RootChildrenCount = insertion - 1;
-                                cache.CommitTo(0, tree);
-                                // Reput the previously promoted node in the cache
-                                cache.Move(0, 1);
-                                insertion = 2;
-                            }
-                            promotion = true;
-                            // Save the new promoted node
-                            cache.Move(handle[i], 0);
-                            // Repack the children on the left if any
-                            cache.MoveRange(handle[i] + 1, insertion, cache.RootChildrenCount);
-                            insertion += cache.RootChildrenCount;
-                            break;
-                        default:
-                            // Commit the children if any
-                            cache.CommitTo(handle[i], tree);
-                            // Repack the sub-root on the left
-                            if (insertion != handle[i])
-                                cache.Move(handle[i], insertion);
-                            insertion++;
-                            break;
-                    }
-                }
-                // finalize the sub-tree data
-                cache.RootChildrenCount = insertion - 1;
-            }
+            if (graph.GetAction(subRoot) != TreeAction.Replace)
+                graph.ApplyPromotes(subRoot);
             // Put it on the stack
-            stack[stackNext++] = cache;
+            stack[stackNext++] = subRoot;
         }
 
         /// <summary>
         /// Finalizes the parse tree and returns it
         /// </summary>
         /// <returns>The final parse tree</returns>
-        public ParseTree GetTree()
+        public AST GetTree()
         {
-            // Get the axiom's sub tree
-            SubTree sub = stack[stackNext - 2];
-            // Commit the children
-            sub.CommitTo(0, tree);
-            // Commit the root
-            tree.StoreRoot(sub.GetItem(0));
-            return tree;
+            graph.SetupRoot(stack[stackNext - 2]);
+            return graph;
         }
     }
 }

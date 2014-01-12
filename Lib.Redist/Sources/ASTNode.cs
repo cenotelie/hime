@@ -28,7 +28,7 @@ namespace Hime.Redist
         /// <summary>
         /// The parent parse tree
         /// </summary>
-        private ParseTree tree;
+        private AST tree;
         /// <summary>
         /// The index of this node in the parse tree
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hime.Redist
         /// <summary>
         /// Gets the symbol in this node
         /// </summary>
-        public Symbols.Symbol Symbol { get { return tree.GetSymbolAt(index); } }
+        public Symbols.Symbol Symbol { get { return tree.GetSymbol(index); } }
 
         /// <summary>
         /// Gets the children of this node
@@ -49,7 +49,7 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="tree">The parent parse tree</param>
         /// <param name="index">The index of this node in the parse tree</param>
-        internal ASTNode(ParseTree tree, int index)
+        internal ASTNode(AST tree, int index)
         {
             this.tree = tree;
             this.index = index;
@@ -61,7 +61,7 @@ namespace Hime.Redist
         /// <returns>The name of the current node's symbol; or "null" if the node does not have a symbol</returns>
         public override string ToString()
         {
-            Symbols.Symbol symbol = tree.GetSymbolAt(index);
+            Symbols.Symbol symbol = tree.GetSymbol(index);
             if (symbol != null)
                 return symbol.ToString();
             else

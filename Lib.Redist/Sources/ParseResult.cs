@@ -30,7 +30,7 @@ namespace Hime.Redist
     {
         private IList<Error> errors;
         private ParsedText text;
-        private ParseTree ast;
+        private AST ast;
 
         /// <summary>
         /// Initializes this result as a failure
@@ -49,7 +49,7 @@ namespace Hime.Redist
         /// <param name="errors">The list of errors</param>
         /// <param name="text">The parsed text</param>
         /// <param name="ast">The produced AST</param>
-        internal ParseResult(List<Error> errors, ParsedText text, ParseTree ast)
+        internal ParseResult(List<Error> errors, ParsedText text, AST ast)
         {
             this.errors = new ReadOnlyCollection<Error>(errors);
             this.text = text;
