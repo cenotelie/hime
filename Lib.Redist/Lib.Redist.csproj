@@ -66,6 +66,7 @@
     <Compile Include="Sources\ParseResult.cs" />
     <Compile Include="Sources\Parsers\ASTGraph.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
+    <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />
     <Compile Include="Sources\Semantics.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="Sources\Lexer\RewindableReader.cs" />
     <Compile Include="Sources\Lexer\Lexer.cs" />
     <Compile Include="Sources\Lexer\Automaton.cs" />
-    <Compile Include="Sources\Utils\RewindableTokenStream.cs" />
     <Compile Include="Sources\UnexpectedCharError.cs" />
     <Compile Include="Sources\Error.cs" />
     <Compile Include="Sources\UnexpectedTokenError.cs" />
