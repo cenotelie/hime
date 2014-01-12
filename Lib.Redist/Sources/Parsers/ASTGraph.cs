@@ -92,13 +92,7 @@ namespace Hime.Redist.Parsers
             this.adjacents = new Utils.BigList<Adjacent>();
             this.nextAdjacent = 0;
             this.root = -1;
-            CreateNode(Symbols.Epsilon.Instance);
         }
-
-        /// <summary>
-        /// Gets the node for the epsilon symbol
-        /// </summary>
-        public int Epsilon { get { return 0; } }
 
         /// <summary>
         /// Gets the root node of this tree
@@ -193,7 +187,7 @@ namespace Hime.Redist.Parsers
         public void AddChild(int parent, int child, TreeAction action)
         {
             // Get the data of the parent cell
-            Cell pCell = this.cells[parent];
+            Cell pCell = cells[parent];
             if (pCell.count == 0)
             {
                 // This is the first child => fills the parent data
@@ -219,8 +213,8 @@ namespace Hime.Redist.Parsers
         /// <param name="from">Node whose children are to be copied</param>
         public void AddChildren(int parent, int from)
         {
-            Cell pCell = this.cells[parent];
-            Cell fCell = this.cells[from];
+            Cell pCell = cells[parent];
+            Cell fCell = cells[from];
             if (pCell.count == 0)
             {
                 pCell.first = nextAdjacent;

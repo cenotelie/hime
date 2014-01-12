@@ -58,7 +58,13 @@ namespace Hime.Redist.Parsers
         {
             this.history = new HistoryPart[initHistorySize];
             this.nextHP = 0;
+            CreateNode(Symbols.Epsilon.Instance);
         }
+
+        /// <summary>
+        /// Gets the node for the epsilon symbol
+        /// </summary>
+        public int Epsilon { get { return 0; } }
 
         /// <summary>
         /// Clears the current history
