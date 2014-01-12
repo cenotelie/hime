@@ -19,6 +19,7 @@
 **********************************************************************/
 
 using System.Collections.Generic;
+using System.IO;
 
 namespace Hime.Redist.Lexer
 {
@@ -34,26 +35,29 @@ namespace Hime.Redist.Lexer
     /// </summary>
     public abstract class Lexer
     {
+        public const int sidEpsilon = 1;
+        public const int sidDollar = 2;
+
         // General data
-        private Automaton lexAutomaton;                             // The automaton
-        private SymbolDictionary<Symbols.Terminal> lexTerminals;    // The dictionary of symbols
-        private int lexSeparator;                                   // Symbol ID of the SEPARATOR terminal
+        private Automaton lexAutomaton;     // The automaton
+        private SymbolDictionary terminals; // The terminals
+        private int lexSeparator;           // Symbol ID of the SEPARATOR terminal
         // Runtime data
-        private Content content;            // Container for all read text
         private RewindableReader input;     // Lexer's input
-        private bool isDollatEmited;            // Flags whether the input's end has been reached and the Dollar token emited
-        private int index;                      // The current index in the input
+        private TokenizedContent text;      // The tokenized text
+        private bool isDollatEmited;        // Flags whether the input's end has been reached and the Dollar token emited
+        private int index;                  // The current index in the input
 
         /// <summary>
         /// Gets the terminals matched by this lexer
         /// </summary>
-        public SymbolDictionary<Symbols.Terminal> Terminals { get { return lexTerminals; } }
+        public SymbolDictionary Terminals { get { return terminals; } }
 
         /// <summary>
-        /// Gets the text content that served as input
+        /// Gets the lexer's output as a tokenized text
         /// </summary>
-        internal Content Input { get { return content; } }
-        
+        public TokenizedText Output { get { return text; } }
+
         /// <summary>
         /// Events for lexical errors
         /// </summary>
@@ -66,13 +70,13 @@ namespace Hime.Redist.Lexer
         /// <param name="terminals">Terminals recognized by this lexer</param>
         /// <param name="separator">SID of the separator token</param>
         /// <param name="input">Input to this lexer</param>
-        protected Lexer(Automaton automaton, Symbols.Terminal[] terminals, int separator, System.IO.TextReader input)
+        protected Lexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
         {
             this.lexAutomaton = automaton;
-            this.lexTerminals = new SymbolDictionary<Symbols.Terminal>(terminals);
+            this.terminals = new SymbolDictionary(terminals);
             this.lexSeparator = separator;
-            this.content = new Content();
-            this.input = new RewindableReader(input, content);
+            this.text = new TokenizedContent(this.terminals);
+            this.input = new RewindableReader(input, text);
             this.isDollatEmited = false;
         }
 
@@ -80,33 +84,35 @@ namespace Hime.Redist.Lexer
         /// Gets the next token in the input
         /// </summary>
         /// <returns>The next token in the input</returns>
-        public Symbols.Token GetNextToken()
+        public Token GetNextToken()
         {
             if (isDollatEmited)
-                return Symbols.Epsilon.Instance;
+                return new Token(sidEpsilon, 0);
+
             while (true)
             {
-                Symbols.TextToken token = GetNextToken_DFA();
-                if (token == null)
+                Token token = GetNextToken_DFA();
+                if (token.SymbolID == sidEpsilon)
                 {
+                    // Failed to match anything
                     RewindableReader.Single s = input.ReadOne();
-                    if (s.AtEnd)
-                    {
-                        isDollatEmited = true;
-                        return Symbols.Dollar.Instance;
-                    }
-                    else
-                    {
-                        OnError(new UnexpectedCharError(s.Value, content.GetPositionAt(index)));
-                        index++;
-                    }
+                    OnError(new UnexpectedCharError(s.Value, text.GetPositionAt(index)));
+                    index++;
+                }
+                else if (token.SymbolID == sidDollar)
+                {
+                    // At the end of the input
+                    isDollatEmited = true;
+                    return token;
                 }
                 else if (token.SymbolID != lexSeparator)
+                {
                     return token;
+                }
             }
         }
 
-        private Symbols.TextToken GetNextToken_DFA()
+        private Token GetNextToken_DFA()
         {
             int matchedIndex = 0;           // Terminal's index of the last match
             int matchedLength = 0;          // Length of the last match
@@ -115,7 +121,7 @@ namespace Hime.Redist.Lexer
 
             TextBuffer buffer = input.Read();
             if (buffer.IsEmpty)
-                return null; // At the end of input
+                return new Token(sidDollar, 0); // At the end of input
             int i = buffer.Start;
 
             while (state != 0xFFFF)
@@ -148,12 +154,13 @@ namespace Hime.Redist.Lexer
                     state = lexAutomaton.GetFallbackTransition(offset, current);
             }
             input.GoTo(i - (length - matchedLength));
+            
             if (matchedLength == 0)
-                return null;
-            Symbols.Terminal matched = lexTerminals[matchedIndex];
-            Symbols.TextToken token = new Symbols.TextToken(matched.SymbolID, matched.Name, content, index, matchedLength);
+                return new Token(sidEpsilon, 0);
+            
+            Token result = text.OnToken(matchedIndex, index, matchedLength);
             index += matchedLength;
-            return token;
+            return result;
         }
     }
 }

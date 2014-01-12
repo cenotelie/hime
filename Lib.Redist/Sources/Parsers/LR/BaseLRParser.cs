@@ -45,11 +45,11 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's variables
         /// </summary>
-        protected SymbolDictionary<Symbols.Variable> parserVariables;
+        protected SymbolDictionary parserVariables;
         /// <summary>
         /// Parser's virtuals
         /// </summary>
-        protected SymbolDictionary<Symbols.Virtual> parserVirtuals;
+        protected SymbolDictionary parserVirtuals;
         /// <summary>
         /// Parser's actions
         /// </summary>
@@ -67,11 +67,11 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Gets the variable symbols used by this parser
         /// </summary>
-        public SymbolDictionary<Symbols.Variable> Variables { get { return parserVariables; } }
+        public SymbolDictionary Variables { get { return parserVariables; } }
         /// <summary>
         /// Gets the virtual symbols used by this parser
         /// </summary>
-        public SymbolDictionary<Symbols.Virtual> Virtuals { get { return parserVirtuals; } }
+        public SymbolDictionary Virtuals { get { return parserVirtuals; } }
 
         /// <summary>
         /// Gets or sets whether the paser should try to recover from errors
@@ -89,10 +89,10 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        protected BaseLRParser(Symbols.Variable[] variables, Symbols.Virtual[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
+        protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
         {
-            this.parserVariables = new SymbolDictionary<Symbols.Variable>(variables);
-            this.parserVirtuals = new SymbolDictionary<Symbols.Virtual>(virtuals);
+            this.parserVariables = new SymbolDictionary(variables);
+            this.parserVirtuals = new SymbolDictionary(virtuals);
             this.parserActions = actions;
             this.recover = true;
             this.allErrors = new List<Error>();

@@ -45,7 +45,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="index">Index of the symbol</param>
         /// <returns>The symbol at the given index</returns>
-        public Symbols.Symbol this[int index]
+        public Symbol this[int index]
         {
             get
             {
@@ -62,9 +62,9 @@ namespace Hime.Redist.Parsers
         /// Initializes the builder with the given stack size
         /// </summary>
         /// <param name="stackSize">The maximal size of the stack</param>
-        public LRkASTBuilder(int stackSize)
+        public LRkASTBuilder(int stackSize, TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
         {
-            this.graph = new ASTGraph();
+            this.graph = new ASTGraph(text, variables, virtuals);
             this.stack = new int[stackSize];
             this.stackNext = 0;
         }
@@ -72,22 +72,25 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Push a symbol onto the stack
         /// </summary>
-        /// <param name="symbol">The symbol to push onto the stack</param>
-        public void StackPush(Symbols.Symbol symbol)
+        /// <param name="id">The symbol's ID</param>
+        /// <param name="type">The symbol's type</param>
+        /// <param name="index">The symbol's index in its respective table</param>
+        public void StackPush(int id, byte type, int index)
         {
-            int key = graph.CreateNode(symbol);
+            int key = graph.CreateNode(id, type, index);
             stack[stackNext++] = key;
         }
 
         /// <summary>
         /// Prepares for the forthcoming reduction operations
         /// </summary>
-        /// <param name="var">The reduced variable</param>
+        /// <param name="id">The reduced variable id</param>
+        /// <param name="index">The reduced variable index</param>
         /// <param name="length">The length of the reduction</param>
         /// <param name="action">The tree action applied onto the symbol</param>
-        public void ReductionPrepare(Symbols.Variable var, int length, TreeAction action)
+        public void ReductionPrepare(int id, int index, int length, TreeAction action)
         {
-            subRoot = graph.CreateNode(var, action);
+            subRoot = graph.CreateNode(id, ASTGraph.TypeVariable, index, action);
             popCount = 0;
             stackNext -= length;
         }
@@ -120,13 +123,14 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// During a reduction, inserts a virtual symbol
         /// </summary>
-        /// <param name="symbol">The virtual symbol</param>
+        /// <param name="symbol">The virtual symbol's id</param>
+        /// <param name="index">The virtual symbol's index</param>
         /// <param name="action">The tree action applied onto the symbol</param>
-        public void ReductionVirtual(Symbols.Virtual symbol, TreeAction action)
+        public void ReductionVirtual(int id, int index, TreeAction action)
         {
             if (action == TreeAction.Drop)
                 return; // why would you do this?
-            graph.AddChild(subRoot, graph.CreateNode(symbol), action);
+            graph.AddChild(subRoot, graph.CreateNode(id, ASTGraph.TypeVirtual, index), action);
         }
 
         /// <summary>
@@ -135,7 +139,7 @@ namespace Hime.Redist.Parsers
         /// <param name="callback">The semantic action</param>
         public void ReductionSemantic(UserAction callback)
         {
-            callback(graph.GetSymbol(subRoot) as Symbols.Variable, this);
+            callback(graph.GetSymbol(subRoot), this);
         }
 
         /// <summary>

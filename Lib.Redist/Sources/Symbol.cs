@@ -18,55 +18,64 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System;
-using System.Collections.Generic;
-
 namespace Hime.Redist
 {
     /// <summary>
-    /// Represents an Abstract Syntax Tree produced by a parser
+    /// Represents a symbol in an AST
     /// </summary>
-    interface AST
+    public struct Symbol
     {
-        /// <summary>
-        /// Gets the root node of this tree
-        /// </summary>
-        ASTNode Root { get; }
+        private int id;
+        private string name;
+        private string value;
 
         /// <summary>
-        /// Gets the symbol of the given node
+        /// Gets the symbol's identifier
         /// </summary>
-        /// <param name="node">A node</param>
-        /// <returns>The node's symbol</returns>
-        Symbol GetSymbol(int node);
+        public int ID { get { return id; } }
 
         /// <summary>
-        /// Gets the number of children of the given node
+        /// Gets the symbol's name
         /// </summary>
-        /// <param name="node">A node</param>
-        /// <returns>The node's numer of children</returns>
-        int GetChildrenCount(int node);
+        public string Name { get { return name; } }
 
         /// <summary>
-        /// Gets the i-th child of the given node
+        /// Gets the symbol's value
         /// </summary>
-        /// <param name="parent">A node</param>
-        /// <param name="i">The child's number</param>
-        /// <returns>The i-th child</returns>
-        ASTNode GetChild(int parent, int i);
+        public string Value { get { return value; } }
 
         /// <summary>
-        /// Gets an enumerator for the children of the given node
+        /// Initializes this symbol
         /// </summary>
-        /// <param name="parent">A node</param>
-        /// <returns>An enumerator for the children</returns>
-        IEnumerator<ASTNode> GetChildren(int parent);
+        /// <param name="id">The id</param>
+        /// <param name="name">The symbol's name</param>
+        public Symbol(int id, string name)
+        {
+            this.id = id;
+            this.name = name;
+            this.value = name;
+        }
 
         /// <summary>
-        /// Gets the position in the input text of the given node
+        /// Initializes this symbol
         /// </summary>
-        /// <param name="node">A node</param>
-        /// <returns>The position in the text</returns>
-        TextPosition GetPosition(int node);
+        /// <param name="id">The id</param>
+        /// <param name="name">The symbol's name</param>
+        /// <param name="value">The symbol's value</param>
+        public Symbol(int id, string name, string value)
+        {
+            this.id = id;
+            this.name = name;
+            this.value = value;
+        }
+
+        /// <summary>
+        /// Gets a string representation of this symbol
+        /// </summary>
+        /// <returns>The value of this symbol</returns>
+        public override string ToString()
+        {
+            return value;
+        }
     }
 }

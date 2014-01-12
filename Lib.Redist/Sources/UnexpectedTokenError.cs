@@ -32,25 +32,26 @@ namespace Hime.Redist
         /// <summary>
         /// Gets the unexpected token
         /// </summary>
-        public Symbols.Token UnexpectedToken { get; private set; }
+        public Token UnexpectedToken { get; private set; }
 
         /// <summary>
         /// Gets a list of the expected terminals
         /// </summary>
-        public IList<Symbols.Terminal> ExpectedTerminals { get; private set; }
+        public IList<Symbol> ExpectedTerminals { get; private set; }
 
 		/// <summary>
         /// Initializes a new instance of the UnexpectedTokenError class with a token and an array of expected names
 		/// </summary>
 		/// <param name='token'>The unexpected token</param>
 		/// <param name='expected'>The expected terminals</param>
-        internal UnexpectedTokenError(Symbols.Token token, IList<Symbols.Terminal> expected)
-            : base(ErrorType.UnexpectedToken, token.Position)
+        /// <param name="text">The text containing the token</param>
+        internal UnexpectedTokenError(Token token, IList<Symbol> expected, TokenizedText text)
+            : base(ErrorType.UnexpectedToken, text.GetPositionOf(token))
         {
             this.UnexpectedToken = token;
-            this.ExpectedTerminals = new ReadOnlyCollection<Symbols.Terminal>(expected);
+            this.ExpectedTerminals = new ReadOnlyCollection<Symbol>(expected);
             StringBuilder Builder = new StringBuilder("Unexpected token \"");
-            Builder.Append(token.Value.ToString());
+            Builder.Append(text.GetValue(token));
             Builder.Append("\"; expected: { ");
             for (int i = 0; i != expected.Count; i++)
             {

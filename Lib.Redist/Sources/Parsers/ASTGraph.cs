@@ -29,45 +29,58 @@ namespace Hime.Redist.Parsers
     /// </summary>
     class ASTGraph : AST
     {
-        protected struct Cell
+        public const byte TypeToken = 1;
+        public const byte TypeVariable = 2;
+        public const byte TypeVirtual = 3;
+
+        /// <summary>
+        /// Represents a label on a graph's node
+        /// </summary>
+        protected struct Label
         {
-            public Symbols.Symbol symbol;   // node's symbol
-            public int first;               // first adjacent child
-            public int count;               // number of adjacents
-            public Cell(Symbols.Symbol symbol)
+            public int id;      // symbol's identifier
+            public int index;   // index of the symbol in its respective table
+            public byte type;   // symbol's type
+            public Label(int id, byte type, int index)
             {
-                this.symbol = symbol;
+                this.id = id;
+                this.index = index;
+                this.type = type;
+            }
+        }
+
+        /// <summary>
+        /// Represents the data of a
+        /// </summary>
+        protected struct Node
+        {
+            public int originalSID;     // original sid of the node
+            public int first;           // index of the first child in the adjacency table
+            public int count;           // number of children
+            public TreeAction action;   // the action to be applied on this node
+            public Node(int sid)
+            {
+                this.originalSID = sid;
                 this.first = 0;
                 this.count = 0;
+                this.action = TreeAction.None;
             }
-            public Cell(Symbols.Symbol symbol, int first, int count)
+            public Node(int sid, TreeAction action)
             {
-                this.symbol = symbol;
-                this.first = first;
-                this.count = count;
+                this.originalSID = sid;
+                this.first = 0;
+                this.count = 0;
+                this.action = action;
             }
         }
 
-        protected struct Meta
-        {
-            public int originalSID;
-            public TreeAction headAction;
-            public Meta(int originalSID)
-            {
-                this.originalSID = originalSID;
-                this.headAction = TreeAction.None;
-            }
-            public Meta(int originalSID, TreeAction headAction)
-            {
-                this.originalSID = originalSID;
-                this.headAction = headAction;
-            }
-        }
-
+        /// <summary>
+        /// Represents an edge in this graph
+        /// </summary>
         protected struct Adjacent
         {
-            public int child;
-            public TreeAction action;
+            public int child;           // Index of the child node
+            public TreeAction action;   // Action for this child
             public Adjacent(int child, TreeAction action)
             {
                 this.child = child;
@@ -75,9 +88,14 @@ namespace Hime.Redist.Parsers
             }
         }
 
+        // Symbol table data
+        protected TokenizedText tableTokens;
+        protected SymbolDictionary tableVariables;
+        protected SymbolDictionary tableVirtuals;
+
         // Graph data
-        protected Utils.BigList<Cell> cells;
-        protected Utils.BigList<Meta> meta;
+        protected Utils.BigList<Label> labels;
+        protected Utils.BigList<Node> nodes;
         protected Utils.BigList<Adjacent> adjacents;
         protected int nextAdjacent;
         protected int root;
@@ -85,10 +103,14 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes this SPPF
         /// </summary>
-        public ASTGraph()
+        public ASTGraph(TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
         {
-            this.cells = new Utils.BigList<Cell>();
-            this.meta = new Utils.BigList<Meta>();
+            this.tableTokens = text;
+            this.tableVariables = variables;
+            this.tableVirtuals = virtuals;
+
+            this.labels = new Utils.BigList<Label>();
+            this.nodes = new Utils.BigList<Node>();
             this.adjacents = new Utils.BigList<Adjacent>();
             this.nextAdjacent = 0;
             this.root = -1;
@@ -104,9 +126,20 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="node">A node</param>
         /// <returns>The node's symbol</returns>
-        public Symbols.Symbol GetSymbol(int node)
+        public Symbol GetSymbol(int node)
         {
-            return cells[node].symbol;
+            Label label = labels[node];
+            switch (label.type)
+            {
+                case TypeToken:
+                    return tableTokens.GetSymbolAt(label.index);
+                case TypeVariable:
+                    return tableVariables[label.index];
+                case TypeVirtual:
+                    return tableVirtuals[label.index];
+            }
+            // This cannot happen
+            return new Symbol(0, string.Empty);
         }
 
         /// <summary>
@@ -116,7 +149,7 @@ namespace Hime.Redist.Parsers
         /// <returns>The action marking the node</returns>
         public TreeAction GetAction(int node)
         {
-            return meta[node].headAction;
+            return nodes[node].action;
         }
 
         /// <summary>
@@ -126,7 +159,7 @@ namespace Hime.Redist.Parsers
         /// <returns>The node's numer of children</returns>
         public int GetChildrenCount(int node)
         {
-            return cells[node].count;
+            return nodes[node].count;
         }
 
         /// <summary>
@@ -137,7 +170,7 @@ namespace Hime.Redist.Parsers
         /// <returns>The i-th child</returns>
         public ASTNode GetChild(int parent, int i)
         {
-            return new ASTNode(this, adjacents[cells[parent].first + i].child);
+            return new ASTNode(this, adjacents[nodes[parent].first + i].child);
         }
 
         /// <summary>
@@ -151,27 +184,44 @@ namespace Hime.Redist.Parsers
         }
 
         /// <summary>
+        /// Gets the position in the input text of the given node
+        /// </summary>
+        /// <param name="node">A node</param>
+        /// <returns>The position in the text</returns>
+        public TextPosition GetPosition(int node)
+        {
+            Label label = labels[node];
+            if (label.type == TypeToken)
+                return tableTokens.GetPositionOf(tableTokens[label.index]); ;
+            return new TextPosition(0, 0);
+        }
+
+        /// <summary>
         /// Creates a new node with the given symbol.
         /// This node will not be marked for replacement.
         /// </summary>
-        /// <param name="symbol">The new node's symbol</param>
+        /// <param name="id">The symbol's ID</param>
+        /// <param name="type">The symbol's type</param>
+        /// <param name="index">The symbol's index in its respective table</param>
         /// <returns>The new node</returns>
-        public int CreateNode(Symbols.Symbol symbol)
+        public int CreateNode(int id, byte type, int index)
         {
-            cells.Add(new Cell(symbol));
-            return meta.Add(new Meta(symbol.SymbolID));
+            labels.Add(new Label(id, type, index));
+            return nodes.Add(new Node(id));
         }
 
         /// <summary>
         /// Creates a new node with the given symbol
         /// </summary>
-        /// <param name="symbol">The new node's symbol</param>
+        /// <param name="id">The symbol's ID</param>
+        /// <param name="type">The symbol's type</param>
+        /// <param name="index">The symbol's index in its respective table</param>
         /// <param name="action">The action applied on this node</param>
         /// <returns>The new node</returns>
-        public int CreateNode(Symbols.Symbol symbol, TreeAction action)
+        public int CreateNode(int id, byte type, int index, TreeAction action)
         {
-            cells.Add(new Cell(symbol));
-            return meta.Add(new Meta(symbol.SymbolID, action));
+            labels.Add(new Label(id, type, index));
+            return nodes.Add(new Node(id, action));
         }
 
         /// <summary>
@@ -187,20 +237,20 @@ namespace Hime.Redist.Parsers
         public void AddChild(int parent, int child, TreeAction action)
         {
             // Get the data of the parent cell
-            Cell pCell = cells[parent];
-            if (pCell.count == 0)
+            Node pNode = nodes[parent];
+            if (pNode.count == 0)
             {
                 // This is the first child => fills the parent data
-                pCell.first = nextAdjacent;
-                pCell.count = 1;
+                pNode.first = nextAdjacent;
+                pNode.count = 1;
             }
             else
             {
                 // Just increment the number of children
-                pCell.count = pCell.count + 1;
+                pNode.count = pNode.count + 1;
             }
             // Push the parent data back into the node list
-            cells[parent] = pCell;
+            nodes[parent] = pNode;
             // Add the child to the adjacency list
             adjacents.Add(new Adjacent(child, action));
             nextAdjacent++;
@@ -213,22 +263,22 @@ namespace Hime.Redist.Parsers
         /// <param name="from">Node whose children are to be copied</param>
         public void AddChildren(int parent, int from)
         {
-            Cell pCell = cells[parent];
-            Cell fCell = cells[from];
-            if (pCell.count == 0)
+            Node pNode = nodes[parent];
+            Node fNode = nodes[from];
+            if (pNode.count == 0)
             {
-                pCell.first = nextAdjacent;
-                pCell.count = fCell.count;
+                pNode.first = nextAdjacent;
+                pNode.count = fNode.count;
             }
             else
             {
-                pCell.count += fCell.count;
+                pNode.count += fNode.count;
             }
             // Push the data back into the node list
-            cells[parent] = pCell;
+            nodes[parent] = pNode;
             // Do the copy
-            adjacents.Duplicate(fCell.first, fCell.count);
-            nextAdjacent += fCell.count;
+            adjacents.Duplicate(fNode.first, fNode.count);
+            nextAdjacent += fNode.count;
         }
 
         /// <summary>
@@ -247,13 +297,13 @@ namespace Hime.Redist.Parsers
         public void ApplyPromotes(int subRoot)
         {
             // Get the root data
-            Cell rootCell = cells[subRoot];
+            Node rootNode = nodes[subRoot];
 
             // Pre-check for promote actions
             bool hasPromotion = false;
-            for (int i = 0; i != rootCell.count; i++)
+            for (int i = 0; i != rootNode.count; i++)
             {
-                if (adjacents[rootCell.first + i].action == TreeAction.Promote)
+                if (adjacents[rootNode.first + i].action == TreeAction.Promote)
                 {
                     hasPromotion = true;
                     break;
@@ -264,25 +314,26 @@ namespace Hime.Redist.Parsers
                 return;
 
             // The data of the current root
-            Cell current = rootCell;
+            Node current = rootNode;
             current.first = nextAdjacent;
             current.count = 0;
             
             // Apply the promotion actions
             // Index of the promoted node
             int promoted = -1;
-            for (int i = 0; i != rootCell.count; i++)
+            for (int i = 0; i != rootNode.count; i++)
             {
-                Adjacent adjacent = adjacents[rootCell.first + i];
+                Adjacent adjacent = adjacents[rootNode.first + i];
                 if (adjacent.action == TreeAction.Promote)
                 {
                     // Get the child data
-                    Cell child = cells[adjacent.child];
+                    Node child = nodes[adjacent.child];
                     if (promoted != -1)
                     {
                         // This is not the first promotion
                         // Save the promoted node data
-                        cells[promoted] = current;
+                        labels[promoted] = labels[subRoot];
+                        nodes[promoted] = current;
                         // Initialize a new set of children
                         current.first = nextAdjacent;
                         current.count = 1;
@@ -291,7 +342,7 @@ namespace Hime.Redist.Parsers
                     }
                     promoted = adjacent.child;
                     // Promote the symbol
-                    current.symbol = child.symbol;
+                    labels[subRoot] = labels[adjacent.child];
                     // Add the children
                     adjacents.Duplicate(child.first, child.count);
                     nextAdjacent += child.count;
@@ -307,7 +358,7 @@ namespace Hime.Redist.Parsers
             }
 
             // Push back the root data
-            cells[subRoot] = current;
+            nodes[subRoot] = current;
         }
 
         /// <summary>
@@ -323,9 +374,9 @@ namespace Hime.Redist.Parsers
             public ChildEnumerator(ASTGraph graph, int node)
             {
                 this.graph = graph;
-                this.first = graph.cells[node].first;
+                this.first = graph.nodes[node].first;
                 this.current = this.first - 1;
-                this.end = this.first + graph.cells[node].count;
+                this.end = this.first + graph.nodes[node].count;
             }
 
             /// <summary>

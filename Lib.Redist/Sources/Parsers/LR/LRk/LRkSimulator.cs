@@ -31,7 +31,7 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Parser's variables
         /// </summary>
-        protected SymbolDictionary<Symbols.Variable> parserVariables;
+        protected SymbolDictionary parserVariables;
         /// <summary>
         /// LR(k) parsing table and productions
         /// </summary>
@@ -56,11 +56,11 @@ namespace Hime.Redist.Parsers
         /// <param name="inserted">Token to insert, or null if none should be inserted</param>
         /// <param name="advance">Returns the number of token used from the input</param>
         /// <returns>True of the parser matches the input, false otherwise</returns>
-        public bool TestForLength(int length, Symbols.Token inserted, out int advance)
+        public bool TestForLength(int length, Token inserted, out int advance)
         {
             int remaining = length;
-            Symbols.Token nextToken = (inserted != null) ? inserted : input.GetNextToken();
-            advance = (inserted == null) ? 1 : 0;
+            Token nextToken = (inserted.SymbolID != 0) ? inserted : input.GetNextToken();
+            advance = (inserted.SymbolID != 0) ? 1 : 0;
             while (true)
             {
                 LRActionCode action = RecognizeOnToken(nextToken);
@@ -78,7 +78,7 @@ namespace Hime.Redist.Parsers
             }
         }
 
-        private LRActionCode RecognizeOnToken(Symbols.Token token)
+        private LRActionCode RecognizeOnToken(Token token)
         {
             while (true)
             {
@@ -91,9 +91,9 @@ namespace Hime.Redist.Parsers
                 else if (action.Code == LRActionCode.Reduce)
                 {
                     LRProduction production = parserAutomaton.GetProduction(action.Data);
-                    Symbols.Variable var = parserVariables[production.Head];
+                    Symbol var = parserVariables[production.Head];
                     head -= production.ReductionLength;
-                    action = parserAutomaton.GetAction(stack[head], var.SymbolID);
+                    action = parserAutomaton.GetAction(stack[head], var.ID);
                     stack[++head] = action.Data;
                     continue;
                 }

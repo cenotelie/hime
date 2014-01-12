@@ -30,7 +30,7 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="index">Index of the symbol</param>
         /// <returns>The symbol at the given index</returns>
-        Symbols.Symbol this[int index] { get; }
+        Symbol this[int index] { get; }
 
         /// <summary>
         /// Gets the length of this body
@@ -44,5 +44,5 @@ namespace Hime.Redist
     /// <param name="head">The semantic object for the head</param>
     /// <param name="body">The current body at the time of the action</param>
     /// <param name="length">The length of the passed body</param>
-    public delegate void UserAction(Symbols.Variable head, SemanticBody body);
+    public delegate void UserAction(Symbol head, SemanticBody body);
 }

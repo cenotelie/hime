@@ -30,7 +30,7 @@ namespace Hime.Redist.Parsers
         private const int ringSize = 32;
 
         private Lexer.Lexer lexer;
-        private Symbols.Token[] ring;
+        private Token[] ring;
         private int ringStart;      // Start index of the ring in case the stream in rewinded
         private int ringNextEntry;  // Index for inserting new characters in the ring
 
@@ -41,22 +41,22 @@ namespace Hime.Redist.Parsers
         public RewindableTokenStream(Lexer.Lexer lexer)
         {
             this.lexer = lexer;
-            this.ring = new Symbols.Token[ringSize];
+            this.ring = new Token[ringSize];
             this.ringStart = 0;
             this.ringNextEntry = 0;
         }
 
         private bool IsRingEmpty() { return (ringStart == ringNextEntry); }
 
-        private Symbols.Token ReadRing()
+        private Token ReadRing()
         {
-            Symbols.Token token = ring[ringStart++];
+            Token token = ring[ringStart++];
             if (ringStart == ring.Length)
                 ringStart = 0;
             return token;
         }
 
-        private void PushInRing(Symbols.Token value)
+        private void PushInRing(Token value)
         {
             ring[ringNextEntry++] = value;
             if (ringNextEntry == ringSize)
@@ -79,11 +79,11 @@ namespace Hime.Redist.Parsers
         /// Gets the next token in the stream
         /// </summary>
         /// <returns>The next token</returns>
-        public Symbols.Token GetNextToken()
+        public Token GetNextToken()
         {
             if (!IsRingEmpty())
                 return ReadRing();
-            Symbols.Token value = lexer.GetNextToken();
+            Token value = lexer.GetNextToken();
             PushInRing(value);
             return value;
         }

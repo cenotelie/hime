@@ -28,10 +28,10 @@ namespace Hime.Redist
     /// The symbols can be accessed by name or index.
     /// </summary>
     /// <typeparam name="T">The type of the symbols</typeparam>
-    public sealed class SymbolDictionary<T> : IDictionary<string, T> where T : Symbols.Symbol
+    public sealed class SymbolDictionary : IDictionary<string, Symbol>
     {
-        private Dictionary<string, T> impl;
-        private T[] raw;
+        private Dictionary<string, Symbol> impl;
+        private Symbol[] raw;
 
         /// <summary>
         /// Determines whether the collection is read-only. Always true.
@@ -48,13 +48,13 @@ namespace Hime.Redist
         /// <summary>
         /// Gets a collection of symbols
         /// </summary>
-        public ICollection<T> Values { get { return impl.Values; } }
+        public ICollection<Symbol> Values { get { return impl.Values; } }
         /// <summary>
         /// Gets the symbol corresponding to the given name
         /// </summary>
         /// <param name="key">A symbol's name</param>
         /// <returns>The symbol with the given name</returns>
-        public T this[string key]
+        public Symbol this[string key]
         {
             get { return impl[key]; }
             set { throw new NotImplementedException(); }
@@ -64,17 +64,17 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="index">A symbol's index</param>
         /// <returns>The symbol at the given index</returns>
-        public T this[int index] { get { return raw[index]; } }
+        public Symbol this[int index] { get { return raw[index]; } }
 
         /// <summary>
         /// Initializes this dictionary from the given array of symbols
         /// </summary>
         /// <param name="data">The symbols serving as data for this dictionary</param>
-        public SymbolDictionary(T[] data)
+        public SymbolDictionary(Symbol[] data)
         {
             this.raw = data;
-            this.impl = new Dictionary<string, T>();
-            foreach (T item in data)
+            this.impl = new Dictionary<string, Symbol>();
+            foreach (Symbol item in data)
                 this.impl.Add(item.Name, item);
         }
 
@@ -82,7 +82,7 @@ namespace Hime.Redist
         /// Gets an enumerator of key-value pairs of symbols with their name
         /// </summary>
         /// <returns>An enumerator of key-value pairs of symbols with their name</returns>
-        public IEnumerator<KeyValuePair<string, T>> GetEnumerator() { return impl.GetEnumerator(); }
+        public IEnumerator<KeyValuePair<string, Symbol>> GetEnumerator() { return impl.GetEnumerator(); }
         /// <summary>
         /// Gets an enumerator of key-value pairs of symbols with their name
         /// </summary>
@@ -94,7 +94,7 @@ namespace Hime.Redist
         /// <param name="key">The name to search for</param>
         /// <param name="value">The symbol with the given name, or null if none is found</param>
         /// <returns>True if a symbol is found</returns>
-        public bool TryGetValue(string key, out T value) { return impl.TryGetValue(key, out value); }
+        public bool TryGetValue(string key, out Symbol value) { return impl.TryGetValue(key, out value); }
 
         /// <summary>
         /// Determines whether a symbol with the given name exists
@@ -107,7 +107,7 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="item">A pair of name and symbol</param>
         /// <returns>True if the pair is in the collection</returns>
-        public bool Contains(KeyValuePair<string, T> item) { return (impl.ContainsKey(item.Key) && impl[item.Key] == item.Value); }
+        public bool Contains(KeyValuePair<string, Symbol> item) { return (impl.ContainsKey(item.Key) && impl[item.Key].ID == item.Value.ID); }
 
         /// <summary>
         /// Adds a symbol with its name in the collection.
@@ -115,13 +115,13 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="key">The name of the symbol</param>
         /// <param name="value">The symbol</param>
-        public void Add(string key, T value) { throw new NotImplementedException(); }
+        public void Add(string key, Symbol value) { throw new NotImplementedException(); }
         /// <summary>
         /// Adds a pair of name and symbol in the collection
         /// This method is not implemented
         /// </summary>
         /// <param name="item">The pair to add to the collection</param>
-        public void Add(KeyValuePair<string, T> item) { throw new NotImplementedException(); }
+        public void Add(KeyValuePair<string, Symbol> item) { throw new NotImplementedException(); }
         /// <summary>
         /// Removes the symbol with the given name from the collection
         /// This method is not implemented
@@ -135,7 +135,7 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="item">The pair of name and symbol to remove</param>
         /// <returns>True if the corresponding pair was removed</returns>
-        public bool Remove(KeyValuePair<string, T> item) { throw new NotImplementedException(); }
+        public bool Remove(KeyValuePair<string, Symbol> item) { throw new NotImplementedException(); }
         /// <summary>
         /// Removes all data in this collection
         /// This method is not implemented
@@ -147,6 +147,6 @@ namespace Hime.Redist
         /// </summary>
         /// <param name="array">The array to copy to</param>
         /// <param name="arrayIndex">The starting index in the array</param>
-        public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex) { throw new NotImplementedException(); }
+        public void CopyTo(KeyValuePair<string, Symbol>[] array, int arrayIndex) { throw new NotImplementedException(); }
     }
 }

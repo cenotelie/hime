@@ -62,7 +62,10 @@
     </Compile>
     <Compile Include="Sources\AST.cs" />
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
-    <Compile Include="Sources\ParsedText.cs" />
+    <Compile Include="Sources\Token.cs" />
+    <Compile Include="Sources\Lexer\TokenizedContent.cs" />
+    <Compile Include="Sources\Symbol.cs" />
+    <Compile Include="Sources\Text.cs" />
     <Compile Include="Sources\ParseResult.cs" />
     <Compile Include="Sources\Parsers\ASTGraph.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="Sources\Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCode.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCodeValues.cs" />
+    <Compile Include="Sources\TokenizedText.cs" />
     <Compile Include="Sources\TreeAction.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSNode.cs" />
@@ -101,18 +105,9 @@
     <Compile Include="Sources\UnexpectedCharError.cs" />
     <Compile Include="Sources\Error.cs" />
     <Compile Include="Sources\UnexpectedTokenError.cs" />
-    <Compile Include="Sources\Symbols\Action.cs" />
-    <Compile Include="Sources\Symbols\Terminal.cs" />
-    <Compile Include="Sources\Symbols\Token.cs" />
-    <Compile Include="Sources\Symbols\Dollar.cs" />
-    <Compile Include="Sources\Symbols\Epsilon.cs" />
-    <Compile Include="Sources\Symbols\TextToken.cs" />
-    <Compile Include="Sources\Symbols\Variable.cs" />
-    <Compile Include="Sources\Symbols\Virtual.cs" />
     <Compile Include="Sources\ASTNode.cs" />
     <Compile Include="Sources\Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sources\Symbols\Symbol.cs" />
     <Compile Include="Sources\Utils\BigList.cs" />
     <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />

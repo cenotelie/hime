@@ -21,13 +21,13 @@
 namespace Hime.Redist
 {
     /// <summary>
-    /// Represents the content of the text read by a lexer
+    /// Represents the input of parser with some metadata for line endings
     /// </summary>
     /// <remarks>
     /// All line numbers and column numbers are 1-based.
     /// Indices in the content are 0-based.
     /// </remarks>
-    public interface ParsedText
+    public interface Text
     {
         /// <summary>
         /// Gets the number of lines

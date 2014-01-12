@@ -37,7 +37,12 @@ namespace Hime.Redist
         /// <summary>
         /// Gets the symbol in this node
         /// </summary>
-        public Symbols.Symbol Symbol { get { return tree.GetSymbol(index); } }
+        public Symbol Symbol { get { return tree.GetSymbol(index); } }
+
+        /// <summary>
+        /// Gets the position int he input text of this node
+        /// </summary>
+        public TextPosition Position { get { return tree.GetPosition(index); } }
 
         /// <summary>
         /// Gets the children of this node
@@ -58,14 +63,10 @@ namespace Hime.Redist
         /// <summary>
         /// Gets a string representation of this node
         /// </summary>
-        /// <returns>The name of the current node's symbol; or "null" if the node does not have a symbol</returns>
+        /// <returns>The string representation of the associated symbol</returns>
         public override string ToString()
         {
-            Symbols.Symbol symbol = tree.GetSymbol(index);
-            if (symbol != null)
-                return symbol.ToString();
-            else
-                return "null";
+            return tree.GetSymbol(index).ToString();
         }
     }
 }

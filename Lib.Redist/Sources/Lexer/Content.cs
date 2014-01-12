@@ -30,7 +30,7 @@ namespace Hime.Redist.Lexer
     /// All line numbers and column numbers are 1-based.
     /// Indices in the content are 0-based.
     /// </remarks>
-    class Content : ParsedText
+    class Content : Text
     {
         private const int initLineCount = 10000;
         private const int upperShift = 12;

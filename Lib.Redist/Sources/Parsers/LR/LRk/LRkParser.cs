@@ -55,36 +55,36 @@ namespace Hime.Redist.Parsers
         /// <param name="virtuals">The parser's virtuals</param>
         /// <param name="actions">The parser's actions</param>
         /// <param name="lexer">The input lexer</param>
-        protected LRkParser(LRkAutomaton automaton, Symbols.Variable[] variables, Symbols.Virtual[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
+        protected LRkParser(LRkAutomaton automaton, Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
             : base(variables, virtuals, actions, lexer)
         {
             this.parserAutomaton = automaton;
             this.input = new RewindableTokenStream(lexer);
-            this.builder = new LRkASTBuilder(maxStackSize);
+            this.builder = new LRkASTBuilder(maxStackSize, lexer.Output, parserVariables, parserVirtuals);
         }
 
-        private Symbols.Token OnUnexpectedToken(Symbols.Token token)
+        private Token OnUnexpectedToken(Token token)
         {
             ICollection<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
-            List<Symbols.Terminal> expected = new List<Symbols.Terminal>();
+            List<Symbol> expected = new List<Symbol>();
             foreach (int index in expectedIDs)
                 expected.Add(lexer.Terminals[index]);
-            allErrors.Add(new UnexpectedTokenError(token, expected));
-            if (!recover) return null;
+            allErrors.Add(new UnexpectedTokenError(token, expected, lexer.Output));
+            if (!recover) return new Token(0, 0);
             if (TryDrop1Unexpected()) return input.GetNextToken();
             if (TryDrop2Unexpected()) return input.GetNextToken();
-            foreach (Symbols.Terminal terminal in expected)
+            foreach (Symbol terminal in expected)
             {
-                Symbols.TextToken dummy = new Symbols.TextToken(terminal.SymbolID, terminal.Name, null, 0, 0);
+                Token dummy = new Token(terminal.ID, 0);
                 if (TryInsertExpected(dummy))
                     return dummy;
             }
-            return null;
+            return new Token(0, 0);
         }
         private bool TryDrop1Unexpected()
         {
             int used = 0;
-            bool success = (new Simulator(this)).TestForLength(3, null, out used);
+            bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
             input.Rewind(used);
             return success;
         }
@@ -92,13 +92,13 @@ namespace Hime.Redist.Parsers
         {
             input.GetNextToken();
             int used = 0;
-            bool success = (new Simulator(this)).TestForLength(3, null, out used);
+            bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
             input.Rewind(used);
             if (!success)
                 input.Rewind(1);
             return success;
         }
-        private bool TryInsertExpected(Symbols.Token terminal)
+        private bool TryInsertExpected(Token terminal)
         {
             int used = 0;
             bool success = (new Simulator(this)).TestForLength(3, terminal, out used);
@@ -113,7 +113,7 @@ namespace Hime.Redist.Parsers
         public override ParseResult Parse()
         {
             this.stack = new int[maxStackSize];
-            Symbols.Token nextToken = input.GetNextToken();
+            Token nextToken = input.GetNextToken();
             while (true)
             {
                 LRActionCode action = ParseOnToken(nextToken);
@@ -123,14 +123,14 @@ namespace Hime.Redist.Parsers
                     continue;
                 }
                 if (action == LRActionCode.Accept)
-                    return new ParseResult(allErrors, lexer.Input, builder.GetTree());
+                    return new ParseResult(allErrors, lexer.Output, builder.GetTree());
                 nextToken = OnUnexpectedToken(nextToken);
-                if (nextToken == null || allErrors.Count >= maxErrorCount)
-                    return new ParseResult(allErrors, lexer.Input);
+                if (nextToken.SymbolID == 0 || allErrors.Count >= maxErrorCount)
+                    return new ParseResult(allErrors, lexer.Output);
             }
         }
 
-        private LRActionCode ParseOnToken(Symbols.Token token)
+        private LRActionCode ParseOnToken(Token token)
         {
             while (true)
             {
@@ -138,7 +138,7 @@ namespace Hime.Redist.Parsers
                 if (action.Code == LRActionCode.Shift)
                 {
                     stack[++head] = action.Data;
-                    builder.StackPush(token);
+                    builder.StackPush(token.SymbolID, ASTGraph.TypeToken, token.Index);
                     return action.Code;
                 }
                 else if (action.Code == LRActionCode.Reduce)
@@ -146,7 +146,7 @@ namespace Hime.Redist.Parsers
                     LRProduction production = parserAutomaton.GetProduction(action.Data);
                     head -= production.ReductionLength;
                     Reduce(production);
-                    action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].SymbolID);
+                    action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].ID);
                     stack[++head] = action.Data;
                     continue;
                 }
@@ -156,7 +156,8 @@ namespace Hime.Redist.Parsers
 
         private void Reduce(LRProduction production)
         {
-            builder.ReductionPrepare(parserVariables[production.Head], production.ReductionLength, production.HeadAction);
+            Symbol variable = parserVariables[production.Head];
+            builder.ReductionPrepare(variable.ID, production.Head, production.ReductionLength, production.HeadAction);
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 LROpCode op = production.Bytecode[i];
@@ -167,7 +168,9 @@ namespace Hime.Redist.Parsers
                 }
                 else if (op.IsAddVirtual)
                 {
-                    builder.ReductionVirtual(parserVirtuals[production.Bytecode[i + 1].Value], op.TreeAction);
+                    int index = production.Bytecode[i + 1].Value;
+                    Symbol virt = parserVirtuals[index];
+                    builder.ReductionVirtual(virt.ID, index, op.TreeAction);
                     i++;
                 }
                 else

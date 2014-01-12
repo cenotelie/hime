@@ -54,11 +54,12 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Initializes this SPPF
         /// </summary>
-        public SPPF()
+        public SPPF(TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
+            : base(text, variables, virtuals)
         {
             this.history = new HistoryPart[initHistorySize];
             this.nextHP = 0;
-            CreateNode(Symbols.Epsilon.Instance);
+            CreateNode(1, TypeToken, 0);
         }
 
         /// <summary>
@@ -84,17 +85,18 @@ namespace Hime.Redist.Parsers
         /// If a node is not found in the history, it will be created.
         /// </summary>
         /// <param name="generation">The identifier of the generation to look the node into</param>
-        /// <param name="variable">The symbol associated to the node to look for</param>
+        /// <param name="id">The symbol's id associated to the node to look for</param>
+        /// <param name="index">The symbol's index associated to the node to look for</param>
         /// <param name="action">The action applied on this node</param>
         /// <returns>The resolved SPPF node</returns>
-        public int Resolve(int generation, Symbols.Variable variable, TreeAction action)
+        public int Resolve(int generation, int id, int index, TreeAction action)
         {
             // Sets the hit flag to false
             hitHistory = false;
             // Try to resolve against existing generations
             for (int i = 0; i != nextHP; i++)
                 if (history[i].generation == generation)
-                    return Resolve(history[i], variable, action);
+                    return Resolve(history[i], id, index, action);
             
             // The generation to look for does not exists
             if (nextHP == history.Length)
@@ -112,7 +114,7 @@ namespace Hime.Redist.Parsers
             history[nextHP].index = 1;
             
             //  Create the result
-            int result = CreateNode(variable, action);
+            int result = CreateNode(id, TypeVariable, index, action);
             // Push it into the history part
             history[nextHP].data[0] = result;
             
@@ -124,16 +126,17 @@ namespace Hime.Redist.Parsers
         /// Resolves a SPPf node against the given history part representing a generation
         /// </summary>
         /// <param name="part">The history part to look into</param>
-        /// <param name="variable">The symbol associated to the node to look for</param>
+        /// <param name="id">The symbol's id associated to the node to look for</param>
+        /// <param name="index">The symbol's index associated to the node to look for</param>
         /// <param name="action">The action applied on this node</param>
         /// <returns>The resolved SPPF node</returns>
-        private int Resolve(HistoryPart part, Symbols.Variable variable, TreeAction action)
+        private int Resolve(HistoryPart part, int id, int index, TreeAction action)
         {
             // Look for the given symbol in the node at this generation
             for (int i = 0; i != part.index; i++)
             {
                 // If the symbol ID matches
-                if (meta[part.data[i]].originalSID == variable.SymbolID)
+                if (nodes[part.data[i]].originalSID == id)
                 {
                     // This is a hit
                     hitHistory = true;
@@ -146,7 +149,7 @@ namespace Hime.Redist.Parsers
                 Array.Copy(part.data, temp, part.data.Length);
                 part.data = temp;
             }
-            int result = CreateNode(variable, action);
+            int result = CreateNode(id, TypeVariable, index, action);
             part.data[part.index++] = result;
             return result;
         }
