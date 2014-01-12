@@ -29,9 +29,10 @@ namespace Hime.Redist.Utils
     /// <typeparam name="T">The type of the stored items</typeparam>
     class BigList<T>
     {
-        private const int upperShift = 10;
+        private const int upperShift = 13;
         private const int chunksSize = 1 << upperShift;
         private const int lowerMask = chunksSize - 1;
+        private const int initChunkCount = chunksSize;
 
         private T[][] chunks;   // The data
         private int chunkIndex; // The index of the current chunk being filled
@@ -42,7 +43,7 @@ namespace Hime.Redist.Utils
         /// </summary>
         public BigList()
         {
-            this.chunks = new T[chunksSize][];
+            this.chunks = new T[initChunkCount][];
             this.chunks[0] = new T[chunksSize];
             this.chunkIndex = 0;
             this.cellIndex = 0;
@@ -156,7 +157,7 @@ namespace Hime.Redist.Utils
             T[] t = new T[chunksSize];
             if (chunkIndex == chunks.Length - 1)
             {
-                T[][] r = new T[chunks.Length + chunksSize][];
+                T[][] r = new T[chunks.Length + initChunkCount][];
                 Array.Copy(chunks, r, chunks.Length);
                 chunks = r;
             }
