@@ -75,8 +75,9 @@
     <Compile Include="IExecutable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\ParseTest.cs" />
     <Compile Include="Tasks\ParseGrammar.cs" />
+    <Compile Include="Tasks\ParseLanguage.cs" />
+    <Compile Include="Tasks\Bootstrap.cs" />
     <Compile Include="WinTreeView.cs">
       <SubType>Form</SubType>
     </Compile>

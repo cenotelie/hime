@@ -28,12 +28,12 @@ using Hime.Redist.Lexer;
 
 namespace Hime.Demo.Tasks
 {
-    class ParseTest : IExecutable
+    class ParseLanguage : IExecutable
     {
         private string path;
         private string input;
 
-        public ParseTest(string path, string input)
+        public ParseLanguage(string path, string input)
         {
             this.path = path;
             this.input = input;

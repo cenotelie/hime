@@ -36,7 +36,9 @@ namespace Hime.Demo
 
             DirectoryInfo extras = FindExtras();
             DirectoryInfo grammars = extras.GetDirectories(dirGrammars)[0];
-            IExecutable executable = new ParseTest(Path.Combine(grammars.FullName, name), input);
+            
+            //IExecutable executable = new ParseLanguage(Path.Combine(grammars.FullName, name), input);
+            IExecutable executable = new Bootstrap();
             executable.Execute();
         }
 
