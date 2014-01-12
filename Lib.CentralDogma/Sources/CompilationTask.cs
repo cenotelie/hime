@@ -25,7 +25,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Hime.Redist;
-using Hime.Redist.Symbols;
 
 namespace Hime.CentralDogma
 {
@@ -290,8 +289,7 @@ namespace Hime.CentralDogma
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {
-                        TextToken token = gnode.Symbol as TextToken;
-                        reporter.Error(name + " @" + token.Position + " No compiler plugin found for resource " + gnode.Symbol.Name);
+                        reporter.Error(name + " @" + gnode.Position + " No compiler plugin found for resource " + gnode.Symbol.Name);
                         hasErrors = true;
                         continue;
                     }
@@ -382,7 +380,7 @@ namespace Hime.CentralDogma
             writer.WriteLine(" */");
             writer.WriteLine();
             writer.WriteLine("using System.Collections.Generic;");
-            writer.WriteLine("using Hime.Redist.Symbols;");
+            writer.WriteLine("using Hime.Redist;");
             if (lexer)
                 writer.WriteLine("using Hime.Redist.Lexer;");
             else

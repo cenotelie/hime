@@ -111,13 +111,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         protected void ExportVariables(StreamWriter stream)
         {
-            stream.WriteLine("        private static readonly Variable[] variables = {");
+            stream.WriteLine("        private static readonly Symbol[] variables = {");
             bool first = true;
             foreach (Variable var in variables)
             {
                 if (!first) stream.WriteLine(", ");
                 stream.Write("            ");
-                stream.Write("new Variable(0x" + var.SID.ToString("X") + ", \"" + var.Name + "\")");
+                stream.Write("new Symbol(0x" + var.SID.ToString("X") + ", \"" + var.Name + "\")");
                 first = false;
             }
             stream.WriteLine(" };");
@@ -125,13 +125,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         protected void ExportVirtuals(StreamWriter stream)
         {
-            stream.WriteLine("        private static readonly Virtual[] virtuals = {");
+            stream.WriteLine("        private static readonly Symbol[] virtuals = {");
             bool first = true;
             foreach (Virtual v in virtuals)
             {
                 if (!first) stream.WriteLine(", ");
                 stream.Write("            ");
-                stream.Write("new Virtual(\"" + v.Name + "\")");
+                stream.Write("new Symbol(0, \"" + v.Name + "\")");
                 first = false;
             }
             stream.WriteLine(" };");

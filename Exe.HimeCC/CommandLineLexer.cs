@@ -24,7 +24,7 @@
  */
 
 using System.Collections.Generic;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 using Hime.Redist.Lexer;
 
 namespace Hime.HimeCC.CL
@@ -32,14 +32,14 @@ namespace Hime.HimeCC.CL
     internal class CommandLineLexer : Lexer
     {
         private static readonly Automaton automaton = Automaton.Find(typeof(CommandLineLexer), "CommandLineLexer.bin");
-        public static readonly Terminal[] terminals = {
-            new Terminal(0x1, "ε"),
-            new Terminal(0x2, "$"),
-            new Terminal(0x7, "ARG_VALUE_NAME"),
-            new Terminal(0x8, "ARG_VALUE_NUMBER"),
-            new Terminal(0x3, "WHITE_SPACE"),
-            new Terminal(0x4, "ARG_NAME"),
-            new Terminal(0x5, "ARG_VALUE_QUOTE") };
+        public static readonly Symbol[] terminals = {
+            new Symbol(0x1, "ε"),
+            new Symbol(0x2, "$"),
+            new Symbol(0x7, "ARG_VALUE_NAME"),
+            new Symbol(0x8, "ARG_VALUE_NUMBER"),
+            new Symbol(0x3, "WHITE_SPACE"),
+            new Symbol(0x4, "ARG_NAME"),
+            new Symbol(0x5, "ARG_VALUE_QUOTE") };
         public CommandLineLexer(string input) : base(automaton, terminals, 0x3, new System.IO.StringReader(input)) {}
         public CommandLineLexer(System.IO.TextReader input) : base(automaton, terminals, 0x3, input) {}
     }

@@ -52,7 +52,7 @@ namespace Hime.Benchmark
             this.rebuildInput = true;
             this.rebuildParsers = true;
             this.doStats = false;
-            this.doLexer = true;
+            this.doLexer = false;
             this.doParserLALR = true;
             this.doParserRNGLR = false;
         }
@@ -146,7 +146,7 @@ namespace Hime.Benchmark
         {
             System.IO.StreamReader reader = new System.IO.StreamReader(input);
             Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
-            Hime.Redist.Symbols.Token token = lexer.GetNextToken();
+            Hime.Redist.Token token = lexer.GetNextToken();
             int count = 0;
             while (token.SymbolID != 1)
             {
@@ -183,7 +183,7 @@ namespace Hime.Benchmark
             Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
             System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
             watch.Start();
-            Hime.Redist.Symbols.Token token = lexer.GetNextToken();
+            Hime.Redist.Token token = lexer.GetNextToken();
             while (token.SymbolID != 1)
                 token = lexer.GetNextToken();
             watch.Stop();

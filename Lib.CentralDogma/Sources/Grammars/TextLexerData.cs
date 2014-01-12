@@ -70,13 +70,13 @@ namespace Hime.CentralDogma.Grammars
         private void ExportStatics(StreamWriter stream, string name, string resource)
         {
             stream.WriteLine("        private static readonly Automaton automaton = Automaton.Find(typeof(" + name + "Lexer), \"" + resource + "\");");
-            stream.WriteLine("        public static readonly Terminal[] terminals = {");
+            stream.WriteLine("        public static readonly Symbol[] terminals = {");
             bool first = true;
             foreach (Terminal terminal in terminals)
             {
                 if (!first) stream.WriteLine(",");
                 stream.Write("            ");
-                stream.Write("new Terminal(0x" + terminal.SID.ToString("X") + ", \"" + terminal.ToString().Replace("\"", "\\\"") + "\")");
+                stream.Write("new Symbol(0x" + terminal.SID.ToString("X") + ", \"" + terminal.ToString().Replace("\"", "\\\"") + "\")");
                 first = false;
             }
             stream.WriteLine(" };");
