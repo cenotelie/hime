@@ -40,7 +40,7 @@ namespace Hime.Redist
         public Symbol Symbol { get { return tree.GetSymbol(index); } }
 
         /// <summary>
-        /// Gets the position int he input text of this node
+        /// Gets the position in the input text of this node
         /// </summary>
         public TextPosition Position { get { return tree.GetPosition(index); } }
 

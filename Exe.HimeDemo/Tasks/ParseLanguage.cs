@@ -62,7 +62,7 @@ namespace Hime.Demo.Tasks
 
             foreach (Error error in result.Errors)
                 Console.WriteLine(error.ToString());
-            if (!result.IsSucess)
+            if (!result.IsSuccess)
                 return;
             WinTreeView win = new WinTreeView(result.Root);
             win.ShowDialog();

@@ -59,7 +59,7 @@ namespace Hime.Redist
         /// <summary>
         /// Gets whether the parser was successful
         /// </summary>
-        public bool IsSucess { get { return (ast != null); } }
+        public bool IsSuccess { get { return (ast != null); } }
 
         /// <summary>
         /// Gets a list of the parsing errors
@@ -67,7 +67,7 @@ namespace Hime.Redist
         public IList<Error> Errors { get { return errors; } }
 
         /// <summary>
-        /// Gets the text that has been parse
+        /// Gets the text that has been parsed
         /// </summary>
         public TokenizedText Input { get { return text; } }
 

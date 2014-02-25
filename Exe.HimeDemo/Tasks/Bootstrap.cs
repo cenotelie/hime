@@ -38,7 +38,7 @@ namespace Hime.Demo.Tasks
             task.Namespace = "Hime.Demo.Generated";
             task.GrammarName = "FileCentralDogma";
             task.CodeAccess = AccessModifier.Public;
-            task.Method = ParsingMethod.LALR1;
+            task.Method = ParsingMethod.RNGLALR1;
             task.Execute();
             Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
             stream.Close();
@@ -50,7 +50,7 @@ namespace Hime.Demo.Tasks
 
             foreach (Error error in result.Errors)
                 Console.WriteLine(error.ToString());
-            if (!result.IsSucess)
+            if (!result.IsSuccess)
                 return;
             WinTreeView win = new WinTreeView(result.Root);
             win.ShowDialog();

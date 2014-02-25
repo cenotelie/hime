@@ -283,7 +283,7 @@ namespace Hime.CentralDogma
                 reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
                 hasErrors = true;
             }
-            if (result.IsSucess)
+            if (result.IsSuccess)
             {
                 foreach (ASTNode gnode in result.Root.Children)
                 {
