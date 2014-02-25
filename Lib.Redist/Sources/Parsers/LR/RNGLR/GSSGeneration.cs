@@ -67,7 +67,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="state">The RNGLR state</param>
         /// <returns>True if there is a node, false otherwise</returns>
-        public bool Contains(int state) { return (data[state] == null); }
+        public bool Contains(int state) { return (data[state] != null); }
 
         /// <summary>
         /// Creates the GSS node in this generation for the given RNGLR state
