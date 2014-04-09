@@ -76,15 +76,21 @@ namespace Hime.HimeCC
         /// Executes the himecc program
         /// </summary>
         /// <param name="args">The command line arguments</param>
-        /// <returns>The number of errors</returns>
+        /// <returns>The error code, or 0 if none</returns>
         public static int Main(string[] args)
         {
             Program program = new Program();
             return program.Run(args);
         }
 
+        /// <summary>
+        /// Runs the himecc program
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        /// <returns>The error code, or 0 if none</returns>
         private int Run(string[] args)
         {
+        	// If no argument is given, print the help screen and return OK
             if (args == null || args.Length == 0)
             {
                 PrintHelp();
@@ -130,6 +136,10 @@ namespace Hime.HimeCC
             return ResultOK;
         }
 
+        /// <summary>
+        /// Generates the parser for the command line
+        /// </summary>
+        /// <returns>The number of errors (should be 0)</returns>
         private int GenerateCLParser()
         {
             System.IO.Stream stream = typeof(Program).Assembly.GetManifestResourceStream("himecc.CommandLine.gram");
@@ -143,6 +153,10 @@ namespace Hime.HimeCC
             return report.ErrorCount;
         }
 
+        /// <summary>
+        /// Generates the parser for the input files of this compiler (.gram files)
+        /// </summary>
+        /// <returns>The number of errors (should be 0)</returns>
         private int GenerateCDParser()
         {
             System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
@@ -157,6 +171,11 @@ namespace Hime.HimeCC
             return report.ErrorCount;
         }
 
+        /// <summary>
+        /// Parses the command line arguments
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        /// <returns>The parsed line as an AST, or null if the parsing failed</returns>
         private ASTNode ParseArguments(string[] args)
         {
             StringBuilder builder = new StringBuilder();
@@ -175,6 +194,11 @@ namespace Hime.HimeCC
             return root;
         }
 
+        /// <summary>
+        /// Gets the name of the first argument if there is one and it is not preceded by any value
+        /// </summary>
+        /// <param name="line">The AST representation of the command line</param>
+        /// <returns>The name of the first argument, or null if none</returns>
         private string GetSpecialCommand(ASTNode line)
         {
             if (line.Children[0].Children.Count == 0 && line.Children[1].Children.Count == 1)
@@ -182,11 +206,18 @@ namespace Hime.HimeCC
             return null;
         }
 
+        /// <summary>
+        /// Builds the compilation task corresponding to the given command line
+        /// </summary>
+        /// <param name="line">The parsed command line as an AST</param>
+        /// <returns>The corresponding compilation task, or null if there is any error</returns>
         private CompilationTask BuildTask(ASTNode line)
         {
             CompilationTask task = new CompilationTask();
+            // All single values before the arguments shall be inputs
             foreach (ASTNode value in line.Children[0].Children)
                 AddInput(task, value);
+            // Inspect each passed argument
             foreach (ASTNode arg in line.Children[1].Children)
             {
                 switch ((arg.Symbol as TextToken).Value)
@@ -233,6 +264,11 @@ namespace Hime.HimeCC
             return task;
         }
 
+        /// <summary>
+        /// Adds an input to a compilation task
+        /// </summary>
+        /// <param name="task">The compilation task</param>
+        /// <param name="node">The input as a parsed data in the command line</param>
         private void AddInput(CompilationTask task, ASTNode node)
         {
             string value = (node.Symbol as TextToken).Value;
@@ -243,6 +279,11 @@ namespace Hime.HimeCC
             task.AddInputFile(value);
         }
 
+        /// <summary>
+        /// Gets the value of the given parsed argument
+        /// </summary>
+        /// <param name="argument">A parsed argument</param>
+        /// <returns>The corresponding value, or null if there is none</returns>
         private string GetValue(ASTNode argument)
         {
             if (argument.Children.Count == 0)
@@ -253,6 +294,9 @@ namespace Hime.HimeCC
             return value;
         }
 
+        /// <summary>
+        /// Prints the help screen for this program
+        /// </summary>
         private void PrintHelp()
         {
             Console.WriteLine("himecc " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (LGPL 3)");
