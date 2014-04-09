@@ -61,7 +61,7 @@ namespace Hime.Tests
         /// </summary>
         /// <param name="data">A string representation of a parse tree</param>
         /// <returns>The parse tree's AST</returns>
-        protected ASTNode ParseTree(string data)
+        private ASTNode ParseTree(string data)
         {
         	Hime.Redist.Lexer.ILexer lexer = parseTreeLexer.Invoke(new object[] { data }) as Hime.Redist.Lexer.ILexer;
             Hime.Redist.Parsers.IParser parser = parseTreeParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
@@ -74,7 +74,7 @@ namespace Hime.Tests
         /// <param name="expected">The expected sub tree</param>
         /// <param name="node">The sub tree to compare</param>
         /// <returns>True if the two trees match</returns>
-        protected bool Compare(ASTNode expected, ASTNode node)
+        private bool Compare(ASTNode expected, ASTNode node)
         {
             if (node.Symbol.Name != (expected.Symbol as Token).Value)
                 return false;
@@ -93,20 +93,18 @@ namespace Hime.Tests
                     return false;
             return true;
         }
-        
-        /// <summary>
-        /// Tests whether the given grammar parses the input as the expected AST
+
+		/// <summary>
+        /// Builds a parser
         /// </summary>
         /// <param name="grammars">Grammar content</param>
         /// <param name="top">The top grammar to compile</param>
         /// <param name="method">The parsing method to use</param>
-        /// <param name="input">The input text to parse</param>
-        /// <param name="expected">The expected AST</param>
-		protected void TestMatch(string grammars, string top, ParsingMethod method, string input, string expected)
-        {
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
+		/// <param name="input">The input text to parse</param>
+        /// <param name="prefix">Prefix for the generated parser</param>
+		/// <returns>The parser</returns>
+        protected Hime.Redist.Parsers.IParser BuildParser(string grammars, string top, ParsingMethod method, string input, string prefix)
+		{
 			string genNamespace = "Hime.Tests.Generated_" + prefix;
 
         	CompilationTask task = new CompilationTask();
@@ -116,7 +114,7 @@ namespace Hime.Tests
             task.Method = method;
             task.Mode = CompilationMode.Assembly;
             task.Namespace = genNamespace;
-			task.OutputPrefix = caller.GetMethod().Name;
+			task.OutputPrefix = prefix;
             Hime.CentralDogma.Reporting.Report report = task.Execute();
             Assert.AreEqual(0, report.ErrorCount, "Failed to compile the grammar");
             Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
@@ -129,8 +127,25 @@ namespace Hime.Tests
 
 			Hime.Redist.Lexer.ILexer lexer = ciLexer.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
             Hime.Redist.Parsers.IParser parser = ciParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
+			return parser;
+		}
+        
+        /// <summary>
+        /// Tests whether the given grammar parses the input as the expected AST
+        /// </summary>
+        /// <param name="grammars">Grammar content</param>
+        /// <param name="top">The top grammar to compile</param>
+        /// <param name="method">The parsing method to use</param>
+        /// <param name="input">The input text to parse</param>
+        /// <param name="expected">The expected AST</param>
+		protected void ParsingMatches(string grammars, string top, ParsingMethod method, string input, string expected)
+        {
+			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
+			string prefix = caller.GetMethod().Name;
 
-			ASTNode inputAST = parser.Parse ();
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			ASTNode inputAST = parser.Parse();
 			Assert.IsNotNull(inputAST, "Failed to parse the input");
 			ASTNode expectedAST = ParseTree(expected);
 			Assert.IsNotNull(expectedAST, "Failed to parse the expected tree");
@@ -138,5 +153,47 @@ namespace Hime.Tests
 			bool result = Compare(expectedAST, inputAST);
 			Assert.IsTrue(result, "AST from input does not match the expected AST");
         }
+
+		/// <summary>
+        /// Tests whether the given grammar does not parse the input as the expected AST
+        /// </summary>
+        /// <param name="grammars">Grammar content</param>
+        /// <param name="top">The top grammar to compile</param>
+        /// <param name="method">The parsing method to use</param>
+        /// <param name="input">The input text to parse</param>
+        /// <param name="unexpected">The expected AST</param>
+		protected void ParsingNotMatches(string grammars, string top, ParsingMethod method, string input, string unexpected)
+        {
+			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
+			string prefix = caller.GetMethod().Name;
+
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			ASTNode inputAST = parser.Parse();
+			Assert.IsNotNull(inputAST, "Failed to parse the input");
+			ASTNode expectedAST = ParseTree(unexpected);
+			Assert.IsNotNull(expectedAST, "Failed to parse the unexpected tree");
+
+			bool result = Compare(expectedAST, inputAST);
+			Assert.IsFalse(result, "AST from input matches the unexpected AST, should not");
+        }
+
+		/// <summary>
+        /// Tests whether the given grammar fails to parse the input as the expected AST
+        /// </summary>
+        /// <param name="grammars">Grammar content</param>
+        /// <param name="top">The top grammar to compile</param>
+        /// <param name="method">The parsing method to use</param>
+        /// <param name="input">The input text to parse</param>
+		protected void ParsingFails(string grammars, string top, ParsingMethod method, string input)
+		{
+			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
+			string prefix = caller.GetMethod().Name;
+
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			ASTNode inputAST = parser.Parse();
+			Assert.IsNull(inputAST, "Failed to parse the input");
+		}
 	}
 }

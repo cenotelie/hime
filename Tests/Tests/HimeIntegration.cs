@@ -18,15 +18,10 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Hime.CentralDogma;
 using Hime.Redist.AST;
-using Hime.Redist.Lexer;
 using Hime.Redist.Parsers;
-using Hime.Redist.Symbols;
 using NUnit.Framework;
 
 namespace Hime.Tests
@@ -38,37 +33,22 @@ namespace Hime.Tests
     public class HimeIntegration : BaseParseSuite
     {
 		/// <summary>
-		/// Tests parsing of empty input
+		/// Tests the correct regeneration of the Central Dogma input parser
 		/// </summary>
 		[Test]
-        public void Test_Minimal_Empty()
-        {
+		public void Test_CentralDogma_Regeneration()
+		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"a\";} rules { a->; } }";
-			TestMatch(grammar, "Test", ParsingMethod.LALR1, "", "a");
-        }
 
-		/// <summary>
-		/// Tests parsing of minimal non-empty input
-		/// </summary>
-		[Test]
-        public void Test_Minimal_Single()
-        {
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
-			TestMatch(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
-        }
+			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+			StreamReader reader = new StreamReader(stream);
+			string grammar = reader.ReadToEnd();
 
-
-		/// <summary>
-		/// Tests parsing of simple math expression
-		/// </summary>
-        [Test]
-        public void Test_SimpleExpression()
-        {
-			SetTestDirectory();
-			string grammar = accessor.GetAllTextFor("MathExp.gram");
-			TestMatch(grammar, "MathExp", ParsingMethod.LALR1, "3 + 5", "PLUS(NUMBER='3' NUMBER='5')");
-        }
+			IParser parser = BuildParser(grammar, "FileCentralDogma", ParsingMethod.LALR1, grammar, "Test_CentralDogma_Regeneration");
+			Assert.IsNotNull(parser, "Failed to compile the parser");
+			ASTNode root = parser.Parse();
+			Assert.IsNotNull(root, "Failed to parse the Central Dogma grammar with the generated parser");
+			Assert.AreEqual(0, parser.Errors.Count, "Some error while parsing the Central Dogma grammar with the generated parser");
+		}
     }
 }

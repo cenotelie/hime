@@ -56,9 +56,11 @@
     <Compile Include="BaseParseSuite.cs" />
     <Compile Include="BaseTestSuite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\HimeCCOptions.cs" />
-    <Compile Include="Tests\HimeCCReturn.cs" />
     <Compile Include="Tests\HimeIntegration.cs" />
+    <Compile Include="Tests\Parsing\BasicGrammars.cs" />
+    <Compile Include="Tests\HimeCC\HimeCCOptions.cs" />
+    <Compile Include="Tests\HimeCC\HimeCCReturn.cs" />
+    <Compile Include="Tests\Parsing\TreeActions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
@@ -95,5 +97,9 @@
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tests\Parsing\" />
+    <Folder Include="Tests\HimeCC\" />
   </ItemGroup>
 </Project>
