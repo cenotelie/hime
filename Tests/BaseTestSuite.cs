@@ -22,16 +22,29 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
+using NUnit.Framework;
 
 namespace Hime.Tests
 {
+	/// <summary>
+	/// Represents a base test suite with helper methods
+	/// </summary>
     public abstract class BaseTestSuite
     {
         private const string logName = "Log.txt";
         private const string output = "output";
 
+        /// <summary>
+        /// The log file for the tests
+        /// </summary>
         private string log;
+        /// <summary>
+        /// The resource accessor for this test bundle
+        /// </summary>
         private ResourceAccessor accessor;
+        /// <summary>
+        /// The current directory for the current test
+        /// </summary>
         private string directory;
 
         protected BaseTestSuite()
@@ -51,12 +64,19 @@ namespace Hime.Tests
             }
         }
 
+        /// <summary>
+        /// Logs the given message
+        /// </summary>
+        /// <param name="message">A message</param>
         protected void Log(string message)
         {
             File.AppendAllText(log, message + Environment.NewLine);
             Console.WriteLine(message);
         }
 
+        /// <summary>
+        /// Setups the current directory for the test to come
+        /// </summary>
         protected void SetTestDirectory() {
             System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
             System.Diagnostics.StackFrame caller = trace.GetFrame(1);
@@ -67,8 +87,18 @@ namespace Hime.Tests
             Environment.CurrentDirectory = dir;
         }
 
+        /// <summary>
+        /// Exports the given resource to the given file
+        /// </summary>
+        /// <param name="name">The name of the resource to export</param>
+        /// <param name="file">The file to export to</param>
         protected void ExportResource(string name, string file) { accessor.Export(name, file); }
 
+        /// <summary>
+        /// Checks whether the given file exists and is not empty
+        /// </summary>
+        /// <param name="file">A file name</param>
+        /// <returns>True if the file exists and is not empty</returns>
         protected bool CheckFile(string file)
         {
             if (!System.IO.File.Exists(file))
@@ -77,6 +107,12 @@ namespace Hime.Tests
             return (fi.Length > 0);
         }
 
+        /// <summary>
+        /// Compiles the given resource grammar for the given parsing method, generates an assembly and loads it
+        /// </summary>
+        /// <param name="resource">The resource to compile</param>
+        /// <param name="method">The parsing method to generate</param>
+        /// <returns>The resulting loaded assembly</returns>
         protected Assembly CompileResource(string resource, ParsingMethod method)
         {
             string gram = accessor.GetAllTextFor(resource + ".gram");
@@ -87,7 +123,9 @@ namespace Hime.Tests
             task.Method = method;
             task.Mode = CompilationMode.Assembly;
             task.Namespace = "Hime.Tests.Generated";
-            task.Execute();
+            Hime.CentralDogma.Reporting.Report report = task.Execute();
+            Assert.AreEqual(0, report.ErrorCount, "himecc failed to compile the resource");
+            Assert.IsTrue(CheckFile(resource + ".dll"), "himecc failed to produce " + resource + ".dll");
             return Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, resource + ".dll"));
         }
     }
