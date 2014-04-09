@@ -92,9 +92,6 @@
     <EmbeddedResource Include="Resources\ParseTree.gram" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Integration.tests" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>

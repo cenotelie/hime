@@ -31,102 +31,44 @@ using NUnit.Framework;
 
 namespace Hime.Tests
 {
+	/// <summary>
+	/// Integration test suite for high-level parsing features
+	/// </summary>
     [TestFixture]
-    public class HimeIntegration : BaseTestSuite
+    public class HimeIntegration : BaseParseSuite
     {
-        private ConstructorInfo scriptLexer;
-        private ConstructorInfo scriptParser;
-        private Dictionary<string, ConstructorInfo> resLexer;
-        private Dictionary<string, ConstructorInfo> resParser;
-
-        public HimeIntegration()
+		/// <summary>
+		/// Tests parsing of empty input
+		/// </summary>
+		[Test]
+        public void Test_Minimal_Empty()
         {
-            GenerateTestScriptParser();
-            resLexer = new Dictionary<string, ConstructorInfo>();
-            resParser = new Dictionary<string, ConstructorInfo>();
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"a\";} rules { a->; } }";
+			TestMatch(grammar, "Test", ParsingMethod.LALR1, "", "a");
         }
 
-        private void GenerateTestScriptParser()
+		/// <summary>
+		/// Tests parsing of minimal non-empty input
+		/// </summary>
+		[Test]
+        public void Test_Minimal_Single()
         {
-            Assembly assembly = CompileResource("TestScript", ParsingMethod.LALR1);
-            Type tl = assembly.GetType("Hime.Tests.Generated.TestScriptLexer");
-            Type tp = assembly.GetType("Hime.Tests.Generated.TestScriptParser");
-            scriptLexer = tl.GetConstructor(new Type[] { typeof(string) });
-            scriptParser = tp.GetConstructor(new Type[] { tl });
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			TestMatch(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
         }
 
-        private void ResolveParserFor(string resource, ParsingMethod method)
-        {
-            if (resParser.ContainsKey(resource))
-                return;
-            Assembly assembly = CompileResource(resource, method);
-            System.Type tl = assembly.GetType("Hime.Tests.Generated." + resource + "Lexer");
-            System.Type tp = assembly.GetType("Hime.Tests.Generated." + resource + "Parser");
-            System.Reflection.ConstructorInfo cl = tl.GetConstructor(new Type[] { typeof(string) });
-            System.Reflection.ConstructorInfo cp = tp.GetConstructor(new Type[] { tl });
-            resLexer.Add(resource, cl);
-            resParser.Add(resource, cp);
-        }
 
-        private bool Compare(ASTNode node, ASTNode check)
-        {
-            if (node.Symbol.Name != (check.Symbol as Token).Value)
-                return false;
-            if (check.Children[0].Children.Count != 0)
-            {
-                string vRef = (check.Children[0].Children[0].Symbol as Token).Value;
-                vRef = vRef.Substring(1, vRef.Length - 2);
-                string vReal = (node.Symbol as Token).Value;
-                if (vReal != vRef)
-                    return false;
-            }
-            if (node.Children.Count != check.Children[1].Children.Count)
-                return false;
-            for (int i = 0; i != node.Children.Count; i++)
-                if (!Compare(node.Children[i], check.Children[1].Children[i]))
-                    return false;
-            return true;
-        }
-
-        private bool ExecuteTest(ASTNode test, ParsingMethod method)
-        {
-            string name = (test.Symbol as Token).Value;
-            string resource = (test.Children[0].Symbol as Token).Value;
-            string input = (test.Children[1].Symbol as Token).Value;
-            input = input.Substring(1, input.Length - 2);
-            ASTNode check = test.Children[2];
-            ResolveParserFor(resource, method);
-            ILexer lc = resLexer[resource].Invoke(new object[] { input }) as ILexer;
-            IParser pc = resParser[resource].Invoke(new object[] { lc }) as IParser;
-            bool result = Compare(pc.Parse(), check);
-            if (!result)
-                Log("Test " + name + " failed");
-            return result;
-        }
-
-        private bool ExecuteScript(string script, ParsingMethod method)
-        {
-            Log("Executing test suite " + script);
-            ExportResource(script, script);
-            ILexer lc = scriptLexer.Invoke(new object[] { File.ReadAllText(script) }) as ILexer;
-            IParser pc = scriptParser.Invoke(new object[] { lc }) as IParser;
-            ASTNode root = pc.Parse();
-            int succeeded = 0;
-            int failed = 0;
-            foreach (ASTNode test in root.Children)
-                if (ExecuteTest(test, method))
-                    succeeded++;
-                else
-                    failed++;
-            Log(succeeded.ToString() + " passed, " + failed.ToString() + " failed");
-            return (failed == 0);
-        }
-
+		/// <summary>
+		/// Tests parsing of simple math expression
+		/// </summary>
         [Test]
-        public void Test_Integration()
+        public void Test_SimpleExpression()
         {
-            SetTestDirectory();
-            Assert.IsTrue(ExecuteScript("Integration.tests", ParsingMethod.LALR1));
+			SetTestDirectory();
+			string grammar = accessor.GetAllTextFor("MathExp.gram");
+			TestMatch(grammar, "MathExp", ParsingMethod.LALR1, "3 + 5", "PLUS(NUMBER='3' NUMBER='5')");
         }
     }
 }

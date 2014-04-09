@@ -1,4 +1,4 @@
-﻿/**********************************************************************
+/**********************************************************************
 * Copyright (c) 2013 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
@@ -47,7 +47,9 @@ namespace Hime.Tests
         /// </summary>
         protected BaseParseSuite()
         {
-        	Assembly assembly = CompileResource("ParseTree", ParsingMethod.LALR1);
+			ExportResource("ParseTree.gram", "ParseTree.gram");
+			Hime.HimeCC.Program.Main(new string[] { "ParseTree.gram -o:nosources -a:public -n Hime.Tests.Generated" });
+        	Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "ParseTree.dll"));
             Type tl = assembly.GetType("Hime.Tests.Generated.ParseTreeLexer");
             Type tp = assembly.GetType("Hime.Tests.Generated.ParseTreeParser");
             parseTreeLexer = tl.GetConstructor(new Type[] { typeof(string) });
@@ -95,30 +97,46 @@ namespace Hime.Tests
         /// <summary>
         /// Tests whether the given grammar parses the input as the expected AST
         /// </summary>
-        /// <param name="grammar">The grammar to use</param>
-        /// <param name="method">The parsing method</param>
-        /// <param name="input">The input</param>
+        /// <param name="grammars">Grammar content</param>
+        /// <param name="top">The top grammar to compile</param>
+        /// <param name="method">The parsing method to use</param>
+        /// <param name="input">The input text to parse</param>
         /// <param name="expected">The expected AST</param>
-        protected void TestMatch(string grammar, ParsingMethod method, string input, string expected)
+		protected void TestMatch(string grammars, string top, ParsingMethod method, string input, string expected)
         {
+			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
+			string prefix = caller.GetMethod().Name;
+			string genNamespace = "Hime.Tests.Generated_" + prefix;
+
         	CompilationTask task = new CompilationTask();
-            task.AddInputRaw("anon", grammar);
+            task.AddInputRaw(grammars);
+			task.GrammarName = top;
             task.CodeAccess = AccessModifier.Public;
             task.Method = method;
             task.Mode = CompilationMode.Assembly;
-            task.Namespace = "Hime.Tests.Generated";
+            task.Namespace = genNamespace;
+			task.OutputPrefix = caller.GetMethod().Name;
             Hime.CentralDogma.Reporting.Report report = task.Execute();
             Assert.AreEqual(0, report.ErrorCount, "Failed to compile the grammar");
-            Assert.IsTrue(CheckFile("anon.dll"), "Failed to produce the assembly");
-            return Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "anon.dll"));
-        	
-        	
-        	
-        	Assembly assembly = CompileResource("ParseTree", ParsingMethod.LALR1);
-            Type tl = assembly.GetType("Hime.Tests.Generated.ParseTreeLexer");
-            Type tp = assembly.GetType("Hime.Tests.Generated.ParseTreeParser");
-            parseTreeLexer = tl.GetConstructor(new Type[] { typeof(string) });
-            parseTreeParser = tp.GetConstructor(new Type[] { tl });
+            Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
+
+			Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
+            Type typeLexer = assembly.GetType(genNamespace + "." + top + "Lexer");
+            Type typeParser = assembly.GetType(genNamespace + "." + top + "Parser");
+			ConstructorInfo ciLexer = typeLexer.GetConstructor(new Type[] { typeof(string) });
+            ConstructorInfo ciParser = typeParser.GetConstructor(new Type[] { typeLexer });
+
+			Hime.Redist.Lexer.ILexer lexer = ciLexer.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
+            Hime.Redist.Parsers.IParser parser = ciParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
+
+			ASTNode inputAST = parser.Parse ();
+			Assert.IsNotNull(inputAST, "Failed to parse the input");
+			ASTNode expectedAST = ParseTree(expected);
+			Assert.IsNotNull(expectedAST, "Failed to parse the expected tree");
+
+			bool result = Compare(expectedAST, inputAST);
+			Assert.IsTrue(result, "AST from input does not match the expected AST");
         }
 	}
 }

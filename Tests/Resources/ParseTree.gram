@@ -11,7 +11,7 @@ cf grammar ParseTree
 		NAME_CHARACTER			-> NAME_CHARACTER_FIRST | [0-9] ;
 		NAME					-> '@'? NAME_CHARACTER_FIRST NAME_CHARACTER* ;
 		
-		QUOTED_DATA				-> '"' [^"]* '"';
+		QUOTED_DATA				-> '\'' [^']* '\'';
 		
 		WHITE_SPACE	-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
 		SEPARATOR	-> WHITE_SPACE+;

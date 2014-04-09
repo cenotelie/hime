@@ -60,10 +60,10 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -x aa" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultErrorBadArgs, result, "HimeCC with unknown arguments did not return bad argument (2), returned " + result);
-            Assert.IsFalse(System.IO.File.Exists("MathExpLexer.cs"), "HimeCC with unknown arguments produced unexpected output (MathExpLexer.cs)");
-            Assert.IsFalse(System.IO.File.Exists("MathExpLexer.bin"), "HimeCC with unknown arguments produced unexpected output (MathExpLexer.bin)");
-            Assert.IsFalse(System.IO.File.Exists("MathExpParser.cs"), "HimeCC with unknown arguments produced unexpected output (MathExpParser.cs)");
-            Assert.IsFalse(System.IO.File.Exists("MathExpParser.bin"), "HimeCC with unknown arguments produced unexpected output (MathExpParser.bin)");
+            Assert.IsFalse(CheckFileExists("MathExpLexer.cs"), "HimeCC with unknown arguments produced unexpected output (MathExpLexer.cs)");
+            Assert.IsFalse(CheckFileExists("MathExpLexer.bin"), "HimeCC with unknown arguments produced unexpected output (MathExpLexer.bin)");
+            Assert.IsFalse(CheckFileExists("MathExpParser.cs"), "HimeCC with unknown arguments produced unexpected output (MathExpParser.cs)");
+            Assert.IsFalse(CheckFileExists("MathExpParser.bin"), "HimeCC with unknown arguments produced unexpected output (MathExpParser.bin)");
         }
 
         /// <summary>
@@ -76,10 +76,10 @@ namespace Hime.Tests
             ExportResource("Error.gram", "Error.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "Error.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultErrorCompiling, result, "HimeCC on compilation failure did not report failure (3), returned " + result);
-            Assert.IsFalse(System.IO.File.Exists("ErrorLexer.cs"), "HimeCC on compilation failure produced unexpected output (ErrorLexer.cs)");
-            Assert.IsFalse(System.IO.File.Exists("ErrorLexer.bin"), "HimeCC on compilation failure produced unexpected output (ErrorLexer.bin)");
-            Assert.IsFalse(System.IO.File.Exists("ErrorParser.cs"), "HimeCC on compilation failure produced unexpected output (ErrorParser.cs)");
-            Assert.IsFalse(System.IO.File.Exists("ErrorParser.bin"), "HimeCC on compilation failure produced unexpected output (ErrorParser.bin)");
+            Assert.IsFalse(CheckFileExists("ErrorLexer.cs"), "HimeCC on compilation failure produced unexpected output (ErrorLexer.cs)");
+            Assert.IsFalse(CheckFileExists("ErrorLexer.bin"), "HimeCC on compilation failure produced unexpected output (ErrorLexer.bin)");
+            Assert.IsFalse(CheckFileExists("ErrorParser.cs"), "HimeCC on compilation failure produced unexpected output (ErrorParser.cs)");
+            Assert.IsFalse(CheckFileExists("ErrorParser.bin"), "HimeCC on compilation failure produced unexpected output (ErrorParser.bin)");
         }
 
         /// <summary>
@@ -92,10 +92,10 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "HimeCC on normal compilation did not report success (0), returned " + result);
-            Assert.IsTrue(System.IO.File.Exists("MathExpLexer.cs"), "HimeCC on normal compilation did not produced expected output (MathExpLexer.cs)");
-            Assert.IsTrue(System.IO.File.Exists("MathExpLexer.bin"), "HimeCC on normal compilation did not produced expected output (MathExpLexer.bin)");
-            Assert.IsTrue(System.IO.File.Exists("MathExpParser.cs"), "HimeCC on normal compilation did not produced expected output (MathExpParser.cs)");
-            Assert.IsTrue(System.IO.File.Exists("MathExpParser.bin"), "HimeCC on normal compilation did not produced expected output (MathExpParser.bin)");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "HimeCC on normal compilation did not produced expected output (MathExpLexer.cs)");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "HimeCC on normal compilation did not produced expected output (MathExpLexer.bin)");
+            Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "HimeCC on normal compilation did not produced expected output (MathExpParser.cs)");
+            Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "HimeCC on normal compilation did not produced expected output (MathExpParser.bin)");
         }
     }
 }

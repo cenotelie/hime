@@ -72,14 +72,14 @@ namespace Hime.Tests
             SetTestDirectory();
             int result = Hime.HimeCC.Program.Main(new string[] { param });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc " + param + " did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("CommandLineLexer.cs"), "himecc " + param + " failed to produce CommandLineLexer.cs");
-            Assert.IsTrue(CheckFile("CommandLineLexer.bin"), "himecc " + param + " failed to produce CommandLineLexer.bin");
-            Assert.IsTrue(CheckFile("CommandLineParser.cs"), "himecc " + param + " failed to produce CommandLineParser.cs");
-            Assert.IsTrue(CheckFile("CommandLineParser.bin"), "himecc " + param + " failed to produce CommandLineParser.bin");
-            Assert.IsTrue(CheckFile("FileCentralDogmaLexer.cs"), "himecc " + param + " failed to produce FileCentralDogmaLexer.cs");
-            Assert.IsTrue(CheckFile("FileCentralDogmaLexer.bin"), "himecc " + param + " failed to produce FileCentralDogmaLexer.bin");
-            Assert.IsTrue(CheckFile("FileCentralDogmaParser.cs"), "himecc " + param + " failed to produce FileCentralDogmaParser.cs");
-            Assert.IsTrue(CheckFile("FileCentralDogmaParser.bin"), "himecc " + param + " failed to produce FileCentralDogmaParser.bin");
+            Assert.IsTrue(CheckFileExists("CommandLineLexer.cs"), "himecc " + param + " failed to produce CommandLineLexer.cs");
+            Assert.IsTrue(CheckFileExists("CommandLineLexer.bin"), "himecc " + param + " failed to produce CommandLineLexer.bin");
+            Assert.IsTrue(CheckFileExists("CommandLineParser.cs"), "himecc " + param + " failed to produce CommandLineParser.cs");
+            Assert.IsTrue(CheckFileExists("CommandLineParser.bin"), "himecc " + param + " failed to produce CommandLineParser.bin");
+            Assert.IsTrue(CheckFileExists("FileCentralDogmaLexer.cs"), "himecc " + param + " failed to produce FileCentralDogmaLexer.cs");
+            Assert.IsTrue(CheckFileExists("FileCentralDogmaLexer.bin"), "himecc " + param + " failed to produce FileCentralDogmaLexer.bin");
+            Assert.IsTrue(CheckFileExists("FileCentralDogmaParser.cs"), "himecc " + param + " failed to produce FileCentralDogmaParser.cs");
+            Assert.IsTrue(CheckFileExists("FileCentralDogmaParser.bin"), "himecc " + param + " failed to produce FileCentralDogmaParser.bin");
         }
 
         /// <summary>
@@ -92,11 +92,11 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExpLexer.cs"), "himecc MathExp.gram failed to produce MathExpLexer.cs");
-            Assert.IsTrue(CheckFile("MathExpLexer.bin"), "himecc MathExp.gram failed to produce MathExpLexer.bin");
-            Assert.IsTrue(CheckFile("MathExpParser.cs"), "himecc MathExp.gram failed to produce MathExpParser.cs");
-            Assert.IsTrue(CheckFile("MathExpParser.bin"), "himecc MathExp.gram failed to produce MathExpParser.bin");
-            Assert.IsFalse(CheckFile("MathExp.dll"), "himecc MathExp.gram produced MathExp.dll, shouldn't have");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "himecc MathExp.gram failed to produce MathExpLexer.cs");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram failed to produce MathExpLexer.bin");
+            Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram failed to produce MathExpParser.cs");
+            Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram failed to produce MathExpParser.bin");
+            Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram produced MathExp.dll, shouldn't have");
         }
 
         /// <summary>
@@ -109,11 +109,11 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram -o:assembly did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExpLexer.cs"), "himecc MathExp.gram -o:assembly failed to produce MathExpLexer.cs");
-            Assert.IsTrue(CheckFile("MathExpLexer.bin"), "himecc MathExp.gram -o:assembly failed to produce MathExpLexer.bin");
-            Assert.IsTrue(CheckFile("MathExpParser.cs"), "himecc MathExp.gram -o:assembly failed to produce MathExpParser.cs");
-            Assert.IsTrue(CheckFile("MathExpParser.bin"), "himecc MathExp.gram -o:assembly failed to produce MathExpParser.bin");
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc MathExp.gram -o:assembly failed to produce MathExp.dll");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "himecc MathExp.gram -o:assembly failed to produce MathExpLexer.cs");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -o:assembly failed to produce MathExpLexer.bin");
+            Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram -o:assembly failed to produce MathExpParser.cs");
+            Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -o:assembly failed to produce MathExpParser.bin");
+            Assert.IsTrue(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -o:assembly failed to produce MathExp.dll");
         }
 
         /// <summary>
@@ -126,11 +126,11 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:nosources" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram -o:nosources did not return OK (0), returned " + result);
-            Assert.IsFalse(CheckFile("MathExpLexer.cs"), "himecc MathExp.gram -o:nosources produced MathExpLexer.cs, shouldn't have");
-            Assert.IsFalse(CheckFile("MathExpLexer.bin"), "himecc MathExp.gram -o:nosources produced MathExpLexer.bin, shouldn't have");
-            Assert.IsFalse(CheckFile("MathExpParser.cs"), "himecc MathExp.gram -o:nosources produced MathExpParser.cs, shouldn't have");
-            Assert.IsFalse(CheckFile("MathExpParser.bin"), "himecc MathExp.gram -o:nosources produced MathExpParser.bin, shouldn't have");
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc MathExp.gram -o:nosources failed to produce MathExp.dll");
+            Assert.IsFalse(CheckFileExists("MathExpLexer.cs"), "himecc MathExp.gram -o:nosources produced MathExpLexer.cs, shouldn't have");
+            Assert.IsFalse(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -o:nosources produced MathExpLexer.bin, shouldn't have");
+            Assert.IsFalse(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram -o:nosources produced MathExpParser.cs, shouldn't have");
+            Assert.IsFalse(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -o:nosources produced MathExpParser.bin, shouldn't have");
+            Assert.IsTrue(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -o:nosources failed to produce MathExp.dll");
         }
 
         /// <summary>
@@ -142,13 +142,13 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            ExportResource("TestScript.gram", "TestScript.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram TestScript.gram -g MathExp" });
+            ExportResource("ParseTree.gram", "ParseTree.gram");
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram ParseTree.gram -g MathExp" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExpLexer.cs"), "himecc failed to produce MathExpLexer.cs");
-            Assert.IsTrue(CheckFile("MathExpLexer.bin"), "himecc failed to produce MathExpLexer.bin");
-            Assert.IsTrue(CheckFile("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
-            Assert.IsTrue(CheckFile("MathExpParser.bin"), "himecc failed to produce MathExpParser.bin");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "himecc failed to produce MathExpLexer.cs");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc failed to produce MathExpLexer.bin");
+            Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+            Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc failed to produce MathExpParser.bin");
         }
 
         /// <summary>
@@ -160,13 +160,13 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            ExportResource("TestScript.gram", "TestScript.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "TestScript.gram MathExp.gram -g MathExp" });
+            ExportResource("ParseTree.gram", "ParseTree.gram");
+            int result = Hime.HimeCC.Program.Main(new string[] { "ParseTree.gram MathExp.gram -g MathExp" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExpLexer.cs"), "himecc failed to produce MathExpLexer.cs");
-            Assert.IsTrue(CheckFile("MathExpLexer.bin"), "himecc failed to produce MathExpLexer.bin");
-            Assert.IsTrue(CheckFile("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
-            Assert.IsTrue(CheckFile("MathExpParser.bin"), "himecc failed to produce MathExpParser.bin");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "himecc failed to produce MathExpLexer.cs");
+            Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc failed to produce MathExpLexer.bin");
+            Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+            Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc failed to produce MathExpParser.bin");
         }
 
         /// <summary>
@@ -179,10 +179,10 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -p XXX" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("XXXLexer.cs"), "himecc failed to produce XXXLexer.cs");
-            Assert.IsTrue(CheckFile("XXXLexer.bin"), "himecc failed to produce XXXLexer.bin");
-            Assert.IsTrue(CheckFile("XXXParser.cs"), "himecc failed to produce XXXParser.cs");
-            Assert.IsTrue(CheckFile("XXXParser.bin"), "himecc failed to produce XXXParser.bin");
+            Assert.IsTrue(CheckFileExists("XXXLexer.cs"), "himecc failed to produce XXXLexer.cs");
+            Assert.IsTrue(CheckFileExists("XXXLexer.bin"), "himecc failed to produce XXXLexer.bin");
+            Assert.IsTrue(CheckFileExists("XXXParser.cs"), "himecc failed to produce XXXParser.cs");
+            Assert.IsTrue(CheckFileExists("XXXParser.bin"), "himecc failed to produce XXXParser.bin");
         }
 
         /// <summary>
@@ -197,10 +197,10 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -p " + prefix });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile(prefix + "Lexer.cs"), "himecc failed to produce " + prefix + "Lexer.cs");
-            Assert.IsTrue(CheckFile(prefix + "Lexer.bin"), "himecc failed to produce " + prefix + "Lexer.bin");
-            Assert.IsTrue(CheckFile(prefix + "Parser.cs"), "himecc failed to produce " + prefix + "Parser.cs");
-            Assert.IsTrue(CheckFile(prefix + "Parser.bin"), "himecc failed to produce " + prefix + "Parser.bin");
+            Assert.IsTrue(CheckFileExists(prefix + "Lexer.cs"), "himecc failed to produce " + prefix + "Lexer.cs");
+            Assert.IsTrue(CheckFileExists(prefix + "Lexer.bin"), "himecc failed to produce " + prefix + "Lexer.bin");
+            Assert.IsTrue(CheckFileExists(prefix + "Parser.cs"), "himecc failed to produce " + prefix + "Parser.cs");
+            Assert.IsTrue(CheckFileExists(prefix + "Parser.bin"), "himecc failed to produce " + prefix + "Parser.bin");
         }
 
         /// <summary>
@@ -211,12 +211,10 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly" });
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc did not produced MathExp.dll");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFile(System.IO.Path.Combine(System.Environment.CurrentDirectory, "MathExp.dll"));
-            System.Type type = assembly.GetType("MathExp.MathExpParser");
-            Assert.IsNotNull(type, "Failed to find the generated parser type (MathExp.MathExpParser) in the generated assembly");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "namespace MathExp"), "Expected default namespace to be the grammar name, was not");
         }
         
         /// <summary>
@@ -227,12 +225,10 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly -n Hime.Tests.Generated" });
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -n Hime.Tests.Generated" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc did not produced MathExp.dll");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFile(System.IO.Path.Combine(System.Environment.CurrentDirectory, "MathExp.dll"));
-            System.Type type = assembly.GetType("Hime.Tests.Generated.MathExpParser");
-            Assert.IsNotNull(type, "Failed to find the generated parser type (Hime.Tests.Generated.MathExpParser) in the generated assembly");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "namespace Hime.Tests.Generated"), "Failed to generated code in the user-defined namespace");
         }
         
         /// <summary>
@@ -243,13 +239,10 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly" });
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc did not produced MathExp.dll");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFile(System.IO.Path.Combine(System.Environment.CurrentDirectory, "MathExp.dll"));
-            System.Type type = assembly.GetType("MathExp.MathExpParser");
-            Assert.IsNotNull(type, "Failed to find the generated parser type (MathExp.MathExpParser) in the generated assembly");
-            Assert.AreEqual(type.BaseType, typeof(Hime.Redist.Parsers.LRkParser), "The produced parser is not an LR(k) parser");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "class MathExpParser : LRkParser"), "Generated parser is not an LR(k) parser by default");
         }
 
         /// <summary>
@@ -260,13 +253,10 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly -m:rnglr" });
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -m:rnglr" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc did not produced MathExp.dll");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFile(System.IO.Path.Combine(System.Environment.CurrentDirectory, "MathExp.dll"));
-            System.Type type = assembly.GetType("MathExp.MathExpParser");
-            Assert.IsNotNull(type, "Failed to find the generated parser type (MathExp.MathExpParser) in the generated assembly");
-            Assert.AreEqual(type.BaseType, typeof(Hime.Redist.Parsers.RNGLRParser), "The produced parser is not a RNGLR parser");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "class MathExpParser : RNGLRParser"), "Generated parser is not a RNGLR parser");
         }
 
         /// <summary>
@@ -277,13 +267,10 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly" });
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc did not produced MathExp.dll");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFile(System.IO.Path.Combine(System.Environment.CurrentDirectory, "MathExp.dll"));
-            System.Type type = assembly.GetType("MathExp.MathExpParser");
-            Assert.IsNotNull(type, "Failed to find the generated parser type (MathExp.MathExpParser) in the generated assembly");
-            Assert.IsFalse(type.IsVisible, "The generated code is visible, should be internal");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "internal class MathExpParser"), "Generated parser is not internal by default");
         }
 
         /// <summary>
@@ -294,14 +281,10 @@ namespace Hime.Tests
         {
             SetTestDirectory();
             ExportResource("MathExp.gram", "MathExp.gram");
-            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:assembly -a:public" });
+            int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -a:public" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExp.dll"), "himecc did not produced MathExp.dll");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFile(System.IO.Path.Combine(System.Environment.CurrentDirectory, "MathExp.dll"));
-            System.Type type = assembly.GetType("MathExp.MathExpParser");
-            Assert.IsNotNull(type, "Failed to find the generated parser type (MathExp.MathExpParser) in the generated assembly");
-            Assert.IsTrue(type.IsPublic, "The generated code is not public, should be");
-            Assert.IsTrue(type.IsVisible, "The generated code is not visible, should be");
+            Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "public class MathExpParser"), "Generated parser is not public");
         }
 
         /// <summary>
@@ -314,7 +297,7 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsFalse(CheckFile("MathExpLog.mht"), "himecc produced a log file, shouldn't have");
+            Assert.IsFalse(CheckFileExists("MathExpLog.mht"), "himecc produced a log file, shouldn't have");
         }
 
         /// <summary>
@@ -327,7 +310,7 @@ namespace Hime.Tests
             ExportResource("MathExp.gram", "MathExp.gram");
             int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -l" });
             Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-            Assert.IsTrue(CheckFile("MathExpLog.mht"), "himecc did not produce a log file, MathExpLog.mht was expected");
+            Assert.IsTrue(CheckFileExists("MathExpLog.mht"), "himecc did not produce a log file, MathExpLog.mht was expected");
         }
 
         /// <summary>
