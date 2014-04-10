@@ -20,7 +20,11 @@
 
 namespace Hime.CentralDogma.Automata
 {
-    class DummyItem : FinalItem
+	/// <summary>
+	/// Represents a fake marker of a final state in an automaton
+	/// </summary>
+	/// <remarks>This class is a singleton</remarks>
+    public class DummyItem : FinalItem
     {
         private static DummyItem instance;
         private static readonly object _lock = new object();

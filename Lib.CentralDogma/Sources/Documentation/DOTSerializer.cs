@@ -24,7 +24,7 @@ using System.IO;
 
 namespace Hime.CentralDogma.Documentation
 {
-    class DOTSerializer
+    public class DOTSerializer
     {
         private StreamWriter writer;
 

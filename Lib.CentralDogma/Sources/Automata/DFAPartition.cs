@@ -22,16 +22,35 @@ using System.Collections.Generic;
 
 namespace Hime.CentralDogma.Automata
 {
-    class DFAPartition
+	/// <summary>
+	/// Represents a partition of a DFA
+	/// This is used to compute minimal DFAs
+	/// </summary>
+    public class DFAPartition
     {
+    	/// <summary>
+    	/// The groups in this partition
+    	/// </summary>
         private List<DFAStateGroup> groups;
 
+        /// <summary>
+        /// Gets the number of groups in this partition
+        /// </summary>
         public int GroupCount { get { return groups.Count; } }
 
+        /// <summary>
+        /// Initializes this partition
+        /// </summary>
         public DFAPartition()
         {
             groups = new List<DFAStateGroup>();
         }
+        
+        /// <summary>
+        /// Initializes this partition as the first partition of the given DFA
+        /// The first partition is according to final, non-final states
+        /// </summary>
+        /// <param name="dfa">A dfa</param>
         public DFAPartition(DFA dfa)
         {
             groups = new List<DFAStateGroup>();
@@ -44,7 +63,7 @@ namespace Hime.CentralDogma.Automata
                 if (state.FinalsCount != 0)
                 {
                     bool added = false;
-                    // Look for a correspondinf group in the existing ones
+                    // Look for a corresponding group in the existing ones
                     foreach (DFAStateGroup group in groups)
                     {
                         // If the current state and the group have same finals set : group found
@@ -75,7 +94,13 @@ namespace Hime.CentralDogma.Automata
                 groups.Insert(0, nonFinals);
         }
 
-        public bool DFAPartition_SameFinals(DFAState left, DFAState right)
+        /// <summary>
+        /// Determines if the two states have the same marks
+        /// </summary>
+        /// <param name="left">The left state</param>
+        /// <param name="right">The right state</param>
+        /// <returns>True if the two states have the same marks</returns>
+        private bool DFAPartition_SameFinals(DFAState left, DFAState right)
         {
             if (left.FinalsCount != right.FinalsCount)
                 return false;
@@ -87,6 +112,10 @@ namespace Hime.CentralDogma.Automata
             return true;
         }
 
+        /// <summary>
+        /// Refines this partition into another one
+        /// </summary>
+        /// <returns>The refined partition</returns>
         public DFAPartition Refine()
         {
             DFAPartition newPartition = new DFAPartition();
@@ -97,6 +126,11 @@ namespace Hime.CentralDogma.Automata
             return newPartition;
         }
 
+        /// <summary>
+        /// Adds a state to this partition, coming from the given old partition
+        /// </summary>
+        /// <param name="state">The state to add</param>
+        /// <param name="old">The old partition</param>
         public void AddState(DFAState state, DFAPartition old)
         {
             bool added = false;
@@ -116,6 +150,13 @@ namespace Hime.CentralDogma.Automata
                 groups.Add(new DFAStateGroup(state));
         }
 
+        /// <summary>
+        /// Determines whether two states should be in the same group
+        /// </summary>
+        /// <param name="s1">A state</param>
+        /// <param name="s2">Another state</param>
+        /// <param name="old">The old partition</param>
+        /// <returns></returns>
         private static bool AddState_SameGroup(DFAState s1, DFAState s2, DFAPartition old)
         {
             if (s1.Transitions.Count != s2.Transitions.Count)
@@ -134,6 +175,11 @@ namespace Hime.CentralDogma.Automata
             return true;
         }
 
+        /// <summary>
+        /// Gets the group of the given state in this partition
+        /// </summary>
+        /// <param name="state">A state</param>
+        /// <returns>The corresponding group</returns>
         private DFAStateGroup AddState_GetGroupOf(DFAState state)
         {
             foreach (DFAStateGroup group in groups)
@@ -142,6 +188,10 @@ namespace Hime.CentralDogma.Automata
             return null;
         }
 
+        /// <summary>
+        /// Gets the new dfa states produced by this partition
+        /// </summary>
+        /// <returns>The dfa states produced by this partition</returns>
         public List<DFAState> GetDFAStates()
         {
             // For each group in the partition

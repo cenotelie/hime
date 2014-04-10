@@ -22,22 +22,47 @@ using System.Collections.Generic;
 
 namespace Hime.CentralDogma.Automata
 {
-    class DFAStateGroup
+	/// <summary>
+	/// Represents a group of DFA states within a partition
+	/// </summary>
+    public class DFAStateGroup
     {
+    	/// <summary>
+    	/// The states in this group
+    	/// </summary>
         private List<DFAState> states;
 
+        /// <summary>
+        /// Gets the states in this group
+        /// </summary>
         public ICollection<DFAState> States { get { return states; } }
 
+        /// <summary>
+        /// Gets the representative state of this group
+        /// </summary>
         public DFAState Representative { get { return states[0]; } }
 
+        /// <summary>
+        /// Initializes this group with a representative state
+        /// </summary>
+        /// <param name="init">The representative state</param>
         public DFAStateGroup(DFAState init)
         {
             states = new List<DFAState>();
             states.Add(init);
         }
 
+        /// <summary>
+        /// Adds a state to this group
+        /// </summary>
+        /// <param name="state">The state to add</param>
         public void AddState(DFAState state) { states.Add(state); }
 
+        /// <summary>
+        /// Splits the given partition with this group
+        /// </summary>
+        /// <param name="current">The current partition</param>
+        /// <returns>The resulting partition</returns>
         public DFAPartition Split(DFAPartition current)
         {
             DFAPartition partition = new DFAPartition();
@@ -46,6 +71,11 @@ namespace Hime.CentralDogma.Automata
             return partition;
         }
 
+        /// <summary>
+        /// Determines whether the given state is in this group
+        /// </summary>
+        /// <param name="state">A state</param>
+        /// <returns>True of the state is in this group</returns>
         public bool Contains(DFAState state) { return states.Contains(state); }
     }
 }

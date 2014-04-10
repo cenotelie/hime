@@ -20,7 +20,7 @@
 
 namespace Hime.CentralDogma.Documentation
 {
-    enum DOTNodeShape
+    public enum DOTNodeShape
     {
         box, polygon, ellipse, circle,
         point, egg, triangle, plaintext,

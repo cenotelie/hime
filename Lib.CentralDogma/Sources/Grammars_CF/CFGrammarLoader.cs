@@ -1,4 +1,4 @@
-/**********************************************************************
+﻿/**********************************************************************
 * Copyright (c) 2013 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
@@ -88,25 +88,21 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         private Automata.NFA Compile_Recognize_terminal_def_atom_any(ASTNode node)
         {
-            Automata.NFA Final = new Automata.NFA();
-            Final.StateEntry = Final.AddNewState();
-            Final.StateExit = Final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             char begin = System.Convert.ToChar(0x0000);
             char end = System.Convert.ToChar(0xFFFF);
-            Final.StateEntry.AddTransition(new Automata.CharSpan(begin, end), Final.StateExit);
-            return Final;
+            final.StateEntry.AddTransition(new Automata.CharSpan(begin, end), final.StateExit);
+            return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(ASTNode node)
         {
-            Automata.NFA Final = new Automata.NFA();
-            Final.StateEntry = Final.AddNewState();
-            Final.StateExit = Final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             string value = ((TextToken)node.Symbol).Value;
             value = value.Substring(2, value.Length - 2);
             int charInt = System.Convert.ToInt32(value, 16);
             char c = System.Convert.ToChar(charInt);
-            Final.StateEntry.AddTransition(new Automata.CharSpan(c, c), Final.StateExit);
-            return Final;
+            final.StateEntry.AddTransition(new Automata.CharSpan(c, c), final.StateExit);
+            return final;
         }
         private string ReplaceEscapees(string value)
         {
@@ -138,8 +134,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_text(ASTNode node)
         {
-            Automata.NFA final = new Automata.NFA();
-            final.StateEntry = final.AddNewState();
+        	Automata.NFA final = Automata.NFA.NewMinimal();
             final.StateExit = final.StateEntry;
             string value = ((TextToken)node.Children[node.Children.Count-1].Symbol).Value;
             bool insensitive = caseInsensitive || (node.Children.Count > 1);
@@ -147,24 +142,22 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             value = ReplaceEscapees(value).Replace("\\'", "'");
             foreach (char c in value)
             {
-                Automata.NFAState Temp = final.AddNewState();
+                Automata.NFAState temp = final.AddNewState();
                 if (insensitive && char.IsLetter(c))
                 {
                     char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
-                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), Temp);
-                    final.StateExit.AddTransition(new Automata.CharSpan(c2, c2), Temp);
+                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), temp);
+                    final.StateExit.AddTransition(new Automata.CharSpan(c2, c2), temp);
                 }
                 else
-                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), Temp);
-                final.StateExit = Temp;
+                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), temp);
+                final.StateExit = temp;
             }
             return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_set(ASTNode node)
         {
-            Automata.NFA final = new Automata.NFA();
-            final.StateEntry = final.AddNewState();
-            final.StateExit = final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             string value = ((TextToken)node.Symbol).Value;
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
@@ -206,9 +199,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(ASTNode node)
         {
-            Automata.NFA final = new Automata.NFA();
-            final.StateEntry = final.AddNewState();
-            final.StateExit = final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             TextToken token = (TextToken)node.Symbol;
             string value = token.Value.Substring(4, token.Value.Length - 5);
             Unicode.Block block = Unicode.Block.Categories[value];
@@ -218,9 +209,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(ASTNode node)
         {
-            Automata.NFA final = new Automata.NFA();
-            final.StateEntry = final.AddNewState();
-            final.StateExit = final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             TextToken token = (TextToken)node.Symbol;
             string value = token.Value.Substring(4, token.Value.Length - 5);
             Unicode.Category category = Unicode.Category.Classes[value];
@@ -231,9 +220,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_span(ASTNode node)
         {
-            Automata.NFA final = new Automata.NFA();
-            final.StateEntry = final.AddNewState();
-            final.StateExit = final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             int spanBegin = 0;
             int spanEnd = 0;
             // Get span begin
@@ -260,11 +247,9 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             if (Ref == null)
             {
                 reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Cannot find terminal " + token.Value);
-                Automata.NFA Final = new Automata.NFA();
-                Final.StateEntry = Final.AddNewState();
-                Final.StateExit = Final.AddNewState();
-                Final.StateEntry.AddTransition(Automata.NFA.Epsilon, Final.StateExit);
-                return Final;
+                Automata.NFA final = Automata.NFA.NewMinimal();
+                final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
+                return final;
             }
             return ((TextTerminal)Ref).NFA.Clone(false);
         }
@@ -282,29 +267,29 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 if (token.Value == "?")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-                    return Automata.NFA.OperatorOption(inner, false);
+                    return Automata.NFA.NewOptional(inner, false);
                 }
                 if (token.Value == "*")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-                    return Automata.NFA.OperatorStar(inner, false);
+                    return Automata.NFA.NewRepeatZeroMore(inner, false);
                 }
                 if (token.Value == "+")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-                    return Automata.NFA.OperatorPlus(inner, false);
+                    return Automata.NFA.NewRepeatOneOrMore(inner, false);
                 }
                 if (token.Value == "|")
                 {
                     Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
                     Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
-                    return Automata.NFA.OperatorUnion(left, right, false);
+                    return Automata.NFA.NewUnion(left, right, false);
                 }
                 if (token.Value == "-")
                 {
                     Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
                     Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
-                    return Automata.NFA.OperatorDifference(left, right, false);
+                    return Automata.NFA.NewDifference(left, right, false);
                 }
                 if (token.Value == ".")
                     return Compile_Recognize_terminal_def_atom_any(node);
@@ -322,9 +307,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     return Compile_Recognize_terminal_def_atom_span(node);
                 if (token.Name == "NAME")
                     return Compile_Recognize_terminal_def_atom_name(node);
-                Automata.NFA final = new Automata.NFA();
-                final.StateEntry = final.AddNewState();
-                final.StateExit = final.AddNewState();
+                Automata.NFA final = Automata.NFA.NewMinimal();
                 final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
                 return final;
             }
@@ -338,17 +321,17 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 if (symbol.Name == "range")
                 {
                     Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-                    uint min = System.Convert.ToUInt32(((TextToken)node.Children[1].Symbol).Value);
-                    uint max = min;
+                    int min = System.Convert.ToInt32(((TextToken)node.Children[1].Symbol).Value);
+                    int max = min;
                     if (node.Children.Count > 2)
-                        max = System.Convert.ToUInt32(((TextToken)node.Children[2].Symbol).Value);
-                    return Automata.NFA.OperatorRange(inner, false, min, max);
+                        max = System.Convert.ToInt32(((TextToken)node.Children[2].Symbol).Value);
+                    return Automata.NFA.NewRepeatRange(inner, false, min, max);
                 }
                 if (symbol.Name == "concat")
                 {
                     Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
                     Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
-                    return Automata.NFA.OperatorConcat(left, right, false);
+                    return Automata.NFA.NewConcatenation(left, right, false);
                 }
             }
             return null;

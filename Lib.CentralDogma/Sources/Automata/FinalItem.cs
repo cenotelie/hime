@@ -20,8 +20,14 @@
 
 namespace Hime.CentralDogma.Automata
 {
-    interface FinalItem
+	/// <summary>
+	/// Represents a marker for the final state of an automaton
+	/// </summary>
+    public interface FinalItem
     {
+    	/// <summary>
+    	/// Gets the priority of this marker
+    	/// </summary>
         int Priority { get; }
     }
 }

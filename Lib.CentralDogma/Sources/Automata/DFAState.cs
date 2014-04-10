@@ -22,30 +22,78 @@ using System.Collections.Generic;
 
 namespace Hime.CentralDogma.Automata
 {
-    class DFAState
+	/// <summary>
+	/// Represents a state in a Deterministic Finite Automaton
+	/// </summary>
+	public class DFAState
     {
+		/// <summary>
+		/// The transitions from this state
+		/// </summary>
         private Dictionary<CharSpan, DFAState> transitions;
+        
+        /// <summary>
+        /// The top marker for this state
+        /// </summary>
         private FinalItem item;
+        
+        /// <summary>
+        /// The list of the current markers for this state
+        /// </summary>
         private List<FinalItem> items;
+        
+        /// <summary>
+        /// This state's id
+        /// </summary>
         private int iD;
 
+        /// <summary>
+        /// Gets the top marker for this state
+        /// </summary>
         public FinalItem TopItem { get { return item; } }
+        
+        /// <summary>
+        /// Gets the list of the markers for this state
+        /// </summary>
         public List<FinalItem> Items { get { return items; } }
+        
+        /// <summary>
+        /// Gets the transitions from this state
+        /// </summary>
         public Dictionary<CharSpan, DFAState> Transitions { get { return transitions; } }
+        
+        /// <summary>
+        /// Gets the number of markers for this state
+        /// </summary>
         public int FinalsCount { get { return items.Count; } }
+        
+        /// <summary>
+        /// Gets the number of transitions from this state
+        /// </summary>
         public int TransitionsCount { get { return transitions.Count; } }
+        
+        /// <summary>
+        /// Gets or sets the ID of this state
+        /// </summary>
         public int ID
         {
             get { return iD; }
             set { iD = value; }
         }
 
+        /// <summary>
+        /// Initialize this state
+        /// </summary>
         public DFAState()
         {
             items = new List<FinalItem>();
             transitions = new Dictionary<CharSpan, DFAState>();
         }
 
+        /// <summary>
+        /// Adds a new marker making this state a final state
+        /// </summary>
+        /// <param name="item">The new marker</param>
         public void AddFinal(FinalItem item)
         {
             if (!items.Contains(item))
@@ -60,16 +108,41 @@ namespace Hime.CentralDogma.Automata
                 }
             }
         }
+        
+        /// <summary>
+        /// Adds new markers making this state a final state
+        /// </summary>
+        /// <param name="items">The new markers</param>
         public void AddFinals(ICollection<FinalItem> items)
         {
             foreach (FinalItem item in items)
                 AddFinal(item);
         }
-        public void ClearFinals() { items.Clear(); item = null; }
+        
+        /// <summary>
+        /// Clears all markers for this states making it non-final
+        /// </summary>
+        public void ClearFinals()
+        {
+        	items.Clear();
+        	item = null;
+        }
 
+        /// <summary>
+        /// Adds a transition from this state
+        /// </summary>
+        /// <param name="value">The value on the transition</param>
+        /// <param name="next">The next state by the transition</param>
         public void AddTransition(CharSpan value, DFAState next) { transitions.Add(value, next); }
+        
+        /// <summary>
+        /// Removes all the transitions from this state
+        /// </summary>
         public void ClearTransitions() { transitions.Clear(); }
 
+        /// <summary>
+        /// Repacks all the transitions from this state to remove overlaps between the transitions' values
+        /// </summary>
         public void RepackTransitions()
         {
             Dictionary<DFAState, List<CharSpan>> inverse = new Dictionary<DFAState, List<CharSpan>>();
