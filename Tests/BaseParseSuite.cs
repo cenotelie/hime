@@ -146,6 +146,8 @@ namespace Hime.Tests
 
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
 			ASTNode inputAST = parser.Parse();
+			foreach (Hime.Redist.Parsers.ParserError error in parser.Errors)
+				Console.WriteLine(error.ToString());
 			Assert.IsNotNull(inputAST, "Failed to parse the input");
 			ASTNode expectedAST = ParseTree(expected);
 			Assert.IsNotNull(expectedAST, "Failed to parse the expected tree");
