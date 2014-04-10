@@ -22,21 +22,30 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
+using NUnit.Framework;
 
 namespace Hime.Tests
 {
+	/// <summary>
+	/// Represents a base test suite with helper methods
+	/// </summary>
     public abstract class BaseTestSuite
     {
-        private const string logName = "Log.txt";
-        private const string output = "output";
+        /// <summary>
+        /// The resource accessor for this test bundle
+        /// </summary>
+        protected ResourceAccessor accessor;
+        
+		/// <summary>
+        /// The current directory for the current test
+        /// </summary>
+        protected string directory;
 
-        private string log;
-        private ResourceAccessor accessor;
-        private string directory;
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Hime.Tests.BaseTestSuite"/> class.
+		/// </summary>
         protected BaseTestSuite()
         {
-            log = Path.Combine(Environment.CurrentDirectory, logName);
             accessor = new ResourceAccessor(Assembly.GetExecutingAssembly(), "Resources");
             directory = "Data_" + this.GetType().Name;
             try
@@ -45,19 +54,14 @@ namespace Hime.Tests
                     Directory.Delete(directory, true);
                 Directory.CreateDirectory(directory);
             }
-            catch (IOException ex)
-            {
-                Log(ex.Message);
-            }
+            catch (IOException) { }
         }
 
-        protected void Log(string message)
-        {
-            File.AppendAllText(log, message + Environment.NewLine);
-            Console.WriteLine(message);
-        }
-
-        protected void SetTestDirectory() {
+        /// <summary>
+        /// Setups the current directory for the test to come
+        /// </summary>
+        protected void SetTestDirectory()
+		{
             System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
             System.Diagnostics.StackFrame caller = trace.GetFrame(1);
             string dir = Path.Combine(directory, caller.GetMethod().Name);
@@ -67,9 +71,19 @@ namespace Hime.Tests
             Environment.CurrentDirectory = dir;
         }
 
+        /// <summary>
+        /// Exports the given resource to the given file
+        /// </summary>
+        /// <param name="name">The name of the resource to export</param>
+        /// <param name="file">The file to export to</param>
         protected void ExportResource(string name, string file) { accessor.Export(name, file); }
 
-        protected bool CheckFile(string file)
+        /// <summary>
+        /// Checks whether the given file exists and is not empty
+        /// </summary>
+        /// <param name="file">A file name</param>
+        /// <returns>True if the file exists and is not empty</returns>
+        protected bool CheckFileExists(string file)
         {
             if (!System.IO.File.Exists(file))
                 return false;
@@ -77,18 +91,17 @@ namespace Hime.Tests
             return (fi.Length > 0);
         }
 
-        protected Assembly CompileResource(string resource, ParsingMethod method)
-        {
-            string gram = accessor.GetAllTextFor(resource + ".gram");
-            CompilationTask task = new CompilationTask();
-            task.AddInputRaw(gram);
-            task.GrammarName = resource;
-            task.CodeAccess = AccessModifier.Public;
-            task.Method = method;
-            task.Mode = CompilationMode.Assembly;
-            task.Namespace = "Hime.Tests.Generated";
-            task.Execute();
-            return Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, resource + ".dll"));
-        }
+		/// <summary>
+		/// Checks that the given file contains the given string
+		/// </summary>
+		/// <param name="file">The file to check</param>
+		/// <param name="data">The data to check for in the file</param>
+		protected bool CheckFileContains(string file, string data)
+		{
+			if (!CheckFileExists(file))
+				return false;
+			string content = System.IO.File.ReadAllText(file);
+			return content.Contains (data);
+		}
     }
 }

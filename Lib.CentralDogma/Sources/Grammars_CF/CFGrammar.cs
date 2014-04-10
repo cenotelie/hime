@@ -130,8 +130,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             log.Info("Generating DFA for Terminals ...");
 
             // Construct a global NFA for all the terminals
-            Automata.NFA final = new Automata.NFA();
-            final.StateEntry = final.AddNewState();
+            Automata.NFA final = Automata.NFA.NewMinimal();
             foreach (TextTerminal terminal in terminalsByName.Values)
             {
                 Automata.NFA sub = terminal.NFA.Clone();

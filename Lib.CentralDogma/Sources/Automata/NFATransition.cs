@@ -20,10 +20,36 @@
 
 namespace Hime.CentralDogma.Automata
 {
-    class NFATransition
+	/// <summary>
+	/// Represents a transition in a Non-deterministic Finite Automaton
+	/// </summary>
+    public class NFATransition
     {
-        public CharSpan span;
-        public NFAState next;
+    	/// <summary>
+    	/// The value on this transition
+    	/// </summary>
+    	private CharSpan span;
+    	
+    	/// <summary>
+    	/// The next state by this transition
+    	/// </summary>
+    	private NFAState next;
+    	
+    	/// <summary>
+    	/// Gets the value on this transition
+    	/// </summary>
+    	public CharSpan Span { get { return span; } }
+    	
+    	/// <summary>
+    	/// Gets the next state by this transition
+    	/// </summary>
+    	public NFAState Next { get { return next; } }
+    	
+    	/// <summary>
+    	/// Initializes this transition
+    	/// </summary>
+    	/// <param name="span">The transition's value</param>
+    	/// <param name="next">The next state by this transition</param>
         public NFATransition(CharSpan span, NFAState next)
         {
             this.span = span;

@@ -22,63 +22,122 @@ using System.Collections.Generic;
 
 namespace Hime.CentralDogma.Automata
 {
-    struct CharSpan
+	/// <summary>
+	/// Represents a range of characters
+	/// </summary>
+    public struct CharSpan
     {
+    	/// <summary>
+    	/// Beginning of the range (included)
+    	/// </summary>
         private char spanBegin;
+        
+        /// <summary>
+        /// End of the range (included)
+        /// </summary>
         private char spanEnd;
 
-        public static CharSpan Null = new CharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
+        /// <summary>
+        /// Constant value for an invalid value
+        /// </summary>
+        public static readonly CharSpan Null = new CharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
 
+        /// <summary>
+        /// Gets the first (included) character of the range
+        /// </summary>
         public char Begin { get { return spanBegin; } }
+        
+        /// <summary>
+        /// Gets the last (included) character of the range
+        /// </summary>
         public char End { get { return spanEnd; } }
+        
+        /// <summary>
+        /// Gets the range's length in number of characters
+        /// </summary>
         public int Length { get { return spanEnd - spanBegin + 1; } }
 
-        public CharSpan(char Begin, char End)
+        /// <summary>
+        /// Initializes this character span
+        /// </summary>
+        /// <param name="begin">The first (included) character</param>
+        /// <param name="end">The last (included) character</param>
+        public CharSpan(char begin, char end)
         {
-            spanBegin = Begin;
-            spanEnd = End;
+            spanBegin = begin;
+            spanEnd = end;
         }
 
-        public static CharSpan Intersect(CharSpan Left, CharSpan Right)
+        /// <summary>
+        /// Gets the intersection between two spans
+        /// </summary>
+        /// <param name="left">The left span</param>
+        /// <param name="right">The right span</param>
+        /// <returns>The intersection</returns>
+        public static CharSpan Intersect(CharSpan left, CharSpan right)
         {
-            if (Left.spanBegin < Right.spanBegin)
+            if (left.spanBegin < right.spanBegin)
             {
-                if (Left.spanEnd < Right.spanBegin)
+                if (left.spanEnd < right.spanBegin)
                     return Null;
-                if (Left.spanEnd < Right.spanEnd)
-                    return new CharSpan(Right.spanBegin, Left.spanEnd);
-                return new CharSpan(Right.spanBegin, Right.spanEnd);
+                if (left.spanEnd < right.spanEnd)
+                    return new CharSpan(right.spanBegin, left.spanEnd);
+                return new CharSpan(right.spanBegin, right.spanEnd);
             }
             else
             {
-                if (Right.spanEnd < Left.spanBegin)
+                if (right.spanEnd < left.spanBegin)
                     return Null;
-                if (Right.spanEnd < Left.spanEnd)
-                    return new CharSpan(Left.spanBegin, Right.spanEnd);
-                return new CharSpan(Left.spanBegin, Left.spanEnd);
+                if (right.spanEnd < left.spanEnd)
+                    return new CharSpan(left.spanBegin, right.spanEnd);
+                return new CharSpan(left.spanBegin, left.spanEnd);
             }
         }
 
-        public static CharSpan Split(CharSpan Original, CharSpan Splitter, out CharSpan Rest)
+        /// <summary>
+        /// Splits the original span with the given splitter
+        /// </summary>
+        /// <param name="original">The span to be split</param>
+        /// <param name="splitter">The splitter</param>
+        /// <param name="rest">The second part of the resulting split</param>
+        /// <returns>The first part of the resulting split</returns>
+        public static CharSpan Split(CharSpan original, CharSpan splitter, out CharSpan rest)
         {
-            if (Original.spanBegin == Splitter.spanBegin)
+            if (original.spanBegin == splitter.spanBegin)
             {
-                Rest = Null;
-                if (Original.spanEnd == Splitter.spanEnd) return Null;
-                return new CharSpan(System.Convert.ToChar(Splitter.spanEnd + 1), Original.spanEnd);
+                rest = Null;
+                if (original.spanEnd == splitter.spanEnd) return Null;
+                return new CharSpan(System.Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
             }
-            if (Original.spanEnd == Splitter.spanEnd)
+            if (original.spanEnd == splitter.spanEnd)
             {
-                Rest = Null;
-                return new CharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
+                rest = Null;
+                return new CharSpan(original.spanBegin, System.Convert.ToChar(splitter.spanBegin - 1));
             }
-            Rest = new CharSpan(System.Convert.ToChar(Splitter.spanEnd + 1), Original.spanEnd);
-            return new CharSpan(Original.spanBegin, System.Convert.ToChar(Splitter.spanBegin - 1));
+            rest = new CharSpan(System.Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
+            return new CharSpan(original.spanBegin, System.Convert.ToChar(splitter.spanBegin - 1));
         }
 
+        /// <summary>
+        /// Compares the left and right spans for an increasing order sort
+        /// </summary>
+        /// <param name="left">The left span</param>
+        /// <param name="right">The right span</param>
+        /// <returns>The order between left and right</returns>
         public static int Compare(CharSpan left, CharSpan right) { return left.spanBegin.CompareTo(right.spanBegin); }
+        
+        /// <summary>
+        /// Compares the left and right spans for a decreasing order sort
+        /// </summary>
+        /// <param name="left">The left span</param>
+        /// <param name="right">The right span</param>
+        /// <returns>The order between left and right</returns>
         public static int CompareReverse(CharSpan left, CharSpan right) { return right.spanBegin.CompareTo(left.spanBegin); }
 
+        /// <summary>
+        /// Gets the string representation of this span
+        /// </summary>
+        /// <returns>The string representation</returns>
         public override string ToString()
         {
             if (spanBegin > spanEnd)
@@ -88,6 +147,11 @@ namespace Hime.CentralDogma.Automata
             return "[" + CharToString(spanBegin) + "-" + CharToString(spanEnd) + "]";
         }
 
+        /// <summary>
+        /// Gets a user-friendly representation of the character
+        /// </summary>
+        /// <param name="c">A character</param>
+        /// <returns>The string representation</returns>
         private string CharToString(char c)
         {
             System.Globalization.UnicodeCategory cat = char.GetUnicodeCategory(c);
@@ -110,12 +174,23 @@ namespace Hime.CentralDogma.Automata
                     return c.ToString();
             }
         }
+        
+        /// <summary>
+        /// Gets the string representation for the given non-printable character
+        /// </summary>
+        /// <param name="c">A non-printable character</param>
+        /// <returns>The string representation</returns>
         private string CharToString_NonPrintable(char c)
         {
             string result = "U+" + System.Convert.ToUInt16(c).ToString("X");
             return result;
         }
 
+        /// <summary>
+        /// Determines whether the given obj is equal to this span
+        /// </summary>
+        /// <param name="obj">The object to compare</param>
+        /// <returns>True if obj is equal to this span</returns>
         public override bool Equals(object obj)
         {
             if (obj is CharSpan)
@@ -125,6 +200,11 @@ namespace Hime.CentralDogma.Automata
             }
             return false;
         }
+        
+        /// <summary>
+        /// Gets the hash-code for this span
+        /// </summary>
+        /// <returns>The span's hash-code</returns>
         public override int GetHashCode() { return base.GetHashCode(); }
     }
 }

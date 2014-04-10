@@ -19,12 +19,12 @@
 **********************************************************************/
 
 using System.Collections.Generic;
-using Hime.Redist;
+using Hime.Redist.AST;
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.SDK
 {
     /// <summary>
-    /// Convenience class for the exportation of ASTs to graphs
+    /// Convenience class for the export of ASTs to graphs
     /// </summary>
     public static class ASTExporter
     {

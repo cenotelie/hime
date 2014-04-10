@@ -20,7 +20,10 @@
 
 namespace Hime.CentralDogma.Documentation
 {
-    enum DOTNodeShape
+	/// <summary>
+	/// Represents the shape of nodes in a graph in the DOT format
+	/// </summary>
+    public enum DOTNodeShape
     {
         box, polygon, ellipse, circle,
         point, egg, triangle, plaintext,

@@ -203,6 +203,10 @@ namespace Hime.CentralDogma
             // Get the parser data
             Grammars.ParserData parserData = grammar.GetParserData(reporter, GetParserGenerator(Method));
 
+            // If there is any error => abort now
+            if (reporter.Result.HasErrors)
+            	return null;
+
             // Build names
             string prefix = (OutputPrefix != null) ? OutputPrefix : grammar.Name;
             string nmspace = (Namespace != null) ? Namespace : grammar.Name;

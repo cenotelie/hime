@@ -22,14 +22,47 @@ using System.Collections.Generic;
 
 namespace Hime.CentralDogma.Automata
 {
-    class DFA
+	/// <summary>
+	/// Represents a Deterministic Finite-state Automaton
+	/// </summary>
+    public class DFA
     {
+    	/// <summary>
+    	/// The list of states in this automaton
+    	/// </summary>
         private List<DFAState> states;
 
-        public ICollection<DFAState> States { get { return states; } }
+        /// <summary>
+        /// Gets the states in this automaton
+        /// </summary>
+        public List<DFAState> States { get { return states; } }
+        
+        /// <summary>
+        /// Gets the entry state of this automaton
+        /// </summary>
         public DFAState Entry { get { return states[0]; } }
 
-        private DFA(List<DFAState> states) { this.states = states; }
+		/// <summary>
+		/// Initializes a new (empty DFA)
+		/// </summary>
+		public DFA ()
+		{
+			this.states = new List<DFAState>();
+		}
+
+        /// <summary>
+        /// Initializes a DFA with a list of existing states
+        /// </summary>
+        /// <param name="states">Some states</param>
+        private DFA(List<DFAState> states)
+        {
+        	this.states = states;
+        }
+        
+        /// <summary>
+        /// Initializes this dfa as equivalent to the given nfa
+        /// </summary>
+        /// <param name="nfa">A nfa</param>
         public DFA(NFA nfa)
         {
             states = new List<DFAState>();
@@ -63,7 +96,7 @@ namespace Hime.CentralDogma.Automata
                     for (int j = 0; j != nfaStateSets.Count; j++)
                     {
                         // An existing equivalent set is already present
-                        if (nfaStateSets[j] == next)
+                        if (nfaStateSets[j].Equals(next))
                         {
                             states[i].AddTransition(value, states[j]);
                             found = true;
@@ -88,6 +121,10 @@ namespace Hime.CentralDogma.Automata
             }
         }
 
+        /// <summary>
+        /// Gets the minimal automaton equivalent to this ine
+        /// </summary>
+        /// <returns>The minimal DFA</returns>
         public DFA Minimize()
         {
             DFAPartition current = new DFAPartition(this);
@@ -100,12 +137,18 @@ namespace Hime.CentralDogma.Automata
             return new DFA(newPartition.GetDFAStates());
         }
 
+        /// <summary>
+        /// Repacks the transitions of all the states in this automaton
+        /// </summary>
         public void RepackTransitions()
         {
             foreach (DFAState state in states)
                 state.RepackTransitions();
         }
 
+        /// <summary>
+        /// Prunes all the unreachable states from this automaton
+        /// </summary>
         public void Prune()
         {
             Dictionary<DFAState, List<DFAState>> inverses = new Dictionary<DFAState, List<DFAState>>();
@@ -154,6 +197,10 @@ namespace Hime.CentralDogma.Automata
             }
         }
 
+        /// <summary>
+        /// Serializes the graph of this automaton with the given serializer
+        /// </summary>
+        /// <param name="serializer">A serializer</param>
         public void SerializeGraph(Documentation.DOTSerializer serializer)
         {
             foreach (DFAState state in states)

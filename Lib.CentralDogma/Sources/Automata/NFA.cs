@@ -22,32 +22,73 @@ using System.Collections.Generic;
 
 namespace Hime.CentralDogma.Automata
 {
-    class NFA
+	/// <summary>
+	/// Represents a Non-deterministic Finite Automaton
+	/// </summary>
+    public class NFA
     {
+    	/// <summary>
+    	/// The list of all the states in this automaton
+    	/// </summary>
         private List<NFAState> states;
+        
+        /// <summary>
+        /// The entry state
+        /// </summary>
         private NFAState stateEntry;
+        
+        /// <summary>
+        /// The exit state
+        /// </summary>
         private NFAState stateExit;
 
+        /// <summary>
+        /// Represents the value epsilon on NFA transtions
+        /// </summary>
         public static readonly CharSpan Epsilon = new CharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
+        
+        /// <summary>
+        /// Gets the collection of states in this automaton
+        /// </summary>
         public ICollection<NFAState> States { get { return states; } }
+        
+        /// <summary>
+        /// Gets the number of states in this automaton
+        /// </summary>
         public int StatesCount { get { return states.Count; } }
+        
+        /// <summary>
+        /// Gets or sets the entry set for this automaton
+        /// </summary>
         public NFAState StateEntry
         {
             get { return stateEntry; }
             set { stateEntry = value; }
         }
+        
+        /// <summary>
+        /// Gets ot sets the exit state for this automaton
+        /// </summary>
         public NFAState StateExit
         {
             get { return stateExit; }
             set { stateExit = value; }
         }
 
-        public NFA()
+        /// <summary>
+        /// Initializes an empty automaton (no state)
+        /// </summary>
+        private NFA()
         {
             states = new List<NFAState>();
         }
 
-        NFA(DFA dfa)
+        /// <summary>
+        /// Initializes this automaton as a copy of the given DFA
+        /// This automaton will not have an exit state
+        /// </summary>
+        /// <param name="dfa">The DFA to copy</param>
+        public NFA(DFA dfa)
         {
             states = new List<NFAState>();
             List<DFAState> dfaStates = new List<DFAState>(dfa.States);
@@ -61,7 +102,11 @@ namespace Hime.CentralDogma.Automata
             }
             stateEntry = states[0];
         }
-
+        
+        /// <summary>
+        /// Adds a new state to this automaton
+        /// </summary>
+        /// <returns>The new state</returns>
         public NFAState AddNewState()
         {
             NFAState state = new NFAState();
@@ -69,7 +114,17 @@ namespace Hime.CentralDogma.Automata
             return state;
         }
 
+        /// <summary>
+        /// Clones this automaton
+        /// </summary>
+        /// <returns>The cloned automaton</returns>
         public NFA Clone() { return Clone(true); }
+        
+        /// <summary>
+        /// Clones this automaton
+        /// </summary>
+        /// <param name="keepFinals">Whether to keep the marks for the final states</param>
+        /// <returns>The cloned automaton</returns>
         public NFA Clone(bool keepFinals)
         {
             NFA copy = new NFA();
@@ -87,7 +142,7 @@ namespace Hime.CentralDogma.Automata
             for (int i = 0; i != states.Count; i++)
             {
                 foreach (NFATransition transition in states[i].Transitions)
-                    copy.states[i].AddTransition(transition.span, copy.states[states.IndexOf(transition.next)]);
+                    copy.states[i].AddTransition(transition.Span, copy.states[states.IndexOf(transition.Next)]);
             }
             if (stateEntry != null)
                 copy.stateEntry = copy.states[states.IndexOf(stateEntry)];
@@ -96,12 +151,21 @@ namespace Hime.CentralDogma.Automata
             return copy;
         }
 
+        /// <summary>
+        /// Inserts all the states of the given automaton into this one
+        /// This does not make a copy of the states, this directly includes them
+        /// </summary>
+        /// <param name="sub">Sub-automaton to include in this one</param>
         public void InsertSubNFA(NFA sub)
         {
             states.AddRange(sub.states);
         }
 		
-		private static NFA BuildNFA()
+        /// <summary>
+        /// Creates and initializes a minimal automaton with an entry state and a separate exit state
+        /// </summary>
+        /// <returns>The created automaton</returns>
+		public static NFA NewMinimal()
 		{
 			NFA result = new NFA();
             result.stateEntry = result.AddNewState();
@@ -109,10 +173,16 @@ namespace Hime.CentralDogma.Automata
 			return result;
 		}
 		
+		/// <summary>
+		/// Creates an automaton that represents makes the given sub-automaton optional
+		/// </summary>
+		/// <param name="sub">The sub-automaton to make optional</param>
+		/// <param name="useClones">True to completely clone the sub-automaton</param>
+		/// <returns>The new automaton</returns>
 		// TODO: should get rid of static methods
-        public static NFA OperatorOption(NFA sub, bool useClones)
+        public static NFA NewOptional(NFA sub, bool useClones)
         {
-            NFA final = BuildNFA();
+            NFA final = NewMinimal();
             if (useClones)
                 sub = sub.Clone();
             final.states.AddRange(sub.states);
@@ -121,10 +191,17 @@ namespace Hime.CentralDogma.Automata
             sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
             return final;
         }
+        
+        /// <summary>
+        /// Creates an automaton that repeats the sub-automaton zero or more times
+        /// </summary>
+        /// <param name="sub">The sub-automaton</param>
+        /// <param name="useClones">True to completely clone the sub-automaton</param>
+        /// <returns>The new automaton</returns>
 		// TODO: should get rid of static methods
-		public static NFA OperatorStar(NFA sub, bool useClones)
+		public static NFA NewRepeatZeroMore(NFA sub, bool useClones)
         {
-            NFA final = BuildNFA();
+            NFA final = NewMinimal();
             if (useClones)
                 sub = sub.Clone();
             final.states.AddRange(sub.states);
@@ -134,9 +211,17 @@ namespace Hime.CentralDogma.Automata
             final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
             return final;
         }
-        public static NFA OperatorPlus(NFA sub, bool useClones)
+		
+        /// <summary>
+        /// Creates an automaton that repeats the sub-automaton one or more times
+        /// </summary>
+        /// <param name="sub">The sub-automaton</param>
+        /// <param name="useClones">True to completely clone the sub-automaton</param>
+        /// <returns>The new automaton</returns>
+		// TODO: should get rid of static methods
+		public static NFA NewRepeatOneOrMore(NFA sub, bool useClones)
         {
-            NFA final = BuildNFA();
+            NFA final = NewMinimal();
             if (useClones)
                 sub = sub.Clone();
             final.states.AddRange(sub.states);
@@ -145,21 +230,31 @@ namespace Hime.CentralDogma.Automata
             final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
             return final;
         }
-        public static NFA OperatorRange(NFA sub, bool useClones, uint min, uint max)
+		
+        /// <summary>
+        /// Creates an automaton that repeats the sub-automaton a number of times in the given range [min, max]
+        /// </summary>
+        /// <param name="sub">The sub-automaton</param>
+        /// <param name="useClones">True to completely clone the sub-automaton</param>
+        /// <param name="min">The minimum (included) number of time to repeat</param>
+        /// <param name="min">The maximum (included) number of time to repeat</param>
+        /// <returns>The new automaton</returns>
+		// TODO: should get rid of static methods
+		public static NFA NewRepeatRange(NFA sub, bool useClones, int min, int max)
         {
-            NFA final = BuildNFA();
+            NFA final = NewMinimal();
 
             NFAState last = final.stateEntry;
-            for (uint i = 0; i != min; i++)
+            for (int i = 0; i != min; i++)
             {
                 NFA inner = sub.Clone();
                 final.states.AddRange(inner.states);
                 last.AddTransition(NFA.Epsilon, inner.stateEntry);
                 last = inner.stateExit;
             }
-            for (uint i = min; i != max; i++)
+            for (int i = min; i != max; i++)
             {
-                NFA inner = OperatorOption(sub, true);
+                NFA inner = NewOptional(sub, true);
                 final.states.AddRange(inner.states);
                 last.AddTransition(NFA.Epsilon, inner.stateEntry);
                 last = inner.stateExit;
@@ -170,9 +265,18 @@ namespace Hime.CentralDogma.Automata
                 final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
             return final;
         }
-		public static NFA OperatorUnion(NFA left, NFA right, bool useClones)
+		
+		/// <summary>
+		/// Creates an automaton that is the union of the two sub-automaton
+		/// </summary>
+		/// <param name="left">The left automaton</param>
+		/// <param name="right">The right automaton</param>
+		/// <param name="useClones">True to completely clone the sub-automata</param>
+        /// <returns>The new automaton</returns>
+		// TODO: should get rid of static methods
+		public static NFA NewUnion(NFA left, NFA right, bool useClones)
         {
-            NFA final = BuildNFA();
+            NFA final = NewMinimal();
             if (useClones)
             {
                 left = left.Clone(true);
@@ -186,7 +290,16 @@ namespace Hime.CentralDogma.Automata
             right.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
             return final;
         }
-        public static NFA OperatorConcat(NFA left, NFA right, bool useClones)
+		
+		/// <summary>
+		/// Creates an automaton that concatenates the two sub-automaton
+		/// </summary>
+		/// <param name="left">The left automaton</param>
+		/// <param name="right">The right automaton</param>
+		/// <param name="useClones">True to completely clone the sub-automata</param>
+        /// <returns>The new automaton</returns>
+		// TODO: should get rid of static methods
+		public static NFA NewConcatenation(NFA left, NFA right, bool useClones)
         {
             NFA final = new NFA();
             if (useClones)
@@ -201,9 +314,18 @@ namespace Hime.CentralDogma.Automata
             left.stateExit.AddTransition(NFA.Epsilon, right.stateEntry);
             return final;
         }
-        public static NFA OperatorDifference(NFA left, NFA right, bool useClones)
+		
+        /// <summary>
+		/// Creates an automaton that is the difference between the left and right sub-automata
+		/// </summary>
+		/// <param name="left">The left automaton</param>
+		/// <param name="right">The right automaton</param>
+		/// <param name="useClones">True to completely clone the sub-automata</param>
+        /// <returns>The new automaton</returns>
+		// TODO: should get rid of static methods
+		public static NFA NewDifference(NFA left, NFA right, bool useClones)
         {
-            NFA final = BuildNFA();
+            NFA final = NewMinimal();
             NFAState statePositive = final.AddNewState();
             NFAState stateNegative = final.AddNewState();
             statePositive.Mark = 1;

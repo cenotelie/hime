@@ -24,48 +24,91 @@ using System.IO;
 
 namespace Hime.CentralDogma.Documentation
 {
-    class DOTSerializer
+	/// <summary>
+	/// Serializes graphs in the DOT format
+	/// </summary>
+    public class DOTSerializer
     {
+		/// <summary>
+		/// The writer
+		/// </summary>
         private StreamWriter writer;
 
+		/// <summary>
+		/// Initializes a new instance of the serializer
+		/// </summary>
+		/// <param name="name">Name of the graph</param>
+		/// <param name="file">File to serialize to</param>
         public DOTSerializer(string name, string file)
         {
             writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
             writer.WriteLine("digraph " + name + " {");
         }
 
+		/// <summary>
+		/// Writes a node with the given id
+		/// </summary>
+		/// <param name="id">Node's ID</param>
         public void WriteNode(string id)
         {
 			this.WriteNode(id, id);
         }
 
+        /// <summary>
+		/// Writes a node with the given id
+		/// </summary>
+		/// <param name="id">Node's ID</param>
+		/// <param name="label">Node's labe</param>
         public void WriteNode(string id, string label)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\"];");
         }
 
+        /// <summary>
+		/// Writes a node with the given id and URL
+		/// </summary>
+		/// <param name="id">Node's ID</param>
+		/// <param name="url">Node's url</param>
         public void WriteNodeURL(string id, string url)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(id) + "\", URL=\"" + url + "\"];");
         }
 
+        /// <summary>
+		/// Writes a node with the given id
+		/// </summary>
+		/// <param name="id">Node's ID</param>
+		/// <param name="label">Node's labe</param>
+        /// <param name="shape">Node's shape</param>
         public void WriteNode(string id, string label, DOTNodeShape shape)
         {
             writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
         }
 
+        /// <summary>
+		/// Writes an edge
+		/// </summary>
+		/// <param name="tail">ID of the starting node</param>
+		/// <param name="head">ID of the ending node</param>
+        /// <param name="label">Label for the edge</param>
         public void WriteEdge(string tail, string head, string label)
         {
             writer.WriteLine("    _" + tail + " -> _" + head + " [label=\"" + label + "\"];");
         }
 
-        public void Close()
+        /// <summary>
+		/// Closes this serializer
+		/// </summary>
+		public void Close()
         {
             writer.WriteLine("}");
             writer.Close();
         }
 
-        private string SanitizeString(string original)
+        /// <summary>
+		/// Sanitizes the given string for the DOT format
+		/// </summary>
+		private string SanitizeString(string original)
         {
             return original.Replace("\"", "\\\"").Replace("\\", "\\\\");
         }
