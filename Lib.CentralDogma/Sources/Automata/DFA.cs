@@ -35,12 +35,20 @@ namespace Hime.CentralDogma.Automata
         /// <summary>
         /// Gets the states in this automaton
         /// </summary>
-        public ICollection<DFAState> States { get { return states; } }
+        public List<DFAState> States { get { return states; } }
         
         /// <summary>
         /// Gets the entry state of this automaton
         /// </summary>
         public DFAState Entry { get { return states[0]; } }
+
+		/// <summary>
+		/// Initializes a new (empty DFA)
+		/// </summary>
+		public DFA ()
+		{
+			this.states = new List<DFAState>();
+		}
 
         /// <summary>
         /// Initializes a DFA with a list of existing states
