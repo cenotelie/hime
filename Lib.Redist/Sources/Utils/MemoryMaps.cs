@@ -26,7 +26,7 @@ namespace Hime.Redist.Utils
     /// Represents a blob of binary data that can be accessed as an array of unsigned 32-bits integers
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    class BlobUInt
+    public class BlobUInt
     {
         [FieldOffset(0)]
         private byte[] blob;
@@ -68,7 +68,7 @@ namespace Hime.Redist.Utils
     /// Represents a blob of binary data that can be accessed as an array of unsigned 16-bits integers
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    class BlobUShort
+    public class BlobUShort
     {
         [FieldOffset(0)]
         private byte[] blob;

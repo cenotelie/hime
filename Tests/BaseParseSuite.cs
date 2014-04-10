@@ -22,8 +22,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
-using Hime.Redist.AST;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 using NUnit.Framework;
 
 namespace Hime.Tests
@@ -60,10 +59,10 @@ namespace Hime.Tests
         /// Parses the string representation of the given parse tree
         /// </summary>
         /// <param name="data">A string representation of a parse tree</param>
-        /// <returns>The parse tree's AST</returns>
-        private ASTNode ParseTree(string data)
+        /// <returns>The parse result</returns>
+        private ParseResult ParseTree(string data)
         {
-        	Hime.Redist.Lexer.ILexer lexer = parseTreeLexer.Invoke(new object[] { data }) as Hime.Redist.Lexer.ILexer;
+        	Hime.Redist.Lexer.Lexer lexer = parseTreeLexer.Invoke(new object[] { data }) as Hime.Redist.Lexer.Lexer;
             Hime.Redist.Parsers.IParser parser = parseTreeParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
             return parser.Parse();
         }
@@ -76,13 +75,13 @@ namespace Hime.Tests
         /// <returns>True if the two trees match</returns>
         private bool Compare(ASTNode expected, ASTNode node)
         {
-            if (node.Symbol.Name != (expected.Symbol as Token).Value)
+            if (node.Symbol.Name != expected.Symbol.Value)
                 return false;
             if (expected.Children[0].Children.Count != 0)
             {
-                string vRef = (expected.Children[0].Children[0].Symbol as Token).Value;
+                string vRef = expected.Children[0].Children[0].Symbol.Value;
                 vRef = vRef.Substring(1, vRef.Length - 2);
-                string vReal = (node.Symbol as Token).Value;
+                string vReal = node.Symbol.Value;
                 if (vReal != vRef)
                     return false;
             }
@@ -125,7 +124,7 @@ namespace Hime.Tests
 			ConstructorInfo ciLexer = typeLexer.GetConstructor(new Type[] { typeof(string) });
             ConstructorInfo ciParser = typeParser.GetConstructor(new Type[] { typeLexer });
 
-			Hime.Redist.Lexer.ILexer lexer = ciLexer.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
+			Hime.Redist.Lexer.Lexer lexer = ciLexer.Invoke(new object[] { input }) as Hime.Redist.Lexer.Lexer;
             Hime.Redist.Parsers.IParser parser = ciParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
 			return parser;
 		}
@@ -145,14 +144,14 @@ namespace Hime.Tests
 			string prefix = caller.GetMethod().Name;
 
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
-			ASTNode inputAST = parser.Parse();
-			foreach (Hime.Redist.Parsers.ParserError error in parser.Errors)
+			ParseResult inputResult = parser.Parse();
+			foreach (Error error in inputResult.Errors)
 				Console.WriteLine(error.ToString());
-			Assert.IsNotNull(inputAST, "Failed to parse the input");
-			ASTNode expectedAST = ParseTree(expected);
-			Assert.IsNotNull(expectedAST, "Failed to parse the expected tree");
+			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
+			ParseResult expectedResult = ParseTree(expected);
+			Assert.IsTrue(expectedResult.IsSuccess, "Failed to parse the expected tree");
 
-			bool result = Compare(expectedAST, inputAST);
+			bool result = Compare(expectedResult.Root, inputResult.Root);
 			Assert.IsTrue(result, "AST from input does not match the expected AST");
         }
 
@@ -171,12 +170,14 @@ namespace Hime.Tests
 			string prefix = caller.GetMethod().Name;
 
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
-			ASTNode inputAST = parser.Parse();
-			Assert.IsNotNull(inputAST, "Failed to parse the input");
-			ASTNode expectedAST = ParseTree(unexpected);
-			Assert.IsNotNull(expectedAST, "Failed to parse the unexpected tree");
+			ParseResult inputResult = parser.Parse();
+			foreach (Error error in inputResult.Errors)
+				Console.WriteLine(error.ToString());
+			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
+			ParseResult unexpectedResult = ParseTree(unexpected);
+			Assert.IsTrue(unexpectedResult.IsSuccess, "Failed to parse the expected tree");
 
-			bool result = Compare(expectedAST, inputAST);
+			bool result = Compare(unexpectedResult.Root, inputResult.Root);
 			Assert.IsFalse(result, "AST from input matches the unexpected AST, should not");
         }
 
@@ -194,8 +195,8 @@ namespace Hime.Tests
 			string prefix = caller.GetMethod().Name;
 
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
-			ASTNode inputAST = parser.Parse();
-			Assert.IsNull(inputAST, "Failed to parse the input");
+			ParseResult inputResult = parser.Parse();
+			Assert.IsFalse(inputResult.IsSuccess, "Succeeded to parse the input, shouldn't");
 		}
 	}
 }

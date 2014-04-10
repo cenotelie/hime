@@ -144,7 +144,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             stream.WriteLine("        public class Actions");
             stream.WriteLine("        {");
             foreach (Action action in actions)
-                stream.WriteLine("            public virtual void " + action.Name + "(Variable head, SemanticBody body) { }");
+                stream.WriteLine("            public virtual void " + action.Name + "(Symbol head, SemanticBody body) { }");
             stream.WriteLine();
             stream.WriteLine("            public UserAction[] GetActions()");
             stream.WriteLine("            {");

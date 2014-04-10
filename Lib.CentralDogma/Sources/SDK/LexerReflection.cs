@@ -21,7 +21,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 
 namespace Hime.CentralDogma.SDK
 {
@@ -30,13 +30,13 @@ namespace Hime.CentralDogma.SDK
 	/// </summary>
 	public class MatchedTerminal : Automata.FinalItem
 	{
-		private Terminal terminal;
+		private Symbol terminal;
 
 		/// <summary>
 		/// Gets the terminal repesented by this marker
 		/// </summary>
 		/// <value>
-		public Terminal Terminal { get { return terminal; } }
+		public Symbol Terminal { get { return terminal; } }
 
 		/// <summary>
     	/// Gets the priority of this marker
@@ -47,7 +47,7 @@ namespace Hime.CentralDogma.SDK
 		/// Initializes this marker
 		/// </summary>
 		/// <param name="t">The matched terminal</param>
-		public MatchedTerminal(Terminal t)
+		public MatchedTerminal(Symbol t)
 		{
 			this.terminal = t;
 		}
@@ -72,7 +72,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// List of the terminals that can be matched
 		/// </summary>
-		private List<Terminal> terminals;
+		private List<Symbol> terminals;
 
 		/// <summary>
 		/// DFA of the lexer
@@ -83,7 +83,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the terminals that can be matched by this lexer
 		/// </summary>
-		public List<Terminal> Terminals { get { return terminals; } }
+		public List<Symbol> Terminals { get { return terminals; } }
 
 		/// <summary>
 		/// Gets the lexer's dfa
@@ -99,9 +99,9 @@ namespace Hime.CentralDogma.SDK
 		{
 			string input = "";
 			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
-			Hime.Redist.Lexer.ILexer lexer = ctor.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
+			Hime.Redist.Lexer.Lexer lexer = ctor.Invoke(new object[] { input }) as Hime.Redist.Lexer.Lexer;
 
-			this.terminals = new List<Terminal>(lexer.Terminals.Values);
+			this.terminals = new List<Symbol>(lexer.Terminals.Values);
 			this.dfa = new Automata.DFA ();
 
 			string[] resources = assembly.GetManifestResourceNames();

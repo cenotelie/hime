@@ -78,6 +78,9 @@ namespace Hime.Redist.Lexer
         /// <returns>The substring</returns>
         public string GetValue(int index, int length)
         {
+			if (length == 0)
+				return "";
+
             int chunk = index >> upperShift;  // index of the chunk
             int start = index & lowerMask; // start index in the chunk
 
