@@ -24,7 +24,7 @@ using Hime.Redist.AST;
 using Hime.Redist.Parsers;
 using NUnit.Framework;
 
-namespace Hime.Tests
+namespace Hime.Tests.Integration
 {
 	/// <summary>
 	/// Integration test suite for high-level parsing features

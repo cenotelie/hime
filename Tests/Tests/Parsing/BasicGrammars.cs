@@ -21,13 +21,13 @@
 using Hime.CentralDogma;
 using NUnit.Framework;
 
-namespace Hime.Tests
+namespace Hime.Tests.Parsing
 {
 	/// <summary>
 	/// Tests the basic grammar features
 	/// </summary>
 	[TestFixture]
-	public class ParsingBasicGrammars : BaseParseSuite
+	public class BasicGrammars : BaseParseSuite
 	{
 		/// <summary>
 		/// Tests that the correct grammar variable is selected as the axiom of the grammar

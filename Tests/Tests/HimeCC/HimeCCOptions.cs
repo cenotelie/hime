@@ -20,7 +20,7 @@
 
 using NUnit.Framework;
 
-namespace Hime.Tests
+namespace Hime.Tests.HimeCC
 {
 	/// <summary>
 	/// Test suite for the HimeCC options

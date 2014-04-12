@@ -21,13 +21,13 @@
 using Hime.CentralDogma;
 using NUnit.Framework;
 
-namespace Hime.Tests
+namespace Hime.Tests.Parsing
 {
 	/// <summary>
 	/// Tests the tree actions features
 	/// </summary>
 	[TestFixture]
-	public class ParsingTreeActions : BaseParseSuite
+	public class TreeActions : BaseParseSuite
 	{
 		[Test]
         public void Test_Promote_Simple()
