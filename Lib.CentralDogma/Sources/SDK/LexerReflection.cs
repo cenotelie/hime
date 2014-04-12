@@ -138,14 +138,14 @@ namespace Hime.CentralDogma.SDK
 					ushort next = data[offset + 3 + j];
 					char c = System.Convert.ToChar(j);
 					if (next != 0xFFFF)
-						current.AddTransition(new Automata.CharSpan(c, c), this.dfa.States[next]);
+						current.AddTransition(new CharSpan(c, c), this.dfa.States[next]);
 				}
 				for (int j=0; j!=nNonCached; j++)
 				{
 					ushort begin = data[offset + 3 + 256 + (j * 3)];
 					ushort end = data[offset + 3 + 256 + (j * 3) + 1];
 					ushort next = data[offset + 3 + 256 + (j * 3) + 2];
-					current.AddTransition(new Automata.CharSpan(System.Convert.ToChar(begin), System.Convert.ToChar(end)), this.dfa.States[next]);
+					current.AddTransition(new CharSpan(System.Convert.ToChar(begin), System.Convert.ToChar(end)), this.dfa.States[next]);
 				}
 				current.RepackTransitions();
 			}

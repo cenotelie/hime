@@ -20,7 +20,7 @@
 
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.CentralDogma
 {
 	/// <summary>
 	/// Represents a range of characters
