@@ -45,7 +45,7 @@ namespace Hime.CentralDogma.Automata
         /// <summary>
         /// This state's id
         /// </summary>
-        private int iD;
+        private int id;
 
         /// <summary>
         /// Gets the top marker for this state
@@ -73,21 +73,19 @@ namespace Hime.CentralDogma.Automata
         public int TransitionsCount { get { return transitions.Count; } }
         
         /// <summary>
-        /// Gets or sets the ID of this state
+        /// Gets the ID of this state
         /// </summary>
-        public int ID
-        {
-            get { return iD; }
-            set { iD = value; }
-        }
+        public int ID { get { return id; } }
 
         /// <summary>
         /// Initialize this state
         /// </summary>
-        public DFAState()
+        /// <param name="id">Identifier for this state</param>
+        public DFAState(int id)
         {
-            items = new List<FinalItem>();
-            transitions = new Dictionary<CharSpan, DFAState>();
+            this.items = new List<FinalItem>();
+            this.transitions = new Dictionary<CharSpan, DFAState>();
+            this.id = id;
         }
 
         /// <summary>

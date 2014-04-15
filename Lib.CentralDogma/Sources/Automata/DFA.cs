@@ -36,7 +36,12 @@ namespace Hime.CentralDogma.Automata
         /// Gets the states in this automaton
         /// </summary>
         public List<DFAState> States { get { return states; } }
-        
+
+        /// <summary>
+        /// Gets the number of states in this automaton
+        /// </summary>
+        public int StatesCount { get { return states.Count; } }
+
         /// <summary>
         /// Gets the entry state of this automaton
         /// </summary>
@@ -74,9 +79,8 @@ namespace Hime.CentralDogma.Automata
             nfaInit.Add(nfa.StateEntry);
             nfaInit.Close();
             // Create the initial state for the DFA
-            DFAState dfaInit = new DFAState();
+            DFAState dfaInit = new DFAState(0);
             states.Add(dfaInit);
-            dfaInit.ID = 0;
 
             // For each set in the list of the NFA states
             for (int i = 0; i != nfaStateSets.Count; i++)
@@ -109,8 +113,7 @@ namespace Hime.CentralDogma.Automata
                         // Add to the sets list
                         nfaStateSets.Add(next);
                         // Create the corresponding DFA state
-                        DFAState newState = new DFAState();
-                        newState.ID = states.Count;
+                        DFAState newState = new DFAState(states.Count);
                         states.Add(newState);
                         // Setup transition
                         states[i].AddTransition(value, newState);
@@ -195,24 +198,6 @@ namespace Hime.CentralDogma.Automata
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Serializes the graph of this automaton with the given serializer
-        /// </summary>
-        /// <param name="serializer">A serializer</param>
-        public void SerializeGraph(Documentation.DOTSerializer serializer)
-        {
-            foreach (DFAState state in states)
-            {
-                if (state.TopItem != null)
-                    serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), Documentation.DOTNodeShape.ellipse);
-                else
-                    serializer.WriteNode(state.ID.ToString());
-            }
-            foreach (DFAState state in states)
-                foreach (CharSpan value in state.Transitions.Keys)
-                    serializer.WriteEdge(state.ID.ToString(), state.Transitions[value].ID.ToString(), value.ToString());
         }
     }
 }

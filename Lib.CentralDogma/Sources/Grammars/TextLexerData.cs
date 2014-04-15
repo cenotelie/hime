@@ -133,7 +133,7 @@ namespace Hime.CentralDogma.Grammars
         }
         private void ExportStates(BinaryWriter stream)
         {
-            stream.Write((uint)dfa.States.Count);
+            stream.Write((uint)dfa.StatesCount);
             uint offset = 0;
             foreach (Automata.DFAState state in dfa.States)
             {

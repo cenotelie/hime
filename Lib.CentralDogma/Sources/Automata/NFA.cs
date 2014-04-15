@@ -50,7 +50,7 @@ namespace Hime.CentralDogma.Automata
         /// <summary>
         /// Gets the collection of states in this automaton
         /// </summary>
-        public ICollection<NFAState> States { get { return states; } }
+        public List<NFAState> States { get { return states; } }
         
         /// <summary>
         /// Gets the number of states in this automaton

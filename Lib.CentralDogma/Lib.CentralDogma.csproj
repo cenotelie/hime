@@ -171,7 +171,7 @@
     <Compile Include="Sources\Reporting\Report.cs" />
     <Compile Include="Sources\Reporting\Reporter.cs" />
     <Compile Include="Sources\ResourceAccessor.cs" />
-    <Compile Include="Sources\SDK\ASTExporter.cs" />
+    <Compile Include="Sources\SDK\GraphSerializer.cs" />
     <Compile Include="Sources\SDK\LexerReflection.cs" />
     <Compile Include="Sources\UnicodeBlock.cs" />
     <Compile Include="Sources\UnicodeCategory.cs" />

@@ -123,11 +123,10 @@ namespace Hime.CentralDogma.SDK
 			reader.Close();
 
 			for (int i=0; i!=count; i++)
-				this.dfa.States.Add(new Automata.DFAState ());
+				this.dfa.States.Add(new Automata.DFAState(this.dfa.StatesCount));
 			for (int i=0; i!=count; i++)
 			{
 				Automata.DFAState current = this.dfa.States[i];
-				current.ID = i;
 				int offset = (int)table[i];
 				ushort tIndex = data[offset];
 				ushort nNonCached = data[offset + 2];
@@ -149,17 +148,6 @@ namespace Hime.CentralDogma.SDK
 				}
 				current.RepackTransitions();
 			}
-		}
-
-		/// <summary>
-		/// Exports the lexer's DFA in the DOT format into the given file
-		/// </summary>
-		/// <param name="file">The file to export to</param>
-		public void ExportDFA(string file)
-		{
-			Documentation.DOTSerializer serializer = new Documentation.DOTSerializer("dfa", file);
-			this.dfa.SerializeGraph(serializer);
-			serializer.Close();
 		}
 	}
 }
