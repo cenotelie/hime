@@ -254,7 +254,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 
         protected void SerializeGraphVisual(string directory, List<string> results)
         {
-            Documentation.DOTSerializer serializer = new Documentation.DOTSerializer("Parser", Path.Combine(directory, "GraphParser.dot"));
+            SDK.DOTSerializer serializer = new SDK.DOTSerializer("Parser", Path.Combine(directory, "GraphParser.dot"));
 			graph.SerializeVisual(serializer);
             serializer.Close();
             results.Add(Path.Combine(directory, "GraphParser.dot"));

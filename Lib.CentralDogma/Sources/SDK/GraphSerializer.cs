@@ -36,7 +36,7 @@ namespace Hime.CentralDogma.SDK
         /// <param name="file">DOT file to export to</param>
         public static void ExportDOT(ASTNode root, string file)
         {
-            Documentation.DOTSerializer serializer = new Documentation.DOTSerializer("CST", file);
+            DOTSerializer serializer = new DOTSerializer("CST", file);
             ExportDOT_CST(serializer, null, 0, root);
             serializer.Close();
         }
@@ -49,11 +49,11 @@ namespace Hime.CentralDogma.SDK
         /// <param name="nextID">The next available ID for the generated DOT data</param>
         /// <param name="node">The node to serialize</param>
         /// <returns>The next available ID for the generate DOT data</returns>
-        private static int ExportDOT_CST(Documentation.DOTSerializer serializer, string parent, int nextID, ASTNode node)
+        private static int ExportDOT_CST(DOTSerializer serializer, string parent, int nextID, ASTNode node)
         {
             string name = "node" + nextID;
             string label = node.Symbol.ToString();
-            serializer.WriteNode(name, label, Documentation.DOTNodeShape.circle);
+            serializer.WriteNode(name, label, DOTNodeShape.circle);
             if (parent != null)
                 serializer.WriteEdge(parent, name, string.Empty);
             int result = nextID + 1;
@@ -70,11 +70,11 @@ namespace Hime.CentralDogma.SDK
         /// <param name="file">DOT file to export to</param>
         public static void ExportDOT(DFA dfa, string file)
         {
-        	Documentation.DOTSerializer serializer = new Documentation.DOTSerializer("DFA", file);
+        	DOTSerializer serializer = new DOTSerializer("DFA", file);
             foreach (DFAState state in dfa.States)
             {
                 if (state.TopItem != null)
-                    serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), Documentation.DOTNodeShape.ellipse);
+                    serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), DOTNodeShape.ellipse);
                 else
                     serializer.WriteNode(state.ID.ToString());
             }
@@ -91,12 +91,12 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="file">DOT file to export to</param>
 		public static void ExportDOT(NFA nfa, string file)
         {
-        	Documentation.DOTSerializer serializer = new Documentation.DOTSerializer("DFA", file);
+        	DOTSerializer serializer = new DOTSerializer("DFA", file);
         	for (int i=0; i!=nfa.States.Count; i++)
             {
         		NFAState state = nfa.States[i];
                 if (state.Item != null)
-                    serializer.WriteNode(i.ToString(), i.ToString() + " : " + state.Item.ToString(), Documentation.DOTNodeShape.ellipse);
+                    serializer.WriteNode(i.ToString(), i.ToString() + " : " + state.Item.ToString(), DOTNodeShape.ellipse);
                 else
                     serializer.WriteNode(i.ToString());
             }

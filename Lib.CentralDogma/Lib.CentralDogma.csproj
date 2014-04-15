@@ -163,14 +163,14 @@
     <Compile Include="Sources\Grammars\Virtual.cs" />
     <Compile Include="Sources\Documentation\MHTMLCompiler.cs" />
     <Compile Include="Sources\Documentation\MHTMLSource.cs" />
-    <Compile Include="Sources\Documentation\DOTNodeShape.cs" />
-    <Compile Include="Sources\Documentation\DOTSerializer.cs" />
     <Compile Include="Sources\Reporting\ELevel.cs" />
     <Compile Include="Sources\Reporting\Entry.cs" />
     <Compile Include="Sources\Reporting\ExceptionEntry.cs" />
     <Compile Include="Sources\Reporting\Report.cs" />
     <Compile Include="Sources\Reporting\Reporter.cs" />
     <Compile Include="Sources\ResourceAccessor.cs" />
+    <Compile Include="Sources\SDK\DOTNodeShape.cs" />
+    <Compile Include="Sources\SDK\DOTSerializer.cs" />
     <Compile Include="Sources\SDK\GraphSerializer.cs" />
     <Compile Include="Sources\SDK\LexerReflection.cs" />
     <Compile Include="Sources\UnicodeBlock.cs" />

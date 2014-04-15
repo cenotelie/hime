@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Hime.CentralDogma.Documentation
+namespace Hime.CentralDogma.SDK
 {
 	/// <summary>
 	/// Serializes graphs in the DOT format
