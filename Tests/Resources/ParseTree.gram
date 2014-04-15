@@ -7,9 +7,9 @@ cf grammar ParseTree
 	}
 	terminals
 	{
-		NAME_CHARACTER_FIRST	-> [_a-zA-Z] | \ub{IsGreek};
+		NAME_CHARACTER_FIRST	-> [_a-zA-Z];
 		NAME_CHARACTER			-> NAME_CHARACTER_FIRST | [0-9] ;
-		NAME					-> '@'? NAME_CHARACTER_FIRST NAME_CHARACTER* ;
+		NAME					-> NAME_CHARACTER_FIRST NAME_CHARACTER* ;
 		
 		QUOTED_DATA				-> '\'' [^']* '\'';
 		
