@@ -200,7 +200,6 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         {
             Automata.NFA final = Automata.NFA.NewMinimal();
             string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
-            Unicode.Block block = Unicode.Block.Categories[value];
             UnicodeBlock block = UnicodeBlock.GetBlock(value);
             // Create transition and return
             final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), final.StateExit);
