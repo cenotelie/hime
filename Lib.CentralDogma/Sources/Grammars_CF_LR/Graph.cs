@@ -59,7 +59,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             sets.Add(Set);
         }
 		
-		internal void SerializeVisual(Documentation.DOTSerializer serializer)
+		internal void SerializeVisual(SDK.DOTSerializer serializer)
 		{
 			foreach (State state in this.States)
 			{

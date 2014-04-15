@@ -90,7 +90,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Automata.NFA final = Automata.NFA.NewMinimal();
             char begin = System.Convert.ToChar(0x0000);
             char end = System.Convert.ToChar(0xFFFF);
-            final.StateEntry.AddTransition(new Automata.CharSpan(begin, end), final.StateExit);
+            final.StateEntry.AddTransition(new CharSpan(begin, end), final.StateExit);
             return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(ASTNode node)
@@ -100,7 +100,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             value = value.Substring(2, value.Length - 2);
             int charInt = System.Convert.ToInt32(value, 16);
             char c = System.Convert.ToChar(charInt);
-            final.StateEntry.AddTransition(new Automata.CharSpan(c, c), final.StateExit);
+            final.StateEntry.AddTransition(new CharSpan(c, c), final.StateExit);
             return final;
         }
         private string ReplaceEscapees(string value)
@@ -145,11 +145,11 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 if (insensitive && char.IsLetter(c))
                 {
                     char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
-                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), temp);
-                    final.StateExit.AddTransition(new Automata.CharSpan(c2, c2), temp);
+                    final.StateExit.AddTransition(new CharSpan(c, c), temp);
+                    final.StateExit.AddTransition(new CharSpan(c2, c2), temp);
                 }
                 else
-                    final.StateExit.AddTransition(new Automata.CharSpan(c, c), temp);
+                    final.StateExit.AddTransition(new CharSpan(c, c), temp);
                 final.StateExit = temp;
             }
             return final;
@@ -166,53 +166,54 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 value = value.Substring(1);
                 positive = false;
             }
-            List<Automata.CharSpan> spans = new List<Automata.CharSpan>();
+            List<CharSpan> spans = new List<CharSpan>();
             for (int i = 0; i != value.Length; i++)
             {
                 if ((i != value.Length - 1) && (value[i + 1] == '-'))
                 {
-                    spans.Add(new Automata.CharSpan(value[i], value[i + 2]));
+                    spans.Add(new CharSpan(value[i], value[i + 2]));
                     i += 2;
                 }
                 else
-                    spans.Add(new Automata.CharSpan(value[i], value[i]));
+                    spans.Add(new CharSpan(value[i], value[i]));
             }
             if (positive)
             {
-                foreach (Automata.CharSpan span in spans)
+                foreach (CharSpan span in spans)
                     final.StateEntry.AddTransition(span, final.StateExit);
             }
             else
             {
-                spans.Sort(new System.Comparison<Automata.CharSpan>(Automata.CharSpan.Compare));
+                spans.Sort(new System.Comparison<CharSpan>(CharSpan.Compare));
                 char b = char.MinValue;
                 for (int i = 0; i != spans.Count; i++)
                 {
                     if (spans[i].Begin > b)
-                        final.StateEntry.AddTransition(new Automata.CharSpan(b, System.Convert.ToChar(spans[i].Begin - 1)), final.StateExit);
+                        final.StateEntry.AddTransition(new CharSpan(b, System.Convert.ToChar(spans[i].Begin - 1)), final.StateExit);
                     b = System.Convert.ToChar(spans[i].End + 1);
                 }
-                final.StateEntry.AddTransition(new Automata.CharSpan(b, char.MaxValue), final.StateExit);
+                final.StateEntry.AddTransition(new CharSpan(b, char.MaxValue), final.StateExit);
             }
             return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(ASTNode node)
         {
             Automata.NFA final = Automata.NFA.NewMinimal();
-            string value = node.Symbol.Value.Substring(4, node.Symbol.Value.Length - 5);
+            string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
             Unicode.Block block = Unicode.Block.Categories[value];
+            UnicodeBlock block = UnicodeBlock.GetBlock(value);
             // Create transition and return
-            final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), final.StateExit);
+            final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), final.StateExit);
             return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(ASTNode node)
         {
             Automata.NFA final = Automata.NFA.NewMinimal();
-            string value = node.Symbol.Value.Substring(4, node.Symbol.Value.Length - 5);
-            Unicode.Category category = Unicode.Category.Classes[value];
+            string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
+            UnicodeCategory category = UnicodeCategory.GetCateogry(value);
             // Create transitions and return
-            foreach (Unicode.Span span in category.Spans)
-                final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), final.StateExit);
+            foreach (CharSpan span in category.Spans)
+                final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), final.StateExit);
             return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_span(ASTNode node)
@@ -232,7 +233,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 spanBegin = Temp;
             }
             // Create transition and return
-            final.StateEntry.AddTransition(new Automata.CharSpan(System.Convert.ToChar(spanBegin), System.Convert.ToChar(spanEnd)), final.StateExit);
+            final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(spanBegin), System.Convert.ToChar(spanEnd)), final.StateExit);
             return final;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_name(ASTNode node)

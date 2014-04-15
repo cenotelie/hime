@@ -217,18 +217,15 @@ namespace Hime.CentralDogma.Automata
             foreach (DFAStateGroup group in groups)
             {
                 // Create a new state
-                DFAState newState = new DFAState();
+                DFAState newState = new DFAState(states.Count);
                 // Add the terminal from the group to the new state
                 newState.AddFinals(group.Representative.Items);
                 states.Add(newState);
             }
-            // Do linkage and setup ID
+            // Do linkage
             for (int i = 0; i != groups.Count; i++)
-            {
-                states[i].ID = i;
                 foreach (CharSpan Key in groups[i].Representative.Transitions.Keys)
                     states[i].AddTransition(Key, states[GetDFAStates_GetGroupIndexOf(groups[i].Representative.Transitions[Key])]);
-            }
             return states;
         }
 

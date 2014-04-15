@@ -61,6 +61,7 @@
     <Compile Include="Tests\HimeCC\HimeCCOptions.cs" />
     <Compile Include="Tests\HimeCC\HimeCCReturn.cs" />
     <Compile Include="Tests\Parsing\TreeActions.cs" />
+    <Compile Include="Tests\Parsing\UnicodeBlocks.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">

@@ -24,16 +24,43 @@ using System.Text;
 
 namespace Hime.CentralDogma.Documentation
 {
+	/// <summary>
+	/// Represents a source of data for the MHTML Compiler
+	/// </summary>
     class MHTMLSource
     {
-        private const int bufferSize = 900;
+    	/// <summary>
+    	/// Size of the read buffer
+    	/// </summary>
+        private const int bufferSize = 1024;
+        /// <summary>
+        /// Keyword for the source encoding in a MHTML document
+        /// </summary>
         private const string contentTransferEncoding = "base64";
 
+        /// <summary>
+        /// The input stream
+        /// </summary>
 		private Stream stream;
+		/// <summary>
+		/// The read buffer
+		/// </summary>
         private byte[] buffer;
+        /// <summary>
+        /// The content type of this source
+        /// </summary>
         private string contentType;
+        /// <summary>
+        /// The location of this resource in the MHTML location
+        /// </summary>
 		private string contentLocation;
 
+		/// <summary>
+		/// Initializes this source
+		/// </summary>
+		/// <param name="mime">The content type of this source</param>
+		/// <param name="location">The location of this resource in the MHTML location</param>
+		/// <param name="stream">The input stream</param>
         public MHTMLSource(string mime, string location, Stream stream)
 		{
 			this.contentType = mime;
@@ -42,11 +69,22 @@ namespace Hime.CentralDogma.Documentation
             this.buffer = new byte[bufferSize];
 		}
 
+        /// <summary>
+		/// Initializes this source
+		/// </summary>
+		/// <param name="mime">The content type of this source</param>
+		/// <param name="location">The location of this resource in the MHTML location</param>
+		/// <param name="file">The input file</param>
         public MHTMLSource(string mime, string location, string file)
             : this(mime, location, new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None))
         {
         }
 
+        /// <summary>
+        /// Writes this source in a MHTML file
+        /// </summary>
+        /// <param name="writer">The writer to output to</param>
+        /// <param name="linebreak">The maximum length of a line in the current MHTML file</param>
         public void ToMHTML(StreamWriter writer, int linebreak)
 		{
 			writer.WriteLine("Content-Type: " + this.contentType);

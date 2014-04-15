@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma.Documentation
+namespace Hime.CentralDogma.SDK
 {
 	/// <summary>
 	/// Represents the shape of nodes in a graph in the DOT format

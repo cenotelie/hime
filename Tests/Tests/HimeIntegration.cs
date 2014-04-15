@@ -23,7 +23,7 @@ using Hime.CentralDogma;
 using Hime.Redist;
 using NUnit.Framework;
 
-namespace Hime.Tests
+namespace Hime.Tests.Integration
 {
 	/// <summary>
 	/// Integration test suite for high-level parsing features

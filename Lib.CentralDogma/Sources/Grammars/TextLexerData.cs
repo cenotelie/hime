@@ -88,7 +88,7 @@ namespace Hime.CentralDogma.Grammars
                 cache[i] = 0xFFFF;
             ushort cached = 0;
             ushort slow = 0;
-            foreach (Automata.CharSpan span in state.Transitions.Keys)
+            foreach (CharSpan span in state.Transitions.Keys)
             {
                 if (span.Begin <= 255)
                 {
@@ -116,9 +116,9 @@ namespace Hime.CentralDogma.Grammars
             for (int i = 0; i != 256; i++)
                 stream.Write(cache[i]);
 
-            List<Automata.CharSpan> keys = new List<Automata.CharSpan>(state.Transitions.Keys);
-            keys.Sort(new Comparison<Automata.CharSpan>(Automata.CharSpan.CompareReverse));
-            foreach (Automata.CharSpan span in keys)
+            List<CharSpan> keys = new List<CharSpan>(state.Transitions.Keys);
+            keys.Sort(new Comparison<CharSpan>(CharSpan.CompareReverse));
+            foreach (CharSpan span in keys)
             {
                 if (span.End <= 255)
                     break; // the rest of the transitions are in the cache
@@ -133,13 +133,13 @@ namespace Hime.CentralDogma.Grammars
         }
         private void ExportStates(BinaryWriter stream)
         {
-            stream.Write((uint)dfa.States.Count);
+            stream.Write((uint)dfa.StatesCount);
             uint offset = 0;
             foreach (Automata.DFAState state in dfa.States)
             {
                 stream.Write(offset);
                 offset += 3 + 256;
-                foreach (Automata.CharSpan key in state.Transitions.Keys)
+                foreach (CharSpan key in state.Transitions.Keys)
                     if (key.End >= 256)
                         offset += 3;
             }

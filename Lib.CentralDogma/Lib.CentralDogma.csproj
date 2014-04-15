@@ -74,7 +74,6 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sources\Automata\CharSpan.cs" />
     <Compile Include="Sources\Automata\DFA.cs" />
     <Compile Include="Sources\Automata\DFAPartition.cs" />
     <Compile Include="Sources\Automata\DFAState.cs" />
@@ -164,19 +163,19 @@
     <Compile Include="Sources\Grammars\Virtual.cs" />
     <Compile Include="Sources\Documentation\MHTMLCompiler.cs" />
     <Compile Include="Sources\Documentation\MHTMLSource.cs" />
-    <Compile Include="Sources\Documentation\DOTNodeShape.cs" />
-    <Compile Include="Sources\Documentation\DOTSerializer.cs" />
     <Compile Include="Sources\Reporting\ELevel.cs" />
     <Compile Include="Sources\Reporting\Entry.cs" />
     <Compile Include="Sources\Reporting\ExceptionEntry.cs" />
     <Compile Include="Sources\Reporting\Report.cs" />
     <Compile Include="Sources\Reporting\Reporter.cs" />
     <Compile Include="Sources\ResourceAccessor.cs" />
-    <Compile Include="Sources\Unicode\Block.cs" />
-    <Compile Include="Sources\Unicode\Category.cs" />
-    <Compile Include="Sources\Unicode\Span.cs" />
-    <Compile Include="Sources\SDK\ASTExporter.cs" />
+    <Compile Include="Sources\SDK\DOTNodeShape.cs" />
+    <Compile Include="Sources\SDK\DOTSerializer.cs" />
+    <Compile Include="Sources\SDK\GraphSerializer.cs" />
     <Compile Include="Sources\SDK\LexerReflection.cs" />
+    <Compile Include="Sources\UnicodeBlock.cs" />
+    <Compile Include="Sources\UnicodeCategory.cs" />
+    <Compile Include="Sources\CharSpan.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

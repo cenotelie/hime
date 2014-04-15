@@ -33,9 +33,9 @@ cf grammar Kernel
 		COMMENT_BLOCK	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
 			
-		NAME_CHARACTER_FIRST	-> [_a-zA-Z] | \ub{IsGreek};
+		NAME_CHARACTER_FIRST	-> [_a-zA-Z];
 		NAME_CHARACTER			-> NAME_CHARACTER_FIRST | [0-9] ;
-		NAME					-> '@'? NAME_CHARACTER_FIRST NAME_CHARACTER* ;
+		NAME					-> NAME_CHARACTER_FIRST NAME_CHARACTER* ;
 	}
 	rules { }
 }
@@ -58,8 +58,8 @@ cf grammar ContextFree : Kernel
 								| '\\v';	/*Vertical quote (character 11)*/
 		SYMBOL_TERMINAL_TEXT	-> '\'' ([^\\'] | ESCAPEES | '\\\'')+ '\'';
 		SYMBOL_TERMINAL_SET		-> '[' ([^\\\[\]] | ESCAPEES | '\\[' | '\\]')+ ']';
-		SYMBOL_TERMINAL_UBLOCK	-> '\\ub' '{' NAME '}' ;
-		SYMBOL_TERMINAL_UCAT	-> '\\uc' '{' NAME '}' ;
+		SYMBOL_TERMINAL_UBLOCK	-> 'ub' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
+		SYMBOL_TERMINAL_UCAT	-> 'uc' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
 			
 		SYMBOL_VALUE_UINT8		-> '0x' [a-fA-F0-9] [a-fA-F0-9] ;
 		SYMBOL_VALUE_UINT16		-> '0x' [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ;
