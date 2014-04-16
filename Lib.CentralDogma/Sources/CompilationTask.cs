@@ -101,7 +101,6 @@ namespace Hime.CentralDogma
         private Dictionary<string, CompilerPlugin> plugins;
         private Reporting.Reporter reporter;
         private List<KeyValuePair<string, TextReader>> inputs;
-        private Dictionary<string, Grammars.Grammar> grammars;
         private Dictionary<string, Grammars.GrammarLoader> loaders;
 
         /// <summary>
@@ -120,7 +119,6 @@ namespace Hime.CentralDogma
             plugins.Add("cf_grammar", new Grammars.ContextFree.CFPlugin());
             reporter = new Reporting.Reporter(typeof(CompilationTask), "Compilation log");
             inputs = new List<KeyValuePair<string, TextReader>>();
-            grammars = new Dictionary<string, Grammars.Grammar>();
             loaders = new Dictionary<string, Grammars.GrammarLoader>();
         }
 
