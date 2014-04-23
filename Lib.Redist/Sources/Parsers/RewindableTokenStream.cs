@@ -27,12 +27,30 @@ namespace Hime.Redist.Parsers
     /// </summary>
     class RewindableTokenStream
     {
+		/// <summary>
+		/// The size of the ring buffer
+		/// </summary>
         private const int ringSize = 32;
 
+		/// <summary>
+		/// The input lexer to read token from
+		/// </summary>
         private Lexer.Lexer lexer;
+
+		/// <summary>
+		/// The ring buffer
+		/// </summary>
         private Token[] ring;
-        private int ringStart;      // Start index of the ring in case the stream in rewinded
-        private int ringNextEntry;  // Index for inserting new characters in the ring
+
+		/// <summary>
+		/// Start index of the ring in case the stream in rewinded
+		/// </summary>
+        private int ringStart;
+
+		/// <summary>
+		/// TIndex for inserting new characters in the ring
+		/// </summary>
+        private int ringNextEntry;
 
         /// <summary>
         /// Initializes the rewindable stream with the given lexer
@@ -46,8 +64,16 @@ namespace Hime.Redist.Parsers
             this.ringNextEntry = 0;
         }
 
+		/// <summary>
+		/// Determines whether the ring buffer is empty
+		/// </summary>
+		/// <returns><c>true</c> if the ring is empty; otherwise, <c>false</c>.</returns>
         private bool IsRingEmpty() { return (ringStart == ringNextEntry); }
 
+		/// <summary>
+		/// Reads a token from the ring
+		/// </summary>
+		/// <returns>The next token in the ring buffer</returns>
         private Token ReadRing()
         {
             Token token = ring[ringStart++];
@@ -56,6 +82,10 @@ namespace Hime.Redist.Parsers
             return token;
         }
 
+		/// <summary>
+		/// Pushs the given token onto the ring
+		/// </summary>
+		/// <param name="value">The token to push</param>
         private void PushInRing(Token value)
         {
             ring[ringNextEntry++] = value;

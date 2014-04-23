@@ -51,6 +51,13 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private TreeAction[] actions;
 
+		/// <summary>
+        /// Gets the label of the node at the given index
+        /// </summary>
+        /// <param name="index">The index within the buffer</param>
+        /// <returns>The label in the buffer</returns>
+        public SymbolRef GetLabelAt(int index) { return nodes[index].symbol; }
+
         /// <summary>
         /// Gets the tree action applied onto the node at the given index
         /// </summary>

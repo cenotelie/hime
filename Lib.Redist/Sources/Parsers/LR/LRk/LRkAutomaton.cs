@@ -41,10 +41,29 @@ namespace Hime.Redist.Parsers
     /// </remarks>
     public sealed class LRkAutomaton
     {
+		/// <summary>
+		/// The number of columns in the LR table
+		/// </summary>
         private ushort ncols;
+
+		/// <summary>
+		/// Cache of the symbol ID for each column
+		/// </summary>
         private Utils.BlobUShort columnsID;
+
+		/// <summary>
+		/// Map of symbol ID to column index in the LR table
+		/// </summary>
         private ColumnMap columns;
+
+		/// <summary>
+		/// The LR table
+		/// </summary>
         private LRActions table;
+
+		/// <summary>
+		/// The table of LR productions
+		/// </summary>
         private LRProduction[] productions;
 
         private LRkAutomaton(Stream stream)
@@ -93,7 +112,7 @@ namespace Hime.Redist.Parsers
             return table[state * ncols + columns[sid]];
         }
 
-        /// <summary>
+        /// <summary>columns
         /// Gets the production at the given index
         /// </summary>
         /// <param name="index">Production's index</param>

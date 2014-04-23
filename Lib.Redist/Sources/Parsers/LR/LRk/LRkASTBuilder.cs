@@ -26,39 +26,118 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents the builder of Parse Trees for LR(k) parsers
 	/// </summary>
-    class LRkASTBuilder
+    class LRkASTBuilder : SemanticBody
     {
-		private class SubTreeFactory : Factory<SubTree>
+		/// <summary>
+        /// Represents factories of SubTrees
+        /// </summary>
+        private class SubTreeFactory : Factory<SubTree>
 		{
+			/// <summary>
+			/// The capacity of the SubTrees produced by this factory
+			/// </summary>
 			private int capacity;
+
+			/// <summary>
+			/// Initializes this SubTree factory
+			/// </summary>
+			/// <param name="capacity">The capacity of the produced SubTrees</param>
 			public SubTreeFactory(int capacity) { this.capacity = capacity; }
+
+			/// <summary>
+			///  Creates a new object
+			/// </summary>
+			/// <param name="pool">The enclosing pool</param>
+			/// <returns>The created object</returns>
 			public SubTree CreateNew(Pool<SubTree> pool) { return new SubTree(pool, capacity); }
 		}
     	
+		/// <summary>
+		/// The maximum size of the reduction handle
+		/// </summary>
         private const int handleSize = 1024;
+
+		/// <summary>
+		/// The bias for estimating the size of the reduced sub-tree
+		/// </summary>
         private const int estimationBias = 5;
 
-		// Sub-tree pools
+		/// <summary>
+		/// The pool of single node sub-trees
+		/// </summary>
         private Pool<SubTree> poolSingle;
+
+		/// <summary>
+		/// The pool of sub-tree with a capacity of 128 nodes
+		/// </summary>
         private Pool<SubTree> pool128;
+
+		/// <summary>
+		/// The pool of sub-tree with a capacity of 1024 nodes
+		/// </summary>
         private Pool<SubTree> pool1024;
-        // Stack of semantic objects
+
+        /// <summary>
+        /// The stack of semantic objects
+        /// </summary>
         private SubTree[] stack;
+
+		/// <summary>
+		/// Index of the available cell on top of the stack's head
+		/// </summary>
         private int stackNext;
-        // Cache for the reductions
+        
+		/// <summary>
+		/// The sub-tree build-up cache
+		/// </summary>
         private SubTree cache;
+
+		/// <summary>
+		/// The new available node in the current cache
+		/// </summary>
         private int cacheNext;
+
+		/// <summary>
+		/// The number of items popped from the stack
+		/// </summary>
         private int popCount;
-        // Reduction data
+        
+		/// <summary>
+		/// The reduction handle represented as the indices of the sub-trees in the cache
+		/// </summary>
         private int[] handle;
+
+		/// <summary>
+		/// The index of the next available slot in the handle
+		/// </summary>
         private int handleNext;
-        // The AST being built
+
+        /// <summary>
+        /// The AST being built
+        /// </summary>
         private SimpleAST result;
+
+		#region Implementation of SemanticBody
+		/// <summary>
+        /// Gets the symbol at the i-th index
+        /// </summary>
+        /// <param name="index">Index of the symbol</param>
+        /// <returns>The symbol at the given index</returns>
+		public Symbol this[int index] { get { return result.GetSymbolFor(cache.GetLabelAt(handle[index])); } }
+
+        /// <summary>
+        /// Gets the length of this body
+        /// </summary>
+		public int Length { get { return handleNext; } }
+		#endregion
 
         /// <summary>
         /// Initializes the builder with the given stack size
         /// </summary>
         /// <param name="stackSize">The maximal size of the stack</param>
+        /// <param name="text">The tokenined text</param>
+        /// <param name="variables">The table of parser variables</param>
+        /// <param name="virtuals">The table of parser virtuals</param>
         public LRkASTBuilder(int stackSize, TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
         {
 			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
@@ -66,8 +145,6 @@ namespace Hime.Redist.Parsers
             this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
             this.stack = new SubTree[stackSize];
             this.stackNext = 0;
-
-
 			this.handle = new int[handleSize];
 			this.result = new SimpleAST(text, variables, virtuals);
         }
@@ -166,15 +243,6 @@ namespace Hime.Redist.Parsers
                 return; // why would you do this?
 			cache.SetAt(cacheNext, new SymbolRef(SymbolType.Virtual, index), action);
             handle[handleNext++] = cacheNext++;
-        }
-
-        /// <summary>
-        /// During a reduction, inserts a semantic action
-        /// </summary>
-        /// <param name="action">The semantic action</param>
-        public void ReductionSemantic(UserAction action)
-        {
-
         }
 
         /// <summary>

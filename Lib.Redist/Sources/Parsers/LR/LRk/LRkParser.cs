@@ -28,8 +28,15 @@ namespace Hime.Redist.Parsers
     /// </summary>
     public abstract class LRkParser : BaseLRParser
     {
-        private class Simulator : LRkSimulator
+		/// <summary>
+		/// The simulator for LR(k) parsers used for error recovery
+		/// </summary>
+	    private class Simulator : LRkSimulator
         {
+			/// <summary>
+			/// Initializes a new simulator based on the given LR(k) parser
+			/// </summary>
+			/// <param name="parser">The base LR(k) parser</param>
             public Simulator(LRkParser parser)
             {
                 this.parserAutomaton = parser.parserAutomaton;
@@ -41,10 +48,29 @@ namespace Hime.Redist.Parsers
             }
         }
 
+		/// <summary>
+		/// The parser's automaton
+		/// </summary>
         private LRkAutomaton parserAutomaton;
+
+		/// <summary>
+		/// The parser's input as a stream of tokens
+		/// </summary>
         private RewindableTokenStream input;
+
+		/// <summary>
+		/// The AST builder
+		/// </summary>
         private LRkASTBuilder builder;
+
+		/// <summary>
+		/// The parser's stack
+		/// </summary>
         private int[] stack;
+
+		/// <summary>
+		/// Index of the stack's head
+		/// </summary>
         private int head;
 
         /// <summary>
@@ -63,6 +89,11 @@ namespace Hime.Redist.Parsers
             this.builder = new LRkASTBuilder(maxStackSize, lexer.Output, parserVariables, parserVirtuals);
         }
 
+		/// <summary>
+		/// Raises an error on an unexepcted token
+		/// </summary>
+		/// <param name="token">The unexpected token</param>
+		/// <returns>The next token in the case the error is recovered</returns>
         private Token OnUnexpectedToken(Token token)
         {
             ICollection<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
@@ -130,6 +161,11 @@ namespace Hime.Redist.Parsers
             }
         }
 
+		/// <summary>
+		/// Parses the given token
+		/// </summary>
+		/// <param name="token">The token to parse</param>
+		/// <returns>The LR action on the token</returns>
         private LRActionCode ParseOnToken(Token token)
         {
             while (true)
@@ -154,6 +190,10 @@ namespace Hime.Redist.Parsers
             }
         }
 
+		/// <summary>
+		/// Executes the given LR reduction
+		/// </summary>
+		/// <param name="production">A LR reduction</param>
         private void Reduce(LRProduction production)
         {
             Symbol variable = parserVariables[production.Head];
@@ -163,13 +203,13 @@ namespace Hime.Redist.Parsers
                 LROpCode op = production.Bytecode[i];
                 if (op.IsSemAction)
                 {
-                    builder.ReductionSemantic(parserActions[production.Bytecode[i + 1].Value]);
-                    i++;
+					UserAction action = parserActions[production.Bytecode[i + 1].Value];
+					i++;
+					action.Invoke(variable, builder);
                 }
                 else if (op.IsAddVirtual)
                 {
                     int index = production.Bytecode[i + 1].Value;
-                    Symbol virt = parserVirtuals[index];
                     builder.ReductionVirtual(index, op.TreeAction);
                     i++;
                 }

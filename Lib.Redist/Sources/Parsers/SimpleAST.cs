@@ -132,18 +132,7 @@ namespace Hime.Redist.Parsers
         /// <returns>The node's symbol</returns>
         public Symbol GetSymbol(int node)
         {
-			SymbolRef sym = nodes[node].symbol;
-            switch (sym.Type)
-            {
-                case SymbolType.Token:
-                    return tableTokens.GetSymbolAt(sym.Index);
-                case SymbolType.Variable:
-                    return tableVariables[sym.Index];
-                case SymbolType.Virtual:
-                    return tableVirtuals[sym.Index];
-            }
-            // This cannot happen
-            return new Symbol(0, string.Empty);
+			return GetSymbolFor(nodes[node].symbol);
         }
 
         /// <summary>
@@ -214,6 +203,26 @@ namespace Hime.Redist.Parsers
 			this.root = size;
 			this.nodes.Add(node);
 			size++;
+		}
+
+		/// <summary>
+		/// Gets the symbol corresponding to the given symbol reference
+		/// </summary>
+		/// <param name="symRef">A symbol reference</param>
+		/// <returns>The corresponding symbol</returns>
+		public Symbol GetSymbolFor(SymbolRef symRef)
+		{
+			switch (symRef.Type)
+            {
+                case SymbolType.Token:
+                    return tableTokens.GetSymbolAt(symRef.Index);
+                case SymbolType.Variable:
+                    return tableVariables[symRef.Index];
+                case SymbolType.Virtual:
+                    return tableVirtuals[symRef.Index];
+            }
+            // This cannot happen
+            return new Symbol(0, string.Empty);
 		}
 
         /// <summary>
