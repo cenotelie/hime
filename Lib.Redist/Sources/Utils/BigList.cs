@@ -27,16 +27,41 @@ namespace Hime.Redist.Utils
     /// Items cannot be removed or inserted.
     /// </summary>
     /// <typeparam name="T">The type of the stored items</typeparam>
+	/// <remarks>
+	/// The internal representation is an array of pointers to arrays of T.
+	/// The basic arrays of T (chunks) have a fixed size.
+	/// </remarks>
     class BigList<T>
     {
-        private const int upperShift = 13;
-        private const int chunksSize = 1 << upperShift;
-        private const int lowerMask = chunksSize - 1;
-        private const int initChunkCount = chunksSize;
+		/// <summary>
+		/// The number of bits allocated to the lowest part of the index (within a chunk)
+		/// </summary>
+		private const int upperShift = 8;
+		/// <summary>
+		/// The size of the chunks
+		/// </summary>
+		private const int chunksSize = 1 << upperShift;
+		/// <summary>
+		/// Bit mask for the lowest part of the index (within a chunk)
+		/// </summary>
+		private const int lowerMask = chunksSize - 1;
+		/// <summary>
+		/// Initial size of the higer array (pointers to the chunks)
+		/// </summary>
+		private const int initChunkCount = chunksSize;
 
-        private T[][] chunks;   // The data
-        private int chunkIndex; // The index of the current chunk being filled
-        private int cellIndex;  // The index of the next cell to be filled (relatively to the selected chunk)
+		/// <summary>
+		/// The data
+		/// </summary>
+        private T[][] chunks;
+		/// <summary>
+		/// The index of the current chunk
+		/// </summary>
+        private int chunkIndex;
+        /// <summary>
+        /// The index of the next available cell within the current chunk
+        /// </summary>
+		private int cellIndex;
 
         /// <summary>
         /// Initializes this list

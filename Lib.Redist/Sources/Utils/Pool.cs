@@ -28,9 +28,24 @@ namespace Hime.Redist.Utils
     /// <typeparam name="T">Type of the pooled objects</typeparam>
     class Pool<T>
     {
+		/// <summary>
+		/// The factory for this pool
+		/// </summary>
         private Factory<T> factory;
+
+		/// <summary>
+		/// Cache of the free objects in this pool
+		/// </summary>
         private T[] free;
+
+		/// <summary>
+		/// Index of the next free object in this pool
+		/// </summary>
         private int nextFree;
+
+		/// <summary>
+		/// Total number of objects in this pool
+		/// </summary>
         private int allocated;
 
         /// <summary>
@@ -54,13 +69,14 @@ namespace Hime.Redist.Utils
         {
             if (nextFree == -1)
             {
-                // Create new one
+                // No free object => create new one
                 T result = factory.CreateNew(this);
                 allocated++;
                 return result;
             }
             else
             {
+				// Gets a free object from the top of the pool
                 return free[nextFree--];
             }
         }
@@ -74,6 +90,7 @@ namespace Hime.Redist.Utils
             nextFree++;
             if (nextFree == free.Length)
             {
+				// The cache is not big enough => extend it to the number of allocated objects
                 T[] temp = new T[allocated];
                 Array.Copy(free, temp, free.Length);
                 free = temp;
