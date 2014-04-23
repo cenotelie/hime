@@ -32,9 +32,27 @@ namespace Hime.Redist.Lexer
         /// </summary>
         private struct Cell
         {
+			/// <summary>
+			/// The terminal's index
+			/// </summary>
             public int terminal;// The terminal's index
-            public int start;   // Start index of the text
-            public int length;  // Length of the token
+
+			/// <summary>
+			/// Start index of the text
+			/// </summary>
+            public int start;
+
+			/// <summary>
+			/// Length of the token
+			/// </summary>
+            public int length;
+
+			/// <summary>
+			/// Initializes this cell
+			/// </summary>
+			/// <param name="terminal">The terminal's index</param>
+			/// <param name="start">Start index of the text</param>
+			/// <param name="length">Length of the token</param>
             public Cell(int terminal, int start, int length)
             {
                 this.terminal = terminal;
@@ -43,7 +61,14 @@ namespace Hime.Redist.Lexer
             }
         }
 
+		/// <summary>
+		/// The terminal symbols matched in this content
+		/// </summary>
         private SymbolDictionary terminals;
+
+		/// <summary>
+		/// The token data in this content
+		/// </summary>
         private Utils.BigList<Cell> cells;
 
         /// <summary>

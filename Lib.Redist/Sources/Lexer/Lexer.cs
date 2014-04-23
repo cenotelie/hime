@@ -35,18 +35,50 @@ namespace Hime.Redist.Lexer
     /// </summary>
     public abstract class Lexer
     {
+		/// <summary>
+		/// Symbol ID of the Epsilon terminal
+		/// </summary>
         public const int sidEpsilon = 1;
+
+		/// <summary>
+		/// Symbol ID of the Dollar terminal
+		/// </summary>
         public const int sidDollar = 2;
 
-        // General data
-        private Automaton lexAutomaton;     // The automaton
-        private SymbolDictionary terminals; // The terminals
-        private int lexSeparator;           // Symbol ID of the SEPARATOR terminal
-        // Runtime data
-        private RewindableReader input;     // Lexer's input
-        private TokenizedContent text;      // The tokenized text
-        private bool isDollatEmited;        // Flags whether the input's end has been reached and the Dollar token emited
-        private int index;                  // The current index in the input
+        /// <summary>
+        /// This lexer's automaton
+        /// </summary>
+        private Automaton lexAutomaton;
+
+		/// <summary>
+		/// The terminals matched by this lexer
+		/// </summary>
+        private SymbolDictionary terminals;
+
+		/// <summary>
+		/// Symbol ID of the SEPARATOR terminal
+		/// </summary>
+        private int lexSeparator;
+
+		/// <summary>
+		/// This lexer's input
+		/// </summary>
+        private RewindableReader input;
+
+		/// <summary>
+		/// The tokenized text
+		/// </summary>
+        private TokenizedContent text;
+
+		/// <summary>
+		/// Flags whether the input's end has been reached and the Dollar token emited
+		/// </summary>
+        private bool isDollatEmited;
+
+		/// <summary>
+		/// The current index in the input
+		/// </summary>
+        private int index;
 
         /// <summary>
         /// Gets the terminals matched by this lexer
@@ -112,6 +144,10 @@ namespace Hime.Redist.Lexer
             }
         }
 
+		/// <summary>
+		/// Gets the next token by running this lexer's DFA
+		/// </summary>
+		/// <returns>The next token in the input</returns>
         private Token GetNextToken_DFA()
         {
             int matchedIndex = 0;           // Terminal's index of the last match

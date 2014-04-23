@@ -25,9 +25,20 @@ namespace Hime.Redist.Lexer
     /// </summary>
     struct TextBuffer
     {
-        private char[] data;    // The contained data
-        private int start;      // The start index in the data
-        private int end;        // The end index in the data
+		/// <summary>
+		/// The contained data
+		/// </summary>
+        private char[] data;
+
+		/// <summary>
+		/// The start index in the data
+		/// </summary>
+        private int start;
+
+		/// <summary>
+		/// The end index in the data
+		/// </summary>
+        private int end;
 
         /// <summary>
         /// Gets the character at the given index

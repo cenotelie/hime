@@ -32,16 +32,26 @@ namespace Hime.Redist.Lexer
         /// </summary>
         public struct Single
         {
+			/// <summary>
+			/// The represented character
+			/// </summary>
             private char value;
+
+			/// <summary>
+			/// Flags wether this character is beyond the end of a stream meaning the value is meaningless
+			/// </summary>
             private bool atEnd;
+
             /// <summary>
             /// Gets the character's value
             /// </summary>
             public char Value { get { return value; } }
+
             /// <summary>
             /// Gets whether the end of the stream has been reached
             /// </summary>
             public bool AtEnd { get { return atEnd; } }
+
             /// <summary>
             /// Initializes the character data
             /// </summary>
@@ -54,14 +64,45 @@ namespace Hime.Redist.Lexer
             }
         }
 
-        private TextReader reader;      // The proxied text reader
-        private Content content;    // The text content read so far
-        private char[] previous;        // The previous buffer
-        private char[] next;            // The next buffer
-        private int nextLength;         // The length of the next buffer
-        private char[] buffer;          // The current buffer
-        private int bufferStart;        // The starting index of the current buffer
-        private int bufferLength;       // The lenght of the current buffer
+		/// <summary>
+		/// The input text reader
+		/// </summary>
+        private TextReader reader;
+
+		/// <summary>
+		/// The text content read so fat
+		/// </summary>
+        private Content content;
+
+		/// <summary>
+		/// The previous buffer
+		/// </summary>
+        private char[] previous;
+
+		/// <summary>
+		/// The next buffer
+		/// </summary>
+        private char[] next;
+
+		/// <summary>
+		/// The length of the next buffer
+		/// </summary>
+        private int nextLength;
+
+		/// <summary>
+		/// The current buffer
+		/// </summary>
+        private char[] buffer;
+
+		/// <summary>
+		/// Start index in the current buffer
+		/// </summary>
+        private int bufferStart;
+
+		/// <summary>
+		/// The length of the current buffer
+		/// </summary>
+        private int bufferLength;
 
         /// <summary>
         /// Creates a new Rewindable Text Reader encapsulating the given TextReader

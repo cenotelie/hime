@@ -32,20 +32,52 @@ namespace Hime.Redist.Lexer
     /// </remarks>
     class Content : Text
     {
+		/// <summary>
+		/// The initiaal size of the cache of line start indices
+		/// </summary>
         private const int initLineCount = 10000;
-        private const int upperShift = 12;
-    	public const int chunksSize = 1 << upperShift;
-    	private const int lowerMask = chunksSize - 1;
+		/// <summary>
+		/// The number of bits allocated to the lowest part of the index (within a chunk)
+		/// </summary>
+		private const int upperShift = 12;
+    	/// <summary>
+		/// The size of the chunks
+		/// </summary>
+		public const int chunksSize = 1 << upperShift;
+    	/// <summary>
+		/// Bit mask for the lowest part of the index (within a chunk)
+		/// </summary>
+		private const int lowerMask = chunksSize - 1;
 
-        // Actual text content
+        /// <summary>
+        /// The chunks of data
+        /// </summary>
         private char[][] chunks;
+
+        /// <summary>
+		/// The index of the next chunk
+		/// </summary>
         private int chunkIndex;
-        // Start indices of the lines
+
+        /// <summary>
+        /// Cache of the starting indices of each line within the text
+        /// </summary>
         private int[] lines;
+
+		/// <summary>
+		/// Index of the next line
+		/// </summary>
         private int line;
-        // Line ending state
+
+		/// <summary>
+		/// Line ending state, true if immediately after a CR character.
+		/// If a LF character is found immediately afeter a CR character, this is a Windows-style line ending marker.
+		/// </summary>
         private bool flagCR;
-        // Additional meta-data
+
+        /// <summary>
+        /// The total size of this content in number of characters
+        /// </summary>
         private int size;
 
         /// <summary>
@@ -145,14 +177,14 @@ namespace Hime.Redist.Lexer
         /// </summary>
         /// <param name="index">Index from the start</param>
         /// <returns>The line number at the index</returns>
-        public int GetLineAt(int index) { return Bisect(index) + 1; }
+        public int GetLineAt(int index) { return FindLineAt(index) + 1; }
 
         /// <summary>
         /// Gets the column number at the given index
         /// </summary>
         /// <param name="index">Index from the start</param>
         /// <returns>The column number at the index</returns>
-        public int GetColumnAt(int index) { return index - lines[Bisect(index)] + 1; }
+        public int GetColumnAt(int index) { return index - lines[FindLineAt(index)] + 1; }
 
         /// <summary>
         /// Gets the position at the given index
@@ -161,11 +193,15 @@ namespace Hime.Redist.Lexer
         /// <returns>The position (line and column) at the index</returns>
         public TextPosition GetPositionAt(int index)
         {
-            int l = Bisect(index);
+            int l = FindLineAt(index);
             return new TextPosition(l + 1, index - lines[l] + 1);
         }
 
-        private int Bisect(int index)
+		/// <summary>
+		/// Finds the 0-based number of the line at the given index in the content
+		/// </summary>
+		/// <param name="index">The index within this content</param>
+        private int FindLineAt(int index)
         {
             int start = 0;
             int end = line;
