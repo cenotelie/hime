@@ -113,6 +113,10 @@
     <Compile Include="Sources\SymbolDictionary.cs" />
     <Compile Include="Sources\Utils\Pool.cs" />
     <Compile Include="Sources\Utils\Factory.cs" />
+    <Compile Include="Sources\Parsers\SimpleAST.cs" />
+    <Compile Include="Sources\Parsers\SubTree.cs" />
+    <Compile Include="Sources\SymbolType.cs" />
+    <Compile Include="Sources\SymbolRef.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

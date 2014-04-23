@@ -138,7 +138,7 @@ namespace Hime.Redist.Parsers
                 if (action.Code == LRActionCode.Shift)
                 {
                     stack[++head] = action.Data;
-                    builder.StackPush(token.SymbolID, ASTGraph.TypeToken, token.Index);
+                    builder.StackPushToken(token.Index);
                     return action.Code;
                 }
                 else if (action.Code == LRActionCode.Reduce)
@@ -157,7 +157,7 @@ namespace Hime.Redist.Parsers
         private void Reduce(LRProduction production)
         {
             Symbol variable = parserVariables[production.Head];
-            builder.ReductionPrepare(variable.ID, production.Head, production.ReductionLength, production.HeadAction);
+            builder.ReductionPrepare(production.Head, production.ReductionLength, production.HeadAction);
             for (int i = 0; i != production.Bytecode.Length; i++)
             {
                 LROpCode op = production.Bytecode[i];
@@ -170,7 +170,7 @@ namespace Hime.Redist.Parsers
                 {
                     int index = production.Bytecode[i + 1].Value;
                     Symbol virt = parserVirtuals[index];
-                    builder.ReductionVirtual(virt.ID, index, op.TreeAction);
+                    builder.ReductionVirtual(index, op.TreeAction);
                     i++;
                 }
                 else
