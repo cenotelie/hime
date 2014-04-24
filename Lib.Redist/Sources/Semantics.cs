@@ -43,6 +43,5 @@ namespace Hime.Redist
     /// </summary>
     /// <param name="head">The semantic object for the head</param>
     /// <param name="body">The current body at the time of the action</param>
-    /// <param name="length">The length of the passed body</param>
     public delegate void UserAction(Symbol head, SemanticBody body);
 }
