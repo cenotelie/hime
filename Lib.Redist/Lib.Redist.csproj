@@ -109,7 +109,6 @@
     <Compile Include="Sources\Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sources\Utils\BigList.cs" />
-    <Compile Include="Sources\Utils\MemoryMaps.cs" />
     <Compile Include="Sources\SymbolDictionary.cs" />
     <Compile Include="Sources\Utils\Pool.cs" />
     <Compile Include="Sources\Utils\Factory.cs" />
@@ -117,6 +116,7 @@
     <Compile Include="Sources\Parsers\SubTree.cs" />
     <Compile Include="Sources\SymbolType.cs" />
     <Compile Include="Sources\SymbolRef.cs" />
+    <Compile Include="Sources\Utils\Blob.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

@@ -47,18 +47,31 @@ namespace Hime.Redist.Lexer
     /// </remarks>
     public sealed class Automaton
     {
-        private Utils.BlobUInt table;
-        private Utils.BlobUShort states;
+		/// <summary>
+		/// Table of indices in the states table
+		/// </summary>
+        private Utils.Blob<uint> table;
 
-        private Automaton(Stream stream)
+		/// <summary>
+		/// Lexer's DFA table of states
+		/// </summary>
+        private Utils.Blob<ushort> states;
+
+		/// <summary>
+		/// Initializes a new automaton from the given binary stream
+		/// </summary>
+		/// <param name="reader">The binary stream to load from</param>
+		/// <remarks>
+		/// This methods reads the necessary data from the 
+		/// The given stream is closed by this method.
+		/// </remarks>
+        public Automaton(BinaryReader reader)
         {
-            BinaryReader reader = new BinaryReader(stream);
             int count = reader.ReadInt32();
-            table = new Utils.BlobUInt(count);
-            reader.Read(table.Raw, 0, table.Raw.Length);
-            states = new Utils.BlobUShort((int)((stream.Length - table.Raw.Length - 4) / 2));
-            reader.Read(states.Raw, 0, states.Raw.Length);
-            reader.Close();
+            table = new Utils.Blob<uint>(count, 4);
+			table.LoadFrom(reader);
+            states = new Utils.Blob<ushort>((int)((reader.BaseStream.Length - table.Length - 4) / 2), 2);
+			states.LoadFrom(reader);
         }
 
         /// <summary>
@@ -68,12 +81,19 @@ namespace Hime.Redist.Lexer
         /// <param name="resource">The name of the resource containing the lexer</param>
         /// <returns>The automaton</returns>
         public static Automaton Find(System.Type type, string resource)
-        {
-            System.Reflection.Assembly assembly = type.Assembly;
-            string[] resources = assembly.GetManifestResourceNames();
-            foreach (string existing in resources)
-                if (existing.EndsWith(resource))
-                    return new Automaton(assembly.GetManifestResourceStream(existing));
+		{
+			System.Reflection.Assembly assembly = type.Assembly;
+			string[] resources = assembly.GetManifestResourceNames();
+			foreach (string existing in resources)
+			{
+				if (existing.EndsWith(resource))
+				{
+					BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream(existing));
+					Automaton result = new Automaton(reader);
+					reader.Close();
+					return result;
+				}
+			}
             return null;
         }
 

@@ -116,10 +116,10 @@ namespace Hime.CentralDogma.SDK
 			}
 			BinaryReader reader = new BinaryReader(stream);
 			int count = reader.ReadInt32();
-			Hime.Redist.Utils.BlobUInt table = new Hime.Redist.Utils.BlobUInt(count);
-			reader.Read(table.Raw, 0, table.Raw.Length);
-			Hime.Redist.Utils.BlobUShort data = new Hime.Redist.Utils.BlobUShort((int)((stream.Length - table.Raw.Length - 4) / 2));
-			reader.Read(data.Raw, 0, data.Raw.Length);
+			Hime.Redist.Utils.Blob<uint> table = new Hime.Redist.Utils.Blob<uint>(count, 4);
+			table.LoadFrom(reader);
+			Hime.Redist.Utils.Blob<ushort> data = new Hime.Redist.Utils.Blob<ushort>((int)((stream.Length - table.Length - 4) / 2), 2);
+			data.LoadFrom(reader);
 			reader.Close();
 
 			for (int i=0; i!=count; i++)

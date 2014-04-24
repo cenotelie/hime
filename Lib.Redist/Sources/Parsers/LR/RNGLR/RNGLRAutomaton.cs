@@ -51,16 +51,16 @@ namespace Hime.Redist.Parsers
         private int axiom;
         private int ncols;
         private int nstates;
-        private Utils.BlobUShort columnsID;
+        private Utils.Blob<ushort> columnsID;
         private ColumnMap columns;
         private RNGLRTable table;
         private LRActions actions;
         private LRProduction[] productions;
-        private Utils.BlobUShort nullables;
+        private Utils.Blob<ushort> nullables;
 
         internal int Axiom { get { return axiom; } }
         internal int StatesCount { get { return nstates; } }
-        internal Utils.BlobUShort Nullables { get { return nullables; } }
+        internal Utils.Blob<ushort> Nullables { get { return nullables; } }
 
         private RNGLRAutomaton(Stream stream)
         {
@@ -71,8 +71,8 @@ namespace Hime.Redist.Parsers
             int nactions = (int)reader.ReadUInt32();
             int nprod = reader.ReadUInt16();
             int nnprod = reader.ReadUInt16();
-            this.columnsID = new Utils.BlobUShort(ncols);
-            reader.Read(columnsID.Raw, 0, columnsID.Raw.Length);
+            this.columnsID = new Utils.Blob<ushort>(ncols, 2);
+			this.columnsID.LoadFrom(reader);
             this.columns = new ColumnMap();
             for (int i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
@@ -83,8 +83,8 @@ namespace Hime.Redist.Parsers
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);
-            this.nullables = new Utils.BlobUShort(nnprod);
-            reader.Read(this.nullables.Raw, 0, this.nullables.Raw.Length);
+            this.nullables = new Utils.Blob<ushort>(nnprod, 2);
+			this.nullables.LoadFrom(reader);
             reader.Close();
         }
 
