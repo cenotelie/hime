@@ -198,25 +198,29 @@ namespace Hime.Redist.Parsers
         {
             Symbol variable = parserVariables[production.Head];
             builder.ReductionPrepare(production.Head, production.ReductionLength, production.HeadAction);
-            for (int i = 0; i != production.Bytecode.Length; i++)
+            for (int i = 0; i != production.BytecodeLength; i++)
             {
-                LROpCode op = production.Bytecode[i];
-                if (op.IsSemAction)
-                {
-					UserAction action = parserActions[production.Bytecode[i + 1].Value];
-					i++;
-					action.Invoke(variable, builder);
-                }
-                else if (op.IsAddVirtual)
-                {
-                    int index = production.Bytecode[i + 1].Value;
-                    builder.ReductionVirtual(index, op.TreeAction);
-                    i++;
-                }
-                else
-                {
-                    builder.ReductionPop(op.TreeAction);
-                }
+                LROpCode op = production[i];
+                switch (op.Base)
+				{
+					case LROpCodeBase.SemanticAction:
+					{
+						UserAction action = parserActions[production[i + 1].DataValue];
+						i++;
+						action.Invoke(variable, builder);
+						break;
+					}
+					case LROpCodeBase.AddVirtual:
+					{
+						int index = production[i + 1].DataValue;
+	                    builder.ReductionVirtual(index, op.TreeAction);
+	                    i++;
+						break;
+					}
+					default:
+						builder.ReductionPop(op.TreeAction);
+						break;
+				}
             }
             builder.Reduce();
         }

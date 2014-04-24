@@ -40,10 +40,6 @@ namespace Hime.Redist
         /// <summary>
         /// Promote the node, i.e. replace its parent with it and insert its children where it was
         /// </summary>
-        Promote = 3,
-        /// <summary>
-        /// Execute a semantic action
-        /// </summary>
-        Semantic = 4
+        Promote = 3
     }
 }

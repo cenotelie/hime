@@ -31,36 +31,36 @@ namespace Hime.Redist.Parsers
         /// <summary>
         /// Pop an AST from the stack without applying any tree action
         /// </summary>
-        PopNoAction = 0,
+        PopStackNoAction = LROpCodeBase.PopStack + TreeAction.None,
         /// <summary>
         /// Pop an AST from the stack and apply the drop tree action
         /// </summary>
-        PopDrop = 2,
+        PopStackDrop = LROpCodeBase.PopStack + TreeAction.Drop,
         /// <summary>
         /// Pop an AST from the stack and apply the promote tree action
         /// </summary>
-        PopPromote = 3,
+        PopStackPromote = LROpCodeBase.PopStack + TreeAction.Promote,
 
         /// <summary>
         /// Add a virtual symbol without tree action
         /// </summary>
-        VirtualNoAction = 4 + PopNoAction,
+        AddVirtualNoAction = LROpCodeBase.AddVirtual + TreeAction.None,
         /// <summary>
         /// Add a virtual symbol and apply the drop tree action
         /// </summary>
         /// <remarks>
         /// This doesn't make any sense, but it is possible!
         /// </remarks>
-        VirtualDrop = 4 + PopDrop,
+        AddVirtualDrop = LROpCodeBase.AddVirtual + TreeAction.Drop,
         /// <summary>
         /// Add a virtual symbol and apply the promote tree action
         /// </summary>
-        VirtualPromote = 4 + PopPromote,
+        AddVirtualPromote = LROpCodeBase.AddVirtual + TreeAction.Promote,
         
         /// <summary>
         /// Execute a semantic action
         /// </summary>
-        SemanticAction = 8,
+        SemanticAction = LROpCodeBase.SemanticAction,
 
         /// <summary>
         /// Add a null variable without any tree action
@@ -68,20 +68,20 @@ namespace Hime.Redist.Parsers
         /// <remarks>
         /// This can be found only in RNGLR productions
         /// </remarks>
-        NullVariableNoAction = 16,
+        AddNullVariableNoAction = LROpCodeBase.AddNullVariable + TreeAction.None,
         /// <summary>
         /// Add a null variable and apply the drop tree action
         /// </summary>
         /// <remarks>
         /// This can be found only in RNGLR productions
         /// </remarks>
-        NullVariableDrop = 16 + PopDrop,
+        AddNullVariableDrop = LROpCodeBase.AddNullVariable + TreeAction.Drop,
         /// <summary>
         /// Add a null variable and apply the promote action
         /// </summary>
         /// <remarks>
         /// This can be found only in RNGLR productions
         /// </remarks>
-        NullVariablePromote = 16 + PopPromote
+        AddNullVariablePromote = LROpCodeBase.AddNullVariable + TreeAction.Promote
     }
 }

@@ -39,7 +39,7 @@ namespace Hime.Redist.Parsers
     /// --- productions table
     /// See LRProduction
     /// </remarks>
-    public sealed class LRkAutomaton
+    public class LRkAutomaton
     {
 		/// <summary>
 		/// The number of columns in the LR table
@@ -59,16 +59,19 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The LR table
 		/// </summary>
-        private LRActions table;
+        private Utils.Blob<LRAction> table;
 
 		/// <summary>
 		/// The table of LR productions
 		/// </summary>
         private LRProduction[] productions;
 
-        private LRkAutomaton(Stream stream)
+		/// <summary>
+		/// Initializes a new automaton from the given binary stream
+		/// </summary>
+		/// <param name="reader">The binary stream to load from</param>
+		public LRkAutomaton(BinaryReader reader)
         {
-            BinaryReader reader = new BinaryReader(stream);
             this.ncols = reader.ReadUInt16();
             int nstates = reader.ReadUInt16();
             int nprod = reader.ReadUInt16();
@@ -77,12 +80,11 @@ namespace Hime.Redist.Parsers
             this.columns = new ColumnMap();
             for (int i = 0; i != ncols; i++)
                 this.columns.Add(columnsID[i], i);
-            this.table = new LRActions(nstates * ncols);
-            reader.Read(this.table.Raw, 0, this.table.Raw.Length);
+            this.table = new Utils.Blob<LRAction>(nstates * ncols, 4);
+			this.table.LoadFrom(reader);
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);
-            reader.Close();
         }
 
         /// <summary>
@@ -92,12 +94,19 @@ namespace Hime.Redist.Parsers
         /// <param name="resource">The name of the resource containing the lexer</param>
         /// <returns>The automaton</returns>
         public static LRkAutomaton Find(System.Type type, string resource)
-        {
-            System.Reflection.Assembly assembly = type.Assembly;
-            string[] resources = assembly.GetManifestResourceNames();
-            foreach (string existing in resources)
-                if (existing.EndsWith(resource))
-                    return new LRkAutomaton(assembly.GetManifestResourceStream(existing));
+		{
+			System.Reflection.Assembly assembly = type.Assembly;
+			string[] resources = assembly.GetManifestResourceNames();
+			foreach (string existing in resources)
+			{
+				if (existing.EndsWith(resource))
+				{
+					BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream(existing));
+					LRkAutomaton automaton = new LRkAutomaton(reader);
+					reader.Close();
+					return automaton;
+				}
+			}
             return null;
         }
 
@@ -107,7 +116,7 @@ namespace Hime.Redist.Parsers
         /// <param name="state">State in the LR(k) automaton</param>
         /// <param name="sid">Symbol's ID</param>
         /// <returns>The LR(k) action for the state and sid</returns>
-        internal LRAction GetAction(int state, int sid)
+        public LRAction GetAction(int state, int sid)
         {
             return table[state * ncols + columns[sid]];
         }
@@ -117,7 +126,7 @@ namespace Hime.Redist.Parsers
         /// </summary>
         /// <param name="index">Production's index</param>
         /// <returns>The production a the given index</returns>
-        internal LRProduction GetProduction(int index) { return productions[index]; }
+        public LRProduction GetProduction(int index) { return productions[index]; }
 
         /// <summary>
         /// Gets a collection of the expected terminal indices
@@ -125,7 +134,7 @@ namespace Hime.Redist.Parsers
         /// <param name="state">The DFA state</param>
         /// <param name="terminalCount">The maximal number of terminals</param>
         /// <returns>The expected terminal indices</returns>
-        internal ICollection<int> GetExpected(int state, int terminalCount)
+        public ICollection<int> GetExpected(int state, int terminalCount)
         {
             List<int> result = new List<int>();
             int offset = ncols * state;

@@ -54,7 +54,7 @@ namespace Hime.Redist.Parsers
         private Utils.Blob<ushort> columnsID;
         private ColumnMap columns;
         private RNGLRTable table;
-        private LRActions actions;
+        private Utils.Blob<LRAction> actions;
         private LRProduction[] productions;
         private Utils.Blob<ushort> nullables;
 
@@ -78,8 +78,8 @@ namespace Hime.Redist.Parsers
                 this.columns.Add(columnsID[i], i);
             this.table = new RNGLRTable(nstates, ncols);
             reader.Read(this.table.Raw, 0, this.table.Raw.Length);
-            this.actions = new LRActions(nactions);
-            reader.Read(this.actions.Raw, 0, this.actions.Raw.Length);
+            this.actions = new Utils.Blob<LRAction>(nactions / 4, 4);
+			this.actions.LoadFrom(reader);
             this.productions = new LRProduction[nprod];
             for (int i = 0; i != nprod; i++)
                 this.productions[i] = new LRProduction(reader);

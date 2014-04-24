@@ -129,7 +129,7 @@ namespace Hime.Redist.Parsers
             if (production.ReductionLength > 0)
                 stackNext = production.ReductionLength - 2;
             // Execute the bytecode
-            for (int i = 0; i != production.Bytecode.Length; i++)
+            for (int i = 0; i != production.BytecodeLength; i++)
             {
                 /*LROpCode op = production.Bytecode[i];
                 if (op.IsSemAction)

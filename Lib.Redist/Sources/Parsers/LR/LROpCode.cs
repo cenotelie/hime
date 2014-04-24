@@ -18,52 +18,47 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Represent an opcode for a LR production
+    /// Represent an op-code for a LR production
+	/// An op-code can be either an instruction or raw data
     /// </summary>
     [StructLayout(LayoutKind.Explicit, Size = 2)]
-    struct LROpCode
+    public struct LROpCode
     {
-        private const ushort MaskAction = 3;
-        private const ushort Virtual = 4;
-        private const ushort SemanticAction = 8;
-        private const ushort NullVariable = 16;
+		/// <summary>
+		/// Bit mask for the tree action part of an instruction
+		/// </summary>
+        private const ushort MaskTreeAction = 0x0003;
+		/// <summary>
+		/// Bit mask for the base part of an instruction
+		/// </summary>
+        private const ushort MaskBase = 0xFFFC;
         
+		/// <summary>
+		/// The op-code value
+		/// </summary>
         [FieldOffset(0)]
         private ushort code;
 
         /// <summary>
-        /// Gets the code's value
+        /// Gets the value of the data interpretation of this op-code
         /// </summary>
-        public int Value { get { return code; } }
+        public int DataValue { get { return code; } }
 
         /// <summary>
         /// Gets the tree action included in this code
         /// </summary>
-        public TreeAction TreeAction { get { return (TreeAction)(code & MaskAction); } }
+        public TreeAction TreeAction { get { return (TreeAction)(code & MaskTreeAction); } }
 
-        /// <summary>
-        /// Gets whether this is a Pop action
+		/// <summary>
+        /// Gets the base instruction in this code
         /// </summary>
-        public bool IsPop { get { return (code < Virtual); } }
-
-        /// <summary>
-        /// Gets whether this is a Add Virtual action
-        /// </summary>
-        public bool IsAddVirtual { get { return ((code & Virtual) == Virtual); } }
-
-        /// <summary>
-        /// Gets whether this is a Semantic Action
-        /// </summary>
-        public bool IsSemAction { get { return (code == SemanticAction); } }
-
-        /// <summary>
-        /// Gets whether this is a Add Null Variable action
-        /// </summary>
-        public bool IsAddNullVar { get { return ((code & NullVariable) == NullVariable); } }
+		[CLSCompliant(false)]
+        public LROpCodeBase Base { get { return (LROpCodeBase)(code & MaskBase); } }
     }
 }

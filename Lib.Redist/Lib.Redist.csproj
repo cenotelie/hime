@@ -82,8 +82,6 @@
     <Compile Include="Sources\Parsers\LR\BaseLRParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRAction.cs" />
     <Compile Include="Sources\Parsers\LR\LRActionCode.cs" />
-    <Compile Include="Sources\Parsers\LR\LRActions.cs" />
-    <Compile Include="Sources\Parsers\LR\LRBytecode.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkAutomaton.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCode.cs" />
@@ -117,6 +115,7 @@
     <Compile Include="Sources\SymbolType.cs" />
     <Compile Include="Sources\SymbolRef.cs" />
     <Compile Include="Sources\Utils\Blob.cs" />
+    <Compile Include="Sources\Parsers\LR\LROpCodeBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />

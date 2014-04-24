@@ -18,49 +18,37 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System.Runtime.InteropServices;
+using System;
 
 namespace Hime.Redist.Parsers
 {
     /// <summary>
-    /// Represents a collection of LRAction stored as a binary blob
+    /// Base values of LR op-code instructions
     /// </summary>
-    [StructLayout(LayoutKind.Explicit)]
-    class LRActions
+    [CLSCompliant(false)]
+    public enum LROpCodeBase : ushort
     {
-        [FieldOffset(0)]
-        private byte[] blob;
-        [FieldOffset(0)]
-        private LRAction[] data;
-        [FieldOffset(8)]
-        private int count;
+        /// <summary>
+        /// Pop an AST from the stack
+        /// </summary>
+        PopStack = 0,
 
         /// <summary>
-        /// Gets the raw array of bytes
+        /// Add a virtual symbol
         /// </summary>
-        public byte[] Raw { get { return blob; } }
+        AddVirtual = 4,
+        
         /// <summary>
-        /// Gets the number of actions in this collection
+        /// Execute a semantic action
         /// </summary>
-        public int Count { get { return count; } }
-        /// <summary>
-        /// Gets the action at the given index
-        /// </summary>
-        /// <param name="index">Index of the action</param>
-        /// <returns>The action at the given index</returns>
-        public LRAction this[int index]
-        {
-            get { return data[index]; }
-        }
+        SemanticAction = 8,
 
         /// <summary>
-        /// Initializes a new blob for the given number of items
+        /// Add a null variable
         /// </summary>
-        /// <param name="count">The number of items</param>
-        public LRActions(int count)
-        {
-            this.blob = new byte[count * 4];
-            this.count = count;
-        }
+        /// <remarks>
+        /// This can be found only in RNGLR productions
+        /// </remarks>
+        AddNullVariable = 16,
     }
 }

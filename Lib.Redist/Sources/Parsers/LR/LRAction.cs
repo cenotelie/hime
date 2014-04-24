@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace Hime.Redist.Parsers
@@ -26,17 +27,26 @@ namespace Hime.Redist.Parsers
     /// Represents a LR action in a LR parse table
     /// </summary>
     [StructLayout(LayoutKind.Explicit, Size = 4)]
-    struct LRAction
+    public struct LRAction
     {
+		/// <summary>
+		/// The LR action code
+		/// </summary>
         [FieldOffset(0)]
         private LRActionCode code;
+
+		/// <summary>
+		/// The data associated with the action
+		/// </summary>
         [FieldOffset(2)]
         private ushort data;
 
         /// <summary>
         /// Gets the action code
         /// </summary>
+		[CLSCompliant(false)]
         public LRActionCode Code { get { return code; } }
+
         /// <summary>
         /// Gets the data associated with the action
         /// </summary>

@@ -31,33 +31,50 @@ namespace Hime.Redist.Parsers
     /// uint16: head's index
     /// uint8: 1=replace, 0=nothing
     /// uint8: reduction length
-    /// uint8: bytecode length in bytes
+    /// uint8: bytecode length in number of op-code
     /// --- production's bytecode
     /// See LRBytecode
     /// </remarks>
-    class LRProduction
+    public class LRProduction
     {
-        private int head;
-        private TreeAction headAction;
-        private int reducLength;
-        private LRBytecode bytecode;
-
         /// <summary>
         /// Index of the rule's head in the parser's array of variables
         /// </summary>
-        public int Head { get { return head; } }
+        private int head;
         /// <summary>
         /// Action of the rule's head (replace or not)
         /// </summary>
-        public TreeAction HeadAction { get { return headAction; } }
+        private TreeAction headAction;
         /// <summary>
         /// Size of the rule's body by only counting terminals and variables
         /// </summary>
-        public int ReductionLength { get { return reducLength; } }
+        private int reducLength;
         /// <summary>
         /// Bytecode for the rule's production
         /// </summary>
-        public LRBytecode Bytecode { get { return bytecode; } }
+        private Utils.Blob<LROpCode> bytecode;
+
+        /// <summary>
+        /// Gets the index of the rule's head in the parser's array of variables
+        /// </summary>
+        public int Head { get { return head; } }
+        /// <summary>
+        /// Gets the action of the rule's head (replace or not)
+        /// </summary>
+        public TreeAction HeadAction { get { return headAction; } }
+        /// <summary>
+        /// Gets the size of the rule's body by only counting terminals and variables
+        /// </summary>
+        public int ReductionLength { get { return reducLength; } }
+		/// <summary>
+		/// Gets the length of the bytecode
+		/// </summary>
+		public int BytecodeLength { get { return bytecode.Count; } }
+		/// <summary>
+		/// Gets the op-code at the specified index in the bytecode
+		/// </summary>
+		/// <param name="index">Index in the bytecode</param>
+		public LROpCode this[int index] { get { return bytecode [index]; } }
 
         /// <summary>
         /// Loads a new instance of the LRProduction class from a binary representation
@@ -68,8 +85,8 @@ namespace Hime.Redist.Parsers
             this.head = reader.ReadUInt16();
             this.headAction = (TreeAction)reader.ReadByte();
             this.reducLength = reader.ReadByte();
-            this.bytecode = new LRBytecode(reader.ReadByte());
-            reader.Read(bytecode.Raw, 0, this.bytecode.Raw.Length);
+            this.bytecode = new Utils.Blob<LROpCode>(reader.ReadByte(), 2);
+			this.bytecode.LoadFrom(reader);
         }
     }
 }
