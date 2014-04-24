@@ -146,14 +146,16 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             foreach (Action action in actions)
                 stream.WriteLine("            public virtual void " + action.Name + "(Symbol head, SemanticBody body) { }");
             stream.WriteLine();
-            stream.WriteLine("            public UserAction[] GetActions()");
-            stream.WriteLine("            {");
-            stream.WriteLine("                UserAction[] actions = new UserAction[" + actions.Count + "];");
-            for (int i = 0; i != actions.Count; i++)
-                stream.WriteLine("                actions[" + i + "] = new UserAction(" + actions[i].Name + ");");
-            stream.WriteLine("                return actions;");
-            stream.WriteLine("            }");
             stream.WriteLine("        }");
+			stream.WriteLine("        private static readonly Actions noActions = new Actions();");
+            stream.WriteLine("        private static UserAction[] GetUserActions(Actions input)");
+            stream.WriteLine("        {");
+            stream.WriteLine("            UserAction[] result = new UserAction[" + actions.Count + "];");
+            for (int i = 0; i != actions.Count; i++)
+                stream.WriteLine("            result[" + i + "] = new UserAction(input." + actions[i].Name + ");");
+            stream.WriteLine("            return result;");
+            stream.WriteLine("        }");
+            
         }
 
         protected virtual void ExportConstructor(StreamWriter stream, string name)
@@ -164,8 +166,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             }
             else
             {
-                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, (new Actions()).RawActions, lexer) { }");
-                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, actions.GetActions(), lexer) { }");
+                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, GetUserActions(noActions), lexer) { }");
+                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
             }
         }
         
