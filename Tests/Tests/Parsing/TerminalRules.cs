@@ -380,5 +380,577 @@ namespace Hime.Tests.Parsing
 			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "a5a");
         }
+
+		/// <summary>
+		/// Tests the simple nesting of terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_NestingRules_Simple()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->'y' X 'y'; A->'a';} rules { e->A Y A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ayxya", "e(A Y='yxy' A)");
+        }
+
+		/// <summary>
+		/// Tests the nesting of rule as a prefix
+		/// </summary>
+		[Test]
+        public void Test_Terminals_NestingRules_Prefix_Strict()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'; A->'a';} rules { e->A Y A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axya", "e(A Y='xy' A)");
+        }
+
+		/// <summary>
+		/// Tests the nesting of rule as a prefix
+		/// </summary>
+		[Test]
+        public void Test_Terminals_NestingRules_Prefix_Optional_1()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axya", "e(A Y='xy' A)");
+        }
+
+		/// <summary>
+		/// Tests the nesting of rule as a prefix
+		/// </summary>
+		[Test]
+        public void Test_Terminals_NestingRules_Prefix_Optional_2()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(A Y='x' A)");
+        }
+
+		/// <summary>
+		/// Tests the star operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorStar_0()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aa", "e(X='aa')");
+        }
+
+		/// <summary>
+		/// Tests the star operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorStar_1()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(X='axa')");
+        }
+
+		/// <summary>
+		/// Tests the star operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorStar_More()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxa", "e(X='axxxa')");
+        }
+
+		/// <summary>
+		/// Tests the plus operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorPlus_0()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "aa");
+        }
+
+		/// <summary>
+		/// Tests the plus operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorPlus_1()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(X='axa')");
+        }
+
+		/// <summary>
+		/// Tests the plus operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorPlus_More()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxa", "e(X='axxxa')");
+        }
+
+		/// <summary>
+		/// Tests the optional operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorOptional_0()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aa", "e(X='aa')");
+        }
+
+		/// <summary>
+		/// Tests the optional operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorOptional_1()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(X='axa')");
+        }
+
+		/// <summary>
+		/// Tests the optional operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorOptional_More()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxa");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Strict_Exact()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxxa", "e(X='axxxxa')");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Strict_Less()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxa");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Strict_More()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxxxa");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Range_LeftBound()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxa", "e(X='axxa')");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Range_RightBound()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxxa", "e(X='axxxxa')");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Range_Within()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxa", "e(X='axxxa')");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Range_Less()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axa");
+        }
+
+		/// <summary>
+		/// Tests the cardinality operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorCardinality_Range_More()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxxxa");
+        }
+
+		/// <summary>
+		/// Tests the concatenation operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorConcatenation_Simple()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ab", "e(A='ab')");
+        }
+
+		/// <summary>
+		/// Tests the concatenation operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorConcatenation_Chained()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abc", "e(A='abc')");
+        }
+
+		/// <summary>
+		/// Tests the union operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorUnion_Simple_Left()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
+        }
+
+		/// <summary>
+		/// Tests the union operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorUnion_Simple_Right()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(A='b')");
+        }
+
+		/// <summary>
+		/// Tests the union operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorUnion_Chained_1()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
+        }
+
+		/// <summary>
+		/// Tests the union operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorUnion_Chained_2()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(A='b')");
+        }
+
+		/// <summary>
+		/// Tests the union operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorUnion_Chained_3()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "c", "e(A='c')");
+        }
+
+		/// <summary>
+		/// Tests the difference operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorDifference_InNominalOnly()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aa", "e(A='aa')");
+        }
+
+		/// <summary>
+		/// Tests the difference operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorDifference_InIntersection()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "bb");
+        }
+
+		/// <summary>
+		/// Tests the difference operator in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_OperatorDifference_InSubstractedOnly()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "cc");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_StarConcat_NoGrouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'*;} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abbbbb", "e(A='abbbbb')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_StarConcat_NoGrouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'*;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abab");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_StarConcat_Grouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')*;} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abab", "e(A='abab')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_StarConcat_Grouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')*;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abbbbb");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_PlusConcat_NoGrouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'+;} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abbbbb", "e(A='abbbbb')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_PlusConcat_NoGrouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'+;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abab");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_PlusConcat_Grouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')+;} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abab", "e(A='abab')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_PlusConcat_Grouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')+;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abbbbb");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_OptionalConcat_NoGrouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ac", "e(A='ac')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_OptionalConcat_NoGrouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "c");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_OptionalConcat_Grouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "c", "e(A='c')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_OptionalConcat_Grouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "ac");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_CardinalityConcat_NoGrouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'{4};} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abbbb", "e(A='abbbb')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_CardinalityConcat_NoGrouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'{4};} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abababab");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_CardinalityConcat_Grouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b'){4};} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abababab", "e(A='abababab')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_CardinalityConcat_Grouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b'){4};} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abbbb");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_ConcatUnion_NoGrouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "c", "e(A='c')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_ConcatUnion_NoGrouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "ac");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_ConcatUnion_Grouping_OK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ac", "e(A='ac')");
+        }
+
+		/// <summary>
+		/// Tests the operator precedence in terminal rules
+		/// </summary>
+		[Test]
+        public void Test_Terminals_Precedence_ConcatUnion_Grouping_NOK()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "c");
+        }
+
+		/// <summary>
+		/// Tests the overriding of a terminal rule by another (more general)
+		/// </summary>
+		[Test]
+        public void Test_Terminals_RuleOverriding()
+        {
+			SetTestDirectory();
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->[a-z]; A->'a';} rules { e->A Y A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(A Y='x' A)");
+        }
 	}
 }
