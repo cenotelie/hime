@@ -24,7 +24,7 @@ using NUnit.Framework;
 namespace Hime.Tests.Parsing
 {
 	/// <summary>
-	/// Tests the basic grammar features
+	/// Tests the support of unicode blocks
 	/// </summary>
 	[TestFixture]
 	public class UnicodeBlocks : BaseParseSuite

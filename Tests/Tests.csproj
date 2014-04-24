@@ -57,11 +57,13 @@
     <Compile Include="BaseTestSuite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\HimeIntegration.cs" />
-    <Compile Include="Tests\Parsing\BasicGrammars.cs" />
     <Compile Include="Tests\HimeCC\HimeCCOptions.cs" />
     <Compile Include="Tests\HimeCC\HimeCCReturn.cs" />
     <Compile Include="Tests\Parsing\TreeActions.cs" />
     <Compile Include="Tests\Parsing\UnicodeBlocks.cs" />
+    <Compile Include="Tests\Parsing\GrammarOptions.cs" />
+    <Compile Include="Tests\Parsing\TerminalRules.cs" />
+    <Compile Include="Tests\Parsing\SyntacticRules.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
