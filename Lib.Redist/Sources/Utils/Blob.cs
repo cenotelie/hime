@@ -27,7 +27,7 @@ namespace Hime.Redist.Utils
     /// Represents a blob of binary data that can be accessed as an array of items T
     /// </summary>
 	[StructLayout(LayoutKind.Explicit)]
-    public class Blob<T>
+    class Blob<T>
 	{
 		/// <summary>
 		/// The backend by storage

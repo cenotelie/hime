@@ -162,16 +162,16 @@ namespace Hime.Redist.Lexer
 
             while (state != 0xFFFF)
             {
-                int offset = lexAutomaton.GetOffset(state);
+                int offset = lexAutomaton.GetOffsetOf(state);
                 // Is this state a matching state ?
-                int terminal = lexAutomaton.GetTerminalIndex(offset);
+                int terminal = lexAutomaton.GetStateRecognizedTerminal(offset);
                 if (terminal != 0xFFFF)
                 {
                     matchedIndex = terminal;
                     matchedLength = length;
                 }
                 // No further transition => exit
-                if (lexAutomaton.HasNoTransition(offset))
+                if (lexAutomaton.IsStateDeadEnd(offset))
                     break;
                 // At the end of the buffer
                 if (i == buffer.End)
@@ -185,9 +185,9 @@ namespace Hime.Redist.Lexer
                 length++;
                 // Try to find a transition from this state with the read character
                 if (current <= 255)
-                    state = lexAutomaton.GetCachedTransition(offset + current + 3);
+                    state = lexAutomaton.GetStateCachedTransition(offset, current);
                 else
-                    state = lexAutomaton.GetFallbackTransition(offset, current);
+                    state = lexAutomaton.GetStateBulkTransition(offset, current);
             }
             input.GoTo(i - (length - matchedLength));
             

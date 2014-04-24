@@ -114,36 +114,36 @@ namespace Hime.CentralDogma.SDK
 					break;
 				}
 			}
+
 			BinaryReader reader = new BinaryReader(stream);
-			int count = reader.ReadInt32();
-			Hime.Redist.Utils.Blob<uint> table = new Hime.Redist.Utils.Blob<uint>(count, 4);
-			table.LoadFrom(reader);
-			Hime.Redist.Utils.Blob<ushort> data = new Hime.Redist.Utils.Blob<ushort>((int)((stream.Length - table.Length - 4) / 2), 2);
-			data.LoadFrom(reader);
+			Hime.Redist.Lexer.Automaton automaton = new Hime.Redist.Lexer.Automaton(reader);
 			reader.Close();
 
-			for (int i=0; i!=count; i++)
+			for (int i=0; i!=automaton.StatesCount; i++)
 				this.dfa.States.Add(new Automata.DFAState(this.dfa.StatesCount));
-			for (int i=0; i!=count; i++)
+			for (int i=0; i!=automaton.StatesCount; i++)
 			{
 				Automata.DFAState current = this.dfa.States[i];
-				int offset = (int)table[i];
-				ushort tIndex = data[offset];
-				ushort nNonCached = data[offset + 2];
-				if (tIndex != 0xFFFF)
-					current.AddFinal(new MatchedTerminal(this.terminals[(int)tIndex]));
+				int offset = automaton.GetOffsetOf(i);
+
+				int terminal = automaton.GetStateRecognizedTerminal(offset);
+				if (terminal != 0xFFFF)
+					current.AddFinal(new MatchedTerminal(this.terminals[terminal]));
+
 				for (int j=0; j!=256; j++)
 				{
-					ushort next = data[offset + 3 + j];
+					int next = automaton.GetStateCachedTransition(offset, j);
 					char c = System.Convert.ToChar(j);
 					if (next != 0xFFFF)
 						current.AddTransition(new CharSpan(c, c), this.dfa.States[next]);
 				}
+
+				int nNonCached = automaton.GetStateBulkTransitionsCount(offset);
 				for (int j=0; j!=nNonCached; j++)
 				{
-					ushort begin = data[offset + 3 + 256 + (j * 3)];
-					ushort end = data[offset + 3 + 256 + (j * 3) + 1];
-					ushort next = data[offset + 3 + 256 + (j * 3) + 2];
+					int begin = 0;
+					int end = 0;
+					int next = automaton.GetStateBulkTransition(offset, j, out begin, out end);
 					current.AddTransition(new CharSpan(System.Convert.ToChar(begin), System.Convert.ToChar(end)), this.dfa.States[next]);
 				}
 				current.RepackTransitions();
