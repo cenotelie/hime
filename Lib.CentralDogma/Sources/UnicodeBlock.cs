@@ -36,7 +36,7 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// The block's character span
 		/// </summary>
-		private CharSpan span;
+		private UnicodeSpan span;
 
 		/// <summary>
 		/// Get this block's name
@@ -44,14 +44,9 @@ namespace Hime.CentralDogma
         public string Name { get { return name; } }
 
 		/// <summary>
-        /// Gets the first (included) character of the block
+        /// Gets the span of this block
         /// </summary>
-        public char Begin { get { return span.Begin; } }
-
-		/// <summary>
-        /// Gets the last (included) character of the block
-        /// </summary>
-        public char End { get { return span.End; } }
+        public UnicodeSpan Span { get { return span; } }
 
 		/// <summary>
 		/// Initializes this Unicode block
@@ -59,22 +54,10 @@ namespace Hime.CentralDogma
 		/// <param name="name">Block's name</param>
 		/// <param name="begin">Beginning character (included)</param>
 		/// <param name="end">End character (included)</param>
-        private UnicodeBlock(string name, ushort begin, ushort end)
+        private UnicodeBlock(string name, int begin, int end)
 		{
             this.name = name;
-			this.span = new CharSpan(System.Convert.ToChar(begin), System.Convert.ToChar(end));
-        }
-
-		/// <summary>
-		/// Initializes this Unicode block
-		/// </summary>
-		/// <param name="name">Block's name</param>
-		/// <param name="begin">Beginning character (included)</param>
-		/// <param name="end">End character (included)</param>
-        public UnicodeBlock(string name, char begin, char end)
-		{
-            this.name = name;
-			this.span = new CharSpan(begin, end);
+			this.span = new UnicodeSpan(begin, end);
         }
 
 		/// <summary>
@@ -111,7 +94,9 @@ namespace Hime.CentralDogma
 		{
 			if (blocks == null)
 				BuildBlocks();
-			return blocks[name];
+			if (blocks.ContainsKey(name))
+				return blocks[name];
+			return null;
 		}
 
 		/// <summary>
@@ -261,9 +246,9 @@ namespace Hime.CentralDogma
 			blocks.Add("MeeteiMayek", new UnicodeBlock("MeeteiMayek", 0xABC0, 0xABFF));
 			blocks.Add("HangulSyllables", new UnicodeBlock("HangulSyllables", 0xAC00, 0xD7AF));
 			blocks.Add("HangulJamoExtended-B", new UnicodeBlock("HangulJamoExtended-B", 0xD7B0, 0xD7FF));
-			blocks.Add("HighSurrogates", new UnicodeBlock("HighSurrogates", 0xD800, 0xDB7F));
-			blocks.Add("HighPrivateUseSurrogates", new UnicodeBlock("HighPrivateUseSurrogates", 0xDB80, 0xDBFF));
-			blocks.Add("LowSurrogates", new UnicodeBlock("LowSurrogates", 0xDC00, 0xDFFF));
+			//blocks.Add("HighSurrogates", new UnicodeBlock("HighSurrogates", 0xD800, 0xDB7F));
+			//blocks.Add("HighPrivateUseSurrogates", new UnicodeBlock("HighPrivateUseSurrogates", 0xDB80, 0xDBFF));
+			//blocks.Add("LowSurrogates", new UnicodeBlock("LowSurrogates", 0xDC00, 0xDFFF));
 			blocks.Add("PrivateUseArea", new UnicodeBlock("PrivateUseArea", 0xE000, 0xF8FF));
 			blocks.Add("CJKCompatibilityIdeographs", new UnicodeBlock("CJKCompatibilityIdeographs", 0xF900, 0xFAFF));
 			blocks.Add("AlphabeticPresentationForms", new UnicodeBlock("AlphabeticPresentationForms", 0xFB00, 0xFB4F));

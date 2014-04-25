@@ -36,7 +36,7 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// The list of character spans contained in this category
 		/// </summary>
-        private List<CharSpan> spans;
+        private List<UnicodeSpan> spans;
 
 		/// <summary>
 		/// Gets this unicode category's name
@@ -46,16 +46,16 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// Gets the character spans contained by this category
 		/// </summary>
-        public List<CharSpan> Spans { get { return spans; } }
+        public List<UnicodeSpan> Spans { get { return spans; } }
 
 		/// <summary>
 		/// Adds a span to this category
 		/// </summary>
 		/// <param name="begin">The span's beginning character</param>
 		/// <param name="end">The span's ending character</param>
-		private void AddSpan(ushort begin, ushort end)
+		private void AddSpan(int begin, int end)
 		{
-			spans.Add(new CharSpan(System.Convert.ToChar(begin), System.Convert.ToChar(end)));
+			spans.Add(new UnicodeSpan(begin, end));
 		}
 
 		/// <summary>
@@ -65,7 +65,7 @@ namespace Hime.CentralDogma
         private UnicodeCategory(string name)
         {
             this.name = name;
-            this.spans = new List<CharSpan>();
+            this.spans = new List<UnicodeSpan>();
         }
 
 		/// <summary>
@@ -102,7 +102,9 @@ namespace Hime.CentralDogma
 		{
 			if (categories == null)
 				BuildCategories();
-			return categories[name];
+			if (categories.ContainsKey(name))
+				return categories[name];
+			return null;
 		}
 
         private static void BuildCategories()

@@ -176,6 +176,9 @@
     <Compile Include="Sources\UnicodeBlock.cs" />
     <Compile Include="Sources\UnicodeCategory.cs" />
     <Compile Include="Sources\CharSpan.cs" />
+    <Compile Include="Sources\UnicodeHelper.cs" />
+    <Compile Include="Sources\UnicodeCodePoint.cs" />
+    <Compile Include="Sources\UnicodeSpan.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

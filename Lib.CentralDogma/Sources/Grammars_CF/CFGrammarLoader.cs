@@ -71,6 +71,15 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 Compile_Recognize_grammar_text(syntaxRoot);
         }
 
+		private void ReportErrorAt(ASTNode node, string message)
+		{
+			TextToken token = node.Symbol as TextToken;
+			if (token  == null)
+				reporter.Error(resName + " @(?,?) " + message);
+			else
+				reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") " + message);
+		}
+
         private Symbol Compile_Tool_NameToSymbol(string name, CompilerContext context)
         {
             if (context.IsReference(name))
@@ -88,21 +97,34 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         private Automata.NFA Compile_Recognize_terminal_def_atom_any(ASTNode node)
         {
-            Automata.NFA final = Automata.NFA.NewMinimal();
-            char begin = System.Convert.ToChar(0x0000);
-            char end = System.Convert.ToChar(0xFFFF);
-            final.StateEntry.AddTransition(new CharSpan(begin, end), final.StateExit);
-            return final;
+            Automata.NFA automata = Automata.NFA.NewMinimal();
+			// plane 0 transitions
+			automata.StateEntry.AddTransition(new CharSpan((char)0x0000, (char)0xD7FF), automata.StateExit);
+			automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
+			// surrogate pairs
+			Automata.NFAState intermediate = automata.AddNewState();
+			automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
+			intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
+			return automata;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(ASTNode node)
-        {
-            Automata.NFA final = Automata.NFA.NewMinimal();
-            string value = ((TextToken)node.Symbol).Value;
-            value = value.Substring(2, value.Length - 2);
-            int charInt = System.Convert.ToInt32(value, 16);
-            char c = System.Convert.ToChar(charInt);
-            final.StateEntry.AddTransition(new CharSpan(c, c), final.StateExit);
-            return final;
+		{
+			Automata.NFA automata = Automata.NFA.NewMinimal();
+			string value = ((TextToken)node.Symbol).Value;
+			value = value.Substring(2, value.Length - 2);
+			UnicodeCodePoint cp = new UnicodeCodePoint(System.Convert.ToInt32(value, 16));
+			char[] data = cp.GetUTF16();
+			if (data.Length == 1)
+			{
+				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), automata.StateExit);
+			}
+			else
+			{
+				Automata.NFAState intermediate = automata.AddNewState();
+				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), intermediate);
+				intermediate.AddTransition(new CharSpan(data[1], data[1]), automata.StateExit);
+			}
+			return automata;
         }
         private string ReplaceEscapees(string value)
         {
@@ -134,30 +156,30 @@ namespace Hime.CentralDogma.Grammars.ContextFree
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_text(ASTNode node)
         {
-        	Automata.NFA final = Automata.NFA.NewMinimal();
-            final.StateExit = final.StateEntry;
+        	Automata.NFA automata = Automata.NFA.NewMinimal();
+            automata.StateExit = automata.StateEntry;
             string value = ((TextToken)node.Children[node.Children.Count-1].Symbol).Value;
             bool insensitive = caseInsensitive || (node.Children.Count > 1);
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\'", "'");
             foreach (char c in value)
             {
-                Automata.NFAState temp = final.AddNewState();
+                Automata.NFAState temp = automata.AddNewState();
                 if (insensitive && char.IsLetter(c))
                 {
                     char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
-                    final.StateExit.AddTransition(new CharSpan(c, c), temp);
-                    final.StateExit.AddTransition(new CharSpan(c2, c2), temp);
+                    automata.StateExit.AddTransition(new CharSpan(c, c), temp);
+                    automata.StateExit.AddTransition(new CharSpan(c2, c2), temp);
                 }
                 else
-                    final.StateExit.AddTransition(new CharSpan(c, c), temp);
-                final.StateExit = temp;
+                    automata.StateExit.AddTransition(new CharSpan(c, c), temp);
+                automata.StateExit = temp;
             }
-            return final;
+            return automata;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_set(ASTNode node)
         {
-            Automata.NFA final = Automata.NFA.NewMinimal();
+            Automata.NFA automata = Automata.NFA.NewMinimal();
             string value = ((TextToken)node.Symbol).Value;
             value = value.Substring(1, value.Length - 2);
             value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
@@ -167,60 +189,146 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                 value = value.Substring(1);
                 positive = false;
             }
+
             List<CharSpan> spans = new List<CharSpan>();
-            for (int i = 0; i != value.Length; i++)
+			for (int i = 0; i != value.Length; i++)
             {
+				// read the first full unicode character
+				char b = value[i];
+				if (b >= 0xD800 && b <= 0xDFFF)
+				{
+					ReportErrorAt(node, "Unsupported non-plane 0 Unicode character (" + b + value[i + 1] + ") in character class");
+					return automata;
+				}
+
                 if ((i != value.Length - 1) && (value[i + 1] == '-'))
                 {
-                    spans.Add(new CharSpan(value[i], value[i + 2]));
-                    i += 2;
+					// this is a range, match the '-'
+					i += 2;
+					char e = value[i];
+					if (e >= 0xD800 && e <= 0xDFFF)
+					{
+						ReportErrorAt(node, "Unsupported non-plane 0 Unicode character (" + e + value[i + 1] + ") in character class");
+						return automata;
+					}
+					if (b < 0xD800 && e > 0xDFFF)
+					{
+						// oooh you ...
+						spans.Add(new CharSpan(b, (char)0xD7FF));
+						spans.Add(new CharSpan((char)0xE000, e));
+					}
+					else
+					{
+						spans.Add(new CharSpan(b, e));
+					}
                 }
                 else
-                    spans.Add(new CharSpan(value[i], value[i]));
+				{
+					// this is a normal character
+					spans.Add(new CharSpan(b, b));
+				}
             }
             if (positive)
             {
                 foreach (CharSpan span in spans)
-                    final.StateEntry.AddTransition(span, final.StateExit);
+                    automata.StateEntry.AddTransition(span, automata.StateExit);
             }
             else
             {
                 spans.Sort(new System.Comparison<CharSpan>(CharSpan.Compare));
-                char b = char.MinValue;
+				// TODO: Check for span intersections and overflow of b (when a span ends on 0xFFFF)
+                char b = (char)0;
                 for (int i = 0; i != spans.Count; i++)
                 {
                     if (spans[i].Begin > b)
-                        final.StateEntry.AddTransition(new CharSpan(b, System.Convert.ToChar(spans[i].Begin - 1)), final.StateExit);
-                    b = System.Convert.ToChar(spans[i].End + 1);
+                        automata.StateEntry.AddTransition(new CharSpan(b, (char)(spans[i].Begin - 1)), automata.StateExit);
+					b = (char)(spans[i].End + 1);
+					// skip the surrogate encoding points
+					if (b >= 0xD800 && b <= 0xDFFF)
+						b = (char)0xE000;
                 }
-                final.StateEntry.AddTransition(new CharSpan(b, char.MaxValue), final.StateExit);
+				if (b <= 0xD7FF)
+				{
+					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xD7FF), automata.StateExit);
+					automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
+				}
+				else if (b != 0xFFFF)
+				{
+					// here b >= 0xE000
+					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xFFFF), automata.StateExit);
+				}
+				// surrogate pairs
+				Automata.NFAState intermediate = automata.AddNewState();
+				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
+				intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
             }
-            return final;
+            return automata;
         }
+		private void AddUnicodeSpanToNFA(Automata.NFA automata, Automata.NFAState intermediate, UnicodeSpan span)
+		{
+			char[] b = span.Begin.GetUTF16();
+			char[] e = span.End.GetUTF16();
+			if (e.Length == 1)
+			{
+				// this span is entirely in plane 0
+				automata.StateEntry.AddTransition(new CharSpan(b[0], e[0]), automata.StateExit);
+			}
+			else if (b.Length == 2)
+			{
+				// this span has no part in plane 0
+				automata.StateEntry.AddTransition(new CharSpan(b[0], e[0]), intermediate);
+				intermediate.AddTransition(new CharSpan(b[1], e[1]), automata.StateExit);
+			}
+			else
+			{
+				// this span has only a part in plane 0
+				if (b[0] < 0xD800)
+				{
+					automata.StateEntry.AddTransition(new CharSpan(b[0], (char)0xD7FF), automata.StateExit);
+					automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
+				}
+				else
+				{
+					automata.StateEntry.AddTransition(new CharSpan(b[0], (char)0xFFFF), automata.StateExit);
+				}
+				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, e[0]), intermediate);
+				intermediate.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
+			}
+		}
         private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(ASTNode node)
-        {
-            Automata.NFA final = Automata.NFA.NewMinimal();
-            TextToken token = (TextToken)node.Symbol;
-            string value = token.Value.Substring(3, token.Value.Length - 4);
-            UnicodeBlock block = UnicodeBlock.GetBlock(value);
-            // Create transition and return
-            final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(block.Begin), System.Convert.ToChar(block.End)), final.StateExit);
-            return final;
+		{
+			Automata.NFA automata = Automata.NFA.NewMinimal();
+			TextToken token = (TextToken)node.Symbol;
+			string value = token.Value.Substring(3, token.Value.Length - 4);
+			UnicodeBlock block = UnicodeBlock.GetBlock(value);
+			if (block == null)
+			{
+				ReportErrorAt(node, "Unkown Unicode block " + value);
+				return automata;
+			}
+			Automata.NFAState intermediate = automata.AddNewState();
+			AddUnicodeSpanToNFA(automata, intermediate, block.Span);
+            return automata;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(ASTNode node)
         {
-            Automata.NFA final = Automata.NFA.NewMinimal();
+            Automata.NFA automata = Automata.NFA.NewMinimal();
             TextToken token = (TextToken)node.Symbol;
             string value = token.Value.Substring(3, token.Value.Length - 4);
             UnicodeCategory category = UnicodeCategory.GetCateogry(value);
-            // Create transitions and return
-            foreach (CharSpan span in category.Spans)
-                final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(span.Begin), System.Convert.ToChar(span.End)), final.StateExit);
-            return final;
+            if (category == null)
+			{
+				ReportErrorAt(node, "Unkown Unicode category " + value);
+				return automata;
+			}
+			Automata.NFAState intermediate = automata.AddNewState();
+			foreach (UnicodeSpan span in category.Spans)
+				AddUnicodeSpanToNFA(automata, intermediate, span);
+            return automata;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_span(ASTNode node)
         {
-            Automata.NFA final = Automata.NFA.NewMinimal();
+            Automata.NFA automata = Automata.NFA.NewMinimal();
             int spanBegin = 0;
             int spanEnd = 0;
             // Get span begin
@@ -232,13 +340,12 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             // If span end is before beginning: reverse
             if (spanBegin > spanEnd)
             {
-                int Temp = spanEnd;
-                spanEnd = spanBegin;
-                spanBegin = Temp;
+				ReportErrorAt(node.Children[0], "Invalid span (end is before beginning)");
+				return automata;
             }
-            // Create transition and return
-            final.StateEntry.AddTransition(new CharSpan(System.Convert.ToChar(spanBegin), System.Convert.ToChar(spanEnd)), final.StateExit);
-            return final;
+			Automata.NFAState intermediate = automata.AddNewState();
+			AddUnicodeSpanToNFA(automata, intermediate, new UnicodeSpan(spanBegin, spanEnd));
+            return automata;
         }
         private Automata.NFA Compile_Recognize_terminal_def_atom_name(ASTNode node)
         {
@@ -246,7 +353,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Terminal Ref = grammar.GetTerminalByName(token.Value);
             if (Ref == null)
             {
-                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Cannot find terminal " + token.Value);
+                ReportErrorAt(node, "Cannot find terminal " + token.Value);
                 Automata.NFA final = Automata.NFA.NewMinimal();
                 final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
                 return final;
@@ -349,7 +456,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             }
             else
             {
-                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Overriding the definition of terminal " + token.Value);
+                ReportErrorAt(node.Children[0], "Overriding the definition of terminal " + token.Value);
             }
             return terminal;
         }
@@ -411,7 +518,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
                     defs.Add(new CFRuleBody(symbol));
                 else
                 {
-                    reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Unrecognized symbol " + token.Value + " in rule definition");
+                    ReportErrorAt(node.Children[0], "Unrecognized symbol " + token.Value + " in rule definition");
                     defs.Add(new CFRuleBody());
                 }
             }
@@ -427,7 +534,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             // check for meta-rule existence
             if (!context.IsTemplateRule(name, paramCount))
             {
-                reporter.Error(resName + " @(" + token.Line + ", " + token.Column + ") Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
+                ReportErrorAt(node.Children[0], "Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
                 defs.Add(new CFRuleBody());
                 return defs;
             }
