@@ -67,9 +67,9 @@ namespace Hime.CentralDogma
 				// plane 0
 				return new char[1] { (char)value };
 			}
-			int temp = value - 0x1FFFF;
-			int lead = (temp >> 10) + 0xD800;
-			int trail = (temp & 0x03FF) + 0xDC00;
+			uint temp = (uint)value - 0x10000;
+			uint lead = (temp >> 10) + 0xD800;
+			uint trail = (temp & 0x03FF) + 0xDC00;
 			return new char[2] { (char)lead, (char)trail };
 		}
 
