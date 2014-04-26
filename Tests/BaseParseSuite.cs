@@ -34,6 +34,24 @@ namespace Hime.Tests
 	public abstract class BaseParseSuite : BaseTestSuite
 	{
 		/// <summary>
+		/// The global random source
+		/// </summary>
+		private static Random rand = new Random();
+
+		/// <summary>
+		/// Gets a unique prefix
+		/// </summary>
+		/// <returns>A unique prefix</returns>
+		private static string GetUniquePrefix()
+		{
+			int i1 = rand.Next();
+			int i2 = rand.Next();
+			int i3 = rand.Next();
+			int i4 = rand.Next();
+			return i1.ToString("X8") + "_" + i2.ToString("X8") + "_" + i3.ToString("X8") + "_" + i4.ToString("X8");
+		}
+
+		/// <summary>
 		/// Constructor for lexers of parse trees
 		/// </summary>
 		private ConstructorInfo parseTreeLexer;
@@ -55,7 +73,7 @@ namespace Hime.Tests
             parseTreeLexer = tl.GetConstructor(new Type[] { typeof(string) });
             parseTreeParser = tp.GetConstructor(new Type[] { tl });
         }
-        
+
         /// <summary>
         /// Parses the string representation of the given parse tree
         /// </summary>
@@ -140,11 +158,7 @@ namespace Hime.Tests
         /// <param name="expected">The expected AST</param>
 		protected void ParsingMatches(string grammars, string top, ParsingMethod method, string input, string expected)
         {
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
-
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ASTNode inputAST = parser.Parse();
 			foreach (Hime.Redist.Parsers.ParserError error in parser.Errors)
 				Console.WriteLine(error.ToString());
@@ -167,11 +181,7 @@ namespace Hime.Tests
         /// <param name="unexpected">The expected AST</param>
 		protected void ParsingNotMatches(string grammars, string top, ParsingMethod method, string input, string unexpected)
         {
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
-
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ASTNode inputAST = parser.Parse();
 			Assert.IsNotNull(inputAST, "Failed to parse the input");
 			ASTNode expectedAST = ParseTree(unexpected);
@@ -190,11 +200,7 @@ namespace Hime.Tests
         /// <param name="input">The input text to parse</param>
 		protected void ParsingFails(string grammars, string top, ParsingMethod method, string input)
 		{
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
-
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			parser.Parse();
 			Assert.AreNotEqual(0, parser.Errors.Count, "Succeeded to parse the input");
 		}
