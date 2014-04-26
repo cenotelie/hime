@@ -75,7 +75,6 @@
     <Compile Include="IExecutable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\ParseTest.cs" />
     <Compile Include="Tasks\ParseGrammar.cs" />
     <Compile Include="WinTreeView.cs">
       <SubType>Form</SubType>
@@ -83,19 +82,7 @@
     <Compile Include="WinTreeView.Designer.cs">
       <DependentUpon>WinTreeView.cs</DependentUpon>
     </Compile>
-    <None Include="Languages\ANSI_C.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Languages\CSharp4.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Languages\Test1.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Compile Include="Tasks\ParseMathExp.cs" />
-    <None Include="Languages\Test2.gram">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Compile Include="Tasks\ExtractLexer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WinTreeView.resx">

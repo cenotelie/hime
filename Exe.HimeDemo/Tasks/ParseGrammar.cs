@@ -22,56 +22,51 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
+using Hime.CentralDogma.SDK;
 using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
+	/// <summary>
+	/// This tasks regenerates the parser for the CentralDogma inputs and re-parses the input grammar with the generated parser
+	/// </summary>
     class ParseGrammar : IExecutable
     {
+		/// <summary>
+		///  Execute this instance. 
+		/// </summary>
         public void Execute()
         {
             // Build parser assembly
-            System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+            Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
             CompilationTask task = new CompilationTask();
             task.Mode = CompilationMode.Assembly;
             task.AddInputRaw(stream);
             task.Namespace = "Hime.Benchmark.Generated";
             task.GrammarName = "FileCentralDogma";
             task.CodeAccess = AccessModifier.Public;
-            task.Method = ParsingMethod.RNGLALR1;
+            task.Method = ParsingMethod.LALR1;
             task.Execute();
-            Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
             stream.Close();
 
-            System.IO.StreamReader reader = new System.IO.StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
-            Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, reader);
+			// Load the generated assembly
+			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
+
+			// Re-parse the input grammar with the generated parser
+            StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
+			BaseLRParser parser = assembly.GetDefaultParser(input);
             Redist.AST.ASTNode root = parser.Parse();
-            reader.Close();
+            input.Close();
             
+			// Display the errors if any
             foreach (ParserError error in parser.Errors)
                 Console.WriteLine(error.ToString());
             if (root == null)
                 return;
+
+			// Display the produced AST
             WinTreeView win = new WinTreeView(root);
             win.ShowDialog();
-        }
-
-        private Hime.Redist.Lexer.TextLexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
-        {
-            Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
-            ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
-            object lexer = lexerConstructor.Invoke(new object[] { reader });
-            return lexer as Hime.Redist.Lexer.TextLexer;
-        }
-
-        private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
-        {
-            Hime.Redist.Lexer.TextLexer lexer = GetLexer(assembly, reader);
-            Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
-            Type parserType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaParser");
-            ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
-            object parser = parserConstructor.Invoke(new object[] { lexer });
-            return parser as Hime.Redist.Parsers.BaseLRParser;
         }
     }
 }

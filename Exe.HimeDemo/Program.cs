@@ -22,13 +22,18 @@ using Hime.Demo.Tasks;
 
 namespace Hime.Demo
 {
+	/// <summary>
+	/// Main program
+	/// </summary>
     public class Program
     {
+		/// <summary>
+		/// The entry point of the program, where the program control starts and ends.
+		/// </summary>
         static void Main()
         {
-			Hime.CentralDogma.UnicodeHelper.GenerateBlocksDB();
-			IExecutable executable = new ParseTest("EBNF");
-            //executable.Execute();
+			IExecutable executable = new ExtractLexer();
+            executable.Execute();
         }
     }
 }

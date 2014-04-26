@@ -30,8 +30,15 @@ using Hime.Redist.Symbols;
 
 namespace Hime.Demo
 {
+	/// <summary>
+	/// Simple window that displays an AST
+	/// </summary>
     partial class WinTreeView : Form
     {
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Hime.Demo.WinTreeView"/> class.
+		/// </summary>
+		/// <param name="root">The root of the AST to display</param>
         public WinTreeView(ASTNode root)
         {
             InitializeComponent();
@@ -39,6 +46,11 @@ namespace Hime.Demo
             AddSubTree(vroot, root);
         }
 
+		/// <summary>
+		/// Recursively adds the given AST node and its children to the tree viewer
+		/// </summary>
+		/// <param name="vnode">The current tree viewer node</param>
+		/// <param name="snode">An AST node</param>
         private void AddSubTree(TreeNode vnode, ASTNode snode)
         {
             foreach (ASTNode child in snode.Children)
@@ -49,6 +61,11 @@ namespace Hime.Demo
             }
         }
 
+		/// <summary>
+		/// Gets the string representation for display of the given node
+		/// </summary>
+		/// <param name="node">An AST node</param>
+		/// <returns>The string representation of the node</returns>
         private string GetString(ASTNode node)
         {
             if (node.Symbol == null)
