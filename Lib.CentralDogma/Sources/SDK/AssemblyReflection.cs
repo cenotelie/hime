@@ -107,7 +107,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="name">The fully qualified name of the parser's type</param>
 		/// <param name="input">The input for the associated lexer</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.BaseLRParser GetParser(string name, TextReader input)
+		public Hime.Redist.Parsers.IParser GetParser(string name, TextReader input)
 		{
 			Type parserType = GetParserType(name);
 			ConstructorInfo[] ctors = parserType.GetConstructors();
@@ -127,7 +127,7 @@ namespace Hime.CentralDogma.SDK
 			lexerCtor = lexerType.GetConstructor(new Type[] { typeof(TextReader) });
 			object lexer = lexerCtor.Invoke(new object[] { input });
 			object parser = parserCtor.Invoke(new object[] { lexer });
-			return (Hime.Redist.Parsers.BaseLRParser)parser;
+			return (Hime.Redist.Parsers.IParser)parser;
 		}
 
 		/// <summary>
@@ -135,7 +135,7 @@ namespace Hime.CentralDogma.SDK
 		/// </summary>
 		/// <param name="input">The input for the associated lexer</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.BaseLRParser GetDefaultParser(TextReader input)
+		public Hime.Redist.Parsers.IParser GetDefaultParser(TextReader input)
 		{
 			List<Type> parsers = GetParsersType();
 			if (parsers.Count == 0)

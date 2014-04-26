@@ -49,7 +49,7 @@ namespace Hime.Demo.Tasks
 
 			// Re-parse the input grammar with the generated parser
             StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
-			BaseLRParser parser = assembly.GetDefaultParser(input);
+			IParser parser = assembly.GetDefaultParser(input);
             ParseResult result = parser.Parse();
             input.Close();
             
