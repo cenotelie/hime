@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
+using Hime.CentralDogma.SDK;
 using Hime.Redist.AST;
 using Hime.Redist.Symbols;
 using NUnit.Framework;
@@ -52,27 +53,28 @@ namespace Hime.Tests
 		}
 
 		/// <summary>
-		/// Constructor for lexers of parse trees
+		/// The assembly for the parse tree parser
 		/// </summary>
-		private ConstructorInfo parseTreeLexer;
-		/// <summary>
-		/// Constructor for parsers of parse trees
-		/// </summary>
-        private ConstructorInfo parseTreeParser;
+		private static AssemblyReflection parseTreeAssembly = BuildParseTreeParser();
         
-        /// <summary>
-        /// Initializes this test suite
-        /// </summary>
-        protected BaseParseSuite()
-        {
-			ExportResource("ParseTree.gram", "ParseTree.gram");
-			Hime.HimeCC.Program.Main(new string[] { "ParseTree.gram -o:nosources -a:public -n Hime.Tests.Generated" });
-        	Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "ParseTree.dll"));
-            Type tl = assembly.GetType("Hime.Tests.Generated.ParseTreeLexer");
-            Type tp = assembly.GetType("Hime.Tests.Generated.ParseTreeParser");
-            parseTreeLexer = tl.GetConstructor(new Type[] { typeof(string) });
-            parseTreeParser = tp.GetConstructor(new Type[] { tl });
-        }
+		/// <summary>
+		/// Builds the parse tree parser.
+		/// </summary>
+		/// <returns>The parse tree parser</returns>
+		private static AssemblyReflection BuildParseTreeParser()
+		{
+			Stream stream = typeof(BaseParseSuite).Assembly.GetManifestResourceStream("Hime.Tests.Resources.ParseTree.gram");
+			CompilationTask task = new CompilationTask();
+            task.AddInputRaw(stream);
+			task.GrammarName = "ParseTree";
+            task.CodeAccess = AccessModifier.Public;
+            task.Method = ParsingMethod.LALR1;
+            task.Mode = CompilationMode.Assembly;
+            task.Namespace = "Hime.Tests.Generated";
+			task.OutputPrefix = "ParseTree";
+            task.Execute();
+			return new AssemblyReflection("ParseTree.dll");
+		}
 
         /// <summary>
         /// Parses the string representation of the given parse tree
@@ -81,9 +83,9 @@ namespace Hime.Tests
         /// <returns>The parse tree's AST</returns>
         private ASTNode ParseTree(string data)
         {
-        	Hime.Redist.Lexer.ILexer lexer = parseTreeLexer.Invoke(new object[] { data }) as Hime.Redist.Lexer.ILexer;
-            Hime.Redist.Parsers.IParser parser = parseTreeParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
-            return parser.Parse();
+			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetDefaultParser(new StringReader(data));
+			Assert.AreEqual(0, parser.Errors.Count, "Failed to parse the reference parse tree");
+			return parser.Parse();
         }
         
         /// <summary>
@@ -137,15 +139,8 @@ namespace Hime.Tests
             Assert.AreEqual(0, report.ErrorCount, "Failed to compile the grammar");
             Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
 
-			Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
-            Type typeLexer = assembly.GetType(genNamespace + "." + top + "Lexer");
-            Type typeParser = assembly.GetType(genNamespace + "." + top + "Parser");
-			ConstructorInfo ciLexer = typeLexer.GetConstructor(new Type[] { typeof(string) });
-            ConstructorInfo ciParser = typeParser.GetConstructor(new Type[] { typeLexer });
-
-			Hime.Redist.Lexer.ILexer lexer = ciLexer.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
-            Hime.Redist.Parsers.IParser parser = ciParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
-			return parser;
+			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
+			return assembly.GetDefaultParser(new StringReader(input));
 		}
         
         /// <summary>
