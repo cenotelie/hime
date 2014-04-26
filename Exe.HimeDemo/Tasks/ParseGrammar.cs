@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
+using Hime.CentralDogma.SDK;
 using Hime.Redist;
 
 namespace Hime.Demo.Tasks
@@ -30,13 +31,29 @@ namespace Hime.Demo.Tasks
     {
         public void Execute()
         {
-            Assembly assembly = Assembly.GetAssembly(typeof(CompilationTask));
-            System.IO.StreamReader reader = new System.IO.StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
-            Hime.Redist.Parsers.BaseLRParser parser = GetParser(assembly, reader);
-            ParseResult result = parser.Parse();
-            reader.Close();
+            // Build parser assembly
+            Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+            CompilationTask task = new CompilationTask();
+            task.Mode = CompilationMode.Assembly;
+            task.AddInputRaw(stream);
+            task.Namespace = "Hime.Benchmark.Generated";
+            task.GrammarName = "FileCentralDogma";
+            task.CodeAccess = AccessModifier.Public;
+            task.Method = ParsingMethod.LALR1;
+            task.Execute();
+            stream.Close();
 
-            foreach (Error error in result.Errors)
+			// Load the generated assembly
+			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
+
+			// Re-parse the input grammar with the generated parser
+            StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
+			BaseLRParser parser = assembly.GetDefaultParser(input);
+            ParseResult result = parser.Parse();
+            input.Close();
+            
+			// Display the errors if any
+            foreach (ParserError error in parser.Errors)
                 Console.WriteLine(error.ToString());
             if (!result.IsSuccess)
                 return;

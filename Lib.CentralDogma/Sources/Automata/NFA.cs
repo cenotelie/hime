@@ -45,7 +45,7 @@ namespace Hime.CentralDogma.Automata
         /// <summary>
         /// Represents the value epsilon on NFA transtions
         /// </summary>
-        public static readonly CharSpan Epsilon = new CharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
+		public static readonly CharSpan Epsilon = CharSpan.Null;
         
         /// <summary>
         /// Gets the collection of states in this automaton

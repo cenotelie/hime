@@ -22,7 +22,8 @@ using System;
 using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
-using Hime.Redist;
+using Hime.CentralDogma.SDK;
+using Hime.Redist
 using NUnit.Framework;
 
 namespace Hime.Tests
@@ -33,28 +34,47 @@ namespace Hime.Tests
 	public abstract class BaseParseSuite : BaseTestSuite
 	{
 		/// <summary>
-		/// Constructor for lexers of parse trees
+		/// The global random source
 		/// </summary>
-		private ConstructorInfo parseTreeLexer;
+		private static Random rand = new Random();
+
 		/// <summary>
-		/// Constructor for parsers of parse trees
+		/// Gets a unique prefix
 		/// </summary>
-        private ConstructorInfo parseTreeParser;
+		/// <returns>A unique prefix</returns>
+		private static string GetUniquePrefix()
+		{
+			int i1 = rand.Next();
+			int i2 = rand.Next();
+			int i3 = rand.Next();
+			int i4 = rand.Next();
+			return i1.ToString("X8") + "_" + i2.ToString("X8") + "_" + i3.ToString("X8") + "_" + i4.ToString("X8");
+		}
+
+		/// <summary>
+		/// The assembly for the parse tree parser
+		/// </summary>
+		private static AssemblyReflection parseTreeAssembly = BuildParseTreeParser();
         
-        /// <summary>
-        /// Initializes this test suite
-        /// </summary>
-        protected BaseParseSuite()
-        {
-			ExportResource("ParseTree.gram", "ParseTree.gram");
-			Hime.HimeCC.Program.Main(new string[] { "ParseTree.gram -o:nosources -a:public -n Hime.Tests.Generated" });
-        	Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "ParseTree.dll"));
-            Type tl = assembly.GetType("Hime.Tests.Generated.ParseTreeLexer");
-            Type tp = assembly.GetType("Hime.Tests.Generated.ParseTreeParser");
-            parseTreeLexer = tl.GetConstructor(new Type[] { typeof(string) });
-            parseTreeParser = tp.GetConstructor(new Type[] { tl });
-        }
-        
+		/// <summary>
+		/// Builds the parse tree parser.
+		/// </summary>
+		/// <returns>The parse tree parser</returns>
+		private static AssemblyReflection BuildParseTreeParser()
+		{
+			Stream stream = typeof(BaseParseSuite).Assembly.GetManifestResourceStream("Hime.Tests.Resources.ParseTree.gram");
+			CompilationTask task = new CompilationTask();
+            task.AddInputRaw(stream);
+			task.GrammarName = "ParseTree";
+            task.CodeAccess = AccessModifier.Public;
+            task.Method = ParsingMethod.LALR1;
+            task.Mode = CompilationMode.Assembly;
+            task.Namespace = "Hime.Tests.Generated";
+			task.OutputPrefix = "ParseTree";
+            task.Execute();
+			return new AssemblyReflection("ParseTree.dll");
+		}
+
         /// <summary>
         /// Parses the string representation of the given parse tree
         /// </summary>
@@ -62,9 +82,9 @@ namespace Hime.Tests
         /// <returns>The parse result</returns>
         private ParseResult ParseTree(string data)
         {
-        	Hime.Redist.Lexer.Lexer lexer = parseTreeLexer.Invoke(new object[] { data }) as Hime.Redist.Lexer.Lexer;
-            Hime.Redist.Parsers.IParser parser = parseTreeParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
-            return parser.Parse();
+			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetDefaultParser(new StringReader(data));
+			Assert.AreEqual(0, parser.Errors.Count, "Failed to parse the reference parse tree");
+			return parser.Parse();
         }
         
         /// <summary>
@@ -118,15 +138,8 @@ namespace Hime.Tests
             Assert.AreEqual(0, report.ErrorCount, "Failed to compile the grammar");
             Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
 
-			Assembly assembly = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
-            Type typeLexer = assembly.GetType(genNamespace + "." + top + "Lexer");
-            Type typeParser = assembly.GetType(genNamespace + "." + top + "Parser");
-			ConstructorInfo ciLexer = typeLexer.GetConstructor(new Type[] { typeof(string) });
-            ConstructorInfo ciParser = typeParser.GetConstructor(new Type[] { typeLexer });
-
-			Hime.Redist.Lexer.Lexer lexer = ciLexer.Invoke(new object[] { input }) as Hime.Redist.Lexer.Lexer;
-            Hime.Redist.Parsers.IParser parser = ciParser.Invoke(new object[] { lexer }) as Hime.Redist.Parsers.IParser;
-			return parser;
+			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
+			return assembly.GetDefaultParser(new StringReader(input));
 		}
         
         /// <summary>
@@ -139,13 +152,9 @@ namespace Hime.Tests
         /// <param name="expected">The expected AST</param>
 		protected void ParsingMatches(string grammars, string top, ParsingMethod method, string input, string expected)
         {
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
-
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
-			foreach (Error error in inputResult.Errors)
+			foreach (Hime.Redist.Parsers.ParserError error in inputResult.Errors)
 				Console.WriteLine(error.ToString());
 			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
 			ParseResult expectedResult = ParseTree(expected);
@@ -165,17 +174,11 @@ namespace Hime.Tests
         /// <param name="unexpected">The expected AST</param>
 		protected void ParsingNotMatches(string grammars, string top, ParsingMethod method, string input, string unexpected)
         {
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
-
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
-			ParseResult inputResult = parser.Parse();
-			foreach (Error error in inputResult.Errors)
-				Console.WriteLine(error.ToString());
-			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
-			ParseResult unexpectedResult = ParseTree(unexpected);
-			Assert.IsTrue(unexpectedResult.IsSuccess, "Failed to parse the expected tree");
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
+			ASTNode inputAST = parser.Parse();
+			Assert.IsNotNull(inputAST, "Failed to parse the input");
+			ASTNode expectedAST = ParseTree(unexpected);
+			Assert.IsNotNull(expectedAST, "Failed to parse the unexpected tree");
 
 			bool result = Compare(unexpectedResult.Root, inputResult.Root);
 			Assert.IsFalse(result, "AST from input matches the unexpected AST, should not");
@@ -190,11 +193,7 @@ namespace Hime.Tests
         /// <param name="input">The input text to parse</param>
 		protected void ParsingFails(string grammars, string top, ParsingMethod method, string input)
 		{
-			System.Diagnostics.StackTrace trace = new System.Diagnostics.StackTrace();
-            System.Diagnostics.StackFrame caller = trace.GetFrame(1);
-			string prefix = caller.GetMethod().Name;
-
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, prefix);
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
 			Assert.IsFalse(inputResult.IsSuccess, "Succeeded to parse the input, shouldn't");
 		}

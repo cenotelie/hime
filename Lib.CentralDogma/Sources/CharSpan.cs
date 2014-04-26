@@ -40,7 +40,7 @@ namespace Hime.CentralDogma
         /// <summary>
         /// Constant value for an invalid value
         /// </summary>
-        public static readonly CharSpan Null = new CharSpan(System.Convert.ToChar(1), System.Convert.ToChar(0));
+        public static readonly CharSpan Null = new CharSpan((char)1, (char)0);
 
         /// <summary>
         /// Gets the first (included) character of the range

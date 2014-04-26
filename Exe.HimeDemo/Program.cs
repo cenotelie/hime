@@ -24,21 +24,17 @@ using Hime.Demo.Tasks;
 
 namespace Hime.Demo
 {
+	/// <summary>
+	/// Main program
+	/// </summary>
     public class Program
     {
-        private const string dirExtras = "Extras";
-        private const string dirGrammars = "Grammars";
-
+		/// <summary>
+		/// The entry point of the program, where the program control starts and ends.
+		/// </summary>
         static void Main()
         {
-            string name = "EBNF";
-            string input = null;
-
-            DirectoryInfo extras = FindExtras();
-            DirectoryInfo grammars = extras.GetDirectories(dirGrammars)[0];
-            
-            //IExecutable executable = new ParseLanguage(Path.Combine(grammars.FullName, name), input);
-            IExecutable executable = new Bootstrap();
+			IExecutable executable = new ExtractLexer();
             executable.Execute();
         }
 

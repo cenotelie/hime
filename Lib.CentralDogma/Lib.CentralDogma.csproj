@@ -176,6 +176,12 @@
     <Compile Include="Sources\UnicodeBlock.cs" />
     <Compile Include="Sources\UnicodeCategory.cs" />
     <Compile Include="Sources\CharSpan.cs" />
+    <Compile Include="Sources\UnicodeHelper.cs" />
+    <Compile Include="Sources\UnicodeCodePoint.cs" />
+    <Compile Include="Sources\UnicodeSpan.cs" />
+    <Compile Include="Sources\UnicodeBlocks.cs" />
+    <Compile Include="Sources\UnicodeCategories.cs" />
+    <Compile Include="Sources\SDK\AssemblyReflection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

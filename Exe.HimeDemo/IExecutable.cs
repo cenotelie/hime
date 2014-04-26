@@ -20,8 +20,14 @@
 
 namespace Hime.Demo
 {
+	/// <summary>
+	/// Represents an executable task for demonstration purposes
+	/// </summary>
     interface IExecutable
     {
+		/// <summary>
+		/// Execute this instance.
+		/// </summary>
         void Execute();
     }
 }
