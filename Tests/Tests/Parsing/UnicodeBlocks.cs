@@ -30,14 +30,26 @@ namespace Hime.Tests.Parsing
 	public class UnicodeBlocks : BaseParseSuite
 	{
 		/// <summary>
+		/// Tests that the given codepoint can be parsed with the given block
+		/// </summary>
+		/// <param name="name">A Unicode block name</param>
+		/// <param name="codepoint">A Unicode code point</param>
+		private void Test_WithinBlock(string name, int codepoint)
+		{
+			UnicodeCodePoint cp = new UnicodeCodePoint(codepoint);
+			string values = new string(cp.GetUTF16());
+			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{" + name + "};} rules { e->X; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, values, "e(X='" + values + "')");
+		}
+
+		/// <summary>
 		/// Tests the parsing of character block BasicLatin
 		/// </summary>
 		[Test]
 		public void Test_UnicodeBlock_BasicLatin_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BasicLatin};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0000", "e(X='\u0000')");
+			Test_WithinBlock("BasicLatin", 0x0);
 		}
 
 		/// <summary>
@@ -47,74 +59,67 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BasicLatin_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BasicLatin};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u007F", "e(X='\u007F')");
+			Test_WithinBlock("BasicLatin", 0x7F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block Latin-1Supplement
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_Latin_1Supplement_LeftBound()
+		public void Test_UnicodeBlock_Latin1Supplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Latin-1Supplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0080", "e(X='\u0080')");
+			Test_WithinBlock("Latin-1Supplement", 0x80);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block Latin-1Supplement
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_Latin_1Supplement_RightBound()
+		public void Test_UnicodeBlock_Latin1Supplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Latin-1Supplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u00FF", "e(X='\u00FF')");
+			Test_WithinBlock("Latin-1Supplement", 0xFF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_A_LeftBound()
+		public void Test_UnicodeBlock_LatinExtendedA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0100", "e(X='\u0100')");
+			Test_WithinBlock("LatinExtended-A", 0x100);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_A_RightBound()
+		public void Test_UnicodeBlock_LatinExtendedA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u017F", "e(X='\u017F')");
+			Test_WithinBlock("LatinExtended-A", 0x17F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_B_LeftBound()
+		public void Test_UnicodeBlock_LatinExtendedB_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0180", "e(X='\u0180')");
+			Test_WithinBlock("LatinExtended-B", 0x180);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_B_RightBound()
+		public void Test_UnicodeBlock_LatinExtendedB_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u024F", "e(X='\u024F')");
+			Test_WithinBlock("LatinExtended-B", 0x24F);
 		}
 
 		/// <summary>
@@ -124,8 +129,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_IPAExtensions_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{IPAExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0250", "e(X='\u0250')");
+			Test_WithinBlock("IPAExtensions", 0x250);
 		}
 
 		/// <summary>
@@ -135,8 +139,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_IPAExtensions_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{IPAExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u02AF", "e(X='\u02AF')");
+			Test_WithinBlock("IPAExtensions", 0x2AF);
 		}
 
 		/// <summary>
@@ -146,8 +149,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SpacingModifierLetters_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SpacingModifierLetters};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u02B0", "e(X='\u02B0')");
+			Test_WithinBlock("SpacingModifierLetters", 0x2B0);
 		}
 
 		/// <summary>
@@ -157,8 +159,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SpacingModifierLetters_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SpacingModifierLetters};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u02FF", "e(X='\u02FF')");
+			Test_WithinBlock("SpacingModifierLetters", 0x2FF);
 		}
 
 		/// <summary>
@@ -168,8 +169,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningDiacriticalMarks_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningDiacriticalMarks};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0300", "e(X='\u0300')");
+			Test_WithinBlock("CombiningDiacriticalMarks", 0x300);
 		}
 
 		/// <summary>
@@ -179,8 +179,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningDiacriticalMarks_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningDiacriticalMarks};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u036F", "e(X='\u036F')");
+			Test_WithinBlock("CombiningDiacriticalMarks", 0x36F);
 		}
 
 		/// <summary>
@@ -190,8 +189,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GreekandCoptic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GreekandCoptic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0370", "e(X='\u0370')");
+			Test_WithinBlock("GreekandCoptic", 0x370);
 		}
 
 		/// <summary>
@@ -201,8 +199,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GreekandCoptic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GreekandCoptic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u03FF", "e(X='\u03FF')");
+			Test_WithinBlock("GreekandCoptic", 0x3FF);
 		}
 
 		/// <summary>
@@ -212,8 +209,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Cyrillic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Cyrillic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0400", "e(X='\u0400')");
+			Test_WithinBlock("Cyrillic", 0x400);
 		}
 
 		/// <summary>
@@ -223,8 +219,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Cyrillic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Cyrillic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u04FF", "e(X='\u04FF')");
+			Test_WithinBlock("Cyrillic", 0x4FF);
 		}
 
 		/// <summary>
@@ -234,8 +229,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CyrillicSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CyrillicSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0500", "e(X='\u0500')");
+			Test_WithinBlock("CyrillicSupplement", 0x500);
 		}
 
 		/// <summary>
@@ -245,8 +239,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CyrillicSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CyrillicSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u052F", "e(X='\u052F')");
+			Test_WithinBlock("CyrillicSupplement", 0x52F);
 		}
 
 		/// <summary>
@@ -256,8 +249,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Armenian_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Armenian};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0530", "e(X='\u0530')");
+			Test_WithinBlock("Armenian", 0x530);
 		}
 
 		/// <summary>
@@ -267,8 +259,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Armenian_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Armenian};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u058F", "e(X='\u058F')");
+			Test_WithinBlock("Armenian", 0x58F);
 		}
 
 		/// <summary>
@@ -278,8 +269,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Hebrew_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Hebrew};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0590", "e(X='\u0590')");
+			Test_WithinBlock("Hebrew", 0x590);
 		}
 
 		/// <summary>
@@ -289,8 +279,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Hebrew_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Hebrew};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u05FF", "e(X='\u05FF')");
+			Test_WithinBlock("Hebrew", 0x5FF);
 		}
 
 		/// <summary>
@@ -300,8 +289,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Arabic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Arabic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0600", "e(X='\u0600')");
+			Test_WithinBlock("Arabic", 0x600);
 		}
 
 		/// <summary>
@@ -311,8 +299,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Arabic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Arabic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u06FF", "e(X='\u06FF')");
+			Test_WithinBlock("Arabic", 0x6FF);
 		}
 
 		/// <summary>
@@ -322,8 +309,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Syriac_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Syriac};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0700", "e(X='\u0700')");
+			Test_WithinBlock("Syriac", 0x700);
 		}
 
 		/// <summary>
@@ -333,8 +319,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Syriac_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Syriac};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u074F", "e(X='\u074F')");
+			Test_WithinBlock("Syriac", 0x74F);
 		}
 
 		/// <summary>
@@ -344,8 +329,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_ArabicSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0750", "e(X='\u0750')");
+			Test_WithinBlock("ArabicSupplement", 0x750);
 		}
 
 		/// <summary>
@@ -355,8 +339,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_ArabicSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u077F", "e(X='\u077F')");
+			Test_WithinBlock("ArabicSupplement", 0x77F);
 		}
 
 		/// <summary>
@@ -366,8 +349,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Thaana_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Thaana};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0780", "e(X='\u0780')");
+			Test_WithinBlock("Thaana", 0x780);
 		}
 
 		/// <summary>
@@ -377,8 +359,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Thaana_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Thaana};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u07BF", "e(X='\u07BF')");
+			Test_WithinBlock("Thaana", 0x7BF);
 		}
 
 		/// <summary>
@@ -388,8 +369,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_NKo_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{NKo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u07C0", "e(X='\u07C0')");
+			Test_WithinBlock("NKo", 0x7C0);
 		}
 
 		/// <summary>
@@ -399,8 +379,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_NKo_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{NKo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u07FF", "e(X='\u07FF')");
+			Test_WithinBlock("NKo", 0x7FF);
 		}
 
 		/// <summary>
@@ -410,8 +389,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Samaritan_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Samaritan};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0800", "e(X='\u0800')");
+			Test_WithinBlock("Samaritan", 0x800);
 		}
 
 		/// <summary>
@@ -421,8 +399,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Samaritan_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Samaritan};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u083F", "e(X='\u083F')");
+			Test_WithinBlock("Samaritan", 0x83F);
 		}
 
 		/// <summary>
@@ -432,8 +409,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Mandaic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Mandaic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0840", "e(X='\u0840')");
+			Test_WithinBlock("Mandaic", 0x840);
 		}
 
 		/// <summary>
@@ -443,30 +419,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Mandaic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Mandaic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u085F", "e(X='\u085F')");
+			Test_WithinBlock("Mandaic", 0x85F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block ArabicExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_ArabicExtended_A_LeftBound()
+		public void Test_UnicodeBlock_ArabicExtendedA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u08A0", "e(X='\u08A0')");
+			Test_WithinBlock("ArabicExtended-A", 0x8A0);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block ArabicExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_ArabicExtended_A_RightBound()
+		public void Test_UnicodeBlock_ArabicExtendedA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u08FF", "e(X='\u08FF')");
+			Test_WithinBlock("ArabicExtended-A", 0x8FF);
 		}
 
 		/// <summary>
@@ -476,8 +449,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Devanagari_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Devanagari};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0900", "e(X='\u0900')");
+			Test_WithinBlock("Devanagari", 0x900);
 		}
 
 		/// <summary>
@@ -487,8 +459,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Devanagari_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Devanagari};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u097F", "e(X='\u097F')");
+			Test_WithinBlock("Devanagari", 0x97F);
 		}
 
 		/// <summary>
@@ -498,8 +469,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Bengali_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Bengali};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0980", "e(X='\u0980')");
+			Test_WithinBlock("Bengali", 0x980);
 		}
 
 		/// <summary>
@@ -509,8 +479,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Bengali_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Bengali};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u09FF", "e(X='\u09FF')");
+			Test_WithinBlock("Bengali", 0x9FF);
 		}
 
 		/// <summary>
@@ -520,8 +489,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Gurmukhi_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Gurmukhi};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0A00", "e(X='\u0A00')");
+			Test_WithinBlock("Gurmukhi", 0xA00);
 		}
 
 		/// <summary>
@@ -531,8 +499,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Gurmukhi_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Gurmukhi};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0A7F", "e(X='\u0A7F')");
+			Test_WithinBlock("Gurmukhi", 0xA7F);
 		}
 
 		/// <summary>
@@ -542,8 +509,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Gujarati_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Gujarati};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0A80", "e(X='\u0A80')");
+			Test_WithinBlock("Gujarati", 0xA80);
 		}
 
 		/// <summary>
@@ -553,8 +519,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Gujarati_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Gujarati};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0AFF", "e(X='\u0AFF')");
+			Test_WithinBlock("Gujarati", 0xAFF);
 		}
 
 		/// <summary>
@@ -564,8 +529,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Oriya_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Oriya};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0B00", "e(X='\u0B00')");
+			Test_WithinBlock("Oriya", 0xB00);
 		}
 
 		/// <summary>
@@ -575,8 +539,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Oriya_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Oriya};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0B7F", "e(X='\u0B7F')");
+			Test_WithinBlock("Oriya", 0xB7F);
 		}
 
 		/// <summary>
@@ -586,8 +549,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tamil_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tamil};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0B80", "e(X='\u0B80')");
+			Test_WithinBlock("Tamil", 0xB80);
 		}
 
 		/// <summary>
@@ -597,8 +559,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tamil_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tamil};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0BFF", "e(X='\u0BFF')");
+			Test_WithinBlock("Tamil", 0xBFF);
 		}
 
 		/// <summary>
@@ -608,8 +569,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Telugu_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Telugu};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0C00", "e(X='\u0C00')");
+			Test_WithinBlock("Telugu", 0xC00);
 		}
 
 		/// <summary>
@@ -619,8 +579,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Telugu_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Telugu};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0C7F", "e(X='\u0C7F')");
+			Test_WithinBlock("Telugu", 0xC7F);
 		}
 
 		/// <summary>
@@ -630,8 +589,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Kannada_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Kannada};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0C80", "e(X='\u0C80')");
+			Test_WithinBlock("Kannada", 0xC80);
 		}
 
 		/// <summary>
@@ -641,8 +599,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Kannada_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Kannada};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0CFF", "e(X='\u0CFF')");
+			Test_WithinBlock("Kannada", 0xCFF);
 		}
 
 		/// <summary>
@@ -652,8 +609,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Malayalam_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Malayalam};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0D00", "e(X='\u0D00')");
+			Test_WithinBlock("Malayalam", 0xD00);
 		}
 
 		/// <summary>
@@ -663,8 +619,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Malayalam_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Malayalam};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0D7F", "e(X='\u0D7F')");
+			Test_WithinBlock("Malayalam", 0xD7F);
 		}
 
 		/// <summary>
@@ -674,8 +629,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Sinhala_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Sinhala};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0D80", "e(X='\u0D80')");
+			Test_WithinBlock("Sinhala", 0xD80);
 		}
 
 		/// <summary>
@@ -685,8 +639,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Sinhala_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Sinhala};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0DFF", "e(X='\u0DFF')");
+			Test_WithinBlock("Sinhala", 0xDFF);
 		}
 
 		/// <summary>
@@ -696,8 +649,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Thai_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Thai};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0E00", "e(X='\u0E00')");
+			Test_WithinBlock("Thai", 0xE00);
 		}
 
 		/// <summary>
@@ -707,8 +659,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Thai_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Thai};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0E7F", "e(X='\u0E7F')");
+			Test_WithinBlock("Thai", 0xE7F);
 		}
 
 		/// <summary>
@@ -718,8 +669,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Lao_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Lao};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0E80", "e(X='\u0E80')");
+			Test_WithinBlock("Lao", 0xE80);
 		}
 
 		/// <summary>
@@ -729,8 +679,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Lao_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Lao};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0EFF", "e(X='\u0EFF')");
+			Test_WithinBlock("Lao", 0xEFF);
 		}
 
 		/// <summary>
@@ -740,8 +689,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tibetan_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tibetan};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0F00", "e(X='\u0F00')");
+			Test_WithinBlock("Tibetan", 0xF00);
 		}
 
 		/// <summary>
@@ -751,8 +699,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tibetan_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tibetan};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u0FFF", "e(X='\u0FFF')");
+			Test_WithinBlock("Tibetan", 0xFFF);
 		}
 
 		/// <summary>
@@ -762,8 +709,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Myanmar_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Myanmar};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1000", "e(X='\u1000')");
+			Test_WithinBlock("Myanmar", 0x1000);
 		}
 
 		/// <summary>
@@ -773,8 +719,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Myanmar_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Myanmar};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u109F", "e(X='\u109F')");
+			Test_WithinBlock("Myanmar", 0x109F);
 		}
 
 		/// <summary>
@@ -784,8 +729,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Georgian_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Georgian};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u10A0", "e(X='\u10A0')");
+			Test_WithinBlock("Georgian", 0x10A0);
 		}
 
 		/// <summary>
@@ -795,8 +739,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Georgian_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Georgian};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u10FF", "e(X='\u10FF')");
+			Test_WithinBlock("Georgian", 0x10FF);
 		}
 
 		/// <summary>
@@ -806,8 +749,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_HangulJamo_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulJamo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1100", "e(X='\u1100')");
+			Test_WithinBlock("HangulJamo", 0x1100);
 		}
 
 		/// <summary>
@@ -817,8 +759,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_HangulJamo_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulJamo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u11FF", "e(X='\u11FF')");
+			Test_WithinBlock("HangulJamo", 0x11FF);
 		}
 
 		/// <summary>
@@ -828,8 +769,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Ethiopic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Ethiopic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1200", "e(X='\u1200')");
+			Test_WithinBlock("Ethiopic", 0x1200);
 		}
 
 		/// <summary>
@@ -839,8 +779,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Ethiopic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Ethiopic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u137F", "e(X='\u137F')");
+			Test_WithinBlock("Ethiopic", 0x137F);
 		}
 
 		/// <summary>
@@ -850,8 +789,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EthiopicSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EthiopicSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1380", "e(X='\u1380')");
+			Test_WithinBlock("EthiopicSupplement", 0x1380);
 		}
 
 		/// <summary>
@@ -861,8 +799,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EthiopicSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EthiopicSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u139F", "e(X='\u139F')");
+			Test_WithinBlock("EthiopicSupplement", 0x139F);
 		}
 
 		/// <summary>
@@ -872,8 +809,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Cherokee_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Cherokee};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u13A0", "e(X='\u13A0')");
+			Test_WithinBlock("Cherokee", 0x13A0);
 		}
 
 		/// <summary>
@@ -883,8 +819,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Cherokee_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Cherokee};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u13FF", "e(X='\u13FF')");
+			Test_WithinBlock("Cherokee", 0x13FF);
 		}
 
 		/// <summary>
@@ -894,8 +829,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_UnifiedCanadianAboriginalSyllabics_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{UnifiedCanadianAboriginalSyllabics};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1400", "e(X='\u1400')");
+			Test_WithinBlock("UnifiedCanadianAboriginalSyllabics", 0x1400);
 		}
 
 		/// <summary>
@@ -905,8 +839,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_UnifiedCanadianAboriginalSyllabics_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{UnifiedCanadianAboriginalSyllabics};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u167F", "e(X='\u167F')");
+			Test_WithinBlock("UnifiedCanadianAboriginalSyllabics", 0x167F);
 		}
 
 		/// <summary>
@@ -916,8 +849,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Ogham_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Ogham};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1680", "e(X='\u1680')");
+			Test_WithinBlock("Ogham", 0x1680);
 		}
 
 		/// <summary>
@@ -927,8 +859,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Ogham_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Ogham};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u169F", "e(X='\u169F')");
+			Test_WithinBlock("Ogham", 0x169F);
 		}
 
 		/// <summary>
@@ -938,8 +869,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Runic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Runic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u16A0", "e(X='\u16A0')");
+			Test_WithinBlock("Runic", 0x16A0);
 		}
 
 		/// <summary>
@@ -949,8 +879,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Runic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Runic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u16FF", "e(X='\u16FF')");
+			Test_WithinBlock("Runic", 0x16FF);
 		}
 
 		/// <summary>
@@ -960,8 +889,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tagalog_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tagalog};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1700", "e(X='\u1700')");
+			Test_WithinBlock("Tagalog", 0x1700);
 		}
 
 		/// <summary>
@@ -971,8 +899,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tagalog_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tagalog};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u171F", "e(X='\u171F')");
+			Test_WithinBlock("Tagalog", 0x171F);
 		}
 
 		/// <summary>
@@ -982,8 +909,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Hanunoo_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Hanunoo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1720", "e(X='\u1720')");
+			Test_WithinBlock("Hanunoo", 0x1720);
 		}
 
 		/// <summary>
@@ -993,8 +919,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Hanunoo_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Hanunoo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u173F", "e(X='\u173F')");
+			Test_WithinBlock("Hanunoo", 0x173F);
 		}
 
 		/// <summary>
@@ -1004,8 +929,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Buhid_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Buhid};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1740", "e(X='\u1740')");
+			Test_WithinBlock("Buhid", 0x1740);
 		}
 
 		/// <summary>
@@ -1015,8 +939,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Buhid_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Buhid};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u175F", "e(X='\u175F')");
+			Test_WithinBlock("Buhid", 0x175F);
 		}
 
 		/// <summary>
@@ -1026,8 +949,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tagbanwa_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tagbanwa};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1760", "e(X='\u1760')");
+			Test_WithinBlock("Tagbanwa", 0x1760);
 		}
 
 		/// <summary>
@@ -1037,8 +959,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tagbanwa_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tagbanwa};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u177F", "e(X='\u177F')");
+			Test_WithinBlock("Tagbanwa", 0x177F);
 		}
 
 		/// <summary>
@@ -1048,8 +969,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Khmer_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Khmer};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1780", "e(X='\u1780')");
+			Test_WithinBlock("Khmer", 0x1780);
 		}
 
 		/// <summary>
@@ -1059,8 +979,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Khmer_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Khmer};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u17FF", "e(X='\u17FF')");
+			Test_WithinBlock("Khmer", 0x17FF);
 		}
 
 		/// <summary>
@@ -1070,8 +989,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Mongolian_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Mongolian};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1800", "e(X='\u1800')");
+			Test_WithinBlock("Mongolian", 0x1800);
 		}
 
 		/// <summary>
@@ -1081,8 +999,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Mongolian_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Mongolian};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u18AF", "e(X='\u18AF')");
+			Test_WithinBlock("Mongolian", 0x18AF);
 		}
 
 		/// <summary>
@@ -1092,8 +1009,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_UnifiedCanadianAboriginalSyllabicsExtended_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{UnifiedCanadianAboriginalSyllabicsExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u18B0", "e(X='\u18B0')");
+			Test_WithinBlock("UnifiedCanadianAboriginalSyllabicsExtended", 0x18B0);
 		}
 
 		/// <summary>
@@ -1103,8 +1019,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_UnifiedCanadianAboriginalSyllabicsExtended_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{UnifiedCanadianAboriginalSyllabicsExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u18FF", "e(X='\u18FF')");
+			Test_WithinBlock("UnifiedCanadianAboriginalSyllabicsExtended", 0x18FF);
 		}
 
 		/// <summary>
@@ -1114,8 +1029,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Limbu_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Limbu};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1900", "e(X='\u1900')");
+			Test_WithinBlock("Limbu", 0x1900);
 		}
 
 		/// <summary>
@@ -1125,8 +1039,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Limbu_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Limbu};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u194F", "e(X='\u194F')");
+			Test_WithinBlock("Limbu", 0x194F);
 		}
 
 		/// <summary>
@@ -1136,8 +1049,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_TaiLe_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{TaiLe};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1950", "e(X='\u1950')");
+			Test_WithinBlock("TaiLe", 0x1950);
 		}
 
 		/// <summary>
@@ -1147,8 +1059,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_TaiLe_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{TaiLe};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u197F", "e(X='\u197F')");
+			Test_WithinBlock("TaiLe", 0x197F);
 		}
 
 		/// <summary>
@@ -1158,8 +1069,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_NewTaiLue_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{NewTaiLue};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1980", "e(X='\u1980')");
+			Test_WithinBlock("NewTaiLue", 0x1980);
 		}
 
 		/// <summary>
@@ -1169,8 +1079,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_NewTaiLue_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{NewTaiLue};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u19DF", "e(X='\u19DF')");
+			Test_WithinBlock("NewTaiLue", 0x19DF);
 		}
 
 		/// <summary>
@@ -1180,8 +1089,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KhmerSymbols_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KhmerSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u19E0", "e(X='\u19E0')");
+			Test_WithinBlock("KhmerSymbols", 0x19E0);
 		}
 
 		/// <summary>
@@ -1191,8 +1099,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KhmerSymbols_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KhmerSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u19FF", "e(X='\u19FF')");
+			Test_WithinBlock("KhmerSymbols", 0x19FF);
 		}
 
 		/// <summary>
@@ -1202,8 +1109,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Buginese_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Buginese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1A00", "e(X='\u1A00')");
+			Test_WithinBlock("Buginese", 0x1A00);
 		}
 
 		/// <summary>
@@ -1213,8 +1119,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Buginese_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Buginese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1A1F", "e(X='\u1A1F')");
+			Test_WithinBlock("Buginese", 0x1A1F);
 		}
 
 		/// <summary>
@@ -1224,8 +1129,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_TaiTham_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{TaiTham};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1A20", "e(X='\u1A20')");
+			Test_WithinBlock("TaiTham", 0x1A20);
 		}
 
 		/// <summary>
@@ -1235,8 +1139,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_TaiTham_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{TaiTham};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1AAF", "e(X='\u1AAF')");
+			Test_WithinBlock("TaiTham", 0x1AAF);
 		}
 
 		/// <summary>
@@ -1246,8 +1149,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Balinese_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Balinese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1B00", "e(X='\u1B00')");
+			Test_WithinBlock("Balinese", 0x1B00);
 		}
 
 		/// <summary>
@@ -1257,8 +1159,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Balinese_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Balinese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1B7F", "e(X='\u1B7F')");
+			Test_WithinBlock("Balinese", 0x1B7F);
 		}
 
 		/// <summary>
@@ -1268,8 +1169,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Sundanese_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Sundanese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1B80", "e(X='\u1B80')");
+			Test_WithinBlock("Sundanese", 0x1B80);
 		}
 
 		/// <summary>
@@ -1279,8 +1179,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Sundanese_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Sundanese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1BBF", "e(X='\u1BBF')");
+			Test_WithinBlock("Sundanese", 0x1BBF);
 		}
 
 		/// <summary>
@@ -1290,8 +1189,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Batak_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Batak};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1BC0", "e(X='\u1BC0')");
+			Test_WithinBlock("Batak", 0x1BC0);
 		}
 
 		/// <summary>
@@ -1301,8 +1199,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Batak_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Batak};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1BFF", "e(X='\u1BFF')");
+			Test_WithinBlock("Batak", 0x1BFF);
 		}
 
 		/// <summary>
@@ -1312,8 +1209,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Lepcha_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Lepcha};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1C00", "e(X='\u1C00')");
+			Test_WithinBlock("Lepcha", 0x1C00);
 		}
 
 		/// <summary>
@@ -1323,8 +1219,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Lepcha_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Lepcha};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1C4F", "e(X='\u1C4F')");
+			Test_WithinBlock("Lepcha", 0x1C4F);
 		}
 
 		/// <summary>
@@ -1334,8 +1229,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_OlChiki_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{OlChiki};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1C50", "e(X='\u1C50')");
+			Test_WithinBlock("OlChiki", 0x1C50);
 		}
 
 		/// <summary>
@@ -1345,8 +1239,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_OlChiki_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{OlChiki};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1C7F", "e(X='\u1C7F')");
+			Test_WithinBlock("OlChiki", 0x1C7F);
 		}
 
 		/// <summary>
@@ -1356,8 +1249,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SundaneseSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SundaneseSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1CC0", "e(X='\u1CC0')");
+			Test_WithinBlock("SundaneseSupplement", 0x1CC0);
 		}
 
 		/// <summary>
@@ -1367,8 +1259,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SundaneseSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SundaneseSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1CCF", "e(X='\u1CCF')");
+			Test_WithinBlock("SundaneseSupplement", 0x1CCF);
 		}
 
 		/// <summary>
@@ -1378,8 +1269,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_VedicExtensions_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{VedicExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1CD0", "e(X='\u1CD0')");
+			Test_WithinBlock("VedicExtensions", 0x1CD0);
 		}
 
 		/// <summary>
@@ -1389,8 +1279,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_VedicExtensions_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{VedicExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1CFF", "e(X='\u1CFF')");
+			Test_WithinBlock("VedicExtensions", 0x1CFF);
 		}
 
 		/// <summary>
@@ -1400,8 +1289,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_PhoneticExtensions_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{PhoneticExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1D00", "e(X='\u1D00')");
+			Test_WithinBlock("PhoneticExtensions", 0x1D00);
 		}
 
 		/// <summary>
@@ -1411,8 +1299,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_PhoneticExtensions_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{PhoneticExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1D7F", "e(X='\u1D7F')");
+			Test_WithinBlock("PhoneticExtensions", 0x1D7F);
 		}
 
 		/// <summary>
@@ -1422,8 +1309,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_PhoneticExtensionsSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{PhoneticExtensionsSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1D80", "e(X='\u1D80')");
+			Test_WithinBlock("PhoneticExtensionsSupplement", 0x1D80);
 		}
 
 		/// <summary>
@@ -1433,8 +1319,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_PhoneticExtensionsSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{PhoneticExtensionsSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1DBF", "e(X='\u1DBF')");
+			Test_WithinBlock("PhoneticExtensionsSupplement", 0x1DBF);
 		}
 
 		/// <summary>
@@ -1444,8 +1329,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningDiacriticalMarksSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningDiacriticalMarksSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1DC0", "e(X='\u1DC0')");
+			Test_WithinBlock("CombiningDiacriticalMarksSupplement", 0x1DC0);
 		}
 
 		/// <summary>
@@ -1455,8 +1339,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningDiacriticalMarksSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningDiacriticalMarksSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1DFF", "e(X='\u1DFF')");
+			Test_WithinBlock("CombiningDiacriticalMarksSupplement", 0x1DFF);
 		}
 
 		/// <summary>
@@ -1466,8 +1349,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_LatinExtendedAdditional_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtendedAdditional};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1E00", "e(X='\u1E00')");
+			Test_WithinBlock("LatinExtendedAdditional", 0x1E00);
 		}
 
 		/// <summary>
@@ -1477,8 +1359,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_LatinExtendedAdditional_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtendedAdditional};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1EFF", "e(X='\u1EFF')");
+			Test_WithinBlock("LatinExtendedAdditional", 0x1EFF);
 		}
 
 		/// <summary>
@@ -1488,8 +1369,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GreekExtended_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GreekExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1F00", "e(X='\u1F00')");
+			Test_WithinBlock("GreekExtended", 0x1F00);
 		}
 
 		/// <summary>
@@ -1499,8 +1379,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GreekExtended_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GreekExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1FFF", "e(X='\u1FFF')");
+			Test_WithinBlock("GreekExtended", 0x1FFF);
 		}
 
 		/// <summary>
@@ -1510,8 +1389,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GeneralPunctuation_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GeneralPunctuation};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2000", "e(X='\u2000')");
+			Test_WithinBlock("GeneralPunctuation", 0x2000);
 		}
 
 		/// <summary>
@@ -1521,30 +1399,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GeneralPunctuation_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GeneralPunctuation};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u206F", "e(X='\u206F')");
+			Test_WithinBlock("GeneralPunctuation", 0x206F);
 		}
 
 		/// <summary>
-		/// Tests the parsing of character block SuperscriptsAndSubscripts
+		/// Tests the parsing of character block SuperscriptsandSubscripts
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_SuperscriptsAndSubscripts_LeftBound()
+		public void Test_UnicodeBlock_SuperscriptsandSubscripts_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SuperscriptsAndSubscripts};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2070", "e(X='\u2070')");
+			Test_WithinBlock("SuperscriptsandSubscripts", 0x2070);
 		}
 
 		/// <summary>
-		/// Tests the parsing of character block SuperscriptsAndSubscripts
+		/// Tests the parsing of character block SuperscriptsandSubscripts
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_SuperscriptsAndSubscripts_RightBound()
+		public void Test_UnicodeBlock_SuperscriptsandSubscripts_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SuperscriptsAndSubscripts};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u209F", "e(X='\u209F')");
+			Test_WithinBlock("SuperscriptsandSubscripts", 0x209F);
 		}
 
 		/// <summary>
@@ -1554,8 +1429,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CurrencySymbols_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CurrencySymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u20A0", "e(X='\u20A0')");
+			Test_WithinBlock("CurrencySymbols", 0x20A0);
 		}
 
 		/// <summary>
@@ -1565,8 +1439,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CurrencySymbols_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CurrencySymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u20CF", "e(X='\u20CF')");
+			Test_WithinBlock("CurrencySymbols", 0x20CF);
 		}
 
 		/// <summary>
@@ -1576,8 +1449,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningDiacriticalMarksforSymbols_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningDiacriticalMarksforSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u20D0", "e(X='\u20D0')");
+			Test_WithinBlock("CombiningDiacriticalMarksforSymbols", 0x20D0);
 		}
 
 		/// <summary>
@@ -1587,8 +1459,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningDiacriticalMarksforSymbols_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningDiacriticalMarksforSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u20FF", "e(X='\u20FF')");
+			Test_WithinBlock("CombiningDiacriticalMarksforSymbols", 0x20FF);
 		}
 
 		/// <summary>
@@ -1598,8 +1469,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_LetterlikeSymbols_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LetterlikeSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2100", "e(X='\u2100')");
+			Test_WithinBlock("LetterlikeSymbols", 0x2100);
 		}
 
 		/// <summary>
@@ -1609,8 +1479,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_LetterlikeSymbols_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LetterlikeSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u214F", "e(X='\u214F')");
+			Test_WithinBlock("LetterlikeSymbols", 0x214F);
 		}
 
 		/// <summary>
@@ -1620,8 +1489,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_NumberForms_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{NumberForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2150", "e(X='\u2150')");
+			Test_WithinBlock("NumberForms", 0x2150);
 		}
 
 		/// <summary>
@@ -1631,8 +1499,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_NumberForms_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{NumberForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u218F", "e(X='\u218F')");
+			Test_WithinBlock("NumberForms", 0x218F);
 		}
 
 		/// <summary>
@@ -1642,8 +1509,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Arrows_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Arrows};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2190", "e(X='\u2190')");
+			Test_WithinBlock("Arrows", 0x2190);
 		}
 
 		/// <summary>
@@ -1653,8 +1519,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Arrows_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Arrows};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u21FF", "e(X='\u21FF')");
+			Test_WithinBlock("Arrows", 0x21FF);
 		}
 
 		/// <summary>
@@ -1664,8 +1529,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MathematicalOperators_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MathematicalOperators};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2200", "e(X='\u2200')");
+			Test_WithinBlock("MathematicalOperators", 0x2200);
 		}
 
 		/// <summary>
@@ -1675,8 +1539,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MathematicalOperators_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MathematicalOperators};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u22FF", "e(X='\u22FF')");
+			Test_WithinBlock("MathematicalOperators", 0x22FF);
 		}
 
 		/// <summary>
@@ -1686,8 +1549,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MiscellaneousTechnical_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousTechnical};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2300", "e(X='\u2300')");
+			Test_WithinBlock("MiscellaneousTechnical", 0x2300);
 		}
 
 		/// <summary>
@@ -1697,8 +1559,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MiscellaneousTechnical_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousTechnical};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u23FF", "e(X='\u23FF')");
+			Test_WithinBlock("MiscellaneousTechnical", 0x23FF);
 		}
 
 		/// <summary>
@@ -1708,8 +1569,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_ControlPictures_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ControlPictures};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2400", "e(X='\u2400')");
+			Test_WithinBlock("ControlPictures", 0x2400);
 		}
 
 		/// <summary>
@@ -1719,8 +1579,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_ControlPictures_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ControlPictures};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u243F", "e(X='\u243F')");
+			Test_WithinBlock("ControlPictures", 0x243F);
 		}
 
 		/// <summary>
@@ -1730,8 +1589,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_OpticalCharacterRecognition_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{OpticalCharacterRecognition};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2440", "e(X='\u2440')");
+			Test_WithinBlock("OpticalCharacterRecognition", 0x2440);
 		}
 
 		/// <summary>
@@ -1741,8 +1599,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_OpticalCharacterRecognition_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{OpticalCharacterRecognition};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u245F", "e(X='\u245F')");
+			Test_WithinBlock("OpticalCharacterRecognition", 0x245F);
 		}
 
 		/// <summary>
@@ -1752,8 +1609,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EnclosedAlphanumerics_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EnclosedAlphanumerics};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2460", "e(X='\u2460')");
+			Test_WithinBlock("EnclosedAlphanumerics", 0x2460);
 		}
 
 		/// <summary>
@@ -1763,8 +1619,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EnclosedAlphanumerics_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EnclosedAlphanumerics};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u24FF", "e(X='\u24FF')");
+			Test_WithinBlock("EnclosedAlphanumerics", 0x24FF);
 		}
 
 		/// <summary>
@@ -1774,8 +1629,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BoxDrawing_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BoxDrawing};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2500", "e(X='\u2500')");
+			Test_WithinBlock("BoxDrawing", 0x2500);
 		}
 
 		/// <summary>
@@ -1785,8 +1639,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BoxDrawing_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BoxDrawing};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u257F", "e(X='\u257F')");
+			Test_WithinBlock("BoxDrawing", 0x257F);
 		}
 
 		/// <summary>
@@ -1796,8 +1649,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BlockElements_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BlockElements};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2580", "e(X='\u2580')");
+			Test_WithinBlock("BlockElements", 0x2580);
 		}
 
 		/// <summary>
@@ -1807,8 +1659,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BlockElements_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BlockElements};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u259F", "e(X='\u259F')");
+			Test_WithinBlock("BlockElements", 0x259F);
 		}
 
 		/// <summary>
@@ -1818,8 +1669,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GeometricShapes_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GeometricShapes};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u25A0", "e(X='\u25A0')");
+			Test_WithinBlock("GeometricShapes", 0x25A0);
 		}
 
 		/// <summary>
@@ -1829,8 +1679,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GeometricShapes_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GeometricShapes};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u25FF", "e(X='\u25FF')");
+			Test_WithinBlock("GeometricShapes", 0x25FF);
 		}
 
 		/// <summary>
@@ -1840,8 +1689,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MiscellaneousSymbols_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2600", "e(X='\u2600')");
+			Test_WithinBlock("MiscellaneousSymbols", 0x2600);
 		}
 
 		/// <summary>
@@ -1851,8 +1699,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MiscellaneousSymbols_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u26FF", "e(X='\u26FF')");
+			Test_WithinBlock("MiscellaneousSymbols", 0x26FF);
 		}
 
 		/// <summary>
@@ -1862,8 +1709,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Dingbats_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Dingbats};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2700", "e(X='\u2700')");
+			Test_WithinBlock("Dingbats", 0x2700);
 		}
 
 		/// <summary>
@@ -1873,52 +1719,47 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Dingbats_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Dingbats};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u27BF", "e(X='\u27BF')");
+			Test_WithinBlock("Dingbats", 0x27BF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block MiscellaneousMathematicalSymbols-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbols_A_LeftBound()
+		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbolsA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousMathematicalSymbols-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u27C0", "e(X='\u27C0')");
+			Test_WithinBlock("MiscellaneousMathematicalSymbols-A", 0x27C0);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block MiscellaneousMathematicalSymbols-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbols_A_RightBound()
+		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbolsA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousMathematicalSymbols-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u27EF", "e(X='\u27EF')");
+			Test_WithinBlock("MiscellaneousMathematicalSymbols-A", 0x27EF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block SupplementalArrows-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_SupplementalArrows_A_LeftBound()
+		public void Test_UnicodeBlock_SupplementalArrowsA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalArrows-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u27F0", "e(X='\u27F0')");
+			Test_WithinBlock("SupplementalArrows-A", 0x27F0);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block SupplementalArrows-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_SupplementalArrows_A_RightBound()
+		public void Test_UnicodeBlock_SupplementalArrowsA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalArrows-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u27FF", "e(X='\u27FF')");
+			Test_WithinBlock("SupplementalArrows-A", 0x27FF);
 		}
 
 		/// <summary>
@@ -1928,8 +1769,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BraillePatterns_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BraillePatterns};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2800", "e(X='\u2800')");
+			Test_WithinBlock("BraillePatterns", 0x2800);
 		}
 
 		/// <summary>
@@ -1939,52 +1779,47 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BraillePatterns_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BraillePatterns};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u28FF", "e(X='\u28FF')");
+			Test_WithinBlock("BraillePatterns", 0x28FF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block SupplementalArrows-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_SupplementalArrows_B_LeftBound()
+		public void Test_UnicodeBlock_SupplementalArrowsB_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalArrows-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2900", "e(X='\u2900')");
+			Test_WithinBlock("SupplementalArrows-B", 0x2900);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block SupplementalArrows-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_SupplementalArrows_B_RightBound()
+		public void Test_UnicodeBlock_SupplementalArrowsB_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalArrows-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u297F", "e(X='\u297F')");
+			Test_WithinBlock("SupplementalArrows-B", 0x297F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block MiscellaneousMathematicalSymbols-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbols_B_LeftBound()
+		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbolsB_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousMathematicalSymbols-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2980", "e(X='\u2980')");
+			Test_WithinBlock("MiscellaneousMathematicalSymbols-B", 0x2980);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block MiscellaneousMathematicalSymbols-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbols_B_RightBound()
+		public void Test_UnicodeBlock_MiscellaneousMathematicalSymbolsB_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousMathematicalSymbols-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u29FF", "e(X='\u29FF')");
+			Test_WithinBlock("MiscellaneousMathematicalSymbols-B", 0x29FF);
 		}
 
 		/// <summary>
@@ -1994,8 +1829,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SupplementalMathematicalOperators_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalMathematicalOperators};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2A00", "e(X='\u2A00')");
+			Test_WithinBlock("SupplementalMathematicalOperators", 0x2A00);
 		}
 
 		/// <summary>
@@ -2005,8 +1839,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SupplementalMathematicalOperators_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalMathematicalOperators};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2AFF", "e(X='\u2AFF')");
+			Test_WithinBlock("SupplementalMathematicalOperators", 0x2AFF);
 		}
 
 		/// <summary>
@@ -2016,8 +1849,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MiscellaneousSymbolsandArrows_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousSymbolsandArrows};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2B00", "e(X='\u2B00')");
+			Test_WithinBlock("MiscellaneousSymbolsandArrows", 0x2B00);
 		}
 
 		/// <summary>
@@ -2027,8 +1859,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MiscellaneousSymbolsandArrows_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousSymbolsandArrows};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2BFF", "e(X='\u2BFF')");
+			Test_WithinBlock("MiscellaneousSymbolsandArrows", 0x2BFF);
 		}
 
 		/// <summary>
@@ -2038,8 +1869,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Glagolitic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Glagolitic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2C00", "e(X='\u2C00')");
+			Test_WithinBlock("Glagolitic", 0x2C00);
 		}
 
 		/// <summary>
@@ -2049,30 +1879,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Glagolitic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Glagolitic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2C5F", "e(X='\u2C5F')");
+			Test_WithinBlock("Glagolitic", 0x2C5F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-C
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_C_LeftBound()
+		public void Test_UnicodeBlock_LatinExtendedC_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-C};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2C60", "e(X='\u2C60')");
+			Test_WithinBlock("LatinExtended-C", 0x2C60);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-C
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_C_RightBound()
+		public void Test_UnicodeBlock_LatinExtendedC_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-C};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2C7F", "e(X='\u2C7F')");
+			Test_WithinBlock("LatinExtended-C", 0x2C7F);
 		}
 
 		/// <summary>
@@ -2082,8 +1909,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Coptic_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Coptic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2C80", "e(X='\u2C80')");
+			Test_WithinBlock("Coptic", 0x2C80);
 		}
 
 		/// <summary>
@@ -2093,8 +1919,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Coptic_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Coptic};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2CFF", "e(X='\u2CFF')");
+			Test_WithinBlock("Coptic", 0x2CFF);
 		}
 
 		/// <summary>
@@ -2104,8 +1929,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GeorgianSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GeorgianSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2D00", "e(X='\u2D00')");
+			Test_WithinBlock("GeorgianSupplement", 0x2D00);
 		}
 
 		/// <summary>
@@ -2115,8 +1939,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_GeorgianSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{GeorgianSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2D2F", "e(X='\u2D2F')");
+			Test_WithinBlock("GeorgianSupplement", 0x2D2F);
 		}
 
 		/// <summary>
@@ -2126,8 +1949,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tifinagh_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tifinagh};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2D30", "e(X='\u2D30')");
+			Test_WithinBlock("Tifinagh", 0x2D30);
 		}
 
 		/// <summary>
@@ -2137,8 +1959,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Tifinagh_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Tifinagh};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2D7F", "e(X='\u2D7F')");
+			Test_WithinBlock("Tifinagh", 0x2D7F);
 		}
 
 		/// <summary>
@@ -2148,8 +1969,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EthiopicExtended_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EthiopicExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2D80", "e(X='\u2D80')");
+			Test_WithinBlock("EthiopicExtended", 0x2D80);
 		}
 
 		/// <summary>
@@ -2159,30 +1979,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EthiopicExtended_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EthiopicExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2DDF", "e(X='\u2DDF')");
+			Test_WithinBlock("EthiopicExtended", 0x2DDF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block CyrillicExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_CyrillicExtended_A_LeftBound()
+		public void Test_UnicodeBlock_CyrillicExtendedA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CyrillicExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2DE0", "e(X='\u2DE0')");
+			Test_WithinBlock("CyrillicExtended-A", 0x2DE0);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block CyrillicExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_CyrillicExtended_A_RightBound()
+		public void Test_UnicodeBlock_CyrillicExtendedA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CyrillicExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2DFF", "e(X='\u2DFF')");
+			Test_WithinBlock("CyrillicExtended-A", 0x2DFF);
 		}
 
 		/// <summary>
@@ -2192,8 +2009,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SupplementalPunctuation_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalPunctuation};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2E00", "e(X='\u2E00')");
+			Test_WithinBlock("SupplementalPunctuation", 0x2E00);
 		}
 
 		/// <summary>
@@ -2203,8 +2019,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SupplementalPunctuation_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SupplementalPunctuation};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2E7F", "e(X='\u2E7F')");
+			Test_WithinBlock("SupplementalPunctuation", 0x2E7F);
 		}
 
 		/// <summary>
@@ -2214,8 +2029,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKRadicalsSupplement_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKRadicalsSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2E80", "e(X='\u2E80')");
+			Test_WithinBlock("CJKRadicalsSupplement", 0x2E80);
 		}
 
 		/// <summary>
@@ -2225,8 +2039,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKRadicalsSupplement_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKRadicalsSupplement};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2EFF", "e(X='\u2EFF')");
+			Test_WithinBlock("CJKRadicalsSupplement", 0x2EFF);
 		}
 
 		/// <summary>
@@ -2236,8 +2049,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KangxiRadicals_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KangxiRadicals};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2F00", "e(X='\u2F00')");
+			Test_WithinBlock("KangxiRadicals", 0x2F00);
 		}
 
 		/// <summary>
@@ -2247,8 +2059,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KangxiRadicals_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KangxiRadicals};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2FDF", "e(X='\u2FDF')");
+			Test_WithinBlock("KangxiRadicals", 0x2FDF);
 		}
 
 		/// <summary>
@@ -2258,8 +2069,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_IdeographicDescriptionCharacters_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{IdeographicDescriptionCharacters};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2FF0", "e(X='\u2FF0')");
+			Test_WithinBlock("IdeographicDescriptionCharacters", 0x2FF0);
 		}
 
 		/// <summary>
@@ -2269,8 +2079,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_IdeographicDescriptionCharacters_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{IdeographicDescriptionCharacters};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u2FFF", "e(X='\u2FFF')");
+			Test_WithinBlock("IdeographicDescriptionCharacters", 0x2FFF);
 		}
 
 		/// <summary>
@@ -2280,8 +2089,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKSymbolsandPunctuation_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKSymbolsandPunctuation};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3000", "e(X='\u3000')");
+			Test_WithinBlock("CJKSymbolsandPunctuation", 0x3000);
 		}
 
 		/// <summary>
@@ -2291,8 +2099,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKSymbolsandPunctuation_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKSymbolsandPunctuation};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u303F", "e(X='\u303F')");
+			Test_WithinBlock("CJKSymbolsandPunctuation", 0x303F);
 		}
 
 		/// <summary>
@@ -2302,8 +2109,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Hiragana_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Hiragana};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3040", "e(X='\u3040')");
+			Test_WithinBlock("Hiragana", 0x3040);
 		}
 
 		/// <summary>
@@ -2313,8 +2119,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Hiragana_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Hiragana};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u309F", "e(X='\u309F')");
+			Test_WithinBlock("Hiragana", 0x309F);
 		}
 
 		/// <summary>
@@ -2324,8 +2129,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Katakana_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Katakana};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u30A0", "e(X='\u30A0')");
+			Test_WithinBlock("Katakana", 0x30A0);
 		}
 
 		/// <summary>
@@ -2335,8 +2139,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Katakana_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Katakana};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u30FF", "e(X='\u30FF')");
+			Test_WithinBlock("Katakana", 0x30FF);
 		}
 
 		/// <summary>
@@ -2346,8 +2149,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Bopomofo_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Bopomofo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3100", "e(X='\u3100')");
+			Test_WithinBlock("Bopomofo", 0x3100);
 		}
 
 		/// <summary>
@@ -2357,8 +2159,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Bopomofo_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Bopomofo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u312F", "e(X='\u312F')");
+			Test_WithinBlock("Bopomofo", 0x312F);
 		}
 
 		/// <summary>
@@ -2368,8 +2169,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_HangulCompatibilityJamo_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulCompatibilityJamo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3130", "e(X='\u3130')");
+			Test_WithinBlock("HangulCompatibilityJamo", 0x3130);
 		}
 
 		/// <summary>
@@ -2379,8 +2179,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_HangulCompatibilityJamo_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulCompatibilityJamo};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u318F", "e(X='\u318F')");
+			Test_WithinBlock("HangulCompatibilityJamo", 0x318F);
 		}
 
 		/// <summary>
@@ -2390,8 +2189,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Kanbun_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Kanbun};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3190", "e(X='\u3190')");
+			Test_WithinBlock("Kanbun", 0x3190);
 		}
 
 		/// <summary>
@@ -2401,8 +2199,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Kanbun_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Kanbun};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u319F", "e(X='\u319F')");
+			Test_WithinBlock("Kanbun", 0x319F);
 		}
 
 		/// <summary>
@@ -2412,8 +2209,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BopomofoExtended_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BopomofoExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u31A0", "e(X='\u31A0')");
+			Test_WithinBlock("BopomofoExtended", 0x31A0);
 		}
 
 		/// <summary>
@@ -2423,8 +2219,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_BopomofoExtended_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{BopomofoExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u31BF", "e(X='\u31BF')");
+			Test_WithinBlock("BopomofoExtended", 0x31BF);
 		}
 
 		/// <summary>
@@ -2434,8 +2229,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKStrokes_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKStrokes};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u31C0", "e(X='\u31C0')");
+			Test_WithinBlock("CJKStrokes", 0x31C0);
 		}
 
 		/// <summary>
@@ -2445,8 +2239,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKStrokes_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKStrokes};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u31EF", "e(X='\u31EF')");
+			Test_WithinBlock("CJKStrokes", 0x31EF);
 		}
 
 		/// <summary>
@@ -2456,8 +2249,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KatakanaPhoneticExtensions_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KatakanaPhoneticExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u31F0", "e(X='\u31F0')");
+			Test_WithinBlock("KatakanaPhoneticExtensions", 0x31F0);
 		}
 
 		/// <summary>
@@ -2467,8 +2259,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KatakanaPhoneticExtensions_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KatakanaPhoneticExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u31FF", "e(X='\u31FF')");
+			Test_WithinBlock("KatakanaPhoneticExtensions", 0x31FF);
 		}
 
 		/// <summary>
@@ -2478,8 +2269,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EnclosedCJKLettersandMonths_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EnclosedCJKLettersandMonths};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3200", "e(X='\u3200')");
+			Test_WithinBlock("EnclosedCJKLettersandMonths", 0x3200);
 		}
 
 		/// <summary>
@@ -2489,8 +2279,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_EnclosedCJKLettersandMonths_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EnclosedCJKLettersandMonths};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u32FF", "e(X='\u32FF')");
+			Test_WithinBlock("EnclosedCJKLettersandMonths", 0x32FF);
 		}
 
 		/// <summary>
@@ -2500,8 +2289,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKCompatibility_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKCompatibility};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3300", "e(X='\u3300')");
+			Test_WithinBlock("CJKCompatibility", 0x3300);
 		}
 
 		/// <summary>
@@ -2511,8 +2299,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKCompatibility_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKCompatibility};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u33FF", "e(X='\u33FF')");
+			Test_WithinBlock("CJKCompatibility", 0x33FF);
 		}
 
 		/// <summary>
@@ -2522,8 +2309,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKUnifiedIdeographsExtensionA};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u3400", "e(X='\u3400')");
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionA", 0x3400);
 		}
 
 		/// <summary>
@@ -2533,8 +2319,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKUnifiedIdeographsExtensionA};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u4DBF", "e(X='\u4DBF')");
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionA", 0x4DBF);
 		}
 
 		/// <summary>
@@ -2544,8 +2329,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_YijingHexagramSymbols_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{YijingHexagramSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u4DC0", "e(X='\u4DC0')");
+			Test_WithinBlock("YijingHexagramSymbols", 0x4DC0);
 		}
 
 		/// <summary>
@@ -2555,8 +2339,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_YijingHexagramSymbols_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{YijingHexagramSymbols};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u4DFF", "e(X='\u4DFF')");
+			Test_WithinBlock("YijingHexagramSymbols", 0x4DFF);
 		}
 
 		/// <summary>
@@ -2566,8 +2349,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKUnifiedIdeographs_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKUnifiedIdeographs};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u4E00", "e(X='\u4E00')");
+			Test_WithinBlock("CJKUnifiedIdeographs", 0x4E00);
 		}
 
 		/// <summary>
@@ -2577,8 +2359,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKUnifiedIdeographs_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKUnifiedIdeographs};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u9FFF", "e(X='\u9FFF')");
+			Test_WithinBlock("CJKUnifiedIdeographs", 0x9FFF);
 		}
 
 		/// <summary>
@@ -2588,8 +2369,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_YiSyllables_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{YiSyllables};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA000", "e(X='\uA000')");
+			Test_WithinBlock("YiSyllables", 0xA000);
 		}
 
 		/// <summary>
@@ -2599,8 +2379,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_YiSyllables_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{YiSyllables};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA48F", "e(X='\uA48F')");
+			Test_WithinBlock("YiSyllables", 0xA48F);
 		}
 
 		/// <summary>
@@ -2610,8 +2389,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_YiRadicals_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{YiRadicals};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA490", "e(X='\uA490')");
+			Test_WithinBlock("YiRadicals", 0xA490);
 		}
 
 		/// <summary>
@@ -2621,8 +2399,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_YiRadicals_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{YiRadicals};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA4CF", "e(X='\uA4CF')");
+			Test_WithinBlock("YiRadicals", 0xA4CF);
 		}
 
 		/// <summary>
@@ -2632,8 +2409,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Lisu_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Lisu};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA4D0", "e(X='\uA4D0')");
+			Test_WithinBlock("Lisu", 0xA4D0);
 		}
 
 		/// <summary>
@@ -2643,8 +2419,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Lisu_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Lisu};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA4FF", "e(X='\uA4FF')");
+			Test_WithinBlock("Lisu", 0xA4FF);
 		}
 
 		/// <summary>
@@ -2654,8 +2429,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Vai_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Vai};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA500", "e(X='\uA500')");
+			Test_WithinBlock("Vai", 0xA500);
 		}
 
 		/// <summary>
@@ -2665,30 +2439,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Vai_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Vai};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA63F", "e(X='\uA63F')");
+			Test_WithinBlock("Vai", 0xA63F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block CyrillicExtended-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_CyrillicExtended_B_LeftBound()
+		public void Test_UnicodeBlock_CyrillicExtendedB_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CyrillicExtended-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA640", "e(X='\uA640')");
+			Test_WithinBlock("CyrillicExtended-B", 0xA640);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block CyrillicExtended-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_CyrillicExtended_B_RightBound()
+		public void Test_UnicodeBlock_CyrillicExtendedB_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CyrillicExtended-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA69F", "e(X='\uA69F')");
+			Test_WithinBlock("CyrillicExtended-B", 0xA69F);
 		}
 
 		/// <summary>
@@ -2698,8 +2469,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Bamum_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Bamum};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA6A0", "e(X='\uA6A0')");
+			Test_WithinBlock("Bamum", 0xA6A0);
 		}
 
 		/// <summary>
@@ -2709,8 +2479,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Bamum_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Bamum};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA6FF", "e(X='\uA6FF')");
+			Test_WithinBlock("Bamum", 0xA6FF);
 		}
 
 		/// <summary>
@@ -2720,8 +2489,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_ModifierToneLetters_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ModifierToneLetters};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA700", "e(X='\uA700')");
+			Test_WithinBlock("ModifierToneLetters", 0xA700);
 		}
 
 		/// <summary>
@@ -2731,30 +2499,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_ModifierToneLetters_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ModifierToneLetters};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA71F", "e(X='\uA71F')");
+			Test_WithinBlock("ModifierToneLetters", 0xA71F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-D
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_D_LeftBound()
+		public void Test_UnicodeBlock_LatinExtendedD_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-D};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA720", "e(X='\uA720')");
+			Test_WithinBlock("LatinExtended-D", 0xA720);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block LatinExtended-D
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_LatinExtended_D_RightBound()
+		public void Test_UnicodeBlock_LatinExtendedD_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LatinExtended-D};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA7FF", "e(X='\uA7FF')");
+			Test_WithinBlock("LatinExtended-D", 0xA7FF);
 		}
 
 		/// <summary>
@@ -2764,8 +2529,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SylotiNagri_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SylotiNagri};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA800", "e(X='\uA800')");
+			Test_WithinBlock("SylotiNagri", 0xA800);
 		}
 
 		/// <summary>
@@ -2775,8 +2539,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SylotiNagri_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SylotiNagri};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA82F", "e(X='\uA82F')");
+			Test_WithinBlock("SylotiNagri", 0xA82F);
 		}
 
 		/// <summary>
@@ -2786,8 +2549,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CommonIndicNumberForms_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CommonIndicNumberForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA830", "e(X='\uA830')");
+			Test_WithinBlock("CommonIndicNumberForms", 0xA830);
 		}
 
 		/// <summary>
@@ -2797,30 +2559,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CommonIndicNumberForms_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CommonIndicNumberForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA83F", "e(X='\uA83F')");
+			Test_WithinBlock("CommonIndicNumberForms", 0xA83F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block Phags-pa
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_Phags_pa_LeftBound()
+		public void Test_UnicodeBlock_Phagspa_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Phags-pa};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA840", "e(X='\uA840')");
+			Test_WithinBlock("Phags-pa", 0xA840);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block Phags-pa
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_Phags_pa_RightBound()
+		public void Test_UnicodeBlock_Phagspa_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Phags-pa};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA87F", "e(X='\uA87F')");
+			Test_WithinBlock("Phags-pa", 0xA87F);
 		}
 
 		/// <summary>
@@ -2830,8 +2589,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Saurashtra_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Saurashtra};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA880", "e(X='\uA880')");
+			Test_WithinBlock("Saurashtra", 0xA880);
 		}
 
 		/// <summary>
@@ -2841,8 +2599,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Saurashtra_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Saurashtra};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA8DF", "e(X='\uA8DF')");
+			Test_WithinBlock("Saurashtra", 0xA8DF);
 		}
 
 		/// <summary>
@@ -2852,8 +2609,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_DevanagariExtended_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{DevanagariExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA8E0", "e(X='\uA8E0')");
+			Test_WithinBlock("DevanagariExtended", 0xA8E0);
 		}
 
 		/// <summary>
@@ -2863,8 +2619,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_DevanagariExtended_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{DevanagariExtended};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA8FF", "e(X='\uA8FF')");
+			Test_WithinBlock("DevanagariExtended", 0xA8FF);
 		}
 
 		/// <summary>
@@ -2874,8 +2629,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KayahLi_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KayahLi};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA900", "e(X='\uA900')");
+			Test_WithinBlock("KayahLi", 0xA900);
 		}
 
 		/// <summary>
@@ -2885,8 +2639,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_KayahLi_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{KayahLi};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA92F", "e(X='\uA92F')");
+			Test_WithinBlock("KayahLi", 0xA92F);
 		}
 
 		/// <summary>
@@ -2896,8 +2649,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Rejang_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Rejang};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA930", "e(X='\uA930')");
+			Test_WithinBlock("Rejang", 0xA930);
 		}
 
 		/// <summary>
@@ -2907,30 +2659,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Rejang_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Rejang};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA95F", "e(X='\uA95F')");
+			Test_WithinBlock("Rejang", 0xA95F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block HangulJamoExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_HangulJamoExtended_A_LeftBound()
+		public void Test_UnicodeBlock_HangulJamoExtendedA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulJamoExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA960", "e(X='\uA960')");
+			Test_WithinBlock("HangulJamoExtended-A", 0xA960);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block HangulJamoExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_HangulJamoExtended_A_RightBound()
+		public void Test_UnicodeBlock_HangulJamoExtendedA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulJamoExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA97F", "e(X='\uA97F')");
+			Test_WithinBlock("HangulJamoExtended-A", 0xA97F);
 		}
 
 		/// <summary>
@@ -2940,8 +2689,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Javanese_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Javanese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA980", "e(X='\uA980')");
+			Test_WithinBlock("Javanese", 0xA980);
 		}
 
 		/// <summary>
@@ -2951,8 +2699,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Javanese_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Javanese};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uA9DF", "e(X='\uA9DF')");
+			Test_WithinBlock("Javanese", 0xA9DF);
 		}
 
 		/// <summary>
@@ -2962,8 +2709,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Cham_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Cham};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAA00", "e(X='\uAA00')");
+			Test_WithinBlock("Cham", 0xAA00);
 		}
 
 		/// <summary>
@@ -2973,30 +2719,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Cham_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Cham};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAA5F", "e(X='\uAA5F')");
+			Test_WithinBlock("Cham", 0xAA5F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block MyanmarExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_MyanmarExtended_A_LeftBound()
+		public void Test_UnicodeBlock_MyanmarExtendedA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MyanmarExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAA60", "e(X='\uAA60')");
+			Test_WithinBlock("MyanmarExtended-A", 0xAA60);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block MyanmarExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_MyanmarExtended_A_RightBound()
+		public void Test_UnicodeBlock_MyanmarExtendedA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MyanmarExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAA7F", "e(X='\uAA7F')");
+			Test_WithinBlock("MyanmarExtended-A", 0xAA7F);
 		}
 
 		/// <summary>
@@ -3006,8 +2749,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_TaiViet_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{TaiViet};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAA80", "e(X='\uAA80')");
+			Test_WithinBlock("TaiViet", 0xAA80);
 		}
 
 		/// <summary>
@@ -3017,8 +2759,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_TaiViet_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{TaiViet};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAADF", "e(X='\uAADF')");
+			Test_WithinBlock("TaiViet", 0xAADF);
 		}
 
 		/// <summary>
@@ -3028,8 +2769,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MeeteiMayekExtensions_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MeeteiMayekExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAAE0", "e(X='\uAAE0')");
+			Test_WithinBlock("MeeteiMayekExtensions", 0xAAE0);
 		}
 
 		/// <summary>
@@ -3039,30 +2779,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MeeteiMayekExtensions_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MeeteiMayekExtensions};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAAFF", "e(X='\uAAFF')");
+			Test_WithinBlock("MeeteiMayekExtensions", 0xAAFF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block EthiopicExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_EthiopicExtended_A_LeftBound()
+		public void Test_UnicodeBlock_EthiopicExtendedA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EthiopicExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAB00", "e(X='\uAB00')");
+			Test_WithinBlock("EthiopicExtended-A", 0xAB00);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block EthiopicExtended-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_EthiopicExtended_A_RightBound()
+		public void Test_UnicodeBlock_EthiopicExtendedA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{EthiopicExtended-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAB2F", "e(X='\uAB2F')");
+			Test_WithinBlock("EthiopicExtended-A", 0xAB2F);
 		}
 
 		/// <summary>
@@ -3072,8 +2809,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MeeteiMayek_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MeeteiMayek};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uABC0", "e(X='\uABC0')");
+			Test_WithinBlock("MeeteiMayek", 0xABC0);
 		}
 
 		/// <summary>
@@ -3083,8 +2819,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_MeeteiMayek_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{MeeteiMayek};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uABFF", "e(X='\uABFF')");
+			Test_WithinBlock("MeeteiMayek", 0xABFF);
 		}
 
 		/// <summary>
@@ -3094,8 +2829,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_HangulSyllables_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulSyllables};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uAC00", "e(X='\uAC00')");
+			Test_WithinBlock("HangulSyllables", 0xAC00);
 		}
 
 		/// <summary>
@@ -3105,96 +2839,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_HangulSyllables_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulSyllables};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uD7AF", "e(X='\uD7AF')");
+			Test_WithinBlock("HangulSyllables", 0xD7AF);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block HangulJamoExtended-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_HangulJamoExtended_B_LeftBound()
+		public void Test_UnicodeBlock_HangulJamoExtendedB_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulJamoExtended-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uD7B0", "e(X='\uD7B0')");
+			Test_WithinBlock("HangulJamoExtended-B", 0xD7B0);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block HangulJamoExtended-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_HangulJamoExtended_B_RightBound()
+		public void Test_UnicodeBlock_HangulJamoExtendedB_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HangulJamoExtended-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uD7FF", "e(X='\uD7FF')");
-		}
-
-		/// <summary>
-		/// Tests the parsing of character block HighSurrogates
-		/// </summary>
-		[Test]
-		public void Test_UnicodeBlock_HighSurrogates_LeftBound()
-		{
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HighSurrogates};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uD800", "e(X='\uD800')");
-		}
-
-		/// <summary>
-		/// Tests the parsing of character block HighSurrogates
-		/// </summary>
-		[Test]
-		public void Test_UnicodeBlock_HighSurrogates_RightBound()
-		{
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HighSurrogates};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uDB7F", "e(X='\uDB7F')");
-		}
-
-		/// <summary>
-		/// Tests the parsing of character block HighPrivateUseSurrogates
-		/// </summary>
-		[Test]
-		public void Test_UnicodeBlock_HighPrivateUseSurrogates_LeftBound()
-		{
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HighPrivateUseSurrogates};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uDB80", "e(X='\uDB80')");
-		}
-
-		/// <summary>
-		/// Tests the parsing of character block HighPrivateUseSurrogates
-		/// </summary>
-		[Test]
-		public void Test_UnicodeBlock_HighPrivateUseSurrogates_RightBound()
-		{
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HighPrivateUseSurrogates};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uDBFF", "e(X='\uDBFF')");
-		}
-
-		/// <summary>
-		/// Tests the parsing of character block LowSurrogates
-		/// </summary>
-		[Test]
-		public void Test_UnicodeBlock_LowSurrogates_LeftBound()
-		{
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LowSurrogates};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uDC00", "e(X='\uDC00')");
-		}
-
-		/// <summary>
-		/// Tests the parsing of character block LowSurrogates
-		/// </summary>
-		[Test]
-		public void Test_UnicodeBlock_LowSurrogates_RightBound()
-		{
-			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{LowSurrogates};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uDFFF", "e(X='\uDFFF')");
+			Test_WithinBlock("HangulJamoExtended-B", 0xD7FF);
 		}
 
 		/// <summary>
@@ -3204,8 +2869,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_PrivateUseArea_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{PrivateUseArea};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uE000", "e(X='\uE000')");
+			Test_WithinBlock("PrivateUseArea", 0xE000);
 		}
 
 		/// <summary>
@@ -3215,8 +2879,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_PrivateUseArea_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{PrivateUseArea};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uF8FF", "e(X='\uF8FF')");
+			Test_WithinBlock("PrivateUseArea", 0xF8FF);
 		}
 
 		/// <summary>
@@ -3226,8 +2889,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKCompatibilityIdeographs_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKCompatibilityIdeographs};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uF900", "e(X='\uF900')");
+			Test_WithinBlock("CJKCompatibilityIdeographs", 0xF900);
 		}
 
 		/// <summary>
@@ -3237,8 +2899,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKCompatibilityIdeographs_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKCompatibilityIdeographs};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFAFF", "e(X='\uFAFF')");
+			Test_WithinBlock("CJKCompatibilityIdeographs", 0xFAFF);
 		}
 
 		/// <summary>
@@ -3248,8 +2909,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_AlphabeticPresentationForms_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{AlphabeticPresentationForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFB00", "e(X='\uFB00')");
+			Test_WithinBlock("AlphabeticPresentationForms", 0xFB00);
 		}
 
 		/// <summary>
@@ -3259,30 +2919,27 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_AlphabeticPresentationForms_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{AlphabeticPresentationForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFB4F", "e(X='\uFB4F')");
+			Test_WithinBlock("AlphabeticPresentationForms", 0xFB4F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block ArabicPresentationForms-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_ArabicPresentationForms_A_LeftBound()
+		public void Test_UnicodeBlock_ArabicPresentationFormsA_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicPresentationForms-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFB50", "e(X='\uFB50')");
+			Test_WithinBlock("ArabicPresentationForms-A", 0xFB50);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block ArabicPresentationForms-A
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_ArabicPresentationForms_A_RightBound()
+		public void Test_UnicodeBlock_ArabicPresentationFormsA_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicPresentationForms-A};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFDFF", "e(X='\uFDFF')");
+			Test_WithinBlock("ArabicPresentationForms-A", 0xFDFF);
 		}
 
 		/// <summary>
@@ -3292,8 +2949,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_VariationSelectors_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{VariationSelectors};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE00", "e(X='\uFE00')");
+			Test_WithinBlock("VariationSelectors", 0xFE00);
 		}
 
 		/// <summary>
@@ -3303,8 +2959,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_VariationSelectors_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{VariationSelectors};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE0F", "e(X='\uFE0F')");
+			Test_WithinBlock("VariationSelectors", 0xFE0F);
 		}
 
 		/// <summary>
@@ -3314,8 +2969,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_VerticalForms_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{VerticalForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE10", "e(X='\uFE10')");
+			Test_WithinBlock("VerticalForms", 0xFE10);
 		}
 
 		/// <summary>
@@ -3325,8 +2979,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_VerticalForms_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{VerticalForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE1F", "e(X='\uFE1F')");
+			Test_WithinBlock("VerticalForms", 0xFE1F);
 		}
 
 		/// <summary>
@@ -3336,8 +2989,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningHalfMarks_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningHalfMarks};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE20", "e(X='\uFE20')");
+			Test_WithinBlock("CombiningHalfMarks", 0xFE20);
 		}
 
 		/// <summary>
@@ -3347,8 +2999,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CombiningHalfMarks_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CombiningHalfMarks};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE2F", "e(X='\uFE2F')");
+			Test_WithinBlock("CombiningHalfMarks", 0xFE2F);
 		}
 
 		/// <summary>
@@ -3358,8 +3009,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKCompatibilityForms_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKCompatibilityForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE30", "e(X='\uFE30')");
+			Test_WithinBlock("CJKCompatibilityForms", 0xFE30);
 		}
 
 		/// <summary>
@@ -3369,8 +3019,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_CJKCompatibilityForms_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{CJKCompatibilityForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE4F", "e(X='\uFE4F')");
+			Test_WithinBlock("CJKCompatibilityForms", 0xFE4F);
 		}
 
 		/// <summary>
@@ -3380,8 +3029,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SmallFormVariants_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SmallFormVariants};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE50", "e(X='\uFE50')");
+			Test_WithinBlock("SmallFormVariants", 0xFE50);
 		}
 
 		/// <summary>
@@ -3391,52 +3039,47 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_SmallFormVariants_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{SmallFormVariants};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE6F", "e(X='\uFE6F')");
+			Test_WithinBlock("SmallFormVariants", 0xFE6F);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block ArabicPresentationForms-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_ArabicPresentationForms_B_LeftBound()
+		public void Test_UnicodeBlock_ArabicPresentationFormsB_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicPresentationForms-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFE70", "e(X='\uFE70')");
+			Test_WithinBlock("ArabicPresentationForms-B", 0xFE70);
 		}
 
 		/// <summary>
 		/// Tests the parsing of character block ArabicPresentationForms-B
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_ArabicPresentationForms_B_RightBound()
+		public void Test_UnicodeBlock_ArabicPresentationFormsB_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{ArabicPresentationForms-B};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFEFF", "e(X='\uFEFF')");
+			Test_WithinBlock("ArabicPresentationForms-B", 0xFEFF);
 		}
 
 		/// <summary>
-		/// Tests the parsing of character block HalfwidthAndFullwidthForms
+		/// Tests the parsing of character block HalfwidthandFullwidthForms
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_HalfwidthAndFullwidthForms_LeftBound()
+		public void Test_UnicodeBlock_HalfwidthandFullwidthForms_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HalfwidthAndFullwidthForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFF00", "e(X='\uFF00')");
+			Test_WithinBlock("HalfwidthandFullwidthForms", 0xFF00);
 		}
 
 		/// <summary>
-		/// Tests the parsing of character block HalfwidthAndFullwidthForms
+		/// Tests the parsing of character block HalfwidthandFullwidthForms
 		/// </summary>
 		[Test]
-		public void Test_UnicodeBlock_HalfwidthAndFullwidthForms_RightBound()
+		public void Test_UnicodeBlock_HalfwidthandFullwidthForms_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{HalfwidthAndFullwidthForms};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFFEF", "e(X='\uFFEF')");
+			Test_WithinBlock("HalfwidthandFullwidthForms", 0xFFEF);
 		}
 
 		/// <summary>
@@ -3446,8 +3089,7 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Specials_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Specials};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFFF0", "e(X='\uFFF0')");
+			Test_WithinBlock("Specials", 0xFFF0);
 		}
 
 		/// <summary>
@@ -3457,8 +3099,1287 @@ namespace Hime.Tests.Parsing
 		public void Test_UnicodeBlock_Specials_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{Specials};} rules { e->X; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\uFFFF", "e(X='\uFFFF')");
+			Test_WithinBlock("Specials", 0xFFFF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block LinearBSyllabary
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_LinearBSyllabary_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("LinearBSyllabary", 0x10000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block LinearBSyllabary
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_LinearBSyllabary_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("LinearBSyllabary", 0x1007F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block LinearBIdeograms
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_LinearBIdeograms_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("LinearBIdeograms", 0x10080);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block LinearBIdeograms
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_LinearBIdeograms_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("LinearBIdeograms", 0x100FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AegeanNumbers
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AegeanNumbers_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AegeanNumbers", 0x10100);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AegeanNumbers
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AegeanNumbers_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AegeanNumbers", 0x1013F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AncientGreekNumbers
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AncientGreekNumbers_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AncientGreekNumbers", 0x10140);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AncientGreekNumbers
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AncientGreekNumbers_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AncientGreekNumbers", 0x1018F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AncientSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AncientSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AncientSymbols", 0x10190);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AncientSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AncientSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AncientSymbols", 0x101CF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block PhaistosDisc
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_PhaistosDisc_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("PhaistosDisc", 0x101D0);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block PhaistosDisc
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_PhaistosDisc_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("PhaistosDisc", 0x101FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Lycian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Lycian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Lycian", 0x10280);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Lycian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Lycian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Lycian", 0x1029F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Carian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Carian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Carian", 0x102A0);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Carian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Carian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Carian", 0x102DF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldItalic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldItalic_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldItalic", 0x10300);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldItalic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldItalic_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldItalic", 0x1032F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Gothic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Gothic_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Gothic", 0x10330);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Gothic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Gothic_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Gothic", 0x1034F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Ugaritic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Ugaritic_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Ugaritic", 0x10380);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Ugaritic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Ugaritic_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Ugaritic", 0x1039F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldPersian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldPersian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldPersian", 0x103A0);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldPersian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldPersian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldPersian", 0x103DF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Deseret
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Deseret_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Deseret", 0x10400);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Deseret
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Deseret_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Deseret", 0x1044F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Shavian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Shavian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Shavian", 0x10450);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Shavian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Shavian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Shavian", 0x1047F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Osmanya
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Osmanya_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Osmanya", 0x10480);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Osmanya
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Osmanya_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Osmanya", 0x104AF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CypriotSyllabary
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CypriotSyllabary_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CypriotSyllabary", 0x10800);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CypriotSyllabary
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CypriotSyllabary_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CypriotSyllabary", 0x1083F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block ImperialAramaic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_ImperialAramaic_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("ImperialAramaic", 0x10840);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block ImperialAramaic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_ImperialAramaic_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("ImperialAramaic", 0x1085F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Phoenician
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Phoenician_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Phoenician", 0x10900);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Phoenician
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Phoenician_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Phoenician", 0x1091F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Lydian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Lydian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Lydian", 0x10920);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Lydian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Lydian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Lydian", 0x1093F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MeroiticHieroglyphs
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MeroiticHieroglyphs_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MeroiticHieroglyphs", 0x10980);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MeroiticHieroglyphs
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MeroiticHieroglyphs_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MeroiticHieroglyphs", 0x1099F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MeroiticCursive
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MeroiticCursive_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MeroiticCursive", 0x109A0);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MeroiticCursive
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MeroiticCursive_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MeroiticCursive", 0x109FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Kharoshthi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Kharoshthi_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Kharoshthi", 0x10A00);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Kharoshthi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Kharoshthi_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Kharoshthi", 0x10A5F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldSouthArabian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldSouthArabian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldSouthArabian", 0x10A60);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldSouthArabian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldSouthArabian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldSouthArabian", 0x10A7F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Avestan
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Avestan_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Avestan", 0x10B00);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Avestan
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Avestan_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Avestan", 0x10B3F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block InscriptionalParthian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_InscriptionalParthian_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("InscriptionalParthian", 0x10B40);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block InscriptionalParthian
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_InscriptionalParthian_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("InscriptionalParthian", 0x10B5F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block InscriptionalPahlavi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_InscriptionalPahlavi_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("InscriptionalPahlavi", 0x10B60);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block InscriptionalPahlavi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_InscriptionalPahlavi_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("InscriptionalPahlavi", 0x10B7F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldTurkic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldTurkic_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldTurkic", 0x10C00);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block OldTurkic
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_OldTurkic_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("OldTurkic", 0x10C4F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block RumiNumeralSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_RumiNumeralSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("RumiNumeralSymbols", 0x10E60);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block RumiNumeralSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_RumiNumeralSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("RumiNumeralSymbols", 0x10E7F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Brahmi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Brahmi_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Brahmi", 0x11000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Brahmi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Brahmi_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Brahmi", 0x1107F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Kaithi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Kaithi_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Kaithi", 0x11080);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Kaithi
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Kaithi_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Kaithi", 0x110CF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block SoraSompeng
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_SoraSompeng_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("SoraSompeng", 0x110D0);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block SoraSompeng
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_SoraSompeng_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("SoraSompeng", 0x110FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Chakma
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Chakma_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Chakma", 0x11100);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Chakma
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Chakma_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Chakma", 0x1114F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Sharada
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Sharada_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Sharada", 0x11180);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Sharada
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Sharada_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Sharada", 0x111DF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Takri
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Takri_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Takri", 0x11680);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Takri
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Takri_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Takri", 0x116CF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Cuneiform
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Cuneiform_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Cuneiform", 0x12000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Cuneiform
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Cuneiform_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Cuneiform", 0x123FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CuneiformNumbersandPunctuation
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CuneiformNumbersandPunctuation_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CuneiformNumbersandPunctuation", 0x12400);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CuneiformNumbersandPunctuation
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CuneiformNumbersandPunctuation_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CuneiformNumbersandPunctuation", 0x1247F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block EgyptianHieroglyphs
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_EgyptianHieroglyphs_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("EgyptianHieroglyphs", 0x13000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block EgyptianHieroglyphs
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_EgyptianHieroglyphs_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("EgyptianHieroglyphs", 0x1342F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block BamumSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_BamumSupplement_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("BamumSupplement", 0x16800);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block BamumSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_BamumSupplement_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("BamumSupplement", 0x16A3F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Miao
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Miao_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Miao", 0x16F00);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Miao
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Miao_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Miao", 0x16F9F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block KanaSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_KanaSupplement_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("KanaSupplement", 0x1B000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block KanaSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_KanaSupplement_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("KanaSupplement", 0x1B0FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block ByzantineMusicalSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_ByzantineMusicalSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("ByzantineMusicalSymbols", 0x1D000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block ByzantineMusicalSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_ByzantineMusicalSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("ByzantineMusicalSymbols", 0x1D0FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MusicalSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MusicalSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MusicalSymbols", 0x1D100);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MusicalSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MusicalSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MusicalSymbols", 0x1D1FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AncientGreekMusicalNotation
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AncientGreekMusicalNotation_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AncientGreekMusicalNotation", 0x1D200);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AncientGreekMusicalNotation
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AncientGreekMusicalNotation_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AncientGreekMusicalNotation", 0x1D24F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block TaiXuanJingSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_TaiXuanJingSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("TaiXuanJingSymbols", 0x1D300);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block TaiXuanJingSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_TaiXuanJingSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("TaiXuanJingSymbols", 0x1D35F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CountingRodNumerals
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CountingRodNumerals_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CountingRodNumerals", 0x1D360);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CountingRodNumerals
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CountingRodNumerals_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CountingRodNumerals", 0x1D37F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MathematicalAlphanumericSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MathematicalAlphanumericSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MathematicalAlphanumericSymbols", 0x1D400);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MathematicalAlphanumericSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MathematicalAlphanumericSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MathematicalAlphanumericSymbols", 0x1D7FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block ArabicMathematicalAlphabeticSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_ArabicMathematicalAlphabeticSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("ArabicMathematicalAlphabeticSymbols", 0x1EE00);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block ArabicMathematicalAlphabeticSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_ArabicMathematicalAlphabeticSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("ArabicMathematicalAlphabeticSymbols", 0x1EEFF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MahjongTiles
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MahjongTiles_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MahjongTiles", 0x1F000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MahjongTiles
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MahjongTiles_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MahjongTiles", 0x1F02F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block DominoTiles
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_DominoTiles_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("DominoTiles", 0x1F030);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block DominoTiles
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_DominoTiles_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("DominoTiles", 0x1F09F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block PlayingCards
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_PlayingCards_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("PlayingCards", 0x1F0A0);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block PlayingCards
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_PlayingCards_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("PlayingCards", 0x1F0FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block EnclosedAlphanumericSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_EnclosedAlphanumericSupplement_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("EnclosedAlphanumericSupplement", 0x1F100);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block EnclosedAlphanumericSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_EnclosedAlphanumericSupplement_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("EnclosedAlphanumericSupplement", 0x1F1FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block EnclosedIdeographicSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_EnclosedIdeographicSupplement_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("EnclosedIdeographicSupplement", 0x1F200);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block EnclosedIdeographicSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_EnclosedIdeographicSupplement_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("EnclosedIdeographicSupplement", 0x1F2FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MiscellaneousSymbolsAndPictographs
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MiscellaneousSymbolsAndPictographs_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MiscellaneousSymbolsAndPictographs", 0x1F300);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block MiscellaneousSymbolsAndPictographs
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_MiscellaneousSymbolsAndPictographs_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("MiscellaneousSymbolsAndPictographs", 0x1F5FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Emoticons
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Emoticons_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Emoticons", 0x1F600);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Emoticons
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Emoticons_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Emoticons", 0x1F64F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block TransportAndMapSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_TransportAndMapSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("TransportAndMapSymbols", 0x1F680);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block TransportAndMapSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_TransportAndMapSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("TransportAndMapSymbols", 0x1F6FF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AlchemicalSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AlchemicalSymbols_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AlchemicalSymbols", 0x1F700);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block AlchemicalSymbols
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_AlchemicalSymbols_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("AlchemicalSymbols", 0x1F77F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKUnifiedIdeographsExtensionB
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionB", 0x20000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKUnifiedIdeographsExtensionB
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionB", 0x2A6DF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKUnifiedIdeographsExtensionC
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionC_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionC", 0x2A700);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKUnifiedIdeographsExtensionC
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionC_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionC", 0x2B73F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKUnifiedIdeographsExtensionD
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionD", 0x2B740);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKUnifiedIdeographsExtensionD
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKUnifiedIdeographsExtensionD", 0x2B81F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKCompatibilityIdeographsSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKCompatibilityIdeographsSupplement", 0x2F800);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block CJKCompatibilityIdeographsSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("CJKCompatibilityIdeographsSupplement", 0x2FA1F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Tags
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Tags_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Tags", 0xE0000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block Tags
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_Tags_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("Tags", 0xE007F);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block VariationSelectorsSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_VariationSelectorsSupplement_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("VariationSelectorsSupplement", 0xE0100);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block VariationSelectorsSupplement
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_VariationSelectorsSupplement_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("VariationSelectorsSupplement", 0xE01EF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block SupplementaryPrivateUseArea-A
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_SupplementaryPrivateUseAreaA_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("SupplementaryPrivateUseArea-A", 0xF0000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block SupplementaryPrivateUseArea-A
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_SupplementaryPrivateUseAreaA_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("SupplementaryPrivateUseArea-A", 0xFFFFF);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block SupplementaryPrivateUseArea-B
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_SupplementaryPrivateUseAreaB_LeftBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("SupplementaryPrivateUseArea-B", 0x100000);
+		}
+
+		/// <summary>
+		/// Tests the parsing of character block SupplementaryPrivateUseArea-B
+		/// </summary>
+		[Test]
+		public void Test_UnicodeBlock_SupplementaryPrivateUseAreaB_RightBound()
+		{
+			SetTestDirectory();
+			Test_WithinBlock("SupplementaryPrivateUseArea-B", 0x10FFFF);
 		}
 	}
 }
