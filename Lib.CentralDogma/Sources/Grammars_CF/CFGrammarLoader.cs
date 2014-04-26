@@ -300,7 +300,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 			Automata.NFA automata = Automata.NFA.NewMinimal();
 			TextToken token = (TextToken)node.Symbol;
 			string value = token.Value.Substring(3, token.Value.Length - 4);
-			UnicodeBlock block = UnicodeBlock.GetBlock(value);
+			UnicodeBlock block = UnicodeBlocks.GetBlock(value);
 			if (block == null)
 			{
 				ReportErrorAt(node, "Unkown Unicode block " + value);

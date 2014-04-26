@@ -26,8 +26,9 @@ namespace Hime.Demo
     {
         static void Main()
         {
-            IExecutable executable = new ParseTest("EBNF");
-            executable.Execute();
+			Hime.CentralDogma.UnicodeHelper.GenerateBlocksDB();
+			IExecutable executable = new ParseTest("EBNF");
+            //executable.Execute();
         }
     }
 }
