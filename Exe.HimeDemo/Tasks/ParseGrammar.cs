@@ -24,6 +24,7 @@ using System.Reflection;
 using Hime.CentralDogma;
 using Hime.CentralDogma.SDK;
 using Hime.Redist;
+using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
@@ -53,30 +54,12 @@ namespace Hime.Demo.Tasks
             input.Close();
             
 			// Display the errors if any
-            foreach (ParserError error in parser.Errors)
+            foreach (Error error in result.Errors)
                 Console.WriteLine(error.ToString());
             if (!result.IsSuccess)
                 return;
             WinTreeView win = new WinTreeView(result.Root);
             win.ShowDialog();
-        }
-
-        private Hime.Redist.Lexer.Lexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
-        {
-            Type lexerType = assembly.GetType("Hime.CentralDogma.Input.FileCentralDogmaLexer");
-            ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
-            object lexer = lexerConstructor.Invoke(new object[] { reader });
-            return lexer as Hime.Redist.Lexer.Lexer;
-        }
-
-        private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
-        {
-            Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
-            Type lexerType = assembly.GetType("Hime.CentralDogma.Input.FileCentralDogmaLexer");
-            Type parserType = assembly.GetType("Hime.CentralDogma.Input.FileCentralDogmaParser");
-            ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
-            object parser = parserConstructor.Invoke(new object[] { lexer });
-            return parser as Hime.Redist.Parsers.BaseLRParser;
         }
     }
 }

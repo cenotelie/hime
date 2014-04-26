@@ -23,7 +23,7 @@ using System.IO;
 using System.Reflection;
 using Hime.CentralDogma;
 using Hime.CentralDogma.SDK;
-using Hime.Redist
+using Hime.Redist;
 using NUnit.Framework;
 
 namespace Hime.Tests
@@ -83,7 +83,6 @@ namespace Hime.Tests
         private ParseResult ParseTree(string data)
         {
 			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetDefaultParser(new StringReader(data));
-			Assert.AreEqual(0, parser.Errors.Count, "Failed to parse the reference parse tree");
 			return parser.Parse();
         }
         
@@ -154,12 +153,14 @@ namespace Hime.Tests
         {
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
-			foreach (Hime.Redist.Parsers.ParserError error in inputResult.Errors)
+			foreach (Error error in inputResult.Errors)
 				Console.WriteLine(error.ToString());
 			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
+			Assert.AreEqual(0, inputResult.Errors.Count, "Failed to parse the input");
 			ParseResult expectedResult = ParseTree(expected);
 			Assert.IsTrue(expectedResult.IsSuccess, "Failed to parse the expected tree");
-
+			Assert.AreEqual(0, expectedResult.Errors.Count, "Failed to parse the input");
+			
 			bool result = Compare(expectedResult.Root, inputResult.Root);
 			Assert.IsTrue(result, "AST from input does not match the expected AST");
         }
@@ -175,11 +176,13 @@ namespace Hime.Tests
 		protected void ParsingNotMatches(string grammars, string top, ParsingMethod method, string input, string unexpected)
         {
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
-			ASTNode inputAST = parser.Parse();
-			Assert.IsNotNull(inputAST, "Failed to parse the input");
-			ASTNode expectedAST = ParseTree(unexpected);
-			Assert.IsNotNull(expectedAST, "Failed to parse the unexpected tree");
-
+			ParseResult inputResult = parser.Parse();
+			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
+			Assert.AreEqual(0, inputResult.Errors.Count, "Failed to parse the input");
+			ParseResult unexpectedResult = ParseTree(unexpected);
+			Assert.IsTrue(unexpectedResult.IsSuccess, "Failed to parse the expected tree");
+			Assert.AreEqual(0, unexpectedResult.Errors.Count, "Failed to parse the input");
+			
 			bool result = Compare(unexpectedResult.Root, inputResult.Root);
 			Assert.IsFalse(result, "AST from input matches the unexpected AST, should not");
         }
@@ -195,7 +198,7 @@ namespace Hime.Tests
 		{
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
-			Assert.IsFalse(inputResult.IsSuccess, "Succeeded to parse the input, shouldn't");
+			Assert.AreNotEqual(0, inputResult.Errors.Count, "Succeeded to parse the input, shouldn't");
 		}
 	}
 }
