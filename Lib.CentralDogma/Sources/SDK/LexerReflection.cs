@@ -93,9 +93,8 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Initializes this lexer reflection
 		/// </summary>
-		/// <param name="assembly">The assembly containing the compiled lexer</param>
 		/// <param name="lexerType">The type of the lexer</param>
-		public LexerReflection(Assembly assembly, System.Type lexerType)
+		public LexerReflection(System.Type lexerType)
 		{
 			string input = "";
 			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
@@ -104,13 +103,13 @@ namespace Hime.CentralDogma.SDK
 			this.terminals = new List<Terminal>(lexer.Terminals.Values);
 			this.dfa = new Automata.DFA ();
 
-			string[] resources = assembly.GetManifestResourceNames();
+			string[] resources = lexerType.Assembly.GetManifestResourceNames();
 			Stream stream = null;
 			foreach (string existing in resources)
 			{
 				if (existing.EndsWith(lexerType.Name + ".bin"))
 				{
-					stream = assembly.GetManifestResourceStream(existing);
+					stream = lexerType.Assembly.GetManifestResourceStream(existing);
 					break;
 				}
 			}
