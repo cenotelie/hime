@@ -180,6 +180,7 @@
     <Compile Include="Sources\UnicodeCodePoint.cs" />
     <Compile Include="Sources\UnicodeSpan.cs" />
     <Compile Include="Sources\UnicodeBlocks.cs" />
+    <Compile Include="Sources\UnicodeCategories.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

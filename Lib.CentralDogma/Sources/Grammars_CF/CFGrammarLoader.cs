@@ -315,7 +315,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             Automata.NFA automata = Automata.NFA.NewMinimal();
             TextToken token = (TextToken)node.Symbol;
             string value = token.Value.Substring(3, token.Value.Length - 4);
-            UnicodeCategory category = UnicodeCategory.GetCateogry(value);
+			UnicodeCategory category = UnicodeCategories.GetCategory(value);
             if (category == null)
 			{
 				ReportErrorAt(node, "Unkown Unicode category " + value);
