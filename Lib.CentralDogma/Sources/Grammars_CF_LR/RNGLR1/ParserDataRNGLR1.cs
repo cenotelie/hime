@@ -21,6 +21,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Hime.Redist;
 using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Grammars.ContextFree.LR
@@ -163,8 +164,8 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule, int length)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)LRTreeAction.Replace);
-            else stream.Write((byte)LRTreeAction.None);
+            if (rule.ReplaceOnProduction) stream.Write((byte)TreeAction.Replace);
+            else stream.Write((byte)TreeAction.None);
             stream.Write((byte)length);
             byte bcl = 0;
             int pop = 0;
@@ -186,9 +187,9 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             {
                 if (elem.Symbol is Virtual)
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.VirtualDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.VirtualPromote);
-                    else stream.Write((ushort)LROpCodeValues.VirtualNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.AddVirtualDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.AddVirtualPromote);
+                    else stream.Write((ushort)LROpCodeValues.AddVirtualNoAction);
                     stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
                 }
                 else if (elem.Symbol is Action)
@@ -200,16 +201,16 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 {
                     // Here the symbol must be a variable
                     ushort index = (ushort)variables.IndexOf(elem.Symbol as CFVariable);
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.NullVariableDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.NullVariablePromote);
-                    else stream.Write((ushort)LROpCodeValues.NullVariableNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.AddNullVariableDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.AddNullVariablePromote);
+                    else stream.Write((ushort)LROpCodeValues.AddNullVariableNoAction);
                     stream.Write(index);
                 }
                 else
                 {
-                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.PopDrop);
-                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.PopPromote);
-                    else stream.Write((ushort)LROpCodeValues.PopNoAction);
+                    if (elem.Action == RuleBodyElementAction.Drop) stream.Write((ushort)LROpCodeValues.PopStackDrop);
+                    else if (elem.Action == RuleBodyElementAction.Promote) stream.Write((ushort)LROpCodeValues.PopStackPromote);
+                    else stream.Write((ushort)LROpCodeValues.PopStackNoAction);
                     pop++;
                 }
             }

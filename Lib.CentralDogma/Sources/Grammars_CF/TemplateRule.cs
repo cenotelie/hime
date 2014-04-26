@@ -19,7 +19,7 @@
 **********************************************************************/
 
 using System.Collections.Generic;
-using Hime.Redist.AST;
+using Hime.Redist;
 
 namespace Hime.CentralDogma.Grammars.ContextFree
 {
@@ -36,7 +36,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 
         public TemplateRule(CFGrammar grammar, ASTNode ruleNode)
         {
-            this.HeadName = ((Hime.Redist.Symbols.TextToken)ruleNode.Children[0].Symbol).Value;
+            this.HeadName = ruleNode.Children[0].Symbol.Value;
             this.Parameters = new List<string>();
             this.instances = new List<TemplateRuleInstance>();
             this.grammar = grammar;
@@ -44,7 +44,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             this.DefinitionNode = ruleNode.Children[2];
             foreach (ASTNode Node in ruleNode.Children[1].Children)
 			{
-                this.Parameters.Add(((Hime.Redist.Symbols.TextToken)Node.Symbol).Value);
+                this.Parameters.Add(Node.Symbol.Value);
 			}
         }
 

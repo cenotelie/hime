@@ -18,6 +18,8 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
+using System;
+using System.IO;
 using Hime.Demo.Tasks;
 
 namespace Hime.Demo

@@ -19,7 +19,7 @@
 **********************************************************************/
 
 using System.Collections.Generic;
-using Hime.Redist.AST;
+using Hime.Redist;
 using Hime.CentralDogma.Automata;
 
 namespace Hime.CentralDogma.SDK

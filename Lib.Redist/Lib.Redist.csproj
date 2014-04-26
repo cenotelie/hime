@@ -48,6 +48,7 @@
     <DocumentationFile>bin\Release\Hime.Redist.XML</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentation>true</GenerateDocumentation>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
@@ -59,56 +60,68 @@
     <Compile Include="..\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="AST\BuildNode.cs" />
-    <Compile Include="Lexer\ILexer.cs" />
-    <Compile Include="Lexer\ITokenStream.cs" />
-    <Compile Include="Parsers\LR\BaseLRParser.cs" />
-    <Compile Include="Parsers\LR\LRAction.cs" />
-    <Compile Include="Parsers\LR\LRActionCode.cs" />
-    <Compile Include="Parsers\LR\LRActions.cs" />
-    <Compile Include="Parsers\LR\LRBytecode.cs" />
-    <Compile Include="Parsers\LR\LRk\LRkAutomaton.cs" />
-    <Compile Include="Parsers\LR\LRk\LRkSimulator.cs" />
-    <Compile Include="Parsers\LR\LROpCode.cs" />
-    <Compile Include="Parsers\LR\LROpCodeValues.cs" />
-    <Compile Include="Parsers\LR\LRTreeAction.cs" />
-    <Compile Include="Parsers\LR\RNGLR\GSSEdge.cs" />
-    <Compile Include="Parsers\LR\RNGLR\GSSNode.cs" />
-    <Compile Include="Parsers\LR\RNGLR\GSSPath.cs" />
-    <Compile Include="Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
-    <Compile Include="Parsers\LR\RNGLR\RNGLRParser.cs" />
-    <Compile Include="Parsers\LR\RNGLR\RNGLRTable.cs" />
-    <Compile Include="Parsers\ParserErrorType.cs" />
-    <Compile Include="Parsers\LR\LRk\LRkParser.cs" />
-    <Compile Include="Parsers\LR\LRProduction.cs" />
-    <Compile Include="Lexer\RewindableTextReader.cs" />
-    <Compile Include="Lexer\TextLexer.cs" />
-    <Compile Include="Lexer\Automaton.cs" />
-    <Compile Include="Parsers\RewindableTokenStream.cs" />
-    <Compile Include="Parsers\UnexpectedCharError.cs" />
-    <Compile Include="Parsers\ParserError.cs" />
-    <Compile Include="Parsers\UnexpectedTokenError.cs" />
-    <Compile Include="Symbols\Terminal.cs" />
-    <Compile Include="Symbols\Token.cs" />
-    <Compile Include="Symbols\Dollar.cs" />
-    <Compile Include="Symbols\Epsilon.cs" />
-    <Compile Include="Symbols\TextToken.cs" />
-    <Compile Include="Symbols\Variable.cs" />
-    <Compile Include="Symbols\Virtual.cs" />
-    <Compile Include="AST\ASTNode.cs" />
-    <Compile Include="Parsers\IParser.cs" />
+    <Compile Include="Sources\AST.cs" />
+    <Compile Include="Sources\Lexer\TextBuffer.cs" />
+    <Compile Include="Sources\Token.cs" />
+    <Compile Include="Sources\Lexer\TokenizedContent.cs" />
+    <Compile Include="Sources\Symbol.cs" />
+    <Compile Include="Sources\Text.cs" />
+    <Compile Include="Sources\ParseResult.cs" />
+    <Compile Include="Sources\Parsers\ASTGraph.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
+    <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />
+    <Compile Include="Sources\Semantics.cs" />
+    <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
+    <Compile Include="Sources\Lexer\Content.cs" />
+    <Compile Include="Sources\TextPosition.cs" />
+    <Compile Include="Sources\ASTFamily.cs" />
+    <Compile Include="Sources\Parsers\LR\LRk\LRkASTBuilder.cs" />
+    <Compile Include="Sources\Parsers\LR\BaseLRParser.cs" />
+    <Compile Include="Sources\Parsers\LR\LRAction.cs" />
+    <Compile Include="Sources\Parsers\LR\LRActionCode.cs" />
+    <Compile Include="Sources\Parsers\LR\LRk\LRkAutomaton.cs" />
+    <Compile Include="Sources\Parsers\LR\LRk\LRkSimulator.cs" />
+    <Compile Include="Sources\Parsers\LR\LROpCode.cs" />
+    <Compile Include="Sources\Parsers\LR\LROpCodeValues.cs" />
+    <Compile Include="Sources\TokenizedText.cs" />
+    <Compile Include="Sources\TreeAction.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSNode.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSPath.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRParser.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRTable.cs" />
+    <Compile Include="Sources\ErrorType.cs" />
+    <Compile Include="Sources\Parsers\LR\LRk\LRkParser.cs" />
+    <Compile Include="Sources\Parsers\LR\LRProduction.cs" />
+    <Compile Include="Sources\Lexer\RewindableReader.cs" />
+    <Compile Include="Sources\Lexer\Lexer.cs" />
+    <Compile Include="Sources\Lexer\Automaton.cs" />
+    <Compile Include="Sources\UnexpectedCharError.cs" />
+    <Compile Include="Sources\Error.cs" />
+    <Compile Include="Sources\UnexpectedTokenError.cs" />
+    <Compile Include="Sources\ASTNode.cs" />
+    <Compile Include="Sources\Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AST\SPPFNode.cs" />
-    <Compile Include="Symbols\Symbol.cs" />
-    <Compile Include="Utils\MemoryMaps.cs" />
-    <Compile Include="Utils\SymbolDictionary.cs" />
-    <Compile Include="Utils\SIDHashMap.cs" />
+    <Compile Include="Sources\Utils\BigList.cs" />
+    <Compile Include="Sources\SymbolDictionary.cs" />
+    <Compile Include="Sources\Utils\Pool.cs" />
+    <Compile Include="Sources\Utils\Factory.cs" />
+    <Compile Include="Sources\Parsers\SimpleAST.cs" />
+    <Compile Include="Sources\Parsers\SubTree.cs" />
+    <Compile Include="Sources\SymbolType.cs" />
+    <Compile Include="Sources\SymbolRef.cs" />
+    <Compile Include="Sources\Utils\Blob.cs" />
+    <Compile Include="Sources\Parsers\LR\LROpCodeBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hime.Logo.ico" />
     <Content Include="..\License.txt">
-        <Link>Properties\License.txt</Link>
-	</Content>
+      <Link>Properties\License.txt</Link>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

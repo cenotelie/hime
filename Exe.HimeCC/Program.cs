@@ -24,9 +24,7 @@ using System.Text;
 using Hime.CentralDogma;
 using Hime.CentralDogma.Reporting;
 using Hime.HimeCC.CL;
-using Hime.Redist.AST;
-using Hime.Redist.Parsers;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 
 namespace Hime.HimeCC
 {
@@ -98,8 +96,8 @@ namespace Hime.HimeCC
             }
 
             // Parse the arguments
-            ASTNode line = ParseArguments(args);
-            if (line == null)
+            ParseResult result = ParseArguments(args);
+            if (!result.IsSuccess || result.Errors.Count > 0)
             {
                 Console.WriteLine(ErrorParsingArgs);
                 Console.WriteLine(ErrorPointHelp);
@@ -107,7 +105,7 @@ namespace Hime.HimeCC
             }
             
             // Check for special switches
-            string special = GetSpecialCommand(line);
+            string special = GetSpecialCommand(result.Root);
             if (special == ArgHelpShort || special == ArgHelpLong)
             {
                 PrintHelp();
@@ -121,7 +119,7 @@ namespace Hime.HimeCC
             }
 
             // Build the compilation task
-            CompilationTask task = BuildTask(line);
+            CompilationTask task = BuildTask(result.Root);
             if (task == null)
             {
                 Console.WriteLine(ErrorBadArgs);
@@ -176,7 +174,7 @@ namespace Hime.HimeCC
         /// </summary>
         /// <param name="args">The command line arguments</param>
         /// <returns>The parsed line as an AST, or null if the parsing failed</returns>
-        private ASTNode ParseArguments(string[] args)
+        private ParseResult ParseArguments(string[] args)
         {
             StringBuilder builder = new StringBuilder();
             foreach (string arg in args)
@@ -186,12 +184,10 @@ namespace Hime.HimeCC
             }
             CommandLineLexer lexer = new CommandLineLexer(builder.ToString());
             CommandLineParser parser = new CommandLineParser(lexer);
-            ASTNode root = parser.Parse();
-            foreach (ParserError error in parser.Errors)
+            ParseResult result = parser.Parse();
+            foreach (Error error in result.Errors)
                 Console.WriteLine(error.Message);
-            if (parser.Errors.Count > 0)
-                return null;
-            return root;
+			return result;
         }
 
         /// <summary>
@@ -202,7 +198,7 @@ namespace Hime.HimeCC
         private string GetSpecialCommand(ASTNode line)
         {
             if (line.Children[0].Children.Count == 0 && line.Children[1].Children.Count == 1)
-                return (line.Children[1].Children[0].Symbol as TextToken).Value;
+                return line.Children[1].Children[0].Symbol.Value;
             return null;
         }
 
@@ -220,7 +216,7 @@ namespace Hime.HimeCC
             // Inspect each passed argument
             foreach (ASTNode arg in line.Children[1].Children)
             {
-                switch ((arg.Symbol as TextToken).Value)
+                switch (arg.Symbol.Value)
                 {
                     case ArgOutputAssembly:
                         if (task.Mode == CompilationMode.Source)
@@ -257,7 +253,7 @@ namespace Hime.HimeCC
                         task.OutputDocumentation = true;
                         break;
                     default:
-                        Console.WriteLine("Unknown argument " + (arg.Symbol as TextToken).Value);
+                        Console.WriteLine("Unknown argument " + arg.Symbol.Value);
                         return null;
                 }
             }
@@ -271,7 +267,7 @@ namespace Hime.HimeCC
         /// <param name="node">The input as a parsed data in the command line</param>
         private void AddInput(CompilationTask task, ASTNode node)
         {
-            string value = (node.Symbol as TextToken).Value;
+            string value = node.Symbol.Value;
             if (value == null)
                 return;
             if (value.StartsWith("\""))
@@ -288,7 +284,7 @@ namespace Hime.HimeCC
         {
             if (argument.Children.Count == 0)
                 return null;
-            string value = (argument.Children[0].Symbol as TextToken).Value;
+            string value = argument.Children[0].Symbol.Value;
             if (value.StartsWith("\""))
                 return value.Substring(1, value.Length - 2);
             return value;

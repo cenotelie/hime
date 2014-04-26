@@ -25,8 +25,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Hime.Redist.AST;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 
 namespace Hime.Demo
 {
@@ -68,12 +67,10 @@ namespace Hime.Demo
 		/// <returns>The string representation of the node</returns>
         private string GetString(ASTNode node)
         {
-            if (node.Symbol == null)
-                return "<null>";
-            string value = node.Symbol.Name;
-            if (node.Symbol is Token)
-                value += ": \"" + (node.Symbol as Token).Value + "\"";
-            return value;
+            Symbol symbol = node.Symbol;
+            if (symbol.Value != null)
+                return symbol.Value;
+            return symbol.Name;
         }
     }
 }

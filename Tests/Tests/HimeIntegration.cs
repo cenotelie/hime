@@ -20,8 +20,7 @@
 
 using System.IO;
 using Hime.CentralDogma;
-using Hime.Redist.AST;
-using Hime.Redist.Parsers;
+using Hime.Redist;
 using NUnit.Framework;
 
 namespace Hime.Tests.Integration
@@ -44,11 +43,11 @@ namespace Hime.Tests.Integration
 			StreamReader reader = new StreamReader(stream);
 			string grammar = reader.ReadToEnd();
 
-			IParser parser = BuildParser(grammar, "FileCentralDogma", ParsingMethod.LALR1, grammar, "Test_CentralDogma_Regeneration");
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammar, "FileCentralDogma", ParsingMethod.LALR1, grammar, "Test_CentralDogma_Regeneration");
 			Assert.IsNotNull(parser, "Failed to compile the parser");
-			ASTNode root = parser.Parse();
-			Assert.IsNotNull(root, "Failed to parse the Central Dogma grammar with the generated parser");
-			Assert.AreEqual(0, parser.Errors.Count, "Some error while parsing the Central Dogma grammar with the generated parser");
+			ParseResult result = parser.Parse();
+			Assert.IsTrue(result.IsSuccess, "Failed to parse the Central Dogma grammar with the generated parser");
+			Assert.AreEqual(0, result.Errors.Count, "Some error while parsing the Central Dogma grammar with the generated parser");
 		}
     }
 }

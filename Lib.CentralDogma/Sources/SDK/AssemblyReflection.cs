@@ -69,7 +69,7 @@ namespace Hime.CentralDogma.SDK
 		/// <returns>The lexers</returns>
 		public ICollection<Type> GetLexersType()
 		{
-			Type baseLexer = typeof(Hime.Redist.Lexer.TextLexer);
+			Type baseLexer = typeof(Hime.Redist.Lexer.Lexer);
 			List<Type> result = new List<Type>();
 			foreach (Type t in assembly.GetTypes())
 				if (t.IsClass && baseLexer.IsAssignableFrom(t))

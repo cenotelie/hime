@@ -24,9 +24,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Hime.Redist.AST;
-using Hime.Redist.Parsers;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 
 namespace Hime.CentralDogma
 {
@@ -274,27 +272,26 @@ namespace Hime.CentralDogma
             bool hasErrors = false;
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
             Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
-            ASTNode root = null;
-            try { root = parser.Parse(); }
+            ParseResult result = null;
+            try { result = parser.Parse(); }
             catch (Exception ex)
             {
                 reporter.Error("Fatal error in " + name);
                 reporter.Report(ex);
                 hasErrors = true;
             }
-            foreach (ParserError error in parser.Errors)
+            foreach (Error error in result.Errors)
             {
                 reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
                 hasErrors = true;
             }
-            if (root != null)
+            if (result.IsSuccess)
             {
-                foreach (ASTNode gnode in root.Children)
+                foreach (ASTNode gnode in result.Root.Children)
                 {
                     if (!plugins.ContainsKey(gnode.Symbol.Name))
                     {
-                        TextToken token = gnode.Symbol as TextToken;
-                        reporter.Error(name + " @(" + token.Line + ", " + token.Column + ") No compiler plugin found for resource " + gnode.Symbol.Name);
+                        reporter.Error(name + " @" + gnode.Position + " No compiler plugin found for resource " + gnode.Symbol.Name);
                         hasErrors = true;
                         continue;
                     }
@@ -385,7 +382,7 @@ namespace Hime.CentralDogma
             writer.WriteLine(" */");
             writer.WriteLine();
             writer.WriteLine("using System.Collections.Generic;");
-            writer.WriteLine("using Hime.Redist.Symbols;");
+            writer.WriteLine("using Hime.Redist;");
             if (lexer)
                 writer.WriteLine("using Hime.Redist.Lexer;");
             else
@@ -405,7 +402,7 @@ namespace Hime.CentralDogma
         internal void BuildAssembly(string prefix)
         {
             reporter.Info("Building assembly " + prefix + PostfixAssembly + " ...");
-            string redist = Assembly.GetAssembly(typeof(BaseLRParser)).Location;
+            string redist = Assembly.GetAssembly(typeof(ParseResult)).Location;
             using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
             {
                 CompilerParameters compilerparams = new CompilerParameters();

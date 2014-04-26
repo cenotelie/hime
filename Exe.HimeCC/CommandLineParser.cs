@@ -24,7 +24,7 @@
  */
 
 using System.Collections.Generic;
-using Hime.Redist.Symbols;
+using Hime.Redist;
 using Hime.Redist.Parsers;
 
 namespace Hime.HimeCC.CL
@@ -32,17 +32,17 @@ namespace Hime.HimeCC.CL
     internal class CommandLineParser : LRkParser
     {
         private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
-        private static readonly Variable[] variables = {
-            new Variable(0x9, "value"), 
-            new Variable(0xA, "argument"), 
-            new Variable(0xB, "values"), 
-            new Variable(0xC, "arguments"), 
-            new Variable(0xD, "line"), 
-            new Variable(0xE, "_v0"), 
-            new Variable(0xF, "_v1"), 
-            new Variable(0x10, "_v2"), 
-            new Variable(0x11, "_Axiom_") };
-        private static readonly Virtual[] virtuals = {
+        private static readonly Symbol[] variables = {
+            new Symbol(0x9, "value"), 
+            new Symbol(0xA, "argument"), 
+            new Symbol(0xB, "values"), 
+            new Symbol(0xC, "arguments"), 
+            new Symbol(0xD, "line"), 
+            new Symbol(0xE, "_v0"), 
+            new Symbol(0xF, "_v1"), 
+            new Symbol(0x10, "_v2"), 
+            new Symbol(0x11, "_Axiom_") };
+        private static readonly Symbol[] virtuals = {
  };
         public CommandLineParser(CommandLineLexer lexer) : base (automaton, variables, virtuals, null, lexer) { }
     }
