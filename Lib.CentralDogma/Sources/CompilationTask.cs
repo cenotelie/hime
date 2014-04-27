@@ -44,7 +44,7 @@ namespace Hime.CentralDogma
         /// <summary>
         /// Gets the compiler's version
         /// </summary>
-        public string Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
+        public static string Version { get { return typeof(CompilationTask).Assembly.GetName().Version.ToString(); } }
 
         /// <summary>
         /// Gets ot sets the compiler's mode
@@ -95,10 +95,25 @@ namespace Hime.CentralDogma
         /// </summary>
         public AccessModifier CodeAccess { get; set; }
 
+		/// <summary>
+		/// Next unique identifier for raw (anonymous) inputs
+		/// </summary>
         private int nextRawID;
+		/// <summary>
+		/// Repositories of the registered compiler plugins
+		/// </summary>
         private Dictionary<string, CompilerPlugin> plugins;
+		/// <summary>
+		/// The reporter
+		/// </summary>
         private Reporting.Reporter reporter;
+		/// <summary>
+		/// Repositories of inputs
+		/// </summary>
         private List<KeyValuePair<string, TextReader>> inputs;
+		/// <summary>
+		/// Repositories of loaders
+		/// </summary>
         private Dictionary<string, Grammars.GrammarLoader> loaders;
 
         /// <summary>
@@ -120,6 +135,10 @@ namespace Hime.CentralDogma
             loaders = new Dictionary<string, Grammars.GrammarLoader>();
         }
 
+		/// <summary>
+		/// Gets a unique identifier for a raw (anonymous) input
+		/// </summary>
+		/// <returns>A unique identifier</returns>
         private string GetRawInputID() { return "raw" + (nextRawID++); }
 
         /// <summary>
@@ -180,7 +199,11 @@ namespace Hime.CentralDogma
             return reporter.Result;
         }
 
-        internal string ExecuteDo()
+		/// <summary>
+		/// Executes the compilation task
+		/// </summary>
+		/// <returns>The prefix for the outputs</returns>
+        private string ExecuteDo()
         {
             reporter.Info("CentralDogma " + Version);
             foreach (string name in plugins.Keys)
@@ -259,7 +282,11 @@ namespace Hime.CentralDogma
             return prefix;
         }
 
-        internal bool LoadInputs()
+		/// <summary>
+		/// Parses the inputs
+		/// </summary>
+		/// <returns><c>true</c> if the operation succeed</returns>
+        private bool LoadInputs()
         {
             foreach (KeyValuePair<string, TextReader> pair in inputs)
                 if (!LoadInput(pair.Key, pair.Value))
@@ -267,7 +294,12 @@ namespace Hime.CentralDogma
             return true;
         }
 
-        internal bool LoadInput(string name, TextReader reader)
+		/// <summary>
+		/// Parses the input with the given identifier
+		/// </summary>
+		/// <param name="name">The input's name</param>
+		/// <param name="reader">The input's reader</param>
+        private bool LoadInput(string name, TextReader reader)
         {
             bool hasErrors = false;
             Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
@@ -304,7 +336,11 @@ namespace Hime.CentralDogma
             return !hasErrors;
         }
 
-        internal bool SolveDependencies()
+		/// <summary>
+		/// Solves the dependencies between the inputs and interprets the parsed inputs
+		/// </summary>
+		/// <returns><c>true</c> if all dependencies were solved</returns>
+        private bool SolveDependencies()
         {
             int unsolved = 1;
             while (unsolved != 0)
@@ -327,7 +363,11 @@ namespace Hime.CentralDogma
             return true;
         }
 
-        internal Grammars.Grammar RetrieveGrammar()
+		/// <summary>
+		/// Retrieves the top grammar to compile
+		/// </summary>
+		/// <returns>The top grammar to compile, or <c>null</c> if none could be found</returns>
+        private Grammars.Grammar RetrieveGrammar()
         {
             if (GrammarName != null)
             {
@@ -352,7 +392,12 @@ namespace Hime.CentralDogma
             return null;
         }
 
-        internal Grammars.ParserGenerator GetParserGenerator(ParsingMethod method)
+		/// <summary>
+		/// Gets the parser generator for the given parsing method
+		/// </summary>
+		/// <param name="method">A parsing method</param>
+		/// <returns>The corresponding parser generator</returns>
+        private Grammars.ParserGenerator GetParserGenerator(ParsingMethod method)
         {
             switch (method)
             {
@@ -373,7 +418,15 @@ namespace Hime.CentralDogma
             return null;
         }
 
-        internal StreamWriter OpenOutputStream(string fileName, string nmespace, bool lexer)
+		/// <summary>
+		/// Opens a text stream to an output file for writing code
+		/// </summary>
+		/// <param name="fileName">The file to output to</param>
+		/// <param name="nmespace">The namespace for the code to output</param>
+		/// <param name="lexer"><c>true</c> if this is to output a lexer</param>
+		/// <returns>The stream to write to</returns>
+		/// <remarks>It is the responsability of the caller to close the returned stream</remarks>
+        private StreamWriter OpenOutputStream(string fileName, string nmespace, bool lexer)
         {
             StreamWriter writer = new StreamWriter(fileName, false, new UTF8Encoding(false));
             writer.WriteLine("/*");
@@ -393,13 +446,21 @@ namespace Hime.CentralDogma
             return writer;
         }
 
-        internal void CloseOutputStream(StreamWriter writer)
+		/// <summary>
+		/// Closes an stream that has been opened
+		/// </summary>
+		/// <param name="writer">The stream to close</param>
+        private void CloseOutputStream(StreamWriter writer)
         {
             writer.WriteLine("}");
             writer.Close();
         }
 
-        internal void BuildAssembly(string prefix)
+		/// <summary>
+		/// Builds the assembly for the generated lexer and parser
+		/// </summary>
+		/// <param name="prefix">The prefix for the generated assembly</param>
+        private void BuildAssembly(string prefix)
         {
             reporter.Info("Building assembly " + prefix + PostfixAssembly + " ...");
             string redist = Assembly.GetAssembly(typeof(ParseResult)).Location;

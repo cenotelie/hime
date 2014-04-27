@@ -22,8 +22,20 @@ using Hime.Redist;
 
 namespace Hime.CentralDogma
 {
+	/// <summary>
+	/// Represents a plugin for a compilation task
+	/// </summary>
+	/// <remarks>
+	/// Compiler plugins are used to interpret data that have already been parsed
+	/// </remarks>
     interface CompilerPlugin
     {
+		/// <summary>
+		/// Gets the data loader
+		/// </summary>
+		/// <param name="resName">The name of the data to load</param>
+		/// <param name="node">The root of the AST containing the data to load</param>
+		/// <param name="log">The reporter</param>
         Grammars.GrammarLoader GetLoader(string resName, ASTNode node, Reporting.Reporter log);
     }
 }
