@@ -28,8 +28,14 @@ using Hime.Redist.Parsers;
 
 namespace Hime.Demo.Tasks
 {
+	/// <summary>
+	/// This tasks regenerates the parser for the CentralDogma inputs and re-parses the input grammar with the generated parser
+	/// </summary>
     class ParseGrammar : IExecutable
     {
+		/// <summary>
+		/// Execute this instance. 
+		/// </summary>
         public void Execute()
         {
             // Build parser assembly

@@ -34,7 +34,7 @@ namespace Hime.Demo
 		/// </summary>
         static void Main()
         {
-			IExecutable executable = new ExtractLexer();
+			IExecutable executable = new ParseGrammar();
             executable.Execute();
         }
     }
