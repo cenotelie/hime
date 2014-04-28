@@ -4,48 +4,47 @@
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
 * of the License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General
 * Public License along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-
 using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Hime.Redist.Utils
 {
 	/// <summary>
-    /// Represents a blob of binary data that can be accessed as an array of items T
-    /// </summary>
+	/// Represents a blob of binary data that can be accessed as an array of items T
+	/// </summary>
 	[StructLayout(LayoutKind.Explicit)]
-    class Blob<T>
+	class Blob<T>
 	{
 		/// <summary>
 		/// The backend by storage
 		/// </summary>
 		[FieldOffset(0)]
-        private byte[] blob;
+		private byte[] blob;
 
 		/// <summary>
 		/// The user data (backed by blob)
 		/// </summary>
-        [FieldOffset(0)]
-        private T[] data;
+		[FieldOffset(0)]
+		private T[] data;
 
 		/// <summary>
 		/// The number of items in this blob
 		/// </summary>
-        [FieldOffset(8)]
-        private int count;
+		[FieldOffset(8)]
+		private int count;
 
 		/// <summary>
 		/// Gets the length of the blob in byte
@@ -53,19 +52,16 @@ namespace Hime.Redist.Utils
 		public int Length { get { return blob.Length; } }
 
 		/// <summary>
-        /// Gets the number of items in this blob
-        /// </summary>
-        public int Count { get { return count; } }
+		/// Gets the number of items in this blob
+		/// </summary>
+		public int Count { get { return count; } }
 
 		/// <summary>
-        /// Gets the i-th item in this blob
-        /// </summary>
-        /// <param name="index">Index in this blob</param>
-        /// <returns>The item at the given index</returns>
-        public T this[int index]
-        {
-            get { return data[index]; }
-        }
+		/// Gets the i-th item in this blob
+		/// </summary>
+		/// <param name="index">Index in this blob</param>
+		/// <returns>The item at the given index</returns>
+		public T this[int index] { get { return data[index]; } }
 
 		/// <summary>
 		/// Initializes a new blob
@@ -73,10 +69,10 @@ namespace Hime.Redist.Utils
 		/// <param name="count">The number of items to store in this blob</param>
 		/// <param name="size">The size in bytes of an individual item</param>
 		public Blob(int count, int size)
-        {
-            this.blob = new byte[count * size];
-            this.count = count;
-        }
+		{
+			this.blob = new byte[count * size];
+			this.count = count;
+		}
 
 		/// <summary>
 		/// Loads and fills this blob from the given binary reader
@@ -103,7 +99,7 @@ namespace Hime.Redist.Utils
 			while (count < length)
 			{
 				int read = reader.Read(buffer, current, length - count);
-				// If the end of the input is reached prematurely, 
+				// If the end of the input is reached prematurely,
 				if (read == 0)
 					return false;
 				count += read;
