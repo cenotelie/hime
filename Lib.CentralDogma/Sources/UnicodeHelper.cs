@@ -4,20 +4,19 @@
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
 * of the License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General
 * Public License along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -238,7 +237,7 @@ namespace Hime.CentralDogma
 		public static void GenerateCategoriesDB()
 		{
 			ICollection<UnicodeCategory> temp = GetLatestCategories();
-			Dictionary<string, UnicodeCategory> categories = new Dictionary<string, UnicodeCategory> ();
+			Dictionary<string, UnicodeCategory> categories = new Dictionary<string, UnicodeCategory>();
 			Dictionary<string, List<UnicodeCategory>> aggregated = new Dictionary<string, List<UnicodeCategory>>();
 			foreach (UnicodeCategory cat in temp)
 			{

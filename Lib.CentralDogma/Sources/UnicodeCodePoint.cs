@@ -4,20 +4,19 @@
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
 * of the License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General
 * Public License along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-
 using System;
 using System.Net;
 
@@ -74,12 +73,35 @@ namespace Hime.CentralDogma
 		}
 
 		// Operator overloading
-		public static bool operator==(UnicodeCodePoint cp1, UnicodeCodePoint cp2) { return (cp1.value == cp2.value); }
-		public static bool operator!=(UnicodeCodePoint cp1, UnicodeCodePoint cp2) { return (cp1.value != cp2.value); }
-		public static bool operator<(UnicodeCodePoint cp1, UnicodeCodePoint cp2) { return (cp1.value < cp2.value); }
-		public static bool operator>(UnicodeCodePoint cp1, UnicodeCodePoint cp2) { return (cp1.value > cp2.value); }
-		public static bool operator<=(UnicodeCodePoint cp1, UnicodeCodePoint cp2) { return (cp1.value <= cp2.value); }
-		public static bool operator>=(UnicodeCodePoint cp1, UnicodeCodePoint cp2) { return (cp1.value >= cp2.value); }
+		public static bool operator==(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
+		{
+			return (cp1.value == cp2.value);
+		}
+
+		public static bool operator!=(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
+		{
+			return (cp1.value != cp2.value);
+		}
+
+		public static bool operator<(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
+		{
+			return (cp1.value < cp2.value);
+		}
+
+		public static bool operator>(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
+		{
+			return (cp1.value > cp2.value);
+		}
+
+		public static bool operator<=(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
+		{
+			return (cp1.value <= cp2.value);
+		}
+
+		public static bool operator>=(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
+		{
+			return (cp1.value >= cp2.value);
+		}
 
 		/// <summary>
 		/// Returns the sort order of the current instance compared to the specified object.
@@ -102,22 +124,25 @@ namespace Hime.CentralDogma
 		/// <see cref="Hime.CentralDogma.UnicodeCodePoint"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
-        {
-            if (obj is UnicodeCodePoint)
-            {
-                UnicodeCodePoint cp = (UnicodeCodePoint)obj;
+		{
+			if (obj is UnicodeCodePoint)
+			{
+				UnicodeCodePoint cp = (UnicodeCodePoint)obj;
 				return (this.value == cp.value);
-            }
-            return false;
-        }
-        
+			}
+			return false;
+		}
+
 		/// <summary>
 		/// Serves as a hash function for a <see cref="Hime.CentralDogma.UnicodeCodePoint"/> object.
 		/// </summary>
 		/// <returns>
 		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
 		/// </returns>
-        public override int GetHashCode() { return (int)this.value; }
+		public override int GetHashCode()
+		{
+			return (int)this.value;
+		}
 
 		/// <summary>
 		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.UnicodeCodePoint"/>.
@@ -134,24 +159,24 @@ namespace Hime.CentralDogma
 			// in plane 0, give the character only is it is printable
 			char c = (char)value;
 			System.Globalization.UnicodeCategory cat = char.GetUnicodeCategory(c);
-            switch (cat)
-            {
-                case System.Globalization.UnicodeCategory.ModifierLetter:
-                case System.Globalization.UnicodeCategory.NonSpacingMark:
-                case System.Globalization.UnicodeCategory.SpacingCombiningMark:
-                case System.Globalization.UnicodeCategory.EnclosingMark:
-                case System.Globalization.UnicodeCategory.SpaceSeparator:
-                case System.Globalization.UnicodeCategory.LineSeparator:
-                case System.Globalization.UnicodeCategory.ParagraphSeparator:
-                case System.Globalization.UnicodeCategory.Control:
-                case System.Globalization.UnicodeCategory.Format:
-                case System.Globalization.UnicodeCategory.Surrogate:
-                case System.Globalization.UnicodeCategory.PrivateUse:
-                case System.Globalization.UnicodeCategory.OtherNotAssigned:
-                    return "U+" + System.Convert.ToUInt16(c).ToString("X");
-                default:
-                    return c.ToString();
-            }
+			switch (cat)
+			{
+				case System.Globalization.UnicodeCategory.ModifierLetter:
+				case System.Globalization.UnicodeCategory.NonSpacingMark:
+				case System.Globalization.UnicodeCategory.SpacingCombiningMark:
+				case System.Globalization.UnicodeCategory.EnclosingMark:
+				case System.Globalization.UnicodeCategory.SpaceSeparator:
+				case System.Globalization.UnicodeCategory.LineSeparator:
+				case System.Globalization.UnicodeCategory.ParagraphSeparator:
+				case System.Globalization.UnicodeCategory.Control:
+				case System.Globalization.UnicodeCategory.Format:
+				case System.Globalization.UnicodeCategory.Surrogate:
+				case System.Globalization.UnicodeCategory.PrivateUse:
+				case System.Globalization.UnicodeCategory.OtherNotAssigned:
+					return "U+" + System.Convert.ToUInt16(c).ToString("X");
+				default:
+					return c.ToString();
+			}
 		}
 	}
 }
