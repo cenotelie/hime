@@ -28,9 +28,6 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <AssemblyName>himecc</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
@@ -62,7 +59,6 @@
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>
-    <Content Include="Hime.Logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">

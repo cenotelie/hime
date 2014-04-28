@@ -50,9 +50,6 @@
     <GenerateDocumentation>true</GenerateDocumentation>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Hime.Logo.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
@@ -118,7 +115,6 @@
     <Compile Include="Sources\Parsers\LR\LROpCodeBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Hime.Logo.ico" />
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>
