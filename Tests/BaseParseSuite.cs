@@ -4,20 +4,19 @@
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
 * of the License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General
 * Public License along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-
 using System;
 using System.IO;
 using System.Reflection;
@@ -55,7 +54,7 @@ namespace Hime.Tests
 		/// The assembly for the parse tree parser
 		/// </summary>
 		private static AssemblyReflection parseTreeAssembly = BuildParseTreeParser();
-        
+
 		/// <summary>
 		/// Builds the parse tree parser.
 		/// </summary>
@@ -64,93 +63,93 @@ namespace Hime.Tests
 		{
 			Stream stream = typeof(BaseParseSuite).Assembly.GetManifestResourceStream("Hime.Tests.Resources.ParseTree.gram");
 			CompilationTask task = new CompilationTask();
-            task.AddInputRaw(stream);
+			task.AddInputRaw(stream);
 			task.GrammarName = "ParseTree";
-            task.CodeAccess = AccessModifier.Public;
-            task.Method = ParsingMethod.LALR1;
-            task.Mode = CompilationMode.Assembly;
-            task.Namespace = "Hime.Tests.Generated";
+			task.CodeAccess = AccessModifier.Public;
+			task.Method = ParsingMethod.LALR1;
+			task.Mode = CompilationMode.Assembly;
+			task.Namespace = "Hime.Tests.Generated";
 			task.OutputPrefix = "ParseTree";
-            task.Execute();
+			task.Execute();
 			return new AssemblyReflection("ParseTree.dll");
 		}
 
-        /// <summary>
-        /// Parses the string representation of the given parse tree
-        /// </summary>
-        /// <param name="data">A string representation of a parse tree</param>
-        /// <returns>The parse result</returns>
-        private ParseResult ParseTree(string data)
-        {
+		/// <summary>
+		/// Parses the string representation of the given parse tree
+		/// </summary>
+		/// <param name="data">A string representation of a parse tree</param>
+		/// <returns>The parse result</returns>
+		private ParseResult ParseTree(string data)
+		{
 			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetDefaultParser(new StringReader(data));
 			return parser.Parse();
-        }
-        
-        /// <summary>
-        /// Compare two parse trees
-        /// </summary>
-        /// <param name="expected">The expected sub tree</param>
-        /// <param name="node">The sub tree to compare</param>
-        /// <returns>True if the two trees match</returns>
-        private bool Compare(ASTNode expected, ASTNode node)
-        {
-            if (node.Symbol.Name != expected.Symbol.Value)
-                return false;
-            if (expected.Children[0].Children.Count != 0)
-            {
-                string vRef = expected.Children[0].Children[0].Symbol.Value;
-                vRef = vRef.Substring(1, vRef.Length - 2);
-                string vReal = node.Symbol.Value;
-                if (vReal != vRef)
-                    return false;
-            }
-            if (node.Children.Count != expected.Children[1].Children.Count)
-                return false;
-            for (int i = 0; i != node.Children.Count; i++)
-                if (!Compare(expected.Children[1].Children[i], node.Children[i]))
-                    return false;
-            return true;
-        }
+		}
 
 		/// <summary>
-        /// Builds a parser
-        /// </summary>
-        /// <param name="grammars">Grammar content</param>
-        /// <param name="top">The top grammar to compile</param>
-        /// <param name="method">The parsing method to use</param>
+		/// Compare two parse trees
+		/// </summary>
+		/// <param name="expected">The expected sub tree</param>
+		/// <param name="node">The sub tree to compare</param>
+		/// <returns>True if the two trees match</returns>
+		private bool Compare(ASTNode expected, ASTNode node)
+		{
+			if (node.Symbol.Name != expected.Symbol.Value)
+				return false;
+			if (expected.Children[0].Children.Count != 0)
+			{
+				string vRef = expected.Children[0].Children[0].Symbol.Value;
+				vRef = vRef.Substring(1, vRef.Length - 2);
+				string vReal = node.Symbol.Value;
+				if (vReal != vRef)
+					return false;
+			}
+			if (node.Children.Count != expected.Children[1].Children.Count)
+				return false;
+			for (int i = 0; i != node.Children.Count; i++)
+				if (!Compare(expected.Children[1].Children[i], node.Children[i]))
+					return false;
+			return true;
+		}
+
+		/// <summary>
+		/// Builds a parser
+		/// </summary>
+		/// <param name="grammars">Grammar content</param>
+		/// <param name="top">The top grammar to compile</param>
+		/// <param name="method">The parsing method to use</param>
 		/// <param name="input">The input text to parse</param>
-        /// <param name="prefix">Prefix for the generated parser</param>
+		/// <param name="prefix">Prefix for the generated parser</param>
 		/// <returns>The parser</returns>
-        protected Hime.Redist.Parsers.IParser BuildParser(string grammars, string top, ParsingMethod method, string input, string prefix)
+		protected Hime.Redist.Parsers.IParser BuildParser(string grammars, string top, ParsingMethod method, string input, string prefix)
 		{
 			string genNamespace = "Hime.Tests.Generated_" + prefix;
 
-        	CompilationTask task = new CompilationTask();
-            task.AddInputRaw(grammars);
+			CompilationTask task = new CompilationTask();
+			task.AddInputRaw(grammars);
 			task.GrammarName = top;
-            task.CodeAccess = AccessModifier.Public;
-            task.Method = method;
-            task.Mode = CompilationMode.Assembly;
-            task.Namespace = genNamespace;
+			task.CodeAccess = AccessModifier.Public;
+			task.Method = method;
+			task.Mode = CompilationMode.Assembly;
+			task.Namespace = genNamespace;
 			task.OutputPrefix = prefix;
-            Hime.CentralDogma.Reporting.Report report = task.Execute();
-            Assert.AreEqual(0, report.ErrorCount, "Failed to compile the grammar");
-            Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
+			Hime.CentralDogma.Reporting.Report report = task.Execute();
+			Assert.AreEqual(0, report.ErrorCount, "Failed to compile the grammar");
+			Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
 
 			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
 			return assembly.GetDefaultParser(new StringReader(input));
 		}
-        
-        /// <summary>
-        /// Tests whether the given grammar parses the input as the expected AST
-        /// </summary>
-        /// <param name="grammars">Grammar content</param>
-        /// <param name="top">The top grammar to compile</param>
-        /// <param name="method">The parsing method to use</param>
-        /// <param name="input">The input text to parse</param>
-        /// <param name="expected">The expected AST</param>
+
+		/// <summary>
+		/// Tests whether the given grammar parses the input as the expected AST
+		/// </summary>
+		/// <param name="grammars">Grammar content</param>
+		/// <param name="top">The top grammar to compile</param>
+		/// <param name="method">The parsing method to use</param>
+		/// <param name="input">The input text to parse</param>
+		/// <param name="expected">The expected AST</param>
 		protected void ParsingMatches(string grammars, string top, ParsingMethod method, string input, string expected)
-        {
+		{
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
 			foreach (Error error in inputResult.Errors)
@@ -160,21 +159,21 @@ namespace Hime.Tests
 			ParseResult expectedResult = ParseTree(expected);
 			Assert.IsTrue(expectedResult.IsSuccess, "Failed to parse the expected tree");
 			Assert.AreEqual(0, expectedResult.Errors.Count, "Failed to parse the input");
-			
+
 			bool result = Compare(expectedResult.Root, inputResult.Root);
 			Assert.IsTrue(result, "AST from input does not match the expected AST");
-        }
+		}
 
 		/// <summary>
-        /// Tests whether the given grammar does not parse the input as the expected AST
-        /// </summary>
-        /// <param name="grammars">Grammar content</param>
-        /// <param name="top">The top grammar to compile</param>
-        /// <param name="method">The parsing method to use</param>
-        /// <param name="input">The input text to parse</param>
-        /// <param name="unexpected">The expected AST</param>
+		/// Tests whether the given grammar does not parse the input as the expected AST
+		/// </summary>
+		/// <param name="grammars">Grammar content</param>
+		/// <param name="top">The top grammar to compile</param>
+		/// <param name="method">The parsing method to use</param>
+		/// <param name="input">The input text to parse</param>
+		/// <param name="unexpected">The expected AST</param>
 		protected void ParsingNotMatches(string grammars, string top, ParsingMethod method, string input, string unexpected)
-        {
+		{
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
 			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
@@ -182,18 +181,18 @@ namespace Hime.Tests
 			ParseResult unexpectedResult = ParseTree(unexpected);
 			Assert.IsTrue(unexpectedResult.IsSuccess, "Failed to parse the expected tree");
 			Assert.AreEqual(0, unexpectedResult.Errors.Count, "Failed to parse the input");
-			
+
 			bool result = Compare(unexpectedResult.Root, inputResult.Root);
 			Assert.IsFalse(result, "AST from input matches the unexpected AST, should not");
-        }
+		}
 
 		/// <summary>
-        /// Tests whether the given grammar fails to parse the input as the expected AST
-        /// </summary>
-        /// <param name="grammars">Grammar content</param>
-        /// <param name="top">The top grammar to compile</param>
-        /// <param name="method">The parsing method to use</param>
-        /// <param name="input">The input text to parse</param>
+		/// Tests whether the given grammar fails to parse the input as the expected AST
+		/// </summary>
+		/// <param name="grammars">Grammar content</param>
+		/// <param name="top">The top grammar to compile</param>
+		/// <param name="method">The parsing method to use</param>
+		/// <param name="input">The input text to parse</param>
 		protected void ParsingFails(string grammars, string top, ParsingMethod method, string input)
 		{
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
