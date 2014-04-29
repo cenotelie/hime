@@ -4,154 +4,223 @@
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
 * of the License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General
 * Public License along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-
 using System;
-using System.Collections.Specialized;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
-    /// <summary>
-    /// Represents a Shared Packed Parse Forest as a graph of nodes
-    /// </summary>
-    class SPPF : ASTGraph
-    {
-        private const int initHistorySize = 8;
-        private const int initHistoryPartSize = 64;
-        
-        /// <summary>
-        /// Represents a generation of node in the current history
-        /// </summary>
-        private class HistoryPart
-        {
-            public int generation;  // The represented generation
-            public int[] data;      // The nodes at this generation
-            public int index;       // Index for inserting new nodes
+	/// <summary>
+	/// Represents a Shared Packed Parse Forest
+	/// </summary>
+	class SPPF
+	{
+		/// <summary>
+		/// The initial size of the history buffer
+		/// </summary>
+		private const int initHistorySize = 8;
+		/// <summary>
+		/// The initial size of the history parts' buffers
+		/// </summary>
+		private const int initHistoryPartSize = 64;
+		/// <summary>
+		/// The bias for estimating the size of the reduced sub-tree
+		/// </summary>
+		private const int estimationBias = 5;
 
-            public HistoryPart()
-            {
-                this.data = new int[initHistoryPartSize];
-                this.index = 0;
-            }
-        }
+		/// <summary>
+		/// Represents a generation of node in the current history
+		/// </summary>
+		private class HistoryPart
+		{
+			/// <summary>
+			/// The index of the represented GSS generation
+			/// </summary>
+			public int generation;
+			/// <summary>
+			/// The GSS labels in this part
+			/// </summary>
+			public GSSLabel[] data;
+			/// <summary>
+			/// The next available slot in the data
+			/// </summary>
+			public int next;
+			/// <summary>
+			/// Initializes a new instance
+			/// </summary>
+			public HistoryPart()
+			{
+				this.generation = 0;
+				this.data = new GSSLabel[initHistoryPartSize];
+				this.next = 0;
+			}
+		}
 
-        private HistoryPart[] history;
-        private int nextHP;
-        private bool hitHistory;
+		/// <summary>
+		/// Represents a factory of history parts
+		/// </summary>
+		private class HistoryPartFactory : Factory<HistoryPart>
+		{
+			/// <summary>
+			///  Creates a new object
+			/// </summary>
+			/// <param name="pool">The enclosing pool</param>
+			/// <returns>The created object</returns>
+			public HistoryPart CreateNew(Pool<HistoryPart> pool)
+			{
+				return new HistoryPart();
+			}
+		}
 
-        /// <summary>
-        /// Initializes this SPPF
-        /// </summary>
-        public SPPF(TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
-            : base(text, variables, virtuals)
-        {
-            this.history = new HistoryPart[initHistorySize];
-            this.nextHP = 0;
-            CreateNode(1, TypeToken, 0);
-        }
 
-        /// <summary>
-        /// Gets the node for the epsilon symbol
-        /// </summary>
-        public int Epsilon { get { return 0; } }
+		/// <summary>
+		/// The pool of single node sub-trees
+		/// </summary>
+		private Pool<SubTree> poolSingle;
+		/// <summary>
+		/// The pool of sub-tree with a capacity of 128 nodes
+		/// </summary>
+		private Pool<SubTree> pool128;
+		/// <summary>
+		/// The pool of sub-tree with a capacity of 1024 nodes
+		/// </summary>
+		private Pool<SubTree> pool1024;
+		/// <summary>
+		/// The pool of history parts
+		/// </summary>
+		private Pool<HistoryPart> poolHPs;
 
-        /// <summary>
-        /// Clears the current history
-        /// </summary>
-        public void ClearHistory()
-        {
-            nextHP = 0;
-        }
+		/// <summary>
+		/// The history
+		/// </summary>
+		private HistoryPart[] history;
+		/// <summary>
+		/// The next available slot for a history part
+		/// </summary>
+		private int nextHP;
 
-        /// <summary>
-        /// Gets whether the last call to resolve resulted in a history hit
-        /// </summary>
-        public bool HistoryHit { get { return hitHistory; } }
+		/// <summary>
+		/// Gets the epsilon GSS label
+		/// </summary>
+		public GSSLabel Epsilon { get { return new GSSLabel(); } }
 
-        /// <summary>
-        /// Resolves a SPPF node against the current history.
-        /// If a node is not found in the history, it will be created.
-        /// </summary>
-        /// <param name="generation">The identifier of the generation to look the node into</param>
-        /// <param name="id">The symbol's id associated to the node to look for</param>
-        /// <param name="index">The symbol's index associated to the node to look for</param>
-        /// <param name="action">The action applied on this node</param>
-        /// <returns>The resolved SPPF node</returns>
-        public int Resolve(int generation, int id, int index, TreeAction action)
-        {
-            // Sets the hit flag to false
-            hitHistory = false;
-            // Try to resolve against existing generations
-            for (int i = 0; i != nextHP; i++)
-                if (history[i].generation == generation)
-                    return Resolve(history[i], id, index, action);
-            
-            // The generation to look for does not exists
-            if (nextHP == history.Length)
-            {
-                // We are at the end of the history, extend it
-                HistoryPart[] temp = new HistoryPart[history.Length + initHistorySize];
-                Array.Copy(history, temp, history.Length);
-                history = temp;
-            }
-            // The next history part has not been created yet
-            if (history[nextHP] == null)
-                history[nextHP] = new HistoryPart();
-            // Setups the next history part
-            history[nextHP].generation = generation;
-            history[nextHP].index = 1;
-            
-            //  Create the result
-            int result = CreateNode(id, TypeVariable, index, action);
-            // Push it into the history part
-            history[nextHP].data[0] = result;
-            
-            nextHP++;
-            return result;
-        }
+		/// <summary>
+		/// Initializes this SPPF
+		/// </summary>
+		public SPPF()
+		{
+			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
+			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
+			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
+			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), initHistorySize);
+			this.history = new HistoryPart[initHistorySize];
+			this.nextHP = 0;
+		}
 
-        /// <summary>
-        /// Resolves a SPPf node against the given history part representing a generation
-        /// </summary>
-        /// <param name="part">The history part to look into</param>
-        /// <param name="id">The symbol's id associated to the node to look for</param>
-        /// <param name="index">The symbol's index associated to the node to look for</param>
-        /// <param name="action">The action applied on this node</param>
-        /// <returns>The resolved SPPF node</returns>
-        private int Resolve(HistoryPart part, int id, int index, TreeAction action)
-        {
-            // Look for the given symbol in the node at this generation
-            for (int i = 0; i != part.index; i++)
-            {
-                // If the symbol ID matches
-                if (nodes[part.data[i]].originalSID == id)
-                {
-                    // This is a hit
-                    hitHistory = true;
-                    return part.data[i];
-                }
-            }
-            if (part.index == part.data.Length)
-            {
-                int[] temp = new int[part.data.Length + initHistoryPartSize];
-                Array.Copy(part.data, temp, part.data.Length);
-                part.data = temp;
-            }
-            int result = CreateNode(id, TypeVariable, index, action);
-            part.data[part.index++] = result;
-            return result;
-        }
-    }
+		/// <summary>
+		/// Gets a sub-tree for a single node
+		/// </summary>
+		/// <returns>A sub-tree</returns>
+		public SubTree GetSingleNode()
+		{
+			return poolSingle.Acquire();
+		}
+
+		/// <summary>
+		/// Gets a pooled sub-tree with the given maximal size
+		/// </summary>
+		/// <param name="size">The size of the sub-tree</param>
+		/// <returns>A sub-tree of the required size</returns>
+		private SubTree GetSubTree(int size)
+		{
+			if (size <= 128)
+				return pool128.Acquire();
+			else if (size <= 1024)
+				return pool1024.Acquire();
+			else
+				return new SubTree(null, size);
+		}
+
+		/// <summary>
+		/// Gets the history part for the given GSS generation
+		/// </summary>
+		/// <param name="generation">The index of a GSS generation</param>
+		/// <returns>The corresponding history part, or <c>null</c></returns>
+		private HistoryPart GetHistoryPart(int generation)
+		{
+			for (int i = 0; i != nextHP; i++)
+				if (history[i].generation == generation)
+					return history[i];
+			return null;
+		}
+
+		/// <summary>
+		/// Clears the current history
+		/// </summary>
+		public void ClearHistory()
+		{
+			for (int i = 0; i != nextHP; i++)
+				poolHPs.Return(history[i]);
+			nextHP = 0;
+		}
+
+		/// <summary>
+		/// Gets the GSS label already in history for the given GSS generation and symbol
+		/// </summary>
+		/// <param name="generation">The index of a GSS generation</param>
+		/// <param name="symbol">A symbol to look for</param>
+		/// <returns>The existing GSS label, or the epsilon label</returns>
+		public GSSLabel GetLabelFor(int generation, SymbolRef symbol)
+		{
+			HistoryPart hp = GetHistoryPart(generation);
+			if (hp == null)
+				return new GSSLabel();
+			for (int i = 0; i != hp.next; i++)
+				if (hp.data[i].Original == symbol)
+					return hp.data[i];
+			return new GSSLabel();
+		}
+
+		/// <summary>
+		/// Creates a new label in the history
+		/// </summary>
+		/// <param name="generation">The index of a GSS generation</param>
+		/// <param name="symbol">The sub-tree root symbol</param>
+		/// <param name="action">The action applied on the sub-tree root</param>
+		/// <param name="length">The size of the children</param>
+		public GSSLabel NewLabelFor(int generation, SymbolRef symbol, TreeAction action, int length)
+		{
+			HistoryPart hp = GetHistoryPart(generation);
+			if (hp == null)
+			{
+				hp = poolHPs.Acquire();
+				hp.generation = generation;
+				hp.next = 0;
+				if (history.Length == nextHP)
+				{
+					HistoryPart[] temp = new HistoryPart[history.Length + initHistorySize];
+					Array.Copy(history, temp, history.Length);
+					history = temp;
+				}
+				history[nextHP++] = hp;
+			}
+			SubTree st = GetSubTree(length);
+			st.SetupRoot(symbol, action);
+			GSSLabel result = new GSSLabel(st);
+			hp.data[hp.next++] = result;
+			return result;
+		}
+	}
 }

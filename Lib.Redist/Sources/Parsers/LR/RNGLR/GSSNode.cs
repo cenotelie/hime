@@ -39,9 +39,13 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private int state;
 		/// <summary>
-		/// The buffer of edges starting from this node
+		/// The targets of edges from this node
 		/// </summary>
-		private GSSEdge[] edges;
+		private GSSNode[] edgesTo;
+		/// <summary>
+		/// The labels on edges from this node
+		/// </summary>
+		private GSSLabel[] edgesLabel;
 		/// <summary>
 		/// The current number of edges
 		/// </summary>
@@ -65,7 +69,8 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public GSSNode()
 		{
-			this.edges = new GSSEdge[initEdgesCount];
+			this.edgesTo = new GSSNode[initEdgesCount];
+			this.edgesLabel = new GSSLabel[initEdgesCount];
 		}
 
 		/// <summary>
@@ -85,15 +90,19 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="target">The edge's target</param>
 		/// <param name="label">The edge's label</param>
-		public void AddEdge(GSSNode target, int label)
+		public void AddEdge(GSSNode target, GSSLabel label)
 		{
-			if (edgesCount == edges.Length)
+			if (edgesCount == edgesTo.Length)
 			{
-				GSSEdge[] temp = new GSSEdge[edges.Length + initEdgesCount];
-				System.Array.Copy(edges, temp, edgesCount);
-				edges = temp;
+				GSSNode[] temp = new GSSNode[edgesTo.Length + initEdgesCount];
+				System.Array.Copy(edgesTo, temp, edgesCount);
+				edgesTo = temp;
+				GSSLabel[] temp2 = new GSSLabel[edgesLabel.Length + initEdgesCount];
+				System.Array.Copy(edgesLabel, temp2, edgesCount);
+				edgesLabel = temp2;
 			}
-			edges[edgesCount] = new GSSEdge(target, label);
+			edgesTo[edgesCount] = target;
+			edgesLabel[edgesCount] = label;
 			target.generation.Mark(target);
 			edgesCount++;
 		}
@@ -106,19 +115,29 @@ namespace Hime.Redist.Parsers
 		public bool HasEdgeTo(GSSNode node)
 		{
 			for (int i = 0; i != edgesCount; i++)
-				if (edges[i].To == node)
+				if (edgesTo[i] == node)
 					return true;
 			return false;
 		}
 
 		/// <summary>
-		/// Gets the edge at the given index
+		/// Gets the target of the edge at the given index
 		/// </summary>
 		/// <param name="index">Edge's index</param>
-		/// <returns>The corresponding edge</returns>
-		public GSSEdge GetEdge(int index)
+		/// <returns>The edge's target</returns>
+		public GSSNode GetEdgeTarget(int index)
 		{
-			return edges[index];
+			return edgesTo[index];
+		}
+
+		/// <summary>
+		/// Gets the label of the edge at the given index
+		/// </summary>
+		/// <param name="index">Edge's index</param>
+		/// <returns>The edge's label</returns>
+		public GSSLabel GetEdgeLabel(int index)
+		{
+			return edgesLabel[index];
 		}
 	}
 }

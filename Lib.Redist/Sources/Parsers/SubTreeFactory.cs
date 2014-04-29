@@ -17,41 +17,38 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
-	/// Represents an edge in a GSS
+	/// Represents factories of SubTrees
 	/// </summary>
-	struct GSSEdge
+	class SubTreeFactory : Factory<SubTree>
 	{
 		/// <summary>
-		/// The edge's target
+		/// The capacity of the SubTrees produced by this factory
 		/// </summary>
-		private GSSNode to;
-		/// <summary>
-		/// The edge's label
-		/// </summary>
-		private int label;
+		private int capacity;
 
 		/// <summary>
-		/// Gets the target node of this edge
+		/// Initializes this SubTree factory
 		/// </summary>
-		public GSSNode To { get { return to; } }
-		/// <summary>
-		/// Gets the label attached to this edge
-		/// </summary>
-		public int Label { get { return label; } }
-
-		/// <summary>
-		/// Initializes this edge
-		/// </summary>
-		/// <param name="node">The edge's target</param>
-		/// <param name="label">The edge's label</param>
-		public GSSEdge(GSSNode node, int label)
+		/// <param name="capacity">The capacity of the produced SubTrees</param>
+		public SubTreeFactory(int capacity)
 		{
-			this.to = node;
-			this.label = label;
+			this.capacity = capacity;
+		}
+
+		/// <summary>
+		///  Creates a new object
+		/// </summary>
+		/// <param name="pool">The enclosing pool</param>
+		/// <returns>The created object</returns>
+		public SubTree CreateNew(Pool<SubTree> pool)
+		{
+			return new SubTree(pool, capacity);
 		}
 	}
 }

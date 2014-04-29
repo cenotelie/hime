@@ -28,36 +28,6 @@ namespace Hime.Redist.Parsers
 	class LRkASTBuilder : SemanticBody
 	{
 		/// <summary>
-		/// Represents factories of SubTrees
-		/// </summary>
-		private class SubTreeFactory : Factory<SubTree>
-		{
-			/// <summary>
-			/// The capacity of the SubTrees produced by this factory
-			/// </summary>
-			private int capacity;
-
-			/// <summary>
-			/// Initializes this SubTree factory
-			/// </summary>
-			/// <param name="capacity">The capacity of the produced SubTrees</param>
-			public SubTreeFactory(int capacity)
-			{
-				this.capacity = capacity;
-			}
-
-			/// <summary>
-			///  Creates a new object
-			/// </summary>
-			/// <param name="pool">The enclosing pool</param>
-			/// <returns>The created object</returns>
-			public SubTree CreateNew(Pool<SubTree> pool)
-			{
-				return new SubTree(pool, capacity);
-			}
-		}
-
-		/// <summary>
 		/// The maximum size of the reduction handle
 		/// </summary>
 		private const int handleSize = 1024;
@@ -128,8 +98,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">Index of the symbol</param>
 		/// <returns>The symbol at the given index</returns>
-		public Symbol this[int index] { get { return result.GetSymbolFor(cache.GetLabelAt(handle[index])); }
-		}
+		public Symbol this[int index] { get { return result.GetSymbolFor(cache.GetLabelAt(handle[index])); } }
 
 		/// <summary>
 		/// Gets the length of this body

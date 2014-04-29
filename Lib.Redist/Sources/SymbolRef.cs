@@ -49,5 +49,46 @@ namespace Hime.Redist
 		{
 			this.data = (((uint)type) << 30) | (uint)index;
 		}
+
+		public static bool operator==(SymbolRef left, SymbolRef right)
+		{
+			return (left.data == right.data);
+		}
+
+		public static bool operator!=(SymbolRef left, SymbolRef right)
+		{
+			return (left.data != right.data);
+		}
+
+		/// <summary>
+		/// Serves as a hash function for a <see cref="Hime.Redist.SymbolRef"/> object.
+		/// </summary>
+		/// <returns>
+		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
+		/// </returns>
+		public override int GetHashCode()
+		{
+			return (int)data;
+		}
+
+		/// <summary>
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.Redist.SymbolRef"/>.
+		/// </summary>
+		/// <param name='obj'>
+		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.Redist.SymbolRef"/>.
+		/// </param>
+		/// <returns>
+		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
+		/// <see cref="Hime.Redist.SymbolRef"/>; otherwise, <c>false</c>.
+		/// </returns>
+		public override bool Equals(object obj)
+		{
+			if (obj is SymbolRef)
+			{
+				SymbolRef temp = (SymbolRef)obj;
+				return (this.data == temp.data);
+			}
+			return false;
+		}
 	}
 }

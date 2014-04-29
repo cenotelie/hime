@@ -37,7 +37,7 @@ namespace Hime.Redist.Parsers
 			/// </summary>
 			private int capacity;
 			/// <summary>
-			/// Initializes a new instance of the <see cref="Hime.Redist.Parsers.GSS+GSSPathFactory"/> class.
+			/// Initializes a new instance of the factory
 			/// </summary>
 			/// <param name="capacity">The capacity of the GSS paths produced by this factory</param>
 			public GSSPathFactory(int capacity)
@@ -215,23 +215,20 @@ namespace Hime.Redist.Parsers
 					// Look for new additional paths
 					for (int j = 1; j != last.EdgesCount; j++)
 					{
-						GSSEdge edge = last.GetEdge(j);
 						// Extend the list of paths if necessary
 						if (next == paths.Length)
 							GrowBuffer();
 						// Clone and extend the new path
-						paths[next] = AcquirePath(edge.To, length);
+						paths[next] = AcquirePath(last.GetEdgeTarget(j), length);
 						paths[next].CopyLabelsFrom(paths[p], i);
-						paths[next][i] = edge.Label;
+						paths[next][i] = last.GetEdgeLabel(j);
 						// Go to next insert
 						next++;
 					}
-					// Get the edge at index 0
-					GSSEdge edge0 = last.GetEdge(0);
 					// Continue the current path
 					paths[m] = paths[p];
-					paths[m].Last = edge0.To;
-					paths[m][i] = edge0.Label;
+					paths[m].Last = last.GetEdgeTarget(0);
+					paths[m][i] = last.GetEdgeLabel(0);
 					// goto next
 					m++;
 				}

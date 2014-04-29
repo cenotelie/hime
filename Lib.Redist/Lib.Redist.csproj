@@ -64,7 +64,6 @@
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
     <Compile Include="Sources\ParseResult.cs" />
-    <Compile Include="Sources\Parsers\ASTGraph.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPF.cs" />
     <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />
     <Compile Include="Sources\Semantics.cs" />
@@ -85,7 +84,6 @@
     <Compile Include="Sources\Parsers\LR\LROpCodeValues.cs" />
     <Compile Include="Sources\TokenizedText.cs" />
     <Compile Include="Sources\TreeAction.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSNode.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPath.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
@@ -113,6 +111,8 @@
     <Compile Include="Sources\SymbolRef.cs" />
     <Compile Include="Sources\Utils\Blob.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCodeBase.cs" />
+    <Compile Include="Sources\Parsers\LR\RNGLR\GSSLabel.cs" />
+    <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

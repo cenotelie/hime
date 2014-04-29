@@ -25,6 +25,7 @@ namespace Hime.Redist.Utils
 	/// <summary>
 	/// Represents a blob of binary data that can be accessed as an array of items T
 	/// </summary>
+	/// <typeparam name="T">The type of the stored items</typeparam>
 	[StructLayout(LayoutKind.Explicit)]
 	class Blob<T>
 	{
