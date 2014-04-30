@@ -43,17 +43,52 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             List<ushort> nullables = new List<ushort>();
             foreach (CFVariable var in grammar.Variables)
             {
-                ushort nullIndex = 0xFFFF;
-                foreach (CFRule rule in var.CFRules)
+				List<KeyValuePair<Rule, int>> temp = new List<KeyValuePair<Rule, int>>();
+				foreach (CFRule rule in var.CFRules)
                 {
-                    rules.Add(new KeyValuePair<Rule, int>(rule, rule.CFBody.GetChoiceAt(0).Length));
-                    if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
-                        nullIndex = (ushort)(rules.Count - 1);
+					// Add normal rule
+                    temp.Add(new KeyValuePair<Rule, int>(rule, rule.CFBody.GetChoiceAt(0).Length));
+					// Look for right-nullable choices
                     for (int i = 1; i < rule.CFBody.GetChoiceAt(0).Length; i++)
                         if (rule.CFBody.GetChoiceAt(i).Firsts.Contains(Epsilon.Instance))
-                            rules.Add(new KeyValuePair<Rule, int>(rule, i));
+                            temp.Add(new KeyValuePair<Rule, int>(rule, i));
                 }
-                nullables.Add(nullIndex);
+				// nullable variable?
+				if (var.Firsts.Contains(Epsilon.Instance))
+				{
+					ushort nullIndex = 0xFFFF;
+					// look for a nullable rule
+					for (int i=0; i!=temp.Count; i++)
+					{
+						if (temp[i].Value == 0)
+						{
+							// Found a 0-length reduction rule => perfect
+							nullIndex = (ushort)(rules.Count + i);
+							break;
+						}
+					}
+					if (nullIndex == 0xFFFF)
+					{
+						// no 0-length reduction rule => create a new 0-length reduction with a nullable rule
+						for (int i=0; i!=temp.Count; i++)
+						{
+							CFRule rule = temp[i].Key as CFRule;
+							if (rule.CFBody.GetChoiceAt(0).Firsts.Contains(Epsilon.Instance))
+							{
+								temp.Add(new KeyValuePair<Rule, int>(rule, 0));
+								nullIndex = (ushort)(rules.Count + temp.Count - 1);
+								break;
+							}
+						}
+					}
+					nullables.Add(nullIndex);
+				}
+				else
+				{
+					nullables.Add(0xFFFF);
+				}
+				// commit
+				rules.AddRange(temp);
             }
 
             uint total = 0;

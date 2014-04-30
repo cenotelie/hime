@@ -153,17 +153,23 @@ namespace Hime.Redist.Parsers
 				for (int i = 0; i != varCount; i++)
 				{
 					List<int> dep = dependencies[i];
-					if (dep != null && dep.Count == 0)
+					if (dep != null)
 					{
-						LRProduction prod = parserAutomaton.GetNullableProduction(i);
-						GSSLabel label = BuildSPPF(0, prod, sppf.Epsilon, null);
-						this.nullables[i] = label.Tree;
-						dependencies[i] = null;
-						solved++;
-					}
-					else if (dep != null)
-					{
-						remaining++;
+						bool ok = true;
+						foreach (int r in dep)
+							ok = ok && (dependencies[r] == null);
+						if (ok)
+						{
+							LRProduction prod = parserAutomaton.GetNullableProduction(i);
+							GSSLabel label = BuildSPPF(0, prod, sppf.Epsilon, null);
+							this.nullables[i] = label.Tree;
+							dependencies[i] = null;
+							solved++;
+						}
+						else
+						{
+							remaining++;
+						}
 					}
 				}
 				if (solved == 0 && remaining > 0)
@@ -331,7 +337,7 @@ namespace Hime.Redist.Parsers
 				{
 					// Generation is empty !
 					OnUnexpectedToken(Ui, oldtoken);
-					return null;
+					return new ParseResult(allErrors, lexer.Output);
 				}
 				Ui = Uj;
 			}
