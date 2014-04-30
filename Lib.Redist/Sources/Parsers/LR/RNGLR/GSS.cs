@@ -239,7 +239,9 @@ namespace Hime.Redist.Parsers
 		public int CreateNode(int state)
 		{
 			nodes.Add(state);
-			genNodes[generation].Count++;
+			Gen data = genNodes[generation];
+			data.Count++;
+			genNodes[generation] = data;
 			return nodes.Size - 1;
 		}
 
@@ -253,7 +255,9 @@ namespace Hime.Redist.Parsers
 		{
 			edges.Add(new Edge(from, to));
 			edgeData.Add(label);
-			genEdges[generation].Count++;
+			Gen data = genEdges[generation];
+			data.Count++;
+			genEdges[generation] = data;
 		}
 
 		/// <summary>
@@ -287,7 +291,7 @@ namespace Hime.Redist.Parsers
 			for (int i=generation; i!=-1; i--)
 			{
 				Gen gen = genNodes[i];
-				if (gen.Start <= node && gen.Start + gen.Count < node)
+				if (node >= gen.Start && node < gen.Start + gen.Count)
 					return i;
 			}
 			// should node happen

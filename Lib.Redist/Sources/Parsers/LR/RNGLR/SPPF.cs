@@ -209,7 +209,7 @@ namespace Hime.Redist.Parsers
 		{
 			SubTree sub = null;
 			if (popCount < length - 1)
-				sub = path[length - 1 - popCount].Tree;
+				sub = path[length - 2 - popCount].Tree;
 			else
 				sub = first.Tree;
 
