@@ -125,15 +125,19 @@ namespace Hime.Redist.Lexer
 				this.index = -1;
 			}
 
-			public Token Current {
-				get {
+			public Token Current
+			{
+				get
+				{
 					Cell cell = text.cells[index];
 					return new Token(text.terminals[cell.terminal].ID, index);
 				}
 			}
 
-			object System.Collections.IEnumerator.Current {
-				get {
+			object System.Collections.IEnumerator.Current
+			{
+				get
+				{
 					Cell cell = text.cells[index];
 					return new Token(text.terminals[cell.terminal].ID, index);
 				}
@@ -168,8 +172,10 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="index">An index</param>
 		/// <returns>The token</returns>
-		public Token this[int index] {
-			get {
+		public Token this[int index]
+		{
+			get
+			{
 				Cell cell = cells[index];
 				Symbol terminal = terminals[cell.terminal];
 				return new Token(terminal.ID, index);
