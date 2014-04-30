@@ -46,13 +46,13 @@ namespace Hime.Benchmark
 			this.input = "Perf.gram";
 			this.output = "result.txt";
 			this.sampleFactor = 600;
-			this.expCount = 50;
+			this.expCount = 5;
 			this.rebuildInput = true;
 			this.rebuildParsers = true;
 			this.doStats = false;
-			this.doLexer = false;
+			this.doLexer = true;
 			this.doParserLALR = true;
-			this.doParserRNGLR = false;
+			this.doParserRNGLR = true;
 		}
 
 		public void Run()
