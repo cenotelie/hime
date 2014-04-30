@@ -42,7 +42,7 @@ namespace Hime.Demo.Tasks
 			CompilationTask task = new CompilationTask();
 			task.Mode = CompilationMode.Assembly;
 			task.AddInputRaw(stream);
-			task.Namespace = "Hime.Benchmark.Generated";
+			task.Namespace = "Hime.Demo.Generated";
 			task.GrammarName = "FileCentralDogma";
 			task.CodeAccess = AccessModifier.Public;
 			task.Method = ParsingMethod.LALR1;
