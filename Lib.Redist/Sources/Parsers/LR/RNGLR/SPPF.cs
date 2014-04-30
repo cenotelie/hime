@@ -25,7 +25,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a Shared Packed Parse Forest
 	/// </summary>
-	class SPPF : SemanticBody
+	class SPPF : LRkASTBuilder
 	{
 		/// <summary>
 		/// The initial size of the history buffer
@@ -35,14 +35,6 @@ namespace Hime.Redist.Parsers
 		/// The initial size of the history parts' buffers
 		/// </summary>
 		private const int initHistoryPartSize = 64;
-		/// <summary>
-		/// The maximum size of the reduction handle
-		/// </summary>
-		private const int handleSize = 1024;
-		/// <summary>
-		/// The bias for estimating the size of the reduced sub-tree
-		/// </summary>
-		private const int estimationBias = 5;
 
 		/// <summary>
 		/// Represents a generation of node in the current history
@@ -50,13 +42,13 @@ namespace Hime.Redist.Parsers
 		private class HistoryPart
 		{
 			/// <summary>
-			/// The index of the represented GSS generation
-			/// </summary>
-			public int generation;
-			/// <summary>
 			/// The GSS labels in this part
 			/// </summary>
 			public GSSLabel[] data;
+			/// <summary>
+			/// The index of the represented GSS generation
+			/// </summary>
+			public int generation;
 			/// <summary>
 			/// The next available slot in the data
 			/// </summary>
@@ -88,24 +80,10 @@ namespace Hime.Redist.Parsers
 			}
 		}
 
-
-		/// <summary>
-		/// The pool of single node sub-trees
-		/// </summary>
-		private Pool<SubTree> poolSingle;
-		/// <summary>
-		/// The pool of sub-tree with a capacity of 128 nodes
-		/// </summary>
-		private Pool<SubTree> pool128;
-		/// <summary>
-		/// The pool of sub-tree with a capacity of 1024 nodes
-		/// </summary>
-		private Pool<SubTree> pool1024;
 		/// <summary>
 		/// The pool of history parts
 		/// </summary>
 		private Pool<HistoryPart> poolHPs;
-
 		/// <summary>
 		/// The history
 		/// </summary>
@@ -127,64 +105,22 @@ namespace Hime.Redist.Parsers
 		/// The reduction length
 		/// </summary>
 		private int length;
-		/// <summary>
-		/// The number of items popped from the stack
-		/// </summary>
-		private int popCount;
-		/// <summary>
-		/// The sub-tree build-up cache
-		/// </summary>
-		private SubTree cache;
-		/// <summary>
-		/// The new available node in the current cache
-		/// </summary>
-		private int cacheNext;
-		/// <summary>
-		/// The reduction handle represented as the indices of the sub-trees in the cache
-		/// </summary>
-		private int[] handle;
-		/// <summary>
-		/// The index of the next available slot in the handle
-		/// </summary>
-		private int handleNext;
-
-		/// <summary>
-		/// The AST being built
-		/// </summary>
-		private SimpleAST result;
 
 		/// <summary>
 		/// Gets the epsilon GSS label
 		/// </summary>
 		public GSSLabel Epsilon { get { return new GSSLabel(); } }
 
-		#region Implementation of SemanticBody
-		/// <summary>
-		/// Gets the symbol at the i-th index
-		/// </summary>
-		/// <param name="index">Index of the symbol</param>
-		/// <returns>The symbol at the given index</returns>
-		public Symbol this[int index] { get { return result.GetSymbolFor(cache.GetLabelAt(handle[index])); } }
-
-		/// <summary>
-		/// Gets the length of this body
-		/// </summary>
-		public int Length { get { return handleNext; } }
-		#endregion
 
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
 		public SPPF(int stackSize, TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
+			: base(stackSize, text, variables, virtuals)
 		{
-			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
-			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
-			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
 			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), initHistorySize);
 			this.history = new HistoryPart[initHistorySize];
 			this.nextHP = 0;
-			this.handle = new int[handleSize];
-			this.result = new SimpleAST(text, variables, virtuals);
 		}
 
 		/// <summary>
@@ -194,21 +130,6 @@ namespace Hime.Redist.Parsers
 		public SubTree GetSingleNode()
 		{
 			return poolSingle.Acquire();
-		}
-
-		/// <summary>
-		/// Gets a pooled sub-tree with the given maximal size
-		/// </summary>
-		/// <param name="size">The size of the sub-tree</param>
-		/// <returns>A sub-tree of the required size</returns>
-		private SubTree GetSubTree(int size)
-		{
-			if (size <= 128)
-				return pool128.Acquire();
-			else if (size <= 1024)
-				return pool1024.Acquire();
-			else
-				return new SubTree(null, size);
 		}
 
 		/// <summary>
@@ -284,7 +205,7 @@ namespace Hime.Redist.Parsers
 		/// During a redution, pops the top symbol from the stack and gives it a tree action
 		/// </summary>
 		/// <param name="action">The tree action to apply to the symbol</param>
-		public void ReductionPop(TreeAction action)
+		public new void ReductionPop(TreeAction action)
 		{
 			SubTree sub = null;
 			if (popCount < length - 1)
@@ -292,57 +213,9 @@ namespace Hime.Redist.Parsers
 			else
 				sub = first.Tree;
 
-			ReductionInsertSub(sub, action);
+			ReductionAddSub(sub, action);
 			sub.Free();
 			popCount++;
-		}
-
-		/// <summary>
-		/// During a reduction, insert the given sub-tree
-		/// </summary>
-		/// <param name="sub">The sub-tree</param>
-		/// <param name="action">The tree action applied onto the symbol</param>
-		private void ReductionInsertSub(SubTree sub, TreeAction action)
-		{
-			if (sub.GetActionAt(0) == TreeAction.Replace)
-			{
-				// copy the children to the cache
-				sub.CopyChildrenTo(cache, cacheNext);
-				// setup the handle
-				int index = 1;
-				for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
-				{
-					int size = sub.GetChildrenCountAt(index) + 1;
-					handle[handleNext++] = cacheNext;
-					cacheNext += size;
-					index += size;
-				}
-			}
-			else if (action == TreeAction.Drop)
-			{
-			}
-			else
-			{
-				if (action != TreeAction.None)
-					sub.SetActionAt(0, action);
-				// copy the complete sub-tree to the cache
-				sub.CopyTo(cache, cacheNext);
-				handle[handleNext++] = cacheNext;
-				cacheNext += sub.GetChildrenCountAt(0) + 1;
-			}
-		}
-
-		/// <summary>
-		/// During a reduction, inserts a virtual symbol
-		/// </summary>
-		/// <param name="index">The virtual symbol's index</param>
-		/// <param name="action">The tree action applied onto the symbol</param>
-		public void ReductionAddVirtual(int index, TreeAction action)
-		{
-			if (action == TreeAction.Drop)
-				return; // why would you do this?
-			cache.SetAt(cacheNext, new SymbolRef(SymbolType.Virtual, index), action);
-			handle[handleNext++] = cacheNext++;
 		}
 
 		/// <summary>
@@ -352,7 +225,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action applied onto the symbol</param>
 		public void ReductionAddNullable(SubTree nullable, TreeAction action)
 		{
-			ReductionInsertSub(nullable, action);
+			ReductionAddSub(nullable, action);
 		}
 
 		/// <summary>
@@ -371,6 +244,7 @@ namespace Hime.Redist.Parsers
 			{
 				ReduceTree();
 			}
+
 			HistoryPart hp = GetHistoryPart(generation);
 			if (hp == null)
 			{
@@ -391,48 +265,15 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Applies the promotion tree actions to the cache and commits to the final AST
+		/// Finalizes the parse tree and returns it
 		/// </summary>
-		private void ReduceTree()
+		/// <param name="root">The root's sub-tree</param>
+		/// <returns>The final parse tree</returns>
+		public AST GetTree(SubTree root)
 		{
-			// promotion data
-			bool promotion = false;
-			int insertion = 1;
-			for (int i = 0; i != handleNext; i++)
-			{
-				switch (cache.GetActionAt(handle[i]))
-				{
-					case TreeAction.Promote:
-						if (promotion)
-						{
-							// This is not the first promotion
-							// Commit the previously promoted node's children
-							cache.SetChildrenCountAt(0, insertion - 1);
-							cache.CommitChildrenOf(0, result);
-							// Reput the previously promoted node in the cache
-							cache.Move(0, 1);
-							insertion = 2;
-						}
-						promotion = true;
-                        // Save the new promoted node
-						cache.Move(handle[i], 0);
-                        // Repack the children on the left if any
-						int nb = cache.GetChildrenCountAt(0);
-						cache.MoveRange(handle[i] + 1, insertion, nb);
-						insertion += nb;
-						break;
-					default:
-                        // Commit the children if any
-						cache.CommitChildrenOf(handle[i], result);
-                        // Repack the sub-root on the left
-						if (insertion != handle[i])
-							cache.Move(handle[i], insertion);
-						insertion++;
-						break;
-				}
-			}
-			// finalize the sub-tree data
-			cache.SetChildrenCountAt(0, insertion - 1);
+			// Commit the remaining sub-tree
+			root.Commit(result);
+			return result;
 		}
 	}
 }

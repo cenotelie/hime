@@ -30,67 +30,67 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The maximum size of the reduction handle
 		/// </summary>
-		private const int handleSize = 1024;
+		protected const int handleSize = 1024;
 
 		/// <summary>
 		/// The bias for estimating the size of the reduced sub-tree
 		/// </summary>
-		private const int estimationBias = 5;
+		protected const int estimationBias = 5;
 
 		/// <summary>
 		/// The pool of single node sub-trees
 		/// </summary>
-		private Pool<SubTree> poolSingle;
+		protected Pool<SubTree> poolSingle;
 
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 128 nodes
 		/// </summary>
-		private Pool<SubTree> pool128;
+		protected Pool<SubTree> pool128;
 
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 1024 nodes
 		/// </summary>
-		private Pool<SubTree> pool1024;
+		protected Pool<SubTree> pool1024;
 
 		/// <summary>
 		/// The stack of semantic objects
 		/// </summary>
-		private SubTree[] stack;
+		protected SubTree[] stack;
 
 		/// <summary>
 		/// Index of the available cell on top of the stack's head
 		/// </summary>
-		private int stackNext;
+		protected int stackNext;
 
 		/// <summary>
 		/// The sub-tree build-up cache
 		/// </summary>
-		private SubTree cache;
+		protected SubTree cache;
 
 		/// <summary>
 		/// The new available node in the current cache
 		/// </summary>
-		private int cacheNext;
+		protected int cacheNext;
 
 		/// <summary>
 		/// The number of items popped from the stack
 		/// </summary>
-		private int popCount;
+		protected int popCount;
 
 		/// <summary>
 		/// The reduction handle represented as the indices of the sub-trees in the cache
 		/// </summary>
-		private int[] handle;
+		protected int[] handle;
 
 		/// <summary>
 		/// The index of the next available slot in the handle
 		/// </summary>
-		private int handleNext;
+		protected int handleNext;
 
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		private SimpleAST result;
+		protected SimpleAST result;
 
 		#region Implementation of SemanticBody
 		/// <summary>
@@ -158,7 +158,7 @@ namespace Hime.Redist.Parsers
 		/// Gets a pooled sub-tree with the given maximal size
 		/// </summary>
 		/// <param name="size">The size of the sub-tree</param>
-		private SubTree GetSubTree(int size)
+		protected SubTree GetSubTree(int size)
 		{
 			if (size <= 128)
 				return pool128.Acquire();
@@ -169,12 +169,12 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// During a redution, pops the top symbol from the stack and gives it a tree action
+		/// During a reduction, insert the given sub-tree
 		/// </summary>
-		/// <param name="action">The tree action to apply to the symbol</param>
-		public void ReductionPop(TreeAction action)
+		/// <param name="sub">The sub-tree</param>
+		/// <param name="action">The tree action applied onto the symbol</param>
+		protected void ReductionAddSub(SubTree sub, TreeAction action)
 		{
-			SubTree sub = stack[stackNext + popCount];
 			if (sub.GetActionAt(0) == TreeAction.Replace)
 			{
 				// copy the children to the cache
@@ -188,12 +188,9 @@ namespace Hime.Redist.Parsers
 					cacheNext += size;
 					index += size;
 				}
-				sub.Free();
 			}
 			else if (action == TreeAction.Drop)
-			{
-				sub.Free();
-			}
+			{ }
 			else
 			{
 				if (action != TreeAction.None)
@@ -202,8 +199,18 @@ namespace Hime.Redist.Parsers
 				sub.CopyTo(cache, cacheNext);
 				handle[handleNext++] = cacheNext;
 				cacheNext += sub.GetChildrenCountAt(0) + 1;
-				sub.Free();
 			}
+		}
+
+		/// <summary>
+		/// During a redution, pops the top symbol from the stack and gives it a tree action
+		/// </summary>
+		/// <param name="action">The tree action to apply to the symbol</param>
+		public void ReductionPop(TreeAction action)
+		{
+			SubTree sub = stack[stackNext + popCount];
+			ReductionAddSub(sub, action);
+			sub.Free();
 			popCount++;
 		}
 
@@ -240,7 +247,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Applies the promotion tree actions to the cache and commits to the final AST
 		/// </summary>
-		private void ReduceTree()
+		protected void ReduceTree()
 		{
 			// promotion data
 			bool promotion = false;

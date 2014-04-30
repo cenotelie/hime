@@ -131,70 +131,72 @@ namespace Hime.Redist.Parsers
 			this.parserAutomaton = automaton;
 			this.gss = new GSS();
 			this.sppf = new SPPF(maxStackSize, lexer.Output, parserVariables, parserVirtuals);
-			//BuildNullables();
+			BuildNullables(variables.Length);
+			this.sppf.ClearHistory();
 		}
 
-		/*private void BuildNullables()
+		/// <summary>
+		/// Builds the constant sub-trees of nullable variables
+		/// </summary>
+		/// <param name="varCount">The total number of variables</param>
+		private void BuildNullables(int varCount)
 		{
-			this.nullables = new SubTree[parserAutomaton.Nullables.Count];
-			List<int>[] dependencies = BuildNullableDependencies();
-			// Build nullables without dependencies
-			for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
+			this.nullables = new SubTree[varCount];
+			// Get the dependency table
+			List<int>[] dependencies = BuildNullableDependencies(varCount);
+			// Solve and build
+			int remaining = 1;
+			while (remaining > 0)
 			{
-				List<int> dep = dependencies[i];
-				if (dep != null && dep.Count == 0)
+				remaining = 0;
+				int solved = 0;
+				for (int i = 0; i != varCount; i++)
 				{
-					this.nullables[i] = BuildNullable(parserAutomaton.GetProduction(parserAutomaton.Nullables[i]));
-					dependencies[i] = null;
+					List<int> dep = dependencies[i];
+					if (dep != null && dep.Count == 0)
+					{
+						LRProduction prod = parserAutomaton.GetNullableProduction(i);
+						GSSLabel label = BuildSPPF(0, prod, sppf.Epsilon, null);
+						this.nullables[i] = label.Tree;
+						dependencies[i] = null;
+						solved++;
+					}
+					else if (dep != null)
+					{
+						remaining++;
+					}
+				}
+				if (solved == 0 && remaining > 0)
+				{
+					// There is dependency cycle ...
+					// That should not be possible ...
+					throw new Exception("Failed to initialize the parser, found a cycle in the nullable variables");
 				}
 			}
 		}
 
-		private SubTree BuildNullable(LRProduction production)
+		/// <summary>
+		/// Builds the dependency table between nullable variables
+		/// </summary>
+		/// <param name="varCount">The total number of variables</param>
+		/// <returns>The dependency table</returns>
+		private List<int>[] BuildNullableDependencies(int varCount)
 		{
-			int size = GetNullableSize(production);
-			SubTree result = new SubTree(null, size);
-			result.SetupRoot(new SymbolRef(SymbolType.Variable, production.Head), production.HeadAction);
-			for (int i = 0; i != production.BytecodeLength; i++)
+			List<int>[] result = new List<int>[varCount];
+			for (int i = 0; i != varCount; i++)
 			{
-				LROpCode op = production[i];
-				switch (op.Base)
-				{
-					case LROpCodeBase.SemanticAction:
-					{
-						i++;
-						break;
-					}
-					case LROpCodeBase.AddVirtual:
-					{
-						i++;
-						break;
-					}
-					case LROpCodeBase.AddNullVariable:
-					{
-						i++;
-						break;
-					}
-				}
-			}
-			return result;
-		}
-
-		private List<int>[] BuildNullableDependencies()
-		{
-			List<int>[] result = new List<int>[parserAutomaton.Nullables.Count];
-			for (int i = 0; i != parserAutomaton.Nullables.Count; i++)
-			{
-				ushort index = parserAutomaton.Nullables[i];
-				if (index != 0xFFFF)
-				{
-					LRProduction prod = parserAutomaton.GetProduction(index);
+				LRProduction prod = parserAutomaton.GetNullableProduction(i);
+				if (prod != null)
 					result[i] = GetNullableDependencies(prod);
-				}
 			}
 			return result;
 		}
 
+		/// <summary>
+		/// Gets the dependencies on nullable variables
+		/// </summary>
+		/// <param name="production">The production of a nullable variable</param>
+		/// <returns>The list of the nullable variables' indices that this production depends on</returns>
 		private List<int> GetNullableDependencies(LRProduction production)
 		{
 			List<int> result = new List<int>();
@@ -223,36 +225,6 @@ namespace Hime.Redist.Parsers
 			}
 			return result;
 		}
-
-		private int GetNullableSize(LRProduction production)
-		{
-			int result = 0;
-			for (int i = 0; i != production.BytecodeLength; i++)
-			{
-				LROpCode op = production[i];
-				switch (op.Base)
-				{
-					case LROpCodeBase.SemanticAction:
-					{
-						i++;
-						break;
-					}
-					case LROpCodeBase.AddVirtual:
-					{
-						i++;
-						result++;
-						break;
-					}
-					case LROpCodeBase.AddNullVariable:
-					{
-						result += nullables[production[i + 1].DataValue].GetSize();
-						i++;
-						break;
-					}
-				}
-			}
-			return result;
-		}*/
 
 		/// <summary>
 		/// Raises an error on an unexepcted token
@@ -332,23 +304,11 @@ namespace Hime.Redist.Parsers
 		/// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
 		public override ParseResult Parse()
 		{
-			nextToken = lexer.GetNextToken();
-			if (nextToken.SymbolID == Lexer.Lexer.sidDollar)
-			{
-				// the input is empty!
-				if (parserAutomaton.IsAcceptingState(0))
-				{
-					SubTree st = nullables[parserAutomaton.Axiom];
-					// TODO: commit and build final AST here
-					return null;
-				}
-				return null;
-			}
-
 			reductions = new Queue<Reduction>();
 			shifts = new Queue<Shift>();
 			int Ui = gss.CreateGeneration();
 			int v0 = gss.CreateNode(0);
+			nextToken = lexer.GetNextToken();
 
 			int count = parserAutomaton.GetActionsCount(0, nextToken.SymbolID);
 			for (int i = 0; i != count; i++)
@@ -384,8 +344,8 @@ namespace Hime.Redist.Parsers
 				{
 					// Has reduction _Axiom_ -> axiom $ . on ε
 					GSSPath[] paths = gss.GetPaths(i, 2, out count);
-					return null;
-					//return new ParseResult(allErrors, lexer.Input, sppf.BuildTreeFrom(paths[0][1]));
+					SubTree rootST = paths[0][1].Tree;
+					return new ParseResult(allErrors, lexer.Output, sppf.GetTree(rootST));
 				}
 			}
 			// At end of input but was still waiting for tokens
