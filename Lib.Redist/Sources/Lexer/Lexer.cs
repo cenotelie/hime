@@ -122,32 +122,43 @@ namespace Hime.Redist.Lexer
 
 			while (true)
 			{
-				Token token = GetNextToken_DFA();
-				if (token.SymbolID == sidEpsilon)
+				int length = 0;
+				int tIndex = RunDFA(out length);
+				if (length == 0)
 				{
-					// Failed to match anything
-					RewindableReader.Single s = input.ReadOne();
-					OnError(new UnexpectedCharError(s.Value, text.GetPositionAt(index)));
-					index++;
+					if (tIndex == 0)
+					{
+						// This is the epsilon terminal, failed to match anything
+						RewindableReader.Single s = input.ReadOne();
+						OnError(new UnexpectedCharError(s.Value, text.GetPositionAt(index)));
+						index++;
+					}
+					else if (tIndex == 1)
+					{
+						// This is the dollar terminal, at the end of the input
+						isDollatEmited = true;
+						return new Token(sidDollar, -1);
+					}
 				}
-				else if (token.SymbolID == sidDollar)
+				else
 				{
-					// At the end of the input
-					isDollatEmited = true;
-					return token;
-				}
-				else if (token.SymbolID != lexSeparator)
-				{
-					return token;
+					if (terminals[tIndex].ID != lexSeparator)
+					{
+						Token token = text.OnToken(tIndex, index, length);
+						index += length;
+						return token;
+					}
+					index += length;
 				}
 			}
 		}
 
 		/// <summary>
-		/// Gets the next token by running this lexer's DFA
+		/// Runs the lexer's DFA to match a terminal in the input ahead
 		/// </summary>
-		/// <returns>The next token in the input</returns>
-		private Token GetNextToken_DFA()
+		/// <param name="tokenLength">The length of the matched token</param>
+		/// <returns>The index of the matched terminal</returns>
+		private int RunDFA(out int tokenLength)
 		{
 			int matchedIndex = 0;           // Terminal's index of the last match
 			int matchedLength = 0;          // Length of the last match
@@ -156,7 +167,11 @@ namespace Hime.Redist.Lexer
 
 			TextBuffer buffer = input.Read();
 			if (buffer.IsEmpty)
-				return new Token(sidDollar, 0); // At the end of input
+			{
+				// At the end of input
+				tokenLength = 0;
+				return 1;
+			}
 			int i = buffer.Start;
 
 			while (state != 0xFFFF)
@@ -188,14 +203,10 @@ namespace Hime.Redist.Lexer
 				else
 					state = lexAutomaton.GetStateBulkTransition(offset, current);
 			}
+			// rewind if necessary
 			input.GoTo(i - (length - matchedLength));
-
-			if (matchedLength == 0)
-				return new Token(sidEpsilon, 0);
-
-			Token result = text.OnToken(matchedIndex, index, matchedLength);
-			index += matchedLength;
-			return result;
+			tokenLength = matchedLength;
+			return matchedIndex;
 		}
 	}
 }
