@@ -25,7 +25,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a Shared Packed Parse Forest
 	/// </summary>
-	class SPPF
+	class SPPF : SemanticBody
 	{
 		/// <summary>
 		/// The initial size of the history buffer
@@ -35,6 +35,10 @@ namespace Hime.Redist.Parsers
 		/// The initial size of the history parts' buffers
 		/// </summary>
 		private const int initHistoryPartSize = 64;
+		/// <summary>
+		/// The maximum size of the reduction handle
+		/// </summary>
+		private const int handleSize = 1024;
 		/// <summary>
 		/// The bias for estimating the size of the reduced sub-tree
 		/// </summary>
@@ -112,14 +116,66 @@ namespace Hime.Redist.Parsers
 		private int nextHP;
 
 		/// <summary>
+		/// The GSS path being reduced
+		/// </summary>
+		private GSSPath path;
+		/// <summary>
+		/// The first label on the complete GSS path
+		/// </summary>
+		private GSSLabel first;
+		/// <summary>
+		/// The reduction length
+		/// </summary>
+		private int length;
+		/// <summary>
+		/// The number of items popped from the stack
+		/// </summary>
+		private int popCount;
+		/// <summary>
+		/// The sub-tree build-up cache
+		/// </summary>
+		private SubTree cache;
+		/// <summary>
+		/// The new available node in the current cache
+		/// </summary>
+		private int cacheNext;
+		/// <summary>
+		/// The reduction handle represented as the indices of the sub-trees in the cache
+		/// </summary>
+		private int[] handle;
+		/// <summary>
+		/// The index of the next available slot in the handle
+		/// </summary>
+		private int handleNext;
+
+		/// <summary>
+		/// The AST being built
+		/// </summary>
+		private SimpleAST result;
+
+		/// <summary>
 		/// Gets the epsilon GSS label
 		/// </summary>
 		public GSSLabel Epsilon { get { return new GSSLabel(); } }
 
+		#region Implementation of SemanticBody
+		/// <summary>
+		/// Gets the symbol at the i-th index
+		/// </summary>
+		/// <param name="index">Index of the symbol</param>
+		/// <returns>The symbol at the given index</returns>
+		public Symbol this[int index] { get { return result.GetSymbolFor(cache.GetLabelAt(handle[index])); } }
+
+		/// <summary>
+		/// Gets the length of this body
+		/// </summary>
+		public int Length { get { return handleNext; } }
+		#endregion
+
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
-		public SPPF()
+		public SPPF(int stackSize, TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
 		{
 			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
@@ -127,6 +183,8 @@ namespace Hime.Redist.Parsers
 			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), initHistorySize);
 			this.history = new HistoryPart[initHistorySize];
 			this.nextHP = 0;
+			this.handle = new int[handleSize];
+			this.result = new SimpleAST(text, variables, virtuals);
 		}
 
 		/// <summary>
@@ -194,14 +252,125 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Creates a new label in the history
+		/// Prepares for the forthcoming reduction operations
 		/// </summary>
-		/// <param name="generation">The index of a GSS generation</param>
-		/// <param name="symbol">The sub-tree root symbol</param>
-		/// <param name="action">The action applied on the sub-tree root</param>
-		/// <param name="length">The size of the children</param>
-		public GSSLabel NewLabelFor(int generation, SymbolRef symbol, TreeAction action, int length)
+		/// <param name="varIndex">The reduced variable index</param>
+		/// <param name="action">The tree action applied onto the symbol</param>
+		/// <param name="first">The first label</param>
+		/// <param name="path">The path being reduced</param>
+		/// <param name="length">The reduction length</param>
+		public void ReductionPrepare(int varIndex, TreeAction action, GSSLabel first, GSSPath path, int length)
 		{
+			this.path = path;
+			this.first = first;
+			this.length = length;
+
+			int estimation = estimationBias;
+			if (length > 0)
+			{
+				for (int i = 0; i != length - 1; i++)
+					estimation += path[i].Tree.GetSize();
+				estimation += first.Tree.GetSize();
+			}
+
+			cache = GetSubTree(estimation);
+			cache.SetupRoot(new SymbolRef(SymbolType.Variable, varIndex), action);
+			cacheNext = 1;
+			handleNext = 0;
+			popCount = 0;
+		}
+
+		/// <summary>
+		/// During a redution, pops the top symbol from the stack and gives it a tree action
+		/// </summary>
+		/// <param name="action">The tree action to apply to the symbol</param>
+		public void ReductionPop(TreeAction action)
+		{
+			SubTree sub = null;
+			if (popCount < length - 1)
+				sub = path[length - 1 - popCount].Tree;
+			else
+				sub = first.Tree;
+
+			ReductionInsertSub(sub, action);
+			sub.Free();
+			popCount++;
+		}
+
+		/// <summary>
+		/// During a reduction, insert the given sub-tree
+		/// </summary>
+		/// <param name="sub">The sub-tree</param>
+		/// <param name="action">The tree action applied onto the symbol</param>
+		private void ReductionInsertSub(SubTree sub, TreeAction action)
+		{
+			if (sub.GetActionAt(0) == TreeAction.Replace)
+			{
+				// copy the children to the cache
+				sub.CopyChildrenTo(cache, cacheNext);
+				// setup the handle
+				int index = 1;
+				for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
+				{
+					int size = sub.GetChildrenCountAt(index) + 1;
+					handle[handleNext++] = cacheNext;
+					cacheNext += size;
+					index += size;
+				}
+			}
+			else if (action == TreeAction.Drop)
+			{
+			}
+			else
+			{
+				if (action != TreeAction.None)
+					sub.SetActionAt(0, action);
+				// copy the complete sub-tree to the cache
+				sub.CopyTo(cache, cacheNext);
+				handle[handleNext++] = cacheNext;
+				cacheNext += sub.GetChildrenCountAt(0) + 1;
+			}
+		}
+
+		/// <summary>
+		/// During a reduction, inserts a virtual symbol
+		/// </summary>
+		/// <param name="index">The virtual symbol's index</param>
+		/// <param name="action">The tree action applied onto the symbol</param>
+		public void ReductionAddVirtual(int index, TreeAction action)
+		{
+			if (action == TreeAction.Drop)
+				return; // why would you do this?
+			cache.SetAt(cacheNext, new SymbolRef(SymbolType.Virtual, index), action);
+			handle[handleNext++] = cacheNext++;
+		}
+
+		/// <summary>
+		/// During a reduction, inserts the sub-tree of a nullable variable
+		/// </summary>
+		/// <param name="nullable">The sub-tree of a nullable variable</param>
+		/// <param name="action">The tree action applied onto the symbol</param>
+		public void ReductionAddNullable(SubTree nullable, TreeAction action)
+		{
+			ReductionInsertSub(nullable, action);
+		}
+
+		/// <summary>
+		/// Finalizes the reduction operation
+		/// </summary>
+		/// <param name="generation">The generation to reduce from</param>
+		/// <param name="varIndex">The reduced variable index</param>
+		/// <returns>The produced sub-tree</returns>
+		public GSSLabel Reduce(int generation, int varIndex)
+		{
+			if (cache.GetActionAt(0) == TreeAction.Replace)
+			{
+				cache.SetChildrenCountAt(0, handleNext);
+			}
+			else
+			{
+				ReduceTree();
+			}
 			HistoryPart hp = GetHistoryPart(generation);
 			if (hp == null)
 			{
@@ -216,11 +385,54 @@ namespace Hime.Redist.Parsers
 				}
 				history[nextHP++] = hp;
 			}
-			SubTree st = GetSubTree(length);
-			st.SetupRoot(symbol, action);
-			GSSLabel result = new GSSLabel(st);
+			GSSLabel result = new GSSLabel(cache, new SymbolRef(SymbolType.Variable, varIndex));
 			hp.data[hp.next++] = result;
 			return result;
+		}
+
+		/// <summary>
+		/// Applies the promotion tree actions to the cache and commits to the final AST
+		/// </summary>
+		private void ReduceTree()
+		{
+			// promotion data
+			bool promotion = false;
+			int insertion = 1;
+			for (int i = 0; i != handleNext; i++)
+			{
+				switch (cache.GetActionAt(handle[i]))
+				{
+					case TreeAction.Promote:
+						if (promotion)
+						{
+							// This is not the first promotion
+							// Commit the previously promoted node's children
+							cache.SetChildrenCountAt(0, insertion - 1);
+							cache.CommitChildrenOf(0, result);
+							// Reput the previously promoted node in the cache
+							cache.Move(0, 1);
+							insertion = 2;
+						}
+						promotion = true;
+                        // Save the new promoted node
+						cache.Move(handle[i], 0);
+                        // Repack the children on the left if any
+						int nb = cache.GetChildrenCountAt(0);
+						cache.MoveRange(handle[i] + 1, insertion, nb);
+						insertion += nb;
+						break;
+					default:
+                        // Commit the children if any
+						cache.CommitChildrenOf(handle[i], result);
+                        // Repack the sub-root on the left
+						if (insertion != handle[i])
+							cache.Move(handle[i], insertion);
+						insertion++;
+						break;
+				}
+			}
+			// finalize the sub-tree data
+			cache.SetChildrenCountAt(0, insertion - 1);
 		}
 	}
 }

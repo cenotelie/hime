@@ -58,5 +58,16 @@ namespace Hime.Redist.Parsers
 			this.tree = st;
 			this.original = st.GetLabelAt(0);
 		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Hime.Redist.Parsers.GSSLabel"/> struct.
+		/// </summary>
+		/// <param name="st">The associated sub-tree</param>
+		/// <param name="original">The original symbol of this sub-tree's root</param>
+		public GSSLabel(SubTree st, SymbolRef original)
+		{
+			this.tree = st;
+			this.original = original;
+		}
 	}
 }

@@ -218,7 +218,7 @@ namespace Hime.Redist.Parsers
 					case LROpCodeBase.AddVirtual:
 						{
 							int index = production[i + 1].DataValue;
-							builder.ReductionVirtual(index, op.TreeAction);
+							builder.ReductionAddVirtual(index, op.TreeAction);
 							i++;
 							break;
 						}

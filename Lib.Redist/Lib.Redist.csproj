@@ -68,9 +68,7 @@
     <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />
     <Compile Include="Sources\Semantics.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\GSSPaths.cs" />
     <Compile Include="Sources\Lexer\Content.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
@@ -84,11 +82,9 @@
     <Compile Include="Sources\Parsers\LR\LROpCodeValues.cs" />
     <Compile Include="Sources\TokenizedText.cs" />
     <Compile Include="Sources\TreeAction.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\GSSNode.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSPath.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRAutomaton.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRParser.cs" />
-    <Compile Include="Sources\Parsers\LR\RNGLR\RNGLRTable.cs" />
     <Compile Include="Sources\ErrorType.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRProduction.cs" />

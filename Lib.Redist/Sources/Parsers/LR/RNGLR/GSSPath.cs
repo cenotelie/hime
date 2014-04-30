@@ -28,13 +28,14 @@ namespace Hime.Redist.Parsers
 	class GSSPath
 	{
 		/// <summary>
-		/// The pool containing this object
+		/// The initial size of the label buffer
 		/// </summary>
-		private Pool<GSSPath> pool;
+		private const int initBufferSize = 64;
+
 		/// <summary>
 		/// The last GSS node in this path
 		/// </summary>
-		private GSSNode last;
+		private int last;
 		/// <summary>
 		/// The labels on this GSS path
 		/// </summary>
@@ -43,7 +44,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets or sets the final target of this path
 		/// </summary>
-		public GSSNode Last
+		public int Last
 		{
 			get { return last; }
 			set { last = value; }
@@ -61,34 +62,29 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this path
 		/// </summary>
-		/// <param name="pool">The parent pool</param>
-		/// <param name="capacity">The maximal length of this path</param>
-		public GSSPath(Pool<GSSPath> pool, int capacity)
+		public GSSPath(int length)
 		{
-			this.pool = pool;
-			this.last = null;
-			this.labels = new GSSLabel[capacity];
+			this.last = 0;
+			this.labels = new GSSLabel[length < initBufferSize ? initBufferSize : length];
 		}
 
 		/// <summary>
 		/// Initializes this path
 		/// </summary>
-		/// <param name="capacity">The maximal length of this path</param>
-		public GSSPath(int capacity)
+		public GSSPath()
 		{
-			this.pool = null;
-			this.last = null;
-			this.labels = new GSSLabel[capacity];
+			this.last = 0;
+			this.labels = null;
 		}
 
 		/// <summary>
-		/// Initializes this path as a 0-length path
+		/// Ensure the specified length of the label buffer
 		/// </summary>
-		public GSSPath()
+		/// <param name="length">The required length</param>
+		public void Ensure(int length)
 		{
-			this.pool = null;
-			this.last = null;
-			this.labels = null;
+			if (length > labels.Length)
+				labels = new GSSLabel[length];
 		}
 
 		/// <summary>
@@ -99,15 +95,6 @@ namespace Hime.Redist.Parsers
 		public void CopyLabelsFrom(GSSPath path, int length)
 		{
 			Array.Copy(path.labels, this.labels, length);
-		}
-
-		/// <summary>
-		/// Frees this path and returns it ot its pool
-		/// </summary>
-		public void Free()
-		{
-			if (pool != null)
-				pool.Return(this);
 		}
 	}
 }

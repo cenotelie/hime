@@ -212,7 +212,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">The virtual symbol's index</param>
 		/// <param name="action">The tree action applied onto the symbol</param>
-		public void ReductionVirtual(int index, TreeAction action)
+		public void ReductionAddVirtual(int index, TreeAction action)
 		{
 			if (action == TreeAction.Drop)
 				return; // why would you do this?

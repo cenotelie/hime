@@ -40,7 +40,7 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// The GSS node to reduce from
 			/// </summary>
-			public GSSNode node;
+			public int node;
 			/// <summary>
 			/// The LR production for the reduction
 			/// </summary>
@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
 			/// <param name="node">The GSS node to reduce from</param>
 			/// <param name="prod">The LR production for the reduction</param>
 			/// <param name="first">The first label in the GSS</param>
-			public Reduction(GSSNode node, LRProduction prod, GSSLabel first)
+			public Reduction(int node, LRProduction prod, GSSLabel first)
 			{
 				this.node = node;
 				this.prod = prod;
@@ -71,7 +71,7 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// GSS node to shift from
 			/// </summary>
-			public GSSNode from;
+			public int from;
 			/// <summary>
 			/// The target RNGLR state
 			/// </summary>
@@ -81,7 +81,7 @@ namespace Hime.Redist.Parsers
 			/// </summary>
 			/// <param name="from">The GSS node to shift from</param>
 			/// <param name="to">The target RNGLR state</param>
-			public Shift(GSSNode from, int to)
+			public Shift(int from, int to)
 			{
 				this.from = from;
 				this.to = to;
@@ -129,12 +129,12 @@ namespace Hime.Redist.Parsers
             : base(variables, virtuals, actions, lexer)
 		{
 			this.parserAutomaton = automaton;
-			this.gss = new GSS(automaton.StatesCount);
-			this.sppf = new SPPF();
+			this.gss = new GSS();
+			this.sppf = new SPPF(maxStackSize, lexer.Output, parserVariables, parserVirtuals);
 			//BuildNullables();
 		}
 
-		private void BuildNullables()
+		/*private void BuildNullables()
 		{
 			this.nullables = new SubTree[parserAutomaton.Nullables.Count];
 			List<int>[] dependencies = BuildNullableDependencies();
@@ -252,20 +252,22 @@ namespace Hime.Redist.Parsers
 				}
 			}
 			return result;
-		}
+		}*/
 
 		/// <summary>
 		/// Raises an error on an unexepcted token
 		/// </summary>
 		/// <param name="gen">The current GSS generation</param>
 		/// <param name="token">The unexpected token</param>
-		private void OnUnexpectedToken(GSSGeneration gen, Token token)
+		private void OnUnexpectedToken(int gen, Token token)
 		{
 			List<int> indices = new List<int>();
 			List<Symbol> expected = new List<Symbol>();
-			foreach (GSSNode node in gen)
+			int count = 0;
+			int start = gss.GetGeneration(gen, out count);
+			for (int i=start; i!=start+count; i++)
 			{
-				ICollection<int> temp = parserAutomaton.GetExpected(node.State, lexer.Terminals.Count);
+				ICollection<int> temp = parserAutomaton.GetExpected(gss.GetRepresentedState(i), lexer.Terminals.Count);
 				foreach (int index in temp)
 				{
 					if (!indices.Contains(index))
@@ -278,45 +280,50 @@ namespace Hime.Redist.Parsers
 			allErrors.Add(new UnexpectedTokenError(token, expected, lexer.Output));
 		}
 
-		private void BuildSPPF(int subRoot, LRProduction production, int first, GSSPath path)
+		/// <summary>
+		/// Builds the SPPF
+		/// </summary>
+		/// <param name="generation">The current GSS generation</param>
+		/// <param name="production">The LR production</param>
+		/// <param name="first">The first label of the path</param>
+		/// <param name="path">The reduction path</param>
+		/// <returns>The corresponding SPPF part</returns>
+		private GSSLabel BuildSPPF(int generation, LRProduction production, GSSLabel first, GSSPath path)
 		{
-			// Setups the stack index for the pop actions
-			int stackNext = -1;
-			if (production.ReductionLength > 0)
-				stackNext = production.ReductionLength - 2;
-			// Execute the bytecode
+			Symbol variable = parserVariables[production.Head];
+			sppf.ReductionPrepare(production.Head, production.HeadAction, first, path, production.ReductionLength);
 			for (int i = 0; i != production.BytecodeLength; i++)
 			{
-				/*LROpCode op = production.Bytecode[i];
-                if (op.IsSemAction)
-                {
-                    int child = sppfActions[production.Bytecode[i + 1].Value];
-                    sppf.AddChild(subRoot, child, TreeAction.Semantic);
-                    i++;
-                }
-                else if (op.IsAddVirtual)
-                {
-                    Symbols.Virtual symbol = parserVirtuals[production.Bytecode[i + 1].Value];
-                    int child = sppf.CreateNode(symbol);
-                    sppf.AddChild(subRoot, child, op.TreeAction);
-                    i++;
-                }
-                else if (op.IsAddNullVar)
-                {
-                    int child = sppfNullables[production.Bytecode[i + 1].Value];
-                    sppf.AddChild(subRoot, child, op.TreeAction);
-                    i++;
-                }
-                else
-                {
-                    int child = new int();
-                    if (stackNext < 0)
-                        child = first;
-                    else
-                        child = path[stackNext--];
-                    sppf.AddChild(subRoot, child, op.TreeAction);
-                }*/
+				LROpCode op = production[i];
+				switch (op.Base)
+				{
+					case LROpCodeBase.SemanticAction:
+						{
+							UserAction action = parserActions[production[i + 1].DataValue];
+							i++;
+							action.Invoke(variable, sppf);
+							break;
+						}
+					case LROpCodeBase.AddVirtual:
+						{
+							int index = production[i + 1].DataValue;
+							sppf.ReductionAddVirtual(index, op.TreeAction);
+							i++;
+							break;
+						}
+					case LROpCodeBase.AddNullVariable:
+						{
+							int index = production[i + 1].DataValue;
+							sppf.ReductionAddNullable(nullables[index], op.TreeAction);
+							i++;
+							break;
+						}
+					default:
+						sppf.ReductionPop(op.TreeAction);
+						break;
+				}
 			}
+			return sppf.Reduce(generation, production.Head);
 		}
 
 		/// <summary>
@@ -340,8 +347,8 @@ namespace Hime.Redist.Parsers
 
 			reductions = new Queue<Reduction>();
 			shifts = new Queue<Shift>();
-			GSSGeneration Ui = gss.GetNextGen();
-			GSSNode v0 = Ui.CreateNode(0);
+			int Ui = gss.CreateGeneration();
+			int v0 = gss.CreateNode(0);
 
 			int count = parserAutomaton.GetActionsCount(0, nextToken.SymbolID);
 			for (int i = 0; i != count; i++)
@@ -358,23 +365,25 @@ namespace Hime.Redist.Parsers
 				Reducer(Ui);
 				Token oldtoken = nextToken;
 				nextToken = lexer.GetNextToken();
-				GSSGeneration Uj = Shifter(oldtoken);
-				if (Uj.Size == 0)
+				int Uj = Shifter(oldtoken);
+				gss.GetGeneration(Uj, out count);
+				if (count == 0)
 				{
 					// Generation is empty !
 					OnUnexpectedToken(Ui, oldtoken);
 					return null;
 				}
-				Ui.Sweep();
 				Ui = Uj;
 			}
 
-			foreach (GSSNode node in Ui)
+			int start = gss.GetGeneration(Ui, out count);
+			for (int i=start; i!=start+count; i++)
 			{
-				if (parserAutomaton.IsAcceptingState(node.State))
+				int state = gss.GetRepresentedState(i);
+				if (parserAutomaton.IsAcceptingState(state))
 				{
 					// Has reduction _Axiom_ -> axiom $ . on ε
-					GSSPaths paths = gss.GetPaths(node, 2);
+					GSSPath[] paths = gss.GetPaths(i, 2, out count);
 					return null;
 					//return new ParseResult(allErrors, lexer.Input, sppf.BuildTreeFrom(paths[0][1]));
 				}
@@ -387,7 +396,7 @@ namespace Hime.Redist.Parsers
 		/// Executes the reduction operations from the given GSS generation
 		/// </summary>
 		/// <param name="generation">The current GSS generation</param>
-		private void Reducer(GSSGeneration generation)
+		private void Reducer(int generation)
 		{
 			sppf.ClearHistory();
 			while (reductions.Count != 0)
@@ -399,18 +408,19 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="generation">The current GSS generation</param>
 		/// <param name="reduction">The reduction operation</param>
-		private void ExecuteReduction(GSSGeneration generation, Reduction reduction)
+		private void ExecuteReduction(int generation, Reduction reduction)
 		{
 			// Get all path from the reduction node
-			GSSPaths paths = new GSSPaths();
+			int count = 0;
+			GSSPath[] paths = null;
 			if (reduction.prod.ReductionLength == 0)
-				paths = gss.GetPaths(reduction.node, 0);
+				paths = gss.GetPaths(reduction.node, 0, out count);
 			else
                 // The given GSS node is the second on the path, so start from it with length - 1
-				paths = gss.GetPaths(reduction.node, reduction.prod.ReductionLength - 1);
+				paths = gss.GetPaths(reduction.node, reduction.prod.ReductionLength - 1, out count);
 
 			// Execute the reduction on all paths
-			for (int i = 0; i != paths.Count; i++)
+			for (int i = 0; i != count; i++)
 				ExecuteReduction(generation, reduction, paths[i]);
 		}
 
@@ -420,28 +430,29 @@ namespace Hime.Redist.Parsers
 		/// <param name="generation">The current GSS generation</param>
 		/// <param name="reduction">The reduction operation</param>
 		/// <param name="path">The GSS path to use for the reduction</param>
-		private void ExecuteReduction(GSSGeneration generation, Reduction reduction, GSSPath path)
+		private void ExecuteReduction(int generation, Reduction reduction, GSSPath path)
 		{
 			// Get the rule's head
 			Symbol head = parserVariables[reduction.prod.Head];
 			// Resolve the sub-root
-			GSSLabel label = sppf.GetLabelFor(generation.Index, new SymbolRef(SymbolType.Variable, reduction.prod.Head));
+			GSSLabel label = sppf.GetLabelFor(generation, new SymbolRef(SymbolType.Variable, reduction.prod.Head));
 			if (label.IsEpsilon)
 			{
 				// not in history, build the SPPF here
-
+				label = BuildSPPF(generation, reduction.prod, reduction.first, path);
 			}
 
 			// Get the target state by transition on the rule's head
-			int to = GetNextByVar(path.Last.State, head.ID);
-			if (generation.Contains(to))
+			int to = GetNextByVar(gss.GetRepresentedState(path.Last), head.ID);
+			// Find a node for the target state in the GSS
+			int w = gss.FindNode(generation, to);
+			if (w != -1)
 			{
 				// A node for the target state is already in the GSS
-				GSSNode w = generation[to];
-				// But the new edge does not exist
-				if (!w.HasEdgeTo(path.Last))
+				if (!gss.HasEdge(generation, w, path.Last))
 				{
-					w.AddEdge(path.Last, label);
+					// But the new edge does not exist
+					gss.CreateEdge(w, path.Last, label);
 					// Look for the new reductions at this state
 					if (reduction.prod.ReductionLength != 0)
 					{
@@ -463,8 +474,8 @@ namespace Hime.Redist.Parsers
 			else
 			{
 				// Create the new corresponding node in the GSS
-				GSSNode w = generation.CreateNode(to);
-				w.AddEdge(path.Last, label);
+				w = gss.CreateNode(to);
+				gss.CreateEdge(w, path.Last, label);
 				// Look for all the reductions and shifts at this state
 				int count = parserAutomaton.GetActionsCount(to, nextToken.SymbolID);
 				for (int i = 0; i != count; i++)
@@ -491,10 +502,10 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="oldtoken">A token</param>
 		/// <returns>The next generation</returns>
-		private GSSGeneration Shifter(Token oldtoken)
+		private int Shifter(Token oldtoken)
 		{
 			// Create next generation
-			GSSGeneration gen = gss.GetNextGen();
+			int gen = gss.CreateGeneration();
 
 			// Create the GSS label to be used for the transitions
 			SubTree st = sppf.GetSingleNode();
@@ -514,13 +525,13 @@ namespace Hime.Redist.Parsers
 		/// <param name="gen">The GSS generation to start from</param>
 		/// <param name="label">The GSS label to use for the new GSS edges</param>
 		/// <param name="shift">The shift operation</param>
-		private void ExecuteShift(GSSGeneration gen, GSSLabel label, Shift shift)
+		private void ExecuteShift(int gen, GSSLabel label, Shift shift)
 		{
-			if (gen.Contains(shift.to))
+			int w = gss.FindNode(gen, shift.to);
+			if (w != -1)
 			{
 				// A node for the target state is already in the GSS
-				GSSNode w = gen[shift.to];
-				w.AddEdge(shift.from, label);
+				gss.CreateEdge(w, shift.from, label);
 				// Look for the new reductions at this state
 				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
 				for (int i = 0; i != count; i++)
@@ -538,8 +549,8 @@ namespace Hime.Redist.Parsers
 			else
 			{
 				// Create the new corresponding node in the GSS
-				GSSNode w = gen.CreateNode(shift.to);
-				w.AddEdge(shift.from, label);
+				w = gss.CreateNode(shift.to);
+				gss.CreateEdge(w, shift.from, label);
 				// Look for all the reductions and shifts at this state
 				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
 				for (int i = 0; i != count; i++)

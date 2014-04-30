@@ -18,162 +18,280 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.Collections.Generic;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
-	/// Represents Graph-Structured Stacks for RNGLR parsers
+	/// Represents Graph-Structured Stacks for GLR parsers
 	/// </summary>
 	class GSS
 	{
-		/// <summary>
-		/// Factory for pooled GSS paths
-		/// </summary>
-		private class GSSPathFactory : Factory<GSSPath>
-		{
-			/// <summary>
-			/// The capacity of the GSS paths produced by this factory
-			/// </summary>
-			private int capacity;
-			/// <summary>
-			/// Initializes a new instance of the factory
-			/// </summary>
-			/// <param name="capacity">The capacity of the GSS paths produced by this factory</param>
-			public GSSPathFactory(int capacity)
-			{
-				this.capacity = capacity;
-			}
-			/// <summary>
-			///  Creates a new object
-			/// </summary>
-			/// <param name="pool">The enclosing pool</param>
-			/// <returns>The created object</returns>
-			public GSSPath CreateNew(Pool<GSSPath> pool)
-			{
-				return new GSSPath(pool, capacity);
-			}
-		}
-
-		/// <summary>
-		/// Factory for pooled GSS nodes
-		/// </summary>
-		private class GSSNodeFactory : Factory<GSSNode>
-		{
-			/// <summary>
-			///  Creates a new object
-			/// </summary>
-			/// <param name="pool">The enclosing pool</param>
-			/// <returns>The created object</returns>
-			public GSSNode CreateNew(Pool<GSSNode> pool)
-			{
-				return new GSSNode();
-			}
-		}
-
 		/// <summary>
 		/// The initial size of the paths buffer in this GSS
 		/// </summary>
 		private const int initPathsCount = 64;
 
 		/// <summary>
-		/// The pool of GSS paths with a capacity of 128
+		/// Represents an edge in a Graph-Structured Stack
 		/// </summary>
-		private Pool<GSSPath> pathsPool128;
+		private struct Edge
+		{
+			/// <summary>
+			/// The index of the node from which this edge starts
+			/// </summary>
+			private int from;
+			/// <summary>
+			/// The index of the node to which this edge arrives to
+			/// </summary>
+			private int to;
+			/// <summary>
+			/// Gets the index of the node from which this edge starts
+			/// </summary>
+			public int From { get { return from; } }
+			/// <summary>
+			/// Gets the index of the node to which this edge arrives to
+			/// </summary>
+			public int To { get { return to; } }
+			/// <summary>
+			/// Initializes this edge
+			/// </summary>
+			/// <param name="from">Index of the node from which this edge starts</param>
+			/// <param name="to">Index of the node to which this edge arrives to</param>
+			public Edge(int from, int to)
+			{
+				this.from = from;
+				this.to = to;
+			}
+		}
+
 		/// <summary>
-		/// The pool of GSS paths with a capacity of 1024
+		/// Represents a generation in a Graph-Structured Stack
 		/// </summary>
-		private Pool<GSSPath> pathsPool1024;
+		/// <remarks>
+		/// Because GSS nodes are always created in the last generation,
+		/// a generation is basically a span in the list of GSS nodes,
+		/// i.e. the starting index in the list of nodes and the number of nodes
+		/// </remarks>
+		private struct Gen
+		{
+			/// <summary>
+			/// The start index of this generation in the list of nodes
+			/// </summary>
+			private int start;
+			/// <summary>
+			/// The number of nodes in this generation
+			/// </summary>
+			private int count;
+			/// <summary>
+			/// Gets the start index of this generation in the list of nodes
+			/// </summary>
+			public int Start { get { return start; } }
+			/// <summary>
+			/// Gets or sets the number of nodes in this generation
+			/// </summary>
+			public int Count
+			{
+				get { return count; }
+				set { count = value; }
+			}
+			/// <summary>
+			/// Initializes this generation
+			/// </summary>
+			/// <param name="start">The start index of this generation in the list of nodes</param>
+			public Gen(int start)
+			{
+				this.start = start;
+				this.count = 0;
+			}
+		}
+
 		/// <summary>
-		/// The pool of GSS nodes
+		/// The nodes in this GSS.
+		/// A node simply contains the GLR state it represents
 		/// </summary>
-		private Pool<GSSNode> nodesPool;
+		private Utils.BigList<int> nodes;
+		/// <summary>
+		/// The generations in this GSS
+		/// </summary>
+		private Utils.BigList<Gen> genNodes;
+		/// <summary>
+		/// The edges in this GSS
+		/// </summary>
+		private Utils.BigList<Edge> edges;
+		/// <summary>
+		/// The labels on the edges in this GSS
+		/// </summary>
+		private Utils.BigList<GSSLabel> edgeData;
+		/// <summary>
+		/// The generations for the edges
+		/// </summary>
+		private Utils.BigList<Gen> genEdges;
+		/// <summary>
+		/// Index of the current generation
+		/// </summary>
+		private int generation;
+
 		/// <summary>
 		/// A single reusable GSS paths for returning 0-length GSS paths
 		/// </summary>
 		private GSSPath path0;
 		/// <summary>
+		/// The single resuable buffer for returning 0-length GSS paths
+		/// </summary>
+		private GSSPath[] paths0;
+		/// <summary>
 		/// A buffer of GSS paths
 		/// </summary>
 		private GSSPath[] paths;
-		/// <summary>
-		/// The index of the next free item in the 'paths' buffer
-		/// </summary>
-		private int nextIndex;
-		/// <summary>
-		/// The number of states in the RNGLR automaton
-		/// </summary>
-		private int nbstates;
 
 		/// <summary>
 		/// Initializes the GSS
 		/// </summary>
-		/// <param name="nbstates">The number of states in the RNGLR automaton</param>
-		public GSS(int nbstates)
+		public GSS()
 		{
-			this.nbstates = nbstates;
-			this.nextIndex = 0;
+			this.nodes = new BigList<int>();
+			this.genNodes = new BigList<Gen>();
+			this.edges = new BigList<Edge>();
+			this.edgeData = new BigList<GSSLabel>();
+			this.genEdges = new BigList<Gen>();
+			this.generation = -1;
 			this.path0 = new GSSPath();
-			this.pathsPool128 = new Pool<GSSPath>(new GSSPathFactory(128), 128);
-			this.pathsPool1024 = new Pool<GSSPath>(new GSSPathFactory(1024), 128);
-			this.nodesPool = new Pool<GSSNode>(new GSSNodeFactory(), 1024);
+			this.paths0 = new GSSPath[1] { path0 };
 			this.paths = new GSSPath[initPathsCount];
 		}
 
 		/// <summary>
-		/// Gets the next generation for this stack
+		/// Gets the data of the given generation
 		/// </summary>
-		/// <returns>The next generation</returns>
-		public GSSGeneration GetNextGen()
+		/// <param name="generation">A generation</param>
+		/// <param name="count">The number of nodes in the generation</param>
+		/// <returns>The generation's first node</returns>
+		public int GetGeneration(int generation, out int count)
 		{
-			return new GSSGeneration(this, nextIndex++, nbstates);
+			Gen gen = genNodes[generation];
+			count = gen.Count;
+			return gen.Start;
 		}
 
 		/// <summary>
-		/// Acquire a GSS node from a pool of reusable ones
+		/// Gets the GLR state represented by the given node
 		/// </summary>
-		/// <returns>A usable GSS node</returns>
-		public GSSNode AcquireNode()
+		/// <param name="node">A node</param>
+		/// <returns>The GLR state represented by the node</returns>
+		public int GetRepresentedState(int node)
 		{
-			return nodesPool.Acquire();
+			return nodes[node];
 		}
 
 		/// <summary>
-		/// Returns the given GSS node to the common pool
+		/// Finds in the given generation contains a node representing the given GLR state
 		/// </summary>
-		/// <param name="node">The GSS node to return</param>
-		public void ReturnNode(GSSNode node)
+		/// <param name="generation">A generation</param>
+		/// <param name="state">A GLR state</param>
+		/// <returns>The node representing the GLR state, or -1 if it is not found</returns>
+		public int FindNode(int generation, int state)
 		{
-			nodesPool.Return(node);
+			Gen data = genNodes[generation];
+			for (int i=data.Start; i!=data.Start + data.Count; i++)
+				if (nodes[i] == state)
+					return i;
+			return -1;
 		}
 
 		/// <summary>
-		/// Acquires a reusable GSS path with the given length
+		/// Determines whether this instance has the required edge
 		/// </summary>
-		/// <param name="last">The last RNGLR state in the path</param>
+		/// <param name="generation">The generation of the edge's start node</param>
+		/// <param name="from">The edge's start node</param>
+		/// <param name="to">The edge's target node</param>
+		/// <returns><c>true</c> if this instance has the required edge; otherwise, <c>false</c></returns>
+		public bool HasEdge(int generation, int from, int to)
+		{
+			Gen data = genEdges[generation];
+			for (int i=data.Start; i!=data.Start + data.Count; i++)
+			{
+				Edge edge = edges[i];
+				if (edge.From == from && edge.To == to)
+					return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Opens a new generation in this GSS
+		/// </summary>
+		/// <returns>The index of the new generation</returns>
+		public int CreateGeneration()
+		{
+			genNodes.Add(new Gen(nodes.Size));
+			genEdges.Add(new Gen(edges.Size));
+			generation++;
+			return generation;
+		}
+
+		/// <summary>
+		/// Creates a new node in the GSS
+		/// </summary>
+		/// <param name="state">The GLR state represented by the node</param>
+		/// <returns>The node identifier</returns>
+		public int CreateNode(int state)
+		{
+			nodes.Add(state);
+			genNodes[generation].Count++;
+			return nodes.Size - 1;
+		}
+
+		/// <summary>
+		/// Creates a new edge in the GSS
+		/// </summary>
+		/// <param name="from">The edge's starting node</param>
+		/// <param name="to">The edge's target node</param>
+		/// <param name="label">The edge's label</param>
+		public void CreateEdge(int from, int to, GSSLabel label)
+		{
+			edges.Add(new Edge(from, to));
+			edgeData.Add(label);
+			genEdges[generation].Count++;
+		}
+
+		/// <summary>
+		/// Setups a reusable GSS path with the given length
+		/// </summary>
+		/// <param name="index">The index in the buffer of reusable paths</param>
+		/// <param name="last">The last GLR state in the path</param>
 		/// <param name="length">The path's length</param>
-		/// <returns>A reusable GSS path</returns>
-		private GSSPath AcquirePath(GSSNode last, int length)
+		private void SetupPath(int index, int last, int length)
 		{
-			GSSPath p = null;
-			if (length <= 128)
-				p = pathsPool128.Acquire();
-			else if (length <= 1024)
-				p = pathsPool1024.Acquire();
+			if (index >= paths.Length)
+			{
+				GSSPath[] temp = new GSSPath[paths.Length + initPathsCount];
+				System.Array.Copy(paths, temp, paths.Length);
+				paths = temp;
+			}
+			if (paths[index] == null)
+				paths[index] = new GSSPath(length);
 			else
-				p = new GSSPath(length);
-			p.Last = last;
-			return p;
+				paths[index].Ensure(length);
+			paths[index].Last = last;
 		}
 
 		/// <summary>
-		/// Grows the 'paths' buffer
+		/// Retrieve the generation of the given node in this GSS
 		/// </summary>
-		private void GrowBuffer()
+		/// <param name="node">A node's index</param>
+		/// <returns>The index of the generation containing the node</returns>
+		private int GetGenerationOf(int node)
 		{
-			GSSPath[] temp = new GSSPath[paths.Length + initPathsCount];
-			System.Array.Copy(paths, temp, paths.Length);
-			paths = temp;
+			for (int i=generation; i!=-1; i--)
+			{
+				Gen gen = genNodes[i];
+				if (gen.Start <= node && gen.Start + gen.Count < node)
+					return i;
+			}
+			// should node happen
+			return -1;
 		}
 
 		/// <summary>
@@ -181,68 +299,93 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="from">The starting node</param>
 		/// <param name="length">The length of the requested paths</param>
+		/// <param name="count">The number of paths</param>
 		/// <returns>A collection of paths in this GSS</returns>
-		public GSSPaths GetPaths(GSSNode from, int length)
+		public GSSPath[] GetPaths(int from, int length, out int count)
 		{
 			if (length == 0)
 			{
 				// use the common 0-length GSS path to avoid new memory allocation
 				path0.Last = from;
-				paths[0] = path0;
-				return new GSSPaths(1, paths);
+				count = 1;
+				return paths0;
 			}
 
 			// Initializes the first path
-			paths[0] = AcquirePath(from, length);
+			SetupPath(0, from, length);
 
 			// The number of paths in the list
-			int count = 1;
+			int total = 1;
 			// For the remaining hops
 			for (int i = 0; i != length; i++)
 			{
 				int m = 0;          // Insertion index for the compaction process
-				int next = count;   // Insertion index for new paths
-				for (int p = 0; p != count; p++)
+				int next = total;   // Insertion index for new paths
+				for (int p = 0; p != total; p++)
 				{
-					GSSNode last = paths[p].Last;
-					// The path stops here
-					if (last.EdgesCount == 0)
+					int last = paths[p].Last;
+					// Look for new additional paths from last
+					Gen gen = genEdges[GetGenerationOf(last)];
+					int firstEdgeTarget = -1;
+					GSSLabel firstEdgeLabel = new GSSLabel();
+					for (int e = gen.Start; e != gen.Start + gen.Count; e++)
 					{
-						// Cleanup
-						paths[p].Free();
-						continue;
+						Edge edge = edges[e];
+						if (edge.From == last)
+						{
+							if (firstEdgeTarget == -1)
+							{
+								// This is the first edge
+								firstEdgeTarget = edge.To;
+								firstEdgeLabel = edgeData[e];
+							}
+							else
+							{
+								// Not the first edge
+								// Clone and extend the new path
+								SetupPath(next, edge.To, length);
+								paths[next].CopyLabelsFrom(paths[p], i);
+								paths[next][i] = edgeData[e];
+								// Go to next insert
+								next++;
+							}
+						}
 					}
-					// Look for new additional paths
-					for (int j = 1; j != last.EdgesCount; j++)
+					// Check whether there was at least one edge
+					if (firstEdgeTarget != -1)
 					{
-						// Extend the list of paths if necessary
-						if (next == paths.Length)
-							GrowBuffer();
-						// Clone and extend the new path
-						paths[next] = AcquirePath(last.GetEdgeTarget(j), length);
-						paths[next].CopyLabelsFrom(paths[p], i);
-						paths[next][i] = last.GetEdgeLabel(j);
-						// Go to next insert
-						next++;
+						// Continue the current path
+						if (m != p)
+						{
+							GSSPath t = paths[m];
+							paths[m] = paths[p];
+							paths[p] = t;
+						}
+						paths[m].Last = firstEdgeTarget;
+						paths[m][i] = firstEdgeLabel;
+						// goto next
+						m++;
 					}
-					// Continue the current path
-					paths[m] = paths[p];
-					paths[m].Last = last.GetEdgeTarget(0);
-					paths[m][i] = last.GetEdgeLabel(0);
-					// goto next
-					m++;
 				}
-				// If Some previous paths have been removed (m != count)
+				// If some previous paths have been removed (m != count)
 				//    and some have been added (next != cout)
 				// => Compact the list
-				if (m != count && next != count)
-					for (int p = count; p != next; p++)
-						paths[m++] = paths[p];
+				if (m != total && next != total)
+				{
+					for (int p = total; p != next; p++)
+					{
+						GSSPath t = paths[m];
+						paths[m] = paths[p];
+						paths[p] = t;
+						m++;
+					}
+				}
 				// m is now the exact number of paths
-				count = m;
+				total = m;
 			}
 
-			return new GSSPaths(count, paths);
+			count = total;
+			return paths;
 		}
 	}
 }

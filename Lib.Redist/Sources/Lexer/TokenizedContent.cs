@@ -34,7 +34,7 @@ namespace Hime.Redist.Lexer
 			/// <summary>
 			/// The terminal's index
 			/// </summary>
-			public int terminal;// The terminal's index
+			public int terminal;
 
 			/// <summary>
 			/// Start index of the text
