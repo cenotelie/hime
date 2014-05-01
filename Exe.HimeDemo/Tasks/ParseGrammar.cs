@@ -38,22 +38,22 @@ namespace Hime.Demo.Tasks
 		public void Execute()
 		{
 			// Build parser assembly
-			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = CompilationMode.Assembly;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.Demo.Generated";
-			task.GrammarName = "FileCentralDogma";
+			task.GrammarName = "HimeGrammar";
 			task.CodeAccess = AccessModifier.Public;
 			task.Method = ParsingMethod.LALR1;
 			task.Execute();
 			stream.Close();
 
 			// Load the generated assembly
-			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "FileCentralDogma.dll"));
+			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "HimeGrammar.dll"));
 
 			// Re-parse the input grammar with the generated parser
-			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram"));
+			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram"));
 			IParser parser = assembly.GetDefaultParser(input);
 			ParseResult result = parser.Parse();
 			input.Close();

@@ -103,6 +103,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 			stream.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Parser : " + this.BaseClassName);
             stream.WriteLine("\t{");
             ExportAutomaton(stream, name, resource);
+			ExportIDs(stream);
             ExportVariables(stream);
             ExportVirtuals(stream);
             ExportActions(stream);
@@ -111,6 +112,32 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         }
 
         protected abstract void ExportAutomaton(StreamWriter stream, string name, string resource);
+
+		protected void ExportIDs(StreamWriter stream)
+		{
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Contains the constant IDs for the variables and virtuals in this parser");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tpublic sealed class ID");
+			stream.WriteLine("\t\t{");
+			foreach (Variable var in variables)
+			{
+				if (var.Name.StartsWith("_v"))
+					continue;
+				stream.WriteLine("\t\t\t/// <summary>");
+				stream.WriteLine("\t\t\t/// The unique identifier for variable " + var.Name);
+				stream.WriteLine("\t\t\t/// </summary>");
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
+			}
+			foreach (Virtual var in virtuals)
+			{
+				stream.WriteLine("\t\t\t/// <summary>");
+				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + var.Name);
+				stream.WriteLine("\t\t\t/// </summary>");
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
+			}
+			stream.WriteLine("\t\t}");
+		}
 
         protected void ExportVariables(StreamWriter stream)
 		{
@@ -132,14 +159,6 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 				first = false;
 			}
 			stream.WriteLine(" };");
-
-			foreach (Variable var in variables)
-			{
-				stream.WriteLine("\t\t/// <summary>");
-				stream.WriteLine("\t\t/// The unique identifier for variable " + var.Name);
-				stream.WriteLine("\t\t/// </summary>");
-				stream.WriteLine("\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
-			}
         }
 
         protected void ExportVirtuals(StreamWriter stream)
@@ -161,14 +180,6 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 first = false;
             }
             stream.WriteLine(" };");
-
-			foreach (Virtual var in virtuals)
-			{
-				stream.WriteLine("\t\t/// <summary>");
-				stream.WriteLine("\t\t/// The unique identifier for virtual " + var.Name);
-				stream.WriteLine("\t\t/// </summary>");
-				stream.WriteLine("\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
-			}
         }
 
         protected void ExportActions(StreamWriter stream)

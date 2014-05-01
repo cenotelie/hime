@@ -301,8 +301,8 @@ namespace Hime.CentralDogma
 		private bool LoadInput(string name, TextReader reader)
 		{
 			bool hasErrors = false;
-			Input.FileCentralDogmaLexer lexer = new Input.FileCentralDogmaLexer(reader);
-			Input.FileCentralDogmaParser parser = new Input.FileCentralDogmaParser(lexer);
+			Input.HimeGrammarLexer lexer = new Input.HimeGrammarLexer(reader);
+			Input.HimeGrammarParser parser = new Input.HimeGrammarParser(lexer);
 			ParseResult result = null;
 			try
 			{

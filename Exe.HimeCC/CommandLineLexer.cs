@@ -19,25 +19,31 @@ namespace Hime.HimeCC.CL
 		/// </summary>
 		private static readonly Automaton automaton = Automaton.Find(typeof(CommandLineLexer), "CommandLineLexer.bin");
 		/// <summary>
-		/// The unique identifier for terminal ARG_VALUE_NAME
+		/// Contains the constant IDs for the terminals for this lexer
 		/// </summary>
-		public const int ARG_VALUE_NAME = 0x7;
-		/// <summary>
-		/// The unique identifier for terminal ARG_VALUE_NUMBER
-		/// </summary>
-		public const int ARG_VALUE_NUMBER = 0x8;
-		/// <summary>
-		/// The unique identifier for terminal WHITE_SPACE
-		/// </summary>
-		public const int WHITE_SPACE = 0x3;
-		/// <summary>
-		/// The unique identifier for terminal ARG_NAME
-		/// </summary>
-		public const int ARG_NAME = 0x4;
-		/// <summary>
-		/// The unique identifier for terminal ARG_VALUE_QUOTE
-		/// </summary>
-		public const int ARG_VALUE_QUOTE = 0x5;
+		public sealed class ID
+		{
+			/// <summary>
+			/// The unique identifier for terminal ARG_VALUE_NAME
+			/// </summary>
+			public const int ARG_VALUE_NAME = 0x7;
+			/// <summary>
+			/// The unique identifier for terminal ARG_VALUE_NUMBER
+			/// </summary>
+			public const int ARG_VALUE_NUMBER = 0x8;
+			/// <summary>
+			/// The unique identifier for terminal WHITE_SPACE
+			/// </summary>
+			public const int WHITE_SPACE = 0x3;
+			/// <summary>
+			/// The unique identifier for terminal ARG_NAME
+			/// </summary>
+			public const int ARG_NAME = 0x4;
+			/// <summary>
+			/// The unique identifier for terminal ARG_VALUE_QUOTE
+			/// </summary>
+			public const int ARG_VALUE_QUOTE = 0x5;
+		}
 		/// <summary>
 		/// The collection of terminals matched by this lexer
 		/// </summary>

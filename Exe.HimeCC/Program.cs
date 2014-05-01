@@ -152,11 +152,11 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private int GenerateCDParser()
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = CompilationMode.Source;
 			task.AddInputRaw(stream);
-			task.GrammarName = "FileCentralDogma";
+			task.GrammarName = "HimeGrammar";
 			task.Namespace = "Hime.CentralDogma.Input";
 			task.CodeAccess = AccessModifier.Internal;
 			task.Method = ParsingMethod.LALR1;

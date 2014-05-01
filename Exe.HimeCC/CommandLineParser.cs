@@ -16,6 +16,36 @@ namespace Hime.HimeCC.CL
 	{
         private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
 		/// <summary>
+		/// Contains the constant IDs for the variables and virtuals in this parser
+		/// </summary>
+		public sealed class ID
+		{
+			/// <summary>
+			/// The unique identifier for variable value
+			/// </summary>
+			public const int value = 0x9;
+			/// <summary>
+			/// The unique identifier for variable argument
+			/// </summary>
+			public const int argument = 0xA;
+			/// <summary>
+			/// The unique identifier for variable values
+			/// </summary>
+			public const int values = 0xB;
+			/// <summary>
+			/// The unique identifier for variable arguments
+			/// </summary>
+			public const int arguments = 0xC;
+			/// <summary>
+			/// The unique identifier for variable line
+			/// </summary>
+			public const int line = 0xD;
+			/// <summary>
+			/// The unique identifier for variable _Axiom_
+			/// </summary>
+			public const int _Axiom_ = 0x11;
+		}
+		/// <summary>
 		/// The collection of variables matched by this parser
 		/// </summary>
 		/// <remarks>
@@ -32,42 +62,6 @@ namespace Hime.HimeCC.CL
 			new Symbol(0xF, "_v1"), 
 			new Symbol(0x10, "_v2"), 
 			new Symbol(0x11, "_Axiom_") };
-		/// <summary>
-		/// The unique identifier for variable value
-		/// </summary>
-		public const int value = 0x9;
-		/// <summary>
-		/// The unique identifier for variable argument
-		/// </summary>
-		public const int argument = 0xA;
-		/// <summary>
-		/// The unique identifier for variable values
-		/// </summary>
-		public const int values = 0xB;
-		/// <summary>
-		/// The unique identifier for variable arguments
-		/// </summary>
-		public const int arguments = 0xC;
-		/// <summary>
-		/// The unique identifier for variable line
-		/// </summary>
-		public const int line = 0xD;
-		/// <summary>
-		/// The unique identifier for variable _v0
-		/// </summary>
-		public const int _v0 = 0xE;
-		/// <summary>
-		/// The unique identifier for variable _v1
-		/// </summary>
-		public const int _v1 = 0xF;
-		/// <summary>
-		/// The unique identifier for variable _v2
-		/// </summary>
-		public const int _v2 = 0x10;
-		/// <summary>
-		/// The unique identifier for variable _Axiom_
-		/// </summary>
-		public const int _Axiom_ = 0x11;
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>

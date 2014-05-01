@@ -38,11 +38,11 @@ namespace Hime.Tests.Integration
 		{
 			SetTestDirectory();
 
-			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			StreamReader reader = new StreamReader(stream);
 			string grammar = reader.ReadToEnd();
 
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammar, "FileCentralDogma", ParsingMethod.LALR1, grammar, "Test_CentralDogma_Regeneration");
+			Hime.Redist.Parsers.IParser parser = BuildParser(grammar, "HimeGrammar", ParsingMethod.LALR1, grammar, "Test_CentralDogma_Regeneration");
 			Assert.IsNotNull(parser, "Failed to compile the parser");
 			ParseResult result = parser.Parse();
 			Assert.IsTrue(result.IsSuccess, "Failed to parse the Central Dogma grammar with the generated parser");

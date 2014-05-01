@@ -86,14 +86,22 @@ namespace Hime.CentralDogma.Grammars
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\tprivate static readonly Automaton automaton = Automaton.Find(typeof(" + name + "Lexer), \"" + resource + "\");");
             
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Contains the constant IDs for the terminals for this lexer");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tpublic sealed class ID");
+			stream.WriteLine("\t\t{");
 			for (int i = 2; i != terminals.Count; i++)
 			{
 				Terminal terminal = terminals[i];
-				stream.WriteLine("\t\t/// <summary>");
-				stream.WriteLine("\t\t/// The unique identifier for terminal " + terminal.Name);
-				stream.WriteLine("\t\t/// </summary>");
-				stream.WriteLine("\t\tpublic const int {0} = 0x{1};", terminal.Name, terminal.SID.ToString("X"));
+				if (terminal.Name.StartsWith("_t"))
+					continue;
+				stream.WriteLine("\t\t\t/// <summary>");
+				stream.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
+				stream.WriteLine("\t\t\t/// </summary>");
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", terminal.Name, terminal.SID.ToString("X"));
 			}
+			stream.WriteLine("\t\t}");
 
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// The collection of terminals matched by this lexer");

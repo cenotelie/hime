@@ -66,7 +66,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree
             for (int i = 0; i != parameters.Count; i++)
                 newContext.AddReference(templateRule.Parameters[i], parameters[i]);
             // Recognize the rule with the new context
-            CFRuleBodySet set = newContext.Compiler.Compile_Recognize_rule_definition(newContext, templateRule.DefinitionNode);
+            CFRuleBodySet set = newContext.Compiler.BuildDefinitions(newContext, templateRule.DefinitionNode);
             // Add recognized rules to the variable
             foreach (CFRuleBody def in set)
                 variable.AddRule(new CFRule(variable, def, false));

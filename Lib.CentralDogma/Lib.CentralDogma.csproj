@@ -145,8 +145,6 @@
     <Compile Include="Sources\Grammars\RuleBodyElement.cs" />
     <Compile Include="Sources\Grammars\RuleBodyElementAction.cs" />
     <Compile Include="Sources\Grammars\TextLexerData.cs" />
-    <Compile Include="Sources\Input\FileCentralDogmaLexer.cs" />
-    <Compile Include="Sources\Input\FileCentralDogmaParser.cs" />
     <Compile Include="Sources\Grammars\Action.cs" />
     <Compile Include="Sources\Grammars\Symbol.cs" />
     <Compile Include="Sources\Grammars\Terminal.cs" />
@@ -182,14 +180,16 @@
     <Compile Include="Sources\Automata\LRReduction.cs" />
     <Compile Include="Sources\Automata\LRAutomaton.cs" />
     <Compile Include="Sources\SDK\ParserReflection.cs" />
+    <Compile Include="Sources\Input\HimeGrammarLexer.cs" />
+    <Compile Include="Sources\Input\HimeGrammarParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>
-    <EmbeddedResource Include="Sources\Input\FileCentralDogma.gram" />
-    <EmbeddedResource Include="Sources\Input\FileCentralDogmaLexer.bin" />
-    <EmbeddedResource Include="Sources\Input\FileCentralDogmaParser.bin" />
+    <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />
+    <EmbeddedResource Include="Sources\Input\HimeGrammarParser.bin" />
+    <EmbeddedResource Include="Sources\Input\HimeGrammarLexer.bin" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">

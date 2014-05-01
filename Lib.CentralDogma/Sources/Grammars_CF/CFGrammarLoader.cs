@@ -4,256 +4,170 @@
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
 * of the License, or (at your option) any later version.
-* 
+*
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General
 * Public License along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-
 using System.Collections.Generic;
+using Hime.CentralDogma.Input;
 using Hime.Redist.Parsers;
 using Hime.Redist;
 
 namespace Hime.CentralDogma.Grammars.ContextFree
 {
-    class CFGrammarLoader : GrammarLoader
-    {
-        private string resName;
-        private ASTNode syntaxRoot;
-        private Reporting.Reporter reporter;
-        private List<string> inherited;
-        private CFGrammar grammar;
-        private bool caseInsensitive;
+	class CFGrammarLoader : GrammarLoader
+	{
+		/// <summary>
+		/// The name of the resource containing the data that are loaded by this instance
+		/// </summary>
+		private string resource;
+		/// <summary>
+		/// The root to load from
+		/// </summary>
+		private ASTNode root;
+		/// <summary>
+		/// The log
+		/// </summary>
+		private Reporting.Reporter reporter;
+		/// <summary>
+		/// Lists of the inherited grammars
+		/// </summary>
+		private List<string> inherited;
+		/// <summary>
+		/// The resulting grammar
+		/// </summary>
+		private CFGrammar grammar;
+		/// <summary>
+		/// Flag for the global casing of the grammar
+		/// </summary>
+		private bool caseInsensitive;
 
-        public Grammar Grammar { get { return grammar; } }
-        public bool IsSolved { get { return (inherited.Count == 0); } }
+		/// <summary>
+		/// Gets the result of this loader
+		/// </summary>
+		public Grammar Grammar { get { return grammar; } }
+		/// <summary>
+		/// Gets a value indicating whether all dependencies are solved
+		/// </summary>
+		public bool IsSolved { get { return (inherited.Count == 0); } }
 
-        public CFGrammarLoader(string resName, ASTNode root, Reporting.Reporter reporter)
-        {
-            this.reporter = reporter;
-            this.syntaxRoot = root;
-            this.resName = resName;
-            this.inherited = new List<string>();
-            foreach (ASTNode child in syntaxRoot.Children[1].Children)
-                inherited.Add(child.Symbol.Value);
-            this.grammar = new CFGrammar(root.Children[0].Symbol.Value);
-            this.caseInsensitive = false;
-            if (inherited.Count == 0)
-                Compile_Recognize_grammar_text(syntaxRoot);
-        }
-
-        public void Load(Dictionary<string, GrammarLoader> loaders)
-        {
-            List<string> temp = new List<string>(inherited);
-            foreach (string parent in temp)
-            {
-                if (!loaders.ContainsKey(parent))
-                {
-                    reporter.Error("Grammar " + parent + " inherited by " + grammar.Name + " cannot be found");
-                    inherited.Remove(parent);
-                }
-                GrammarLoader loader = loaders[parent];
-                if (!loader.IsSolved)
-                    continue;
-                this.grammar.Inherit(loader.Grammar);
-                inherited.Remove(parent);
-            }
-            if (inherited.Count == 0)
-                Compile_Recognize_grammar_text(syntaxRoot);
-        }
-
-        private Symbol Compile_Tool_NameToSymbol(string name, CompilerContext context)
-        {
-            if (context.IsReference(name))
-                return context.GetReference(name);
-            return grammar.GetSymbol(name);
-        }
-
-        private void Compile_Recognize_option(ASTNode node)
-        {
-            string Name = node.Children[0].Symbol.Value;
-            string Value = node.Children[1].Symbol.Value;
-            Value = Value.Substring(1, Value.Length - 2);
-            grammar.AddOption(Name, Value);
-        }
-
-        private Automata.NFA Compile_Recognize_terminal_def_atom_any(ASTNode node)
-        {
-            Automata.NFA automata = Automata.NFA.NewMinimal();
-			// plane 0 transitions
-			automata.StateEntry.AddTransition(new CharSpan((char)0x0000, (char)0xD7FF), automata.StateExit);
-			automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
-			// surrogate pairs
-			Automata.NFAState intermediate = automata.AddNewState();
-			automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
-			intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
-			return automata;
-        }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_unicode(ASTNode node)
+		/// <summary>
+		/// Initializes this load
+		/// </summary>
+		/// <param name="resName">The name of the resource</param>
+		/// <param name="root">The root AST</param>
+		/// <param name="reporter">The log</param>
+		public CFGrammarLoader(string resName, ASTNode root, Reporting.Reporter reporter)
 		{
-			Automata.NFA automata = Automata.NFA.NewMinimal();
-			string value = node.Symbol.Value;
-			value = value.Substring(2, value.Length - 2);
-			UnicodeCodePoint cp = new UnicodeCodePoint(System.Convert.ToInt32(value, 16));
-			char[] data = cp.GetUTF16();
-			if (data.Length == 1)
-			{
-				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), automata.StateExit);
-			}
-			else
-			{
-				Automata.NFAState intermediate = automata.AddNewState();
-				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), intermediate);
-				intermediate.AddTransition(new CharSpan(data[1], data[1]), automata.StateExit);
-			}
-			return automata;
-        }
-        private string ReplaceEscapees(string value)
-        {
-            if (!value.Contains("\\"))
-                return value;
-            System.Text.StringBuilder builder = new System.Text.StringBuilder();
-            for (int i = 0; i != value.Length; i++)
-            {
-                char c = value[i];
-                if (c != '\\')
-                {
-                    builder.Append(c);
-                    continue;
-                }
-                i++;
-                char next = value[i];
-                if (next == '\\') builder.Append(next);
-                else if (next == '0') builder.Append('\0'); /*Unicode character 0*/
-                else if (next == 'a') builder.Append('\a'); /*Alert (character 7)*/
-                else if (next == 'b') builder.Append('\b'); /*Backspace (character 8)*/
-                else if (next == 'f') builder.Append('\f'); /*Form feed (character 12)*/
-                else if (next == 'n') builder.Append('\n'); /*New line (character 10)*/
-                else if (next == 'r') builder.Append('\r'); /*Carriage return (character 13)*/
-                else if (next == 't') builder.Append('\t'); /*Horizontal tab (character 9)*/
-                else if (next == 'v') builder.Append('\v'); /*Vertical quote (character 11)*/
-                else builder.Append("\\" + next);
-            }
-            return builder.ToString();
-        }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_text(ASTNode node)
-        {
-        	Automata.NFA automata = Automata.NFA.NewMinimal();
-            automata.StateExit = automata.StateEntry;
-            string value = node.Children[node.Children.Count-1].Symbol.Value;
-            bool insensitive = caseInsensitive || (node.Children.Count > 1);
-            value = value.Substring(1, value.Length - 2);
-            value = ReplaceEscapees(value).Replace("\\'", "'");
-            foreach (char c in value)
-            {
-                Automata.NFAState temp = automata.AddNewState();
-                if (insensitive && char.IsLetter(c))
-                {
-                    char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
-                    automata.StateExit.AddTransition(new CharSpan(c, c), temp);
-                    automata.StateExit.AddTransition(new CharSpan(c2, c2), temp);
-                }
-                else
-                    automata.StateExit.AddTransition(new CharSpan(c, c), temp);
-                automata.StateExit = temp;
-            }
-            return automata;
-        }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_set(ASTNode node)
-        {
-            Automata.NFA automata = Automata.NFA.NewMinimal();
-            string value = node.Symbol.Value;
-            value = value.Substring(1, value.Length - 2);
-            value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
-            bool positive = true;
-            if (value[0] == '^')
-            {
-                value = value.Substring(1);
-                positive = false;
-            }
+			this.reporter = reporter;
+			this.root = root;
+			this.resource = resName;
+			this.inherited = new List<string>();
+			foreach (ASTNode child in root.Children[1].Children)
+				inherited.Add(child.Symbol.Value);
+			this.grammar = new CFGrammar(root.Children[0].Symbol.Value);
+			this.caseInsensitive = false;
+			if (inherited.Count == 0)
+				LoadGrammarContent(root);
+		}
 
-            List<CharSpan> spans = new List<CharSpan>();
+		/// <summary>
+		/// Loads the specified data
+		/// </summary>
+		/// <param name="siblings">The siblings of this loader</param>
+		public void Load(Dictionary<string, GrammarLoader> siblings)
+		{
+			List<string> temp = new List<string>(inherited);
+			foreach (string parent in temp)
+			{
+				if (!siblings.ContainsKey(parent))
+				{
+					reporter.Error(string.Format("{0} Grammar {1} inherited by {2} cannot be found", resource, parent, grammar.Name));
+					inherited.Remove(parent);
+				}
+				GrammarLoader loader = siblings[parent];
+				if (!loader.IsSolved)
+					continue;
+				this.grammar.Inherit(loader.Grammar);
+				inherited.Remove(parent);
+			}
+			if (inherited.Count == 0)
+				LoadGrammarContent(root);
+		}
+
+		/// <summary>
+		/// Gets the symbol corresponding to the given name, depending on the context
+		/// </summary>
+		/// <param name="name">A name</param>
+		/// <param name="context">The current context</param>
+		private Symbol ResolveSymbol(string name, CompilerContext context)
+		{
+			// is this a reference to a template parameter?
+			if (context.IsReference(name))
+				return context.GetReference(name);
+			// then this is a reference to a normal grammar symbol
+			return grammar.GetSymbol(name);
+		}
+
+		/// <summary>
+		/// Replaces the escape sequences in the given piece of text by their value
+		/// </summary>
+		/// <param name="value">A string</param>
+		/// <returns>The string with the escape sequences replaced by their value</returns>
+		private string ReplaceEscapees(string value)
+		{
+			if (!value.Contains("\\"))
+				return value;
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
 			for (int i = 0; i != value.Length; i++)
-            {
-				// read the first full unicode character
-				char b = value[i];
-				if (b >= 0xD800 && b <= 0xDFFF)
+			{
+				char c = value[i];
+				if (c != '\\')
 				{
-					reporter.Error("Unsupported non-plane 0 Unicode character (" + b + value[i + 1] + ") in character class");
-					return automata;
+					builder.Append(c);
+					continue;
 				}
-
-                if ((i != value.Length - 1) && (value[i + 1] == '-'))
-                {
-					// this is a range, match the '-'
-					i += 2;
-					char e = value[i];
-					if (e >= 0xD800 && e <= 0xDFFF)
-					{
-						reporter.Error("Unsupported non-plane 0 Unicode character (" + e + value[i + 1] + ") in character class");
-						return automata;
-					}
-					if (b < 0xD800 && e > 0xDFFF)
-					{
-						// oooh you ...
-						spans.Add(new CharSpan(b, (char)0xD7FF));
-						spans.Add(new CharSpan((char)0xE000, e));
-					}
-					else
-					{
-						spans.Add(new CharSpan(b, e));
-					}
-                }
+				i++;
+				char next = value[i];
+				if (next == '\\')
+					builder.Append(next);
+				else if (next == '0')
+					builder.Append('\0'); /*Unicode character 0*/
+                else if (next == 'a')
+					builder.Append('\a'); /*Alert (character 7)*/
+                else if (next == 'b')
+					builder.Append('\b'); /*Backspace (character 8)*/
+                else if (next == 'f')
+					builder.Append('\f'); /*Form feed (character 12)*/
+                else if (next == 'n')
+					builder.Append('\n'); /*New line (character 10)*/
+                else if (next == 'r')
+					builder.Append('\r'); /*Carriage return (character 13)*/
+                else if (next == 't')
+					builder.Append('\t'); /*Horizontal tab (character 9)*/
+                else if (next == 'v')
+					builder.Append('\v'); /*Vertical quote (character 11)*/
                 else
-				{
-					// this is a normal character
-					spans.Add(new CharSpan(b, b));
-				}
-            }
-            if (positive)
-            {
-                foreach (CharSpan span in spans)
-                    automata.StateEntry.AddTransition(span, automata.StateExit);
-            }
-            else
-            {
-                spans.Sort(new System.Comparison<CharSpan>(CharSpan.Compare));
-				// TODO: Check for span intersections and overflow of b (when a span ends on 0xFFFF)
-                char b = (char)0;
-                for (int i = 0; i != spans.Count; i++)
-                {
-                    if (spans[i].Begin > b)
-                        automata.StateEntry.AddTransition(new CharSpan(b, (char)(spans[i].Begin - 1)), automata.StateExit);
-					b = (char)(spans[i].End + 1);
-					// skip the surrogate encoding points
-					if (b >= 0xD800 && b <= 0xDFFF)
-						b = (char)0xE000;
-                }
-				if (b <= 0xD7FF)
-				{
-					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xD7FF), automata.StateExit);
-					automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
-				}
-				else if (b != 0xFFFF)
-				{
-					// here b >= 0xE000
-					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xFFFF), automata.StateExit);
-				}
-				// surrogate pairs
-				Automata.NFAState intermediate = automata.AddNewState();
-				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
-				intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
-            }
-            return automata;
-        }
+					builder.Append("\\" + next);
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Adds a unicode character span to an existing NFA automaton
+		/// </summary>
+		/// <param name="automata">The target NFA</param>
+		/// <param name="intermediate">The intermediate state for characters outside plane 0</param>
+		/// <param name="span">The unicode span to add</param>
 		private void AddUnicodeSpanToNFA(Automata.NFA automata, Automata.NFAState intermediate, UnicodeSpan span)
 		{
 			char[] b = span.Begin.GetUTF16();
@@ -285,396 +199,705 @@ namespace Hime.CentralDogma.Grammars.ContextFree
 				intermediate.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
 			}
 		}
-        private Automata.NFA Compile_Recognize_terminal_def_atom_ublock(ASTNode node)
+
+		/// <summary>
+		/// Loads the content of the grammar in the given AST
+		/// </summary>
+		/// <param name="node">The AST node representing a grammar</param>
+		private void LoadGrammarContent(ASTNode node)
+		{
+			for (int i = 2; i < node.Children.Count; i++)
+			{
+				ASTNode child = node.Children[i];
+				if (child.Symbol.ID == HimeGrammarLexer.ID.BLOCK_OPTIONS)
+					LoadBlockOptions(child);
+				else if (child.Symbol.ID == HimeGrammarLexer.ID.BLOCK_TERMINALS)
+					LoadBlockTerminals(child);
+				else if (child.Symbol.ID == HimeGrammarLexer.ID.BLOCK_RULES)
+					LoadBlockRules(child);
+			}
+		}
+
+		/// <summary>
+		/// Loads the options block of a grammar
+		/// </summary>
+		/// <param name="node">The options block's AST node</param>
+		private void LoadBlockOptions(ASTNode node)
+		{
+			foreach (ASTNode child in node.Children)
+				LoadOption(child);
+			// determine the casing of the grammar
+			caseInsensitive = (grammar.HasOption("CaseSensitive") && grammar.GetOption("CaseSensitive").Equals("false", System.StringComparison.InvariantCultureIgnoreCase));
+		}
+
+		/// <summary>
+		/// Loads the grammar option in the given AST
+		/// </summary>
+		/// <param name="node">The AST node of a grammar option</param>
+		private void LoadOption(ASTNode node)
+		{
+			string name = node.Children[0].Symbol.Value;
+			string value = node.Children[1].Symbol.Value;
+			value = value.Substring(1, value.Length - 2);
+			grammar.AddOption(name, value);
+		}
+
+		/// <summary>
+		/// Loads the terminal blocks of a grammar
+		/// </summary>
+		/// <param name="node">The terminal block's AST node</param>
+		private void LoadBlockTerminals(ASTNode node)
+		{
+			foreach (ASTNode child in node.Children)
+				LoadTerminal(child);
+		}
+
+		/// <summary>
+		/// Loads the terminal in the given AST
+		/// </summary>
+		/// <param name="node">The AST node of a terminal rule</param>
+		private void LoadTerminal(ASTNode node)
+		{
+			ASTNode nameNode = node.Children[0];
+			// Resolve the terminal
+			TextTerminal terminal = grammar.GetTerminalByName(nameNode.Symbol.Value) as TextTerminal;
+			if (terminal == null)
+			{
+				// The terminal does not already exists
+				// Build the NFA
+				Automata.NFA nfa = BuildNFA(node.Children[1]);
+				// Create the terminal in the grammar
+				terminal = grammar.AddTerminalNamed(nameNode.Symbol.Value, nfa);
+				// Marks the final NFA state with the new terminal
+				nfa.StateExit.Item = terminal;
+			}
+			else
+			{
+				// Tried to override the terminal
+				reporter.Error(string.Format("{0}{1} Overriding the definition of terminal {2}", resource, nameNode.Position, nameNode.Symbol.Value));
+			}
+		}
+
+		/// <summary>
+		/// Builds the NFA represented by the AST node
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFA(ASTNode node)
+		{
+			Hime.Redist.Symbol symbol = node.Symbol;
+
+			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_TEXT)
+				return BuildNFAFromText(node);
+			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_CODEPOINT)
+				return BuildNFAFromCodepoint(node);
+			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_CLASS)
+				return BuildNFAFromClass(node);
+			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_CATEGORY)
+				return BuildNFAFromUnicodeCategory(node);
+			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_BLOCK)
+				return BuildNFAFromUnicodeBlock(node);
+			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_SPAN_MARKER)
+				return BuildNFAFromUnicodeSpan(node);
+			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_ANY)
+				return BuildNFAFromAny(node);
+
+			if (symbol.ID == HimeGrammarLexer.ID.NAME)
+				return BuildNFAFromReference(node);
+
+			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
+			{
+				Automata.NFA inner = BuildNFA(node.Children[0]);
+				return Automata.NFA.NewOptional(inner, false);
+			}
+			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_ZEROMORE)
+			{
+				Automata.NFA inner = BuildNFA(node.Children[0]);
+				return Automata.NFA.NewRepeatZeroMore(inner, false);
+			}
+			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_ONEMORE)
+			{
+				Automata.NFA inner = BuildNFA(node.Children[0]);
+				return Automata.NFA.NewRepeatOneOrMore(inner, false);
+			}
+			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_UNION)
+			{
+				Automata.NFA left = BuildNFA(node.Children[0]);
+				Automata.NFA right = BuildNFA(node.Children[1]);
+				return Automata.NFA.NewUnion(left, right, false);
+			}
+			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_DIFFERENCE)
+			{
+				Automata.NFA left = BuildNFA(node.Children[0]);
+				Automata.NFA right = BuildNFA(node.Children[1]);
+				return Automata.NFA.NewDifference(left, right, false);
+			}
+			if (symbol.Name == "range")
+			{
+				Automata.NFA inner = BuildNFA(node.Children[0]);
+				int min = System.Convert.ToInt32(node.Children[1].Symbol.Value);
+				int max = min;
+				if (node.Children.Count > 2)
+					max = System.Convert.ToInt32(node.Children[2].Symbol.Value);
+				return Automata.NFA.NewRepeatRange(inner, false, min, max);
+			}
+			if (symbol.Name == "concat")
+			{
+				Automata.NFA left = BuildNFA(node.Children[0]);
+				Automata.NFA right = BuildNFA(node.Children[1]);
+				return Automata.NFA.NewConcatenation(left, right, false);
+			}
+
+			// nothing found ...
+			reporter.Error(string.Format("{0}{1} Failed to recognize lexical rule", resource, node.Position));
+			// return an empty NFA
+			return BuildEpsilonNFA();
+		}
+
+		/// <summary>
+		/// Builds a NFA that does nothing
+		/// </summary>
+		/// <returns>A NFA</returns>
+		private Automata.NFA BuildEpsilonNFA()
+		{
+			Automata.NFA final = Automata.NFA.NewMinimal();
+			final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
+			return final;
+		}
+
+		/// <summary>
+		/// Builds a NFA from a piece of text
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromText(ASTNode node)
 		{
 			Automata.NFA automata = Automata.NFA.NewMinimal();
+			automata.StateExit = automata.StateEntry;
+
+			// build the raw piece of text
+			string value = node.Symbol.Value;
+			bool insensitive = caseInsensitive;
+			if (value.StartsWith("~"))
+			{
+				insensitive = true;
+				value = value.Substring(2, value.Length - 3);
+			}
+			else
+			{
+				value = value.Substring(1, value.Length - 2);
+			}
+			value = ReplaceEscapees(value).Replace("\\'", "'");
+
+			// build the result
+			foreach (char c in value)
+			{
+				Automata.NFAState temp = automata.AddNewState();
+				if (insensitive && char.IsLetter(c))
+				{
+					char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
+					automata.StateExit.AddTransition(new CharSpan(c, c), temp);
+					automata.StateExit.AddTransition(new CharSpan(c2, c2), temp);
+				}
+				else
+					automata.StateExit.AddTransition(new CharSpan(c, c), temp);
+				automata.StateExit = temp;
+			}
+			return automata;
+		}
+
+		/// <summary>
+		/// Builds a NFA from a unicode code point
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromCodepoint(ASTNode node)
+		{
+			// extract the code point value
+			string value = node.Symbol.Value;
+			value = value.Substring(2, value.Length - 2);
+			int cpValue = System.Convert.ToInt32(value, 16);
+			if (cpValue < 0 || (cpValue >= 0xD800 && cpValue <= 0xDFFF) || cpValue >= 0x110000)
+			{
+				reporter.Error(string.Format("{0}{1} The value U+{2} is not a supported unicode code point", resource, node.Position, cpValue.ToString("X")));
+				return BuildEpsilonNFA();
+			}
+			UnicodeCodePoint cp = new UnicodeCodePoint(cpValue);
+			// build the NFA
+			Automata.NFA automata = Automata.NFA.NewMinimal();
+			char[] data = cp.GetUTF16();
+			if (data.Length == 1)
+			{
+				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), automata.StateExit);
+			}
+			else
+			{
+				Automata.NFAState intermediate = automata.AddNewState();
+				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), intermediate);
+				intermediate.AddTransition(new CharSpan(data[1], data[1]), automata.StateExit);
+			}
+			return automata;
+		}
+
+		/// <summary>
+		/// Builds a NFA from a character class
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromClass(ASTNode node)
+		{
+			// extract the value
+			string value = node.Symbol.Value;
+			value = value.Substring(1, value.Length - 2);
+			value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
+			bool positive = true;
+			if (value[0] == '^')
+			{
+				value = value.Substring(1);
+				positive = false;
+			}
+			// build the character spans
+			List<CharSpan> spans = new List<CharSpan>();
+			for (int i = 0; i != value.Length; i++)
+			{
+				// read the first full unicode character
+				char b = value[i];
+				if (b >= 0xD800 && b <= 0xDFFF)
+				{
+					reporter.Error(string.Format("{0}{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, b + value[i + 1]));
+					return BuildEpsilonNFA();
+				}
+				if ((i != value.Length - 1) && (value[i + 1] == '-'))
+				{
+					// this is a range, match the '-'
+					i += 2;
+					char e = value[i];
+					if (e >= 0xD800 && e <= 0xDFFF)
+					{
+						reporter.Error(string.Format("{0}{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, e + value[i + 1]));
+						return BuildEpsilonNFA();
+					}
+					if (b < 0xD800 && e > 0xDFFF)
+					{
+						// oooh you ...
+						spans.Add(new CharSpan(b, (char)0xD7FF));
+						spans.Add(new CharSpan((char)0xE000, e));
+					}
+					else
+					{
+						spans.Add(new CharSpan(b, e));
+					}
+				}
+				else
+				{
+					// this is a normal character
+					spans.Add(new CharSpan(b, b));
+				}
+			}
+			// build the result
+			Automata.NFA automata = Automata.NFA.NewMinimal();
+			if (positive)
+			{
+				foreach (CharSpan span in spans)
+					automata.StateEntry.AddTransition(span, automata.StateExit);
+			}
+			else
+			{
+				spans.Sort(new System.Comparison<CharSpan>(CharSpan.Compare));
+				// TODO: Check for span intersections and overflow of b (when a span ends on 0xFFFF)
+				char b = (char)0;
+				for (int i = 0; i != spans.Count; i++)
+				{
+					if (spans[i].Begin > b)
+						automata.StateEntry.AddTransition(new CharSpan(b, (char)(spans[i].Begin - 1)), automata.StateExit);
+					b = (char)(spans[i].End + 1);
+					// skip the surrogate encoding points
+					if (b >= 0xD800 && b <= 0xDFFF)
+						b = (char)0xE000;
+				}
+				if (b <= 0xD7FF)
+				{
+					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xD7FF), automata.StateExit);
+					automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
+				}
+				else if (b != 0xFFFF)
+				{
+					// here b >= 0xE000
+					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xFFFF), automata.StateExit);
+				}
+				// surrogate pairs
+				Automata.NFAState intermediate = automata.AddNewState();
+				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
+				intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
+			}
+			return automata;
+		}
+
+		/// <summary>
+		/// Builds a NFA from a unicode category
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromUnicodeCategory(ASTNode node)
+		{
+			// extract the value
+			string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
+			UnicodeCategory category = UnicodeCategories.GetCategory(value);
+			if (category == null)
+			{
+				reporter.Error(string.Format("{0}{1} Unknown unicode category {2}", resource, node.Position, value));
+				return BuildEpsilonNFA();
+			}
+			// build the result
+			Automata.NFA automata = Automata.NFA.NewMinimal();
+			Automata.NFAState intermediate = automata.AddNewState();
+			foreach (UnicodeSpan span in category.Spans)
+				AddUnicodeSpanToNFA(automata, intermediate, span);
+			return automata;
+		}
+
+		/// <summary>
+		/// Builds a NFA from a unicode block
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromUnicodeBlock(ASTNode node)
+		{
+			// extract the value
 			string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
 			UnicodeBlock block = UnicodeBlocks.GetBlock(value);
 			if (block == null)
 			{
-				reporter.Error("Unkown Unicode block " + value);
-				return automata;
+				reporter.Error(string.Format("{0}{1} Unknown unicode block {2}", resource, node.Position, value));
+				return BuildEpsilonNFA();
 			}
+			// build the result
+			Automata.NFA automata = Automata.NFA.NewMinimal();
 			Automata.NFAState intermediate = automata.AddNewState();
 			AddUnicodeSpanToNFA(automata, intermediate, block.Span);
-            return automata;
-        }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_ucat(ASTNode node)
-        {
-            Automata.NFA automata = Automata.NFA.NewMinimal();
-            string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
-			UnicodeCategory category = UnicodeCategories.GetCategory(value);
-            if (category == null)
+			return automata;
+		}
+
+		/// <summary>
+		/// Builds a NFA from a unicode character span
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromUnicodeSpan(ASTNode node)
+		{
+			// extract the values
+			int spanBegin = 0;
+			int spanEnd = 0;
+			spanBegin = System.Convert.ToInt32(node.Children[0].Symbol.Value.Substring(2), 16);
+			spanEnd = System.Convert.ToInt32(node.Children[1].Symbol.Value.Substring(2), 16);
+			if (spanBegin > spanEnd)
 			{
-				reporter.Error("Unkown Unicode category " + value);
-				return automata;
+				reporter.Error(string.Format("{0}{1} Invalid unicode character span, the end is before the beginning", resource, node.Position));
+				return BuildEpsilonNFA();
 			}
-			Automata.NFAState intermediate = automata.AddNewState();
-			foreach (UnicodeSpan span in category.Spans)
-				AddUnicodeSpanToNFA(automata, intermediate, span);
-            return automata;
-        }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_span(ASTNode node)
-        {
-            Automata.NFA automata = Automata.NFA.NewMinimal();
-            int spanBegin = 0;
-            int spanEnd = 0;
-            // Get span begin
-            spanBegin = System.Convert.ToInt32(node.Children[0].Symbol.Value.Substring(2), 16);
-            // Get span end
-            spanEnd = System.Convert.ToInt32(node.Children[1].Symbol.Value.Substring(2), 16);
-            // If span end is before beginning: reverse
-            if (spanBegin > spanEnd)
-            {
-				reporter.Error("Invalid span (end is before beginning)");
-				return automata;
-            }
+			// build the result
+			Automata.NFA automata = Automata.NFA.NewMinimal();
 			Automata.NFAState intermediate = automata.AddNewState();
 			AddUnicodeSpanToNFA(automata, intermediate, new UnicodeSpan(spanBegin, spanEnd));
-            return automata;
-        }
-        private Automata.NFA Compile_Recognize_terminal_def_atom_name(ASTNode node)
-        {
-            Terminal Ref = grammar.GetTerminalByName(node.Symbol.Value);
-            if (Ref == null)
-            {
-				reporter.Error(resName + " @(" + node.Position.Line + ", " + node.Position.Column + ") Cannot find terminal " + node.Symbol.Value);
-                Automata.NFA final = Automata.NFA.NewMinimal();
-                final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
-                return final;
-            }
-            return ((TextTerminal)Ref).NFA.Clone(false);
-        }
-		
-        private Automata.NFA Compile_Recognize_terminal_definition(ASTNode node)
-        {
-			Hime.Redist.Symbol symbol = node.Symbol;
-			if (symbol.Name == "terminal_def_atom_text")
-			        return Compile_Recognize_terminal_def_atom_text(node);
-			if (symbol.Name == "SYMBOL_VALUE_UINT8")
-			    return Compile_Recognize_terminal_def_atom_unicode(node);
-			if (symbol.Name == "SYMBOL_VALUE_UINT16")
-			    return Compile_Recognize_terminal_def_atom_unicode(node);
-			if (symbol.Name == "SYMBOL_TERMINAL_SET")
-			    return Compile_Recognize_terminal_def_atom_set(node);
-			if (symbol.Name == "SYMBOL_TERMINAL_UCAT")
-			    return Compile_Recognize_terminal_def_atom_ucat(node);
-			if (symbol.Name == "SYMBOL_TERMINAL_UBLOCK")
-			    return Compile_Recognize_terminal_def_atom_ublock(node);
-			if (symbol.Value == "..")
-			    return Compile_Recognize_terminal_def_atom_span(node);
-			if (symbol.Name == "NAME")
-			    return Compile_Recognize_terminal_def_atom_name(node);
-			if (symbol.Value == ".")
-			    return Compile_Recognize_terminal_def_atom_any(node);
+			return automata;
+		}
 
-			if (symbol.Value == "?")
-			{
-			    Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-			    return Automata.NFA.NewOptional(inner, false);
-			}
-			if (symbol.Value == "*")
-			{
-			    Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-			    return Automata.NFA.NewRepeatZeroMore(inner, false);
-			}
-			if (symbol.Value == "+")
-			{
-			    Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-			    return Automata.NFA.NewRepeatOneOrMore(inner, false);
-			}
-			if (symbol.Value == "|")
-			{
-			    Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
-			    Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
-			    return Automata.NFA.NewUnion(left, right, false);
-			}
-			if (symbol.Value == "-")
-			{
-			    Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
-			    Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
-			    return Automata.NFA.NewDifference(left, right, false);
-			}
-			if (symbol.Name == "range")
-			{
-			    Automata.NFA inner = Compile_Recognize_terminal_definition(node.Children[0]);
-			    int min = System.Convert.ToInt32(node.Children[1].Symbol.Value);
-			    int max = min;
-			    if (node.Children.Count > 2)
-			        max = System.Convert.ToInt32(node.Children[2].Symbol.Value);
-			    return Automata.NFA.NewRepeatRange(inner, false, min, max);
-			}
-			if (symbol.Name == "concat")
-			{
-			    Automata.NFA left = Compile_Recognize_terminal_definition(node.Children[0]);
-			    Automata.NFA right = Compile_Recognize_terminal_definition(node.Children[1]);
-			    return Automata.NFA.NewConcatenation(left, right, false);
-			}
-			Automata.NFA final = Automata.NFA.NewMinimal();
-			final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
-			return final;
-        }
-		
-        private Terminal Compile_Recognize_terminal(ASTNode node)
-        {
-            TextTerminal terminal = grammar.GetTerminalByName(node.Children[0].Symbol.Value) as TextTerminal;
-            if (terminal == null)
-            {
-                Automata.NFA nfa = Compile_Recognize_terminal_definition(node.Children[1]);
-                terminal = grammar.AddTerminalNamed(node.Children[0].Symbol.Value, nfa);
-                nfa.StateExit.Item = terminal;
-            }
-            else
-            {
-                reporter.Error(resName + " @(" + node.Children[0].Position.Line + ", " + node.Children[0].Position.Column + ") Overriding the definition of terminal " + node.Children[0].Symbol.Value);
-            }
-            return terminal;
-        }
+		/// <summary>
+		/// Builds a NFA that matches everything (a single character)
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromAny(ASTNode node)
+		{
+			Automata.NFA automata = Automata.NFA.NewMinimal();
+			// plane 0 transitions
+			automata.StateEntry.AddTransition(new CharSpan((char)0x0000, (char)0xD7FF), automata.StateExit);
+			automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
+			// surrogate pairs
+			Automata.NFAState intermediate = automata.AddNewState();
+			automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
+			intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
+			return automata;
+		}
 
-        private CFRuleBodySet Compile_Recognize_grammar_text_terminal(ASTNode node)
-        {
-            // Construct the terminal name
-            string value = node.Children[node.Children.Count - 1].Symbol.Value;
-            value = value.Substring(1, value.Length - 2);
-            value = ReplaceEscapees(value).Replace("\\'", "'");
-            // Check for previous instance in the grammar
-            Terminal terminal = grammar.GetTerminalByValue(value);
-            if (terminal == null)
-            {
-                // Create the terminal
-                Automata.NFA nfa = Compile_Recognize_terminal_def_atom_text(node);
-                terminal = grammar.AddTerminalAnon(value, nfa);
-                nfa.StateExit.Item = terminal;
-            }
-            // Create the definition set
-            CFRuleBodySet set = new CFRuleBodySet();
-            set.Add(new CFRuleBody(terminal));
-            return set;
-        }
+		/// <summary>
+		/// Builds a NFA from a referenced terminal
+		/// </summary>
+		/// <param name="node">An AST node representing a NFA</param>
+		/// <returns>The equivalent NFA</returns>
+		private Automata.NFA BuildNFAFromReference(ASTNode node)
+		{
+			// rerieve the reference
+			Terminal reference = grammar.GetTerminalByName(node.Symbol.Value);
+			if (reference == null)
+			{
+				reporter.Error(string.Format("{0}{1} Reference to unknown terminal {2}", resource, node.Position, node.Symbol.Value));
+				return BuildEpsilonNFA();
+			}
+			return (reference as TextTerminal).NFA.Clone(false);
+		}
 
-        private CFRuleBodySet Compile_Recognize_rule_sym_action(ASTNode node)
-        {
-            CFRuleBodySet set = new CFRuleBodySet();
-            string name = node.Children[0].Symbol.Value;
-            Action action = grammar.GetAction(name);
-            if (action == null)
-                action = grammar.AddAction(name);
-            set.Add(new CFRuleBody(action));
-            return set;
-        }
-        private CFRuleBodySet Compile_Recognize_rule_sym_virtual(ASTNode node)
-        {
-            CFRuleBodySet set = new CFRuleBodySet();
-            string name = node.Children[0].Symbol.Value;
-            name = name.Substring(1, name.Length - 2);
-            Virtual vir = grammar.GetVirtual(name);
-            if (vir == null)
-                vir = grammar.AddVirtual(name);
-            set.Add(new CFRuleBody(vir));
-            return set;
-        }
-        private CFRuleBodySet Compile_Recognize_rule_sym_ref_simple(CompilerContext context, ASTNode node)
-        {
-            CFRuleBodySet defs = new CFRuleBodySet();
-            if (node.Children[0].Symbol.Value == "ε")
-            {
-                defs.Add(new CFRuleBody());
-            }
-            else
-            {
-                Symbol symbol = Compile_Tool_NameToSymbol(node.Children[0].Symbol.Value, context);
-                if (symbol != null)
-                    defs.Add(new CFRuleBody(symbol));
-                else
-                {
-                    reporter.Error(resName + " @(" + node.Children[0].Position.Line + ", " + node.Children[0].Position.Column + ") Unrecognized symbol " + node.Children[0].Symbol.Value + " in rule definition");
-                    defs.Add(new CFRuleBody());
-                }
-            }
-            return defs;
-        }
-        private CFRuleBodySet Compile_Recognize_rule_sym_ref_template(CompilerContext context, ASTNode node)
-        {
-            CFRuleBodySet defs = new CFRuleBodySet();
-            // Get the information
-            string name = node.Children[0].Symbol.Value;
-            int paramCount = node.Children[1].Children.Count;
-            // check for meta-rule existence
-            if (!context.IsTemplateRule(name, paramCount))
-            {
-                reporter.Error(resName + " @(" + node.Children[0].Position.Line + ", " + node.Children[0].Position.Column + ") Meta-rule " + name + " does not exist with " + paramCount.ToString() + " parameters");
-                defs.Add(new CFRuleBody());
-                return defs;
-            }
-            // Recognize the parameters
-            List<Symbol> parameters = new List<Symbol>();
-            foreach (ASTNode symbolNode in node.Children[1].Children)
-                parameters.Add(Compile_Recognize_rule_def_atom(context, symbolNode)[0].Parts[0].Symbol);
-            // Get the corresponding variable
-            Variable variable = context.GetVariableFromMetaRule(name, parameters, context);
-            // Create the definition
-            defs.Add(new CFRuleBody(variable));
-            return defs;
-        }
+		/// <summary>
+		/// Loads the rules block of a grammar
+		/// </summary>
+		/// <param name="node">The AST node of a rules block</param>
+		private void LoadBlockRules(ASTNode node)
+		{
+			// Create a new context
+			CompilerContext context = new CompilerContext(this);
+			// Add existing meta-rules that may have been inherited
+			foreach (TemplateRule templateRule in grammar.TemplateRules)
+				context.AddTemplateRule(templateRule);
+			// Load new variables for the rules' head
+			foreach (ASTNode child in node.Children)
+			{
+				if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_simple)
+				{
+					string name = child.Children[0].Symbol.Value;
+					Variable var = grammar.GetVariable(name);
+					if (var == null)
+						var = grammar.AddVariable(name);
+				}
+				else if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_template)
+					context.AddTemplateRule(grammar.AddTemplateRule(child));
+			}
+			// Load the grammar rules
+			foreach (ASTNode child in node.Children)
+			{
+				if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_simple)
+					LoadRule(context, child);
+			}
+		}
 
-        private CFRuleBodySet Compile_Recognize_rule_def_atom(CompilerContext context, ASTNode node)
-        {
-            if (node.Symbol.Name == "rule_sym_action")
-                return Compile_Recognize_rule_sym_action(node);
-            if (node.Symbol.Name == "rule_sym_virtual")
-                return Compile_Recognize_rule_sym_virtual(node);
-            if (node.Symbol.Name == "rule_sym_ref_simple")
-                return Compile_Recognize_rule_sym_ref_simple(context, node);
-            if (node.Symbol.Name.StartsWith("rule_sym_ref_template"))
-                return Compile_Recognize_rule_sym_ref_template(context, node);
-            if (node.Symbol.Name == "terminal_def_atom_text")
-                return Compile_Recognize_grammar_text_terminal(node);
-            return null;
-        }
-        public CFRuleBodySet Compile_Recognize_rule_definition(CompilerContext context, ASTNode node)
-        {
-			if (node.Symbol.Value == "?")
+		/// <summary>
+		/// Loads the syntactic rule in the given AST
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		private void LoadRule(CompilerContext context, ASTNode node)
+		{
+			string name = node.Children[0].Symbol.Value;
+			CFVariable var = grammar.GetCFVariable(name);
+			CFRuleBodySet defs = BuildDefinitions(context, node.Children[1]);
+			foreach (CFRuleBody def in defs)
+				var.AddRule(new CFRule(var, def, false));
+		}
+
+		/// <summary>
+		/// Builds the set of rule definitions that are represented by the given AST
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		public CFRuleBodySet BuildDefinitions(CompilerContext context, ASTNode node)
+		{
+			if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
 			{
-			    CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    setInner.Insert(0, new CFRuleBody());
-			    return setInner;
+				CFRuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
+				setInner.Insert(0, new CFRuleBody());
+				return setInner;
 			}
-			else if (node.Symbol.Value == "*")
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_ZEROMORE)
 			{
-			    CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    CFVariable subVar = grammar.NewCFVariable();
-			    foreach (CFRuleBody def in setInner)
-			        subVar.AddRule(new CFRule(subVar, def, true));
-			    CFRuleBodySet setVar = new CFRuleBodySet();
-			    setVar.Add(new CFRuleBody(subVar));
-			    setVar = setVar * setInner;
-			    foreach (CFRuleBody def in setVar)
-			        subVar.AddRule(new CFRule(subVar, def, true));
-			    setVar = new CFRuleBodySet();
-			    setVar.Add(new CFRuleBody());
-			    setVar.Add(new CFRuleBody(subVar));
-			    return setVar;
+				CFRuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
+				CFVariable subVar = grammar.NewCFVariable();
+				foreach (CFRuleBody def in setInner)
+					subVar.AddRule(new CFRule(subVar, def, true));
+				CFRuleBodySet setVar = new CFRuleBodySet();
+				setVar.Add(new CFRuleBody(subVar));
+				setVar = setVar * setInner;
+				foreach (CFRuleBody def in setVar)
+					subVar.AddRule(new CFRule(subVar, def, true));
+				setVar = new CFRuleBodySet();
+				setVar.Add(new CFRuleBody());
+				setVar.Add(new CFRuleBody(subVar));
+				return setVar;
 			}
-			else if (node.Symbol.Value == "+")
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_ONEMORE)
 			{
-			    CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    CFVariable subVar = grammar.NewCFVariable();
-			    foreach (CFRuleBody def in setInner)
-			        subVar.AddRule(new CFRule(subVar, def, true));
-			    CFRuleBodySet setVar = new CFRuleBodySet();
-			    setVar.Add(new CFRuleBody(subVar));
-			    setVar = setVar * setInner;
-			    foreach (CFRuleBody Def in setVar)
-			        subVar.AddRule(new CFRule(subVar, Def, true));
-			    setVar = new CFRuleBodySet();
-			    setVar.Add(new CFRuleBody(subVar));
-			    return setVar;
+				CFRuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
+				CFVariable subVar = grammar.NewCFVariable();
+				foreach (CFRuleBody def in setInner)
+					subVar.AddRule(new CFRule(subVar, def, true));
+				CFRuleBodySet setVar = new CFRuleBodySet();
+				setVar.Add(new CFRuleBody(subVar));
+				setVar = setVar * setInner;
+				foreach (CFRuleBody Def in setVar)
+					subVar.AddRule(new CFRule(subVar, Def, true));
+				setVar = new CFRuleBodySet();
+				setVar.Add(new CFRuleBody(subVar));
+				return setVar;
 			}
-			else if (node.Symbol.Value == "^")
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_UNION)
 			{
-			    CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    setInner.SetActionPromote();
-			    return setInner;
+				CFRuleBodySet setLeft = BuildDefinitions(context, node.Children[0]);
+				CFRuleBodySet setRight = BuildDefinitions(context, node.Children[1]);
+				return (setLeft + setRight);
 			}
-			else if (node.Symbol.Value == "!")
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TREE_ACTION_PROMOTE)
 			{
-			    CFRuleBodySet setInner = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    setInner.SetActionDrop();
-			    return setInner;
+				CFRuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
+				setInner.SetActionPromote();
+				return setInner;
 			}
-			else if (node.Symbol.Value == "|")
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TREE_ACTION_DROP)
 			{
-			    CFRuleBodySet setLeft = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    CFRuleBodySet setRight = Compile_Recognize_rule_definition(context, node.Children[1]);
-			    return (setLeft + setRight);
-			}
-			else if (node.Symbol.Value == "-")
-			{
-			    CFRuleBodySet setLeft = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    CFRuleBodySet setRight = Compile_Recognize_rule_definition(context, node.Children[1]);
-			    CFVariable subVar = grammar.NewCFVariable();
-			    foreach (CFRuleBody def in setLeft)
-			        subVar.AddRule(new CFRule(subVar, def, true, subVar.SID));
-			    foreach (CFRuleBody def in setRight)
-			        subVar.AddRule(new CFRule(subVar, def, true, -subVar.SID));
-			    CFRuleBodySet setFinal = new CFRuleBodySet();
-			    setFinal.Add(new CFRuleBody(subVar));
-			    return setFinal;
-			}
-			if (node.Symbol.Name == "emptypart")
-			{
-			    CFRuleBodySet set = new CFRuleBodySet();
-			    set.Add(new CFRuleBody());
-			    return set;
+				CFRuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
+				setInner.SetActionDrop();
+				return setInner;
 			}
 			else if (node.Symbol.Name == "concat")
 			{
-			    CFRuleBodySet setLeft = Compile_Recognize_rule_definition(context, node.Children[0]);
-			    CFRuleBodySet setRight = Compile_Recognize_rule_definition(context, node.Children[1]);
-			    return (setLeft * setRight);
+				CFRuleBodySet setLeft = BuildDefinitions(context, node.Children[0]);
+				CFRuleBodySet setRight = BuildDefinitions(context, node.Children[1]);
+				return (setLeft * setRight);
 			}
-			return Compile_Recognize_rule_def_atom(context, node);
-        }
-        private void Compile_Recognize_rule(CompilerContext context, ASTNode node)
-        {
-            string name = node.Children[0].Symbol.Value;
-            CFVariable var = grammar.GetCFVariable(name);
-            CFRuleBodySet defs = Compile_Recognize_rule_definition(context, node.Children[1]);
-            foreach (CFRuleBody def in defs)
-                var.AddRule(new CFRule(var, def, false));
-        }
+			else if (node.Symbol.Name == "emptypart")
+			{
+				CFRuleBodySet set = new CFRuleBodySet();
+				set.Add(new CFRuleBody());
+				return set;
+			}
+			return BuildAtomicDefinition(context, node);
+		}
 
-        private void Compile_Recognize_grammar_options(ASTNode optionsNode)
-        {
-            foreach (ASTNode node in optionsNode.Children)
-                Compile_Recognize_option(node);
-            caseInsensitive = (grammar.HasOption("CaseSensitive") && grammar.GetOption("CaseSensitive").Equals("false", System.StringComparison.InvariantCultureIgnoreCase));
-        }
-        private void Compile_Recognize_grammar_terminals(ASTNode terminalsNode)
-        {
-            foreach (ASTNode node in terminalsNode.Children)
-                Compile_Recognize_terminal(node);
-        }
-        private void Compile_Recognize_grammar_rules(ASTNode rulesNode)
-        {
-            // Create a new context
-            CompilerContext context = new CompilerContext(this);
-            // Add existing meta-rules that may have been inherited
-            foreach (TemplateRule templateRule in grammar.TemplateRules)
-                context.AddTemplateRule(templateRule);
-            // Load new variables for the rules' head
-            foreach (ASTNode node in rulesNode.Children)
-            {
-                if (node.Symbol.Name.StartsWith("cf_rule_simple"))
-                {
-                    string name = node.Children[0].Symbol.Value;
-                    Variable var = grammar.GetVariable(name);
-                    if (var == null)
-                        var = grammar.AddVariable(name);
-                }
-                else if (node.Symbol.Name.StartsWith("cf_rule_template"))
-                    context.AddTemplateRule(grammar.AddTemplateRule(node));
-            }
-            // Load the grammar rules
-            foreach (ASTNode node in rulesNode.Children)
-            {
-                if (node.Symbol.Name.StartsWith("cf_rule_simple"))
-                    Compile_Recognize_rule(context, node);
-            }
-        }
+		/// <summary>
+		/// Builds the set of rule definitions that are represented by the given AST
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		private CFRuleBodySet BuildAtomicDefinition(CompilerContext context, ASTNode node)
+		{
+			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_action)
+				return BuildAtomicAction(node);
+			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_virtual)
+				return BuildAtomicVirtual(node);
+			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_ref_simple)
+				return BuildAtomicSimpleReference(context, node);
+			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_ref_template)
+				return BuildAtomicTemplateReference(context, node);
+			if (node.Symbol.ID == HimeGrammarLexer.ID.LITERAL_TEXT)
+				return BuildAtomicInlineText(node);
+			// nothing found ...
+			reporter.Error(string.Format("{0}{1} Failed to recognize syntactic rule", resource, node.Position));
+			CFRuleBodySet set = new CFRuleBodySet();
+			set.Add(new CFRuleBody());
+			return set;
+		}
 
-        private void Compile_Recognize_grammar_text(ASTNode node)
-        {
-            for (int i = 2; i < node.Children.Count; i++)
-            {
-                ASTNode child = node.Children[i];
-                if (child.Symbol.Name == "options")
-                    Compile_Recognize_grammar_options(child);
-                else if (child.Symbol.Name == "terminals")
-                    Compile_Recognize_grammar_terminals(child);
-                else if (child.Symbol.Name == "rules")
-                    Compile_Recognize_grammar_rules(child);
-            }
-        }
-    }
+		/// <summary>
+		/// Builds the set of rule definitions that represents a single semantic action
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		private CFRuleBodySet BuildAtomicAction(ASTNode node)
+		{
+			CFRuleBodySet set = new CFRuleBodySet();
+			string name = node.Children[0].Symbol.Value;
+			Action action = grammar.GetAction(name);
+			if (action == null)
+				action = grammar.AddAction(name);
+			set.Add(new CFRuleBody(action));
+			return set;
+		}
+
+		/// <summary>
+		/// Builds the set of rule definitions that represents a single virtual symbol
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		private CFRuleBodySet BuildAtomicVirtual(ASTNode node)
+		{
+			CFRuleBodySet set = new CFRuleBodySet();
+			string name = node.Children[0].Symbol.Value;
+			name = name.Substring(1, name.Length - 2);
+			Virtual vir = grammar.GetVirtual(name);
+			if (vir == null)
+				vir = grammar.AddVirtual(name);
+			set.Add(new CFRuleBody(vir));
+			return set;
+		}
+
+		/// <summary>
+		/// Builds the set of rule definitions that represents a single reference to a simple variable
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		private CFRuleBodySet BuildAtomicSimpleReference(CompilerContext context, ASTNode node)
+		{
+			CFRuleBodySet defs = new CFRuleBodySet();
+			Symbol symbol = ResolveSymbol(node.Children[0].Symbol.Value, context);
+			if (symbol == null)
+			{
+				reporter.Error(string.Format("{0}{1} Unknown symbol {2} in rule definition", resource, node.Children[0].Position, node.Children[0].Symbol.Value));
+				defs.Add(new CFRuleBody());
+			}
+			else
+			{
+				defs.Add(new CFRuleBody(symbol));
+			}
+			return defs;
+		}
+
+		/// <summary>
+		/// Builds the set of rule definitions that represents a single reference to a template variable
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		private CFRuleBodySet BuildAtomicTemplateReference(CompilerContext context, ASTNode node)
+		{
+			CFRuleBodySet defs = new CFRuleBodySet();
+			// Get the information
+			string name = node.Children[0].Symbol.Value;
+			int paramCount = node.Children[1].Children.Count;
+			// check for meta-rule existence
+			if (!context.IsTemplateRule(name, paramCount))
+			{
+				reporter.Error(string.Format("{0}{1} Unknown meta-rule {2}<{3}> in rule definition", resource, node.Children[0].Position, name, paramCount));
+				defs.Add(new CFRuleBody());
+				return defs;
+			}
+			// Recognize the parameters
+			List<Symbol> parameters = new List<Symbol>();
+			foreach (ASTNode symbolNode in node.Children[1].Children)
+				parameters.Add(BuildAtomicDefinition(context, symbolNode)[0].Parts[0].Symbol);
+			// Get the corresponding variable
+			Variable variable = context.GetVariableFromMetaRule(name, parameters, context);
+			// Create the definition
+			defs.Add(new CFRuleBody(variable));
+			return defs;
+		}
+
+		/// <summary>
+		/// Builds the set of rule definitions that represents a single inline piece of text
+		/// </summary>
+		/// <param name="context">The current context</param>
+		/// <param name="node">The AST node of a syntactic rule</param>
+		/// <returns>The set of possible rule definitions</returns>
+		private CFRuleBodySet BuildAtomicInlineText(ASTNode node)
+		{
+			// Construct the terminal name
+			string value = node.Symbol.Value;
+			value = value.Substring(1, value.Length - 2);
+			value = ReplaceEscapees(value).Replace("\\'", "'");
+			// Check for previous instance in the grammar
+			Terminal terminal = grammar.GetTerminalByValue(value);
+			if (terminal == null)
+			{
+				// Create the terminal
+				Automata.NFA nfa = BuildNFAFromText(node);
+				terminal = grammar.AddTerminalAnon(value, nfa);
+				nfa.StateExit.Item = terminal;
+			}
+			// Create the definition set
+			CFRuleBodySet set = new CFRuleBodySet();
+			set.Add(new CFRuleBody(terminal));
+			return set;
+		}
+	}
 }
