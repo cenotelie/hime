@@ -26,9 +26,9 @@ using Hime.CentralDogma.SDK;
 namespace Hime.Demo.Tasks
 {
 	/// <summary>
-	/// This task generates a parser and uses the SDK API to outputs the generated lexer
+	/// This task generates a parser and uses the SDK API to outputs the generated lexer and parser
 	/// </summary>
-	class ExtractLexer : IExecutable
+	class ExtractParser : IExecutable
 	{
 		/// <summary>
 		///  Execute this instance.
@@ -36,7 +36,7 @@ namespace Hime.Demo.Tasks
 		public void Execute()
 		{
 			// Build parser assembly
-			string grammar = "cf grammar Demo { options {Axiom=\"e\";} terminals {X->ub{MiscellaneousSymbolsAndPictographs};} rules { e->X; } }";
+			string grammar = "cf grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
 			CompilationTask task = new CompilationTask();
 			task.Mode = CompilationMode.Assembly;
 			task.AddInputRaw(grammar);
@@ -48,10 +48,11 @@ namespace Hime.Demo.Tasks
 
 			// Load the generated assembly and retrieve the lexer
 			AssemblyReflection assembly = new AssemblyReflection("Demo.dll");
-			Type lexerType = assembly.GetLexerType("Hime.Benchmark.Generated.DemoLexer");
-			LexerReflection lexer = new LexerReflection(lexerType);
-			// Export the lexer's DFA
+			LexerReflection lexer = new LexerReflection(assembly.GetLexerType("Hime.Demo.Generated.DemoLexer"));
+			ParserReflection parser = new ParserReflection(assembly.GetParserType("Hime.Demo.Generated.DemoParser"));
+			// Export the automata
 			GraphSerializer.ExportDOT(lexer.DFA, "Demo.Lexer.dot");
+			GraphSerializer.ExportDOT(parser.Automaton, "Demo.Parser.dot");
 		}
 	}
 }
