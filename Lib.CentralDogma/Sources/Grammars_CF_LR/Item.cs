@@ -78,7 +78,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             root.Attributes.Append(document.CreateAttribute("HeadSID"));
             root.Attributes.Append(document.CreateAttribute("Conflict"));
             root.Attributes["HeadName"].Value = rule.Head.Name;
-            root.Attributes["HeadSID"].Value = rule.Head.SID.ToString("X");
+            root.Attributes["HeadSID"].Value = rule.Head.ID.ToString("X");
             root.Attributes["Conflict"].Value = GetXMLNode_Conflict(set).ToString().ToLower();
 
             System.Xml.XmlNode action = document.CreateElement("Action");

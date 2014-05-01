@@ -89,10 +89,6 @@ namespace Hime.CentralDogma
 		/// </summary>
 		private int nextRawID;
 		/// <summary>
-		/// Repositories of the registered compiler plugins
-		/// </summary>
-		private Dictionary<string, CompilerPlugin> plugins;
-		/// <summary>
 		/// The reporter
 		/// </summary>
 		private Reporting.Reporter reporter;
@@ -115,8 +111,6 @@ namespace Hime.CentralDogma
 			CodeAccess = AccessModifier.Internal;
 
 			nextRawID = 0;
-			plugins = new Dictionary<string, CompilerPlugin>();
-			plugins.Add("cf_grammar", new Grammars.ContextFree.CFPlugin());
 			reporter = new Reporting.Reporter(typeof(CompilationTask), "Compilation log");
 			inputs = new List<KeyValuePair<string, TextReader>>();
 			loaders = new Dictionary<string, Grammars.GrammarLoader>();
@@ -214,8 +208,6 @@ namespace Hime.CentralDogma
 		private void ExecuteDo()
 		{
 			reporter.Info("CentralDogma " + Version);
-			foreach (string name in plugins.Keys)
-				reporter.Info("Registered plugin " + plugins[name].ToString() + " for " + name);
 
 			// Load data
 			if (!LoadInputs())
@@ -228,9 +220,9 @@ namespace Hime.CentralDogma
 			if (grammar == null)
 				return;
 			// Get the lexer data
-			Grammars.LexerData lexerData = grammar.GetLexerData(reporter);
+			Grammars.LexerData lexerData = null; //grammar.GetLexerData(reporter);
 			// Get the parser data
-			Grammars.ParserData parserData = grammar.GetParserData(reporter, GetParserGenerator(Method));
+			Grammars.ParserData parserData = null; //grammar.GetParserData(reporter, GetParserGenerator(Method));
 
 			// If there is any error => abort now
 			if (reporter.Result.HasErrors)
@@ -323,14 +315,7 @@ namespace Hime.CentralDogma
 			{
 				foreach (ASTNode gnode in result.Root.Children)
 				{
-					if (!plugins.ContainsKey(gnode.Symbol.Name))
-					{
-						reporter.Error(name + " @" + gnode.Position + " No compiler plugin found for resource " + gnode.Symbol.Name);
-						hasErrors = true;
-						continue;
-					}
-					CompilerPlugin plugin = plugins[gnode.Symbol.Name];
-					Grammars.GrammarLoader loader = plugin.GetLoader(name, gnode, reporter);
+					Grammars.GrammarLoader loader = new Grammars.GrammarLoader(name, gnode, reporter);
 					loaders.Add(loader.Grammar.Name, loader);
 				}
 			}

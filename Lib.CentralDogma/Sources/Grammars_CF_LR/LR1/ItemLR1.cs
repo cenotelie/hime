@@ -80,11 +80,11 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                 foreach (Terminal first in firsts)
                 {
                     // Child item creation and unique insertion
-                    ushort sid = first.SID;
+                    ushort sid = first.ID;
                     bool found = false;
                     foreach (Item previous in previouses)
                     {
-                        if (previous.Lookaheads[0].SID == sid)
+                        if (previous.Lookaheads[0].ID == sid)
                         {
                             found = true;
                             break;
@@ -103,7 +103,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         public override bool ItemEquals(Item item)
         {
             ItemLR1 tested = item as ItemLR1;
-            if (this.lookahead.SID != tested.lookahead.SID)
+            if (this.lookahead.ID != tested.lookahead.ID)
                 return false;
             return Equals_Base(tested);
         }

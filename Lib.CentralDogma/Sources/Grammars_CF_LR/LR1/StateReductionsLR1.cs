@@ -73,7 +73,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             // No previous conflict was found
             Conflict Conflict = new Conflict(component, Set, ConflictType.ShiftReduce, Lookahead);
             foreach (Item Item in Set.Items)
-                if (Item.Action == ItemAction.Shift && Item.NextSymbol.SID == Lookahead.SID)
+                if (Item.Action == ItemAction.Shift && Item.NextSymbol.ID == Lookahead.ID)
                     Conflict.AddItem(Item);
             Conflict.AddItem(ConflictuousItem);
             Conflicts.Add(Conflict);

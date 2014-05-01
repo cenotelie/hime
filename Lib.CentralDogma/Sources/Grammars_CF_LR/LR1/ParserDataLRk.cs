@@ -44,9 +44,9 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             stream.Write((ushort)rules.Count);                          // Nb or rules
 
             foreach (Terminal t in terminals)
-                stream.Write(t.SID);
+                stream.Write(t.ID);
             foreach (Variable var in variables)
-                stream.Write(var.SID);
+                stream.Write(var.ID);
 
             foreach (State state in graph.States)
                 ExportDataTable(stream, state);

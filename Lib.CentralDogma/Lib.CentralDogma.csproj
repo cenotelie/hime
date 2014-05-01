@@ -84,19 +84,7 @@
     <Compile Include="Sources\AccessModifier.cs" />
     <Compile Include="Sources\CompilationMode.cs" />
     <Compile Include="Sources\CompilationTask.cs" />
-    <Compile Include="Sources\CompilerPlugin.cs" />
-    <Compile Include="Sources\Grammars\GrammarLoader.cs" />
     <Compile Include="Sources\ParsingMethod.cs" />
-    <Compile Include="Sources\Grammars_CF\CFGrammar.cs" />
-    <Compile Include="Sources\Grammars_CF\CFGrammarLoader.cs" />
-    <Compile Include="Sources\Grammars_CF\CFPlugin.cs" />
-    <Compile Include="Sources\Grammars_CF\CFRule.cs" />
-    <Compile Include="Sources\Grammars_CF\CFRuleBody.cs" />
-    <Compile Include="Sources\Grammars_CF\CFRuleBodySet.cs" />
-    <Compile Include="Sources\Grammars_CF\CFVariable.cs" />
-    <Compile Include="Sources\Grammars_CF\CompilerContext.cs" />
-    <Compile Include="Sources\Grammars_CF\TemplateRule.cs" />
-    <Compile Include="Sources\Grammars_CF\TemplateRuleInstance.cs" />
     <Compile Include="Sources\Grammars_CF_LR\Conflict.cs" />
     <Compile Include="Sources\Grammars_CF_LR\ConflictExample.cs" />
     <Compile Include="Sources\Grammars_CF_LR\ConflictType.cs" />
@@ -137,25 +125,6 @@
     <Compile Include="Sources\Grammars_CF_LR\StateKernel.cs" />
     <Compile Include="Sources\Grammars_CF_LR\StateReductions.cs" />
     <Compile Include="Sources\Grammars\Grammar.cs" />
-    <Compile Include="Sources\Grammars\LexerData.cs" />
-    <Compile Include="Sources\Grammars\ParserData.cs" />
-    <Compile Include="Sources\Grammars\ParserGenerator.cs" />
-    <Compile Include="Sources\Grammars\Rule.cs" />
-    <Compile Include="Sources\Grammars\RuleBody.cs" />
-    <Compile Include="Sources\Grammars\RuleBodyElement.cs" />
-    <Compile Include="Sources\Grammars\RuleBodyElementAction.cs" />
-    <Compile Include="Sources\Grammars\TextLexerData.cs" />
-    <Compile Include="Sources\Grammars\Action.cs" />
-    <Compile Include="Sources\Grammars\Symbol.cs" />
-    <Compile Include="Sources\Grammars\Terminal.cs" />
-    <Compile Include="Sources\Grammars\Dollar.cs" />
-    <Compile Include="Sources\Grammars\Dummy.cs" />
-    <Compile Include="Sources\Grammars\Epsilon.cs" />
-    <Compile Include="Sources\Grammars\NullTerminal.cs" />
-    <Compile Include="Sources\Grammars\TerminalSet.cs" />
-    <Compile Include="Sources\Grammars\TextTerminal.cs" />
-    <Compile Include="Sources\Grammars\Variable.cs" />
-    <Compile Include="Sources\Grammars\Virtual.cs" />
     <Compile Include="Sources\Reporting\ELevel.cs" />
     <Compile Include="Sources\Reporting\Entry.cs" />
     <Compile Include="Sources\Reporting\ExceptionEntry.cs" />
@@ -182,6 +151,29 @@
     <Compile Include="Sources\SDK\ParserReflection.cs" />
     <Compile Include="Sources\Input\HimeGrammarLexer.cs" />
     <Compile Include="Sources\Input\HimeGrammarParser.cs" />
+    <Compile Include="Sources\Output\TextLexerData.cs" />
+    <Compile Include="Sources\Output\ParserGenerator.cs" />
+    <Compile Include="Sources\Output\LexerData.cs" />
+    <Compile Include="Sources\Output\ParserData.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Action.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Dollar.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Dummy.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Epsilon.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Symbol.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Virtual.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Variable.cs" />
+    <Compile Include="Sources\Grammars\Symbols\Terminal.cs" />
+    <Compile Include="Sources\Grammars\Symbols\TerminalSet.cs" />
+    <Compile Include="Sources\Grammars\Symbols\NullTerminal.cs" />
+    <Compile Include="Sources\Grammars\Rules\Rule.cs" />
+    <Compile Include="Sources\Grammars\Rules\RuleBody.cs" />
+    <Compile Include="Sources\Grammars\Rules\RuleBodyElement.cs" />
+    <Compile Include="Sources\Grammars\Rules\RuleBodySet.cs" />
+    <Compile Include="Sources\Grammars\Rules\RuleChoice.cs" />
+    <Compile Include="Sources\Grammars\Rules\TemplateRule.cs" />
+    <Compile Include="Sources\Grammars\Rules\TemplateRuleInstance.cs" />
+    <Compile Include="Sources\Grammars\Context.cs" />
+    <Compile Include="Sources\Grammars\GrammarLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">
@@ -208,5 +200,8 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Sources\SDK\" />
+    <Folder Include="Sources\Output\" />
+    <Folder Include="Sources\Grammars\Symbols\" />
+    <Folder Include="Sources\Grammars\Rules\" />
   </ItemGroup>
 </Project>

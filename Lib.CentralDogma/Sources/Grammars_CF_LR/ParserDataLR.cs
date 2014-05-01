@@ -57,7 +57,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)TreeAction.Replace);
+            if (rule.IsGenerated) stream.Write((byte)TreeAction.Replace);
             else stream.Write((byte)TreeAction.None);
             stream.Write((byte)(rule as CFRule).CFBody.GetChoiceAt(0).Length);
             byte length = 0;
@@ -127,14 +127,14 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for variable " + var.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", var.Name, var.ID.ToString("X"));
 			}
 			foreach (Virtual var in virtuals)
 			{
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + var.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", var.Name, var.ID.ToString("X"));
 			}
 			stream.WriteLine("\t\t}");
 		}
@@ -155,7 +155,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
 				if (!first)
 					stream.WriteLine(", ");
 				stream.Write("\t\t\t");
-				stream.Write("new Symbol(0x" + var.SID.ToString("X") + ", \"" + var.Name + "\")");
+				stream.Write("new Symbol(0x" + var.ID.ToString("X") + ", \"" + var.Name + "\")");
 				first = false;
 			}
 			stream.WriteLine(" };");

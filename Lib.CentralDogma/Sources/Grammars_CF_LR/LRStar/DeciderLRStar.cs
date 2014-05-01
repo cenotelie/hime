@@ -218,13 +218,13 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
                     {
                         if (visited.ContainsKey(previous.ID))
                         {
-                            if (visited[previous.ID].ContainsKey(s.SID))
+                            if (visited[previous.ID].ContainsKey(s.ID))
                                 continue;
                         }
                         else
                             visited.Add(previous.ID, new SortedList<ushort, ENode>());
                         ENode pnode = new ENode(previous, current, s);
-                        visited[previous.ID].Add(s.SID, pnode);
+                        visited[previous.ID].Add(s.ID, pnode);
                         if (previous.ID == 0)
                             goals.Add(pnode);
                         else

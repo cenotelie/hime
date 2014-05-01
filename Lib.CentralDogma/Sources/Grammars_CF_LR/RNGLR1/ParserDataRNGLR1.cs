@@ -105,9 +105,9 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
             stream.Write((ushort)nullables.Count);                      // Nb of nullables
 
             foreach (Terminal t in terminals)
-                stream.Write(t.SID);
+                stream.Write(t.ID);
             foreach (Variable var in variables)
-                stream.Write(var.SID);
+                stream.Write(var.ID);
 
             for (int i = 0; i != offsets.Count; i++)
             {
@@ -199,7 +199,7 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         protected void ExportDataProduction(BinaryWriter stream, Rule rule, int length)
         {
             stream.Write((ushort)variables.IndexOf(rule.Head));
-            if (rule.ReplaceOnProduction) stream.Write((byte)TreeAction.Replace);
+            if (rule.IsGenerated) stream.Write((byte)TreeAction.Replace);
             else stream.Write((byte)TreeAction.None);
             stream.Write((byte)length);
             byte bcl = 0;

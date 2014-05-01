@@ -67,7 +67,7 @@ namespace Hime.CentralDogma.Grammars
         {
             string sep = "FFFF";
             if (separator != null)
-				sep = separator.SID.ToString("X");
+				sep = separator.ID.ToString("X");
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Initializes a new instance of the lexer");
 			stream.WriteLine("\t\t/// </summary>");
@@ -99,7 +99,7 @@ namespace Hime.CentralDogma.Grammars
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", terminal.Name, terminal.SID.ToString("X"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", terminal.Name, terminal.ID.ToString("X"));
 			}
 			stream.WriteLine("\t\t}");
 
@@ -116,7 +116,7 @@ namespace Hime.CentralDogma.Grammars
             {
                 if (!first) stream.WriteLine(",");
                 stream.Write("\t\t\t");
-                stream.Write("new Symbol(0x" + terminal.SID.ToString("X") + ", \"" + terminal.ToString().Replace("\"", "\\\"") + "\")");
+                stream.Write("new Symbol(0x" + terminal.ID.ToString("X") + ", \"" + terminal.ToString().Replace("\"", "\\\"") + "\")");
                 first = false;
             }
             stream.WriteLine(" };");
