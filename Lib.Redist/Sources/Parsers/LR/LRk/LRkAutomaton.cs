@@ -44,26 +44,27 @@ namespace Hime.Redist.Parsers
 		/// The number of columns in the LR table
 		/// </summary>
 		private ushort ncols;
-
 		/// <summary>
-		/// Cache of the symbol ID for each column
+		/// The number of states in the LR table
 		/// </summary>
-		private Utils.Blob<ushort> columnsID;
-
+		private ushort nstates;
 		/// <summary>
 		/// Map of symbol ID to column index in the LR table
 		/// </summary>
 		private ColumnMap columns;
-
 		/// <summary>
 		/// The LR table
 		/// </summary>
 		private Utils.Blob<LRAction> table;
-
 		/// <summary>
 		/// The table of LR productions
 		/// </summary>
 		private LRProduction[] productions;
+
+		/// <summary>
+		/// Gets the number of states in this automaton
+		/// </summary>
+		public int StatesCount { get { return nstates; } }
 
 		/// <summary>
 		/// Initializes a new automaton from the given binary stream
@@ -72,10 +73,10 @@ namespace Hime.Redist.Parsers
 		public LRkAutomaton(BinaryReader reader)
 		{
 			this.ncols = reader.ReadUInt16();
-			int nstates = reader.ReadUInt16();
+			this.nstates = reader.ReadUInt16();
 			int nprod = reader.ReadUInt16();
-			this.columnsID = new Utils.Blob<ushort>(ncols, 2);
-			this.columnsID.LoadFrom(reader);
+			Utils.Blob<ushort> columnsID = new Utils.Blob<ushort>(ncols, 2);
+			columnsID.LoadFrom(reader);
 			this.columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
 				this.columns.Add(columnsID[i], i);

@@ -73,7 +73,7 @@ namespace Hime.CentralDogma.SDK
 			foreach (DFAState state in dfa.States)
 			{
 				if (state.TopItem != null)
-					serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), DOTNodeShape.ellipse);
+					serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), DOTNodeShape.doubleoctagon);
 				else
 					serializer.WriteNode(state.ID.ToString());
 			}
@@ -95,7 +95,7 @@ namespace Hime.CentralDogma.SDK
 			{
 				NFAState state = nfa.States[i];
 				if (state.Item != null)
-					serializer.WriteNode(i.ToString(), i.ToString() + " : " + state.Item.ToString(), DOTNodeShape.ellipse);
+					serializer.WriteNode(i.ToString(), i.ToString() + " : " + state.Item.ToString(), DOTNodeShape.doubleoctagon);
 				else
 					serializer.WriteNode(i.ToString());
 			}
@@ -108,6 +108,28 @@ namespace Hime.CentralDogma.SDK
 					serializer.WriteEdge(i.ToString(), to.ToString(), transition.Span.ToString());
 				}
 			}
+			serializer.Close();
+		}
+
+		/// <summary>
+		/// Exports the given LR automaton to a DOT graph in the specified file
+		/// </summary>
+		/// <param name="automaton">The LR automaton to export</param>
+		/// <param name="file">DOT file to export to</param>
+		public static void ExportDOT(LRAutomaton automaton, string file)
+		{
+			DOTSerializer serializer = new DOTSerializer("LR", file);
+			foreach (LRState state in automaton.States)
+			{
+				string[] items = new string[state.Reductions.Count];
+				for (int i=0; i!=state.Reductions.Count; i++)
+					items[i] = state.Reductions[i].ToString();
+				string label = state.IsAccept ? state.ID.ToString() + "=Accept" : state.ID.ToString();
+				serializer.WriteStructure(state.ID.ToString(), label, items);
+			}
+			foreach (LRState state in automaton.States)
+				foreach (LRTransition transition in state.Transitions)
+					serializer.WriteEdge(state.ID.ToString(), transition.Target.ID.ToString(), transition.Label.ToString());
 			serializer.Close();
 		}
 	}

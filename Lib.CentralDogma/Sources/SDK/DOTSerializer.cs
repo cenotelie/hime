@@ -96,6 +96,28 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
+		/// Writes a structure as a node
+		/// </summary>
+		/// <param name="id">Node's ID</param>
+		/// <param name="label">Node's labe</param>
+		/// <param name="items">Items of this structure</param>
+		public void WriteStructure(string id, string label, string[] items)
+		{
+			System.Text.StringBuilder builder = new System.Text.StringBuilder("    _");
+			builder.Append(id);
+			builder.Append(" [label=\"{ ");
+			builder.Append(SanitizeString(label));
+			foreach (string item in items)
+			{
+				builder.Append(" | { | ");
+				builder.Append(SanitizeString(item).Replace("|", "\\|").Replace("<", "\\<").Replace(">", "\\>").Replace("{", "\\{").Replace("}", "\\}"));
+				builder.Append(" }");
+			}
+			builder.Append(" }\", shape=\"record\"];");
+			writer.WriteLine(builder.ToString());
+		}
+
+		/// <summary>
 		/// Closes this serializer
 		/// </summary>
 		public void Close()

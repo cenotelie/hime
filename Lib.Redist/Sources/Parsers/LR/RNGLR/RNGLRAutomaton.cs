@@ -87,10 +87,6 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private int nstates;
 		/// <summary>
-		/// Cache of the symbol ID for each column
-		/// </summary>
-		private Utils.Blob<ushort> columnsID;
-		/// <summary>
 		/// Map of symbol ID to column index in the LR table
 		/// </summary>
 		private ColumnMap columns;
@@ -132,8 +128,8 @@ namespace Hime.Redist.Parsers
 			int nactions = (int)reader.ReadUInt32();
 			int nprod = reader.ReadUInt16();
 			int nnprod = reader.ReadUInt16();
-			this.columnsID = new Utils.Blob<ushort>(ncols, 2);
-			this.columnsID.LoadFrom(reader);
+			Utils.Blob<ushort> columnsID = new Utils.Blob<ushort>(ncols, 2);
+			columnsID.LoadFrom(reader);
 			this.columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
 				this.columns.Add(columnsID[i], i);

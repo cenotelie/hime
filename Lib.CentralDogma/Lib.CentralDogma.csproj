@@ -179,6 +179,11 @@
     <Compile Include="Sources\UnicodeBlocks.cs" />
     <Compile Include="Sources\UnicodeCategories.cs" />
     <Compile Include="Sources\SDK\AssemblyReflection.cs" />
+    <Compile Include="Sources\Automata\LRState.cs" />
+    <Compile Include="Sources\Automata\LRTransition.cs" />
+    <Compile Include="Sources\Automata\LRReduction.cs" />
+    <Compile Include="Sources\Automata\LRAutomaton.cs" />
+    <Compile Include="Sources\SDK\ParserReflection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">
