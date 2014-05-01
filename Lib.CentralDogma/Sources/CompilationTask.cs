@@ -37,8 +37,6 @@ namespace Hime.CentralDogma
 		internal const string PostfixParserCode = "Parser.cs";
 		internal const string PostfixParserData = "Parser.bin";
 		internal const string PostfixAssembly = ".dll";
-		internal const string PostfixLog = "Log.mht";
-		internal const string PostfixDoc = "Doc";
 
 		/// <summary>
 		/// Gets the compiler's version
@@ -74,14 +72,6 @@ namespace Hime.CentralDogma
 		/// Assembly:           ${prefix}.dll
 		/// </remarks>
 		public string OutputPrefix { get; set; }
-		/// <summary>
-		/// Gets or sets the flag to export the compilation log.
-		/// </summary>
-		public bool OutputLog { get; set; }
-		/// <summary>
-		/// Gets ot sets the flag to export the documentation about the compiled grammar.
-		/// </summary>
-		public bool OutputDocumentation { get; set; }
 
 		/// <summary>
 		/// Gets or sets the namespace in which the generated Lexer and Parser classes will be put.
@@ -122,8 +112,6 @@ namespace Hime.CentralDogma
 		{
 			Mode = CompilationMode.Source;
 			Method = ParsingMethod.LALR1;
-			OutputLog = false;
-			OutputDocumentation = false;
 			CodeAccess = AccessModifier.Internal;
 
 			nextRawID = 0;
@@ -209,27 +197,21 @@ namespace Hime.CentralDogma
 		/// <returns>The compilation report</returns>
 		public Reporting.Report Execute()
 		{
-			string prefix = null;
 			try
 			{
-				prefix = ExecuteDo();
+				ExecuteDo();
 			}
 			catch (Exception ex)
 			{
 				reporter.Report(ex);
-				prefix = string.Empty;
 			}
-
-			if (OutputLog)
-				reporter.ExportMHTML(prefix + PostfixLog);
 			return reporter.Result;
 		}
 
 		/// <summary>
 		/// Executes the compilation task
 		/// </summary>
-		/// <returns>The prefix for the outputs</returns>
-		private string ExecuteDo()
+		private void ExecuteDo()
 		{
 			reporter.Info("CentralDogma " + Version);
 			foreach (string name in plugins.Keys)
@@ -237,14 +219,14 @@ namespace Hime.CentralDogma
 
 			// Load data
 			if (!LoadInputs())
-				return null;
+				return;
 			// Solve dependencies and compile
 			if (!SolveDependencies())
-				return null;
+				return;
 			// Retrieve the grammar to compile
 			Grammars.Grammar grammar = RetrieveGrammar();
 			if (grammar == null)
-				return null;
+				return;
 			// Get the lexer data
 			Grammars.LexerData lexerData = grammar.GetLexerData(reporter);
 			// Get the parser data
@@ -252,7 +234,7 @@ namespace Hime.CentralDogma
 
 			// If there is any error => abort now
 			if (reporter.Result.HasErrors)
-				return null;
+				return;
 
 			// Build names
 			string prefix = (OutputPrefix != null) ? OutputPrefix : grammar.Name;
@@ -297,15 +279,6 @@ namespace Hime.CentralDogma
 				File.Delete(prefix + PostfixParserCode);
 				File.Delete(prefix + PostfixParserData);
 			}
-
-			// Export documentation
-			if (OutputDocumentation)
-			{
-				reporter.Info("Exporting parser documentation at " + prefix + PostfixDoc);
-				parserData.Document(prefix + PostfixDoc);
-				reporter.Info("Done!");
-			}
-			return prefix;
 		}
 
 		/// <summary>

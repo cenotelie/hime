@@ -43,8 +43,6 @@ namespace Hime.HimeCC
 		private const string ArgMethodRNGLR = "-m:rnglr";
 		private const string ArgNamespace = "-n";
 		private const string ArgAccessPublic = "-a:public";
-		private const string ArgLog = "-l";
-		private const string ArgDoc = "-d";
 		private const string ErrorParsingArgs = "Error while parsing the arguments.";
 		private const string ErrorBadArgs = "Incorrect arguments.";
 		private const string ErrorPointHelp = "Run without arguments for help.";
@@ -243,12 +241,6 @@ namespace Hime.HimeCC
 					case ArgAccessPublic:
 						task.CodeAccess = AccessModifier.Public;
 						break;
-					case ArgLog:
-						task.OutputLog = true;
-						break;
-					case ArgDoc:
-						task.OutputDocumentation = true;
-						break;
 					default:
 						Console.WriteLine("Unknown argument " + arg.Symbol.Value);
 						return null;
@@ -312,10 +304,6 @@ namespace Hime.HimeCC
 			Console.WriteLine(ArgNamespace + " <namespace>\tNamespace for the generated code, default is the grammar's name");
 			Console.WriteLine();
 			Console.WriteLine(ArgAccessPublic + "\tPublic modifier for the generated code, default is internal");
-			Console.WriteLine();
-			Console.WriteLine(ArgLog + "\t\tOutput the log as a MHTML file");
-			Console.WriteLine();
-			Console.WriteLine(ArgDoc + "\t\tOutput the documentation for the compiled grammar");
 		}
 	}
 }

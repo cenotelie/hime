@@ -158,8 +158,6 @@
     <Compile Include="Sources\Grammars\TextTerminal.cs" />
     <Compile Include="Sources\Grammars\Variable.cs" />
     <Compile Include="Sources\Grammars\Virtual.cs" />
-    <Compile Include="Sources\Documentation\MHTMLCompiler.cs" />
-    <Compile Include="Sources\Documentation\MHTMLSource.cs" />
     <Compile Include="Sources\Reporting\ELevel.cs" />
     <Compile Include="Sources\Reporting\Entry.cs" />
     <Compile Include="Sources\Reporting\ExceptionEntry.cs" />
@@ -189,39 +187,6 @@
     <Content Include="..\License.txt">
       <Link>Properties\License.txt</Link>
     </Content>
-    <Content Include="Resources\Icons\Hime.Logo.ico" />
-    <Content Include="Resources\Visuals\svg\Hime.GoTo.svg" />
-    <None Include="Resources\Visuals\svg\Hime.Warning.svg" />
-    <None Include="Resources\Visuals\svg\Hime.ShiftReduce.svg" />
-    <None Include="Resources\Visuals\svg\Hime.Shift.svg" />
-    <None Include="Resources\Visuals\svg\Hime.ReduceReduce.svg" />
-    <None Include="Resources\Visuals\svg\Hime.Reduce.svg" />
-    <None Include="Resources\Visuals\svg\Hime.None.svg" />
-    <None Include="Resources\Visuals\svg\Hime.Logo.svg" />
-    <None Include="Resources\Visuals\svg\Hime.Info.svg" />
-    <None Include="Resources\Visuals\svg\Hime.Error.svg" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.Warning.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.ShiftReduce.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.Shift.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.ReduceReduce.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.Reduce.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.None.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.Logo.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.Info.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.GoTo.png" />
-    <EmbeddedResource Include="Resources\Visuals\Hime.Error.png" />
-    <EmbeddedResource Include="Resources\Visuals\button_plus.gif" />
-    <EmbeddedResource Include="Resources\Visuals\button_minus.gif" />
-    <EmbeddedResource Include="Resources\Transforms\Logs.xslt" />
-    <EmbeddedResource Include="Resources\Transforms\Hime.js" />
-    <EmbeddedResource Include="Resources\Transforms\Hime.css" />
-    <EmbeddedResource Include="Resources\Transforms\Doc.ParserData.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Transforms\Doc.Index.xslt" />
-    <EmbeddedResource Include="Resources\Transforms\Doc.Grammar.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Sources\Input\FileCentralDogma.gram" />
     <EmbeddedResource Include="Sources\Input\FileCentralDogmaLexer.bin" />
     <EmbeddedResource Include="Sources\Input\FileCentralDogmaParser.bin" />

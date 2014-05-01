@@ -18,10 +18,8 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using log4net;
-using System.Xml;
-using System.Xml.Xsl;
 using System.IO;
+using log4net;
 
 namespace Hime.CentralDogma.Reporting
 {
@@ -119,44 +117,6 @@ namespace Hime.CentralDogma.Reporting
 		public void Report(Exception exception)
 		{
 			Report(new ExceptionEntry(exception));
-		}
-
-		/// <summary>
-		/// Export the current log as an MHTML file
-		/// </summary>
-		/// <param name="fileName">Name of the file to export to</param>
-		public void ExportMHTML(string fileName)
-		{
-			XmlDocument document = report.ExportXML();
-			FileInfo fileInfo = new FileInfo(fileName);
-			string xmlFileName = fileName + ".xml";
-			string htmlFileName = fileName + ".html";
-			document.Save(xmlFileName);
-
-			using (ResourceAccessor session = new ResourceAccessor())
-			{
-				session.AddCheckoutFile(xmlFileName);
-				session.CheckOut("Transforms.Logs.xslt", fileInfo.DirectoryName + "Logs.xslt");
-
-				XslCompiledTransform transform = new XslCompiledTransform();
-				transform.Load(fileInfo.DirectoryName + "Logs.xslt");
-				transform.Transform(xmlFileName, htmlFileName);
-				session.AddCheckoutFile(htmlFileName);
-
-				Documentation.MHTMLCompiler compiler = new Documentation.MHTMLCompiler(report.Title);
-
-				compiler.AddSource(new Documentation.MHTMLSource("text/html", "Grammar.html", htmlFileName));
-				compiler.AddSource(new Documentation.MHTMLSource("text/css", "hime_data/Hime.css", session.GetStreamFor("Transforms.Hime.css")));
-				compiler.AddSource(new Documentation.MHTMLSource("text/javascript", "hime_data/Hime.js", session.GetStreamFor("Transforms.Hime.js")));
-
-				compiler.AddSource(new Documentation.MHTMLSource("image/gif", "hime_data/button_plus.gif", session.GetStreamFor("Visuals.button_plus.gif")));
-				compiler.AddSource(new Documentation.MHTMLSource("image/gif", "hime_data/button_minus.gif", session.GetStreamFor("Visuals.button_minus.gif")));
-				compiler.AddSource(new Documentation.MHTMLSource("image/png", "hime_data/Hime.Logo.png", session.GetStreamFor("Visuals.Hime.Logo.png")));
-				compiler.AddSource(new Documentation.MHTMLSource("image/png", "hime_data/Hime.Info.png", session.GetStreamFor("Visuals.Hime.Info.png")));
-				compiler.AddSource(new Documentation.MHTMLSource("image/png", "hime_data/Hime.Warning.png", session.GetStreamFor("Visuals.Hime.Warning.png")));
-				compiler.AddSource(new Documentation.MHTMLSource("image/png", "hime_data/Hime.Error.png", session.GetStreamFor("Visuals.Hime.Error.png")));
-				compiler.CompileTo(fileName);
-			}
 		}
 	}
 }
