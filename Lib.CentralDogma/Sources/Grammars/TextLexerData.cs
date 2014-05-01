@@ -49,11 +49,14 @@ namespace Hime.CentralDogma.Grammars
 
         public void ExportCode(StreamWriter stream, string name, AccessModifier modifier, string resource)
         {
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Lexer : Lexer");
-            stream.WriteLine("    {");
+            stream.WriteLine("\t/// <summary>");
+			stream.WriteLine("\t/// Represents a lexer");
+			stream.WriteLine("\t/// </summary>");
+			stream.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Lexer : Lexer");
+            stream.WriteLine("\t{");
             ExportStatics(stream, name, resource);
             ExportConstructor(stream, name);
-            stream.WriteLine("    }");
+            stream.WriteLine("\t}");
         }
         public void ExportData(BinaryWriter stream)
         {
@@ -63,19 +66,48 @@ namespace Hime.CentralDogma.Grammars
         private void ExportConstructor(StreamWriter stream, string name)
         {
             string sep = "FFFF";
-            if (separator != null) sep = separator.SID.ToString("X");
-            stream.WriteLine("        public " + name + "Lexer(string input) : base(automaton, terminals, 0x" + sep + ", new System.IO.StringReader(input)) {}");
-            stream.WriteLine("        public " + name + "Lexer(System.IO.TextReader input) : base(automaton, terminals, 0x" + sep + ", input) {}");
+            if (separator != null)
+				sep = separator.SID.ToString("X");
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Initializes a new instance of the lexer");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <param name=\"input\">The lexer's input</param>");
+            stream.WriteLine("\t\tpublic " + name + "Lexer(string input) : base(automaton, terminals, 0x" + sep + ", new System.IO.StringReader(input)) {}");
+            stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Initializes a new instance of the lexer");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <param name=\"input\">The lexer's input</param>");
+            stream.WriteLine("\t\tpublic " + name + "Lexer(System.IO.TextReader input) : base(automaton, terminals, 0x" + sep + ", input) {}");
         }
         private void ExportStatics(StreamWriter stream, string name, string resource)
-        {
-            stream.WriteLine("        private static readonly Automaton automaton = Automaton.Find(typeof(" + name + "Lexer), \"" + resource + "\");");
-            stream.WriteLine("        public static readonly Symbol[] terminals = {");
+		{
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// The automaton for this lexer");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tprivate static readonly Automaton automaton = Automaton.Find(typeof(" + name + "Lexer), \"" + resource + "\");");
+            
+			for (int i = 2; i != terminals.Count; i++)
+			{
+				Terminal terminal = terminals[i];
+				stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// The unique identifier for terminal " + terminal.Name);
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\tpublic const int {0} = 0x{1};", terminal.Name, terminal.SID.ToString("X"));
+			}
+
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// The collection of terminals matched by this lexer");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <remarks>");
+			stream.WriteLine("\t\t/// The terminals are in an order consistent with the automaton,");
+			stream.WriteLine("\t\t/// so that terminal indices in the automaton can be used to retrieve the terminals in this table");
+			stream.WriteLine("\t\t/// </remarks>");
+			stream.WriteLine("\t\tprivate static readonly Symbol[] terminals = {");
             bool first = true;
             foreach (Terminal terminal in terminals)
             {
                 if (!first) stream.WriteLine(",");
-                stream.Write("            ");
+                stream.Write("\t\t\t");
                 stream.Write("new Symbol(0x" + terminal.SID.ToString("X") + ", \"" + terminal.ToString().Replace("\"", "\\\"") + "\")");
                 first = false;
             }

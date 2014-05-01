@@ -97,77 +97,142 @@ namespace Hime.CentralDogma.Grammars.ContextFree.LR
         {
             this.terminals = new List<Terminal>(expected);
 
-            stream.WriteLine("    " + modifier.ToString().ToLower() + " class " + name + "Parser : " + this.BaseClassName);
-            stream.WriteLine("    {");
+            stream.WriteLine("\t/// <summary>");
+			stream.WriteLine("\t/// Represents a parser");
+			stream.WriteLine("\t/// </summary>");
+			stream.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Parser : " + this.BaseClassName);
+            stream.WriteLine("\t{");
             ExportAutomaton(stream, name, resource);
             ExportVariables(stream);
             ExportVirtuals(stream);
             ExportActions(stream);
             ExportConstructor(stream, name);
-            stream.WriteLine("    }");
+            stream.WriteLine("\t}");
         }
 
         protected abstract void ExportAutomaton(StreamWriter stream, string name, string resource);
 
         protected void ExportVariables(StreamWriter stream)
-        {
-            stream.WriteLine("        private static readonly Symbol[] variables = {");
-            bool first = true;
-            foreach (Variable var in variables)
-            {
-                if (!first) stream.WriteLine(", ");
-                stream.Write("            ");
-                stream.Write("new Symbol(0x" + var.SID.ToString("X") + ", \"" + var.Name + "\")");
-                first = false;
-            }
-            stream.WriteLine(" };");
+		{
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// The collection of variables matched by this parser");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <remarks>");
+			stream.WriteLine("\t\t/// The variables are in an order consistent with the automaton,");
+			stream.WriteLine("\t\t/// so that variable indices in the automaton can be used to retrieve the variables in this table");
+			stream.WriteLine("\t\t/// </remarks>");
+			stream.WriteLine("\t\tprivate static readonly Symbol[] variables = {");
+			bool first = true;
+			foreach (Variable var in variables)
+			{
+				if (!first)
+					stream.WriteLine(", ");
+				stream.Write("\t\t\t");
+				stream.Write("new Symbol(0x" + var.SID.ToString("X") + ", \"" + var.Name + "\")");
+				first = false;
+			}
+			stream.WriteLine(" };");
+
+			foreach (Variable var in variables)
+			{
+				stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// The unique identifier for variable " + var.Name);
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
+			}
         }
 
         protected void ExportVirtuals(StreamWriter stream)
         {
-            stream.WriteLine("        private static readonly Symbol[] virtuals = {");
+            stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// The collection of virtuals matched by this parser");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <remarks>");
+			stream.WriteLine("\t\t/// The virtuals are in an order consistent with the automaton,");
+			stream.WriteLine("\t\t/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table");
+			stream.WriteLine("\t\t/// </remarks>");
+			stream.WriteLine("\t\tprivate static readonly Symbol[] virtuals = {");
             bool first = true;
             foreach (Virtual v in virtuals)
             {
                 if (!first) stream.WriteLine(", ");
-                stream.Write("            ");
+                stream.Write("\t\t\t");
                 stream.Write("new Symbol(0, \"" + v.Name + "\")");
                 first = false;
             }
             stream.WriteLine(" };");
+
+			foreach (Virtual var in virtuals)
+			{
+				stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// The unique identifier for virtual " + var.Name);
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\tpublic const int {0} = 0x{1};", var.Name, var.SID.ToString("X"));
+			}
         }
 
         protected void ExportActions(StreamWriter stream)
-        {
-            if (actions.Count == 0)
-                return;
-            stream.WriteLine("        public class Actions");
-            stream.WriteLine("        {");
-            foreach (Action action in actions)
-                stream.WriteLine("            public virtual void " + action.Name + "(Symbol head, SemanticBody body) { }");
+		{
+			if (actions.Count == 0)
+				return;
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Represents a set of semantic actions in this parser");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tpublic class Actions");
+			stream.WriteLine("\t\t{");
+			foreach (Action action in actions)
+			{
+				stream.WriteLine("\t\t\t/// <summary>");
+				stream.WriteLine("\t\t\t/// The " + action.Name + " semantic action");
+				stream.WriteLine("\t\t\t/// </summary>");
+				stream.WriteLine("\t\t\tpublic virtual void " + action.Name + "(Symbol head, SemanticBody body) { }");
+			}
             stream.WriteLine();
-            stream.WriteLine("        }");
-			stream.WriteLine("        private static readonly Actions noActions = new Actions();");
-            stream.WriteLine("        private static UserAction[] GetUserActions(Actions input)");
-            stream.WriteLine("        {");
-            stream.WriteLine("            UserAction[] result = new UserAction[" + actions.Count + "];");
+            stream.WriteLine("\t\t}");
+
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Represents a set of empty semantic actions (do nothing)");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tprivate static readonly Actions noActions = new Actions();");
+
+            stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Gets the set semantic actions in the form a table consistent with the automaton");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <param name=\"input\">A set of semantic actions</param>");
+            stream.WriteLine("\t\t/// <returns>A table of semantic actions</returns>");
+            stream.WriteLine("\t\tprivate static UserAction[] GetUserActions(Actions input)");
+            stream.WriteLine("\t\t{");
+            stream.WriteLine("\t\t\tUserAction[] result = new UserAction[" + actions.Count + "];");
             for (int i = 0; i != actions.Count; i++)
-                stream.WriteLine("            result[" + i + "] = new UserAction(input." + actions[i].Name + ");");
-            stream.WriteLine("            return result;");
-            stream.WriteLine("        }");
-            
+                stream.WriteLine("\t\t\tresult[" + i + "] = new UserAction(input." + actions[i].Name + ");");
+            stream.WriteLine("\t\t\treturn result;");
+            stream.WriteLine("\t\t}");
         }
 
         protected virtual void ExportConstructor(StreamWriter stream, string name)
         {
             if (actions.Count == 0)
             {
-                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, null, lexer) { }");
+                stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
+	            stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, null, lexer) { }");
             }
             else
             {
-                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, GetUserActions(noActions), lexer) { }");
-                stream.WriteLine("        public " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
+                stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
+	            stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, GetUserActions(noActions), lexer) { }");
+
+                stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
+	            stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
+	            stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
             }
         }
         
