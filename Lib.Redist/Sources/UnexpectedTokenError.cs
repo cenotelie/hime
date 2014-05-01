@@ -31,7 +31,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the unexpected token
 		/// </summary>
-		public Token UnexpectedToken { get; private set; }
+		public Symbol UnexpectedToken { get; private set; }
 
 		/// <summary>
 		/// Gets a list of the expected terminals
@@ -41,16 +41,16 @@ namespace Hime.Redist
 		/// <summary>
 		/// Initializes a new instance of the UnexpectedTokenError class with a token and an array of expected names
 		/// </summary>
-		/// <param name='token'>The unexpected token</param>
-		/// <param name='expected'>The expected terminals</param>
-		/// <param name="text">The text containing the token</param>
-		internal UnexpectedTokenError(Token token, IList<Symbol> expected, TokenizedText text)
-            : base(ErrorType.UnexpectedToken, text.GetPositionOf(token))
+		/// <param name="token">The unexpected token</param>
+		/// <param name="position">Error's position in the input</param>
+		/// <param name="expected">The expected terminals</param>
+		internal UnexpectedTokenError(Symbol token, TextPosition position, IList<Symbol> expected)
+			: base(ErrorType.UnexpectedToken, position)
 		{
 			this.UnexpectedToken = token;
 			this.ExpectedTerminals = new ReadOnlyCollection<Symbol>(expected);
 			StringBuilder Builder = new StringBuilder("Unexpected token \"");
-			Builder.Append(text.GetValue(token));
+			Builder.Append(token.Value);
 			Builder.Append("\"; expected: { ");
 			for (int i = 0; i != expected.Count; i++)
 			{

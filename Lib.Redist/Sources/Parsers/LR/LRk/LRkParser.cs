@@ -99,7 +99,7 @@ namespace Hime.Redist.Parsers
 			List<Symbol> expected = new List<Symbol>();
 			foreach (int index in expectedIDs)
 				expected.Add(lexer.Terminals[index]);
-			allErrors.Add(new UnexpectedTokenError(token, expected, lexer.Output));
+			allErrors.Add(new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected));
 			if (!recover)
 				return new Token(0, 0);
 			if (TryDrop1Unexpected())

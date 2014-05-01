@@ -72,20 +72,6 @@ namespace Hime.Redist
 		string GetLineContent(int line);
 
 		/// <summary>
-		/// Gets the line number at the given index
-		/// </summary>
-		/// <param name="index">Index from the start</param>
-		/// <returns>The line number at the index</returns>
-		int GetLineAt(int index);
-
-		/// <summary>
-		/// Gets the column number at the given index
-		/// </summary>
-		/// <param name="index">Index from the start</param>
-		/// <returns>The column number at the index</returns>
-		int GetColumnAt(int index);
-
-		/// <summary>
 		/// Gets the position at the given index
 		/// </summary>
 		/// <param name="index">Index from the start</param>

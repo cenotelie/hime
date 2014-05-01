@@ -175,26 +175,6 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the line number at the given index
-		/// </summary>
-		/// <param name="index">Index from the start</param>
-		/// <returns>The line number at the index</returns>
-		public int GetLineAt(int index)
-		{
-			return FindLineAt(index) + 1;
-		}
-
-		/// <summary>
-		/// Gets the column number at the given index
-		/// </summary>
-		/// <param name="index">Index from the start</param>
-		/// <returns>The column number at the index</returns>
-		public int GetColumnAt(int index)
-		{
-			return index - lines[FindLineAt(index)] + 1;
-		}
-
-		/// <summary>
 		/// Gets the position at the given index
 		/// </summary>
 		/// <param name="index">Index from the start</param>

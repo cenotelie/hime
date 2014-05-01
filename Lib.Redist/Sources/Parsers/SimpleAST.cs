@@ -174,7 +174,7 @@ namespace Hime.Redist.Parsers
 		{
 			SymbolRef sym = nodes[node].symbol;
 			if (sym.Type == SymbolType.Token)
-				return tableTokens.GetPositionOf(tableTokens[sym.Index]);
+				return tableTokens.GetPositionOf(sym.Index);
 			return new TextPosition(0, 0);
 		}
 
@@ -214,7 +214,7 @@ namespace Hime.Redist.Parsers
 			switch (symRef.Type)
 			{
 				case SymbolType.Token:
-					return tableTokens.GetSymbolAt(symRef.Index);
+					return tableTokens[symRef.Index];
 				case SymbolType.Variable:
 					return tableVariables[symRef.Index];
 				case SymbolType.Virtual:

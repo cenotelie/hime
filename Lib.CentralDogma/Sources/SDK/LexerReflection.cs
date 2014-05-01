@@ -71,7 +71,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// List of the terminals that can be matched
 		/// </summary>
-		private List<Symbol> terminals;
+		private IList<Symbol> terminals;
 
 		/// <summary>
 		/// DFA of the lexer
@@ -82,7 +82,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the terminals that can be matched by this lexer
 		/// </summary>
-		public List<Symbol> Terminals { get { return terminals; } }
+		public IList<Symbol> Terminals { get { return terminals; } }
 
 		/// <summary>
 		/// Gets the lexer's dfa
@@ -99,7 +99,7 @@ namespace Hime.CentralDogma.SDK
 			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
 			Hime.Redist.Lexer.Lexer lexer = ctor.Invoke(new object[] { input }) as Hime.Redist.Lexer.Lexer;
 
-			this.terminals = new List<Symbol>(lexer.Terminals.Values);
+			this.terminals = lexer.Terminals;
 			this.dfa = new Automata.DFA();
 
 			string[] resources = lexerType.Assembly.GetManifestResourceNames();

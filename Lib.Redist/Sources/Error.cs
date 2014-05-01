@@ -53,7 +53,7 @@ namespace Hime.Redist
 		/// Initializes a new instance of the ParserError
 		/// </summary>
 		/// <param name="type">Error's type</param>
-		/// <param name='position'>Error's position in the input</param>
+		/// <param name="position">Error's position in the input</param>
 		protected Error(ErrorType type, TextPosition position)
 		{
 			this.Type = type;

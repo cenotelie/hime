@@ -38,7 +38,7 @@ namespace Hime.Redist
 		/// <param name="unexpected">The errorneous character</param>
 		/// <param name='position'>Error's position in the input</param>
 		internal UnexpectedCharError(char unexpected, TextPosition position)
-            : base(ErrorType.UnexpectedChar, position)
+			: base(ErrorType.UnexpectedChar, position)
 		{
 			this.UnexpectedChar = unexpected;
 			StringBuilder Builder = new StringBuilder("Unexpected character '");

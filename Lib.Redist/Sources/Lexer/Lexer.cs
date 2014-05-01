@@ -145,7 +145,7 @@ namespace Hime.Redist.Lexer
 				{
 					if (terminals[tIndex].ID != lexSeparator)
 					{
-						Token token = text.OnToken(tIndex, index, length);
+						Token token = text.AddToken(tIndex, index, length);
 						index += length;
 						return token;
 					}

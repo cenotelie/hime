@@ -255,7 +255,7 @@ namespace Hime.Redist.Parsers
 					}
 				}
 			}
-			allErrors.Add(new UnexpectedTokenError(token, expected, lexer.Output));
+			allErrors.Add(new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected));
 		}
 
 		/// <summary>

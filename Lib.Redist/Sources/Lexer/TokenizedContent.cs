@@ -87,7 +87,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="start">Start index in the text</param>
 		/// <param name="length">Length of the token</param>
 		/// <returns></returns>
-		internal Token OnToken(int terminal, int start, int length)
+		public Token AddToken(int terminal, int start, int length)
 		{
 			return new Token(terminals[terminal].ID, cells.Add(new Cell(terminal, start, length)));
 		}
@@ -97,9 +97,9 @@ namespace Hime.Redist.Lexer
 		/// Gets an enumerator of the contained tokens
 		/// </summary>
 		/// <returns>An enumerator of tokens</returns>
-		public IEnumerator<Token> GetEnumerator()
+		public IEnumerator<Symbol> GetEnumerator()
 		{
-			return new TokenEnumerator(this);
+			return new SymbolEnumerator(this);
 		}
 
 		/// <summary>
@@ -108,40 +108,26 @@ namespace Hime.Redist.Lexer
 		/// <returns>An enumerator of tokens</returns>
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
-			return new TokenEnumerator(this);
+			return new SymbolEnumerator(this);
 		}
 
 		/// <summary>
 		/// Represents an enumerator of tokens
 		/// </summary>
-		private class TokenEnumerator : IEnumerator<Token>
+		private class SymbolEnumerator : IEnumerator<Symbol>
 		{
 			private TokenizedContent text;
 			private int index;
 
-			public TokenEnumerator(TokenizedContent text)
+			public SymbolEnumerator(TokenizedContent text)
 			{
 				this.text = text;
 				this.index = -1;
 			}
 
-			public Token Current
-			{
-				get
-				{
-					Cell cell = text.cells[index];
-					return new Token(text.terminals[cell.terminal].ID, index);
-				}
-			}
+			public Symbol Current { get { return text[index]; } }
 
-			object System.Collections.IEnumerator.Current
-			{
-				get
-				{
-					Cell cell = text.cells[index];
-					return new Token(text.terminals[cell.terminal].ID, index);
-				}
-			}
+			object System.Collections.IEnumerator.Current { get { return text[index]; } }
 
 			public bool MoveNext()
 			{
@@ -172,13 +158,13 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="index">An index</param>
 		/// <returns>The token</returns>
-		public Token this[int index]
+		public Symbol this[int index]
 		{
 			get
 			{
 				Cell cell = cells[index];
 				Symbol terminal = terminals[cell.terminal];
-				return new Token(terminal.ID, index);
+				return new Symbol(terminal.ID, terminal.Name, GetValue(cell.start, cell.length));
 			}
 		}
 
@@ -196,56 +182,13 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the value of the given token
+		/// Gets the position of the token at the given index
 		/// </summary>
-		/// <param name="token">A token in this text</param>
-		/// <returns>The token's value as a string</returns>
-		public Symbol GetSymbol(Token token)
+		/// <param name="tokenIndex">The index of a token</param>
+		/// <returns>The position (line and column) of the token</returns>
+		public TextPosition GetPositionOf(int tokenIndex)
 		{
-			return GetSymbolAt(token.Index);
-		}
-
-		/// <summary>
-		/// Gets the string value of the given token
-		/// </summary>
-		/// <param name="token">A token</param>
-		/// <returns>The string value of the given token</returns>
-		public string GetValue(Token token)
-		{
-			Cell cell = cells[token.Index];
-			return GetValue(cell.start, cell.length);
-		}
-
-		/// <summary>
-		/// Gets the line number of the given token
-		/// </summary>
-		/// <param name="token">A token</param>
-		/// <returns>The line number of the given token</returns>
-		public int GetLineOf(Token token)
-		{
-			Cell cell = cells[token.Index];
-			return GetLineAt(cell.start);
-		}
-
-		/// <summary>
-		/// Gets the column number of the given token
-		/// </summary>
-		/// <param name="token">A token</param>
-		/// <returns>The column number of the given token</returns>
-		public int GetColumnOf(Token token)
-		{
-			Cell cell = cells[token.Index];
-			return GetColumnAt(cell.start);
-		}
-
-		/// <summary>
-		/// Gets the position of the given token
-		/// </summary>
-		/// <param name="token">A token</param>
-		/// <returns>The position (line and column) of the given token</returns>
-		public TextPosition GetPositionOf(Token token)
-		{
-			Cell cell = cells[token.Index];
+			Cell cell = cells[tokenIndex];
 			return GetPositionAt(cell.start);
 		}
         #endregion
