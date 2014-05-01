@@ -1,4 +1,4 @@
-﻿/**********************************************************************
+/**********************************************************************
 * Copyright (c) 2013 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.Collections.Generic;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
@@ -115,7 +116,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
-		public SPPF(int stackSize, TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
+		public SPPF(int stackSize, TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
 			: base(stackSize, text, variables, virtuals)
 		{
 			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), initHistorySize);

@@ -1,4 +1,4 @@
-﻿/**********************************************************************
+/**********************************************************************
 * Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
@@ -63,7 +63,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The terminal symbols matched in this content
 		/// </summary>
-		private SymbolDictionary terminals;
+		private IList<Symbol> terminals;
 
 		/// <summary>
 		/// The token data in this content
@@ -74,7 +74,7 @@ namespace Hime.Redist.Lexer
 		/// Initializes this text
 		/// </summary>
 		/// <param name="terminals">The terminal symbols</param>
-		public TokenizedContent(SymbolDictionary terminals)
+		public TokenizedContent(IList<Symbol> terminals)
 		{
 			this.terminals = terminals;
 			this.cells = new Utils.BigList<Cell>();

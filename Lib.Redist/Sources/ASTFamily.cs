@@ -46,8 +46,7 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="index">The index of the child</param>
 		/// <returns>The child at the given index</returns>
-		public ASTNode this[int index] { get { return tree.GetChild(parent, index); }
-		}
+		public ASTNode this[int index] { get { return tree.GetChild(parent, index); } }
 
 		/// <summary>
 		/// Gets an enumeration of the children

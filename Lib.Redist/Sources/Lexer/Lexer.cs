@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace Hime.Redist.Lexer
@@ -52,7 +53,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The terminals matched by this lexer
 		/// </summary>
-		private SymbolDictionary terminals;
+		private IList<Symbol> terminals;
 
 		/// <summary>
 		/// Symbol ID of the SEPARATOR terminal
@@ -82,7 +83,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the terminals matched by this lexer
 		/// </summary>
-		public SymbolDictionary Terminals { get { return terminals; } }
+		public IList<Symbol> Terminals { get { return terminals; } }
 
 		/// <summary>
 		/// Gets the lexer's output as a tokenized text
@@ -95,7 +96,7 @@ namespace Hime.Redist.Lexer
 		internal event AddLexicalError OnError;
 
 		/// <summary>
-		/// Initializes a new instance of the TextLexer class with the given input
+		/// Initializes a new instance of the Lexer class with the given input
 		/// </summary>
 		/// <param name="automaton">DFA automaton for this lexer</param>
 		/// <param name="terminals">Terminals recognized by this lexer</param>
@@ -104,7 +105,7 @@ namespace Hime.Redist.Lexer
 		protected Lexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 		{
 			this.lexAutomaton = automaton;
-			this.terminals = new SymbolDictionary(terminals);
+			this.terminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
 			this.lexSeparator = separator;
 			this.text = new TokenizedContent(this.terminals);
 			this.input = new RewindableReader(input, text);

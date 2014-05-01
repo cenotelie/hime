@@ -30,7 +30,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Parser's variables
 		/// </summary>
-		protected SymbolDictionary parserVariables;
+		protected IList<Symbol> parserVariables;
 		/// <summary>
 		/// LR(k) parsing table and productions
 		/// </summary>

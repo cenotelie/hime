@@ -19,7 +19,7 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Collections.ObjectModel;
 
 namespace Hime.Redist.Parsers
 {
@@ -36,19 +36,19 @@ namespace Hime.Redist.Parsers
 		/// Maximum number of errors
 		/// </summary>
 		protected const int maxErrorCount = 100;
+
 		/// <summary>
 		/// Determines whether the parser will try to recover from errors
 		/// </summary>
 		protected bool recover = true;
-
 		/// <summary>
 		/// Parser's variables
 		/// </summary>
-		protected SymbolDictionary parserVariables;
+		protected IList<Symbol> parserVariables;
 		/// <summary>
 		/// Parser's virtuals
 		/// </summary>
-		protected SymbolDictionary parserVirtuals;
+		protected IList<Symbol> parserVirtuals;
 		/// <summary>
 		/// Parser's actions
 		/// </summary>
@@ -66,12 +66,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the variable symbols used by this parser
 		/// </summary>
-		public SymbolDictionary Variables { get { return parserVariables; } }
+		public IList<Symbol> Variables { get { return parserVariables; } }
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
-		public SymbolDictionary Virtuals { get { return parserVirtuals; } }
-
+		public IList<Symbol> Virtuals { get { return parserVirtuals; } }
 		/// <summary>
 		/// Gets or sets whether the paser should try to recover from errors
 		/// </summary>
@@ -90,8 +89,8 @@ namespace Hime.Redist.Parsers
 		/// <param name="lexer">The input lexer</param>
 		protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
 		{
-			this.parserVariables = new SymbolDictionary(variables);
-			this.parserVirtuals = new SymbolDictionary(virtuals);
+			this.parserVariables = new ReadOnlyCollection<Symbol>(new List<Symbol>(variables));
+			this.parserVirtuals = new ReadOnlyCollection<Symbol>(new List<Symbol>(virtuals));
 			this.parserActions = actions;
 			this.recover = true;
 			this.allErrors = new List<Error>();

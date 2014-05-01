@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.Collections.Generic;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
@@ -113,7 +114,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="text">The tokenined text</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
-		public LRkASTBuilder(int stackSize, TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
+		public LRkASTBuilder(int stackSize, TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);

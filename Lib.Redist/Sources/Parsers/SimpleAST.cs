@@ -83,12 +83,12 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The table of variables
 		/// </summary>
-		protected SymbolDictionary tableVariables;
+		protected IList<Symbol> tableVariables;
 
 		/// <summary>
 		/// The table of virtuals
 		/// </summary>
-		protected SymbolDictionary tableVirtuals;
+		protected IList<Symbol> tableVirtuals;
 
 		/// <summary>
 		/// The nodes' labels
@@ -108,7 +108,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
-		public SimpleAST(TokenizedText text, SymbolDictionary variables, SymbolDictionary virtuals)
+		public SimpleAST(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.tableTokens = text;
 			this.tableVariables = variables;
@@ -175,7 +175,6 @@ namespace Hime.Redist.Parsers
 			SymbolRef sym = nodes[node].symbol;
 			if (sym.Type == SymbolType.Token)
 				return tableTokens.GetPositionOf(tableTokens[sym.Index]);
-			;
 			return new TextPosition(0, 0);
 		}
 

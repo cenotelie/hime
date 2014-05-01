@@ -25,12 +25,21 @@ namespace Hime.Redist
 	/// </summary>
 	public struct Symbol
 	{
+		/// <summary>
+		/// The symbol's unique identifier
+		/// </summary>
 		private int id;
+		/// <summary>
+		/// The symbol's name
+		/// </summary>
 		private string name;
+		/// <summary>
+		/// The symbol's value
+		/// </summary>
 		private string value;
 
 		/// <summary>
-		/// Gets the symbol's identifier
+		/// Gets the symbol's unique identifier
 		/// </summary>
 		public int ID { get { return id; } }
 

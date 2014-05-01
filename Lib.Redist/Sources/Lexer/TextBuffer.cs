@@ -45,8 +45,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="index">Index in the data</param>
 		/// <returns>The corresponding character</returns>
-		public char this[int index] { get { return data[index]; }
-		}
+		public char this[int index] { get { return data[index]; } }
 
 		/// <summary>
 		/// Gets the start index

@@ -75,7 +75,8 @@ namespace Hime.Redist
 		/// </summary>
 		public ASTNode Root
 		{
-			get {
+			get
+			{
 				if (ast == null)
 					return new ASTNode();
 				return ast.Root;

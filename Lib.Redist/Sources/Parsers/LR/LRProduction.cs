@@ -73,8 +73,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the op-code at the specified index in the bytecode
 		/// </summary>
 		/// <param name="index">Index in the bytecode</param>
-		public LROpCode this[int index] { get { return bytecode[index]; }
-		}
+		public LROpCode this[int index] { get { return bytecode[index]; } }
 
 		/// <summary>
 		/// Loads a new instance of the LRProduction class from a binary representation
