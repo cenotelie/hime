@@ -379,13 +379,11 @@ namespace Hime.CentralDogma
 			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace, true);
 			generator.GenerateCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
 			CloseOutputStream(txtOutput);
-			reporter.Info("Done!");
 			// generate the lexer's data
 			reporter.Info("Exporting lexer data at " + prefix + PostfixLexerData + " ...");
 			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixLexerData, FileMode.Create));
 			generator.GenerateData(binOutput);
 			binOutput.Close();
-			reporter.Info("Done!");
 			return generator.Expected;
 		}
 
@@ -425,13 +423,11 @@ namespace Hime.CentralDogma
 			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace, true);
 			generator.GenerateCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
 			CloseOutputStream(txtOutput);
-			reporter.Info("Done!");
 			// generate the lexer's data
 			reporter.Info("Exporting parser data at " + prefix + PostfixParserData + " ...");
 			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixParserData, FileMode.Create));
 			generator.GenerateData(binOutput);
 			binOutput.Close();
-			reporter.Info("Done!");
 			return true;
 		}
 
@@ -499,7 +495,6 @@ namespace Hime.CentralDogma
 				foreach (CompilerError error in results.Errors)
 					reporter.Error(error.ToString());
 			}
-			reporter.Info("Done!");
 		}
 	}
 }
