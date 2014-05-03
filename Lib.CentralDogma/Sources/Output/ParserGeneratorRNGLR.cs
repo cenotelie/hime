@@ -166,7 +166,7 @@ namespace Hime.CentralDogma.Output
 			}
 			foreach (Grammars.Terminal terminal in terminals)
 			{
-				int count = state.Children.ContainsKey(terminal) ? 1 : 0;
+				int count = state.HasTransition(terminal) ? 1 : 0;
 				if (reductionCounters.ContainsKey(terminal))
 					count += reductionCounters[terminal];
 				offsets.Add(total);
@@ -175,7 +175,7 @@ namespace Hime.CentralDogma.Output
 			}
 			foreach (Grammars.Variable variable in variables)
 			{
-				int count = state.Children.ContainsKey(variable) ? 1 : 0;
+				int count = state.HasTransition(variable) ? 1 : 0;
 				offsets.Add(total);
 				counts.Add((ushort)count);
 				total += (uint)count;
@@ -207,10 +207,10 @@ namespace Hime.CentralDogma.Output
 			for (int i = 1; i != terminals.Count; i++)
 			{
 				Grammars.Terminal terminal = terminals[i];
-				if (state.Children.ContainsKey(terminal))
+				if (state.HasTransition(terminal))
 				{
 					stream.Write((ushort)LRActionCode.Shift);
-					stream.Write((ushort)state.Children[terminal].ID);
+					stream.Write((ushort)state.GetChildBy(terminal).ID);
 				}
 				if (reductions.ContainsKey(terminal))
 				{
@@ -223,10 +223,10 @@ namespace Hime.CentralDogma.Output
 			}
 			foreach (Grammars.Variable variable in variables)
 			{
-				if (state.Children.ContainsKey(variable))
+				if (state.HasTransition(variable))
 				{
 					stream.Write((ushort)LRActionCode.Shift);
-					stream.Write((ushort)state.Children[variable].ID);
+					stream.Write((ushort)state.GetChildBy(variable).ID);
 				}
 			}
 		}

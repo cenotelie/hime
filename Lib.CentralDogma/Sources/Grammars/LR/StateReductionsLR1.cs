@@ -63,7 +63,7 @@ namespace Hime.CentralDogma.Grammars.LR
 				if (item.Action == LRActionCode.Shift)
 					continue;
 				// There is already a shift action for the lookahead => conflict
-				if (state.Children.ContainsKey(item.Lookahead))
+				if (state.HasTransition(item.Lookahead))
 					RaiseConflictShiftReduce(state, item, item.Lookahead);
                 // There is already a reduction action for the lookahead => conflict
                 else if (reductions.ContainsKey(item.Lookahead))

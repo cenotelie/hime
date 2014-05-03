@@ -59,18 +59,15 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the items in this state
 		/// </summary>
-		public ICollection<Item> Items { get { return items; } }
-		/// <summary>
-		/// Gets the state's children
-		/// </summary>
-		/// <value>
-		/// The children.
-		/// </value>
-		public Dictionary<Symbol, State> Children { get { return children; } }
+		public ROList<Item> Items { get { return new ROList<Item>(items); } }
 		/// <summary>
 		/// Gets the conflicts in this state
 		/// </summary>
 		public ROList<Conflict> Conflicts { get { return reductions.Conflicts; } }
+		/// <summary>
+		/// Gets the symbols that triggers transitions from this state
+		/// </summary>
+		public ICollection<Symbol> Transitions { get { return children.Keys; } }
 
 		/// <summary>
 		/// Initializes this state
@@ -82,6 +79,36 @@ namespace Hime.CentralDogma.Grammars.LR
 			this.kernel = kernel;
 			this.items = items;
 			this.children = new Dictionary<Symbol, State>(new Symbol.EqualityComparer());
+		}
+
+		/// <summary>
+		/// Determines whether this state has a transition triggered by the specified symbol
+		/// </summary>
+		/// <param name="symbol">A transition symbol</param>
+		/// <returns><c>true</c> if this state has a transition triggered by the specified symbol; otherwise, <c>false</c></returns>
+		public bool HasTransition(Symbol symbol)
+		{
+			return children.ContainsKey(symbol);
+		}
+
+		/// <summary>
+		/// Gets the child of this state by the specified transition
+		/// </summary>
+		/// <param name="symbol">A transition symbol</param>
+		/// <returns>The child by the specified transition</returns>
+		public State GetChildBy(Symbol symbol)
+		{
+			return children[symbol];
+		}
+
+		/// <summary>
+		/// Adds a transition to a child
+		/// </summary>
+		/// <param name="symbol">The transition symbol</param>
+		/// <param name="child">The child state</param>
+		public void AddChild(Symbol symbol, State child)
+		{
+			children.Add(symbol, child);
 		}
 
 		/// <summary>

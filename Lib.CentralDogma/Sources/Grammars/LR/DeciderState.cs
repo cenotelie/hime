@@ -202,7 +202,7 @@ namespace Hime.CentralDogma.Grammars.LR
 			foreach (GLRStackNode node in choice.Nodes)
 			{
 				State state = node.State;
-				foreach (Symbol s in state.Children.Keys)
+				foreach (Symbol s in state.Transitions)
 				{
 					if (!(s is Terminal))
 						continue;

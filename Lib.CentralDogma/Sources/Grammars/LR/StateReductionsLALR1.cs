@@ -65,7 +65,7 @@ namespace Hime.CentralDogma.Grammars.LR
 				foreach (Terminal lookahead in item.Lookaheads)
 				{
 					// There is already a shift action for the lookahead => conflict
-					if (state.Children.ContainsKey(lookahead))
+					if (state.HasTransition(lookahead))
 						RaiseConflictShiftReduce(state, item, lookahead);
                     // There is already a reduction action for the lookahead => conflict
                     else if (reductions.ContainsKey(lookahead))

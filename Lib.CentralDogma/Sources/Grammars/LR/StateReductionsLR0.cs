@@ -53,7 +53,7 @@ namespace Hime.CentralDogma.Grammars.LR
 				// Ignore Shift actions
 				if (item.Action == LRActionCode.Shift)
 					continue;
-				if (state.Children.Count != 0)
+				if (state.Transitions.Count != 0)
 				{
 					// Conflict Shift/Reduce
 					RaiseConflictShiftReduce(state, item, NullTerminal.Instance);

@@ -119,7 +119,7 @@ namespace Hime.CentralDogma.Grammars.LR
 						if (item.Action == LRActionCode.Reduce)
 							continue;
 						// Get the child item in the child LALR(1) kernel
-						State childLR0 = stateLR0.Children[item.GetNextSymbol()];
+						State childLR0 = stateLR0.GetChildBy(item.GetNextSymbol());
 						StateKernel childKernel = kernels[childLR0.ID];
 						ItemLALR1 childLALR1 = (ItemLALR1)GetEquivalentInSet(childKernel, item.GetChild());
 						// If the lookaheads of the item in the dummy set contains the dummy terminal
@@ -190,10 +190,10 @@ namespace Hime.CentralDogma.Grammars.LR
 				// Set ID
 				stateLALR1.ID = i;
 				// Link
-				foreach (Symbol symbol in stateLR0.Children.Keys)
+				foreach (Symbol symbol in stateLR0.Transitions)
 				{
-					State childLALR1 = graphLALR1.States[stateLR0.Children[symbol].ID];
-					stateLALR1.Children.Add(symbol, childLALR1);
+					State childLALR1 = graphLALR1.States[stateLR0.GetChildBy(symbol).ID];
+					stateLALR1.AddChild(symbol, childLALR1);
 				}
 				// Build
 				stateLALR1.BuildReductions(new StateReductionsLALR1());

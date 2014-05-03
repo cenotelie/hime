@@ -97,10 +97,10 @@ namespace Hime.CentralDogma.Output
 			for (int i = 1; i != terminals.Count; i++)
 			{
 				Grammars.Terminal t = terminals[i];
-				if (state.Children.ContainsKey(t))
+				if (state.HasTransition(t))
 				{
 					stream.Write((ushort)LRActionCode.Shift);
-					stream.Write((ushort)state.Children[t].ID);
+					stream.Write((ushort)state.GetChildBy(t).ID);
 				}
 				else if (reductions.ContainsKey(t))
 				{
@@ -119,12 +119,12 @@ namespace Hime.CentralDogma.Output
 				}
 			}
 			// write actions for variables
-			foreach (Grammars.Variable var in variables)
+			foreach (Grammars.Variable variable in variables)
 			{
-				if (state.Children.ContainsKey(var))
+				if (state.HasTransition(variable))
 				{
 					stream.Write((ushort)LRActionCode.Shift);
-					stream.Write((ushort)state.Children[var].ID);
+					stream.Write((ushort)state.GetChildBy(variable).ID);
 				}
 				else
 				{

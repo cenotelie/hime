@@ -81,18 +81,18 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// </summary>
 		protected void BuildInverse()
 		{
-			foreach (State set in graph.States)
+			foreach (State state in graph.States)
 			{
-				foreach (Symbol symbol in set.Children.Keys)
+				foreach (Symbol symbol in state.Transitions)
 				{
-					State child = set.Children[symbol];
+					State child = state.GetChildBy(symbol);
 					if (!inverseGraph.ContainsKey(child.ID))
 						inverseGraph.Add(child.ID, new Dictionary<Symbol, List<State>>());
 					Dictionary<Symbol, List<State>> inverses = inverseGraph[child.ID];
 					if (!inverses.ContainsKey(symbol))
 						inverses.Add(symbol, new List<State>());
 					List<State> parents = inverses[symbol];
-					parents.Add(set);
+					parents.Add(state);
 				}
 			}
 		}

@@ -152,8 +152,8 @@ namespace Hime.CentralDogma.SDK
 				serializer.WriteStructure("state" + state.ID.ToString(), state.ID.ToString(), items.ToArray());
 			}
 			foreach (Grammars.LR.State state in graph.States)
-				foreach (Grammars.Symbol symbol in state.Children.Keys)
-					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.Children[symbol].ID.ToString(), symbol.ToString());
+				foreach (Grammars.Symbol symbol in state.Transitions)
+					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.GetChildBy(symbol).ID.ToString(), symbol.ToString());
 			serializer.Close();
 		}
 	}

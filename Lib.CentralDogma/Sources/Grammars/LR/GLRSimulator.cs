@@ -63,11 +63,11 @@ namespace Hime.CentralDogma.Grammars.LR
 					// for each stack node in the origin
 					foreach (GLRStackNode nOrigin in origin.Nodes)
 					{
-						if (nOrigin.State.Children.ContainsKey(reduction.ToReduceRule.Head))
+						if (nOrigin.State.HasTransition(reduction.ToReduceRule.Head))
 						{
 							// there is a transition from the LR state represented by this origin stack node by the reduced variable
 							// get the target state
-							State next = nOrigin.State.Children[reduction.ToReduceRule.Head];
+							State next = nOrigin.State.GetChildBy(reduction.ToReduceRule.Head);
 							// resolve this state in the current generation
 							GLRStackNode follower = current.Resolve(next);
 							// adds an edge from the new node to the original one, labelled with the rule's head
@@ -81,11 +81,11 @@ namespace Hime.CentralDogma.Grammars.LR
 			GLRGeneration result = new GLRGeneration();
 			foreach (GLRStackNode node in current)
 			{
-				if (node.State.Children.ContainsKey(lookahead))
+				if (node.State.HasTransition(lookahead))
 				{
 					// there is a transition in the LR graph from the state
 					// represented by the current stack node by the lookahead
-					State next = node.State.Children[lookahead];
+					State next = node.State.GetChildBy(lookahead);
 					// resolve the next state in the target generation
 					GLRStackNode follower = result.Resolve(next);
 					// adds the corresponding edge to the current node in the current generation
@@ -115,7 +115,7 @@ namespace Hime.CentralDogma.Grammars.LR
 			{
 				// the item to simulate is a shift action, simply populate the target generation
 				// resolve the target state in the target generation
-				GLRStackNode next = result.Resolve(state.Children[item.GetNextSymbol()]);
+				GLRStackNode next = result.Resolve(state.GetChildBy(item.GetNextSymbol()));
 				// adds the corresponding edge
 				next.AddEdge(item.GetNextSymbol(), start);
 				// stop here
@@ -128,11 +128,11 @@ namespace Hime.CentralDogma.Grammars.LR
 			// for each stack node in the origin
 			foreach (GLRStackNode node in origin.Nodes)
 			{
-				if (node.State.Children.ContainsKey(item.BaseRule.Head))
+				if (node.State.HasTransition(item.BaseRule.Head))
 				{
 					// there is a transition from the LR state represented by this origin stack node by the reduced variable
 					// get the target state
-					State target = node.State.Children[item.BaseRule.Head];
+					State target = node.State.GetChildBy(item.BaseRule.Head);
 					// resolve this state in the target generation
 					GLRStackNode next = result.Resolve(target);
 					// adds an edge from the new node to the original one, labelled with the rule's head
