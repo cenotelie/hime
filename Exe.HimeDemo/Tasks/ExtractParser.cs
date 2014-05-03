@@ -38,11 +38,11 @@ namespace Hime.Demo.Tasks
 			// Build parser assembly
 			string grammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
 			CompilationTask task = new CompilationTask();
-			task.Mode = CompilationMode.Assembly;
+			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.AddInputRaw(grammar);
 			task.Namespace = "Hime.Demo.Generated";
 			task.GrammarName = "Demo";
-			task.CodeAccess = AccessModifier.Public;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
 			task.Execute();
 

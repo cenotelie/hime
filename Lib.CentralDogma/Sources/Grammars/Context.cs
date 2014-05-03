@@ -29,7 +29,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// The loader
 		/// </summary>
-		private GrammarLoader loader;
+		private Loader loader;
 		/// <summary>
 		/// The current template rules
 		/// </summary>
@@ -42,13 +42,13 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the loader to which this context is associated
 		/// </summary>
-		public GrammarLoader Loader { get { return loader; } }
+		public Loader Loader { get { return loader; } }
 
 		/// <summary>
 		/// Initializes this context
 		/// </summary>
 		/// <param name="loader">The parent loader</param>
-		public Context(GrammarLoader loader)
+		public Context(Loader loader)
 		{
 			this.loader = loader;
 			this.templateRules = new List<TemplateRule>();

@@ -65,9 +65,9 @@ namespace Hime.Tests
 			CompilationTask task = new CompilationTask();
 			task.AddInputRaw(stream);
 			task.GrammarName = "ParseTree";
-			task.CodeAccess = AccessModifier.Public;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
-			task.Mode = CompilationMode.Assembly;
+			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = "Hime.Tests.Generated";
 			task.OutputPrefix = "ParseTree";
 			task.Execute();
@@ -127,9 +127,9 @@ namespace Hime.Tests
 			CompilationTask task = new CompilationTask();
 			task.AddInputRaw(grammars);
 			task.GrammarName = top;
-			task.CodeAccess = AccessModifier.Public;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = method;
-			task.Mode = CompilationMode.Assembly;
+			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = genNamespace;
 			task.OutputPrefix = prefix;
 			Hime.CentralDogma.Report report = task.Execute();

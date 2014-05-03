@@ -40,11 +40,11 @@ namespace Hime.Demo.Tasks
 			// Build parser assembly
 			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = CompilationMode.Assembly;
+			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.Demo.Generated";
 			task.GrammarName = "HimeGrammar";
-			task.CodeAccess = AccessModifier.Public;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
 			task.Execute();
 			stream.Close();

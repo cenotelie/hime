@@ -128,11 +128,11 @@ namespace Hime.Benchmark
 		{
 			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = CompilationMode.Assembly;
+			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.Benchmark.Generated";
 			task.GrammarName = "FileCentralDogma";
-			task.CodeAccess = AccessModifier.Public;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = method;
 			task.OutputPrefix = "gen_" + method.ToString();
 			task.Execute();

@@ -18,12 +18,12 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Output
 {
 	/// <summary>
 	/// Represents the access modifiers for the generated code
 	/// </summary>
-	public enum AccessModifier
+	public enum Modifier
 	{
 		/// <summary>
 		/// Generated classes are public

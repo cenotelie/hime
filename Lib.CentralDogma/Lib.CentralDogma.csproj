@@ -81,8 +81,6 @@
     <Compile Include="Sources\Automata\NFAState.cs" />
     <Compile Include="Sources\Automata\NFAStateSet.cs" />
     <Compile Include="Sources\Automata\NFATransition.cs" />
-    <Compile Include="Sources\AccessModifier.cs" />
-    <Compile Include="Sources\CompilationMode.cs" />
     <Compile Include="Sources\CompilationTask.cs" />
     <Compile Include="Sources\ParsingMethod.cs" />
     <Compile Include="Sources\Grammars\Grammar.cs" />
@@ -125,7 +123,6 @@
     <Compile Include="Sources\Grammars\Rules\TemplateRule.cs" />
     <Compile Include="Sources\Grammars\Rules\TemplateRuleInstance.cs" />
     <Compile Include="Sources\Grammars\Context.cs" />
-    <Compile Include="Sources\Grammars\GrammarLoader.cs" />
     <Compile Include="Sources\Output\LexerGenerator.cs" />
     <Compile Include="Sources\Report.cs" />
     <Compile Include="Sources\Reporter.cs" />
@@ -160,6 +157,11 @@
     <Compile Include="Sources\Output\ParserGenerator.cs" />
     <Compile Include="Sources\Output\ParserGeneratorLRk.cs" />
     <Compile Include="Sources\Output\ParserGeneratorRNGLR.cs" />
+    <Compile Include="Sources\Input\Loader.cs" />
+    <Compile Include="Sources\Grammars\Loader.cs" />
+    <Compile Include="Sources\Output\Emitter.cs" />
+    <Compile Include="Sources\Output\Mode.cs" />
+    <Compile Include="Sources\Output\Modifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

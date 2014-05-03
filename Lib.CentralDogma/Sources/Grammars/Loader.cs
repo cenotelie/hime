@@ -27,7 +27,7 @@ namespace Hime.CentralDogma.Grammars
 	/// <summary>
 	/// Represents a loader for a grammar
 	/// </summary>
-	public class GrammarLoader
+	public class Loader
 	{
 		/// <summary>
 		/// The name of the resource containing the data that are loaded by this instance
@@ -69,7 +69,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <param name="resName">The name of the resource</param>
 		/// <param name="root">The root AST</param>
 		/// <param name="reporter">The log</param>
-		public GrammarLoader(string resName, ASTNode root, Reporter reporter)
+		public Loader(string resName, ASTNode root, Reporter reporter)
 		{
 			this.reporter = reporter;
 			this.root = root;
@@ -87,7 +87,7 @@ namespace Hime.CentralDogma.Grammars
 		/// Loads the specified data
 		/// </summary>
 		/// <param name="siblings">The siblings of this loader</param>
-		public void Load(Dictionary<string, GrammarLoader> siblings)
+		public void Load(Dictionary<string, Loader> siblings)
 		{
 			List<string> temp = new List<string>(inherited);
 			foreach (string parent in temp)
@@ -97,7 +97,7 @@ namespace Hime.CentralDogma.Grammars
 					reporter.Error(string.Format("{0} Grammar {1} inherited by {2} cannot be found", resource, parent, grammar.Name));
 					inherited.Remove(parent);
 				}
-				GrammarLoader loader = siblings[parent];
+				Loader loader = siblings[parent];
 				if (!loader.IsSolved)
 					continue;
 				this.grammar.Inherit(loader.Grammar);

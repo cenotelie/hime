@@ -118,7 +118,7 @@ namespace Hime.CentralDogma.Output
 			foreach (Grammars.LR.State state in graph.States)
 				total = GenerateDataOffsetTable(offsets, counts, total, state);
 
-			stream.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption("Axiom"))));
+			stream.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammars.Grammar.optionAxiom))));
 			stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
 			stream.Write((ushort)graph.States.Count);                   // Nb or rows
 			stream.Write((uint)total);                                  // Nb of actions

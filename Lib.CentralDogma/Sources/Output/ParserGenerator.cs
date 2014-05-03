@@ -85,7 +85,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="name">The parser's name</param>
 		/// <param name="modifier">The parser's visibility modifier</param>
 		/// <param name="resource">The name of the associated binary data resource</param>
-		public void GenerateCode(StreamWriter stream, string name, AccessModifier modifier, string resource)
+		public void GenerateCode(StreamWriter stream, string name, Modifier modifier, string resource)
 		{
 			stream.WriteLine("\t/// <summary>");
 			stream.WriteLine("\t/// Represents a parser");

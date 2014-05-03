@@ -38,6 +38,14 @@ namespace Hime.CentralDogma.Grammars
 		/// The name of the generated axiom variable
 		/// </summary>
 		public const string generatedAxiom = "_Axiom_";
+		/// <summary>
+		/// Name of the grammar option specifying the grammar's axiom variable
+		/// </summary>
+		public const string optionAxiom = "Axiom";
+		/// <summary>
+		/// Name of the grammar option specifying the grammar's separator terminal
+		/// </summary>
+		public const string optionSeparator = "Separator";
 
 		/// <summary>
 		/// The counter for the generation of unique names across multiple grammars
@@ -522,10 +530,10 @@ namespace Hime.CentralDogma.Grammars
 		private string AddRealAxiom()
 		{
 			// Search for Axiom option
-			if (!options.ContainsKey("Axiom"))
+			if (!options.ContainsKey(optionAxiom))
 				return "No axiom variable has been defined for grammar " + this.name;
 			// Search for the variable specified as the Axiom
-			string name = options["Axiom"];
+			string name = options[optionAxiom];
 			if (!variables.ContainsKey(name))
 				return "The specified axiom variable " + name + " is undefined";
 

@@ -136,10 +136,10 @@ namespace Hime.HimeCC
 		{
 			System.IO.Stream stream = typeof(Program).Assembly.GetManifestResourceStream("himecc.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = CompilationMode.Source;
+			task.Mode = Hime.CentralDogma.Output.Mode.Source;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.HimeCC.CL";
-			task.CodeAccess = AccessModifier.Internal;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
 			return report.Errors.Count;
@@ -153,11 +153,11 @@ namespace Hime.HimeCC
 		{
 			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = CompilationMode.Source;
+			task.Mode = Hime.CentralDogma.Output.Mode.Source;
 			task.AddInputRaw(stream);
 			task.GrammarName = "HimeGrammar";
 			task.Namespace = "Hime.CentralDogma.Input";
-			task.CodeAccess = AccessModifier.Internal;
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
 			return report.Errors.Count;
@@ -213,11 +213,11 @@ namespace Hime.HimeCC
 				switch (arg.Symbol.Value)
 				{
 					case ArgOutputAssembly:
-						if (task.Mode == CompilationMode.Source)
-							task.Mode = CompilationMode.SourceAndAssembly;
+						if (task.Mode == Hime.CentralDogma.Output.Mode.Source)
+							task.Mode = Hime.CentralDogma.Output.Mode.SourceAndAssembly;
 						break;
 					case ArgOutputNoSources:
-						task.Mode = CompilationMode.Assembly;
+						task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 						break;
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
@@ -238,7 +238,7 @@ namespace Hime.HimeCC
 						task.Namespace = GetValue(arg);
 						break;
 					case ArgAccessPublic:
-						task.CodeAccess = AccessModifier.Public;
+						task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 						break;
 					default:
 						Console.WriteLine("Unknown argument " + arg.Symbol.Value);

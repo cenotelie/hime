@@ -18,12 +18,12 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Output
 {
 	/// <summary>
 	/// Represents a grammar's compilation mode
 	/// </summary>
-	public enum CompilationMode
+	public enum Mode
 	{
 		/// <summary>
 		/// Generates the source code for the lexer and parser
