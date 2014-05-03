@@ -26,23 +26,23 @@ namespace Hime.HimeCC.CL
 			/// <summary>
 			/// The unique identifier for terminal ARG_VALUE_NAME
 			/// </summary>
-			public const int ARG_VALUE_NAME = 0x7;
+			public const int ARG_VALUE_NAME = 0x0007;
 			/// <summary>
 			/// The unique identifier for terminal ARG_VALUE_NUMBER
 			/// </summary>
-			public const int ARG_VALUE_NUMBER = 0x8;
+			public const int ARG_VALUE_NUMBER = 0x0008;
 			/// <summary>
 			/// The unique identifier for terminal WHITE_SPACE
 			/// </summary>
-			public const int WHITE_SPACE = 0x3;
+			public const int WHITE_SPACE = 0x0003;
 			/// <summary>
 			/// The unique identifier for terminal ARG_NAME
 			/// </summary>
-			public const int ARG_NAME = 0x4;
+			public const int ARG_NAME = 0x0004;
 			/// <summary>
 			/// The unique identifier for terminal ARG_VALUE_QUOTE
 			/// </summary>
-			public const int ARG_VALUE_QUOTE = 0x5;
+			public const int ARG_VALUE_QUOTE = 0x0005;
 		}
 		/// <summary>
 		/// The collection of terminals matched by this lexer
@@ -52,22 +52,22 @@ namespace Hime.HimeCC.CL
 		/// so that terminal indices in the automaton can be used to retrieve the terminals in this table
 		/// </remarks>
 		private static readonly Symbol[] terminals = {
-			new Symbol(0x1, "ε"),
-			new Symbol(0x2, "$"),
-			new Symbol(0x7, "ARG_VALUE_NAME"),
-			new Symbol(0x8, "ARG_VALUE_NUMBER"),
-			new Symbol(0x3, "WHITE_SPACE"),
-			new Symbol(0x4, "ARG_NAME"),
-			new Symbol(0x5, "ARG_VALUE_QUOTE") };
+			new Symbol(0x0001, "ε"),
+			new Symbol(0x0002, "$"),
+			new Symbol(0x0007, "ARG_VALUE_NAME"),
+			new Symbol(0x0008, "ARG_VALUE_NUMBER"),
+			new Symbol(0x0003, "WHITE_SPACE"),
+			new Symbol(0x0004, "ARG_NAME"),
+			new Symbol(0x0005, "ARG_VALUE_QUOTE") };
 		/// <summary>
 		/// Initializes a new instance of the lexer
 		/// </summary>
 		/// <param name="input">The lexer's input</param>
-		public CommandLineLexer(string input) : base(automaton, terminals, 0x3, new System.IO.StringReader(input)) {}
+		public CommandLineLexer(string input) : base(automaton, terminals, 0x0003, new System.IO.StringReader(input)) {}
 		/// <summary>
 		/// Initializes a new instance of the lexer
 		/// </summary>
 		/// <param name="input">The lexer's input</param>
-		public CommandLineLexer(System.IO.TextReader input) : base(automaton, terminals, 0x3, input) {}
+		public CommandLineLexer(System.IO.TextReader input) : base(automaton, terminals, 0x0003, input) {}
 	}
 }

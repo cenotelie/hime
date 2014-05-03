@@ -14,7 +14,7 @@ namespace Hime.CentralDogma.Input
 	/// </summary>
 	internal class HimeGrammarParser : LRkParser
 	{
-        private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(HimeGrammarParser), "HimeGrammarParser.bin");
+		private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(HimeGrammarParser), "HimeGrammarParser.bin");
 		/// <summary>
 		/// Contains the constant IDs for the variables and virtuals in this parser
 		/// </summary>
@@ -23,139 +23,139 @@ namespace Hime.CentralDogma.Input
 			/// <summary>
 			/// The unique identifier for variable option
 			/// </summary>
-			public const int option = 0x1E;
+			public const int option = 0x001E;
 			/// <summary>
 			/// The unique identifier for variable terminal_def_atom
 			/// </summary>
-			public const int terminal_def_atom = 0x1F;
+			public const int terminal_def_atom = 0x001F;
 			/// <summary>
 			/// The unique identifier for variable terminal_def_element
 			/// </summary>
-			public const int terminal_def_element = 0x20;
+			public const int terminal_def_element = 0x0020;
 			/// <summary>
 			/// The unique identifier for variable terminal_def_cardinalilty
 			/// </summary>
-			public const int terminal_def_cardinalilty = 0x21;
+			public const int terminal_def_cardinalilty = 0x0021;
 			/// <summary>
 			/// The unique identifier for variable terminal_def_repetition
 			/// </summary>
-			public const int terminal_def_repetition = 0x22;
+			public const int terminal_def_repetition = 0x0022;
 			/// <summary>
 			/// The unique identifier for variable terminal_def_fragment
 			/// </summary>
-			public const int terminal_def_fragment = 0x23;
+			public const int terminal_def_fragment = 0x0023;
 			/// <summary>
 			/// The unique identifier for variable terminal_def_restrict
 			/// </summary>
-			public const int terminal_def_restrict = 0x24;
+			public const int terminal_def_restrict = 0x0024;
 			/// <summary>
 			/// The unique identifier for variable terminal_definition
 			/// </summary>
-			public const int terminal_definition = 0x25;
+			public const int terminal_definition = 0x0025;
 			/// <summary>
 			/// The unique identifier for variable terminal
 			/// </summary>
-			public const int terminal = 0x26;
+			public const int terminal = 0x0026;
 			/// <summary>
 			/// The unique identifier for variable rule_sym_action
 			/// </summary>
-			public const int rule_sym_action = 0x27;
+			public const int rule_sym_action = 0x0027;
 			/// <summary>
 			/// The unique identifier for variable rule_sym_virtual
 			/// </summary>
-			public const int rule_sym_virtual = 0x28;
+			public const int rule_sym_virtual = 0x0028;
 			/// <summary>
 			/// The unique identifier for variable rule_sym_ref_params
 			/// </summary>
-			public const int rule_sym_ref_params = 0x29;
+			public const int rule_sym_ref_params = 0x0029;
 			/// <summary>
 			/// The unique identifier for variable rule_sym_ref_template
 			/// </summary>
-			public const int rule_sym_ref_template = 0x2A;
+			public const int rule_sym_ref_template = 0x002A;
 			/// <summary>
 			/// The unique identifier for variable rule_sym_ref_simple
 			/// </summary>
-			public const int rule_sym_ref_simple = 0x2B;
+			public const int rule_sym_ref_simple = 0x002B;
 			/// <summary>
 			/// The unique identifier for variable rule_def_atom
 			/// </summary>
-			public const int rule_def_atom = 0x2C;
+			public const int rule_def_atom = 0x002C;
 			/// <summary>
 			/// The unique identifier for variable rule_def_element
 			/// </summary>
-			public const int rule_def_element = 0x2D;
+			public const int rule_def_element = 0x002D;
 			/// <summary>
 			/// The unique identifier for variable rule_def_tree_action
 			/// </summary>
-			public const int rule_def_tree_action = 0x2E;
+			public const int rule_def_tree_action = 0x002E;
 			/// <summary>
 			/// The unique identifier for variable rule_def_repetition
 			/// </summary>
-			public const int rule_def_repetition = 0x2F;
+			public const int rule_def_repetition = 0x002F;
 			/// <summary>
 			/// The unique identifier for variable rule_def_fragment
 			/// </summary>
-			public const int rule_def_fragment = 0x30;
+			public const int rule_def_fragment = 0x0030;
 			/// <summary>
 			/// The unique identifier for variable rule_def_choice
 			/// </summary>
-			public const int rule_def_choice = 0x31;
+			public const int rule_def_choice = 0x0031;
 			/// <summary>
 			/// The unique identifier for variable rule_definition
 			/// </summary>
-			public const int rule_definition = 0x32;
+			public const int rule_definition = 0x0032;
 			/// <summary>
 			/// The unique identifier for variable rule_template_params
 			/// </summary>
-			public const int rule_template_params = 0x33;
+			public const int rule_template_params = 0x0033;
 			/// <summary>
 			/// The unique identifier for variable cf_rule_template
 			/// </summary>
-			public const int cf_rule_template = 0x34;
+			public const int cf_rule_template = 0x0034;
 			/// <summary>
 			/// The unique identifier for variable cf_rule_simple
 			/// </summary>
-			public const int cf_rule_simple = 0x35;
+			public const int cf_rule_simple = 0x0035;
 			/// <summary>
 			/// The unique identifier for variable grammar_options
 			/// </summary>
-			public const int grammar_options = 0x36;
+			public const int grammar_options = 0x0036;
 			/// <summary>
 			/// The unique identifier for variable grammar_terminals
 			/// </summary>
-			public const int grammar_terminals = 0x37;
+			public const int grammar_terminals = 0x0037;
 			/// <summary>
 			/// The unique identifier for variable grammar_cf_rules
 			/// </summary>
-			public const int grammar_cf_rules = 0x38;
+			public const int grammar_cf_rules = 0x0038;
 			/// <summary>
 			/// The unique identifier for variable grammar_parency
 			/// </summary>
-			public const int grammar_parency = 0x39;
+			public const int grammar_parency = 0x0039;
 			/// <summary>
 			/// The unique identifier for variable cf_grammar
 			/// </summary>
-			public const int cf_grammar = 0x3A;
+			public const int cf_grammar = 0x003A;
 			/// <summary>
 			/// The unique identifier for variable file
 			/// </summary>
-			public const int file = 0x3B;
+			public const int file = 0x003B;
 			/// <summary>
 			/// The unique identifier for variable _Axiom_
 			/// </summary>
-			public const int _Axiom_ = 0x54;
+			public const int _Axiom_ = 0x0057;
 			/// <summary>
 			/// The unique identifier for virtual range
 			/// </summary>
-			public const int range = 0x0;
+			public const int range = 0x0040;
 			/// <summary>
 			/// The unique identifier for virtual concat
 			/// </summary>
-			public const int concat = 0x0;
+			public const int concat = 0x0044;
 			/// <summary>
 			/// The unique identifier for virtual emptypart
 			/// </summary>
-			public const int emptypart = 0x0;
+			public const int emptypart = 0x004D;
 		}
 		/// <summary>
 		/// The collection of variables matched by this parser
@@ -165,49 +165,49 @@ namespace Hime.CentralDogma.Input
 		/// so that variable indices in the automaton can be used to retrieve the variables in this table
 		/// </remarks>
 		private static readonly Symbol[] variables = {
-			new Symbol(0x1E, "option"), 
-			new Symbol(0x1F, "terminal_def_atom"), 
-			new Symbol(0x20, "terminal_def_element"), 
-			new Symbol(0x21, "terminal_def_cardinalilty"), 
-			new Symbol(0x22, "terminal_def_repetition"), 
-			new Symbol(0x23, "terminal_def_fragment"), 
-			new Symbol(0x24, "terminal_def_restrict"), 
-			new Symbol(0x25, "terminal_definition"), 
-			new Symbol(0x26, "terminal"), 
-			new Symbol(0x27, "rule_sym_action"), 
-			new Symbol(0x28, "rule_sym_virtual"), 
-			new Symbol(0x29, "rule_sym_ref_params"), 
-			new Symbol(0x2A, "rule_sym_ref_template"), 
-			new Symbol(0x2B, "rule_sym_ref_simple"), 
-			new Symbol(0x2C, "rule_def_atom"), 
-			new Symbol(0x2D, "rule_def_element"), 
-			new Symbol(0x2E, "rule_def_tree_action"), 
-			new Symbol(0x2F, "rule_def_repetition"), 
-			new Symbol(0x30, "rule_def_fragment"), 
-			new Symbol(0x31, "rule_def_choice"), 
-			new Symbol(0x32, "rule_definition"), 
-			new Symbol(0x33, "rule_template_params"), 
-			new Symbol(0x34, "cf_rule_template"), 
-			new Symbol(0x35, "cf_rule_simple"), 
-			new Symbol(0x36, "grammar_options"), 
-			new Symbol(0x37, "grammar_terminals"), 
-			new Symbol(0x38, "grammar_cf_rules"), 
-			new Symbol(0x39, "grammar_parency"), 
-			new Symbol(0x3A, "cf_grammar"), 
-			new Symbol(0x3B, "file"), 
-			new Symbol(0x43, "_vA"), 
-			new Symbol(0x44, "_vB"), 
-			new Symbol(0x45, "_vC"), 
-			new Symbol(0x48, "_vF"), 
-			new Symbol(0x4A, "_v11"), 
-			new Symbol(0x4B, "_v12"), 
-			new Symbol(0x4C, "_v13"), 
-			new Symbol(0x4D, "_v14"), 
-			new Symbol(0x4E, "_v15"), 
-			new Symbol(0x4F, "_v16"), 
-			new Symbol(0x51, "_v18"), 
-			new Symbol(0x53, "_v1A"), 
-			new Symbol(0x54, "_Axiom_") };
+			new Symbol(0x001E, "option"), 
+			new Symbol(0x001F, "terminal_def_atom"), 
+			new Symbol(0x0020, "terminal_def_element"), 
+			new Symbol(0x0021, "terminal_def_cardinalilty"), 
+			new Symbol(0x0022, "terminal_def_repetition"), 
+			new Symbol(0x0023, "terminal_def_fragment"), 
+			new Symbol(0x0024, "terminal_def_restrict"), 
+			new Symbol(0x0025, "terminal_definition"), 
+			new Symbol(0x0026, "terminal"), 
+			new Symbol(0x0027, "rule_sym_action"), 
+			new Symbol(0x0028, "rule_sym_virtual"), 
+			new Symbol(0x0029, "rule_sym_ref_params"), 
+			new Symbol(0x002A, "rule_sym_ref_template"), 
+			new Symbol(0x002B, "rule_sym_ref_simple"), 
+			new Symbol(0x002C, "rule_def_atom"), 
+			new Symbol(0x002D, "rule_def_element"), 
+			new Symbol(0x002E, "rule_def_tree_action"), 
+			new Symbol(0x002F, "rule_def_repetition"), 
+			new Symbol(0x0030, "rule_def_fragment"), 
+			new Symbol(0x0031, "rule_def_choice"), 
+			new Symbol(0x0032, "rule_definition"), 
+			new Symbol(0x0033, "rule_template_params"), 
+			new Symbol(0x0034, "cf_rule_template"), 
+			new Symbol(0x0035, "cf_rule_simple"), 
+			new Symbol(0x0036, "grammar_options"), 
+			new Symbol(0x0037, "grammar_terminals"), 
+			new Symbol(0x0038, "grammar_cf_rules"), 
+			new Symbol(0x0039, "grammar_parency"), 
+			new Symbol(0x003A, "cf_grammar"), 
+			new Symbol(0x003B, "file"), 
+			new Symbol(0x0045, "_gen_V69"), 
+			new Symbol(0x0046, "_gen_V70"), 
+			new Symbol(0x0047, "_gen_V71"), 
+			new Symbol(0x004A, "_gen_V74"), 
+			new Symbol(0x004C, "_gen_V76"), 
+			new Symbol(0x004E, "_gen_V78"), 
+			new Symbol(0x004F, "_gen_V79"), 
+			new Symbol(0x0050, "_gen_V80"), 
+			new Symbol(0x0051, "_gen_V81"), 
+			new Symbol(0x0052, "_gen_V82"), 
+			new Symbol(0x0054, "_gen_V84"), 
+			new Symbol(0x0056, "_gen_V86"), 
+			new Symbol(0x0057, "_Axiom_") };
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>
@@ -216,9 +216,9 @@ namespace Hime.CentralDogma.Input
 		/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table
 		/// </remarks>
 		private static readonly Symbol[] virtuals = {
-			new Symbol(0, "range"), 
-			new Symbol(0, "concat"), 
-			new Symbol(0, "emptypart") };
+			new Symbol(0x0040, "range"), 
+			new Symbol(0x0044, "concat"), 
+			new Symbol(0x004D, "emptypart") };
 		/// <summary>
 		/// Initializes a new instance of the parser
 		/// </summary>

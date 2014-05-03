@@ -14,7 +14,7 @@ namespace Hime.HimeCC.CL
 	/// </summary>
 	internal class CommandLineParser : LRkParser
 	{
-        private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
+		private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
 		/// <summary>
 		/// Contains the constant IDs for the variables and virtuals in this parser
 		/// </summary>
@@ -23,27 +23,27 @@ namespace Hime.HimeCC.CL
 			/// <summary>
 			/// The unique identifier for variable value
 			/// </summary>
-			public const int value = 0x9;
+			public const int value = 0x0009;
 			/// <summary>
 			/// The unique identifier for variable argument
 			/// </summary>
-			public const int argument = 0xA;
+			public const int argument = 0x000A;
 			/// <summary>
 			/// The unique identifier for variable values
 			/// </summary>
-			public const int values = 0xB;
+			public const int values = 0x000B;
 			/// <summary>
 			/// The unique identifier for variable arguments
 			/// </summary>
-			public const int arguments = 0xC;
+			public const int arguments = 0x000C;
 			/// <summary>
 			/// The unique identifier for variable line
 			/// </summary>
-			public const int line = 0xD;
+			public const int line = 0x000D;
 			/// <summary>
 			/// The unique identifier for variable _Axiom_
 			/// </summary>
-			public const int _Axiom_ = 0x11;
+			public const int _Axiom_ = 0x0011;
 		}
 		/// <summary>
 		/// The collection of variables matched by this parser
@@ -53,15 +53,15 @@ namespace Hime.HimeCC.CL
 		/// so that variable indices in the automaton can be used to retrieve the variables in this table
 		/// </remarks>
 		private static readonly Symbol[] variables = {
-			new Symbol(0x9, "value"), 
-			new Symbol(0xA, "argument"), 
-			new Symbol(0xB, "values"), 
-			new Symbol(0xC, "arguments"), 
-			new Symbol(0xD, "line"), 
-			new Symbol(0xE, "_v0"), 
-			new Symbol(0xF, "_v1"), 
-			new Symbol(0x10, "_v2"), 
-			new Symbol(0x11, "_Axiom_") };
+			new Symbol(0x0009, "value"), 
+			new Symbol(0x000A, "argument"), 
+			new Symbol(0x000B, "values"), 
+			new Symbol(0x000C, "arguments"), 
+			new Symbol(0x000D, "line"), 
+			new Symbol(0x000E, "_gen_V14"), 
+			new Symbol(0x000F, "_gen_V15"), 
+			new Symbol(0x0010, "_gen_V16"), 
+			new Symbol(0x0011, "_Axiom_") };
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>
