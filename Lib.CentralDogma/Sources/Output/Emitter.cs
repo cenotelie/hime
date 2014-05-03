@@ -58,11 +58,6 @@ namespace Hime.CentralDogma.Output
 		private Grammars.Grammar grammar;
 
 		/// <summary>
-		/// Gets the errors raised by this loader
-		/// </summary>
-		public List<object> Errors { get { return new List<object>(reporter.Result.Errors); } }
-
-		/// <summary>
 		/// Initializes this loader
 		/// </summary>
 		/// <param name="grammar">The grammar to emit data for</param>
@@ -90,8 +85,8 @@ namespace Hime.CentralDogma.Output
 		public bool Emit(string prefix, string nmspace, Modifier modifier, ParsingMethod method, Mode mode)
 		{
 			// Export the lexer
-			List<Grammars.Terminal> expected = GenerateLexer(prefix, nmspace, modifier);
-			if (expected == null)
+			ROList<Grammars.Terminal> expected = GenerateLexer(prefix, nmspace, modifier);
+			if (!expected.IsValid)
 				return false;
 			// Export the paser
 			if (!GenerateParser(prefix, nmspace, modifier, method, expected))
@@ -120,11 +115,11 @@ namespace Hime.CentralDogma.Output
 		/// <param name="nmspace">The namespace for the generated code</param>
 		/// <param name="modifier">The visibility modifier for the emitted code</param>
 		/// <returns>The terminals matched by the lexer</returns>
-		private List<Grammars.Terminal> GenerateLexer(string prefix, string nmspace, Modifier modifier)
+		private ROList<Grammars.Terminal> GenerateLexer(string prefix, string nmspace, Modifier modifier)
 		{
 			Automata.DFA dfa = GetDFAFor(grammar);
 			if (dfa == null)
-				return null;
+				return new ROList<Grammars.Terminal>(null);
 			// retrieve the separator
 			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
 			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
@@ -205,7 +200,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="method">The parsing method to use</param>
 		/// <param name="expected">The terminals matched by the associated lexer</param>
 		/// <returns><c>true</c> if the operation succeed</returns>
-		private bool GenerateParser(string prefix, string nmspace, Modifier modifier, ParsingMethod method, List<Grammars.Terminal> expected)
+		private bool GenerateParser(string prefix, string nmspace, Modifier modifier, ParsingMethod method, ROList<Grammars.Terminal> expected)
 		{
 			// build the LR graph
 			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);

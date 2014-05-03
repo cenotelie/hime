@@ -202,7 +202,7 @@ namespace Hime.CentralDogma
 			string nmspace = (Namespace != null) ? Namespace : target.Name;
 
 			// emit the artifacts
-			Output.Emitter emitter = new Hime.CentralDogma.Output.Emitter(target);
+			Output.Emitter emitter = new Hime.CentralDogma.Output.Emitter(reporter, target);
 			emitter.Emit(prefix, nmspace, CodeAccess, Method, Mode);
 		}
 	}

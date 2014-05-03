@@ -49,11 +49,6 @@ namespace Hime.CentralDogma.Input
 		private Reporter reporter;
 
 		/// <summary>
-		/// Gets the errors raised by this loader
-		/// </summary>
-		public List<object> Errors { get { return new List<object>(reporter.Result.Errors); } }
-
-		/// <summary>
 		/// Initializes this loader
 		/// </summary>
 		public Loader() : this(new Reporter(typeof(Loader)))
