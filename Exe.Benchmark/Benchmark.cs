@@ -126,12 +126,12 @@ namespace Hime.Benchmark
 
 		private Assembly Compile(ParsingMethod method)
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.FileCentralDogma.gram");
+			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.Benchmark.Generated";
-			task.GrammarName = "FileCentralDogma";
+			task.GrammarName = "HimeGrammar";
 			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = method;
 			task.OutputPrefix = "gen_" + method.ToString();
@@ -158,7 +158,7 @@ namespace Hime.Benchmark
 
 		private Hime.Redist.Lexer.Lexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
 		{
-			Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
+			Type lexerType = assembly.GetType("Hime.Benchmark.Generated.HimeGrammarLexer");
 			ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
 			object lexer = lexerConstructor.Invoke(new object[] { reader });
 			return lexer as Hime.Redist.Lexer.Lexer;
@@ -167,8 +167,8 @@ namespace Hime.Benchmark
 		private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
 		{
 			Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
-			Type lexerType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaLexer");
-			Type parserType = assembly.GetType("Hime.Benchmark.Generated.FileCentralDogmaParser");
+			Type lexerType = assembly.GetType("Hime.Benchmark.Generated.HimeGrammarLexer");
+			Type parserType = assembly.GetType("Hime.Benchmark.Generated.HimeGrammarParser");
 			ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
 			object parser = parserConstructor.Invoke(new object[] { lexer });
 			return parser as Hime.Redist.Parsers.BaseLRParser;
