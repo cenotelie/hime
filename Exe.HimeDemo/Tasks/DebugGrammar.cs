@@ -39,6 +39,7 @@ namespace Hime.Demo.Tasks
 			// prepare
 			Hime.CentralDogma.Grammars.Grammar grammar = grammars[0];
 			grammar.Prepare();
+			Hime.CentralDogma.SDK.DebugSerializer.Export(grammar, "Demo.Grammar.txt");
 			// get the NFA for a single lexical rule
 			Hime.CentralDogma.Grammars.Terminal terminalK = grammar.GetTerminalByName("K");
 			Hime.CentralDogma.SDK.GraphSerializer.ExportDOT(terminalK.NFA, "Demo.NFA_K.dot");
@@ -51,6 +52,7 @@ namespace Hime.Demo.Tasks
 			foreach (Hime.CentralDogma.Grammars.LR.Conflict conflict in builder.Conflicts)
 				System.Console.WriteLine(conflict);
 			Hime.CentralDogma.SDK.GraphSerializer.ExportDOT(graph, "Demo.LR.dot");
+			Hime.CentralDogma.SDK.DebugSerializer.Export(graph, "Demo.LR.txt");
 		}
 	}
 }
