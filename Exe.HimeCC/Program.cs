@@ -21,7 +21,6 @@ using System;
 using System.Reflection;
 using System.Text;
 using Hime.CentralDogma;
-using Hime.CentralDogma.Reporting;
 using Hime.HimeCC.CL;
 using Hime.Redist;
 
@@ -143,7 +142,7 @@ namespace Hime.HimeCC
 			task.CodeAccess = AccessModifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
-			return report.ErrorCount;
+			return report.Errors.Count;
 		}
 
 		/// <summary>
@@ -161,7 +160,7 @@ namespace Hime.HimeCC
 			task.CodeAccess = AccessModifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
-			return report.ErrorCount;
+			return report.Errors.Count;
 		}
 
 		/// <summary>
