@@ -47,6 +47,23 @@ namespace Hime.CentralDogma.Output
 		/// The suffix for the emitted assemblies
 		/// </summary>
 		public const string suffixAssembly = ".dll";
+		/// <summary>
+		/// The suffix for the emitted debug grammar data
+		/// </summary>
+		public const string suffixDebugGrammar = "Grammar.txt";
+		/// <summary>
+		/// The suffix for the emitted debug DFA data
+		/// </summary>
+		public const string suffixDebugDFA = "DFA.dot";
+		/// <summary>
+		/// The suffix for the emitted debug LR graph as text
+		/// </summary>
+		public const string suffixDebugLRAsText = "LRGraph.txt";
+		/// <summary>
+		/// The suffix for the emitted debug LR graph as DOT
+		/// </summary>
+		public const string suffixDebugLRAsDOT = "LRGraph.dot";
+
 
 		/// <summary>
 		/// The reporter
@@ -56,6 +73,40 @@ namespace Hime.CentralDogma.Output
 		/// The grammar to emit data for
 		/// </summary>
 		private Grammars.Grammar grammar;
+		/// <summary>
+		/// The prefix for the emitted artifacts
+		/// </summary>
+		private string prefix;
+		/// <summary>
+		/// The namespace of the generated code
+		/// </summary>
+		private string nmspace;
+		/// <summary>
+		/// The visibility modifier of the generated code
+		/// </summary>
+		private Modifier modifier;
+		/// <summary>
+		/// The parsing method for the generated parser
+		/// </summary>
+		private ParsingMethod method;
+		/// <summary>
+		/// The mode of this emitter
+		/// </summary>
+		private Mode mode;
+
+		/// <summary>
+		/// The DFA to emit in a lexer
+		/// </summary>
+		private Automata.DFA dfa;
+		/// <summary>
+		/// The terminals matched by the DFA and expected by the parser
+		/// </summary>
+		private ROList<Grammars.Terminal> expected;
+		/// <summary>
+		/// The LR graph to emit in a parser
+		/// </summary>
+		private Grammars.LR.Graph graph;
+
 
 		/// <summary>
 		/// Initializes this loader
@@ -82,28 +133,71 @@ namespace Hime.CentralDogma.Output
 		/// <param name="nmspace">The namespace for the emitted code</param>
 		/// <param name="modifier">The visibility modifier for the emitted code</param>
 		/// <param name="method">The parsing method to use</param>
+		/// <returns><c>true</c> if this operation succeeded</returns>
 		public bool Emit(string prefix, string nmspace, Modifier modifier, ParsingMethod method, Mode mode)
 		{
-			// Export the lexer
-			ROList<Grammars.Terminal> expected = GenerateLexer(prefix, nmspace, modifier);
-			if (!expected.IsValid)
+			// setup
+			this.prefix = prefix;
+			this.nmspace = nmspace;
+			this.modifier = modifier;
+			this.method = method;
+			this.mode = mode;
+			this.dfa = null;
+			this.expected = new ROList<Grammars.Terminal>(null);
+			this.graph = null;
+			// emit the artifacts
+			bool success = true;
+			if (!EmitBaseArtifacts())
+				success = false;
+			if (mode == Mode.Debug && !EmitDebugArtifacts())
+				success = false;
+			return success;
+		}
+
+		/// <summary>
+		/// Emits the base artifacts for the lexer and parser
+		/// </summary>
+		/// <returns><c>true</c> if this operation succeeded</returns>
+		private bool EmitBaseArtifacts()
+		{
+			if (!GenerateLexer())
 				return false;
-			// Export the paser
-			if (!GenerateParser(prefix, nmspace, modifier, method, expected))
+			if (!GenerateParser())
 				return false;
-			// Build assembly
-			if (mode != Mode.Source)
+			if (mode == Mode.Assembly || mode == Mode.SourceAndAssembly)
 			{
-				if (!BuildAssembly(prefix))
+				if (!EmitAssembly())
 					return false;
+				if (mode == Mode.Assembly)
+				{
+					File.Delete(prefix + suffixLexerCode);
+					File.Delete(prefix + suffixLexerData);
+					File.Delete(prefix + suffixParserCode);
+					File.Delete(prefix + suffixParserData);
+				}
 			}
-			// Cleanup
-			if (mode == Mode.Assembly)
+			return true;
+		}
+
+		/// <summary>
+		/// Emits the debug artifacts for the lexer and parser
+		/// </summary>
+		/// <returns><c>true</c> if this operation succeeded</returns>
+		private bool EmitDebugArtifacts()
+		{
+			reporter.Info("Exporting grammar debug data at " + prefix + suffixDebugGrammar + " ...");
+			SDK.DebugSerializer.Export(grammar, prefix + suffixDebugGrammar);
+			if (dfa != null)
 			{
-				File.Delete(prefix + suffixLexerCode);
-				File.Delete(prefix + suffixLexerData);
-				File.Delete(prefix + suffixParserCode);
-				File.Delete(prefix + suffixParserData);
+				reporter.Info("Exporting DFA debug data at " + prefix + suffixDebugDFA + " ...");
+				SDK.GraphSerializer.ExportDOT(dfa, prefix + suffixDebugDFA);
+			}
+			if (graph != null)
+			{
+				reporter.Info("Exporting LR graph debug data (txt) at " + prefix + suffixDebugLRAsDOT + " ...");
+				SDK.GraphSerializer.ExportDOT(graph, prefix + suffixDebugLRAsDOT);
+				reporter.Info("Exporting LR graph debug data (dot) at " + prefix + suffixDebugLRAsText + " ...");
+				SDK.DebugSerializer.Export(graph, prefix + suffixDebugLRAsText);
 			}
 			return true;
 		}
@@ -111,15 +205,12 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Generates the lexer for the given grammar
 		/// </summary>
-		/// <param name="prefix">The prefix for the output artifacts</param>
-		/// <param name="nmspace">The namespace for the generated code</param>
-		/// <param name="modifier">The visibility modifier for the emitted code</param>
-		/// <returns>The terminals matched by the lexer</returns>
-		private ROList<Grammars.Terminal> GenerateLexer(string prefix, string nmspace, Modifier modifier)
+		/// <returns><c>true</c> if this operation succeeded</returns>
+		private bool GenerateLexer()
 		{
-			Automata.DFA dfa = GetDFAFor(grammar);
+			dfa = GetDFAFor(grammar);
 			if (dfa == null)
-				return new ROList<Grammars.Terminal>(null);
+				return false;
 			// retrieve the separator
 			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
 			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
@@ -135,7 +226,8 @@ namespace Hime.CentralDogma.Output
 			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + suffixLexerData, FileMode.Create));
 			generator.GenerateData(binOutput);
 			binOutput.Close();
-			return generator.Expected;
+			expected = generator.Expected;
+			return true;
 		}
 
 		/// <summary>
@@ -194,17 +286,12 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Generates the parser for the given grammar
 		/// </summary>
-		/// <param name="prefix">The prefix for the output artifacts</param>
-		/// <param name="nmspace">The namespace for the generated code</param>
-		/// <param name="modifier">The visibility modifier for the emitted code</param>
-		/// <param name="method">The parsing method to use</param>
-		/// <param name="expected">The terminals matched by the associated lexer</param>
 		/// <returns><c>true</c> if the operation succeed</returns>
-		private bool GenerateParser(string prefix, string nmspace, Modifier modifier, ParsingMethod method, ROList<Grammars.Terminal> expected)
+		private bool GenerateParser()
 		{
 			// build the LR graph
 			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);
-			Grammars.LR.Graph graph = builder.Build(method);
+			graph = builder.Build(method);
 			foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
 				reporter.Error(conflict);
 			if (builder.Conflicts.Count != 0)
@@ -275,11 +362,10 @@ namespace Hime.CentralDogma.Output
 		}
 
 		/// <summary>
-		/// Builds the assembly for the generated lexer and parser
+		/// Emits the assembly for the generated lexer and parser
 		/// </summary>
-		/// <param name="prefix">The prefix for the generated assembly</param>
 		/// <returns><c>true</c> if the operation succeed</returns>
-		private bool BuildAssembly(string prefix)
+		private bool EmitAssembly()
 		{
 			reporter.Info("Building assembly " + prefix + suffixAssembly + " ...");
 			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;

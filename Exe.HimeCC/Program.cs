@@ -37,6 +37,7 @@ namespace Hime.HimeCC
 		private const string ArgRegenerateLong = "--regenerate";
 		private const string ArgOutputAssembly = "-o:assembly";
 		private const string ArgOutputNoSources = "-o:nosources";
+		private const string ArgOutputDebug = "-o:debug";
 		private const string ArgGrammar = "-g";
 		private const string ArgPrefix = "-p";
 		private const string ArgMethodRNGLR = "-m:rnglr";
@@ -219,6 +220,9 @@ namespace Hime.HimeCC
 					case ArgOutputNoSources:
 						task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 						break;
+					case ArgOutputDebug:
+						task.Mode = Hime.CentralDogma.Output.Mode.Debug;
+						break;
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
 							return null;
@@ -293,6 +297,8 @@ namespace Hime.HimeCC
 			Console.WriteLine(ArgOutputAssembly + "\tCompile the generated parser code in an assembly");
 			Console.WriteLine();
 			Console.WriteLine(ArgOutputNoSources + "\tOnly generate the assembly, do not keep the sources");
+			Console.WriteLine();
+			Console.WriteLine(ArgOutputDebug + "\tGenerate debug artifacts in addition to the sources");
 			Console.WriteLine();
 			Console.WriteLine(ArgGrammar + " <grammar>\tSelect the top grammar to compile if more than one are given");
 			Console.WriteLine();

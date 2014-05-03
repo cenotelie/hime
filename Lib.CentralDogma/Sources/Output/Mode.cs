@@ -36,6 +36,10 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Generates the source code for the lexer and parser and the compiled assembly
 		/// </summary>
-		SourceAndAssembly
+		SourceAndAssembly,
+		/// <summary>
+		/// Generates the source code for the lexer and parser, as well as the debug data
+		/// </summary>
+		Debug
 	}
 }
