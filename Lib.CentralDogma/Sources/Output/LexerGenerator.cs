@@ -100,7 +100,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", terminal.Name, terminal.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeName(terminal), terminal.ID.ToString("X4"));
 			}
 			stream.WriteLine("\t\t}");
 
