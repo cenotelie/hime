@@ -60,7 +60,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="label">Node's labe</param>
 		public void WriteNode(string id, string label)
 		{
-			writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\"];");
+			writer.WriteLine("    " + id + " [label=\"" + SanitizeString(label) + "\"];");
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="url">Node's url</param>
 		public void WriteNodeURL(string id, string url)
 		{
-			writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(id) + "\", URL=\"" + url + "\"];");
+			writer.WriteLine("    " + id + " [label=\"" + SanitizeString(id) + "\", URL=\"" + url + "\"];");
 		}
 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="shape">Node's shape</param>
 		public void WriteNode(string id, string label, DOTNodeShape shape)
 		{
-			writer.WriteLine("    _" + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
+			writer.WriteLine("    " + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
 		}
 
 		/// <summary>
@@ -92,7 +92,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="label">Label for the edge</param>
 		public void WriteEdge(string tail, string head, string label)
 		{
-			writer.WriteLine("    _" + tail + " -> _" + head + " [label=\"" + label + "\"];");
+			writer.WriteLine("    " + tail + " -> " + head + " [label=\"" + label + "\"];");
 		}
 
 		/// <summary>
@@ -103,7 +103,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="items">Items of this structure</param>
 		public void WriteStructure(string id, string label, string[] items)
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("    _");
+			System.Text.StringBuilder builder = new System.Text.StringBuilder("    ");
 			builder.Append(id);
 			builder.Append(" [label=\"{ ");
 			builder.Append(SanitizeString(label));

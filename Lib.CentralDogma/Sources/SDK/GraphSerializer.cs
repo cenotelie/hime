@@ -73,13 +73,13 @@ namespace Hime.CentralDogma.SDK
 			foreach (DFAState state in dfa.States)
 			{
 				if (state.TopItem != null)
-					serializer.WriteNode(state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), DOTNodeShape.doubleoctagon);
+					serializer.WriteNode("state" + state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), DOTNodeShape.doubleoctagon);
 				else
-					serializer.WriteNode(state.ID.ToString());
+					serializer.WriteNode("state" + state.ID.ToString(), state.ID.ToString());
 			}
 			foreach (DFAState state in dfa.States)
 				foreach (CharSpan value in state.Transitions.Keys)
-					serializer.WriteEdge(state.ID.ToString(), state.Transitions[value].ID.ToString(), value.ToString());
+					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.Transitions[value].ID.ToString(), value.ToString());
 			serializer.Close();
 		}
 
@@ -95,9 +95,9 @@ namespace Hime.CentralDogma.SDK
 			{
 				NFAState state = nfa.States[i];
 				if (state.Item != null)
-					serializer.WriteNode(i.ToString(), i.ToString() + " : " + state.Item.ToString(), DOTNodeShape.doubleoctagon);
+					serializer.WriteNode("state" + i.ToString(), i.ToString() + " : " + state.Item.ToString(), DOTNodeShape.doubleoctagon);
 				else
-					serializer.WriteNode(i.ToString());
+					serializer.WriteNode("state" + i.ToString(), i.ToString());
 			}
 			for (int i=0; i!=nfa.States.Count; i++)
 			{
@@ -105,7 +105,7 @@ namespace Hime.CentralDogma.SDK
 				foreach (NFATransition transition in state.Transitions)
 				{
 					int to = nfa.States.IndexOf(transition.Next);
-					serializer.WriteEdge(i.ToString(), to.ToString(), transition.Span.ToString());
+					serializer.WriteEdge("state" + i.ToString(), "state" + to.ToString(), transition.Span.ToString());
 				}
 			}
 			serializer.Close();
@@ -125,11 +125,35 @@ namespace Hime.CentralDogma.SDK
 				for (int i=0; i!=state.Reductions.Count; i++)
 					items[i] = state.Reductions[i].ToString();
 				string label = state.IsAccept ? state.ID.ToString() + "=Accept" : state.ID.ToString();
-				serializer.WriteStructure(state.ID.ToString(), label, items);
+				serializer.WriteStructure("state" + state.ID.ToString(), label, items);
 			}
 			foreach (LRState state in automaton.States)
 				foreach (LRTransition transition in state.Transitions)
-					serializer.WriteEdge(state.ID.ToString(), transition.Target.ID.ToString(), transition.Label.ToString());
+					serializer.WriteEdge("state" + state.ID.ToString(), "state" + transition.Target.ID.ToString(), transition.Label.ToString());
+			serializer.Close();
+		}
+
+		/// <summary>
+		/// Exports the given LR automaton to a DOT graph in the specified file
+		/// </summary>
+		/// <param name="graph">The LR automaton to export</param>
+		/// <param name="file">DOT file to export to</param>
+		public static void ExportDOT(Grammars.LR.Graph graph, string file)
+		{
+			DOTSerializer serializer = new DOTSerializer("LR", file);
+			foreach (Grammars.LR.State state in graph.States)
+			{
+				List<string> items = new List<string>();
+				foreach (Grammars.LR.Item item in state.Items)
+				{
+					if (item.Action == Hime.Redist.Parsers.LRActionCode.Reduce)
+						items.Add(item.ToString());
+				}
+				serializer.WriteStructure("state" + state.ID.ToString(), state.ID.ToString(), items.ToArray());
+			}
+			foreach (Grammars.LR.State state in graph.States)
+				foreach (Grammars.Symbol symbol in state.Children.Keys)
+					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.Children[symbol].ID.ToString(), symbol.ToString());
 			serializer.Close();
 		}
 	}
