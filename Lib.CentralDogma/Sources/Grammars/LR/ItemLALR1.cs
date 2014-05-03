@@ -146,38 +146,5 @@ namespace Hime.CentralDogma.Grammars.LR
 			}
 			return true;
 		}
-
-		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
-		/// </summary>
-		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
-		/// </returns>
-		public override string ToString()
-		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
-			builder.Append(rule.Head.ToString());
-			builder.Append(" ->");
-			int i = 0;
-			foreach (RuleBodyElement Part in rule.Body.Choices[0])
-			{
-				if (i == position)
-					builder.Append(" " + dot);
-				builder.Append(" ");
-				builder.Append(Part.ToString());
-				i++;
-			}
-			if (i == position)
-				builder.Append(" " + dot);
-			builder.Append(", ");
-			for (int j = 0; j != lookaheads.Count; j++)
-			{
-				if (j != 0)
-					builder.Append("/");
-				builder.Append(lookaheads[j].ToString());
-			}
-			builder.Append("]");
-			return builder.ToString();
-		}
 	}
 }

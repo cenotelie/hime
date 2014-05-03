@@ -102,31 +102,5 @@ namespace Hime.CentralDogma.Grammars.LR
 		{
 			return BaseEquals(item);
 		}
-
-		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
-		/// </summary>
-		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
-		/// </returns>
-		public override string ToString()
-		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
-			builder.Append(rule.Head.ToString());
-			builder.Append(" ->");
-			int i = 0;
-			foreach (RuleBodyElement part in rule.Body.Choices[0])
-			{
-				if (i == position)
-					builder.Append(" " + dot);
-				builder.Append(" ");
-				builder.Append(part.ToString());
-				i++;
-			}
-			if (i == position)
-				builder.Append(" " + dot);
-			builder.Append("]");
-			return builder.ToString();
-		}
 	}
 }

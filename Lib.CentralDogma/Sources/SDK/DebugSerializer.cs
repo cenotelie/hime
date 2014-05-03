@@ -100,10 +100,10 @@ namespace Hime.CentralDogma.SDK
 			writer.WriteLine("State {0}:", state.ID.ToString());
 			writer.WriteLine("\tTransitions:");
 			foreach (Grammars.Symbol symbol in state.Transitions)
-				writer.WriteLine("\t\t{0} -> {1}", symbol.ToString(), state.GetChildBy(symbol).ID.ToString());
+				writer.WriteLine("\t\tOn {0} shift to {1}", symbol.ToString(), state.GetChildBy(symbol).ID.ToString());
 			writer.WriteLine("\tItems:");
 			foreach (Grammars.LR.Item item in state.Items)
-				writer.WriteLine("\t\t" + item.ToString());
+				writer.WriteLine("\t\t" + item.ToString(true));
 			writer.WriteLine("\tConflicts:");
 			foreach (Grammars.LR.Conflict conflict in state.Conflicts)
 				ExportLRConflict(writer, conflict);
