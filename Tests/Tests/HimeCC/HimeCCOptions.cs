@@ -87,10 +87,10 @@ namespace Hime.Tests.HimeCC
 			Assert.IsTrue(CheckFileExists("CommandLineLexer.bin"), "himecc " + param + " failed to produce CommandLineLexer.bin");
 			Assert.IsTrue(CheckFileExists("CommandLineParser.cs"), "himecc " + param + " failed to produce CommandLineParser.cs");
 			Assert.IsTrue(CheckFileExists("CommandLineParser.bin"), "himecc " + param + " failed to produce CommandLineParser.bin");
-			Assert.IsTrue(CheckFileExists("FileCentralDogmaLexer.cs"), "himecc " + param + " failed to produce FileCentralDogmaLexer.cs");
-			Assert.IsTrue(CheckFileExists("FileCentralDogmaLexer.bin"), "himecc " + param + " failed to produce FileCentralDogmaLexer.bin");
-			Assert.IsTrue(CheckFileExists("FileCentralDogmaParser.cs"), "himecc " + param + " failed to produce FileCentralDogmaParser.cs");
-			Assert.IsTrue(CheckFileExists("FileCentralDogmaParser.bin"), "himecc " + param + " failed to produce FileCentralDogmaParser.bin");
+			Assert.IsTrue(CheckFileExists("HimeGrammarLexer.cs"), "himecc " + param + " failed to produce HimeGrammarLexer.cs");
+			Assert.IsTrue(CheckFileExists("HimeGrammarLexer.bin"), "himecc " + param + " failed to produce HimeGrammarLexer.bin");
+			Assert.IsTrue(CheckFileExists("HimeGrammarParser.cs"), "himecc " + param + " failed to produce HimeGrammarParser.cs");
+			Assert.IsTrue(CheckFileExists("HimeGrammarParser.bin"), "himecc " + param + " failed to produce HimeGrammarParser.bin");
 		}
 
 		/// <summary>
@@ -296,58 +296,6 @@ namespace Hime.Tests.HimeCC
 			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
 			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
 			Assert.IsTrue(CheckFileContains("MathExpParser.cs", "public class MathExpParser"), "Generated parser is not public");
-		}
-
-		/// <summary>
-		/// Tests default log production of himecc
-		/// </summary>
-		[Test]
-		public void Test_LogDefault()
-		{
-			SetTestDirectory();
-			ExportResource("MathExp.gram", "MathExp.gram");
-			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
-			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-			Assert.IsFalse(CheckFileExists("MathExpLog.mht"), "himecc produced a log file, shouldn't have");
-		}
-
-		/// <summary>
-		/// Tests the activation of the log output of himecc
-		/// </summary>
-		[Test]
-		public void Test_LogEnabled()
-		{
-			SetTestDirectory();
-			ExportResource("MathExp.gram", "MathExp.gram");
-			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -l" });
-			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-			Assert.IsTrue(CheckFileExists("MathExpLog.mht"), "himecc did not produce a log file, MathExpLog.mht was expected");
-		}
-
-		/// <summary>
-		/// Tests the default documentation production of himecc
-		/// </summary>
-		[Test]
-		public void Test_DocDefault()
-		{
-			SetTestDirectory();
-			ExportResource("MathExp.gram", "MathExp.gram");
-			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
-			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-			Assert.IsFalse(System.IO.Directory.Exists("MathExpDoc"), "himecc produced some documentation, shouldn't have");
-		}
-
-		/// <summary>
-		/// Tests the activation of the documentation production of himecc
-		/// </summary>
-		[Test]
-		public void Test_DocEnabled()
-		{
-			SetTestDirectory();
-			ExportResource("MathExp.gram", "MathExp.gram");
-			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -d" });
-			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-			Assert.IsTrue(System.IO.Directory.Exists("MathExpDoc"), "himecc did not produce the documentation, MathExpDoc directory was expected");
 		}
 	}
 }

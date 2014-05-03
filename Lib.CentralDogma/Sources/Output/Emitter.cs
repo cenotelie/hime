@@ -310,7 +310,7 @@ namespace Hime.CentralDogma.Output
 					hasError = true;
 				}
 			}
-			return hasError;
+			return (!hasError);
 		}
 	}
 }
