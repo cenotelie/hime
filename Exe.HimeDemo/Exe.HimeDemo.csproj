@@ -82,7 +82,8 @@
     <Compile Include="WinTreeView.Designer.cs">
       <DependentUpon>WinTreeView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tasks\ExtractParser.cs" />
+    <Compile Include="Tasks\DebugGrammar.cs" />
+    <Compile Include="Tasks\DebugAssembly.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WinTreeView.resx">
