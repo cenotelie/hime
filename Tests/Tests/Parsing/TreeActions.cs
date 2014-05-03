@@ -32,7 +32,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Promote_Simple()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->x; x->A^; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->x; x->A^; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
@@ -40,7 +40,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Promote_ToRoot()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A^; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A^; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "A");
 		}
 
@@ -48,7 +48,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Promote_MultipleInSameRule()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A^ B^ C; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A^ B^ C; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abc", "B(A C)");
 		}
 
@@ -56,7 +56,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Promote_Chaining()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->x^ A; x->y^ B; y->C^; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->x^ A; x->y^ B; y->C^; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "cba", "C(B A)");
 		}
 
@@ -64,7 +64,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Drop_Simple()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A B! C; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A B! C; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abc", "e(A C)");
 		}
 
@@ -72,7 +72,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Drop_SubTree()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A x! C; x->B; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A x! C; x->B; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abc", "e(A C)");
 		}
 	}

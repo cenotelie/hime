@@ -367,8 +367,9 @@ namespace Hime.CentralDogma
 		/// <returns>The terminals matched by the lexer</returns>
 		private List<Grammars.Terminal> GenerateLexer(Grammars.Grammar grammar, string prefix, string nmspace)
 		{
-			// build the lexer's dfa
-			Automata.DFA dfa = grammar.BuildDFA();
+			Automata.DFA dfa = GetDFAFor(grammar);
+			if (dfa == null)
+				return null;
 			// retrieve the separator
 			string name = grammar.GetOption("Separator");
 			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
@@ -385,6 +386,59 @@ namespace Hime.CentralDogma
 			generator.GenerateData(binOutput);
 			binOutput.Close();
 			return generator.Expected;
+		}
+
+		/// <summary>
+		/// Gets the DFA for the provided grammar
+		/// </summary>
+		/// <param name="grammar">The grammar to generate a lexer for</param>
+		/// <returns>The corresponding DFA; or <c>null</c> if it is not well-formed</returns>
+		private Automata.DFA GetDFAFor(Grammars.Grammar grammar)
+		{
+			// build the lexer's dfa
+			Automata.DFA dfa = grammar.BuildDFA();
+			// retrieve the separator
+			string name = grammar.GetOption("Separator");
+			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
+			if (name != null)
+			{
+				// a separator is defined
+				if (separator == null)
+				{
+					// but could not be found ...
+					reporter.Error(string.Format("Terminal {0} specified as the separator is undefined", name));
+					return null;
+				}
+				// look for the separator in the dfa
+				bool found = false;
+				Automata.FinalItem superceding = null;
+				foreach (Automata.DFAState state in dfa.States)
+				{
+					if (state.TopItem == separator)
+					{
+						found = true;
+						break;
+					}
+					else if (state.Items.Contains(separator))
+					{
+						superceding = state.TopItem;
+					}
+				}
+				if (!found)
+				{
+					if (superceding != null)
+						reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched, it is superceded by {1}", separator, superceding));
+					else
+						reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched", separator));
+					return null;
+				}
+			}
+			// check well-formedness
+			foreach (Automata.FinalItem item in dfa.Entry.Items)
+				reporter.Error(string.Format("Terminal {0} can be an empty string, this is forbidden", item.ToString()));
+			if (dfa.Entry.TopItem != null)
+				return null;
+			return dfa;
 		}
 
 		/// <summary>

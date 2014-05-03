@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-cf grammar CommandLine
+grammar CommandLine
 {
 	options
 	{
@@ -27,7 +27,7 @@ cf grammar CommandLine
 	}
 	terminals
 	{
-		WHITE_SPACE			-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		WHITE_SPACE			-> U+0020 | U+0009 | U+000B | U+000C ;
 		
 		ARG_NAME			-> '-' '-'? [a-zA-Z] ([a-zA-Z0-9_:] | '-')* ;
 

@@ -35,7 +35,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_SingleCharacter()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
 		}
 
@@ -46,7 +46,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceBackslash()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\\\';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\\\';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\\a", "e(A X='\\' A)");
 		}
 
@@ -57,7 +57,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceSingleQuote()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\'';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\'';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a'a", "e(A X A)");
 		}
 
@@ -68,7 +68,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode0()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\0';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\0';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u0000a", "e(A X='\u0000' A)");
 		}
 
@@ -79,7 +79,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode7()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u0007a", "e(A X='\u0007' A)");
 		}
 
@@ -90,7 +90,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode8()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\b';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\b';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u0008a", "e(A X='\u0008' A)");
 		}
 
@@ -101,7 +101,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode9()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\t';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\t';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\ta", "e(A X='\t' A)");
 		}
 
@@ -112,7 +112,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode10()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\n';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\n';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\na", "e(A X='\n' A)");
 		}
 
@@ -123,7 +123,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode11()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\v';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\v';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\va", "e(A X='\v' A)");
 		}
 
@@ -134,7 +134,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode12()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\f';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\f';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\fa", "e(A X='\f' A)");
 		}
 
@@ -145,7 +145,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_EscapeSequenceUnicode13()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\r';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->'\\r';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\ra", "e(A X='\r' A)");
 		}
 
@@ -156,7 +156,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_MultipleCharacters()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'abc';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'abc';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abc", "e(A='abc')");
 		}
 
@@ -167,7 +167,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_UnicodeCodepoint_1234()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->0x1234;} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->U+1234;} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u1234a", "e(A X='\u1234' A)");
 		}
 
@@ -178,7 +178,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_UnicodeCodepoint_Range()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->0x1234 .. 0x5678;} rules { e->X X X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; X->U+1234 .. U+5678;} rules { e->X X X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "\u1234\u3333\u5678", "e(X='\u1234' X='\u3333' X='\u5678')");
 		}
 
@@ -189,7 +189,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Wildcard_Single()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aba", "e(A X='b' A)");
 		}
 
@@ -200,7 +200,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Wildcard_SpecialCharacter_0()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u0000a", "e(A X='\u0000' A)");
 		}
 
@@ -211,7 +211,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Wildcard_SpecialCharacter_1234()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u1234a", "e(A X='\u1234' A)");
 		}
 
@@ -222,7 +222,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Wildcard_SpecialCharacter_5678()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\u5678a", "e(A X='\u5678' A)");
 		}
 
@@ -233,7 +233,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Wildcard_NewLine()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\na", "e(A X='\n' A)");
 		}
 
@@ -244,7 +244,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Wildcard_CarriageReturn()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->.; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a\ra", "e(A X='\r' A)");
 		}
 
@@ -255,7 +255,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_SimpleCharacter()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[xyz]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[xyz]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aya", "e(A X='y' A)");
 		}
 
@@ -266,7 +266,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_Range()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aya", "e(A X='y' A)");
 		}
 
@@ -277,7 +277,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_RangeLeftBorder()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(A X='x' A)");
 		}
 
@@ -288,7 +288,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_RangeRightBorder()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aza", "e(A X='z' A)");
 		}
 
@@ -299,7 +299,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_NegativeRange_Excluded()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "aya");
 		}
 
@@ -310,7 +310,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_NegativeRange_ExcludedLeftBorder()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axa");
 		}
 
@@ -321,7 +321,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_NegativeRange_ExcludedRightBorder()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "aza");
 		}
 
@@ -332,7 +332,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_NegativeRange_Included()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aba", "e(A X='b' A)");
 		}
 
@@ -343,7 +343,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_MultiRange_First()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[x-z0-9]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[x-z0-9]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aya", "e(A X='y' A)");
 		}
 
@@ -354,7 +354,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_MultiRange_Second()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[x-z0-9]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[x-z0-9]; A->'a';} rules { e->A X A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a5a", "e(A X='5' A)");
 		}
 
@@ -365,7 +365,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_NegativeMultiRange_First()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "aya");
 		}
 
@@ -376,7 +376,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Class_NegativeMultiRange_Second()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "a5a");
 		}
 
@@ -387,7 +387,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_NestingRules_Simple()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->'y' X 'y'; A->'a';} rules { e->A Y A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->'y' X 'y'; A->'a';} rules { e->A Y A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ayxya", "e(A Y='yxy' A)");
 		}
 
@@ -398,7 +398,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_NestingRules_Prefix_Strict()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'; A->'a';} rules { e->A Y A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'; A->'a';} rules { e->A Y A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axya", "e(A Y='xy' A)");
 		}
 
@@ -409,7 +409,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_NestingRules_Prefix_Optional_1()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axya", "e(A Y='xy' A)");
 		}
 
@@ -420,7 +420,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_NestingRules_Prefix_Optional_2()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(A Y='x' A)");
 		}
 
@@ -431,7 +431,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorStar_0()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aa", "e(X='aa')");
 		}
 
@@ -442,7 +442,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorStar_1()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(X='axa')");
 		}
 
@@ -453,7 +453,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorStar_More()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxa", "e(X='axxxa')");
 		}
 
@@ -464,7 +464,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorPlus_0()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "aa");
 		}
 
@@ -475,7 +475,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorPlus_1()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(X='axa')");
 		}
 
@@ -486,7 +486,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorPlus_More()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxa", "e(X='axxxa')");
 		}
 
@@ -497,7 +497,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorOptional_0()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aa", "e(X='aa')");
 		}
 
@@ -508,7 +508,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorOptional_1()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(X='axa')");
 		}
 
@@ -519,7 +519,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorOptional_More()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxa");
 		}
 
@@ -530,7 +530,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Strict_Exact()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxxa", "e(X='axxxxa')");
 		}
 
@@ -541,7 +541,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Strict_Less()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxa");
 		}
 
@@ -552,7 +552,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Strict_More()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxxxa");
 		}
 
@@ -563,7 +563,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Range_LeftBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxa", "e(X='axxa')");
 		}
 
@@ -574,7 +574,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Range_RightBound()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxxa", "e(X='axxxxa')");
 		}
 
@@ -585,7 +585,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Range_Within()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axxxa", "e(X='axxxa')");
 		}
 
@@ -596,7 +596,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Range_Less()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axa");
 		}
 
@@ -607,7 +607,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorCardinality_Range_More()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "axxxxxa");
 		}
 
@@ -618,7 +618,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorConcatenation_Simple()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ab", "e(A='ab')");
 		}
 
@@ -629,7 +629,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorConcatenation_Chained()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abc", "e(A='abc')");
 		}
 
@@ -640,7 +640,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorUnion_Simple_Left()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
 		}
 
@@ -651,7 +651,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorUnion_Simple_Right()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(A='b')");
 		}
 
@@ -662,7 +662,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorUnion_Chained_1()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
 		}
 
@@ -673,7 +673,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorUnion_Chained_2()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(A='b')");
 		}
 
@@ -684,7 +684,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorUnion_Chained_3()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "c", "e(A='c')");
 		}
 
@@ -695,7 +695,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorDifference_InNominalOnly()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aa", "e(A='aa')");
 		}
 
@@ -706,7 +706,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorDifference_InIntersection()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "bb");
 		}
 
@@ -717,7 +717,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_OperatorDifference_InSubstractedOnly()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "cc");
 		}
 
@@ -728,7 +728,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_StarConcat_NoGrouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'*;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'*;} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abbbbb", "e(A='abbbbb')");
 		}
 
@@ -739,7 +739,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_StarConcat_NoGrouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'*;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'*;} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abab");
 		}
 
@@ -750,8 +750,8 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_StarConcat_Grouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')*;} rules { e->A; } }";
-			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abab", "e(A='abab')");
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'c' ('a' 'b')*;} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "cabab", "e(A='cabab')");
 		}
 
 		/// <summary>
@@ -761,8 +761,8 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_StarConcat_Grouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')*;} rules { e->A; } }";
-			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abbbbb");
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'c' ('a' 'b')*;} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "cabbbbb");
 		}
 
 		/// <summary>
@@ -772,7 +772,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_PlusConcat_NoGrouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'+;} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abbbbb", "e(A='abbbbb')");
 		}
 
@@ -783,7 +783,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_PlusConcat_NoGrouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'+;} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abab");
 		}
 
@@ -794,7 +794,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_PlusConcat_Grouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')+;} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abab", "e(A='abab')");
 		}
 
@@ -805,7 +805,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_PlusConcat_Grouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')+;} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')+;} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abbbbb");
 		}
 
@@ -816,7 +816,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_OptionalConcat_NoGrouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ac", "e(A='ac')");
 		}
 
@@ -827,7 +827,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_OptionalConcat_NoGrouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "c");
 		}
 
@@ -838,7 +838,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_OptionalConcat_Grouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "c", "e(A='c')");
 		}
 
@@ -849,7 +849,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_OptionalConcat_Grouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "ac");
 		}
 
@@ -860,7 +860,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_CardinalityConcat_NoGrouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'{4};} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'{4};} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abbbb", "e(A='abbbb')");
 		}
 
@@ -871,7 +871,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_CardinalityConcat_NoGrouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'{4};} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a' 'b'{4};} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abababab");
 		}
 
@@ -882,7 +882,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_CardinalityConcat_Grouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b'){4};} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b'){4};} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "abababab", "e(A='abababab')");
 		}
 
@@ -893,7 +893,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_CardinalityConcat_Grouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b'){4};} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->('a' 'b'){4};} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "abbbb");
 		}
 
@@ -904,7 +904,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_ConcatUnion_NoGrouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "c", "e(A='c')");
 		}
 
@@ -915,7 +915,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_ConcatUnion_NoGrouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "ac");
 		}
 
@@ -926,7 +926,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_ConcatUnion_Grouping_OK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "ac", "e(A='ac')");
 		}
 
@@ -937,7 +937,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_Precedence_ConcatUnion_Grouping_NOK()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "c");
 		}
 
@@ -948,7 +948,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Terminals_RuleOverriding()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->[a-z]; A->'a';} rules { e->A Y A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->'x'; Y->[a-z]; A->'a';} rules { e->A Y A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axa", "e(A Y='x' A)");
 		}
 	}

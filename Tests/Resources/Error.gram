@@ -1,4 +1,4 @@
-cf grammar Error
+grammar Error
 {
 	options
 	{

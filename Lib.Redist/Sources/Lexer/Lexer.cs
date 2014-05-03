@@ -138,7 +138,7 @@ namespace Hime.Redist.Lexer
 					{
 						// This is the dollar terminal, at the end of the input
 						isDollatEmited = true;
-						return new Token(sidDollar, -1);
+						return text.AddToken(tIndex, index, length);
 					}
 				}
 				else

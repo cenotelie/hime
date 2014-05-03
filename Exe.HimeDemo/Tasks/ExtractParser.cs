@@ -36,7 +36,7 @@ namespace Hime.Demo.Tasks
 		public void Execute()
 		{
 			// Build parser assembly
-			string grammar = "cf grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
+			string grammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
 			CompilationTask task = new CompilationTask();
 			task.Mode = CompilationMode.Assembly;
 			task.AddInputRaw(grammar);

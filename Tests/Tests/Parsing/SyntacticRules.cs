@@ -35,7 +35,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Minimal_Empty()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"a\";} rules { a->; } }";
+			string grammar = "grammar Test { options {Axiom=\"a\";} rules { a->; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "a");
 		}
 
@@ -46,7 +46,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Minimal_Single_MatchOne()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A='a')");
 		}
 
@@ -57,7 +57,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Minimal_Single_FailsEmpty()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "");
 		}
 
@@ -68,7 +68,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Minimal_Single_FailsWrongInput()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "b");
 		}
 
@@ -79,7 +79,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OptionalOperator_MatchZero()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
@@ -87,7 +87,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OptionalOperator_MatchOne()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
@@ -95,7 +95,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_StarOperator_MatchZero()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
@@ -103,7 +103,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_StarOperator_MatchOne()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
@@ -111,7 +111,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_StarOperator_MatchMoreThanOne()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aaa", "e(A A A)");
 		}
 
@@ -119,7 +119,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_PlusOperator_FailsOnZeo()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "");
 		}
 
@@ -127,7 +127,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_PlusOperator_MatchOne()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
@@ -135,7 +135,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_PlusOperator_MatchMoreThanOne()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aaa", "e(A A A)");
 		}
 
@@ -143,7 +143,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_UnionOperator_Left()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
@@ -151,7 +151,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_UnionOperator_Right()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(B)");
 		}
 
@@ -159,7 +159,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OperatorComposition0()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
@@ -167,7 +167,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OperatorComposition1()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
@@ -175,7 +175,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OperatorComposition2()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(B)");
 		}
 
@@ -183,7 +183,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OperatorComposition3()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aba", "e(A B A)");
 		}
 
@@ -191,7 +191,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Grammar_OperatorComposition4()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "bab", "e(B A B)");
 		}
 

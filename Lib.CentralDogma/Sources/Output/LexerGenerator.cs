@@ -60,8 +60,10 @@ namespace Hime.CentralDogma.Output
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				if (state.TopItem != null)
-				if (!terminals.Contains(state.TopItem as Grammars.Terminal))
-					terminals.Add(state.TopItem as Grammars.Terminal);
+				{
+					if (!terminals.Contains(state.TopItem as Grammars.Terminal))
+						terminals.Add(state.TopItem as Grammars.Terminal);
+				}	
 			}
 		}
 

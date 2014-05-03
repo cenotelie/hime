@@ -35,7 +35,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Option_Axiom_CorrectVariable()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} rules { b->; e->; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} rules { b->; e->; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
@@ -46,7 +46,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Option_Separator_Space()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\"; Separator=\"SEPARATOR\";} terminals {SEPARATOR->' '+; A->'a'; } rules { e->A+; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\"; Separator=\"SEPARATOR\";} terminals {SEPARATOR->' '+; A->'a'; } rules { e->A+; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a a   a     a", "e(A A A A)");
 		}
 
@@ -57,7 +57,7 @@ namespace Hime.Tests.Parsing
 		public void Test_Option_Separator_ArbitraryCharacter()
 		{
 			SetTestDirectory();
-			string grammar = "cf grammar Test { options {Axiom=\"e\"; Separator=\"SEPARATOR\";} terminals {SEPARATOR->'x'+; A->'a'; } rules { e->A+; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\"; Separator=\"SEPARATOR\";} terminals {SEPARATOR->'x'+; A->'a'; } rules { e->A+; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "axaxxxaxxxxa", "e(A A A A)");
 		}
 	}

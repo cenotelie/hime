@@ -1,4 +1,4 @@
-cf grammar Test
+grammar Test
 {
 	options
 	{

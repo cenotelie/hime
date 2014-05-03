@@ -37,7 +37,7 @@ namespace Hime.Tests.Parsing
 		{
 			UnicodeCodePoint cp = new UnicodeCodePoint(codepoint);
 			string values = new string(cp.GetUTF16());
-			string grammar = "cf grammar Test { options {Axiom=\"e\";} terminals {X->ub{" + name + "};} rules { e->X; } }";
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {X->ub{" + name + "};} rules { e->X; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, values, "e(X='" + values + "')");
 		}
 
