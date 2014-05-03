@@ -76,12 +76,12 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <param name="map">The current helper map</param>
 		public override void CloseTo(List<Item> closure, Dictionary<Rule, Dictionary<int, List<Item>>> map)
 		{
+			// the item was of the form [Var -> alpha .] (reduction)
+			// nothing to do
+			if (Action == LRActionCode.Reduce)
+				return;
 			// Get the next symbol in the item
 			Symbol next = GetNextSymbol();
-			// No next symbol, the item was of the form [Var -> alpha .] (reduction)
-			// => return
-			if (next == null)
-				return;
 			// Here the item is of the form [Var -> alpha . Next beta]
 			// If the next symbol is not a variable : do nothing
 			// If the next symbol is a variable :

@@ -418,12 +418,12 @@ namespace Hime.CentralDogma
 					generator = new Output.ParserGeneratorRNGLR(grammar, graph, expected);
 					break;
 			}
-			// generate the lexer's code
+			// generate the parser's code
 			reporter.Info("Exporting parser code at " + prefix + PostfixParserCode + " ...");
-			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace, true);
-			generator.GenerateCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
+			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace, false);
+			generator.GenerateCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixParserData);
 			CloseOutputStream(txtOutput);
-			// generate the lexer's data
+			// generate the parser's data
 			reporter.Info("Exporting parser data at " + prefix + PostfixParserData + " ...");
 			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixParserData, FileMode.Create));
 			generator.GenerateData(binOutput);

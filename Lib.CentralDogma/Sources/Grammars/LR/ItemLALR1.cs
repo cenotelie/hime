@@ -45,7 +45,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <param name="lookaheads">The lookaheads for this item</param>
 		public ItemLALR1(Rule rule, int position, TerminalSet lookaheads) : base(rule, position)
 		{
-			lookaheads = new TerminalSet(lookaheads);
+			this.lookaheads = new TerminalSet(lookaheads);
 		}
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <param name="copied">The item to copy</param>
 		public ItemLALR1(Item copied) : base(copied.BaseRule, copied.DotPosition)
 		{
-			lookaheads = new TerminalSet();
+			this.lookaheads = new TerminalSet();
 		}
 
 		/// <summary>
@@ -75,13 +75,13 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <param name="map">The current helper map</param>
 		public override void CloseTo(List<Item> closure, Dictionary<Rule, Dictionary<int, List<Item>>> map)
 		{
+			// the item was of the form [Var -> alpha .] (reduction)
+			// nothing to do
+			if (Action == LRActionCode.Reduce)
+				return;
 			// Get the next symbol in the item
 			Symbol next = GetNextSymbol();
-			// No next symbol, the item was of the form [Var -> alpha .] (reduction)
-			// => return
-			if (next == null)
-				return;
-			// Here the item is of the form [Var -> alpha . Next beta]
+			// Here the item is of the form [Var -> alpha . next beta]
 			// If the next symbol is not a variable : do nothing
 			// If the next symbol is a variable :
 			Variable nextVar = next as Variable;
