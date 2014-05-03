@@ -38,7 +38,7 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// The terminals matched by the associated lexer
 		/// </summary>
-		protected List<Grammars.Terminal> terminals;
+		protected ROList<Grammars.Terminal> terminals;
 		/// <summary>
 		/// The variables to be exported
 		/// </summary>
@@ -67,11 +67,11 @@ namespace Hime.CentralDogma.Output
 		/// <param name="gram">The grammar to generate a parser for</param>
 		/// <param name="graph">The LR graph to use</param>
 		/// <param name="expected">The terminals matched by the associated lexer</param>
-		public ParserGenerator(Grammars.Grammar gram, Grammars.LR.Graph graph, ICollection<Grammars.Terminal> expected)
+		public ParserGenerator(Grammars.Grammar gram, Grammars.LR.Graph graph, ROList<Grammars.Terminal> expected)
 		{
 			this.grammar = gram;
 			this.graph = graph;
-			this.terminals = new List<Grammars.Terminal>(expected);
+			this.terminals = expected;
 			this.variables = new List<Grammars.Variable>(gram.Variables);
 			this.virtuals = new List<Grammars.Virtual>(gram.Virtuals);
 			this.actions = new List<Grammars.Action>(gram.Actions);

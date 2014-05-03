@@ -35,7 +35,7 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the states in this automaton
 		/// </summary>
-		public List<LRState> States { get { return states; } }
+		public ROList<LRState> States { get { return new ROList<LRState>(states); } }
 
 		/// <summary>
 		/// Initializes an empty automaton
@@ -43,6 +43,15 @@ namespace Hime.CentralDogma.Automata
 		public LRAutomaton()
 		{
 			this.states = new List<LRState>();
+		}
+
+		/// <summary>
+		/// Adds the specified state to this automaton
+		/// </summary>
+		/// <param name="state">A state</param>
+		public void AddState(LRState state)
+		{
+			states.Add(state);
 		}
 	}
 }

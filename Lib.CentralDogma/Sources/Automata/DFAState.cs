@@ -54,7 +54,7 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the list of the markers for this state
 		/// </summary>
-		public List<FinalItem> Items { get { return items; } }
+		public ROList<FinalItem> Items { get { return new ROList<FinalItem>(items); } }
 
 		/// <summary>
 		/// Gets the transitions from this state
@@ -110,7 +110,7 @@ namespace Hime.CentralDogma.Automata
 		/// Adds new markers making this state a final state
 		/// </summary>
 		/// <param name="items">The new markers</param>
-		public void AddFinals(ICollection<FinalItem> items)
+		public void AddFinals(IEnumerable<FinalItem> items)
 		{
 			foreach (FinalItem item in items)
 				AddFinal(item);

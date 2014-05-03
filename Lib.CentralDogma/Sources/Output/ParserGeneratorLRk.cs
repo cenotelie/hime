@@ -34,7 +34,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="gram">The grammar to generate a parser for</param>
 		/// <param name="graph">The LR graph to use</param>
 		/// <param name="expected">The terminals matched by the associated lexer</param>
-		public ParserGeneratorLRk(Grammars.Grammar gram, Grammars.LR.Graph graph, ICollection<Grammars.Terminal> expected)
+		public ParserGeneratorLRk(Grammars.Grammar gram, Grammars.LR.Graph graph, ROList<Grammars.Terminal> expected)
 			 : base(gram, graph, expected)
 		{
 		}

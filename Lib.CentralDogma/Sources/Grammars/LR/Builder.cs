@@ -46,7 +46,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the conflicts produced by this builder
 		/// </summary>
-		public List<Conflict> Conflicts { get { return conflicts; } }
+		public ROList<Conflict> Conflicts { get { return new ROList<Conflict>(conflicts); } }
 
 		/// <summary>
 		/// Initializes this builder
@@ -99,7 +99,7 @@ namespace Hime.CentralDogma.Grammars.LR
 						{
 							Phrase temp = new Phrase(sample);
 							temp.Append(conflict.ConflictSymbol);
-							conflict.Examples.Add(temp);
+							conflict.AddExample(temp);
 						}
 						conflicts.Add(conflict);
 					}

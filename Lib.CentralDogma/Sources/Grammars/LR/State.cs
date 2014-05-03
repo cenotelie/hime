@@ -70,7 +70,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the conflicts in this state
 		/// </summary>
-		public ICollection<Conflict> Conflicts { get { return reductions.Conflicts; } }
+		public ROList<Conflict> Conflicts { get { return reductions.Conflicts; } }
 
 		/// <summary>
 		/// Initializes this state

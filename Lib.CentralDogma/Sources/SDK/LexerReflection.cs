@@ -118,7 +118,7 @@ namespace Hime.CentralDogma.SDK
 			reader.Close();
 
 			for (int i=0; i!=automaton.StatesCount; i++)
-				this.dfa.States.Add(new Automata.DFAState(this.dfa.StatesCount));
+				dfa.CreateState();
 			for (int i=0; i!=automaton.StatesCount; i++)
 			{
 				Automata.DFAState current = this.dfa.States[i];

@@ -66,25 +66,25 @@ namespace Hime.CentralDogma
 		/// <param name="message">The info message</param>
 		public void Info(object message)
 		{
-			report.Infos.Add(message);
+			report.AddInfo(message);
 			log.Info(message.ToString());
 		}
 		/// <summary>
 		/// Adds a new warning entry in the log
 		/// </summary>
-		/// <param name="message">The info message</param>
+		/// <param name="message">The warning message</param>
 		public void Warn(object message)
 		{
-			report.Warnings.Add(message);
+			report.AddWarning(message);
 			log.Warn(message.ToString());
 		}
 		/// <summary>
 		/// Adds a new error entry in the log
 		/// </summary>
-		/// <param name="message">The info message</param>
+		/// <param name="message">The error message</param>
 		public void Error(object message)
 		{
-			report.Errors.Add(message);
+			report.AddError(message);
 			log.Error(message.ToString());
 		}
 	}

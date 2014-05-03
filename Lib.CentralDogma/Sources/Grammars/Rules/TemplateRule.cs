@@ -55,7 +55,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the parameters of this rule
 		/// </summary>
-		public List<string> Parameters { get { return parameters; } }
+		public ROList<string> Parameters { get { return new ROList<string>(parameters); } }
 		/// <summary>
 		/// Gets root AST node for this rule
 		/// </summary>
@@ -78,7 +78,7 @@ namespace Hime.CentralDogma.Grammars
 			this.parameters = new List<string>();
 			this.root = ruleNode;
 			foreach (ASTNode child in ruleNode.Children[1].Children)
-				this.Parameters.Add(child.Symbol.Value);
+				this.parameters.Add(child.Symbol.Value);
 		}
 
 		/// <summary>

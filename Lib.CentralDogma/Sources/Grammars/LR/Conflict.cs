@@ -63,11 +63,11 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the list of conflictuous items
 		/// </summary>
-		public ICollection<Item> Items { get { return items; } }
+		public ROList<Item> Items { get { return new ROList<Item>(items); } }
 		/// <summary>
 		/// Gets a list of examples of conflictuous examples
 		/// </summary>
-		public List<Phrase> Examples { get { return examples; } }
+		public ROList<Phrase> Examples { get { return new ROList<Phrase>(examples); } }
 
 		/// <summary>
 		/// Initializes this conflict
@@ -105,6 +105,15 @@ namespace Hime.CentralDogma.Grammars.LR
 		public void AddItem(Item item)
 		{
 			items.Add(item);
+		}
+
+		/// <summary>
+		/// Adds an input example to this conflict
+		/// </summary>
+		/// <param name="example">The example to add</param>
+		public void AddExample(Phrase example)
+		{
+			examples.Add(example);
 		}
 
 		/// <summary>

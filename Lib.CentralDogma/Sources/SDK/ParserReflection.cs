@@ -120,7 +120,7 @@ namespace Hime.CentralDogma.SDK
 		{
 			Hime.Redist.Parsers.LRkAutomaton temp = new Hime.Redist.Parsers.LRkAutomaton(reader);
 			for (int i=0; i!=temp.StatesCount; i++)
-				this.automaton.States.Add(new Automata.LRState(i));
+				this.automaton.AddState(new Automata.LRState(i));
 			for (int i=0; i!=temp.StatesCount; i++)
 			{
 				Automata.LRState state = automaton.States[i];
@@ -133,11 +133,11 @@ namespace Hime.CentralDogma.SDK
 							state.IsAccept = true;
 							break;
 						case Hime.Redist.Parsers.LRActionCode.Shift:
-							state.Transitions.Add(new Automata.LRTransition(terminal, automaton.States[action.Data]));
+							state.AddTransition(new Automata.LRTransition(terminal, automaton.States[action.Data]));
 							break;
 						case Hime.Redist.Parsers.LRActionCode.Reduce:
 							Hime.Redist.Parsers.LRProduction prod = temp.GetProduction(action.Data);
-							state.Reductions.Add(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
+							state.AddReduction(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
 							break;
 					}
 				}
@@ -146,7 +146,7 @@ namespace Hime.CentralDogma.SDK
 					Hime.Redist.Parsers.LRAction action = temp.GetAction(i, variable.ID);
 					if (action.Code == Hime.Redist.Parsers.LRActionCode.Shift)
 					{
-						state.Transitions.Add(new Automata.LRTransition(variable, automaton.States[action.Data]));
+						state.AddTransition(new Automata.LRTransition(variable, automaton.States[action.Data]));
 					}
 				}
 			}
@@ -160,7 +160,7 @@ namespace Hime.CentralDogma.SDK
 		{
 			Hime.Redist.Parsers.RNGLRAutomaton temp = new Hime.Redist.Parsers.RNGLRAutomaton(reader);
 			for (int i=0; i!=temp.StatesCount; i++)
-				this.automaton.States.Add(new Automata.LRState(i));
+				this.automaton.AddState(new Automata.LRState(i));
 			for (int i=0; i!=temp.StatesCount; i++)
 			{
 				Automata.LRState state = automaton.States[i];
@@ -176,11 +176,11 @@ namespace Hime.CentralDogma.SDK
 								state.IsAccept = true;
 								break;
 							case Hime.Redist.Parsers.LRActionCode.Shift:
-								state.Transitions.Add(new Automata.LRTransition(terminal, automaton.States[action.Data]));
+								state.AddTransition(new Automata.LRTransition(terminal, automaton.States[action.Data]));
 								break;
 							case Hime.Redist.Parsers.LRActionCode.Reduce:
 								Hime.Redist.Parsers.LRProduction prod = temp.GetProduction(action.Data);
-								state.Reductions.Add(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
+								state.AddReduction(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
 								break;
 						}
 					}
@@ -193,7 +193,7 @@ namespace Hime.CentralDogma.SDK
 						Hime.Redist.Parsers.LRAction action = temp.GetAction(i, variable.ID, j);
 						if (action.Code == Hime.Redist.Parsers.LRActionCode.Shift)
 						{
-							state.Transitions.Add(new Automata.LRTransition(variable, automaton.States[action.Data]));
+							state.AddTransition(new Automata.LRTransition(variable, automaton.States[action.Data]));
 						}
 					}
 				}

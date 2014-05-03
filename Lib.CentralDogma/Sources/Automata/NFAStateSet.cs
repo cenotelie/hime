@@ -143,7 +143,7 @@ namespace Hime.CentralDogma.Automata
 									CharSpan Part1;
 									CharSpan Part2;
 									Part1 = CharSpan.Split(backend[s1].Transitions[t1].Span, Inter, out Part2);
-									backend[s1].Transitions[t1] = new NFATransition(Inter, backend[s1].Transitions[t1].Next);
+									backend[s1].ReplaceTransition(t1, new NFATransition(Inter, backend[s1].Transitions[t1].Next));
 									if (Part1.Length != 0)
 										backend[s1].AddTransition(Part1, backend[s1].Transitions[t1].Next);
 									if (Part2.Length != 0)
@@ -151,7 +151,7 @@ namespace Hime.CentralDogma.Automata
 
 									// Split transition2 in 1, 2 or 3 transitions and modifiy the states accordingly
 									Part1 = CharSpan.Split(backend[s2].Transitions[t2].Span, Inter, out Part2);
-									backend[s2].Transitions[t2] = new NFATransition(Inter, backend[s2].Transitions[t2].Next);
+									backend[s2].ReplaceTransition(t2, new NFATransition(Inter, backend[s2].Transitions[t2].Next));
 									if (Part1.Length != 0)
 										backend[s2].AddTransition(Part1, backend[s2].Transitions[t2].Next);
 									if (Part2.Length != 0)

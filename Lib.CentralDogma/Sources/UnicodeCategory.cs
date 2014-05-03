@@ -45,7 +45,7 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// Gets the character spans contained by this category
 		/// </summary>
-		public List<UnicodeSpan> Spans { get { return spans; } }
+		public ROList<UnicodeSpan> Spans { get { return new ROList<UnicodeSpan>(spans); } }
 
 		/// <summary>
 		/// Adds a span to this category

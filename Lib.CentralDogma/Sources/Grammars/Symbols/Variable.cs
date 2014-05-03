@@ -44,7 +44,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the rules for this variables
 		/// </summary>
-		public List<Rule> Rules { get { return rules; } }
+		public ROList<Rule> Rules { get { return new ROList<Rule>(rules); } }
 		/// <summary>
 		/// Gets the FIRSTS set of this variable
 		/// </summary>

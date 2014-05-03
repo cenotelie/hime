@@ -51,11 +51,11 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the transitions from this state
 		/// </summary>
-		public List<LRTransition> Transitions { get { return transitions; } }
+		public ROList<LRTransition> Transitions { get { return new ROList<LRTransition>(transitions); } }
 		/// <summary>
 		/// Gets the reductions in this state
 		/// </summary>
-		public List<LRReduction> Reductions { get { return reductions; } }
+		public ROList<LRReduction> Reductions { get { return new ROList<LRReduction>(reductions); } }
 		/// <summary>
 		/// Gets or sets whether this state is an accepting state
 		/// </summary>
@@ -74,6 +74,24 @@ namespace Hime.CentralDogma.Automata
 			this.id = id;
 			this.transitions = new List<LRTransition>();
 			this.reductions = new List<LRReduction>();
+		}
+
+		/// <summary>
+		/// Adds the specified transition to this state
+		/// </summary>
+		/// <param name="transition">A transition</param>
+		public void AddTransition(LRTransition transition)
+		{
+			transitions.Add(transition);
+		}
+
+		/// <summary>
+		/// Adds the specified reduction to this state
+		/// </summary>
+		/// <param name="reduction">A reduction</param>
+		public void AddReduction(LRReduction reduction)
+		{
+			reductions.Add(reduction);
 		}
 
 		/// <summary>

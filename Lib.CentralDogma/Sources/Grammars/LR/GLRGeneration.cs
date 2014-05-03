@@ -34,7 +34,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the stack nodes in this generation
 		/// </summary>
-		public List<GLRStackNode> Nodes { get { return nodes; } }
+		public ROList<GLRStackNode> Nodes { get { return new ROList<GLRStackNode>(nodes); } }
 
 		/// <summary>
 		/// Initializes this generation as empty

@@ -34,7 +34,7 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the states in this automaton
 		/// </summary>
-		public List<DFAState> States { get { return states; } }
+		public ROList<DFAState> States { get { return new ROList<DFAState>(states); } }
 
 		/// <summary>
 		/// Gets the number of states in this automaton
@@ -121,6 +121,17 @@ namespace Hime.CentralDogma.Automata
 				// Add finals
 				states[i].AddFinals(nfaStateSets[i].GetFinals());
 			}
+		}
+
+		/// <summary>
+		/// Creates a new state in this DFA
+		/// </summary>
+		/// <returns>The create state</returns>
+		public DFAState CreateState()
+		{
+			DFAState state = new DFAState(states.Count);
+			states.Add(state);
+			return state;
 		}
 
 		/// <summary>

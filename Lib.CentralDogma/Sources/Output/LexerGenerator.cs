@@ -43,7 +43,7 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Gets a list of the expected terminals
 		/// </summary>
-		public List<Grammars.Terminal> Expected { get { return terminals; } }
+		public ROList<Grammars.Terminal> Expected { get { return new ROList<Grammars.Terminal>(terminals); } }
 
 		/// <summary>
 		/// Initializes this generator

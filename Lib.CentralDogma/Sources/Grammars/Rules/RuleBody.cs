@@ -34,7 +34,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the choices in this rule
 		/// </summary>
-		public List<RuleChoice> Choices { get { return choices; } }
+		public ROList<RuleChoice> Choices { get { return new ROList<RuleChoice>(choices); } }
 
 		/// <summary>
 		/// Initializes this body as empty

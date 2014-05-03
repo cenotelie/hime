@@ -49,7 +49,7 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the collection of states in this automaton
 		/// </summary>
-		public List<NFAState> States { get { return states; } }
+		public ROList<NFAState> States { get { return new ROList<NFAState>(states); } }
 
 		/// <summary>
 		/// Gets the number of states in this automaton

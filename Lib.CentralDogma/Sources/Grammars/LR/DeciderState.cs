@@ -241,8 +241,8 @@ namespace Hime.CentralDogma.Grammars.LR
 			{
 				if (!right.choices.ContainsKey(item))
 					return false;
-				IList<GLRStackNode> l1 = this.choices[item].Nodes;
-				IList<GLRStackNode> l2 = right.choices[item].Nodes;
+				ROList<GLRStackNode> l1 = this.choices[item].Nodes;
+				ROList<GLRStackNode> l2 = right.choices[item].Nodes;
 				if (l1.Count != l2.Count)
 					return false;
 				List<int> ids1 = new List<int>();

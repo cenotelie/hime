@@ -38,6 +38,11 @@ namespace Hime.CentralDogma
 		public int Count { get { return inner.Count; } }
 
 		/// <summary>
+		/// Gets a value indicating whether this instance is valid.
+		/// </summary>
+		public bool IsValid { get { return (inner != null); } }
+
+		/// <summary>
 		/// Gets the element at the specified index.
 		/// </summary>
 		/// <param name="index">An index in this list</param>
@@ -50,6 +55,26 @@ namespace Hime.CentralDogma
 		public ROList(IList<T> original)
 		{
 			this.inner = original;
+		}
+
+		/// <summary>
+		/// Determines whether this list contains the specified item
+		/// </summary>
+		/// <param name="item">The item to look for</param>
+		/// <returns><c>true</c> if the item is in this list</returns>
+		public bool Contains(T item)
+		{
+			return inner.Contains(item);
+		}
+
+		/// <summary>
+		/// Determines the index of the specified item in this list
+		/// </summary>
+		/// <param name="item">The item to look for</param>
+		/// <returns>The index of the specified item, or -1</returns>
+		public int IndexOf(T item)
+		{
+			return inner.IndexOf(item);
 		}
 
 		/// <summary>

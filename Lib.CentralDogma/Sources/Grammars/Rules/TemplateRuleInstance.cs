@@ -46,7 +46,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the parameter values
 		/// </summary>
-		public List<Symbol> Parameters { get { return parameters; } }
+		public ROList<Symbol> Parameters { get { return new ROList<Symbol>(parameters); } }
 
 		public TemplateRuleInstance(TemplateRule tRule, List<Symbol> parameters, Grammar grammar)
 		{

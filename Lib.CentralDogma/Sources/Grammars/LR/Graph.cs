@@ -34,7 +34,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the states in this graph
 		/// </summary>
-		public List<State> States { get { return states; } }
+		public ROList<State> States { get { return new ROList<State>(states); } }
 
 		/// <summary>
 		/// Initializes a new empty graph

@@ -40,15 +40,15 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// Gets the informational entries in this report
 		/// </summary>
-		public List<object> Infos { get { return infos; } }
+		public ROList<object> Infos { get { return new ROList<object>(infos); } }
 		/// <summary>
 		/// Gets the informational entries in this report
 		/// </summary>
-		public List<object> Warnings { get { return warnings; } }
+		public ROList<object> Warnings { get { return new ROList<object>(warnings); } }
 		/// <summary>
 		/// Gets the informational entries in this report
 		/// </summary>
-		public List<object> Errors { get { return errors; } }
+		public ROList<object> Errors { get { return new ROList<object>(errors); } }
 
 		/// <summary>
 		/// Initializes a new report
@@ -58,6 +58,33 @@ namespace Hime.CentralDogma
 			this.infos = new List<object>();
 			this.warnings = new List<object>();
 			this.errors = new List<object>();
+		}
+
+		/// <summary>
+		/// Adds a new info entry
+		/// </summary>
+		/// <param name="message">The info message</param>
+		public void AddInfo(object message)
+		{
+			infos.Add(message);
+		}
+
+		/// <summary>
+		/// Adds a new warning entry
+		/// </summary>
+		/// <param name="message">The warning message</param>
+		public void AddWarning(object message)
+		{
+			warnings.Add(message);
+		}
+
+		/// <summary>
+		/// Adds a new error entry
+		/// </summary>
+		/// <param name="message">The error message</param>
+		public void AddError(object message)
+		{
+			errors.Add(message);
 		}
 	}
 }

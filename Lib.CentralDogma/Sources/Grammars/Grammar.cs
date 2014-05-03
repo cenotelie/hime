@@ -129,7 +129,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the template rules in this grammar
 		/// </summary>
-		public List<TemplateRule> TemplateRules { get { return templateRules; } }
+		public ROList<TemplateRule> TemplateRules { get { return new ROList<TemplateRule>(templateRules); } }
 
 		/// <summary>
 		/// Initializes this grammar

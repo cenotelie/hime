@@ -48,7 +48,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Gets the conflicts raised by this set
 		/// </summary>
-		public List<Conflict> Conflicts { get { return conflicts; } }
+		public ROList<Conflict> Conflicts { get { return new ROList<Conflict>(conflicts); } }
 
 		/// <summary>
 		/// Initializes this set of reductions as empty

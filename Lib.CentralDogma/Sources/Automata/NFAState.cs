@@ -42,7 +42,7 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the list of transitions from this state
 		/// </summary>
-		public List<NFATransition> Transitions { get { return transitions; } }
+		public ROList<NFATransition> Transitions { get { return new ROList<NFATransition>(transitions); } }
 
 		/// <summary>
 		/// Gets or sets the item marking this state as a final state
@@ -89,6 +89,17 @@ namespace Hime.CentralDogma.Automata
 		public void ClearTransitions()
 		{
 			transitions.Clear();
+		}
+
+		/// <summary>
+		/// Replaces the transition at the given index by the specified one
+		/// </summary>
+		/// <param name="index">An index in the list of transitions</param>
+		/// <param name="transition">The replacing transition</param>
+		public void ReplaceTransition(int index, NFATransition transition)
+		{
+			// TODO: remove this method by refactoring the algorithm that calls it
+			transitions[index] = transition;
 		}
 	}
 }
