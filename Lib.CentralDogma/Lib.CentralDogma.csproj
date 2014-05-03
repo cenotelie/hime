@@ -84,7 +84,6 @@
     <Compile Include="Sources\CompilationTask.cs" />
     <Compile Include="Sources\ParsingMethod.cs" />
     <Compile Include="Sources\Grammars\Grammar.cs" />
-    <Compile Include="Sources\ResourceAccessor.cs" />
     <Compile Include="Sources\SDK\DOTNodeShape.cs" />
     <Compile Include="Sources\SDK\DOTSerializer.cs" />
     <Compile Include="Sources\SDK\GraphSerializer.cs" />

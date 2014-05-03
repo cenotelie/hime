@@ -31,11 +31,6 @@ namespace Hime.Tests
 	public abstract class BaseTestSuite
 	{
 		/// <summary>
-		/// The resource accessor for this test bundle
-		/// </summary>
-		protected ResourceAccessor accessor;
-
-		/// <summary>
 		/// The current directory for the current test
 		/// </summary>
 		protected string directory;
@@ -45,7 +40,6 @@ namespace Hime.Tests
 		/// </summary>
 		protected BaseTestSuite()
 		{
-			accessor = new ResourceAccessor(Assembly.GetExecutingAssembly(), "Resources");
 			directory = "Data_" + this.GetType().Name;
 			try
 			{
@@ -79,7 +73,10 @@ namespace Hime.Tests
 		/// <param name="file">The file to export to</param>
 		protected void ExportResource(string name, string file)
 		{
-			accessor.Export(name, file);
+			Stream stream = typeof(BaseTestSuite).Assembly.GetManifestResourceStream("Hime.Tests.Resources." + name);
+			StreamReader reader = new StreamReader(stream);
+			string content = reader.ReadToEnd();
+			File.WriteAllText(file, content);
 		}
 
 		/// <summary>
