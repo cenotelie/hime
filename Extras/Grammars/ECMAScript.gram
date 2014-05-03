@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-cf grammar ECMAScript
+grammar ECMAScript
 {
 	options
 	{
@@ -26,13 +26,13 @@ cf grammar ECMAScript
 		Separator = "Separator";
 	}
 	terminals {
-		LineTerminator  -> 0x000D /* CR */
-						|  0x000A /* LF */
-						|  0x000D 0x000A /* CR LF */
-						|  0x2028 /* LS */
-						|  0x2029 /* PS */ ;
+		LineTerminator  -> U+000D /* CR */
+						|  U+000A /* LF */
+						|  U+000D U+000A /* CR LF */
+						|  U+2028 /* LS */
+						|  U+2029 /* PS */ ;
 		
-		WhiteSpace  	-> 0x0020 | 0x0009 | 0x000B | 0x000C ; // 0x0009 | \uc{Zs} ;
+		WhiteSpace  	-> U+0020 | U+0009 | U+000B | U+000C ; // U+0009 | \uc{Zs} ;
 		CommentLine		-> '//' (.* - (.* LineTerminator .*)) LineTerminator ;
 		CommentBlock	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 		

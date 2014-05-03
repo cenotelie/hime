@@ -18,18 +18,18 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-cf grammar ANSI_C {
+grammar ANSI_C {
 	options {
 		Axiom = "translation_unit";
 		Separator = "SEPARATOR";
 	}
 	terminals {
-		NEW_LINE		-> 0x000D /* CR */
-						|  0x000A /* LF */
-						|  0x000D 0x000A /* CR LF */
-						|  0x2028 /* LS */
-						|  0x2029 /* PS */ ;
-		WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		NEW_LINE		-> U+000D /* CR */
+						|  U+000A /* LF */
+						|  U+000D U+000A /* CR LF */
+						|  U+2028 /* LS */
+						|  U+2029 /* PS */ ;
+		WHITE_SPACE		-> U+0020 | U+0009 | U+000B | U+000C ;
 		COMMENT_LINE	-> '//' (.* - (.* NEW_LINE .*)) NEW_LINE ;
 		COMMENT_BLOCK	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
@@ -46,12 +46,12 @@ cf grammar ANSI_C {
 		REAL_LITTERAL				-> INTEGER_LITTERAL_DECIMAL? '.' INTEGER_LITTERAL_DECIMAL  (('e' | 'E') ('+' | '-')? INTEGER_LITTERAL_DECIMAL)? REAL_LITTERAL_SUFFIX?
 									|  INTEGER_LITTERAL_DECIMAL ('e' | 'E') ('+' | '-')? INTEGER_LITTERAL_DECIMAL REAL_LITTERAL_SUFFIX?
 									|  INTEGER_LITTERAL_DECIMAL REAL_LITTERAL_SUFFIX ;
-		CHARACTER_LITTERAL			-> '\'' ( (0x0000 .. 0xFFFF - ('\'' | '\\' | NEW_LINE))
+		CHARACTER_LITTERAL			-> '\'' ( (. - ('\'' | '\\' | NEW_LINE))
 											| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
 											| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
 											| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
 										) '\'' ;
-		STRING_LITERAL		-> '"'  ( (0x0000 .. 0xFFFF - ('"' | '\\' | NEW_LINE))
+		STRING_LITERAL		-> '"'  ( (. - ('"' | '\\' | NEW_LINE))
 									| '\\' ('\'' | '"' | '\'' | '\\' | [0abfnrtv])
 									| '\\' 'x' [a-fA-F0-9] [a-fA-F0-9]? [a-fA-F0-9]? [a-fA-F0-9]?
 									| '\\' ('u' | 'U') [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?

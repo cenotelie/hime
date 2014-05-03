@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-cf grammar EBNF
+grammar EBNF
 {
 	options
 	{
@@ -27,12 +27,12 @@ cf grammar EBNF
 	}
 	terminals
 	{
-		NEW_LINE		-> 0x000D /* CR */
-						|  0x000A /* LF */
-						|  0x000D 0x000A /* CR LF */
-						|  0x2028 /* LS */
-						|  0x2029 /* PS */ ;
-		WHITE_SPACE		-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		NEW_LINE		-> U+000D /* CR */
+						|  U+000A /* LF */
+						|  U+000D U+000A /* CR LF */
+						|  U+2028 /* LS */
+						|  U+2029 /* PS */ ;
+		WHITE_SPACE		-> U+0020 | U+0009 | U+000B | U+000C ;
 		COMMENT			-> '(*' (.* - (.* '*)' .*)) '*)' ;
 		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT)+;
 		

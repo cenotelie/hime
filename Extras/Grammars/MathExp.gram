@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-cf grammar MathExp
+grammar MathExp
 {
 	options
 	{
@@ -32,7 +32,7 @@ cf grammar MathExp
 				|  INTEGER ('e' | 'E') ('+' | '-')? INTEGER ;
 		NUMBER	-> INTEGER | REAL ;
 
-		WHITE_SPACE	-> 0x0020 | 0x0009 | 0x000B | 0x000C ;
+		WHITE_SPACE	-> U+0020 | U+0009 | U+000B | U+000C ;
 		SEPARATOR	-> WHITE_SPACE+;
 	}
 	rules
