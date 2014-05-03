@@ -59,7 +59,7 @@ namespace Hime.CentralDogma.Automata
 			foreach (DFAState state in dfa.States)
 			{
 				// If the state is final
-				if (state.FinalsCount != 0)
+				if (state.Items.Count != 0)
 				{
 					bool added = false;
 					// Look for a corresponding group in the existing ones
@@ -101,7 +101,7 @@ namespace Hime.CentralDogma.Automata
 		/// <returns>True if the two states have the same marks</returns>
 		private bool DFAPartition_SameFinals(DFAState left, DFAState right)
 		{
-			if (left.FinalsCount != right.FinalsCount)
+			if (left.Items.Count != right.Items.Count)
 				return false;
 			foreach (FinalItem Final in left.Items)
 			{
@@ -161,14 +161,14 @@ namespace Hime.CentralDogma.Automata
 			if (s1.Transitions.Count != s2.Transitions.Count)
 				return false;
 			// For each transition from state 1
-			foreach (CharSpan Key in s1.Transitions.Keys)
+			foreach (CharSpan key in s1.Transitions)
 			{
 				// If state 2 does not have a transition with the same value : not same group
-				if (!s2.Transitions.ContainsKey(Key))
+				if (!s2.HasTransition(key))
 					return false;
 				// Here State1 and State2 have both a transition of the same value
 				// If the target of these transitions are in the same group in the old partition : same transition
-				if (old.AddState_GetGroupOf(s1.Transitions[Key]) != old.AddState_GetGroupOf(s2.Transitions[Key]))
+				if (old.AddState_GetGroupOf(s1.GetChildBy(key)) != old.AddState_GetGroupOf(s2.GetChildBy(key)))
 					return false;
 			}
 			return true;
@@ -224,8 +224,8 @@ namespace Hime.CentralDogma.Automata
 			}
 			// Do linkage
 			for (int i = 0; i != groups.Count; i++)
-				foreach (CharSpan Key in groups[i].Representative.Transitions.Keys)
-					states[i].AddTransition(Key, states[GetDFAStates_GetGroupIndexOf(groups[i].Representative.Transitions[Key])]);
+				foreach (CharSpan Key in groups[i].Representative.Transitions)
+					states[i].AddTransition(Key, states[GetDFAStates_GetGroupIndexOf(groups[i].Representative.GetChildBy(Key))]);
 			return states;
 		}
 

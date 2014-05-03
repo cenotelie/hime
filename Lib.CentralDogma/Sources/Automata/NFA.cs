@@ -94,8 +94,8 @@ namespace Hime.CentralDogma.Automata
 			for (int i = 0; i != dfaStates.Count; i++)
 			{
 				states[i].Item = dfaStates[i].TopItem;
-				foreach (CharSpan transition in dfaStates[i].Transitions.Keys)
-					states[i].AddTransition(transition, states[dfaStates.IndexOf(dfaStates[i].Transitions[transition])]);
+				foreach (CharSpan transition in dfaStates[i].Transitions)
+					states[i].AddTransition(transition, states[dfaStates.IndexOf(dfaStates[i].GetChildBy(transition))]);
 			}
 			stateEntry = states[0];
 		}

@@ -78,8 +78,8 @@ namespace Hime.CentralDogma.SDK
 					serializer.WriteNode("state" + state.ID.ToString(), state.ID.ToString());
 			}
 			foreach (DFAState state in dfa.States)
-				foreach (CharSpan value in state.Transitions.Keys)
-					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.Transitions[value].ID.ToString(), value.ToString());
+				foreach (CharSpan value in state.Transitions)
+					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.GetChildBy(value).ID.ToString(), value.ToString());
 			serializer.Close();
 		}
 

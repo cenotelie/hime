@@ -168,13 +168,13 @@ namespace Hime.CentralDogma.Automata
 			List<DFAState> finals = new List<DFAState>();
 			foreach (DFAState state in states)
 			{
-				foreach (DFAState next in state.Transitions.Values)
+				foreach (DFAState next in state.Children)
 				{
 					if (!inverses.ContainsKey(next))
 						inverses.Add(next, new List<DFAState>());
 					inverses[next].Add(state);
 				}
-				if (state.FinalsCount != 0)
+				if (state.Items.Count != 0)
 					finals.Add(state);
 			}
 
@@ -200,10 +200,10 @@ namespace Hime.CentralDogma.Automata
 					{
 						foreach (DFAState antecedent in inverses[state])
 						{
-							List<CharSpan> keys = new List<CharSpan>(antecedent.Transitions.Keys);
+							List<CharSpan> keys = new List<CharSpan>(antecedent.Transitions);
 							foreach (CharSpan key in keys)
-								if (antecedent.Transitions[key] == state)
-									antecedent.Transitions.Remove(key);
+								if (antecedent.GetChildBy(key) == state)
+									antecedent.RemoveTransition(key);
 						}
 					}
 				}

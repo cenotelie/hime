@@ -59,17 +59,12 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Gets the transitions from this state
 		/// </summary>
-		public Dictionary<CharSpan, DFAState> Transitions { get { return transitions; } }
+		public ICollection<CharSpan> Transitions { get { return transitions.Keys; } }
 
 		/// <summary>
-		/// Gets the number of markers for this state
+		/// Gets the children of this state, i.e. states that are reached by a single transition from this one
 		/// </summary>
-		public int FinalsCount { get { return items.Count; } }
-
-		/// <summary>
-		/// Gets the number of transitions from this state
-		/// </summary>
-		public int TransitionsCount { get { return transitions.Count; } }
+		public ICollection<DFAState> Children { get { return transitions.Values; } }
 
 		/// <summary>
 		/// Gets the ID of this state
@@ -126,6 +121,26 @@ namespace Hime.CentralDogma.Automata
 		}
 
 		/// <summary>
+		/// Gets the child state by the specified transition
+		/// </summary>
+		/// <param name="value">The value on the transition</param>
+		/// <returns>The child state</returns>
+		public DFAState GetChildBy(CharSpan value)
+		{
+			return transitions[value];
+		}
+
+		/// <summary>
+		/// Determines whether this state has the specified transition
+		/// </summary>
+		/// <param name="value">The value on the transition</param>
+		/// <returns><c>true</c> if this state has the specified transition; otherwise, <c>false</c></returns>
+		public bool HasTransition(CharSpan value)
+		{
+			return transitions.ContainsKey(value);
+		}
+
+		/// <summary>
 		/// Adds a transition from this state
 		/// </summary>
 		/// <param name="value">The value on the transition</param>
@@ -133,6 +148,15 @@ namespace Hime.CentralDogma.Automata
 		public void AddTransition(CharSpan value, DFAState next)
 		{
 			transitions.Add(value, next);
+		}
+
+		/// <summary>
+		/// Removes a transition from this state
+		/// </summary>
+		/// <param name="value">The value on the transition</param>
+		public void RemoveTransition(CharSpan value)
+		{
+			transitions.Remove(value);
 		}
 
 		/// <summary>

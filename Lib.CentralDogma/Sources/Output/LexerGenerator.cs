@@ -153,7 +153,7 @@ namespace Hime.CentralDogma.Output
 			{
 				stream.Write(offset);
 				offset += 3 + 256;
-				foreach (CharSpan key in state.Transitions.Keys)
+				foreach (CharSpan key in state.Transitions)
 					if (key.End >= 256)
 						offset += 3;
 			}
@@ -173,7 +173,7 @@ namespace Hime.CentralDogma.Output
 				cache[i] = 0xFFFF;
 			ushort cached = 0;
 			ushort slow = 0;
-			foreach (CharSpan span in state.Transitions.Keys)
+			foreach (CharSpan span in state.Transitions)
 			{
 				if (span.Begin <= 255)
 				{
@@ -185,7 +185,7 @@ namespace Hime.CentralDogma.Output
 						slow++;
 					}
 					for (int i = span.Begin; i <= end; i++)
-						cache[i] = (ushort)state.Transitions[span].ID;
+						cache[i] = (ushort)state.GetChildBy(span).ID;
 				}
 				else
 					slow++;
@@ -201,7 +201,7 @@ namespace Hime.CentralDogma.Output
 			for (int i = 0; i != 256; i++)
 				stream.Write(cache[i]);
 
-			List<CharSpan> keys = new List<CharSpan>(state.Transitions.Keys);
+			List<CharSpan> keys = new List<CharSpan>(state.Transitions);
 			keys.Sort(new System.Comparison<CharSpan>(CharSpan.CompareReverse));
 			foreach (CharSpan span in keys)
 			{
@@ -212,7 +212,7 @@ namespace Hime.CentralDogma.Output
 					begin = 256;
 				stream.Write(begin);
 				stream.Write(System.Convert.ToUInt16(span.End));
-				stream.Write((ushort)state.Transitions[span].ID);
+				stream.Write((ushort)state.GetChildBy(span).ID);
 				slow--;
 			}
 		}
