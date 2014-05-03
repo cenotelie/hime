@@ -17,33 +17,24 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Grammars.LR
 {
 	/// <summary>
-	/// Represents a parsing method
+	/// Represents an action in a LR state
 	/// </summary>
-	public enum ParsingMethod : byte
+	[System.CLSCompliant(false)]
+	public interface StateAction
 	{
 		/// <summary>
-		/// The LR(0) parsing method
+		/// Gets the type of action
 		/// </summary>
-		LR0 = 1,
+		LRActionCode ActionType { get; }
+
 		/// <summary>
-		/// The LR(1) parsing method
+		/// Gets the trigger for the action
 		/// </summary>
-		LR1 = 2,
-		/// <summary>
-		/// The LALR(1) parsing method
-		/// </summary>
-		LALR1 = 3,
-		/// <summary>
-		/// The RNGLR parsing method based on a LR(1) graph
-		/// </summary>
-		RNGLR1 = 4,
-		/// <summary>
-		/// The RNGLR parsing method based on a LALR(1) graph
-		/// </summary>
-		RNGLALR1 = 5
+		Symbol OnSymbol { get; }
 	}
 }

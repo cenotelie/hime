@@ -24,7 +24,7 @@ namespace Hime.CentralDogma.Grammars
 	/// <summary>
 	/// Represents a choice in a rule, i.e. the remainder of a rule's body
 	/// </summary>
-	public class RuleChoice
+	public class RuleChoice : IEnumerable<RuleBodyElement>
 	{
 		/// <summary>
 		/// The elements in this body
@@ -33,7 +33,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// The FIRSTS set of terminals
 		/// </summary>
-        protected TerminalSet firsts;
+        protected TerminalSet setFirsts;
 
 		/// <summary>
 		/// Gets the length of this body
@@ -47,7 +47,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the FIRSTS set
 		/// </summary>
-		public TerminalSet Firsts { get { return firsts; } }
+		public TerminalSet Firsts { get { return setFirsts; } }
 
 		/// <summary>
 		/// Initializes this body as empty
@@ -55,7 +55,7 @@ namespace Hime.CentralDogma.Grammars
 		public RuleChoice()
 		{
 			this.parts = new List<RuleBodyElement>();
-			this.firsts = new TerminalSet();
+			this.setFirsts = new TerminalSet();
 		}
 
 		/// <summary>
@@ -66,7 +66,24 @@ namespace Hime.CentralDogma.Grammars
 		{
 			this.parts = new List<RuleBodyElement>();
 			this.parts.Add(new RuleBodyElement(symbol, Hime.Redist.TreeAction.None));
-			this.firsts = new TerminalSet();
+			this.setFirsts = new TerminalSet();
+		}
+
+		/// <summary>
+		/// Gets the enumerator of the inner parts
+		/// </summary>
+		/// <returns>The enumerator</returns>
+		public IEnumerator<RuleBodyElement> GetEnumerator()
+		{
+			return parts.GetEnumerator();
+		}
+		/// <summary>
+		/// Gets the enumerator of the inner parts
+		/// </summary>
+		/// <returns>The enumerator</returns>
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return parts.GetEnumerator();
 		}
 
 		/// <summary>
@@ -86,12 +103,12 @@ namespace Hime.CentralDogma.Grammars
 		{
 			// If the choice is empty : Add the ε to the Firsts and return
 			if (parts.Count == 0)
-				return firsts.Add(Epsilon.Instance);
+				return setFirsts.Add(Epsilon.Instance);
 
 			Symbol symbol = parts[0].Symbol;
 			// If the first symbol in the choice is a terminal : Add terminal as first and return
 			if (symbol is Terminal)
-				return firsts.Add(symbol as Terminal);
+				return setFirsts.Add(symbol as Terminal);
 
 			// Here the first symbol in the current choice is a variable
 			Variable variable = symbol as Variable;
@@ -102,10 +119,10 @@ namespace Hime.CentralDogma.Grammars
 				// If the symbol is ε
 				if (first == Epsilon.Instance)
                     // Add the Firsts set of the next choice to the current Firsts set
-					mod = mod || firsts.AddRange(next.firsts);
+					mod = mod || setFirsts.AddRange(next.setFirsts);
 				else
                     // Symbol is not ε : Add the symbol to the Firsts set
-					mod = mod || firsts.Add(first);
+					mod = mod || setFirsts.Add(first);
 			}
 			return mod;
 		}

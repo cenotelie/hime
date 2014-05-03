@@ -32,11 +32,11 @@ namespace Hime.CentralDogma
 	/// </summary>
 	public sealed class CompilationTask
 	{
-		internal const string PostfixLexerCode = "Lexer.cs";
-		internal const string PostfixLexerData = "Lexer.bin";
-		internal const string PostfixParserCode = "Parser.cs";
-		internal const string PostfixParserData = "Parser.bin";
-		internal const string PostfixAssembly = ".dll";
+		public const string PostfixLexerCode = "Lexer.cs";
+		public const string PostfixLexerData = "Lexer.bin";
+		public const string PostfixParserCode = "Parser.cs";
+		public const string PostfixParserData = "Parser.bin";
+		public const string PostfixAssembly = ".dll";
 
 		/// <summary>
 		/// Gets the compiler's version
@@ -91,7 +91,7 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// The reporter
 		/// </summary>
-		private Reporting.Reporter reporter;
+		private Reporter reporter;
 		/// <summary>
 		/// Repositories of inputs
 		/// </summary>
@@ -111,7 +111,7 @@ namespace Hime.CentralDogma
 			CodeAccess = AccessModifier.Internal;
 
 			nextRawID = 0;
-			reporter = new Reporting.Reporter(typeof(CompilationTask), "Compilation log");
+			reporter = new Reporter(typeof(CompilationTask));
 			inputs = new List<KeyValuePair<string, TextReader>>();
 			loaders = new Dictionary<string, Grammars.GrammarLoader>();
 		}
@@ -189,7 +189,7 @@ namespace Hime.CentralDogma
 		/// Executes this compilation task
 		/// </summary>
 		/// <returns>The compilation report</returns>
-		public Reporting.Report Execute()
+		public Report Execute()
 		{
 			try
 			{
@@ -197,7 +197,7 @@ namespace Hime.CentralDogma
 			}
 			catch (Exception ex)
 			{
-				reporter.Report(ex);
+				reporter.Error(ex);
 			}
 			return reporter.Result;
 		}
@@ -219,47 +219,22 @@ namespace Hime.CentralDogma
 			Grammars.Grammar grammar = RetrieveGrammar();
 			if (grammar == null)
 				return;
-			// Get the lexer data
-			Grammars.LexerData lexerData = null; //grammar.GetLexerData(reporter);
-			// Get the parser data
-			Grammars.ParserData parserData = null; //grammar.GetParserData(reporter, GetParserGenerator(Method));
-
-			// If there is any error => abort now
-			if (reporter.Result.HasErrors)
+			string message = grammar.Prepare();
+			if (message != null)
+			{
+				reporter.Error(message);
 				return;
-
+			}
 			// Build names
 			string prefix = (OutputPrefix != null) ? OutputPrefix : grammar.Name;
 			string nmspace = (Namespace != null) ? Namespace : grammar.Name;
-
-			// Export lexer code
-			reporter.Info("Exporting lexer code at " + prefix + PostfixLexerCode + " ...");
-			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace, true);
-			lexerData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
-			CloseOutputStream(txtOutput);
-			reporter.Info("Done!");
-
-			// Export lexer data
-			reporter.Info("Exporting lexer data at " + prefix + PostfixLexerData + " ...");
-			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixLexerData, FileMode.Create));
-			lexerData.ExportData(binOutput);
-			binOutput.Close();
-			reporter.Info("Done!");
-
-			// Export parser code
-			reporter.Info("Exporting parser data at " + prefix + PostfixParserCode + " ...");
-			txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace, false);
-			parserData.ExportCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixParserData, lexerData.Expected);
-			CloseOutputStream(txtOutput);
-			reporter.Info("Done!");
-
-			// Export parser data
-			reporter.Info("Exporting parser data at " + prefix + PostfixParserData + " ...");
-			binOutput = new BinaryWriter(new FileStream(prefix + PostfixParserData, FileMode.Create));
-			parserData.ExportData(binOutput);
-			binOutput.Close();
-			reporter.Info("Done!");
-
+			// Export the lexer
+			List<Grammars.Terminal> expected = GenerateLexer(grammar, prefix, nmspace);
+			if (expected == null)
+				return;
+			// Export the paser
+			if (!GenerateParser(grammar, prefix, nmspace, expected))
+				return;
 			// Build assembly
 			if (Mode != CompilationMode.Source)
 				BuildAssembly(prefix);
@@ -290,6 +265,7 @@ namespace Hime.CentralDogma
 		/// </summary>
 		/// <param name="name">The input's name</param>
 		/// <param name="reader">The input's reader</param>
+		/// <returns><c>true</c> if the operation succeed</returns>
 		private bool LoadInput(string name, TextReader reader)
 		{
 			bool hasErrors = false;
@@ -303,12 +279,12 @@ namespace Hime.CentralDogma
 			catch (Exception ex)
 			{
 				reporter.Error("Fatal error in " + name);
-				reporter.Report(ex);
+				reporter.Error(ex);
 				hasErrors = true;
 			}
 			foreach (Error error in result.Errors)
 			{
-				reporter.Report(new Reporting.Entry(Reporting.ELevel.Error, name + " " + error.Message));
+				reporter.Error(error);
 				hasErrors = true;
 			}
 			if (result.IsSuccess)
@@ -383,29 +359,80 @@ namespace Hime.CentralDogma
 		}
 
 		/// <summary>
-		/// Gets the parser generator for the given parsing method
+		/// Generates the lexer for the given grammar
 		/// </summary>
-		/// <param name="method">A parsing method</param>
-		/// <returns>The corresponding parser generator</returns>
-		private Grammars.ParserGenerator GetParserGenerator(ParsingMethod method)
+		/// <param name="grammar">The grammar to generate a lexer for</param>
+		/// <param name="prefix">The prefix for the output artifacts</param>
+		/// <param name="nmspace">The namespace for the generated code</param>
+		/// <returns>The terminals matched by the lexer</returns>
+		private List<Grammars.Terminal> GenerateLexer(Grammars.Grammar grammar, string prefix, string nmspace)
 		{
-			switch (method)
+			// build the lexer's dfa
+			Automata.DFA dfa = grammar.BuildDFA();
+			// retrieve the separator
+			string name = grammar.GetOption("Separator");
+			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
+			// get the generator
+			Output.LexerGenerator generator = new Hime.CentralDogma.Output.LexerGenerator(dfa, separator);
+			// generate the lexer's code
+			reporter.Info("Exporting lexer code at " + prefix + PostfixLexerCode + " ...");
+			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixLexerCode, nmspace, true);
+			generator.GenerateCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
+			CloseOutputStream(txtOutput);
+			reporter.Info("Done!");
+			// generate the lexer's data
+			reporter.Info("Exporting lexer data at " + prefix + PostfixLexerData + " ...");
+			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixLexerData, FileMode.Create));
+			generator.GenerateData(binOutput);
+			binOutput.Close();
+			reporter.Info("Done!");
+			return generator.Expected;
+		}
+
+		/// <summary>
+		/// Generates the parser for the given grammar
+		/// </summary>
+		/// <param name="grammar">The grammar to generate a parser for</param>
+		/// <param name="prefix">The prefix for the output artifacts</param>
+		/// <param name="nmspace">The namespace for the generated code</param>
+		/// <param name="expected">The terminals matched by the associated lexer</param>
+		/// <returns><c>true</c> if the operation succeed</returns>
+		private bool GenerateParser(Grammars.Grammar grammar, string prefix, string nmspace, List<Grammars.Terminal> expected)
+		{
+			// build the LR graph
+			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);
+			Grammars.LR.Graph graph = builder.Build(Method);
+			foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
+				reporter.Error(conflict);
+			if (builder.Conflicts.Count != 0)
+				return false;
+			// get the generator
+			Output.ParserGenerator generator = null;
+			switch (Method)
 			{
 				case ParsingMethod.LR0:
-					return new Grammars.ContextFree.LR.MethodLR0(this.reporter);
 				case ParsingMethod.LR1:
-					return new Grammars.ContextFree.LR.MethodLR1(this.reporter);
 				case ParsingMethod.LALR1:
-					return new Grammars.ContextFree.LR.MethodLALR1(this.reporter);
-				case ParsingMethod.LRStar:
-					return new Grammars.ContextFree.LR.MethodLRStar(this.reporter);
+					generator = new Output.ParserGeneratorLRk(grammar, graph, expected);
+					break;
 				case ParsingMethod.RNGLR1:
-					return new Grammars.ContextFree.LR.MethodRNGLR1(this.reporter);
 				case ParsingMethod.RNGLALR1:
-					return new Grammars.ContextFree.LR.MethodRNGLALR1(this.reporter);
+					generator = new Output.ParserGeneratorRNGLR(grammar, graph, expected);
+					break;
 			}
-			// cannot fall here because all possibilities are exhausted in the switch above
-			return null;
+			// generate the lexer's code
+			reporter.Info("Exporting parser code at " + prefix + PostfixParserCode + " ...");
+			StreamWriter txtOutput = OpenOutputStream(prefix + PostfixParserCode, nmspace, true);
+			generator.GenerateCode(txtOutput, grammar.Name, CodeAccess, prefix + PostfixLexerData);
+			CloseOutputStream(txtOutput);
+			reporter.Info("Done!");
+			// generate the lexer's data
+			reporter.Info("Exporting parser data at " + prefix + PostfixParserData + " ...");
+			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + PostfixParserData, FileMode.Create));
+			generator.GenerateData(binOutput);
+			binOutput.Close();
+			reporter.Info("Done!");
+			return true;
 		}
 
 		/// <summary>

@@ -18,32 +18,20 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Grammars.LR
 {
 	/// <summary>
-	/// Represents a parsing method
+	/// Represents the type of a LR conflict
 	/// </summary>
-	public enum ParsingMethod : byte
+	public enum ConflictType
 	{
 		/// <summary>
-		/// The LR(0) parsing method
+		/// Represents a Shift-Reduce conflict
 		/// </summary>
-		LR0 = 1,
+		ShiftReduce,
 		/// <summary>
-		/// The LR(1) parsing method
+		/// Represents a Reduce-Reduce conflict
 		/// </summary>
-		LR1 = 2,
-		/// <summary>
-		/// The LALR(1) parsing method
-		/// </summary>
-		LALR1 = 3,
-		/// <summary>
-		/// The RNGLR parsing method based on a LR(1) graph
-		/// </summary>
-		RNGLR1 = 4,
-		/// <summary>
-		/// The RNGLR parsing method based on a LALR(1) graph
-		/// </summary>
-		RNGLALR1 = 5
+		ReduceReduce
 	}
 }

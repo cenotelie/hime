@@ -17,33 +17,29 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Collections.Generic;
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Grammars.LR
 {
 	/// <summary>
-	/// Represents a parsing method
+	/// Represents a reduction action in a RNGLR state
 	/// </summary>
-	public enum ParsingMethod : byte
+	public class StateActionRNReduce : StateActionReduce
 	{
 		/// <summary>
-		/// The LR(0) parsing method
+		/// Gets the reduction length
 		/// </summary>
-		LR0 = 1,
+		public int ReduceLength { get; private set; }
+
 		/// <summary>
-		/// The LR(1) parsing method
+		/// Initializes this action
 		/// </summary>
-		LR1 = 2,
-		/// <summary>
-		/// The LALR(1) parsing method
-		/// </summary>
-		LALR1 = 3,
-		/// <summary>
-		/// The RNGLR parsing method based on a LR(1) graph
-		/// </summary>
-		RNGLR1 = 4,
-		/// <summary>
-		/// The RNGLR parsing method based on a LALR(1) graph
-		/// </summary>
-		RNGLALR1 = 5
+		/// <param name="lookahead">The lookahead to reduce on</param>
+		/// <param name="rule">The rule to reduce</param>
+		/// <param name="length">The length of the reduction</param>
+		public StateActionRNReduce(Terminal lookahead, Rule rule, int length) : base(lookahead, rule)
+		{
+			this.ReduceLength = length;
+		}
 	}
 }

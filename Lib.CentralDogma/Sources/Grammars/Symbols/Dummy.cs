@@ -28,7 +28,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// The singleton instance
 		/// </summary>
-		private static Epsilon instance;
+		private static Dummy instance;
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
@@ -39,12 +39,12 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the the singleton instance
 		/// </summary>
-		public static Epsilon Instance
+		public static Dummy Instance
 		{
 			get
 			{
 				if (instance == null)
-					instance = new Epsilon();
+					instance = new Dummy();
 				return instance;
 			}
 		}

@@ -17,33 +17,51 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Grammars.LR
 {
 	/// <summary>
-	/// Represents a parsing method
+	/// Represents a reduction action in a LR state
 	/// </summary>
-	public enum ParsingMethod : byte
+	public class StateActionReduce : StateAction
 	{
 		/// <summary>
-		/// The LR(0) parsing method
+		/// The lookahead to reduce on
 		/// </summary>
-		LR0 = 1,
+		private Terminal lookahead;
 		/// <summary>
-		/// The LR(1) parsing method
+		/// The rule to reduce
 		/// </summary>
-		LR1 = 2,
+		private Rule toReduce;
+
 		/// <summary>
-		/// The LALR(1) parsing method
+		///  Gets the type of action 
 		/// </summary>
-		LALR1 = 3,
+		[System.CLSCompliant(false)]
+		public LRActionCode ActionType { get { return LRActionCode.Shift; } }
 		/// <summary>
-		/// The RNGLR parsing method based on a LR(1) graph
+		///  Gets the trigger for the action 
 		/// </summary>
-		RNGLR1 = 4,
+		public Symbol OnSymbol { get { return lookahead; } }
 		/// <summary>
-		/// The RNGLR parsing method based on a LALR(1) graph
+		/// Gets the lookahead for this action
 		/// </summary>
-		RNGLALR1 = 5
+		public Terminal Lookahead { get { return lookahead; } }
+		/// <summary>
+		/// Gets the rule to reduce
+		/// </summary>
+		public Rule ToReduceRule { get { return toReduce; } }
+
+		/// <summary>
+		/// Initializes this action
+		/// </summary>
+		/// <param name="lookahead">The lookahead to reduce on</param>
+		/// <param name="rule">The rule to reduce</param>
+		public StateActionReduce(Terminal lookahead, Rule rule)
+		{
+			this.lookahead = lookahead;
+			this.toReduce = rule;
+		}
 	}
 }

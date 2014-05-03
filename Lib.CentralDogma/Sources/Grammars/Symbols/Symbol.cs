@@ -87,7 +87,7 @@ namespace Hime.CentralDogma.Grammars
 		{
 			Symbol temp  = obj as Symbol;
 			if (temp == null)
-				return temp;
+				return false;
 			return (this.ID == temp.ID);
 		}
 

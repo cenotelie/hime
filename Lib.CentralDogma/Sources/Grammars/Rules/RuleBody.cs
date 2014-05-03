@@ -95,13 +95,13 @@ namespace Hime.CentralDogma.Grammars
 					continue;
 				// Append the symbol to all the choices definition
 				foreach (RuleChoice choice in choices)
-					choice.Append(part);
+					choice.Append(part.Symbol);
 				// Create a new choice with only the symbol
 				choices.Add(new RuleChoice(part.Symbol));
 			}
 			// Create a new empty choice
 			choices.Add(new RuleChoice());
-			firsts = choices[0].Firsts;
+			setFirsts = choices[0].Firsts;
 		}
 
 		/// <summary>

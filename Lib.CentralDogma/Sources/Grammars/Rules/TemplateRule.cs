@@ -95,11 +95,10 @@ namespace Hime.CentralDogma.Grammars
 			this.root = copied.root;
 			foreach (TemplateRuleInstance instance in copied.instances)
 			{
-				Variable headVar = grammar.GetVariable(instance.HeadVariable.Name);
 				List<Symbol> param = new List<Symbol>();
 				foreach (Symbol symbol in instance.Parameters)
 					param.Add(grammar.GetSymbol(symbol.Name));
-				instances.Add(new TemplateRuleInstance(this, param, headVar));
+				instances.Add(new TemplateRuleInstance(this, param, grammar));
 			}
 		}
 		

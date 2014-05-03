@@ -17,33 +17,47 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace Hime.CentralDogma
 {
 	/// <summary>
-	/// Represents a parsing method
+	/// Represents a compilation report
 	/// </summary>
-	public enum ParsingMethod : byte
+	public sealed class Report
 	{
+		private List<object> infos;
+		private List<object> warnings;
+		private List<object> errors;
+
 		/// <summary>
-		/// The LR(0) parsing method
+		/// Gets whether the report contains errors
 		/// </summary>
-		LR0 = 1,
+		public bool HasErrors { get { return (errors.Count > 0); } }
+
 		/// <summary>
-		/// The LR(1) parsing method
+		/// Gets the informational entries in this report
 		/// </summary>
-		LR1 = 2,
+		public List<object> Infos { get { return infos; } }
 		/// <summary>
-		/// The LALR(1) parsing method
+		/// Gets the informational entries in this report
 		/// </summary>
-		LALR1 = 3,
+		public List<object> Warnings { get { return warnings; } }
 		/// <summary>
-		/// The RNGLR parsing method based on a LR(1) graph
+		/// Gets the informational entries in this report
 		/// </summary>
-		RNGLR1 = 4,
+		public List<object> Errors { get { return errors; } }
+
 		/// <summary>
-		/// The RNGLR parsing method based on a LALR(1) graph
+		/// Initializes a new report
 		/// </summary>
-		RNGLALR1 = 5
+		public Report()
+		{
+			this.infos = new List<object>();
+			this.warnings = new List<object>();
+			this.errors = new List<object>();
+		}
 	}
 }

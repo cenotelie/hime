@@ -48,11 +48,11 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets the FIRSTS set of this variable
 		/// </summary>
-		public TerminalSet Firsts { get; private set; }
+		public TerminalSet Firsts { get { return firsts; } }
 		/// <summary>
 		/// Gets the FOLLOWERS set of this variable
 		/// </summary>
-		public TerminalSet Followers { get; private set; }
+		public TerminalSet Followers { get { return followers; } }
 
 		/// <summary>
 		/// Initializes this symbol

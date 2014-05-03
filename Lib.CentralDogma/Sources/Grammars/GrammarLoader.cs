@@ -40,7 +40,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// The log
 		/// </summary>
-		private Reporting.Reporter reporter;
+		private Reporter reporter;
 		/// <summary>
 		/// Lists of the inherited grammars
 		/// </summary>
@@ -69,7 +69,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <param name="resName">The name of the resource</param>
 		/// <param name="root">The root AST</param>
 		/// <param name="reporter">The log</param>
-		public GrammarLoader(string resName, ASTNode root, Reporting.Reporter reporter)
+		public GrammarLoader(string resName, ASTNode root, Reporter reporter)
 		{
 			this.reporter = reporter;
 			this.root = root;
@@ -709,7 +709,7 @@ namespace Hime.CentralDogma.Grammars
 					subVar.AddRule(new Rule(subVar, def, true));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
-				setVar = setVar * setInner;
+				setVar = RuleBodySet.Multiply(setVar, setInner);
 				foreach (RuleBody def in setVar)
 					subVar.AddRule(new Rule(subVar, def, true));
 				setVar = new RuleBodySet();
@@ -725,7 +725,7 @@ namespace Hime.CentralDogma.Grammars
 					subVar.AddRule(new Rule(subVar, def, true));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
-				setVar = setVar * setInner;
+				setVar = RuleBodySet.Multiply(setVar, setInner);
 				foreach (RuleBody def in setVar)
 					subVar.AddRule(new Rule(subVar, def, true));
 				setVar = new RuleBodySet();
@@ -736,7 +736,7 @@ namespace Hime.CentralDogma.Grammars
 			{
 				RuleBodySet setLeft = BuildDefinitions(context, node.Children[0]);
 				RuleBodySet setRight = BuildDefinitions(context, node.Children[1]);
-				return (setLeft + setRight);
+				return RuleBodySet.Union(setLeft, setRight);
 			}
 			else if (node.Symbol.ID == HimeGrammarLexer.ID.TREE_ACTION_PROMOTE)
 			{
@@ -754,7 +754,7 @@ namespace Hime.CentralDogma.Grammars
 			{
 				RuleBodySet setLeft = BuildDefinitions(context, node.Children[0]);
 				RuleBodySet setRight = BuildDefinitions(context, node.Children[1]);
-				return (setLeft * setRight);
+				return RuleBodySet.Multiply(setLeft, setRight);
 			}
 			else if (node.Symbol.Name == "emptypart")
 			{
@@ -871,7 +871,7 @@ namespace Hime.CentralDogma.Grammars
 			foreach (ASTNode symbolNode in node.Children[1].Children)
 				parameters.Add(BuildAtomicDefinition(context, symbolNode)[0][0].Symbol);
 			// Get the corresponding variable
-			Variable variable = context.InstantiateMetaRule(name, parameters, context);
+			Variable variable = context.InstantiateMetaRule(name, parameters);
 			// Create the definition
 			defs.Add(new RuleBody(variable));
 			return defs;

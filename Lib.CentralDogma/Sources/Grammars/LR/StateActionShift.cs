@@ -17,33 +17,47 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma
+namespace Hime.CentralDogma.Grammars.LR
 {
 	/// <summary>
-	/// Represents a parsing method
+	/// Represents a shift action in a LR state
 	/// </summary>
-	public enum ParsingMethod : byte
+	public class StateActionShift : StateAction
 	{
 		/// <summary>
-		/// The LR(0) parsing method
+		/// The trigger symbol
 		/// </summary>
-		LR0 = 1,
+		private Symbol symbol;
 		/// <summary>
-		/// The LR(1) parsing method
+		/// The target of the shift action
 		/// </summary>
-		LR1 = 2,
+		private State target;
+
 		/// <summary>
-		/// The LALR(1) parsing method
+		///  Gets the type of action 
 		/// </summary>
-		LALR1 = 3,
+		[System.CLSCompliant(false)]
+		public LRActionCode ActionType { get { return LRActionCode.Shift; } }
 		/// <summary>
-		/// The RNGLR parsing method based on a LR(1) graph
+		///  Gets the trigger for the action 
 		/// </summary>
-		RNGLR1 = 4,
+		public Symbol OnSymbol { get { return symbol; } }
 		/// <summary>
-		/// The RNGLR parsing method based on a LALR(1) graph
+		/// Gets the target of this action
 		/// </summary>
-		RNGLALR1 = 5
+		public State Target { get { return target; } }
+
+		/// <summary>
+		/// Initializes this action
+		/// </summary>
+		/// <param name="trigger">The action's trigger</param>
+		/// <param name="target">The shift target</param>
+		public StateActionShift(Symbol trigger, State target)
+		{
+			this.symbol = trigger;
+			this.target = target;
+		}
 	}
 }

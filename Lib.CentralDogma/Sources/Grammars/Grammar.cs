@@ -499,9 +499,12 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Prepare this grammar
+		/// Prepares this grammar for code and data generation
 		/// </summary>
 		/// <returns>The error message, or <c>null</c> if all went well</returns>
+		/// <remarks>
+		/// This methods inserts a new grammar rule as its axiom and computes the FIRSTS and FOLLOWERS sets
+		/// </remarks>
 		public string Prepare()
 		{
 			string message = AddRealAxiom();

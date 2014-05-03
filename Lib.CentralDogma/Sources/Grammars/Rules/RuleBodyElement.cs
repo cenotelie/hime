@@ -85,7 +85,7 @@ namespace Hime.CentralDogma.Grammars
 		{
 			RuleBodyElement temp = obj as RuleBodyElement;
 			if (temp == null)
-				return null;
+				return false;
 			return (this.symbol.Equals(temp.symbol) && this.action == temp.action);
 		}
 
