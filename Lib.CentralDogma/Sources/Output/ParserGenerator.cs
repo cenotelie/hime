@@ -268,6 +268,13 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
 				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
 				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
+
+				stream.WriteLine("\t\t/// <summary>");
+				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
+				stream.WriteLine("\t\t/// </summary>");
+				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
+				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, UserAction[] actions) : base (automaton, variables, virtuals, actions, lexer) { }");
 			}
 		}
 	}
