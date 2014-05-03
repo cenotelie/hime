@@ -162,6 +162,8 @@
     <Compile Include="Sources\Output\Emitter.cs" />
     <Compile Include="Sources\Output\Mode.cs" />
     <Compile Include="Sources\Output\Modifier.cs" />
+    <Compile Include="Sources\SDK\DebugSerializer.cs" />
+    <Compile Include="Sources\Utils\ROList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">
@@ -191,5 +193,6 @@
     <Folder Include="Sources\Output\" />
     <Folder Include="Sources\Grammars\Symbols\" />
     <Folder Include="Sources\Grammars\Rules\" />
+    <Folder Include="Sources\Utils\" />
   </ItemGroup>
 </Project>
