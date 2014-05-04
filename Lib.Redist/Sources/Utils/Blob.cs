@@ -26,37 +26,25 @@ namespace Hime.Redist.Utils
 	/// Represents a blob of binary data that can be accessed as an array of items T
 	/// </summary>
 	/// <typeparam name="T">The type of the stored items</typeparam>
-	[StructLayout(LayoutKind.Explicit)]
 	class Blob<T>
 	{
 		/// <summary>
-		/// The backend by storage
-		/// </summary>
-		[FieldOffset(0)]
-		private byte[] blob;
-
-		/// <summary>
 		/// The user data (backed by blob)
 		/// </summary>
-		[FieldOffset(0)]
 		private T[] data;
-
 		/// <summary>
-		/// The number of items in this blob
+		/// The length of the data in bytes
 		/// </summary>
-		[FieldOffset(8)]
-		private int count;
-
-		/// <summary>
-		/// Gets the length of the blob in byte
-		/// </summary>
-		public int Length { get { return blob.Length; } }
+		private int length;
 
 		/// <summary>
 		/// Gets the number of items in this blob
 		/// </summary>
-		public int Count { get { return count; } }
-
+		public int Count { get { return data.Length; } }
+		/// <summary>
+		/// Gets the length of this blob in bytes
+		/// </summary>
+		public int Length { get { return length; } }
 		/// <summary>
 		/// Gets the i-th item in this blob
 		/// </summary>
@@ -68,11 +56,11 @@ namespace Hime.Redist.Utils
 		/// Initializes a new blob
 		/// </summary>
 		/// <param name="count">The number of items to store in this blob</param>
-		/// <param name="size">The size in bytes of an individual item</param>
+		/// <param name="size">The size of the an element in byte</param>
 		public Blob(int count, int size)
 		{
-			this.blob = new byte[count * size];
-			this.count = count;
+			this.data = new T[count];
+			this.length = count * size;
 		}
 
 		/// <summary>
@@ -82,31 +70,37 @@ namespace Hime.Redist.Utils
 		/// <returns><c>true</c> if the operation was successful</returns>
 		public bool LoadFrom(BinaryReader reader)
 		{
-			return ReadBinary(reader, blob, 0, blob.Length);
+			// load the data in a buffer
+			byte[] buffer = Read(reader, length);
+			if (buffer == null)
+				return false;
+			// copy them into the data set
+			GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			System.IntPtr ptr = handle.AddrOfPinnedObject();
+			Marshal.Copy(buffer, 0, ptr, length);
+			handle.Free();
+			return true;
 		}
 
 		/// <summary>
-		/// Reads the binary data from a reader and puts them in a buffer
+		/// Reads the the specified length of data and returns the buffer
 		/// </summary>
 		/// <param name="reader">The reader to read from</param>
-		/// <param name="buffer">The buffer to put the read data in</param>
-		/// <param name="index">Start index in the buffer</param>
 		/// <param name="length">Number of bytes to read</param>
-		/// <returns><c>true</c> if the operation was successful</returns>
-		protected static bool ReadBinary(BinaryReader reader, byte[] buffer, int index, int length)
+		/// <returns>The data in a buffer, or <c>null</c> if the read failed</returns>
+		private static byte[] Read(BinaryReader reader, int length)
 		{
-			int current = index;
-			int count = 0;
-			while (count < length)
+			byte[] buffer = new byte[length]; 
+			int current = 0;
+			while (current < length)
 			{
-				int read = reader.Read(buffer, current, length - count);
+				int read = reader.Read(buffer, current, length - current);
 				// If the end of the input is reached prematurely,
 				if (read == 0)
-					return false;
-				count += read;
+					return null;
 				current += read;
 			}
-			return true;
+			return buffer;
 		}
 	}
 }
