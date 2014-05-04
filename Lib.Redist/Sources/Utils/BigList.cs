@@ -122,32 +122,6 @@ namespace Hime.Redist.Utils
 		}
 
 		/// <summary>
-		/// Copies the values from the given index at the end of the list
-		/// </summary>
-		/// <param name="from">The index to start copy from</param>
-		/// <param name="count">The number of items to copy</param>
-		/// <returns>The index within this list at which the values have been copied to</returns>
-		public int Duplicate(int from, int count)
-		{
-			int start = (chunkIndex << upperShift | cellIndex);
-			if (count <= 0)
-				return start;
-
-			int chunk = from >> upperShift;     // The current chunk to copy from
-			int cell = from & lowerMask;        // The current starting index in the chunk
-			while (cell + count > chunksSize)
-			{
-				DoCopy(chunks[chunk], cell, chunksSize - cell);
-				count -= chunksSize - cell;
-				chunk++;
-				cell = 0;
-			}
-			DoCopy(chunks[chunk], cell, count);
-
-			return start;
-		}
-
-		/// <summary>
 		/// Copies the given values at the end of this list
 		/// </summary>
 		/// <param name="values">The values to add</param>
