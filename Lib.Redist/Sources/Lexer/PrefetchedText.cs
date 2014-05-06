@@ -183,7 +183,15 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the number of lines
 		/// </summary>
-		public int LineCount { get { return line; } }
+		public int LineCount
+		{
+			get
+			{
+				if (lines == null)
+					FindLines();
+				return line;
+			}
+		}
 
 		/// <summary>
 		/// Gets the size in number of characters
@@ -211,6 +219,8 @@ namespace Hime.Redist.Lexer
 		/// <remarks>The line numbering is 1-based</remarks>
 		public int GetLineIndex(int line)
 		{
+			if (lines == null)
+				FindLines();
 			return lines[line - 1];
 		}
 
@@ -222,6 +232,8 @@ namespace Hime.Redist.Lexer
 		/// <remarks>The line numbering is 1-based</remarks>
 		public int GetLineLength(int line)
 		{
+			if (lines == null)
+				FindLines();
 			return (lines[line] - lines[line - 1]);
 		}
 
@@ -253,6 +265,8 @@ namespace Hime.Redist.Lexer
 		/// <param name="index">The index within this content</param>
 		private int FindLineAt(int index)
 		{
+			if (lines == null)
+				FindLines();
 			int start = 0;
 			int end = line - 1;
 			while (true)

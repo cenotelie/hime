@@ -108,8 +108,7 @@ namespace Hime.Redist.Lexer
 		{
 			if (tokenIndex == -1)
 			{
-				// this is the first call to this method, prefetch all the things!
-				text.FindLines();
+				// this is the first call to this method, prefetch the tokens
 				FindTokens();
 				tokenIndex = 0;
 			}
