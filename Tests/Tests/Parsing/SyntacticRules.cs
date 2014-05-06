@@ -32,7 +32,7 @@ namespace Hime.Tests.Parsing
 		/// Tests parsing of empty input
 		/// </summary>
 		[Test]
-		public void Test_Minimal_Empty()
+		public void Test_Minimal_Empty_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"a\";} rules { a->; } }";
@@ -40,10 +40,21 @@ namespace Hime.Tests.Parsing
 		}
 
 		/// <summary>
+		/// Tests parsing of empty input
+		/// </summary>
+		[Test]
+		public void Test_Minimal_Empty_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"a\";} rules { a->; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "", "a");
+		}
+
+		/// <summary>
 		/// Tests parsing of minimal non-empty input
 		/// </summary>
 		[Test]
-		public void Test_Minimal_Single_MatchOne()
+		public void Test_Minimal_Single_MatchOne_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
@@ -51,10 +62,21 @@ namespace Hime.Tests.Parsing
 		}
 
 		/// <summary>
+		/// Tests parsing of minimal non-empty input
+		/// </summary>
+		[Test]
+		public void Test_Minimal_Single_MatchOne_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "a", "e(A='a')");
+		}
+
+		/// <summary>
 		/// Tests parsing fails on empty input when single element was expected
 		/// </summary>
 		[Test]
-		public void Test_Minimal_Single_FailsEmpty()
+		public void Test_Minimal_Single_FailsEmpty_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
@@ -62,10 +84,21 @@ namespace Hime.Tests.Parsing
 		}
 
 		/// <summary>
+		/// Tests parsing fails on empty input when single element was expected
+		/// </summary>
+		[Test]
+		public void Test_Minimal_Single_FailsEmpty_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.RNGLALR1, "");
+		}
+
+		/// <summary>
 		/// Tests parsing fails on wrong input when single element was expected
 		/// </summary>
 		[Test]
-		public void Test_Minimal_Single_FailsWrongInput()
+		public void Test_Minimal_Single_FailsWrongInput_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
@@ -73,127 +106,366 @@ namespace Hime.Tests.Parsing
 		}
 
 		/// <summary>
+		/// Tests parsing fails on wrong input when single element was expected
+		/// </summary>
+		[Test]
+		public void Test_Minimal_Single_FailsWrongInput_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.RNGLALR1, "b");
+		}
+
+		/// <summary>
 		/// Tests parsing with the optional operator on empty input
 		/// </summary>
 		[Test]
-		public void Test_Grammar_OptionalOperator_MatchZero()
+		public void Test_Grammar_OptionalOperator_MatchZero_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
+		/// <summary>
+		/// Tests parsing with the optional operator on empty input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_OptionalOperator_MatchOne()
+		public void Test_Grammar_OptionalOperator_MatchZero_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "", "e");
+		}
+
+		/// <summary>
+		/// Tests parsing with the optional operator with a single input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OptionalOperator_MatchOne_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the optional operator with a single input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_StarOperator_MatchZero()
+		public void Test_Grammar_OptionalOperator_MatchOne_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "a", "e(A)");
+		}
+
+		/// <summary>
+		/// Tests parsing fails with the optional operator with more than one input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OptionalOperator_FailsOnTwo_LR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "aa");
+		}
+
+		/// <summary>
+		/// Tests parsing fails with the optional operator with more than one input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OptionalOperator_FailsOnTwo_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A?; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.RNGLALR1, "aa");
+		}
+
+		/// <summary>
+		/// Tests parsing with the star operator on empty input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_StarOperator_MatchZero_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
+		/// <summary>
+		/// Tests parsing with the star operator on empty input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_StarOperator_MatchOne()
+		public void Test_Grammar_StarOperator_MatchZero_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "", "e");
+		}
+
+		/// <summary>
+		/// Tests parsing with the star operator with a single input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_StarOperator_MatchOne_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the star operator with a single input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_StarOperator_MatchMoreThanOne()
+		public void Test_Grammar_StarOperator_MatchOne_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "a", "e(A)");
+		}
+
+		/// <summary>
+		/// Tests parsing with the star operator with more than one input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_StarOperator_MatchMoreThanOne_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aaa", "e(A A A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the star operator with more than one input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_PlusOperator_FailsOnZeo()
+		public void Test_Grammar_StarOperator_MatchMoreThanOne_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "aaa", "e(A A A)");
+		}
+
+		/// <summary>
+		/// Tests parsing fails with the plus operator on empty input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_PlusOperator_FailsOnZeo_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
 			ParsingFails(grammar, "Test", ParsingMethod.LALR1, "");
 		}
 
+		/// <summary>
+		/// Tests parsing fails with the plus operator on empty input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_PlusOperator_MatchOne()
+		public void Test_Grammar_PlusOperator_FailsOnZeo_RNGLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
+			ParsingFails(grammar, "Test", ParsingMethod.RNGLALR1, "");
+		}
+
+		/// <summary>
+		/// Tests parsing with the plus operator with a single input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_PlusOperator_MatchOne_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the plus operator with a single input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_PlusOperator_MatchMoreThanOne()
+		public void Test_Grammar_PlusOperator_MatchOne_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "a", "e(A)");
+		}
+
+		/// <summary>
+		/// Tests parsing with the plus operator with more than one input
+		/// </summary>
+		[Test]
+		public void Test_Grammar_PlusOperator_MatchMoreThanOne_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aaa", "e(A A A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the plus operator with more than one input
+		/// </summary>
 		[Test]
-		public void Test_Grammar_UnionOperator_Left()
+		public void Test_Grammar_PlusOperator_MatchMoreThanOne_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a';} rules { e->A+; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "aaa", "e(A A A)");
+		}
+
+		/// <summary>
+		/// Tests parsing with the union operator, left side
+		/// </summary>
+		[Test]
+		public void Test_Grammar_UnionOperator_Left_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the union operator, left side
+		/// </summary>
 		[Test]
-		public void Test_Grammar_UnionOperator_Right()
+		public void Test_Grammar_UnionOperator_Left_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "a", "e(A)");
+		}
+
+		/// <summary>
+		/// Tests parsing with the union operator, right side
+		/// </summary>
+		[Test]
+		public void Test_Grammar_UnionOperator_Right_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(B)");
 		}
 
+		/// <summary>
+		/// Tests parsing with the union operator, right side
+		/// </summary>
 		[Test]
-		public void Test_Grammar_OperatorComposition0()
+		public void Test_Grammar_UnionOperator_Right_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->A|B; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "b", "e(B)");
+		}
+
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OperatorComposition0_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "", "e");
 		}
 
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
 		[Test]
-		public void Test_Grammar_OperatorComposition1()
+		public void Test_Grammar_OperatorComposition0_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "", "e");
+		}
+
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OperatorComposition1_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "a", "e(A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
 		[Test]
-		public void Test_Grammar_OperatorComposition2()
+		public void Test_Grammar_OperatorComposition1_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "a", "e(A)");
+		}
+
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OperatorComposition2_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "b", "e(B)");
 		}
 
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
 		[Test]
-		public void Test_Grammar_OperatorComposition3()
+		public void Test_Grammar_OperatorComposition2_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "b", "e(B)");
+		}
+
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OperatorComposition3_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "aba", "e(A B A)");
 		}
 
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
 		[Test]
-		public void Test_Grammar_OperatorComposition4()
+		public void Test_Grammar_OperatorComposition3_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "aba", "e(A B A)");
+		}
+
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OperatorComposition4_LR()
 		{
 			SetTestDirectory();
 			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
 			ParsingMatches(grammar, "Test", ParsingMethod.LALR1, "bab", "e(B A B)");
 		}
 
+		/// <summary>
+		/// Tests parsing with composed operators
+		/// </summary>
+		[Test]
+		public void Test_Grammar_OperatorComposition4_GLR()
+		{
+			SetTestDirectory();
+			string grammar = "grammar Test { options {Axiom=\"e\";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }";
+			ParsingMatches(grammar, "Test", ParsingMethod.RNGLALR1, "bab", "e(B A B)");
+		}
 	}
 }
