@@ -88,7 +88,7 @@ namespace Hime.CentralDogma.SDK
 			object lexer = lexerCtor.Invoke(new object[] { input });
 			object parser = parserCtor.Invoke(new object[] { lexer });
 
-			this.terminals = (lexer as Hime.Redist.Lexer.Lexer).Terminals;
+			this.terminals = (lexer as Hime.Redist.Lexer.ILexer).Terminals;
 			this.variables = (parser as Hime.Redist.Parsers.IParser).Variables;
 			this.virtuals = (parser as Hime.Redist.Parsers.IParser).Virtuals;
 			this.automaton = new Automata.LRAutomaton();

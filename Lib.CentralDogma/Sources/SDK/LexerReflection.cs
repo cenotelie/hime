@@ -97,7 +97,7 @@ namespace Hime.CentralDogma.SDK
 		{
 			string input = "";
 			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
-			Hime.Redist.Lexer.Lexer lexer = ctor.Invoke(new object[] { input }) as Hime.Redist.Lexer.Lexer;
+			Hime.Redist.Lexer.ILexer lexer = ctor.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
 
 			this.terminals = lexer.Terminals;
 			this.dfa = new Automata.DFA();

@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Hime.Redist.Lexer
@@ -29,7 +30,7 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	class Content : Text
+	class StreamedText : TokenizedInput
 	{
 		/// <summary>
 		/// The initiaal size of the cache of line start indices
@@ -82,17 +83,18 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the number of lines
 		/// </summary>
-		public int LineCount { get { return line + 1; } }
+		public override int LineCount { get { return line + 1; } }
 
 		/// <summary>
 		/// Gets the size in number of characters
 		/// </summary>
-		public int Size { get { return size; } }
+		public override int Size { get { return size; } }
 
 		/// <summary>
-		/// Initializes the storage
+		/// Initializes this text
 		/// </summary>
-		public Content()
+		/// <param name="terminals">The terminal symbols</param>
+		public StreamedText(IList<Symbol> terminals) : base(terminals)
 		{
 			this.chunks = new char[chunksSize][];
 			this.chunkIndex = 0;
@@ -107,7 +109,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="index">Index of the substring from the start</param>
 		/// <param name="length">Length of the substring</param>
 		/// <returns>The substring</returns>
-		public string GetValue(int index, int length)
+		public override string GetValue(int index, int length)
 		{
 			if (length == 0)
 				return "";
@@ -145,7 +147,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="line">The line number</param>
 		/// <returns>The starting index of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		public int GetLineIndex(int line)
+		public override int GetLineIndex(int line)
 		{
 			return lines[line - 1];
 		}
@@ -156,7 +158,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="line">The line number</param>
 		/// <returns>The length of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		public int GetLineLength(int line)
+		public override int GetLineLength(int line)
 		{
 			if (this.line == line - 1)
 				return (size - lines[line - 1]);
@@ -169,7 +171,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="line">The line number</param>
 		/// <returns>The string content of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		public string GetLineContent(int line)
+		public override string GetLineContent(int line)
 		{
 			return GetValue(GetLineIndex(line), GetLineLength(line));
 		}
@@ -179,7 +181,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="index">Index from the start</param>
 		/// <returns>The position (line and column) at the index</returns>
-		public TextPosition GetPositionAt(int index)
+		public override TextPosition GetPositionAt(int index)
 		{
 			int l = FindLineAt(index);
 			return new TextPosition(l + 1, index - lines[l] + 1);

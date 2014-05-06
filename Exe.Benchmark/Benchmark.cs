@@ -46,13 +46,13 @@ namespace Hime.Benchmark
 			this.input = "Perf.gram";
 			this.output = "result.txt";
 			this.sampleFactor = 600;
-			this.expCount = 5;
+			this.expCount = 20;
 			this.rebuildInput = true;
 			this.rebuildParsers = true;
 			this.doStats = false;
 			this.doLexer = true;
-			this.doParserLALR = true;
-			this.doParserRNGLR = true;
+			this.doParserLALR = false;
+			this.doParserRNGLR = false;
 		}
 
 		public void Run()
@@ -142,7 +142,7 @@ namespace Hime.Benchmark
 		private void OutputInputStats(Assembly assembly)
 		{
 			System.IO.StreamReader reader = new System.IO.StreamReader(input);
-			Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
+			Hime.Redist.Lexer.ILexer lexer = GetLexer(assembly, reader);
 			Hime.Redist.Token token = lexer.GetNextToken();
 			int count = 0;
 			while (token.SymbolID != 1)
@@ -156,17 +156,17 @@ namespace Hime.Benchmark
 			Console.WriteLine("-- tokens: " + count);
 		}
 
-		private Hime.Redist.Lexer.Lexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
+		private Hime.Redist.Lexer.ILexer GetLexer(Assembly assembly, System.IO.StreamReader reader)
 		{
 			Type lexerType = assembly.GetType("Hime.Benchmark.Generated.HimeGrammarLexer");
 			ConstructorInfo lexerConstructor = lexerType.GetConstructor(new Type[] { typeof(System.IO.TextReader) });
 			object lexer = lexerConstructor.Invoke(new object[] { reader });
-			return lexer as Hime.Redist.Lexer.Lexer;
+			return lexer as Hime.Redist.Lexer.ILexer;
 		}
 
 		private Hime.Redist.Parsers.BaseLRParser GetParser(Assembly assembly, System.IO.StreamReader reader)
 		{
-			Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
+			Hime.Redist.Lexer.ILexer lexer = GetLexer(assembly, reader);
 			Type lexerType = assembly.GetType("Hime.Benchmark.Generated.HimeGrammarLexer");
 			Type parserType = assembly.GetType("Hime.Benchmark.Generated.HimeGrammarParser");
 			ConstructorInfo parserConstructor = parserType.GetConstructor(new Type[] { lexerType });
@@ -177,7 +177,7 @@ namespace Hime.Benchmark
 		private void BenchmarkLexer(Assembly assembly, int index)
 		{
 			System.IO.StreamReader reader = new System.IO.StreamReader(input);
-			Hime.Redist.Lexer.Lexer lexer = GetLexer(assembly, reader);
+			Hime.Redist.Lexer.ILexer lexer = GetLexer(assembly, reader);
 			System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
 			watch.Start();
 			Hime.Redist.Token token = lexer.GetNextToken();

@@ -12,7 +12,7 @@ namespace Hime.CentralDogma.Input
 	/// <summary>
 	/// Represents a lexer
 	/// </summary>
-	internal class HimeGrammarLexer : Lexer
+	internal class HimeGrammarLexer : StreamedLexer
 	{
 		/// <summary>
 		/// The automaton for this lexer

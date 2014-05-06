@@ -24,57 +24,34 @@ using System.IO;
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Handler for lexical errors
-	/// </summary>
-	/// <param name="error">The new error</param>
-	internal delegate void AddLexicalError(Error error);
-
-
-	/// <summary>
 	/// Represents a lexer for a text stream
 	/// </summary>
-	public abstract class Lexer
+	public abstract class StreamedLexer : ILexer
 	{
-		/// <summary>
-		/// Symbol ID of the Epsilon terminal
-		/// </summary>
-		public const int sidEpsilon = 1;
-
-		/// <summary>
-		/// Symbol ID of the Dollar terminal
-		/// </summary>
-		public const int sidDollar = 2;
-
 		/// <summary>
 		/// This lexer's automaton
 		/// </summary>
 		private Automaton lexAutomaton;
-
 		/// <summary>
 		/// The terminals matched by this lexer
 		/// </summary>
 		private IList<Symbol> terminals;
-
 		/// <summary>
 		/// Symbol ID of the SEPARATOR terminal
 		/// </summary>
 		private int lexSeparator;
-
 		/// <summary>
 		/// This lexer's input
 		/// </summary>
 		private RewindableReader input;
-
 		/// <summary>
 		/// The tokenized text
 		/// </summary>
-		private TokenizedContent text;
-
+		private StreamedText text;
 		/// <summary>
 		/// Flags whether the input's end has been reached and the Dollar token emited
 		/// </summary>
 		private bool isDollatEmited;
-
 		/// <summary>
 		/// The current index in the input
 		/// </summary>
@@ -84,16 +61,14 @@ namespace Hime.Redist.Lexer
 		/// Gets the terminals matched by this lexer
 		/// </summary>
 		public IList<Symbol> Terminals { get { return terminals; } }
-
 		/// <summary>
 		/// Gets the lexer's output as a tokenized text
 		/// </summary>
 		public TokenizedText Output { get { return text; } }
-
 		/// <summary>
 		/// Events for lexical errors
 		/// </summary>
-		internal event AddLexicalError OnError;
+		public event AddLexicalError OnError;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -102,14 +77,26 @@ namespace Hime.Redist.Lexer
 		/// <param name="terminals">Terminals recognized by this lexer</param>
 		/// <param name="separator">SID of the separator token</param>
 		/// <param name="input">Input to this lexer</param>
-		protected Lexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
+		protected StreamedLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 		{
 			this.lexAutomaton = automaton;
 			this.terminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
 			this.lexSeparator = separator;
-			this.text = new TokenizedContent(this.terminals);
+			this.text = new StreamedText(this.terminals);
 			this.input = new RewindableReader(input, text);
 			this.isDollatEmited = false;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the Lexer class with the given input
+		/// </summary>
+		/// <param name="automaton">DFA automaton for this lexer</param>
+		/// <param name="terminals">Terminals recognized by this lexer</param>
+		/// <param name="separator">SID of the separator token</param>
+		/// <param name="input">Input to this lexer</param>
+		protected StreamedLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
+			: this(automaton, terminals, separator, new StringReader(input))
+		{
 		}
 
 		/// <summary>
@@ -119,7 +106,7 @@ namespace Hime.Redist.Lexer
 		public Token GetNextToken()
 		{
 			if (isDollatEmited)
-				return new Token(sidEpsilon, 0);
+				return new Token(Symbol.sidEpsilon, 0);
 
 			while (true)
 			{

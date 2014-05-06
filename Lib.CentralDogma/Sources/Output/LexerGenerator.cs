@@ -79,7 +79,7 @@ namespace Hime.CentralDogma.Output
 			stream.WriteLine("\t/// <summary>");
 			stream.WriteLine("\t/// Represents a lexer");
 			stream.WriteLine("\t/// </summary>");
-			stream.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Lexer : Lexer");
+			stream.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Lexer : PrefetchedLexer");
 			stream.WriteLine("\t{");
 
 			stream.WriteLine("\t\t/// <summary>");
@@ -130,7 +130,7 @@ namespace Hime.CentralDogma.Output
 			stream.WriteLine("\t\t/// Initializes a new instance of the lexer");
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\t/// <param name=\"input\">The lexer's input</param>");
-			stream.WriteLine("\t\tpublic " + name + "Lexer(string input) : base(automaton, terminals, 0x" + sep + ", new System.IO.StringReader(input)) {}");
+			stream.WriteLine("\t\tpublic " + name + "Lexer(string input) : base(automaton, terminals, 0x" + sep + ", input) {}");
 
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Initializes a new instance of the lexer");

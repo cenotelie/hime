@@ -34,7 +34,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The input lexer to read token from
 		/// </summary>
-		private Lexer.Lexer lexer;
+		private Lexer.ILexer lexer;
 
 		/// <summary>
 		/// The ring buffer
@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
 		/// Initializes the rewindable stream with the given lexer
 		/// </summary>
 		/// <param name="lexer">The encapsulated lexer</param>
-		public RewindableTokenStream(Lexer.Lexer lexer)
+		public RewindableTokenStream(Lexer.ILexer lexer)
 		{
 			this.lexer = lexer;
 			this.ring = new Token[ringSize];

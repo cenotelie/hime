@@ -125,7 +125,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The parser's virtuals</param>
 		/// <param name="actions">The parser's actions</param>
 		/// <param name="lexer">The input lexer</param>
-		public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.Lexer lexer)
+		public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.ILexer lexer)
             : base(variables, virtuals, actions, lexer)
 		{
 			this.parserAutomaton = automaton;
@@ -326,7 +326,7 @@ namespace Hime.Redist.Parsers
 					reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), sppf.Epsilon));
 			}
 
-			while (nextToken.SymbolID != Lexer.Lexer.sidEpsilon) // Wait for ε token
+			while (nextToken.SymbolID != Symbol.sidEpsilon) // Wait for ε token
 			{
 				Reducer(Ui);
 				Token oldtoken = nextToken;

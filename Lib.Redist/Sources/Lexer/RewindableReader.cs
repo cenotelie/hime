@@ -71,7 +71,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The text content read so fat
 		/// </summary>
-		private Content content;
+		private StreamedText content;
 
 		/// <summary>
 		/// The previous buffer
@@ -108,7 +108,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="reader">The text reader to encapsulate</param>
 		/// <param name="content">The container that will store all read text</param>
-		public RewindableReader(TextReader reader, Content content)
+		public RewindableReader(TextReader reader, StreamedText content)
 		{
 			this.reader = reader;
 			this.content = content;
@@ -129,8 +129,8 @@ namespace Hime.Redist.Lexer
 				nextLength = bufferLength;
 				// Reset the previous buffer as the current buffer
 				buffer = previous;
-				bufferStart += Content.chunksSize;
-				bufferLength = Content.chunksSize;
+				bufferStart += StreamedText.chunksSize;
+				bufferLength = StreamedText.chunksSize;
 			}
 		}
 
@@ -161,8 +161,8 @@ namespace Hime.Redist.Lexer
 			else
 			{
 				// Read the next buffer from the input
-				buffer = new char[Content.chunksSize];
-				bufferLength = reader.Read(buffer, 0, Content.chunksSize);
+				buffer = new char[StreamedText.chunksSize];
+				bufferLength = reader.Read(buffer, 0, StreamedText.chunksSize);
 				if (bufferLength != 0)
 					content.Append(buffer, bufferLength);
 			}
@@ -195,8 +195,8 @@ namespace Hime.Redist.Lexer
 			else
 			{
 				// Read the next buffer from the input
-				buffer = new char[Content.chunksSize];
-				bufferLength = reader.Read(buffer, 0, Content.chunksSize);
+				buffer = new char[StreamedText.chunksSize];
+				bufferLength = reader.Read(buffer, 0, StreamedText.chunksSize);
 				if (bufferLength != 0)
 				{
 					content.Append(buffer, bufferLength);

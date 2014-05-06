@@ -60,7 +60,6 @@
     <Compile Include="Sources\AST.cs" />
     <Compile Include="Sources\Lexer\TextBuffer.cs" />
     <Compile Include="Sources\Token.cs" />
-    <Compile Include="Sources\Lexer\TokenizedContent.cs" />
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
     <Compile Include="Sources\ParseResult.cs" />
@@ -69,7 +68,6 @@
     <Compile Include="Sources\Semantics.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
-    <Compile Include="Sources\Lexer\Content.cs" />
     <Compile Include="Sources\TextPosition.cs" />
     <Compile Include="Sources\ASTFamily.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkASTBuilder.cs" />
@@ -89,7 +87,6 @@
     <Compile Include="Sources\Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRProduction.cs" />
     <Compile Include="Sources\Lexer\RewindableReader.cs" />
-    <Compile Include="Sources\Lexer\Lexer.cs" />
     <Compile Include="Sources\Lexer\Automaton.cs" />
     <Compile Include="Sources\UnexpectedCharError.cs" />
     <Compile Include="Sources\Error.cs" />
@@ -108,6 +105,12 @@
     <Compile Include="Sources\Parsers\LR\LROpCodeBase.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSLabel.cs" />
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
+    <Compile Include="Sources\Lexer\ILexer.cs" />
+    <Compile Include="Sources\Lexer\PrefetchedText.cs" />
+    <Compile Include="Sources\Lexer\PrefetchedLexer.cs" />
+    <Compile Include="Sources\Lexer\StreamedLexer.cs" />
+    <Compile Include="Sources\Lexer\StreamedText.cs" />
+    <Compile Include="Sources\Lexer\TokenizedInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

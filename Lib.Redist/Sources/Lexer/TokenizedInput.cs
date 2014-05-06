@@ -24,7 +24,7 @@ namespace Hime.Redist.Lexer
 	/// <summary>
 	/// Represents the output of a lexer as a tokenized text
 	/// </summary>
-	class TokenizedContent : Content, TokenizedText
+	abstract class TokenizedInput : TokenizedText
 	{
 		/// <summary>
 		/// Represents the metadata of a token
@@ -64,7 +64,6 @@ namespace Hime.Redist.Lexer
 		/// The terminal symbols matched in this content
 		/// </summary>
 		private IList<Symbol> terminals;
-
 		/// <summary>
 		/// The token data in this content
 		/// </summary>
@@ -74,12 +73,14 @@ namespace Hime.Redist.Lexer
 		/// Initializes this text
 		/// </summary>
 		/// <param name="terminals">The terminal symbols</param>
-		public TokenizedContent(IList<Symbol> terminals)
+		public TokenizedInput(IList<Symbol> terminals)
 		{
 			this.terminals = terminals;
 			this.cells = new Utils.BigList<Cell>();
 		}
 
+
+		#region Internal API
 		/// <summary>
 		/// Adds a detected token in this text
 		/// </summary>
@@ -92,7 +93,20 @@ namespace Hime.Redist.Lexer
 			return new Token(terminals[terminal].ID, cells.Add(new Cell(terminal, start, length)));
 		}
 
-        #region Implementation of IEnumerable
+		/// <summary>
+		/// Gets the token at the specified index
+		/// </summary>
+		/// <param name="index">A token's index</param>
+		/// <returns>The token at the specified index</returns>
+		public Token GetTokenAt(int index)
+		{
+			Cell cell = cells[index];
+			return new Token(terminals[cell.terminal].ID, index);
+		}
+		#endregion
+
+
+		#region Implementation of IEnumerable
 		/// <summary>
 		/// Gets an enumerator of the contained tokens
 		/// </summary>
@@ -116,10 +130,10 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		private class SymbolEnumerator : IEnumerator<Symbol>
 		{
-			private TokenizedContent text;
+			private TokenizedInput text;
 			private int index;
 
-			public SymbolEnumerator(TokenizedContent text)
+			public SymbolEnumerator(TokenizedInput text)
 			{
 				this.text = text;
 				this.index = -1;
@@ -145,9 +159,62 @@ namespace Hime.Redist.Lexer
 				text = null;
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Implementation of TokenizedText
+
+		#region Implementation of TokenizedText
+		/// <summary>
+		/// Gets the number of lines
+		/// </summary>
+		public abstract int LineCount { get; }
+
+		/// <summary>
+		/// Gets the size in number of characters
+		/// </summary>
+		public abstract int Size { get; }
+
+		/// <summary>
+		/// Gets the substring beginning at the given index with the given length
+		/// </summary>
+		/// <param name="index">Index of the substring from the start</param>
+		/// <param name="length">Length of the substring</param>
+		/// <returns>The substring</returns>
+		public abstract string GetValue(int index, int length);
+
+		/// <summary>
+		/// Gets the starting index of the i-th line
+		/// </summary>
+		/// <param name="line">The line number</param>
+		/// <returns>The starting index of the line</returns>
+		/// <remarks>The line numbering is 1-based</remarks>
+		public abstract int GetLineIndex(int line);
+
+		/// <summary>
+		/// Gets the length of the i-th line
+		/// </summary>
+		/// <param name="line">The line number</param>
+		/// <returns>The length of the line</returns>
+		/// <remarks>The line numbering is 1-based</remarks>
+		public abstract int GetLineLength(int line);
+
+		/// <summary>
+		/// Gets the string content of the i-th line
+		/// </summary>
+		/// <param name="line">The line number</param>
+		/// <returns>The string content of the line</returns>
+		/// <remarks>The line numbering is 1-based</remarks>
+		public abstract string GetLineContent(int line);
+
+		/// <summary>
+		/// Gets the position at the given index
+		/// </summary>
+		/// <param name="index">Index from the start</param>
+		/// <returns>The position (line and column) at the index</returns>
+		public abstract TextPosition GetPositionAt(int index);
+		#endregion
+
+
+		#region Implementation of TokenizedText
 		/// <summary>
 		/// Gets the number of tokens in this text
 		/// </summary>
@@ -191,6 +258,6 @@ namespace Hime.Redist.Lexer
 			Cell cell = cells[tokenIndex];
 			return GetPositionAt(cell.start);
 		}
-        #endregion
+		#endregion
 	}
 }
