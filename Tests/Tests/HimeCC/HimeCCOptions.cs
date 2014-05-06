@@ -107,6 +107,10 @@ namespace Hime.Tests.HimeCC
 			Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram failed to produce MathExpLexer.bin");
 			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram failed to produce MathExpParser.cs");
 			Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram failed to produce MathExpParser.bin");
+			Assert.IsFalse(CheckFileExists("MathExpGrammar.txt"), "himecc MathExp.gram produced MathExpGrammar.txt, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpDFA.dot"), "himecc MathExp.gram produced MathExpDFA.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram produced MathExpLRGraph.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram produced MathExpLRGraph.txt, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram produced MathExp.dll, shouldn't have");
 		}
 
@@ -124,6 +128,10 @@ namespace Hime.Tests.HimeCC
 			Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -o:assembly failed to produce MathExpLexer.bin");
 			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram -o:assembly failed to produce MathExpParser.cs");
 			Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -o:assembly failed to produce MathExpParser.bin");
+			Assert.IsFalse(CheckFileExists("MathExpGrammar.txt"), "himecc MathExp.gram -o:assembly produced MathExpGrammar.txt, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpDFA.dot"), "himecc MathExp.gram -o:assembly produced MathExpDFA.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram -o:assembly produced MathExpLRGraph.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram -o:assembly produced MathExpLRGraph.txt, shouldn't have");
 			Assert.IsTrue(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -o:assembly failed to produce MathExp.dll");
 		}
 
@@ -141,7 +149,32 @@ namespace Hime.Tests.HimeCC
 			Assert.IsFalse(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -o:nosources produced MathExpLexer.bin, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram -o:nosources produced MathExpParser.cs, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -o:nosources produced MathExpParser.bin, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpGrammar.txt"), "himecc MathExp.gram -o:nosources produced MathExpGrammar.txt, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpDFA.dot"), "himecc MathExp.gram -o:nosources produced MathExpDFA.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram -o:nosources produced MathExpLRGraph.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram -o:nosources produced MathExpLRGraph.txt, shouldn't have");
 			Assert.IsTrue(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -o:nosources failed to produce MathExp.dll");
+		}
+
+		/// <summary>
+		/// Tests the output of himecc whith the debug output mode
+		/// </summary>
+		[Test]
+		public void Test_OutputModeDebug()
+		{
+			SetTestDirectory();
+			ExportResource("MathExp.gram", "MathExp.gram");
+			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -o:debug" });
+			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram did not return OK (0), returned " + result);
+			Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "himecc MathExp.gram -o:debug failed to produce MathExpLexer.cs");
+			Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -o:debug failed to produce MathExpLexer.bin");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram -o:debug failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -o:debug failed to produce MathExpParser.bin");
+			Assert.IsTrue(CheckFileExists("MathExpGrammar.txt"), "himecc MathExp.gram -o:debug failed to produce MathExpGrammar.txt");
+			Assert.IsTrue(CheckFileExists("MathExpDFA.dot"), "himecc MathExp.gram -o:debug failed to produce MathExpDFA.dot");
+			Assert.IsTrue(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram -o:debug failed to produce MathExpLRGraph.dot");
+			Assert.IsTrue(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram -o:debug failed to produce MathExpLRGraph.txt");
+			Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram produced MathExp.dll, shouldn't have");
 		}
 
 		/// <summary>
