@@ -12,7 +12,7 @@ namespace Hime.HimeCC.CL
 	/// <summary>
 	/// Represents a lexer
 	/// </summary>
-	internal class CommandLineLexer : StreamedLexer
+	internal class CommandLineLexer : PrefetchedLexer
 	{
 		/// <summary>
 		/// The automaton for this lexer
