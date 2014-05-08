@@ -17,57 +17,76 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Runtime.InteropServices;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
 	/// Represents a label on a GSS edge
 	/// </summary>
+	/// <remarks>
+	/// The data in this structure can have two interpretations:
+	/// 1) It can represent a sub-tree with a replaceable root.
+	/// 2) It can represent a reference to a single node in a SPPF.
+	/// </remarks>
 	struct GSSLabel
 	{
 		/// <summary>
-		/// The associated sub-tree
+		/// A sub-tree with a replaceable root
 		/// </summary>
 		private SubTree tree;
 		/// <summary>
-		/// The original symbol of the sub-tree's root
+		/// The original symbol of the SPPF node
 		/// </summary>
 		private SymbolRef original;
-
 		/// <summary>
-		/// Gets a value indicating whether this instance is epsilon
+		/// The index of the SPPF node
 		/// </summary>
-		public bool IsEpsilon { get { return (tree == null); } }
+		private int nodeIndex;
 
 		/// <summary>
-		/// Gets the tree associated with this label
+		/// Gets the sub-tree with a repleaceable root
 		/// </summary>
-		public SubTree Tree { get { return tree; } }
-
+		public SubTree ReplaceableTree { get { return tree; } }
 		/// <summary>
-		/// Gets the original symbol of the sub-tree's root
+		/// Gets the original symbol of the SPPF node
 		/// </summary>
 		public SymbolRef Original { get { return original; } }
+		/// <summary>
+		/// Gets the index of the SPPF node
+		/// </summary>
+		public int NodeIndex { get { return nodeIndex; } }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Hime.Redist.Parsers.GSSLabel"/> struct.
+		/// Wether this label is an epsilon label
 		/// </summary>
-		/// <param name="st">The associated sub-tree</param>
-		public GSSLabel(SubTree st)
+		public bool IsEpsilon { get { return (tree == null && nodeIndex == -1); } }
+		/// <summary>
+		/// Whether this label represents a sub-tree with a replaceable root
+		/// </summary>
+		public bool IsReplaceable { get { return (tree != null); } }
+
+		/// <summary>
+		/// Initializes this label as representing a sub-tree with a replaceable root
+		/// </summary>
+		/// <param name="tree">The sub-tree with a replaceable root</param>
+		public GSSLabel(SubTree tree)
 		{
-			this.tree = st;
-			this.original = st.GetLabelAt(0);
+			this.tree = tree;
+			this.original = new SymbolRef();
+			this.nodeIndex = -1;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Hime.Redist.Parsers.GSSLabel"/> struct.
+		/// Initializes this label as representing a single SPPF node
 		/// </summary>
-		/// <param name="st">The associated sub-tree</param>
-		/// <param name="original">The original symbol of this sub-tree's root</param>
-		public GSSLabel(SubTree st, SymbolRef original)
+		/// <param name="original">The original symbol of the SPPF node</param>
+		/// <param name="index">The index of the SPPF node</param>
+		public GSSLabel(SymbolRef original, int index)
 		{
-			this.tree = st;
+			this.tree = null;
 			this.original = original;
+			this.nodeIndex = index;
 		}
 	}
 }

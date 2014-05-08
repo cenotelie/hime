@@ -26,6 +26,10 @@ namespace Hime.Redist
 	enum SymbolType : byte
 	{
 		/// <summary>
+		/// Marks as other
+		/// </summary>
+		None = 0,
+		/// <summary>
 		/// Marks a token symbol
 		/// </summary>
 		Token = 1,
@@ -36,11 +40,6 @@ namespace Hime.Redist
 		/// <summary>
 		/// Marks a virtual symbol
 		/// </summary>
-		Virtual = 3,
-		/// <summary>
-		/// Marks a semantic action symbol
-		/// </summary>
-		Semantic = 4
+		Virtual = 3
 	}
 }
-

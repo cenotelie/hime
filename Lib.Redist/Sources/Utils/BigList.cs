@@ -86,7 +86,8 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		/// <param name="index">Index of an item</param>
 		/// <returns>The value of the item at the given index</returns>
-		public T this[int index] {
+		public T this[int index]
+		{
 			get { return chunks[index >> upperShift][index & lowerMask]; }
 			set { chunks[index >> upperShift][index & lowerMask] = value; }
 		}
@@ -118,6 +119,30 @@ namespace Hime.Redist.Utils
 			int start = (chunkIndex << upperShift | cellIndex);
 			if (length > 0)
 				DoCopy(values, index, length);
+			return start;
+		}
+
+		/// <summary>
+		/// Copies the values from the given index at the end of the list
+		/// </summary>
+		/// <param name="from">The index to start copy from</param>
+		/// <param name="count">The number of items to copy</param>
+		/// <returns>The index within this list at which the values have been copied to</returns>
+		public int Duplicate(int from, int count)
+		{
+			int start = (chunkIndex << upperShift | cellIndex);
+			if (count <= 0)
+				return start;
+			int chunk = from >> upperShift;     // The current chunk to copy from
+			int cell = from & lowerMask;        // The current starting index in the chunk
+			while (cell + count > chunksSize)
+			{
+				DoCopy(chunks[chunk], cell, chunksSize - cell);
+				count -= chunksSize - cell;
+				chunk++;
+				cell = 0;
+			}
+			DoCopy(chunks[chunk], cell, count);
 			return start;
 		}
 

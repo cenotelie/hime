@@ -124,6 +124,19 @@ namespace Hime.Redist.Parsers
 			this.actions = new TreeAction[capacity];
 		}
 
+		public SubTree Clone()
+		{
+			SubTree result = null;
+			if (this.pool != null)
+				result = this.pool.Acquire();
+			else
+				result = new SubTree(null, this.nodes.Length);
+			int size = GetSize();
+			Array.Copy(this.nodes, result.nodes, size);
+			Array.Copy(this.actions, result.actions, size);
+			return result;
+		}
+
 		/// <summary>
 		/// Initializes the root of this sub-tree
 		/// </summary>

@@ -23,111 +23,45 @@ using System.Collections.Generic;
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
-	/// Represents a simple AST with a tree structure
+	/// Represents an AST using a graph structure
 	/// </summary>
-	/// <remarks>
-	/// The nodes are stored in sequentials arrays where the children of a node are an inner sequence.
-	/// The linkage is represented by each node storing its number of children and the index of its first child.
-	/// </remarks>
-	class SimpleAST : AST
+	class GraphAST : AST
 	{
-		/// <summary>
-		/// Represents a node in this AST
-		/// </summary>
-		public struct Node
-		{
-			/// <summary>
-			/// The node's symbol reference
-			/// </summary>
-			public SymbolRef symbol;
-
-			/// <summary>
-			/// The number of children
-			/// </summary>
-			public int count;
-
-			/// <summary>
-			/// The index of the first child
-			/// </summary>
-			public int first;
-
-			/// <summary>
-			/// Initializes this node
-			/// </summary>
-			/// <param name="symbol">The node's symbol</param>
-			public Node(SymbolRef symbol)
-			{
-				this.symbol = symbol;
-				this.count = 0;
-				this.first = -1;
-			}
-
-			/// <summary>
-			/// Initializes this node
-			/// </summary>
-			/// <param name="symbol">The node's symbol</param>
-			/// <param name="count">The number of children</param>
-			public Node(SymbolRef symbol, int count)
-			{
-				this.symbol = symbol;
-				this.count = 0;
-				this.first = -1;
-			}
-
-			/// <summary>
-			/// Initializes this node
-			/// </summary>
-			/// <param name="symbol">The node's symbol</param>
-			/// <param name="count">The number of children</param>
-			public Node(SymbolRef symbol, int count, int first)
-			{
-				this.symbol = symbol;
-				this.count = 0;
-				this.first = first;
-			}
-		}
-
 		/// <summary>
 		/// The table of tokens
 		/// </summary>
-		protected TokenizedText tableTokens;
-
+		private TokenizedText tableTokens;
 		/// <summary>
 		/// The table of variables
 		/// </summary>
-		protected IList<Symbol> tableVariables;
-
+		private IList<Symbol> tableVariables;
 		/// <summary>
 		/// The table of virtuals
 		/// </summary>
-		protected IList<Symbol> tableVirtuals;
-
+		private IList<Symbol> tableVirtuals;
 		/// <summary>
 		/// The nodes' labels
 		/// </summary>
-		protected Utils.BigList<Node> nodes;
-
+		private Utils.BigList<SimpleAST.Node> nodes;
 		/// <summary>
-		/// The number of nodes stored in this tree
+		/// The adjacency table
 		/// </summary>
-		protected int size;
-
+		private Utils.BigList<int> adjacency;
 		/// <summary>
 		/// The index of the tree's root node
 		/// </summary>
-		protected int root;
+		private int root;
 
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
-		public SimpleAST(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public GraphAST(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.tableTokens = text;
 			this.tableVariables = variables;
 			this.tableVirtuals = virtuals;
-
-			this.nodes = new Utils.BigList<Node>();
-			this.size = 0;
+			this.nodes = new Utils.BigList<SimpleAST.Node>();
+			this.adjacency = new Utils.BigList<int>();
 			this.root = -1;
 		}
 
@@ -164,7 +98,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The i-th child</returns>
 		public ASTNode GetChild(int parent, int i)
 		{
-			return new ASTNode(this, nodes[parent].first + i);
+			return new ASTNode(this, adjacency[nodes[parent].first + i]);
 		}
 
 		/// <summary>
@@ -190,30 +124,58 @@ namespace Hime.Redist.Parsers
 			return new TextPosition(0, 0);
 		}
 
-		/// <summary>
-		/// Stores some children nodes in this AST
-		/// </summary>
-		/// <param name="nodes">The nodes to store</param>
-		/// <param name="index">The starting index of the nodes in the data to store</param>
-		/// <param name="count">The number of nodes to store</param>
-		/// <returns>The index of the first inserted node in this tree</returns>
-		public int Store(Node[] nodes, int index, int count)
+		#region Internal API
+		public int Store(SymbolRef symbol)
 		{
-			int result = size;
-			this.nodes.Add(nodes, index, count);
-			size += count;
+			return nodes.Add(new SimpleAST.Node(symbol));
+		}
+
+		public int Store(SymbolRef symbol, int first, int count)
+		{
+			return nodes.Add(new SimpleAST.Node(symbol, first, count));
+		}
+
+		public int Store(int[] adjacents, int count)
+		{
+			return adjacency.Add(adjacents, 0, count);
+		}
+
+		public int CopyNode(int node)
+		{
+			int result = nodes.Add(nodes[node]);
+			SimpleAST.Node copy = nodes[result];
+			if (copy.count != 0)
+			{
+				copy.first = adjacency.Duplicate(copy.first, copy.count);
+				nodes[result] = copy;
+			}
 			return result;
 		}
 
-		/// <summary>
-		/// Stores the root of this tree
-		/// </summary>
-		/// <param name="node">The root</param>
-		public void StoreRoot(Node node)
+		public SymbolRef GetLabel(int index)
 		{
-			this.root = size;
-			this.nodes.Add(node);
-			size++;
+			return nodes[index].symbol;
+		}
+
+		public int GetAdjacency(int node, int[] buffer, int index)
+		{
+			SimpleAST.Node temp = nodes[node];
+			for (int i=0; i!=temp.count; i++)
+				buffer[index + i] = adjacency[temp.first + i];
+			return temp.count;
+		}
+
+		public void SetAdjacency(int node, int first, int count)
+		{
+			SimpleAST.Node temp = nodes[node];
+			temp.first = first;
+			temp.count = count;
+			nodes[node] = temp;
+		}
+
+		public void SetRoot(int node)
+		{
+			this.root = node;
 		}
 
 		/// <summary>
@@ -235,21 +197,22 @@ namespace Hime.Redist.Parsers
 			// This cannot happen
 			return new Symbol(0, string.Empty);
 		}
+		#endregion
 
 		/// <summary>
 		/// Represents and iterator for adjacents in this graph
 		/// </summary>
 		private class ChildEnumerator : IEnumerator<ASTNode>
 		{
-			private SimpleAST ast;
+			private GraphAST ast;
 			private int first;
 			private int current;
 			private int end;
 
-			public ChildEnumerator(SimpleAST ast, int node)
+			public ChildEnumerator(GraphAST ast, int node)
 			{
 				this.ast = ast;
-				Node n = ast.nodes[node];
+				SimpleAST.Node n = ast.nodes[node];
 				this.first = n.first;
 				this.current = this.first - 1;
 				this.end = this.first + n.count;
@@ -258,12 +221,12 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// Gets the current node
 			/// </summary>
-			public ASTNode Current { get { return new ASTNode(ast, current); } }
+			public ASTNode Current { get { return new ASTNode(ast, ast.adjacency[current]); } }
 
 			/// <summary>
 			/// Gets the current node
 			/// </summary>
-			object System.Collections.IEnumerator.Current { get { return new ASTNode(ast, current); } }
+			object System.Collections.IEnumerator.Current { get { return new ASTNode(ast, ast.adjacency[current]); } }
 
 			/// <summary>
 			/// Disposes this enumerator

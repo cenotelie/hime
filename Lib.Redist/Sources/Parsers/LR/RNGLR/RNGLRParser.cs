@@ -99,11 +99,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The SPPF being built
 		/// </summary>
-		private SPPF sppf;
+		private SPPFBuilder sppf;
 		/// <summary>
 		/// The sub-trees for the constant nullable variables
 		/// </summary>
-		private SubTree[] nullables;
+		private GSSLabel[] nullables;
 		/// <summary>
 		/// The next token
 		/// </summary>
@@ -130,7 +130,7 @@ namespace Hime.Redist.Parsers
 		{
 			this.parserAutomaton = automaton;
 			this.gss = new GSS();
-			this.sppf = new SPPF(maxStackSize, lexer.Output, parserVariables, parserVirtuals);
+			this.sppf = new SPPFBuilder(lexer.Output, parserVariables, parserVirtuals);
 			BuildNullables(variables.Length);
 			this.sppf.ClearHistory();
 		}
@@ -141,7 +141,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="varCount">The total number of variables</param>
 		private void BuildNullables(int varCount)
 		{
-			this.nullables = new SubTree[varCount];
+			this.nullables = new GSSLabel[varCount];
 			// Get the dependency table
 			List<int>[] dependencies = BuildNullableDependencies(varCount);
 			// Solve and build
@@ -161,8 +161,7 @@ namespace Hime.Redist.Parsers
 						if (ok)
 						{
 							LRProduction prod = parserAutomaton.GetNullableProduction(i);
-							GSSLabel label = BuildSPPF(0, prod, sppf.Epsilon, null);
-							this.nullables[i] = label.Tree;
+							this.nullables[i] = BuildSPPF(0, prod, sppf.Epsilon, null);
 							dependencies[i] = null;
 							solved++;
 						}
@@ -269,7 +268,7 @@ namespace Hime.Redist.Parsers
 		private GSSLabel BuildSPPF(int generation, LRProduction production, GSSLabel first, GSSPath path)
 		{
 			Symbol variable = parserVariables[production.Head];
-			sppf.ReductionPrepare(production.Head, production.HeadAction, first, path, production.ReductionLength);
+			sppf.ReductionPrepare(first, path, production.ReductionLength);
 			for (int i = 0; i != production.BytecodeLength; i++)
 			{
 				LROpCode op = production[i];
@@ -301,7 +300,7 @@ namespace Hime.Redist.Parsers
 						break;
 				}
 			}
-			return sppf.Reduce(generation, production.Head);
+			return sppf.Reduce(generation, production.Head, production.HeadAction == TreeAction.Replace);
 		}
 
 		/// <summary>
@@ -350,8 +349,7 @@ namespace Hime.Redist.Parsers
 				{
 					// Has reduction _Axiom_ -> axiom $ . on ε
 					GSSPath[] paths = gss.GetPaths(i, 2, out count);
-					SubTree rootST = paths[0][1].Tree;
-					return new ParseResult(allErrors, lexer.Output, sppf.GetTree(rootST));
+					return new ParseResult(allErrors, lexer.Output, sppf.GetTree(paths[0][1]));
 				}
 			}
 			// At end of input but was still waiting for tokens
@@ -474,9 +472,8 @@ namespace Hime.Redist.Parsers
 			int gen = gss.CreateGeneration();
 
 			// Create the GSS label to be used for the transitions
-			SubTree st = sppf.GetSingleNode();
-			st.SetupRoot(new SymbolRef(SymbolType.Token, oldtoken.Index), TreeAction.None);
-			GSSLabel label = new GSSLabel(st);
+			SymbolRef sym = new SymbolRef(SymbolType.Token, oldtoken.Index);
+			GSSLabel label = new GSSLabel(sym, sppf.GetSingleNode(sym));
 
 			// Execute all shifts in the queue at this point
 			int count = shifts.Count;
