@@ -116,7 +116,7 @@ namespace Hime.Redist.Utils
 		/// <returns>The index within this list at which the values have been added</returns>
 		public int Add(T[] values, int index, int length)
 		{
-			int start = (chunkIndex << upperShift | cellIndex);
+			int start = Size;
 			if (length > 0)
 				DoCopy(values, index, length);
 			return start;
@@ -130,7 +130,7 @@ namespace Hime.Redist.Utils
 		/// <returns>The index within this list at which the values have been copied to</returns>
 		public int Duplicate(int from, int count)
 		{
-			int start = (chunkIndex << upperShift | cellIndex);
+			int start = Size;
 			if (count <= 0)
 				return start;
 			int chunk = from >> upperShift;     // The current chunk to copy from
