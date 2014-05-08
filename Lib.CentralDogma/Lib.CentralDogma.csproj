@@ -86,7 +86,6 @@
     <Compile Include="Sources\Grammars\Grammar.cs" />
     <Compile Include="Sources\SDK\DOTNodeShape.cs" />
     <Compile Include="Sources\SDK\DOTSerializer.cs" />
-    <Compile Include="Sources\SDK\GraphSerializer.cs" />
     <Compile Include="Sources\SDK\LexerReflection.cs" />
     <Compile Include="Sources\UnicodeBlock.cs" />
     <Compile Include="Sources\UnicodeCategory.cs" />
@@ -161,9 +160,9 @@
     <Compile Include="Sources\Output\Emitter.cs" />
     <Compile Include="Sources\Output\Mode.cs" />
     <Compile Include="Sources\Output\Modifier.cs" />
-    <Compile Include="Sources\SDK\DebugSerializer.cs" />
     <Compile Include="Sources\Utils\ROList.cs" />
     <Compile Include="Sources\Output\Helper.cs" />
+    <Compile Include="Sources\SDK\Serializers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

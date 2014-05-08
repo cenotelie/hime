@@ -190,12 +190,12 @@ namespace Hime.CentralDogma.Output
 			if (dfa != null)
 			{
 				reporter.Info("Exporting DFA debug data at " + prefix + suffixDebugDFA + " ...");
-				SDK.GraphSerializer.ExportDOT(dfa, prefix + suffixDebugDFA);
+				SDK.Serializers.ExportDOT(dfa, prefix + suffixDebugDFA);
 			}
 			if (graph != null)
 			{
 				reporter.Info("Exporting LR graph debug data (txt) at " + prefix + suffixDebugLRAsDOT + " ...");
-				SDK.GraphSerializer.ExportDOT(graph, prefix + suffixDebugLRAsDOT);
+				SDK.Serializers.ExportDOT(graph, prefix + suffixDebugLRAsDOT);
 				reporter.Info("Exporting LR graph debug data (dot) at " + prefix + suffixDebugLRAsText + " ...");
 				SDK.DebugSerializer.Export(graph, prefix + suffixDebugLRAsText);
 			}
