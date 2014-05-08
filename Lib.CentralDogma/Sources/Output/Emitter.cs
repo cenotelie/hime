@@ -186,7 +186,7 @@ namespace Hime.CentralDogma.Output
 		private bool EmitDebugArtifacts()
 		{
 			reporter.Info("Exporting grammar debug data at " + prefix + suffixDebugGrammar + " ...");
-			SDK.DebugSerializer.Export(grammar, prefix + suffixDebugGrammar);
+			SDK.Serializers.Export(grammar, prefix + suffixDebugGrammar);
 			if (dfa != null)
 			{
 				reporter.Info("Exporting DFA debug data at " + prefix + suffixDebugDFA + " ...");
@@ -197,7 +197,7 @@ namespace Hime.CentralDogma.Output
 				reporter.Info("Exporting LR graph debug data (txt) at " + prefix + suffixDebugLRAsDOT + " ...");
 				SDK.Serializers.ExportDOT(graph, prefix + suffixDebugLRAsDOT);
 				reporter.Info("Exporting LR graph debug data (dot) at " + prefix + suffixDebugLRAsText + " ...");
-				SDK.DebugSerializer.Export(graph, prefix + suffixDebugLRAsText);
+				SDK.Serializers.Export(graph, prefix + suffixDebugLRAsText);
 			}
 			return true;
 		}

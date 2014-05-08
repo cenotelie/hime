@@ -39,20 +39,20 @@ namespace Hime.Demo.Tasks
 			// prepare
 			Hime.CentralDogma.Grammars.Grammar grammar = grammars[0];
 			grammar.Prepare();
-			Hime.CentralDogma.SDK.DebugSerializer.Export(grammar, "Demo.Grammar.txt");
+			Hime.CentralDogma.SDK.Serializers.Export(grammar, "Demo.Grammar.txt");
 			// get the NFA for a single lexical rule
 			Hime.CentralDogma.Grammars.Terminal terminalK = grammar.GetTerminalByName("K");
-			Hime.CentralDogma.SDK.GraphSerializer.ExportDOT(terminalK.NFA, "Demo.NFA_K.dot");
+			Hime.CentralDogma.SDK.Serializers.ExportDOT(terminalK.NFA, "Demo.NFA_K.dot");
 			// build the global DFA an output it
 			Hime.CentralDogma.Automata.DFA dfa = grammar.BuildDFA();
-			Hime.CentralDogma.SDK.GraphSerializer.ExportDOT(dfa, "Demo.DFA.dot");
+			Hime.CentralDogma.SDK.Serializers.ExportDOT(dfa, "Demo.DFA.dot");
 			// build the LALR(1) automaton and output it
 			Hime.CentralDogma.Grammars.LR.Builder builder = new Hime.CentralDogma.Grammars.LR.Builder(grammar);
 			Hime.CentralDogma.Grammars.LR.Graph graph = builder.Build(Hime.CentralDogma.ParsingMethod.LALR1);
 			foreach (Hime.CentralDogma.Grammars.LR.Conflict conflict in builder.Conflicts)
 				System.Console.WriteLine(conflict);
-			Hime.CentralDogma.SDK.GraphSerializer.ExportDOT(graph, "Demo.LR.dot");
-			Hime.CentralDogma.SDK.DebugSerializer.Export(graph, "Demo.LR.txt");
+			Hime.CentralDogma.SDK.Serializers.ExportDOT(graph, "Demo.LR.dot");
+			Hime.CentralDogma.SDK.Serializers.Export(graph, "Demo.LR.txt");
 		}
 	}
 }
