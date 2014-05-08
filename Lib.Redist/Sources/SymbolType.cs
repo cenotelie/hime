@@ -26,7 +26,7 @@ namespace Hime.Redist
 	enum SymbolType : byte
 	{
 		/// <summary>
-		/// Marks as other
+		/// Marks as other (used for SPPF nodes)
 		/// </summary>
 		None = 0,
 		/// <summary>

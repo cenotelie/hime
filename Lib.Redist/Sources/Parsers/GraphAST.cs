@@ -25,78 +25,30 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents an AST using a graph structure
 	/// </summary>
-	class GraphAST : AST
+	class GraphAST : ASTImpl
 	{
-		/// <summary>
-		/// The table of tokens
-		/// </summary>
-		private TokenizedText tableTokens;
-		/// <summary>
-		/// The table of variables
-		/// </summary>
-		private IList<Symbol> tableVariables;
-		/// <summary>
-		/// The table of virtuals
-		/// </summary>
-		private IList<Symbol> tableVirtuals;
-		/// <summary>
-		/// The nodes' labels
-		/// </summary>
-		private Utils.BigList<SimpleAST.Node> nodes;
 		/// <summary>
 		/// The adjacency table
 		/// </summary>
 		private Utils.BigList<int> adjacency;
-		/// <summary>
-		/// The index of the tree's root node
-		/// </summary>
-		private int root;
 
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
 		public GraphAST(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+			: base(text, variables, virtuals)
 		{
-			this.tableTokens = text;
-			this.tableVariables = variables;
-			this.tableVirtuals = virtuals;
-			this.nodes = new Utils.BigList<SimpleAST.Node>();
 			this.adjacency = new Utils.BigList<int>();
-			this.root = -1;
 		}
 
-		/// <summary>
-		/// Gets the root node of this tree
-		/// </summary>
-		public ASTNode Root { get { return new ASTNode(this, this.root); } }
-
-		/// <summary>
-		/// Gets the symbol of the given node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The node's symbol</returns>
-		public Symbol GetSymbol(int node)
-		{
-			return GetSymbolFor(nodes[node].symbol);
-		}
-
-		/// <summary>
-		/// Gets the number of children of the given node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The node's numer of children</returns>
-		public int GetChildrenCount(int node)
-		{
-			return nodes[node].count;
-		}
-
+		#region Implementation of AST interface
 		/// <summary>
 		/// Gets the i-th child of the given node
 		/// </summary>
 		/// <param name="parent">A node</param>
 		/// <param name="i">The child's number</param>
 		/// <returns>The i-th child</returns>
-		public ASTNode GetChild(int parent, int i)
+		public override ASTNode GetChild(int parent, int i)
 		{
 			return new ASTNode(this, adjacency[nodes[parent].first + i]);
 		}
@@ -106,96 +58,9 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="parent">A node</param>
 		/// <returns>An enumerator for the children</returns>
-		public IEnumerator<ASTNode> GetChildren(int parent)
+		public override IEnumerator<ASTNode> GetChildren(int parent)
 		{
 			return new ChildEnumerator(this, parent);
-		}
-
-		/// <summary>
-		/// Gets the position in the input text of the given node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The position in the text</returns>
-		public TextPosition GetPosition(int node)
-		{
-			SymbolRef sym = nodes[node].symbol;
-			if (sym.Type == SymbolType.Token)
-				return tableTokens.GetPositionOf(sym.Index);
-			return new TextPosition(0, 0);
-		}
-
-		#region Internal API
-		public int Store(SymbolRef symbol)
-		{
-			return nodes.Add(new SimpleAST.Node(symbol));
-		}
-
-		public int Store(SymbolRef symbol, int first, int count)
-		{
-			return nodes.Add(new SimpleAST.Node(symbol, first, count));
-		}
-
-		public int Store(int[] adjacents, int count)
-		{
-			return adjacency.Add(adjacents, 0, count);
-		}
-
-		public int CopyNode(int node)
-		{
-			int result = nodes.Add(nodes[node]);
-			SimpleAST.Node copy = nodes[result];
-			if (copy.count != 0)
-			{
-				copy.first = adjacency.Duplicate(copy.first, copy.count);
-				nodes[result] = copy;
-			}
-			return result;
-		}
-
-		public SymbolRef GetLabel(int index)
-		{
-			return nodes[index].symbol;
-		}
-
-		public int GetAdjacency(int node, int[] buffer, int index)
-		{
-			SimpleAST.Node temp = nodes[node];
-			for (int i=0; i!=temp.count; i++)
-				buffer[index + i] = adjacency[temp.first + i];
-			return temp.count;
-		}
-
-		public void SetAdjacency(int node, int first, int count)
-		{
-			SimpleAST.Node temp = nodes[node];
-			temp.first = first;
-			temp.count = count;
-			nodes[node] = temp;
-		}
-
-		public void SetRoot(int node)
-		{
-			this.root = node;
-		}
-
-		/// <summary>
-		/// Gets the symbol corresponding to the given symbol reference
-		/// </summary>
-		/// <param name="symRef">A symbol reference</param>
-		/// <returns>The corresponding symbol</returns>
-		public Symbol GetSymbolFor(SymbolRef symRef)
-		{
-			switch (symRef.Type)
-			{
-				case SymbolType.Token:
-					return tableTokens[symRef.Index];
-				case SymbolType.Variable:
-					return tableVariables[symRef.Index];
-				case SymbolType.Virtual:
-					return tableVirtuals[symRef.Index];
-			}
-			// This cannot happen
-			return new Symbol(0, string.Empty);
 		}
 		#endregion
 
@@ -253,6 +118,82 @@ namespace Hime.Redist.Parsers
 			{
 				current = first - 1;
 			}
+		}
+
+		/// <summary>
+		/// Stores the specified symbol in this AST as a new node
+		/// </summary>
+		/// <param name="symbol">The symbol to store</param>
+		/// <returns>The index of the new node</returns>
+		public int Store(SymbolRef symbol)
+		{
+			return nodes.Add(new SimpleAST.Node(symbol));
+		}
+
+		/// <summary>
+		/// Stores some adjacency data in this graph AST
+		/// </summary>
+		/// <param name="adjacents">A buffer of adjacency data</param>
+		/// <param name="count">The number of adjacents to store</param>
+		/// <returns>The index of the data stored in this graph</returns>
+		public int Store(int[] adjacents, int count)
+		{
+			return adjacency.Add(adjacents, 0, count);
+		}
+
+		/// <summary>
+		/// Copies the provided node (and its adjacency data)
+		/// </summary>
+		/// <param name="node">The node to copy</param>
+		/// <returns>The index of the copy</returns>
+		public int CopyNode(int node)
+		{
+			int result = nodes.Add(nodes[node]);
+			SimpleAST.Node copy = nodes[result];
+			if (copy.count != 0)
+			{
+				copy.first = adjacency.Duplicate(copy.first, copy.count);
+				nodes[result] = copy;
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// Gets the adjacency data for the specified node
+		/// </summary>
+		/// <param name="node">The node to retrieve the adjacency data of</param>
+		/// <param name="buffer">The buffer to store the retrieved data in</param>
+		/// <param name="index">The starting index in the provided buffer</param>
+		/// <returns>The number of adjacents</returns>
+		public int GetAdjacency(int node, int[] buffer, int index)
+		{
+			SimpleAST.Node temp = nodes[node];
+			for (int i=0; i!=temp.count; i++)
+				buffer[index + i] = adjacency[temp.first + i];
+			return temp.count;
+		}
+
+		/// <summary>
+		/// Sets the adjacencydata for the specified node
+		/// </summary>
+		/// <param name="node">The node to set the adjacency data of</param>
+		/// <param name="first">The index of the first adjacency item</param>
+		/// <param name="count">The number of adjacency items</param>
+		public void SetAdjacency(int node, int first, int count)
+		{
+			SimpleAST.Node temp = nodes[node];
+			temp.first = first;
+			temp.count = count;
+			nodes[node] = temp;
+		}
+
+		/// <summary>
+		/// Sets the root of this AST
+		/// </summary>
+		/// <param name="node">Index of the root node</param>
+		public void SetRoot(int node)
+		{
+			this.root = node;
 		}
 	}
 }

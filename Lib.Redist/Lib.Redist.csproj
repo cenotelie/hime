@@ -112,6 +112,7 @@
     <Compile Include="Sources\Lexer\TokenizedInput.cs" />
     <Compile Include="Sources\Parsers\GraphAST.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
+    <Compile Include="Sources\Parsers\ASTImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

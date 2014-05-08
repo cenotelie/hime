@@ -140,10 +140,6 @@ namespace Hime.Redist.Parsers
 		/// The number of items popped from the stack
 		/// </summary>
 		private int popCount;
-		/// <summary>
-		/// The reduction length
-		/// </summary>
-		private int length;
 
 		/// <summary>
 		/// The AST being built
@@ -274,7 +270,6 @@ namespace Hime.Redist.Parsers
 				stack[length - 1] = first;
 			}
 			// initialize the reduction data
-			this.length = length;
 			this.cacheNext = 0;
 			this.handleNext = 0;
 			this.popCount = 0;

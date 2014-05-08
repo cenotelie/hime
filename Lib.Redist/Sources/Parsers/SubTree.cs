@@ -39,12 +39,10 @@ namespace Hime.Redist.Parsers
 		/// The pool containing this object
 		/// </summary>
 		private Pool<SubTree> pool;
-
 		/// <summary>
 		/// The nodes in this buffer
 		/// </summary>
 		private SimpleAST.Node[] nodes;
-
 		/// <summary>
 		/// The tree actions for the nodes
 		/// </summary>
@@ -124,6 +122,10 @@ namespace Hime.Redist.Parsers
 			this.actions = new TreeAction[capacity];
 		}
 
+		/// <summary>
+		/// Clones this sub-tree
+		/// </summary>
+		/// <returns>The clone</returns>
 		public SubTree Clone()
 		{
 			SubTree result = null;
