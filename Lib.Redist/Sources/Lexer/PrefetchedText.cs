@@ -109,35 +109,50 @@ namespace Hime.Redist.Lexer
 		public void FindLines()
 		{
 			this.lines = new int[initLineCount];
-			this.line = 0;
-			bool flagCR = false;
+			this.lines[0] = 0;
+			this.line = 1;
+			char c1 = '\0';
+			char c2 = '\0';
 			for (int i = 0; i != content.Length; i++)
 			{
-				switch ((int)content[i])
+				// is c1 c2 a line ending sequence?
+				if (IsLineEnding(c1, c2))
 				{
-					case 0x0D:
-						flagCR = true;
+					// are we late to detect MacOS style?
+					if (c1 == '\u000D' && c2 != '\u000A')
+						AddLine(i - 1);
+					else
 						AddLine(i);
-						break;
-					case 0x0A:
-						if (!flagCR)
-							AddLine(i);
-						flagCR = false;
-						break;
-					case 0x0B:
-					case 0x0C:
-					case 0x85:
-					case 0x2028:
-					case 0x2029:
-						flagCR = false;
-						AddLine(i);
-						break;
-					default:
-						flagCR = false;
-						break;
 				}
+				c1 = c2;
+				c2 = content[i];
 			}
 			lines[line] = content.Length;
+		}
+
+		/// <summary>
+		/// Determines whether [c1, c2] form a line ending sequence
+		/// </summary>
+		/// <param name="c1">First character</param>
+		/// <param name="c2">Second character</param>
+		/// <returns><c>true</c> if this is a line ending sequence</returns>
+		/// <remarks>
+		/// Recognized sequences are:
+		/// [U+000D, U+000A] (this is Windows-style \r \n)
+		/// [U+????, U+000A] (this is unix style \n)
+		/// [U+000D, U+????] (this is MacOS style \r, without \n after)
+		/// Others:
+		/// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
+		/// </remarks>
+		private bool IsLineEnding(char c1, char c2)
+		{
+			// other characters
+			if (c2 == '\u000B' || c2 == '\u000C' || c2 == '\u0085' || c2 == '\u2028' || c2 == '\u2029')
+				return true;
+			// matches [\r, \n] [\r, ??] and  [??, \n]
+			if (c1 == '\u000D' || c2 == '\u000A')
+				return true;
+			return false;
 		}
 
 		/// <summary>
