@@ -36,7 +36,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The maximum size of the reduction handle
 		/// </summary>
-		protected const int handleSize = 1024;
+		private const int handleSize = 1024;
 		/// <summary>
 		/// The initial size of the history buffer
 		/// </summary>
@@ -235,6 +235,11 @@ namespace Hime.Redist.Parsers
 			return Epsilon;
 		}
 
+		/// <summary>
+		/// Creates a single node in the result SPPF an returns it
+		/// </summary>
+		/// <param name="symbol">The symbol as the node's label</param>
+		/// <returns>The created node's index in the SPPF</returns>
 		public int GetSingleNode(SymbolRef symbol)
 		{
 			return result.Store(symbol);
@@ -244,7 +249,7 @@ namespace Hime.Redist.Parsers
 		/// Gets a pooled sub-tree with the given maximal size
 		/// </summary>
 		/// <param name="size">The size of the sub-tree</param>
-		protected SubTree GetSubTree(int size)
+		private SubTree GetSubTree(int size)
 		{
 			if (size <= 128)
 				return pool128.Acquire();
@@ -276,7 +281,7 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// During a redution, pops the top symbol from the stack and gives it a tree action
+		/// During a reduction, pops the top symbol from the stack and gives it a tree action
 		/// </summary>
 		/// <param name="action">The tree action to apply to the symbol</param>
 		public void ReductionPop(TreeAction action)
@@ -284,6 +289,11 @@ namespace Hime.Redist.Parsers
 			AddToCache(stack[popCount++], action);
 		}
 
+		/// <summary>
+		/// Adds the specified GSS label to the reduction cache with the given tree action
+		/// </summary>
+		/// <param name="label">The label to add to the cache</param>
+		/// <param name="action">The tree action to apply</param>
 		private void AddToCache(GSSLabel label, TreeAction action)
 		{
 			if (label.IsReplaceable)
@@ -304,11 +314,17 @@ namespace Hime.Redist.Parsers
 			}
 		}
 
+		/// <summary>
+		/// Adds the specified SPPF node to the cache
+		/// </summary>
+		/// <param name="node">The node to add to the cache</param>
+		/// <param name="action">The tree action to apply onto the node</param>
 		private void AddToCache(int node, TreeAction action)
 		{
 			int count = result.GetChildrenCount(node);
 			if (cacheNext + count >= cacheChildren.Length)
 			{
+				// the current cache is not big enough, build a bigger one
 				int[] t1 = new int[cacheChildren.Length + handleSize];
 				TreeAction[] t2 = new TreeAction[cacheActions.Length + handleSize];
 				Array.Copy(cacheChildren, t1, cacheChildren.Length);
@@ -316,9 +332,12 @@ namespace Hime.Redist.Parsers
 				cacheChildren = t1;
 				cacheActions = t2;
 			}
+			// add the node in the cache
 			cacheChildren[cacheNext] = node;
 			cacheActions[cacheNext] = action;
+			// setup the hanle to point to the root
 			handle[handleNext++] = cacheNext;
+			// copy the root's children
 			result.GetAdjacency(node, cacheChildren, cacheNext + 1);
 			cacheNext += count + 1;
 		}
@@ -364,12 +383,21 @@ namespace Hime.Redist.Parsers
 		/// <returns>The produced sub-tree</returns>
 		public GSSLabel Reduce(int generation, int varIndex, bool replaceable)
 		{
+			GSSLabel label = Epsilon;
 			if (replaceable)
-				return ReduceReplaceable(generation, varIndex);
+				label = ReduceReplaceable(generation, varIndex);
 			else
-				return ReduceNormal(generation, varIndex);
+				label = ReduceNormal(generation, varIndex);
+			AddTohistory(generation, label);
+			return label;
 		}
 
+		/// <summary>
+		/// Executes the reduction as a normal reduction
+		/// </summary>
+		/// <param name="generation">The generation to reduce from</param>
+		/// <param name="varIndex">The reduced variable index</param>
+		/// <returns>The produced sub-tree</returns>
 		private GSSLabel ReduceNormal(int generation, int varIndex)
 		{
 			int root = -1;
@@ -414,10 +442,15 @@ namespace Hime.Redist.Parsers
 			result.SetAdjacency(root, result.Store(cacheChildren, insertion), insertion);
 			// create the GSS label
 			GSSLabel label = new GSSLabel(new SymbolRef(SymbolType.Variable, varIndex), root);
-			AddTohistory(generation, label);
 			return label;
 		}
 
+		/// <summary>
+		/// Executes the reduction as the reduction of a replaceable variable
+		/// </summary>
+		/// <param name="generation">The generation to reduce from</param>
+		/// <param name="varIndex">The reduced variable index</param>
+		/// <returns>The produced sub-tree</returns>
 		private GSSLabel ReduceReplaceable(int generation, int varIndex)
 		{
 			SubTree tree = GetSubTree(cacheNext);
@@ -430,10 +463,14 @@ namespace Hime.Redist.Parsers
 				tree.SetAt(i + 1, new SymbolRef(SymbolType.None, node), action);
 			}
 			GSSLabel label = new GSSLabel(tree);
-			AddTohistory(generation, label);
 			return label;
 		}
 
+		/// <summary>
+		/// Adds the specified GSS label to the current history
+		/// </summary>
+		/// <param name="generation">The current generation</param>
+		/// <param name="label">The label to register</param>
 		private void AddTohistory(int generation, GSSLabel label)
 		{
 			HistoryPart hp = GetHistoryPart(generation);
