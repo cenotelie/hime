@@ -48,7 +48,6 @@ namespace Hime.CentralDogma.Automata
 		/// Initializes this transition
 		/// </summary>
 		/// <param name="label">The label on this transition</param>
-		/// <param name="type">The type of the label</param>
 		/// <param name="target">The target of this transition</param>
 		public LRTransition(Symbol label, LRState target)
 		{

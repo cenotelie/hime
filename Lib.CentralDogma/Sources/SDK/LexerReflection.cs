@@ -34,7 +34,6 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the terminal repesented by this marker
 		/// </summary>
-		/// <value>
 		public Symbol Terminal { get { return terminal; } }
 
 		/// <summary>

@@ -48,6 +48,12 @@ namespace Hime.CentralDogma.Grammars
 		/// </summary>
 		public ROList<Symbol> Parameters { get { return new ROList<Symbol>(parameters); } }
 
+		/// <summary>
+		/// Initializes this template rule instance
+		/// </summary>
+		/// <param name="tRule">The parent template rule</param>
+		/// <param name="parameters">The values for the template rule parameters</param>
+		/// <param name="grammar">The parent grammar</param>
 		public TemplateRuleInstance(TemplateRule tRule, List<Symbol> parameters, Grammar grammar)
 		{
 			// Build the head variable name

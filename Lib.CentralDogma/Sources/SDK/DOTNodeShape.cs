@@ -25,39 +25,141 @@ namespace Hime.CentralDogma.SDK
 	/// </summary>
 	public enum DOTNodeShape
 	{
+		/// <summary>
+		/// Box shape
+		/// </summary>
 		box,
+		/// <summary>
+		/// Polygon shape
+		/// </summary>
 		polygon,
+		/// <summary>
+		/// Ellipse shape
+		/// </summary>
 		ellipse,
+		/// <summary>
+		/// Circle shape
+		/// </summary>
 		circle,
+		/// <summary>
+		/// Point shape
+		/// </summary>
 		point,
+		/// <summary>
+		/// Egg shape
+		/// </summary>
 		egg,
+		/// <summary>
+		/// Triangle shape
+		/// </summary>
 		triangle,
+		/// <summary>
+		/// No shape
+		/// </summary>
 		plaintext,
+		/// <summary>
+		/// Diamond shape
+		/// </summary>
 		diamond,
+		/// <summary>
+		/// Trapzium shape
+		/// </summary>
 		trapezium,
+		/// <summary>
+		/// Parallelogram shape
+		/// </summary>
 		parallelogram,
+		/// <summary>
+		/// House shape
+		/// </summary>
 		house,
+		/// <summary>
+		/// Pentagon shape
+		/// </summary>
 		pentagon,
+		/// <summary>
+		/// Hexagon shape
+		/// </summary>
 		hexagon,
+		/// <summary>
+		/// Septagon shape
+		/// </summary>
 		septagon,
+		/// <summary>
+		/// Octogon shape
+		/// </summary>
 		octagon,
+		/// <summary>
+		/// Double circle shape
+		/// </summary>
 		doublecircle,
+		/// <summary>
+		/// Double octogon shape
+		/// </summary>
 		doubleoctagon,
+		/// <summary>
+		/// Triple octogon shape
+		/// </summary>
 		tripleoctagon,
+		/// <summary>
+		/// Inverse triangle shape
+		/// </summary>
 		invtriangle,
+		/// <summary>
+		/// Inverse trapezium shape
+		/// </summary>
 		invtrapezium,
+		/// <summary>
+		/// Inverse house shape
+		/// </summary>
 		invhouse,
+		/// <summary>
+		/// Diamon shape
+		/// </summary>
 		Mdiamond,
+		/// <summary>
+		/// Sqaure shape
+		/// </summary>
 		Msquare,
+		/// <summary>
+		/// Circle shape
+		/// </summary>
 		Mcircle,
+		/// <summary>
+		/// Rectangle shape
+		/// </summary>
 		rect,
+		/// <summary>
+		/// Rectangle shape
+		/// </summary>
 		rectangle,
+		/// <summary>
+		/// Square shape
+		/// </summary>
 		square,
+		/// <summary>
+		/// Empty shape
+		/// </summary>
 		none,
+		/// <summary>
+		/// Note shape
+		/// </summary>
 		note,
+		/// <summary>
+		/// Tab shape
+		/// </summary>
 		tab,
+		/// <summary>
+		/// Folder shape
+		/// </summary>
 		folder,
+		/// <summary>
+		/// 3D box shape
+		/// </summary>
 		box3d,
+		/// <summary>
+		/// Component shape
+		/// </summary>
 		component
 	}
 }

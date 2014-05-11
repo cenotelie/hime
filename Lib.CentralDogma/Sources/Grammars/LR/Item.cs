@@ -27,6 +27,12 @@ namespace Hime.CentralDogma.Grammars.LR
 	/// </summary>
 	public abstract class Item
 	{
+		/// <summary>
+		/// String representation of the dot in LR items
+		/// </summary>
+		/// <remarks>
+		/// A dot represents the position of a parser in an item
+		/// </remarks>
 		public const string dot = "●";
 
 		/// <summary>
