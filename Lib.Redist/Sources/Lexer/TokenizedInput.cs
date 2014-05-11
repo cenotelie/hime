@@ -92,17 +92,6 @@ namespace Hime.Redist.Lexer
 		{
 			return new Token(terminals[terminal].ID, cells.Add(new Cell(terminal, start, length)));
 		}
-
-		/// <summary>
-		/// Gets the token at the specified index
-		/// </summary>
-		/// <param name="index">A token's index</param>
-		/// <returns>The token at the specified index</returns>
-		public Token GetTokenAt(int index)
-		{
-			Cell cell = cells[index];
-			return new Token(terminals[cell.terminal].ID, index);
-		}
 		#endregion
 
 
@@ -233,19 +222,6 @@ namespace Hime.Redist.Lexer
 				Symbol terminal = terminals[cell.terminal];
 				return new Symbol(terminal.ID, terminal.Name, GetValue(cell.start, cell.length));
 			}
-		}
-
-		/// <summary>
-		/// Gets the value of the token at the given index
-		/// </summary>
-		/// <param name="index">An index</param>
-		/// <returns>The corresponding symbol</returns>
-		public Symbol GetSymbolAt(int index)
-		{
-			Cell cell = cells[index];
-			Symbol terminal = terminals[cell.terminal];
-			string value = GetValue(cell.start, cell.length);
-			return new Symbol(terminal.ID, terminal.Name, value);
 		}
 
 		/// <summary>
