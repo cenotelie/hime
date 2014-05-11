@@ -25,7 +25,7 @@ namespace Hime.Redist.Lexer
 	/// Handler for lexical errors
 	/// </summary>
 	/// <param name="error">The new error</param>
-	public delegate void AddLexicalError(Error error);
+	public delegate void AddLexicalError(ParseError error);
 
 
 	/// <summary>

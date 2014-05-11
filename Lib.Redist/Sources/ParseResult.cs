@@ -27,7 +27,7 @@ namespace Hime.Redist
 	/// </summary>
 	public sealed class ParseResult
 	{
-		private IList<Error> errors;
+		private IList<ParseError> errors;
 		private TokenizedText text;
 		private AST ast;
 
@@ -36,9 +36,9 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="errors">The list of errors</param>
 		/// <param name="text">The parsed text</param>
-		internal ParseResult(List<Error> errors, TokenizedText text)
+		internal ParseResult(List<ParseError> errors, TokenizedText text)
 		{
-			this.errors = new ReadOnlyCollection<Error>(errors);
+			this.errors = new ReadOnlyCollection<ParseError>(errors);
 			this.text = text;
 		}
 
@@ -48,9 +48,9 @@ namespace Hime.Redist
 		/// <param name="errors">The list of errors</param>
 		/// <param name="text">The parsed text</param>
 		/// <param name="ast">The produced AST</param>
-		internal ParseResult(List<Error> errors, TokenizedText text, AST ast)
+		internal ParseResult(List<ParseError> errors, TokenizedText text, AST ast)
 		{
-			this.errors = new ReadOnlyCollection<Error>(errors);
+			this.errors = new ReadOnlyCollection<ParseError>(errors);
 			this.text = text;
 			this.ast = ast;
 		}
@@ -63,7 +63,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets a list of the parsing errors
 		/// </summary>
-		public IList<Error> Errors { get { return errors; } }
+		public IList<ParseError> Errors { get { return errors; } }
 
 		/// <summary>
 		/// Gets the text that has been parsed

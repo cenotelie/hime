@@ -26,7 +26,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an unexpected token error in a parser
 	/// </summary>
-	public sealed class UnexpectedTokenError : Error
+	public sealed class UnexpectedTokenError : ParseError
 	{
 		/// <summary>
 		/// Gets the unexpected token
@@ -45,7 +45,7 @@ namespace Hime.Redist
 		/// <param name="position">Error's position in the input</param>
 		/// <param name="expected">The expected terminals</param>
 		internal UnexpectedTokenError(Symbol token, TextPosition position, IList<Symbol> expected)
-			: base(ErrorType.UnexpectedToken, position)
+			: base(ParseErrorType.UnexpectedToken, position)
 		{
 			this.UnexpectedToken = token;
 			this.ExpectedTerminals = new ReadOnlyCollection<Symbol>(expected);

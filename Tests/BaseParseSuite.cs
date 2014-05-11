@@ -152,7 +152,7 @@ namespace Hime.Tests
 		{
 			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
 			ParseResult inputResult = parser.Parse();
-			foreach (Error error in inputResult.Errors)
+			foreach (ParseError error in inputResult.Errors)
 				Console.WriteLine(error.ToString());
 			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
 			Assert.AreEqual(0, inputResult.Errors.Count, "Failed to parse the input");

@@ -59,7 +59,7 @@ namespace Hime.Demo.Tasks
 			input.Close();
 
 			// Display the errors if any
-			foreach (Error error in result.Errors)
+			foreach (ParseError error in result.Errors)
 				Console.WriteLine(error.ToString());
 			if (!result.IsSuccess)
 				return;

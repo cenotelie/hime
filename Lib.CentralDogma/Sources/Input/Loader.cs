@@ -174,7 +174,7 @@ namespace Hime.CentralDogma.Input
 				reporter.Error(ex);
 				hasErrors = true;
 			}
-			foreach (Error error in result.Errors)
+			foreach (ParseError error in result.Errors)
 			{
 				reporter.Error(error);
 				hasErrors = true;

@@ -23,7 +23,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Specifies the type of error
 	/// </summary>
-	public enum ErrorType
+	public enum ParseErrorType
 	{
 		/// <summary>
 		/// Lexical error occuring when an unexpected character is encountered in the input preventing to match tokens

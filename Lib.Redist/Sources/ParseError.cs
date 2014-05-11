@@ -23,12 +23,12 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an error in a parser
 	/// </summary>
-	public class Error
+	public class ParseError
 	{
 		/// <summary>
 		/// Gets the error's type
 		/// </summary>
-		public ErrorType Type { get; protected set; }
+		public ParseErrorType Type { get; protected set; }
 
 		/// <summary>
 		/// Gets the error's position in the input
@@ -54,7 +54,7 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="type">Error's type</param>
 		/// <param name="position">Error's position in the input</param>
-		protected Error(ErrorType type, TextPosition position)
+		protected ParseError(ParseErrorType type, TextPosition position)
 		{
 			this.Type = type;
 			this.Position = position;

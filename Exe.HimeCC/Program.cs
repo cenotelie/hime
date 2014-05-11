@@ -180,7 +180,7 @@ namespace Hime.HimeCC
 			CommandLineLexer lexer = new CommandLineLexer(builder.ToString());
 			CommandLineParser parser = new CommandLineParser(lexer);
 			ParseResult result = parser.Parse();
-			foreach (Error error in result.Errors)
+			foreach (ParseError error in result.Errors)
 				Console.WriteLine(error.Message);
 			return result;
 		}

@@ -56,7 +56,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// List of the encountered syntaxic errors
 		/// </summary>
-		protected List<Error> allErrors;
+		protected List<ParseError> allErrors;
 		/// <summary>
 		/// Lexer associated to this parser
 		/// </summary>
@@ -93,7 +93,7 @@ namespace Hime.Redist.Parsers
 			this.parserVirtuals = new ReadOnlyCollection<Symbol>(new List<Symbol>(virtuals));
 			this.parserActions = actions;
 			this.recover = true;
-			this.allErrors = new List<Error>();
+			this.allErrors = new List<ParseError>();
 			this.lexer = lexer;
 			this.lexer.OnError += OnLexicalError;
 		}
@@ -102,7 +102,7 @@ namespace Hime.Redist.Parsers
 		/// Adds the given lexical error emanating from the lexer to the list of errors
 		/// </summary>
 		/// <param name="error">Lexical error</param>
-		protected void OnLexicalError(Error error)
+		protected void OnLexicalError(ParseError error)
 		{
 			allErrors.Add(error);
 		}

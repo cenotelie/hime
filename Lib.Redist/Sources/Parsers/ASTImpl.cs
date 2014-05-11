@@ -55,19 +55,6 @@ namespace Hime.Redist.Parsers
 				this.count = 0;
 				this.first = -1;
 			}
-
-			/// <summary>
-			/// Initializes this node
-			/// </summary>
-			/// <param name="symbol">The node's symbol</param>
-			/// <param name="count">The number of children</param>
-			/// <param name="first">Index of the first child</param>
-			public Node(SymbolRef symbol, int count, int first)
-			{
-				this.symbol = symbol;
-				this.count = 0;
-				this.first = first;
-			}
 		}
 
 		/// <summary>

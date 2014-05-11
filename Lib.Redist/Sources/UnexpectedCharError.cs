@@ -25,7 +25,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an unexpected character error in the input stream of a lexer
 	/// </summary>
-	public sealed class UnexpectedCharError : Error
+	public sealed class UnexpectedCharError : ParseError
 	{
 		/// <summary>
 		/// Gets the unexpected char
@@ -38,7 +38,7 @@ namespace Hime.Redist
 		/// <param name="unexpected">The errorneous character</param>
 		/// <param name='position'>Error's position in the input</param>
 		internal UnexpectedCharError(char unexpected, TextPosition position)
-			: base(ErrorType.UnexpectedChar, position)
+			: base(ParseErrorType.UnexpectedChar, position)
 		{
 			this.UnexpectedChar = unexpected;
 			StringBuilder Builder = new StringBuilder("Unexpected character '");
