@@ -306,10 +306,20 @@ namespace Hime.Redist.Parsers
 
 		private void AddToCache(int node, TreeAction action)
 		{
+			int count = result.GetChildrenCount(node);
+			if (cacheNext + count >= cacheChildren.Length)
+			{
+				int[] t1 = new int[cacheChildren.Length + handleSize];
+				TreeAction[] t2 = new TreeAction[cacheActions.Length + handleSize];
+				Array.Copy(cacheChildren, t1, cacheChildren.Length);
+				Array.Copy(cacheActions, t2, cacheActions.Length);
+				cacheChildren = t1;
+				cacheActions = t2;
+			}
 			cacheChildren[cacheNext] = node;
 			cacheActions[cacheNext] = action;
 			handle[handleNext++] = cacheNext;
-			int count = result.GetAdjacency(node, cacheChildren, cacheNext + 1);
+			result.GetAdjacency(node, cacheChildren, cacheNext + 1);
 			cacheNext += count + 1;
 		}
 
@@ -350,6 +360,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="generation">The generation to reduce from</param>
 		/// <param name="varIndex">The reduced variable index</param>
+		/// <param name="replaceable">Whether the sub-tree to build must have a replaceable root or not</param>
 		/// <returns>The produced sub-tree</returns>
 		public GSSLabel Reduce(int generation, int varIndex, bool replaceable)
 		{
@@ -409,7 +420,7 @@ namespace Hime.Redist.Parsers
 
 		private GSSLabel ReduceReplaceable(int generation, int varIndex)
 		{
-			SubTree tree = GetSubTree(handleNext);
+			SubTree tree = GetSubTree(cacheNext);
 			tree.SetupRoot(new SymbolRef(SymbolType.Variable, varIndex), TreeAction.Replace);
 			tree.SetChildrenCountAt(0, handleNext);
 			for (int i=0; i!=handleNext; i++)
