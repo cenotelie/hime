@@ -29,6 +29,9 @@ namespace Hime.CentralDogma.SDK
 	/// </summary>
 	public class MatchedTerminal : Automata.FinalItem
 	{
+		/// <summary>
+		/// The terminal represented by this marker
+		/// </summary>
 		private Symbol terminal;
 
 		/// <summary>
@@ -81,7 +84,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the terminals that can be matched by this lexer
 		/// </summary>
-		public IList<Symbol> Terminals { get { return terminals; } }
+		public ROList<Symbol> Terminals { get { return new ROList<Symbol>(terminals); } }
 
 		/// <summary>
 		/// Gets the lexer's dfa
@@ -91,7 +94,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Initializes this lexer reflection
 		/// </summary>
-		/// <param name="lexerType">The type of the lexer</param>
+		/// <param name="lexerType">The lexer's type</param>
 		public LexerReflection(System.Type lexerType)
 		{
 			string input = "";

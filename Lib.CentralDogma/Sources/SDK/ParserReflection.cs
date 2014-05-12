@@ -49,15 +49,15 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the terminals that can be matched by the associated lexer
 		/// </summary>
-		public IList<Symbol> Terminals { get { return terminals; } }
+		public ROList<Symbol> Terminals { get { return new ROList<Symbol>(terminals); } }
 		/// <summary>
 		/// Gets the variable symbols used by this parser
 		/// </summary>
-		public IList<Symbol> Variables { get { return variables; } }
+		public ROList<Symbol> Variables { get { return new ROList<Symbol>(variables); } }
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
-		public IList<Symbol> Virtuals { get { return virtuals; } }
+		public ROList<Symbol> Virtuals { get { return new ROList<Symbol>(virtuals); } }
 		/// <summary>
 		/// Gets this parser's LR automaton
 		/// </summary>
@@ -66,7 +66,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Initializes this parser reflection
 		/// </summary>
-		/// <param name="parserType">The type of the parser</param>
+		/// <param name="parserType">The parser's type</param>
 		public ParserReflection(System.Type parserType)
 		{
 			string input = "";

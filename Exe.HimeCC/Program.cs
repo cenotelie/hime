@@ -124,7 +124,7 @@ namespace Hime.HimeCC
 
 			// Execute the task
 			Report report = task.Execute();
-			if (report.HasErrors)
+			if (report.Errors.Count != 0)
 				return ResultErrorCompiling;
 			return ResultOK;
 		}

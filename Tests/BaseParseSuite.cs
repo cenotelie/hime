@@ -133,7 +133,7 @@ namespace Hime.Tests
 			task.Namespace = genNamespace;
 			task.OutputPrefix = prefix;
 			Hime.CentralDogma.Report report = task.Execute();
-			Assert.IsFalse(report.HasErrors, "Failed to compile the grammar");
+			Assert.IsTrue(report.Errors.Count == 0, "Failed to compile the grammar");
 			Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
 
 			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));

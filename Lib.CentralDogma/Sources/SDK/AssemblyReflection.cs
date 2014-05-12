@@ -55,7 +55,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the lexer inside this assembly that has the given (fully-qualified) name
 		/// </summary>
-		/// <param name='name'>A fully-qualified name</param>
+		/// <param name="name">A fully-qualified name</param>
 		/// <returns>The lexer type</returns>
 		public Type GetLexerType(string name)
 		{
@@ -63,7 +63,7 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
-		/// Gets the lexers types inside this assembly
+		/// Gets all the lexers types inside this assembly
 		/// </summary>
 		/// <returns>The lexers</returns>
 		public ICollection<Type> GetLexersType()
@@ -79,7 +79,7 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// Gets the parser inside this assembly that has the given (fully-qualified) name
 		/// </summary>
-		/// <param name='name'>A fully-qualified name</param>
+		/// <param name="name">A fully-qualified name</param>
 		/// <returns>The parser type</returns>
 		public Type GetParserType(string name)
 		{
@@ -87,7 +87,7 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
-		/// Gets the parsers types inside this assembly
+		/// Gets all the parsers types inside this assembly
 		/// </summary>
 		/// <returns>The parsers</returns>
 		public List<Type> GetParsersType()
@@ -101,7 +101,7 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
-		/// Gets an instance of the parser with the given name
+		/// Gets an instance of the parser with the given (fully-qualified) name
 		/// </summary>
 		/// <param name="name">The fully qualified name of the parser's type</param>
 		/// <param name="input">The input for the associated lexer</param>

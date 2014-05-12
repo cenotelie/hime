@@ -24,7 +24,7 @@ using Hime.CentralDogma.Automata;
 namespace Hime.CentralDogma.SDK
 {
 	/// <summary>
-	/// Convenience class for the export of graph-like data structures to files
+	/// Common serializers for debugging purposes
 	/// </summary>
 	public static class Serializers
 	{
@@ -153,26 +153,26 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
-		/// Exports the given CST tree to a DOT graph in the specified file
+		/// Exports the given AST tree to a DOT graph in the specified file
 		/// </summary>
 		/// <param name="root">Root of the tree to export</param>
 		/// <param name="file">DOT file to export to</param>
 		public static void ExportDOT(ASTNode root, string file)
 		{
 			DOTSerializer serializer = new DOTSerializer("CST", file);
-			ExportDOT_CST(serializer, null, 0, root);
+			ExportNode(serializer, null, 0, root);
 			serializer.Close();
 		}
 
 		/// <summary>
-		/// Exports the given CST node with the given serializer
+		/// Exports the given AST node with the given serializer
 		/// </summary>
 		/// <param name="serializer">The DOT serializer</param>
 		/// <param name="parent">The parent node ID</param>
 		/// <param name="nextID">The next available ID for the generated DOT data</param>
 		/// <param name="node">The node to serialize</param>
 		/// <returns>The next available ID for the generate DOT data</returns>
-		private static int ExportDOT_CST(DOTSerializer serializer, string parent, int nextID, ASTNode node)
+		private static int ExportNode(DOTSerializer serializer, string parent, int nextID, ASTNode node)
 		{
 			string name = "node" + nextID;
 			string label = node.Symbol.ToString();
@@ -181,7 +181,7 @@ namespace Hime.CentralDogma.SDK
 				serializer.WriteEdge(parent, name, string.Empty);
 			int result = nextID + 1;
 			foreach (ASTNode child in node.Children)
-				result = ExportDOT_CST(serializer, name, result, child);
+				result = ExportNode(serializer, name, result, child);
 			return result;
 		}
 
