@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Parser's actions
 		/// </summary>
-		protected UserAction[] parserActions;
+		protected SemanticAction[] parserActions;
 		/// <summary>
 		/// List of the encountered syntaxic errors
 		/// </summary>
@@ -87,7 +87,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The parser's virtuals</param>
 		/// <param name="actions">The parser's actions</param>
 		/// <param name="lexer">The input lexer</param>
-		protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.ILexer lexer)
+		protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
 		{
 			this.parserVariables = new ReadOnlyCollection<Symbol>(new List<Symbol>(variables));
 			this.parserVirtuals = new ReadOnlyCollection<Symbol>(new List<Symbol>(virtuals));

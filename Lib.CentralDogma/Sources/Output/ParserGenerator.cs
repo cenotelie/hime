@@ -230,11 +230,11 @@ namespace Hime.CentralDogma.Output
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\t/// <param name=\"input\">A set of semantic actions</param>");
 			stream.WriteLine("\t\t/// <returns>A table of semantic actions</returns>");
-			stream.WriteLine("\t\tprivate static UserAction[] GetUserActions(Actions input)");
+			stream.WriteLine("\t\tprivate static SemanticAction[] GetUserActions(Actions input)");
 			stream.WriteLine("\t\t{");
-			stream.WriteLine("\t\t\tUserAction[] result = new UserAction[" + actions.Count + "];");
+			stream.WriteLine("\t\t\tSemanticAction[] result = new SemanticAction[" + actions.Count + "];");
 			for (int i = 0; i != actions.Count; i++)
-				stream.WriteLine("\t\t\tresult[" + i + "] = new UserAction(input." + actions[i].Name + ");");
+				stream.WriteLine("\t\t\tresult[" + i + "] = new SemanticAction(input." + actions[i].Name + ");");
 			stream.WriteLine("\t\t\treturn result;");
 			stream.WriteLine("\t\t}");
 		}
@@ -274,7 +274,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t/// </summary>");
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
 				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
-				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, UserAction[] actions) : base (automaton, variables, virtuals, actions, lexer) { }");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, SemanticAction[] actions) : base (automaton, variables, virtuals, actions, lexer) { }");
 			}
 		}
 	}

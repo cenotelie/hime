@@ -125,7 +125,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The parser's virtuals</param>
 		/// <param name="actions">The parser's actions</param>
 		/// <param name="lexer">The input lexer</param>
-		public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, UserAction[] actions, Lexer.ILexer lexer)
+		public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
             : base(variables, virtuals, actions, lexer)
 		{
 			this.parserAutomaton = automaton;
@@ -276,7 +276,7 @@ namespace Hime.Redist.Parsers
 				{
 					case LROpCodeBase.SemanticAction:
 						{
-							UserAction action = parserActions[production[i + 1].DataValue];
+							SemanticAction action = parserActions[production[i + 1].DataValue];
 							i++;
 							action.Invoke(variable, sppf);
 							break;
