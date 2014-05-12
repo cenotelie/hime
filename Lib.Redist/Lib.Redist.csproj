@@ -38,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentation>true</GenerateDocumentation>
+    <NoWarn>1587</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -113,11 +114,6 @@
     <Compile Include="Sources\Parsers\GraphAST.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\Parsers\ASTImpl.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\License.txt">
-      <Link>Properties\License.txt</Link>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
