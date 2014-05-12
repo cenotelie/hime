@@ -42,7 +42,7 @@ namespace Hime.Tests.Integration
 			StreamReader reader = new StreamReader(stream);
 			string grammar = reader.ReadToEnd();
 
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammar, "HimeGrammar", ParsingMethod.LALR1, grammar, "Test_CentralDogma_Regeneration");
+			Hime.Redist.Parsers.IParser parser = GetParser(grammar, "HimeGrammar", ParsingMethod.LALR1, grammar);
 			Assert.IsNotNull(parser, "Failed to compile the parser");
 			ParseResult result = parser.Parse();
 			Assert.IsTrue(result.IsSuccess, "Failed to parse the Central Dogma grammar with the generated parser");

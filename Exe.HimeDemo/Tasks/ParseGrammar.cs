@@ -54,7 +54,7 @@ namespace Hime.Demo.Tasks
 
 			// Re-parse the input grammar with the generated parser
 			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram"));
-			IParser parser = assembly.GetDefaultParser(input);
+			IParser parser = assembly.GetParser(input);
 			ParseResult result = parser.Parse();
 			input.Close();
 

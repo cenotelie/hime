@@ -34,8 +34,8 @@ namespace Hime.Demo.Tasks
 			BuildAssembly();
 			// load the generated assembly and retrieve the lexer and parser
 			Hime.CentralDogma.SDK.AssemblyReflection assembly = new Hime.CentralDogma.SDK.AssemblyReflection("Demo.dll");
-			Hime.CentralDogma.SDK.LexerReflection lexer = new Hime.CentralDogma.SDK.LexerReflection(assembly.GetLexerType("Hime.Demo.Generated.DemoLexer"));
-			Hime.CentralDogma.SDK.ParserReflection parser = new Hime.CentralDogma.SDK.ParserReflection(assembly.GetParserType("Hime.Demo.Generated.DemoParser"));
+			Hime.CentralDogma.SDK.LexerReflection lexer = new Hime.CentralDogma.SDK.LexerReflection(assembly.GetType("Hime.Demo.Generated.DemoLexer"));
+			Hime.CentralDogma.SDK.ParserReflection parser = new Hime.CentralDogma.SDK.ParserReflection(assembly.GetType("Hime.Demo.Generated.DemoParser"));
 			// Export the automata
 			Hime.CentralDogma.SDK.Serializers.ExportDOT(lexer.DFA, "Demo.Lexer.dot");
 			Hime.CentralDogma.SDK.Serializers.ExportDOT(parser.Automaton, "Demo.Parser.dot");

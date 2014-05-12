@@ -33,6 +33,23 @@ namespace Hime.CentralDogma.SDK
 		/// The inspected assembly
 		/// </summary>
 		protected Assembly assembly;
+		/// <summary>
+		/// The lexers in the current assembly
+		/// </summary>
+		protected List<Type> lexerTypes;
+		/// <summary>
+		/// The parsers in the current assembly
+		/// </summary>
+		protected List<Type> parserTypes;
+
+		/// <summary>
+		/// Gets the lexers in this assembly
+		/// </summary>
+		public ROList<Type> Lexers { get { return new ROList<Type>(lexerTypes); } }
+		/// <summary>
+		/// Gets the parsers in this assembly
+		/// </summary>
+		public ROList<Type> Parsers { get { return new ROList<Type>(parserTypes); } }
 
 		/// <summary>
 		/// Initializes this inspector for the given assembly
@@ -41,6 +58,20 @@ namespace Hime.CentralDogma.SDK
 		public AssemblyReflection(Assembly assembly)
 		{
 			this.assembly = assembly;
+			this.lexerTypes = new List<Type>();
+			this.parserTypes = new List<Type>();
+			Type baseLexer = typeof(Hime.Redist.Lexer.ILexer);
+			Type baseParser = typeof(Hime.Redist.Parsers.IParser);
+			foreach (Type t in assembly.GetTypes())
+			{
+				if (t.IsClass)
+				{
+					if (baseLexer.IsAssignableFrom(t))
+						lexerTypes.Add(t);
+					else if (baseParser.IsAssignableFrom(t))
+						parserTypes.Add(t);
+				}
+			}
 		}
 
 		/// <summary>
@@ -53,62 +84,83 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
-		/// Gets the lexer inside this assembly that has the given (fully-qualified) name
+		/// Gets the type in this assembly with the specified fully-qualified name
 		/// </summary>
-		/// <param name="name">A fully-qualified name</param>
-		/// <returns>The lexer type</returns>
-		public Type GetLexerType(string name)
+		/// <param name="name">The fully qualified name of a type</param>
+		/// <returns>The type with the specified name</returns>
+		public Type GetType(string name)
 		{
 			return assembly.GetType(name);
 		}
 
 		/// <summary>
-		/// Gets all the lexers types inside this assembly
+		/// Gets an instance of the default parser
 		/// </summary>
-		/// <returns>The lexers</returns>
-		public ICollection<Type> GetLexersType()
-		{
-			Type baseLexer = typeof(Hime.Redist.Lexer.ILexer);
-			List<Type> result = new List<Type>();
-			foreach (Type t in assembly.GetTypes())
-				if (t.IsClass && baseLexer.IsAssignableFrom(t))
-					result.Add(t);
-			return result;
-		}
-
-		/// <summary>
-		/// Gets the parser inside this assembly that has the given (fully-qualified) name
-		/// </summary>
-		/// <param name="name">A fully-qualified name</param>
-		/// <returns>The parser type</returns>
-		public Type GetParserType(string name)
-		{
-			return assembly.GetType(name);
-		}
-
-		/// <summary>
-		/// Gets all the parsers types inside this assembly
-		/// </summary>
-		/// <returns>The parsers</returns>
-		public List<Type> GetParsersType()
-		{
-			Type baseParser = typeof(Hime.Redist.Parsers.BaseLRParser);
-			List<Type> result = new List<Type>();
-			foreach (Type t in assembly.GetTypes())
-				if (t.IsClass && baseParser.IsAssignableFrom(t))
-					result.Add(t);
-			return result;
-		}
-
-		/// <summary>
-		/// Gets an instance of the parser with the given (fully-qualified) name
-		/// </summary>
-		/// <param name="name">The fully qualified name of the parser's type</param>
 		/// <param name="input">The input for the associated lexer</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser(string name, TextReader input)
+		public Hime.Redist.Parsers.IParser GetParser<T>(T input)
 		{
-			Type parserType = GetParserType(name);
+			if (parserTypes.Count == 0)
+				return null;
+			return GetParser(parserTypes[0], input, null);
+		}
+
+		/// <summary>
+		/// Gets an instance of the default parser
+		/// </summary>
+		/// <param name="input">The input for the associated lexer</param>
+		/// <param name="actions">The semantic actions for the parser</param>
+		/// <returns>The parser</returns>
+		public Hime.Redist.Parsers.IParser GetParser<T>(T input, Hime.Redist.SemanticAction[] actions)
+		{
+			if (parserTypes.Count == 0)
+				return null;
+			return GetParser(parserTypes[0], input, actions);
+		}
+
+		/// <summary>
+		/// Gets an instance of the specified parser
+		/// </summary>
+		/// <param name="name">The parser's fully qualified name</param>
+		/// <param name="input">The input for the associated lexer</param>
+		/// <returns>The parser</returns>
+		public Hime.Redist.Parsers.IParser GetParser<T>(string name, T input)
+		{
+			return GetParser(assembly.GetType(name), input, null);
+		}
+
+		/// <summary>
+		/// Gets an instance of the specified parser
+		/// </summary>
+		/// <param name="name">The parser's fully qualified name</param>
+		/// <param name="input">The input for the associated lexer</param>
+		/// <param name="actions">The semantic actions for the parser</param>
+		/// <returns>The parser</returns>
+		public Hime.Redist.Parsers.IParser GetParser<T>(string name, T input, Hime.Redist.SemanticAction[] actions)
+		{
+			return GetParser(assembly.GetType(name), input, actions);
+		}
+
+		/// <summary>
+		/// Gets an instance of the specified parser
+		/// </summary>
+		/// <param name="parserType">The parser's type</param>
+		/// <param name="input">The input for the associated lexer</param>
+		/// <returns>The parser</returns>
+		public Hime.Redist.Parsers.IParser GetParser<T>(Type parserType, T input)
+		{
+			return GetParser(parserType, input, null);
+		}
+
+		/// <summary>
+		/// Gets an instance of the specified parser
+		/// </summary>
+		/// <param name="parserType">The parser's type</param>
+		/// <param name="input">The input for the associated lexer</param>
+		/// <param name="actions">The semantic actions for the parser</param>
+		/// <returns>The parser</returns>
+		public Hime.Redist.Parsers.IParser GetParser<T>(Type parserType, T input, Hime.Redist.SemanticAction[] actions)
+		{
 			ConstructorInfo[] ctors = parserType.GetConstructors();
 			ConstructorInfo parserCtor = null;
 			Type lexerType = null;
@@ -116,30 +168,27 @@ namespace Hime.CentralDogma.SDK
 			for (int i=0; i!=ctors.Length; i++)
 			{
 				ParameterInfo[] parameters = ctors[i].GetParameters();
-				if (parameters.Length == 1)
+				if (actions == null && parameters.Length == 1)
 				{
-					parserCtor = ctors[i];
 					lexerType = parameters[0].ParameterType;
+					parserCtor = ctors[i];
+					break;
+				}
+				if (actions != null && parameters.Length == 2 && parameters[1].ParameterType.IsArray)
+				{
+					lexerType = parameters[0].ParameterType;
+					parserCtor = ctors[i];
 					break;
 				}
 			}
-			lexerCtor = lexerType.GetConstructor(new Type[] { typeof(TextReader) });
+			lexerCtor = lexerType.GetConstructor(new Type[] { typeof(T) });
 			object lexer = lexerCtor.Invoke(new object[] { input });
-			object parser = parserCtor.Invoke(new object[] { lexer });
+			object parser = null;
+			if (actions == null)
+				parser = parserCtor.Invoke(new object[] { lexer });
+			else
+				parser = parserCtor.Invoke(new object[] { lexer, actions });
 			return (Hime.Redist.Parsers.IParser)parser;
-		}
-
-		/// <summary>
-		/// Gets an instance of the default parser in this assembly
-		/// </summary>
-		/// <param name="input">The input for the associated lexer</param>
-		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetDefaultParser(TextReader input)
-		{
-			List<Type> parsers = GetParsersType();
-			if (parsers.Count == 0)
-				return null;
-			return GetParser(parsers[0].FullName, input);
 		}
 	}
 }

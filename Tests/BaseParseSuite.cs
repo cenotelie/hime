@@ -81,7 +81,7 @@ namespace Hime.Tests
 		/// <returns>The parse result</returns>
 		private ParseResult ParseTree(string data)
 		{
-			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetDefaultParser(new StringReader(data));
+			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetParser(data);
 			return parser.Parse();
 		}
 
@@ -118,10 +118,10 @@ namespace Hime.Tests
 		/// <param name="top">The top grammar to compile</param>
 		/// <param name="method">The parsing method to use</param>
 		/// <param name="input">The input text to parse</param>
-		/// <param name="prefix">Prefix for the generated parser</param>
 		/// <returns>The parser</returns>
-		protected Hime.Redist.Parsers.IParser BuildParser(string grammars, string top, ParsingMethod method, string input, string prefix)
+		protected AssemblyReflection Build(string grammars, string top, ParsingMethod method, string input)
 		{
+			string prefix = GetUniquePrefix();
 			string genNamespace = "Hime.Tests.Generated_" + prefix;
 
 			CompilationTask task = new CompilationTask();
@@ -136,8 +136,21 @@ namespace Hime.Tests
 			Assert.IsTrue(report.Errors.Count == 0, "Failed to compile the grammar");
 			Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
 
-			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
-			return assembly.GetDefaultParser(new StringReader(input));
+			return new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
+		}
+
+		/// <summary>
+		/// Builds a parser
+		/// </summary>
+		/// <param name="grammars">Grammar content</param>
+		/// <param name="top">The top grammar to compile</param>
+		/// <param name="method">The parsing method to use</param>
+		/// <param name="input">The input text to parse</param>
+		/// <returns>The parser</returns>
+		protected Hime.Redist.Parsers.IParser GetParser(string grammars, string top, ParsingMethod method, string input)
+		{
+			AssemblyReflection assembly = Build(grammars, top, method, input);
+			return assembly.GetParser(input);
 		}
 
 		/// <summary>
@@ -150,7 +163,7 @@ namespace Hime.Tests
 		/// <param name="expected">The expected AST</param>
 		protected void ParsingMatches(string grammars, string top, ParsingMethod method, string input, string expected)
 		{
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
+			Hime.Redist.Parsers.IParser parser = GetParser(grammars, top, method, input);
 			ParseResult inputResult = parser.Parse();
 			foreach (ParseError error in inputResult.Errors)
 				Console.WriteLine(error.ToString());
@@ -174,7 +187,7 @@ namespace Hime.Tests
 		/// <param name="unexpected">The expected AST</param>
 		protected void ParsingNotMatches(string grammars, string top, ParsingMethod method, string input, string unexpected)
 		{
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
+			Hime.Redist.Parsers.IParser parser = GetParser(grammars, top, method, input);
 			ParseResult inputResult = parser.Parse();
 			Assert.IsTrue(inputResult.IsSuccess, "Failed to parse the input");
 			Assert.AreEqual(0, inputResult.Errors.Count, "Failed to parse the input");
@@ -195,7 +208,7 @@ namespace Hime.Tests
 		/// <param name="input">The input text to parse</param>
 		protected void ParsingFails(string grammars, string top, ParsingMethod method, string input)
 		{
-			Hime.Redist.Parsers.IParser parser = BuildParser(grammars, top, method, input, GetUniquePrefix());
+			Hime.Redist.Parsers.IParser parser = GetParser(grammars, top, method, input);
 			ParseResult inputResult = parser.Parse();
 			Assert.AreNotEqual(0, inputResult.Errors.Count, "Succeeded to parse the input, shouldn't");
 		}
