@@ -16,6 +16,7 @@
   </metadata>
   <files>
     <file src="..\License.txt" target="License.txt"/>
-	<file src="..\Exe.HimeCC\bin\Release\himecc.exe" target="tools\himecc.exe"/>
+    <file src="..\Exe.HimeCC\bin\Release\himecc.exe" target="tools\himecc.exe"/>
+    <file src="**\*.cs" target="src" />
   </files>
 </package>

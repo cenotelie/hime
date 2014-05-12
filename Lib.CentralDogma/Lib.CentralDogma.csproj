@@ -51,7 +51,8 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -182,11 +183,4 @@
   </Target>
   -->
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Sources\SDK\" />
-    <Folder Include="Sources\Output\" />
-    <Folder Include="Sources\Grammars\Symbols\" />
-    <Folder Include="Sources\Grammars\Rules\" />
-    <Folder Include="Sources\Utils\" />
-  </ItemGroup>
 </Project>
