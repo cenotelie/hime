@@ -76,7 +76,22 @@ namespace Hime.Tests
 			Stream stream = typeof(BaseTestSuite).Assembly.GetManifestResourceStream("Hime.Tests.Resources." + name);
 			StreamReader reader = new StreamReader(stream);
 			string content = reader.ReadToEnd();
+			reader.Close();
 			File.WriteAllText(file, content);
+		}
+
+		/// <summary>
+		/// Gets the content of the specified resource
+		/// </summary>
+		/// <param name="name">The name of the resource</param>
+		/// <returns>The content of the specified resource</returns>
+		protected string GetResource(string name)
+		{
+			Stream stream = typeof(BaseTestSuite).Assembly.GetManifestResourceStream("Hime.Tests.Resources." + name);
+			StreamReader reader = new StreamReader(stream);
+			string content = reader.ReadToEnd();
+			reader.Close();
+			return content;
 		}
 
 		/// <summary>
