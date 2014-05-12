@@ -80,6 +80,12 @@ namespace Hime.CentralDogma.Grammars
 		/// </summary>
 		public sealed class PriorityComparer : System.Collections.Generic.IComparer<Terminal>
         {
+			/// <summary>
+			/// Compare the specified terminals
+			/// </summary>
+			/// <param name="x">A terminal</param>
+			/// <param name="y">A terminal</param>
+			/// <returns>A value representing the order of the two terminals</returns>
             public int Compare(Terminal x, Terminal y) { return (x.Priority - y.Priority); }
         }
     }

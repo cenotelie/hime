@@ -91,7 +91,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Determines whether the specified <see cref="Hime.CentralDogma.Grammars.LR.Item"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
 		/// </summary>
-		/// <param name='obj'>
+		/// <param name='item'>
 		/// The <see cref="Hime.CentralDogma.Grammars.LR.Item"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
 		/// </param>
 		/// <returns>

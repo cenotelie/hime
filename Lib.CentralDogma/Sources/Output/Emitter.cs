@@ -133,6 +133,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="nmspace">The namespace for the emitted code</param>
 		/// <param name="modifier">The visibility modifier for the emitted code</param>
 		/// <param name="method">The parsing method to use</param>
+		/// <param name="mode">The output mode</param>
 		/// <returns><c>true</c> if this operation succeeded</returns>
 		public bool Emit(string prefix, string nmspace, Modifier modifier, ParsingMethod method, Mode mode)
 		{

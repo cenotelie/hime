@@ -52,10 +52,21 @@ namespace Hime.CentralDogma.Grammars
 		/// </summary>
 		public sealed class EqualityComparer : IEqualityComparer<Symbol>
 		{
+			/// <summary>
+			/// Checks whether two symbols are the same
+			/// </summary>
+			/// <param name="x">A symbol</param>
+			/// <param name="y">A symbol</param>
+			/// <returns><c>true</c> if the two symbols are the same</returns>
 			public bool Equals(Symbol x, Symbol y)
 			{
 				return (x.ID == y.ID);
 			}
+			/// <summary>
+			/// Returns a hash code for the specified object
+			/// </summary>
+			/// <param name="obj">The object for which the hash code is to be returned</param>
+			/// <returns>A hash code for the specified object</returns>
 			public int GetHashCode(Symbol obj)
 			{
 				return obj.ID;

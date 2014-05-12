@@ -72,32 +72,67 @@ namespace Hime.CentralDogma
 			return new char[2] { (char)lead, (char)trail };
 		}
 
-		// Operator overloading
+		/// <summary>
+		/// Tests the equality of two Unicode code points
+		/// </summary>
+		/// <param name="cp1">A Unicode code point</param>
+		/// <param name="cp2">A Unicode code point</param>
+		/// <returns><c>true</c> if the two codepoints are equal</returns>
 		public static bool operator==(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
 		{
 			return (cp1.value == cp2.value);
 		}
 
+		/// <summary>
+		/// Tests the difference of two Unicode code points
+		/// </summary>
+		/// <param name="cp1">A Unicode code point</param>
+		/// <param name="cp2">A Unicode code point</param>
+		/// <returns><c>true</c> if the two codepoints are different</returns>
 		public static bool operator!=(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
 		{
 			return (cp1.value != cp2.value);
 		}
 
+		/// <summary>
+		/// Tests the order of two Unicode code points
+		/// </summary>
+		/// <param name="cp1">A Unicode code point</param>
+		/// <param name="cp2">A Unicode code point</param>
+		/// <returns><c>true</c> if codepoint 1 is strictly before codepoint 2</returns>
 		public static bool operator<(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
 		{
 			return (cp1.value < cp2.value);
 		}
 
+		/// <summary>
+		/// Tests the order of two Unicode code points
+		/// </summary>
+		/// <param name="cp1">A Unicode code point</param>
+		/// <param name="cp2">A Unicode code point</param>
+		/// <returns><c>true</c> if codepoint 1 is strictly after codepoint 2</returns>
 		public static bool operator>(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
 		{
 			return (cp1.value > cp2.value);
 		}
 
+		/// <summary>
+		/// Tests the order of two Unicode code points
+		/// </summary>
+		/// <param name="cp1">A Unicode code point</param>
+		/// <param name="cp2">A Unicode code point</param>
+		/// <returns><c>true</c> if codepoint 1 is before or equal to codepoint 2</returns>
 		public static bool operator<=(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
 		{
 			return (cp1.value <= cp2.value);
 		}
 
+		/// <summary>
+		/// Tests the order of two Unicode code points
+		/// </summary>
+		/// <param name="cp1">A Unicode code point</param>
+		/// <param name="cp2">A Unicode code point</param>
+		/// <returns><c>true</c> if codepoint 1 is after or equal to codepoint 2</returns>
 		public static bool operator>=(UnicodeCodePoint cp1, UnicodeCodePoint cp2)
 		{
 			return (cp1.value >= cp2.value);

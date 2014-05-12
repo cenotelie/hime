@@ -74,7 +74,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// Gets the previous stack node by an edge labelled with the specified symbol
 		/// </summary>
 		/// <param name="symbol">A symbol</param>
-		/// <returns>The previous stack node, or <c>null/c> if no edge with the specified symbol exists</returns>
+		/// <returns>The previous stack node, or <c>null</c> if no edge with the specified symbol exists</returns>
 		public GLRStackNode GetPreviousBy(Symbol symbol)
 		{
 			foreach (KeyValuePair<Symbol, GLRStackNode> edge in edges)

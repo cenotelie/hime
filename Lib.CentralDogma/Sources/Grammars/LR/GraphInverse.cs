@@ -59,6 +59,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// Gets the origins of the incoming transitions to the given state
 		/// </summary>
 		/// <param name="target">The target state to investigate</param>
+		/// <param name="transition">The symbol to look for on the transitions</param>
 		/// <returns>The origins of the incoming transitions</returns>
 		public ICollection<State> GetOrigins(int target, Symbol transition)
 		{

@@ -72,8 +72,8 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <summary>
 		/// Initializes this state
 		/// </summary>
-		/// <param name='Kernel'>The state's kernel</param>
-		/// <param name='Items'>The state's items</param>
+		/// <param name="kernel">The state's kernel</param>
+		/// <param name="items">The state's items</param>
 		public State(StateKernel kernel, List<Item> items)
 		{
 			this.kernel = kernel;

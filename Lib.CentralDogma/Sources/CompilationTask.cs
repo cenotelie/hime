@@ -23,9 +23,9 @@ using System.IO;
 namespace Hime.CentralDogma
 {
 	/// <summary>
-	/// Represents a compilation task for the himecc
+	/// Represents a compilation task for the generation of lexers and parsers from grammars
 	/// </summary>
-	public sealed class CompilationTask
+	public class CompilationTask
 	{
 		/// <summary>
 		/// Gets the compiler's version
@@ -33,33 +33,20 @@ namespace Hime.CentralDogma
 		public static string Version { get { return typeof(CompilationTask).Assembly.GetName().Version.ToString(); } }
 
 		/// <summary>
+		/// Gets or sets the name of the grammar to compile in the case where several grammars are loaded.
+		/// When only one grammar is loaded, it will be automatically selected.
+		/// </summary>
+		public string GrammarName { get; set; }
+
+		/// <summary>
 		/// Gets ot sets the compiler's mode
 		/// </summary>
 		public Output.Mode Mode { get; set; }
 
 		/// <summary>
-		/// Gets or sets the name of the grammar to compile in the case where several grammars are loaded.
-		/// If this property is not set, the first grammar to be found will be compiled.
-		/// </summary>
-		public string GrammarName { get; set; }
-
-		/// <summary>
-		/// Gets or sets the parsing method to use
-		/// </summary>
-		public ParsingMethod Method { get; set; }
-
-		/// <summary>
 		/// Gets ot sets the compiler's output files' prefix.
-		/// If this property is not set, the name of the compiled grammar will be used as a prefix and the files output into the current directory
+		/// If this property is not set, the name of the compiled grammar will be used as a prefix and the files output into the current directory.
 		/// </summary>
-		/// <remarks>
-		/// The compiler will generate the following files:
-		/// Lexer code file:    ${prefix}Lexer.cs
-		/// Lexer data file:    ${prefix}Lexer.bin
-		/// Parser code file:   ${prefix}Parser.cs
-		/// Parser data file:   ${prefix}Parser.bin
-		/// Assembly:           ${prefix}.dll
-		/// </remarks>
 		public string OutputPrefix { get; set; }
 
 		/// <summary>
@@ -67,6 +54,7 @@ namespace Hime.CentralDogma
 		/// If this property is not set, the namespace will be the name of the grammar.
 		/// </summary>
 		public string Namespace { get; set; }
+
 		/// <summary>
 		/// Gets or sets the access modifiers for the generated Lexer and Parser classes.
 		/// The default value is Internal.
@@ -74,13 +62,19 @@ namespace Hime.CentralDogma
 		public Output.Modifier CodeAccess { get; set; }
 
 		/// <summary>
+		/// Gets or sets the parsing method to use.
+		/// The default value is LALR1.
+		/// </summary>
+		public ParsingMethod Method { get; set; }
+
+		/// <summary>
 		/// The reporter
 		/// </summary>
-		private Reporter reporter;
+		protected Reporter reporter;
 		/// <summary>
 		/// The loader for this task
 		/// </summary>
-		private Input.Loader loader;
+		protected Input.Loader loader;
 
 		/// <summary>
 		/// Initializes a new compilation task
@@ -153,7 +147,7 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// Executes the compilation task
 		/// </summary>
-		private void ExecuteDo()
+		protected void ExecuteDo()
 		{
 			reporter.Info("Hime.CentralDogma " + Version);
 

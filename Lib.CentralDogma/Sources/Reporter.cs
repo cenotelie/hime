@@ -22,10 +22,13 @@ using System;
 namespace Hime.CentralDogma
 {
 	/// <summary>
-	/// Represents a logger for the CentralDogma assembly
+	/// Represents a logger producing a compilation report
 	/// </summary>
-	public sealed class Reporter
+	public class Reporter
 	{
+		/// <summary>
+		/// The resulting report
+		/// </summary>
 		private Report report;
 
 		/// <summary>

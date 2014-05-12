@@ -79,7 +79,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Compile this rule and generate the associated grammar rule
 		/// </summary>
-		/// <param name="data">The parent grammar</param>
+		/// <param name="grammar">The parent grammar</param>
 		/// <param name="context">The current context</param>
 		public void Compile(Grammar grammar, Context context)
 		{

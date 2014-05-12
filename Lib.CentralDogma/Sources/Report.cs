@@ -25,16 +25,20 @@ namespace Hime.CentralDogma
 	/// <summary>
 	/// Represents a compilation report
 	/// </summary>
-	public sealed class Report
+	public class Report
 	{
-		private List<object> infos;
-		private List<object> warnings;
-		private List<object> errors;
-
 		/// <summary>
-		/// Gets whether the report contains errors
+		/// The list of info messages in this report
 		/// </summary>
-		public bool HasErrors { get { return (errors.Count > 0); } }
+		private List<object> infos;
+		/// <summary>
+		/// The list of warnings in this report
+		/// </summary>
+		private List<object> warnings;
+		/// <summary>
+		/// The list of errors in this report
+		/// </summary>
+		private List<object> errors;
 
 		/// <summary>
 		/// Gets the informational entries in this report

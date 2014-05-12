@@ -22,7 +22,7 @@ using System.Collections.Generic;
 namespace Hime.CentralDogma
 {
 	/// <summary>
-	/// Represents a lightweight interface as a readonly list of T elements
+	/// Represents a lightweight interface for a readonly list of T elements
 	/// </summary>
 	/// <typeparam name="T">The type of elements in this list</typeparam>
 	public struct ROList<T> : IEnumerable<T>
@@ -38,12 +38,7 @@ namespace Hime.CentralDogma
 		public int Count { get { return inner.Count; } }
 
 		/// <summary>
-		/// Gets a value indicating whether this instance is valid.
-		/// </summary>
-		public bool IsValid { get { return (inner != null); } }
-
-		/// <summary>
-		/// Gets the element at the specified index.
+		/// Gets the element at the specified index
 		/// </summary>
 		/// <param name="index">An index in this list</param>
 		public T this[int index] { get { return inner[index]; } }
@@ -78,7 +73,7 @@ namespace Hime.CentralDogma
 		}
 
 		/// <summary>
-		/// Gets the enumerator.
+		/// Gets the enumerator
 		/// </summary>
 		/// <returns>The enumerator</returns>
 		public IEnumerator<T> GetEnumerator()
@@ -87,7 +82,7 @@ namespace Hime.CentralDogma
 		}
 
 		/// <summary>
-		/// Gets the enumerator.
+		/// Gets the enumerator
 		/// </summary>
 		/// <returns>The enumerator</returns>
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

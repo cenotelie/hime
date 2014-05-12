@@ -178,6 +178,11 @@ namespace Hime.CentralDogma.Grammars.LR
 			return conflicts;
 		}
 
+		/// <summary>
+		/// Adds a decision at this state
+		/// </summary>
+		/// <param name="item">The item being decided on</param>
+		/// <param name="t">The lookahead for this decition</param>
 		public void AddDecision(int item, Terminal t)
 		{
 			if (transitions.ContainsKey(t))
@@ -186,6 +191,11 @@ namespace Hime.CentralDogma.Grammars.LR
 			transitions.Add(t, decider.AddUnique(decision));
 		}
 
+		/// <summary>
+		/// Adds a transition from this state
+		/// </summary>
+		/// <param name="t">The transition's label</param>
+		/// <param name="next">The next state by the transition</param>
 		public void AddTransition(Terminal t, DeciderState next)
 		{
 			if (transitions.ContainsKey(t))
@@ -217,11 +227,27 @@ namespace Hime.CentralDogma.Grammars.LR
 			return result;
 		}
 
+		/// <summary>
+		/// Serves as a hash function for a <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/> object.
+		/// </summary>
+		/// <returns>
+		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
+		/// </returns>
 		public override int GetHashCode()
 		{
 			return base.GetHashCode();
 		}
 
+		/// <summary>
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/>.
+		/// </summary>
+		/// <param name='obj'>
+		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/>.
+		/// </param>
+		/// <returns>
+		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
+		/// <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/>; otherwise, <c>false</c>.
+		/// </returns>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is DeciderState))

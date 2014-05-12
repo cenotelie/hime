@@ -237,7 +237,7 @@ namespace Hime.CentralDogma.Automata
 		/// <param name="sub">The sub-automaton</param>
 		/// <param name="useClones">True to completely clone the sub-automaton</param>
 		/// <param name="min">The minimum (included) number of time to repeat</param>
-		/// <param name="min">The maximum (included) number of time to repeat</param>
+		/// <param name="max">The maximum (included) number of time to repeat</param>
 		/// <returns>The new automaton</returns>
 		// TODO: should get rid of static methods
 		public static NFA NewRepeatRange(NFA sub, bool useClones, int min, int max)

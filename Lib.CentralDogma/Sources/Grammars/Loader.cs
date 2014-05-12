@@ -793,7 +793,6 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Builds the set of rule definitions that represents a single semantic action
 		/// </summary>
-		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
 		private RuleBodySet BuildAtomicAction(ASTNode node)
@@ -810,7 +809,6 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Builds the set of rule definitions that represents a single virtual symbol
 		/// </summary>
-		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
 		private RuleBodySet BuildAtomicVirtual(ASTNode node)
@@ -880,7 +878,6 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Builds the set of rule definitions that represents a single inline piece of text
 		/// </summary>
-		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
 		private RuleBodySet BuildAtomicInlineText(ASTNode node)
