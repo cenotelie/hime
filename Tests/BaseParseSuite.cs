@@ -117,9 +117,8 @@ namespace Hime.Tests
 		/// <param name="grammars">Grammar content</param>
 		/// <param name="top">The top grammar to compile</param>
 		/// <param name="method">The parsing method to use</param>
-		/// <param name="input">The input text to parse</param>
 		/// <returns>The parser</returns>
-		protected AssemblyReflection Build(string grammars, string top, ParsingMethod method, string input)
+		protected AssemblyReflection Build(string grammars, string top, ParsingMethod method)
 		{
 			string prefix = GetUniquePrefix();
 			string genNamespace = "Hime.Tests.Generated_" + prefix;
@@ -149,7 +148,7 @@ namespace Hime.Tests
 		/// <returns>The parser</returns>
 		protected Hime.Redist.Parsers.IParser GetParser(string grammars, string top, ParsingMethod method, string input)
 		{
-			AssemblyReflection assembly = Build(grammars, top, method, input);
+			AssemblyReflection assembly = Build(grammars, top, method);
 			return assembly.GetParser(input);
 		}
 

@@ -64,6 +64,7 @@
     <Compile Include="Tests\Parsing\GrammarOptions.cs" />
     <Compile Include="Tests\Parsing\TerminalRules.cs" />
     <Compile Include="Tests\Parsing\SyntacticRules.cs" />
+    <Compile Include="Tests\Parsing\SemanticActions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Exe.HimeCC\Exe.HimeCC.csproj">
