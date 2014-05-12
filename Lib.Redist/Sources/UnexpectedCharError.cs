@@ -30,22 +30,33 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the unexpected char
 		/// </summary>
-		public char UnexpectedChar { get; private set; }
+		public string UnexpectedChar { get; private set; }
 
 		/// <summary>
 		/// Initializes a new instance of the UnexpectedCharError class for the given character
 		/// </summary>
-		/// <param name="unexpected">The errorneous character</param>
-		/// <param name='position'>Error's position in the input</param>
-		internal UnexpectedCharError(char unexpected, TextPosition position)
+		/// <param name="unexpected">The errorneous character (as a string)</param>
+		/// <param name="position">Error's position in the input</param>
+		internal UnexpectedCharError(string unexpected, TextPosition position)
 			: base(ParseErrorType.UnexpectedChar, position)
 		{
 			this.UnexpectedChar = unexpected;
 			StringBuilder Builder = new StringBuilder("Unexpected character '");
 			Builder.Append(unexpected);
-			Builder.Append("' (0x");
-			Builder.Append(Convert.ToInt32(unexpected).ToString("X"));
+			Builder.Append("' (U+");
+			if (unexpected.Length == 1)
+			{
+				Builder.Append(((int)unexpected[0]).ToString("X"));
+			}
+			else
+			{
+				uint lead = unexpected[0];
+				uint trail = unexpected[1];
+				uint cp = ((trail - 0xDC00) | ((lead - 0xD800) << 10)) + 0x10000;
+				Builder.Append(cp.ToString("X"));
+			}
 			Builder.Append(")");
+
 			this.Message += Builder.ToString();
 		}
 	}

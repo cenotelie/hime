@@ -160,8 +160,21 @@ namespace Hime.Redist.Lexer
 				if (match.terminal == 0)
 				{
 					// This is the epsilon terminal, failed to match anything
-					OnError(new UnexpectedCharError(input[inputIndex], text.GetPositionAt(inputIndex)));
-					inputIndex++;
+					TextPosition position = text.GetPositionAt(inputIndex);
+					string unexpected = null;
+					int c = input[inputIndex];
+					if (c >= 0xD800 && c <= 0xDFFF)
+					{
+						// this is a surrogate encoding point
+						unexpected = input.Substring(inputIndex, 2);
+						inputIndex += 2;
+					}
+					else
+					{
+						unexpected = input.Substring(inputIndex, 1);
+						inputIndex++;
+					}
+					OnError(new UnexpectedCharError(unexpected, position));
 					continue;
 				}
 				// This is the dollar terminal, at the end of the input

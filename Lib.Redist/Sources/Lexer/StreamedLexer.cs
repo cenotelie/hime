@@ -117,9 +117,21 @@ namespace Hime.Redist.Lexer
 					if (tIndex == 0)
 					{
 						// This is the epsilon terminal, failed to match anything
-						RewindableReader.Single s = input.ReadOne();
-						OnError(new UnexpectedCharError(s.Value, text.GetPositionAt(index)));
-						index++;
+						TextPosition position = text.GetPositionAt(index);
+						string unexpected = null;
+						int c = input.ReadOne().Value;
+						if (c >= 0xD800 && c <= 0xDFFF)
+						{
+							// this is a surrogate encoding point
+							unexpected = new string(new char[] { System.Convert.ToChar(c), input.ReadOne().Value });
+							index += 2;
+						}
+						else
+						{
+							unexpected = new string(System.Convert.ToChar(c), 1);
+							index++;
+						}
+						OnError(new UnexpectedCharError(unexpected, position));
 					}
 					else if (tIndex == 1)
 					{
