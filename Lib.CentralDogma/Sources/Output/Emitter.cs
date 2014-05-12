@@ -112,7 +112,7 @@ namespace Hime.CentralDogma.Output
 		/// Initializes this loader
 		/// </summary>
 		/// <param name="grammar">The grammar to emit data for</param>
-		public Emitter(Grammars.Grammar grammar) : this(new Reporter(typeof(Emitter)), grammar)
+		public Emitter(Grammars.Grammar grammar) : this(new Reporter(), grammar)
 		{
 		}
 		/// <summary>

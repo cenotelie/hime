@@ -18,8 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.IO;
-using log4net;
 
 namespace Hime.CentralDogma
 {
@@ -29,34 +27,17 @@ namespace Hime.CentralDogma
 	public sealed class Reporter
 	{
 		private Report report;
-		private ILog log;
 
 		/// <summary>
 		/// Gets the current report
 		/// </summary>
 		public Report Result { get { return report; } }
 
-		private static bool configured = false;
-
-		private static void Configure()
-		{
-			if (configured)
-				return;
-			log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout("%-5p: %m%n");
-			log4net.Appender.ConsoleAppender appender = new log4net.Appender.ConsoleAppender();
-			appender.Layout = layout;
-			log4net.Config.BasicConfigurator.Configure(appender);
-			configured = true;
-		}
-
 		/// <summary>
 		/// Initializes the reporter for the given type
 		/// </summary>
-		/// <param name="type">The reporting component's type</param>
-		public Reporter(System.Type type)
+		public Reporter()
 		{
-			Configure();
-			log = log4net.LogManager.GetLogger(type);
 			report = new Report();
 		}
 
@@ -67,7 +48,7 @@ namespace Hime.CentralDogma
 		public void Info(object message)
 		{
 			report.AddInfo(message);
-			log.Info(message.ToString());
+			Console.WriteLine("[INFO] {0}", message);
 		}
 		/// <summary>
 		/// Adds a new warning entry in the log
@@ -76,7 +57,7 @@ namespace Hime.CentralDogma
 		public void Warn(object message)
 		{
 			report.AddWarning(message);
-			log.Warn(message.ToString());
+			Console.WriteLine("[WARNING] {0}", message);
 		}
 		/// <summary>
 		/// Adds a new error entry in the log
@@ -85,7 +66,7 @@ namespace Hime.CentralDogma
 		public void Error(object message)
 		{
 			report.AddError(message);
-			log.Error(message.ToString());
+			Console.WriteLine("[ERROR] {0}", message);
 		}
 	}
 }

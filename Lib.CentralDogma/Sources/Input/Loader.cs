@@ -51,7 +51,7 @@ namespace Hime.CentralDogma.Input
 		/// <summary>
 		/// Initializes this loader
 		/// </summary>
-		public Loader() : this(new Reporter(typeof(Loader)))
+		public Loader() : this(new Reporter())
 		{
 		}
 		/// <summary>

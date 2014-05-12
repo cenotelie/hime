@@ -90,7 +90,7 @@ namespace Hime.CentralDogma
 			this.Mode = Output.Mode.Source;
 			this.Method = ParsingMethod.LALR1;
 			this.CodeAccess = Output.Modifier.Internal;
-			this.reporter = new Reporter(typeof(CompilationTask));
+			this.reporter = new Reporter();
 			this.loader = new Input.Loader(this.reporter);
 		}
 
