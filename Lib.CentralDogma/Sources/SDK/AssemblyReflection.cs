@@ -110,7 +110,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="input">The input for the associated lexer</param>
 		/// <param name="actions">The semantic actions for the parser</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(T input, Hime.Redist.SemanticAction[] actions)
+		public Hime.Redist.Parsers.IParser GetParser<T>(T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
 		{
 			if (parserTypes.Count == 0)
 				return null;
@@ -135,7 +135,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="input">The input for the associated lexer</param>
 		/// <param name="actions">The semantic actions for the parser</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(string name, T input, Hime.Redist.SemanticAction[] actions)
+		public Hime.Redist.Parsers.IParser GetParser<T>(string name, T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
 		{
 			return GetParser(assembly.GetType(name), input, actions);
 		}
@@ -158,7 +158,7 @@ namespace Hime.CentralDogma.SDK
 		/// <param name="input">The input for the associated lexer</param>
 		/// <param name="actions">The semantic actions for the parser</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(Type parserType, T input, Hime.Redist.SemanticAction[] actions)
+		public Hime.Redist.Parsers.IParser GetParser<T>(Type parserType, T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
 		{
 			ConstructorInfo[] ctors = parserType.GetConstructors();
 			ConstructorInfo parserCtor = null;
@@ -173,7 +173,7 @@ namespace Hime.CentralDogma.SDK
 					parserCtor = ctors[i];
 					break;
 				}
-				if (actions != null && parameters.Length == 2 && parameters[1].ParameterType.IsArray)
+				if (actions != null && parameters.Length == 2 && parameters[1].ParameterType == (typeof(Dictionary<string, Hime.Redist.SemanticAction>)))
 				{
 					lexerType = parameters[0].ParameterType;
 					parserCtor = ctors[i];

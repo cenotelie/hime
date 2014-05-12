@@ -159,6 +159,8 @@
     <Compile Include="Sources\Utils\ROList.cs" />
     <Compile Include="Sources\Output\Helper.cs" />
     <Compile Include="Sources\SDK\Serializers.cs" />
+    <Compile Include="Sources\SDK\TracingAction.cs" />
+    <Compile Include="Sources\SDK\ActionTracer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\License.txt">

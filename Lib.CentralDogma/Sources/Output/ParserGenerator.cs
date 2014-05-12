@@ -226,7 +226,7 @@ namespace Hime.CentralDogma.Output
 			stream.WriteLine("\t\tprivate static readonly Actions noActions = new Actions();");
 
 			stream.WriteLine("\t\t/// <summary>");
-			stream.WriteLine("\t\t/// Gets the set semantic actions in the form a table consistent with the automaton");
+			stream.WriteLine("\t\t/// Gets the set of semantic actions in the form a table consistent with the automaton");
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\t/// <param name=\"input\">A set of semantic actions</param>");
 			stream.WriteLine("\t\t/// <returns>A table of semantic actions</returns>");
@@ -235,6 +235,19 @@ namespace Hime.CentralDogma.Output
 			stream.WriteLine("\t\t\tSemanticAction[] result = new SemanticAction[" + actions.Count + "];");
 			for (int i = 0; i != actions.Count; i++)
 				stream.WriteLine("\t\t\tresult[" + i + "] = new SemanticAction(input." + actions[i].Name + ");");
+			stream.WriteLine("\t\t\treturn result;");
+			stream.WriteLine("\t\t}");
+
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Gets the set of semantic actions in the form a table consistent with the automaton");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <param name=\"input\">A set of semantic actions</param>");
+			stream.WriteLine("\t\t/// <returns>A table of semantic actions</returns>");
+			stream.WriteLine("\t\tprivate static SemanticAction[] GetUserActions(Dictionary<string, SemanticAction> input)");
+			stream.WriteLine("\t\t{");
+			stream.WriteLine("\t\t\tSemanticAction[] result = new SemanticAction[" + actions.Count + "];");
+			for (int i = 0; i != actions.Count; i++)
+				stream.WriteLine("\t\t\tresult[" + i + "] = input[\"" + actions[i].Name + "\"];");
 			stream.WriteLine("\t\t\treturn result;");
 			stream.WriteLine("\t\t}");
 		}
@@ -274,7 +287,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t/// </summary>");
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
 				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
-				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, SemanticAction[] actions) : base (automaton, variables, virtuals, actions, lexer) { }");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Dictionary<string, SemanticAction> actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
 			}
 		}
 	}
