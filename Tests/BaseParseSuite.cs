@@ -79,7 +79,7 @@ namespace Hime.Tests
 		/// </summary>
 		/// <param name="data">A string representation of a parse tree</param>
 		/// <returns>The parse result</returns>
-		private ParseResult ParseTree(string data)
+		protected ParseResult ParseTree(string data)
 		{
 			Hime.Redist.Parsers.IParser parser = parseTreeAssembly.GetParser(data);
 			return parser.Parse();
