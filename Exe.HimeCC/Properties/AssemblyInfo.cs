@@ -26,9 +26,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("himecc")]
-[assembly: AssemblyDescription("Command line Hime parser generator")]
+[assembly: AssemblyDescription("Command line utility for the generation of parsers with Hime.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Laurent Wouters")]
 [assembly: AssemblyProduct("himecc")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

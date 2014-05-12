@@ -27,9 +27,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Hime.CentralDogma")]
-[assembly: AssemblyDescription("Core library for the Hime parser generator")]
+[assembly: AssemblyDescription("Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Laurent Wouters")]
 [assembly: AssemblyProduct("Hime.CentralDogma")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

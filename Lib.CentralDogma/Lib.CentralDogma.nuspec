@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Hime.SDK</id>
+    <version>$version$</version>
+    <title>Hime Parser Generator (SDK)</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl.txt</licenseUrl>
+    <projectUrl>https://bitbucket.org/laurentw/hime/overview</projectUrl>
+    <iconUrl>https://bitbucket.org/laurentw/hime/downloads/Logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2014</copyright>
+    <tags>parser generator lr glr rnglr</tags>
+  </metadata>
+  <files>
+    <file src="..\License.txt" target="License.txt"/>
+	<file src="..\Exe.HimeCC\bin\Release\himecc.exe" target="tools\himecc.exe"/>
+  </files>
+</package>

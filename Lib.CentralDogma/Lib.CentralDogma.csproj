@@ -163,9 +163,6 @@
     <Compile Include="Sources\SDK\ActionTracer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\License.txt">
-      <Link>Properties\License.txt</Link>
-    </Content>
     <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />
     <EmbeddedResource Include="Sources\Input\HimeGrammarParser.bin" />
     <EmbeddedResource Include="Sources\Input\HimeGrammarLexer.bin" />
