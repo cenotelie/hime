@@ -53,6 +53,11 @@ namespace Hime.CentralDogma
 		public int Length { get { return spanEnd.Value - spanBegin.Value + 1; } }
 
 		/// <summary>
+		/// Gets a value indicating whether this span is entirely in Unicode plane 0
+		/// </summary>
+		public bool IsPlane0 { get { return (spanBegin.IsPlane0 && spanEnd.IsPlane0); } }
+
+		/// <summary>
 		/// Initializes this character span
 		/// </summary>
 		/// <param name="begin">The first (included) character</param>

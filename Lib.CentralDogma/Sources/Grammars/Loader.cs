@@ -169,24 +169,18 @@ namespace Hime.CentralDogma.Grammars
 		/// Adds a unicode character span to an existing NFA automaton
 		/// </summary>
 		/// <param name="automata">The target NFA</param>
-		/// <param name="intermediate">The intermediate state for characters outside plane 0</param>
 		/// <param name="span">The unicode span to add</param>
-		private void AddUnicodeSpanToNFA(Automata.NFA automata, Automata.NFAState intermediate, UnicodeSpan span)
+		private void AddUnicodeSpanToNFA(Automata.NFA automata, UnicodeSpan span)
 		{
 			char[] b = span.Begin.GetUTF16();
 			char[] e = span.End.GetUTF16();
-			if (e.Length == 1)
+
+			if (span.IsPlane0)
 			{
 				// this span is entirely in plane 0
 				automata.StateEntry.AddTransition(new CharSpan(b[0], e[0]), automata.StateExit);
 			}
-			else if (b.Length == 2)
-			{
-				// this span has no part in plane 0
-				automata.StateEntry.AddTransition(new CharSpan(b[0], e[0]), intermediate);
-				intermediate.AddTransition(new CharSpan(b[1], e[1]), automata.StateExit);
-			}
-			else
+			else if (span.Begin.IsPlane0)
 			{
 				// this span has only a part in plane 0
 				if (b[0] < 0xD800)
@@ -198,8 +192,48 @@ namespace Hime.CentralDogma.Grammars
 				{
 					automata.StateEntry.AddTransition(new CharSpan(b[0], (char)0xFFFF), automata.StateExit);
 				}
+				Automata.NFAState intermediate = automata.AddNewState();
 				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, e[0]), intermediate);
 				intermediate.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
+			}
+			else
+			{
+				// this span has no part in plane 0
+				if (b[0] == e[0])
+				{
+					// same first surrogate
+					Automata.NFAState intermediate = automata.AddNewState();
+					automata.StateEntry.AddTransition(new CharSpan(b[0], b[0]), intermediate);
+					intermediate.AddTransition(new CharSpan(b[1], e[1]), automata.StateExit);
+				}
+				else if (e[0] == b[0] + 1)
+				{
+					// the first surrogates are consecutive encodings
+					// build lower half
+					Automata.NFAState i1 = automata.AddNewState();
+					automata.StateEntry.AddTransition(new CharSpan(b[0], b[0]), i1);
+					i1.AddTransition(new CharSpan(b[1], (char)0xDFFF), automata.StateExit);
+					// build upper half
+					Automata.NFAState i2 = automata.AddNewState();
+					automata.StateEntry.AddTransition(new CharSpan(e[0], e[0]), i2);
+					i2.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
+				}
+				else
+				{
+					// there is at least one surrogate value between the first surrogates of begin and end
+					// build lower part
+					Automata.NFAState ia = automata.AddNewState();
+					automata.StateEntry.AddTransition(new CharSpan(b[0], b[0]), ia);
+					ia.AddTransition(new CharSpan(b[1], (char)0xDFFF), automata.StateExit);
+					// build intermediate part
+					Automata.NFAState im = automata.AddNewState();
+					automata.StateEntry.AddTransition(new CharSpan((char)(b[0] + 1), (char)(e[0] - 1)), im);
+					im.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
+					// build upper part
+					Automata.NFAState iz = automata.AddNewState();
+					automata.StateEntry.AddTransition(new CharSpan(e[0], e[0]), iz);
+					iz.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
+				}
 			}
 		}
 
@@ -554,9 +588,8 @@ namespace Hime.CentralDogma.Grammars
 			}
 			// build the result
 			Automata.NFA automata = Automata.NFA.NewMinimal();
-			Automata.NFAState intermediate = automata.AddNewState();
 			foreach (UnicodeSpan span in category.Spans)
-				AddUnicodeSpanToNFA(automata, intermediate, span);
+				AddUnicodeSpanToNFA(automata, span);
 			return automata;
 		}
 
@@ -577,8 +610,7 @@ namespace Hime.CentralDogma.Grammars
 			}
 			// build the result
 			Automata.NFA automata = Automata.NFA.NewMinimal();
-			Automata.NFAState intermediate = automata.AddNewState();
-			AddUnicodeSpanToNFA(automata, intermediate, block.Span);
+			AddUnicodeSpanToNFA(automata, block.Span);
 			return automata;
 		}
 
@@ -601,8 +633,7 @@ namespace Hime.CentralDogma.Grammars
 			}
 			// build the result
 			Automata.NFA automata = Automata.NFA.NewMinimal();
-			Automata.NFAState intermediate = automata.AddNewState();
-			AddUnicodeSpanToNFA(automata, intermediate, new UnicodeSpan(spanBegin, spanEnd));
+			AddUnicodeSpanToNFA(automata, new UnicodeSpan(spanBegin, spanEnd));
 			return automata;
 		}
 

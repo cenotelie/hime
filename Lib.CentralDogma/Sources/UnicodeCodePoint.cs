@@ -38,6 +38,11 @@ namespace Hime.CentralDogma
 		public int Value { get { return value; } }
 
 		/// <summary>
+		/// Gets a value indicating whether this codepoint is in Unicode plane 0
+		/// </summary>
+		public bool IsPlane0 { get { return (value <= 0xFFFF); } }
+
+		/// <summary>
 		/// Initializes the code point
 		/// </summary>
 		/// <param name="value">The code point value</param>
