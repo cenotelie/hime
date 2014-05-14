@@ -160,7 +160,7 @@ namespace Hime.CentralDogma.Input
 		/// Initializes a new instance of the lexer
 		/// </summary>
 		/// <param name="input">The lexer's input</param>
-		public HimeGrammarLexer(string input) : base(automaton, terminals, 0x0007, new System.IO.StringReader(input)) {}
+		public HimeGrammarLexer(string input) : base(automaton, terminals, 0x0007, input) {}
 		/// <summary>
 		/// Initializes a new instance of the lexer
 		/// </summary>

@@ -63,7 +63,7 @@ namespace Hime.HimeCC.CL
 		/// Initializes a new instance of the lexer
 		/// </summary>
 		/// <param name="input">The lexer's input</param>
-		public CommandLineLexer(string input) : base(automaton, terminals, 0x0003, new System.IO.StringReader(input)) {}
+		public CommandLineLexer(string input) : base(automaton, terminals, 0x0003, input) {}
 		/// <summary>
 		/// Initializes a new instance of the lexer
 		/// </summary>
