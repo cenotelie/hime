@@ -20,8 +20,8 @@
 package hime.redist.parsers;
 
 import hime.redist.*;
+import hime.redist.utils.BigList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,6 +55,13 @@ abstract class ASTImpl implements AST {
             this.count = 0;
             this.first = -1;
         }
+
+        public Node clone() {
+            Node temp = new Node(symbol);
+            temp.count = this.count;
+            temp.first = this.first;
+            return temp;
+        }
     }
 
     /**
@@ -72,7 +79,7 @@ abstract class ASTImpl implements AST {
     /**
      * The nodes' labels
      */
-    protected List<Node> nodes;
+    protected BigList<Node> nodes;
     /**
      * The index of the tree's root node
      */
@@ -90,7 +97,7 @@ abstract class ASTImpl implements AST {
         this.tableTokens = text;
         this.tableVariables = variables;
         this.tableVirtuals = virtuals;
-        this.nodes = new ArrayList<Node>();
+        this.nodes = new BigList<Node>(Node.class, Node[].class);
         this.root = -1;
     }
 

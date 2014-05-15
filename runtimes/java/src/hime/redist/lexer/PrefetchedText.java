@@ -24,8 +24,8 @@ import hime.redist.Symbol;
 import hime.redist.TextPosition;
 import hime.redist.Token;
 import hime.redist.TokenizedText;
+import hime.redist.utils.BigList;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -91,7 +91,7 @@ public class PrefetchedText implements TokenizedText {
     /**
      * The token data in this content
      */
-    private List<Cell> cells;
+    private BigList<Cell> cells;
 
     /**
      * Initializes this text
@@ -102,7 +102,7 @@ public class PrefetchedText implements TokenizedText {
     public PrefetchedText(List<Symbol> terminals, String content) {
         this.content = content;
         this.terminals = terminals;
-        this.cells = new ArrayList<Cell>();
+        this.cells = new BigList<Cell>(Cell.class, Cell[].class);
     }
 
     /**
