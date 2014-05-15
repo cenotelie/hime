@@ -72,7 +72,7 @@ public class LRkAutomaton {
             columnsID[i] = input.readChar();
         this.columns = new ColumnMap();
         for (int i = 0; i != ncols; i++)
-            this.columns.Add(columnsID[i], i);
+            this.columns.add(columnsID[i], i);
         this.table = new LRAction[nstates * ncols];
         for (int i = 0; i != table.length; i++)
             this.table[i] = new LRAction(input);

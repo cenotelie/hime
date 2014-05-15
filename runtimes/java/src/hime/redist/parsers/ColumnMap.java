@@ -53,7 +53,7 @@ class ColumnMap {
      * @param key   The key for the data
      * @param value The data
      */
-    public void Add(int key, int value) {
+    public void add(int key, int value) {
         if (key <= 0xFF)
             cache1[key] = value;
         else if (key <= 0x1FF) {
@@ -61,7 +61,7 @@ class ColumnMap {
                 cache2 = new int[256];
             cache2[key - 0x100] = value;
         } else {
-            if (others != null)
+            if (others == null)
                 others = new HashMap<Integer, Integer>();
             others.put(key, value);
         }
