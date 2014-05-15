@@ -21,9 +21,10 @@
 package hime.redist.lexer;
 
 import hime.redist.*;
+import hime.redist.utils.BinaryInput;
 
-import java.io.DataInput;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -119,8 +120,8 @@ public abstract class PrefetchedLexer implements ILexer {
      * @param separator SID of the separator token
      * @param input     Input to this lexer
      */
-    protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, DataInput input) throws IOException {
-        this(automaton, terminals, separator, input.readUTF());
+    protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, InputStream input) throws IOException {
+        this(automaton, terminals, separator, (new BinaryInput(input)).toString());
     }
 
     /**

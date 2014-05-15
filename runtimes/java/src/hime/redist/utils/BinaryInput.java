@@ -68,7 +68,15 @@ public class BinaryInput {
      * @param name The name of the resource to load
      */
     public BinaryInput(Class type, String name) {
-        InputStream stream = type.getResourceAsStream(name);
+        this(type.getResourceAsStream(name));
+    }
+
+    /**
+     * Initializes this input
+     *
+     * @param stream The input stream to load from
+     */
+    public BinaryInput(InputStream stream) {
         this.content = new ArrayList<byte[]>();
         this.size = 0;
         try {
@@ -164,6 +172,7 @@ public class BinaryInput {
 
     /**
      * Gets the full content of this input as a String
+     *
      * @return The full content of this input as a String
      */
     public String toString() {
