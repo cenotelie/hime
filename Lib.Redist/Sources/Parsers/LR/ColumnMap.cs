@@ -66,7 +66,7 @@ namespace Hime.Redist.Parsers
 			}
 			else
 			{
-				if (others != null)
+				if (others == null)
 					others = new Dictionary<int, int>();
 				others.Add(key, value);
 			}

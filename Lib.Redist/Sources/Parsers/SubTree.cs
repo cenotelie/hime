@@ -104,6 +104,8 @@ namespace Hime.Redist.Parsers
 		/// <returns>The total number of nodes in this sub-tree</returns>
 		public int GetSize()
 		{
+			if (actions[0] != TreeAction.Replace)
+				return nodes[0].count + 1;
 			int size = 1;
 			for (int i = 0; i != nodes[0].count; i++)
 				size += nodes[size].count + 1;
