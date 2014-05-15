@@ -4,3 +4,5 @@ syntax: regexp
 .*\.suo
 .*/.idea/.*
 .*/target/.*
+.*/out/.*
+.*\.class
