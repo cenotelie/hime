@@ -20,7 +20,16 @@
 
 package hime.redist;
 
+/**
+ * Specifies the type of error
+ */
 public enum ParseErrorType {
+    /**
+     * Lexical error occuring when an unexpected character is encountered in the input preventing to match tokens
+     */
     UnexpectedChar,
+    /**
+     * Syntactic error occuring when an unexpected token is encountered by the parser
+     */
     UnexpectedToken
 }

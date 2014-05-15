@@ -20,24 +20,54 @@
 
 package hime.redist;
 
-import java.util.Enumeration;
+import java.util.List;
 
+/**
+ * Represents a node in an Abstract Syntax Tree
+ */
 public class ASTNode {
+    /**
+     * The parent parse tree
+     */
     private AST tree;
+    /**
+     * The index of this node in the parse tree
+     */
     private int index;
 
+    /**
+     * Gets the symbol in this node
+     *
+     * @return The symbol in this node
+     */
     public Symbol getSymbol() {
         return tree.getSymbol(index);
     }
 
+    /**
+     * Gets the position in the input text of this node
+     *
+     * @return The position in the input text of this node
+     */
     public TextPosition getPosition() {
         return tree.getPosition(index);
     }
 
-    public Enumeration<ASTNode> getChildren() {
+    /**
+     * Gets the children of this node
+     *
+     * @return The children of this node
+     */
+    public List<ASTNode> getChildren() {
         return tree.getChildren(index);
     }
 
+    /**
+     * Initializes this node
+     *
+     * @param tree  The parent parse tree
+     * @param index The index of this node in the parse tree
+     */
     public ASTNode(AST tree, int index) {
         this.tree = tree;
         this.index = index;

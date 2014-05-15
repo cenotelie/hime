@@ -20,8 +20,22 @@
 
 package hime.redist;
 
+/**
+ * Represents the semantic body of a rule being reduced
+ */
 public interface SemanticBody {
+    /**
+     * Gets the symbol at the i-th index
+     *
+     * @param index Index of the symbol
+     * @return The symbol at the given index
+     */
     Symbol at(int index);
 
+    /**
+     * Gets the length of this body
+     *
+     * @return The length of this body
+     */
     int length();
 }

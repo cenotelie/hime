@@ -20,18 +20,43 @@
 
 package hime.redist;
 
+/**
+ * Represents a position in term of line and column in a text input
+ */
 public class TextPosition {
+    /**
+     * The line number
+     */
     private int line;
+    /**
+     * The column number
+     */
     private int column;
 
+    /**
+     * Gets the line number
+     *
+     * @return The line number
+     */
     public int getLine() {
         return line;
     }
 
+    /**
+     * Gets the column number
+     *
+     * @return The column number
+     */
     public int getColumn() {
         return column;
     }
 
+    /**
+     * Initializes this position with the given line and column numbers
+     *
+     * @param line   The line number
+     * @param column The column number
+     */
     public TextPosition(int line, int column) {
         this.line = line;
         this.column = column;

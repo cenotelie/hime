@@ -20,18 +20,57 @@
 
 package hime.redist;
 
-import java.util.Enumeration;
+import java.util.List;
 
+/**
+ * Represents an Abstract Syntax Tree produced by a parser
+ */
 public interface AST {
+    /**
+     * Gets the root node of this tree
+     *
+     * @return the root node of this tree
+     */
     ASTNode getRoot();
 
+    /**
+     * Gets the symbol of the given node
+     *
+     * @param node A node
+     * @return The node's symbol
+     */
     Symbol getSymbol(int node);
 
+    /**
+     * Gets the number of children of the given node
+     *
+     * @param node A node
+     * @return The node's numer of children
+     */
     int getChildrenCount(int node);
 
+    /**
+     * Gets the i-th child of the given node
+     *
+     * @param parent A node
+     * @param i      The child's number
+     * @return The i-th child
+     */
     ASTNode getChild(int parent, int i);
 
-    Enumeration<ASTNode> getChildren(int parent);
+    /**
+     * Gets the children of the given node
+     *
+     * @param parent A node
+     * @return The children
+     */
+    List<ASTNode> getChildren(int parent);
 
+    /**
+     * Gets the position in the input text of the given node
+     *
+     * @param node A node
+     * @return The position in the text
+     */
     TextPosition getPosition(int node);
 }

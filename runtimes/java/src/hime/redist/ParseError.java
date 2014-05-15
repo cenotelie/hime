@@ -20,23 +20,56 @@
 
 package hime.redist;
 
-public class ParseError {
+/**
+ * Represents an error in a parser
+ */
+public abstract class ParseError {
+    /**
+     * The error's type
+     */
     protected ParseErrorType type;
+    /**
+     * The error's position in the input
+     */
     protected TextPosition position;
+    /**
+     * The error's message
+     */
     protected String message;
 
+    /**
+     * Gets the error's type
+     *
+     * @return The error's type
+     */
     public ParseErrorType getType() {
         return type;
     }
 
+    /**
+     * Gets the error's position in the input
+     *
+     * @return The error's position in the input
+     */
     public TextPosition getPosition() {
         return position;
     }
 
+    /**
+     * Gets the error's message
+     *
+     * @return The error's message
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Initializes a new instance of the ParserError
+     *
+     * @param type     Error's type
+     * @param position Error's position in the input
+     */
     protected ParseError(ParseErrorType type, TextPosition position) {
         this.type = type;
         this.position = position;

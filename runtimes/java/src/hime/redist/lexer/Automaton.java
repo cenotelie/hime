@@ -22,18 +22,37 @@ package hime.redist.lexer;
 
 import hime.redist.utils.BinHelper;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-
+/**
+ * Data structure for a text lexer automaton
+ */
 public class Automaton {
+    /**
+     * Table of indices in the states table
+     */
     private int[] table;
+    /**
+     * Lexer's DFA table of states
+     */
     private char[] states;
+    /**
+     * The number of states in this automaton
+     */
     private int statesCount;
 
+    /**
+     * Gets the number of states in this automaton
+     *
+     * @return the number of states in this automaton
+     */
     public int getStatesCount() {
         return statesCount;
     }
 
+    /**
+     * Initializes a new automaton from the given binary stream
+     *
+     * @param input A binary stream
+     */
     public Automaton(BinHelper input) {
         this.statesCount = input.readInt();
         this.table = new int[this.statesCount];
@@ -44,31 +63,76 @@ public class Automaton {
             this.states[i] = input.readChar();
     }
 
+    /**
+     * Loads an automaton from a resource
+     *
+     * @param lexerType The type of the lexer to load an automaton for
+     * @param name      The full name of the resource to load from
+     * @return The automaton
+     */
     public static Automaton find(Class lexerType, String name) {
         BinHelper input = new BinHelper(lexerType, name);
         return new Automaton(input);
     }
 
+    /**
+     * Gets the offset of the given state in the table
+     *
+     * @param state he DFA state which offset shall be retrieved
+     * @return The offset of the given DFA state
+     */
     public int getOffsetOf(int state) {
         return table[state];
     }
 
+    /**
+     * Gets the recognized terminal index for the DFA at the given offset
+     *
+     * @param offset The DFA state's offset
+     * @return The index of the terminal recognized at this state, or 0xFFFF if none
+     */
     public int getStateRecognizedTerminal(int offset) {
         return states[offset];
     }
 
+    /**
+     * Checks whether the DFA state at the given offset does not have any transition
+     *
+     * @param offset The DFA state's offset
+     * @return true if the state at the given offset has no transition
+     */
     public boolean isStateDeadEnd(int offset) {
         return (states[offset + 1] == 0);
     }
 
+    /**
+     * Gets the number of non-cached transitions from the DFA state at the given offset
+     *
+     * @param offset The DFA state's offset
+     * @return The number of non-cached transitions
+     */
     public int getStateBulkTransitionsCount(int offset) {
         return states[offset + 2];
     }
 
+    /**
+     * Gets the transition from the DFA state at the given offset with the input value (max 255)
+     *
+     * @param offset The DFA state's offset
+     * @param value  The input value
+     * @return The state obtained by the transition, or 0xFFFF if none is found
+     */
     public int getStateCachedTransition(int offset, int value) {
         return states[offset + 3 + value];
     }
 
+    /**
+     * Gets the transition from the DFA state at the given offset with the input value (min 256)
+     *
+     * @param offset The DFA state's offset
+     * @param value  The input value
+     * @return The state obtained by the transition, or 0xFFFF if none is found
+     */
     public int getStateBulkTransition(int offset, int value) {
         int count = states[offset + 2];
         offset += 259;

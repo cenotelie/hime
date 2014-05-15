@@ -20,6 +20,15 @@
 
 package hime.redist;
 
+/**
+ * Represents a user-defined semantic action on the given body and with the given parent
+ */
 public interface SemanticAction {
+    /**
+     * Executes this action
+     *
+     * @param head The semantic object for the head
+     * @param body The current body at the time of the action
+     */
     void execute(Symbol head, SemanticBody body);
 }

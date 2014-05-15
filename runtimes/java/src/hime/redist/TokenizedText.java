@@ -20,10 +20,30 @@
 
 package hime.redist;
 
+/**
+ * Represents the output of a lexer as a tokenized text
+ */
 public interface TokenizedText extends Text {
+    /**
+     * Gets the number of tokens in this text
+     *
+     * @return The number of tokens in this text
+     */
     int getTokenCount();
 
+    /**
+     * Gets the token at the given index
+     *
+     * @param index An index
+     * @return The token
+     */
     Symbol at(int index);
 
+    /**
+     * Gets the position of the token at the given index
+     *
+     * @param tokenIndex The index of a token
+     * @return The position (line and column) of the token
+     */
     TextPosition getPositionOf(int tokenIndex);
 }

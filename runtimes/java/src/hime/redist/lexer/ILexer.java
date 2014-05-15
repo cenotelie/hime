@@ -26,12 +26,35 @@ import hime.redist.TokenizedText;
 
 import java.util.List;
 
+/**
+ * Represents a lexer for a text stream
+ */
 public interface ILexer {
+    /**
+     * Gets the terminals matched by this lexer
+     *
+     * @return The terminals matched by this lexer
+     */
     List<Symbol> getTerminals();
 
+    /**
+     * Gets the lexer's output as a tokenized text
+     *
+     * @return The lexer's output as a tokenized text
+     */
     TokenizedText getOutput();
 
+    /**
+     * Sets the handler of lexical errors coming from this parser
+     *
+     * @param handler The handler
+     */
     void setErrorHandler(LexicalErrorHandler handler);
 
+    /**
+     * Gets the next token in the input
+     *
+     * @return The next token in the input
+     */
     Token getNextToken();
 }

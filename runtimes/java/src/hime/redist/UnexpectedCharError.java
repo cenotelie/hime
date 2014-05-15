@@ -20,13 +20,30 @@
 
 package hime.redist;
 
+/**
+ * Represents an unexpected character error in the input stream of a lexer
+ */
 public class UnexpectedCharError extends ParseError {
+    /**
+     * The unexpected char
+     */
     private String unexpected;
 
+    /**
+     * Gets the unexpected char
+     *
+     * @return The unexpected char
+     */
     public String getUnexpected() {
         return unexpected;
     }
 
+    /**
+     * Initializes a new instance of the UnexpectedCharError class for the given character
+     *
+     * @param unexpected The errorneous character (as a string)
+     * @param position   Error's position in the input
+     */
     public UnexpectedCharError(String unexpected, TextPosition position) {
         super(ParseErrorType.UnexpectedChar, position);
         StringBuilder builder = new StringBuilder("Unexpected character '");

@@ -20,18 +20,37 @@
 
 package hime.redist;
 
+/**
+ * Represents a token as an output element of a lexer
+ */
 public class Token {
     private int sid;
     private int index;
 
+    /**
+     * Gets the id of the terminal symbol associated to this token
+     *
+     * @return The id of the terminal symbol associated to this token
+     */
     public int getSymbolID() {
         return sid;
     }
 
+    /**
+     * Gets the index of this token in a lexer's stream of token
+     *
+     * @return The index of this token in a lexer's stream of token
+     */
     public int getIndex() {
         return index;
     }
 
+    /**
+     * Initializes this token
+     *
+     * @param sid   The terminal's id
+     * @param index The token's index
+     */
     public Token(int sid, int index) {
         this.sid = sid;
         this.index = index;

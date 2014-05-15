@@ -22,6 +22,14 @@ package hime.redist.lexer;
 
 import hime.redist.ParseError;
 
+/**
+ * Handler for lexical errors
+ */
 public interface LexicalErrorHandler {
+    /**
+     * Handle the specified error
+     *
+     * @param error The error
+     */
     void handle(ParseError error);
 }

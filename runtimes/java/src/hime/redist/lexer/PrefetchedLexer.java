@@ -28,29 +28,79 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents a lexer for a prefetched piece of text, i.e. the text is already in memory
+ */
 public abstract class PrefetchedLexer implements ILexer {
+    /**
+     * The handler of lexical error for this lexer
+     */
     private LexicalErrorHandler handler;
+    /**
+     * This lexer's automaton
+     */
     private Automaton lexAutomaton;
+    /**
+     * The terminals matched by this lexer
+     */
     private List<Symbol> terminals;
+    /**
+     * Symbol ID of the SEPARATOR terminal
+     */
     private int lexSeparator;
+    /**
+     * The lexer's full input
+     */
     private String input;
+    /**
+     * The tokenized text
+     */
     private PrefetchedText text;
+    /**
+     * The current index in the input
+     */
     private int inputIndex;
+    /**
+     * The index of the next token
+     */
     private int tokenIndex;
 
+    /**
+     * Gets the terminals matched by this lexer
+     *
+     * @return The terminals matched by this lexer
+     */
     public List<Symbol> getTerminals() {
         return terminals;
     }
 
+    /**
+     * Gets the lexer's output as a tokenized text
+     *
+     * @return The lexer's output as a tokenized text
+     */
     public TokenizedText getOutput() {
         return text;
     }
 
+    /**
+     * Sets the handler of lexical errors coming from this parser
+     *
+     * @param handler The handler
+     */
     public void setErrorHandler(LexicalErrorHandler handler) {
         this.handler = handler;
     }
 
 
+    /**
+     * Initializes a new instance of the Lexer class with the given input
+     *
+     * @param automaton DFA automaton for this lexer
+     * @param terminals Terminals recognized by this lexer
+     * @param separator SID of the separator token
+     * @param input     Input to this lexer
+     */
     protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
         this.lexAutomaton = automaton;
         this.terminals = Collections.unmodifiableList(Arrays.asList(terminals));
@@ -61,10 +111,23 @@ public abstract class PrefetchedLexer implements ILexer {
         this.tokenIndex = -1;
     }
 
+    /**
+     * Initializes a new instance of the Lexer class with the given input
+     *
+     * @param automaton DFA automaton for this lexer
+     * @param terminals Terminals recognized by this lexer
+     * @param separator SID of the separator token
+     * @param input     Input to this lexer
+     */
     protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, DataInput input) throws IOException {
         this(automaton, terminals, separator, input.readUTF());
     }
 
+    /**
+     * Gets the next token in the input
+     *
+     * @return The next token in the input
+     */
     public Token getNextToken() {
         if (tokenIndex == -1) {
             // this is the first call to this method, prefetch the tokens
@@ -77,16 +140,33 @@ public abstract class PrefetchedLexer implements ILexer {
         return text.getTokenAt(tokenIndex++);
     }
 
+    /**
+     * Represents a match in the input
+     */
     private class Match {
+        /**
+         * Index of the matched terminal
+         */
         public int terminal;
+        /**
+         * Length of the matched input
+         */
         public int length;
 
+        /**
+         * Initializes a match
+         *
+         * @param terminal Index of the matched terminal
+         */
         public Match(int terminal) {
             this.terminal = terminal;
             this.length = 0;
         }
     }
 
+    /**
+     * Finds all the tokens in the lexer's input
+     */
     private void findTokens() {
         while (true) {
             Match match = runDFA();
@@ -118,6 +198,11 @@ public abstract class PrefetchedLexer implements ILexer {
         }
     }
 
+    /**
+     * Runs the lexer's DFA to match a terminal in the input ahead
+     *
+     * @return The matched terminal and length
+     */
     private Match runDFA() {
         if (inputIndex == input.length()) {
             // At the end of input

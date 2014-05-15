@@ -20,32 +20,78 @@
 
 package hime.redist;
 
+/**
+ * Represents a symbol in an AST
+ */
 public class Symbol {
+    /**
+     * Symbol ID of the Epsilon terminal
+     */
     public static final int sidEpsilon = 1;
+    /**
+     * Symbol ID of the Dollar terminal
+     */
     public static final int sidDollar = 2;
 
+    /**
+     * The symbol's unique identifier
+     */
     private int id;
+    /**
+     * The symbol's name
+     */
     private String name;
+    /**
+     * The symbol's value
+     */
     private String value;
 
+    /**
+     * Gets the symbol's unique identifier
+     *
+     * @return The symbol's unique identifier
+     */
     public int getID() {
         return id;
     }
 
+    /**
+     * Gets the symbol's name
+     *
+     * @return The symbol's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the symbol's value
+     *
+     * @return The symbol's value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Initializes this symbol
+     *
+     * @param id   The id
+     * @param name The symbol's name
+     */
     public Symbol(int id, String name) {
         this.id = id;
         this.name = name;
         this.value = name;
     }
 
+    /**
+     * Initializes this symbol
+     *
+     * @param id    The id
+     * @param name  The symbol's name
+     * @param value The symbol's value
+     */
     public Symbol(int id, String name, String value) {
         this.id = id;
         this.name = name;

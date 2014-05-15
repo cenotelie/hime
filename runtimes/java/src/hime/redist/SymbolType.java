@@ -20,9 +20,24 @@
 
 package hime.redist;
 
-public class SymbolType {
+/**
+ * Represents the type of symbol
+ */
+class SymbolType {
+    /**
+     * Marks as other (used for SPPF nodes)
+     */
     public static final byte None = 0;
+    /**
+     * Marks a token symbol
+     */
     public static final byte Token = 1;
+    /**
+     * Marks a variable symbol
+     */
     public static final byte Variable = 2;
+    /**
+     * Marks a virtual symbol
+     */
     public static final byte Virtual = 3;
 }

@@ -20,24 +20,51 @@
 
 package hime.redist;
 
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents an unexpected token error in a parser
+ */
 public class UnexpectedTokenError extends ParseError {
+    /**
+     * The unexpected token
+     */
     private Symbol unexpected;
+    /**
+     * A list of the expected terminals
+     */
     private List<Symbol> expected;
 
+    /**
+     * Gets the unexpected token
+     *
+     * @return The unexpected token
+     */
     public Symbol getUnexpectedToken() {
         return unexpected;
     }
 
+    /**
+     * Gets a list of the expected terminals
+     *
+     * @return A list of the expected terminals
+     */
     public List<Symbol> getExpectedTerminals() {
         return expected;
     }
 
+    /**
+     * Initializes a new instance of the UnexpectedTokenError class with a token and an array of expected names
+     *
+     * @param token    The unexpected token
+     * @param position Error's position in the input
+     * @param expected The expected terminals
+     */
     public UnexpectedTokenError(Symbol token, TextPosition position, List<Symbol> expected) {
         super(ParseErrorType.UnexpectedToken, position);
         this.unexpected = token;
-        this.expected = expected;
+        this.expected = Collections.unmodifiableList(expected);
         StringBuilder builder = new StringBuilder("Unexpected token \"");
         builder.append(token.getValue());
         builder.append("\"; expected {");

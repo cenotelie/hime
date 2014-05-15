@@ -20,8 +20,6 @@
 
 package hime.redist.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -29,17 +27,46 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a binary input for the automata
+ * This class is required because we are forced to read the resource from InputStream without previous knowledge
+ * of the stream size. That, plus .Net uses little endian whereas Java uses big endian ...
+ * This class provides a set of methods to read as a stream of little endian data.
+ */
 public class BinHelper {
+    /**
+     * The size of the intermediate buffers
+     */
     private static final int bufferSize = 1024;
 
+    /**
+     * The list of the intermediate buffers for loading the content
+     */
     private List<byte[]> content;
+    /**
+     * The total size of the input
+     */
     private int size;
+    /**
+     * The in-memory buffer to read from in little endian style
+     */
     private ByteBuffer buffer;
 
+    /**
+     * Gets the length of this input
+     *
+     * @return The length of this input
+     */
     public int length() {
         return size;
     }
 
+    /**
+     * Initializes this input
+     *
+     * @param type The type used to retrieve the resource
+     * @param name The name of the resource to load
+     */
     public BinHelper(Class type, String name) {
         InputStream stream = type.getResourceAsStream(name);
         this.content = new ArrayList<byte[]>();
@@ -58,6 +85,12 @@ public class BinHelper {
         this.content = null;
     }
 
+    /**
+     * Loads all the content from the specified input stream
+     *
+     * @param stream The stream to load from
+     * @throws IOException When the reading the stream fails
+     */
     private void load(InputStream stream) throws IOException {
         byte[] buffer = new byte[bufferSize];
         int length = 0;
@@ -82,6 +115,11 @@ public class BinHelper {
         }
     }
 
+    /**
+     * Builds the full (consecutive in memory) buffer
+     *
+     * @return The full buffer
+     */
     private byte[] buildFullBuffer() {
         byte[] buffer = new byte[size];
         int current = 0;
@@ -97,7 +135,21 @@ public class BinHelper {
         return buffer;
     }
 
-    public char readChar() { return buffer.getChar(); }
+    /**
+     * Reads a single char (an unsigned 16 bits integer)
+     *
+     * @return The next data as a char
+     */
+    public char readChar() {
+        return buffer.getChar();
+    }
 
-    public int readInt() { return buffer.getInt(); }
+    /**
+     * Reads a single int (signed 32 bits integer)
+     *
+     * @return The next data as an int
+     */
+    public int readInt() {
+        return buffer.getInt();
+    }
 }
