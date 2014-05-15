@@ -33,7 +33,7 @@ import java.util.List;
  * of the stream size. That, plus .Net uses little endian whereas Java uses big endian ...
  * This class provides a set of methods to read as a stream of little endian data.
  */
-public class BinHelper {
+public class BinaryInput {
     /**
      * The size of the intermediate buffers
      */
@@ -67,7 +67,7 @@ public class BinHelper {
      * @param type The type used to retrieve the resource
      * @param name The name of the resource to load
      */
-    public BinHelper(Class type, String name) {
+    public BinaryInput(Class type, String name) {
         InputStream stream = type.getResourceAsStream(name);
         this.content = new ArrayList<byte[]>();
         this.size = 0;
@@ -136,6 +136,15 @@ public class BinHelper {
     }
 
     /**
+     * Reads a single byte
+     *
+     * @return The next data as a byte
+     */
+    public byte readByte() {
+        return buffer.get();
+    }
+
+    /**
      * Reads a single char (an unsigned 16 bits integer)
      *
      * @return The next data as a char
@@ -151,5 +160,13 @@ public class BinHelper {
      */
     public int readInt() {
         return buffer.getInt();
+    }
+
+    /**
+     * Gets the full content of this input as a String
+     * @return The full content of this input as a String
+     */
+    public String toString() {
+        return new String(buffer.array());
     }
 }

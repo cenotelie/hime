@@ -17,41 +17,49 @@
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
  **********************************************************************/
+package hime.redist.parsers;
 
-package hime.redist;
+import hime.redist.ParseResult;
+import hime.redist.Symbol;
+
+import java.util.List;
 
 /**
- * Utility class for the compact representation of a reference to a symbol in a table
+ * Represents a parser
  */
-class SymbolRef {
+public interface IParser {
     /**
-     * Gets a reference for the specified information
+     * Gets the variable symbols used by this parser
      *
-     * @param type  The symbol's type
-     * @param index The symbol's index in its respective table
-     * @return The corresponding reference
+     * @return The variable symbols used by this parser
      */
-    public static int encode(byte type, int index) {
-        return ((int) type << 30) | index;
-    }
+    List<Symbol> getVariables();
 
     /**
-     * Gets the type of the symbol for the specified reference
+     * Gets the virtual symbols used by this parser
      *
-     * @param ref A reference to a symbol
-     * @return The type of the symbol referred to
+     * @return The virtual symbols used by this parser
      */
-    public static byte getType(int ref) {
-        return (byte) (ref >>> 30);
-    }
+    List<Symbol> getVirtuals();
 
     /**
-     * Gets the index of the symbol in its respective table
+     * Gets whether the parser should try to recover from errors
      *
-     * @param ref A reference to a symbol
-     * @return The index of the symbol in its respective table
+     * @return Whether the parser should try to recover from errors
      */
-    public static int getIndex(int ref) {
-        return (ref & 0x3FFFFFFF);
-    }
+    boolean getRecover();
+
+    /**
+     * Sets whether the parser should try to recover from errors
+     *
+     * @param recover Whether the parser should try to recover from errors
+     */
+    void setRecover(boolean recover);
+
+    /**
+     * Parses the input and returns the result
+     *
+     * @return A ParseResult object containing the data about the result
+     */
+    ParseResult parse();
 }

@@ -17,27 +17,19 @@
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
  **********************************************************************/
-
-package hime.redist;
+package hime.redist.parsers;
 
 /**
- * Represents the type of symbol
+ * Represents a factory of objects for a pool
+ *
+ * @param <T> The type of the pooled objects
  */
-class SymbolType {
+interface Factory<T> {
     /**
-     * Marks as other (used for SPPF nodes)
+     * Creates a new object
+     *
+     * @param pool The enclosing pool
+     * @return The created object
      */
-    public static final byte None = 0;
-    /**
-     * Marks a token symbol
-     */
-    public static final byte Token = 1;
-    /**
-     * Marks a variable symbol
-     */
-    public static final byte Variable = 2;
-    /**
-     * Marks a virtual symbol
-     */
-    public static final byte Virtual = 3;
+    T createNew(Pool<T> pool);
 }

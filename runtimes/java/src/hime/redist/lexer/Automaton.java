@@ -20,7 +20,7 @@
 
 package hime.redist.lexer;
 
-import hime.redist.utils.BinHelper;
+import hime.redist.utils.BinaryInput;
 
 /**
  * Data structure for a text lexer automaton
@@ -53,7 +53,7 @@ public class Automaton {
      *
      * @param input A binary stream
      */
-    public Automaton(BinHelper input) {
+    public Automaton(BinaryInput input) {
         this.statesCount = input.readInt();
         this.table = new int[this.statesCount];
         for (int i = 0; i != this.statesCount; i++)
@@ -71,7 +71,7 @@ public class Automaton {
      * @return The automaton
      */
     public static Automaton find(Class lexerType, String name) {
-        BinHelper input = new BinHelper(lexerType, name);
+        BinaryInput input = new BinaryInput(lexerType, name);
         return new Automaton(input);
     }
 
