@@ -21,9 +21,9 @@
 package hime.redist;
 
 public interface TokenizedText extends Text {
-    public int getTokenCount();
+    int getTokenCount();
 
-    public Symbol at(int index);
+    Symbol at(int index);
 
-    public TextPosition getPositionOf(int tokenIndex);
+    TextPosition getPositionOf(int tokenIndex);
 }

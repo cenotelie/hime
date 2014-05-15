@@ -20,40 +20,20 @@
 
 package hime.redist;
 
-public class Symbol {
-    public static final int sidEpsilon = 1;
-    public static final int sidDollar = 2;
+public class Token {
+    private int sid;
+    private int index;
 
-    private int id;
-    private String name;
-    private String value;
-
-    public int getID() {
-        return id;
+    public int getSymbolID() {
+        return sid;
     }
 
-    public String getName() {
-        return name;
+    public int getIndex() {
+        return index;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public Symbol(int id, String name) {
-        this.id = id;
-        this.name = name;
-        this.value = name;
-    }
-
-    public Symbol(int id, String name, String value) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
+    public Token(int sid, int index) {
+        this.sid = sid;
+        this.index = index;
     }
 }

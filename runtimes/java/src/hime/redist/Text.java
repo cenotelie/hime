@@ -21,17 +21,17 @@
 package hime.redist;
 
 public interface Text {
-    public int getLineCount();
+    int getLineCount();
 
-    public int size();
+    int size();
 
-    public String getValue(int index, int length);
+    String getValue(int index, int length);
 
-    public int getLineIndex(int line);
+    int getLineIndex(int line);
 
-    public int getLineLength(int line);
+    int getLineLength(int line);
 
-    public String getLineContent(int line);
+    String getLineContent(int line);
 
-    public TextPosition getPositionAt(int index);
+    TextPosition getPositionAt(int index);
 }

@@ -25,9 +25,17 @@ public class ParseError {
     protected TextPosition position;
     protected String message;
 
-    public ParseErrorType getType() { return type; }
-    public TextPosition getPosition() { return position; }
-    public String getMessage() { return  message; }
+    public ParseErrorType getType() {
+        return type;
+    }
+
+    public TextPosition getPosition() {
+        return position;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 
     protected ParseError(ParseErrorType type, TextPosition position) {
         this.type = type;

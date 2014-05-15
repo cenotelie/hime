@@ -18,42 +18,10 @@
  *     Laurent Wouters - lwouters@xowl.org
  **********************************************************************/
 
-package hime.redist;
+package hime.redist.lexer;
 
-public class Symbol {
-    public static final int sidEpsilon = 1;
-    public static final int sidDollar = 2;
+import hime.redist.ParseError;
 
-    private int id;
-    private String name;
-    private String value;
-
-    public int getID() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public Symbol(int id, String name) {
-        this.id = id;
-        this.name = name;
-        this.value = name;
-    }
-
-    public Symbol(int id, String name, String value) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public interface LexicalErrorHandler {
+    void handle(ParseError error);
 }

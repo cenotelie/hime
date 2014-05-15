@@ -22,11 +22,11 @@ package hime.redist;
 
 public class SymbolRef {
     public static int encode(byte type, int index) {
-        return ((int)type << 30) | index;
+        return ((int) type << 30) | index;
     }
 
     public static byte getType(int ref) {
-        return (byte)(ref >>> 30);
+        return (byte) (ref >>> 30);
     }
 
     public static int getIndex(int ref) {

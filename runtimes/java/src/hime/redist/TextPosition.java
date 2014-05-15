@@ -24,9 +24,13 @@ public class TextPosition {
     private int line;
     private int column;
 
-    public int getLine() { return line; }
+    public int getLine() {
+        return line;
+    }
 
-    public  int getColumn() { return column; }
+    public int getColumn() {
+        return column;
+    }
 
     public TextPosition(int line, int column) {
         this.line = line;

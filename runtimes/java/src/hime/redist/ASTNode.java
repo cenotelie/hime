@@ -26,11 +26,17 @@ public class ASTNode {
     private AST tree;
     private int index;
 
-    public Symbol getSymbol() { return tree.getSymbol(index); }
+    public Symbol getSymbol() {
+        return tree.getSymbol(index);
+    }
 
-    public TextPosition getPosition() { return tree.getPosition(index); }
+    public TextPosition getPosition() {
+        return tree.getPosition(index);
+    }
 
-    public Enumeration<ASTNode> getChildren() { return tree.getChildren(index); }
+    public Enumeration<ASTNode> getChildren() {
+        return tree.getChildren(index);
+    }
 
     public ASTNode(AST tree, int index) {
         this.tree = tree;

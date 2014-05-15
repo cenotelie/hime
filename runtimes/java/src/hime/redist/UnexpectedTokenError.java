@@ -26,9 +26,13 @@ public class UnexpectedTokenError extends ParseError {
     private Symbol unexpected;
     private List<Symbol> expected;
 
-    public Symbol getUnexpectedToken() { return unexpected; }
+    public Symbol getUnexpectedToken() {
+        return unexpected;
+    }
 
-    public List<Symbol> getExpectedTerminals() { return expected; }
+    public List<Symbol> getExpectedTerminals() {
+        return expected;
+    }
 
     public UnexpectedTokenError(Symbol token, TextPosition position, List<Symbol> expected) {
         super(ParseErrorType.UnexpectedToken, position);
@@ -37,7 +41,7 @@ public class UnexpectedTokenError extends ParseError {
         StringBuilder builder = new StringBuilder("Unexpected token \"");
         builder.append(token.getValue());
         builder.append("\"; expected {");
-        for (int i=0; i!=expected.size(); i++) {
+        for (int i = 0; i != expected.size(); i++) {
             if (i != 0)
                 builder.append(", ");
             builder.append(expected.get(i).getName());

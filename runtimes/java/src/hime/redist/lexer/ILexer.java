@@ -18,42 +18,20 @@
  *     Laurent Wouters - lwouters@xowl.org
  **********************************************************************/
 
-package hime.redist;
+package hime.redist.lexer;
 
-public class Symbol {
-    public static final int sidEpsilon = 1;
-    public static final int sidDollar = 2;
+import hime.redist.Symbol;
+import hime.redist.Token;
+import hime.redist.TokenizedText;
 
-    private int id;
-    private String name;
-    private String value;
+import java.util.List;
 
-    public int getID() {
-        return id;
-    }
+public interface ILexer {
+    List<Symbol> getTerminals();
 
-    public String getName() {
-        return name;
-    }
+    TokenizedText getOutput();
 
-    public String getValue() {
-        return value;
-    }
+    void setErrorHandler(LexicalErrorHandler handler);
 
-    public Symbol(int id, String name) {
-        this.id = id;
-        this.name = name;
-        this.value = name;
-    }
-
-    public Symbol(int id, String name, String value) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    Token getNextToken();
 }

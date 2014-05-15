@@ -23,19 +23,18 @@ package hime.redist;
 public class UnexpectedCharError extends ParseError {
     private String unexpected;
 
-    public String getUnexpected() { return unexpected; }
+    public String getUnexpected() {
+        return unexpected;
+    }
 
     public UnexpectedCharError(String unexpected, TextPosition position) {
         super(ParseErrorType.UnexpectedChar, position);
         StringBuilder builder = new StringBuilder("Unexpected character '");
         builder.append(unexpected);
         builder.append("' (U+");
-        if (unexpected.length() == 1)
-        {
+        if (unexpected.length() == 1) {
             builder.append(Integer.toHexString(unexpected.charAt(0)));
-        }
-        else
-        {
+        } else {
             int lead = unexpected.charAt(0);
             int trail = unexpected.charAt(1);
             int cp = ((trail - 0xDC00) | ((lead - 0xD800) << 10)) + 0x10000;
