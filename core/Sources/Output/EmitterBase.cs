@@ -68,6 +68,44 @@ namespace Hime.CentralDogma.Output
 
 
 		/// <summary>
+		/// Gets the full path and name for the lexer code artifact
+		/// </summary>
+		public string ArtifactLexerCode { get { return prefix + grammar.Name + SuffixLexerCode; } }
+		/// <summary>
+		/// Gets the full path and name for the lexer data artifact
+		/// </summary>
+		public string ArtifactLexerData { get { return prefix + grammar.Name + suffixLexerData; } }
+		/// <summary>
+		/// Gets the full path and name for the parser code artifact
+		/// </summary>
+		public string ArtifactParserCode { get { return prefix + grammar.Name + SuffixParserCode; } }
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		public string ArtifactParserData { get { return prefix + grammar.Name + suffixParserData; } }
+		/// <summary>
+		/// Gets the full path and name for the assembly artifact
+		/// </summary>
+		public string ArtifactAssembly { get { return prefix + grammar.Name + SuffixAssembly; } }
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		public string ArtifactDebugGrammar { get { return prefix + grammar.Name + suffixDebugGrammar; } }
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		public string ArtifactDebugDFA { get { return prefix + grammar.Name + suffixDebugDFA; } }
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		public string ArtifactDebugLRAsText { get { return prefix + grammar.Name + suffixDebugLRAsText; } }
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		public string ArtifactDebugLRAsDOT { get { return prefix + grammar.Name + suffixDebugLRAsDOT; } }
+
+
+		/// <summary>
 		/// The reporter
 		/// </summary>
 		protected Reporter reporter;
@@ -173,10 +211,10 @@ namespace Hime.CentralDogma.Output
 					return false;
 				if (mode == Mode.Assembly)
 				{
-					File.Delete(prefix + SuffixLexerCode);
-					File.Delete(prefix + suffixLexerData);
-					File.Delete(prefix + SuffixParserCode);
-					File.Delete(prefix + suffixParserData);
+					File.Delete(ArtifactLexerCode);
+					File.Delete(ArtifactLexerData);
+					File.Delete(ArtifactParserCode);
+					File.Delete(ArtifactParserData);
 				}
 			}
 			return true;
@@ -188,19 +226,19 @@ namespace Hime.CentralDogma.Output
 		/// <returns><c>true</c> if this operation succeeded</returns>
 		private bool EmitDebugArtifacts()
 		{
-			reporter.Info("Exporting grammar debug data at " + prefix + suffixDebugGrammar + " ...");
-			SDK.Serializers.Export(grammar, prefix + suffixDebugGrammar);
+			reporter.Info("Exporting grammar debug data at " + ArtifactDebugGrammar + " ...");
+			SDK.Serializers.Export(grammar, ArtifactDebugGrammar);
 			if (dfa != null)
 			{
-				reporter.Info("Exporting DFA debug data at " + prefix + suffixDebugDFA + " ...");
-				SDK.Serializers.ExportDOT(dfa, prefix + suffixDebugDFA);
+				reporter.Info("Exporting DFA debug data at " + ArtifactDebugDFA + " ...");
+				SDK.Serializers.ExportDOT(dfa, ArtifactDebugDFA);
 			}
 			if (graph != null)
 			{
-				reporter.Info("Exporting LR graph debug data (txt) at " + prefix + suffixDebugLRAsDOT + " ...");
-				SDK.Serializers.ExportDOT(graph, prefix + suffixDebugLRAsDOT);
-				reporter.Info("Exporting LR graph debug data (dot) at " + prefix + suffixDebugLRAsText + " ...");
-				SDK.Serializers.Export(graph, prefix + suffixDebugLRAsText);
+				reporter.Info("Exporting LR graph debug data (txt) at " + ArtifactDebugLRAsText + " ...");
+				SDK.Serializers.ExportDOT(graph, ArtifactDebugLRAsText);
+				reporter.Info("Exporting LR graph debug data (dot) at " + ArtifactDebugLRAsDOT + " ...");
+				SDK.Serializers.Export(graph, ArtifactDebugLRAsDOT);
 			}
 			return true;
 		}
@@ -219,15 +257,15 @@ namespace Hime.CentralDogma.Output
 			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
 
 			// generate the lexer's data
-			reporter.Info("Exporting lexer data at " + prefix + suffixLexerData + " ...");
+			reporter.Info("Exporting lexer data at " + ArtifactLexerData + " ...");
 			LexerDataGenerator genData = new LexerDataGenerator(dfa);
-			genData.Generate(prefix + suffixLexerData);
+			genData.Generate(ArtifactLexerData);
 			expected = genData.Expected;
 
 			// generate the lexer's code
-			reporter.Info("Exporting lexer code at " + prefix + SuffixLexerCode + " ...");
+			reporter.Info("Exporting lexer code at " + ArtifactLexerCode + " ...");
 			Generator genCode = GetLexerCodeGenerator(separator);
-			genCode.Generate(prefix + SuffixLexerCode);
+			genCode.Generate(ArtifactLexerCode);
 			return true;
 		}
 
@@ -316,13 +354,13 @@ namespace Hime.CentralDogma.Output
 			}
 
 			// generate the parser's data
-			reporter.Info("Exporting parser data at " + prefix + suffixParserData + " ...");
-			generator.Generate(prefix + suffixParserData);
+			reporter.Info("Exporting parser data at " + ArtifactParserData + " ...");
+			generator.Generate(ArtifactParserData);
 
 			// generate the parser's code
-			reporter.Info("Exporting parser code at " + prefix + SuffixParserCode + " ...");
+			reporter.Info("Exporting parser code at " + ArtifactParserCode + " ...");
 			generator = GetParserCodeGenerator(parserType);
-			generator.Generate(prefix + SuffixParserCode);
+			generator.Generate(ArtifactParserCode);
 			return true;
 		}
 

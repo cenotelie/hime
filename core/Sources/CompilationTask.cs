@@ -198,7 +198,9 @@ namespace Hime.CentralDogma
 			}
 
 			// Build names
-			string prefix = (OutputPrefix != null) ? OutputPrefix : target.Name;
+			string prefix = (OutputPrefix != null) ? OutputPrefix : "";
+			if (prefix.Length != 0 && !prefix.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				prefix += Path.DirectorySeparatorChar;
 			string nmspace = (Namespace != null) ? Namespace : target.Name;
 
 			// emit the artifacts

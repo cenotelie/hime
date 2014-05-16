@@ -52,7 +52,6 @@ namespace Hime.CentralDogma.Output
 		/// <param name="grammar">The grammar to emit data for</param>
 		public EmitterForNet(Reporter reporter, Grammars.Grammar grammar) : base(reporter, grammar) { }
 
-
 		/// <summary>
 		/// Gets the runtime-specific generator of lexer code
 		/// </summary>
@@ -60,7 +59,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns>The runtime-specific generator of lexer code</returns>
 		protected override Generator GetLexerCodeGenerator(Grammars.Terminal separator)
 		{
-			return new LexerNetCodeGenerator(nmspace, modifier, grammar.Name, prefix + suffixLexerData, expected, separator);
+			return new LexerNetCodeGenerator(nmspace, modifier, grammar.Name, grammar.Name + suffixLexerData, expected, separator);
 		}
 
 		/// <summary>
@@ -70,7 +69,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(string parserType)
 		{
-			return new ParserNetCodeGenerator(nmspace, modifier, grammar.Name, prefix + suffixParserData, grammar, parserType);
+			return new ParserNetCodeGenerator(nmspace, modifier, grammar.Name, grammar.Name + suffixParserData, grammar, parserType);
 		}
 
 		/// <summary>
@@ -79,7 +78,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns><c>true</c> if the operation succeed</returns>
 		protected override bool EmitAssembly()
 		{
-			reporter.Info("Building assembly " + prefix + SuffixAssembly + " ...");
+			reporter.Info("Building assembly " + ArtifactAssembly + " ...");
 			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
 			bool hasError = false;
 			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
@@ -90,12 +89,12 @@ namespace Hime.CentralDogma.Output
 				compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
 				compilerparams.ReferencedAssemblies.Add("System.dll");
 				compilerparams.ReferencedAssemblies.Add(redist);
-				compilerparams.EmbeddedResources.Add(prefix + suffixLexerData);
-				compilerparams.EmbeddedResources.Add(prefix + suffixParserData);
-				compilerparams.OutputAssembly = prefix + SuffixAssembly;
+				compilerparams.EmbeddedResources.Add(ArtifactLexerData);
+				compilerparams.EmbeddedResources.Add(ArtifactParserData);
+				compilerparams.OutputAssembly = ArtifactAssembly;
 				System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] {
-					prefix + SuffixLexerCode,
-					prefix + SuffixParserCode
+					ArtifactLexerCode,
+					ArtifactParserCode
 				});
 				foreach (System.CodeDom.Compiler.CompilerError error in results.Errors)
 				{
