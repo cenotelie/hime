@@ -1,20 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>Hime</groupId>
-  <artifactId>Hime.Redist</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0.0</version>
-  <name>Hime.Redist</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.xowl.hime</groupId>
+	<artifactId>redist</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0</version>
+	<name>Hime Runtime</name>
+	<description>Redistributable Java runtime for the parsers generated with Hime</description>
+	<url>https://bitbucket.org/laurentw/hime</url>
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License, Version 3</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://bitbucket.org/laurentw/hime</url>
+	</scm>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
