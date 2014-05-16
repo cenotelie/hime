@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeDemo", "Exe.HimeDem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.CentralDogma", "Lib.CentralDogma\Lib.CentralDogma.csproj", "{BA0D93DF-9EA3-4643-A18C-E463376AADA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Redist", "Lib.Redist\Lib.Redist.csproj", "{8E4DE283-BA6E-4779-8C79-EB708002EDCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Redist", "runtimes\net\Lib.Redist.csproj", "{8E4DE283-BA6E-4779-8C79-EB708002EDCC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exe.HimeCC", "Exe.HimeCC\Exe.HimeCC.csproj", "{7A05384E-959E-4D54-B23A-D357AC0153B5}"
 EndProject
