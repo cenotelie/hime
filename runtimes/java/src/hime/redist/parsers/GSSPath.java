@@ -86,14 +86,6 @@ class GSSPath {
     }
 
     /**
-     * Initializes this path
-     */
-    public GSSPath() {
-        this.last = 0;
-        this.labels = null;
-    }
-
-    /**
      * Ensure the specified length of the label buffer
      *
      * @param length The required length

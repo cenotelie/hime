@@ -142,7 +142,7 @@ class GSS {
         this.generation = -1;
         this.set = new PathSet();
         this.set.paths = new GSSPath[initPathsCount];
-        this.set.paths[0] = new GSSPath();
+        this.set.paths[0] = new GSSPath(1);
     }
 
     /**
