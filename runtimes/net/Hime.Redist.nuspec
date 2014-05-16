@@ -15,6 +15,6 @@
     <tags>parser generator lr glr rnglr</tags>
   </metadata>
   <files>
-    <file src="..\License.txt" target="License.txt"/>
+    <file src="..\..\releng\License.txt" target="License.txt"/>
   </files>
 </package>

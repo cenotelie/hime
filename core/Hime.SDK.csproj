@@ -64,7 +64,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\VersionInfo.cs">
+    <Compile Include="..\releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -169,9 +169,9 @@
     <EmbeddedResource Include="Sources\Input\HimeGrammarLexer.bin" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
+    <ProjectReference Include="..\runtimes\net\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
-      <Name>Lib.Redist</Name>
+      <Name>Hime.Redist</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

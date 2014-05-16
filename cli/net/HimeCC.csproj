@@ -47,7 +47,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\VersionInfo.cs">
+    <Compile Include="..\..\releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="CommandLineLexer.cs" />
@@ -56,13 +56,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lib.CentralDogma\Lib.CentralDogma.csproj">
+    <ProjectReference Include="..\..\core\Hime.SDK.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
-      <Name>Lib.CentralDogma</Name>
+      <Name>Hime.SDK</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lib.Redist\Lib.Redist.csproj">
+    <ProjectReference Include="..\..\runtimes\net\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
-      <Name>Lib.Redist</Name>
+      <Name>Hime.Redist</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
