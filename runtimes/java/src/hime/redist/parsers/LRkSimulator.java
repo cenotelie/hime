@@ -96,7 +96,7 @@ abstract class LRkSimulator {
                 stack[++head] = action.getData();
                 return action.getCode();
             } else if (action.getCode() == LRAction.CODE_REDUCE) {
-                LRProduction production = parserAutomaton.GetProduction(action.getData());
+                LRProduction production = parserAutomaton.getProduction(action.getData());
                 Symbol var = parserVariables.get(production.getHead());
                 head -= production.getReductionLength();
                 action = parserAutomaton.getAction(stack[head], var.getID());

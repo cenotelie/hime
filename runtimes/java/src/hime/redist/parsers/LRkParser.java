@@ -91,7 +91,7 @@ public abstract class LRkParser extends BaseLRParser {
      * @return The next token in the case the error is recovered
      */
     private Token onUnexpectedToken(Token token) {
-        List<Integer> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.getTerminals().size());
+        List<Integer> expectedIDs = parserAutomaton.getExpected(stack[head], lexer.getTerminals().size());
         List<Symbol> expected = new ArrayList<Symbol>();
         for (int index : expectedIDs)
             expected.add(lexer.getTerminals().get(index));
@@ -170,7 +170,7 @@ public abstract class LRkParser extends BaseLRParser {
                 builder.stackPushToken(token.getIndex());
                 return action.getCode();
             } else if (action.getCode() == LRAction.CODE_REDUCE) {
-                LRProduction production = parserAutomaton.GetProduction(action.getData());
+                LRProduction production = parserAutomaton.getProduction(action.getData());
                 head -= production.getReductionLength();
                 reduce(production);
                 action = parserAutomaton.getAction(stack[head], parserVariables.get(production.getHead()).getID());

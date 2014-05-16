@@ -39,36 +39,48 @@ class GSSPath {
 
     /**
      * Gets the final target of this path
+     *
      * @return The final target of this path
      */
-    public int getLast() { return last; }
+    public int getLast() {
+        return last;
+    }
 
     /**
      * Sets the final target of this path
+     *
      * @param state The final target of this path
      */
-    public void setLast(int state) { last = state; }
+    public void setLast(int state) {
+        last = state;
+    }
 
     /**
      * Gets the i-th label of the edges traversed by this path
+     *
      * @param index Index of the label of the edges traversed by this path
      * @return The i-th label of the edges traversed by this path
      */
-    public GSSLabel get(int index) { return labels[index]; }
+    public GSSLabel get(int index) {
+        return labels[index];
+    }
 
     /**
      * Sets the i-th label of the edges traversed by this path
+     *
      * @param index Index of the label of the edges traversed by this path
      * @param label The i-th label of the edges traversed by this path
      */
-    public void set(int index, GSSLabel label) { labels[index] = label; }
+    public void set(int index, GSSLabel label) {
+        labels[index] = label;
+    }
 
     /**
      * Initializes this path
+     *
      * @param length The number of labels required for this path
      */
-    public GSSPath(int length)
-    {
+    public GSSPath(int length) {
         this.last = 0;
         this.labels = new GSSLabel[length < initBufferSize ? initBufferSize : length];
     }
@@ -76,29 +88,28 @@ class GSSPath {
     /**
      * Initializes this path
      */
-    public GSSPath()
-    {
+    public GSSPath() {
         this.last = 0;
         this.labels = null;
     }
 
     /**
      * Ensure the specified length of the label buffer
+     *
      * @param length The required length
      */
-    public void ensure(int length)
-    {
+    public void ensure(int length) {
         if (length > labels.length)
             labels = new GSSLabel[length];
     }
 
     /**
      * Copy the content of another path to this one
-     * @param path The path to copy
+     *
+     * @param path   The path to copy
      * @param length The path's length
      */
-    public void copyLabelsFrom(GSSPath path, int length)
-    {
+    public void copyLabelsFrom(GSSPath path, int length) {
         System.arraycopy(path.labels, 0, this.labels, 0, length);
     }
 }

@@ -135,7 +135,7 @@ public abstract class PrefetchedLexer implements ILexer {
             findTokens();
             tokenIndex = 0;
         }
-        // no more tokens? return epsilon
+        // no more tokens? return EPSILON
         if (tokenIndex >= text.getTokenCount())
             return new Token(Symbol.sidEpsilon, 0);
         return text.getTokenAt(tokenIndex++);
@@ -178,7 +178,7 @@ public abstract class PrefetchedLexer implements ILexer {
                 continue;
             }
             if (match.terminal == 0) {
-                // This is the epsilon terminal, failed to match anything
+                // This is the EPSILON terminal, failed to match anything
                 TextPosition position = text.getPositionAt(inputIndex);
                 String unexpected = null;
                 int c = input.charAt(inputIndex);

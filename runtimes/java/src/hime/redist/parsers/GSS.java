@@ -36,8 +36,7 @@ class GSS {
     /**
      * Represents an edge in a Graph-Structured Stack
      */
-    private static class Edge
-    {
+    private static class Edge {
         /**
          * The index of the node from which this edge starts
          */
@@ -53,11 +52,11 @@ class GSS {
 
         /**
          * Initializes this edge
+         *
          * @param from Index of the node from which this edge starts
-         * @param to Index of the node to which this edge arrives to
+         * @param to   Index of the node to which this edge arrives to
          */
-        public Edge(int from, int to, GSSLabel label)
-        {
+        public Edge(int from, int to, GSSLabel label) {
             this.from = from;
             this.to = to;
             this.label = label;
@@ -66,13 +65,12 @@ class GSS {
 
     /**
      * Represents a generation in a Graph-Structured Stack
-     *
+     * <p/>
      * Because GSS nodes are always created in the last generation,
      * a generation is basically a span in the list of GSS nodes,
      * i.e. the starting index in the list of nodes and the number of nodes
      */
-    public static class Gen
-    {
+    public static class Gen {
         /**
          * The start index of this generation in the list of nodes
          */
@@ -84,10 +82,10 @@ class GSS {
 
         /**
          * Initializes this generation
+         *
          * @param start The start index of this generation in the list of nodes
          */
-        public Gen(int start)
-        {
+        public Gen(int start) {
             this.start = start;
             this.count = 0;
         }
@@ -136,8 +134,7 @@ class GSS {
     /**
      * Initializes the GSS
      */
-    public GSS()
-    {
+    public GSS() {
         this.nodes = new IntBigList();
         this.genNodes = new BigList<Gen>(Gen.class, Gen[].class);
         this.edges = new BigList<Edge>(Edge.class, Edge[].class);
@@ -150,34 +147,34 @@ class GSS {
 
     /**
      * Gets the data of the given generation
+     *
      * @param generation A generation
      * @return The generation's first node
      */
-    public Gen getGeneration(int generation)
-    {
+    public Gen getGeneration(int generation) {
         return genNodes.get(generation);
     }
 
     /**
      * Gets the GLR state represented by the given node
+     *
      * @param node A node
      * @return The GLR state represented by the node
      */
-    public int getRepresentedState(int node)
-    {
+    public int getRepresentedState(int node) {
         return nodes.get(node);
     }
 
     /**
      * Finds in the given generation contains a node representing the given GLR state
+     *
      * @param generation A generation
-     * @param state A GLR state
+     * @param state      A GLR state
      * @return The node representing the GLR state, or -1 if it is not found
      */
-    public int findNode(int generation, int state)
-    {
+    public int findNode(int generation, int state) {
         Gen data = genNodes.get(generation);
-        for (int i=data.start; i!=data.start + data.count; i++)
+        for (int i = data.start; i != data.start + data.count; i++)
             if (nodes.get(i) == state)
                 return i;
         return -1;
@@ -185,16 +182,15 @@ class GSS {
 
     /**
      * Determines whether this instance has the required edge
+     *
      * @param generation The generation of the edge's start node
-     * @param from The edge's start node
-     * @param to The edge's target node
+     * @param from       The edge's start node
+     * @param to         The edge's target node
      * @return true if this instance has the required edge; otherwise, false
      */
-    public boolean hasEdge(int generation, int from, int to)
-    {
+    public boolean hasEdge(int generation, int from, int to) {
         Gen data = genNodes.get(generation);
-        for (int i=data.start; i!=data.start + data.count; i++)
-        {
+        for (int i = data.start; i != data.start + data.count; i++) {
             Edge edge = edges.get(i);
             if (edge.from == from && edge.to == to)
                 return true;
@@ -204,10 +200,10 @@ class GSS {
 
     /**
      * Opens a new generation in this GSS
+     *
      * @return The index of the new generation
      */
-    public int createGeneration()
-    {
+    public int createGeneration() {
         genNodes.add(new Gen(nodes.size()));
         genEdges.add(new Gen(edges.size()));
         generation++;
@@ -216,11 +212,11 @@ class GSS {
 
     /**
      * Creates a new node in the GSS
+     *
      * @param state The GLR state represented by the node
      * @return The node identifier
      */
-    public int createNode(int state)
-    {
+    public int createNode(int state) {
         nodes.add(state);
         Gen data = genNodes.get(generation);
         data.count++;
@@ -229,12 +225,12 @@ class GSS {
 
     /**
      * Creates a new edge in the GSS
-     * @param from The edge's starting node
-     * @param to The edge's target node
+     *
+     * @param from  The edge's starting node
+     * @param to    The edge's target node
      * @param label The edge's label
      */
-    public void createEdge(int from, int to, GSSLabel label)
-    {
+    public void createEdge(int from, int to, GSSLabel label) {
         edges.add(new Edge(from, to, label));
         Gen data = genEdges.get(generation);
         data.count++;
@@ -242,12 +238,12 @@ class GSS {
 
     /**
      * Setups a reusable GSS path with the given length
-     * @param index The index in the buffer of reusable paths
-     * @param last The last GLR state in the path
+     *
+     * @param index  The index in the buffer of reusable paths
+     * @param last   The last GLR state in the path
      * @param length The path's length
      */
-    private void setupPath(int index, int last, int length)
-    {
+    private void setupPath(int index, int last, int length) {
         if (index >= set.paths.length)
             set.paths = Arrays.copyOf(set.paths, set.paths.length + initPathsCount);
         if (set.paths[index] == null)
@@ -259,13 +255,12 @@ class GSS {
 
     /**
      * Retrieve the generation of the given node in this GSS
+     *
      * @param node A node's index
      * @return The index of the generation containing the node
      */
-    private int getGenerationOf(int node)
-    {
-        for (int i=generation; i!=-1; i--)
-        {
+    private int getGenerationOf(int node) {
+        for (int i = generation; i != -1; i--) {
             Gen gen = genNodes.get(i);
             if (node >= gen.start && node < gen.start + gen.count)
                 return i;
@@ -276,14 +271,13 @@ class GSS {
 
     /**
      * Gets all paths in the GSS starting at the given node and with the given length
-     * @param from The starting node
+     *
+     * @param from   The starting node
      * @param length The length of the requested paths
      * @return A set of paths in this GSS
      */
-    public PathSet getPaths(int from, int length)
-    {
-        if (length == 0)
-        {
+    public PathSet getPaths(int from, int length) {
+        if (length == 0) {
             // use the common 0-length GSS path to avoid new memory allocation
             set.paths[0].setLast(from);
             set.count = 1;
@@ -296,30 +290,23 @@ class GSS {
         // The number of paths in the list
         int total = 1;
         // For the remaining hops
-        for (int i = 0; i != length; i++)
-        {
+        for (int i = 0; i != length; i++) {
             int m = 0;          // Insertion index for the compaction process
             int next = total;   // Insertion index for new paths
-            for (int p = 0; p != total; p++)
-            {
+            for (int p = 0; p != total; p++) {
                 int last = set.paths[p].getLast();
                 // Look for new additional paths from last
                 Gen gen = genEdges.get(getGenerationOf(last));
                 int firstEdgeTarget = -1;
                 GSSLabel firstEdgeLabel = null;
-                for (int e = gen.start; e != gen.start + gen.count; e++)
-                {
+                for (int e = gen.start; e != gen.start + gen.count; e++) {
                     Edge edge = edges.get(e);
-                    if (edge.from == last)
-                    {
-                        if (firstEdgeTarget == -1)
-                        {
+                    if (edge.from == last) {
+                        if (firstEdgeTarget == -1) {
                             // This is the first edge
                             firstEdgeTarget = edge.to;
                             firstEdgeLabel = edge.label;
-                        }
-                        else
-                        {
+                        } else {
                             // Not the first edge
                             // Clone and extend the new path
                             setupPath(next, edge.to, length);
@@ -331,11 +318,9 @@ class GSS {
                     }
                 }
                 // Check whether there was at least one edge
-                if (firstEdgeTarget != -1)
-                {
+                if (firstEdgeTarget != -1) {
                     // Continue the current path
-                    if (m != p)
-                    {
+                    if (m != p) {
                         GSSPath t = set.paths[m];
                         set.paths[m] = set.paths[p];
                         set.paths[p] = t;
@@ -349,10 +334,8 @@ class GSS {
             // If some previous paths have been removed (m != count)
             //    and some have been added (next != cout)
             // => Compact the list
-            if (m != total && next != total)
-            {
-                for (int p = total; p != next; p++)
-                {
+            if (m != total && next != total) {
+                for (int p = total; p != next; p++) {
                     GSSPath t = set.paths[m];
                     set.paths[m] = set.paths[p];
                     set.paths[p] = t;

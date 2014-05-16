@@ -21,7 +21,7 @@ package hime.redist.parsers;
 
 /**
  * Represents a label on a GSS edge
- *
+ * <p/>
  * The data in this structure can have two interpretations:
  * 1) It can represent a sub-tree with a replaceable root.
  * 2) It can represent a reference to a single node in a SPPF.
@@ -42,40 +42,55 @@ class GSSLabel {
 
     /**
      * Gets the sub-tree with a repleaceable root
+     *
      * @return The sub-tree with a repleaceable root
      */
-    public SubTree getTree() { return tree; }
+    public SubTree getTree() {
+        return tree;
+    }
 
     /**
      * Gets the original symbol of the SPPF node
+     *
      * @return The original symbol of the SPPF node
      */
-    public int getOriginal() { return original; }
+    public int getOriginal() {
+        return original;
+    }
 
     /**
      * Gets the index of the SPPF node
+     *
      * @return The index of the SPPF node
      */
-    public int getIndex() { return nodeIndex; }
+    public int getIndex() {
+        return nodeIndex;
+    }
 
     /**
-     * Wether this label is an epsilon label
-     * @return true if this is an epsilon label
+     * Wether this label is an EPSILON label
+     *
+     * @return true if this is an EPSILON label
      */
-    public boolean isEpsilon() { return (tree == null && nodeIndex == -1); }
+    public boolean isEpsilon() {
+        return (tree == null && nodeIndex == -1);
+    }
 
     /**
      * Whether this label represents a sub-tree with a replaceable root
+     *
      * @return true if this label represents a sub-tree with a replaceable root
      */
-    public boolean IsReplaceable() { return (tree != null); }
+    public boolean isReplaceable() {
+        return (tree != null);
+    }
 
     /**
      * Initializes this label as representing a sub-tree with a replaceable root
+     *
      * @param tree The sub-tree with a replaceable root
      */
-    public GSSLabel(SubTree tree)
-    {
+    public GSSLabel(SubTree tree) {
         this.tree = tree;
         this.original = 0;
         this.nodeIndex = -1;
@@ -83,11 +98,11 @@ class GSSLabel {
 
     /**
      * Initializes this label as representing a single SPPF node
+     *
      * @param original The original symbol of the SPPF node
-     * @param index The index of the SPPF node
+     * @param index    The index of the SPPF node
      */
-    public GSSLabel(int original, int index)
-    {
+    public GSSLabel(int original, int index) {
         this.tree = null;
         this.original = original;
         this.nodeIndex = index;

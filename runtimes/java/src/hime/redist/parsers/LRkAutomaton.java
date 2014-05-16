@@ -110,7 +110,7 @@ public class LRkAutomaton {
      * @param index Production's index
      * @return The production a the given index
      */
-    public LRProduction GetProduction(int index) {
+    public LRProduction getProduction(int index) {
         return productions[index];
     }
 
@@ -121,7 +121,7 @@ public class LRkAutomaton {
      * @param terminalCount The maximal number of terminals
      * @return The expected terminal indices
      */
-    public List<Integer> GetExpected(int state, int terminalCount) {
+    public List<Integer> getExpected(int state, int terminalCount) {
         List<Integer> result = new ArrayList<Integer>();
         int offset = ncols * state;
         for (int i = 0; i != terminalCount; i++) {
