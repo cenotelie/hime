@@ -23,40 +23,57 @@ using Hime.Redist.Parsers;
 
 namespace Hime.CentralDogma.Output
 {
-	class ParserGeneratorRNGLR : ParserGenerator
+	/// <summary>
+	/// Represents a generator for RNGLR parser data for the .Net platform
+	/// </summary>
+	public class ParserRNGLRDataGenerator : Generator
 	{
+		/// <summary>
+		/// The grammar to generate a parser for
+		/// </summary>
+		private Grammars.Grammar grammar;
+		/// <summary>
+		/// LR graph for the parser
+		/// </summary>
+		private Grammars.LR.Graph graph;
+		/// <summary>
+		/// The terminals matched by the associated lexer
+		/// </summary>
+		private ROList<Grammars.Terminal> terminals;
+		/// <summary>
+		/// The variables to be exported
+		/// </summary>
+		private List<Grammars.Variable> variables;
+		/// <summary>
+		/// The virtual symbols to be exported
+		/// </summary>
+		private List<Grammars.Virtual> virtuals;
+		/// <summary>
+		/// The action symbols to be exported
+		/// </summary>
+		private List<Grammars.Action> actions;
+
 		/// <summary>
 		/// Initializes this parser generator
 		/// </summary>
 		/// <param name="gram">The grammar to generate a parser for</param>
 		/// <param name="graph">The LR graph to use</param>
 		/// <param name="expected">The terminals matched by the associated lexer</param>
-		public ParserGeneratorRNGLR(Grammars.Grammar gram, Grammars.LR.Graph graph, ROList<Grammars.Terminal> expected)
-			 : base(gram, graph, expected)
+		public ParserRNGLRDataGenerator(Grammars.Grammar gram, Grammars.LR.Graph graph, ROList<Grammars.Terminal> expected)
 		{
-		}
-
-		/// <summary>
-		/// Gets the name of the base parser class for the code generation
-		/// </summary>
-		protected override string BaseClassName { get { return "RNGLRParser"; } }
-
-		/// <summary>
-		/// Generates the code for the automaton
-		/// </summary>
-		/// <param name="stream">The output stream</param>
-		/// <param name="name">The parser's name</param>
-		/// <param name="resource">The name of the associated binary data resource</param>
-		protected override void GenerateCodeAutomaton(StreamWriter stream, string name, string resource)
-		{
-			stream.WriteLine("\t\tprivate static readonly RNGLRAutomaton automaton = RNGLRAutomaton.Find(typeof(" + name + "Parser), \"" + resource + "\");");
+			this.grammar = gram;
+			this.graph = graph;
+			this.terminals = expected;
+			this.variables = new List<Grammars.Variable>(gram.Variables);
+			this.virtuals = new List<Grammars.Virtual>(gram.Virtuals);
+			this.actions = new List<Grammars.Action>(gram.Actions);
 		}
 
 		/// <summary>
 		/// Generates the parser's binary data
 		/// </summary>
-		/// <param name="stream">The output stream</param>
-		public override void GenerateData(BinaryWriter stream)
+		/// <param name="file">The file to output to</param>
+		public void Generate(string file)
 		{
 			// complete list of rules, including new ones for the right-nullable parts
 			List<KeyValuePair<Grammars.Rule, int>> rules = new List<KeyValuePair<Grammars.Rule, int>>();
@@ -118,32 +135,36 @@ namespace Hime.CentralDogma.Output
 			foreach (Grammars.LR.State state in graph.States)
 				total = GenerateDataOffsetTable(offsets, counts, total, state);
 
-			stream.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammars.Grammar.optionAxiom))));
-			stream.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
-			stream.Write((ushort)graph.States.Count);                   // Nb or rows
-			stream.Write((uint)total);                                  // Nb of actions
-			stream.Write((ushort)rules.Count);                          // Nb of rules
-			stream.Write((ushort)nullables.Count);                      // Nb of nullables
+			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
+
+			writer.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammars.Grammar.optionAxiom))));
+			writer.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
+			writer.Write((ushort)graph.States.Count);                   // Nb or rows
+			writer.Write((uint)total);                                  // Nb of actions
+			writer.Write((ushort)rules.Count);                          // Nb of rules
+			writer.Write((ushort)nullables.Count);                      // Nb of nullables
 
 			foreach (Grammars.Terminal terminal in terminals)
-				stream.Write((ushort)terminal.ID);
+				writer.Write((ushort)terminal.ID);
 			foreach (Grammars.Variable variable in variables)
-				stream.Write((ushort)variable.ID);
+				writer.Write((ushort)variable.ID);
 
 			for (int i = 0; i != offsets.Count; i++)
 			{
-				stream.Write(counts[i]);
-				stream.Write(offsets[i]);
+				writer.Write(counts[i]);
+				writer.Write(offsets[i]);
 			}
 
 			foreach (Grammars.LR.State state in graph.States)
-				GenerateDataActionTable(stream, rules, state);
+				GenerateDataActionTable(writer, rules, state);
 
 			foreach (KeyValuePair<Grammars.Rule, int> pair in rules)
-				GenerateDataProduction(stream, pair.Key, pair.Value);
+				GenerateDataProduction(writer, pair.Key, pair.Value);
 
 			foreach (int index in nullables)
-				stream.Write((ushort)index);
+				writer.Write((ushort)index);
+
+			writer.Close();
 		}
 
 		/// <summary>
@@ -186,10 +207,10 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Generates the action table
 		/// </summary>
-		/// <param name="stream">The output stream</param>
+		/// <param name="writer">The output writer</param>
 		/// <param name="rules">The rules</param>
 		/// <param name="state">The state to inspect</param>
-		private void GenerateDataActionTable(BinaryWriter stream, List<KeyValuePair<Grammars.Rule, int>> rules, Grammars.LR.State state)
+		private void GenerateDataActionTable(BinaryWriter writer, List<KeyValuePair<Grammars.Rule, int>> rules, Grammars.LR.State state)
 		{
 			Dictionary<Grammars.Terminal, List<Grammars.LR.StateActionRNReduce>> reductions = new Dictionary<Grammars.Terminal, List<Grammars.LR.StateActionRNReduce>>();
 			foreach (Grammars.LR.StateActionReduce reduce in state.Reductions)
@@ -201,23 +222,23 @@ namespace Hime.CentralDogma.Output
 			if (reductions.ContainsKey(Grammars.Epsilon.Instance))
 			{
 				// There can be only one reduction on epsilon
-				stream.Write((ushort)LRActionCode.Accept);
-				stream.Write((ushort)LRActionCode.None);
+				writer.Write((ushort)LRActionCode.Accept);
+				writer.Write((ushort)LRActionCode.None);
 			}
 			for (int i = 1; i != terminals.Count; i++)
 			{
 				Grammars.Terminal terminal = terminals[i];
 				if (state.HasTransition(terminal))
 				{
-					stream.Write((ushort)LRActionCode.Shift);
-					stream.Write((ushort)state.GetChildBy(terminal).ID);
+					writer.Write((ushort)LRActionCode.Shift);
+					writer.Write((ushort)state.GetChildBy(terminal).ID);
 				}
 				if (reductions.ContainsKey(terminal))
 				{
 					foreach (Grammars.LR.StateActionRNReduce reduce in reductions[terminal])
 					{
-						stream.Write((ushort)LRActionCode.Reduce);
-						stream.Write((ushort)rules.IndexOf(new KeyValuePair<Grammars.Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
+						writer.Write((ushort)LRActionCode.Reduce);
+						writer.Write((ushort)rules.IndexOf(new KeyValuePair<Grammars.Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
 					}
 				}
 			}
@@ -225,8 +246,8 @@ namespace Hime.CentralDogma.Output
 			{
 				if (state.HasTransition(variable))
 				{
-					stream.Write((ushort)LRActionCode.Shift);
-					stream.Write((ushort)state.GetChildBy(variable).ID);
+					writer.Write((ushort)LRActionCode.Shift);
+					writer.Write((ushort)state.GetChildBy(variable).ID);
 				}
 			}
 		}
@@ -234,17 +255,17 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Generates the parser's binary representation of a rule production
 		/// </summary>
-		/// <param name="stream">The output stream</param>
+		/// <param name="writer">The output writer</param>
 		/// <param name="rule">A grammar rule</param>
 		/// <param name="length">The reduction's length</param>
-		private void GenerateDataProduction(BinaryWriter stream, Grammars.Rule rule, int length)
+		private void GenerateDataProduction(BinaryWriter writer, Grammars.Rule rule, int length)
 		{
-			stream.Write((ushort)variables.IndexOf(rule.Head));
+			writer.Write((ushort)variables.IndexOf(rule.Head));
 			if (rule.IsGenerated)
-				stream.Write((byte)Hime.Redist.TreeAction.Replace);
+				writer.Write((byte)Hime.Redist.TreeAction.Replace);
 			else
-				stream.Write((byte)Hime.Redist.TreeAction.None);
-			stream.Write((byte)length);
+				writer.Write((byte)Hime.Redist.TreeAction.None);
+			writer.Write((byte)length);
 			byte bcl = 0;
 			int pop = 0;
 			foreach (Grammars.RuleBodyElement elem in rule.Body)
@@ -259,45 +280,45 @@ namespace Hime.CentralDogma.Output
 					pop++;
 				}
 			}
-			stream.Write(bcl);
+			writer.Write(bcl);
 			pop = 0;
 			foreach (Grammars.RuleBodyElement elem in rule.Body)
 			{
 				if (elem.Symbol is Grammars.Virtual)
 				{
 					if (elem.Action == Hime.Redist.TreeAction.Drop)
-						stream.Write((ushort)LROpCodeValues.AddVirtualDrop);
+						writer.Write((ushort)LROpCodeValues.AddVirtualDrop);
 					else if (elem.Action == Hime.Redist.TreeAction.Promote)
-						stream.Write((ushort)LROpCodeValues.AddVirtualPromote);
+						writer.Write((ushort)LROpCodeValues.AddVirtualPromote);
 					else
-						stream.Write((ushort)LROpCodeValues.AddVirtualNoAction);
-					stream.Write((ushort)virtuals.IndexOf(elem.Symbol as Grammars.Virtual));
+						writer.Write((ushort)LROpCodeValues.AddVirtualNoAction);
+					writer.Write((ushort)virtuals.IndexOf(elem.Symbol as Grammars.Virtual));
 				}
 				else if (elem.Symbol is Grammars.Action)
 				{
-					stream.Write((ushort)LROpCodeValues.SemanticAction);
-					stream.Write((ushort)actions.IndexOf(elem.Symbol as Grammars.Action));
+					writer.Write((ushort)LROpCodeValues.SemanticAction);
+					writer.Write((ushort)actions.IndexOf(elem.Symbol as Grammars.Action));
 				}
 				else if (pop >= length)
 				{
 					// Here the symbol must be a variable
 					ushort index = (ushort)variables.IndexOf(elem.Symbol as Grammars.Variable);
 					if (elem.Action == Hime.Redist.TreeAction.Drop)
-						stream.Write((ushort)LROpCodeValues.AddNullVariableDrop);
+						writer.Write((ushort)LROpCodeValues.AddNullVariableDrop);
 					else if (elem.Action == Hime.Redist.TreeAction.Promote)
-						stream.Write((ushort)LROpCodeValues.AddNullVariablePromote);
+						writer.Write((ushort)LROpCodeValues.AddNullVariablePromote);
 					else
-						stream.Write((ushort)LROpCodeValues.AddNullVariableNoAction);
-					stream.Write(index);
+						writer.Write((ushort)LROpCodeValues.AddNullVariableNoAction);
+					writer.Write(index);
 				}
 				else
 				{
 					if (elem.Action == Hime.Redist.TreeAction.Drop)
-						stream.Write((ushort)LROpCodeValues.PopStackDrop);
+						writer.Write((ushort)LROpCodeValues.PopStackDrop);
 					else if (elem.Action == Hime.Redist.TreeAction.Promote)
-						stream.Write((ushort)LROpCodeValues.PopStackPromote);
+						writer.Write((ushort)LROpCodeValues.PopStackPromote);
 					else
-						stream.Write((ushort)LROpCodeValues.PopStackNoAction);
+						writer.Write((ushort)LROpCodeValues.PopStackNoAction);
 					pop++;
 				}
 			}

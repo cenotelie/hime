@@ -44,6 +44,11 @@ namespace Hime.CentralDogma
 		public Output.Mode Mode { get; set; }
 
 		/// <summary>
+		/// Gets or sets the target runtime
+		/// </summary>
+		public Output.Runtime Target { get; set; }
+
+		/// <summary>
 		/// Gets ot sets the compiler's output files' prefix.
 		/// If this property is not set, the name of the compiled grammar will be used as a prefix and the files output into the current directory.
 		/// </summary>
@@ -82,6 +87,7 @@ namespace Hime.CentralDogma
 		public CompilationTask()
 		{
 			this.Mode = Output.Mode.Source;
+			this.Target = Output.Runtime.Net;
 			this.Method = ParsingMethod.LALR1;
 			this.CodeAccess = Output.Modifier.Internal;
 			this.reporter = new Reporter();
@@ -196,7 +202,16 @@ namespace Hime.CentralDogma
 			string nmspace = (Namespace != null) ? Namespace : target.Name;
 
 			// emit the artifacts
-			Output.Emitter emitter = new Hime.CentralDogma.Output.Emitter(reporter, target);
+			Output.EmitterBase emitter = null;
+			switch (Target)
+			{
+				case Output.Runtime.Net:
+					emitter = new Output.EmitterForNet(reporter, target);
+					break;
+				case Output.Runtime.Java:
+					emitter = new Output.EmitterForJava(reporter, target);
+					break;
+			}
 			emitter.Emit(prefix, nmspace, CodeAccess, Method, Mode);
 		}
 	}

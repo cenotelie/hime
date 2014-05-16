@@ -23,30 +23,18 @@ using System.IO;
 namespace Hime.CentralDogma.Output
 {
 	/// <summary>
-	/// Represents an emitter of lexer and parser for a given grammar
+	/// Represents a platform-agnostic emitter of lexer and parser for a given grammar
 	/// </summary>
-	public class Emitter
+	public abstract class EmitterBase
 	{
-		/// <summary>
-		/// The suffix for the emitted lexer code files
-		/// </summary>
-		public const string suffixLexerCode = "Lexer.cs";
 		/// <summary>
 		/// The suffix for the emitted lexer data files
 		/// </summary>
 		public const string suffixLexerData = "Lexer.bin";
 		/// <summary>
-		/// The suffix for the emitted parser code files
-		/// </summary>
-		public const string suffixParserCode = "Parser.cs";
-		/// <summary>
 		/// The suffix for the emitted parser data files
 		/// </summary>
 		public const string suffixParserData = "Parser.bin";
-		/// <summary>
-		/// The suffix for the emitted assemblies
-		/// </summary>
-		public const string suffixAssembly = ".dll";
 		/// <summary>
 		/// The suffix for the emitted debug grammar data
 		/// </summary>
@@ -66,61 +54,75 @@ namespace Hime.CentralDogma.Output
 
 
 		/// <summary>
+		/// Gets the suffix for the emitted lexer code files
+		/// </summary>
+		public abstract string SuffixLexerCode { get; }
+		/// <summary>
+		/// Gets suffix for the emitted parser code files
+		/// </summary>
+		public abstract string SuffixParserCode { get; }
+		/// <summary>
+		/// Gets suffix for the emitted assemblies
+		/// </summary>
+		public abstract string SuffixAssembly { get; }
+
+
+		/// <summary>
 		/// The reporter
 		/// </summary>
-		private Reporter reporter;
+		protected Reporter reporter;
 		/// <summary>
 		/// The grammar to emit data for
 		/// </summary>
-		private Grammars.Grammar grammar;
+		protected Grammars.Grammar grammar;
 		/// <summary>
 		/// The prefix for the emitted artifacts
 		/// </summary>
-		private string prefix;
+		protected string prefix;
 		/// <summary>
 		/// The namespace of the generated code
 		/// </summary>
-		private string nmspace;
+		protected string nmspace;
 		/// <summary>
 		/// The visibility modifier of the generated code
 		/// </summary>
-		private Modifier modifier;
+		protected Modifier modifier;
 		/// <summary>
 		/// The parsing method for the generated parser
 		/// </summary>
-		private ParsingMethod method;
+		protected ParsingMethod method;
 		/// <summary>
 		/// The mode of this emitter
 		/// </summary>
-		private Mode mode;
+		protected Mode mode;
 
 		/// <summary>
 		/// The DFA to emit in a lexer
 		/// </summary>
-		private Automata.DFA dfa;
+		protected Automata.DFA dfa;
 		/// <summary>
 		/// The terminals matched by the DFA and expected by the parser
 		/// </summary>
-		private ROList<Grammars.Terminal> expected;
+		protected ROList<Grammars.Terminal> expected;
 		/// <summary>
 		/// The LR graph to emit in a parser
 		/// </summary>
-		private Grammars.LR.Graph graph;
+		protected Grammars.LR.Graph graph;
 
 
 		/// <summary>
-		/// Initializes this loader
+		/// Initializes this emitter
 		/// </summary>
 		/// <param name="grammar">The grammar to emit data for</param>
-		public Emitter(Grammars.Grammar grammar) : this(new Reporter(), grammar)
+		public EmitterBase(Grammars.Grammar grammar) : this(new Reporter(), grammar)
 		{
 		}
 		/// <summary>
-		/// Initializes this loader
+		/// Initializes this emitter
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
 		/// <param name="grammar">The grammar to emit data for</param>
-		public Emitter(Reporter reporter, Grammars.Grammar grammar)
+		public EmitterBase(Reporter reporter, Grammars.Grammar grammar)
 		{
 			this.reporter = reporter;
 			this.grammar = grammar;
@@ -171,9 +173,9 @@ namespace Hime.CentralDogma.Output
 					return false;
 				if (mode == Mode.Assembly)
 				{
-					File.Delete(prefix + suffixLexerCode);
+					File.Delete(prefix + SuffixLexerCode);
 					File.Delete(prefix + suffixLexerData);
-					File.Delete(prefix + suffixParserCode);
+					File.Delete(prefix + SuffixParserCode);
 					File.Delete(prefix + suffixParserData);
 				}
 			}
@@ -215,19 +217,17 @@ namespace Hime.CentralDogma.Output
 			// retrieve the separator
 			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
 			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
-			// get the generator
-			Output.LexerGenerator generator = new Hime.CentralDogma.Output.LexerGenerator(dfa, separator);
-			// generate the lexer's code
-			reporter.Info("Exporting lexer code at " + prefix + suffixLexerCode + " ...");
-			StreamWriter txtOutput = OpenOutputStream(prefix + suffixLexerCode, nmspace, true);
-			generator.GenerateCode(txtOutput, grammar.Name, modifier, prefix + suffixLexerData);
-			CloseOutputStream(txtOutput);
+
 			// generate the lexer's data
 			reporter.Info("Exporting lexer data at " + prefix + suffixLexerData + " ...");
-			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + suffixLexerData, FileMode.Create));
-			generator.GenerateData(binOutput);
-			binOutput.Close();
-			expected = generator.Expected;
+			LexerDataGenerator genData = new LexerDataGenerator(dfa);
+			genData.Generate(prefix + suffixLexerData);
+			expected = genData.Expected;
+
+			// generate the lexer's code
+			reporter.Info("Exporting lexer code at " + prefix + SuffixLexerCode + " ...");
+			Generator genCode = GetLexerCodeGenerator(separator);
+			genCode.Generate(prefix + SuffixLexerCode);
 			return true;
 		}
 
@@ -298,101 +298,52 @@ namespace Hime.CentralDogma.Output
 			if (builder.Conflicts.Count != 0)
 				return false;
 			// get the generator
-			Output.ParserGenerator generator = null;
+			Generator generator = null;
+			string parserType = null;
 			switch (method)
 			{
 				case ParsingMethod.LR0:
 				case ParsingMethod.LR1:
 				case ParsingMethod.LALR1:
-					generator = new Output.ParserGeneratorLRk(grammar, graph, expected);
+					generator = new ParserLRkDataGenerator(grammar, graph, expected);
+					parserType = "LRk";
 					break;
 				case ParsingMethod.RNGLR1:
 				case ParsingMethod.RNGLALR1:
-					generator = new Output.ParserGeneratorRNGLR(grammar, graph, expected);
+					generator = new ParserRNGLRDataGenerator(grammar, graph, expected);
+					parserType = "RNGLR";
 					break;
 			}
-			// generate the parser's code
-			reporter.Info("Exporting parser code at " + prefix + suffixParserCode + " ...");
-			StreamWriter txtOutput = OpenOutputStream(prefix + suffixParserCode, nmspace, false);
-			generator.GenerateCode(txtOutput, grammar.Name, modifier, prefix + suffixParserData);
-			CloseOutputStream(txtOutput);
+
 			// generate the parser's data
 			reporter.Info("Exporting parser data at " + prefix + suffixParserData + " ...");
-			BinaryWriter binOutput = new BinaryWriter(new FileStream(prefix + suffixParserData, FileMode.Create));
-			generator.GenerateData(binOutput);
-			binOutput.Close();
+			generator.Generate(prefix + suffixParserData);
+
+			// generate the parser's code
+			reporter.Info("Exporting parser code at " + prefix + SuffixParserCode + " ...");
+			generator = GetParserCodeGenerator(parserType);
+			generator.Generate(prefix + SuffixParserCode);
 			return true;
 		}
 
 		/// <summary>
-		/// Opens a text stream to an output file for writing code
+		/// Gets the runtime-specific generator of lexer code
 		/// </summary>
-		/// <param name="fileName">The file to output to</param>
-		/// <param name="nmespace">The namespace for the code to output</param>
-		/// <param name="lexer"><c>true</c> if this is to output a lexer</param>
-		/// <returns>The stream to write to</returns>
-		/// <remarks>It is the responsability of the caller to close the returned stream</remarks>
-		private StreamWriter OpenOutputStream(string fileName, string nmespace, bool lexer)
-		{
-			StreamWriter writer = new StreamWriter(fileName, false, new System.Text.UTF8Encoding(false));
-			writer.WriteLine("/*");
-			writer.WriteLine(" * WARNING: this file has been generated by");
-			writer.WriteLine(" * Hime Parser Generator " + CompilationTask.Version);
-			writer.WriteLine(" */");
-			writer.WriteLine();
-			writer.WriteLine("using System.Collections.Generic;");
-			writer.WriteLine("using Hime.Redist;");
-			if (lexer)
-				writer.WriteLine("using Hime.Redist.Lexer;");
-			else
-				writer.WriteLine("using Hime.Redist.Parsers;");
-			writer.WriteLine();
-			writer.WriteLine("namespace " + nmespace);
-			writer.WriteLine("{");
-			return writer;
-		}
+		/// <param name="separator">The separator terminal</param>
+		/// <returns>The runtime-specific generator of lexer code</returns>
+		protected abstract Generator GetLexerCodeGenerator(Grammars.Terminal separator);
 
 		/// <summary>
-		/// Closes an stream that has been opened
+		/// Gets the runtime-specific generator of parser code
 		/// </summary>
-		/// <param name="writer">The stream to close</param>
-		private void CloseOutputStream(StreamWriter writer)
-		{
-			writer.WriteLine("}");
-			writer.Close();
-		}
+		/// <param name="parserType">The type of parser to generate</param>
+		/// <returns>The runtime-specific generator of parser code</returns>
+		protected abstract Generator GetParserCodeGenerator(string parserType);
 
 		/// <summary>
 		/// Emits the assembly for the generated lexer and parser
 		/// </summary>
 		/// <returns><c>true</c> if the operation succeed</returns>
-		private bool EmitAssembly()
-		{
-			reporter.Info("Building assembly " + prefix + suffixAssembly + " ...");
-			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
-			bool hasError = false;
-			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
-			{
-				System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
-				compilerparams.GenerateExecutable = false;
-				compilerparams.GenerateInMemory = false;
-				compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
-				compilerparams.ReferencedAssemblies.Add("System.dll");
-				compilerparams.ReferencedAssemblies.Add(redist);
-				compilerparams.EmbeddedResources.Add(prefix + suffixLexerData);
-				compilerparams.EmbeddedResources.Add(prefix + suffixParserData);
-				compilerparams.OutputAssembly = prefix + suffixAssembly;
-				System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] {
-					prefix + suffixLexerCode,
-					prefix + suffixParserCode
-				});
-				foreach (System.CodeDom.Compiler.CompilerError error in results.Errors)
-				{
-					reporter.Error(error.ToString());
-					hasError = true;
-				}
-			}
-			return (!hasError);
-		}
+		protected abstract bool EmitAssembly();
 	}
 }

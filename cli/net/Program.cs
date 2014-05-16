@@ -38,6 +38,7 @@ namespace Hime.HimeCC
 		private const string ArgOutputAssembly = "-o:assembly";
 		private const string ArgOutputNoSources = "-o:nosources";
 		private const string ArgOutputDebug = "-o:debug";
+		private const string ArgTargetJava = "-t:java";
 		private const string ArgGrammar = "-g";
 		private const string ArgPrefix = "-p";
 		private const string ArgMethodRNGLR = "-m:rnglr";
@@ -223,6 +224,9 @@ namespace Hime.HimeCC
 					case ArgOutputDebug:
 						task.Mode = Hime.CentralDogma.Output.Mode.Debug;
 						break;
+					case ArgTargetJava:
+						task.Target = Hime.CentralDogma.Output.Runtime.Java;
+						break;
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
 							return null;
@@ -299,6 +303,8 @@ namespace Hime.HimeCC
 			Console.WriteLine(ArgOutputNoSources + "\tOnly generate the assembly, do not keep the sources");
 			Console.WriteLine();
 			Console.WriteLine(ArgOutputDebug + "\tGenerate debug artifacts in addition to the sources");
+			Console.WriteLine();
+			Console.WriteLine(ArgTargetJava + "\tTarget the Java runtime instead of .Net");
 			Console.WriteLine();
 			Console.WriteLine(ArgGrammar + " <grammar>\tSelect the top grammar to compile if more than one are given");
 			Console.WriteLine();
