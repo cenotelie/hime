@@ -236,9 +236,9 @@ namespace Hime.CentralDogma.Output
 			if (graph != null)
 			{
 				reporter.Info("Exporting LR graph debug data (txt) at " + ArtifactDebugLRAsText + " ...");
-				SDK.Serializers.ExportDOT(graph, ArtifactDebugLRAsText);
+				SDK.Serializers.Export(graph, ArtifactDebugLRAsText);
 				reporter.Info("Exporting LR graph debug data (dot) at " + ArtifactDebugLRAsDOT + " ...");
-				SDK.Serializers.Export(graph, ArtifactDebugLRAsDOT);
+				SDK.Serializers.ExportDOT(graph, ArtifactDebugLRAsDOT);
 			}
 			return true;
 		}
