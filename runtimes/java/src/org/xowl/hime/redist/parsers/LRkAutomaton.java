@@ -125,7 +125,7 @@ public class LRkAutomaton {
         List<Integer> result = new ArrayList<Integer>();
         int offset = ncols * state;
         for (int i = 0; i != terminalCount; i++) {
-            if (table[offset].getCode() != LRAction.CODE_NONE)
+            if (table[offset].getCode() == LRAction.CODE_SHIFT)
                 result.add(i);
             offset++;
         }

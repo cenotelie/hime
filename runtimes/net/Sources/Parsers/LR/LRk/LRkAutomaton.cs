@@ -143,7 +143,7 @@ namespace Hime.Redist.Parsers
 			int offset = ncols * state;
 			for (int i = 0; i != terminalCount; i++)
 			{
-				if (table[offset].Code != LRActionCode.None)
+				if (table[offset].Code == LRActionCode.Shift)
 					result.Add(i);
 				offset++;
 			}

@@ -215,8 +215,13 @@ public class RNGLRAutomaton {
     public List<Integer> getExpected(int state, int terminalCount) {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i != terminalCount; i++) {
-            if (table[state * ncols + i].count != 0)
-                result.add(i);
+            Cell cell = table[state * ncols + i];
+            for (int j = 0; j != cell.count; j++) {
+                if (actions[cell.index + j].getCode() == LRAction.CODE_SHIFT) {
+                    result.add(i);
+                    break;
+                }
+            }
         }
         return result;
     }

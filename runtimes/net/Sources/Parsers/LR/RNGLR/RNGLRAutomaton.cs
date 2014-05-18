@@ -234,10 +234,17 @@ namespace Hime.Redist.Parsers
 		public ICollection<int> GetExpected(int state, int terminalCount)
 		{
 			List<int> result = new List<int>();
-			for (ushort i = 0; i != terminalCount; i++)
+			for (int i = 0; i != terminalCount; i++)
 			{
-				if (table[state * ncols + i].ActionsCount != 0)
-					result.Add(i);
+				Cell cell = table[state * ncols + i];
+				for (int j=0; j!=cell.ActionsCount; j++)
+				{
+					if (actions[cell.ActionsIndex + j].Code == LRActionCode.Shift)
+					{
+						result.Add(i);
+						break;
+					}
+				}
 			}
 			return result;
 		}
