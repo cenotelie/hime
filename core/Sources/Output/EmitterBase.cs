@@ -249,6 +249,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns><c>true</c> if this operation succeeded</returns>
 		private bool GenerateLexer()
 		{
+			reporter.Info("Preparing lexer's data ...");
 			dfa = GetDFAFor(grammar);
 			if (dfa == null)
 				return false;
@@ -329,6 +330,7 @@ namespace Hime.CentralDogma.Output
 		private bool GenerateParser()
 		{
 			// build the LR graph
+			reporter.Info("Preparing parser's data ...");
 			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);
 			graph = builder.Build(method);
 			foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
