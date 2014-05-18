@@ -174,7 +174,6 @@
     <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />
     <EmbeddedResource Include="Sources\Input\HimeGrammarParser.bin" />
     <EmbeddedResource Include="Sources\Input\HimeGrammarLexer.bin" />
-    <EmbeddedResource Include="Resources\Java\redist-1.0.0.jar" />
     <EmbeddedResource Include="Resources\Java\pom.xml" />
   </ItemGroup>
   <ItemGroup>

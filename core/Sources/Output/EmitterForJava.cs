@@ -90,10 +90,6 @@ namespace Hime.CentralDogma.Output
 			reporter.Info("Building assembly " + ArtifactAssembly + " ...");
 			// setup the maven project
 			CreateMavenProject();
-			// install redist, just to be sure
-			string target = Path.Combine(prefix, "redist-1.0.0.jar");
-			ExportResource("Java.redist-1.0.0.jar", target);
-			ExecuteCommand("mvn", "install:install-file -Dfile=" + target + " -DgroupId=org.xowl.hime -DartifactId=redist -Dversion=1.0.0 -Dpackaging=jar");
 			// compile
 			bool success = ExecuteCommand("mvn", "package");
 			// extract the result
@@ -104,7 +100,6 @@ namespace Hime.CentralDogma.Output
 			Directory.Delete(Path.Combine(prefix, "res"), true);
 			Directory.Delete(Path.Combine(prefix, "target"), true);
 			File.Delete(Path.Combine(prefix, "pom.xml"));
-			File.Delete(Path.Combine(prefix, "redist-1.0.0.jar"));
 			return success;
 		}
 

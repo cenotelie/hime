@@ -95,12 +95,12 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine();
 			writer.WriteLine("package " + nmespace + ";");
 			writer.WriteLine();
-			writer.WriteLine("import hime.redist.SemanticAction;");
-			writer.WriteLine("import hime.redist.SemanticBody;");
-			writer.WriteLine("import hime.redist.Symbol;");
-			writer.WriteLine("import hime.redist.parsers.InitializationException;");
-			writer.WriteLine("import hime.redist.parsers." + parserType + "Automaton;");
-			writer.WriteLine("import hime.redist.parsers." + parserType + "Parser;");
+			writer.WriteLine("import org.xowl.hime.redist.SemanticAction;");
+			writer.WriteLine("import org.xowl.hime.redist.SemanticBody;");
+			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
+			writer.WriteLine("import org.xowl.hime.redist.parsers.InitializationException;");
+			writer.WriteLine("import org.xowl.hime.redist.parsers." + parserType + "Automaton;");
+			writer.WriteLine("import org.xowl.hime.redist.parsers." + parserType + "Parser;");
 			writer.WriteLine();
 			writer.WriteLine("import java.util.Map;");
 			writer.WriteLine();

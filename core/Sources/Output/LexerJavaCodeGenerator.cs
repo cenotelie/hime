@@ -96,9 +96,9 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine();
 			writer.WriteLine("package " + nmespace + ";");
 			writer.WriteLine();
-			writer.WriteLine("import hime.redist.Symbol;");
-			writer.WriteLine("import hime.redist.lexer.Automaton;");
-			writer.WriteLine("import hime.redist.lexer.PrefetchedLexer;");
+			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
+			writer.WriteLine("import org.xowl.hime.redist.lexer.Automaton;");
+			writer.WriteLine("import org.xowl.hime.redist.lexer.PrefetchedLexer;");
 			writer.WriteLine();
 			writer.WriteLine("import java.io.InputStream;");
 			writer.WriteLine("import java.io.IOException;");
