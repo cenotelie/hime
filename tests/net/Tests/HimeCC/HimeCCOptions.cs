@@ -112,6 +112,7 @@ namespace Hime.Tests.HimeCC
 			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram produced MathExpLRGraph.dot, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram produced MathExpLRGraph.txt, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram produced MathExp.dll, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExp.jar"), "himecc MathExp.gram produced MathExp.jar, shouldn't have");
 		}
 
 		/// <summary>
@@ -133,6 +134,7 @@ namespace Hime.Tests.HimeCC
 			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram -o:assembly produced MathExpLRGraph.dot, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram -o:assembly produced MathExpLRGraph.txt, shouldn't have");
 			Assert.IsTrue(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -o:assembly failed to produce MathExp.dll");
+			Assert.IsFalse(CheckFileExists("MathExp.jar"), "himecc MathExp.gram -o:assembly produced MathExp.jar, shouldn't have");
 		}
 
 		/// <summary>
@@ -149,11 +151,66 @@ namespace Hime.Tests.HimeCC
 			Assert.IsFalse(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -o:nosources produced MathExpLexer.bin, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExpParser.cs"), "himecc MathExp.gram -o:nosources produced MathExpParser.cs, shouldn't have");
 			Assert.IsFalse(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -o:nosources produced MathExpParser.bin, shouldn't have");
-			Assert.IsFalse(CheckFileExists("MathExpGrammar.txt"), "himecc MathExp.gram -o:nosources produced MathExpGrammar.txt, shouldn't have");
-			Assert.IsFalse(CheckFileExists("MathExpDFA.dot"), "himecc MathExp.gram -o:nosources produced MathExpDFA.dot, shouldn't have");
-			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram -o:nosources produced MathExpLRGraph.dot, shouldn't have");
-			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram -o:nosources produced MathExpLRGraph.txt, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpGrammar.txt"), "himecc MathExp.gram -o:assembly produced MathExpGrammar.txt, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpDFA.dot"), "himecc MathExp.gram -o:assembly produced MathExpDFA.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.dot"), "himecc MathExp.gram -o:assembly produced MathExpLRGraph.dot, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLRGraph.txt"), "himecc MathExp.gram -o:assembly produced MathExpLRGraph.txt, shouldn't have");
 			Assert.IsTrue(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -o:nosources failed to produce MathExp.dll");
+			Assert.IsFalse(CheckFileExists("MathExp.jar"), "himecc MathExp.gram -o:nosources produced MathExp.jar, shouldn't have");
+		}
+
+		/// <summary>
+		/// Tests the output of himecc when targeting the Java platform
+		/// </summary>
+		[Test]
+		public void Test_OutputTargetJavaModeDefault()
+		{
+			SetTestDirectory();
+			ExportResource("MathExp.gram", "MathExp.gram");
+			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram", "-t:java" });
+			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram -t:java did not return OK (0), returned " + result);
+			Assert.IsTrue(CheckFileExists("MathExpLexer.java"), "himecc MathExp.gram -t:java failed to produce MathExpLexer.java");
+			Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -t:java failed to produce MathExpLexer.bin");
+			Assert.IsTrue(CheckFileExists("MathExpParser.java"), "himecc MathExp.gram -t:java failed to produce MathExpParser.java");
+			Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -t:java failed to produce MathExpParser.bin");
+			Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -t:java produced MathExp.dll, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExp.jar"), "himecc MathExp.gram -t:java produced MathExp.jar, shouldn't have");
+		}
+
+		/// <summary>
+		/// Tests the output of himecc when targeting the Java platform
+		/// </summary>
+		[Test]
+		public void Test_OutputTargetJavaModeAssembly()
+		{
+			SetTestDirectory();
+			ExportResource("MathExp.gram", "MathExp.gram");
+			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram", "-t:java", "-o:assembly" });
+			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram -t:java -o:assembly did not return OK (0), returned " + result);
+			Assert.IsTrue(CheckFileExists("MathExpLexer.java"), "himecc MathExp.gram -t:java -o:assembly failed to produce MathExpLexer.java");
+			Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -t:java -o:assembly failed to produce MathExpLexer.bin");
+			Assert.IsTrue(CheckFileExists("MathExpParser.java"), "himecc MathExp.gram -t:java -o:assembly failed to produce MathExpParser.java");
+			Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -t:java -o:assembly failed to produce MathExpParser.bin");
+			Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -t:java -o:assembly produced MathExp.dll, shouldn't have");
+			Assert.IsTrue(CheckFileExists("MathExp.jar"), "himecc MathExp.gram -t:java -o:assembly failed to produce MathExp.jar");
+		}
+
+		/// <summary>
+		/// Tests the output of himecc when targeting the Java platform
+		/// </summary>
+		[Test]
+		public void Test_OutputTargetJavaModeNoSources()
+		{
+			SetTestDirectory();
+			ExportResource("MathExp.gram", "MathExp.gram");
+			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram", "-t:java", "-o:nosources" });
+			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc MathExp.gram -t:java -o:nosources did not return OK (0), returned " + result);
+			Assert.IsFalse(CheckFileExists("MathExpLexer.java"), "himecc MathExp.gram -t:java -o:nosources produced MathExpLexer.java, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpLexer.bin"), "himecc MathExp.gram -t:java -o:nosources produced MathExpLexer.bin, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpParser.java"), "himecc MathExp.gram -t:java -o:nosources produced MathExpParser.java, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExpParser.bin"), "himecc MathExp.gram -t:java -o:nosources produced MathExpParser.bin, shouldn't have");
+			Assert.IsFalse(CheckFileExists("MathExp.dll"), "himecc MathExp.gram -t:java -o:nosources produced MathExp.dll, shouldn't have");
+			Assert.IsTrue(CheckFileExists("MathExp.jar"), "himecc MathExp.gram -t:java -o:nosources failed to produce MathExp.jar");
 		}
 
 		/// <summary>
@@ -217,29 +274,29 @@ namespace Hime.Tests.HimeCC
 		/// Tests the output of himecc when selecting a simple prefix for the output
 		/// </summary>
 		[Test]
-		public void Test_Prefix_FileName()
+		public void Test_Path_Default()
 		{
 			SetTestDirectory();
 			ExportResource("MathExp.gram", "MathExp.gram");
-			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -p XXX" });
+			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram" });
 			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
-			Assert.IsTrue(CheckFileExists("XXXLexer.cs"), "himecc failed to produce XXXLexer.cs");
-			Assert.IsTrue(CheckFileExists("XXXLexer.bin"), "himecc failed to produce XXXLexer.bin");
-			Assert.IsTrue(CheckFileExists("XXXParser.cs"), "himecc failed to produce XXXParser.cs");
-			Assert.IsTrue(CheckFileExists("XXXParser.bin"), "himecc failed to produce XXXParser.bin");
+			Assert.IsTrue(CheckFileExists("MathExpLexer.cs"), "himecc failed to produce MathExpLexer.cs");
+			Assert.IsTrue(CheckFileExists("MathExpLexer.bin"), "himecc failed to produce MathExpLexer.bin");
+			Assert.IsTrue(CheckFileExists("MathExpParser.cs"), "himecc failed to produce MathExpParser.cs");
+			Assert.IsTrue(CheckFileExists("MathExpParser.bin"), "himecc failed to produce MathExpParser.bin");
 		}
 
 		/// <summary>
 		/// Tests the output of himecc when selecting a complex prefix (directory) for the output
 		/// </summary>
 		[Test]
-		public void Test_Prefix_Directory()
+		public void Test_Path_Custom()
 		{
 			SetTestDirectory();
 			System.IO.Directory.CreateDirectory("YYY");
-			string prefix = System.IO.Path.Combine("YYY", "XXX");
+			string prefix = System.IO.Path.Combine("YYY", "MathExp");
 			ExportResource("MathExp.gram", "MathExp.gram");
-			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -p " + prefix });
+			int result = Hime.HimeCC.Program.Main(new string[] { "MathExp.gram -p YYY" });
 			Assert.AreEqual(Hime.HimeCC.Program.ResultOK, result, "himecc did not return OK (0), returned " + result);
 			Assert.IsTrue(CheckFileExists(prefix + "Lexer.cs"), "himecc failed to produce " + prefix + "Lexer.cs");
 			Assert.IsTrue(CheckFileExists(prefix + "Lexer.bin"), "himecc failed to produce " + prefix + "Lexer.bin");

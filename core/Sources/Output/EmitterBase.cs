@@ -70,39 +70,39 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Gets the full path and name for the lexer code artifact
 		/// </summary>
-		public string ArtifactLexerCode { get { return prefix + grammar.Name + SuffixLexerCode; } }
+		public string ArtifactLexerCode { get { return path + grammar.Name + SuffixLexerCode; } }
 		/// <summary>
 		/// Gets the full path and name for the lexer data artifact
 		/// </summary>
-		public string ArtifactLexerData { get { return prefix + grammar.Name + suffixLexerData; } }
+		public string ArtifactLexerData { get { return path + grammar.Name + suffixLexerData; } }
 		/// <summary>
 		/// Gets the full path and name for the parser code artifact
 		/// </summary>
-		public string ArtifactParserCode { get { return prefix + grammar.Name + SuffixParserCode; } }
+		public string ArtifactParserCode { get { return path + grammar.Name + SuffixParserCode; } }
 		/// <summary>
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
-		public string ArtifactParserData { get { return prefix + grammar.Name + suffixParserData; } }
+		public string ArtifactParserData { get { return path + grammar.Name + suffixParserData; } }
 		/// <summary>
 		/// Gets the full path and name for the assembly artifact
 		/// </summary>
-		public string ArtifactAssembly { get { return prefix + grammar.Name + SuffixAssembly; } }
+		public string ArtifactAssembly { get { return path + grammar.Name + SuffixAssembly; } }
 		/// <summary>
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
-		public string ArtifactDebugGrammar { get { return prefix + grammar.Name + suffixDebugGrammar; } }
+		public string ArtifactDebugGrammar { get { return path + grammar.Name + suffixDebugGrammar; } }
 		/// <summary>
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
-		public string ArtifactDebugDFA { get { return prefix + grammar.Name + suffixDebugDFA; } }
+		public string ArtifactDebugDFA { get { return path + grammar.Name + suffixDebugDFA; } }
 		/// <summary>
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
-		public string ArtifactDebugLRAsText { get { return prefix + grammar.Name + suffixDebugLRAsText; } }
+		public string ArtifactDebugLRAsText { get { return path + grammar.Name + suffixDebugLRAsText; } }
 		/// <summary>
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
-		public string ArtifactDebugLRAsDOT { get { return prefix + grammar.Name + suffixDebugLRAsDOT; } }
+		public string ArtifactDebugLRAsDOT { get { return path + grammar.Name + suffixDebugLRAsDOT; } }
 
 
 		/// <summary>
@@ -114,9 +114,9 @@ namespace Hime.CentralDogma.Output
 		/// </summary>
 		protected Grammars.Grammar grammar;
 		/// <summary>
-		/// The prefix for the emitted artifacts
+		/// The path for the emitted artifacts
 		/// </summary>
-		protected string prefix;
+		protected string path;
 		/// <summary>
 		/// The namespace of the generated code
 		/// </summary>
@@ -175,10 +175,12 @@ namespace Hime.CentralDogma.Output
 		/// <param name="method">The parsing method to use</param>
 		/// <param name="mode">The output mode</param>
 		/// <returns><c>true</c> if this operation succeeded</returns>
-		public bool Emit(string prefix, string nmspace, Modifier modifier, ParsingMethod method, Mode mode)
+		public bool Emit(string path, string nmspace, Modifier modifier, ParsingMethod method, Mode mode)
 		{
 			// setup
-			this.prefix = prefix;
+			this.path = path;
+			if (this.path.Length > 0 && !this.path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				this.path += Path.DirectorySeparatorChar;
 			this.nmspace = nmspace;
 			this.modifier = modifier;
 			this.method = method;

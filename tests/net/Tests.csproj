@@ -68,7 +68,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\cli\net\HimeCC.csproj">
       <Project>{7A05384E-959E-4D54-B23A-D357AC0153B5}</Project>
-      <Name>Exe.HimeCC</Name>
+      <Name>HimeCC</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\core\Hime.SDK.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
@@ -80,11 +80,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System" />
+    <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Error.gram" />
@@ -96,11 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ParseTree.gram" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\License.txt">
-      <Link>Properties\License.txt</Link>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

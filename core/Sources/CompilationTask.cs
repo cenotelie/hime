@@ -49,10 +49,10 @@ namespace Hime.CentralDogma
 		public Output.Runtime Target { get; set; }
 
 		/// <summary>
-		/// Gets ot sets the compiler's output files' prefix.
-		/// If this property is not set, the name of the compiled grammar will be used as a prefix and the files output into the current directory.
+		/// Gets ot sets the compiler's output files' path.
+		/// If this property is not set, the path will be the current directory.
 		/// </summary>
-		public string OutputPrefix { get; set; }
+		public string OutputPath { get; set; }
 
 		/// <summary>
 		/// Gets or sets the namespace in which the generated Lexer and Parser classes will be put.
@@ -198,9 +198,6 @@ namespace Hime.CentralDogma
 			}
 
 			// Build names
-			string prefix = (OutputPrefix != null) ? OutputPrefix : "";
-			if (prefix.Length != 0 && !prefix.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				prefix += Path.DirectorySeparatorChar;
 			string nmspace = (Namespace != null) ? Namespace : target.Name;
 
 			// emit the artifacts
@@ -214,7 +211,7 @@ namespace Hime.CentralDogma
 					emitter = new Output.EmitterForJava(reporter, target);
 					break;
 			}
-			emitter.Emit(prefix, nmspace, CodeAccess, Method, Mode);
+			emitter.Emit((OutputPath != null) ? OutputPath : "", nmspace, CodeAccess, Method, Mode);
 		}
 	}
 }

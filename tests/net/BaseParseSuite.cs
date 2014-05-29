@@ -69,7 +69,7 @@ namespace Hime.Tests
 			task.Method = ParsingMethod.LALR1;
 			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = "Hime.Tests.Generated";
-			task.OutputPrefix = "ParseTree";
+			task.OutputPath = "ParseTree";
 			task.Execute();
 			return new AssemblyReflection("ParseTree.dll");
 		}
@@ -130,7 +130,7 @@ namespace Hime.Tests
 			task.Method = method;
 			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = genNamespace;
-			task.OutputPrefix = prefix;
+			task.OutputPath = prefix;
 			Hime.CentralDogma.Report report = task.Execute();
 			Assert.IsTrue(report.Errors.Count == 0, "Failed to compile the grammar");
 			Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");

@@ -40,7 +40,7 @@ namespace Hime.HimeCC
 		private const string ArgOutputDebug = "-o:debug";
 		private const string ArgTargetJava = "-t:java";
 		private const string ArgGrammar = "-g";
-		private const string ArgPrefix = "-p";
+		private const string ArgPath = "-p";
 		private const string ArgMethodRNGLR = "-m:rnglr";
 		private const string ArgNamespace = "-n";
 		private const string ArgAccessPublic = "-a:public";
@@ -232,10 +232,10 @@ namespace Hime.HimeCC
 							return null;
 						task.GrammarName = GetValue(arg);
 						break;
-					case ArgPrefix:
+					case ArgPath:
 						if (arg.Children.Count != 1)
 							return null;
-						task.OutputPrefix = GetValue(arg);
+						task.OutputPath = GetValue(arg);
 						break;
 					case ArgMethodRNGLR:
 						task.Method = ParsingMethod.RNGLALR1;
@@ -308,7 +308,7 @@ namespace Hime.HimeCC
 			Console.WriteLine();
 			Console.WriteLine(ArgGrammar + " <grammar>\tSelect the top grammar to compile if more than one are given");
 			Console.WriteLine();
-			Console.WriteLine(ArgPrefix + " <prefix>\tSet the path for the outputs, default is the current directory");
+			Console.WriteLine(ArgPath + " <prefix>\tSet the path for the outputs, default is the current directory");
 			Console.WriteLine();
 			Console.WriteLine(ArgMethodRNGLR + "\tUse the RNGLR parsing algorithm, default is LALR");
 			Console.WriteLine();

@@ -38,7 +38,7 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Gets suffix for the emitted assemblies
 		/// </summary>
-		public override string SuffixAssembly { get { return "-1.0.0.jar"; } }
+		public override string SuffixAssembly { get { return ".jar"; } }
 
 		/// <summary>
 		/// Initializes this emitter
@@ -94,12 +94,12 @@ namespace Hime.CentralDogma.Output
 			bool success = ExecuteCommand("mvn", "package");
 			// extract the result
 			if (success)
-				File.Move(Path.Combine(Path.Combine(prefix, "target"), grammar.Name + "-1.0.0.jar"), ArtifactAssembly);
+				File.Move(Path.Combine(Path.Combine(path, "target"), grammar.Name + "-1.0.0.jar"), ArtifactAssembly);
 			// cleanup the mess ...
-			Directory.Delete(Path.Combine(prefix, "src"), true);
-			Directory.Delete(Path.Combine(prefix, "res"), true);
-			Directory.Delete(Path.Combine(prefix, "target"), true);
-			File.Delete(Path.Combine(prefix, "pom.xml"));
+			Directory.Delete(Path.Combine(path, "src"), true);
+			Directory.Delete(Path.Combine(path, "res"), true);
+			Directory.Delete(Path.Combine(path, "target"), true);
+			File.Delete(Path.Combine(path, "pom.xml"));
 			return success;
 		}
 
@@ -109,7 +109,7 @@ namespace Hime.CentralDogma.Output
 		private void CreateMavenProject()
 		{
 			// setup the sources folder
-			string bottom = Path.Combine(prefix, "src");
+			string bottom = Path.Combine(path, "src");
 			Directory.CreateDirectory(bottom);
 			string[] parts = nmspace.Split(new char[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
 			for (int i=0; i!=parts.Length; i++)
@@ -121,7 +121,7 @@ namespace Hime.CentralDogma.Output
 			File.Copy(ArtifactParserCode, Path.Combine(bottom, grammar.Name + SuffixParserCode));
 
 			// setup the resources folder
-			bottom = Path.Combine(prefix, "res");
+			bottom = Path.Combine(path, "res");
 			Directory.CreateDirectory(bottom);
 			for (int i=0; i!=parts.Length; i++)
 			{
@@ -132,12 +132,12 @@ namespace Hime.CentralDogma.Output
 			File.Copy(ArtifactParserData, Path.Combine(bottom, grammar.Name + suffixParserData));
 
 			// export the pom
-			ExportResource("Java.pom.xml", Path.Combine(prefix, "pom.xml"));
+			ExportResource("Java.pom.xml", Path.Combine(path, "pom.xml"));
 
 			// setup the pom
-			string content = File.ReadAllText(Path.Combine(prefix, "pom.xml"));
+			string content = File.ReadAllText(Path.Combine(path, "pom.xml"));
 			content = content.Replace("${gen-name}", grammar.Name);
-			File.WriteAllText(Path.Combine(prefix, "pom.xml"), content, System.Text.Encoding.UTF8);
+			File.WriteAllText(Path.Combine(path, "pom.xml"), content, System.Text.Encoding.UTF8);
 		}
 
 		/// <summary>

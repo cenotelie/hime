@@ -134,7 +134,7 @@ namespace Hime.Benchmark
 			task.GrammarName = "HimeGrammar";
 			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = method;
-			task.OutputPrefix = "gen_" + method.ToString();
+			task.OutputPath = "gen_" + method.ToString();
 			task.Execute();
 			return Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "gen_" + method.ToString() + ".dll"));
 		}
