@@ -160,6 +160,7 @@ namespace Hime.CentralDogma.Input
 		/// <returns><c>true</c> if the operation succeed</returns>
 		private bool LoadInput(string name, TextReader reader)
 		{
+			reporter.Info("Reading input " + name + " ...");
 			bool hasErrors = false;
 			Input.HimeGrammarLexer lexer = new Input.HimeGrammarLexer(reader);
 			Input.HimeGrammarParser parser = new Input.HimeGrammarParser(lexer);
@@ -176,7 +177,7 @@ namespace Hime.CentralDogma.Input
 			}
 			foreach (ParseError error in result.Errors)
 			{
-				reporter.Error(error);
+				reporter.Error(name + error.Message);
 				hasErrors = true;
 			}
 			if (result.IsSuccess)

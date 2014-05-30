@@ -312,7 +312,7 @@ namespace Hime.CentralDogma.Grammars
 			else
 			{
 				// Tried to override the terminal
-				reporter.Error(string.Format("{0}{1} Overriding the definition of terminal {2}", resource, nameNode.Position, nameNode.Symbol.Value));
+				reporter.Error(string.Format("{0}@{1} Overriding the definition of terminal {2}", resource, nameNode.Position, nameNode.Symbol.Value));
 			}
 		}
 
@@ -387,7 +387,7 @@ namespace Hime.CentralDogma.Grammars
 			}
 
 			// nothing found ...
-			reporter.Error(string.Format("{0}{1} Failed to recognize lexical rule", resource, node.Position));
+			reporter.Error(string.Format("{0}@{1} Failed to recognize lexical rule", resource, node.Position));
 			// return an empty NFA
 			return BuildEpsilonNFA();
 		}
@@ -457,7 +457,7 @@ namespace Hime.CentralDogma.Grammars
 			int cpValue = System.Convert.ToInt32(value, 16);
 			if (cpValue < 0 || (cpValue >= 0xD800 && cpValue <= 0xDFFF) || cpValue >= 0x110000)
 			{
-				reporter.Error(string.Format("{0}{1} The value U+{2} is not a supported unicode code point", resource, node.Position, cpValue.ToString("X")));
+				reporter.Error(string.Format("{0}@{1} The value U+{2} is not a supported unicode code point", resource, node.Position, cpValue.ToString("X")));
 				return BuildEpsilonNFA();
 			}
 			UnicodeCodePoint cp = new UnicodeCodePoint(cpValue);
@@ -502,7 +502,7 @@ namespace Hime.CentralDogma.Grammars
 				char b = value[i];
 				if (b >= 0xD800 && b <= 0xDFFF)
 				{
-					reporter.Error(string.Format("{0}{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, b + value[i + 1]));
+					reporter.Error(string.Format("{0}@{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, b + value[i + 1]));
 					return BuildEpsilonNFA();
 				}
 				if ((i != value.Length - 1) && (value[i + 1] == '-'))
@@ -512,7 +512,7 @@ namespace Hime.CentralDogma.Grammars
 					char e = value[i];
 					if (e >= 0xD800 && e <= 0xDFFF)
 					{
-						reporter.Error(string.Format("{0}{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, e + value[i + 1]));
+						reporter.Error(string.Format("{0}@{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, e + value[i + 1]));
 						return BuildEpsilonNFA();
 					}
 					if (b < 0xD800 && e > 0xDFFF)
@@ -583,7 +583,7 @@ namespace Hime.CentralDogma.Grammars
 			UnicodeCategory category = UnicodeCategories.GetCategory(value);
 			if (category == null)
 			{
-				reporter.Error(string.Format("{0}{1} Unknown unicode category {2}", resource, node.Position, value));
+				reporter.Error(string.Format("{0}@{1} Unknown unicode category {2}", resource, node.Position, value));
 				return BuildEpsilonNFA();
 			}
 			// build the result
@@ -605,7 +605,7 @@ namespace Hime.CentralDogma.Grammars
 			UnicodeBlock block = UnicodeBlocks.GetBlock(value);
 			if (block == null)
 			{
-				reporter.Error(string.Format("{0}{1} Unknown unicode block {2}", resource, node.Position, value));
+				reporter.Error(string.Format("{0}@{1} Unknown unicode block {2}", resource, node.Position, value));
 				return BuildEpsilonNFA();
 			}
 			// build the result
@@ -628,7 +628,7 @@ namespace Hime.CentralDogma.Grammars
 			spanEnd = System.Convert.ToInt32(node.Children[1].Symbol.Value.Substring(2), 16);
 			if (spanBegin > spanEnd)
 			{
-				reporter.Error(string.Format("{0}{1} Invalid unicode character span, the end is before the beginning", resource, node.Position));
+				reporter.Error(string.Format("{0}@{1} Invalid unicode character span, the end is before the beginning", resource, node.Position));
 				return BuildEpsilonNFA();
 			}
 			// build the result
@@ -666,7 +666,7 @@ namespace Hime.CentralDogma.Grammars
 			Terminal reference = grammar.GetTerminalByName(node.Symbol.Value);
 			if (reference == null)
 			{
-				reporter.Error(string.Format("{0}{1} Reference to unknown terminal {2}", resource, node.Position, node.Symbol.Value));
+				reporter.Error(string.Format("{0}@{1} Reference to unknown terminal {2}", resource, node.Position, node.Symbol.Value));
 				return BuildEpsilonNFA();
 			}
 			return reference.NFA.Clone(false);
@@ -815,7 +815,7 @@ namespace Hime.CentralDogma.Grammars
 			if (node.Symbol.ID == HimeGrammarLexer.ID.LITERAL_TEXT)
 				return BuildAtomicInlineText(node);
 			// nothing found ...
-			reporter.Error(string.Format("{0}{1} Failed to recognize syntactic rule", resource, node.Position));
+			reporter.Error(string.Format("{0}@{1} Failed to recognize syntactic rule", resource, node.Position));
 			RuleBodySet set = new RuleBodySet();
 			set.Add(new RuleBody());
 			return set;
@@ -866,7 +866,7 @@ namespace Hime.CentralDogma.Grammars
 			Symbol symbol = ResolveSymbol(node.Children[0].Symbol.Value, context);
 			if (symbol == null)
 			{
-				reporter.Error(string.Format("{0}{1} Unknown symbol {2} in rule definition", resource, node.Children[0].Position, node.Children[0].Symbol.Value));
+				reporter.Error(string.Format("{0}@{1} Unknown symbol {2} in rule definition", resource, node.Children[0].Position, node.Children[0].Symbol.Value));
 				defs.Add(new RuleBody());
 			}
 			else
@@ -891,7 +891,7 @@ namespace Hime.CentralDogma.Grammars
 			// check for meta-rule existence
 			if (!context.IsTemplateRule(name, paramCount))
 			{
-				reporter.Error(string.Format("{0}{1} Unknown meta-rule {2}<{3}> in rule definition", resource, node.Children[0].Position, name, paramCount));
+				reporter.Error(string.Format("{0}@{1} Unknown meta-rule {2}<{3}> in rule definition", resource, node.Children[0].Position, name, paramCount));
 				defs.Add(new RuleBody());
 				return defs;
 			}
