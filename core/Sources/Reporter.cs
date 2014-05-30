@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using Hime.Redist;
 
 namespace Hime.CentralDogma
 {
@@ -53,6 +54,7 @@ namespace Hime.CentralDogma
 			report.AddInfo(message);
 			Console.WriteLine("[INFO] {0}", message);
 		}
+
 		/// <summary>
 		/// Adds a new warning entry in the log
 		/// </summary>
@@ -62,6 +64,7 @@ namespace Hime.CentralDogma
 			report.AddWarning(message);
 			Console.WriteLine("[WARNING] {0}", message);
 		}
+
 		/// <summary>
 		/// Adds a new error entry in the log
 		/// </summary>
@@ -70,6 +73,32 @@ namespace Hime.CentralDogma
 		{
 			report.AddError(message);
 			Console.WriteLine("[ERROR] {0}", message);
+		}
+
+		/// <summary>
+		/// Adds a new input error entry in the log
+		/// </summary>
+		/// <param name="message">The error message</param>
+		/// <param name="input">The input where containing an error</param>
+		/// <param name="position">The position of the error within the input</param>
+		public void Error(object message, Text input, TextPosition position)
+		{
+			Error(message);
+			string content = input.GetLineContent(position.Line);
+			content = content.TrimEnd('\r', '\n');
+			int cut = 0;
+			for (int i=0; i!=content.Length; i++)
+			{
+				if (!char.IsWhiteSpace(content[i]))
+					break;
+				cut++;
+			}
+			Console.Write('\t');
+			Console.WriteLine(content.Substring(cut));
+			Console.Write('\t');
+			for (int i=cut; i!=position.Column - 1; i++)
+				Console.Write(content[i] == '\t' ? '\t' : ' ');
+			Console.WriteLine('^');
 		}
 	}
 }
