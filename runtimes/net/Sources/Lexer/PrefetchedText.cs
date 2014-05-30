@@ -271,7 +271,7 @@ namespace Hime.Redist.Lexer
 		public TextPosition GetPositionAt(int index)
 		{
 			int l = FindLineAt(index);
-			return new TextPosition(l + 1, index - lines[l]);
+			return new TextPosition(l + 1, index - lines[l] + 1);
 		}
 
 		/// <summary>

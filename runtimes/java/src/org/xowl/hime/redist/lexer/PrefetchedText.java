@@ -268,7 +268,7 @@ public class PrefetchedText implements TokenizedText {
      */
     public TextPosition getPositionAt(int index) {
         int l = findLineAt(index);
-        return new TextPosition(l + 1, index - lines[l]);
+        return new TextPosition(l + 1, index - lines[l] + 1);
     }
 
     /**
