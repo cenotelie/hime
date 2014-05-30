@@ -60,6 +60,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\Hime.CentralDogma.XML</DocumentationFile>
     <GenerateDocumentation>true</GenerateDocumentation>
+    <NoWarn>1587</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

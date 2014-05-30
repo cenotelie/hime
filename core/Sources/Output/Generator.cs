@@ -25,6 +25,10 @@ namespace Hime.CentralDogma.Output
 	/// </summary>
 	public interface Generator
 	{
+		/// <summary>
+		/// Generates code or data for the specified file
+		/// </summary>
+		/// <param name="file">The target file to generate code or data in</param>
 		void Generate(string file);
 	}
 }

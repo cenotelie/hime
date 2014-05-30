@@ -60,6 +60,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="name">The name of the generated lexer</param>
 		/// <param name="binResource">Path to the automaton's binary resource</param>
 		/// <param name="gram">The grammar to generate a parser for</param>
+		/// <param name="parserType">The type of parser, as implemented in the runtime</param>
 		public ParserNetCodeGenerator(string nmespace, Modifier modifier, string name, string binResource, Grammars.Grammar gram, string parserType)
 		{
 			this.nmespace = nmespace;

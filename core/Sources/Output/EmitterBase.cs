@@ -169,7 +169,7 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Emit the lexer and parser artifacts
 		/// </summary>
-		/// <param name="prefix">The prefix for the emitted artifacts</param>
+		/// <param name="path">The output path for the emitted artifacts</param>
 		/// <param name="nmspace">The namespace for the emitted code</param>
 		/// <param name="modifier">The visibility modifier for the emitted code</param>
 		/// <param name="method">The parsing method to use</param>
