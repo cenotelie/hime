@@ -49,12 +49,12 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Table of indices in the states table
 		/// </summary>
-		private Utils.Blob<uint> table;
+		private uint[] table;
 
 		/// <summary>
 		/// Lexer's DFA table of states
 		/// </summary>
-		private Utils.Blob<ushort> states;
+		private ushort[] states;
 
 		/// <summary>
 		/// The number of states in this automaton
@@ -77,10 +77,13 @@ namespace Hime.Redist.Lexer
 		public Automaton(BinaryReader reader)
 		{
 			statesCount = reader.ReadInt32();
-			table = new Utils.Blob<uint>(statesCount, 4);
-			table.LoadFrom(reader);
-			states = new Utils.Blob<ushort>((int)((reader.BaseStream.Length - table.Length - 4) / 2), 2);
-			states.LoadFrom(reader);
+			table = new uint[statesCount];
+			for (int i=0; i!=statesCount; i++)
+				table[i] = reader.ReadUInt32();
+			long rest = (reader.BaseStream.Length - table.Length * 4 - 4) / 2;
+			states = new ushort[rest];
+			for (int i=0; i!=rest; i++)
+				states[i] = reader.ReadUInt16();
 		}
 
 		/// <summary>

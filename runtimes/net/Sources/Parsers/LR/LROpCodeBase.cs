@@ -17,15 +17,13 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
 	/// Base values of LR op-code instructions
 	/// </summary>
-	[CLSCompliant(false)]
-	public enum LROpCodeBase : ushort
+	public enum LROpCodeBase
 	{
 		/// <summary>
 		/// Pop an AST from the stack

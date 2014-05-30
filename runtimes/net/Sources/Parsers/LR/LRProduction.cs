@@ -51,7 +51,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Bytecode for the rule's production
 		/// </summary>
-		private Utils.Blob<LROpCode> bytecode;
+		private LROpCode[] bytecode;
 
 		/// <summary>
 		/// Gets the index of the rule's head in the parser's array of variables
@@ -68,7 +68,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the length of the bytecode
 		/// </summary>
-		public int BytecodeLength { get { return bytecode.Count; } }
+		public int BytecodeLength { get { return bytecode.Length; } }
 		/// <summary>
 		/// Gets the op-code at the specified index in the bytecode
 		/// </summary>
@@ -84,8 +84,9 @@ namespace Hime.Redist.Parsers
 			this.head = reader.ReadUInt16();
 			this.headAction = (TreeAction)reader.ReadByte();
 			this.reducLength = reader.ReadByte();
-			this.bytecode = new Utils.Blob<LROpCode>(reader.ReadByte(), 2);
-			this.bytecode.LoadFrom(reader);
+			this.bytecode = new LROpCode[reader.ReadByte()];
+			for (int i=0; i!=bytecode.Length; i++)
+				this.bytecode[i] = new LROpCode(reader);
 		}
 	}
 }

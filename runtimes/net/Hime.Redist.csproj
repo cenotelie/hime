@@ -50,7 +50,7 @@
     <DocumentationFile>bin\Release\Hime.Redist.XML</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentation>true</GenerateDocumentation>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>1587</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -102,7 +102,6 @@
     <Compile Include="Sources\Parsers\SubTree.cs" />
     <Compile Include="Sources\SymbolType.cs" />
     <Compile Include="Sources\SymbolRef.cs" />
-    <Compile Include="Sources\Utils\Blob.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCodeBase.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSLabel.cs" />
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />

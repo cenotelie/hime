@@ -17,33 +17,28 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
-using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
 	/// Represents a LR action in a LR parse table
 	/// </summary>
-	[StructLayout(LayoutKind.Explicit, Size = 4)]
 	public struct LRAction
 	{
 		/// <summary>
 		/// The LR action code
 		/// </summary>
-		[FieldOffset(0)]
 		private LRActionCode code;
 
 		/// <summary>
 		/// The data associated with the action
 		/// </summary>
-		[FieldOffset(2)]
-		private ushort data;
+		private int data;
 
 		/// <summary>
 		/// Gets the action code
 		/// </summary>
-		[CLSCompliant(false)]
 		public LRActionCode Code { get { return code; } }
 
 		/// <summary>
@@ -54,5 +49,15 @@ namespace Hime.Redist.Parsers
 		/// If the code is Shift, it is the index of the next state
 		/// </remarks>
 		public int Data { get { return data; } }
+
+		/// <summary>
+		/// Loads this LR Action from the specified input
+		/// </summary>
+		/// <param name="input">An input</param>
+		public LRAction(BinaryReader input)
+		{
+			this.code = (LRActionCode)(input.ReadUInt16());
+			this.data = input.ReadUInt16();
+		}
 	}
 }

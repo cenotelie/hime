@@ -17,8 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
-using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Hime.Redist.Parsers
 {
@@ -26,23 +25,21 @@ namespace Hime.Redist.Parsers
 	/// Represent an op-code for a LR production
 	/// An op-code can be either an instruction or raw data
 	/// </summary>
-	[StructLayout(LayoutKind.Explicit, Size = 2)]
 	public struct LROpCode
 	{
 		/// <summary>
 		/// Bit mask for the tree action part of an instruction
 		/// </summary>
-		private const ushort MaskTreeAction = 0x0003;
+		private const int MaskTreeAction = 0x0003;
 		/// <summary>
 		/// Bit mask for the base part of an instruction
 		/// </summary>
-		private const ushort MaskBase = 0xFFFC;
+		private const int MaskBase = 0xFFFC;
 
 		/// <summary>
 		/// The op-code value
 		/// </summary>
-		[FieldOffset(0)]
-		private ushort code;
+		private int code;
 
 		/// <summary>
 		/// Gets the value of the data interpretation of this op-code
@@ -57,7 +54,15 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the base instruction in this code
 		/// </summary>
-		[CLSCompliant(false)]
 		public LROpCodeBase Base { get { return (LROpCodeBase)(code & MaskBase); } }
+
+		/// <summary>
+		/// Loads this op-code from the specified input
+		/// </summary>
+		/// <param name="input">An input</param>
+		public LROpCode(BinaryReader input)
+		{
+			this.code = input.ReadUInt16();
+		}
 	}
 }

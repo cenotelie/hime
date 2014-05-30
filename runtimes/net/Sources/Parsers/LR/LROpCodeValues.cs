@@ -17,15 +17,13 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
 	/// Enumeration of the LR op codes
 	/// </summary>
-	[CLSCompliant(false)]
-	public enum LROpCodeValues : ushort
+	public enum LROpCodeValues
 	{
 		/// <summary>
 		/// Pop an AST from the stack without applying any tree action

@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The LR table
 		/// </summary>
-		private Utils.Blob<LRAction> table;
+		private LRAction[] table;
 		/// <summary>
 		/// The table of LR productions
 		/// </summary>
@@ -75,13 +75,12 @@ namespace Hime.Redist.Parsers
 			this.ncols = reader.ReadUInt16();
 			this.nstates = reader.ReadUInt16();
 			int nprod = reader.ReadUInt16();
-			Utils.Blob<ushort> columnsID = new Utils.Blob<ushort>(ncols, 2);
-			columnsID.LoadFrom(reader);
 			this.columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
-				this.columns.Add(columnsID[i], i);
-			this.table = new Utils.Blob<LRAction>(nstates * ncols, 4);
-			this.table.LoadFrom(reader);
+				this.columns.Add(reader.ReadUInt16(), i);
+			this.table = new LRAction[nstates * ncols];
+			for (int i=0; i!=nstates * ncols; i++)
+				this.table[i] = new LRAction(reader);
 			this.productions = new LRProduction[nprod];
 			for (int i = 0; i != nprod; i++)
 				this.productions[i] = new LRProduction(reader);

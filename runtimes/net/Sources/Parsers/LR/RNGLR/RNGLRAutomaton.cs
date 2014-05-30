@@ -51,19 +51,16 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Represents a cell in a RNGLR parse table
 		/// </summary>
-		[StructLayout(LayoutKind.Explicit, Size = 6)]
 		private struct Cell
 		{
 			/// <summary>
 			/// The number of actions in this cell
 			/// </summary>
-			[FieldOffset(0)]
-			private ushort count;
+			private int count;
 			/// <summary>
 			/// Index of the cell's data
 			/// </summary>
-			[FieldOffset(2)]
-			private uint index;
+			private int index;
 			/// <summary>
 			/// Gets the number of actions in the cell
 			/// </summary>
@@ -71,7 +68,13 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// Gets the index of the first action in the Actions table
 			/// </summary>
-			public int ActionsIndex { get { return (int)index; } }
+			public int ActionsIndex { get { return index; } }
+
+			public Cell(BinaryReader input)
+			{
+				this.count = input.ReadUInt16();
+				this.index = (int)input.ReadUInt32();
+			}
 		}
 
 		/// <summary>
@@ -93,11 +96,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The RNGLR table
 		/// </summary>
-		private Utils.Blob<Cell> table;
+		private Cell[] table;
 		/// <summary>
 		/// The action table
 		/// </summary>
-		private Utils.Blob<LRAction> actions;
+		private LRAction[] actions;
 		/// <summary>
 		/// The table of LR productions
 		/// </summary>
@@ -105,7 +108,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The table of nullable variables
 		/// </summary>
-		private Utils.Blob<ushort> nullables;
+		private ushort[] nullables;
 
 		/// <summary>
 		/// Gets the index of the axiom
@@ -128,20 +131,21 @@ namespace Hime.Redist.Parsers
 			int nactions = (int)reader.ReadUInt32();
 			int nprod = reader.ReadUInt16();
 			int nnprod = reader.ReadUInt16();
-			Utils.Blob<ushort> columnsID = new Utils.Blob<ushort>(ncols, 2);
-			columnsID.LoadFrom(reader);
 			this.columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
-				this.columns.Add(columnsID[i], i);
-			this.table = new Utils.Blob<Cell>(nstates * ncols, 6);
-			this.table.LoadFrom(reader);
-			this.actions = new Utils.Blob<LRAction>(nactions, 4);
-			this.actions.LoadFrom(reader);
+				this.columns.Add(reader.ReadUInt16(), i);
+			this.table = new Cell[nstates * ncols];
+			for (int i = 0; i != table.Length; i++)
+				this.table[i] = new Cell(reader);
+			this.actions = new LRAction[nactions];
+			for (int i = 0; i != nactions; i++)
+				this.actions[i] = new LRAction(reader);
 			this.productions = new LRProduction[nprod];
 			for (int i = 0; i != nprod; i++)
 				this.productions[i] = new LRProduction(reader);
-			this.nullables = new Utils.Blob<ushort>(nnprod, 2);
-			this.nullables.LoadFrom(reader);
+			this.nullables = new ushort[nnprod];
+			for (int i = 0; i != nnprod; i++)
+				this.nullables[i] = reader.ReadUInt16();
 		}
 
 		/// <summary>
