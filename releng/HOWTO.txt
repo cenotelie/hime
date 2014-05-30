@@ -1,0 +1,29 @@
+How to build and release Hime components
+
+1) Update the version numbers for the components
+	1) For .Net artifacts, update the releng/VersionInfo.cs file, all .Net artifacts include this file
+	2) For Java artifacts, update the pom.xml: runtimes/java/pom.xml
+
+2) Build NuGet packages
+	1) Execute releng/nuget/package.sh
+	2) NuGet packages are put into releng/nuget
+
+3) Publish NuGet packages
+	1) Set Nuget API key: $ nuget SetApi Key <key>
+	2) Execute nuget push <package file> on each normal package in releng/nuget
+	3) The <name>.symbols.nupkg are automatically pushed to SymbolSource.org when the <name>.nupkg is pushed to NuGet.org
+	4) Deleted the nupkg from releng/nuget
+
+4) Build and publish Java components
+	1) Setup a GPG key with developer's name and email
+	2) $ cd runtimes/java
+	3) $ mvn clean deploy
+
+5) Package and deploy the standalone release
+	1) Use an IDE (VS, MonoDevelop, ...) or the CLI, to build all components with the RELEASE profile in the HimeSystems.sln solution
+	2) Build java components:
+		1) $ cd runtimes/java
+		2) $ mvn clean package
+	3) Execute releng/standalone/package.sh vX.Y.Z
+	4) The result is the zip hime-vX.Y.Z.zip at the root
+	5) Upload the zip to Bitbucket
