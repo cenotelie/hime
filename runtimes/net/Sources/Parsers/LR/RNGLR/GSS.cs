@@ -415,12 +415,12 @@ namespace Hime.Redist.Parsers
 					if (!linked.Contains(edge.To))
 						linked.Add(edge.To);
 				}
-				// Retrieve the nodes in this generation and sort them in decreasing order
+				// Retrieve the nodes in this generation and reverse their order
 				Gen cnodes = genNodes[i];
 				List<int> mynodes = new List<int>();
 				for (int j=0; j!=cnodes.Count; j++)
 					mynodes.Add(cnodes.Start + j);
-				mynodes.Sort(Compare);
+				mynodes.Reverse();
 				// print this generation
 				foreach (int node in mynodes)
 				{
@@ -444,17 +444,6 @@ namespace Hime.Redist.Parsers
 					}
 				}
 			}
-		}
-
-		/// <summary>
-		/// Compares the specified node1 and node2.
-		/// </summary>
-		/// <param name="node1">Node 1</param>
-		/// <param name="node2">Node 2</param>
-		/// <returns>The comparison value</returns>
-		private int Compare(int node1, int node2)
-		{
-			return nodes[node2] - nodes[node1];
 		}
 	}
 }

@@ -369,17 +369,12 @@ class GSS {
                 myedges.get(edge.from).add(edge.to);
                 linked.add(edge.to);
             }
-            // Retrieve the nodes in this generation and sort them in decreasing order
+            // Retrieve the nodes in this generation and reverse their order
             Gen cnodes = genNodes.get(i);
             List<Integer> mynodes = new ArrayList<Integer>();
             for (int j = 0; j != cnodes.count; j++)
                 mynodes.add(cnodes.start + j);
-            Collections.sort(mynodes, new Comparator<Integer>() {
-                @Override
-                public int compare(Integer node1, Integer node2) {
-                    return Integer.compare(nodes.get(node2), nodes.get(node1));
-                }
-            });
+            Collections.reverse(mynodes);
             // print this generation
             for (int node : mynodes) {
                 String mark = linked.contains(node) ? "\u2192" : "\u2297";
