@@ -87,4 +87,12 @@ public interface Text {
      * @return The position (line and column) at the index
      */
     TextPosition getPositionAt(int index);
+
+    /**
+     * Gets the context description for the current text at the specified position
+     *
+     * @param position The position in this text
+     * @return The context description
+     */
+    String[] getContext(TextPosition position);
 }

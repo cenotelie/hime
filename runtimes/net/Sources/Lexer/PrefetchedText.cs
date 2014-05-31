@@ -275,6 +275,32 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
+		/// Gets the context description for the current text at the specified position
+		/// </summary>
+		/// <param name="position">The position in this text</param>
+		/// <returns>The context description</returns>
+		public string[] GetContext(TextPosition position)
+		{
+			string content = GetLineContent(position.Line);
+			content = content.TrimEnd('\r', '\n');
+			int cut = 0;
+			for (int i=0; i!=content.Length; i++)
+			{
+				if (!char.IsWhiteSpace(content[i]))
+					break;
+				cut++;
+			}
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i=cut; i!=position.Column - 1; i++)
+				builder.Append(content[i] == '\t' ? '\t' : ' ');
+			builder.Append("^");
+			return new string[] {
+				content.Substring(cut),
+				builder.ToString()
+			};
+		}
+
+		/// <summary>
 		/// Finds the 0-based number of the line at the given index in the content
 		/// </summary>
 		/// <param name="index">The index within this content</param>

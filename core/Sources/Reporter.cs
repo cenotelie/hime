@@ -118,21 +118,11 @@ namespace Hime.CentralDogma
 		/// <param name="position">The position within the input</param>
 		protected void OutputContext(Text input, TextPosition position)
 		{
-			string content = input.GetLineContent(position.Line);
-			content = content.TrimEnd('\r', '\n');
-			int cut = 0;
-			for (int i=0; i!=content.Length; i++)
-			{
-				if (!char.IsWhiteSpace(content[i]))
-					break;
-				cut++;
-			}
+			string context = input.GetContext(position);
 			Console.Write('\t');
-			Console.WriteLine(content.Substring(cut));
+			Console.WriteLine(context[0]);
 			Console.Write('\t');
-			for (int i=cut; i!=position.Column - 1; i++)
-				Console.Write(content[i] == '\t' ? '\t' : ' ');
-			Console.WriteLine('^');
+			Console.WriteLine(context[1]);
 		}
 	}
 }

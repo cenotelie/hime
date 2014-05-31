@@ -272,6 +272,38 @@ public class PrefetchedText implements TokenizedText {
     }
 
     /**
+     * Gets the context description for the current text at the specified position
+     *
+     * @param position The position in this text
+     * @return The context description
+     */
+    public String[] getContext(TextPosition position) {
+        String content = getLineContent(position.getLine());
+        // trim the end of the string to remove the end of line markers
+        for (int i=content.length() - 1; i != -1; i--) {
+            char x = content.charAt(i);
+            if (x == '\r' || x == '\n')
+                continue;
+            content = content.substring(0, i + 1);
+        }
+        int cut = 0;
+        for (int i=0; i!=content.length(); i++)
+        {
+            if (Character.isWhitespace(content.charAt(i)))
+                break;
+            cut++;
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i=cut; i!=position.getColumn() - 1; i++)
+            builder.append(content.charAt(i) == '\t' ? '\t' : ' ');
+        builder.append("^");
+        return new String[] {
+                content.substring(cut),
+                builder.toString()
+        };
+    }
+
+    /**
      * Finds the 0-based number of the line at the given index in the content
      *
      * @param index The index within this content

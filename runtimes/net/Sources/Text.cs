@@ -77,5 +77,12 @@ namespace Hime.Redist
 		/// <param name="index">Index from the start</param>
 		/// <returns>The position (line and column) at the index</returns>
 		TextPosition GetPositionAt(int index);
+
+		/// <summary>
+		/// Gets the context description for the current text at the specified position
+		/// </summary>
+		/// <param name="position">The position in this text</param>
+		/// <returns>The context description</returns>
+		string[] GetContext(TextPosition position);
 	}
 }
