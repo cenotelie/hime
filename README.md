@@ -26,6 +26,10 @@ Patches can also be submitted by email, or through the [issue management system]
 
 * [laurentw on Bitbucket](https://bitbucket.org/laurentw): lwouters at xowl dot org.
 
+#### For newcomers ####
+
+The [isse tracker](https://bitbucket.org/laurentw/hime/issues) contains tickets that are accessible to newcomers. Look for tickets with `[beginner]` in the title. These tickets are good ways to become more familiar with the project and the codebase.
+
 #### Repository content ####
 
 The Hime parser generator generates parsers for the .Net platform and the Java runtime. The generator itselfs runs on the .Net platform. The repository is then structured as follow:
