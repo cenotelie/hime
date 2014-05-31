@@ -17,6 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -27,6 +28,24 @@ namespace Hime.CentralDogma.Output
 	/// </summary>
 	public class EmitterForNet : EmitterBase
 	{
+		/// <summary>
+		/// The global random source
+		/// </summary>
+		private static Random rand = new Random();
+
+		/// <summary>
+		/// Gets a unique identifier for generated assemblies
+		/// </summary>
+		/// <returns>A unique identifier</returns>
+		private static string GetUniqueID()
+		{
+			int i1 = rand.Next();
+			int i2 = rand.Next();
+			int i3 = rand.Next();
+			int i4 = rand.Next();
+			return i1.ToString("X8") + "_" + i2.ToString("X8") + "_" + i3.ToString("X8") + "_" + i4.ToString("X8");
+		}
+
 		/// <summary>
 		/// Gets the suffix for the emitted lexer code files
 		/// </summary>
@@ -81,6 +100,7 @@ namespace Hime.CentralDogma.Output
 			reporter.Info("Building assembly " + ArtifactAssembly + " ...");
 			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
 			bool hasError = false;
+			string output = path + GetUniqueID() + SuffixAssembly;
 			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
 			{
 				System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
@@ -91,7 +111,7 @@ namespace Hime.CentralDogma.Output
 				compilerparams.ReferencedAssemblies.Add(redist);
 				compilerparams.EmbeddedResources.Add(ArtifactLexerData);
 				compilerparams.EmbeddedResources.Add(ArtifactParserData);
-				compilerparams.OutputAssembly = ArtifactAssembly;
+				compilerparams.OutputAssembly = output;
 				System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] {
 					ArtifactLexerCode,
 					ArtifactParserCode
@@ -102,7 +122,13 @@ namespace Hime.CentralDogma.Output
 					hasError = true;
 				}
 			}
-			return (!hasError);
+			if (hasError)
+				return false;
+			// stage the output
+			if (File.Exists(ArtifactAssembly))
+				File.Delete(ArtifactAssembly);
+			File.Move(output, ArtifactAssembly);
+			return true;
 		}
 	}
 }

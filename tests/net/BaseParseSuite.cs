@@ -38,10 +38,10 @@ namespace Hime.Tests
 		private static Random rand = new Random();
 
 		/// <summary>
-		/// Gets a unique prefix
+		/// Gets a unique identifier for generated assemblies
 		/// </summary>
-		/// <returns>A unique prefix</returns>
-		private static string GetUniquePrefix()
+		/// <returns>A unique identifier</returns>
+		private static string GetUniqueID()
 		{
 			int i1 = rand.Next();
 			int i2 = rand.Next();
@@ -69,7 +69,6 @@ namespace Hime.Tests
 			task.Method = ParsingMethod.LALR1;
 			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = "Hime.Tests.Generated";
-			task.OutputPath = "ParseTree";
 			task.Execute();
 			return new AssemblyReflection("ParseTree.dll");
 		}
@@ -120,8 +119,8 @@ namespace Hime.Tests
 		/// <returns>The parser</returns>
 		protected AssemblyReflection Build(string grammars, string top, ParsingMethod method)
 		{
-			string prefix = GetUniquePrefix();
-			string genNamespace = "Hime.Tests.Generated_" + prefix;
+			string id = GetUniqueID();
+			string genNamespace = "Hime.Tests.Generated_" + id;
 
 			CompilationTask task = new CompilationTask();
 			task.AddInputRaw(grammars);
@@ -130,12 +129,10 @@ namespace Hime.Tests
 			task.Method = method;
 			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = genNamespace;
-			task.OutputPath = prefix;
 			Hime.CentralDogma.Report report = task.Execute();
 			Assert.IsTrue(report.Errors.Count == 0, "Failed to compile the grammar");
-			Assert.IsTrue(CheckFileExists(prefix + ".dll"), "Failed to produce the assembly");
-
-			return new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, prefix + ".dll"));
+			Assert.IsTrue(CheckFileExists(top + ".dll"), "Failed to produce the assembly");
+			return new AssemblyReflection(top + ".dll");
 		}
 
 		/// <summary>
