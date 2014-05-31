@@ -55,6 +55,8 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// <param name="state">A LR state</param>
 		public override void Build(State state)
 		{
+			// Recutions dictionnary for the given set
+			Dictionary<Terminal, ItemLALR1> reductions = new Dictionary<Terminal, ItemLALR1>();
 			// Construct reductions
 			foreach (ItemLALR1 item in state.Items)
 			{
@@ -63,8 +65,18 @@ namespace Hime.CentralDogma.Grammars.LR
 					continue;
 				foreach (Terminal lookahead in item.Lookaheads)
 				{
-					StateActionRNReduce reduction = new StateActionRNReduce(lookahead, item.BaseRule, item.DotPosition);
-					this.Add(reduction);
+					// There is already a shift action for the lookahead => conflict
+					if (state.HasTransition(lookahead))
+						RaiseConflictShiftReduce(state, item, lookahead);
+					// There is already a reduction action for the lookahead => conflict
+					else if (reductions.ContainsKey(lookahead))
+						RaiseConflictReduceReduce(state, item, reductions[lookahead], lookahead);
+					else // No conflict
+					{
+						reductions.Add(lookahead, item);
+						StateActionRNReduce reduction = new StateActionRNReduce(lookahead, item.BaseRule, item.DotPosition);
+						this.Add(reduction);
+					}
 				}
 			}
 		}

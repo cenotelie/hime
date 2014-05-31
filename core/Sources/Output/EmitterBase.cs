@@ -335,10 +335,23 @@ namespace Hime.CentralDogma.Output
 			reporter.Info("Preparing parser's data ...");
 			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);
 			graph = builder.Build(method);
-			foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
-				reporter.Error(conflict);
-			if (builder.Conflicts.Count != 0)
-				return false;
+			// report the conflicts
+			if (method == ParsingMethod.RNGLR1 || method == ParsingMethod.RNGLALR1)
+			{
+				// for RNGLR method we only warn of existing conflicts
+				if (builder.Conflicts.Count > 0)
+					reporter.Warn(string.Format("Found {0} conflict(s), use debug output mode for the details", builder.Conflicts.Count));
+			}
+			else
+			{
+				// for LR(k) methods, conflicts prevent the generation of the automaton
+				if (builder.Conflicts.Count > 0)
+				{
+					foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
+						reporter.Error(conflict);
+					return false;
+				}
+			}
 			// get the generator
 			Generator generator = null;
 			string parserType = null;
