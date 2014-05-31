@@ -305,7 +305,6 @@ namespace Hime.Redist.Parsers
 					for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
 						AddToCache(sub.GetLabelAt(i + 1).Index, sub.GetActionAt(i + 1));
 				}
-				sub.Free();
 			}
 			else if (action != TreeAction.Drop)
 			{

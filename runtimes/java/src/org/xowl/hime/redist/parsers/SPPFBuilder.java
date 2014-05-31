@@ -304,7 +304,6 @@ class SPPFBuilder implements SemanticBody {
                 for (int i = 0; i != sub.getChildrenCountAt(0); i++)
                     addToCache(SymbolRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
             }
-            sub.free();
         } else if (action != LROpCode.TREE_ACTION_DROP) {
             // this is a simple reference to an existing SPPF node
             addToCache(label.getIndex(), action);
