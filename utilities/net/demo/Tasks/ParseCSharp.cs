@@ -56,6 +56,7 @@ namespace Hime.Demo.Tasks
 			// Load the generated assembly
 			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "CSharp.dll"));
 
+			ParseIn(assembly, rootDir + Path.DirectorySeparatorChar + "runtimes" + Path.DirectorySeparatorChar + "net" + Path.DirectorySeparatorChar + "Sources");
 			ParseIn(assembly, rootDir + Path.DirectorySeparatorChar + "core" + Path.DirectorySeparatorChar + "Sources");
 		}
 
@@ -72,13 +73,19 @@ namespace Hime.Demo.Tasks
 				if (file.EndsWith(".cs"))
 				{
 					Console.WriteLine("== Parsing " + Path.Combine(folder, file));
-					Reporter report = new Reporter();
 					StreamReader input = new StreamReader(new FileStream(Path.Combine(folder, file), FileMode.Open));
 					IParser parser = assembly.GetParser(input);
 					ParseResult result = parser.Parse();
 					input.Close();
 					foreach (ParseError error in result.Errors)
-						report.Error(error.Message, result.Input, error.Position);
+					{
+						Console.WriteLine("[ERROR] " + error.Message);
+						string[] context = result.Input.GetContext(error.Position);
+						Console.Write("\t");
+						Console.WriteLine(context[0]);
+						Console.Write("\t");
+						Console.WriteLine(context[1]);
+					}
 				}
 			}
 			string[] subs = Directory.GetDirectories(folder);
