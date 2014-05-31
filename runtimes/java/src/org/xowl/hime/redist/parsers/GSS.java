@@ -331,19 +331,22 @@ class GSS {
                     m++;
                 }
             }
-            // If some previous paths have been removed (m != count)
-            //    and some have been added (next != cout)
-            // => Compact the list
-            if (m != total && next != total) {
+            if (m != total) {
+                // if some previous paths have been removed
+                // => compact the list if needed
                 for (int p = total; p != next; p++) {
                     GSSPath t = set.paths[m];
                     set.paths[m] = set.paths[p];
                     set.paths[p] = t;
                     m++;
                 }
+                // m is now the exact number of paths
+                total = m;
+            } else if (next != total) {
+                // no path has been removed, but some have been added
+                // => next is the exact number of paths
+                total = next;
             }
-            // m is now the exact number of paths
-            total = m;
         }
 
         set.count = total;
