@@ -39,6 +39,10 @@ namespace Hime.Redist.Parsers
 		/// Gets or sets whether the paser should try to recover from errors
 		/// </summary>
 		bool RecoverErrors { get; set; }
+		/// <summary>
+		/// Gets or sets a value indicating whether this parser is in debug mode
+		/// </summary>
+		bool DebugMode { get; set; }
 
 		/// <summary>
 		/// Parses the input and returns the result

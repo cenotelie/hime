@@ -48,6 +48,10 @@ public abstract class BaseLRParser implements IParser {
      */
     protected boolean recover = true;
     /**
+     * Value indicating whether this parser is in debug mode
+     */
+    protected boolean debug = false;
+    /**
      * Parser's variables
      */
     protected List<Symbol> parserVariables;
@@ -104,6 +108,20 @@ public abstract class BaseLRParser implements IParser {
     public void setRecover(boolean recover) {
         this.recover = recover;
     }
+
+    /**
+     * Gets whether this parser is in debug mode
+     *
+     * @return Whether this parser is in debug mode
+     */
+    public boolean isDebugMode() { return debug; }
+
+    /**
+     * Sets whether this parser is in debug mode
+     *
+     * @param mode Whether this parser is in debug mode
+     */
+    public void setDebugMode(boolean mode) { this.debug = mode; }
 
     /**
      * Initializes a new instance of the LRkParser class with the given lexer

@@ -42,6 +42,10 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		protected bool recover = true;
 		/// <summary>
+		/// Value indicating whether this parser is in debug mode
+		/// </summary>
+		protected bool debug = false;
+		/// <summary>
 		/// Parser's variables
 		/// </summary>
 		protected IList<Symbol> parserVariables;
@@ -78,6 +82,14 @@ namespace Hime.Redist.Parsers
 		{
 			get { return recover; }
 			set { recover = value; }
+		}
+		/// <summary>
+		/// Gets or sets a value indicating whether this parser is in debug mode
+		/// </summary>
+		public bool DebugMode
+		{
+			get { return debug; }
+			set { debug = value; }
 		}
 
 		/// <summary>

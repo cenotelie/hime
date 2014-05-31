@@ -57,6 +57,20 @@ public interface IParser {
     void setRecover(boolean recover);
 
     /**
+     * Gets whether this parser is in debug mode
+     *
+     * @return Whether this parser is in debug mode
+     */
+    boolean isDebugMode();
+
+    /**
+     * Sets whether this parser is in debug mode
+     *
+     * @param mode Whether this parser is in debug mode
+     */
+    void setDebugMode(boolean mode);
+
+    /**
      * Parses the input and returns the result
      *
      * @return A ParseResult object containing the data about the result
