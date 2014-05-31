@@ -60,7 +60,6 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\AST.cs" />
-    <Compile Include="Sources\Lexer\TextBuffer.cs" />
     <Compile Include="Sources\Token.cs" />
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
@@ -87,7 +86,6 @@
     <Compile Include="Sources\ParseErrorType.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkParser.cs" />
     <Compile Include="Sources\Parsers\LR\LRProduction.cs" />
-    <Compile Include="Sources\Lexer\RewindableReader.cs" />
     <Compile Include="Sources\Lexer\Automaton.cs" />
     <Compile Include="Sources\UnexpectedCharError.cs" />
     <Compile Include="Sources\ParseError.cs" />
@@ -108,9 +106,6 @@
     <Compile Include="Sources\Lexer\ILexer.cs" />
     <Compile Include="Sources\Lexer\PrefetchedText.cs" />
     <Compile Include="Sources\Lexer\PrefetchedLexer.cs" />
-    <Compile Include="Sources\Lexer\StreamedLexer.cs" />
-    <Compile Include="Sources\Lexer\StreamedText.cs" />
-    <Compile Include="Sources\Lexer\TokenizedInput.cs" />
     <Compile Include="Sources\Parsers\GraphAST.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\Parsers\ASTImpl.cs" />
