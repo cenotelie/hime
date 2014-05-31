@@ -70,11 +70,9 @@ namespace Hime.CentralDogma.Grammars.LR
 				else if (reductions.ContainsKey(item.Lookahead))
 					RaiseConflictReduceReduce(state, item, reductions[item.Lookahead], item.Lookahead);
 				else // No conflict
-				{
 					reductions.Add(item.Lookahead, item);
-					StateActionRNReduce reduction = new StateActionRNReduce(item.Lookahead, item.BaseRule, item.DotPosition);
-					this.Add(reduction);
-				}
+				StateActionRNReduce reduction = new StateActionRNReduce(item.Lookahead, item.BaseRule, item.DotPosition);
+				this.Add(reduction);
 			}
 		}
 	}
