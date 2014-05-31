@@ -33,8 +33,24 @@ namespace Hime.Demo
 		/// </summary>
 		static void Main()
 		{
-			IExecutable executable = new ParseGrammar();
+			IExecutable executable = new ParseCSharp();
 			executable.Execute();
+		}
+
+		/// <summary>
+		/// Gets the path to the root of the repository
+		/// </summary>
+		/// <returns>The path to the root of the repository</returns>
+		public static string GetRepoRoot()
+		{
+			DirectoryInfo current = new DirectoryInfo(Environment.CurrentDirectory);
+			DirectoryInfo[] subs = current.GetDirectories("core");
+			while (subs == null || subs.Length == 0)
+			{
+				current = current.Parent;
+				subs = current.GetDirectories("core");
+			}
+			return current.FullName;
 		}
 	}
 }
