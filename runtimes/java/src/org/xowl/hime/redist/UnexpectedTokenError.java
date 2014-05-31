@@ -67,13 +67,12 @@ public class UnexpectedTokenError extends ParseError {
         this.expected = Collections.unmodifiableList(expected);
         StringBuilder builder = new StringBuilder("Unexpected token \"");
         builder.append(token.getValue());
-        builder.append("\"; expected {");
+        builder.append("\"; expected: ");
         for (int i = 0; i != expected.size(); i++) {
             if (i != 0)
                 builder.append(", ");
             builder.append(expected.get(i).getName());
         }
-        builder.append(" }");
         this.message += builder.toString();
     }
 }
