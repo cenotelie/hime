@@ -42,14 +42,12 @@ grammar CSharp
 		COMMENT_LINE	-> '//' (.* - (.* NEW_LINE .*)) NEW_LINE ;
 		COMMENT_BLOCK	-> '/*' (.* - (.* '*/' .*)) '*/' ;
 
-		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
-
 		// A.1.6 Identifiers
 		// IDENTIFIER_CHAR		-> uc{Lu} | uc{Ll} | uc{Lt} | uc{Lm} | uc{Lo} | uc{Nl} ;
 		// IDENTIFIER			-> '@'? (IDENTIFIER_CHAR | '_') (IDENTIFIER_CHAR | '_' | uc{Nd} | uc{Pc} | uc{Cf})* ;
 		// We use the following simplified rule instead to reduce the lexer's size
 		IDENTIFIER			-> '@'? [a-zA-Z_] [a-zA-Z0-9_]* ;
-		
+
 		// A.1.8 Literals
 		INTEGER_LITERAL_DECIMAL		-> ('0' | [1-9] [0-9]*) ([Uu] [Ll]? | [Ll] [Uu]? )? ;
 		INTEGER_LITERAL_HEXA		-> '0' [xX] [a-fA-F0-9]+ ([Uu] [Ll]? | [Ll] [Uu]? )? ;
@@ -68,6 +66,11 @@ grammar CSharp
 											| '\\' [uU] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] ([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])?
 										)* '"' ;
 		VERBATIM_STRING_LITERAL		-> '@' '"' ([^"] | '""')* '"' ;
+
+		// A.1.10 Pre-Processing Directives
+		PP_DIRECTIVES	-> WHITE_SPACE* '#' (.* - (.* NEW_LINE .*)) NEW_LINE ;
+
+		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK | PP_DIRECTIVES)+;
 	}
 	rules
 	{
@@ -151,13 +154,13 @@ grammar CSharp
 					|  'void' ;
 
 		// A.1.8 Literals
-		literal			-> 'true' | 'false' 
+		literal			-> 'true' | 'false'
 						|  INTEGER_LITERAL_DECIMAL | INTEGER_LITERAL_HEXA
 						|  REAL_LITERAL
 						|  CHARACTER_LITERAL
 						|  REGULAR_STRING_LITERAL | VERBATIM_STRING_LITERAL
 						|  'null' ;
-		
+
 		// A.1.9 Operators and punctuators
 		right_shift						-> '>' '>' ;
 		right_shift_assignment			-> '>' '>=' ;
@@ -407,7 +410,7 @@ grammar CSharp
 		checked_statement			-> 'checked' block ;
 		unchecked_statement			-> 'unchecked' block ;
 		lock_statement				-> 'lock' '(' expression ')' block ;
-		using_statement				-> 'using' resource_acquisition embedded_statement ;
+		using_statement				-> 'using' '(' resource_acquisition ')' embedded_statement ;
 		resource_acquisition		-> local_variable_declaration | expression ;
 		yield_statement				-> 'yield' 'return' expression ';'
 									|  'yield' 'break' ';' ;
