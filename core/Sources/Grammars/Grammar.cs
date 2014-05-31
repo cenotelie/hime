@@ -556,8 +556,8 @@ namespace Hime.CentralDogma.Grammars
 			while (mod)
 			{
 				mod = false;
-				foreach (Variable Var in variables.Values)
-					if (Var.ComputeFirsts())
+				foreach (Variable var in variables.Values)
+					if (var.ComputeFirsts())
 						mod = true;
 			}
 		}

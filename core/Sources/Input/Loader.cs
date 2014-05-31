@@ -184,7 +184,7 @@ namespace Hime.CentralDogma.Input
 			{
 				foreach (ASTNode gnode in result.Root.Children)
 				{
-					Grammars.Loader loader = new Grammars.Loader(name, gnode, reporter);
+					Grammars.Loader loader = new Grammars.Loader(name, result.Input, gnode, reporter);
 					inners.Add(loader.Grammar.Name, loader);
 				}
 			}
@@ -215,7 +215,12 @@ namespace Hime.CentralDogma.Input
 				}
 				if (unsolved != 0 && solved == 0)
 				{
-					reporter.Error("Unable to solve all resource depedencies");
+					foreach (string name in inners.Keys)
+					{
+						Grammars.Loader loader = inners[name];
+						foreach (string dep in loader.Dependencies)
+							reporter.Error(string.Format("Failed to solve dependency of {0} on {1}", name, dep));
+					}
 					return false;
 				}
 			}

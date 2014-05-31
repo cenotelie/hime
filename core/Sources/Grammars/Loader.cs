@@ -34,6 +34,10 @@ namespace Hime.CentralDogma.Grammars
 		/// </summary>
 		private string resource;
 		/// <summary>
+		/// The input from which the grammar is loaded
+		/// </summary>
+		private Text input;
+		/// <summary>
 		/// The root to load from
 		/// </summary>
 		private ASTNode root;
@@ -62,18 +66,25 @@ namespace Hime.CentralDogma.Grammars
 		/// Gets a value indicating whether all dependencies are solved
 		/// </summary>
 		public bool IsSolved { get { return (inherited.Count == 0); } }
+		/// <summary>
+		/// Gets the remaining unsolved dependencies
+		/// </summary>
+		/// <value>The remaining unsolved dependencies</value>
+		public ROList<string> Dependencies { get { return new ROList<string>(inherited); } }
 
 		/// <summary>
 		/// Initializes this load
 		/// </summary>
 		/// <param name="resName">The name of the resource</param>
+		/// <param name="input">The input from which the grammar is loaded</param>
 		/// <param name="root">The root AST</param>
 		/// <param name="reporter">The log</param>
-		public Loader(string resName, ASTNode root, Reporter reporter)
+		public Loader(string resName, Text input, ASTNode root, Reporter reporter)
 		{
 			this.reporter = reporter;
 			this.root = root;
 			this.resource = resName;
+			this.input = input;
 			this.inherited = new List<string>();
 			foreach (ASTNode child in root.Children[1].Children)
 				inherited.Add(child.Symbol.Value);
@@ -94,7 +105,7 @@ namespace Hime.CentralDogma.Grammars
 			{
 				if (!siblings.ContainsKey(parent))
 				{
-					reporter.Error(string.Format("{0} Grammar {1} inherited by {2} cannot be found", resource, parent, grammar.Name));
+					OnErrorNoContext("Grammar {0} inherited by {1} cannot be found", parent, grammar.Name);
 					inherited.Remove(parent);
 				}
 				Loader loader = siblings[parent];
@@ -105,6 +116,30 @@ namespace Hime.CentralDogma.Grammars
 			}
 			if (inherited.Count == 0)
 				LoadGrammarContent(root);
+		}
+
+		/// <summary>
+		/// Raises an error in this loader
+		/// </summary>
+		/// <param name="message">The error's message</param>
+		/// <param name="args">The message's arguments</param>
+		private void OnErrorNoContext(string message, params object[] args)
+		{
+			OnError(new TextPosition(0, 0), message, args);
+		}
+
+		/// <summary>
+		/// Raises an error in this loader
+		/// </summary>
+		/// <param name="position">The error's position in the input</param>
+		/// <param name="message">The error's message</param>
+		/// <param name="args">The message's arguments</param>
+		private void OnError(TextPosition position, string message, params object[] args)
+		{
+			if (position.Line == 0 && position.Column == 0)
+				reporter.Error(string.Format("{0}@{1} {2}", resource, new TextPosition(0, 0), string.Format(message, args)));
+			else
+				reporter.Error(string.Format("{0}@{1} {2}", resource, position, string.Format(message, args)), input, position);
 		}
 
 		/// <summary>
@@ -243,6 +278,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <param name="node">The AST node representing a grammar</param>
 		private void LoadGrammarContent(ASTNode node)
 		{
+			reporter.Info("Loading grammar " + grammar.Name + " ...");
 			for (int i = 2; i < node.Children.Count; i++)
 			{
 				ASTNode child = node.Children[i];
@@ -312,7 +348,7 @@ namespace Hime.CentralDogma.Grammars
 			else
 			{
 				// Tried to override the terminal
-				reporter.Error(string.Format("{0}@{1} Overriding the definition of terminal {2}", resource, nameNode.Position, nameNode.Symbol.Value));
+				OnError(nameNode.Position, "Overriding the definition of terminal {0}", nameNode.Symbol.Value);
 			}
 		}
 
@@ -387,7 +423,7 @@ namespace Hime.CentralDogma.Grammars
 			}
 
 			// nothing found ...
-			reporter.Error(string.Format("{0}@{1} Failed to recognize lexical rule", resource, node.Position));
+			OnError(node.Position, "Failed to recognize lexical rule");
 			// return an empty NFA
 			return BuildEpsilonNFA();
 		}
@@ -457,7 +493,7 @@ namespace Hime.CentralDogma.Grammars
 			int cpValue = System.Convert.ToInt32(value, 16);
 			if (cpValue < 0 || (cpValue >= 0xD800 && cpValue <= 0xDFFF) || cpValue >= 0x110000)
 			{
-				reporter.Error(string.Format("{0}@{1} The value U+{2} is not a supported unicode code point", resource, node.Position, cpValue.ToString("X")));
+				OnError(node.Position, "The value U+{0} is not a supported unicode code point", cpValue.ToString("X"));
 				return BuildEpsilonNFA();
 			}
 			UnicodeCodePoint cp = new UnicodeCodePoint(cpValue);
@@ -502,7 +538,7 @@ namespace Hime.CentralDogma.Grammars
 				char b = value[i];
 				if (b >= 0xD800 && b <= 0xDFFF)
 				{
-					reporter.Error(string.Format("{0}@{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, b + value[i + 1]));
+					OnError(node.Position, "Unsupported non-plane 0 Unicode character ({0}) in character class", b + value[i + 1]);
 					return BuildEpsilonNFA();
 				}
 				if ((i != value.Length - 1) && (value[i + 1] == '-'))
@@ -512,7 +548,7 @@ namespace Hime.CentralDogma.Grammars
 					char e = value[i];
 					if (e >= 0xD800 && e <= 0xDFFF)
 					{
-						reporter.Error(string.Format("{0}@{1} Unsupported non-plane 0 Unicode character ({2}) in character class", resource, node.Position, e + value[i + 1]));
+						OnError(node.Position, "Unsupported non-plane 0 Unicode character ({0}) in character class", e + value[i + 1]);
 						return BuildEpsilonNFA();
 					}
 					if (b < 0xD800 && e > 0xDFFF)
@@ -583,7 +619,7 @@ namespace Hime.CentralDogma.Grammars
 			UnicodeCategory category = UnicodeCategories.GetCategory(value);
 			if (category == null)
 			{
-				reporter.Error(string.Format("{0}@{1} Unknown unicode category {2}", resource, node.Position, value));
+				OnError(node.Position, "Unknown unicode category {0}", value);
 				return BuildEpsilonNFA();
 			}
 			// build the result
@@ -605,7 +641,7 @@ namespace Hime.CentralDogma.Grammars
 			UnicodeBlock block = UnicodeBlocks.GetBlock(value);
 			if (block == null)
 			{
-				reporter.Error(string.Format("{0}@{1} Unknown unicode block {2}", resource, node.Position, value));
+				OnError(node.Position, "Unknown unicode block {0}", value);
 				return BuildEpsilonNFA();
 			}
 			// build the result
@@ -628,7 +664,7 @@ namespace Hime.CentralDogma.Grammars
 			spanEnd = System.Convert.ToInt32(node.Children[1].Symbol.Value.Substring(2), 16);
 			if (spanBegin > spanEnd)
 			{
-				reporter.Error(string.Format("{0}@{1} Invalid unicode character span, the end is before the beginning", resource, node.Position));
+				OnError(node.Position, "Invalid unicode character span, the end is before the beginning");
 				return BuildEpsilonNFA();
 			}
 			// build the result
@@ -666,7 +702,7 @@ namespace Hime.CentralDogma.Grammars
 			Terminal reference = grammar.GetTerminalByName(node.Symbol.Value);
 			if (reference == null)
 			{
-				reporter.Error(string.Format("{0}@{1} Reference to unknown terminal {2}", resource, node.Position, node.Symbol.Value));
+				OnError(node.Position, "Reference to unknown terminal {0}", node.Symbol.Value);
 				return BuildEpsilonNFA();
 			}
 			return reference.NFA.Clone(false);
@@ -815,7 +851,7 @@ namespace Hime.CentralDogma.Grammars
 			if (node.Symbol.ID == HimeGrammarLexer.ID.LITERAL_TEXT)
 				return BuildAtomicInlineText(node);
 			// nothing found ...
-			reporter.Error(string.Format("{0}@{1} Failed to recognize syntactic rule", resource, node.Position));
+			OnError(node.Position, "Failed to recognize syntactic rule");
 			RuleBodySet set = new RuleBodySet();
 			set.Add(new RuleBody());
 			return set;
@@ -866,7 +902,7 @@ namespace Hime.CentralDogma.Grammars
 			Symbol symbol = ResolveSymbol(node.Children[0].Symbol.Value, context);
 			if (symbol == null)
 			{
-				reporter.Error(string.Format("{0}@{1} Unknown symbol {2} in rule definition", resource, node.Children[0].Position, node.Children[0].Symbol.Value));
+				OnError(node.Children[0].Position, "Unknown symbol {0} in rule definition", node.Children[0].Symbol.Value);
 				defs.Add(new RuleBody());
 			}
 			else
@@ -891,7 +927,7 @@ namespace Hime.CentralDogma.Grammars
 			// check for meta-rule existence
 			if (!context.IsTemplateRule(name, paramCount))
 			{
-				reporter.Error(string.Format("{0}@{1} Unknown meta-rule {2}<{3}> in rule definition", resource, node.Children[0].Position, name, paramCount));
+				OnError(node.Children[0].Position, "Unknown meta-rule {0}<{1}> in rule definition", name, paramCount);
 				defs.Add(new RuleBody());
 				return defs;
 			}

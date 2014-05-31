@@ -190,6 +190,7 @@ namespace Hime.CentralDogma
 				return;
 
 			// prepare the target grammar
+			reporter.Info("Preparing grammar " + target.Name + " ...");
 			string message = target.Prepare();
 			if (message != null)
 			{
