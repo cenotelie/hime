@@ -28,14 +28,6 @@ namespace Hime.CentralDogma.Grammars.LR
 	public abstract class Item
 	{
 		/// <summary>
-		/// String representation of the dot in LR items
-		/// </summary>
-		/// <remarks>
-		/// A dot represents the position of a parser in an item
-		/// </remarks>
-		public const string dot = "●";
-
-		/// <summary>
 		/// The underlying grammar rule
 		/// </summary>
 		protected Rule rule;
@@ -183,32 +175,32 @@ namespace Hime.CentralDogma.Grammars.LR
 		/// </returns>
 		public string ToString(bool withLookaheads)
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
+			System.Text.StringBuilder builder = new System.Text.StringBuilder("\u3014");
 			builder.Append(rule.Head.ToString());
-			builder.Append(" ->");
+			builder.Append(" \u2192");
 			int i = 0;
 			foreach (RuleBodyElement Part in rule.Body.Choices[0])
 			{
 				if (i == position)
-					builder.Append(" " + dot);
+					builder.Append(" \u25CF");
 				builder.Append(" ");
 				builder.Append(Part.ToString());
 				i++;
 			}
 			if (i == position)
-				builder.Append(" " + dot);
+				builder.Append(" \u25CF");
 			if (withLookaheads)
 			{
-				builder.Append(", ");
+				builder.Append(" \u25B6 ");
 				TerminalSet lookaheads = Lookaheads;
 				for (int j = 0; j != lookaheads.Count; j++)
 				{
 					if (j != 0)
-						builder.Append("/");
+						builder.Append(" ");
 					builder.Append(lookaheads[j].ToString());
 				}
 			}
-			builder.Append("]");
+			builder.Append("\u3015");
 			return builder.ToString();
 		}
 	}

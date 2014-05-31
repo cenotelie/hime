@@ -93,7 +93,7 @@ namespace Hime.CentralDogma.Grammars
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
+			System.Text.StringBuilder builder = new System.Text.StringBuilder("\u3016");
 			bool first = true;
 			foreach (Terminal terminal in content)
 			{
@@ -102,7 +102,7 @@ namespace Hime.CentralDogma.Grammars
 				first = false;
 				builder.Append(terminal.ToString());
 			}
-			builder.Append("]");
+			builder.Append("\u3017");
 			return builder.ToString();
 		}
 	}

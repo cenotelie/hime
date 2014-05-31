@@ -106,7 +106,7 @@ namespace Hime.CentralDogma.Grammars
 		{
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
 			builder.Append(head.Name);
-			builder.Append(" ->");
+			builder.Append(" \u2192");
 			builder.Append(body.ToString());
 			return builder.ToString();
 		}
