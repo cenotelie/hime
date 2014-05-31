@@ -391,5 +391,70 @@ namespace Hime.Redist.Parsers
 			count = total;
 			return paths;
 		}
+
+		/// <summary>
+		/// Prints this stack onto the console output
+		/// </summary>
+		public void Print()
+		{
+			// list of all nodes having at least one child
+			List<int> linked = new List<int>();
+
+			for (int i=generation; i!=-1; i--)
+			{
+				Console.WriteLine("\t--- generation {0} ---", i);
+				// Retrieve the edges in this generation
+				Dictionary<int, List<int>> myedges = new Dictionary<int, List<int>>();
+				Gen cedges = genEdges[i];
+				for (int j=0; j!=cedges.Count; j++)
+				{
+					Edge edge = this.edges[cedges.Start + j];
+					if (!myedges.ContainsKey(edge.From))
+						myedges.Add(edge.From, new List<int>());
+					myedges[edge.From].Add(edge.To);
+					if (!linked.Contains(edge.To))
+						linked.Add(edge.To);
+				}
+				// Retrieve the nodes in this generation and sort them in decreasing order
+				Gen cnodes = genNodes[i];
+				List<int> mynodes = new List<int>();
+				for (int j=0; j!=cnodes.Count; j++)
+					mynodes.Add(cnodes.Start + j);
+				mynodes.Sort(Compare);
+				// print this generation
+				foreach (int node in mynodes)
+				{
+					string mark = linked.Contains(node) ? "\u2192" : "\u2297";
+					if (myedges.ContainsKey(node))
+					{
+						foreach (int to in myedges[node])
+						{
+							int gen = GetGenerationOf(to);
+							if (gen == i)
+								Console.WriteLine("\t\t{0} {1} \u21BA {2}", mark, nodes[node], nodes[to]);
+							else if (gen == i - 1)
+								Console.WriteLine("\t\t{0} {1} \u21B4 {2}", mark, nodes[node], nodes[to]);
+							else
+								Console.WriteLine("\t\t{0} {1} \u21E3 {2} @ {3}", mark, nodes[node], nodes[to], gen);
+						}
+					}
+					else
+					{
+						Console.WriteLine("\t\t{0} {1}", mark, nodes[node]);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Compares the specified node1 and node2.
+		/// </summary>
+		/// <param name="node1">Node 1</param>
+		/// <param name="node2">Node 2</param>
+		/// <returns>The comparison value</returns>
+		private int Compare(int node1, int node2)
+		{
+			return nodes[node2] - nodes[node1];
+		}
 	}
 }

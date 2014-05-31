@@ -22,7 +22,7 @@ package org.xowl.hime.redist.parsers;
 import org.xowl.hime.redist.utils.BigList;
 import org.xowl.hime.redist.utils.IntBigList;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Represents Graph-Structured Stacks for GLR parsers
@@ -348,5 +348,55 @@ class GSS {
 
         set.count = total;
         return set;
+    }
+
+    /**
+     * Prints this stack onto the console output
+     */
+    public void print() {
+        // list of all nodes having at least one child
+        Set<Integer> linked = new HashSet<Integer>();
+
+        for (int i = generation; i != -1; i--) {
+            System.out.println("\t--- generation " + i + " ---");
+            // Retrieve the edges in this generation
+            Map<Integer, List<Integer>> myedges = new HashMap<Integer, List<Integer>>();
+            Gen cedges = genEdges.get(i);
+            for (int j = 0; j != cedges.count; j++) {
+                Edge edge = this.edges.get(cedges.start + j);
+                if (!myedges.containsKey(edge.from))
+                    myedges.put(edge.from, new ArrayList<Integer>());
+                myedges.get(edge.from).add(edge.to);
+                linked.add(edge.to);
+            }
+            // Retrieve the nodes in this generation and sort them in decreasing order
+            Gen cnodes = genNodes.get(i);
+            List<Integer> mynodes = new ArrayList<Integer>();
+            for (int j = 0; j != cnodes.count; j++)
+                mynodes.add(cnodes.start + j);
+            Collections.sort(mynodes, new Comparator<Integer>() {
+                @Override
+                public int compare(Integer node1, Integer node2) {
+                    return Integer.compare(nodes.get(node2), nodes.get(node1));
+                }
+            });
+            // print this generation
+            for (int node : mynodes) {
+                String mark = linked.contains(node) ? "\u2192" : "\u2297";
+                if (myedges.containsKey(node)) {
+                    for (int to : myedges.get(node)) {
+                        int gen = getGenerationOf(to);
+                        if (gen == i)
+                            System.out.println("\t\t" + mark + " " + nodes.get(node) + " \u21BA " + nodes.get(to));
+                        else if (gen == i - 1)
+                            System.out.println("\t\t" + mark + " " + nodes.get(node) + " \u21B4 " + nodes.get(to));
+                        else
+                            System.out.println("\t\t" + mark + " " + nodes.get(node) + " \u21E3 " + nodes.get(to) + " @ " + gen);
+                    }
+                } else {
+                    System.out.println("\t\t" + mark + " " + nodes.get(node));
+                }
+            }
+        }
     }
 }

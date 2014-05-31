@@ -241,7 +241,19 @@ public class RNGLRParser extends BaseLRParser {
                 }
             }
         }
-        allErrors.add(new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected));
+        UnexpectedTokenError error = new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected);
+        allErrors.add(error);
+        if (debug) {
+            System.out.println("==== RNGLR parsing error:");
+            System.out.print("\t");
+            System.out.println(error.toString());
+            String[] context = lexer.getOutput().getContext(error.getPosition());
+            System.out.print("\t");
+            System.out.println(context[0]);
+            System.out.print("\t");
+            System.out.println(context[1]);
+            gss.print();
+        }
     }
 
     /**

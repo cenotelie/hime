@@ -254,7 +254,20 @@ namespace Hime.Redist.Parsers
 					}
 				}
 			}
-			allErrors.Add(new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected));
+			UnexpectedTokenError error = new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected);
+			allErrors.Add(error);
+			if (debug)
+			{
+				Console.WriteLine("==== RNGLR parsing error:");
+				Console.Write("\t");
+				Console.WriteLine(error.ToString());
+				String[] context = lexer.Output.GetContext(error.Position);
+				Console.Write("\t");
+				Console.WriteLine(context[0]);
+				Console.Write("\t");
+				Console.WriteLine(context[1]);
+				gss.Print();
+			}
 		}
 
 		/// <summary>
