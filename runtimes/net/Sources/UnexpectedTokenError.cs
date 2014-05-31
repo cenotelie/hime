@@ -51,14 +51,13 @@ namespace Hime.Redist
 			this.ExpectedTerminals = new ReadOnlyCollection<Symbol>(expected);
 			StringBuilder Builder = new StringBuilder("Unexpected token \"");
 			Builder.Append(token.Value);
-			Builder.Append("\"; expected: { ");
+			Builder.Append("\"; expected: ");
 			for (int i = 0; i != expected.Count; i++)
 			{
 				if (i != 0)
 					Builder.Append(", ");
 				Builder.Append(expected[i].Name);
 			}
-			Builder.Append(" }");
 			this.Message += Builder.ToString();
 		}
 	}
