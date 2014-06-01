@@ -26,7 +26,7 @@ namespace Hime.Benchmark
 {
 	class Benchmark
 	{
-		private const string dirExtras = "Extras";
+		private const string dirExtras = "extras";
 		private const string dirGrammars = "Grammars";
 		private string language;
 		private string input;
@@ -46,13 +46,13 @@ namespace Hime.Benchmark
 			this.input = "Perf.gram";
 			this.output = "result.txt";
 			this.sampleFactor = 600;
-			this.expCount = 20;
+			this.expCount = 10;
 			this.rebuildInput = true;
 			this.rebuildParsers = true;
-			this.doStats = false;
+			this.doStats = true;
 			this.doLexer = true;
-			this.doParserLALR = false;
-			this.doParserRNGLR = false;
+			this.doParserLALR = true;
+			this.doParserRNGLR = true;
 		}
 
 		public void Run()
@@ -69,7 +69,8 @@ namespace Hime.Benchmark
 			{
 				asmLALR = Compile(ParsingMethod.LALR1);
 				asmGLR = Compile(ParsingMethod.RNGLALR1);
-			} else
+			}
+			else
 			{
 				asmLALR = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "gen_LALR1.dll"));
 				asmGLR = Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "gen_RNGLALR1.dll"));
@@ -134,8 +135,10 @@ namespace Hime.Benchmark
 			task.GrammarName = "HimeGrammar";
 			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = method;
-			task.OutputPath = "gen_" + method.ToString();
 			task.Execute();
+			if (File.Exists("gen_" + method.ToString() + ".dll"))
+				File.Delete("gen_" + method.ToString() + ".dll");
+			File.Move("HimeGrammar.dll", "gen_" + method.ToString() + ".dll");
 			return Assembly.LoadFile(Path.Combine(Environment.CurrentDirectory, "gen_" + method.ToString() + ".dll"));
 		}
 
