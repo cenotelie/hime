@@ -132,7 +132,7 @@ namespace Hime.Redist.Parsers
 			this.gss = new GSS();
 			this.sppf = new SPPFBuilder(lexer.Output, parserVariables, parserVirtuals);
 			BuildNullables(variables.Length);
-			this.sppf.ClearHistory();
+			sppf.ClearHistory();
 		}
 
 		/// <summary>
@@ -378,6 +378,7 @@ namespace Hime.Redist.Parsers
 			sppf.ClearHistory();
 			while (reductions.Count != 0)
 				ExecuteReduction(generation, reductions.Dequeue());
+			sppf.Collect();
 		}
 
 		/// <summary>

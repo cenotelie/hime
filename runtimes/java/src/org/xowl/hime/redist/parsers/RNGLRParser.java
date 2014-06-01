@@ -355,6 +355,7 @@ public class RNGLRParser extends BaseLRParser {
         sppf.clearHistory();
         while (!reductions.isEmpty())
             executeReduction(generation, reductions.remove());
+        sppf.collect();
     }
 
     /**

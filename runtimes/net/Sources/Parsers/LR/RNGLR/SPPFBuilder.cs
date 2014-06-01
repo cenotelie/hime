@@ -92,6 +92,10 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
+		/// The pool of sub-tree with a capacity of 8 nodes
+		/// </summary>
+		private Pool<SubTree> pool8;
+		/// <summary>
 		/// The pool of sub-tree with a capacity of 128 nodes
 		/// </summary>
 		private Pool<SubTree> pool128;
@@ -140,6 +144,14 @@ namespace Hime.Redist.Parsers
 		/// The number of items popped from the stack
 		/// </summary>
 		private int popCount;
+		/// <summary>
+		/// List of collectable sub-trees
+		/// </summary>
+		private SubTree[] collection;
+		/// <summary>
+		/// Insertion index in the list of collectable sub-trees
+		/// </summary>
+		private int collectionNext;
 
 		/// <summary>
 		/// The AST being built
@@ -173,6 +185,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The table of parser virtuals</param>
 		public SPPFBuilder(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
+			this.pool8 = new Pool<SubTree>(new SubTreeFactory(8), 1024);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
 			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
 			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), initHistorySize);
@@ -182,6 +195,8 @@ namespace Hime.Redist.Parsers
 			this.cacheActions = new TreeAction[handleSize];
 			this.handle = new int[handleSize];
 			this.stack = new GSSLabel[handleSize];
+			this.collection = new SubTree[initHistoryPartSize];
+			this.collectionNext = 0;
 			this.result = new GraphAST(text, variables, virtuals);
 		}
 
@@ -206,6 +221,16 @@ namespace Hime.Redist.Parsers
 			for (int i = 0; i != nextHP; i++)
 				poolHPs.Return(history[i]);
 			nextHP = 0;
+		}
+
+		/// <summary>
+		/// Collects the reusable sub-trees
+		/// </summary>
+		public void Collect()
+		{
+			for (int i = 0; i != collectionNext; i++)
+				collection[i].Free();
+			collectionNext = 0;
 		}
 
 		/// <summary>
@@ -251,12 +276,13 @@ namespace Hime.Redist.Parsers
 		/// <param name="size">The size of the sub-tree</param>
 		private SubTree GetSubTree(int size)
 		{
+			if (size <= 8)
+				return pool8.Acquire();
 			if (size <= 128)
 				return pool128.Acquire();
-			else if (size <= 1024)
+			if (size <= 1024)
 				return pool1024.Acquire();
-			else
-				return new SubTree(null, size);
+			return new SubTree(null, size);
 		}
 
 		/// <summary>
@@ -305,6 +331,20 @@ namespace Hime.Redist.Parsers
 					for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
 						AddToCache(sub.GetLabelAt(i + 1).Index, sub.GetActionAt(i + 1));
 				}
+				// add the sub-tree to the collectable list
+				// is-it already present?
+				for (int i = 0; i != collectionNext; i++)
+					if (collection[i] == sub)
+						return;
+				// do we have enough space?
+				if (collection.Length == collectionNext)
+				{
+					SubTree[] temp = new SubTree[collection.Length + initHistoryPartSize];
+					Array.Copy(collection, temp, collection.Length);
+					collection = temp;
+				}
+				// insert the collectable sub-tree
+				collection[collectionNext++] = sub;
 			}
 			else if (action != TreeAction.Drop)
 			{
@@ -384,9 +424,9 @@ namespace Hime.Redist.Parsers
 		{
 			GSSLabel label = Epsilon;
 			if (replaceable)
-				label = ReduceReplaceable(generation, varIndex);
+				label = ReduceReplaceable(varIndex);
 			else
-				label = ReduceNormal(generation, varIndex);
+				label = ReduceNormal(varIndex);
 			AddTohistory(generation, label);
 			return label;
 		}
@@ -394,10 +434,9 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Executes the reduction as a normal reduction
 		/// </summary>
-		/// <param name="generation">The generation to reduce from</param>
 		/// <param name="varIndex">The reduced variable index</param>
 		/// <returns>The produced sub-tree</returns>
-		private GSSLabel ReduceNormal(int generation, int varIndex)
+		private GSSLabel ReduceNormal(int varIndex)
 		{
 			int root = -1;
 			int insertion = 0;
@@ -447,15 +486,14 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Executes the reduction as the reduction of a replaceable variable
 		/// </summary>
-		/// <param name="generation">The generation to reduce from</param>
 		/// <param name="varIndex">The reduced variable index</param>
 		/// <returns>The produced sub-tree</returns>
-		private GSSLabel ReduceReplaceable(int generation, int varIndex)
+		private GSSLabel ReduceReplaceable(int varIndex)
 		{
-			SubTree tree = GetSubTree(cacheNext);
+			SubTree tree = GetSubTree(handleNext + 1);
 			tree.SetupRoot(new SymbolRef(SymbolType.Variable, varIndex), TreeAction.Replace);
 			tree.SetChildrenCountAt(0, handleNext);
-			for (int i=0; i!=handleNext; i++)
+			for (int i = 0; i != handleNext; i++)
 			{
 				int node = cacheChildren[handle[i]];
 				TreeAction action = cacheActions[handle[i]];

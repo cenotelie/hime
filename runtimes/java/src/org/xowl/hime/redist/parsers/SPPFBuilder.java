@@ -84,6 +84,10 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The pool of sub-tree with a capacity of 128 nodes
      */
+    private Pool<SubTree> pool8;
+    /**
+     * The pool of sub-tree with a capacity of 128 nodes
+     */
     private Pool<SubTree> pool128;
     /**
      * The pool of sub-tree with a capacity of 1024 nodes
@@ -130,6 +134,14 @@ class SPPFBuilder implements SemanticBody {
      * The number of items popped from the stack
      */
     private int popCount;
+    /**
+     * List of collectable sub-trees
+     */
+    private SubTree[] collection;
+    /**
+     * Insertion index in the list of collectable sub-trees
+     */
+    private int collectionNext;
 
     /**
      * The AST being built
@@ -164,6 +176,12 @@ class SPPFBuilder implements SemanticBody {
      * @param virtuals  The table of parser virtuals
      */
     public SPPFBuilder(TokenizedText text, List<Symbol> variables, List<Symbol> virtuals) {
+        this.pool8 = new Pool<SubTree>(new Factory<SubTree>() {
+            @Override
+            public SubTree createNew(Pool<SubTree> pool) {
+                return new SubTree(pool8, 8);
+            }
+        }, 1024, SubTree.class);
         this.pool128 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
             public SubTree createNew(Pool<SubTree> pool) {
@@ -188,6 +206,8 @@ class SPPFBuilder implements SemanticBody {
         this.cacheActions = new byte[handleSize];
         this.handle = new int[handleSize];
         this.stack = new GSSLabel[handleSize];
+        this.collection = new SubTree[initHistoryPartSize];
+        this.collectionNext = 0;
         this.result = new GraphAST(text, variables, virtuals);
     }
 
@@ -211,6 +231,15 @@ class SPPFBuilder implements SemanticBody {
         for (int i = 0; i != nextHP; i++)
             poolHPs.putBack(history[i]);
         nextHP = 0;
+    }
+
+    /**
+     * Collects the reusable sub-trees
+     */
+    public void collect() {
+        for (int i = 0; i != collectionNext; i++)
+            collection[i].free();
+        collectionNext = 0;
     }
 
     /**
@@ -253,12 +282,13 @@ class SPPFBuilder implements SemanticBody {
      * @return A pooled sub-tree with the given maximal size
      */
     private SubTree getSubTree(int size) {
+        if (size <= 8)
+            return pool8.acquire();
         if (size <= 128)
             return pool128.acquire();
-        else if (size <= 1024)
+        if (size <= 1024)
             return pool1024.acquire();
-        else
-            return new SubTree(null, size);
+        return new SubTree(null, size);
     }
 
     /**
@@ -304,6 +334,16 @@ class SPPFBuilder implements SemanticBody {
                 for (int i = 0; i != sub.getChildrenCountAt(0); i++)
                     addToCache(SymbolRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
             }
+            // add the sub-tree to the collectable list
+            // is-it already present?
+            for (int i = 0; i != collectionNext; i++)
+                if (collection[i] == sub)
+                    return;
+            // do we have enough space?
+            if (collection.length == collectionNext)
+                collection = Arrays.copyOf(collection, collection.length + initHistoryPartSize);
+            // insert the collectable sub-tree
+            collection[collectionNext++] = sub;
         } else if (action != LROpCode.TREE_ACTION_DROP) {
             // this is a simple reference to an existing SPPF node
             addToCache(label.getIndex(), action);
@@ -373,9 +413,9 @@ class SPPFBuilder implements SemanticBody {
     public GSSLabel reduce(int generation, int varIndex, boolean replaceable) {
         GSSLabel label = EPSILON;
         if (replaceable)
-            label = reduceReplaceable(generation, varIndex);
+            label = reduceReplaceable(varIndex);
         else
-            label = reduceNormal(generation, varIndex);
+            label = reduceNormal(varIndex);
         addTohistory(generation, label);
         return label;
     }
@@ -383,11 +423,10 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Executes the reduction as a normal reduction
      *
-     * @param generation The generation to reduce from
      * @param varIndex   The reduced variable index
      * @return The produced sub-tree
      */
-    private GSSLabel reduceNormal(int generation, int varIndex) {
+    private GSSLabel reduceNormal(int varIndex) {
         int root = -1;
         int insertion = 0;
         for (int i = 0; i != handleNext; i++) {
@@ -432,11 +471,10 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Executes the reduction as the reduction of a replaceable variable
      *
-     * @param generation The generation to reduce from
      * @param varIndex   The reduced variable index
      * @return The produced sub-tree
      */
-    private GSSLabel reduceReplaceable(int generation, int varIndex) {
+    private GSSLabel reduceReplaceable(int varIndex) {
         SubTree tree = getSubTree(cacheNext);
         tree.setupRoot(SymbolRef.encode(SymbolType.VARIABLE, varIndex), LROpCode.TREE_ACTION_REPLACE);
         tree.setChildrenCountAt(0, handleNext);
