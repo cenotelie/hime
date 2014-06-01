@@ -21,7 +21,7 @@ package org.xowl.hime.redist.parsers;
 
 /**
  * Represents a label on a GSS edge
- * <p/>
+ *
  * The data in this structure can have two interpretations:
  * 1) It can represent a sub-tree with a replaceable root.
  * 2) It can represent a reference to a single node in a SPPF.

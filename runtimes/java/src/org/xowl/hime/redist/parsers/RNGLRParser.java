@@ -33,7 +33,7 @@ import java.util.Queue;
 public class RNGLRParser extends BaseLRParser {
     /**
      * Represents a reduction operation to be performed
-     * <p/>
+     *
      * For reduction of length 0, the node is the GSS node on which it is applied, the first label then is epsilon
      * For others, the node is the SECOND GSS node on the path, not the head. The first label is then the label on the transition from the head
      */
@@ -127,7 +127,7 @@ public class RNGLRParser extends BaseLRParser {
      * @param virtuals  The parser's virtuals
      * @param actions   The parser's actions
      * @param lexer     The input lexer
-     * @throws InitializationException
+     * @throws InitializationException if the parser failed to initialize the nullable rules
      */
     public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, ILexer lexer) throws InitializationException {
         super(variables, virtuals, actions, lexer);

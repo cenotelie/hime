@@ -119,6 +119,7 @@ public abstract class PrefetchedLexer implements ILexer {
      * @param terminals Terminals recognized by this lexer
      * @param separator SID of the separator token
      * @param input     Input to this lexer
+     * @throws java.io.IOException if the lexer cannot read the input
      */
     protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, InputStream input) throws IOException {
         this(automaton, terminals, separator, (new BinaryInput(input)).toString());

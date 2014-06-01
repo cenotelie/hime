@@ -62,7 +62,7 @@ class LRAction {
 
     /**
      * Gets the data associated with the action
-     * <p/>
+     *
      * If the code is Reduce, it is the index of the LRProduction
      * If the code is Shift, it is the index of the next state
      *

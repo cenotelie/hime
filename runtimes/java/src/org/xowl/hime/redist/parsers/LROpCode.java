@@ -64,7 +64,7 @@ class LROpCode {
     public static final char BASE_SEMANTIC_ACTION = 8;
     /**
      * Add a null variable
-     * <p/>
+     *
      * This can be found only in RNGLR productions
      */
     public static final char BASE_ADD_NULL_VARIABLE = 16;

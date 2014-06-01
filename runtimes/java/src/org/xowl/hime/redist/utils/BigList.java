@@ -67,7 +67,7 @@ public class BigList<T> {
      * Initializes this list
      *
      * @param type The type of stored elements
-     * @throws ClassNotFoundException
+     * @param typeArray The type of an array of stored elements
      */
     public BigList(Class<T> type, Class<T[]> typeArray) {
         this.typeElement = type;

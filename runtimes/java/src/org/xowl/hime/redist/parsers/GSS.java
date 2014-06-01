@@ -65,7 +65,7 @@ class GSS {
 
     /**
      * Represents a generation in a Graph-Structured Stack
-     * <p/>
+     *
      * Because GSS nodes are always created in the last generation,
      * a generation is basically a span in the list of GSS nodes,
      * i.e. the starting index in the list of nodes and the number of nodes

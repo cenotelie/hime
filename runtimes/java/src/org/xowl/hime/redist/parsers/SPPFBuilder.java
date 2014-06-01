@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
- * <p/>
+ *
  * A SPPF is a compact representation of multiple variants of an AST at once.
  * GLR algorithms originally builds the complete SPPF.
  * However we only need to build one of the variant, i.e. an AST for the user.
