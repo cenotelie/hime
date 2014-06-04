@@ -376,6 +376,8 @@ namespace Hime.CentralDogma.Grammars
 			InheritTerminals(parent);
 			InheritVirtuals(parent);
 			InheritActions(parent);
+			InheritVariables(parent);
+			InheritTemplateRules(parent);
 		}
 
 		/// <summary>
