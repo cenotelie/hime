@@ -16,6 +16,5 @@
   </metadata>
   <files>
     <file src="..\License.txt" target="License.txt"/>
-    <file src="**\*.cs" target="src" />
   </files>
 </package>
