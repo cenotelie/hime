@@ -178,5 +178,21 @@ namespace Hime.Redist.Lexer
 			}
 			return 0xFFFF;
 		}
+
+		/// <summary>
+		/// Gets the transition i-th from the DFA state at the given offset
+		/// </summary>
+		/// <param name="offset">The DFA state's offset</param>
+		/// <param name="index">The non-cached transition index</param>
+		/// <param name="start">The starting value of the transition</param>
+		/// <param name="end">The ending value of the transition</param>
+		/// <returns>The state obtained by the transition</returns>
+		public int GetStateBulkTransition(int offset, int index, out int start, out int end)
+		{
+			int real = offset + 3 + 256 + (index * 3);
+			start = states[real];
+			end = states[real + 1];
+			return states[real + 2];
+		}
 	}
 }
