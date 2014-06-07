@@ -405,19 +405,6 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the value of the token at the given index
-		/// </summary>
-		/// <param name="index">An index</param>
-		/// <returns>The corresponding symbol</returns>
-		public Symbol GetSymbolAt(int index)
-		{
-			Cell cell = cells[index];
-			Symbol terminal = terminals[cell.terminal];
-			string value = GetValue(cell.start, cell.length);
-			return new Symbol(terminal.ID, terminal.Name, value);
-		}
-
-		/// <summary>
 		/// Gets the position of the token at the given index
 		/// </summary>
 		/// <param name="tokenIndex">The index of a token</param>
