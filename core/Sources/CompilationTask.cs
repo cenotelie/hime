@@ -84,13 +84,18 @@ namespace Hime.CentralDogma
 		/// <summary>
 		/// Initializes a new compilation task
 		/// </summary>
-		public CompilationTask()
+		public CompilationTask() : this(new Reporter()) { }
+		/// <summary>
+		/// Initializes a new compilation task
+		/// </summary>
+		/// <param name="reporter">The reported to use</param>
+		public CompilationTask(Reporter reporter)
 		{
 			this.Mode = Output.Mode.Source;
 			this.Target = Output.Runtime.Net;
 			this.Method = ParsingMethod.LALR1;
 			this.CodeAccess = Output.Modifier.Internal;
-			this.reporter = new Reporter();
+			this.reporter = reporter;
 			this.loader = new Input.Loader(this.reporter);
 		}
 
