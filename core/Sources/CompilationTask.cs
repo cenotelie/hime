@@ -132,6 +132,12 @@ namespace Hime.CentralDogma
 		/// <param name="name">The input's name</param>
 		/// <param name="reader">The input reader</param>
 		public void AddInputRaw(string name, TextReader reader) { loader.AddInputRaw(name, reader); }
+		/// <summary>
+		/// Adds the specified pre-parsed grammar to the inputs
+		/// </summary>
+		/// <param name="node">The parse tree of a grammar</param>
+		/// <param name="input">The input that contains the grammar</param>
+		public void AddInput(Hime.Redist.ASTNode node, Hime.Redist.Text input) { loader.AddInput(node, input); }
 
 		/// <summary>
 		/// Executes this compilation task

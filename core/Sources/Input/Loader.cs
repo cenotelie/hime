@@ -40,6 +40,10 @@ namespace Hime.CentralDogma.Input
 		/// </summary>
 		private List<KeyValuePair<string, TextReader>> inputs;
 		/// <summary>
+		/// Repositories of pre-parsed inputs
+		/// </summary>
+		private List<KeyValuePair<ASTNode, Text>> preReadInputs;
+		/// <summary>
 		/// Repositories of inner loaders
 		/// </summary>
 		private Dictionary<string, Grammars.Loader> inners;
@@ -62,6 +66,7 @@ namespace Hime.CentralDogma.Input
 		{
 			this.nextRawID = 0;
 			this.inputs = new List<KeyValuePair<string, TextReader>>();
+			this.preReadInputs = new List<KeyValuePair<ASTNode, Text>>();
 			this.inners = new Dictionary<string, Grammars.Loader>();
 			this.reporter = reporter;
 		}
@@ -134,6 +139,15 @@ namespace Hime.CentralDogma.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(name, reader));
 		}
+		/// <summary>
+		/// Adds the specified pre-parsed grammar to the inputs
+		/// </summary>
+		/// <param name="node">The parse tree of a grammar</param>
+		/// <param name="input">The input that contains the grammar</param>
+		public void AddInput(ASTNode node, Text input)
+		{
+			preReadInputs.Add(new KeyValuePair<ASTNode, Text>(node, input));
+		}
 
 		/// <summary>
 		/// Parses the inputs
@@ -145,11 +159,27 @@ namespace Hime.CentralDogma.Input
 			foreach (KeyValuePair<string, TextReader> pair in inputs)
 				if (!LoadInput(pair.Key, pair.Value))
 					return result;
+			foreach (KeyValuePair<ASTNode, Text> pair in preReadInputs)
+				if (!LoadInput(pair.Key, pair.Value))
+					return result;
 			if (!SolveDependencies())
 				return result;
 			foreach (Grammars.Loader inner in inners.Values)
 				result.Add(inner.Grammar);
 			return result;
+		}
+
+		/// <summary>
+		/// Loads the specified input
+		/// </summary>
+		/// <param name="node">The parse tree of a grammar</param>
+		/// <param name="input">The input that contains the grammar</param>
+		/// <returns><c>true</c> if the operation succeed</returns>
+		private bool LoadInput(ASTNode node, Text input)
+		{
+			Grammars.Loader loader = new Grammars.Loader(node.Children[0].Symbol.Value, input, node, reporter);
+			inners.Add(loader.Grammar.Name, loader);
+			return true;
 		}
 
 		/// <summary>
