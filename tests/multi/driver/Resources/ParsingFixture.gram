@@ -1,0 +1,27 @@
+grammar ParsingFixture : HimeGrammar
+{
+	options
+	{
+		Axiom = "fixture";
+		Separator = "SEPARATOR";
+	}
+	terminals { }
+	rules
+	{
+		fixture			-> header^ test* ;
+		header			-> 'fixture'! NAME^ ;
+		test			-> test_matches^
+						|  test_no_match^
+						|  test_fails^ ;
+		test_matches	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'yields'! tree ;
+		test_no_match	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING '!'! 'yields'! tree ;
+		test_fails		-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'fails'! ;
+
+		tree		-> NAME^ check children ;
+		check		-> ;
+		check		-> '=' LITERAL_TEXT ;
+		check		-> '!=' LITERAL_TEXT ;
+		children	-> ;
+		children	-> '('! tree* ')'! ;
+	}
+}

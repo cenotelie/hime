@@ -1,0 +1,103 @@
+/**********************************************************************
+* Copyright (c) 2014 Laurent Wouters and others
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation, either version 3
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General
+* Public License along with this program.
+* If not, see <http://www.gnu.org/licenses/>.
+*
+* Contributors:
+*     Laurent Wouters - lwouters@xowl.org
+**********************************************************************/
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Hime.Redist;
+using Hime.CentralDogma;
+using Hime.CentralDogma.Output;
+using Hime.CentralDogma.SDK;
+
+namespace Hime.Tests.Driver
+{
+	/// <summary>
+	/// Represents a multi-platform test fixture
+	/// </summary>
+	public class Fixture
+	{
+		/// <summary>
+		/// The assembly for the fixture parser
+		/// </summary>
+		private static AssemblyReflection parserFixture = BuildFixtureParser();
+
+		/// <summary>
+		/// Builds the fixture parser
+		/// </summary>
+		/// <returns>The fixture parser assembly</returns>
+		private static AssemblyReflection BuildFixtureParser()
+		{
+			Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.ParsingFixture.gram");
+			Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
+			CompilationTask task = new CompilationTask();
+			task.AddInputRaw(stream1);
+			task.AddInputRaw(stream2);
+			task.GrammarName = "ParsingFixture";
+			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
+			task.Method = ParsingMethod.LALR1;
+			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
+			task.Namespace = "Hime.Tests.Driver";
+			task.Execute();
+			return new AssemblyReflection("ParsingFixture.dll");
+		}
+
+		/// <summary>
+		/// The fixture's name
+		/// </summary>
+		private string name;
+		/// <summary>
+		/// The contained tests
+		/// </summary>
+		private List<Test> tests;
+
+		/// <summary>
+		/// Loads this fixture
+		/// </summary>
+		/// <param name="reporter">The reported to use</param>
+		/// <param name="name">The fixture's name</param>
+		public Fixture(Reporter reporter, string name)
+		{
+			reporter.Info("Loading fixture " + name);
+			Stream stream = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Suites." + name + ".suite");
+			TextReader reader = new StreamReader(stream, System.Text.Encoding.UTF8);
+			string content = reader.ReadToEnd();
+			reader.Close();
+			Hime.Redist.Parsers.IParser parser = parserFixture.GetParser(content);
+			ParseResult result = parser.Parse();
+			foreach (ParseError error in result.Errors)
+				reporter.Error(error, result.Input, error.Position);
+			ASTNode fixtureNode = result.Root;
+			this.name = fixtureNode.Symbol.Value;
+			this.tests = new List<Test>();
+			foreach (ASTNode testNode in fixtureNode.Children)
+				tests.Add(new Test(testNode, result.Input));
+		}
+
+		/// <summary>
+		/// Executes this fixture
+		/// </summary>
+		/// <param name="reporter">The reported to use</param>
+		/// <param name="targets">The targets to execute on</param>
+		public void Execute(Reporter reporter, List<Runtime> targets)
+		{
+			foreach (Test test in tests)
+				test.Execute(reporter, targets);
+		}
+	}
+}
