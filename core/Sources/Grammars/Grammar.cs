@@ -372,12 +372,29 @@ namespace Hime.CentralDogma.Grammars
 		/// <param name="parent">The parent's grammar</param>
 		public void Inherit(Grammar parent)
 		{
+			bool doClone = (this.nextSID == 3);
 			InheritOptions(parent);
-			InheritTerminals(parent);
-			InheritVirtuals(parent);
-			InheritActions(parent);
-			InheritVariables(parent);
+			InheritTerminals(parent, doClone);
+			InheritVirtuals(parent, doClone);
+			InheritActions(parent, doClone);
+			InheritVariables(parent, doClone);
 			InheritTemplateRules(parent);
+			if (doClone)
+			{
+				foreach (Terminal terminal in this.terminalsByName.Values)
+					if (terminal.ID > nextSID)
+						nextSID = terminal.ID;
+				foreach (Variable variable in this.variables.Values)
+					if (variable.ID > nextSID)
+						nextSID = variable.ID;
+				foreach (Virtual virt in this.virtuals.Values)
+					if (virt.ID > nextSID)
+						nextSID = virt.ID;
+				foreach (Action action in this.actions.Values)
+					if (action.ID > nextSID)
+						nextSID = action.ID;
+				nextSID += 1;
+			}
 		}
 
 		/// <summary>
@@ -394,7 +411,8 @@ namespace Hime.CentralDogma.Grammars
 		/// Inherits the terminals from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
-		protected void InheritTerminals(Grammar parent)
+		/// <param name="doClone">Clone the symbols</param>
+		protected void InheritTerminals(Grammar parent, bool doClone)
 		{
 			List<Terminal> inherited = new List<Terminal>(parent.terminalsByName.Values);
 			inherited.Sort(new Terminal.PriorityComparer());
@@ -410,6 +428,13 @@ namespace Hime.CentralDogma.Grammars
 					// this is a redefinition of an inline terminal
 					// => do nothing, simply reuse the one with the same value
 				}
+				else if (doClone)
+				{
+					Terminal clone = new Terminal(terminal.ID, terminal.Name, terminal.Value, terminal.NFA.Clone(false));
+					clone.NFA.StateExit.Item = clone;
+					this.terminalsByName.Add(clone.Name, terminal);
+					this.terminalsByValue.Add(clone.Value, terminal);
+				}
 				else
 				{
 					Terminal clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false));
@@ -422,10 +447,21 @@ namespace Hime.CentralDogma.Grammars
 		/// Inherits the variables from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
-		protected void InheritVariables(Grammar parent)
+		/// <param name="doClone">Clone the symbols</param>
+		protected void InheritVariables(Grammar parent, bool doClone)
 		{
 			foreach (Variable variable in parent.Variables)
-				AddVariable(variable.Name);
+			{
+				if (doClone)
+				{
+					Variable clone = new Variable(variable.ID, variable.Name);
+					this.variables.Add(clone.Name, clone);
+				}
+				else
+				{
+					AddVariable(variable.Name);
+				}
+			}
 			foreach (Variable variable in parent.Variables)
 			{
 				Variable clone = variables[variable.Name];
@@ -455,12 +491,21 @@ namespace Hime.CentralDogma.Grammars
 		/// Inherits the virtuals from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
-		protected void InheritVirtuals(Grammar parent)
+		/// <param name="doClone">Clone the symbols</param>
+		protected void InheritVirtuals(Grammar parent, bool doClone)
 		{
 			foreach (Virtual vir in parent.Virtuals)
 			{
-				if (!virtuals.ContainsKey(vir.Name))
-					AddVirtual(vir.Name);
+				if (doClone)
+				{
+					Virtual clone = new Virtual(vir.ID, vir.Name);
+					this.virtuals.Add(clone.Name, clone);
+				}
+				else
+				{
+					if (!virtuals.ContainsKey(vir.Name))
+						AddVirtual(vir.Name);
+				}
 			}
 		}
 
@@ -468,12 +513,21 @@ namespace Hime.CentralDogma.Grammars
 		/// Inherits the actions from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
-		protected void InheritActions(Grammar parent)
+		/// <param name="doClone">Clone the symbols</param>
+		protected void InheritActions(Grammar parent, bool doClone)
 		{
 			foreach (Action action in parent.Actions)
 			{
-				if (!actions.ContainsKey(action.Name))
-					AddAction(action.Name);
+				if (doClone)
+				{
+					Action clone = new Action(action.ID, action.Name);
+					this.actions.Add(clone.Name, clone);
+				}
+				else
+				{
+					if (!actions.ContainsKey(action.Name))
+						AddAction(action.Name);
+				}
 			}
 		}
 
