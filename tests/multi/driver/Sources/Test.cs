@@ -106,7 +106,7 @@ namespace Hime.Tests.Driver
 				element.Attributes.Append(expected.CreateAttribute("test"));
 				element.Attributes.Append(expected.CreateAttribute("value"));
 				element.Attributes["test"].Value = (test == "=" ? VERB_MATCHES : VERB_NOMATCHES);
-				element.Attributes["value"].Value = value;
+				element.Attributes["value"].Value = value.Substring(1, value.Length - 2);
 			}
 			foreach (ASTNode child in node.Children[1].Children)
 				element.AppendChild(GetExpectedAsXML(child));
