@@ -55,7 +55,7 @@ public class Program {
         String input = getValue(args[2]);
         String verb = args[3];
         String pathToExpected = null;
-        if (VERB_FAILS.equals(verb))
+        if (!VERB_FAILS.equals(verb))
             pathToExpected = getValue(args[4]);
         Program program = new Program();
         int code = program.execute(pathToAssembly, name, input, verb, pathToExpected);
@@ -77,6 +77,7 @@ public class Program {
                 xmlParser.parse(pathToExpected);
                 expected = xmlParser.getDocument();
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
         if (VERB_MATCHES.equals(verb))
@@ -94,7 +95,7 @@ public class Program {
             return RESULT_FAILURE_PARSING;
         if (result.getErrors().size() != 0)
             return RESULT_FAILURE_PARSING;
-        boolean comparison = compare(expected.getChildNodes().item(1), result.getRoot());
+        boolean comparison = compare(expected.getDocumentElement(), result.getRoot());
         return comparison ? RESULT_SUCCESS : RESULT_FAILURE_VERB;
     }
 
@@ -104,7 +105,7 @@ public class Program {
             return RESULT_FAILURE_PARSING;
         if (result.getErrors().size() != 0)
             return RESULT_FAILURE_PARSING;
-        boolean comparison = compare(expected.getChildNodes().item(1), result.getRoot());
+        boolean comparison = compare(expected.getDocumentElement(), result.getRoot());
         return comparison ? RESULT_FAILURE_VERB : RESULT_SUCCESS;
     }
 
@@ -146,6 +147,7 @@ public class Program {
             Object parser = parserClass.getConstructor(lexerClass).newInstance(lexer);
             return (IParser)parser;
         } catch (Exception ex) {
+            ex.printStackTrace();
             return null;
         }
     }
@@ -160,6 +162,7 @@ public class Program {
             addURL.setAccessible(true);
             addURL.invoke(ClassLoader.getSystemClassLoader(), url);
         } catch (Exception ex) {
+            ex.printStackTrace();
             return false;
         }
         return true;
