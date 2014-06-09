@@ -63,4 +63,7 @@
     <Folder Include="Resources\Suites\" />
     <Folder Include="Sources\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Suites\SyntacticRules.suite" />
+  </ItemGroup>
 </Project>

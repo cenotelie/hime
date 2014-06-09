@@ -170,7 +170,20 @@ namespace Hime.Tests.Driver
 		/// <returns>The test result</returns>
 		private TestResult ExecuteOnJava(Reporter reporter)
 		{
-			return null;
+			TestResult result = new TestResult();
+			List<string> output = new List<string>();
+			int code = TestResult.RESULT_FAILURE_PARSING;
+			try
+			{
+				string grammar = BuildParserForJava(reporter);
+				code = ExecuteCommand(reporter, "java", "-jar executor.jar " + grammar + ".jar " + grammar + " " + node.Children[3].Symbol.Value + " " + verb + " " + EXPECTED_PATH, output);
+			}
+			catch (Exception ex)
+			{
+				output.Add(ex.ToString());
+			}
+			result.Finish(code, output);
+			return result;
 		}
 
 		/// <summary>
@@ -189,6 +202,25 @@ namespace Hime.Tests.Driver
 			task.Execute();
 			return node.Children[1].Children[0].Symbol.Value;
 		}
+
+		/// <summary>
+		/// Builds the parser for the Java runtime
+		/// </summary>
+		/// <param name="reporter">The reported to use</param>
+		/// <returns>The name of the compiled grammar</returns>
+		private string BuildParserForJava(Reporter reporter)
+		{
+			CompilationTask task = new CompilationTask(reporter);
+			task.AddInput(node.Children[1], originalInput);
+			task.CodeAccess = Modifier.Public;
+			task.Method = (ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Symbol.Value);
+			task.Mode = Mode.Assembly;
+			task.Namespace = "org.xowl.hime.tests.generated";
+			task.Target = Runtime.Java;
+			task.Execute();
+			return node.Children[1].Children[0].Symbol.Value;
+		}
+
 		// <summary>
 		/// Executes the specified command
 		/// </summary>

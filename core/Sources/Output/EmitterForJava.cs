@@ -94,7 +94,11 @@ namespace Hime.CentralDogma.Output
 			bool success = ExecuteCommand("mvn", "package");
 			// extract the result
 			if (success)
+			{
+				if (File.Exists(ArtifactAssembly))
+					File.Delete(ArtifactAssembly);
 				File.Move(Path.Combine(Path.Combine(path, "target"), grammar.Name + "-1.0.0.jar"), ArtifactAssembly);
+			}
 			// cleanup the mess ...
 			Directory.Delete(Path.Combine(path, "src"), true);
 			Directory.Delete(Path.Combine(path, "res"), true);
@@ -117,8 +121,8 @@ namespace Hime.CentralDogma.Output
 				bottom = Path.Combine(bottom, parts[i]);
 				Directory.CreateDirectory(bottom);
 			}
-			File.Copy(ArtifactLexerCode, Path.Combine(bottom, grammar.Name + SuffixLexerCode));
-			File.Copy(ArtifactParserCode, Path.Combine(bottom, grammar.Name + SuffixParserCode));
+			File.Copy(ArtifactLexerCode, Path.Combine(bottom, grammar.Name + SuffixLexerCode), true);
+			File.Copy(ArtifactParserCode, Path.Combine(bottom, grammar.Name + SuffixParserCode), true);
 
 			// setup the resources folder
 			bottom = Path.Combine(path, "res");
@@ -128,8 +132,8 @@ namespace Hime.CentralDogma.Output
 				bottom = Path.Combine(bottom, parts[i]);
 				Directory.CreateDirectory(bottom);
 			}
-			File.Copy(ArtifactLexerData, Path.Combine(bottom, grammar.Name + suffixLexerData));
-			File.Copy(ArtifactParserData, Path.Combine(bottom, grammar.Name + suffixParserData));
+			File.Copy(ArtifactLexerData, Path.Combine(bottom, grammar.Name + suffixLexerData), true);
+			File.Copy(ArtifactParserData, Path.Combine(bottom, grammar.Name + suffixParserData), true);
 
 			// export the pom
 			ExportResource("Java.pom.xml", Path.Combine(path, "pom.xml"));

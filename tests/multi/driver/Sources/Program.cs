@@ -62,6 +62,7 @@ namespace Hime.Tests.Driver
 			reporter = new Reporter();
 			targets = new List<Runtime>();
 			targets.Add(Runtime.Net);
+			targets.Add(Runtime.Java);
 
 			// load fixtures
 			fixtures = new List<Fixture>();
