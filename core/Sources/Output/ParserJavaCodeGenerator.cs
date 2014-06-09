@@ -55,20 +55,19 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Initializes this code generator
 		/// </summary>
-		/// <param name="nmespace">The nmespace of the generated code</param>
-		/// <param name="modifier">The visibility modifier for the generated code</param>
-		/// <param name="name">The name of the generated lexer</param>
+		/// <param name="unit">The unit to generate code for</param>
 		/// <param name="binResource">Path to the automaton's binary resource</param>
-		/// <param name="gram">The grammar to generate a parser for</param>
-		/// <param name="parserType">The type of parser, as implemented in the runtime</param>
-		public ParserJavaCodeGenerator(string nmespace, Modifier modifier, string name, string binResource, Grammars.Grammar gram, string parserType)
+		public ParserJavaCodeGenerator(Unit unit, string binResource)
 		{
-			this.nmespace = nmespace;
-			this.modifier = modifier;
-			this.name = name;
+			this.nmespace = unit.Namespace;
+			this.modifier = unit.Modifier;
+			this.name = unit.Name;
 			this.binResource = binResource;
-			this.grammar = gram;
-			this.parserType = parserType;
+			this.grammar = unit.Grammar;
+			if (unit.Method == ParsingMethod.RNGLR1 || unit.Method == ParsingMethod.RNGLALR1)
+				this.parserType = "RNGLR";
+			else
+				this.parserType = "LRk";
 		}
 
 		/// <summary>

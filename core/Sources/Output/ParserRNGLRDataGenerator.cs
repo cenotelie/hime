@@ -56,17 +56,15 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Initializes this parser generator
 		/// </summary>
-		/// <param name="gram">The grammar to generate a parser for</param>
-		/// <param name="graph">The LR graph to use</param>
-		/// <param name="expected">The terminals matched by the associated lexer</param>
-		public ParserRNGLRDataGenerator(Grammars.Grammar gram, Grammars.LR.Graph graph, ROList<Grammars.Terminal> expected)
+		/// <param name="unit">The unit to generate a parser for</param>
+		public ParserRNGLRDataGenerator(Unit unit)
 		{
-			this.grammar = gram;
-			this.graph = graph;
-			this.terminals = expected;
-			this.variables = new List<Grammars.Variable>(gram.Variables);
-			this.virtuals = new List<Grammars.Virtual>(gram.Virtuals);
-			this.actions = new List<Grammars.Action>(gram.Actions);
+			this.grammar = unit.Grammar;
+			this.graph = unit.Graph;
+			this.terminals = unit.Expected;
+			this.variables = new List<Grammars.Variable>(unit.Grammar.Variables);
+			this.virtuals = new List<Grammars.Virtual>(unit.Grammar.Virtuals);
+			this.actions = new List<Grammars.Action>(unit.Grammar.Actions);
 		}
 
 		/// <summary>

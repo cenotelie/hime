@@ -171,6 +171,7 @@
     <Compile Include="Sources\Output\EmitterForNet.cs" />
     <Compile Include="Sources\Output\EmitterBase.cs" />
     <Compile Include="Sources\Output\EmitterForJava.cs" />
+    <Compile Include="Sources\Output\Unit.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />

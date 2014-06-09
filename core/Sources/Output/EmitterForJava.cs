@@ -39,46 +39,59 @@ namespace Hime.CentralDogma.Output
 		/// Gets suffix for the emitted assemblies
 		/// </summary>
 		public override string SuffixAssembly { get { return ".jar"; } }
+		
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="units">The units to emit data for</param>
+		public EmitterForJava(List<Unit> units) : base(new Reporter(), units)
+		{
+		}
 
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
-		/// <param name="grammar">The grammar to emit data for</param>
-		public EmitterForJava(Grammars.Grammar grammar) : base(grammar) { }
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterForJava(Unit unit) : base(new Reporter(), unit)
+		{
+		}
+
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
-		/// <param name="grammar">The grammar to emit data for</param>
-		public EmitterForJava(Reporter reporter, Grammars.Grammar grammar) : base(reporter, grammar) { }
+		/// <param name="units">The units to emit data for</param>
+		public EmitterForJava(Reporter reporter, List<Unit> units) : base(reporter, units)
+		{
+		}
 
 		/// <summary>
-		/// Gets the radical for the names of the embedded resources
+		/// Initializes this emitter
 		/// </summary>
-		/// <returns>The radical for the names of the embedded resources</returns>
-		protected string GetResourceName()
+		/// <param name="reporter">The reporter to use</param>
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterForJava(Reporter reporter, Unit unit) : base(reporter, unit)
 		{
-			return "/" + nmspace.Replace(".", "/") + "/" + grammar.Name;
 		}
 
 		/// <summary>
 		/// Gets the runtime-specific generator of lexer code
 		/// </summary>
-		/// <param name="separator">The separator terminal</param>
+		/// <param name="unit">The unit to generate a lexer for</param>
 		/// <returns>The runtime-specific generator of lexer code</returns>
-		protected override Generator GetLexerCodeGenerator(Grammars.Terminal separator)
+		protected override Generator GetLexerCodeGenerator(Unit unit)
 		{
-			return new LexerJavaCodeGenerator(nmspace, modifier, grammar.Name, GetResourceName() + suffixLexerData, expected, separator);
+			return new LexerJavaCodeGenerator(unit, unit.Name + suffixLexerData);
 		}
 
 		/// <summary>
 		/// Gets the runtime-specific generator of parser code
 		/// </summary>
-		/// <param name="parserType">The type of parser to generate</param>
+		/// <param name="unit">The unit to generate a parser for</param>
 		/// <returns>The runtime-specific generator of parser code</returns>
-		protected override Generator GetParserCodeGenerator(string parserType)
+		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserJavaCodeGenerator(nmspace, modifier, grammar.Name, GetResourceName() + suffixParserData, grammar, parserType);
+			return new ParserJavaCodeGenerator(unit, "/" + unit.Namespace.Replace(".", "/") + "/" + unit.Name + suffixParserData);
 		}
 
 		/// <summary>
@@ -87,7 +100,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns><c>true</c> if the operation succeed</returns>
 		protected override bool EmitAssembly()
 		{
-			reporter.Info("Building assembly " + ArtifactAssembly + " ...");
+			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			// setup the maven project
 			CreateMavenProject();
 			// compile
@@ -95,9 +108,9 @@ namespace Hime.CentralDogma.Output
 			// extract the result
 			if (success)
 			{
-				if (File.Exists(ArtifactAssembly))
-					File.Delete(ArtifactAssembly);
-				File.Move(Path.Combine(Path.Combine(path, "target"), grammar.Name + "-1.0.0.jar"), ArtifactAssembly);
+				if (File.Exists(GetArtifactAssembly()))
+					File.Delete(GetArtifactAssembly());
+				File.Move(Path.Combine(Path.Combine(path, "target"), "generated-1.0.0.jar"), GetArtifactAssembly());
 			}
 			// cleanup the mess ...
 			Directory.Delete(Path.Combine(path, "src"), true);
@@ -108,40 +121,49 @@ namespace Hime.CentralDogma.Output
 		}
 
 		/// <summary>
+		/// Creates the physical folder for the specified unit
+		/// </summary>
+		/// <param name="origin">The directory to start from</param>
+		/// <param name="unit">The unit</param>
+		/// <returns>The resulting folder</returns>
+		private string CreateFolderFor(string origin, Unit unit)
+		{
+			string current = origin;
+			string[] parts = unit.Namespace.Split(new char[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+			for (int i=0; i!=parts.Length; i++)
+			{
+				current = Path.Combine(current, parts[i]);
+				if (!Directory.Exists(current))
+					Directory.CreateDirectory(current);
+			}
+			return current;
+		}
+
+		/// <summary>
 		/// Creates the maven project to compile
 		/// </summary>
 		private void CreateMavenProject()
 		{
-			// setup the sources folder
-			string bottom = Path.Combine(path, "src");
-			Directory.CreateDirectory(bottom);
-			string[] parts = nmspace.Split(new char[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
-			for (int i=0; i!=parts.Length; i++)
+			// setup the src folder
+			string src = Path.Combine(path, "src");
+			foreach (Unit unit in units)
 			{
-				bottom = Path.Combine(bottom, parts[i]);
-				Directory.CreateDirectory(bottom);
+				string folder = CreateFolderFor(src, unit);
+				File.Copy(GetArtifactLexerCode(unit), Path.Combine(folder, unit.Name + SuffixLexerCode), true);
+				File.Copy(GetArtifactParserCode(unit), Path.Combine(folder, unit.Name + SuffixParserCode), true);
 			}
-			File.Copy(ArtifactLexerCode, Path.Combine(bottom, grammar.Name + SuffixLexerCode), true);
-			File.Copy(ArtifactParserCode, Path.Combine(bottom, grammar.Name + SuffixParserCode), true);
 
-			// setup the resources folder
-			bottom = Path.Combine(path, "res");
-			Directory.CreateDirectory(bottom);
-			for (int i=0; i!=parts.Length; i++)
+			// setup the res folder
+			string res = Path.Combine(path, "res");
+			foreach (Unit unit in units)
 			{
-				bottom = Path.Combine(bottom, parts[i]);
-				Directory.CreateDirectory(bottom);
+				string folder = CreateFolderFor(res, unit);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(folder, unit.Name + suffixLexerData), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(folder, unit.Name + suffixParserData), true);
 			}
-			File.Copy(ArtifactLexerData, Path.Combine(bottom, grammar.Name + suffixLexerData), true);
-			File.Copy(ArtifactParserData, Path.Combine(bottom, grammar.Name + suffixParserData), true);
 
 			// export the pom
 			ExportResource("Java.pom.xml", Path.Combine(path, "pom.xml"));
-
-			// setup the pom
-			string content = File.ReadAllText(Path.Combine(path, "pom.xml"));
-			content = content.Replace("${gen-name}", grammar.Name);
-			File.WriteAllText(Path.Combine(path, "pom.xml"), content, System.Text.Encoding.UTF8);
 		}
 
 		/// <summary>

@@ -37,11 +37,6 @@ namespace Hime.CentralDogma.Output
 		private Automata.DFA dfa;
 
 		/// <summary>
-		/// Gets a list of the expected terminals
-		/// </summary>
-		public ROList<Grammars.Terminal> Expected { get { return new ROList<Grammars.Terminal>(terminals); } }
-
-		/// <summary>
 		/// Initializes this generator
 		/// </summary>
 		/// <param name="dfa">The dfa to serialize</param>

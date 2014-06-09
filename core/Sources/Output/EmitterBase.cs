@@ -51,349 +51,326 @@ namespace Hime.CentralDogma.Output
 		/// The suffix for the emitted debug LR graph as DOT
 		/// </summary>
 		public const string suffixDebugLRAsDOT = "LRGraph.dot";
-
+		/// <summary>
+		/// The default name of the assembly when it contains multiple parsers
+		/// </summary>
+		public const string defaultCompositeAssemblyName = "Parsers";
 
 		/// <summary>
 		/// Gets the suffix for the emitted lexer code files
 		/// </summary>
 		public abstract string SuffixLexerCode { get; }
+
 		/// <summary>
 		/// Gets suffix for the emitted parser code files
 		/// </summary>
 		public abstract string SuffixParserCode { get; }
+
 		/// <summary>
 		/// Gets suffix for the emitted assemblies
 		/// </summary>
 		public abstract string SuffixAssembly { get; }
-
-
-		/// <summary>
-		/// Gets the full path and name for the lexer code artifact
-		/// </summary>
-		public string ArtifactLexerCode { get { return path + grammar.Name + SuffixLexerCode; } }
-		/// <summary>
-		/// Gets the full path and name for the lexer data artifact
-		/// </summary>
-		public string ArtifactLexerData { get { return path + grammar.Name + suffixLexerData; } }
-		/// <summary>
-		/// Gets the full path and name for the parser code artifact
-		/// </summary>
-		public string ArtifactParserCode { get { return path + grammar.Name + SuffixParserCode; } }
-		/// <summary>
-		/// Gets the full path and name for the parser data artifact
-		/// </summary>
-		public string ArtifactParserData { get { return path + grammar.Name + suffixParserData; } }
-		/// <summary>
-		/// Gets the full path and name for the assembly artifact
-		/// </summary>
-		public string ArtifactAssembly { get { return path + grammar.Name + SuffixAssembly; } }
-		/// <summary>
-		/// Gets the full path and name for the parser data artifact
-		/// </summary>
-		public string ArtifactDebugGrammar { get { return path + grammar.Name + suffixDebugGrammar; } }
-		/// <summary>
-		/// Gets the full path and name for the parser data artifact
-		/// </summary>
-		public string ArtifactDebugDFA { get { return path + grammar.Name + suffixDebugDFA; } }
-		/// <summary>
-		/// Gets the full path and name for the parser data artifact
-		/// </summary>
-		public string ArtifactDebugLRAsText { get { return path + grammar.Name + suffixDebugLRAsText; } }
-		/// <summary>
-		/// Gets the full path and name for the parser data artifact
-		/// </summary>
-		public string ArtifactDebugLRAsDOT { get { return path + grammar.Name + suffixDebugLRAsDOT; } }
-
-
+		
 		/// <summary>
 		/// The reporter
 		/// </summary>
 		protected Reporter reporter;
 		/// <summary>
-		/// The grammar to emit data for
+		/// The units to emit artifacts for
 		/// </summary>
-		protected Grammars.Grammar grammar;
+		protected List<Unit> units;
 		/// <summary>
 		/// The path for the emitted artifacts
 		/// </summary>
 		protected string path;
-		/// <summary>
-		/// The namespace of the generated code
-		/// </summary>
-		protected string nmspace;
-		/// <summary>
-		/// The visibility modifier of the generated code
-		/// </summary>
-		protected Modifier modifier;
-		/// <summary>
-		/// The parsing method for the generated parser
-		/// </summary>
-		protected ParsingMethod method;
 		/// <summary>
 		/// The mode of this emitter
 		/// </summary>
 		protected Mode mode;
 
 		/// <summary>
-		/// The DFA to emit in a lexer
+		/// Initializes this emitter
 		/// </summary>
-		protected Automata.DFA dfa;
-		/// <summary>
-		/// The terminals matched by the DFA and expected by the parser
-		/// </summary>
-		protected ROList<Grammars.Terminal> expected;
-		/// <summary>
-		/// The LR graph to emit in a parser
-		/// </summary>
-		protected Grammars.LR.Graph graph;
-
+		/// <param name="units">The units to emit data for</param>
+		public EmitterBase(List<Unit> units) : this(new Reporter(), units)
+		{
+		}
 
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
-		/// <param name="grammar">The grammar to emit data for</param>
-		public EmitterBase(Grammars.Grammar grammar) : this(new Reporter(), grammar)
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterBase(Unit unit) : this(new Reporter(), unit)
 		{
 		}
+
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
-		/// <param name="grammar">The grammar to emit data for</param>
-		public EmitterBase(Reporter reporter, Grammars.Grammar grammar)
+		/// <param name="units">The units to emit data for</param>
+		public EmitterBase(Reporter reporter, List<Unit> units)
 		{
 			this.reporter = reporter;
-			this.grammar = grammar;
+			this.units = new List<Unit>(units);
+		}
+
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterBase(Reporter reporter, Unit unit)
+		{
+			this.reporter = reporter;
+			this.units = new List<Unit>();
+			this.units.Add(unit);
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the lexer code artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactLexerCode(Unit unit)
+		{
+			return path + unit.Name + SuffixLexerCode;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the lexer data artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactLexerData(Unit unit)
+		{
+			return path + unit.Name + suffixLexerData;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser code artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactParserCode(Unit unit)
+		{
+			return path + unit.Name + SuffixParserCode;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactParserData(Unit unit)
+		{
+			return path + unit.Name + suffixParserData;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the assembly artifact
+		/// </summary>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactAssembly()
+		{
+			if (units.Count == 1)
+				return path + units[0].Name + SuffixAssembly;
+			return path + defaultCompositeAssemblyName + SuffixAssembly;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactDebugGrammar(Unit unit)
+		{
+			return path + unit.Name + suffixDebugGrammar;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactDebugDFA(Unit unit)
+		{
+			return path + unit.Name + suffixDebugDFA;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactDebugLRAsText(Unit unit)
+		{
+			return path + unit.Name + suffixDebugLRAsText;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser data artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public string GetArtifactDebugLRAsDOT(Unit unit)
+		{
+			return path + unit.Name + suffixDebugLRAsDOT;
 		}
 
 		/// <summary>
 		/// Emit the lexer and parser artifacts
 		/// </summary>
 		/// <param name="path">The output path for the emitted artifacts</param>
-		/// <param name="nmspace">The namespace for the emitted code</param>
-		/// <param name="modifier">The visibility modifier for the emitted code</param>
-		/// <param name="method">The parsing method to use</param>
 		/// <param name="mode">The output mode</param>
 		/// <returns><c>true</c> if this operation succeeded</returns>
-		public bool Emit(string path, string nmspace, Modifier modifier, ParsingMethod method, Mode mode)
+		public bool Emit(string path, Mode mode)
 		{
 			// setup
 			this.path = path;
 			if (this.path.Length > 0 && !this.path.EndsWith(Path.DirectorySeparatorChar.ToString()))
 				this.path += Path.DirectorySeparatorChar;
-			this.nmspace = nmspace;
-			this.modifier = modifier;
-			this.method = method;
 			this.mode = mode;
-			this.dfa = null;
-			this.expected = new ROList<Grammars.Terminal>(null);
-			this.graph = null;
-			// emit the artifacts
-			bool success = true;
-			if (!EmitBaseArtifacts())
-				success = false;
-			if (mode == Mode.Debug && !EmitDebugArtifacts())
-				success = false;
-			return success;
-		}
 
-		/// <summary>
-		/// Emits the base artifacts for the lexer and parser
-		/// </summary>
-		/// <returns><c>true</c> if this operation succeeded</returns>
-		private bool EmitBaseArtifacts()
-		{
-			if (!GenerateLexer())
-				return false;
-			if (!GenerateParser())
-				return false;
+			bool errors = false;
+			for (int i=0; i!=units.Count; i++)
+			{
+				if (!EmitBaseArtifacts(units[i]))
+				{
+					reporter.Warn("Grammar " + units[i].Name + " will be dropped");
+					units.RemoveAt(i);
+					i--;
+					errors = true;
+				}
+			}
+
 			if (mode == Mode.Assembly || mode == Mode.SourceAndAssembly)
 			{
 				if (!EmitAssembly())
 					return false;
 				if (mode == Mode.Assembly)
 				{
-					File.Delete(ArtifactLexerCode);
-					File.Delete(ArtifactLexerData);
-					File.Delete(ArtifactParserCode);
-					File.Delete(ArtifactParserData);
+					foreach (Unit unit in units)
+					{
+						File.Delete(GetArtifactLexerCode(unit));
+						File.Delete(GetArtifactLexerData(unit));
+						File.Delete(GetArtifactParserCode(unit));
+						File.Delete(GetArtifactParserData(unit));
+					}
 				}
 			}
-			return true;
+			return !errors;
+		}
+
+		/// <summary>
+		/// Emits the base artifacts (lexer, parser and debug) for the specified unit
+		/// </summary>
+		/// <param name="unit">The unit to generate artifacts for</param>
+		/// <returns><c>true</c> if this operation succeeded</returns>
+		private bool EmitBaseArtifacts(Unit unit)
+		{
+			bool ok = true;
+			// prepare the unit
+			ok = unit.Prepare(reporter);
+			if (ok) ok = unit.BuildDFA(reporter);
+			if (ok) ok = unit.BuildGraph(reporter);
+			// output the artifacts
+			if (ok) ok = GenerateLexer(unit);
+			if (ok) ok = GenerateParser(unit);
+			if (mode == Mode.Debug && ok)
+				ok = EmitDebugArtifacts(unit);
+			return ok;
 		}
 
 		/// <summary>
 		/// Emits the debug artifacts for the lexer and parser
 		/// </summary>
+		/// <param name="unit">The unit to generate artifacts for</param>
 		/// <returns><c>true</c> if this operation succeeded</returns>
-		private bool EmitDebugArtifacts()
+		private bool EmitDebugArtifacts(Unit unit)
 		{
-			reporter.Info("Exporting grammar debug data at " + ArtifactDebugGrammar + " ...");
-			SDK.Serializers.Export(grammar, ArtifactDebugGrammar);
-			if (dfa != null)
+			reporter.Info("Exporting grammar debug data at " + GetArtifactDebugGrammar(unit) + " ...");
+			SDK.Serializers.Export(unit.Grammar, GetArtifactDebugGrammar(unit));
+			if (unit.DFA != null)
 			{
-				reporter.Info("Exporting DFA debug data at " + ArtifactDebugDFA + " ...");
-				SDK.Serializers.ExportDOT(dfa, ArtifactDebugDFA);
+				reporter.Info("Exporting DFA debug data at " + GetArtifactDebugDFA(unit) + " ...");
+				SDK.Serializers.ExportDOT(unit.DFA, GetArtifactDebugDFA(unit));
 			}
-			if (graph != null)
+			if (unit.Graph != null)
 			{
-				reporter.Info("Exporting LR graph debug data (txt) at " + ArtifactDebugLRAsText + " ...");
-				SDK.Serializers.Export(graph, ArtifactDebugLRAsText);
-				reporter.Info("Exporting LR graph debug data (dot) at " + ArtifactDebugLRAsDOT + " ...");
-				SDK.Serializers.ExportDOT(graph, ArtifactDebugLRAsDOT);
+				reporter.Info("Exporting LR graph debug data (txt) at " + GetArtifactDebugLRAsText(unit) + " ...");
+				SDK.Serializers.Export(unit.Graph, GetArtifactDebugLRAsText(unit));
+				reporter.Info("Exporting LR graph debug data (dot) at " + GetArtifactDebugLRAsDOT(unit) + " ...");
+				SDK.Serializers.ExportDOT(unit.Graph, GetArtifactDebugLRAsDOT(unit));
 			}
 			return true;
 		}
 
 		/// <summary>
-		/// Generates the lexer for the given grammar
+		/// Generates the lexer for the given unit
 		/// </summary>
+		/// <param name="unit">The unit to generate a lexer for</param>
 		/// <returns><c>true</c> if this operation succeeded</returns>
-		private bool GenerateLexer()
+		private bool GenerateLexer(Unit unit)
 		{
-			reporter.Info("Preparing lexer's data ...");
-			dfa = GetDFAFor(grammar);
-			if (dfa == null)
-				return false;
-			// retrieve the separator
-			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
-			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
-
 			// generate the lexer's data
-			reporter.Info("Exporting lexer data at " + ArtifactLexerData + " ...");
-			LexerDataGenerator genData = new LexerDataGenerator(dfa);
-			genData.Generate(ArtifactLexerData);
-			expected = genData.Expected;
+			reporter.Info("Exporting lexer data at " + GetArtifactLexerData(unit) + " ...");
+			LexerDataGenerator genData = new LexerDataGenerator(unit.DFA);
+			genData.Generate(GetArtifactLexerData(unit));
 
 			// generate the lexer's code
-			reporter.Info("Exporting lexer code at " + ArtifactLexerCode + " ...");
-			Generator genCode = GetLexerCodeGenerator(separator);
-			genCode.Generate(ArtifactLexerCode);
+			reporter.Info("Exporting lexer code at " + GetArtifactLexerCode(unit) + " ...");
+			Generator genCode = GetLexerCodeGenerator(unit);
+			genCode.Generate(GetArtifactLexerCode(unit));
 			return true;
-		}
-
-		/// <summary>
-		/// Gets the DFA for the provided grammar
-		/// </summary>
-		/// <param name="grammar">The grammar to generate a lexer for</param>
-		/// <returns>The corresponding DFA; or <c>null</c> if it is not well-formed</returns>
-		private Automata.DFA GetDFAFor(Grammars.Grammar grammar)
-		{
-			// build the lexer's dfa
-			Automata.DFA dfa = grammar.BuildDFA();
-			// retrieve the separator
-			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
-			Grammars.Terminal separator = name != null ? grammar.GetTerminalByName(name) : null;
-			if (name != null)
-			{
-				// a separator is defined
-				if (separator == null)
-				{
-					// but could not be found ...
-					reporter.Error(string.Format("Terminal {0} specified as the separator is undefined", name));
-					return null;
-				}
-				// look for the separator in the dfa
-				bool found = false;
-				Automata.FinalItem superceding = null;
-				foreach (Automata.DFAState state in dfa.States)
-				{
-					if (state.TopItem == separator)
-					{
-						found = true;
-						break;
-					}
-					else if (state.Items.Contains(separator))
-					{
-						superceding = state.TopItem;
-					}
-				}
-				if (!found)
-				{
-					if (superceding != null)
-						reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched, it is superceded by {1}", separator, superceding));
-					else
-						reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched", separator));
-					return null;
-				}
-			}
-			// check well-formedness
-			foreach (Automata.FinalItem item in dfa.Entry.Items)
-				reporter.Error(string.Format("Terminal {0} can be an empty string, this is forbidden", item.ToString()));
-			if (dfa.Entry.TopItem != null)
-				return null;
-			return dfa;
 		}
 
 		/// <summary>
 		/// Generates the parser for the given grammar
 		/// </summary>
+		/// <param name="unit">The unit to generate a parser for</param>
 		/// <returns><c>true</c> if the operation succeed</returns>
-		private bool GenerateParser()
+		private bool GenerateParser(Unit unit)
 		{
-			// build the LR graph
-			reporter.Info("Preparing parser's data ...");
-			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);
-			graph = builder.Build(method);
-			// report the conflicts
-			if (method == ParsingMethod.RNGLR1 || method == ParsingMethod.RNGLALR1)
-			{
-				// for RNGLR method we only warn of existing conflicts
-				if (builder.Conflicts.Count > 0)
-					reporter.Warn(string.Format("Found {0} conflict(s), use debug output mode for the details", builder.Conflicts.Count));
-			}
-			else
-			{
-				// for LR(k) methods, conflicts prevent the generation of the automaton
-				if (builder.Conflicts.Count > 0)
-				{
-					foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
-						reporter.Error(conflict);
-					return false;
-				}
-			}
 			// get the generator
 			Generator generator = null;
-			string parserType = null;
-			switch (method)
+			switch (unit.Method)
 			{
 				case ParsingMethod.LR0:
 				case ParsingMethod.LR1:
 				case ParsingMethod.LALR1:
-					generator = new ParserLRkDataGenerator(grammar, graph, expected);
-					parserType = "LRk";
+					generator = new ParserLRkDataGenerator(unit);
 					break;
 				case ParsingMethod.RNGLR1:
 				case ParsingMethod.RNGLALR1:
-					generator = new ParserRNGLRDataGenerator(grammar, graph, expected);
-					parserType = "RNGLR";
+					generator = new ParserRNGLRDataGenerator(unit);
 					break;
 			}
 
 			// generate the parser's data
-			reporter.Info("Exporting parser data at " + ArtifactParserData + " ...");
-			generator.Generate(ArtifactParserData);
+			reporter.Info("Exporting parser data at " + GetArtifactParserData(unit) + " ...");
+			generator.Generate(GetArtifactParserData(unit));
 
 			// generate the parser's code
-			reporter.Info("Exporting parser code at " + ArtifactParserCode + " ...");
-			generator = GetParserCodeGenerator(parserType);
-			generator.Generate(ArtifactParserCode);
+			reporter.Info("Exporting parser code at " + GetArtifactParserCode(unit) + " ...");
+			generator = GetParserCodeGenerator(unit);
+			generator.Generate(GetArtifactParserCode(unit));
 			return true;
 		}
 
 		/// <summary>
 		/// Gets the runtime-specific generator of lexer code
 		/// </summary>
-		/// <param name="separator">The separator terminal</param>
+		/// <param name="unit">The unit to generate a lexer for</param>
 		/// <returns>The runtime-specific generator of lexer code</returns>
-		protected abstract Generator GetLexerCodeGenerator(Grammars.Terminal separator);
+		protected abstract Generator GetLexerCodeGenerator(Unit unit);
 
 		/// <summary>
 		/// Gets the runtime-specific generator of parser code
 		/// </summary>
-		/// <param name="parserType">The type of parser to generate</param>
+		/// <param name="unit">The unit to generate a parser for</param>
 		/// <returns>The runtime-specific generator of parser code</returns>
-		protected abstract Generator GetParserCodeGenerator(string parserType);
+		protected abstract Generator GetParserCodeGenerator(Unit unit);
 
 		/// <summary>
 		/// Emits the assembly for the generated lexer and parser

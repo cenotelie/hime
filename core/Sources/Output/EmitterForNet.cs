@@ -62,33 +62,55 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
-		/// <param name="grammar">The grammar to emit data for</param>
-		public EmitterForNet(Grammars.Grammar grammar) : base(grammar) { }
+		/// <param name="units">The units to emit data for</param>
+		public EmitterForNet(List<Unit> units) : base(new Reporter(), units)
+		{
+		}
+
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterForNet(Unit unit) : base(new Reporter(), unit)
+		{
+		}
+
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
-		/// <param name="grammar">The grammar to emit data for</param>
-		public EmitterForNet(Reporter reporter, Grammars.Grammar grammar) : base(reporter, grammar) { }
+		/// <param name="units">The units to emit data for</param>
+		public EmitterForNet(Reporter reporter, List<Unit> units) : base(reporter, units)
+		{
+		}
 
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterForNet(Reporter reporter, Unit unit) : base(reporter, unit)
+		{
+		}
+		
 		/// <summary>
 		/// Gets the runtime-specific generator of lexer code
 		/// </summary>
-		/// <param name="separator">The separator terminal</param>
+		/// <param name="unit">The unit to generate a lexer for</param>
 		/// <returns>The runtime-specific generator of lexer code</returns>
-		protected override Generator GetLexerCodeGenerator(Grammars.Terminal separator)
+		protected override Generator GetLexerCodeGenerator(Unit unit)
 		{
-			return new LexerNetCodeGenerator(nmspace, modifier, grammar.Name, grammar.Name + suffixLexerData, expected, separator);
+			return new LexerNetCodeGenerator(unit, unit.Name + suffixLexerData);
 		}
 
 		/// <summary>
 		/// Gets the runtime-specific generator of parser code
 		/// </summary>
-		/// <param name="parserType">The type of parser to generate</param>
+		/// <param name="unit">The unit to generate a parser for</param>
 		/// <returns>The runtime-specific generator of parser code</returns>
-		protected override Generator GetParserCodeGenerator(string parserType)
+		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserNetCodeGenerator(nmspace, modifier, grammar.Name, grammar.Name + suffixParserData, grammar, parserType);
+			return new ParserNetCodeGenerator(unit, unit.Name + suffixParserData);
 		}
 
 		/// <summary>
@@ -97,7 +119,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns><c>true</c> if the operation succeed</returns>
 		protected override bool EmitAssembly()
 		{
-			reporter.Info("Building assembly " + ArtifactAssembly + " ...");
+			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
 			bool hasError = false;
 			string output = path + GetUniqueID() + SuffixAssembly;
@@ -109,13 +131,19 @@ namespace Hime.CentralDogma.Output
 				compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
 				compilerparams.ReferencedAssemblies.Add("System.dll");
 				compilerparams.ReferencedAssemblies.Add(redist);
-				compilerparams.EmbeddedResources.Add(ArtifactLexerData);
-				compilerparams.EmbeddedResources.Add(ArtifactParserData);
+				foreach (Unit unit in units)
+				{
+					compilerparams.EmbeddedResources.Add(GetArtifactLexerData(unit));
+					compilerparams.EmbeddedResources.Add(GetArtifactParserData(unit));
+				}
 				compilerparams.OutputAssembly = output;
-				System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, new string[] {
-					ArtifactLexerCode,
-					ArtifactParserCode
-				});
+				List<string> files = new List<string>();
+				foreach (Unit unit in units)
+				{
+					files.Add(GetArtifactLexerCode(unit));
+					files.Add(GetArtifactParserCode(unit));
+				}
+				System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, files.ToArray());
 				foreach (System.CodeDom.Compiler.CompilerError error in results.Errors)
 				{
 					reporter.Error(error.ToString());
@@ -125,9 +153,9 @@ namespace Hime.CentralDogma.Output
 			if (hasError)
 				return false;
 			// stage the output
-			if (File.Exists(ArtifactAssembly))
-				File.Delete(ArtifactAssembly);
-			File.Move(output, ArtifactAssembly);
+			if (File.Exists(GetArtifactAssembly()))
+				File.Delete(GetArtifactAssembly());
+			File.Move(output, GetArtifactAssembly());
 			return true;
 		}
 	}

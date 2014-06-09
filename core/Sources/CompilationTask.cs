@@ -37,41 +37,34 @@ namespace Hime.CentralDogma
 		/// When only one grammar is loaded, it will be automatically selected.
 		/// </summary>
 		public string GrammarName { get; set; }
-
 		/// <summary>
 		/// Gets ot sets the compiler's mode
 		/// </summary>
 		public Output.Mode Mode { get; set; }
-
 		/// <summary>
 		/// Gets or sets the target runtime
 		/// </summary>
 		public Output.Runtime Target { get; set; }
-
 		/// <summary>
 		/// Gets ot sets the compiler's output files' path.
 		/// If this property is not set, the path will be the current directory.
 		/// </summary>
 		public string OutputPath { get; set; }
-
 		/// <summary>
 		/// Gets or sets the namespace in which the generated Lexer and Parser classes will be put.
 		/// If this property is not set, the namespace will be the name of the grammar.
 		/// </summary>
 		public string Namespace { get; set; }
-
 		/// <summary>
 		/// Gets or sets the access modifiers for the generated Lexer and Parser classes.
 		/// The default value is Internal.
 		/// </summary>
 		public Output.Modifier CodeAccess { get; set; }
-
 		/// <summary>
 		/// Gets or sets the parsing method to use.
 		/// The default value is LALR1.
 		/// </summary>
 		public ParsingMethod Method { get; set; }
-
 		/// <summary>
 		/// The reporter
 		/// </summary>
@@ -169,61 +162,53 @@ namespace Hime.CentralDogma
 			reporter.Info("Hime.CentralDogma " + Version);
 
 			// Load data
-			List<Grammars.Grammar> grammars = loader.Load();
-			if (grammars == null)
+			List<Grammars.Grammar> inputs = loader.Load();
+			if (inputs == null)
 				return;
 
-			// resolve the target grammar to compile
-			Grammars.Grammar target = null;
+			// resolve the target grammars to compile
+			if (inputs.Count == 0)
+			{
+				reporter.Error("No grammar in inputs");
+				return;
+			}
+			List<Output.Unit> units = new List<Output.Unit>();
 			if (GrammarName != null)
 			{
-				foreach (Grammars.Grammar potential in grammars)
+				foreach (Grammars.Grammar potential in inputs)
 				{
 					if (potential.Name == GrammarName)
 					{
-						target = potential;
+						units.Add(new Output.Unit(potential, Method, Namespace, CodeAccess));
 						break;
 					}
 				}
-				if (target == null)
+				if (units.Count == 0)
+				{
 					reporter.Error("Grammar " + GrammarName + " cannot be found");
+					return;
+				}
 			}
 			else
 			{
-				if (grammars.Count > 1)
-					reporter.Error("Inputs contain more than one grammar, cannot decide which one to compile");
-				else if (grammars.Count == 0)
-					reporter.Error("No grammar in inputs");
-				else
-					target = grammars[0];
+				foreach (Grammars.Grammar potential in inputs)
+				{
+					units.Add(new Output.Unit(potential, Method, Namespace, CodeAccess));
+				}
 			}
-			if (target == null)
-				return;
-
-			// prepare the target grammar
-			reporter.Info("Preparing grammar " + target.Name + " ...");
-			string message = target.Prepare();
-			if (message != null)
-			{
-				reporter.Error(message);
-				return;
-			}
-
-			// Build names
-			string nmspace = (Namespace != null) ? Namespace : target.Name;
 
 			// emit the artifacts
 			Output.EmitterBase emitter = null;
 			switch (Target)
 			{
 				case Output.Runtime.Net:
-					emitter = new Output.EmitterForNet(reporter, target);
+					emitter = new Output.EmitterForNet(reporter, units);
 					break;
 				case Output.Runtime.Java:
-					emitter = new Output.EmitterForJava(reporter, target);
+					emitter = new Output.EmitterForJava(reporter, units);
 					break;
 			}
-			emitter.Emit((OutputPath != null) ? OutputPath : "", nmspace, CodeAccess, Method, Mode);
+			emitter.Emit((OutputPath != null) ? OutputPath : "", Mode);
 		}
 	}
 }
