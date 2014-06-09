@@ -41,6 +41,7 @@
     <Compile Include="Sources\Program.cs" />
     <Compile Include="Sources\Test.cs" />
     <Compile Include="Sources\TestResult.cs" />
+    <Compile Include="Sources\ReportData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

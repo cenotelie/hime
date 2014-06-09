@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 using Hime.Redist;
 using Hime.CentralDogma;
 using Hime.CentralDogma.Output;
@@ -98,6 +99,35 @@ namespace Hime.Tests.Driver
 		{
 			foreach (Test test in tests)
 				test.Execute(reporter, targets);
+		}
+
+		/// <summary>
+		/// Gets the XML report for this fixture
+		/// </summary>
+		/// <param name="doc">The parent XML document</param>
+		/// <returns>The XML report</returns>
+		public ReportData GetXMLReport(XmlDocument doc)
+		{
+			XmlElement root = doc.CreateElement("TestRecord");
+			root.Attributes.Append(doc.CreateAttribute("Name"));
+			root.Attributes["Name"].Value = name;
+
+			XmlElement nodeResults = doc.CreateElement("Results");
+			XmlElement nodeTests = doc.CreateElement("Tests");
+			root.AppendChild(nodeResults);
+			root.AppendChild(nodeTests);
+			ReportData aggregated = new ReportData();
+
+			foreach (Test test in tests)
+			{
+				ReportData data = test.GetXMLReport(doc);
+				aggregated = aggregated + data;
+				nodeTests.AppendChild(data.child);
+			}
+
+			nodeResults.AppendChild(aggregated.GetXML(doc));
+			aggregated.child = root;
+			return aggregated;
 		}
 	}
 }

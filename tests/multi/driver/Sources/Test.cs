@@ -34,9 +34,7 @@ namespace Hime.Tests.Driver
 		public const string VERB_MATCHES = "matches";
 		public const string VERB_NOMATCHES = "nomatches";
 		public const string VERB_FAILS = "fails";
-
 		public const string EXPECTED_PATH = "expected.xml";
-
 		/// <summary>
 		/// The test specification
 		/// </summary>
@@ -151,8 +149,16 @@ namespace Hime.Tests.Driver
 		{
 			TestResult result = new TestResult();
 			List<string> output = new List<string>();
-			string grammar = BuildParserForNet(reporter);
-			int code = ExecuteCommand(reporter, "mono", "executor.exe " + grammar + ".dll " + node.Children[3].Symbol.Value + " " + verb + " " + EXPECTED_PATH, output);
+			int code = TestResult.RESULT_FAILURE_PARSING;
+			try
+			{
+				string grammar = BuildParserForNet(reporter);
+				code = ExecuteCommand(reporter, "mono", "executor.exe " + grammar + ".dll " + node.Children[3].Symbol.Value + " " + verb + " " + EXPECTED_PATH, output);
+			}
+			catch (Exception ex)
+			{
+				output.Add(ex.ToString());
+			}
 			result.Finish(code, output);
 			return result;
 		}
@@ -183,7 +189,6 @@ namespace Hime.Tests.Driver
 			task.Execute();
 			return node.Children[1].Children[0].Symbol.Value;
 		}
-
 		// <summary>
 		/// Executes the specified command
 		/// </summary>
@@ -218,6 +223,54 @@ namespace Hime.Tests.Driver
 			}
 			process.WaitForExit();
 			return process.ExitCode;
+		}
+
+		/// <summary>
+		/// Gets the XML report for this test
+		/// </summary>
+		/// <param name="doc">The parent XML document</param>
+		/// <returns>The XML report</returns>
+		public ReportData GetXMLReport(XmlDocument doc)
+		{
+			XmlElement root = doc.CreateElement("TestRecord");
+			root.Attributes.Append(doc.CreateAttribute("Name"));
+			root.Attributes["Name"].Value = Name;
+
+			XmlElement nodeResults = doc.CreateElement("Results");
+			XmlElement nodeTests = doc.CreateElement("Tests");
+			root.AppendChild(nodeResults);
+			root.AppendChild(nodeTests);
+			ReportData aggregated = new ReportData();
+
+			foreach (Runtime target in results.Keys)
+			{
+				ReportData data = GetXMLReport(doc, target);
+				aggregated = aggregated + data;
+				nodeTests.AppendChild(data.child);
+			}
+
+			nodeResults.AppendChild(aggregated.GetXML(doc));
+			aggregated.child = root;
+			return aggregated;
+		}
+
+		/// <summary>
+		/// Gets the XML report for the specified target
+		/// </summary>
+		/// <param name="doc">The parent XML document</param>
+		/// <param name="target">The target</param>
+		/// <returns>The XML report</returns>
+		public ReportData GetXMLReport(XmlDocument doc, Runtime target)
+		{
+			XmlElement nodeRecord = doc.CreateElement("TestRecord");
+			XmlElement nodeResult = doc.CreateElement("Results");
+			ReportData data = results[target].GetXML(doc);
+			nodeResult.AppendChild(data.child);
+			nodeRecord.AppendChild(nodeResult);
+			nodeRecord.Attributes.Append(doc.CreateAttribute("Name"));
+			nodeRecord.Attributes["Name"].Value = target.ToString();
+			data.child = nodeRecord;
+			return data;
 		}
 	}
 }

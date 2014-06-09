@@ -18,3 +18,8 @@ mv tests/multi/net/bin/Release/Tests.Executor.exe tests/multi/results/executor.e
 # Execute
 cd tests/multi/results
 mono driver.exe
+
+# Cleanup
+cd ../../..
+mv tests/multi/results/TestResults.xml tests/multi/TestResults.xml
+rm -r tests/multi/results

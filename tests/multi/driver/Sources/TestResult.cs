@@ -19,6 +19,7 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Hime.Tests.Driver
 {
@@ -75,6 +76,57 @@ namespace Hime.Tests.Driver
 			this.spentTime = (DateTime.Now - this.startTime);
 			this.executorResult = result;
 			this.output = output;
+		}
+
+		/// <summary>
+		/// Gets the XML serialization of this result
+		/// </summary>
+		/// <param name="doc">The parent XML document</param>
+		/// <returns>The element</returns>
+		public ReportData GetXML(XmlDocument doc)
+		{
+			XmlElement root = doc.CreateElement("UnitTestResult");
+			root.AppendChild(GetElement(doc, "TestDate", this.startTime.ToString()));
+			root.AppendChild(GetElement(doc, "Status", null));
+			root.AppendChild(GetElement(doc, "Passed", executorResult == RESULT_SUCCESS ? "1" : "0"));
+			root.AppendChild(GetElement(doc, "Errors", executorResult == RESULT_FAILURE_PARSING ? "1" : "0"));
+			root.AppendChild(GetElement(doc, "Failures", executorResult == RESULT_FAILURE_VERB ? "1" : "0"));
+			root.AppendChild(GetElement(doc, "Inconclusive", null));
+			root.AppendChild(GetElement(doc, "NotRunnable", null));
+			root.AppendChild(GetElement(doc, "Skipped", null));
+			root.AppendChild(GetElement(doc, "Ignored", null));
+			root.AppendChild(GetElement(doc, "Time", this.spentTime.ToString()));
+			root.AppendChild(GetElement(doc, "Message", null));
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			foreach (string line in this.output)
+			{
+				builder.Append(line);
+				builder.Append(Environment.NewLine);
+			}
+			root.AppendChild(GetElement(doc, "ConsoleOutput", builder.ToString()));
+			root.AppendChild(GetElement(doc, "ConsoleError", null));
+			ReportData data = new ReportData();
+			data.spent = this.spentTime;
+			data.passed = executorResult == RESULT_SUCCESS ? 1 : 0;
+			data.errors = executorResult == RESULT_FAILURE_PARSING ? 1 : 0;
+			data.failed = executorResult == RESULT_FAILURE_VERB ? 1 : 0;
+			data.child = root;
+			return data;
+		}
+
+		/// <summary>
+		/// Gets an XML element with a content
+		/// </summary>
+		/// <param name="doc">The parent XML document</param>
+		/// <param name="name">The element's name</param>
+		/// <param name="content">The element's content</param>
+		/// <returns>The element</returns>
+		public static XmlElement GetElement(XmlDocument doc, string name, string content)
+		{
+			XmlElement elem = doc.CreateElement(name);
+			if (content != null)
+				elem.AppendChild(doc.CreateTextNode(content));
+			return elem;
 		}
 	}
 }

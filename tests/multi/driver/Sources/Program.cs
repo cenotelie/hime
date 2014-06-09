@@ -19,6 +19,7 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using Hime.CentralDogma;
 using Hime.CentralDogma.Output;
 
@@ -69,6 +70,38 @@ namespace Hime.Tests.Driver
 			// execute
 			foreach (Fixture fixture in fixtures)
 				fixture.Execute(reporter, targets);
+
+			// create report
+			XmlDocument doc = new XmlDocument();
+			doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
+
+			XmlNode current = doc;
+			string[] nmspace = new string[] { null, "Hime", "Tests", "Runtimes" };
+			for (int i=0; i!=nmspace.Length; i++)
+			{
+				XmlElement node1 = doc.CreateElement("TestRecord");
+				XmlElement node2 = doc.CreateElement("Tests");
+				string name = nmspace[i];
+				if (name != null)
+				{
+					node1.Attributes.Append(doc.CreateAttribute("Name"));
+					node1.Attributes["Name"].Value = name;
+				}
+				node1.AppendChild(node2);
+				current.AppendChild(node1);
+				current = node2;
+			}
+
+			foreach (Fixture fixture in fixtures)
+				current.AppendChild(fixture.GetXMLReport(doc).child);
+
+			// export document
+			XmlTextWriter writer = new XmlTextWriter("TestResults.xml", System.Text.Encoding.UTF8);
+			writer.Formatting = Formatting.Indented;
+			writer.Indentation = 1;
+			writer.IndentChar = '\t';
+			doc.WriteTo(writer);
+			writer.Close();
 		}
 	}
 }
