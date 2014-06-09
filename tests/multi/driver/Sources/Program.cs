@@ -67,6 +67,7 @@ namespace Hime.Tests.Driver
 			// load fixtures
 			fixtures = new List<Fixture>();
 			fixtures.Add(new Fixture(reporter, "GrammarOptions"));
+			fixtures.Add(new Fixture(reporter, "SyntacticRules"));
 
 			// execute
 			foreach (Fixture fixture in fixtures)

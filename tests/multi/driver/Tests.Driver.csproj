@@ -57,13 +57,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\ParsingFixture.gram" />
     <EmbeddedResource Include="Resources\Suites\GrammarOptions.suite" />
+    <EmbeddedResource Include="Resources\Suites\SyntacticRules.suite" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Resources\Suites\" />
     <Folder Include="Sources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Suites\SyntacticRules.suite" />
   </ItemGroup>
 </Project>
