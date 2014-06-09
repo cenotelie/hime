@@ -55,21 +55,17 @@ namespace Hime.Tests.Executor
 		/// <returns>The success or failure of the test</returns>
 		/// <remarks>
 		/// Expected arguments are:
-		/// * The path to the compiled assembly containing the parser to test
+		/// * The parser's name
 		/// * A quoted string with the input to be parsed
 		/// * A verb specifying the type of test, one of: matches, nomatches, fails
-		/// * Optionnally, the path to the XML file containing the expected parse tree
 		/// </remarks>
 		public static int Main(string[] args)
 		{
-			string pathToAssembly = GetValue(args[0]);
+			string parserName = GetValue(args[0]);
 			string input = GetValue(args[1]);
 			string verb = args[2];
-			string pathToExpected = null;
-			if (verb != VERB_FAILS)
-				pathToExpected = GetValue(args[3]);
 			Program program = new Program();
-			return program.Execute(pathToAssembly, input, verb, pathToExpected);
+			return program.Execute(parserName, input, verb);
 		}
 
 		private static string GetValue(string arg)
@@ -82,18 +78,17 @@ namespace Hime.Tests.Executor
 		/// <summary>
 		/// Executes the specified test
 		/// </summary>
-		/// <param name="pathToAssembly">The path to the compiled assembly containing the parser to test</param>
+		/// <param name="parserName">The parser's name</param>
 		/// <param name="input">A string with the input to be parsed</param>
 		/// <param name="verb">A verb specifying the type of test, one of: matches, nomatches, fails</param>
-		/// <param name="pathToExpected">The path to the XML file containing the expected parse tree, or null</param>
-		public int Execute(string pathToAssembly, string input, string verb, string pathToExpected)
+		public int Execute(string parserName, string input, string verb)
 		{
-			Hime.Redist.Parsers.IParser parser = GetParser(pathToAssembly, input);
+			Hime.Redist.Parsers.IParser parser = GetParser(parserName, input);
 			XmlDocument expected = null;
-			if (pathToExpected != null)
+			if (verb != VERB_FAILS)
 			{
 				expected = new XmlDocument();
-				expected.LoadXml(System.IO.File.ReadAllText(pathToExpected, System.Text.Encoding.UTF8));
+				expected.LoadXml(System.IO.File.ReadAllText("expected.xml", System.Text.Encoding.UTF8));
 			}
 
 			switch (verb)
@@ -171,22 +166,13 @@ namespace Hime.Tests.Executor
 		/// <summary>
 		/// Gets the parser for the specified assembly and input
 		/// </summary>
-		/// <param name="pathToAssembly">Path to an assembly</param>
+		/// <param name="parserName">The parser's name</param>
 		/// <param name="input">An input for the parser</param>
 		/// <returns>The parser</returns>
-		private Hime.Redist.Parsers.IParser GetParser(string pathToAssembly, string input)
+		private Hime.Redist.Parsers.IParser GetParser(string parserName, string input)
 		{
-			Assembly assembly = Assembly.LoadFile(pathToAssembly);
-			Type parserType = null;
-			Type baseParser = typeof(Hime.Redist.Parsers.IParser);
-			foreach (Type t in assembly.GetTypes())
-			{
-				if (t.IsClass && baseParser.IsAssignableFrom(t))
-				{
-					parserType = t;
-					break;
-				}
-			}
+			Assembly assembly = Assembly.LoadFile("Parsers.dll");
+			Type parserType = assembly.GetType(parserName);
 			ConstructorInfo parserCtor = parserType.GetConstructors()[0];
 			ParameterInfo[] parameters = parserCtor.GetParameters();
 			Type lexerType = parameters[0].ParameterType;

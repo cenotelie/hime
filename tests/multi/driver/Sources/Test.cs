@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Xml;
 using Hime.Redist;
 using Hime.CentralDogma;
+using Hime.CentralDogma.Input;
 using Hime.CentralDogma.Output;
 
 namespace Hime.Tests.Driver
@@ -92,6 +93,21 @@ namespace Hime.Tests.Driver
 		}
 
 		/// <summary>
+		/// Gets the compilation unit for this test
+		/// </summary>
+		/// <returns>The compilation unit</returns>
+		public Unit GetUnit(string fixture)
+		{
+			Loader loader = new Loader();
+			loader.AddInput(node.Children[1], originalInput);
+			return new Unit(
+				loader.Load()[0],
+				(ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Symbol.Value),
+				"Hime.Tests.Generated." + fixture,
+				Modifier.Public);
+		}
+
+		/// <summary>
 		/// Translates the specified AST node into the equivalent expected XML node
 		/// </summary>
 		/// <param name="node">An AST node</param>
@@ -118,7 +134,8 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
 		/// <param name="targets">The targets to execute on</param>
-		public void Execute(Reporter reporter, List<Runtime> targets)
+		/// <param name="fixture">The parent fixture's name</param>
+		public void Execute(Reporter reporter, List<Runtime> targets, string fixture)
 		{
 			if (expected != null)
 			{
@@ -131,10 +148,10 @@ namespace Hime.Tests.Driver
 				switch (runtime)
 				{
 					case Runtime.Net:
-						this.results.Add(runtime, ExecuteOnNet(reporter));
+						this.results.Add(runtime, ExecuteOnNet(reporter, fixture));
 						break;
 					case Runtime.Java:
-						this.results.Add(runtime, ExecuteOnJava(reporter));
+						this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
 						break;
 				}
 			}
@@ -144,16 +161,29 @@ namespace Hime.Tests.Driver
 		/// Executes this test on the .Net runtime
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
+		/// <param name="fixture">The parent fixture's name</param>
 		/// <returns>The test result</returns>
-		private TestResult ExecuteOnNet(Reporter reporter)
+		private TestResult ExecuteOnNet(Reporter reporter, string fixture)
 		{
 			TestResult result = new TestResult();
 			List<string> output = new List<string>();
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				string grammar = BuildParserForNet(reporter);
-				code = ExecuteCommand(reporter, "mono", "executor.exe " + grammar + ".dll " + node.Children[3].Symbol.Value + " " + verb + " " + EXPECTED_PATH, output);
+				System.Text.StringBuilder args = new System.Text.StringBuilder("executor.exe");
+				// add parser name argument
+				args.Append(" Hime.Tests.Generated.");
+				args.Append(fixture);
+				args.Append(".");
+				args.Append(Name);
+				args.Append("Parser");
+				// add input argument
+				args.Append(" ");
+				args.Append(node.Children[3].Symbol.Value);
+				// add verb argument
+				args.Append(" ");
+				args.Append(verb);
+				code = ExecuteCommand(reporter, "mono", args.ToString(), output);
 			}
 			catch (Exception ex)
 			{
@@ -167,16 +197,29 @@ namespace Hime.Tests.Driver
 		/// Executes this test on the Java runtime
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
+		/// <param name="fixture">The parent fixture's name</param>
 		/// <returns>The test result</returns>
-		private TestResult ExecuteOnJava(Reporter reporter)
+		private TestResult ExecuteOnJava(Reporter reporter, string fixture)
 		{
 			TestResult result = new TestResult();
 			List<string> output = new List<string>();
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				string grammar = BuildParserForJava(reporter);
-				code = ExecuteCommand(reporter, "java", "-jar executor.jar " + grammar + ".jar " + grammar + " " + node.Children[3].Symbol.Value + " " + verb + " " + EXPECTED_PATH, output);
+				System.Text.StringBuilder args = new System.Text.StringBuilder("-jar executor.jar");
+				// add parser name argument
+				args.Append(" Hime.Tests.Generated.");
+				args.Append(fixture);
+				args.Append(".");
+				args.Append(Name);
+				args.Append("Parser");
+				// add input argument
+				args.Append(" ");
+				args.Append(node.Children[3].Symbol.Value);
+				// add verb argument
+				args.Append(" ");
+				args.Append(verb);
+				code = ExecuteCommand(reporter, "java", args.ToString(), output);
 			}
 			catch (Exception ex)
 			{
@@ -184,41 +227,6 @@ namespace Hime.Tests.Driver
 			}
 			result.Finish(code, output);
 			return result;
-		}
-
-		/// <summary>
-		/// Builds the parser for the .Net runtime
-		/// </summary>
-		/// <param name="reporter">The reported to use</param>
-		/// <returns>The name of the compiled grammar</returns>
-		private string BuildParserForNet(Reporter reporter)
-		{
-			CompilationTask task = new CompilationTask(reporter);
-			task.AddInput(node.Children[1], originalInput);
-			task.CodeAccess = Modifier.Public;
-			task.Method = (ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Symbol.Value);
-			task.Mode = Mode.Assembly;
-			task.Namespace = "Hime.Tests.Generated";
-			task.Execute();
-			return node.Children[1].Children[0].Symbol.Value;
-		}
-
-		/// <summary>
-		/// Builds the parser for the Java runtime
-		/// </summary>
-		/// <param name="reporter">The reported to use</param>
-		/// <returns>The name of the compiled grammar</returns>
-		private string BuildParserForJava(Reporter reporter)
-		{
-			CompilationTask task = new CompilationTask(reporter);
-			task.AddInput(node.Children[1], originalInput);
-			task.CodeAccess = Modifier.Public;
-			task.Method = (ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Symbol.Value);
-			task.Mode = Mode.Assembly;
-			task.Namespace = "org.xowl.hime.tests.generated";
-			task.Target = Runtime.Java;
-			task.Execute();
-			return node.Children[1].Children[0].Symbol.Value;
 		}
 
 		// <summary>

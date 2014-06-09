@@ -50,15 +50,11 @@ public class Program {
     private static final int RESULT_FAILURE_PARSING = 2;
 
     public static void main(String[] args) {
-        String pathToAssembly = getValue(args[0]);
-        String name = getValue(args[1]);
-        String input = getValue(args[2]);
-        String verb = args[3];
-        String pathToExpected = null;
-        if (!VERB_FAILS.equals(verb))
-            pathToExpected = getValue(args[4]);
+        String name = getValue(args[0]);
+        String input = getValue(args[1]);
+        String verb = args[2];
         Program program = new Program();
-        int code = program.execute(pathToAssembly, name, input, verb, pathToExpected);
+        int code = program.execute(name, input, verb);
         System.exit(code);
     }
 
@@ -68,13 +64,13 @@ public class Program {
         return arg;
     }
 
-    public int execute(String pathToAssembly, String name, String input, String verb, String pathToExpected) {
-        IParser parser = getParser(pathToAssembly, name, input);
+    public int execute(String name, String input, String verb) {
+        IParser parser = getParser(name, input);
         Document expected = null;
-        if (pathToExpected != null) {
+        if (!VERB_FAILS.equals(verb)) {
             DOMParser xmlParser = new DOMParser();
             try {
-                xmlParser.parse(pathToExpected);
+                xmlParser.parse("expected.xml");
                 expected = xmlParser.getDocument();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -138,11 +134,11 @@ public class Program {
         return true;
     }
 
-    private IParser getParser(String pathToAssembly, String name, String input) {
-        loadJar(pathToAssembly);
+    private IParser getParser(String name, String input) {
+        loadJar("Parsers.jar");
         try {
-            Class lexerClass = Class.forName("org.xowl.hime.tests.generated." + name + "Lexer");
-            Class parserClass = Class.forName("org.xowl.hime.tests.generated." + name + "Parser");
+            Class lexerClass = Class.forName(name.substring(0, name.length() - 6) + "Lexer");
+            Class parserClass = Class.forName(name);
             Object lexer = lexerClass.getConstructor(String.class).newInstance(input);
             Object parser = parserClass.getConstructor(lexerClass).newInstance(lexer);
             return (IParser)parser;

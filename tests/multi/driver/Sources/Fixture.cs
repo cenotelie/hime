@@ -68,6 +68,15 @@ namespace Hime.Tests.Driver
 		private List<Test> tests;
 
 		/// <summary>
+		/// Gets the fixture's name
+		/// </summary>
+		public string Name { get { return name; } }
+		/// <summary>
+		/// Gets the tests in this fixture
+		/// </summary>
+		public ROList<Test> Tests { get { return new ROList<Test>(tests); } }
+
+		/// <summary>
 		/// Loads this fixture
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
@@ -98,7 +107,7 @@ namespace Hime.Tests.Driver
 		public void Execute(Reporter reporter, List<Runtime> targets)
 		{
 			foreach (Test test in tests)
-				test.Execute(reporter, targets);
+				test.Execute(reporter, targets, name);
 		}
 
 		/// <summary>

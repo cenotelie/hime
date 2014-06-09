@@ -69,6 +69,15 @@ namespace Hime.Tests.Driver
 			fixtures.Add(new Fixture(reporter, "GrammarOptions"));
 			fixtures.Add(new Fixture(reporter, "SyntacticRules"));
 
+			List<Unit> units = new List<Unit>();
+			foreach (Fixture fixture in fixtures)
+				foreach (Test test in fixture.Tests)
+					units.Add(test.GetUnit(fixture.Name));
+			EmitterForNet emitterNet = new EmitterForNet(units);
+			emitterNet.Emit("", Mode.Assembly);
+			EmitterForJava emitterJava = new EmitterForJava(units);
+			emitterJava.Emit("", Mode.Assembly);
+
 			// execute
 			foreach (Fixture fixture in fixtures)
 				fixture.Execute(reporter, targets);

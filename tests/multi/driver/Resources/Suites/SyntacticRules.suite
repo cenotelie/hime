@@ -1,241 +1,241 @@
 fixture SyntacticRules
 
 test Test_Minimal_Empty_LR:
-	grammar Test { options {Axiom="a";} rules { a->; } }
+	grammar Test_Minimal_Empty_LR { options {Axiom="a";} rules { a->; } }
 	parser LALR1
 	on ""
 	yields a
 
 test Test_Minimal_Empty_GLR:
-	grammar Test { options {Axiom="a";} rules { a->; } }
+	grammar Test_Minimal_Empty_GLR { options {Axiom="a";} rules { a->; } }
 	parser RNGLALR1
 	on ""
 	yields a
 
 test Test_Minimal_Single_MatchOne_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	grammar Test_Minimal_Single_MatchOne_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
 	parser LALR1
 	on "a"
 	yields e(A='a')
 
 test Test_Minimal_Single_MatchOne_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	grammar Test_Minimal_Single_MatchOne_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
 	parser RNGLALR1
 	on "a"
 	yields e(A='a')
 
 test Test_Minimal_Single_FailsEmpty_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	grammar Test_Minimal_Single_FailsEmpty_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
 	parser LALR1
 	on ""
 	fails
 
 test Test_Minimal_Single_FailsEmpty_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	grammar Test_Minimal_Single_FailsEmpty_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
 	parser RNGLALR1
 	on ""
 	fails
 
 test Test_Minimal_Single_FailsWrongInput_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	grammar Test_Minimal_Single_FailsWrongInput_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
 	parser LALR1
 	on "b"
 	fails
 
 test Test_Minimal_Single_FailsWrongInput_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	grammar Test_Minimal_Single_FailsWrongInput_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
 	parser RNGLALR1
 	on "b"
 	fails
 
 test Test_Grammar_OptionalOperator_MatchZero_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
+	grammar Test_Grammar_OptionalOperator_MatchZero_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
 	parser LALR1
 	on ""
 	yields e
 
 test Test_Grammar_OptionalOperator_MatchZero_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
+	grammar Test_Grammar_OptionalOperator_MatchZero_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
 	parser RNGLALR1
 	on ""
 	yields e
 
 test Test_Grammar_OptionalOperator_MatchOne_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
+	grammar Test_Grammar_OptionalOperator_MatchOne_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
 	parser LALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_OptionalOperator_MatchOne_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
+	grammar Test_Grammar_OptionalOperator_MatchOne_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
 	parser RNGLALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_OptionalOperator_FailsOnTwo_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
+	grammar Test_Grammar_OptionalOperator_FailsOnTwo_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
 	parser LALR1
 	on "aa"
 	fails
 
 test Test_Grammar_OptionalOperator_FailsOnTwo_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
+	grammar Test_Grammar_OptionalOperator_FailsOnTwo_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A?; } }
 	parser RNGLALR1
 	on "aa"
 	fails
 
 test Test_Grammar_StarOperator_MatchZero_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
+	grammar Test_Grammar_StarOperator_MatchZero_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
 	parser LALR1
 	on ""
 	yields e
 
 test Test_Grammar_StarOperator_MatchZero_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
+	grammar Test_Grammar_StarOperator_MatchZero_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
 	parser RNGLALR1
 	on ""
 	yields e
 
 test Test_Grammar_StarOperator_MatchOne_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
+	grammar Test_Grammar_StarOperator_MatchOne_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
 	parser LALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_StarOperator_MatchOne_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
+	grammar Test_Grammar_StarOperator_MatchOne_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
 	parser RNGLALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_StarOperator_MatchMoreThanOne_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
+	grammar Test_Grammar_StarOperator_MatchMoreThanOne_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
 	parser LALR1
 	on "aaa"
 	yields e(A A A)
 
 test Test_Grammar_StarOperator_MatchMoreThanOne_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
+	grammar Test_Grammar_StarOperator_MatchMoreThanOne_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A*; } }
 	parser RNGLALR1
 	on "aaa"
 	yields e(A A A)
 
 test Test_Grammar_PlusOperator_FailsOnZeo_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
+	grammar Test_Grammar_PlusOperator_FailsOnZeo_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
 	parser LALR1
 	on ""
 	fails
 
 test Test_Grammar_PlusOperator_FailsOnZeo_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
+	grammar Test_Grammar_PlusOperator_FailsOnZeo_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
 	parser RNGLALR1
 	on ""
 	fails
 
 test Test_Grammar_PlusOperator_MatchOne_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
+	grammar Test_Grammar_PlusOperator_MatchOne_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
 	parser LALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_PlusOperator_MatchOne_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
+	grammar Test_Grammar_PlusOperator_MatchOne_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
 	parser RNGLALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_PlusOperator_MatchMoreThanOne_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
+	grammar Test_Grammar_PlusOperator_MatchMoreThanOne_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
 	parser LALR1
 	on "aaa"
 	yields e(A A A)
 
 test Test_Grammar_PlusOperator_MatchMoreThanOne_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
+	grammar Test_Grammar_PlusOperator_MatchMoreThanOne_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A+; } }
 	parser RNGLALR1
 	on "aaa"
 	yields e(A A A)
 
 test Test_Grammar_UnionOperator_Left_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
+	grammar Test_Grammar_UnionOperator_Left_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
 	parser LALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_UnionOperator_Left_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
+	grammar Test_Grammar_UnionOperator_Left_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
 	parser RNGLALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_UnionOperator_Right_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
+	grammar Test_Grammar_UnionOperator_Right_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
 	parser LALR1
 	on "b"
 	yields e(B)
 
 test Test_Grammar_UnionOperator_Right_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
+	grammar Test_Grammar_UnionOperator_Right_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->A|B; } }
 	parser RNGLALR1
 	on "b"
 	yields e(B)
 
 test Test_Grammar_OperatorComposition0_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition0_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser LALR1
 	on ""
 	yields e
 
 test Test_Grammar_OperatorComposition0_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition0_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser RNGLALR1
 	on ""
 	yields e
 
 test Test_Grammar_OperatorComposition1_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition1_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser LALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_OperatorComposition1_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition1_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser RNGLALR1
 	on "a"
 	yields e(A)
 
 test Test_Grammar_OperatorComposition2_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition2_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser LALR1
 	on "b"
 	yields e(B)
 
 test Test_Grammar_OperatorComposition2_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition2_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser RNGLALR1
 	on "b"
 	yields e(B)
 
 test Test_Grammar_OperatorComposition3_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition3_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser LALR1
 	on "aba"
 	yields e(A B A)
 
 test Test_Grammar_OperatorComposition3_GLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition3_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser RNGLALR1
 	on "aba"
 	yields e(A B A)
 
 test Test_Grammar_OperatorComposition4_LR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+	grammar Test_Grammar_OperatorComposition4_LR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser LALR1
 	on "bab"
 	yields e(B A B)
 
-test Test_Grammar_OperatorComposition4_gLR:
-	grammar Test { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
+test Test_Grammar_OperatorComposition4_GLR:
+	grammar Test_Grammar_OperatorComposition4_GLR { options {Axiom="e";} terminals {A->'a'; B->'b';} rules { e->(A|B)*; } }
 	parser RNGLALR1
 	on "bab"
 	yields e(B A B)
