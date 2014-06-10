@@ -117,25 +117,29 @@ namespace Hime.Tests.Driver
 		/// <returns>The XML report</returns>
 		public ReportData GetXMLReport(XmlDocument doc)
 		{
-			XmlElement root = doc.CreateElement("TestRecord");
-			root.Attributes.Append(doc.CreateAttribute("Name"));
-			root.Attributes["Name"].Value = name;
+			XmlElement root = doc.CreateElement("testsuite");
+			root.Attributes.Append(doc.CreateAttribute("name"));
+			root.Attributes.Append(doc.CreateAttribute("timestamp"));
+			root.Attributes.Append(doc.CreateAttribute("tests"));
+			root.Attributes.Append(doc.CreateAttribute("failures"));
+			root.Attributes.Append(doc.CreateAttribute("errors"));
+			root.Attributes.Append(doc.CreateAttribute("time"));
 
-			XmlElement nodeResults = doc.CreateElement("Results");
-			XmlElement nodeTests = doc.CreateElement("Tests");
-			root.AppendChild(nodeResults);
-			root.AppendChild(nodeTests);
 			ReportData aggregated = new ReportData();
-
 			foreach (Test test in tests)
 			{
-				ReportData data = test.GetXMLReport(doc);
+				ReportData data = test.GetXMLReport(doc, name);
 				aggregated = aggregated + data;
-				nodeTests.AppendChild(data.child);
+				root.AppendChild(data.child);
 			}
-
-			nodeResults.AppendChild(aggregated.GetXML(doc));
 			aggregated.child = root;
+
+			root.Attributes["name"].Value = name;
+			root.Attributes["tests"].Value = (aggregated.passed + aggregated.errors + aggregated.failed).ToString();
+			root.Attributes["failures"].Value = aggregated.failed.ToString();
+			root.Attributes["errors"].Value = aggregated.errors.ToString();
+			root.Attributes["time"].Value = aggregated.spent.ToString();
+
 			return aggregated;
 		}
 	}

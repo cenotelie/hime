@@ -269,28 +269,33 @@ namespace Hime.Tests.Driver
 		/// Gets the XML report for this test
 		/// </summary>
 		/// <param name="doc">The parent XML document</param>
+		/// <param name="fixture">The parent fixture's name</param>
 		/// <returns>The XML report</returns>
-		public ReportData GetXMLReport(XmlDocument doc)
+		public ReportData GetXMLReport(XmlDocument doc, string fixture)
 		{
-			XmlElement root = doc.CreateElement("TestRecord");
-			root.Attributes.Append(doc.CreateAttribute("Name"));
-			root.Attributes["Name"].Value = Name;
+			XmlElement root = doc.CreateElement("testsuite");
+			root.Attributes.Append(doc.CreateAttribute("name"));
+			root.Attributes.Append(doc.CreateAttribute("timestamp"));
+			root.Attributes.Append(doc.CreateAttribute("tests"));
+			root.Attributes.Append(doc.CreateAttribute("failures"));
+			root.Attributes.Append(doc.CreateAttribute("errors"));
+			root.Attributes.Append(doc.CreateAttribute("time"));
 
-			XmlElement nodeResults = doc.CreateElement("Results");
-			XmlElement nodeTests = doc.CreateElement("Tests");
-			root.AppendChild(nodeResults);
-			root.AppendChild(nodeTests);
 			ReportData aggregated = new ReportData();
-
 			foreach (Runtime target in results.Keys)
 			{
-				ReportData data = GetXMLReport(doc, target);
+				ReportData data = GetXMLReport(doc, target, fixture);
 				aggregated = aggregated + data;
-				nodeTests.AppendChild(data.child);
+				root.AppendChild(data.child);
 			}
-
-			nodeResults.AppendChild(aggregated.GetXML(doc));
 			aggregated.child = root;
+
+			root.Attributes["name"].Value = fixture + "." + Name;
+			root.Attributes["tests"].Value = results.Count.ToString();
+			root.Attributes["failures"].Value = aggregated.failed.ToString();
+			root.Attributes["errors"].Value = aggregated.errors.ToString();
+			root.Attributes["time"].Value = aggregated.spent.ToString();
+
 			return aggregated;
 		}
 
@@ -299,17 +304,13 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		/// <param name="doc">The parent XML document</param>
 		/// <param name="target">The target</param>
+		/// <param name="fixture">The parent fixture's name</param>
 		/// <returns>The XML report</returns>
-		public ReportData GetXMLReport(XmlDocument doc, Runtime target)
+		public ReportData GetXMLReport(XmlDocument doc, Runtime target, string fixture)
 		{
-			XmlElement nodeRecord = doc.CreateElement("TestRecord");
-			XmlElement nodeResult = doc.CreateElement("Results");
 			ReportData data = results[target].GetXML(doc);
-			nodeResult.AppendChild(data.child);
-			nodeRecord.AppendChild(nodeResult);
-			nodeRecord.Attributes.Append(doc.CreateAttribute("Name"));
-			nodeRecord.Attributes["Name"].Value = target.ToString();
-			data.child = nodeRecord;
+			data.child.Attributes["name"].Value = target.ToString();
+			data.child.Attributes["classname"].Value = fixture + "." + Name + "." + target.ToString();
 			return data;
 		}
 	}

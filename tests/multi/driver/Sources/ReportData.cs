@@ -63,27 +63,5 @@ namespace Hime.Tests.Driver
 			result.failed = data1.failed + data2.failed;
 			return result;
 		}
-
-		/// <summary>
-		/// Gets the XML serialization of this result
-		/// </summary>
-		/// <param name="doc">The parent XML document</param>
-		/// <returns>The element</returns>
-		public XmlElement GetXML(XmlDocument doc)
-		{
-			XmlElement root = doc.CreateElement("UnitTestResult");
-			root.AppendChild(TestResult.GetElement(doc, "TestDate", System.DateTime.Now.ToString()));
-			root.AppendChild(TestResult.GetElement(doc, "Status", null));
-			root.AppendChild(TestResult.GetElement(doc, "Passed", passed.ToString()));
-			root.AppendChild(TestResult.GetElement(doc, "Errors", errors.ToString()));
-			root.AppendChild(TestResult.GetElement(doc, "Failures", failed.ToString()));
-			root.AppendChild(TestResult.GetElement(doc, "Inconclusive", null));
-			root.AppendChild(TestResult.GetElement(doc, "NotRunnable", null));
-			root.AppendChild(TestResult.GetElement(doc, "Skipped", null));
-			root.AppendChild(TestResult.GetElement(doc, "Ignored", null));
-			root.AppendChild(TestResult.GetElement(doc, "Time", this.spent.ToString()));
-			root.AppendChild(TestResult.GetElement(doc, "Message", null));
-			return root;
-		}
 	}
 }

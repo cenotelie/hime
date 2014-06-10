@@ -85,26 +85,35 @@ namespace Hime.Tests.Driver
 		/// <returns>The element</returns>
 		public ReportData GetXML(XmlDocument doc)
 		{
-			XmlElement root = doc.CreateElement("UnitTestResult");
-			root.AppendChild(GetElement(doc, "TestDate", this.startTime.ToString()));
-			root.AppendChild(GetElement(doc, "Status", null));
-			root.AppendChild(GetElement(doc, "Passed", executorResult == RESULT_SUCCESS ? "1" : "0"));
-			root.AppendChild(GetElement(doc, "Errors", executorResult == RESULT_FAILURE_PARSING ? "1" : "0"));
-			root.AppendChild(GetElement(doc, "Failures", executorResult == RESULT_FAILURE_VERB ? "1" : "0"));
-			root.AppendChild(GetElement(doc, "Inconclusive", null));
-			root.AppendChild(GetElement(doc, "NotRunnable", null));
-			root.AppendChild(GetElement(doc, "Skipped", null));
-			root.AppendChild(GetElement(doc, "Ignored", null));
-			root.AppendChild(GetElement(doc, "Time", this.spentTime.ToString()));
-			root.AppendChild(GetElement(doc, "Message", null));
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
-			foreach (string line in this.output)
+			XmlElement root = doc.CreateElement("testcase");
+			root.Attributes.Append(doc.CreateAttribute("name"));
+			root.Attributes.Append(doc.CreateAttribute("classname"));
+			root.Attributes.Append(doc.CreateAttribute("time"));
+			root.Attributes["time"].Value = this.spentTime.TotalSeconds.ToString();
+			if (executorResult == RESULT_FAILURE_PARSING)
 			{
-				builder.Append(line);
-				builder.Append(Environment.NewLine);
+				XmlElement error = doc.CreateElement("error");
+				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				foreach (string line in this.output)
+				{
+					builder.Append(line);
+					builder.Append(Environment.NewLine);
+				}
+				error.AppendChild(doc.CreateTextNode(builder.ToString()));
+				root.AppendChild(error);
 			}
-			root.AppendChild(GetElement(doc, "ConsoleOutput", builder.ToString()));
-			root.AppendChild(GetElement(doc, "ConsoleError", null));
+			else if (executorResult == RESULT_FAILURE_VERB)
+			{
+				XmlElement error = doc.CreateElement("failure");
+				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				foreach (string line in this.output)
+				{
+					builder.Append(line);
+					builder.Append(Environment.NewLine);
+				}
+				error.AppendChild(doc.CreateTextNode(builder.ToString()));
+				root.AppendChild(error);
+			}
 			ReportData data = new ReportData();
 			data.spent = this.spentTime;
 			data.passed = executorResult == RESULT_SUCCESS ? 1 : 0;
@@ -112,21 +121,6 @@ namespace Hime.Tests.Driver
 			data.failed = executorResult == RESULT_FAILURE_VERB ? 1 : 0;
 			data.child = root;
 			return data;
-		}
-
-		/// <summary>
-		/// Gets an XML element with a content
-		/// </summary>
-		/// <param name="doc">The parent XML document</param>
-		/// <param name="name">The element's name</param>
-		/// <param name="content">The element's content</param>
-		/// <returns>The element</returns>
-		public static XmlElement GetElement(XmlDocument doc, string name, string content)
-		{
-			XmlElement elem = doc.CreateElement(name);
-			if (content != null)
-				elem.AppendChild(doc.CreateTextNode(content));
-			return elem;
 		}
 	}
 }

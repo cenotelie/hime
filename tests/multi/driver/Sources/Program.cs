@@ -85,26 +85,7 @@ namespace Hime.Tests.Driver
 			// create report
 			XmlDocument doc = new XmlDocument();
 			doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-
-			XmlNode current = doc;
-			string[] nmspace = new string[] { null, "Hime", "Tests", "Runtimes" };
-			for (int i=0; i!=nmspace.Length; i++)
-			{
-				XmlElement node1 = doc.CreateElement("TestRecord");
-				XmlElement node2 = doc.CreateElement("Tests");
-				string name = nmspace[i];
-				if (name != null)
-				{
-					node1.Attributes.Append(doc.CreateAttribute("Name"));
-					node1.Attributes["Name"].Value = name;
-				}
-				node1.AppendChild(node2);
-				current.AppendChild(node1);
-				current = node2;
-			}
-
-			foreach (Fixture fixture in fixtures)
-				current.AppendChild(fixture.GetXMLReport(doc).child);
+			doc.AppendChild(GetXMLReport(doc));
 
 			// export document
 			XmlTextWriter writer = new XmlTextWriter("TestResults.xml", System.Text.Encoding.UTF8);
@@ -113,6 +94,34 @@ namespace Hime.Tests.Driver
 			writer.IndentChar = '\t';
 			doc.WriteTo(writer);
 			writer.Close();
+		}
+
+		private XmlElement GetXMLReport(XmlDocument doc)
+		{
+			XmlElement root = doc.CreateElement("testsuite");
+			root.Attributes.Append(doc.CreateAttribute("name"));
+			root.Attributes.Append(doc.CreateAttribute("timestamp"));
+			root.Attributes.Append(doc.CreateAttribute("tests"));
+			root.Attributes.Append(doc.CreateAttribute("failures"));
+			root.Attributes.Append(doc.CreateAttribute("errors"));
+			root.Attributes.Append(doc.CreateAttribute("time"));
+
+			ReportData aggregated = new ReportData();
+			foreach (Fixture fixture in fixtures)
+			{
+				ReportData data = fixture.GetXMLReport(doc);
+				aggregated = aggregated + data;
+				root.AppendChild(data.child);
+			}
+			aggregated.child = root;
+
+			root.Attributes["name"].Value = "All tests";
+			root.Attributes["tests"].Value = (aggregated.passed + aggregated.errors + aggregated.failed).ToString();
+			root.Attributes["failures"].Value = aggregated.failed.ToString();
+			root.Attributes["errors"].Value = aggregated.errors.ToString();
+			root.Attributes["time"].Value = aggregated.spent.ToString();
+
+			return root;
 		}
 	}
 }
