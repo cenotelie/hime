@@ -58,6 +58,8 @@
     <EmbeddedResource Include="Resources\ParsingFixture.gram" />
     <EmbeddedResource Include="Resources\Suites\GrammarOptions.suite" />
     <EmbeddedResource Include="Resources\Suites\SyntacticRules.suite" />
+    <EmbeddedResource Include="Resources\Suites\TreeActions.suite" />
+    <EmbeddedResource Include="Resources\Suites\UnicodeBlocks.suite" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

@@ -71,6 +71,7 @@ namespace Hime.Tests.Driver
 		/// Gets the fixture's name
 		/// </summary>
 		public string Name { get { return name; } }
+
 		/// <summary>
 		/// Gets the tests in this fixture
 		/// </summary>
@@ -84,7 +85,7 @@ namespace Hime.Tests.Driver
 		public Fixture(Reporter reporter, string name)
 		{
 			reporter.Info("Loading fixture " + name);
-			Stream stream = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Suites." + name + ".suite");
+			Stream stream = typeof(Program).Assembly.GetManifestResourceStream(name);
 			TextReader reader = new StreamReader(stream, System.Text.Encoding.UTF8);
 			string content = reader.ReadToEnd();
 			reader.Close();

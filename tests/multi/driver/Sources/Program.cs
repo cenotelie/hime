@@ -52,40 +52,83 @@ namespace Hime.Tests.Driver
 		/// The tests
 		/// </summary>
 		private List<Fixture> fixtures;
-		
+
 		/// <summary>
 		/// Execute this instance
 		/// </summary>
 		public void Execute()
 		{
-			// init
-			reporter = new Reporter();
-			targets = new List<Runtime>();
-			targets.Add(Runtime.Net);
-			targets.Add(Runtime.Java);
+			Initialize();
 
-			// load fixtures
-			fixtures = new List<Fixture>();
-			fixtures.Add(new Fixture(reporter, "GrammarOptions"));
-			fixtures.Add(new Fixture(reporter, "SyntacticRules"));
-
-			List<Unit> units = new List<Unit>();
-			foreach (Fixture fixture in fixtures)
-				foreach (Test test in fixture.Tests)
-					units.Add(test.GetUnit(fixture.Name));
-			EmitterForNet emitterNet = new EmitterForNet(units);
-			emitterNet.Emit("", Mode.Assembly);
-			EmitterForJava emitterJava = new EmitterForJava(units);
-			emitterJava.Emit("", Mode.Assembly);
+			BuildTestParsers();
 
 			// execute
 			foreach (Fixture fixture in fixtures)
 				fixture.Execute(reporter, targets);
 
-			// create report
+			ExportReport();
+		}
+
+		/// <summary>
+		/// Initializes this driver
+		/// </summary>
+		private void Initialize()
+		{
+			reporter = new Reporter();
+			targets = new List<Runtime>();
+			foreach (object v in Enum.GetValues(typeof(Runtime)))
+				targets.Add((Runtime)v);
+
+			// load fixtures
+			fixtures = new List<Fixture>();
+			string[] resources = (typeof(Program)).Assembly.GetManifestResourceNames();
+			foreach (string resource in resources)
+				if (resource.StartsWith("Hime.Tests.Driver.Resources.Suites."))
+					fixtures.Add(new Fixture(reporter, resource));
+		}
+
+		/// <summary>
+		/// Builds the test parsers
+		/// </summary>
+		private void BuildTestParsers()
+		{
+			// get all units from the tests
+			List<Unit> units = new List<Unit>();
+			foreach (Fixture fixture in fixtures)
+				foreach (Test test in fixture.Tests)
+					units.Add(test.GetUnit(fixture.Name));
+
+			// build the unit for the expected trees
+			System.IO.Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.ParsingFixture.gram");
+			System.IO.Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
+			Hime.CentralDogma.Input.Loader loader = new Hime.CentralDogma.Input.Loader();
+			loader.AddInputRaw(stream1);
+			loader.AddInputRaw(stream2);
+			List<Hime.CentralDogma.Grammars.Grammar> grammars = loader.Load();
+			foreach (Hime.CentralDogma.Grammars.Grammar grammar in grammars)
+			{
+				if (grammar.Name == "ExpectedTree")
+				{
+					units.Add(new Unit(grammar, ParsingMethod.LALR1, "Hime.Tests.Generated", Modifier.Public));
+					break;
+				}
+			}
+
+			EmitterForNet emitterNet = new EmitterForNet(units);
+			emitterNet.Emit("", Mode.Assembly);
+			EmitterForJava emitterJava = new EmitterForJava(units);
+			emitterJava.Emit("", Mode.Assembly);
+		}
+
+		/// <summary>
+		/// Exports the tests report
+		/// </summary>
+		private void ExportReport()
+		{
 			XmlDocument doc = new XmlDocument();
 			doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-			doc.AppendChild(GetXMLReport(doc));
+			ReportData aggregated = GetXMLReport(doc);
+			doc.AppendChild(aggregated.child);
 
 			// export document
 			XmlTextWriter writer = new XmlTextWriter("TestResults.xml", System.Text.Encoding.UTF8);
@@ -94,9 +137,17 @@ namespace Hime.Tests.Driver
 			writer.IndentChar = '\t';
 			doc.WriteTo(writer);
 			writer.Close();
+
+			int total = (aggregated.passed + aggregated.errors + aggregated.failed);
+			reporter.Info(string.Format("{0} tests executed, {1} failed, {2} errors", total, aggregated.failed, aggregated.errors));
 		}
 
-		private XmlElement GetXMLReport(XmlDocument doc)
+		/// <summary>
+		/// Gets the XML report
+		/// </summary>
+		/// <returns>The XML report</returns>
+		/// <param name="doc">The parent XML document</param>
+		private ReportData GetXMLReport(XmlDocument doc)
 		{
 			XmlElement root = doc.CreateElement("testsuite");
 			root.Attributes.Append(doc.CreateAttribute("name"));
@@ -121,7 +172,7 @@ namespace Hime.Tests.Driver
 			root.Attributes["errors"].Value = aggregated.errors.ToString();
 			root.Attributes["time"].Value = aggregated.spent.ToString();
 
-			return root;
+			return aggregated;
 		}
 	}
 }

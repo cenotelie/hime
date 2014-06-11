@@ -33,7 +33,7 @@ namespace Hime.Demo
 		/// </summary>
 		static void Main()
 		{
-			IExecutable executable = new ParseCSharp();
+			IExecutable executable = new ParseGrammar();
 			executable.Execute();
 		}
 

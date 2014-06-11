@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Xml;
 
 using Hime.Redist;
 
@@ -31,8 +30,17 @@ namespace Hime.Tests.Executor
 	/// </summary>
 	class Program
 	{
+		/// <summary>
+		/// The parser must produce an AST that matches the expected one
+		/// </summary>
 		private const string VERB_MATCHES = "matches";
+		/// <summary>
+		/// The parser must produce an AST that do NOT match the expected one
+		/// </summary>
 		private const string VERB_NOMATCHES = "nomatches";
+		/// <summary>
+		/// The parser must fail
+		/// </summary>
 		private const string VERB_FAILS = "fails";
 
 		/// <summary>
@@ -56,39 +64,41 @@ namespace Hime.Tests.Executor
 		/// <remarks>
 		/// Expected arguments are:
 		/// * The parser's name
-		/// * A quoted string with the input to be parsed
 		/// * A verb specifying the type of test, one of: matches, nomatches, fails
 		/// </remarks>
 		public static int Main(string[] args)
 		{
-			string parserName = GetValue(args[0]);
-			string input = GetValue(args[1]);
-			string verb = args[2];
+			string parserName = args[0];
+			string verb = args[1];
 			Program program = new Program();
-			return program.Execute(parserName, input, verb);
-		}
-
-		private static string GetValue(string arg)
-		{
-			if (arg.StartsWith("\""))
-				return arg.Substring(1, arg.Length - 2);
-			return arg;
+			return program.Execute(parserName, verb);
 		}
 
 		/// <summary>
 		/// Executes the specified test
 		/// </summary>
 		/// <param name="parserName">The parser's name</param>
-		/// <param name="input">A string with the input to be parsed</param>
 		/// <param name="verb">A verb specifying the type of test, one of: matches, nomatches, fails</param>
-		public int Execute(string parserName, string input, string verb)
+		public int Execute(string parserName, string verb)
 		{
+			string input = System.IO.File.ReadAllText("input.txt", System.Text.Encoding.UTF8);
 			Hime.Redist.Parsers.IParser parser = GetParser(parserName, input);
-			XmlDocument expected = null;
+			ASTNode expected = new ASTNode();
 			if (verb != VERB_FAILS)
 			{
-				expected = new XmlDocument();
-				expected.LoadXml(System.IO.File.ReadAllText("expected.xml", System.Text.Encoding.UTF8));
+				string expectedText = System.IO.File.ReadAllText("expected.txt", System.Text.Encoding.UTF8);
+				Hime.Redist.Parsers.IParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+				ParseResult result = expectedParser.Parse();
+				foreach (ParseError error in result.Errors)
+				{
+					Console.WriteLine(error);
+					string[] context = result.Input.GetContext(error.Position);
+					Console.WriteLine(context[0]);
+					Console.WriteLine(context[1]);
+				}
+				if (result.Errors.Count > 0)
+					return RESULT_FAILURE_PARSING;
+				expected = result.Root;
 			}
 
 			switch (verb)
@@ -103,25 +113,39 @@ namespace Hime.Tests.Executor
 			return RESULT_FAILURE_VERB;
 		}
 
-		private int TestMatches(Hime.Redist.Parsers.IParser parser, XmlDocument expected)
+		private int TestMatches(Hime.Redist.Parsers.IParser parser, ASTNode expected)
 		{
 			ParseResult result = parser.Parse();
+			foreach (ParseError error in result.Errors)
+			{
+				Console.WriteLine(error);
+				string[] context = result.Input.GetContext(error.Position);
+				Console.WriteLine(context[0]);
+				Console.WriteLine(context[1]);
+			}
 			if (!result.IsSuccess)
 				return RESULT_FAILURE_PARSING;
 			if (result.Errors.Count != 0)
 				return RESULT_FAILURE_PARSING;
-			bool comparison = Compare((XmlElement)expected.ChildNodes[1], result.Root);
+			bool comparison = Compare(expected, result.Root);
 			return comparison ? RESULT_SUCCESS : RESULT_FAILURE_VERB;
 		}
 
-		private int TestNoMatches(Hime.Redist.Parsers.IParser parser, XmlDocument expected)
+		private int TestNoMatches(Hime.Redist.Parsers.IParser parser, ASTNode expected)
 		{
 			ParseResult result = parser.Parse();
+			foreach (ParseError error in result.Errors)
+			{
+				Console.WriteLine(error);
+				string[] context = result.Input.GetContext(error.Position);
+				Console.WriteLine(context[0]);
+				Console.WriteLine(context[1]);
+			}
 			if (!result.IsSuccess)
 				return RESULT_FAILURE_PARSING;
 			if (result.Errors.Count != 0)
 				return RESULT_FAILURE_PARSING;
-			bool comparison = Compare((XmlElement)expected.ChildNodes[1], result.Root);
+			bool comparison = Compare(expected, result.Root);
 			return comparison ? RESULT_FAILURE_VERB : RESULT_SUCCESS;
 		}
 
@@ -136,29 +160,30 @@ namespace Hime.Tests.Executor
 		}
 
 		/// <summary>
-		/// Compare the specified AST node to the expected XML node
+		/// Compare the specified AST node to the expected node
 		/// </summary>
-		/// <param name="expected">The expected node as a XML node</param>
+		/// <param name="expected">The expected node</param>
 		/// <param name="node">The AST node to compare</param>
 		/// <returns><c>true</c> if the nodes match</returns>
-		private bool Compare(XmlElement expected, ASTNode node)
+		private bool Compare(ASTNode expected, ASTNode node)
 		{
-			if (node.Symbol.Name != expected.Name)
+			if (node.Symbol.Name != expected.Symbol.Value)
 				return false;
-			if (expected.HasAttribute("test"))
+			if (expected.Children[0].Children.Count > 0)
 			{
-				string test = expected.Attributes["test"].Value;
-				string vRef = expected.Attributes["value"].Value;
+				string test = expected.Children[0].Children[0].Symbol.Value;
+				string vRef = expected.Children[0].Children[1].Symbol.Value;
+				vRef = vRef.Substring(1, vRef.Length - 2).Replace("\\'", "'").Replace("\\\\", "\\");
 				string vReal = node.Symbol.Value;
-				if (test == VERB_MATCHES && vReal != vRef)
+				if (test == "=" && vReal != vRef)
 					return false;
-				if (test == VERB_NOMATCHES && vReal == vRef)
+				if (test == "!=" && vReal == vRef)
 					return false;
 			}
-			if (node.Children.Count != expected.ChildNodes.Count)
+			if (node.Children.Count != expected.Children[1].Children.Count)
 				return false;
 			for (int i = 0; i != node.Children.Count; i++)
-				if (!Compare((XmlElement)expected.ChildNodes.Item(i), node.Children[i]))
+				if (!Compare(expected.Children[1].Children[i], node.Children[i]))
 					return false;
 			return true;
 		}

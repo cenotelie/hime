@@ -965,7 +965,7 @@ namespace Hime.CentralDogma.Grammars
 				else if (c == 'u')
 				{
 					int l = 0;
-					while (true)
+					while (i + 1 + l < value.Length)
 					{
 						c = value[i + 1 + l];
 						if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))

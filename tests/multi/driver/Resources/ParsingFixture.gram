@@ -14,7 +14,7 @@ grammar ParsingFixture : HimeGrammar
 						|  test_no_match^
 						|  test_fails^ ;
 		test_matches	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'yields'! tree ;
-		test_no_match	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING '!'! 'yields'! tree ;
+		test_no_match	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'differs'! tree ;
 		test_fails		-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'fails'! ;
 
 		tree		-> NAME^ check children ;
@@ -24,4 +24,15 @@ grammar ParsingFixture : HimeGrammar
 		children	-> ;
 		children	-> '('! tree* ')'! ;
 	}
+}
+
+grammar ExpectedTree : ParsingFixture
+{
+	options
+	{
+		Axiom = "tree";
+		Separator = "SEPARATOR";
+	}
+	terminals { }
+	rules { }
 }

@@ -32,10 +32,19 @@ namespace Hime.Tests.Driver
 	/// </summary>
 	public class Test
 	{
+		/// <summary>
+		/// The parser must produce an AST that matches the expected one
+		/// </summary>
 		public const string VERB_MATCHES = "matches";
+		/// <summary>
+		/// The parser must produce an AST that do NOT match the expected one
+		/// </summary>
 		public const string VERB_NOMATCHES = "nomatches";
+		/// <summary>
+		/// The parser must fail
+		/// </summary>
 		public const string VERB_FAILS = "fails";
-		public const string EXPECTED_PATH = "expected.xml";
+
 		/// <summary>
 		/// The test specification
 		/// </summary>
@@ -49,9 +58,9 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		private string verb;
 		/// <summary>
-		/// The expected tree as XML
+		/// The expected AST
 		/// </summary>
-		private XmlDocument expected;
+		private string expected;
 		/// <summary>
 		/// The results per platform
 		/// </summary>
@@ -86,9 +95,39 @@ namespace Hime.Tests.Driver
 			this.results = new Dictionary<Runtime, TestResult>();
 			if (node.Children.Count >= 5)
 			{
-				this.expected = new XmlDocument();
-				this.expected.AppendChild(this.expected.CreateXmlDeclaration("1.0", "utf-8", null));
-				this.expected.AppendChild(GetExpectedAsXML(node.Children[4]));
+				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				BuildExpected(builder, node.Children[4]);
+				this.expected = builder.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Builds the string representation of the expected AST
+		/// </summary>
+		/// <param name="builder">A text builder</param>
+		/// <param name="node">The current node to build</param>
+		private void BuildExpected(System.Text.StringBuilder builder, ASTNode node)
+		{
+			builder.Append(node.Symbol.Value);
+			if (node.Children[0].Children.Count > 0)
+			{
+				builder.Append(node.Children[0].Children[0].Symbol.Value);
+				builder.Append("'");
+				string value = node.Children[0].Children[1].Symbol.Value;
+				value = Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(value.Substring(1, value.Length - 2));
+				value = value.Replace("\\", "\\\\").Replace("'", "\\'");
+				builder.Append(value);
+				builder.Append("'");
+			}
+			if (node.Children[1].Children.Count > 0)
+			{
+				builder.Append('(');
+				foreach (ASTNode child in node.Children[1].Children)
+				{
+					builder.Append(' ');
+					BuildExpected(builder, child);
+				}
+				builder.Append(')');
 			}
 		}
 
@@ -108,28 +147,6 @@ namespace Hime.Tests.Driver
 		}
 
 		/// <summary>
-		/// Translates the specified AST node into the equivalent expected XML node
-		/// </summary>
-		/// <param name="node">An AST node</param>
-		/// <returns>The expected XML node</returns>
-		private XmlElement GetExpectedAsXML(ASTNode node)
-		{
-			XmlElement element = expected.CreateElement(node.Symbol.Value);
-			if (node.Children[0].Children.Count != 0)
-			{
-				string test = node.Children[0].Children[0].Symbol.Value;
-				string value = node.Children[0].Children[1].Symbol.Value;
-				element.Attributes.Append(expected.CreateAttribute("test"));
-				element.Attributes.Append(expected.CreateAttribute("value"));
-				element.Attributes["test"].Value = (test == "=" ? VERB_MATCHES : VERB_NOMATCHES);
-				element.Attributes["value"].Value = value.Substring(1, value.Length - 2);
-			}
-			foreach (ASTNode child in node.Children[1].Children)
-				element.AppendChild(GetExpectedAsXML(child));
-			return element;
-		}
-
-		/// <summary>
 		/// Executes this test
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
@@ -137,12 +154,14 @@ namespace Hime.Tests.Driver
 		/// <param name="fixture">The parent fixture's name</param>
 		public void Execute(Reporter reporter, List<Runtime> targets, string fixture)
 		{
+			// Export input
+			string inputValue = node.Children[3].Symbol.Value;
+			inputValue =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
+			System.IO.File.WriteAllText("input.txt", inputValue, System.Text.Encoding.UTF8);
+			// Export expected AST
 			if (expected != null)
-			{
-				XmlWriter writer = new XmlTextWriter(EXPECTED_PATH, System.Text.Encoding.UTF8);
-				expected.WriteTo(writer);
-				writer.Close();
-			}
+				System.IO.File.WriteAllText("expected.txt", expected, System.Text.Encoding.UTF8);
+			// Execute for each runtime
 			foreach (Runtime runtime in targets)
 			{
 				switch (runtime)
@@ -151,7 +170,7 @@ namespace Hime.Tests.Driver
 						this.results.Add(runtime, ExecuteOnNet(reporter, fixture));
 						break;
 					case Runtime.Java:
-						this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
+						//this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
 						break;
 				}
 			}
@@ -177,9 +196,6 @@ namespace Hime.Tests.Driver
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser");
-				// add input argument
-				args.Append(" ");
-				args.Append(node.Children[3].Symbol.Value);
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
@@ -213,9 +229,6 @@ namespace Hime.Tests.Driver
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser");
-				// add input argument
-				args.Append(" ");
-				args.Append(node.Children[3].Symbol.Value);
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
