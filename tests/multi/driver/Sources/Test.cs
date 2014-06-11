@@ -157,10 +157,10 @@ namespace Hime.Tests.Driver
 			// Export input
 			string inputValue = node.Children[3].Symbol.Value;
 			inputValue =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
-			System.IO.File.WriteAllText("input.txt", inputValue, System.Text.Encoding.UTF8);
+			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
 			// Export expected AST
 			if (expected != null)
-				System.IO.File.WriteAllText("expected.txt", expected, System.Text.Encoding.UTF8);
+				System.IO.File.WriteAllText("expected.txt", expected, new System.Text.UTF8Encoding(false));
 			// Execute for each runtime
 			foreach (Runtime runtime in targets)
 			{
@@ -170,7 +170,7 @@ namespace Hime.Tests.Driver
 						this.results.Add(runtime, ExecuteOnNet(reporter, fixture));
 						break;
 					case Runtime.Java:
-						//this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
+						this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
 						break;
 				}
 			}

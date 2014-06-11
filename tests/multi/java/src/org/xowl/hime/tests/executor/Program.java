@@ -19,21 +19,31 @@
  **********************************************************************/
 package org.xowl.hime.tests.executor;
 
-import org.apache.xerces.parsers.DOMParser;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
 import org.xowl.hime.redist.parsers.IParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 
 public class Program {
+    /**
+     * The parser must produce an AST that matches the expected one
+     */
     private static final String VERB_MATCHES = "matches";
+    /**
+     * The parser must produce an AST that do NOT match the expected one
+     */
     private static final String VERB_NOMATCHES = "nomatches";
+    /**
+     * The parser must fail
+     */
     private static final String VERB_FAILS = "fails";
 
     /**
@@ -50,31 +60,41 @@ public class Program {
     private static final int RESULT_FAILURE_PARSING = 2;
 
     public static void main(String[] args) {
-        String name = getValue(args[0]);
-        String input = getValue(args[1]);
-        String verb = args[2];
+        String name = args[0];
+        String verb = args[1];
         Program program = new Program();
-        int code = program.execute(name, input, verb);
+        int code = program.execute(name, verb);
         System.exit(code);
     }
 
-    private static String getValue(String arg) {
-        if (arg.startsWith("\""))
-            return arg.substring(1, arg.length() - 1);
-        return arg;
+    private String readAllText(String file) {
+        try {
+            byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(file));
+            String result = new String(bytes, "UTF-8");
+            return result;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "";
+        }
     }
 
-    public int execute(String name, String input, String verb) {
+    public int execute(String name, String verb) {
+        String input = readAllText("input.txt");
         IParser parser = getParser(name, input);
-        Document expected = null;
+        ASTNode expected = null;
         if (!VERB_FAILS.equals(verb)) {
-            DOMParser xmlParser = new DOMParser();
-            try {
-                xmlParser.parse("expected.xml");
-                expected = xmlParser.getDocument();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            String expectedText = readAllText("expected.txt");
+            IParser expectedParser = getParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+            ParseResult result = expectedParser.parse();
+            for (ParseError error : result.getErrors()) {
+                System.out.println(error.toString());
+                String[] context = result.getInput().getContext(error.getPosition());
+                System.out.println(context[0]);
+                System.out.println(context[1]);
             }
+            if (result.getErrors().size() > 0)
+                return RESULT_FAILURE_PARSING;
+            expected = result.getRoot();
         }
         if (VERB_MATCHES.equals(verb))
             return testMatches(parser, expected);
@@ -85,23 +105,23 @@ public class Program {
         return RESULT_FAILURE_VERB;
     }
 
-    private int testMatches(IParser parser, Document expected) {
+    private int testMatches(IParser parser, ASTNode expected) {
         ParseResult result = parser.parse();
         if (!result.isSuccess())
             return RESULT_FAILURE_PARSING;
         if (result.getErrors().size() != 0)
             return RESULT_FAILURE_PARSING;
-        boolean comparison = compare(expected.getDocumentElement(), result.getRoot());
+        boolean comparison = compare(expected, result.getRoot());
         return comparison ? RESULT_SUCCESS : RESULT_FAILURE_VERB;
     }
 
-    private int testNoMatches(IParser parser, Document expected) {
+    private int testNoMatches(IParser parser, ASTNode expected) {
         ParseResult result = parser.parse();
         if (!result.isSuccess())
             return RESULT_FAILURE_PARSING;
         if (result.getErrors().size() != 0)
             return RESULT_FAILURE_PARSING;
-        boolean comparison = compare(expected.getDocumentElement(), result.getRoot());
+        boolean comparison = compare(expected, result.getRoot());
         return comparison ? RESULT_FAILURE_VERB : RESULT_SUCCESS;
     }
 
@@ -114,22 +134,23 @@ public class Program {
         return RESULT_FAILURE_VERB;
     }
 
-    private boolean compare(Node expected, ASTNode node) {
-        if (!node.getSymbol().getName().equals(expected.getLocalName()))
+    private boolean compare(ASTNode expected, ASTNode node) {
+        if (!node.getSymbol().getName().equals(expected.getSymbol().getValue()))
             return false;
-        if (expected.hasAttributes()) {
-            String test = expected.getAttributes().getNamedItem("test").getNodeValue();
-            String vRef = expected.getAttributes().getNamedItem("value").getNodeValue();
+        if (expected.getChildren().get(0).getChildren().size() > 0) {
+            String test = expected.getChildren().get(0).getChildren().get(0).getSymbol().getValue();
+            String vRef = expected.getChildren().get(0).getChildren().get(1).getSymbol().getValue();
+            vRef = vRef.substring(1, vRef.length() - 1).replaceAll("\'", "'").replaceAll("\\\\", "\\");
             String vReal = node.getSymbol().getValue();
-            if (VERB_MATCHES.equals(test) && !vReal.equals(vRef))
+            if (test == "=" && vReal != vRef)
                 return false;
-            if (VERB_NOMATCHES.equals(test) && vReal.equals(vRef))
+            if (test == "!=" && vReal == vRef)
                 return false;
         }
-        if (node.getChildren().size() != expected.getChildNodes().getLength())
+        if (node.getChildren().size() != expected.getChildren().get(1).getChildren().size())
             return false;
         for (int i = 0; i != node.getChildren().size(); i++)
-            if (!compare(expected.getChildNodes().item(i), node.getChildren().get(i)))
+            if (!compare(expected.getChildren().get(1).getChildren().get(i), node.getChildren().get(i)))
                 return false;
         return true;
     }
