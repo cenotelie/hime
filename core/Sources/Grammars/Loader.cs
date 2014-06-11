@@ -157,50 +157,6 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Replaces the escape sequences in the given piece of text by their value
-		/// </summary>
-		/// <param name="value">A string</param>
-		/// <returns>The string with the escape sequences replaced by their value</returns>
-		private string ReplaceEscapees(string value)
-		{
-			if (!value.Contains("\\"))
-				return value;
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
-			for (int i = 0; i != value.Length; i++)
-			{
-				char c = value[i];
-				if (c != '\\')
-				{
-					builder.Append(c);
-					continue;
-				}
-				i++;
-				char next = value[i];
-				if (next == '\\')
-					builder.Append(next);
-				else if (next == '0')
-					builder.Append('\0'); /*Unicode character 0*/
-                else if (next == 'a')
-					builder.Append('\a'); /*Alert (character 7)*/
-                else if (next == 'b')
-					builder.Append('\b'); /*Backspace (character 8)*/
-                else if (next == 'f')
-					builder.Append('\f'); /*Form feed (character 12)*/
-                else if (next == 'n')
-					builder.Append('\n'); /*New line (character 10)*/
-                else if (next == 'r')
-					builder.Append('\r'); /*Carriage return (character 13)*/
-                else if (next == 't')
-					builder.Append('\t'); /*Horizontal tab (character 9)*/
-                else if (next == 'v')
-					builder.Append('\v'); /*Vertical quote (character 11)*/
-                else
-					builder.Append("\\" + next);
-			}
-			return builder.ToString();
-		}
-
-		/// <summary>
 		/// Adds a unicode character span to an existing NFA automaton
 		/// </summary>
 		/// <param name="automata">The target NFA</param>
@@ -312,7 +268,7 @@ namespace Hime.CentralDogma.Grammars
 		{
 			string name = node.Children[0].Symbol.Value;
 			string value = node.Children[1].Symbol.Value;
-			value = value.Substring(1, value.Length - 2);
+			value = ReplaceEscapees(value.Substring(1, value.Length - 2));
 			grammar.AddOption(name, value);
 		}
 
@@ -882,7 +838,7 @@ namespace Hime.CentralDogma.Grammars
 		{
 			RuleBodySet set = new RuleBodySet();
 			string name = node.Children[0].Symbol.Value;
-			name = name.Substring(1, name.Length - 2);
+			name = ReplaceEscapees(name.Substring(1, name.Length - 2));
 			Virtual vir = grammar.GetVirtual(name);
 			if (vir == null)
 				vir = grammar.AddVirtual(name);
@@ -966,6 +922,65 @@ namespace Hime.CentralDogma.Grammars
 			RuleBodySet set = new RuleBodySet();
 			set.Add(new RuleBody(terminal));
 			return set;
+		}
+
+		/// <summary>
+		/// Replaces the escape sequences in the given piece of text by their value
+		/// </summary>
+		/// <param name="value">A string</param>
+		/// <returns>The string with the escape sequences replaced by their value</returns>
+		public static string ReplaceEscapees(string value)
+		{
+			if (!value.Contains("\\"))
+				return value;
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != value.Length; i++)
+			{
+				char c = value[i];
+				if (c != '\\')
+				{
+					builder.Append(c);
+					continue;
+				}
+				i++;
+				c = value[i];
+				if (c == '\\')
+					builder.Append(c);
+				else if (c == '0')
+					builder.Append('\0'); /*Unicode character 0*/
+				else if (c == 'a')
+					builder.Append('\a'); /*Alert (character 7)*/
+				else if (c == 'b')
+					builder.Append('\b'); /*Backspace (character 8)*/
+				else if (c == 'f')
+					builder.Append('\f'); /*Form feed (character 12)*/
+				else if (c == 'n')
+					builder.Append('\n'); /*New line (character 10)*/
+				else if (c == 'r')
+					builder.Append('\r'); /*Carriage return (character 13)*/
+				else if (c == 't')
+					builder.Append('\t'); /*Horizontal tab (character 9)*/
+				else if (c == 'v')
+					builder.Append('\v'); /*Vertical quote (character 11)*/
+				else if (c == 'u')
+				{
+					int l = 0;
+					while (true)
+					{
+						c = value[i + 1 + l];
+						if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+							l++;
+						else
+							break;
+					}
+					int cp = System.Convert.ToInt32(value.Substring(i + 1, l), 16);
+					builder.Append((new UnicodeCodePoint(cp)).GetUTF16());
+					i += l;
+				}
+				else
+					builder.Append("\\" + c);
+			}
+			return builder.ToString();
 		}
 	}
 }

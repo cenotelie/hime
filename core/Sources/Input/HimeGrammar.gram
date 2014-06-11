@@ -41,19 +41,20 @@ grammar HimeGrammar
 		NAME			-> NAME_FIRST (NAME_FIRST | [0-9])* ;
 		
 		INTEGER				-> [1-9] [0-9]* | '0' ;
-		LITERAL_STRING		-> '"' [^"]* '"';
-		ESCAPEES			-> '\\\\'		/*Backslash*/
-								| '\\0'		/*Unicode character 0*/
-								| '\\a'		/*Alert (character 7)*/
-								| '\\b'		/*Backspace (character 8)*/
-								| '\\f'		/*Form feed (character 12)*/
-								| '\\n'		/*New line (character 10)*/
-								| '\\r'		/*Carriage return (character 13)*/
-								| '\\t'		/*Horizontal tab (character 9)*/
-								| '\\v';	/*Vertical quote (character 11)*/
+		ESCAPEES			-> '\\\\'		// Backslash
+								| '\\0'		// Unicode character 0
+								| '\\a'		// Alert (character 7)
+								| '\\b'		// Backspace (character 8)
+								| '\\f'		// Form feed (character 12)
+								| '\\n'		// New line (character 10)
+								| '\\r'		// Carriage return (character 13)
+								| '\\t'		// Horizontal tab (character 9)
+								| '\\v'		// Vertical quote (character 11)
+								| '\\u' [0-9a-fA-F]+ ; // Unicode code point
+		LITERAL_STRING		-> '"' ( [^"] | '\\"' | ESCAPEES )* '"';
 		LITERAL_ANY			-> '.';
-		LITERAL_TEXT		-> '~'? '\'' ([^\\'] | ESCAPEES | '\\\'')+ '\'';
-		LITERAL_CLASS		-> '[' ([^\\\[\]] | ESCAPEES | '\\[' | '\\]')+ ']';
+		LITERAL_TEXT		-> '~'? '\'' ( [^\\'] | '\\\'' | ESCAPEES )+ '\'';
+		LITERAL_CLASS		-> '[' ( [^\\\[\]] | '\\[' | '\\]' | ESCAPEES )+ ']';
 		UNICODE_BLOCK		-> 'ub' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
 		UNICODE_CATEGORY	-> 'uc' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
 		UNICODE_CODEPOINT	-> 'U+' [a-fA-F0-9]+;
