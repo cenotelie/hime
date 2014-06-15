@@ -1,16 +1,110 @@
 # README #
 
-The Hime parser generator is a parser generator for the .Net platform (including Mono on Linux and MacOS) and Java. It primarily supports the LR family of parsing methods, including GLR (Generalized-LR). Key distinguishing features are:
+The Hime parser generator is a parser generator for the various platforms. It primarily supports the LR family of parsing methods, including GLR (Generalized-LR). Key distinguishing features are:
 
-* Fast LR and GLR parsing for the .Net platform.
+* Fast LR and GLR parsing.
 * Modern implementation of GLR with the [RNGLR algorithm](http://portal.acm.org/citation.cfm?id=1146809.1146810&coll=DL&dl=GUIDE&CFID=9339017&CFTOKEN=49072692).
 * [Simple and clear API](http://himedoc.bitbucket.org/v1.1.0/namespaceHime_1_1Redist.html) to manipulate parse trees.
 * [Extensive SDK API](http://himedoc.bitbucket.org/v1.1.0/namespaceHime_1_1CentralDogma.html) to programmatically manipulate grammars, generate lexers and parsers and use them.
 * Strong emphasis on separating data and code. Hime forbids the inclusion of inline code in its grammar definitions in order to have very readable grammars that can be easily understood, debugged, improved. It is still possible to have custom code invoked during parsing with semantic actions.
 
+The parser generator requires the .Net runtime (or Mono) for the generation of parsers, but these can be generated for other platforms, the supported one are:
+
+* .Net framework 2.0+, or Mono on Linux and MacOS
+* Java 7+
+
+
+
 ### How do I use this software? ###
 
 All user documentation is available in the [wiki](https://bitbucket.org/laurentw/hime/wiki/Home).
+
+
+
+### Repository structure ###
+
+* Software components
+	* `runtimes`: Contains the sources for the different runtime implementation for the generated parsers:
+		* `runtimes/net`: Contains the C# sources for the .Net implementation of the runtime library for the generated parsers.
+		* `runtimes/java`: Contains the Java sources for the Java implementation of the runtime library.
+	* `core`: Contains the C# sources of the SDK API, i.e. the parser generator.
+	* `cli/net`: Contains the sources for the command-line interfaces of the parser generator, organized by platforms:
+		* cli/net`: Contains the C# sources of the .Net CLI interface of the parser generator.
+	* `utilities`: Contains the sources for other helper software components, organized by platform:
+		* `utilities/net/demo`: Contains the C# sources of demonstration usage of the SDK API.
+		* `utilities/net/benchmark`: Contains the C# sources of the benchmark for the .Net platform.
+	* `tests`: Contains the all the test software components:
+		* `tests/multi`: Contains the common tests for the different runtime implementations.
+			* `tests/multi/driver`: Sources of the tests driver for all runtime tests.
+			* `tests/multi/net`: Sources of the test executor for the .Net runtime implementation.
+			* `tests/multi/java`: Sources of the test executor for the Java runtime implementation.
+		* `tests/net`: Contains the tests for other .Net software components.
+* Others
+	* `packages`: Contains the NuGet dependencies for the .Net software components.
+	* `extras`: Contains some extra products, e.g. standard grammars.
+	* `releng`: Contains the release engineering artifacts.
+
+
+
+### How to build ###
+
+All .Net software components are written in C# and integrated in a single Visual Studio solution file: `HimeSystems.sln` at the repository's root. All software components can be built from the component as follow:
+
+#### Build the runtimes ####
+
+Build the .Net runtime (on the .Net Framework with MSBuild):
+
+```
+$ msbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
+```
+
+Build the .Net runtime (on Mono with xbuild):
+
+```
+$ xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
+```
+
+Build the Java runtime with Maven:
+
+```
+$ mvn -f runtimes/java/pom.xml clean package
+```
+
+#### Build the parser generator ####
+
+Building the .Net command line interface for the parser generator will automatically build its required dependencies.
+
+On the .Net Framework with MSBuild:
+
+```
+$ msbuild /p:Configuration=Release cli/net/HimeCC.csproj
+```
+
+On Mono with xbuild:
+
+```
+$ xbuild /p:Configuration=Release cli/net/HimeCC.csproj
+```
+
+The results are put in `cli/net/bin/Release`.
+
+
+
+### Run the tests ###
+
+#### Run the runtimes tests ####
+
+A common set of tests are executed on all runtime implementation.
+The results are output in the JUnit format at `tests/multi/TestResults.xml`.
+Running the tests requires a local installation of Mono, xbuild and Maven.
+
+```
+$ sh tests/multi/execute.sh
+```
+
+On Windows, the script can be run with Cygwin.
+
+
 
 ### How can I contribute? ###
 
@@ -29,47 +123,3 @@ Patches can also be submitted by email, or through the [issue management system]
 #### For newcomers ####
 
 The [isse tracker](https://bitbucket.org/laurentw/hime/issues) contains tickets that are accessible to newcomers. Look for tickets with `[beginner]` in the title. These tickets are good ways to become more familiar with the project and the codebase.
-
-#### Repository content ####
-
-The Hime parser generator generates parsers for the .Net platform and the Java runtime. The generator itselfs runs on the .Net platform. The repository is then structured as follow:
-
-* Software components
-	* `runtimes/net`: Contains the C# sources for the .Net implementation of the runtime library for the generated parsers.
-	* `runtimes/java`: Contains the Java sources for the Java implementation of the runtime library.
-	* `core`: Contains the C# sources of the SDK API, i.e. the parser generator.
-	* `cli/net`: Contains the C# sources of the CLI interface of the parser generator.
-	* `utilities/net/demo`: Contains the C# sources of demonstration usage of the SDK API.
-	* `utilities/net/benchmark`: Contains the C# sources of the benchmark for the .Net platform.
-* Others
-	* `tests/net`: Contains the C# sources of the test suites for the .Net platform.
-	* `packages`: Contains the NuGet dependencies for the .Net software components.
-	* `extras`: Contains some extra products, e.g. standard grammars.
-	* `releng`: Contains the release engineering artifacts.
-
-#### Dependencies ####
-
-* External Dependencies:
-	* All .Net software artifacts depends on the .Net platform 2.0 and are compatible with higher versions, as well as Mono.
-	* All Java software artifacts depends on Java 1.6 API.
-	* Tests suites for the .Net platform (tests/net) depends on NUnit 2.6.3.
-* Internal Dependencies:
-	* `core` depends on `runtimes/net`.
-	* `cli/net` depends on `core` and indirectly on `runtimes/net`.
-	* `utilities/net/demo` depends on `core` and indirectly on `runtimes/net`.
-	* `utilities/net/benchmark` depends on `core` and indirectly on `runtimes/net`.
-	* `tests/net` depends on directly`core` and `cli/net` and indirectly on `runtimes/net`.
-
-#### How to build? ####
-
-* All .Net artifacts are organized in Visual Studio C# projects.
-* The global solution for all the .Net project is HimeSystems.sln at the root of the repository.
-* All Java artifacts are built using Maven.
-
-Building .Net artifacts:
-
-* Use the Visual Studio solution HimeSystems.sln at the root of the repository, it also works with MonoDevelop.
-
-Building Java artifacts:
-
-* Execute Maven `mvn package` on each Java artifact.
