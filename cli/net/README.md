@@ -2,6 +2,7 @@
 
 This is the command line interface for the Hime parser generator. It allows the generation of new parsers from the command line.
 This software component is available:
+
 * [In the standalone distribution](https://bitbucket.org/laurentw/hime/downloads/)
 
 

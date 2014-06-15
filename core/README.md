@@ -2,6 +2,7 @@
 
 This is the core component of the Hime parser generator. It is implemented in C# as a library. It can be used as a SDK to programmatically generated parsers and more.
 This software component is available:
+
 * [As a NuGet package](https://www.nuget.org/packages/Hime.SDK/)
 * [In the standalone distribution](https://bitbucket.org/laurentw/hime/downloads/)
 
