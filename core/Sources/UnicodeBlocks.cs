@@ -288,6 +288,11 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock TaiTham { get { return blockTaiTham; } }
 		private static readonly UnicodeBlock blockTaiTham = new UnicodeBlock("TaiTham", 0x1A20, 0x1AAF);
 		/// <summary>
+		/// Gets the Unicode block CombiningDiacriticalMarksExtended
+		/// </summary>
+		public static UnicodeBlock CombiningDiacriticalMarksExtended { get { return blockCombiningDiacriticalMarksExtended; } }
+		private static readonly UnicodeBlock blockCombiningDiacriticalMarksExtended = new UnicodeBlock("CombiningDiacriticalMarksExtended", 0x1AB0, 0x1AFF);
+		/// <summary>
 		/// Gets the Unicode block Balinese
 		/// </summary>
 		public static UnicodeBlock Balinese { get { return blockBalinese; } }
@@ -678,6 +683,11 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock Javanese { get { return blockJavanese; } }
 		private static readonly UnicodeBlock blockJavanese = new UnicodeBlock("Javanese", 0xA980, 0xA9DF);
 		/// <summary>
+		/// Gets the Unicode block MyanmarExtended-B
+		/// </summary>
+		public static UnicodeBlock MyanmarExtendedB { get { return blockMyanmarExtendedB; } }
+		private static readonly UnicodeBlock blockMyanmarExtendedB = new UnicodeBlock("MyanmarExtended-B", 0xA9E0, 0xA9FF);
+		/// <summary>
 		/// Gets the Unicode block Cham
 		/// </summary>
 		public static UnicodeBlock Cham { get { return blockCham; } }
@@ -702,6 +712,11 @@ namespace Hime.CentralDogma
 		/// </summary>
 		public static UnicodeBlock EthiopicExtendedA { get { return blockEthiopicExtendedA; } }
 		private static readonly UnicodeBlock blockEthiopicExtendedA = new UnicodeBlock("EthiopicExtended-A", 0xAB00, 0xAB2F);
+		/// <summary>
+		/// Gets the Unicode block LatinExtended-E
+		/// </summary>
+		public static UnicodeBlock LatinExtendedE { get { return blockLatinExtendedE; } }
+		private static readonly UnicodeBlock blockLatinExtendedE = new UnicodeBlock("LatinExtended-E", 0xAB30, 0xAB6F);
 		/// <summary>
 		/// Gets the Unicode block MeeteiMayek
 		/// </summary>
@@ -818,6 +833,11 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock Carian { get { return blockCarian; } }
 		private static readonly UnicodeBlock blockCarian = new UnicodeBlock("Carian", 0x102A0, 0x102DF);
 		/// <summary>
+		/// Gets the Unicode block CopticEpactNumbers
+		/// </summary>
+		public static UnicodeBlock CopticEpactNumbers { get { return blockCopticEpactNumbers; } }
+		private static readonly UnicodeBlock blockCopticEpactNumbers = new UnicodeBlock("CopticEpactNumbers", 0x102E0, 0x102FF);
+		/// <summary>
 		/// Gets the Unicode block OldItalic
 		/// </summary>
 		public static UnicodeBlock OldItalic { get { return blockOldItalic; } }
@@ -827,6 +847,11 @@ namespace Hime.CentralDogma
 		/// </summary>
 		public static UnicodeBlock Gothic { get { return blockGothic; } }
 		private static readonly UnicodeBlock blockGothic = new UnicodeBlock("Gothic", 0x10330, 0x1034F);
+		/// <summary>
+		/// Gets the Unicode block OldPermic
+		/// </summary>
+		public static UnicodeBlock OldPermic { get { return blockOldPermic; } }
+		private static readonly UnicodeBlock blockOldPermic = new UnicodeBlock("OldPermic", 0x10350, 0x1037F);
 		/// <summary>
 		/// Gets the Unicode block Ugaritic
 		/// </summary>
@@ -853,6 +878,21 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock Osmanya { get { return blockOsmanya; } }
 		private static readonly UnicodeBlock blockOsmanya = new UnicodeBlock("Osmanya", 0x10480, 0x104AF);
 		/// <summary>
+		/// Gets the Unicode block Elbasan
+		/// </summary>
+		public static UnicodeBlock Elbasan { get { return blockElbasan; } }
+		private static readonly UnicodeBlock blockElbasan = new UnicodeBlock("Elbasan", 0x10500, 0x1052F);
+		/// <summary>
+		/// Gets the Unicode block CaucasianAlbanian
+		/// </summary>
+		public static UnicodeBlock CaucasianAlbanian { get { return blockCaucasianAlbanian; } }
+		private static readonly UnicodeBlock blockCaucasianAlbanian = new UnicodeBlock("CaucasianAlbanian", 0x10530, 0x1056F);
+		/// <summary>
+		/// Gets the Unicode block LinearA
+		/// </summary>
+		public static UnicodeBlock LinearA { get { return blockLinearA; } }
+		private static readonly UnicodeBlock blockLinearA = new UnicodeBlock("LinearA", 0x10600, 0x1077F);
+		/// <summary>
 		/// Gets the Unicode block CypriotSyllabary
 		/// </summary>
 		public static UnicodeBlock CypriotSyllabary { get { return blockCypriotSyllabary; } }
@@ -862,6 +902,16 @@ namespace Hime.CentralDogma
 		/// </summary>
 		public static UnicodeBlock ImperialAramaic { get { return blockImperialAramaic; } }
 		private static readonly UnicodeBlock blockImperialAramaic = new UnicodeBlock("ImperialAramaic", 0x10840, 0x1085F);
+		/// <summary>
+		/// Gets the Unicode block Palmyrene
+		/// </summary>
+		public static UnicodeBlock Palmyrene { get { return blockPalmyrene; } }
+		private static readonly UnicodeBlock blockPalmyrene = new UnicodeBlock("Palmyrene", 0x10860, 0x1087F);
+		/// <summary>
+		/// Gets the Unicode block Nabataean
+		/// </summary>
+		public static UnicodeBlock Nabataean { get { return blockNabataean; } }
+		private static readonly UnicodeBlock blockNabataean = new UnicodeBlock("Nabataean", 0x10880, 0x108AF);
 		/// <summary>
 		/// Gets the Unicode block Phoenician
 		/// </summary>
@@ -893,6 +943,16 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock OldSouthArabian { get { return blockOldSouthArabian; } }
 		private static readonly UnicodeBlock blockOldSouthArabian = new UnicodeBlock("OldSouthArabian", 0x10A60, 0x10A7F);
 		/// <summary>
+		/// Gets the Unicode block OldNorthArabian
+		/// </summary>
+		public static UnicodeBlock OldNorthArabian { get { return blockOldNorthArabian; } }
+		private static readonly UnicodeBlock blockOldNorthArabian = new UnicodeBlock("OldNorthArabian", 0x10A80, 0x10A9F);
+		/// <summary>
+		/// Gets the Unicode block Manichaean
+		/// </summary>
+		public static UnicodeBlock Manichaean { get { return blockManichaean; } }
+		private static readonly UnicodeBlock blockManichaean = new UnicodeBlock("Manichaean", 0x10AC0, 0x10AFF);
+		/// <summary>
 		/// Gets the Unicode block Avestan
 		/// </summary>
 		public static UnicodeBlock Avestan { get { return blockAvestan; } }
@@ -907,6 +967,11 @@ namespace Hime.CentralDogma
 		/// </summary>
 		public static UnicodeBlock InscriptionalPahlavi { get { return blockInscriptionalPahlavi; } }
 		private static readonly UnicodeBlock blockInscriptionalPahlavi = new UnicodeBlock("InscriptionalPahlavi", 0x10B60, 0x10B7F);
+		/// <summary>
+		/// Gets the Unicode block PsalterPahlavi
+		/// </summary>
+		public static UnicodeBlock PsalterPahlavi { get { return blockPsalterPahlavi; } }
+		private static readonly UnicodeBlock blockPsalterPahlavi = new UnicodeBlock("PsalterPahlavi", 0x10B80, 0x10BAF);
 		/// <summary>
 		/// Gets the Unicode block OldTurkic
 		/// </summary>
@@ -938,15 +1003,65 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock Chakma { get { return blockChakma; } }
 		private static readonly UnicodeBlock blockChakma = new UnicodeBlock("Chakma", 0x11100, 0x1114F);
 		/// <summary>
+		/// Gets the Unicode block Mahajani
+		/// </summary>
+		public static UnicodeBlock Mahajani { get { return blockMahajani; } }
+		private static readonly UnicodeBlock blockMahajani = new UnicodeBlock("Mahajani", 0x11150, 0x1117F);
+		/// <summary>
 		/// Gets the Unicode block Sharada
 		/// </summary>
 		public static UnicodeBlock Sharada { get { return blockSharada; } }
 		private static readonly UnicodeBlock blockSharada = new UnicodeBlock("Sharada", 0x11180, 0x111DF);
 		/// <summary>
+		/// Gets the Unicode block SinhalaArchaicNumbers
+		/// </summary>
+		public static UnicodeBlock SinhalaArchaicNumbers { get { return blockSinhalaArchaicNumbers; } }
+		private static readonly UnicodeBlock blockSinhalaArchaicNumbers = new UnicodeBlock("SinhalaArchaicNumbers", 0x111E0, 0x111FF);
+		/// <summary>
+		/// Gets the Unicode block Khojki
+		/// </summary>
+		public static UnicodeBlock Khojki { get { return blockKhojki; } }
+		private static readonly UnicodeBlock blockKhojki = new UnicodeBlock("Khojki", 0x11200, 0x1124F);
+		/// <summary>
+		/// Gets the Unicode block Khudawadi
+		/// </summary>
+		public static UnicodeBlock Khudawadi { get { return blockKhudawadi; } }
+		private static readonly UnicodeBlock blockKhudawadi = new UnicodeBlock("Khudawadi", 0x112B0, 0x112FF);
+		/// <summary>
+		/// Gets the Unicode block Grantha
+		/// </summary>
+		public static UnicodeBlock Grantha { get { return blockGrantha; } }
+		private static readonly UnicodeBlock blockGrantha = new UnicodeBlock("Grantha", 0x11300, 0x1137F);
+		/// <summary>
+		/// Gets the Unicode block Tirhuta
+		/// </summary>
+		public static UnicodeBlock Tirhuta { get { return blockTirhuta; } }
+		private static readonly UnicodeBlock blockTirhuta = new UnicodeBlock("Tirhuta", 0x11480, 0x114DF);
+		/// <summary>
+		/// Gets the Unicode block Siddham
+		/// </summary>
+		public static UnicodeBlock Siddham { get { return blockSiddham; } }
+		private static readonly UnicodeBlock blockSiddham = new UnicodeBlock("Siddham", 0x11580, 0x115FF);
+		/// <summary>
+		/// Gets the Unicode block Modi
+		/// </summary>
+		public static UnicodeBlock Modi { get { return blockModi; } }
+		private static readonly UnicodeBlock blockModi = new UnicodeBlock("Modi", 0x11600, 0x1165F);
+		/// <summary>
 		/// Gets the Unicode block Takri
 		/// </summary>
 		public static UnicodeBlock Takri { get { return blockTakri; } }
 		private static readonly UnicodeBlock blockTakri = new UnicodeBlock("Takri", 0x11680, 0x116CF);
+		/// <summary>
+		/// Gets the Unicode block WarangCiti
+		/// </summary>
+		public static UnicodeBlock WarangCiti { get { return blockWarangCiti; } }
+		private static readonly UnicodeBlock blockWarangCiti = new UnicodeBlock("WarangCiti", 0x118A0, 0x118FF);
+		/// <summary>
+		/// Gets the Unicode block PauCinHau
+		/// </summary>
+		public static UnicodeBlock PauCinHau { get { return blockPauCinHau; } }
+		private static readonly UnicodeBlock blockPauCinHau = new UnicodeBlock("PauCinHau", 0x11AC0, 0x11AFF);
 		/// <summary>
 		/// Gets the Unicode block Cuneiform
 		/// </summary>
@@ -968,6 +1083,21 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock BamumSupplement { get { return blockBamumSupplement; } }
 		private static readonly UnicodeBlock blockBamumSupplement = new UnicodeBlock("BamumSupplement", 0x16800, 0x16A3F);
 		/// <summary>
+		/// Gets the Unicode block Mro
+		/// </summary>
+		public static UnicodeBlock Mro { get { return blockMro; } }
+		private static readonly UnicodeBlock blockMro = new UnicodeBlock("Mro", 0x16A40, 0x16A6F);
+		/// <summary>
+		/// Gets the Unicode block BassaVah
+		/// </summary>
+		public static UnicodeBlock BassaVah { get { return blockBassaVah; } }
+		private static readonly UnicodeBlock blockBassaVah = new UnicodeBlock("BassaVah", 0x16AD0, 0x16AFF);
+		/// <summary>
+		/// Gets the Unicode block PahawhHmong
+		/// </summary>
+		public static UnicodeBlock PahawhHmong { get { return blockPahawhHmong; } }
+		private static readonly UnicodeBlock blockPahawhHmong = new UnicodeBlock("PahawhHmong", 0x16B00, 0x16B8F);
+		/// <summary>
 		/// Gets the Unicode block Miao
 		/// </summary>
 		public static UnicodeBlock Miao { get { return blockMiao; } }
@@ -977,6 +1107,16 @@ namespace Hime.CentralDogma
 		/// </summary>
 		public static UnicodeBlock KanaSupplement { get { return blockKanaSupplement; } }
 		private static readonly UnicodeBlock blockKanaSupplement = new UnicodeBlock("KanaSupplement", 0x1B000, 0x1B0FF);
+		/// <summary>
+		/// Gets the Unicode block Duployan
+		/// </summary>
+		public static UnicodeBlock Duployan { get { return blockDuployan; } }
+		private static readonly UnicodeBlock blockDuployan = new UnicodeBlock("Duployan", 0x1BC00, 0x1BC9F);
+		/// <summary>
+		/// Gets the Unicode block ShorthandFormatControls
+		/// </summary>
+		public static UnicodeBlock ShorthandFormatControls { get { return blockShorthandFormatControls; } }
+		private static readonly UnicodeBlock blockShorthandFormatControls = new UnicodeBlock("ShorthandFormatControls", 0x1BCA0, 0x1BCAF);
 		/// <summary>
 		/// Gets the Unicode block ByzantineMusicalSymbols
 		/// </summary>
@@ -1008,6 +1148,11 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock MathematicalAlphanumericSymbols { get { return blockMathematicalAlphanumericSymbols; } }
 		private static readonly UnicodeBlock blockMathematicalAlphanumericSymbols = new UnicodeBlock("MathematicalAlphanumericSymbols", 0x1D400, 0x1D7FF);
 		/// <summary>
+		/// Gets the Unicode block MendeKikakui
+		/// </summary>
+		public static UnicodeBlock MendeKikakui { get { return blockMendeKikakui; } }
+		private static readonly UnicodeBlock blockMendeKikakui = new UnicodeBlock("MendeKikakui", 0x1E800, 0x1E8DF);
+		/// <summary>
 		/// Gets the Unicode block ArabicMathematicalAlphabeticSymbols
 		/// </summary>
 		public static UnicodeBlock ArabicMathematicalAlphabeticSymbols { get { return blockArabicMathematicalAlphabeticSymbols; } }
@@ -1038,25 +1183,40 @@ namespace Hime.CentralDogma
 		public static UnicodeBlock EnclosedIdeographicSupplement { get { return blockEnclosedIdeographicSupplement; } }
 		private static readonly UnicodeBlock blockEnclosedIdeographicSupplement = new UnicodeBlock("EnclosedIdeographicSupplement", 0x1F200, 0x1F2FF);
 		/// <summary>
-		/// Gets the Unicode block MiscellaneousSymbolsAndPictographs
+		/// Gets the Unicode block MiscellaneousSymbolsandPictographs
 		/// </summary>
-		public static UnicodeBlock MiscellaneousSymbolsAndPictographs { get { return blockMiscellaneousSymbolsAndPictographs; } }
-		private static readonly UnicodeBlock blockMiscellaneousSymbolsAndPictographs = new UnicodeBlock("MiscellaneousSymbolsAndPictographs", 0x1F300, 0x1F5FF);
+		public static UnicodeBlock MiscellaneousSymbolsandPictographs { get { return blockMiscellaneousSymbolsandPictographs; } }
+		private static readonly UnicodeBlock blockMiscellaneousSymbolsandPictographs = new UnicodeBlock("MiscellaneousSymbolsandPictographs", 0x1F300, 0x1F5FF);
 		/// <summary>
 		/// Gets the Unicode block Emoticons
 		/// </summary>
 		public static UnicodeBlock Emoticons { get { return blockEmoticons; } }
 		private static readonly UnicodeBlock blockEmoticons = new UnicodeBlock("Emoticons", 0x1F600, 0x1F64F);
 		/// <summary>
-		/// Gets the Unicode block TransportAndMapSymbols
+		/// Gets the Unicode block OrnamentalDingbats
 		/// </summary>
-		public static UnicodeBlock TransportAndMapSymbols { get { return blockTransportAndMapSymbols; } }
-		private static readonly UnicodeBlock blockTransportAndMapSymbols = new UnicodeBlock("TransportAndMapSymbols", 0x1F680, 0x1F6FF);
+		public static UnicodeBlock OrnamentalDingbats { get { return blockOrnamentalDingbats; } }
+		private static readonly UnicodeBlock blockOrnamentalDingbats = new UnicodeBlock("OrnamentalDingbats", 0x1F650, 0x1F67F);
+		/// <summary>
+		/// Gets the Unicode block TransportandMapSymbols
+		/// </summary>
+		public static UnicodeBlock TransportandMapSymbols { get { return blockTransportandMapSymbols; } }
+		private static readonly UnicodeBlock blockTransportandMapSymbols = new UnicodeBlock("TransportandMapSymbols", 0x1F680, 0x1F6FF);
 		/// <summary>
 		/// Gets the Unicode block AlchemicalSymbols
 		/// </summary>
 		public static UnicodeBlock AlchemicalSymbols { get { return blockAlchemicalSymbols; } }
 		private static readonly UnicodeBlock blockAlchemicalSymbols = new UnicodeBlock("AlchemicalSymbols", 0x1F700, 0x1F77F);
+		/// <summary>
+		/// Gets the Unicode block GeometricShapesExtended
+		/// </summary>
+		public static UnicodeBlock GeometricShapesExtended { get { return blockGeometricShapesExtended; } }
+		private static readonly UnicodeBlock blockGeometricShapesExtended = new UnicodeBlock("GeometricShapesExtended", 0x1F780, 0x1F7FF);
+		/// <summary>
+		/// Gets the Unicode block SupplementalArrows-C
+		/// </summary>
+		public static UnicodeBlock SupplementalArrowsC { get { return blockSupplementalArrowsC; } }
+		private static readonly UnicodeBlock blockSupplementalArrowsC = new UnicodeBlock("SupplementalArrows-C", 0x1F800, 0x1F8FF);
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionB
 		/// </summary>
@@ -1163,6 +1323,7 @@ namespace Hime.CentralDogma
 			db.Add("KhmerSymbols", KhmerSymbols);
 			db.Add("Buginese", Buginese);
 			db.Add("TaiTham", TaiTham);
+			db.Add("CombiningDiacriticalMarksExtended", CombiningDiacriticalMarksExtended);
 			db.Add("Balinese", Balinese);
 			db.Add("Sundanese", Sundanese);
 			db.Add("Batak", Batak);
@@ -1241,11 +1402,13 @@ namespace Hime.CentralDogma
 			db.Add("Rejang", Rejang);
 			db.Add("HangulJamoExtended-A", HangulJamoExtendedA);
 			db.Add("Javanese", Javanese);
+			db.Add("MyanmarExtended-B", MyanmarExtendedB);
 			db.Add("Cham", Cham);
 			db.Add("MyanmarExtended-A", MyanmarExtendedA);
 			db.Add("TaiViet", TaiViet);
 			db.Add("MeeteiMayekExtensions", MeeteiMayekExtensions);
 			db.Add("EthiopicExtended-A", EthiopicExtendedA);
+			db.Add("LatinExtended-E", LatinExtendedE);
 			db.Add("MeeteiMayek", MeeteiMayek);
 			db.Add("HangulSyllables", HangulSyllables);
 			db.Add("HangulJamoExtended-B", HangulJamoExtendedB);
@@ -1269,54 +1432,83 @@ namespace Hime.CentralDogma
 			db.Add("PhaistosDisc", PhaistosDisc);
 			db.Add("Lycian", Lycian);
 			db.Add("Carian", Carian);
+			db.Add("CopticEpactNumbers", CopticEpactNumbers);
 			db.Add("OldItalic", OldItalic);
 			db.Add("Gothic", Gothic);
+			db.Add("OldPermic", OldPermic);
 			db.Add("Ugaritic", Ugaritic);
 			db.Add("OldPersian", OldPersian);
 			db.Add("Deseret", Deseret);
 			db.Add("Shavian", Shavian);
 			db.Add("Osmanya", Osmanya);
+			db.Add("Elbasan", Elbasan);
+			db.Add("CaucasianAlbanian", CaucasianAlbanian);
+			db.Add("LinearA", LinearA);
 			db.Add("CypriotSyllabary", CypriotSyllabary);
 			db.Add("ImperialAramaic", ImperialAramaic);
+			db.Add("Palmyrene", Palmyrene);
+			db.Add("Nabataean", Nabataean);
 			db.Add("Phoenician", Phoenician);
 			db.Add("Lydian", Lydian);
 			db.Add("MeroiticHieroglyphs", MeroiticHieroglyphs);
 			db.Add("MeroiticCursive", MeroiticCursive);
 			db.Add("Kharoshthi", Kharoshthi);
 			db.Add("OldSouthArabian", OldSouthArabian);
+			db.Add("OldNorthArabian", OldNorthArabian);
+			db.Add("Manichaean", Manichaean);
 			db.Add("Avestan", Avestan);
 			db.Add("InscriptionalParthian", InscriptionalParthian);
 			db.Add("InscriptionalPahlavi", InscriptionalPahlavi);
+			db.Add("PsalterPahlavi", PsalterPahlavi);
 			db.Add("OldTurkic", OldTurkic);
 			db.Add("RumiNumeralSymbols", RumiNumeralSymbols);
 			db.Add("Brahmi", Brahmi);
 			db.Add("Kaithi", Kaithi);
 			db.Add("SoraSompeng", SoraSompeng);
 			db.Add("Chakma", Chakma);
+			db.Add("Mahajani", Mahajani);
 			db.Add("Sharada", Sharada);
+			db.Add("SinhalaArchaicNumbers", SinhalaArchaicNumbers);
+			db.Add("Khojki", Khojki);
+			db.Add("Khudawadi", Khudawadi);
+			db.Add("Grantha", Grantha);
+			db.Add("Tirhuta", Tirhuta);
+			db.Add("Siddham", Siddham);
+			db.Add("Modi", Modi);
 			db.Add("Takri", Takri);
+			db.Add("WarangCiti", WarangCiti);
+			db.Add("PauCinHau", PauCinHau);
 			db.Add("Cuneiform", Cuneiform);
 			db.Add("CuneiformNumbersandPunctuation", CuneiformNumbersandPunctuation);
 			db.Add("EgyptianHieroglyphs", EgyptianHieroglyphs);
 			db.Add("BamumSupplement", BamumSupplement);
+			db.Add("Mro", Mro);
+			db.Add("BassaVah", BassaVah);
+			db.Add("PahawhHmong", PahawhHmong);
 			db.Add("Miao", Miao);
 			db.Add("KanaSupplement", KanaSupplement);
+			db.Add("Duployan", Duployan);
+			db.Add("ShorthandFormatControls", ShorthandFormatControls);
 			db.Add("ByzantineMusicalSymbols", ByzantineMusicalSymbols);
 			db.Add("MusicalSymbols", MusicalSymbols);
 			db.Add("AncientGreekMusicalNotation", AncientGreekMusicalNotation);
 			db.Add("TaiXuanJingSymbols", TaiXuanJingSymbols);
 			db.Add("CountingRodNumerals", CountingRodNumerals);
 			db.Add("MathematicalAlphanumericSymbols", MathematicalAlphanumericSymbols);
+			db.Add("MendeKikakui", MendeKikakui);
 			db.Add("ArabicMathematicalAlphabeticSymbols", ArabicMathematicalAlphabeticSymbols);
 			db.Add("MahjongTiles", MahjongTiles);
 			db.Add("DominoTiles", DominoTiles);
 			db.Add("PlayingCards", PlayingCards);
 			db.Add("EnclosedAlphanumericSupplement", EnclosedAlphanumericSupplement);
 			db.Add("EnclosedIdeographicSupplement", EnclosedIdeographicSupplement);
-			db.Add("MiscellaneousSymbolsAndPictographs", MiscellaneousSymbolsAndPictographs);
+			db.Add("MiscellaneousSymbolsandPictographs", MiscellaneousSymbolsandPictographs);
 			db.Add("Emoticons", Emoticons);
-			db.Add("TransportAndMapSymbols", TransportAndMapSymbols);
+			db.Add("OrnamentalDingbats", OrnamentalDingbats);
+			db.Add("TransportandMapSymbols", TransportandMapSymbols);
 			db.Add("AlchemicalSymbols", AlchemicalSymbols);
+			db.Add("GeometricShapesExtended", GeometricShapesExtended);
+			db.Add("SupplementalArrows-C", SupplementalArrowsC);
 			db.Add("CJKUnifiedIdeographsExtensionB", CJKUnifiedIdeographsExtensionB);
 			db.Add("CJKUnifiedIdeographsExtensionC", CJKUnifiedIdeographsExtensionC);
 			db.Add("CJKUnifiedIdeographsExtensionD", CJKUnifiedIdeographsExtensionD);

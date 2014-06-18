@@ -205,7 +205,11 @@ namespace Hime.CentralDogma
 			{
 				string csName = block.Name.Replace("-", "");
 
-				string values = "\\u" + block.Span.Begin.Value.ToString("X");
+				string values = null;
+				if (block.Span.Begin.Value <= 0xFFFF)
+					values = "\\u" + block.Span.Begin.Value.ToString("X4");
+				else
+					values = "\\u" + block.Span.Begin.Value.ToString("X8");
 				writer.WriteLine();
 				writer.WriteLine("test Test_UnicodeBlock_" + csName + "_LeftBound:");
 				writer.WriteLine("\tgrammar Test_UnicodeBlock_" + csName + "_LeftBound { options {Axiom=\"e\";} terminals {X->ub{" + block.Name + "};} rules { e->X; } }");
@@ -213,7 +217,10 @@ namespace Hime.CentralDogma
 				writer.WriteLine("\ton \"" + values + "\"");
 				writer.WriteLine("\tyields e(X='" + values + "')");
 
-				values = "\\u" + block.Span.End.Value.ToString("X");
+				if (block.Span.Begin.Value <= 0xFFFF)
+					values = "\\u" + block.Span.End.Value.ToString("X4");
+				else
+					values = "\\u" + block.Span.End.Value.ToString("X8");
 				writer.WriteLine();
 				writer.WriteLine("test Test_UnicodeBlock_" + csName + "_RightBound:");
 				writer.WriteLine("\tgrammar Test_UnicodeBlock_" + csName + "_RightBound { options {Axiom=\"e\";} terminals {X->ub{" + block.Name + "};} rules { e->X; } }");

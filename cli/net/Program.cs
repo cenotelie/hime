@@ -111,6 +111,9 @@ namespace Hime.HimeCC
 			{
 				GenerateCLParser();
 				GenerateCDParser();
+				UnicodeHelper.GenerateBlocksDB();
+				UnicodeHelper.GenerateCategoriesDB();
+				UnicodeHelper.GenerateBlocksTests();
 				return ResultOK;
 			}
 
