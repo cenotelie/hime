@@ -307,7 +307,7 @@ namespace Hime.Tests.Driver
 			root.Attributes["tests"].Value = results.Count.ToString();
 			root.Attributes["failures"].Value = aggregated.failed.ToString();
 			root.Attributes["errors"].Value = aggregated.errors.ToString();
-			root.Attributes["time"].Value = aggregated.spent.ToString();
+			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
 			return aggregated;
 		}

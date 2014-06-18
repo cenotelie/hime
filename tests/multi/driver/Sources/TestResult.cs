@@ -89,7 +89,7 @@ namespace Hime.Tests.Driver
 			root.Attributes.Append(doc.CreateAttribute("name"));
 			root.Attributes.Append(doc.CreateAttribute("classname"));
 			root.Attributes.Append(doc.CreateAttribute("time"));
-			root.Attributes["time"].Value = this.spentTime.TotalSeconds.ToString();
+			root.Attributes["time"].Value = this.spentTime.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
 			if (executorResult == RESULT_FAILURE_PARSING)
 			{
 				XmlElement error = doc.CreateElement("error");
