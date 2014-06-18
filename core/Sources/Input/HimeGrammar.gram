@@ -50,7 +50,8 @@ grammar HimeGrammar
 								| '\\r'		// Carriage return (character 13)
 								| '\\t'		// Horizontal tab (character 9)
 								| '\\v'		// Vertical quote (character 11)
-								| '\\u' [0-9a-fA-F]+ ; // Unicode code point
+								| '\\u' [0-9a-fA-F]{4}   // Unicode code point
+								| '\\u' [0-9a-fA-F]{8} ; // Unicode code point
 		LITERAL_STRING		-> '"' ( [^"] | '\\"' | ESCAPEES )* '"';
 		LITERAL_ANY			-> '.';
 		LITERAL_TEXT		-> '~'? '\'' ( [^\\'] | '\\\'' | ESCAPEES )+ '\'';

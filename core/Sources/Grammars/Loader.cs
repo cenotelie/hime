@@ -973,6 +973,10 @@ namespace Hime.CentralDogma.Grammars
 						else
 							break;
 					}
+					if (l > 8)
+						l = 8;
+					else if (l > 4)
+						l = 4;
 					int cp = System.Convert.ToInt32(value.Substring(i + 1, l), 16);
 					builder.Append((new UnicodeCodePoint(cp)).GetUTF16());
 					i += l;
