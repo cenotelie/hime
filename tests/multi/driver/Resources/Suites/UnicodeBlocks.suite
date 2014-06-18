@@ -3,398 +3,398 @@ fixture UnicodeBlocks
 test Test_UnicodeBlock_BasicLatin_LeftBound:
 	grammar Test_UnicodeBlock_BasicLatin_LeftBound { options {Axiom="e";} terminals {X->ub{BasicLatin};} rules { e->X; } }
 	parser LALR1
-	on "\u0"
-	yields e(X='\u0')
+	on "\u0000"
+	yields e(X='\u0000')
 
 test Test_UnicodeBlock_BasicLatin_RightBound:
 	grammar Test_UnicodeBlock_BasicLatin_RightBound { options {Axiom="e";} terminals {X->ub{BasicLatin};} rules { e->X; } }
 	parser LALR1
-	on "\u7F"
-	yields e(X='\u7F')
+	on "\u007F"
+	yields e(X='\u007F')
 
 test Test_UnicodeBlock_Latin1Supplement_LeftBound:
 	grammar Test_UnicodeBlock_Latin1Supplement_LeftBound { options {Axiom="e";} terminals {X->ub{Latin-1Supplement};} rules { e->X; } }
 	parser LALR1
-	on "\u80"
-	yields e(X='\u80')
+	on "\u0080"
+	yields e(X='\u0080')
 
 test Test_UnicodeBlock_Latin1Supplement_RightBound:
 	grammar Test_UnicodeBlock_Latin1Supplement_RightBound { options {Axiom="e";} terminals {X->ub{Latin-1Supplement};} rules { e->X; } }
 	parser LALR1
-	on "\uFF"
-	yields e(X='\uFF')
+	on "\u00FF"
+	yields e(X='\u00FF')
 
 test Test_UnicodeBlock_LatinExtendedA_LeftBound:
 	grammar Test_UnicodeBlock_LatinExtendedA_LeftBound { options {Axiom="e";} terminals {X->ub{LatinExtended-A};} rules { e->X; } }
 	parser LALR1
-	on "\u100"
-	yields e(X='\u100')
+	on "\u0100"
+	yields e(X='\u0100')
 
 test Test_UnicodeBlock_LatinExtendedA_RightBound:
 	grammar Test_UnicodeBlock_LatinExtendedA_RightBound { options {Axiom="e";} terminals {X->ub{LatinExtended-A};} rules { e->X; } }
 	parser LALR1
-	on "\u17F"
-	yields e(X='\u17F')
+	on "\u017F"
+	yields e(X='\u017F')
 
 test Test_UnicodeBlock_LatinExtendedB_LeftBound:
 	grammar Test_UnicodeBlock_LatinExtendedB_LeftBound { options {Axiom="e";} terminals {X->ub{LatinExtended-B};} rules { e->X; } }
 	parser LALR1
-	on "\u180"
-	yields e(X='\u180')
+	on "\u0180"
+	yields e(X='\u0180')
 
 test Test_UnicodeBlock_LatinExtendedB_RightBound:
 	grammar Test_UnicodeBlock_LatinExtendedB_RightBound { options {Axiom="e";} terminals {X->ub{LatinExtended-B};} rules { e->X; } }
 	parser LALR1
-	on "\u24F"
-	yields e(X='\u24F')
+	on "\u024F"
+	yields e(X='\u024F')
 
 test Test_UnicodeBlock_IPAExtensions_LeftBound:
 	grammar Test_UnicodeBlock_IPAExtensions_LeftBound { options {Axiom="e";} terminals {X->ub{IPAExtensions};} rules { e->X; } }
 	parser LALR1
-	on "\u250"
-	yields e(X='\u250')
+	on "\u0250"
+	yields e(X='\u0250')
 
 test Test_UnicodeBlock_IPAExtensions_RightBound:
 	grammar Test_UnicodeBlock_IPAExtensions_RightBound { options {Axiom="e";} terminals {X->ub{IPAExtensions};} rules { e->X; } }
 	parser LALR1
-	on "\u2AF"
-	yields e(X='\u2AF')
+	on "\u02AF"
+	yields e(X='\u02AF')
 
 test Test_UnicodeBlock_SpacingModifierLetters_LeftBound:
 	grammar Test_UnicodeBlock_SpacingModifierLetters_LeftBound { options {Axiom="e";} terminals {X->ub{SpacingModifierLetters};} rules { e->X; } }
 	parser LALR1
-	on "\u2B0"
-	yields e(X='\u2B0')
+	on "\u02B0"
+	yields e(X='\u02B0')
 
 test Test_UnicodeBlock_SpacingModifierLetters_RightBound:
 	grammar Test_UnicodeBlock_SpacingModifierLetters_RightBound { options {Axiom="e";} terminals {X->ub{SpacingModifierLetters};} rules { e->X; } }
 	parser LALR1
-	on "\u2FF"
-	yields e(X='\u2FF')
+	on "\u02FF"
+	yields e(X='\u02FF')
 
 test Test_UnicodeBlock_CombiningDiacriticalMarks_LeftBound:
 	grammar Test_UnicodeBlock_CombiningDiacriticalMarks_LeftBound { options {Axiom="e";} terminals {X->ub{CombiningDiacriticalMarks};} rules { e->X; } }
 	parser LALR1
-	on "\u300"
-	yields e(X='\u300')
+	on "\u0300"
+	yields e(X='\u0300')
 
 test Test_UnicodeBlock_CombiningDiacriticalMarks_RightBound:
 	grammar Test_UnicodeBlock_CombiningDiacriticalMarks_RightBound { options {Axiom="e";} terminals {X->ub{CombiningDiacriticalMarks};} rules { e->X; } }
 	parser LALR1
-	on "\u36F"
-	yields e(X='\u36F')
+	on "\u036F"
+	yields e(X='\u036F')
 
 test Test_UnicodeBlock_GreekandCoptic_LeftBound:
 	grammar Test_UnicodeBlock_GreekandCoptic_LeftBound { options {Axiom="e";} terminals {X->ub{GreekandCoptic};} rules { e->X; } }
 	parser LALR1
-	on "\u370"
-	yields e(X='\u370')
+	on "\u0370"
+	yields e(X='\u0370')
 
 test Test_UnicodeBlock_GreekandCoptic_RightBound:
 	grammar Test_UnicodeBlock_GreekandCoptic_RightBound { options {Axiom="e";} terminals {X->ub{GreekandCoptic};} rules { e->X; } }
 	parser LALR1
-	on "\u3FF"
-	yields e(X='\u3FF')
+	on "\u03FF"
+	yields e(X='\u03FF')
 
 test Test_UnicodeBlock_Cyrillic_LeftBound:
 	grammar Test_UnicodeBlock_Cyrillic_LeftBound { options {Axiom="e";} terminals {X->ub{Cyrillic};} rules { e->X; } }
 	parser LALR1
-	on "\u400"
-	yields e(X='\u400')
+	on "\u0400"
+	yields e(X='\u0400')
 
 test Test_UnicodeBlock_Cyrillic_RightBound:
 	grammar Test_UnicodeBlock_Cyrillic_RightBound { options {Axiom="e";} terminals {X->ub{Cyrillic};} rules { e->X; } }
 	parser LALR1
-	on "\u4FF"
-	yields e(X='\u4FF')
+	on "\u04FF"
+	yields e(X='\u04FF')
 
 test Test_UnicodeBlock_CyrillicSupplement_LeftBound:
 	grammar Test_UnicodeBlock_CyrillicSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{CyrillicSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u500"
-	yields e(X='\u500')
+	on "\u0500"
+	yields e(X='\u0500')
 
 test Test_UnicodeBlock_CyrillicSupplement_RightBound:
 	grammar Test_UnicodeBlock_CyrillicSupplement_RightBound { options {Axiom="e";} terminals {X->ub{CyrillicSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u52F"
-	yields e(X='\u52F')
+	on "\u052F"
+	yields e(X='\u052F')
 
 test Test_UnicodeBlock_Armenian_LeftBound:
 	grammar Test_UnicodeBlock_Armenian_LeftBound { options {Axiom="e";} terminals {X->ub{Armenian};} rules { e->X; } }
 	parser LALR1
-	on "\u530"
-	yields e(X='\u530')
+	on "\u0530"
+	yields e(X='\u0530')
 
 test Test_UnicodeBlock_Armenian_RightBound:
 	grammar Test_UnicodeBlock_Armenian_RightBound { options {Axiom="e";} terminals {X->ub{Armenian};} rules { e->X; } }
 	parser LALR1
-	on "\u58F"
-	yields e(X='\u58F')
+	on "\u058F"
+	yields e(X='\u058F')
 
 test Test_UnicodeBlock_Hebrew_LeftBound:
 	grammar Test_UnicodeBlock_Hebrew_LeftBound { options {Axiom="e";} terminals {X->ub{Hebrew};} rules { e->X; } }
 	parser LALR1
-	on "\u590"
-	yields e(X='\u590')
+	on "\u0590"
+	yields e(X='\u0590')
 
 test Test_UnicodeBlock_Hebrew_RightBound:
 	grammar Test_UnicodeBlock_Hebrew_RightBound { options {Axiom="e";} terminals {X->ub{Hebrew};} rules { e->X; } }
 	parser LALR1
-	on "\u5FF"
-	yields e(X='\u5FF')
+	on "\u05FF"
+	yields e(X='\u05FF')
 
 test Test_UnicodeBlock_Arabic_LeftBound:
 	grammar Test_UnicodeBlock_Arabic_LeftBound { options {Axiom="e";} terminals {X->ub{Arabic};} rules { e->X; } }
 	parser LALR1
-	on "\u600"
-	yields e(X='\u600')
+	on "\u0600"
+	yields e(X='\u0600')
 
 test Test_UnicodeBlock_Arabic_RightBound:
 	grammar Test_UnicodeBlock_Arabic_RightBound { options {Axiom="e";} terminals {X->ub{Arabic};} rules { e->X; } }
 	parser LALR1
-	on "\u6FF"
-	yields e(X='\u6FF')
+	on "\u06FF"
+	yields e(X='\u06FF')
 
 test Test_UnicodeBlock_Syriac_LeftBound:
 	grammar Test_UnicodeBlock_Syriac_LeftBound { options {Axiom="e";} terminals {X->ub{Syriac};} rules { e->X; } }
 	parser LALR1
-	on "\u700"
-	yields e(X='\u700')
+	on "\u0700"
+	yields e(X='\u0700')
 
 test Test_UnicodeBlock_Syriac_RightBound:
 	grammar Test_UnicodeBlock_Syriac_RightBound { options {Axiom="e";} terminals {X->ub{Syriac};} rules { e->X; } }
 	parser LALR1
-	on "\u74F"
-	yields e(X='\u74F')
+	on "\u074F"
+	yields e(X='\u074F')
 
 test Test_UnicodeBlock_ArabicSupplement_LeftBound:
 	grammar Test_UnicodeBlock_ArabicSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{ArabicSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u750"
-	yields e(X='\u750')
+	on "\u0750"
+	yields e(X='\u0750')
 
 test Test_UnicodeBlock_ArabicSupplement_RightBound:
 	grammar Test_UnicodeBlock_ArabicSupplement_RightBound { options {Axiom="e";} terminals {X->ub{ArabicSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u77F"
-	yields e(X='\u77F')
+	on "\u077F"
+	yields e(X='\u077F')
 
 test Test_UnicodeBlock_Thaana_LeftBound:
 	grammar Test_UnicodeBlock_Thaana_LeftBound { options {Axiom="e";} terminals {X->ub{Thaana};} rules { e->X; } }
 	parser LALR1
-	on "\u780"
-	yields e(X='\u780')
+	on "\u0780"
+	yields e(X='\u0780')
 
 test Test_UnicodeBlock_Thaana_RightBound:
 	grammar Test_UnicodeBlock_Thaana_RightBound { options {Axiom="e";} terminals {X->ub{Thaana};} rules { e->X; } }
 	parser LALR1
-	on "\u7BF"
-	yields e(X='\u7BF')
+	on "\u07BF"
+	yields e(X='\u07BF')
 
 test Test_UnicodeBlock_NKo_LeftBound:
 	grammar Test_UnicodeBlock_NKo_LeftBound { options {Axiom="e";} terminals {X->ub{NKo};} rules { e->X; } }
 	parser LALR1
-	on "\u7C0"
-	yields e(X='\u7C0')
+	on "\u07C0"
+	yields e(X='\u07C0')
 
 test Test_UnicodeBlock_NKo_RightBound:
 	grammar Test_UnicodeBlock_NKo_RightBound { options {Axiom="e";} terminals {X->ub{NKo};} rules { e->X; } }
 	parser LALR1
-	on "\u7FF"
-	yields e(X='\u7FF')
+	on "\u07FF"
+	yields e(X='\u07FF')
 
 test Test_UnicodeBlock_Samaritan_LeftBound:
 	grammar Test_UnicodeBlock_Samaritan_LeftBound { options {Axiom="e";} terminals {X->ub{Samaritan};} rules { e->X; } }
 	parser LALR1
-	on "\u800"
-	yields e(X='\u800')
+	on "\u0800"
+	yields e(X='\u0800')
 
 test Test_UnicodeBlock_Samaritan_RightBound:
 	grammar Test_UnicodeBlock_Samaritan_RightBound { options {Axiom="e";} terminals {X->ub{Samaritan};} rules { e->X; } }
 	parser LALR1
-	on "\u83F"
-	yields e(X='\u83F')
+	on "\u083F"
+	yields e(X='\u083F')
 
 test Test_UnicodeBlock_Mandaic_LeftBound:
 	grammar Test_UnicodeBlock_Mandaic_LeftBound { options {Axiom="e";} terminals {X->ub{Mandaic};} rules { e->X; } }
 	parser LALR1
-	on "\u840"
-	yields e(X='\u840')
+	on "\u0840"
+	yields e(X='\u0840')
 
 test Test_UnicodeBlock_Mandaic_RightBound:
 	grammar Test_UnicodeBlock_Mandaic_RightBound { options {Axiom="e";} terminals {X->ub{Mandaic};} rules { e->X; } }
 	parser LALR1
-	on "\u85F"
-	yields e(X='\u85F')
+	on "\u085F"
+	yields e(X='\u085F')
 
 test Test_UnicodeBlock_ArabicExtendedA_LeftBound:
 	grammar Test_UnicodeBlock_ArabicExtendedA_LeftBound { options {Axiom="e";} terminals {X->ub{ArabicExtended-A};} rules { e->X; } }
 	parser LALR1
-	on "\u8A0"
-	yields e(X='\u8A0')
+	on "\u08A0"
+	yields e(X='\u08A0')
 
 test Test_UnicodeBlock_ArabicExtendedA_RightBound:
 	grammar Test_UnicodeBlock_ArabicExtendedA_RightBound { options {Axiom="e";} terminals {X->ub{ArabicExtended-A};} rules { e->X; } }
 	parser LALR1
-	on "\u8FF"
-	yields e(X='\u8FF')
+	on "\u08FF"
+	yields e(X='\u08FF')
 
 test Test_UnicodeBlock_Devanagari_LeftBound:
 	grammar Test_UnicodeBlock_Devanagari_LeftBound { options {Axiom="e";} terminals {X->ub{Devanagari};} rules { e->X; } }
 	parser LALR1
-	on "\u900"
-	yields e(X='\u900')
+	on "\u0900"
+	yields e(X='\u0900')
 
 test Test_UnicodeBlock_Devanagari_RightBound:
 	grammar Test_UnicodeBlock_Devanagari_RightBound { options {Axiom="e";} terminals {X->ub{Devanagari};} rules { e->X; } }
 	parser LALR1
-	on "\u97F"
-	yields e(X='\u97F')
+	on "\u097F"
+	yields e(X='\u097F')
 
 test Test_UnicodeBlock_Bengali_LeftBound:
 	grammar Test_UnicodeBlock_Bengali_LeftBound { options {Axiom="e";} terminals {X->ub{Bengali};} rules { e->X; } }
 	parser LALR1
-	on "\u980"
-	yields e(X='\u980')
+	on "\u0980"
+	yields e(X='\u0980')
 
 test Test_UnicodeBlock_Bengali_RightBound:
 	grammar Test_UnicodeBlock_Bengali_RightBound { options {Axiom="e";} terminals {X->ub{Bengali};} rules { e->X; } }
 	parser LALR1
-	on "\u9FF"
-	yields e(X='\u9FF')
+	on "\u09FF"
+	yields e(X='\u09FF')
 
 test Test_UnicodeBlock_Gurmukhi_LeftBound:
 	grammar Test_UnicodeBlock_Gurmukhi_LeftBound { options {Axiom="e";} terminals {X->ub{Gurmukhi};} rules { e->X; } }
 	parser LALR1
-	on "\uA00"
-	yields e(X='\uA00')
+	on "\u0A00"
+	yields e(X='\u0A00')
 
 test Test_UnicodeBlock_Gurmukhi_RightBound:
 	grammar Test_UnicodeBlock_Gurmukhi_RightBound { options {Axiom="e";} terminals {X->ub{Gurmukhi};} rules { e->X; } }
 	parser LALR1
-	on "\uA7F"
-	yields e(X='\uA7F')
+	on "\u0A7F"
+	yields e(X='\u0A7F')
 
 test Test_UnicodeBlock_Gujarati_LeftBound:
 	grammar Test_UnicodeBlock_Gujarati_LeftBound { options {Axiom="e";} terminals {X->ub{Gujarati};} rules { e->X; } }
 	parser LALR1
-	on "\uA80"
-	yields e(X='\uA80')
+	on "\u0A80"
+	yields e(X='\u0A80')
 
 test Test_UnicodeBlock_Gujarati_RightBound:
 	grammar Test_UnicodeBlock_Gujarati_RightBound { options {Axiom="e";} terminals {X->ub{Gujarati};} rules { e->X; } }
 	parser LALR1
-	on "\uAFF"
-	yields e(X='\uAFF')
+	on "\u0AFF"
+	yields e(X='\u0AFF')
 
 test Test_UnicodeBlock_Oriya_LeftBound:
 	grammar Test_UnicodeBlock_Oriya_LeftBound { options {Axiom="e";} terminals {X->ub{Oriya};} rules { e->X; } }
 	parser LALR1
-	on "\uB00"
-	yields e(X='\uB00')
+	on "\u0B00"
+	yields e(X='\u0B00')
 
 test Test_UnicodeBlock_Oriya_RightBound:
 	grammar Test_UnicodeBlock_Oriya_RightBound { options {Axiom="e";} terminals {X->ub{Oriya};} rules { e->X; } }
 	parser LALR1
-	on "\uB7F"
-	yields e(X='\uB7F')
+	on "\u0B7F"
+	yields e(X='\u0B7F')
 
 test Test_UnicodeBlock_Tamil_LeftBound:
 	grammar Test_UnicodeBlock_Tamil_LeftBound { options {Axiom="e";} terminals {X->ub{Tamil};} rules { e->X; } }
 	parser LALR1
-	on "\uB80"
-	yields e(X='\uB80')
+	on "\u0B80"
+	yields e(X='\u0B80')
 
 test Test_UnicodeBlock_Tamil_RightBound:
 	grammar Test_UnicodeBlock_Tamil_RightBound { options {Axiom="e";} terminals {X->ub{Tamil};} rules { e->X; } }
 	parser LALR1
-	on "\uBFF"
-	yields e(X='\uBFF')
+	on "\u0BFF"
+	yields e(X='\u0BFF')
 
 test Test_UnicodeBlock_Telugu_LeftBound:
 	grammar Test_UnicodeBlock_Telugu_LeftBound { options {Axiom="e";} terminals {X->ub{Telugu};} rules { e->X; } }
 	parser LALR1
-	on "\uC00"
-	yields e(X='\uC00')
+	on "\u0C00"
+	yields e(X='\u0C00')
 
 test Test_UnicodeBlock_Telugu_RightBound:
 	grammar Test_UnicodeBlock_Telugu_RightBound { options {Axiom="e";} terminals {X->ub{Telugu};} rules { e->X; } }
 	parser LALR1
-	on "\uC7F"
-	yields e(X='\uC7F')
+	on "\u0C7F"
+	yields e(X='\u0C7F')
 
 test Test_UnicodeBlock_Kannada_LeftBound:
 	grammar Test_UnicodeBlock_Kannada_LeftBound { options {Axiom="e";} terminals {X->ub{Kannada};} rules { e->X; } }
 	parser LALR1
-	on "\uC80"
-	yields e(X='\uC80')
+	on "\u0C80"
+	yields e(X='\u0C80')
 
 test Test_UnicodeBlock_Kannada_RightBound:
 	grammar Test_UnicodeBlock_Kannada_RightBound { options {Axiom="e";} terminals {X->ub{Kannada};} rules { e->X; } }
 	parser LALR1
-	on "\uCFF"
-	yields e(X='\uCFF')
+	on "\u0CFF"
+	yields e(X='\u0CFF')
 
 test Test_UnicodeBlock_Malayalam_LeftBound:
 	grammar Test_UnicodeBlock_Malayalam_LeftBound { options {Axiom="e";} terminals {X->ub{Malayalam};} rules { e->X; } }
 	parser LALR1
-	on "\uD00"
-	yields e(X='\uD00')
+	on "\u0D00"
+	yields e(X='\u0D00')
 
 test Test_UnicodeBlock_Malayalam_RightBound:
 	grammar Test_UnicodeBlock_Malayalam_RightBound { options {Axiom="e";} terminals {X->ub{Malayalam};} rules { e->X; } }
 	parser LALR1
-	on "\uD7F"
-	yields e(X='\uD7F')
+	on "\u0D7F"
+	yields e(X='\u0D7F')
 
 test Test_UnicodeBlock_Sinhala_LeftBound:
 	grammar Test_UnicodeBlock_Sinhala_LeftBound { options {Axiom="e";} terminals {X->ub{Sinhala};} rules { e->X; } }
 	parser LALR1
-	on "\uD80"
-	yields e(X='\uD80')
+	on "\u0D80"
+	yields e(X='\u0D80')
 
 test Test_UnicodeBlock_Sinhala_RightBound:
 	grammar Test_UnicodeBlock_Sinhala_RightBound { options {Axiom="e";} terminals {X->ub{Sinhala};} rules { e->X; } }
 	parser LALR1
-	on "\uDFF"
-	yields e(X='\uDFF')
+	on "\u0DFF"
+	yields e(X='\u0DFF')
 
 test Test_UnicodeBlock_Thai_LeftBound:
 	grammar Test_UnicodeBlock_Thai_LeftBound { options {Axiom="e";} terminals {X->ub{Thai};} rules { e->X; } }
 	parser LALR1
-	on "\uE00"
-	yields e(X='\uE00')
+	on "\u0E00"
+	yields e(X='\u0E00')
 
 test Test_UnicodeBlock_Thai_RightBound:
 	grammar Test_UnicodeBlock_Thai_RightBound { options {Axiom="e";} terminals {X->ub{Thai};} rules { e->X; } }
 	parser LALR1
-	on "\uE7F"
-	yields e(X='\uE7F')
+	on "\u0E7F"
+	yields e(X='\u0E7F')
 
 test Test_UnicodeBlock_Lao_LeftBound:
 	grammar Test_UnicodeBlock_Lao_LeftBound { options {Axiom="e";} terminals {X->ub{Lao};} rules { e->X; } }
 	parser LALR1
-	on "\uE80"
-	yields e(X='\uE80')
+	on "\u0E80"
+	yields e(X='\u0E80')
 
 test Test_UnicodeBlock_Lao_RightBound:
 	grammar Test_UnicodeBlock_Lao_RightBound { options {Axiom="e";} terminals {X->ub{Lao};} rules { e->X; } }
 	parser LALR1
-	on "\uEFF"
-	yields e(X='\uEFF')
+	on "\u0EFF"
+	yields e(X='\u0EFF')
 
 test Test_UnicodeBlock_Tibetan_LeftBound:
 	grammar Test_UnicodeBlock_Tibetan_LeftBound { options {Axiom="e";} terminals {X->ub{Tibetan};} rules { e->X; } }
 	parser LALR1
-	on "\uF00"
-	yields e(X='\uF00')
+	on "\u0F00"
+	yields e(X='\u0F00')
 
 test Test_UnicodeBlock_Tibetan_RightBound:
 	grammar Test_UnicodeBlock_Tibetan_RightBound { options {Axiom="e";} terminals {X->ub{Tibetan};} rules { e->X; } }
 	parser LALR1
-	on "\uFFF"
-	yields e(X='\uFFF')
+	on "\u0FFF"
+	yields e(X='\u0FFF')
 
 test Test_UnicodeBlock_Myanmar_LeftBound:
 	grammar Test_UnicodeBlock_Myanmar_LeftBound { options {Axiom="e";} terminals {X->ub{Myanmar};} rules { e->X; } }
@@ -1839,767 +1839,767 @@ test Test_UnicodeBlock_Specials_RightBound:
 test Test_UnicodeBlock_LinearBSyllabary_LeftBound:
 	grammar Test_UnicodeBlock_LinearBSyllabary_LeftBound { options {Axiom="e";} terminals {X->ub{LinearBSyllabary};} rules { e->X; } }
 	parser LALR1
-	on "\u10000"
-	yields e(X='\u10000')
+	on "\u00010000"
+	yields e(X='\u00010000')
 
 test Test_UnicodeBlock_LinearBSyllabary_RightBound:
 	grammar Test_UnicodeBlock_LinearBSyllabary_RightBound { options {Axiom="e";} terminals {X->ub{LinearBSyllabary};} rules { e->X; } }
 	parser LALR1
-	on "\u1007F"
-	yields e(X='\u1007F')
+	on "\u0001007F"
+	yields e(X='\u0001007F')
 
 test Test_UnicodeBlock_LinearBIdeograms_LeftBound:
 	grammar Test_UnicodeBlock_LinearBIdeograms_LeftBound { options {Axiom="e";} terminals {X->ub{LinearBIdeograms};} rules { e->X; } }
 	parser LALR1
-	on "\u10080"
-	yields e(X='\u10080')
+	on "\u00010080"
+	yields e(X='\u00010080')
 
 test Test_UnicodeBlock_LinearBIdeograms_RightBound:
 	grammar Test_UnicodeBlock_LinearBIdeograms_RightBound { options {Axiom="e";} terminals {X->ub{LinearBIdeograms};} rules { e->X; } }
 	parser LALR1
-	on "\u100FF"
-	yields e(X='\u100FF')
+	on "\u000100FF"
+	yields e(X='\u000100FF')
 
 test Test_UnicodeBlock_AegeanNumbers_LeftBound:
 	grammar Test_UnicodeBlock_AegeanNumbers_LeftBound { options {Axiom="e";} terminals {X->ub{AegeanNumbers};} rules { e->X; } }
 	parser LALR1
-	on "\u10100"
-	yields e(X='\u10100')
+	on "\u00010100"
+	yields e(X='\u00010100')
 
 test Test_UnicodeBlock_AegeanNumbers_RightBound:
 	grammar Test_UnicodeBlock_AegeanNumbers_RightBound { options {Axiom="e";} terminals {X->ub{AegeanNumbers};} rules { e->X; } }
 	parser LALR1
-	on "\u1013F"
-	yields e(X='\u1013F')
+	on "\u0001013F"
+	yields e(X='\u0001013F')
 
 test Test_UnicodeBlock_AncientGreekNumbers_LeftBound:
 	grammar Test_UnicodeBlock_AncientGreekNumbers_LeftBound { options {Axiom="e";} terminals {X->ub{AncientGreekNumbers};} rules { e->X; } }
 	parser LALR1
-	on "\u10140"
-	yields e(X='\u10140')
+	on "\u00010140"
+	yields e(X='\u00010140')
 
 test Test_UnicodeBlock_AncientGreekNumbers_RightBound:
 	grammar Test_UnicodeBlock_AncientGreekNumbers_RightBound { options {Axiom="e";} terminals {X->ub{AncientGreekNumbers};} rules { e->X; } }
 	parser LALR1
-	on "\u1018F"
-	yields e(X='\u1018F')
+	on "\u0001018F"
+	yields e(X='\u0001018F')
 
 test Test_UnicodeBlock_AncientSymbols_LeftBound:
 	grammar Test_UnicodeBlock_AncientSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{AncientSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u10190"
-	yields e(X='\u10190')
+	on "\u00010190"
+	yields e(X='\u00010190')
 
 test Test_UnicodeBlock_AncientSymbols_RightBound:
 	grammar Test_UnicodeBlock_AncientSymbols_RightBound { options {Axiom="e";} terminals {X->ub{AncientSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u101CF"
-	yields e(X='\u101CF')
+	on "\u000101CF"
+	yields e(X='\u000101CF')
 
 test Test_UnicodeBlock_PhaistosDisc_LeftBound:
 	grammar Test_UnicodeBlock_PhaistosDisc_LeftBound { options {Axiom="e";} terminals {X->ub{PhaistosDisc};} rules { e->X; } }
 	parser LALR1
-	on "\u101D0"
-	yields e(X='\u101D0')
+	on "\u000101D0"
+	yields e(X='\u000101D0')
 
 test Test_UnicodeBlock_PhaistosDisc_RightBound:
 	grammar Test_UnicodeBlock_PhaistosDisc_RightBound { options {Axiom="e";} terminals {X->ub{PhaistosDisc};} rules { e->X; } }
 	parser LALR1
-	on "\u101FF"
-	yields e(X='\u101FF')
+	on "\u000101FF"
+	yields e(X='\u000101FF')
 
 test Test_UnicodeBlock_Lycian_LeftBound:
 	grammar Test_UnicodeBlock_Lycian_LeftBound { options {Axiom="e";} terminals {X->ub{Lycian};} rules { e->X; } }
 	parser LALR1
-	on "\u10280"
-	yields e(X='\u10280')
+	on "\u00010280"
+	yields e(X='\u00010280')
 
 test Test_UnicodeBlock_Lycian_RightBound:
 	grammar Test_UnicodeBlock_Lycian_RightBound { options {Axiom="e";} terminals {X->ub{Lycian};} rules { e->X; } }
 	parser LALR1
-	on "\u1029F"
-	yields e(X='\u1029F')
+	on "\u0001029F"
+	yields e(X='\u0001029F')
 
 test Test_UnicodeBlock_Carian_LeftBound:
 	grammar Test_UnicodeBlock_Carian_LeftBound { options {Axiom="e";} terminals {X->ub{Carian};} rules { e->X; } }
 	parser LALR1
-	on "\u102A0"
-	yields e(X='\u102A0')
+	on "\u000102A0"
+	yields e(X='\u000102A0')
 
 test Test_UnicodeBlock_Carian_RightBound:
 	grammar Test_UnicodeBlock_Carian_RightBound { options {Axiom="e";} terminals {X->ub{Carian};} rules { e->X; } }
 	parser LALR1
-	on "\u102DF"
-	yields e(X='\u102DF')
+	on "\u000102DF"
+	yields e(X='\u000102DF')
 
 test Test_UnicodeBlock_OldItalic_LeftBound:
 	grammar Test_UnicodeBlock_OldItalic_LeftBound { options {Axiom="e";} terminals {X->ub{OldItalic};} rules { e->X; } }
 	parser LALR1
-	on "\u10300"
-	yields e(X='\u10300')
+	on "\u00010300"
+	yields e(X='\u00010300')
 
 test Test_UnicodeBlock_OldItalic_RightBound:
 	grammar Test_UnicodeBlock_OldItalic_RightBound { options {Axiom="e";} terminals {X->ub{OldItalic};} rules { e->X; } }
 	parser LALR1
-	on "\u1032F"
-	yields e(X='\u1032F')
+	on "\u0001032F"
+	yields e(X='\u0001032F')
 
 test Test_UnicodeBlock_Gothic_LeftBound:
 	grammar Test_UnicodeBlock_Gothic_LeftBound { options {Axiom="e";} terminals {X->ub{Gothic};} rules { e->X; } }
 	parser LALR1
-	on "\u10330"
-	yields e(X='\u10330')
+	on "\u00010330"
+	yields e(X='\u00010330')
 
 test Test_UnicodeBlock_Gothic_RightBound:
 	grammar Test_UnicodeBlock_Gothic_RightBound { options {Axiom="e";} terminals {X->ub{Gothic};} rules { e->X; } }
 	parser LALR1
-	on "\u1034F"
-	yields e(X='\u1034F')
+	on "\u0001034F"
+	yields e(X='\u0001034F')
 
 test Test_UnicodeBlock_Ugaritic_LeftBound:
 	grammar Test_UnicodeBlock_Ugaritic_LeftBound { options {Axiom="e";} terminals {X->ub{Ugaritic};} rules { e->X; } }
 	parser LALR1
-	on "\u10380"
-	yields e(X='\u10380')
+	on "\u00010380"
+	yields e(X='\u00010380')
 
 test Test_UnicodeBlock_Ugaritic_RightBound:
 	grammar Test_UnicodeBlock_Ugaritic_RightBound { options {Axiom="e";} terminals {X->ub{Ugaritic};} rules { e->X; } }
 	parser LALR1
-	on "\u1039F"
-	yields e(X='\u1039F')
+	on "\u0001039F"
+	yields e(X='\u0001039F')
 
 test Test_UnicodeBlock_OldPersian_LeftBound:
 	grammar Test_UnicodeBlock_OldPersian_LeftBound { options {Axiom="e";} terminals {X->ub{OldPersian};} rules { e->X; } }
 	parser LALR1
-	on "\u103A0"
-	yields e(X='\u103A0')
+	on "\u000103A0"
+	yields e(X='\u000103A0')
 
 test Test_UnicodeBlock_OldPersian_RightBound:
 	grammar Test_UnicodeBlock_OldPersian_RightBound { options {Axiom="e";} terminals {X->ub{OldPersian};} rules { e->X; } }
 	parser LALR1
-	on "\u103DF"
-	yields e(X='\u103DF')
+	on "\u000103DF"
+	yields e(X='\u000103DF')
 
 test Test_UnicodeBlock_Deseret_LeftBound:
 	grammar Test_UnicodeBlock_Deseret_LeftBound { options {Axiom="e";} terminals {X->ub{Deseret};} rules { e->X; } }
 	parser LALR1
-	on "\u10400"
-	yields e(X='\u10400')
+	on "\u00010400"
+	yields e(X='\u00010400')
 
 test Test_UnicodeBlock_Deseret_RightBound:
 	grammar Test_UnicodeBlock_Deseret_RightBound { options {Axiom="e";} terminals {X->ub{Deseret};} rules { e->X; } }
 	parser LALR1
-	on "\u1044F"
-	yields e(X='\u1044F')
+	on "\u0001044F"
+	yields e(X='\u0001044F')
 
 test Test_UnicodeBlock_Shavian_LeftBound:
 	grammar Test_UnicodeBlock_Shavian_LeftBound { options {Axiom="e";} terminals {X->ub{Shavian};} rules { e->X; } }
 	parser LALR1
-	on "\u10450"
-	yields e(X='\u10450')
+	on "\u00010450"
+	yields e(X='\u00010450')
 
 test Test_UnicodeBlock_Shavian_RightBound:
 	grammar Test_UnicodeBlock_Shavian_RightBound { options {Axiom="e";} terminals {X->ub{Shavian};} rules { e->X; } }
 	parser LALR1
-	on "\u1047F"
-	yields e(X='\u1047F')
+	on "\u0001047F"
+	yields e(X='\u0001047F')
 
 test Test_UnicodeBlock_Osmanya_LeftBound:
 	grammar Test_UnicodeBlock_Osmanya_LeftBound { options {Axiom="e";} terminals {X->ub{Osmanya};} rules { e->X; } }
 	parser LALR1
-	on "\u10480"
-	yields e(X='\u10480')
+	on "\u00010480"
+	yields e(X='\u00010480')
 
 test Test_UnicodeBlock_Osmanya_RightBound:
 	grammar Test_UnicodeBlock_Osmanya_RightBound { options {Axiom="e";} terminals {X->ub{Osmanya};} rules { e->X; } }
 	parser LALR1
-	on "\u104AF"
-	yields e(X='\u104AF')
+	on "\u000104AF"
+	yields e(X='\u000104AF')
 
 test Test_UnicodeBlock_CypriotSyllabary_LeftBound:
 	grammar Test_UnicodeBlock_CypriotSyllabary_LeftBound { options {Axiom="e";} terminals {X->ub{CypriotSyllabary};} rules { e->X; } }
 	parser LALR1
-	on "\u10800"
-	yields e(X='\u10800')
+	on "\u00010800"
+	yields e(X='\u00010800')
 
 test Test_UnicodeBlock_CypriotSyllabary_RightBound:
 	grammar Test_UnicodeBlock_CypriotSyllabary_RightBound { options {Axiom="e";} terminals {X->ub{CypriotSyllabary};} rules { e->X; } }
 	parser LALR1
-	on "\u1083F"
-	yields e(X='\u1083F')
+	on "\u0001083F"
+	yields e(X='\u0001083F')
 
 test Test_UnicodeBlock_ImperialAramaic_LeftBound:
 	grammar Test_UnicodeBlock_ImperialAramaic_LeftBound { options {Axiom="e";} terminals {X->ub{ImperialAramaic};} rules { e->X; } }
 	parser LALR1
-	on "\u10840"
-	yields e(X='\u10840')
+	on "\u00010840"
+	yields e(X='\u00010840')
 
 test Test_UnicodeBlock_ImperialAramaic_RightBound:
 	grammar Test_UnicodeBlock_ImperialAramaic_RightBound { options {Axiom="e";} terminals {X->ub{ImperialAramaic};} rules { e->X; } }
 	parser LALR1
-	on "\u1085F"
-	yields e(X='\u1085F')
+	on "\u0001085F"
+	yields e(X='\u0001085F')
 
 test Test_UnicodeBlock_Phoenician_LeftBound:
 	grammar Test_UnicodeBlock_Phoenician_LeftBound { options {Axiom="e";} terminals {X->ub{Phoenician};} rules { e->X; } }
 	parser LALR1
-	on "\u10900"
-	yields e(X='\u10900')
+	on "\u00010900"
+	yields e(X='\u00010900')
 
 test Test_UnicodeBlock_Phoenician_RightBound:
 	grammar Test_UnicodeBlock_Phoenician_RightBound { options {Axiom="e";} terminals {X->ub{Phoenician};} rules { e->X; } }
 	parser LALR1
-	on "\u1091F"
-	yields e(X='\u1091F')
+	on "\u0001091F"
+	yields e(X='\u0001091F')
 
 test Test_UnicodeBlock_Lydian_LeftBound:
 	grammar Test_UnicodeBlock_Lydian_LeftBound { options {Axiom="e";} terminals {X->ub{Lydian};} rules { e->X; } }
 	parser LALR1
-	on "\u10920"
-	yields e(X='\u10920')
+	on "\u00010920"
+	yields e(X='\u00010920')
 
 test Test_UnicodeBlock_Lydian_RightBound:
 	grammar Test_UnicodeBlock_Lydian_RightBound { options {Axiom="e";} terminals {X->ub{Lydian};} rules { e->X; } }
 	parser LALR1
-	on "\u1093F"
-	yields e(X='\u1093F')
+	on "\u0001093F"
+	yields e(X='\u0001093F')
 
 test Test_UnicodeBlock_MeroiticHieroglyphs_LeftBound:
 	grammar Test_UnicodeBlock_MeroiticHieroglyphs_LeftBound { options {Axiom="e";} terminals {X->ub{MeroiticHieroglyphs};} rules { e->X; } }
 	parser LALR1
-	on "\u10980"
-	yields e(X='\u10980')
+	on "\u00010980"
+	yields e(X='\u00010980')
 
 test Test_UnicodeBlock_MeroiticHieroglyphs_RightBound:
 	grammar Test_UnicodeBlock_MeroiticHieroglyphs_RightBound { options {Axiom="e";} terminals {X->ub{MeroiticHieroglyphs};} rules { e->X; } }
 	parser LALR1
-	on "\u1099F"
-	yields e(X='\u1099F')
+	on "\u0001099F"
+	yields e(X='\u0001099F')
 
 test Test_UnicodeBlock_MeroiticCursive_LeftBound:
 	grammar Test_UnicodeBlock_MeroiticCursive_LeftBound { options {Axiom="e";} terminals {X->ub{MeroiticCursive};} rules { e->X; } }
 	parser LALR1
-	on "\u109A0"
-	yields e(X='\u109A0')
+	on "\u000109A0"
+	yields e(X='\u000109A0')
 
 test Test_UnicodeBlock_MeroiticCursive_RightBound:
 	grammar Test_UnicodeBlock_MeroiticCursive_RightBound { options {Axiom="e";} terminals {X->ub{MeroiticCursive};} rules { e->X; } }
 	parser LALR1
-	on "\u109FF"
-	yields e(X='\u109FF')
+	on "\u000109FF"
+	yields e(X='\u000109FF')
 
 test Test_UnicodeBlock_Kharoshthi_LeftBound:
 	grammar Test_UnicodeBlock_Kharoshthi_LeftBound { options {Axiom="e";} terminals {X->ub{Kharoshthi};} rules { e->X; } }
 	parser LALR1
-	on "\u10A00"
-	yields e(X='\u10A00')
+	on "\u00010A00"
+	yields e(X='\u00010A00')
 
 test Test_UnicodeBlock_Kharoshthi_RightBound:
 	grammar Test_UnicodeBlock_Kharoshthi_RightBound { options {Axiom="e";} terminals {X->ub{Kharoshthi};} rules { e->X; } }
 	parser LALR1
-	on "\u10A5F"
-	yields e(X='\u10A5F')
+	on "\u00010A5F"
+	yields e(X='\u00010A5F')
 
 test Test_UnicodeBlock_OldSouthArabian_LeftBound:
 	grammar Test_UnicodeBlock_OldSouthArabian_LeftBound { options {Axiom="e";} terminals {X->ub{OldSouthArabian};} rules { e->X; } }
 	parser LALR1
-	on "\u10A60"
-	yields e(X='\u10A60')
+	on "\u00010A60"
+	yields e(X='\u00010A60')
 
 test Test_UnicodeBlock_OldSouthArabian_RightBound:
 	grammar Test_UnicodeBlock_OldSouthArabian_RightBound { options {Axiom="e";} terminals {X->ub{OldSouthArabian};} rules { e->X; } }
 	parser LALR1
-	on "\u10A7F"
-	yields e(X='\u10A7F')
+	on "\u00010A7F"
+	yields e(X='\u00010A7F')
 
 test Test_UnicodeBlock_Avestan_LeftBound:
 	grammar Test_UnicodeBlock_Avestan_LeftBound { options {Axiom="e";} terminals {X->ub{Avestan};} rules { e->X; } }
 	parser LALR1
-	on "\u10B00"
-	yields e(X='\u10B00')
+	on "\u00010B00"
+	yields e(X='\u00010B00')
 
 test Test_UnicodeBlock_Avestan_RightBound:
 	grammar Test_UnicodeBlock_Avestan_RightBound { options {Axiom="e";} terminals {X->ub{Avestan};} rules { e->X; } }
 	parser LALR1
-	on "\u10B3F"
-	yields e(X='\u10B3F')
+	on "\u00010B3F"
+	yields e(X='\u00010B3F')
 
 test Test_UnicodeBlock_InscriptionalParthian_LeftBound:
 	grammar Test_UnicodeBlock_InscriptionalParthian_LeftBound { options {Axiom="e";} terminals {X->ub{InscriptionalParthian};} rules { e->X; } }
 	parser LALR1
-	on "\u10B40"
-	yields e(X='\u10B40')
+	on "\u00010B40"
+	yields e(X='\u00010B40')
 
 test Test_UnicodeBlock_InscriptionalParthian_RightBound:
 	grammar Test_UnicodeBlock_InscriptionalParthian_RightBound { options {Axiom="e";} terminals {X->ub{InscriptionalParthian};} rules { e->X; } }
 	parser LALR1
-	on "\u10B5F"
-	yields e(X='\u10B5F')
+	on "\u00010B5F"
+	yields e(X='\u00010B5F')
 
 test Test_UnicodeBlock_InscriptionalPahlavi_LeftBound:
 	grammar Test_UnicodeBlock_InscriptionalPahlavi_LeftBound { options {Axiom="e";} terminals {X->ub{InscriptionalPahlavi};} rules { e->X; } }
 	parser LALR1
-	on "\u10B60"
-	yields e(X='\u10B60')
+	on "\u00010B60"
+	yields e(X='\u00010B60')
 
 test Test_UnicodeBlock_InscriptionalPahlavi_RightBound:
 	grammar Test_UnicodeBlock_InscriptionalPahlavi_RightBound { options {Axiom="e";} terminals {X->ub{InscriptionalPahlavi};} rules { e->X; } }
 	parser LALR1
-	on "\u10B7F"
-	yields e(X='\u10B7F')
+	on "\u00010B7F"
+	yields e(X='\u00010B7F')
 
 test Test_UnicodeBlock_OldTurkic_LeftBound:
 	grammar Test_UnicodeBlock_OldTurkic_LeftBound { options {Axiom="e";} terminals {X->ub{OldTurkic};} rules { e->X; } }
 	parser LALR1
-	on "\u10C00"
-	yields e(X='\u10C00')
+	on "\u00010C00"
+	yields e(X='\u00010C00')
 
 test Test_UnicodeBlock_OldTurkic_RightBound:
 	grammar Test_UnicodeBlock_OldTurkic_RightBound { options {Axiom="e";} terminals {X->ub{OldTurkic};} rules { e->X; } }
 	parser LALR1
-	on "\u10C4F"
-	yields e(X='\u10C4F')
+	on "\u00010C4F"
+	yields e(X='\u00010C4F')
 
 test Test_UnicodeBlock_RumiNumeralSymbols_LeftBound:
 	grammar Test_UnicodeBlock_RumiNumeralSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{RumiNumeralSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u10E60"
-	yields e(X='\u10E60')
+	on "\u00010E60"
+	yields e(X='\u00010E60')
 
 test Test_UnicodeBlock_RumiNumeralSymbols_RightBound:
 	grammar Test_UnicodeBlock_RumiNumeralSymbols_RightBound { options {Axiom="e";} terminals {X->ub{RumiNumeralSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u10E7F"
-	yields e(X='\u10E7F')
+	on "\u00010E7F"
+	yields e(X='\u00010E7F')
 
 test Test_UnicodeBlock_Brahmi_LeftBound:
 	grammar Test_UnicodeBlock_Brahmi_LeftBound { options {Axiom="e";} terminals {X->ub{Brahmi};} rules { e->X; } }
 	parser LALR1
-	on "\u11000"
-	yields e(X='\u11000')
+	on "\u00011000"
+	yields e(X='\u00011000')
 
 test Test_UnicodeBlock_Brahmi_RightBound:
 	grammar Test_UnicodeBlock_Brahmi_RightBound { options {Axiom="e";} terminals {X->ub{Brahmi};} rules { e->X; } }
 	parser LALR1
-	on "\u1107F"
-	yields e(X='\u1107F')
+	on "\u0001107F"
+	yields e(X='\u0001107F')
 
 test Test_UnicodeBlock_Kaithi_LeftBound:
 	grammar Test_UnicodeBlock_Kaithi_LeftBound { options {Axiom="e";} terminals {X->ub{Kaithi};} rules { e->X; } }
 	parser LALR1
-	on "\u11080"
-	yields e(X='\u11080')
+	on "\u00011080"
+	yields e(X='\u00011080')
 
 test Test_UnicodeBlock_Kaithi_RightBound:
 	grammar Test_UnicodeBlock_Kaithi_RightBound { options {Axiom="e";} terminals {X->ub{Kaithi};} rules { e->X; } }
 	parser LALR1
-	on "\u110CF"
-	yields e(X='\u110CF')
+	on "\u000110CF"
+	yields e(X='\u000110CF')
 
 test Test_UnicodeBlock_SoraSompeng_LeftBound:
 	grammar Test_UnicodeBlock_SoraSompeng_LeftBound { options {Axiom="e";} terminals {X->ub{SoraSompeng};} rules { e->X; } }
 	parser LALR1
-	on "\u110D0"
-	yields e(X='\u110D0')
+	on "\u000110D0"
+	yields e(X='\u000110D0')
 
 test Test_UnicodeBlock_SoraSompeng_RightBound:
 	grammar Test_UnicodeBlock_SoraSompeng_RightBound { options {Axiom="e";} terminals {X->ub{SoraSompeng};} rules { e->X; } }
 	parser LALR1
-	on "\u110FF"
-	yields e(X='\u110FF')
+	on "\u000110FF"
+	yields e(X='\u000110FF')
 
 test Test_UnicodeBlock_Chakma_LeftBound:
 	grammar Test_UnicodeBlock_Chakma_LeftBound { options {Axiom="e";} terminals {X->ub{Chakma};} rules { e->X; } }
 	parser LALR1
-	on "\u11100"
-	yields e(X='\u11100')
+	on "\u00011100"
+	yields e(X='\u00011100')
 
 test Test_UnicodeBlock_Chakma_RightBound:
 	grammar Test_UnicodeBlock_Chakma_RightBound { options {Axiom="e";} terminals {X->ub{Chakma};} rules { e->X; } }
 	parser LALR1
-	on "\u1114F"
-	yields e(X='\u1114F')
+	on "\u0001114F"
+	yields e(X='\u0001114F')
 
 test Test_UnicodeBlock_Sharada_LeftBound:
 	grammar Test_UnicodeBlock_Sharada_LeftBound { options {Axiom="e";} terminals {X->ub{Sharada};} rules { e->X; } }
 	parser LALR1
-	on "\u11180"
-	yields e(X='\u11180')
+	on "\u00011180"
+	yields e(X='\u00011180')
 
 test Test_UnicodeBlock_Sharada_RightBound:
 	grammar Test_UnicodeBlock_Sharada_RightBound { options {Axiom="e";} terminals {X->ub{Sharada};} rules { e->X; } }
 	parser LALR1
-	on "\u111DF"
-	yields e(X='\u111DF')
+	on "\u000111DF"
+	yields e(X='\u000111DF')
 
 test Test_UnicodeBlock_Takri_LeftBound:
 	grammar Test_UnicodeBlock_Takri_LeftBound { options {Axiom="e";} terminals {X->ub{Takri};} rules { e->X; } }
 	parser LALR1
-	on "\u11680"
-	yields e(X='\u11680')
+	on "\u00011680"
+	yields e(X='\u00011680')
 
 test Test_UnicodeBlock_Takri_RightBound:
 	grammar Test_UnicodeBlock_Takri_RightBound { options {Axiom="e";} terminals {X->ub{Takri};} rules { e->X; } }
 	parser LALR1
-	on "\u116CF"
-	yields e(X='\u116CF')
+	on "\u000116CF"
+	yields e(X='\u000116CF')
 
 test Test_UnicodeBlock_Cuneiform_LeftBound:
 	grammar Test_UnicodeBlock_Cuneiform_LeftBound { options {Axiom="e";} terminals {X->ub{Cuneiform};} rules { e->X; } }
 	parser LALR1
-	on "\u12000"
-	yields e(X='\u12000')
+	on "\u00012000"
+	yields e(X='\u00012000')
 
 test Test_UnicodeBlock_Cuneiform_RightBound:
 	grammar Test_UnicodeBlock_Cuneiform_RightBound { options {Axiom="e";} terminals {X->ub{Cuneiform};} rules { e->X; } }
 	parser LALR1
-	on "\u123FF"
-	yields e(X='\u123FF')
+	on "\u000123FF"
+	yields e(X='\u000123FF')
 
 test Test_UnicodeBlock_CuneiformNumbersandPunctuation_LeftBound:
 	grammar Test_UnicodeBlock_CuneiformNumbersandPunctuation_LeftBound { options {Axiom="e";} terminals {X->ub{CuneiformNumbersandPunctuation};} rules { e->X; } }
 	parser LALR1
-	on "\u12400"
-	yields e(X='\u12400')
+	on "\u00012400"
+	yields e(X='\u00012400')
 
 test Test_UnicodeBlock_CuneiformNumbersandPunctuation_RightBound:
 	grammar Test_UnicodeBlock_CuneiformNumbersandPunctuation_RightBound { options {Axiom="e";} terminals {X->ub{CuneiformNumbersandPunctuation};} rules { e->X; } }
 	parser LALR1
-	on "\u1247F"
-	yields e(X='\u1247F')
+	on "\u0001247F"
+	yields e(X='\u0001247F')
 
 test Test_UnicodeBlock_EgyptianHieroglyphs_LeftBound:
 	grammar Test_UnicodeBlock_EgyptianHieroglyphs_LeftBound { options {Axiom="e";} terminals {X->ub{EgyptianHieroglyphs};} rules { e->X; } }
 	parser LALR1
-	on "\u13000"
-	yields e(X='\u13000')
+	on "\u00013000"
+	yields e(X='\u00013000')
 
 test Test_UnicodeBlock_EgyptianHieroglyphs_RightBound:
 	grammar Test_UnicodeBlock_EgyptianHieroglyphs_RightBound { options {Axiom="e";} terminals {X->ub{EgyptianHieroglyphs};} rules { e->X; } }
 	parser LALR1
-	on "\u1342F"
-	yields e(X='\u1342F')
+	on "\u0001342F"
+	yields e(X='\u0001342F')
 
 test Test_UnicodeBlock_BamumSupplement_LeftBound:
 	grammar Test_UnicodeBlock_BamumSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{BamumSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u16800"
-	yields e(X='\u16800')
+	on "\u00016800"
+	yields e(X='\u00016800')
 
 test Test_UnicodeBlock_BamumSupplement_RightBound:
 	grammar Test_UnicodeBlock_BamumSupplement_RightBound { options {Axiom="e";} terminals {X->ub{BamumSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u16A3F"
-	yields e(X='\u16A3F')
+	on "\u00016A3F"
+	yields e(X='\u00016A3F')
 
 test Test_UnicodeBlock_Miao_LeftBound:
 	grammar Test_UnicodeBlock_Miao_LeftBound { options {Axiom="e";} terminals {X->ub{Miao};} rules { e->X; } }
 	parser LALR1
-	on "\u16F00"
-	yields e(X='\u16F00')
+	on "\u00016F00"
+	yields e(X='\u00016F00')
 
 test Test_UnicodeBlock_Miao_RightBound:
 	grammar Test_UnicodeBlock_Miao_RightBound { options {Axiom="e";} terminals {X->ub{Miao};} rules { e->X; } }
 	parser LALR1
-	on "\u16F9F"
-	yields e(X='\u16F9F')
+	on "\u00016F9F"
+	yields e(X='\u00016F9F')
 
 test Test_UnicodeBlock_KanaSupplement_LeftBound:
 	grammar Test_UnicodeBlock_KanaSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{KanaSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u1B000"
-	yields e(X='\u1B000')
+	on "\u0001B000"
+	yields e(X='\u0001B000')
 
 test Test_UnicodeBlock_KanaSupplement_RightBound:
 	grammar Test_UnicodeBlock_KanaSupplement_RightBound { options {Axiom="e";} terminals {X->ub{KanaSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u1B0FF"
-	yields e(X='\u1B0FF')
+	on "\u0001B0FF"
+	yields e(X='\u0001B0FF')
 
 test Test_UnicodeBlock_ByzantineMusicalSymbols_LeftBound:
 	grammar Test_UnicodeBlock_ByzantineMusicalSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{ByzantineMusicalSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D000"
-	yields e(X='\u1D000')
+	on "\u0001D000"
+	yields e(X='\u0001D000')
 
 test Test_UnicodeBlock_ByzantineMusicalSymbols_RightBound:
 	grammar Test_UnicodeBlock_ByzantineMusicalSymbols_RightBound { options {Axiom="e";} terminals {X->ub{ByzantineMusicalSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D0FF"
-	yields e(X='\u1D0FF')
+	on "\u0001D0FF"
+	yields e(X='\u0001D0FF')
 
 test Test_UnicodeBlock_MusicalSymbols_LeftBound:
 	grammar Test_UnicodeBlock_MusicalSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{MusicalSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D100"
-	yields e(X='\u1D100')
+	on "\u0001D100"
+	yields e(X='\u0001D100')
 
 test Test_UnicodeBlock_MusicalSymbols_RightBound:
 	grammar Test_UnicodeBlock_MusicalSymbols_RightBound { options {Axiom="e";} terminals {X->ub{MusicalSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D1FF"
-	yields e(X='\u1D1FF')
+	on "\u0001D1FF"
+	yields e(X='\u0001D1FF')
 
 test Test_UnicodeBlock_AncientGreekMusicalNotation_LeftBound:
 	grammar Test_UnicodeBlock_AncientGreekMusicalNotation_LeftBound { options {Axiom="e";} terminals {X->ub{AncientGreekMusicalNotation};} rules { e->X; } }
 	parser LALR1
-	on "\u1D200"
-	yields e(X='\u1D200')
+	on "\u0001D200"
+	yields e(X='\u0001D200')
 
 test Test_UnicodeBlock_AncientGreekMusicalNotation_RightBound:
 	grammar Test_UnicodeBlock_AncientGreekMusicalNotation_RightBound { options {Axiom="e";} terminals {X->ub{AncientGreekMusicalNotation};} rules { e->X; } }
 	parser LALR1
-	on "\u1D24F"
-	yields e(X='\u1D24F')
+	on "\u0001D24F"
+	yields e(X='\u0001D24F')
 
 test Test_UnicodeBlock_TaiXuanJingSymbols_LeftBound:
 	grammar Test_UnicodeBlock_TaiXuanJingSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{TaiXuanJingSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D300"
-	yields e(X='\u1D300')
+	on "\u0001D300"
+	yields e(X='\u0001D300')
 
 test Test_UnicodeBlock_TaiXuanJingSymbols_RightBound:
 	grammar Test_UnicodeBlock_TaiXuanJingSymbols_RightBound { options {Axiom="e";} terminals {X->ub{TaiXuanJingSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D35F"
-	yields e(X='\u1D35F')
+	on "\u0001D35F"
+	yields e(X='\u0001D35F')
 
 test Test_UnicodeBlock_CountingRodNumerals_LeftBound:
 	grammar Test_UnicodeBlock_CountingRodNumerals_LeftBound { options {Axiom="e";} terminals {X->ub{CountingRodNumerals};} rules { e->X; } }
 	parser LALR1
-	on "\u1D360"
-	yields e(X='\u1D360')
+	on "\u0001D360"
+	yields e(X='\u0001D360')
 
 test Test_UnicodeBlock_CountingRodNumerals_RightBound:
 	grammar Test_UnicodeBlock_CountingRodNumerals_RightBound { options {Axiom="e";} terminals {X->ub{CountingRodNumerals};} rules { e->X; } }
 	parser LALR1
-	on "\u1D37F"
-	yields e(X='\u1D37F')
+	on "\u0001D37F"
+	yields e(X='\u0001D37F')
 
 test Test_UnicodeBlock_MathematicalAlphanumericSymbols_LeftBound:
 	grammar Test_UnicodeBlock_MathematicalAlphanumericSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{MathematicalAlphanumericSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D400"
-	yields e(X='\u1D400')
+	on "\u0001D400"
+	yields e(X='\u0001D400')
 
 test Test_UnicodeBlock_MathematicalAlphanumericSymbols_RightBound:
 	grammar Test_UnicodeBlock_MathematicalAlphanumericSymbols_RightBound { options {Axiom="e";} terminals {X->ub{MathematicalAlphanumericSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1D7FF"
-	yields e(X='\u1D7FF')
+	on "\u0001D7FF"
+	yields e(X='\u0001D7FF')
 
 test Test_UnicodeBlock_ArabicMathematicalAlphabeticSymbols_LeftBound:
 	grammar Test_UnicodeBlock_ArabicMathematicalAlphabeticSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{ArabicMathematicalAlphabeticSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1EE00"
-	yields e(X='\u1EE00')
+	on "\u0001EE00"
+	yields e(X='\u0001EE00')
 
 test Test_UnicodeBlock_ArabicMathematicalAlphabeticSymbols_RightBound:
 	grammar Test_UnicodeBlock_ArabicMathematicalAlphabeticSymbols_RightBound { options {Axiom="e";} terminals {X->ub{ArabicMathematicalAlphabeticSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1EEFF"
-	yields e(X='\u1EEFF')
+	on "\u0001EEFF"
+	yields e(X='\u0001EEFF')
 
 test Test_UnicodeBlock_MahjongTiles_LeftBound:
 	grammar Test_UnicodeBlock_MahjongTiles_LeftBound { options {Axiom="e";} terminals {X->ub{MahjongTiles};} rules { e->X; } }
 	parser LALR1
-	on "\u1F000"
-	yields e(X='\u1F000')
+	on "\u0001F000"
+	yields e(X='\u0001F000')
 
 test Test_UnicodeBlock_MahjongTiles_RightBound:
 	grammar Test_UnicodeBlock_MahjongTiles_RightBound { options {Axiom="e";} terminals {X->ub{MahjongTiles};} rules { e->X; } }
 	parser LALR1
-	on "\u1F02F"
-	yields e(X='\u1F02F')
+	on "\u0001F02F"
+	yields e(X='\u0001F02F')
 
 test Test_UnicodeBlock_DominoTiles_LeftBound:
 	grammar Test_UnicodeBlock_DominoTiles_LeftBound { options {Axiom="e";} terminals {X->ub{DominoTiles};} rules { e->X; } }
 	parser LALR1
-	on "\u1F030"
-	yields e(X='\u1F030')
+	on "\u0001F030"
+	yields e(X='\u0001F030')
 
 test Test_UnicodeBlock_DominoTiles_RightBound:
 	grammar Test_UnicodeBlock_DominoTiles_RightBound { options {Axiom="e";} terminals {X->ub{DominoTiles};} rules { e->X; } }
 	parser LALR1
-	on "\u1F09F"
-	yields e(X='\u1F09F')
+	on "\u0001F09F"
+	yields e(X='\u0001F09F')
 
 test Test_UnicodeBlock_PlayingCards_LeftBound:
 	grammar Test_UnicodeBlock_PlayingCards_LeftBound { options {Axiom="e";} terminals {X->ub{PlayingCards};} rules { e->X; } }
 	parser LALR1
-	on "\u1F0A0"
-	yields e(X='\u1F0A0')
+	on "\u0001F0A0"
+	yields e(X='\u0001F0A0')
 
 test Test_UnicodeBlock_PlayingCards_RightBound:
 	grammar Test_UnicodeBlock_PlayingCards_RightBound { options {Axiom="e";} terminals {X->ub{PlayingCards};} rules { e->X; } }
 	parser LALR1
-	on "\u1F0FF"
-	yields e(X='\u1F0FF')
+	on "\u0001F0FF"
+	yields e(X='\u0001F0FF')
 
 test Test_UnicodeBlock_EnclosedAlphanumericSupplement_LeftBound:
 	grammar Test_UnicodeBlock_EnclosedAlphanumericSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{EnclosedAlphanumericSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u1F100"
-	yields e(X='\u1F100')
+	on "\u0001F100"
+	yields e(X='\u0001F100')
 
 test Test_UnicodeBlock_EnclosedAlphanumericSupplement_RightBound:
 	grammar Test_UnicodeBlock_EnclosedAlphanumericSupplement_RightBound { options {Axiom="e";} terminals {X->ub{EnclosedAlphanumericSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u1F1FF"
-	yields e(X='\u1F1FF')
+	on "\u0001F1FF"
+	yields e(X='\u0001F1FF')
 
 test Test_UnicodeBlock_EnclosedIdeographicSupplement_LeftBound:
 	grammar Test_UnicodeBlock_EnclosedIdeographicSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{EnclosedIdeographicSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u1F200"
-	yields e(X='\u1F200')
+	on "\u0001F200"
+	yields e(X='\u0001F200')
 
 test Test_UnicodeBlock_EnclosedIdeographicSupplement_RightBound:
 	grammar Test_UnicodeBlock_EnclosedIdeographicSupplement_RightBound { options {Axiom="e";} terminals {X->ub{EnclosedIdeographicSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u1F2FF"
-	yields e(X='\u1F2FF')
+	on "\u0001F2FF"
+	yields e(X='\u0001F2FF')
 
 test Test_UnicodeBlock_MiscellaneousSymbolsAndPictographs_LeftBound:
 	grammar Test_UnicodeBlock_MiscellaneousSymbolsAndPictographs_LeftBound { options {Axiom="e";} terminals {X->ub{MiscellaneousSymbolsAndPictographs};} rules { e->X; } }
 	parser LALR1
-	on "\u1F300"
-	yields e(X='\u1F300')
+	on "\u0001F300"
+	yields e(X='\u0001F300')
 
 test Test_UnicodeBlock_MiscellaneousSymbolsAndPictographs_RightBound:
 	grammar Test_UnicodeBlock_MiscellaneousSymbolsAndPictographs_RightBound { options {Axiom="e";} terminals {X->ub{MiscellaneousSymbolsAndPictographs};} rules { e->X; } }
 	parser LALR1
-	on "\u1F5FF"
-	yields e(X='\u1F5FF')
+	on "\u0001F5FF"
+	yields e(X='\u0001F5FF')
 
 test Test_UnicodeBlock_Emoticons_LeftBound:
 	grammar Test_UnicodeBlock_Emoticons_LeftBound { options {Axiom="e";} terminals {X->ub{Emoticons};} rules { e->X; } }
 	parser LALR1
-	on "\u1F600"
-	yields e(X='\u1F600')
+	on "\u0001F600"
+	yields e(X='\u0001F600')
 
 test Test_UnicodeBlock_Emoticons_RightBound:
 	grammar Test_UnicodeBlock_Emoticons_RightBound { options {Axiom="e";} terminals {X->ub{Emoticons};} rules { e->X; } }
 	parser LALR1
-	on "\u1F64F"
-	yields e(X='\u1F64F')
+	on "\u0001F64F"
+	yields e(X='\u0001F64F')
 
 test Test_UnicodeBlock_TransportAndMapSymbols_LeftBound:
 	grammar Test_UnicodeBlock_TransportAndMapSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{TransportAndMapSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1F680"
-	yields e(X='\u1F680')
+	on "\u0001F680"
+	yields e(X='\u0001F680')
 
 test Test_UnicodeBlock_TransportAndMapSymbols_RightBound:
 	grammar Test_UnicodeBlock_TransportAndMapSymbols_RightBound { options {Axiom="e";} terminals {X->ub{TransportAndMapSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1F6FF"
-	yields e(X='\u1F6FF')
+	on "\u0001F6FF"
+	yields e(X='\u0001F6FF')
 
 test Test_UnicodeBlock_AlchemicalSymbols_LeftBound:
 	grammar Test_UnicodeBlock_AlchemicalSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{AlchemicalSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1F700"
-	yields e(X='\u1F700')
+	on "\u0001F700"
+	yields e(X='\u0001F700')
 
 test Test_UnicodeBlock_AlchemicalSymbols_RightBound:
 	grammar Test_UnicodeBlock_AlchemicalSymbols_RightBound { options {Axiom="e";} terminals {X->ub{AlchemicalSymbols};} rules { e->X; } }
 	parser LALR1
-	on "\u1F77F"
-	yields e(X='\u1F77F')
+	on "\u0001F77F"
+	yields e(X='\u0001F77F')
 
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_LeftBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_LeftBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionB};} rules { e->X; } }
 	parser LALR1
-	on "\u20000"
-	yields e(X='\u20000')
+	on "\u00020000"
+	yields e(X='\u00020000')
 
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_RightBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_RightBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionB};} rules { e->X; } }
 	parser LALR1
-	on "\u2A6DF"
-	yields e(X='\u2A6DF')
+	on "\u0002A6DF"
+	yields e(X='\u0002A6DF')
 
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionC_LeftBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionC_LeftBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionC};} rules { e->X; } }
 	parser LALR1
-	on "\u2A700"
-	yields e(X='\u2A700')
+	on "\u0002A700"
+	yields e(X='\u0002A700')
 
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionC_RightBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionC_RightBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionC};} rules { e->X; } }
 	parser LALR1
-	on "\u2B73F"
-	yields e(X='\u2B73F')
+	on "\u0002B73F"
+	yields e(X='\u0002B73F')
 
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_LeftBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_LeftBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionD};} rules { e->X; } }
 	parser LALR1
-	on "\u2B740"
-	yields e(X='\u2B740')
+	on "\u0002B740"
+	yields e(X='\u0002B740')
 
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_RightBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_RightBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionD};} rules { e->X; } }
 	parser LALR1
-	on "\u2B81F"
-	yields e(X='\u2B81F')
+	on "\u0002B81F"
+	yields e(X='\u0002B81F')
 
 test Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_LeftBound:
 	grammar Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{CJKCompatibilityIdeographsSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u2F800"
-	yields e(X='\u2F800')
+	on "\u0002F800"
+	yields e(X='\u0002F800')
 
 test Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_RightBound:
 	grammar Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_RightBound { options {Axiom="e";} terminals {X->ub{CJKCompatibilityIdeographsSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\u2FA1F"
-	yields e(X='\u2FA1F')
+	on "\u0002FA1F"
+	yields e(X='\u0002FA1F')
 
 test Test_UnicodeBlock_Tags_LeftBound:
 	grammar Test_UnicodeBlock_Tags_LeftBound { options {Axiom="e";} terminals {X->ub{Tags};} rules { e->X; } }
 	parser LALR1
-	on "\uE0000"
-	yields e(X='\uE0000')
+	on "\u000E0000"
+	yields e(X='\u000E0000')
 
 test Test_UnicodeBlock_Tags_RightBound:
 	grammar Test_UnicodeBlock_Tags_RightBound { options {Axiom="e";} terminals {X->ub{Tags};} rules { e->X; } }
 	parser LALR1
-	on "\uE007F"
-	yields e(X='\uE007F')
+	on "\u000E007F"
+	yields e(X='\u000E007F')
 
 test Test_UnicodeBlock_VariationSelectorsSupplement_LeftBound:
 	grammar Test_UnicodeBlock_VariationSelectorsSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{VariationSelectorsSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\uE0100"
-	yields e(X='\uE0100')
+	on "\u000E0100"
+	yields e(X='\u000E0100')
 
 test Test_UnicodeBlock_VariationSelectorsSupplement_RightBound:
 	grammar Test_UnicodeBlock_VariationSelectorsSupplement_RightBound { options {Axiom="e";} terminals {X->ub{VariationSelectorsSupplement};} rules { e->X; } }
 	parser LALR1
-	on "\uE01EF"
-	yields e(X='\uE01EF')
+	on "\u000E01EF"
+	yields e(X='\u000E01EF')
 
 test Test_UnicodeBlock_SupplementaryPrivateUseAreaA_LeftBound:
 	grammar Test_UnicodeBlock_SupplementaryPrivateUseAreaA_LeftBound { options {Axiom="e";} terminals {X->ub{SupplementaryPrivateUseArea-A};} rules { e->X; } }
 	parser LALR1
-	on "\uF0000"
-	yields e(X='\uF0000')
+	on "\u000F0000"
+	yields e(X='\u000F0000')
 
 test Test_UnicodeBlock_SupplementaryPrivateUseAreaA_RightBound:
 	grammar Test_UnicodeBlock_SupplementaryPrivateUseAreaA_RightBound { options {Axiom="e";} terminals {X->ub{SupplementaryPrivateUseArea-A};} rules { e->X; } }
 	parser LALR1
-	on "\uFFFFF"
-	yields e(X='\uFFFFF')
+	on "\u000FFFFF"
+	yields e(X='\u000FFFFF')
 
 test Test_UnicodeBlock_SupplementaryPrivateUseAreaB_LeftBound:
 	grammar Test_UnicodeBlock_SupplementaryPrivateUseAreaB_LeftBound { options {Axiom="e";} terminals {X->ub{SupplementaryPrivateUseArea-B};} rules { e->X; } }
 	parser LALR1
-	on "\u100000"
-	yields e(X='\u100000')
+	on "\u00100000"
+	yields e(X='\u00100000')
 
 test Test_UnicodeBlock_SupplementaryPrivateUseAreaB_RightBound:
 	grammar Test_UnicodeBlock_SupplementaryPrivateUseAreaB_RightBound { options {Axiom="e";} terminals {X->ub{SupplementaryPrivateUseArea-B};} rules { e->X; } }
 	parser LALR1
-	on "\u10FFFF"
-	yields e(X='\u10FFFF')
+	on "\u0010FFFF"
+	yields e(X='\u0010FFFF')
