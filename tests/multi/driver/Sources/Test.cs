@@ -265,14 +265,15 @@ namespace Hime.Tests.Driver
 				if (line == null || line.Length == 0)
 					break;
 				output.Add(line);
-				if (line.StartsWith("[ERROR]"))
-					reporter.Error(line.Substring(8));
-				else if (line.StartsWith("[WARNING]"))
-					reporter.Warn(line.Substring(10));
-				else if (line.StartsWith("[INFO]"))
-					reporter.Info(line.Substring(7));
-				else
-					reporter.Info(line);
+				reporter.Info(line);
+			}
+			while (true)
+			{
+				string line = process.StandardError.ReadLine();
+				if (line == null || line.Length == 0)
+					break;
+				output.Add(line);
+				reporter.Error(line);
 			}
 			process.WaitForExit();
 			return process.ExitCode;
