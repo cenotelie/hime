@@ -973,7 +973,7 @@ namespace Hime.CentralDogma.Grammars
 						else
 							break;
 					}
-					if (l > 8)
+					if (l >= 8)
 						l = 8;
 					else if (l > 4)
 						l = 4;

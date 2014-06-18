@@ -206,6 +206,18 @@ namespace Hime.Tests.Driver
 				output.Add(ex.ToString());
 			}
 			result.Finish(code, output);
+			switch (code)
+			{
+				case TestResult.RESULT_SUCCESS:
+					reporter.Info("\t=> Success");
+					break;
+				case TestResult.RESULT_FAILURE_PARSING:
+					reporter.Info("\t=> Error");
+					break;
+				case TestResult.RESULT_FAILURE_VERB:
+					reporter.Info("\t=> Failure");
+					break;
+			}
 			return result;
 		}
 
@@ -239,6 +251,18 @@ namespace Hime.Tests.Driver
 				output.Add(ex.ToString());
 			}
 			result.Finish(code, output);
+			switch (code)
+			{
+				case TestResult.RESULT_SUCCESS:
+					reporter.Info("\t=> Success");
+					break;
+				case TestResult.RESULT_FAILURE_PARSING:
+					reporter.Info("\t=> Error");
+					break;
+				case TestResult.RESULT_FAILURE_VERB:
+					reporter.Info("\t=> Failure");
+					break;
+			}
 			return result;
 		}
 
