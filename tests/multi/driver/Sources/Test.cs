@@ -114,7 +114,9 @@ namespace Hime.Tests.Driver
 				builder.Append(node.Children[0].Children[0].Symbol.Value);
 				builder.Append("'");
 				string value = node.Children[0].Children[1].Symbol.Value;
-				value = Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(value.Substring(1, value.Length - 2));
+				// Decode the read value by replacing all the escape sequences
+				value = Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(value.Substring(1, value.Length - 2)).Replace("\\'", "'");
+				// Reset escape sequences for single quotes and backslashes
 				value = value.Replace("\\", "\\\\").Replace("'", "\\'");
 				builder.Append(value);
 				builder.Append("'");
