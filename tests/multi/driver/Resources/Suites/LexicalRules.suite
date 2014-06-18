@@ -1,0 +1,505 @@
+fixture LexicalRules
+
+test Test_Terminals_SingleCharacter:
+	grammar Test_Terminals_SingleCharacter { options {Axiom="e";} terminals {A->'a';} rules { e->A; } }
+	parser LALR1
+	on "a"
+	yields e(A='a')
+
+test Test_Terminals_EscapeSequenceBackslash:
+	grammar Test_Terminals_EscapeSequenceBackslash { options {Axiom="e";} terminals {A->'a'; X->'\\';} rules { e->A X A; } }
+	parser LALR1
+	on "a\\a"
+	yields e(A X='\\' A)
+
+test Test_Terminals_EscapeSequenceSingleQuote:
+	grammar Test_Terminals_EscapeSequenceSingleQuote { options {Axiom="e";} terminals {A->'a'; X->'\'';} rules { e->A X A; } }
+	parser LALR1
+	on "a'a"
+	yields e(A X='\'' A)
+
+test Test_Terminals_EscapeSequenceUnicode0:
+	grammar Test_Terminals_EscapeSequenceUnicode0 { options {Axiom="e";} terminals {A->'a'; X->'\0';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u0000a"
+	yields e(A X='\u0000' A)
+
+test Test_Terminals_EscapeSequenceUnicode7:
+	grammar Test_Terminals_EscapeSequenceUnicode7 { options {Axiom="e";} terminals {A->'a'; X->'\a';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u0007a"
+	yields e(A X='\u0007' A)
+
+test Test_Terminals_EscapeSequenceUnicode8:
+	grammar Test_Terminals_EscapeSequenceUnicode8 { options {Axiom="e";} terminals {A->'a'; X->'\b';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u0008a"
+	yields e(A X='\u0008' A)
+
+test Test_Terminals_EscapeSequenceUnicode9:
+	grammar Test_Terminals_EscapeSequenceUnicode9 { options {Axiom="e";} terminals {A->'a'; X->'\t';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u0009a"
+	yields e(A X='\u0009' A)
+
+test Test_Terminals_EscapeSequenceUnicode10:
+	grammar Test_Terminals_EscapeSequenceUnicode10 { options {Axiom="e";} terminals {A->'a'; X->'\n';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u000Aa"
+	yields e(A X='\u000A' A)
+
+test Test_Terminals_EscapeSequenceUnicode11:
+	grammar Test_Terminals_EscapeSequenceUnicode11 { options {Axiom="e";} terminals {A->'a'; X->'\v';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u000Ba"
+	yields e(A X='\u000B' A)
+
+test Test_Terminals_EscapeSequenceUnicode12:
+	grammar Test_Terminals_EscapeSequenceUnicode12 { options {Axiom="e";} terminals {A->'a'; X->'\f';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u000Ca"
+	yields e(A X='\u000C' A)
+
+test Test_Terminals_EscapeSequenceUnicode13:
+	grammar Test_Terminals_EscapeSequenceUnicode13 { options {Axiom="e";} terminals {A->'a'; X->'\r';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u000Da"
+	yields e(A X='\u000D' A)
+
+test Test_Terminals_MultipleCharacters:
+	grammar Test_Terminals_MultipleCharacters { options {Axiom="e";} terminals {A->'abc';} rules { e->A; } }
+	parser LALR1
+	on "abc"
+	yields e(A='abc')
+
+test Test_Terminals_UnicodeCodepoint_1234:
+	grammar Test_Terminals_UnicodeCodepoint_1234 { options {Axiom="e";} terminals {A->'a'; X->U+1234;} rules { e->A X A; } }
+	parser LALR1
+	on "a\u1234a"
+	yields e(A X='\u1234' A)
+
+test Test_Terminals_UnicodeCodepoint_Range:
+	grammar Test_Terminals_UnicodeCodepoint_Range { options {Axiom="e";} terminals {A->'a'; X->U+1234 .. U+5678;} rules { e->X X X; } }
+	parser LALR1
+	on "\u1234\u3333\u5678"
+	yields e(X='\u1234' X='\u3333' X='\u5678')
+
+test Test_Terminals_Wildcard_Single:
+	grammar Test_Terminals_Wildcard_Single { options {Axiom="e";} terminals {X->.; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aba"
+	yields e(A X='b' A)
+
+test Test_Terminals_Wildcard_SpecialCharacter_0:
+	grammar Test_Terminals_Wildcard_SpecialCharacter_0 { options {Axiom="e";} terminals {X->.; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u0000a"
+	yields e(A X='\u0000' A)
+
+test Test_Terminals_Wildcard_SpecialCharacter_1234:
+	grammar Test_Terminals_Wildcard_SpecialCharacter_1234 { options {Axiom="e";} terminals {X->.; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u1234a"
+	yields e(A X='\u1234' A)
+
+test Test_Terminals_Wildcard_SpecialCharacter_5678:
+	grammar Test_Terminals_Wildcard_SpecialCharacter_5678 { options {Axiom="e";} terminals {X->.; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a\u5678a"
+	yields e(A X='\u5678' A)
+
+test Test_Terminals_Wildcard_NewLine:
+	grammar Test_Terminals_Wildcard_NewLine { options {Axiom="e";} terminals {X->.; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a\na"
+	yields e(A X='\n' A)
+
+test Test_Terminals_Wildcard_CarriageReturn:
+	grammar Test_Terminals_Wildcard_CarriageReturn { options {Axiom="e";} terminals {X->.; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a\ra"
+	yields e(A X='\r' A)
+
+test Test_Terminals_Class_SimpleCharacter:
+	grammar Test_Terminals_Class_SimpleCharacter { options {Axiom="e";} terminals {X->[xyz]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aya"
+	yields e(A X='y' A)
+
+test Test_Terminals_Class_Range:
+	grammar Test_Terminals_Class_Range { options {Axiom="e";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aya"
+	yields e(A X='y' A)
+
+test Test_Terminals_Class_RangeLeftBorder:
+	grammar Test_Terminals_Class_RangeLeftBorder { options {Axiom="e";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "axa"
+	yields e(A X='x' A)
+
+test Test_Terminals_Class_RangeRightBorder:
+	grammar Test_Terminals_Class_RangeRightBorder { options {Axiom="e";} terminals {X->[x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aza"
+	yields e(A X='z' A)
+
+test Test_Terminals_Class_NegativeRange_Excluded:
+	grammar Test_Terminals_Class_NegativeRange_Excluded { options {Axiom="e";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aya"
+	fails
+
+test Test_Terminals_Class_NegativeRange_ExcludedLeftBorder:
+	grammar Test_Terminals_Class_NegativeRange_ExcludedLeftBorder { options {Axiom="e";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "axa"
+	fails
+
+test Test_Terminals_Class_NegativeRange_ExcludedRightBorder:
+	grammar Test_Terminals_Class_NegativeRange_ExcludedRightBorder { options {Axiom="e";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aza"
+	fails
+
+test Test_Terminals_Class_NegativeRange_Included:
+	grammar Test_Terminals_Class_NegativeRange_Included { options {Axiom="e";} terminals {X->[^x-z]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aba"
+	yields e(A X='b' A)
+
+test Test_Terminals_Class_MultiRange_First:
+	grammar Test_Terminals_Class_MultiRange_First { options {Axiom="e";} terminals {X->[x-z0-9]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aya"
+	yields e(A X='y' A)
+
+test Test_Terminals_Class_MultiRange_Second:
+	grammar Test_Terminals_Class_MultiRange_Second { options {Axiom="e";} terminals {X->[x-z0-9]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a5a"
+	yields e(A X='5' A)
+
+test Test_Terminals_Class_NegativeMultiRange_First:
+	grammar Test_Terminals_Class_NegativeMultiRange_First { options {Axiom="e";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "aya"
+	fails
+
+test Test_Terminals_Class_NegativeMultiRange_Second:
+	grammar Test_Terminals_Class_NegativeMultiRange_Second { options {Axiom="e";} terminals {X->[^x-z0-9]; A->'a';} rules { e->A X A; } }
+	parser LALR1
+	on "a5a"
+	fails
+
+test Test_Terminals_NestingRules_Simple:
+	grammar Test_Terminals_NestingRules_Simple { options {Axiom="e";} terminals {X->'x'; Y->'y' X 'y'; A->'a';} rules { e->A Y A; } }
+	parser LALR1
+	on "ayxya"
+	yields e(A Y='yxy' A)
+
+test Test_Terminals_NestingRules_Prefix_Strict:
+	grammar Test_Terminals_NestingRules_Prefix_Strict { options {Axiom="e";} terminals {X->'x'; Y->X 'y'; A->'a';} rules { e->A Y A; } }
+	parser LALR1
+	on "axya"
+	yields e(A Y='xy' A)
+
+test Test_Terminals_NestingRules_Prefix_Optional_1:
+	grammar Test_Terminals_NestingRules_Prefix_Optional_1 { options {Axiom="e";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }
+	parser LALR1
+	on "axya"
+	yields e(A Y='xy' A)
+
+test Test_Terminals_NestingRules_Prefix_Optional_2:
+	grammar Test_Terminals_NestingRules_Prefix_Optional_2 { options {Axiom="e";} terminals {X->'x'; Y->X 'y'?; A->'a';} rules { e->A Y A; } }
+	parser LALR1
+	on "axa"
+	yields e(A Y='x' A)
+
+test Test_Terminals_OperatorStar_0:
+	grammar Test_Terminals_OperatorStar_0 { options {Axiom="e";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }
+	parser LALR1
+	on "aa"
+	yields e(X='aa')
+
+test Test_Terminals_OperatorStar_1:
+	grammar Test_Terminals_OperatorStar_1 { options {Axiom="e";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }
+	parser LALR1
+	on "axa"
+	yields e(X='axa')
+
+test Test_Terminals_OperatorStar_More:
+	grammar Test_Terminals_OperatorStar_More { options {Axiom="e";} terminals {X->'a' 'x'* 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxa"
+	yields e(X='axxxa')
+
+test Test_Terminals_OperatorPlus_0:
+	grammar Test_Terminals_OperatorPlus_0 { options {Axiom="e";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }
+	parser LALR1
+	on "aa"
+	fails
+
+test Test_Terminals_OperatorPlus_1:
+	grammar Test_Terminals_OperatorPlus_1 { options {Axiom="e";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }
+	parser LALR1
+	on "axa"
+	yields e(X='axa')
+
+test Test_Terminals_OperatorPlus_More:
+	grammar Test_Terminals_OperatorPlus_More { options {Axiom="e";} terminals {X->'a' 'x'+ 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxa"
+	yields e(X='axxxa')
+
+test Test_Terminals_OperatorOptional_0:
+	grammar Test_Terminals_OperatorOptional_0 { options {Axiom="e";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }
+	parser LALR1
+	on "aa"
+	yields e(X='aa')
+
+test Test_Terminals_OperatorOptional_1:
+	grammar Test_Terminals_OperatorOptional_1 { options {Axiom="e";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }
+	parser LALR1
+	on "axa"
+	yields e(X='axa')
+
+test Test_Terminals_OperatorOptional_More:
+	grammar Test_Terminals_OperatorOptional_More { options {Axiom="e";} terminals {X->'a' 'x'? 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxa"
+	fails
+
+test Test_Terminals_OperatorCardinality_Strict_Exact:
+	grammar Test_Terminals_OperatorCardinality_Strict_Exact { options {Axiom="e";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxxa"
+	yields e(X='axxxxa')
+
+test Test_Terminals_OperatorCardinality_Strict_Less:
+	grammar Test_Terminals_OperatorCardinality_Strict_Less { options {Axiom="e";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxa"
+	fails
+
+test Test_Terminals_OperatorCardinality_Strict_More:
+	grammar Test_Terminals_OperatorCardinality_Strict_More { options {Axiom="e";} terminals {X->'a' 'x'{4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxxxa"
+	fails
+
+test Test_Terminals_OperatorCardinality_Range_LeftBound:
+	grammar Test_Terminals_OperatorCardinality_Range_LeftBound { options {Axiom="e";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxa"
+	yields e(X='axxa')
+
+test Test_Terminals_OperatorCardinality_Range_RightBound:
+	grammar Test_Terminals_OperatorCardinality_Range_RightBound { options {Axiom="e";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxxa"
+	yields e(X='axxxxa')
+
+test Test_Terminals_OperatorCardinality_Range_Within:
+	grammar Test_Terminals_OperatorCardinality_Range_Within { options {Axiom="e";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxa"
+	yields e(X='axxxa')
+
+test Test_Terminals_OperatorCardinality_Range_Less:
+	grammar Test_Terminals_OperatorCardinality_Range_Less { options {Axiom="e";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axa"
+	fails
+
+test Test_Terminals_OperatorCardinality_Range_More:
+	grammar Test_Terminals_OperatorCardinality_Range_More { options {Axiom="e";} terminals {X->'a' 'x'{2,4} 'a';} rules { e->X; } }
+	parser LALR1
+	on "axxxxxa"
+	fails
+
+test Test_Terminals_OperatorConcatenation_Simple:
+	grammar Test_Terminals_OperatorConcatenation_Simple { options {Axiom="e";} terminals {A-> 'a' 'b';} rules { e->A; } }
+	parser LALR1
+	on "ab"
+	yields e(A='ab')
+
+test Test_Terminals_OperatorConcatenation_Chained:
+	grammar Test_Terminals_OperatorConcatenation_Chained { options {Axiom="e";} terminals {A-> 'a' 'b' 'c';} rules { e->A; } }
+	parser LALR1
+	on "abc"
+	yields e(A='abc')
+
+test Test_Terminals_OperatorUnion_Simple_Left:
+	grammar Test_Terminals_OperatorUnion_Simple_Left { options {Axiom="e";} terminals {A-> 'a' | 'b';} rules { e->A; } }
+	parser LALR1
+	on "a"
+	yields e(A='a')
+
+test Test_Terminals_OperatorUnion_Simple_Right:
+	grammar Test_Terminals_OperatorUnion_Simple_Right { options {Axiom="e";} terminals {A-> 'a' | 'b';} rules { e->A; } }
+	parser LALR1
+	on "b"
+	yields e(A='b')
+
+test Test_Terminals_OperatorUnion_Chained_1:
+	grammar Test_Terminals_OperatorUnion_Chained_1 { options {Axiom="e";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }
+	parser LALR1
+	on "a"
+	yields e(A='a')
+
+test Test_Terminals_OperatorUnion_Chained_2:
+	grammar Test_Terminals_OperatorUnion_Chained_2 { options {Axiom="e";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }
+	parser LALR1
+	on "b"
+	yields e(A='b')
+
+test Test_Terminals_OperatorUnion_Chained_3:
+	grammar Test_Terminals_OperatorUnion_Chained_3 { options {Axiom="e";} terminals {A-> 'a' | 'b' | 'c';} rules { e->A; } }
+	parser LALR1
+	on "c"
+	yields e(A='c')
+
+test Test_Terminals_OperatorDifference_InNominalOnly:
+	grammar Test_Terminals_OperatorDifference_InNominalOnly { options {Axiom="e";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }
+	parser LALR1
+	on "aa"
+	yields e(A='aa')
+
+test Test_Terminals_OperatorDifference_InIntersection:
+	grammar Test_Terminals_OperatorDifference_InIntersection { options {Axiom="e";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }
+	parser LALR1
+	on "bb"
+	fails
+
+test Test_Terminals_OperatorDifference_InSubstractedOnly:
+	grammar Test_Terminals_OperatorDifference_InSubstractedOnly { options {Axiom="e";} terminals {A->[ab]+ - [bc]+;} rules { e->A; } }
+	parser LALR1
+	on "cc"
+	fails
+
+test Test_Terminals_Precedence_StarConcat_NoGrouping_OK:
+	grammar Test_Terminals_Precedence_StarConcat_NoGrouping_OK { options {Axiom="e";} terminals {A->'a' 'b'*;} rules { e->A; } }
+	parser LALR1
+	on "abbbbb"
+	yields e(A='abbbbb')
+
+test Test_Terminals_Precedence_StarConcat_NoGrouping_NOK:
+	grammar Test_Terminals_Precedence_StarConcat_NoGrouping_NOK { options {Axiom="e";} terminals {A->'a' 'b'*;} rules { e->A; } }
+	parser LALR1
+	on "abab"
+	fails
+
+test Test_Terminals_Precedence_StarConcat_Grouping_OK:
+	grammar Test_Terminals_Precedence_StarConcat_Grouping_OK { options {Axiom="e";} terminals {A->'c' ('a' 'b')*;} rules { e->A; } }
+	parser LALR1
+	on "cabab"
+	yields e(A='cabab')
+
+test Test_Terminals_Precedence_StarConcat_Grouping_NOK:
+	grammar Test_Terminals_Precedence_StarConcat_Grouping_NOK { options {Axiom="e";} terminals {A->'c' ('a' 'b')*;} rules { e->A; } }
+	parser LALR1
+	on "cabbbbb"
+	fails
+
+test Test_Terminals_Precedence_PlusConcat_NoGrouping_OK:
+	grammar Test_Terminals_Precedence_PlusConcat_NoGrouping_OK { options {Axiom="e";} terminals {A->'a' 'b'+;} rules { e->A; } }
+	parser LALR1
+	on "abbbbb"
+	yields e(A='abbbbb')
+
+test Test_Terminals_Precedence_PlusConcat_NoGrouping_NOK:
+	grammar Test_Terminals_Precedence_PlusConcat_NoGrouping_NOK { options {Axiom="e";} terminals {A->'a' 'b'+;} rules { e->A; } }
+	parser LALR1
+	on "abab"
+	fails
+
+test Test_Terminals_Precedence_PlusConcat_Grouping_OK:
+	grammar Test_Terminals_Precedence_PlusConcat_Grouping_OK { options {Axiom="e";} terminals {A->('a' 'b')+;} rules { e->A; } }
+	parser LALR1
+	on "abab"
+	yields e(A='abab')
+
+test Test_Terminals_Precedence_PlusConcat_Grouping_NOK:
+	grammar Test_Terminals_Precedence_PlusConcat_Grouping_NOK { options {Axiom="e";} terminals {A->('a' 'b')+;} rules { e->A; } }
+	parser LALR1
+	on "abbbbb"
+	fails
+
+test Test_Terminals_Precedence_OptionalConcat_NoGrouping_OK:
+	grammar Test_Terminals_Precedence_OptionalConcat_NoGrouping_OK { options {Axiom="e";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }
+	parser LALR1
+	on "ac"
+	yields e(A='ac')
+
+test Test_Terminals_Precedence_OptionalConcat_NoGrouping_NOK:
+	grammar Test_Terminals_Precedence_OptionalConcat_NoGrouping_NOK { options {Axiom="e";} terminals {A->'a' 'b'? 'c';} rules { e->A; } }
+	parser LALR1
+	on "c"
+	fails
+
+test Test_Terminals_Precedence_OptionalConcat_Grouping_OK:
+	grammar Test_Terminals_Precedence_OptionalConcat_Grouping_OK { options {Axiom="e";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }
+	parser LALR1
+	on "c"
+	yields e(A='c')
+
+test Test_Terminals_Precedence_OptionalConcat_Grouping_NOK:
+	grammar Test_Terminals_Precedence_OptionalConcat_Grouping_NOK { options {Axiom="e";} terminals {A->('a' 'b')? 'c';} rules { e->A; } }
+	parser LALR1
+	on "ac"
+	fails
+
+test Test_Terminals_Precedence_CardinalityConcat_NoGrouping_OK:
+	grammar Test_Terminals_Precedence_CardinalityConcat_NoGrouping_OK { options {Axiom="e";} terminals {A->'a' 'b'{4};} rules { e->A; } }
+	parser LALR1
+	on "abbbb"
+	yields e(A='abbbb')
+
+test Test_Terminals_Precedence_CardinalityConcat_NoGrouping_NOK:
+	grammar Test_Terminals_Precedence_CardinalityConcat_NoGrouping_NOK { options {Axiom="e";} terminals {A->'a' 'b'{4};} rules { e->A; } }
+	parser LALR1
+	on "abababab"
+	fails
+
+test Test_Terminals_Precedence_CardinalityConcat_Grouping_OK:
+	grammar Test_Terminals_Precedence_CardinalityConcat_Grouping_OK { options {Axiom="e";} terminals {A->('a' 'b'){4};} rules { e->A; } }
+	parser LALR1
+	on "abababab"
+	yields e(A='abababab')
+
+test Test_Terminals_Precedence_CardinalityConcat_Grouping_NOK:
+	grammar Test_Terminals_Precedence_CardinalityConcat_Grouping_NOK { options {Axiom="e";} terminals {A->('a' 'b'){4};} rules { e->A; } }
+	parser LALR1
+	on "abbbb"
+	fails
+
+test Test_Terminals_Precedence_ConcatUnion_NoGrouping_OK:
+	grammar Test_Terminals_Precedence_ConcatUnion_NoGrouping_OK { options {Axiom="e";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }
+	parser LALR1
+	on "c"
+	yields e(A='c')
+
+test Test_Terminals_Precedence_ConcatUnion_NoGrouping_NOK:
+	grammar Test_Terminals_Precedence_ConcatUnion_NoGrouping_NOK { options {Axiom="e";} terminals {A-> 'a' 'b' | 'c';} rules { e->A; } }
+	parser LALR1
+	on "ac"
+	fails
+
+test Test_Terminals_Precedence_ConcatUnion_Grouping_OK:
+	grammar Test_Terminals_Precedence_ConcatUnion_Grouping_OK { options {Axiom="e";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }
+	parser LALR1
+	on "ac"
+	yields e(A='ac')
+
+test Test_Terminals_Precedence_ConcatUnion_Grouping_NOK:
+	grammar Test_Terminals_Precedence_ConcatUnion_Grouping_NOK { options {Axiom="e";} terminals {A-> 'a' ('b' | 'c');} rules { e->A; } }
+	parser LALR1
+	on "c"
+	fails
+
+test Test_Terminals_RuleOverriding:
+	grammar Test_Terminals_RuleOverriding { options {Axiom="e";} terminals {X->'x'; Y->[a-z]; A->'a';} rules { e->A Y A; } }
+	parser LALR1
+	on "axa"
+	yields e(A Y='x' A)
