@@ -291,14 +291,6 @@ namespace Hime.Tests.Driver
 				output.Add(line);
 				reporter.Info(line);
 			}
-			while (true)
-			{
-				string line = process.StandardError.ReadLine();
-				if (line == null || line.Length == 0)
-					break;
-				output.Add(line);
-				reporter.Error(line);
-			}
 			process.WaitForExit();
 			return process.ExitCode;
 		}
