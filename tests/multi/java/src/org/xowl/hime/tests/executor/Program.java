@@ -70,8 +70,7 @@ public class Program {
     private String readAllText(String file) {
         try {
             byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(file));
-            String result = new String(bytes, "UTF-8");
-            return result;
+            return new String(bytes, "UTF-8");
         } catch (IOException ex) {
             ex.printStackTrace();
             return "";
@@ -140,11 +139,11 @@ public class Program {
         if (expected.getChildren().get(0).getChildren().size() > 0) {
             String test = expected.getChildren().get(0).getChildren().get(0).getSymbol().getValue();
             String vRef = expected.getChildren().get(0).getChildren().get(1).getSymbol().getValue();
-            vRef = vRef.substring(1, vRef.length() - 1).replaceAll("\'", "'").replaceAll("\\\\", "\\");
+            vRef = vRef.substring(1, vRef.length() - 1).replace("\\'", "'").replace("\\\\", "\\");
             String vReal = node.getSymbol().getValue();
-            if (test == "=" && vReal != vRef)
+            if ("=".equals(test) && !vRef.equals(vReal))
                 return false;
-            if (test == "!=" && vReal == vRef)
+            if ("!=".equals(test) && vRef.equals(vReal))
                 return false;
         }
         if (node.getChildren().size() != expected.getChildren().get(1).getChildren().size())
