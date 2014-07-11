@@ -172,12 +172,18 @@
     <Compile Include="Sources\Output\EmitterBase.cs" />
     <Compile Include="Sources\Output\EmitterForJava.cs" />
     <Compile Include="Sources\Output\Unit.cs" />
+    <Compile Include="Sources\Input\CommandLineLexer.cs" />
+    <Compile Include="Sources\Input\CommandLineParser.cs" />
+    <Compile Include="Sources\Input\CommandLine.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />
     <EmbeddedResource Include="Sources\Input\HimeGrammarParser.bin" />
     <EmbeddedResource Include="Sources\Input\HimeGrammarLexer.bin" />
     <EmbeddedResource Include="Resources\Java\pom.xml" />
+    <EmbeddedResource Include="Sources\Input\CommandLine.gram" />
+    <EmbeddedResource Include="Sources\Input\CommandLineLexer.bin" />
+    <EmbeddedResource Include="Sources\Input\CommandLineParser.bin" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\runtimes\net\Hime.Redist.csproj">

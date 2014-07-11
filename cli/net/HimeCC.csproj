@@ -50,8 +50,6 @@
     <Compile Include="..\..\releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="CommandLineLexer.cs" />
-    <Compile Include="CommandLineParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,13 +62,6 @@
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CommandLine.gram" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CommandLineLexer.bin" />
-    <EmbeddedResource Include="CommandLineParser.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
