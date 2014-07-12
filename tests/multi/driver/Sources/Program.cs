@@ -19,9 +19,11 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.CentralDogma;
 using Hime.CentralDogma.Output;
+using Hime.Redist;
 
 namespace Hime.Tests.Driver
 {
@@ -37,7 +39,7 @@ namespace Hime.Tests.Driver
 		public static void Main(string[] args)
 		{
 			Program program = new Program();
-			program.Execute();
+			program.Execute(args);
 		}
 
 		/// <summary>
@@ -52,13 +54,61 @@ namespace Hime.Tests.Driver
 		/// The tests
 		/// </summary>
 		private List<Fixture> fixtures;
+		/// <summary>
+		/// Filter for the enable tests
+		/// </summary>
+		private Regex filter;
 
 		/// <summary>
 		/// Execute this instance
 		/// </summary>
-		public void Execute()
+		/// <param name="args">The command-line arguments.</param>
+		public void Execute(string[] args)
 		{
-			Initialize();
+			// If no argument is given, print the help screen and return OK
+			if (args == null || args.Length == 0)
+			{
+				PrintHelp();
+				return;
+			}
+
+			// Parse the arguments
+			ParseResult result = Hime.CentralDogma.Input.CommandLine.ParseArguments(args);
+			if (!result.IsSuccess || result.Errors.Count > 0)
+			{
+				Console.WriteLine("[ERROR] Could not parse the arguments");
+				PrintHelp();
+				return;
+			}
+
+			// Initializes the parameters
+			reporter = new Reporter();
+			targets = new List<Runtime>();
+			fixtures = new List<Fixture>();
+			filter = new Regex(".*");
+
+			// Loads the arguments from the command line
+			foreach (ASTNode arg in result.Root.Children[1].Children)
+			{
+				switch (arg.Symbol.Value)
+				{
+					case "--targets":
+						foreach (string name in Hime.CentralDogma.Input.CommandLine.GetValues(arg))
+							targets.Add((Runtime)Enum.Parse(typeof(Runtime), name));
+						break;
+					case "--filter":
+						filter = new Regex(Hime.CentralDogma.Input.CommandLine.GetValue(arg));
+						break;
+					default:
+						Console.WriteLine("Unknown argument " + arg.Symbol.Value);
+						break;
+				}
+			}
+
+			string[] resources = (typeof(Program)).Assembly.GetManifestResourceNames();
+			foreach (string resource in resources)
+				if (resource.StartsWith("Hime.Tests.Driver.Resources.Suites."))
+					fixtures.Add(new Fixture(reporter, resource, filter));
 
 			BuildTestParsers();
 
@@ -67,24 +117,6 @@ namespace Hime.Tests.Driver
 				fixture.Execute(reporter, targets);
 
 			ExportReport();
-		}
-
-		/// <summary>
-		/// Initializes this driver
-		/// </summary>
-		private void Initialize()
-		{
-			reporter = new Reporter();
-			targets = new List<Runtime>();
-			foreach (object v in Enum.GetValues(typeof(Runtime)))
-				targets.Add((Runtime)v);
-
-			// load fixtures
-			fixtures = new List<Fixture>();
-			string[] resources = (typeof(Program)).Assembly.GetManifestResourceNames();
-			foreach (string resource in resources)
-				if (resource.StartsWith("Hime.Tests.Driver.Resources.Suites."))
-					fixtures.Add(new Fixture(reporter, resource));
 		}
 
 		/// <summary>
@@ -114,10 +146,20 @@ namespace Hime.Tests.Driver
 				}
 			}
 
-			EmitterForNet emitterNet = new EmitterForNet(units);
-			emitterNet.Emit("", Mode.Assembly);
-			EmitterForJava emitterJava = new EmitterForJava(units);
-			emitterJava.Emit("", Mode.Assembly);
+			foreach (Runtime target in targets)
+			{
+				EmitterBase emitter = null;
+				switch (target)
+				{
+					case Runtime.Net:
+						emitter = new EmitterForNet(reporter, units);
+						break;
+					case Runtime.Java:
+						emitter = new EmitterForJava(reporter, units);
+						break;
+				}
+				emitter.Emit("", Mode.Assembly);
+			}
 		}
 
 		/// <summary>
@@ -173,6 +215,35 @@ namespace Hime.Tests.Driver
 			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
 			return aggregated;
+		}
+
+		/// <summary>
+		/// Prints the help screen for this program
+		/// </summary>
+		private void PrintHelp()
+		{
+			Console.WriteLine("driver " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (LGPL 3)");
+			Console.WriteLine("Tests driver for the multiplatform tests of the Hime parser generator");
+			Console.WriteLine();
+			Console.WriteLine("usage: mono driver.exe --targets <NAMES> [--filter REGEXP]");
+			Console.WriteLine();
+			Console.WriteLine("\t--targets <NAMES>");
+			Console.WriteLine("\t\tExecute tests only for the provided platforms");
+			Console.WriteLine("\t\tSupported platforms:");
+			Console.Write("\t\t");
+			bool first = true;
+			foreach (object v in Enum.GetValues(typeof(Runtime)))
+			{
+				if (!first)
+					Console.Write(", ");
+				Console.Write(v.ToString());
+				first = false;
+			}
+			Console.WriteLine();
+			Console.WriteLine();
+			Console.WriteLine("\t--filter REGEXP");
+			Console.WriteLine("\t\tOnly execute tests with name matching the provided expression");
+			Console.WriteLine("\t\tBy default, execute all tests");
 		}
 	}
 }

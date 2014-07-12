@@ -106,7 +106,8 @@ namespace Hime.HimeCC
 			{
 				PrintHelp();
 				return ResultOK;
-			} else if (special == ArgRegenerateShort || special == ArgRegenerateLong)
+			}
+			else if (special == ArgRegenerateShort || special == ArgRegenerateLong)
 			{
 				GenerateCLParser();
 				GenerateCDParser();
@@ -211,12 +212,12 @@ namespace Hime.HimeCC
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
 							return null;
-						task.GrammarName = GetValue(arg);
+						task.GrammarName = Hime.CentralDogma.Input.CommandLine.GetValue(arg);
 						break;
 					case ArgPath:
 						if (arg.Children.Count != 1)
 							return null;
-						task.OutputPath = GetValue(arg);
+						task.OutputPath = Hime.CentralDogma.Input.CommandLine.GetValue(arg);
 						break;
 					case ArgMethodRNGLR:
 						task.Method = ParsingMethod.RNGLALR1;
@@ -224,7 +225,7 @@ namespace Hime.HimeCC
 					case ArgNamespace:
 						if (arg.Children.Count != 1)
 							return null;
-						task.Namespace = GetValue(arg);
+						task.Namespace = Hime.CentralDogma.Input.CommandLine.GetValue(arg);
 						break;
 					case ArgAccessPublic:
 						task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
@@ -250,21 +251,6 @@ namespace Hime.HimeCC
 			if (value.StartsWith("\""))
 				value = value.Substring(1, value.Length - 2);
 			task.AddInputFile(value);
-		}
-
-		/// <summary>
-		/// Gets the value of the given parsed argument
-		/// </summary>
-		/// <param name="argument">A parsed argument</param>
-		/// <returns>The corresponding value, or null if there is none</returns>
-		private string GetValue(ASTNode argument)
-		{
-			if (argument.Children.Count == 0)
-				return null;
-			string value = argument.Children[0].Symbol.Value;
-			if (value.StartsWith("\""))
-				return value.Substring(1, value.Length - 2);
-			return value;
 		}
 
 		/// <summary>

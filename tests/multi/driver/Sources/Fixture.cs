@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.Redist;
 using Hime.CentralDogma;
@@ -82,7 +83,8 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
 		/// <param name="name">The fixture's name</param>
-		public Fixture(Reporter reporter, string name)
+		/// <param name="filter">The filter for the tests to execute</param>
+		public Fixture(Reporter reporter, string name, Regex filter)
 		{
 			reporter.Info("Loading fixture " + name);
 			Stream stream = typeof(Program).Assembly.GetManifestResourceStream(name);
@@ -97,7 +99,11 @@ namespace Hime.Tests.Driver
 			this.name = fixtureNode.Symbol.Value;
 			this.tests = new List<Test>();
 			foreach (ASTNode testNode in fixtureNode.Children)
-				tests.Add(new Test(testNode, result.Input));
+			{
+				Test test = new Test(testNode, result.Input);
+				if (filter.IsMatch(test.Name))
+					tests.Add(test);
+			}
 		}
 
 		/// <summary>

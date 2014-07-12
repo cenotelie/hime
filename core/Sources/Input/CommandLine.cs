@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Hime.Redist;
 
@@ -47,6 +48,39 @@ namespace Hime.CentralDogma.Input
 			foreach (ParseError error in result.Errors)
 				Console.WriteLine(error.Message);
 			return result;
+		}
+
+		/// <summary>
+		/// Gets the value of the given parsed argument
+		/// </summary>
+		/// <param name="argument">A parsed argument</param>
+		/// <returns>The corresponding value, or null if there is none</returns>
+		public static string GetValue(ASTNode argument)
+		{
+			if (argument.Children.Count == 0)
+				return null;
+			string value = argument.Children[0].Symbol.Value;
+			if (value.StartsWith("\""))
+				return value.Substring(1, value.Length - 2);
+			return value;
+		}
+
+		/// <summary>
+		/// Gets the values of the given parsed argument
+		/// </summary>
+		/// <param name="argument">A parsed argument</param>
+		/// <returns>The corresponding values</returns>
+		public static ICollection<string> GetValues(ASTNode argument)
+		{
+			List<string> values = new List<string>();
+			foreach (ASTNode child in argument.Children)
+			{
+				string value = child.Symbol.Value;
+				if (value.StartsWith("\""))
+					value = value.Substring(1, value.Length - 2);
+				values.Add(value);
+			}
+			return values;
 		}
 	}
 }

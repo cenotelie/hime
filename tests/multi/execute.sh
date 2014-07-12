@@ -19,7 +19,7 @@ mv tests/multi/java/target/dependency/*.jar tests/multi/results/
 
 # Execute
 cd tests/multi/results
-mono driver.exe
+mono driver.exe --targets $*
 cd ../../..
 
 # Cleanup
