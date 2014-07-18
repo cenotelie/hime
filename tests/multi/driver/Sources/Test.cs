@@ -294,7 +294,9 @@ namespace Hime.Tests.Driver
 				reporter.Info(line);
 			}
 			process.WaitForExit();
-			return process.ExitCode;
+			int code = process.ExitCode;
+			process.Close();
+			return code;
 		}
 
 		/// <summary>

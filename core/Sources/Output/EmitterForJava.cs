@@ -221,6 +221,7 @@ namespace Hime.CentralDogma.Output
 					reporter.Info(line);
 			}
 			process.WaitForExit();
+			process.Close();
 			return !errors;
 		}
 	}
