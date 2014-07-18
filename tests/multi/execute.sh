@@ -5,7 +5,7 @@ xbuild /p:Configuration=Release tests/multi/driver/Tests.Driver.csproj
 
 # Build the executors:
 xbuild /p:Configuration=Release tests/multi/net/Tests.Executor.csproj
-mvn -f runtimes/java/pom.xml clean install
+mvn -f runtimes/java/pom.xml clean install -Dgpg.skip=true
 mvn -f tests/multi/java/pom.xml clean package
 
 # Setup the environment
