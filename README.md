@@ -15,6 +15,12 @@ The parser generator requires the .Net runtime (or Mono) for the generation of p
 
 
 
+### Status ###
+
+[ ![Build Status](https://www.codeship.io/projects/187d0060-f89b-0131-618b-4abf95291133/status?branch=default)](https://www.codeship.io/projects/28719)
+
+
+
 ### How do I use this software? ###
 
 All user documentation is available in the [wiki](https://bitbucket.org/laurentw/hime/wiki/Home).
