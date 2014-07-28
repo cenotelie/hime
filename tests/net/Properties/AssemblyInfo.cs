@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -18,18 +18,18 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
+using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Hime.Tests")]
-[assembly: AssemblyDescription("Testing solution for the Hime parser generator")]
+[assembly: AssemblyTitle("Tests.Executor")]
+[assembly: AssemblyDescription("Test executor for the .Net runtime")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Hime.Tests")]
+[assembly: AssemblyCompany("Laurent Wouters")]
+[assembly: AssemblyProduct("Tests.Executor")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -38,5 +38,4 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9ea6e226-e1bd-4ada-916f-cc26955947c0")]
+[assembly: CLSCompliant(true)]
