@@ -20,7 +20,7 @@ mv tests/java/target/dependency/*.jar tests/results/
 # Execute
 cd tests/results
 mono driver.exe --targets Net Java
-cd ../../..
+cd ../..
 
 # Cleanup
 mv tests/results/TestResults.xml tests/TestResults.xml
