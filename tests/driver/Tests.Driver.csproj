@@ -34,7 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\..\releng\VersionInfo.cs">
+    <Compile Include="..\..\releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\Fixture.cs" />
@@ -45,11 +45,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\..\core\Hime.SDK.csproj">
+    <ProjectReference Include="..\..\core\Hime.SDK.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
       <Name>Hime.SDK</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\runtimes\net\Hime.Redist.csproj">
+    <ProjectReference Include="..\..\runtimes\net\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>
