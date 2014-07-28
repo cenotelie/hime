@@ -1,27 +1,27 @@
 #!/bin/sh
 
 # Build the driver
-xbuild /p:Configuration=Release tests/multi/driver/Tests.Driver.csproj
+xbuild /p:Configuration=Release tests/driver/Tests.Driver.csproj
 
 # Build the executors:
-xbuild /p:Configuration=Release tests/multi/net/Tests.Executor.csproj
+xbuild /p:Configuration=Release tests/net/Tests.Executor.csproj
 mvn -f runtimes/java/pom.xml clean install -Dgpg.skip=true
-mvn -f tests/multi/java/pom.xml clean package
+mvn -f tests/java/pom.xml clean package
 
 # Setup the environment
-mkdir tests/multi/results
-mv tests/multi/driver/bin/Release/Hime.Redist.dll tests/multi/results/Hime.Redist.dll
-mv tests/multi/driver/bin/Release/Hime.CentralDogma.dll tests/multi/results/Hime.CentralDogma.dll
-mv tests/multi/driver/bin/Release/Tests.Driver.exe tests/multi/results/driver.exe
-mv tests/multi/net/bin/Release/Tests.Executor.exe tests/multi/results/executor.exe
-mv tests/multi/java/target/*.jar tests/multi/results/executor.jar
-mv tests/multi/java/target/dependency/*.jar tests/multi/results/
+mkdir tests/results
+mv tests/driver/bin/Release/Hime.Redist.dll tests/results/Hime.Redist.dll
+mv tests/driver/bin/Release/Hime.CentralDogma.dll tests/results/Hime.CentralDogma.dll
+mv tests/driver/bin/Release/Tests.Driver.exe tests/results/driver.exe
+mv tests/net/bin/Release/Tests.Executor.exe tests/results/executor.exe
+mv tests/java/target/*.jar tests/results/executor.jar
+mv tests/java/target/dependency/*.jar tests/results/
 
 # Execute
-cd tests/multi/results
+cd tests/results
 mono driver.exe --targets $*
 cd ../../..
 
 # Cleanup
-mv tests/multi/results/TestResults.xml tests/multi/TestResults.xml
-rm -r tests/multi/results
+mv tests/results/TestResults.xml tests/TestResults.xml
+rm -r tests/results
