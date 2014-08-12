@@ -105,12 +105,12 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("import java.util.Map;");
 			writer.WriteLine();
 
-			string mod = modifier == Modifier.Public ? "public" : "";
+			string mod = modifier == Modifier.Public ? "public " : "";
 
 			writer.WriteLine("/**");
 			writer.WriteLine(" * Represents a parser");
 			writer.WriteLine(" */");
-			writer.WriteLine(mod + " class " + name + "Parser extends " + parserType + "Parser {");
+			writer.WriteLine(mod + "class " + name + "Parser extends " + parserType + "Parser {");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * The automaton for this parser");
@@ -144,14 +144,14 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for variable " + var.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeName(var), var.ID.ToString("X4"));
+				stream.WriteLine("        public static final int {0} = 0x{1};", var, var.ID.ToString("X4"));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for virtual " + var.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeName(var), var.ID.ToString("X4"));
+				stream.WriteLine("        public static final int {0} = 0x{1};", var, var.ID.ToString("X4"));
 			}
 			stream.WriteLine("    }");
 		}
