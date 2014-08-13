@@ -138,14 +138,14 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for variable " + var.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeName(var), var.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(var), var.ID.ToString("X4"));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + var.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeName(var), var.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(var), var.ID.ToString("X4"));
 			}
 			stream.WriteLine("\t\t}");
 		}

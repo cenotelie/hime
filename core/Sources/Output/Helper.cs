@@ -27,11 +27,11 @@ namespace Hime.CentralDogma.Output
 	public class Helper
 	{
 		/// <summary>
-		/// Sanitizes the name of a symbol for output in code
+		/// Sanitizes the name of a symbol for output in C# code
 		/// </summary>
 		/// <param name="symbol">A symbol</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string SanitizeName(Grammars.Symbol symbol)
+		public static string SanitizeNameCS(Grammars.Symbol symbol)
 		{
 			string original = symbol.Name;
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
@@ -45,12 +45,33 @@ namespace Hime.CentralDogma.Output
 					builder.Append('_');
 			}
 			original = builder.ToString();
-			if (keywords.Contains(original))
+			if (keywordsCS.Contains(original))
 				return "@" + original;
 			return original;
 		}
 
-		private static readonly ROList<string> keywords = new ROList<string>(new List<string>(new string[] { "abstract",
+		/// <summary>
+		/// Sanitizes the name of a symbol for output in Java code
+		/// </summary>
+		/// <param name="symbol">A symbol</param>
+		/// <returns>The sanitized name of the symbol</returns>
+		public static string SanitizeNameJava(Grammars.Symbol symbol)
+		{
+			string original = symbol.Name;
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			foreach (char c in original)
+			{
+				if (c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+					builder.Append(c);
+				else if (c >= '0' && c <= '9')
+					builder.Append(c);
+				else if (c == '<' || c == '>' || c == '-')
+					builder.Append('_');
+			}
+			return builder.ToString();
+		}
+
+		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new string[] { "abstract",
 			"as",
 			"base",
 			"bool",

@@ -144,14 +144,14 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for variable " + var.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", var, var.ID.ToString("X4"));
+				stream.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(var), var.ID.ToString("X4"));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for virtual " + var.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", var, var.ID.ToString("X4"));
+				stream.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(var), var.ID.ToString("X4"));
 			}
 			stream.WriteLine("    }");
 		}

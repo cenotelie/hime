@@ -104,7 +104,12 @@ namespace Hime.CentralDogma.Output
 			// setup the maven project
 			CreateMavenProject();
 			// compile
-			bool success = ExecuteCommand("mvn", "package");
+			System.PlatformID platform = System.Environment.OSVersion.Platform;
+			bool success = false;
+			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
+				success = ExecuteCommand("mvn", "package");
+			else
+				success = ExecuteCommand("mvn.bat", "package");
 			// extract the result
 			if (success)
 			{
