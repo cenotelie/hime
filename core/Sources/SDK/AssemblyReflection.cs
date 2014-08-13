@@ -78,7 +78,7 @@ namespace Hime.CentralDogma.SDK
 		/// Initializes this inspector for the assembly in the given file
 		/// </summary>
 		/// <param name="file">The file containing the assembly to inspect</param>
-		public AssemblyReflection(string file) : this(Assembly.LoadFile(file))
+		public AssemblyReflection(string file) : this(Assembly.LoadFile(Path.GetFullPath(file)))
 		{
 		}
 
