@@ -310,13 +310,12 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
-			for (int i= 0; i != line + 1; i++)
+			for (int i = 1; i != line + 1; i++)
 			{
 				if (index < lines[i])
 					return i - 1;
 			}
-			// cannot happen ...
-			return -1;
+			return line;
 		}
 		#endregion
 
