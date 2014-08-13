@@ -279,26 +279,26 @@ public class PrefetchedText implements TokenizedText {
      */
     public String[] getContext(TextPosition position) {
         String content = getLineContent(position.getLine());
-        // trim the end of the string to remove the end of line markers
-        for (int i=content.length() - 1; i != -1; i--) {
-            char x = content.charAt(i);
-            if (x == '\r' || x == '\n')
-                continue;
-            content = content.substring(0, i + 1);
+        int end = content.length() - 1;
+        while (end != -1 && (content.charAt(end) == '\n' || content.charAt(end) == '\r'))
+            end--;
+        int start = 0;
+        while (start < end && Character.isWhitespace(content.charAt(start)))
+            start++;
+        if (position.getColumn() - 1 < start) {
+            // the position is in the whitespace prefix ...
+            start = 0;
         }
-        int cut = 0;
-        for (int i=0; i!=content.length(); i++)
-        {
-            if (Character.isWhitespace(content.charAt(i)))
-                break;
-            cut++;
+        if (position.getColumn() - 1 > end) {
+            // the position is in the trailing line endings ...
+            end = content.length() - 1;
         }
         StringBuilder builder = new StringBuilder();
-        for (int i=cut; i!=position.getColumn() - 1; i++)
+        for (int i=start; i!=position.getColumn() - 1; i++)
             builder.append(content.charAt(i) == '\t' ? '\t' : ' ');
         builder.append("^");
         return new String[] {
-                content.substring(cut),
+                content.substring(start, end + 1),
                 builder.toString()
         };
     }
@@ -312,20 +312,13 @@ public class PrefetchedText implements TokenizedText {
     private int findLineAt(int index) {
         if (lines == null)
             findLines();
-        int start = 0;
-        int end = line - 1;
-        while (true) {
-            if (end == start || end == start + 1)
-                return start;
-            int m = (start + end) / 2;
-            int v = lines[m];
-            if (index == v)
-                return m;
-            if (index < v)
-                end = m;
-            else
-                start = m;
+        for (int i=0; i!=line+1; i++) {
+            if (index < lines[i]) {
+                return i - 1;
+            }
         }
+        // cannot happen ...
+        return -1;
     }
 
     /**
