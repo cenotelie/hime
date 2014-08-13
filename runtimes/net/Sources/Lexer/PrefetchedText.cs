@@ -282,20 +282,22 @@ namespace Hime.Redist.Lexer
 		public string[] GetContext(TextPosition position)
 		{
 			string content = GetLineContent(position.Line);
-			content = content.TrimEnd('\r', '\n');
-			int cut = 0;
-			for (int i=0; i!=content.Length; i++)
-			{
-				if (!char.IsWhiteSpace(content[i]))
-					break;
-				cut++;
-			}
+			int end = content.Length - 1;
+			while (end != 1 && (content[end] == '\n' || content[end] == '\r'))
+				end--;
+			int start = 0;
+			while (start < end && char.IsWhiteSpace(content[start]))
+				start++;
+			if (position.Column - 1 < start)
+				start = 0;
+			if (position.Column - 1 > end)
+				end = content.Length - 1;
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
-			for (int i=cut; i!=position.Column - 1; i++)
+			for (int i=start; i!=position.Column - 1; i++)
 				builder.Append(content[i] == '\t' ? '\t' : ' ');
 			builder.Append("^");
 			return new string[] {
-				content.Substring(cut),
+				content.Substring(start, end - start + 1),
 				builder.ToString()
 			};
 		}
@@ -308,21 +310,13 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
-			int start = 0;
-			int end = line - 1;
-			while (true)
+			for (int i= 0; i != line + 1; i++)
 			{
-				if (end == start || end == start + 1)
-					return start;
-				int m = (start + end) / 2;
-				int v = lines[m];
-				if (index == v)
-					return m;
-				if (index < v)
-					end = m;
-				else
-					start = m;
+				if (index < lines[i])
+					return i - 1;
 			}
+			// cannot happen ...
+			return -1;
 		}
 		#endregion
 
