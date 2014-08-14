@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-grammar ParsingFixture : HimeGrammar
+grammar Fixture : HimeGrammar
 {
 	options
 	{
@@ -32,10 +32,13 @@ grammar ParsingFixture : HimeGrammar
 		header			-> 'fixture'! NAME^ ;
 		test			-> test_matches^
 						|  test_no_match^
-						|  test_fails^ ;
+						|  test_fails^
+						|  test_output^ ;
+
 		test_matches	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'yields'! tree ;
 		test_no_match	-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'differs'! tree ;
 		test_fails		-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'fails'! ;
+		test_output		-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'outputs'! LITERAL_STRING* ;
 
 		tree		-> NAME^ check children ;
 		check		-> ;
@@ -46,7 +49,7 @@ grammar ParsingFixture : HimeGrammar
 	}
 }
 
-grammar ExpectedTree : ParsingFixture
+grammar ExpectedTree : Fixture
 {
 	options
 	{

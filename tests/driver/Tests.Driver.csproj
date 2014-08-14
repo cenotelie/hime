@@ -38,6 +38,8 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\Fixture.cs" />
+    <Compile Include="Sources\OutputTest.cs" />
+    <Compile Include="Sources\ParsingTest.cs" />
     <Compile Include="Sources\Program.cs" />
     <Compile Include="Sources\Test.cs" />
     <Compile Include="Sources\TestResult.cs" />
@@ -55,7 +57,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ParsingFixture.gram" />
+    <EmbeddedResource Include="Resources\Fixture.gram" />
     <EmbeddedResource Include="Resources\Suites\GrammarOptions.suite" />
     <EmbeddedResource Include="Resources\Suites\LexicalRules.suite" />
     <EmbeddedResource Include="Resources\Suites\SyntacticRules.suite" />

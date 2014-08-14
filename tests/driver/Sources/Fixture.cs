@@ -45,18 +45,18 @@ namespace Hime.Tests.Driver
 		/// <returns>The fixture parser assembly</returns>
 		private static AssemblyReflection BuildFixtureParser()
 		{
-			Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.ParsingFixture.gram");
+			Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
 			Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.AddInputRaw(stream1);
 			task.AddInputRaw(stream2);
-			task.GrammarName = "ParsingFixture";
+			task.GrammarName = "Fixture";
 			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
 			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
 			task.Namespace = "Hime.Tests.Driver";
 			task.Execute();
-			return new AssemblyReflection("ParsingFixture.dll");
+			return new AssemblyReflection("Fixture.dll");
 		}
 
 		/// <summary>
@@ -100,7 +100,16 @@ namespace Hime.Tests.Driver
 			this.tests = new List<Test>();
 			foreach (ASTNode testNode in fixtureNode.Children)
 			{
-				Test test = new Test(testNode, result.Input);
+				Test test = null;
+				switch (testNode.Symbol.Name)
+				{
+					case "test_output":
+						test = new OutputTest(testNode, result.Input);
+						break;
+					default:
+						test = new ParsingTest(testNode, result.Input);
+						break;
+				}
 				if (filter.IsMatch(test.Name))
 					tests.Add(test);
 			}
