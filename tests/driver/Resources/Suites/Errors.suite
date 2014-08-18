@@ -11,3 +11,233 @@ test Test_NoError_SomeInput:
 	parser LALR1
 	on "x"
 	outputs
+
+test Test_Position_LineEndings_Windows:
+	grammar Test_Position_LineEndings_Windows {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\r\n\r\nx\r\nyx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_Unix:
+	grammar Test_Position_LineEndings_Unix {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\nx\nyx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_OldMacOS:
+	grammar Test_Position_LineEndings_OldMacOS {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\r\rx\ryx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_UNICODE_VerticalTab:
+	grammar Test_Position_LineEndings_UNICODE_VerticalTab {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\u000B\u000Bx\u000Byx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_UNICODE_FormFeed:
+	grammar Test_Position_LineEndings_UNICODE_FormFeed {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\u000C\u000Cx\u000Cyx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_UNICODE_LineSeparator:
+	grammar Test_Position_LineEndings_UNICODE_LineSeparator {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\u2028\u2028x\u2028yx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_UNICODE_ParagraphSeparator:
+	grammar Test_Position_LineEndings_UNICODE_ParagraphSeparator {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\u2029\u2029x\u2029yx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_LineEndings_UNICODE_NextLine:
+	grammar Test_Position_LineEndings_UNICODE_NextLine {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\u0085\u0085x\u0085yx"
+	outputs
+		"@(4, 1)"
+		"yx"
+		"^"
+
+test Test_Position_Column_First:
+	grammar Test_Position_Column_First {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "yxxx"
+	outputs
+		"@(1, 1)"
+		"yxxx"
+		"^"
+
+test Test_Position_Column_Last:
+	grammar Test_Position_Column_Last {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "xxxy"
+	outputs
+		"@(1, 4)"
+		"xxxy"
+		"   ^"
+
+test Test_Position_Arbitrary:
+	grammar Test_Position_Arbitrary {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\nxxyx\nx"
+	outputs
+		"@(3, 3)"
+		"xxyx"
+		"  ^"
+
+test Test_Context_Whitespace_No_Leading:
+	grammar Test_Context_Whitespace_No_Leading {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\n  xxyx\nx"
+	outputs
+		"@(3, 5)"
+		"xxyx"
+		"  ^"
+
+test Test_Context_Whitespace_Inner:
+	grammar Test_Context_Whitespace_Inner {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\nx  xyx\nx"
+	outputs
+		"@(3, 5)"
+		"x  xyx"
+		"    ^"
+
+test Test_Context_Whitespace_No_Trailing:
+	grammar Test_Context_Whitespace_No_Trailing {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\nxxyx  \nx"
+	outputs
+		"@(3, 3)"
+		"xxyx"
+		"  ^"
+
+test Test_Context_Tab_Is_4:
+	grammar Test_Context_Tab_Is_4 {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020 | U+0009)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\nx\txyx\nx"
+	outputs
+		"@(3, 7)"
+		"x\txyx"
+		"      ^"
+
+test Test_Context_Tab_No_Leading:
+	grammar Test_Context_Tab_No_Leading {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020 | U+0009)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\n\txxyx\nx"
+	outputs
+		"@(3, 7)"
+		"xxyx"
+		"  ^"
+
+test Test_Context_Tab_No_Trailing:
+	grammar Test_Context_Tab_No_Trailing {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020 | U+0009)+; X->'x'; }
+		rules { e->X*; }
+	}
+	parser LALR1
+	on "x\n\nxxyx\t\nx"
+	outputs
+		"@(3, 3)"
+		"xxyx"
+		"  ^"
+
+test Test_UnexpectedChar_SingleInsert:
+	grammar Test_UnexpectedChar_SingleInsert { options {Axiom="e";} terminals { X->'x'; } rules { e->X; } }
+	parser LALR1
+	on "yx"
+	outputs
+		"@(1, 1) Unexpected character 'y'"
+		"yx"
+		"^"
