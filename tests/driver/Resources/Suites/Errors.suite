@@ -1,0 +1,13 @@
+fixture Errors
+
+test Test_NoError_EmptyInput:
+	grammar Test_NoError_EmptyInput { options {Axiom="e";} rules { e->; } }
+	parser LALR1
+	on ""
+	outputs
+
+test Test_NoError_SomeInput:
+	grammar Test_NoError_SomeInput { options {Axiom="e";} terminals { X->'x'; } rules { e->X; } }
+	parser LALR1
+	on "x"
+	outputs

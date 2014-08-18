@@ -42,6 +42,10 @@ namespace Hime.Tests.Executor
 		/// The parser must fail
 		/// </summary>
 		private const string VERB_FAILS = "fails";
+		/// <summary>
+		/// The parser have the specified output
+		/// </summary>
+		private const string VERB_OUTPUTS = "outputs";
 
 		/// <summary>
 		/// The test was successful
@@ -78,43 +82,69 @@ namespace Hime.Tests.Executor
 		/// Executes the specified test
 		/// </summary>
 		/// <param name="parserName">The parser's name</param>
-		/// <param name="verb">A verb specifying the type of test, one of: matches, nomatches, fails</param>
+		/// <param name="verb">A verb specifying the type of test</param>
+		/// <returns>The test result</returns>
 		public int Execute(string parserName, string verb)
 		{
 			string input = System.IO.File.ReadAllText("input.txt", System.Text.Encoding.UTF8);
 			Hime.Redist.Parsers.IParser parser = GetParser(parserName, input);
-			ASTNode expected = new ASTNode();
-			if (verb != VERB_FAILS)
-			{
-				string expectedText = System.IO.File.ReadAllText("expected.txt", System.Text.Encoding.UTF8);
-				Hime.Redist.Parsers.IParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
-				ParseResult result = expectedParser.Parse();
-				foreach (ParseError error in result.Errors)
-				{
-					Console.WriteLine(error);
-					string[] context = result.Input.GetContext(error.Position);
-					Console.WriteLine(context[0]);
-					Console.WriteLine(context[1]);
-				}
-				if (result.Errors.Count > 0)
-					return RESULT_FAILURE_PARSING;
-				expected = result.Root;
-			}
-
 			switch (verb)
 			{
 				case VERB_MATCHES:
-					return TestMatches(parser, expected);
+					return TestMatches(parser);
 				case VERB_NOMATCHES:
-					return TestNoMatches(parser, expected);
+					return TestNoMatches(parser);
 				case VERB_FAILS:
 					return TestFails(parser);
+				case VERB_OUTPUTS:
+					return TestOutputs(parser);
 			}
 			return RESULT_FAILURE_VERB;
 		}
 
-		private int TestMatches(Hime.Redist.Parsers.IParser parser, ASTNode expected)
+		/// <summary>
+		/// Gets the serialized expected AST
+		/// </summary>
+		/// <returns>The expected AST, or null if an error occurred</returns>
+		private Nullable<ASTNode> GetExpectedAST()
 		{
+			string expectedText = System.IO.File.ReadAllText("expected.txt", System.Text.Encoding.UTF8);
+			Hime.Redist.Parsers.IParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+			ParseResult result = expectedParser.Parse();
+			foreach (ParseError error in result.Errors)
+			{
+				Console.WriteLine(error);
+				string[] context = result.Input.GetContext(error.Position);
+				Console.WriteLine(context[0]);
+				Console.WriteLine(context[1]);
+			}
+			if (result.Errors.Count > 0)
+				return new Nullable<ASTNode>();
+			return new Nullable<ASTNode>(result.Root);
+		}
+
+		/// <summary>
+		/// Gets the serialized expected output
+		/// </summary>
+		/// <returns>The expected output lines</returns>
+		private string[] GetExpectedOutput()
+		{
+			return System.IO.File.ReadAllLines("expected.txt", System.Text.Encoding.UTF8);
+		}
+
+		/// <summary>
+		/// Executes the test as a parsing test with a matching condition
+		/// </summary>
+		/// <param name="parser">The parser to use</param>
+		/// <returns>The test result</returns>
+		private int TestMatches(Hime.Redist.Parsers.IParser parser)
+		{
+			Nullable<ASTNode> expected = GetExpectedAST();
+			if (!expected.HasValue)
+			{
+				Console.WriteLine("Failed to parse the expected AST");
+				return RESULT_FAILURE_PARSING;
+			}
 			ParseResult result = parser.Parse();
 			foreach (ParseError error in result.Errors)
 			{
@@ -124,15 +154,39 @@ namespace Hime.Tests.Executor
 				Console.WriteLine(context[1]);
 			}
 			if (!result.IsSuccess)
+			{
+				Console.WriteLine("Failed to parse the input");
 				return RESULT_FAILURE_PARSING;
+			}
 			if (result.Errors.Count != 0)
+			{
+				Console.WriteLine("Some errors while parsing the input");
 				return RESULT_FAILURE_PARSING;
-			bool comparison = Compare(expected, result.Root);
-			return comparison ? RESULT_SUCCESS : RESULT_FAILURE_VERB;
+			}
+			if (Compare(expected.Value, result.Root))
+			{
+				return RESULT_SUCCESS;
+			}
+			else
+			{
+				Console.WriteLine("Produced AST does not match the expected one");
+				return RESULT_FAILURE_VERB;
+			}
 		}
 
-		private int TestNoMatches(Hime.Redist.Parsers.IParser parser, ASTNode expected)
+		/// <summary>
+		/// Executes the test as a parsing test with a non-matching condition
+		/// </summary>
+		/// <param name="parser">The parser to use</param>
+		/// <returns>The test result</returns>
+		private int TestNoMatches(Hime.Redist.Parsers.IParser parser)
 		{
+			Nullable<ASTNode> expected = GetExpectedAST();
+			if (!expected.HasValue)
+			{
+				Console.WriteLine("Failed to parse the expected AST");
+				return RESULT_FAILURE_PARSING;
+			}
 			ParseResult result = parser.Parse();
 			foreach (ParseError error in result.Errors)
 			{
@@ -142,13 +196,31 @@ namespace Hime.Tests.Executor
 				Console.WriteLine(context[1]);
 			}
 			if (!result.IsSuccess)
+			{
+				Console.WriteLine("Failed to parse the input");
 				return RESULT_FAILURE_PARSING;
+			}
 			if (result.Errors.Count != 0)
+			{
+				Console.WriteLine("Some errors while parsing the input");
 				return RESULT_FAILURE_PARSING;
-			bool comparison = Compare(expected, result.Root);
-			return comparison ? RESULT_FAILURE_VERB : RESULT_SUCCESS;
+			}
+			if (Compare(expected.Value, result.Root))
+			{
+				Console.WriteLine("Produced AST incorrectly matches the specified expectation");
+				return RESULT_FAILURE_VERB;
+			}
+			else
+			{
+				return RESULT_SUCCESS;
+			}
 		}
 
+		/// <summary>
+		/// Executes the test as a parsing test with a failing condition
+		/// </summary>
+		/// <param name="parser">The parser to use</param>
+		/// <returns>The test result</returns>
 		private int TestFails(Hime.Redist.Parsers.IParser parser)
 		{
 			ParseResult result = parser.Parse();
@@ -156,6 +228,70 @@ namespace Hime.Tests.Executor
 				return RESULT_SUCCESS;
 			if (result.Errors.Count != 0)
 				return RESULT_SUCCESS;
+			Console.WriteLine("No error found while parsing, while some were expected");
+			return RESULT_FAILURE_VERB;
+		}
+
+		/// <summary>
+		/// Executes the test as an output test
+		/// </summary>
+		/// <param name="parser">The parser to use</param>
+		/// <returns>The test result</returns>
+		private int TestOutputs(Hime.Redist.Parsers.IParser parser)
+		{
+			string[] output = GetExpectedOutput();
+			ParseResult result = parser.Parse();
+			if (output.Length == 0 || (output.Length == 1 && output[0].Length == 0))
+			{
+				if (result.IsSuccess && result.Errors.Count == 0)
+					return RESULT_SUCCESS;
+				foreach (ParseError error in result.Errors)
+				{
+					Console.WriteLine(error);
+					string[] context = result.Input.GetContext(error.Position);
+					Console.WriteLine(context[0]);
+					Console.WriteLine(context[1]);
+				}
+				Console.WriteLine("Expected an empty output but some error where found while parsing");
+				return RESULT_FAILURE_VERB;
+			}
+			int i = 0;
+			foreach (ParseError error in result.Errors)
+			{
+				string message = error.ToString();
+				string[] context = result.Input.GetContext(error.Position);
+				if (i + 2 >= output.Length)
+				{
+					Console.WriteLine("Unexpected error:");
+					Console.WriteLine(message);
+					Console.WriteLine(context[0]);
+					Console.WriteLine(context[1]);
+					return RESULT_FAILURE_VERB;
+				}
+				if (!message.StartsWith(output[i]))
+				{
+					Console.WriteLine("Unexpected output: " + message);
+					Console.WriteLine("Expected prefix: " + output[i]);
+					return RESULT_FAILURE_VERB;
+				}
+				if (!context[0].StartsWith(output[i + 1]))
+				{
+					Console.WriteLine("Unexpected output: " + context[0]);
+					Console.WriteLine("Expected prefix: " + output[i + 1]);
+					return RESULT_FAILURE_VERB;
+				}
+				if (!context[1].StartsWith(output[i + 2]))
+				{
+					Console.WriteLine("Unexpected output: " + context[1]);
+					Console.WriteLine("Expected prefix: " + output[i + 2]);
+					return RESULT_FAILURE_VERB;
+				}
+				i += 3;
+			}
+			if (i == output.Length)
+				return RESULT_SUCCESS;
+			for (int j = i; j != output.Length; j++)
+				Console.WriteLine("Missing output: " + output[j]);
 			return RESULT_FAILURE_VERB;
 		}
 

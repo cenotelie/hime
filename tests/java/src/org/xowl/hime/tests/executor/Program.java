@@ -29,8 +29,11 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Program {
     /**
@@ -45,6 +48,10 @@ public class Program {
      * The parser must fail
      */
     private static final String VERB_FAILS = "fails";
+    /**
+     * The parser have the specified output
+     */
+    private static final String VERB_OUTPUTS = "outputs";
 
     /**
      * The test was successful
@@ -59,6 +66,11 @@ public class Program {
      */
     private static final int RESULT_FAILURE_PARSING = 2;
 
+    /**
+     * Main entry point
+     *
+     * @param args The command parameters
+     */
     public static void main(String[] args) {
         String name = args[0];
         String verb = args[1];
@@ -67,6 +79,12 @@ public class Program {
         System.exit(code);
     }
 
+    /**
+     * Reads all the text of the specified file
+     *
+     * @param file A file
+     * @return The content of the file as a string
+     */
     private String readAllText(String file) {
         try {
             byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(file));
@@ -77,62 +95,210 @@ public class Program {
         }
     }
 
-    public int execute(String name, String verb) {
+    /**
+     * Executes the specified test
+     *
+     * @param parserName The parser's name
+     * @param verb       A verb specifying the type of test
+     * @return The test result
+     */
+    public int execute(String parserName, String verb) {
         String input = readAllText("input.txt");
-        IParser parser = getParser(name, input);
-        ASTNode expected = null;
-        if (!VERB_FAILS.equals(verb)) {
-            String expectedText = readAllText("expected.txt");
-            IParser expectedParser = getParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
-            ParseResult result = expectedParser.parse();
-            for (ParseError error : result.getErrors()) {
-                System.out.println(error.toString());
-                String[] context = result.getInput().getContext(error.getPosition());
-                System.out.println(context[0]);
-                System.out.println(context[1]);
-            }
-            if (result.getErrors().size() > 0)
-                return RESULT_FAILURE_PARSING;
-            expected = result.getRoot();
-        }
+        IParser parser = getParser(parserName, input);
         if (VERB_MATCHES.equals(verb))
-            return testMatches(parser, expected);
+            return testMatches(parser);
         if (VERB_NOMATCHES.equals(verb))
-            return testNoMatches(parser, expected);
+            return testNoMatches(parser);
         if (VERB_FAILS.equals(verb))
             return testFails(parser);
+        if (VERB_OUTPUTS.equals(verb))
+            return testOutputs(parser);
         return RESULT_FAILURE_VERB;
     }
 
-    private int testMatches(IParser parser, ASTNode expected) {
-        ParseResult result = parser.parse();
-        if (!result.isSuccess())
-            return RESULT_FAILURE_PARSING;
-        if (result.getErrors().size() != 0)
-            return RESULT_FAILURE_PARSING;
-        boolean comparison = compare(expected, result.getRoot());
-        return comparison ? RESULT_SUCCESS : RESULT_FAILURE_VERB;
+    /**
+     * Gets the serialized expected AST
+     *
+     * @return The expected AST, or null if an error occurred
+     */
+    private ASTNode getExpectedAST() {
+        String expectedText = readAllText("expected.txt");
+        IParser expectedParser = getParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+        ParseResult result = expectedParser.parse();
+        for (ParseError error : result.getErrors()) {
+            System.out.println(error.toString());
+            String[] context = result.getInput().getContext(error.getPosition());
+            System.out.println(context[0]);
+            System.out.println(context[1]);
+        }
+        if (result.getErrors().size() > 0)
+            return null;
+        return result.getRoot();
     }
 
-    private int testNoMatches(IParser parser, ASTNode expected) {
-        ParseResult result = parser.parse();
-        if (!result.isSuccess())
-            return RESULT_FAILURE_PARSING;
-        if (result.getErrors().size() != 0)
-            return RESULT_FAILURE_PARSING;
-        boolean comparison = compare(expected, result.getRoot());
-        return comparison ? RESULT_FAILURE_VERB : RESULT_SUCCESS;
+    /**
+     * Gets the serialized expected output
+     *
+     * @return The expected output lines
+     */
+    private List<String> getExpectedOutput() {
+        try {
+            return Files.readAllLines((new File("expected.txt")).toPath(), Charset.forName("UTF-8"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return new ArrayList<String>();
+        }
     }
 
+    /**
+     * Executes the test as a parsing test with a matching condition
+     *
+     * @param parser The parser to use
+     * @return The test result
+     */
+    private int testMatches(IParser parser) {
+        ASTNode expected = getExpectedAST();
+        if (expected == null) {
+            System.out.println("Failed to parse the expected AST");
+            return RESULT_FAILURE_PARSING;
+        }
+        ParseResult result = parser.parse();
+        for (ParseError error : result.getErrors()) {
+            System.out.println(error);
+            String[] context = result.getInput().getContext(error.getPosition());
+            System.out.println(context[0]);
+            System.out.println(context[1]);
+        }
+        if (!result.isSuccess()) {
+            System.out.println("Failed to parse the input");
+            return RESULT_FAILURE_PARSING;
+        }
+        if (result.getErrors().size() != 0) {
+            System.out.println("Some errors while parsing the input");
+            return RESULT_FAILURE_PARSING;
+        }
+        if (compare(expected, result.getRoot())) {
+            return RESULT_SUCCESS;
+        } else {
+            System.out.println("Produced AST does not match the expected one");
+            return RESULT_FAILURE_VERB;
+        }
+    }
+
+    /**
+     * Executes the test as a parsing test with a non-matching condition
+     *
+     * @param parser The parser to use
+     * @return The test result
+     */
+    private int testNoMatches(IParser parser) {
+        ASTNode expected = getExpectedAST();
+        if (expected == null) {
+            System.out.println("Failed to parse the expected AST");
+            return RESULT_FAILURE_PARSING;
+        }
+        ParseResult result = parser.parse();
+        for (ParseError error : result.getErrors()) {
+            System.out.println(error);
+            String[] context = result.getInput().getContext(error.getPosition());
+            System.out.println(context[0]);
+            System.out.println(context[1]);
+        }
+        if (!result.isSuccess()) {
+            System.out.println("Failed to parse the input");
+            return RESULT_FAILURE_PARSING;
+        }
+        if (result.getErrors().size() != 0) {
+            System.out.println("Some errors while parsing the input");
+            return RESULT_FAILURE_PARSING;
+        }
+        if (compare(expected, result.getRoot())) {
+            System.out.println("Produced AST does not match the expected one");
+            return RESULT_FAILURE_VERB;
+        } else {
+            return RESULT_SUCCESS;
+        }
+    }
+
+    /**
+     * Executes the test as a parsing test with a failing condition
+     *
+     * @param parser The parser to use
+     * @return The test result
+     */
     private int testFails(IParser parser) {
         ParseResult result = parser.parse();
         if (!result.isSuccess())
             return RESULT_SUCCESS;
         if (result.getErrors().size() != 0)
             return RESULT_SUCCESS;
+        System.out.println("No error found while parsing, while some were expected");
         return RESULT_FAILURE_VERB;
     }
 
+    /**
+     * Executes the test as an output test
+     *
+     * @param parser The parser to use
+     * @return The test result
+     */
+    private int testOutputs(IParser parser) {
+        List<String> output = getExpectedOutput();
+        ParseResult result = parser.parse();
+        if (output.size() == 0 || (output.size() == 1 && output.get(0).length() == 0)) {
+            if (result.isSuccess() && result.getErrors().size() == 0)
+                return RESULT_SUCCESS;
+            for (ParseError error : result.getErrors()) {
+                System.out.println(error);
+                String[] context = result.getInput().getContext(error.getPosition());
+                System.out.println(context[0]);
+                System.out.println(context[1]);
+            }
+            System.out.println("Expected an empty output but some error where found while parsing");
+            return RESULT_FAILURE_VERB;
+        }
+        int i = 0;
+        for (ParseError error : result.getErrors()) {
+            String message = error.toString();
+            String[] context = result.getInput().getContext(error.getPosition());
+            if (i + 2 >= output.size()) {
+                System.out.println("Unexpected error:");
+                System.out.println(message);
+                System.out.println(context[0]);
+                System.out.println(context[1]);
+                return RESULT_FAILURE_VERB;
+            }
+            if (!message.startsWith(output.get(i))) {
+                System.out.println("Unexpected output: " + message);
+                System.out.println("Expected prefix: " + output.get(i));
+                return RESULT_FAILURE_VERB;
+            }
+            if (!context[0].startsWith(output.get(i + 1))) {
+                System.out.println("Unexpected output: " + context[0]);
+                System.out.println("Expected prefix: " + output.get(i + 1));
+                return RESULT_FAILURE_VERB;
+            }
+            if (!context[1].startsWith(output.get(i + 2))) {
+                System.out.println("Unexpected output: " + context[1]);
+                System.out.println("Expected prefix: " + output.get(i + 2));
+                return RESULT_FAILURE_VERB;
+            }
+            i += 3;
+        }
+        if (i == output.size())
+            return RESULT_SUCCESS;
+        for (int j = i; j != output.size(); j++)
+            System.out.println("Missing output: " + output.get(j));
+        return RESULT_FAILURE_VERB;
+    }
+
+    /**
+     * Compare the specified AST node to the expected node
+     *
+     * @param expected The expected node
+     * @param node     The AST node to compare
+     * @return True if the nodes match
+     */
     private boolean compare(ASTNode expected, ASTNode node) {
         if (!node.getSymbol().getName().equals(expected.getSymbol().getValue()))
             return false;
@@ -154,22 +320,35 @@ public class Program {
         return true;
     }
 
-    private IParser getParser(String name, String input) {
+    /**
+     * Gets the parser for the specified assembly and input
+     *
+     * @param parserName The parser's name
+     * @param input      An input for the parser
+     * @return The parser
+     */
+    private IParser getParser(String parserName, String input) {
         loadJar("Parsers.jar");
         try {
-            Class lexerClass = Class.forName(name.substring(0, name.length() - 6) + "Lexer");
-            Class parserClass = Class.forName(name);
+            Class lexerClass = Class.forName(parserName.substring(0, parserName.length() - 6) + "Lexer");
+            Class parserClass = Class.forName(parserName);
             Object lexer = lexerClass.getConstructor(String.class).newInstance(input);
             Object parser = parserClass.getConstructor(lexerClass).newInstance(lexer);
-            return (IParser)parser;
+            return (IParser) parser;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
-    private boolean loadJar(String pathToAssembly) {
-        File f = new File(pathToAssembly);
+    /**
+     * Loads the specified jar file
+     *
+     * @param file The file to load
+     * @return Whether the operation succeeded
+     */
+    private boolean loadJar(String file) {
+        File f = new File(file);
         if (!f.exists())
             return false;
         try {
