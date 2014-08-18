@@ -110,7 +110,7 @@ namespace Hime.Tests.Driver
 						test = new ParsingTest(testNode, result.Input);
 						break;
 				}
-				if (filter.IsMatch(test.Name))
+				if (filter.IsMatch(name + "." + test.Name))
 					tests.Add(test);
 			}
 		}
