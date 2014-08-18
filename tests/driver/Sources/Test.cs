@@ -140,7 +140,7 @@ namespace Hime.Tests.Driver
 		{
 			ReportData data = results[target].GetXML(doc);
 			data.child.Attributes["name"].Value = target.ToString();
-			data.child.Attributes["classname"].Value = fixture + "." + Name + "." + target.ToString();
+			data.child.Attributes["classname"].Value = fixture + "." + Name;
 			return data;
 		}
 	}
