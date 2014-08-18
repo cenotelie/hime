@@ -1,5 +1,5 @@
 <NotepadPlus>
-    <UserLang name="Hime Grammar" ext="gram" udlVersion="2.1">
+    <UserLang name="Hime Test Fixutre" ext="suite" udlVersion="2.1">
         <Settings>
             <Global caseIgnored="no" allowFoldOfComments="yes" foldCompact="no" forcePureLC="0" decimalSeparator="0" />
             <Prefix Keywords1="no" Keywords2="no" Keywords3="no" Keywords4="no" Keywords5="no" Keywords6="no" Keywords7="no" Keywords8="no" />
@@ -24,8 +24,8 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">cf grammar options terminals rules</Keywords>
-            <Keywords name="Keywords2">Axiom Separator</Keywords>
+            <Keywords name="Keywords1">grammar options terminals rules fixture test parser on yields differs fails outputs</Keywords>
+            <Keywords name="Keywords2">Axiom Separator LR0 LR1 LALR1 RNGLR1 RNGLALR1</Keywords>
             <Keywords name="Keywords3"></Keywords>
             <Keywords name="Keywords4"></Keywords>
             <Keywords name="Keywords5"></Keywords>
