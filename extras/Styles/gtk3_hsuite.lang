@@ -19,7 +19,7 @@
  Contributors:
      Laurent Wouters - lwouters@xowl.org
 -->
-<language id="hsuite" _name="Hime Test Fixture" version="2.0" _section="Sources">
+<language id="hsuite" _name="Hime Test Suite" version="2.0" _section="Sources">
   <metadata>
     <property name="mimetypes">text/x-hsuite</property>
     <property name="globs">*.suite</property>
