@@ -270,17 +270,17 @@ public class Program {
             }
             if (!message.startsWith(output.get(i))) {
                 System.out.println("Unexpected output: " + message);
-                System.out.println("Expected prefix: " + output.get(i));
+                System.out.println("Expected prefix  : " + output.get(i));
                 return RESULT_FAILURE_VERB;
             }
             if (!context[0].startsWith(output.get(i + 1))) {
                 System.out.println("Unexpected output: " + context[0]);
-                System.out.println("Expected prefix: " + output.get(i + 1));
+                System.out.println("Expected prefix  : " + output.get(i + 1));
                 return RESULT_FAILURE_VERB;
             }
             if (!context[1].startsWith(output.get(i + 2))) {
                 System.out.println("Unexpected output: " + context[1]);
-                System.out.println("Expected prefix: " + output.get(i + 2));
+                System.out.println("Expected prefix  : " + output.get(i + 2));
                 return RESULT_FAILURE_VERB;
             }
             i += 3;

@@ -271,19 +271,19 @@ namespace Hime.Tests.Executor
 				if (!message.StartsWith(output[i]))
 				{
 					Console.WriteLine("Unexpected output: " + message);
-					Console.WriteLine("Expected prefix: " + output[i]);
+					Console.WriteLine("Expected prefix  : " + output[i]);
 					return RESULT_FAILURE_VERB;
 				}
 				if (!context[0].StartsWith(output[i + 1]))
 				{
 					Console.WriteLine("Unexpected output: " + context[0]);
-					Console.WriteLine("Expected prefix: " + output[i + 1]);
+					Console.WriteLine("Expected prefix  : " + output[i + 1]);
 					return RESULT_FAILURE_VERB;
 				}
 				if (!context[1].StartsWith(output[i + 2]))
 				{
 					Console.WriteLine("Unexpected output: " + context[1]);
-					Console.WriteLine("Expected prefix: " + output[i + 2]);
+					Console.WriteLine("Expected prefix  : " + output[i + 2]);
 					return RESULT_FAILURE_VERB;
 				}
 				i += 3;
