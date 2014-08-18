@@ -85,7 +85,7 @@ namespace Hime.Tests.Driver
 			reporter = new Reporter();
 			targets = new List<Runtime>();
 			fixtures = new List<Fixture>();
-			filter = new Regex(".*");
+			filter = new Regex("Errors.*");
 
 			// Loads the arguments from the command line
 			foreach (ASTNode arg in result.Root.Children[1].Children)
