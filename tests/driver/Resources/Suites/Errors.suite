@@ -194,8 +194,8 @@ test Test_Context_Whitespace_No_Trailing:
 		"xxyx"
 		"  ^"
 
-test Test_Context_Tab_Is_4:
-	grammar Test_Context_Tab_Is_4 {
+test Test_Context_Tab_Inner:
+	grammar Test_Context_Tab_Inner {
 		options { Axiom="e"; Separator = "SEPARATOR"; }
 		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020 | U+0009)+; X->'x'; }
 		rules { e->X*; }
@@ -203,9 +203,9 @@ test Test_Context_Tab_Is_4:
 	parser LALR1
 	on "x\n\nx\txyx\nx"
 	outputs
-		"@(3, 7)"
+		"@(3, 4)"
 		"x\txyx"
-		"      ^"
+		" \t ^"
 
 test Test_Context_Tab_No_Leading:
 	grammar Test_Context_Tab_No_Leading {
@@ -216,7 +216,7 @@ test Test_Context_Tab_No_Leading:
 	parser LALR1
 	on "x\n\n\txxyx\nx"
 	outputs
-		"@(3, 7)"
+		"@(3, 4)"
 		"xxyx"
 		"  ^"
 
