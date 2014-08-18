@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2014 Laurent Wouters
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as
+ published by the Free Software Foundation, either version 3
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General
+ Public License along with this program.
+ If not, see <http://www.gnu.org/licenses/>.
+
+ Contributors:
+     Laurent Wouters - lwouters@xowl.org
+-->
+<language id="hgram" _name="Hime Grammar" version="2.0" _section="Sources">
+  <metadata>
+    <property name="mimetypes">text/x-hgram</property>
+    <property name="globs">*.gram</property>
+    <property name="line-comment-start">//</property>
+    <property name="block-comment-start">/*</property>
+    <property name="block-comment-end">*/</property>
+  </metadata>
+  <styles>
+    <style id="comment"           _name="Comment"            map-to="def:comment"/>
+    <style id="string"            _name="String"             map-to="def:string"/>
+    <style id="class"             _name="Character Class"    map-to="def:character"/>
+    <style id="escaped-character" _name="Escaped Character"  map-to="def:special-char"/>
+    <style id="keyword"           _name="Keyword"            map-to="def:keyword"/>
+    <style id="special"           _name="Special Identifier" map-to="def:type"/>
+    <style id="unicode"           _name="Unicode Codepoint"  map-to="def:number"/>
+  </styles>
+  <definitions>
+    <context id="keywords" style-ref="keyword">
+      <keyword>grammar</keyword>
+      <keyword>options</keyword>
+      <keyword>terminals</keyword>
+      <keyword>rules</keyword>
+    </context>
+
+    <context id="specials" style-ref="special">
+      <keyword>Axiom</keyword>
+      <keyword>Separator</keyword>
+    </context>
+
+    <context id="unicodecp" style-ref="unicode">
+      <match>U\+[0-9a-fA-F]+</match>
+    </context>
+
+    <context id="escape" style-ref="escaped-character">
+      <match>\\.</match>
+    </context>
+
+    <context id="double_string" end-at-line-end="true" style-ref="string">
+      <start>"</start>
+      <end>"</end>
+      <include>
+        <context ref="escape"/>
+      </include>
+    </context>
+
+    <context id="single_string" end-at-line-end="true" style-ref="string">
+      <start>'</start>
+      <end>'</end>
+      <include>
+        <context ref="escape"/>
+      </include>
+    </context>
+
+    <context id="character_class" end-at-line-end="true" style-ref="class">
+      <start>\[</start>
+      <end>\]</end>
+      <include>
+        <context ref="escape"/>
+      </include>
+    </context>
+
+    <!--Main context-->
+    <context id="hgram" class="no-spell-check">
+      <include>
+        <context ref="c:comment"/>
+        <context ref="c:comment-multiline"/>
+        <context ref="keywords"/>
+        <context ref="specials"/>
+        <context ref="unicodecp"/>
+        <context ref="double_string"/>
+        <context ref="single_string"/>
+        <context ref="character_class"/>
+      </include>
+    </context>
+  </definitions>
+</language>
