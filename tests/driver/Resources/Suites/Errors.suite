@@ -155,6 +155,19 @@ test Test_Position_Arbitrary:
 		"xxyx"
 		"  ^"
 
+test Test_Position_AfterLastEmptyLine:
+	grammar Test_Position_AfterLastEmptyLine {
+		options { Axiom="e"; Separator = "SEPARATOR"; }
+		terminals { SEPARATOR -> (U+000A | U+000B | U+000C | U+000D | U+0085 | U+2028 | U+2029 | U+0020)+; X->'x'; }
+		rules { e->X X; }
+	}
+	parser LALR1
+	on "x\n"
+	outputs
+		"@(2, 1)"
+		""
+		"^"
+
 test Test_Context_Whitespace_No_Leading:
 	grammar Test_Context_Whitespace_No_Leading {
 		options { Axiom="e"; Separator = "SEPARATOR"; }
