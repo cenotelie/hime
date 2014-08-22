@@ -115,19 +115,18 @@ namespace Hime.Redist.Lexer
 			char c2 = '\0';
 			for (int i = 0; i != content.Length; i++)
 			{
+				c1 = c2;
+				c2 = content[i];
 				// is c1 c2 a line ending sequence?
 				if (IsLineEnding(c1, c2))
 				{
 					// are we late to detect MacOS style?
 					if (c1 == '\u000D' && c2 != '\u000A')
-						AddLine(i - 1);
-					else
 						AddLine(i);
+					else
+						AddLine(i + 1);
 				}
-				c1 = c2;
-				c2 = content[i];
 			}
-			lines[line] = content.Length;
 		}
 
 		/// <summary>
@@ -161,13 +160,14 @@ namespace Hime.Redist.Lexer
 		/// <param name="index">An index in the content</param>
 		private void AddLine(int index)
 		{
-			if (line + 1 >= lines.Length)
+			if (line >= lines.Length)
 			{
 				int[] t = new int[lines.Length + initLineCount];
 				System.Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
 				lines = t;
 			}
-			lines[line++] = index;
+			lines[line] = index;
+			line++;
 		}
 
 		/// <summary>
@@ -249,6 +249,8 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
+			if (line == this.line)
+				return (content.Length - lines[this.line - 1]);
 			return (lines[line] - lines[line - 1]);
 		}
 
@@ -282,6 +284,8 @@ namespace Hime.Redist.Lexer
 		public string[] GetContext(TextPosition position)
 		{
 			string content = GetLineContent(position.Line);
+			if (content.Length == 0)
+				return new string[] { "", "^" };
 			int end = content.Length - 1;
 			while (end != 1 && (content[end] == '\n' || content[end] == '\r'))
 				end--;
@@ -303,19 +307,20 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Finds the 0-based number of the line at the given index in the content
+		/// Finds the index in the cache of the line at the given input index in the content
 		/// </summary>
 		/// <param name="index">The index within this content</param>
+		/// <returns>The index of the corresponding line in the cache</returns>
 		private int FindLineAt(int index)
 		{
 			if (lines == null)
 				FindLines();
-			for (int i = 1; i != line + 1; i++)
+			for (int i = 1; i != line; i++)
 			{
 				if (index < lines[i])
 					return i - 1;
 			}
-			return line;
+			return line - 1;
 		}
 		#endregion
 
