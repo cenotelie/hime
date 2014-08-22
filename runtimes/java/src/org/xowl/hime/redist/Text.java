@@ -94,5 +94,5 @@ public interface Text {
      * @param position The position in this text
      * @return The context description
      */
-    String[] getContext(TextPosition position);
+    Context getContext(TextPosition position);
 }

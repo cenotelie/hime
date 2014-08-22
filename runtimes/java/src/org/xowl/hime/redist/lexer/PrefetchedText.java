@@ -20,10 +20,7 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TextPosition;
-import org.xowl.hime.redist.Token;
-import org.xowl.hime.redist.TokenizedText;
+import org.xowl.hime.redist.*;
 import org.xowl.hime.redist.utils.BigList;
 
 import java.util.Arrays;
@@ -279,10 +276,10 @@ public class PrefetchedText implements TokenizedText {
      * @param position The position in this text
      * @return The context description
      */
-    public String[] getContext(TextPosition position) {
+    public Context getContext(TextPosition position) {
         String content = getLineContent(position.getLine());
         if (content.length() == 0)
-            return new String[] { "", "^" };
+            return new Context("", "^");
         int end = content.length() - 1;
         while (end != -1 && (content.charAt(end) == '\n' || content.charAt(end) == '\r'))
             end--;
@@ -301,10 +298,7 @@ public class PrefetchedText implements TokenizedText {
         for (int i=start; i!=position.getColumn() - 1; i++)
             builder.append(content.charAt(i) == '\t' ? '\t' : ' ');
         builder.append("^");
-        return new String[] {
-                content.substring(start, end + 1),
-                builder.toString()
-        };
+        return new Context( content.substring(start, end + 1), builder.toString());
     }
 
     /**

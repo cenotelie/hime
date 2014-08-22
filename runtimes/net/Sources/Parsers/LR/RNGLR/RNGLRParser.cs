@@ -261,11 +261,11 @@ namespace Hime.Redist.Parsers
 				Console.WriteLine("==== RNGLR parsing error:");
 				Console.Write("\t");
 				Console.WriteLine(error.ToString());
-				String[] context = lexer.Output.GetContext(error.Position);
+				Context context = lexer.Output.GetContext(error.Position);
 				Console.Write("\t");
-				Console.WriteLine(context[0]);
+				Console.WriteLine(context.Content);
 				Console.Write("\t");
-				Console.WriteLine(context[1]);
+				Console.WriteLine(context.Pointer);
 				gss.Print();
 			}
 		}

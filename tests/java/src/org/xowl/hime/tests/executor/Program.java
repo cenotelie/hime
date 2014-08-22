@@ -20,6 +20,7 @@
 package org.xowl.hime.tests.executor;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.hime.redist.Context;
 import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
 import org.xowl.hime.redist.parsers.IParser;
@@ -127,9 +128,9 @@ public class Program {
         ParseResult result = expectedParser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error.toString());
-            String[] context = result.getInput().getContext(error.getPosition());
-            System.out.println(context[0]);
-            System.out.println(context[1]);
+            Context context = result.getInput().getContext(error.getPosition());
+            System.out.println(context.getContent());
+            System.out.println(context.getPointer());
         }
         if (result.getErrors().size() > 0)
             return null;
@@ -165,9 +166,9 @@ public class Program {
         ParseResult result = parser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error);
-            String[] context = result.getInput().getContext(error.getPosition());
-            System.out.println(context[0]);
-            System.out.println(context[1]);
+            Context context = result.getInput().getContext(error.getPosition());
+            System.out.println(context.getContent());
+            System.out.println(context.getPointer());
         }
         if (!result.isSuccess()) {
             System.out.println("Failed to parse the input");
@@ -200,9 +201,9 @@ public class Program {
         ParseResult result = parser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error);
-            String[] context = result.getInput().getContext(error.getPosition());
-            System.out.println(context[0]);
-            System.out.println(context[1]);
+            Context context = result.getInput().getContext(error.getPosition());
+            System.out.println(context.getContent());
+            System.out.println(context.getPointer());
         }
         if (!result.isSuccess()) {
             System.out.println("Failed to parse the input");
@@ -250,9 +251,9 @@ public class Program {
                 return RESULT_SUCCESS;
             for (ParseError error : result.getErrors()) {
                 System.out.println(error);
-                String[] context = result.getInput().getContext(error.getPosition());
-                System.out.println(context[0]);
-                System.out.println(context[1]);
+                Context context = result.getInput().getContext(error.getPosition());
+                System.out.println(context.getContent());
+                System.out.println(context.getPointer());
             }
             System.out.println("Expected an empty output but some error where found while parsing");
             return RESULT_FAILURE_VERB;
@@ -260,12 +261,12 @@ public class Program {
         int i = 0;
         for (ParseError error : result.getErrors()) {
             String message = error.toString();
-            String[] context = result.getInput().getContext(error.getPosition());
+            Context context = result.getInput().getContext(error.getPosition());
             if (i + 2 >= output.size()) {
                 System.out.println("Unexpected error:");
                 System.out.println(message);
-                System.out.println(context[0]);
-                System.out.println(context[1]);
+                System.out.println(context.getContent());
+                System.out.println(context.getPointer());
                 return RESULT_FAILURE_VERB;
             }
             if (!message.startsWith(output.get(i))) {
@@ -273,13 +274,13 @@ public class Program {
                 System.out.println("Expected prefix  : " + output.get(i));
                 return RESULT_FAILURE_VERB;
             }
-            if (!context[0].startsWith(output.get(i + 1))) {
-                System.out.println("Unexpected output: " + context[0]);
+            if (!context.getContent().startsWith(output.get(i + 1))) {
+                System.out.println("Unexpected output: " + context.getContent());
                 System.out.println("Expected prefix  : " + output.get(i + 1));
                 return RESULT_FAILURE_VERB;
             }
-            if (!context[1].startsWith(output.get(i + 2))) {
-                System.out.println("Unexpected output: " + context[1]);
+            if (!context.getPointer().startsWith(output.get(i + 2))) {
+                System.out.println("Unexpected output: " + context.getPointer());
                 System.out.println("Expected prefix  : " + output.get(i + 2));
                 return RESULT_FAILURE_VERB;
             }

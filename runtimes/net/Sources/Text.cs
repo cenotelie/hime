@@ -83,6 +83,6 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="position">The position in this text</param>
 		/// <returns>The context description</returns>
-		string[] GetContext(TextPosition position);
+		Context GetContext(TextPosition position);
 	}
 }

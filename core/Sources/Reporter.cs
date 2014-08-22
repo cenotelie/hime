@@ -118,11 +118,11 @@ namespace Hime.CentralDogma
 		/// <param name="position">The position within the input</param>
 		protected void OutputContext(Text input, TextPosition position)
 		{
-			string[] context = input.GetContext(position);
+			Context context = input.GetContext(position);
 			Console.Write('\t');
-			Console.WriteLine(context[0]);
+			Console.WriteLine(context.Content);
 			Console.Write('\t');
-			Console.WriteLine(context[1]);
+			Console.WriteLine(context.Pointer);
 		}
 	}
 }

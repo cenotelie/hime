@@ -281,11 +281,11 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="position">The position in this text</param>
 		/// <returns>The context description</returns>
-		public string[] GetContext(TextPosition position)
+		public Context GetContext(TextPosition position)
 		{
 			string content = GetLineContent(position.Line);
 			if (content.Length == 0)
-				return new string[] { "", "^" };
+				return new Context("", "^" );
 			int end = content.Length - 1;
 			while (end != 1 && (content[end] == '\n' || content[end] == '\r'))
 				end--;
@@ -300,10 +300,7 @@ namespace Hime.Redist.Lexer
 			for (int i=start; i!=position.Column - 1; i++)
 				builder.Append(content[i] == '\t' ? '\t' : ' ');
 			builder.Append("^");
-			return new string[] {
-				content.Substring(start, end - start + 1),
-				builder.ToString()
-			};
+			return new Context(content.Substring(start, end - start + 1), builder.ToString());
 		}
 
 		/// <summary>

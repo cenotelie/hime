@@ -247,11 +247,11 @@ public class RNGLRParser extends BaseLRParser {
             System.out.println("==== RNGLR parsing error:");
             System.out.print("\t");
             System.out.println(error.toString());
-            String[] context = lexer.getOutput().getContext(error.getPosition());
+            Context context = lexer.getOutput().getContext(error.getPosition());
             System.out.print("\t");
-            System.out.println(context[0]);
+            System.out.println(context.getContent());
             System.out.print("\t");
-            System.out.println(context[1]);
+            System.out.println(context.getPointer());
             gss.print();
         }
     }

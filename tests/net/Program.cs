@@ -114,9 +114,9 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				Console.WriteLine(error);
-				string[] context = result.Input.GetContext(error.Position);
-				Console.WriteLine(context[0]);
-				Console.WriteLine(context[1]);
+				Context context = result.Input.GetContext(error.Position);
+				Console.WriteLine(context.Content);
+				Console.WriteLine(context.Pointer);
 			}
 			if (result.Errors.Count > 0)
 				return new Nullable<ASTNode>();
@@ -149,9 +149,9 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				Console.WriteLine(error);
-				string[] context = result.Input.GetContext(error.Position);
-				Console.WriteLine(context[0]);
-				Console.WriteLine(context[1]);
+				Context context = result.Input.GetContext(error.Position);
+				Console.WriteLine(context.Content);
+				Console.WriteLine(context.Pointer);
 			}
 			if (!result.IsSuccess)
 			{
@@ -191,9 +191,9 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				Console.WriteLine(error);
-				string[] context = result.Input.GetContext(error.Position);
-				Console.WriteLine(context[0]);
-				Console.WriteLine(context[1]);
+				Context context = result.Input.GetContext(error.Position);
+				Console.WriteLine(context.Content);
+				Console.WriteLine(context.Pointer);
 			}
 			if (!result.IsSuccess)
 			{
@@ -248,9 +248,9 @@ namespace Hime.Tests.Executor
 				foreach (ParseError error in result.Errors)
 				{
 					Console.WriteLine(error);
-					string[] context = result.Input.GetContext(error.Position);
-					Console.WriteLine(context[0]);
-					Console.WriteLine(context[1]);
+					Context context = result.Input.GetContext(error.Position);
+					Console.WriteLine(context.Content);
+					Console.WriteLine(context.Pointer);
 				}
 				Console.WriteLine("Expected an empty output but some error where found while parsing");
 				return RESULT_FAILURE_VERB;
@@ -259,13 +259,13 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				string message = error.ToString();
-				string[] context = result.Input.GetContext(error.Position);
+				Context context = result.Input.GetContext(error.Position);
 				if (i + 2 >= output.Length)
 				{
 					Console.WriteLine("Unexpected error:");
 					Console.WriteLine(message);
-					Console.WriteLine(context[0]);
-					Console.WriteLine(context[1]);
+					Console.WriteLine(context.Content);
+					Console.WriteLine(context.Pointer);
 					return RESULT_FAILURE_VERB;
 				}
 				if (!message.StartsWith(output[i]))
@@ -274,15 +274,15 @@ namespace Hime.Tests.Executor
 					Console.WriteLine("Expected prefix  : " + output[i]);
 					return RESULT_FAILURE_VERB;
 				}
-				if (!context[0].StartsWith(output[i + 1]))
+				if (!context.Content.StartsWith(output[i + 1]))
 				{
-					Console.WriteLine("Unexpected output: " + context[0]);
+					Console.WriteLine("Unexpected output: " + context.Content);
 					Console.WriteLine("Expected prefix  : " + output[i + 1]);
 					return RESULT_FAILURE_VERB;
 				}
-				if (!context[1].StartsWith(output[i + 2]))
+				if (!context.Pointer.StartsWith(output[i + 2]))
 				{
-					Console.WriteLine("Unexpected output: " + context[1]);
+					Console.WriteLine("Unexpected output: " + context.Pointer);
 					Console.WriteLine("Expected prefix  : " + output[i + 2]);
 					return RESULT_FAILURE_VERB;
 				}
