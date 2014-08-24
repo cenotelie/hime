@@ -47,6 +47,7 @@ rm -r tests/results
 
 # Package
 mkdir hime-$VERSION-$TAG
+cp LICENSE.txt hime-$VERSION-$TAG/README.txt
 cp releng/standalone/README.txt hime-$VERSION-$TAG/README.txt
 cp runtimes/java/target/*.jar hime-$VERSION-$TAG/
 cp runtimes/net/bin/Release/Hime.Redist.dll hime-$VERSION-$TAG/Hime.Redist.dll
