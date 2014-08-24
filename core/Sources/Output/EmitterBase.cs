@@ -237,6 +237,7 @@ namespace Hime.CentralDogma.Output
 			{
 				if (!EmitBaseArtifacts(units[i]))
 				{
+					reporter.Error("Failed to emit the base artifacts for " + units[i].Name);
 					reporter.Warn("Grammar " + units[i].Name + " will be dropped");
 					units.RemoveAt(i);
 					i--;
@@ -247,7 +248,10 @@ namespace Hime.CentralDogma.Output
 			if (mode == Mode.Assembly || mode == Mode.SourceAndAssembly)
 			{
 				if (!EmitAssembly())
+				{
+					reporter.Error("Failed to emit the assembly " + GetArtifactAssembly());
 					return false;
+				}
 				if (mode == Mode.Assembly)
 				{
 					foreach (Unit unit in units)

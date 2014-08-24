@@ -115,7 +115,8 @@ namespace Hime.CentralDogma.Output
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				File.Move(Path.Combine(Path.Combine(path, "target"), "generated-1.0.0.jar"), GetArtifactAssembly());
+				string[] results = Directory.GetFiles(Path.Combine(path, "target"), "generated-*.jar");
+				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...
 			Directory.Delete(Path.Combine(path, "src"), true);

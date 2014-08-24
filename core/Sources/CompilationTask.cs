@@ -208,7 +208,9 @@ namespace Hime.CentralDogma
 					emitter = new Output.EmitterForJava(reporter, units);
 					break;
 			}
-			emitter.Emit((OutputPath != null) ? OutputPath : "", Mode);
+			bool success = emitter.Emit((OutputPath != null) ? OutputPath : "", Mode);
+			if (!success)
+				reporter.Error("Failed to emit some output");
 		}
 	}
 }
