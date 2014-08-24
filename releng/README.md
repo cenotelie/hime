@@ -17,13 +17,30 @@ The version number of the artifacts must be updated as follow:
 	* the `project/version` element.
 	* the `project/dependencies/dependency/version` element.
 
+This is automatically taken care of by the script `releng/toolkit/version-update.sh`.
+To update to a new version number, run:
+
+```
+$ sh releng/toolkit/version-update.sh X.Y.Z
+```
+
 
 
 ### Releasing ###
 
-1) Update all the version numbers as explained above.
+1) Update the version numbers with:
 
-2) Build and release NuGet packages:
+```
+$ sh releng/toolkit/version-update.sh X.Y.Z
+```
+
+2) Execute the build process using PGP signing. This also produce the standalone package.
+
+```
+$ sh build.sh --sign
+```
+
+3) Building and releasing the NuGet packages:
 
 ```
 $ nuget SetApi Key <key>
@@ -35,20 +52,12 @@ $ nuget push core/Hime.SDK.nupkg
 
 The <name>.symbols.nupkg are automatically pushed to SymbolSource.org when the <name>.nupkg is pushed to NuGet.org
 
-3) Build and release Java runtime
+4) Release Java runtime
 
 Setup a GPG key with developer's name and email, then
 
 ```
-$ mvn -f runtimes/java/pom.xml clean deploy
+$ mvn -f runtimes/java/pom.xml deploy
 ```
 
 Go to [Sonatype Nexus](https://oss.sonatype.org/) to finalize the repository and push to Maven Central.
-
-4) Build and release the standalone package
-
-```
-$ sh releng/standalone/package.sh vX.Y.Z
-```
-
-The result is the zip hime-vX.Y.Z.zip at the root. Upload the zip to Bitbucket.
