@@ -1,20 +1,10 @@
 #!/bin/sh
 
 # Gather version info
-VERSION=1.2.0
+VERSION=$(sh releng/toolkit/version.sh)
 TAG=$(hg log -l 1 --template "{node|short}\n")
-YEAR=$(date +%Y)
+
 echo "Building Hime version $VERSION-$TAG"
-
-
-# Prepare .Net components
-sed -i "s/AssemblyCopyright(\".*\")/AssemblyCopyright(\"Copyright © $YEAR\")/" releng/VersionInfo.cs
-sed -i "s/AssemblyVersion(\".*\")/AssemblyVersion(\"$VERSION.0\")/" releng/VersionInfo.cs
-sed -i "s/AssemblyFileVersion(\".*\")/AssemblyFileVersion(\"$VERSION.0\")/" releng/VersionInfo.cs
-# Prepare the Java components
-python releng/toolkit/maven.py version runtimes/java/pom.xml $VERSION
-python releng/toolkit/maven.py version core/Resources/Java/pom.xml $VERSION
-python releng/toolkit/maven.py version tests/java/pom.xml $VERSION
 
 
 # Build the main components
@@ -57,10 +47,3 @@ cp core/bin/Release/Hime.CentralDogma.XML hime-$VERSION-$TAG/Hime.CentralDogma.x
 cp cli/net/bin/Release/himecc.exe hime-$VERSION-$TAG/himecc.exe
 zip hime-$VERSION-$TAG.zip hime-$VERSION-$TAG/*
 rm -r hime-$VERSION-$TAG
-
-
-# Cleanup
-hg revert --no-backup releng/VersionInfo.cs
-hg revert --no-backup runtimes/java/pom.xml
-hg revert --no-backup core/Resources/Java/pom.xml
-hg revert --no-backup tests/java/pom.xml
