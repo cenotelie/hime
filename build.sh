@@ -53,7 +53,7 @@ if [ $SKIP_TEST != "true" ]
 	rm -r tests/results
 fi
 
-if [ $SKIP_TEST != "true" ]
+if [ $SKIP_PACK != "true" ]
   then
 	# Package
 	mkdir hime-$VERSION-$TAG
