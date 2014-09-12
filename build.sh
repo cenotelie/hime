@@ -28,7 +28,7 @@ echo "Building Hime version $VERSION-$TAG"
 xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
 xbuild /p:Configuration=Release core/Hime.SDK.csproj
 xbuild /p:Configuration=Release cli/net/HimeCC.csproj
-mvn -f runtimes/java/pom.xml clean verify -Dgpg.skip=$SKIP_SIGN
+mvn -f runtimes/java/pom.xml clean install -Dgpg.skip=$SKIP_SIGN
 
 if [ $SKIP_TEST != "true" ]
   then
