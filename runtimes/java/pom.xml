@@ -4,7 +4,7 @@
 	<groupId>org.xowl.hime</groupId>
 	<artifactId>redist</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<name>Hime Runtime</name>
 	<description>Redistributable Java runtime for the parsers generated with Hime</description>
 	<url>https://bitbucket.org/laurentw/hime</url>

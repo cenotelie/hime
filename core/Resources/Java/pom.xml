@@ -4,13 +4,13 @@
 	<groupId>org.xowl.hime</groupId>
 	<artifactId>generated</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<name>Generated Parsers</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.hime</groupId>
 			<artifactId>redist</artifactId>
-			<version>1.2.0</version>
+			<version>1.3.0</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
