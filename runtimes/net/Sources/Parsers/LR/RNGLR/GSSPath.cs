@@ -37,6 +37,10 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private int last;
 		/// <summary>
+		/// The generation containing the last GSS node in this path
+		/// </summary>
+		private int generation;
+		/// <summary>
 		/// The labels on this GSS path
 		/// </summary>
 		private GSSLabel[] labels;
@@ -48,6 +52,15 @@ namespace Hime.Redist.Parsers
 		{
 			get { return last; }
 			set { last = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the generation containing the final target of this path
+		/// </summary>
+		public int Generation
+		{
+			get { return generation; }
+			set { generation = value; }
 		}
 
 		/// <summary>

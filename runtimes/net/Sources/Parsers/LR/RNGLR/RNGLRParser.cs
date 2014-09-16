@@ -413,7 +413,7 @@ namespace Hime.Redist.Parsers
 			// Get the rule's head
 			Symbol head = parserVariables[reduction.prod.Head];
 			// Resolve the sub-root
-			GSSLabel label = sppf.GetLabelFor(generation, new SymbolRef(SymbolType.Variable, reduction.prod.Head));
+			GSSLabel label = sppf.GetLabelFor(path.Generation, new SymbolRef(SymbolType.Variable, reduction.prod.Head));
 			if (label.IsEpsilon)
 			{
 				// not in history, build the SPPF here

@@ -255,6 +255,7 @@ class GSS {
         else
             set.paths[index].ensure(length);
         set.paths[index].setLast(last);
+        set.paths[index].setGeneration(getGenerationOf(last));
     }
 
     /**
@@ -299,8 +300,9 @@ class GSS {
             int next = total;   // Insertion index for new paths
             for (int p = 0; p != total; p++) {
                 int last = set.paths[p].getLast();
+                int genIndex = set.paths[p].getGeneration();
                 // Look for new additional paths from last
-                Gen gen = genEdges.get(getGenerationOf(last));
+                Gen gen = genEdges.get(genIndex);
                 int firstEdgeTarget = -1;
                 GSSLabel firstEdgeLabel = null;
                 for (int e = gen.start; e != gen.start + gen.count; e++) {
@@ -330,6 +332,7 @@ class GSS {
                         set.paths[p] = t;
                     }
                     set.paths[m].setLast(firstEdgeTarget);
+                    set.paths[m].setGeneration(getGenerationOf(firstEdgeTarget));
                     set.paths[m].set(i, firstEdgeLabel);
                     // goto next
                     m++;

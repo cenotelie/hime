@@ -389,7 +389,7 @@ public class RNGLRParser extends BaseLRParser {
         // Get the rule's head
         Symbol head = parserVariables.get(reduction.prod.getHead());
         // Resolve the sub-root
-        GSSLabel label = sppf.getLabelFor(generation, SymbolRef.encode(SymbolType.VARIABLE, reduction.prod.getHead()));
+        GSSLabel label = sppf.getLabelFor(path.getGeneration(), SymbolRef.encode(SymbolType.VARIABLE, reduction.prod.getHead()));
         if (label.isEpsilon()) {
             // not in history, build the SPPF here
             label = buildSPPF(generation, reduction.prod, reduction.first, path);

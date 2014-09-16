@@ -33,6 +33,10 @@ class GSSPath {
      */
     private int last;
     /**
+     * The generation containing the last GSS node in this path
+     */
+    private int generation;
+    /**
      * The labels on this GSS path
      */
     private GSSLabel[] labels;
@@ -53,6 +57,24 @@ class GSSPath {
      */
     public void setLast(int state) {
         last = state;
+    }
+
+    /**
+     * Gets the generation containing the final target of this path
+     *
+     * @return The generation containing the final target of this path
+     */
+    public int getGeneration() {
+        return generation;
+    }
+
+    /**
+     * Sets the generation containing the final target of this path
+     *
+     * @param generation The generation containing the final target of this path
+     */
+    public void setGeneration(int generation) {
+        this.generation = generation;
     }
 
     /**

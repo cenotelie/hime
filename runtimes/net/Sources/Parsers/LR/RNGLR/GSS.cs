@@ -280,6 +280,7 @@ namespace Hime.Redist.Parsers
 			else
 				paths[index].Ensure(length);
 			paths[index].Last = last;
+			paths[index].Generation = GetGenerationOf(last);
 		}
 
 		/// <summary>
@@ -329,8 +330,9 @@ namespace Hime.Redist.Parsers
 				for (int p = 0; p != total; p++)
 				{
 					int last = paths[p].Last;
+					int genIndex = paths[p].Generation;
 					// Look for new additional paths from last
-					Gen gen = genEdges[GetGenerationOf(last)];
+					Gen gen = genEdges[genIndex];
 					int firstEdgeTarget = -1;
 					GSSLabel firstEdgeLabel = new GSSLabel();
 					for (int e = gen.Start; e != gen.Start + gen.Count; e++)
@@ -367,6 +369,7 @@ namespace Hime.Redist.Parsers
 							paths[p] = t;
 						}
 						paths[m].Last = firstEdgeTarget;
+						paths[m].Generation = GetGenerationOf(firstEdgeTarget);
 						paths[m][i] = firstEdgeLabel;
 						// goto next
 						m++;
