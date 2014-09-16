@@ -1,0 +1,11 @@
+fixture Regressions
+
+test Issue009_RNGLR_WrongSPPFGenerationLookup:
+	grammar Issue009_RNGLR_WrongSPPFGenerationLookup { options {Axiom="axiom";} terminals { A->'a'; NOT->'!'; } rules {
+		not -> NOT unary;
+		unary -> A | not;
+		axiom -> unary;
+	} }
+	parser RNGLALR1
+	on "!a"
+	yields axiom(unary(not(NOT unary(A))))
