@@ -2,19 +2,10 @@
 
 # Gather parameters
 SKIP_TEST=false
-SKIP_SIGN=true
-SKIP_PACK=false
-if [ "$1" = "--no-test" ] || [ "$2" = "--no-test" ]
+
+if [ "$1" = "--no-test" ]
   then
     SKIP_TEST=true
-fi
-if [ "$1" = "--sign" ] || [ "$2" = "--sign" ]
-  then
-    SKIP_SIGN=false
-fi
-if [ "$1" = "--no-pack" ] || [ "$2" = "--no-pack" ]
-  then
-    SKIP_PACK=true
 fi
 
 # Gather version info
@@ -25,21 +16,14 @@ echo "Building Hime version $VERSION-$TAG"
 
 
 # Build the main components
-xbuild /p:Configuration=Release /t:Clean runtimes/net/Hime.Redist.csproj 
+xbuild /p:Configuration=Release /t:Clean runtimes/net/Hime.Redist.csproj
 xbuild /p:Configuration=Release /t:Clean core/Hime.SDK.csproj
 xbuild /p:Configuration=Release /t:Clean cli/net/HimeCC.csproj
-if [ $SKIP_SIGN = "true" ]
-  then
-	xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
-	xbuild /p:Configuration=Release core/Hime.SDK.csproj
-	xbuild /p:Configuration=Release cli/net/HimeCC.csproj
-  else
-	xbuild /p:Configuration=Release /p:Sign=True runtimes/net/Hime.Redist.csproj
-	xbuild /p:Configuration=Release /p:Sign=True core/Hime.SDK.csproj
-	xbuild /p:Configuration=Release /p:Sign=True cli/net/HimeCC.csproj
-fi
+xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
+xbuild /p:Configuration=Release core/Hime.SDK.csproj
+xbuild /p:Configuration=Release cli/net/HimeCC.csproj
+mvn -f runtimes/java/pom.xml clean install -Dgpg.skip=true
 
-mvn -f runtimes/java/pom.xml clean install -Dgpg.skip=$SKIP_SIGN
 
 if [ $SKIP_TEST != "true" ]
   then
@@ -62,20 +46,4 @@ if [ $SKIP_TEST != "true" ]
 	# Cleanup the tests
 	mv tests/results/TestResults.xml tests/TestResults.xml
 	rm -r tests/results
-fi
-
-if [ $SKIP_PACK != "true" ]
-  then
-	# Package
-	mkdir hime-$VERSION-$TAG
-	cp LICENSE.txt hime-$VERSION-$TAG/README.txt
-	cp releng/standalone/README.txt hime-$VERSION-$TAG/README.txt
-	cp runtimes/java/target/*.jar hime-$VERSION-$TAG/
-	cp runtimes/net/bin/Release/Hime.Redist.dll hime-$VERSION-$TAG/Hime.Redist.dll
-	cp runtimes/net/bin/Release/Hime.Redist.XML hime-$VERSION-$TAG/Hime.Redist.xml
-	cp core/bin/Release/Hime.CentralDogma.dll hime-$VERSION-$TAG/Hime.CentralDogma.dll
-	cp core/bin/Release/Hime.CentralDogma.XML hime-$VERSION-$TAG/Hime.CentralDogma.xml
-	cp cli/net/bin/Release/himecc.exe hime-$VERSION-$TAG/himecc.exe
-	zip hime-$VERSION-$TAG.zip hime-$VERSION-$TAG/*
-	rm -r hime-$VERSION-$TAG
 fi

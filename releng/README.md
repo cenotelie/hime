@@ -34,25 +34,22 @@ $ sh releng/toolkit/version-update.sh X.Y.Z
 $ sh releng/toolkit/version-update.sh X.Y.Z
 ```
 
-2) Execute the build process using PGP signing. This also produce the standalone package.
+2) Commit the changed files with the new version number
+
+3) Add a Marcurial tag vX.Y.Z
+
+4) On Windows, build and release the Nuget packages
 
 ```
-$ sh build.sh --sign
-```
-
-3) Building and releasing the NuGet packages:
-
-```
-$ nuget SetApi Key <key>
-$ nuget pack runtimes/net/Hime.Redist.csproj -Build -Symbols -Properties Configuration=Release
-$ nuget pack core/Hime.SDK.csproj -Build -Symbols -Properties Configuration=Release
-$ nuget push runtimes/net/Hime.Redist.nupkg
-$ nuget push core/Hime.SDK.nupkg
+$ nuget SetApiKey <key>
+$ sh releng/release-nuget.sh
+$ nuget push Hime.Redist.X.Y.Z.0.nupkg
+$ nuget push Hime.SDK.X.Y.Z.0.nupkg
 ```
 
 The <name>.symbols.nupkg are automatically pushed to SymbolSource.org when the <name>.nupkg is pushed to NuGet.org
 
-4) Release Java runtime
+5) Build and release the Java packages
 
 Setup a GPG key with developer's name and email, then
 
@@ -61,3 +58,9 @@ $ mvn -f runtimes/java/pom.xml deploy
 ```
 
 Go to [Sonatype Nexus](https://oss.sonatype.org/) to finalize the repository and push to Maven Central.
+
+6) Build and release the standalone package
+
+```
+$ sh releng/release-standalone.sh
+```
