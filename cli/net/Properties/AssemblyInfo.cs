@@ -40,6 +40,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("9ea6e226-e1bd-4ada-916f-cc26955947c0")]
-
-// added this visibility so that internal classes and methods may be tested in Hime.NUnit
-[assembly: InternalsVisibleTo("Hime.Tests")]

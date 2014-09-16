@@ -25,9 +25,20 @@ echo "Building Hime version $VERSION-$TAG"
 
 
 # Build the main components
-xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
-xbuild /p:Configuration=Release core/Hime.SDK.csproj
-xbuild /p:Configuration=Release cli/net/HimeCC.csproj
+xbuild /p:Configuration=Release /t:Clean runtimes/net/Hime.Redist.csproj 
+xbuild /p:Configuration=Release /t:Clean core/Hime.SDK.csproj
+xbuild /p:Configuration=Release /t:Clean cli/net/HimeCC.csproj
+if [ $SKIP_SIGN == "true" ]
+  then
+	xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
+	xbuild /p:Configuration=Release core/Hime.SDK.csproj
+	xbuild /p:Configuration=Release cli/net/HimeCC.csproj
+  else
+	xbuild /p:Configuration=Release /p:Sign=True runtimes/net/Hime.Redist.csproj
+	xbuild /p:Configuration=Release /p:Sign=True core/Hime.SDK.csproj
+	xbuild /p:Configuration=Release /p:Sign=True cli/net/HimeCC.csproj
+fi
+
 mvn -f runtimes/java/pom.xml clean install -Dgpg.skip=$SKIP_SIGN
 
 if [ $SKIP_TEST != "true" ]
