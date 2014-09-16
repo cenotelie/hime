@@ -22,6 +22,10 @@ package org.xowl.hime.redist.parsers;
 import org.xowl.hime.redist.utils.BigList;
 import org.xowl.hime.redist.utils.IntBigList;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -65,7 +69,7 @@ class GSS {
 
     /**
      * Represents a generation in a Graph-Structured Stack
-     *
+     * <p/>
      * Because GSS nodes are always created in the last generation,
      * a generation is basically a span in the list of GSS nodes,
      * i.e. the starting index in the list of nodes and the number of nodes
@@ -357,11 +361,41 @@ class GSS {
      * Prints this stack onto the console output
      */
     public void print() {
+        try {
+            OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
+            printTo(writer);
+            writer.close();
+        } catch (IOException ex) {
+            // ignore
+        }
+    }
+
+    /**
+     * Prints this stack into the specified file
+     *
+     * @param file The file to print to
+     * @throws IOException When failing to write
+     */
+    public void printTo(String file) throws IOException {
+        FileOutputStream stream = new FileOutputStream(file, false);
+        OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8");
+        printTo(writer);
+        writer.close();
+        stream.close();
+    }
+
+    /**
+     * Prints this stack with the specified writer
+     *
+     * @param writer A writer
+     * @throws IOException When failing to write
+     */
+    public void printTo(Writer writer) throws IOException {
         // list of all nodes having at least one child
         Set<Integer> linked = new HashSet<Integer>();
 
         for (int i = generation; i != -1; i--) {
-            System.out.println("\t--- generation " + i + " ---");
+            writer.write("--- generation " + i + " ---" + System.lineSeparator());
             // Retrieve the edges in this generation
             Map<Integer, List<Integer>> myedges = new HashMap<Integer, List<Integer>>();
             Gen cedges = genEdges.get(i);
@@ -380,19 +414,17 @@ class GSS {
             Collections.reverse(mynodes);
             // print this generation
             for (int node : mynodes) {
-                String mark = linked.contains(node) ? "\u2192" : "\u2297";
+                String mark = linked.contains(node) ? "node" : "head";
                 if (myedges.containsKey(node)) {
                     for (int to : myedges.get(node)) {
                         int gen = getGenerationOf(to);
                         if (gen == i)
-                            System.out.println("\t\t" + mark + " " + nodes.get(node) + " \u21BA " + nodes.get(to));
-                        else if (gen == i - 1)
-                            System.out.println("\t\t" + mark + " " + nodes.get(node) + " \u21B4 " + nodes.get(to));
+                            writer.write("\t" + mark + " " + nodes.get(node) + " to " + nodes.get(to) + System.lineSeparator());
                         else
-                            System.out.println("\t\t" + mark + " " + nodes.get(node) + " \u21E3 " + nodes.get(to) + " @ " + gen);
+                            writer.write("\t" + mark + " " + nodes.get(node) + " to " + nodes.get(to) + " in gen " + gen + System.lineSeparator());
                     }
                 } else {
-                    System.out.println("\t\t" + mark + " " + nodes.get(node));
+                    writer.write("\t" + mark + " " + nodes.get(node) + System.lineSeparator());
                 }
             }
         }

@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -402,16 +403,36 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public void Print()
 		{
+			PrintTo(Console.Out);
+		}
+
+		/// <summary>
+		/// Prints this stack into the specified file
+		/// </summary>
+		/// <param name="file">The file to print to</param>
+		public void PrintTo(string file)
+		{
+			TextWriter writer = new StreamWriter(file, false, System.Text.Encoding.UTF8);
+			PrintTo(writer);
+			writer.Close();
+		}
+
+		/// <summary>
+		/// Prints this stack with the specified writer
+		/// </summary>
+		/// <param name="writer">A text writer</param>
+		public void PrintTo(TextWriter writer)
+		{
 			// list of all nodes having at least one child
 			List<int> linked = new List<int>();
 
-			for (int i=generation; i!=-1; i--)
+			for (int i = generation; i != -1; i--)
 			{
-				Console.WriteLine("\t--- generation {0} ---", i);
+				writer.WriteLine("--- generation {0} ---", i);
 				// Retrieve the edges in this generation
 				Dictionary<int, List<int>> myedges = new Dictionary<int, List<int>>();
 				Gen cedges = genEdges[i];
-				for (int j=0; j!=cedges.Count; j++)
+				for (int j = 0; j != cedges.Count; j++)
 				{
 					Edge edge = this.edges[cedges.Start + j];
 					if (!myedges.ContainsKey(edge.From))
@@ -423,29 +444,27 @@ namespace Hime.Redist.Parsers
 				// Retrieve the nodes in this generation and reverse their order
 				Gen cnodes = genNodes[i];
 				List<int> mynodes = new List<int>();
-				for (int j=0; j!=cnodes.Count; j++)
+				for (int j = 0; j != cnodes.Count; j++)
 					mynodes.Add(cnodes.Start + j);
 				mynodes.Reverse();
 				// print this generation
 				foreach (int node in mynodes)
 				{
-					string mark = linked.Contains(node) ? "\u2192" : "\u2297";
+					string mark = linked.Contains(node) ? "node" : "head";
 					if (myedges.ContainsKey(node))
 					{
 						foreach (int to in myedges[node])
 						{
 							int gen = GetGenerationOf(to);
 							if (gen == i)
-								Console.WriteLine("\t\t{0} {1} \u21BA {2}", mark, nodes[node], nodes[to]);
-							else if (gen == i - 1)
-								Console.WriteLine("\t\t{0} {1} \u21B4 {2}", mark, nodes[node], nodes[to]);
+								writer.WriteLine("\t{0} {1} to {2}", mark, nodes[node], nodes[to]);
 							else
-								Console.WriteLine("\t\t{0} {1} \u21E3 {2} @ {3}", mark, nodes[node], nodes[to], gen);
+								writer.WriteLine("\t{0} {1} to {2} in gen {3}", mark, nodes[node], nodes[to], gen);
 						}
 					}
 					else
 					{
-						Console.WriteLine("\t\t{0} {1}", mark, nodes[node]);
+						writer.WriteLine("\t{0} {1}", mark, nodes[node]);
 					}
 				}
 			}
