@@ -28,7 +28,7 @@ echo "Building Hime version $VERSION-$TAG"
 xbuild /p:Configuration=Release /t:Clean runtimes/net/Hime.Redist.csproj 
 xbuild /p:Configuration=Release /t:Clean core/Hime.SDK.csproj
 xbuild /p:Configuration=Release /t:Clean cli/net/HimeCC.csproj
-if [ $SKIP_SIGN == "true" ]
+if [ $SKIP_SIGN = "true" ]
   then
 	xbuild /p:Configuration=Release runtimes/net/Hime.Redist.csproj
 	xbuild /p:Configuration=Release core/Hime.SDK.csproj
