@@ -395,6 +395,8 @@ namespace Hime.Redist.Lexer
 			{
 				Cell cell = cells[index];
 				Symbol terminal = terminals[cell.terminal];
+				if (terminal.ID == Symbol.sidDollar || terminal.ID == Symbol.sidEpsilon)
+					return new Symbol(terminal.ID, terminal.Name, "<EOF>");
 				return new Symbol(terminal.ID, terminal.Name, GetValue(cell.start, cell.length));
 			}
 		}

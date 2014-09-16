@@ -336,6 +336,8 @@ public class PrefetchedText implements TokenizedText {
     public Symbol at(int index) {
         Cell cell = cells.get(index);
         Symbol terminal = terminals.get(cell.terminal);
+        if (terminal.getID() == Symbol.sidDollar || terminal.getID() == Symbol.sidEpsilon)
+            return new Symbol(terminal.getID(), terminal.getName(), "<EOF>");
         String value = getValue(cell.start, cell.length);
         return new Symbol(terminal.getID(), terminal.getName(), value);
     }
