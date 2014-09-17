@@ -44,7 +44,6 @@ All user documentation is available in the [wiki](https://bitbucket.org/laurentw
 		* `tests/net`: Sources of the test executor for the .Net runtime implementation.
 		* `tests/java`: Sources of the test executor for the Java runtime implementation.
 * Others
-	* `packages`: Contains the NuGet dependencies for the .Net software components.
 	* `extras`: Contains some extra products, e.g. standard grammars.
 	* `releng`: Contains the release engineering artifacts.
 
