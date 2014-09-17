@@ -24,6 +24,7 @@ import org.xowl.hime.redist.SemanticBody;
 import org.xowl.hime.redist.Symbol;
 import org.xowl.hime.redist.TokenizedText;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -189,11 +190,14 @@ class LRkASTBuilder implements SemanticBody {
      */
     protected void reductionAddSub(SubTree sub, byte action) {
         if (sub.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE) {
+            int directChildrenCount = sub.getChildrenCountAt(0);
+            while (handleNext + directChildrenCount >= handle.length)
+                handle = Arrays.copyOf(handle, handle.length + INIT_HANDLE_SIZE);
             // copy the children to the cache
             sub.copyChildrenTo(cache, cacheNext);
             // setup the handle
             int index = 1;
-            for (int i = 0; i != sub.getChildrenCountAt(0); i++) {
+            for (int i = 0; i != directChildrenCount; i++) {
                 int size = sub.getChildrenCountAt(index) + 1;
                 handle[handleNext++] = cacheNext;
                 cacheNext += size;
@@ -203,6 +207,8 @@ class LRkASTBuilder implements SemanticBody {
         } else {
             if (action != LROpCode.TREE_ACTION_NONE)
                 sub.setActionAt(0, action);
+            if (handleNext == handle.length)
+                handle = Arrays.copyOf(handle, handle.length + INIT_HANDLE_SIZE);
             // copy the complete sub-tree to the cache
             sub.copyTo(cache, cacheNext);
             handle[handleNext++] = cacheNext;

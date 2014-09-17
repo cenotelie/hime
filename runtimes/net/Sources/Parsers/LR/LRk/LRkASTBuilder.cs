@@ -178,11 +178,18 @@ namespace Hime.Redist.Parsers
 		{
 			if (sub.GetActionAt(0) == TreeAction.Replace)
 			{
+				int directChildrenCount = sub.GetChildrenCountAt(0);
+				while (handleNext + directChildrenCount >= handle.Length)
+				{
+					int[] temp = new int[handle.Length + INIT_HANDLE_SIZE];
+					Array.Copy(handle, temp, handle.Length);
+					handle = temp;
+				}
 				// copy the children to the cache
 				sub.CopyChildrenTo(cache, cacheNext);
 				// setup the handle
 				int index = 1;
-				for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
+				for (int i = 0; i != directChildrenCount; i++)
 				{
 					int size = sub.GetChildrenCountAt(index) + 1;
 					handle[handleNext++] = cacheNext;
@@ -197,6 +204,12 @@ namespace Hime.Redist.Parsers
 				if (action != TreeAction.None)
 					sub.SetActionAt(0, action);
 				// copy the complete sub-tree to the cache
+				if (handleNext == handle.Length)
+				{
+					int[] temp = new int[handle.Length + INIT_HANDLE_SIZE];
+					Array.Copy(handle, temp, handle.Length);
+					handle = temp;
+				}
 				sub.CopyTo(cache, cacheNext);
 				handle[handleNext++] = cacheNext;
 				cacheNext += sub.GetChildrenCountAt(0) + 1;
