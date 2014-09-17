@@ -416,7 +416,7 @@ class SPPFBuilder implements SemanticBody {
             label = reduceReplaceable(varIndex);
         else
             label = reduceNormal(varIndex);
-        addTohistory(generation, label);
+        addToHistory(generation, label);
         return label;
     }
 
@@ -493,7 +493,7 @@ class SPPFBuilder implements SemanticBody {
      * @param generation The current generation
      * @param label      The label to register
      */
-    private void addTohistory(int generation, GSSLabel label) {
+    private void addToHistory(int generation, GSSLabel label) {
         HistoryPart hp = getHistoryPart(generation);
         if (hp == null) {
             hp = poolHPs.acquire();

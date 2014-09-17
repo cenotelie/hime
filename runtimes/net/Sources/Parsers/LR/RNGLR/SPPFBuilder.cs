@@ -427,7 +427,7 @@ namespace Hime.Redist.Parsers
 				label = ReduceReplaceable(varIndex);
 			else
 				label = ReduceNormal(varIndex);
-			AddTohistory(generation, label);
+			AddToHistory(generation, label);
 			return label;
 		}
 
@@ -508,7 +508,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="generation">The current generation</param>
 		/// <param name="label">The label to register</param>
-		private void AddTohistory(int generation, GSSLabel label)
+		private void AddToHistory(int generation, GSSLabel label)
 		{
 			HistoryPart hp = GetHistoryPart(generation);
 			if (hp == null)
