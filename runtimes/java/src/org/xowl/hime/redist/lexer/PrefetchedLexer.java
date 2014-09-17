@@ -138,7 +138,7 @@ public abstract class PrefetchedLexer implements ILexer {
         }
         // no more tokens? return EPSILON
         if (tokenIndex >= text.getTokenCount())
-            return new Token(Symbol.sidEpsilon, 0);
+            return new Token(Symbol.SID_EPSILON, 0);
         return text.getTokenAt(tokenIndex++);
     }
 

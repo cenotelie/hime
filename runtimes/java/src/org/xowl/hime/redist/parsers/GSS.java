@@ -35,7 +35,7 @@ class GSS {
     /**
      * The initial size of the paths buffer in this GSS
      */
-    private static final int initPathsCount = 64;
+    private static final int INIT_PATHS_COUNT = 64;
 
     /**
      * Represents an edge in a Graph-Structured Stack
@@ -145,7 +145,7 @@ class GSS {
         this.genEdges = new BigList<Gen>(Gen.class, Gen[].class);
         this.generation = -1;
         this.set = new PathSet();
-        this.set.paths = new GSSPath[initPathsCount];
+        this.set.paths = new GSSPath[INIT_PATHS_COUNT];
         this.set.paths[0] = new GSSPath(1);
     }
 
@@ -249,7 +249,7 @@ class GSS {
      */
     private void setupPath(int index, int last, int length) {
         if (index >= set.paths.length)
-            set.paths = Arrays.copyOf(set.paths, set.paths.length + initPathsCount);
+            set.paths = Arrays.copyOf(set.paths, set.paths.length + INIT_PATHS_COUNT);
         if (set.paths[index] == null)
             set.paths[index] = new GSSPath(length);
         else

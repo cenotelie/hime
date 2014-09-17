@@ -36,7 +36,7 @@ public class PrefetchedText implements TokenizedText {
     /**
      * The initiaal size of the cache of line start indices
      */
-    private static final int initLineCount = 10000;
+    private static final int INIT_LINE_COUNT_CACHE_SIZE = 10000;
 
     /**
      * Represents the metadata of a token
@@ -106,7 +106,7 @@ public class PrefetchedText implements TokenizedText {
      * Finds all the lines in this content
      */
     public void findLines() {
-        this.lines = new int[initLineCount];
+        this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
         this.lines[0] = 0;
         this.line = 1;
         char c1 = '\0';
@@ -156,7 +156,7 @@ public class PrefetchedText implements TokenizedText {
      */
     private void addLine(int index) {
         if (line >= lines.length)
-            lines = Arrays.copyOf(lines, lines.length + initLineCount);
+            lines = Arrays.copyOf(lines, lines.length + INIT_LINE_COUNT_CACHE_SIZE);
         lines[line] = index;
         line++;
     }
@@ -336,7 +336,7 @@ public class PrefetchedText implements TokenizedText {
     public Symbol at(int index) {
         Cell cell = cells.get(index);
         Symbol terminal = terminals.get(cell.terminal);
-        if (terminal.getID() == Symbol.sidDollar || terminal.getID() == Symbol.sidEpsilon)
+        if (terminal.getID() == Symbol.SID_DOLLAR || terminal.getID() == Symbol.SID_EPSILON)
             return new Symbol(terminal.getID(), terminal.getName(), "<EOF>");
         String value = getValue(cell.start, cell.length);
         return new Symbol(terminal.getID(), terminal.getName(), value);

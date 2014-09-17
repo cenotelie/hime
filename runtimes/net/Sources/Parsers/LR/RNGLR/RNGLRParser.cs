@@ -338,7 +338,7 @@ namespace Hime.Redist.Parsers
 					reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), sppf.Epsilon));
 			}
 
-			while (nextToken.SymbolID != Symbol.sidEpsilon) // Wait for ε token
+			while (nextToken.SymbolID != Symbol.SID_EPSILON) // Wait for ε token
 			{
 				Reducer(Ui);
 				Token oldtoken = nextToken;

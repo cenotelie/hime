@@ -114,7 +114,7 @@ namespace Hime.Redist.Lexer
 			}
 			// no more tokens? return epsilon
 			if (tokenIndex >= text.TokenCount)
-				return new Token(Symbol.sidEpsilon, 0);
+				return new Token(Symbol.SID_EPSILON, 0);
 			return text.GetTokenAt(tokenIndex++);
 		}
 

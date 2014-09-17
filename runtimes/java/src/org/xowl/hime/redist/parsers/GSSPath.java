@@ -26,7 +26,7 @@ class GSSPath {
     /**
      * The initial size of the label buffer
      */
-    private static final int initBufferSize = 64;
+    private static final int INIT_BUFFER_SIZE = 64;
 
     /**
      * The last GSS node in this path
@@ -104,7 +104,7 @@ class GSSPath {
      */
     public GSSPath(int length) {
         this.last = 0;
-        this.labels = new GSSLabel[length < initBufferSize ? initBufferSize : length];
+        this.labels = new GSSLabel[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
     }
 
     /**

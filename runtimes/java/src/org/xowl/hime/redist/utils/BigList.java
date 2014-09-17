@@ -32,19 +32,19 @@ public class BigList<T> {
     /**
      * The number of bits allocated to the lowest part of the index (within a chunk)
      */
-    private static final int upperShift = 8;
+    private static final int UPPER_SHIFT = 8;
     /**
      * The size of the chunks
      */
-    private static final int chunksSize = 1 << upperShift;
+    private static final int CHUNKS_SIZE = 1 << UPPER_SHIFT;
     /**
      * Bit mask for the lowest part of the index (within a chunk)
      */
-    private static final int lowerMask = chunksSize - 1;
+    private static final int LOWER_MASK = CHUNKS_SIZE - 1;
     /**
      * Initial size of the higer array (pointers to the chunks)
      */
-    private static final int initChunkCount = chunksSize;
+    private static final int INIT_CHUNK_COUNT = CHUNKS_SIZE;
 
     /**
      * The data
@@ -71,8 +71,8 @@ public class BigList<T> {
      */
     public BigList(Class<T> type, Class<T[]> typeArray) {
         this.typeElement = type;
-        this.chunks = (T[][]) Array.newInstance(typeArray, initChunkCount);
-        this.chunks[0] = (T[]) Array.newInstance(typeElement, chunksSize);
+        this.chunks = (T[][]) Array.newInstance(typeArray, INIT_CHUNK_COUNT);
+        this.chunks[0] = (T[]) Array.newInstance(typeElement, CHUNKS_SIZE);
         this.chunkIndex = 0;
         this.cellIndex = 0;
     }
@@ -83,7 +83,7 @@ public class BigList<T> {
      * @return The size of this list
      */
     public int size() {
-        return (chunkIndex * chunksSize) + cellIndex;
+        return (chunkIndex * CHUNKS_SIZE) + cellIndex;
     }
 
     /**
@@ -93,7 +93,7 @@ public class BigList<T> {
      * @return The value of the item at the given index
      */
     public T get(int index) {
-        return chunks[index >> upperShift][index & lowerMask];
+        return chunks[index >> UPPER_SHIFT][index & LOWER_MASK];
     }
 
     /**
@@ -103,7 +103,7 @@ public class BigList<T> {
      * @param value The value of the item at the given index
      */
     public void set(int index, T value) {
-        chunks[index >> upperShift][index & lowerMask] = value;
+        chunks[index >> UPPER_SHIFT][index & LOWER_MASK] = value;
     }
 
     /**
@@ -113,10 +113,10 @@ public class BigList<T> {
      * @return The index of the value in this list
      */
     public int add(T value) {
-        if (cellIndex == chunksSize)
+        if (cellIndex == CHUNKS_SIZE)
             addChunk();
         chunks[chunkIndex][cellIndex] = value;
-        int index = (chunkIndex << upperShift | cellIndex);
+        int index = (chunkIndex << UPPER_SHIFT | cellIndex);
         cellIndex++;
         return index;
     }
@@ -147,11 +147,11 @@ public class BigList<T> {
         int start = size();
         if (count <= 0)
             return start;
-        int chunk = from >> upperShift;     // The current chunk to copy from
-        int cell = from & lowerMask;        // The current starting index in the chunk
-        while (cell + count > chunksSize) {
-            docopy(chunks[chunk], cell, chunksSize - cell);
-            count -= chunksSize - cell;
+        int chunk = from >> UPPER_SHIFT;     // The current chunk to copy from
+        int cell = from & LOWER_MASK;        // The current starting index in the chunk
+        while (cell + count > CHUNKS_SIZE) {
+            docopy(chunks[chunk], cell, CHUNKS_SIZE - cell);
+            count -= CHUNKS_SIZE - cell;
             chunk++;
             cell = 0;
         }
@@ -167,8 +167,8 @@ public class BigList<T> {
      * @param length The number of values to store
      */
     private void docopy(T[] values, int index, int length) {
-        while (cellIndex + length > chunksSize) {
-            int count = chunksSize - cellIndex;
+        while (cellIndex + length > CHUNKS_SIZE) {
+            int count = CHUNKS_SIZE - cellIndex;
             if (count == 0) {
                 addChunk();
                 continue;
@@ -186,9 +186,9 @@ public class BigList<T> {
      * Adds a new (empty) chunk of cells
      */
     private void addChunk() {
-        T[] t = (T[]) Array.newInstance(typeElement, chunksSize);
+        T[] t = (T[]) Array.newInstance(typeElement, CHUNKS_SIZE);
         if (chunkIndex == chunks.length - 1)
-            chunks = Arrays.copyOf(chunks, chunks.length + initChunkCount);
+            chunks = Arrays.copyOf(chunks, chunks.length + INIT_CHUNK_COUNT);
         chunks[++chunkIndex] = t;
         cellIndex = 0;
     }

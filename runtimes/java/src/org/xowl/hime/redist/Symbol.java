@@ -27,11 +27,11 @@ public class Symbol {
     /**
      * Symbol ID of the Epsilon terminal
      */
-    public static final int sidEpsilon = 1;
+    public static final int SID_EPSILON = 1;
     /**
      * Symbol ID of the Dollar terminal
      */
-    public static final int sidDollar = 2;
+    public static final int SID_DOLLAR = 2;
 
     /**
      * The symbol's unique identifier

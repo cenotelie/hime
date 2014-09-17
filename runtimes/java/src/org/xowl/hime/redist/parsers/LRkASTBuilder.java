@@ -31,13 +31,13 @@ import java.util.List;
  */
 class LRkASTBuilder implements SemanticBody {
     /**
-     * The maximum size of the reduction handle
+     * The initial size of the reduction handle
      */
-    protected static final int handleSize = 1024;
+    protected static final int INIT_HANDLE_SIZE = 1024;
     /**
      * The bias for estimating the size of the reduced sub-tree
      */
-    protected static final int estimationBias = 5;
+    protected static final int ESTIMATION_BIAS = 5;
 
     /**
      * The pool of single node sub-trees
@@ -132,7 +132,7 @@ class LRkASTBuilder implements SemanticBody {
         }, 16, SubTree.class);
         this.stack = new SubTree[stackSize];
         this.stackNext = 0;
-        this.handle = new int[handleSize];
+        this.handle = new int[INIT_HANDLE_SIZE];
         this.result = new SimpleAST(text, variables, virtuals);
     }
 
@@ -156,7 +156,7 @@ class LRkASTBuilder implements SemanticBody {
      */
     public void reductionPrepare(int varIndex, int length, byte action) {
         stackNext -= length;
-        int estimation = estimationBias;
+        int estimation = ESTIMATION_BIAS;
         for (int i = 0; i != length; i++)
             estimation += stack[stackNext + i].size();
         cache = getSubTree(estimation);

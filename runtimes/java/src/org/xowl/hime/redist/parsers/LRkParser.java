@@ -41,8 +41,8 @@ public abstract class LRkParser extends BaseLRParser {
             this.parserAutomaton = LRkParser.this.parserAutomaton;
             this.parserVariables = LRkParser.this.parserVariables;
             this.input = LRkParser.this.input;
-            this.stack = Arrays.copyOf(LRkParser.this.stack, BaseLRParser.maxStackSize);
-            this.stack = new int[BaseLRParser.maxStackSize];
+            this.stack = Arrays.copyOf(LRkParser.this.stack, BaseLRParser.MAX_STACK_SIZE);
+            this.stack = new int[BaseLRParser.MAX_STACK_SIZE];
             this.head = LRkParser.this.head;
         }
     }
@@ -81,7 +81,7 @@ public abstract class LRkParser extends BaseLRParser {
         super(variables, virtuals, actions, lexer);
         this.parserAutomaton = automaton;
         this.input = new RewindableTokenStream(lexer);
-        this.builder = new LRkASTBuilder(maxStackSize, lexer.getOutput(), parserVariables, parserVirtuals);
+        this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.getOutput(), parserVariables, parserVirtuals);
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class LRkParser extends BaseLRParser {
      * @return A ParseResult object containing the data about the result
      */
     public ParseResult parse() {
-        this.stack = new int[maxStackSize];
+        this.stack = new int[MAX_STACK_SIZE];
         Token nextToken = input.getNextToken();
         while (true) {
             char action = ParseOnToken(nextToken);
@@ -151,7 +151,7 @@ public abstract class LRkParser extends BaseLRParser {
             if (action == LRAction.CODE_ACCEPT)
                 return new ParseResult(allErrors, lexer.getOutput(), builder.GetTree());
             nextToken = onUnexpectedToken(nextToken);
-            if (nextToken.getSymbolID() == 0 || allErrors.size() >= maxErrorCount)
+            if (nextToken.getSymbolID() == 0 || allErrors.size() >= MAX_ERROR_COUNT)
                 return new ParseResult(allErrors, lexer.getOutput());
         }
     }

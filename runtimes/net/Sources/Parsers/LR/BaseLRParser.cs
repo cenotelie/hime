@@ -31,11 +31,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Maximal size of the stack
 		/// </summary>
-		protected const int maxStackSize = 128;
+		protected const int MAX_STACK_SIZE = 128;
 		/// <summary>
 		/// Maximum number of errors
 		/// </summary>
-		protected const int maxErrorCount = 100;
+		protected const int MAX_ERROR_COUNT = 100;
 
 		/// <summary>
 		/// Determines whether the parser will try to recover from errors

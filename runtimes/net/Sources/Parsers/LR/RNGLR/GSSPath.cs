@@ -30,7 +30,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The initial size of the label buffer
 		/// </summary>
-		private const int initBufferSize = 64;
+		private const int INIT_BUFFER_SIZE = 64;
 
 		/// <summary>
 		/// The last GSS node in this path
@@ -78,7 +78,7 @@ namespace Hime.Redist.Parsers
 		public GSSPath(int length)
 		{
 			this.last = 0;
-			this.labels = new GSSLabel[length < initBufferSize ? initBufferSize : length];
+			this.labels = new GSSLabel[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
 		}
 
 		/// <summary>

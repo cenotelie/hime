@@ -318,7 +318,7 @@ public class RNGLRParser extends BaseLRParser {
                 reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), sppf.EPSILON));
         }
 
-        while (nextToken.getSymbolID() != Symbol.sidEpsilon) // Wait for ε token
+        while (nextToken.getSymbolID() != Symbol.SID_EPSILON) // Wait for ε token
         {
             reducer(Ui);
             Token oldtoken = nextToken;

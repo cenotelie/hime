@@ -35,19 +35,19 @@ namespace Hime.Redist.Utils
 		/// <summary>
 		/// The number of bits allocated to the lowest part of the index (within a chunk)
 		/// </summary>
-		private const int upperShift = 8;
+		private const int UPPER_SHIFT = 8;
 		/// <summary>
 		/// The size of the chunks
 		/// </summary>
-		private const int chunksSize = 1 << upperShift;
+		private const int CHUNKS_SIZE = 1 << UPPER_SHIFT;
 		/// <summary>
 		/// Bit mask for the lowest part of the index (within a chunk)
 		/// </summary>
-		private const int lowerMask = chunksSize - 1;
+		private const int LOWER_MASK = CHUNKS_SIZE - 1;
 		/// <summary>
 		/// Initial size of the higer array (pointers to the chunks)
 		/// </summary>
-		private const int initChunkCount = chunksSize;
+		private const int INIT_CHUNK_COUNT = CHUNKS_SIZE;
 
 		/// <summary>
 		/// The data
@@ -67,8 +67,8 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		public BigList()
 		{
-			this.chunks = new T[initChunkCount][];
-			this.chunks[0] = new T[chunksSize];
+			this.chunks = new T[INIT_CHUNK_COUNT][];
+			this.chunks[0] = new T[CHUNKS_SIZE];
 			this.chunkIndex = 0;
 			this.cellIndex = 0;
 		}
@@ -78,7 +78,7 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		public int Size
 		{
-			get { return (chunkIndex * chunksSize) + cellIndex; }
+			get { return (chunkIndex * CHUNKS_SIZE) + cellIndex; }
 		}
 
 		/// <summary>
@@ -88,8 +88,8 @@ namespace Hime.Redist.Utils
 		/// <returns>The value of the item at the given index</returns>
 		public T this[int index]
 		{
-			get { return chunks[index >> upperShift][index & lowerMask]; }
-			set { chunks[index >> upperShift][index & lowerMask] = value; }
+			get { return chunks[index >> UPPER_SHIFT][index & LOWER_MASK]; }
+			set { chunks[index >> UPPER_SHIFT][index & LOWER_MASK] = value; }
 		}
 
 		/// <summary>
@@ -99,10 +99,10 @@ namespace Hime.Redist.Utils
 		/// <returns>The index of the value in this list</returns>
 		public int Add(T value)
 		{
-			if (cellIndex == chunksSize)
+			if (cellIndex == CHUNKS_SIZE)
 				AddChunk();
 			chunks[chunkIndex][cellIndex] = value;
-			int index = (chunkIndex << upperShift | cellIndex);
+			int index = (chunkIndex << UPPER_SHIFT | cellIndex);
 			cellIndex++;
 			return index;
 		}
@@ -133,12 +133,12 @@ namespace Hime.Redist.Utils
 			int start = Size;
 			if (count <= 0)
 				return start;
-			int chunk = from >> upperShift;     // The current chunk to copy from
-			int cell = from & lowerMask;        // The current starting index in the chunk
-			while (cell + count > chunksSize)
+			int chunk = from >> UPPER_SHIFT;     // The current chunk to copy from
+			int cell = from & LOWER_MASK;        // The current starting index in the chunk
+			while (cell + count > CHUNKS_SIZE)
 			{
-				DoCopy(chunks[chunk], cell, chunksSize - cell);
-				count -= chunksSize - cell;
+				DoCopy(chunks[chunk], cell, CHUNKS_SIZE - cell);
+				count -= CHUNKS_SIZE - cell;
 				chunk++;
 				cell = 0;
 			}
@@ -154,9 +154,9 @@ namespace Hime.Redist.Utils
 		/// <param name="length">The number of values to store</param>
 		private void DoCopy(T[] values, int index, int length)
 		{
-			while (cellIndex + length > chunksSize)
+			while (cellIndex + length > CHUNKS_SIZE)
 			{
-				int count = chunksSize - cellIndex;
+				int count = CHUNKS_SIZE - cellIndex;
 				if (count == 0)
 				{
 					AddChunk();
@@ -176,10 +176,10 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		private void AddChunk()
 		{
-			T[] t = new T[chunksSize];
+			T[] t = new T[CHUNKS_SIZE];
 			if (chunkIndex == chunks.Length - 1)
 			{
-				T[][] r = new T[chunks.Length + initChunkCount][];
+				T[][] r = new T[chunks.Length + INIT_CHUNK_COUNT][];
 				Array.Copy(chunks, r, chunks.Length);
 				chunks = r;
 			}

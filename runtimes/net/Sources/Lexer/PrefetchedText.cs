@@ -33,7 +33,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The initiaal size of the cache of line start indices
 		/// </summary>
-		private const int initLineCount = 10000;
+		private const int INIT_LINE_COUNT_CACHE_SIZE = 10000;
 
 		/// <summary>
 		/// Represents the metadata of a token
@@ -108,7 +108,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		public void FindLines()
 		{
-			this.lines = new int[initLineCount];
+			this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
 			this.lines[0] = 0;
 			this.line = 1;
 			char c1 = '\0';
@@ -162,7 +162,7 @@ namespace Hime.Redist.Lexer
 		{
 			if (line >= lines.Length)
 			{
-				int[] t = new int[lines.Length + initLineCount];
+				int[] t = new int[lines.Length + INIT_LINE_COUNT_CACHE_SIZE];
 				System.Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
 				lines = t;
 			}
@@ -395,7 +395,7 @@ namespace Hime.Redist.Lexer
 			{
 				Cell cell = cells[index];
 				Symbol terminal = terminals[cell.terminal];
-				if (terminal.ID == Symbol.sidDollar || terminal.ID == Symbol.sidEpsilon)
+				if (terminal.ID == Symbol.SID_DOLLAR || terminal.ID == Symbol.SID_EPSILON)
 					return new Symbol(terminal.ID, terminal.Name, "<EOF>");
 				return new Symbol(terminal.ID, terminal.Name, GetValue(cell.start, cell.length));
 			}

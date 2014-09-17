@@ -29,14 +29,14 @@ namespace Hime.Redist.Parsers
 	class LRkASTBuilder : SemanticBody
 	{
 		/// <summary>
-		/// The maximum size of the reduction handle
+		/// The initial size of the reduction handle
 		/// </summary>
-		protected const int handleSize = 1024;
+		protected const int INIT_HANDLE_SIZE = 1024;
 
 		/// <summary>
 		/// The bias for estimating the size of the reduced sub-tree
 		/// </summary>
-		protected const int estimationBias = 5;
+		protected const int ESTIMATION_BIAS = 5;
 
 		/// <summary>
 		/// The pool of single node sub-trees
@@ -121,7 +121,7 @@ namespace Hime.Redist.Parsers
 			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
 			this.stack = new SubTree[stackSize];
 			this.stackNext = 0;
-			this.handle = new int[handleSize];
+			this.handle = new int[INIT_HANDLE_SIZE];
 			this.result = new SimpleAST(text, variables, virtuals);
 		}
 
@@ -145,7 +145,7 @@ namespace Hime.Redist.Parsers
 		public void ReductionPrepare(int varIndex, int length, TreeAction action)
 		{
 			stackNext -= length;
-			int estimation = estimationBias;
+			int estimation = ESTIMATION_BIAS;
 			for (int i = 0; i != length; i++)
 				estimation += stack[stackNext + i].GetSize();
 			cache = GetSubTree(estimation);

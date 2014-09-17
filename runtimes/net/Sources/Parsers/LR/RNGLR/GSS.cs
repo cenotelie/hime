@@ -32,7 +32,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The initial size of the paths buffer in this GSS
 		/// </summary>
-		private const int initPathsCount = 64;
+		private const int INIT_PATHS_COUNT = 64;
 
 		/// <summary>
 		/// Represents an edge in a Graph-Structured Stack
@@ -160,7 +160,7 @@ namespace Hime.Redist.Parsers
 			this.generation = -1;
 			this.path0 = new GSSPath();
 			this.paths0 = new GSSPath[1] { path0 };
-			this.paths = new GSSPath[initPathsCount];
+			this.paths = new GSSPath[INIT_PATHS_COUNT];
 		}
 
 		/// <summary>
@@ -271,7 +271,7 @@ namespace Hime.Redist.Parsers
 		{
 			if (index >= paths.Length)
 			{
-				GSSPath[] temp = new GSSPath[paths.Length + initPathsCount];
+				GSSPath[] temp = new GSSPath[paths.Length + INIT_PATHS_COUNT];
 				System.Array.Copy(paths, temp, paths.Length);
 				paths = temp;
 			}

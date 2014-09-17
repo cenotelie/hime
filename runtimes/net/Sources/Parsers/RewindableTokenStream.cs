@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The size of the ring buffer
 		/// </summary>
-		private const int ringSize = 32;
+		private const int RING_SIZE = 32;
 
 		/// <summary>
 		/// The input lexer to read token from
@@ -58,7 +58,7 @@ namespace Hime.Redist.Parsers
 		public RewindableTokenStream(Lexer.ILexer lexer)
 		{
 			this.lexer = lexer;
-			this.ring = new Token[ringSize];
+			this.ring = new Token[RING_SIZE];
 			this.ringStart = 0;
 			this.ringNextEntry = 0;
 		}
@@ -91,7 +91,7 @@ namespace Hime.Redist.Parsers
 		private void PushInRing(Token value)
 		{
 			ring[ringNextEntry++] = value;
-			if (ringNextEntry == ringSize)
+			if (ringNextEntry == RING_SIZE)
 				ringNextEntry = 0;
 			ringStart = ringNextEntry;
 		}
@@ -104,7 +104,7 @@ namespace Hime.Redist.Parsers
 		{
 			ringStart -= count;
 			if (ringStart < 0)
-				ringStart += ringSize;
+				ringStart += RING_SIZE;
 		}
 
 		/// <summary>

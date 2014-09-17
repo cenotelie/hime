@@ -34,17 +34,17 @@ namespace Hime.Redist.Parsers
 	class SPPFBuilder : SemanticBody
 	{
 		/// <summary>
-		/// The maximum size of the reduction handle
+		/// The initial size of the reduction handle
 		/// </summary>
-		private const int handleSize = 1024;
+		private const int INIT_HANDLE_SIZE = 1024;
 		/// <summary>
 		/// The initial size of the history buffer
 		/// </summary>
-		private const int initHistorySize = 8;
+		private const int INIT_HISTORY_SIZE = 8;
 		/// <summary>
 		/// The initial size of the history parts' buffers
 		/// </summary>
-		private const int initHistoryPartSize = 64;
+		private const int INIT_HISTORY_PART_SIZE = 64;
 
 		/// <summary>
 		/// Represents a generation of GSS edges in the current history
@@ -70,7 +70,7 @@ namespace Hime.Redist.Parsers
 			public HistoryPart()
 			{
 				this.generation = 0;
-				this.data = new GSSLabel[initHistoryPartSize];
+				this.data = new GSSLabel[INIT_HISTORY_PART_SIZE];
 				this.next = 0;
 			}
 		}
@@ -188,14 +188,14 @@ namespace Hime.Redist.Parsers
 			this.pool8 = new Pool<SubTree>(new SubTreeFactory(8), 1024);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
 			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
-			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), initHistorySize);
-			this.history = new HistoryPart[initHistorySize];
+			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), INIT_HISTORY_SIZE);
+			this.history = new HistoryPart[INIT_HISTORY_SIZE];
 			this.nextHP = 0;
-			this.cacheChildren = new int[handleSize];
-			this.cacheActions = new TreeAction[handleSize];
-			this.handle = new int[handleSize];
-			this.stack = new GSSLabel[handleSize];
-			this.collection = new SubTree[initHistoryPartSize];
+			this.cacheChildren = new int[INIT_HANDLE_SIZE];
+			this.cacheActions = new TreeAction[INIT_HANDLE_SIZE];
+			this.handle = new int[INIT_HANDLE_SIZE];
+			this.stack = new GSSLabel[INIT_HANDLE_SIZE];
+			this.collection = new SubTree[INIT_HISTORY_PART_SIZE];
 			this.collectionNext = 0;
 			this.result = new GraphAST(text, variables, virtuals);
 		}
@@ -339,7 +339,7 @@ namespace Hime.Redist.Parsers
 				// do we have enough space?
 				if (collection.Length == collectionNext)
 				{
-					SubTree[] temp = new SubTree[collection.Length + initHistoryPartSize];
+					SubTree[] temp = new SubTree[collection.Length + INIT_HISTORY_PART_SIZE];
 					Array.Copy(collection, temp, collection.Length);
 					collection = temp;
 				}
@@ -364,8 +364,8 @@ namespace Hime.Redist.Parsers
 			if (cacheNext + count >= cacheChildren.Length)
 			{
 				// the current cache is not big enough, build a bigger one
-				int[] t1 = new int[cacheChildren.Length + handleSize];
-				TreeAction[] t2 = new TreeAction[cacheActions.Length + handleSize];
+				int[] t1 = new int[cacheChildren.Length + INIT_HANDLE_SIZE];
+				TreeAction[] t2 = new TreeAction[cacheActions.Length + INIT_HANDLE_SIZE];
 				Array.Copy(cacheChildren, t1, cacheChildren.Length);
 				Array.Copy(cacheActions, t2, cacheActions.Length);
 				cacheChildren = t1;
@@ -518,7 +518,7 @@ namespace Hime.Redist.Parsers
 				hp.next = 0;
 				if (history.Length == nextHP)
 				{
-					HistoryPart[] temp = new HistoryPart[history.Length + initHistorySize];
+					HistoryPart[] temp = new HistoryPart[history.Length + INIT_HISTORY_SIZE];
 					Array.Copy(history, temp, history.Length);
 					history = temp;
 				}

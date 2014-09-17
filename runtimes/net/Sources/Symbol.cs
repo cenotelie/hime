@@ -28,12 +28,12 @@ namespace Hime.Redist
 		/// <summary>
 		/// Symbol ID of the Epsilon terminal
 		/// </summary>
-		public const int sidEpsilon = 1;
+		public const int SID_EPSILON = 1;
 
 		/// <summary>
 		/// Symbol ID of the Dollar terminal
 		/// </summary>
-		public const int sidDollar = 2;
+		public const int SID_DOLLAR = 2;
 
 		/// <summary>
 		/// The symbol's unique identifier

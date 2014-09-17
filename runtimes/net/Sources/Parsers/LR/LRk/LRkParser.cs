@@ -41,7 +41,7 @@ namespace Hime.Redist.Parsers
 				this.parserAutomaton = parser.parserAutomaton;
 				this.parserVariables = parser.parserVariables;
 				this.input = parser.input;
-				this.stack = new int[maxStackSize];
+				this.stack = new int[MAX_STACK_SIZE];
 				this.head = parser.head;
 				System.Array.Copy(parser.stack, this.stack, parser.head + 1);
 			}
@@ -85,7 +85,7 @@ namespace Hime.Redist.Parsers
 		{
 			this.parserAutomaton = automaton;
 			this.input = new RewindableTokenStream(lexer);
-			this.builder = new LRkASTBuilder(maxStackSize, lexer.Output, parserVariables, parserVirtuals);
+			this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.Output, parserVariables, parserVirtuals);
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>A ParseResult object containing the data about the result</returns>
 		public override ParseResult Parse()
 		{
-			this.stack = new int[maxStackSize];
+			this.stack = new int[MAX_STACK_SIZE];
 			Token nextToken = input.GetNextToken();
 			while (true)
 			{
@@ -161,7 +161,7 @@ namespace Hime.Redist.Parsers
 				if (action == LRActionCode.Accept)
 					return new ParseResult(allErrors, lexer.Output, builder.GetTree());
 				nextToken = OnUnexpectedToken(nextToken);
-				if (nextToken.SymbolID == 0 || allErrors.Count >= maxErrorCount)
+				if (nextToken.SymbolID == 0 || allErrors.Count >= MAX_ERROR_COUNT)
 					return new ParseResult(allErrors, lexer.Output);
 			}
 		}

@@ -29,7 +29,7 @@ class RewindableTokenStream {
     /**
      * The size of the ring buffer
      */
-    private static final int ringSize = 32;
+    private static final int RING_SIZE = 32;
 
     /**
      * The input lexer to read token from
@@ -55,7 +55,7 @@ class RewindableTokenStream {
      */
     public RewindableTokenStream(ILexer lexer) {
         this.lexer = lexer;
-        this.ring = new Token[ringSize];
+        this.ring = new Token[RING_SIZE];
         this.ringStart = 0;
         this.ringNextEntry = 0;
     }
@@ -88,7 +88,7 @@ class RewindableTokenStream {
      */
     private void pushInRing(Token value) {
         ring[ringNextEntry++] = value;
-        if (ringNextEntry == ringSize)
+        if (ringNextEntry == RING_SIZE)
             ringNextEntry = 0;
         ringStart = ringNextEntry;
     }
@@ -101,7 +101,7 @@ class RewindableTokenStream {
     public void rewind(int count) {
         ringStart -= count;
         if (ringStart < 0)
-            ringStart += ringSize;
+            ringStart += RING_SIZE;
     }
 
     /**

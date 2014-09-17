@@ -36,17 +36,17 @@ import java.util.List;
  */
 class SPPFBuilder implements SemanticBody {
     /**
-     * The maximum size of the reduction handle
+     * The initial size of the reduction handle
      */
-    private static final int handleSize = 1024;
+    private static final int INIT_HANDLE_SIZE = 1024;
     /**
      * The initial size of the history buffer
      */
-    private static final int initHistorySize = 8;
+    private static final int INIT_HISTORY_SIZE = 8;
     /**
      * The initial size of the history parts' buffers
      */
-    private static final int initHistoryPartSize = 64;
+    private static final int INIT_HISTORY_PART_SIZE = 64;
 
     /**
      * Gets the EPSILON GSS label
@@ -76,7 +76,7 @@ class SPPFBuilder implements SemanticBody {
          */
         public HistoryPart() {
             this.generation = 0;
-            this.data = new GSSLabel[initHistoryPartSize];
+            this.data = new GSSLabel[INIT_HISTORY_PART_SIZE];
             this.next = 0;
         }
     }
@@ -199,14 +199,14 @@ class SPPFBuilder implements SemanticBody {
             public HistoryPart createNew(Pool<HistoryPart> pool) {
                 return new HistoryPart();
             }
-        }, initHistorySize, HistoryPart.class);
-        this.history = new HistoryPart[initHistorySize];
+        }, INIT_HISTORY_SIZE, HistoryPart.class);
+        this.history = new HistoryPart[INIT_HISTORY_SIZE];
         this.nextHP = 0;
-        this.cacheChildren = new int[handleSize];
-        this.cacheActions = new byte[handleSize];
-        this.handle = new int[handleSize];
-        this.stack = new GSSLabel[handleSize];
-        this.collection = new SubTree[initHistoryPartSize];
+        this.cacheChildren = new int[INIT_HANDLE_SIZE];
+        this.cacheActions = new byte[INIT_HANDLE_SIZE];
+        this.handle = new int[INIT_HANDLE_SIZE];
+        this.stack = new GSSLabel[INIT_HANDLE_SIZE];
+        this.collection = new SubTree[INIT_HISTORY_PART_SIZE];
         this.collectionNext = 0;
         this.result = new GraphAST(text, variables, virtuals);
     }
@@ -341,7 +341,7 @@ class SPPFBuilder implements SemanticBody {
                     return;
             // do we have enough space?
             if (collection.length == collectionNext)
-                collection = Arrays.copyOf(collection, collection.length + initHistoryPartSize);
+                collection = Arrays.copyOf(collection, collection.length + INIT_HISTORY_PART_SIZE);
             // insert the collectable sub-tree
             collection[collectionNext++] = sub;
         } else if (action != LROpCode.TREE_ACTION_DROP) {
@@ -360,8 +360,8 @@ class SPPFBuilder implements SemanticBody {
         int count = result.getChildrenCount(node);
         if (cacheNext + count >= cacheChildren.length) {
             // the current cache is not big enough, build a bigger one
-            cacheChildren = Arrays.copyOf(cacheChildren, cacheChildren.length + handleSize);
-            cacheActions = Arrays.copyOf(cacheActions, cacheActions.length + handleSize);
+            cacheChildren = Arrays.copyOf(cacheChildren, cacheChildren.length + INIT_HANDLE_SIZE);
+            cacheActions = Arrays.copyOf(cacheActions, cacheActions.length + INIT_HANDLE_SIZE);
         }
         // add the node in the cache
         cacheChildren[cacheNext] = node;
@@ -500,7 +500,7 @@ class SPPFBuilder implements SemanticBody {
             hp.generation = generation;
             hp.next = 0;
             if (history.length == nextHP)
-                history = Arrays.copyOf(history, history.length + initHistorySize);
+                history = Arrays.copyOf(history, history.length + INIT_HISTORY_SIZE);
             history[nextHP++] = hp;
         }
         hp.data[hp.next++] = label;
