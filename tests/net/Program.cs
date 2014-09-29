@@ -86,7 +86,8 @@ namespace Hime.Tests.Executor
 		/// <returns>The test result</returns>
 		public int Execute(string parserName, string verb)
 		{
-			string input = System.IO.File.ReadAllText("input.txt", System.Text.Encoding.UTF8);
+			byte[] buffer = System.IO.File.ReadAllBytes("input.txt");
+			string input = new string(System.Text.Encoding.UTF8.GetChars(buffer));
 			Hime.Redist.Parsers.IParser parser = GetParser(parserName, input);
 			switch (verb)
 			{
