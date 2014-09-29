@@ -524,6 +524,12 @@ namespace Hime.Redist.Parsers
 				}
 				history[nextHP++] = hp;
 			}
+			if (hp.next == hp.data.Length)
+			{
+				GSSLabel[] temp = new GSSLabel[hp.data.Length + INIT_HISTORY_PART_SIZE];
+				Array.Copy(hp.data, temp, hp.data.Length);
+				hp.data = temp;
+			}
 			hp.data[hp.next++] = label;
 		}
 

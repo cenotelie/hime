@@ -503,6 +503,8 @@ class SPPFBuilder implements SemanticBody {
                 history = Arrays.copyOf(history, history.length + INIT_HISTORY_SIZE);
             history[nextHP++] = hp;
         }
+        if (hp.data.length == hp.next)
+            hp.data = Arrays.copyOf(hp.data, hp.data.length + INIT_HISTORY_PART_SIZE);
         hp.data[hp.next++] = label;
     }
 
