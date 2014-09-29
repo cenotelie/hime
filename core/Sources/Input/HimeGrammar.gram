@@ -73,6 +73,7 @@ grammar HimeGrammar
 		BLOCK_OPTIONS		-> 'options';
 		BLOCK_TERMINALS		-> 'terminals';
 		BLOCK_RULES			-> 'rules';
+		BLOCK_CONTEXT		-> 'context';
 	}
 	rules
 	{
@@ -100,7 +101,9 @@ grammar HimeGrammar
 		terminal_def_fragment		-> terminal_def_repetition^ ("concat"^ terminal_def_repetition)*;
 		terminal_def_restrict		-> terminal_def_fragment^ (OPERATOR_DIFFERENCE^ terminal_def_fragment)* ;
 		terminal_definition			-> terminal_def_restrict^ (OPERATOR_UNION^ terminal_def_restrict)*;
-		terminal					-> NAME '->'! terminal_definition ';'! ;
+		terminal_rule				-> NAME '->'! terminal_definition ';'! ;
+		terminal_context			-> BLOCK_CONTEXT^ NAME '{'! terminal_rule* '}'! ;
+		terminal_item				-> terminal_rule^ | terminal_context^ ;
 
 
 		/* Define symbols for grammar rules */
@@ -127,12 +130,13 @@ grammar HimeGrammar
 		rule_template_params	-> '<'! NAME (','! NAME)* '>'!;
 		cf_rule_template		-> NAME rule_template_params '->'! rule_definition ';'! ;
 		cf_rule_simple			-> NAME '->'! rule_definition ';'! ;
+		cf_rule					-> cf_rule_simple^ | cf_rule_template^ ;
 
 
 		/* Define the grammars */
 		grammar_options				-> BLOCK_OPTIONS^ '{'! option* '}'! ;
-		grammar_terminals			-> BLOCK_TERMINALS^ '{'! terminal* '}'! ;
-		grammar_cf_rules			-> BLOCK_RULES^ '{'! (cf_rule_simple | cf_rule_template)* '}'! ;
+		grammar_terminals			-> BLOCK_TERMINALS^ '{'! terminal_item* '}'! ;
+		grammar_cf_rules			-> BLOCK_RULES^ '{'! cf_rule* '}'! ;
 		grammar_parency				-> (':'! NAME (','! NAME)*)? ;
 
 		cf_grammar		-> 'grammar'! NAME grammar_parency
