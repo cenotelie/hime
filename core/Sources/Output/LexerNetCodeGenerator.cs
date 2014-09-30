@@ -48,6 +48,10 @@ namespace Hime.CentralDogma.Output
 		/// </summary>
 		private ROList<Terminal> terminals;
 		/// <summary>
+		/// The contexts for the lexer
+		/// </summary>
+		private ROList<Variable> contexts;
+		/// <summary>
 		/// The separator terminal
 		/// </summary>
 		private Terminal separator;
@@ -64,6 +68,7 @@ namespace Hime.CentralDogma.Output
 			this.name = unit.Name;
 			this.binResource = binResource;
 			this.terminals = unit.Expected;
+			this.contexts = unit.Contexts;
 			this.separator = unit.Separator;
 		}
 
@@ -122,6 +127,25 @@ namespace Hime.CentralDogma.Output
 				writer.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("\t\t\t/// </summary>");
 				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(terminal), terminal.ID.ToString("X4"));
+			}
+			writer.WriteLine("\t\t}");
+
+			writer.WriteLine("\t\t/// <summary>");
+			writer.WriteLine("\t\t/// Contains the constant IDs for the contexts for this lexer");
+			writer.WriteLine("\t\t/// </summary>");
+			writer.WriteLine("\t\tpublic class Context");
+			writer.WriteLine("\t\t{");
+			writer.WriteLine("\t\t\t/// <summary>");
+			writer.WriteLine("\t\t\t/// The unique identifier for the default context");
+			writer.WriteLine("\t\t\t/// </summary>");
+			writer.WriteLine("\t\t\tpublic const int DEFAULT = 0;");
+			for (int i = 1; i != contexts.Count; i++)
+			{
+				Variable context = contexts[i];
+				writer.WriteLine("\t\t\t/// <summary>");
+				writer.WriteLine("\t\t\t/// The unique identifier for context " + context.Name);
+				writer.WriteLine("\t\t\t/// </summary>");
+				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(context), i.ToString("X4"));
 			}
 			writer.WriteLine("\t\t}");
 
