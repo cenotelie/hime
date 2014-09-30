@@ -29,7 +29,7 @@ namespace Hime.CentralDogma.Automata
 	{
 		public int Compare(int x, int y)
 		{
-			return (x - y);
+			return (y - x);
 		}
 	}
 }
