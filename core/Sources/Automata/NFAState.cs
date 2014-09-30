@@ -24,16 +24,12 @@ namespace Hime.CentralDogma.Automata
 	/// <summary>
 	/// Represents a state in a Non-deterministic Finite Automaton
 	/// </summary>
-	public class NFAState
+	public class NFAState : State
 	{
 		/// <summary>
 		/// The list of transitions
 		/// </summary>
 		private List<NFATransition> transitions;
-		/// <summary>
-		/// The marker whether this state is a final state
-		/// </summary>
-		private FinalItem item;
 		/// <summary>
 		/// The watermark for this state
 		/// </summary>
@@ -43,16 +39,6 @@ namespace Hime.CentralDogma.Automata
 		/// Gets the list of transitions from this state
 		/// </summary>
 		public ROList<NFATransition> Transitions { get { return new ROList<NFATransition>(transitions); } }
-
-		/// <summary>
-		/// Gets or sets the item marking this state as a final state
-		/// If the value is null, the state is not final
-		/// </summary>
-		public FinalItem Item
-		{
-			get { return item; }
-			set { item = value; }
-		}
 
 		/// <summary>
 		/// Gets or sets the watermark of this state
@@ -69,7 +55,6 @@ namespace Hime.CentralDogma.Automata
 		public NFAState()
 		{
 			transitions = new List<NFATransition>();
-			item = null;
 			mark = 0;
 		}
 

@@ -219,7 +219,7 @@ namespace Hime.CentralDogma.Automata
 				// Create a new state
 				DFAState newState = new DFAState(states.Count);
 				// Add the terminal from the group to the new state
-				newState.AddFinals(group.Representative.Items);
+				newState.AddItems(group.Representative.Items);
 				states.Add(newState);
 			}
 			// Do linkage

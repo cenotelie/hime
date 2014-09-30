@@ -209,7 +209,7 @@ namespace Hime.CentralDogma.Grammars
 		public Terminal AddTerminalAnon(string value, Automata.NFA nfa)
 		{
 			string name = prefixGeneratedTerminal + GenerateID();
-			return AddTerminal(name, value, nfa);
+			return AddTerminal(name, value, nfa, null);
 		}
 
 		/// <summary>
@@ -217,10 +217,11 @@ namespace Hime.CentralDogma.Grammars
 		/// </summary>
 		/// <param name="name">The terminal's name</param>
 		/// <param name="nfa">The terminal's NFA</param>
+		/// <param name="context">The terminal's context</param>
 		/// <returns>The new terminal</returns>
-		public Terminal AddTerminalNamed(string name, Automata.NFA nfa)
+		public Terminal AddTerminalNamed(string name, Automata.NFA nfa, string context)
 		{
-			return AddTerminal(name, name, nfa);
+			return AddTerminal(name, name, nfa, context);
 		}
 
 		/// <summary>
@@ -229,10 +230,11 @@ namespace Hime.CentralDogma.Grammars
 		/// <param name="name">The terminal's name</param>
 		/// <param name="value">The terminal's value</param>
 		/// <param name="nfa">The terminal's NFA</param>
+		/// <param name="context">The terminal's context</param>
 		/// <returns>The new terminal</returns>
-		private Terminal AddTerminal(string name, string value, Automata.NFA nfa)
+		private Terminal AddTerminal(string name, string value, Automata.NFA nfa, string context)
 		{
-			Terminal terminal = new Terminal(nextSID, name, value, nfa);
+			Terminal terminal = new Terminal(nextSID, name, value, nfa, context);
 			nextSID++;
 			terminalsByName.Add(name, terminal);
 			terminalsByValue.Add(value, terminal);
@@ -430,15 +432,15 @@ namespace Hime.CentralDogma.Grammars
 				}
 				else if (doClone)
 				{
-					Terminal clone = new Terminal(terminal.ID, terminal.Name, terminal.Value, terminal.NFA.Clone(false));
-					clone.NFA.StateExit.Item = clone;
+					Terminal clone = new Terminal(terminal.ID, terminal.Name, terminal.Value, terminal.NFA.Clone(false), terminal.Context);
+					clone.NFA.StateExit.AddItem(clone);
 					this.terminalsByName.Add(clone.Name, terminal);
 					this.terminalsByValue.Add(clone.Value, terminal);
 				}
 				else
 				{
-					Terminal clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false));
-					clone.NFA.StateExit.Item = clone;
+					Terminal clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false), terminal.Context);
+					clone.NFA.StateExit.AddItem(clone);
 				}
 			}
 		}
@@ -468,7 +470,7 @@ namespace Hime.CentralDogma.Grammars
 				foreach (Rule rule in variable.Rules)
 				{
 					List<RuleBodyElement> parts = new List<RuleBodyElement>();
-					for (int i=0; i!=rule.Body.Length; i++)
+					for (int i = 0; i != rule.Body.Length; i++)
 					{
 						RuleBodyElement part = rule.Body[i];
 						Symbol symbol = null;

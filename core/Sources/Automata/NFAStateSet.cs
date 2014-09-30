@@ -207,8 +207,7 @@ namespace Hime.CentralDogma.Automata
 		{
 			List<FinalItem> finals = new List<FinalItem>();
 			foreach (NFAState state in backend)
-				if (state.Item != null)
-					finals.Add(state.Item);
+				finals.AddRange(state.Items);
 			return finals;
 		}
 

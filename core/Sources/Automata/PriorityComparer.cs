@@ -1,5 +1,5 @@
-/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+﻿/**********************************************************************
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,36 +17,19 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.CentralDogma.Automata
 {
 	/// <summary>
-	/// Represents the absence of terminal, used as a marker by LR-related algorithms
+	/// Represents a comparer of the priority of the final items
+	/// This comparer is used to sort final items on a state by priority (greater has more priority)
 	/// </summary>
-	public class NullTerminal : Terminal
+	public class PriorityComparer : IComparer<int>
 	{
-		/// <summary>
-		/// The singleton instance
-		/// </summary>
-		private static NullTerminal instance;
-		/// <summary>
-		/// Initializes the singleton
-		/// </summary>
-		private NullTerminal() : base(0, string.Empty, string.Empty, null, null)
+		public int Compare(int x, int y)
 		{
-		}
-
-		/// <summary>
-		/// Gets the the singleton instance
-		/// </summary>
-		public static NullTerminal Instance
-		{
-			get
-			{
-				if (instance == null)
-					instance = new NullTerminal();
-				return instance;
-			}
+			return (x - y);
 		}
 	}
 }

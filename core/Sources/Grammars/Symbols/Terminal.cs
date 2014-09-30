@@ -23,8 +23,8 @@ namespace Hime.CentralDogma.Grammars
 	/// <summary>
 	/// Represents a terminal symbol in a grammar
 	/// </summary>
-    public class Terminal : Symbol, Automata.FinalItem
-    {
+	public class Terminal : Symbol, Automata.FinalItem
+	{
 		/// <summary>
 		/// Gets or sets the inline value of this terminal
 		/// </summary>
@@ -33,7 +33,12 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets or sets the NFA that is used to match this terminal
 		/// </summary>
-        public Automata.NFA NFA { get; protected set; }
+		public Automata.NFA NFA { get; protected set; }
+
+		/// <summary>
+		/// Gets or sets the context of this terminal
+		/// </summary>
+		public string Context { get; protected set; }
 
 		/// <summary>
 		///  Gets the priority of this marker 
@@ -47,12 +52,14 @@ namespace Hime.CentralDogma.Grammars
 		/// <param name="name">The symbol's name</param>
 		/// <param name="value">The symbol's inline value</param>
 		/// <param name="nfa">The symbol's name</param>
-        public Terminal(int sid, string name, string value, Automata.NFA nfa)
-            : base(sid, name)
-        {
+		/// <param name="context">The symbol's context</param>
+		public Terminal(int sid, string name, string value, Automata.NFA nfa, string context)
+			: base(sid, name)
+		{
 			this.Value = value;
-            this.NFA = nfa;
-        }
+			this.NFA = nfa;
+			this.Context = context;
+		}
 
 		/// <summary>
 		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Terminal"/>.
@@ -60,33 +67,33 @@ namespace Hime.CentralDogma.Grammars
 		/// <returns>
 		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Terminal"/>.
 		/// </returns>
-        public override string ToString()
+		public override string ToString()
 		{
 			string result = Value;
-            result = result.Replace("\\", "\\\\");
-            result = result.Replace("\0", "\\0");
-            result = result.Replace("\a", "\\a");
-            result = result.Replace("\b", "\\b");
-            result = result.Replace("\f", "\\f");
-            result = result.Replace("\n", "\\n");
-            result = result.Replace("\r", "\\r");
-            result = result.Replace("\t", "\\t");
-            result = result.Replace("\v", "\\v");
-            return result;
+			result = result.Replace("\\", "\\\\");
+			result = result.Replace("\0", "\\0");
+			result = result.Replace("\a", "\\a");
+			result = result.Replace("\b", "\\b");
+			result = result.Replace("\f", "\\f");
+			result = result.Replace("\n", "\\n");
+			result = result.Replace("\r", "\\r");
+			result = result.Replace("\t", "\\t");
+			result = result.Replace("\v", "\\v");
+			return result;
 		}
 
 		/// <summary>
 		/// Represents a comparer that works on the priority of the terminals
 		/// </summary>
 		public sealed class PriorityComparer : System.Collections.Generic.IComparer<Terminal>
-        {
+		{
 			/// <summary>
 			/// Compare the specified terminals
 			/// </summary>
 			/// <param name="x">A terminal</param>
 			/// <param name="y">A terminal</param>
 			/// <returns>A value representing the order of the two terminals</returns>
-            public int Compare(Terminal x, Terminal y) { return (x.Priority - y.Priority); }
-        }
-    }
+			public int Compare(Terminal x, Terminal y) { return (x.Priority - y.Priority); }
+		}
+	}
 }

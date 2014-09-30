@@ -119,7 +119,7 @@ namespace Hime.CentralDogma.Automata
 					}
 				}
 				// Add finals
-				states[i].AddFinals(nfaStateSets[i].GetFinals());
+				states[i].AddItems(nfaStateSets[i].GetFinals());
 			}
 		}
 

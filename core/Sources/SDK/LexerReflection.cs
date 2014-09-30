@@ -128,7 +128,7 @@ namespace Hime.CentralDogma.SDK
 
 				int terminal = automaton.GetStateRecognizedTerminal(offset);
 				if (terminal != 0xFFFF)
-					current.AddFinal(new MatchedTerminal(this.terminals[terminal]));
+					current.AddItem(new MatchedTerminal(this.terminals[terminal]));
 
 				for (int j=0; j!=256; j++)
 				{

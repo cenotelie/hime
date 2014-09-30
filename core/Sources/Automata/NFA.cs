@@ -93,7 +93,7 @@ namespace Hime.CentralDogma.Automata
 				states.Add(new NFAState());
 			for (int i = 0; i != dfaStates.Count; i++)
 			{
-				states[i].Item = dfaStates[i].TopItem;
+				states[i].AddItems(dfaStates[i].Items);
 				foreach (CharSpan transition in dfaStates[i].Transitions)
 					states[i].AddTransition(transition, states[dfaStates.IndexOf(dfaStates[i].GetChildBy(transition))]);
 			}
@@ -135,7 +135,7 @@ namespace Hime.CentralDogma.Automata
 				NFAState state = new NFAState();
 				state.Mark = states[i].Mark;
 				if (keepFinals)
-					state.Item = states[i].Item;
+					state.AddItems(states[i].Items);
 				copy.states.Add(state);
 			}
 			// Make linkage
@@ -344,16 +344,16 @@ namespace Hime.CentralDogma.Automata
 			right.stateExit.AddTransition(NFA.Epsilon, stateNegative);
 			statePositive.AddTransition(NFA.Epsilon, final.stateExit);
 
-			final.stateExit.Item = DummyItem.Instance;
+			final.stateExit.AddItem(DummyItem.Instance);
 			DFA equivalent = new DFA(final);
 			equivalent.Prune();
 			final = new NFA(equivalent);
 			final.stateExit = final.AddNewState();
 			foreach (NFAState state in final.states)
 			{
-				if (state.Item == DummyItem.Instance)
+				if (state.Items.Contains(DummyItem.Instance))
 				{
-					state.Item = null;
+					state.ClearItems();
 					state.AddTransition(NFA.Epsilon, final.stateExit);
 				}
 			}

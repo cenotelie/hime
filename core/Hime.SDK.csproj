@@ -86,6 +86,8 @@
     <Compile Include="Sources\Automata\NFAState.cs" />
     <Compile Include="Sources\Automata\NFAStateSet.cs" />
     <Compile Include="Sources\Automata\NFATransition.cs" />
+    <Compile Include="Sources\Automata\PriorityComparer.cs" />
+    <Compile Include="Sources\Automata\State.cs" />
     <Compile Include="Sources\CompilationTask.cs" />
     <Compile Include="Sources\ParsingMethod.cs" />
     <Compile Include="Sources\Grammars\Grammar.cs" />

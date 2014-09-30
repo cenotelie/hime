@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
+using System.Text;
 using Hime.Redist;
 using Hime.CentralDogma.Automata;
 
@@ -196,10 +197,23 @@ namespace Hime.CentralDogma.SDK
 			DOTSerializer serializer = new DOTSerializer("DFA", file);
 			foreach (DFAState state in dfa.States)
 			{
-				if (state.TopItem != null)
-					serializer.WriteNode("state" + state.ID.ToString(), state.ID.ToString() + " : " + state.TopItem.ToString(), DOTNodeShape.doubleoctagon);
+				if (state.IsFinal)
+				{
+					ROList<FinalItem> items = state.Items;
+					StringBuilder builder = new StringBuilder(state.ID.ToString());
+					builder.Append(" : ");
+					for (int i = 0; i != items.Count; i++)
+					{
+						if (i != 0)
+							builder.Append(", ");
+						builder.Append(items[i].ToString());
+					}
+					serializer.WriteNode("state" + state.ID.ToString(), builder.ToString(), DOTNodeShape.doubleoctagon);
+				}
 				else
+				{
 					serializer.WriteNode("state" + state.ID.ToString(), state.ID.ToString());
+				}
 			}
 			foreach (DFAState state in dfa.States)
 				foreach (CharSpan value in state.Transitions)
@@ -218,10 +232,23 @@ namespace Hime.CentralDogma.SDK
 			for (int i=0; i!=nfa.States.Count; i++)
 			{
 				NFAState state = nfa.States[i];
-				if (state.Item != null)
-					serializer.WriteNode("state" + i.ToString(), i.ToString() + " : " + state.Item.ToString(), DOTNodeShape.doubleoctagon);
+				if (state.IsFinal)
+				{
+					ROList<FinalItem> items = state.Items;
+					StringBuilder builder = new StringBuilder(i.ToString());
+					builder.Append(" : ");
+					for (int j = 0; i != items.Count; i++)
+					{
+						if (i != 0)
+							builder.Append(", ");
+						builder.Append(items[j].ToString());
+					}
+					serializer.WriteNode("state" + i.ToString(), builder.ToString(), DOTNodeShape.doubleoctagon);
+				}
 				else
+				{
 					serializer.WriteNode("state" + i.ToString(), i.ToString());
+				}
 			}
 			for (int i=0; i!=nfa.States.Count; i++)
 			{
