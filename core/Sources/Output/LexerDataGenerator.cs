@@ -61,14 +61,26 @@ namespace Hime.CentralDogma.Output
 
 			writer.Write((uint)dfa.StatesCount);
 			uint offset = 0;
+			List<string> contexts = new List<string>();
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				writer.Write(offset);
 				offset += 3 + 256;
+				contexts.Clear();
+				foreach (Automata.FinalItem item in state.Items)
+				{
+					Grammars.Terminal terminal = item as Grammars.Terminal;
+					if (!contexts.Contains(terminal.Context))
+					{
+						contexts.Add(terminal.Context);
+						offset += 2;
+					}
+				}
 				foreach (CharSpan key in state.Transitions)
 					if (key.End >= 256)
 						offset += 3;
 			}
+
 			foreach (Automata.DFAState state in dfa.States)
 				GenerateDataFor(writer, state);
 
