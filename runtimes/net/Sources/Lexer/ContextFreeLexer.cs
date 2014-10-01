@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,58 +17,19 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents a lexer for a prefetched piece of text, i.e. the text is already in memory
+	/// Represents a context-free lexer (lexing rules do not depend on the context)
 	/// </summary>
-	public abstract class PrefetchedLexer : ILexer
+	public abstract class ContextFreeLexer : BaseLexer
 	{
 		/// <summary>
-		/// This lexer's automaton
+		/// Index of the next token
 		/// </summary>
-		private Automaton lexAutomaton;
-		/// <summary>
-		/// The terminals matched by this lexer
-		/// </summary>
-		private IList<Symbol> terminals;
-		/// <summary>
-		/// Symbol ID of the SEPARATOR terminal
-		/// </summary>
-		private int lexSeparator;
-		/// <summary>
-		/// The lexer's full input
-		/// </summary>
-		private string input;
-		/// <summary>
-		/// The tokenized text
-		/// </summary>
-		private PrefetchedText text;
-		/// <summary>
-		/// The current index in the input
-		/// </summary>
-		private int inputIndex;
-		/// <summary>
-		/// The index of the next token
-		/// </summary>
-		private int tokenIndex;
-
-		/// <summary>
-		/// Gets the terminals matched by this lexer
-		/// </summary>
-		public IList<Symbol> Terminals { get { return terminals; } }
-		/// <summary>
-		/// Gets the lexer's output as a tokenized text
-		/// </summary>
-		public TokenizedText Output { get { return text; } }
-		/// <summary>
-		/// Events for lexical errors
-		/// </summary>
-		public event AddLexicalError OnError;
+		protected int tokenIndex = -1;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -77,14 +38,9 @@ namespace Hime.Redist.Lexer
 		/// <param name="terminals">Terminals recognized by this lexer</param>
 		/// <param name="separator">SID of the separator token</param>
 		/// <param name="input">Input to this lexer</param>
-		protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
+		protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
+			: base(automaton, terminals, separator, input)
 		{
-			this.lexAutomaton = automaton;
-			this.terminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
-			this.lexSeparator = separator;
-			this.input = input;
-			this.text = new PrefetchedText(this.terminals, this.input);
-			this.inputIndex = 0;
 			this.tokenIndex = -1;
 		}
 
@@ -95,16 +51,18 @@ namespace Hime.Redist.Lexer
 		/// <param name="terminals">Terminals recognized by this lexer</param>
 		/// <param name="separator">SID of the separator token</param>
 		/// <param name="input">Input to this lexer</param>
-		protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
-			: this (automaton, terminals, separator, input.ReadToEnd())
+		protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
+			: base(automaton, terminals, separator, input)
 		{
+			this.tokenIndex = -1;
 		}
 
 		/// <summary>
 		/// Gets the next token in the input
 		/// </summary>
 		/// <returns>The next token in the input</returns>
-		public Token GetNextToken()
+		/// <remarks>This forces the use of the default context</remarks>
+		public override Token GetNextToken()
 		{
 			if (tokenIndex == -1)
 			{
@@ -119,27 +77,13 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Represents a match in the input
+		/// Gets the next token in the input
 		/// </summary>
-		private struct Match
+		/// <param name="contexts">The current applicable contexts</param>
+		/// <returns>The next token in the input</returns>
+		public override Token GetNextToken(ContextStack contexts)
 		{
-			/// <summary>
-			/// Index of the matched terminal
-			/// </summary>
-			public int terminal;
-			/// <summary>
-			/// Length of the matched input
-			/// </summary>
-			public int length;
-			/// <summary>
-			/// Initializes a match
-			/// </summary>
-			/// <param name='terminal'>Index of the matched terminal</param>
-			public Match(int terminal)
-			{
-				this.terminal = terminal;
-				this.length = 0;
-			}
+			return GetNextToken();
 		}
 
 		/// <summary>
@@ -152,29 +96,30 @@ namespace Hime.Redist.Lexer
 				Match match = RunDFA();
 				if (match.length != 0)
 				{
-					if (terminals[match.terminal].ID != lexSeparator)
+					// matched something
+					if (recognizedTerminals[match.terminal].ID != separatorID)
 						text.AddToken(match.terminal, inputIndex, match.length);
 					inputIndex += match.length;
 					continue;
 				}
-				if (match.terminal == 0)
+				if (match.terminal == Symbol.SID_NOTHING)
 				{
-					// This is the epsilon terminal, failed to match anything
+					// This is an error
 					TextPosition position = text.GetPositionAt(inputIndex);
 					string unexpected = null;
-					int c = input[inputIndex];
+					int c = text.GetValue(inputIndex);
 					if (c >= 0xD800 && c <= 0xDFFF)
 					{
 						// this is a surrogate encoding point
-						unexpected = input.Substring(inputIndex, 2);
+						unexpected = text.GetValue(inputIndex, 2);
 						inputIndex += 2;
 					}
 					else
 					{
-						unexpected = input.Substring(inputIndex, 1);
+						unexpected = text.GetValue(inputIndex).ToString();
 						inputIndex++;
 					}
-					OnError(new UnexpectedCharError(unexpected, position));
+					RaiseError(new UnexpectedCharError(unexpected, position));
 					continue;
 				}
 				// This is the dollar terminal, at the end of the input
@@ -189,38 +134,35 @@ namespace Hime.Redist.Lexer
 		/// <returns>The matched terminal and length</returns>
 		private Match RunDFA()
 		{
-			if (inputIndex == input.Length)
+			if (text.IsEnd(inputIndex))
 			{
 				// At the end of input
-				return new Match(1);
+				return new Match(Symbol.SID_DOLLAR);
 			}
 
 			Match result = new Match();
 			int state = 0;
 			int i = inputIndex;
 
-			while (state != 0xFFFF)
+			while (state != Automaton.DEAD_STATE)
 			{
-				int offset = lexAutomaton.GetOffsetOf(state);
+				State stateData = automaton.GetState(state);
 				// Is this state a matching state ?
-				int terminal = lexAutomaton.GetStateRecognizedTerminal(offset);
-				if (terminal != 0xFFFF)
+				if (stateData.TerminalsCount != 0)
 				{
-					result.terminal = terminal;
+					result.terminal = stateData.GetTerminal(0).Index;
 					result.length = (i - inputIndex);
 				}
 				// No further transition => exit
-				if (lexAutomaton.IsStateDeadEnd(offset))
+				if (stateData.IsDeadEnd)
 					break;
 				// At the end of the buffer
-				if (i == input.Length)
+				if (text.IsEnd(i))
 					break;
-				char current = input[i++];
+				char current = text.GetValue(i);
+				i++;
 				// Try to find a transition from this state with the read character
-				if (current <= 255)
-					state = lexAutomaton.GetStateCachedTransition(offset, current);
-				else
-					state = lexAutomaton.GetStateBulkTransition(offset, current);
+				state = stateData.GetTargetBy(current);
 			}
 			return result;
 		}

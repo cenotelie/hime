@@ -26,6 +26,11 @@ namespace Hime.Redist
 	public struct Symbol
 	{
 		/// <summary>
+		/// Symbol ID for inexistant symbol
+		/// </summary>
+		public const int SID_NOTHING = 0;
+
+		/// <summary>
 		/// Symbol ID of the Epsilon terminal
 		/// </summary>
 		public const int SID_EPSILON = 1;

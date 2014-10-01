@@ -12,7 +12,7 @@ namespace Hime.CentralDogma.Input
 	/// <summary>
 	/// Represents a lexer
 	/// </summary>
-	internal class CommandLineLexer : PrefetchedLexer
+	internal class CommandLineLexer : ContextFreeLexer
 	{
 		/// <summary>
 		/// The automaton for this lexer

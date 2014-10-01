@@ -30,22 +30,16 @@ namespace Hime.Redist.Lexer
 	/// -- states offset table
 	/// each entry is of the form:
 	/// uint32: offset of the state from the beginning of the states table in number of uint16
-	///
 	/// -- states table
-	/// each entry is of the form:
-	/// uint16: recognized terminal's index
-	/// uint16: total number of transitions
-	/// uint16: number of non-cached transitions
-	/// -- cache: 256 entries
-	/// uint16: next state's index for index of the entry
-	/// -- transitions
-	/// each transition is of the form:
-	/// uint16: start of the range
-	/// uint16: end of the range
-	/// uint16: next state's index
+	/// See State
 	/// </remarks>
 	public class Automaton
 	{
+		/// <summary>
+		/// Identifier of inexistant state in an automaton
+		/// </summary>
+		public const int DEAD_STATE = 0xFFFF;
+
 		/// <summary>
 		/// Table of indices in the states table
 		/// </summary>
@@ -110,89 +104,13 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Get the offset of the given state in the table
+		/// Get the data of the specified state
 		/// </summary>
-		/// <param name="state">The DFA which offset shall be retrieved</param>
-		/// <returns>The offset of the given DFA state</returns>
-		public int GetOffsetOf(int state)
+		/// <param name="state">A state's index</param>
+		/// <returns>The data of the specified state</returns>
+		public State GetState(int state)
 		{
-			return (int)table[state];
-		}
-
-		/// <summary>
-		/// Gets the recognized terminal index for the DFA at the given offset
-		/// </summary>
-		/// <param name="offset">The DFA state's offset</param>
-		/// <returns>The index of the terminal recognized at this state, or 0xFFFF if none</returns>
-		public int GetStateRecognizedTerminal(int offset)
-		{
-			return states[offset];
-		}
-
-		/// <summary>
-		/// Checks whether the DFA state at the given offset does not have any transition
-		/// </summary>
-		/// <param name="offset">The DFA state's offset</param>
-		/// <returns><c>true</c> if the state at the given offset has no transition</returns>
-		public bool IsStateDeadEnd(int offset)
-		{
-			return (states[offset + 1] == 0);
-		}
-
-		/// <summary>
-		/// Gets the number of non-cached transitions from the DFA state at the given offset
-		/// </summary>
-		/// <param name="offset">The DFA state's offset</param>
-		/// <returns>The number of non-cached transitions</returns>
-		public int GetStateBulkTransitionsCount(int offset)
-		{
-			return states[offset + 2];
-		}
-
-		/// <summary>
-		/// Gets the transition from the DFA state at the given offset with the input value (max 255)
-		/// </summary>
-		/// <param name="offset">The DFA state's offset</param>
-		/// <param name="value">The input value</param>
-		/// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-		public int GetStateCachedTransition(int offset, int value)
-		{
-			return states[offset + 3 + value];
-		}
-
-		/// <summary>
-		/// Gets the transition from the DFA state at the given offset with the input value (min 256)
-		/// </summary>
-		/// <param name="offset">The DFA state's offset</param>
-		/// <param name="value">The input value</param>
-		/// <returns>The state obtained by the transition, or 0xFFFF if none is found</returns>
-		public int GetStateBulkTransition(int offset, int value)
-		{
-			int count = states[offset + 2];
-			offset += 259;
-			for (int i = 0; i != count; i++)
-			{
-				if (value >= states[offset] && value <= states[offset + 1])
-					return states[offset + 2];
-				offset += 3;
-			}
-			return 0xFFFF;
-		}
-
-		/// <summary>
-		/// Gets the transition i-th from the DFA state at the given offset
-		/// </summary>
-		/// <param name="offset">The DFA state's offset</param>
-		/// <param name="index">The non-cached transition index</param>
-		/// <param name="start">The starting value of the transition</param>
-		/// <param name="end">The ending value of the transition</param>
-		/// <returns>The state obtained by the transition</returns>
-		public int GetStateBulkTransition(int offset, int index, out int start, out int end)
-		{
-			int real = offset + 3 + 256 + (index * 3);
-			start = states[real];
-			end = states[real + 1];
-			return states[real + 2];
+			return new State(states, (int) table[state]);
 		}
 	}
 }

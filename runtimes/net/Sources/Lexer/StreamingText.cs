@@ -1,5 +1,5 @@
-/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+﻿/**********************************************************************
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -18,35 +18,77 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
+using System.IO;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Text provider that fetches and stores the full content of an input lexer
+	/// Text provider that uses a stream as a backend
 	/// </summary>
 	/// <remarks>
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	class PrefetchedText : BaseTokenizedText
+	class StreamingText : BaseTokenizedText
 	{
 		/// <summary>
-		/// The full content of the input
+		/// The size of text block
 		/// </summary>
-		private string content;
+		private const int BLOCK_SIZE = 256;
+
+		/// <summary>
+		/// The input to use
+		/// </summary>
+		private TextReader input;
+		/// <summary>
+		/// The content read so far
+		/// </summary>
+		private BigList<char> content;
+		/// <summary>
+		/// A buffer for reading text
+		/// </summary>
+		private char[] buffer;
+		/// <summary>
+		/// Whether the complete input has been read
+		/// </summary>
+		private bool atEnd;
 
 		/// <summary>
 		/// Initializes this text
 		/// </summary>
 		/// <param name="terminals">The terminal symbols</param>
-		/// <param name="content">The full lexer's input as a string</param>
-		public PrefetchedText(IList<Symbol> terminals, string content)
+		/// <param name="content">The input text</param>
+		public StreamingText(IList<Symbol> terminals, TextReader input)
 			: base(terminals)
 		{
-			this.content = content;
+			this.input = input;
+			this.content = new BigList<char>();
+			this.buffer = new char[BLOCK_SIZE];
+			this.atEnd = false;
 		}
 
 		#region Internal API
+		/// <summary>
+		/// Reads the input so as to make the specified index available
+		/// </summary>
+		/// <param name="index">An index from the start</param>
+		private void MakeAvailable(int index)
+		{
+			if (atEnd)
+				return;
+			while (index > content.Size)
+			{
+				int read = input.Read(buffer, 0, BLOCK_SIZE);
+				if (read == 0)
+				{
+					atEnd = true;
+					return;
+				}
+				content.Add(buffer, 0, read);
+			}
+		}
+
 		/// <summary>
 		/// Gets the character at the specified index
 		/// </summary>
@@ -54,6 +96,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The character at the specified index</returns>
 		public override char GetValue(int index)
 		{
+			MakeAvailable(index);
 			return content[index];
 		}
 
@@ -64,7 +107,8 @@ namespace Hime.Redist.Lexer
 		/// <returns><c>true</c> if the index is after the end of the text</returns>
 		public override bool IsEnd(int index)
 		{
-			return (index >= content.Length);
+			MakeAvailable(index + 1);
+			return (index >= content.Size);
 		}
 
 		/// <summary>
@@ -72,12 +116,14 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		protected override void FindLines()
 		{
+			if (!atEnd)
+				MakeAvailable(System.Int32.MaxValue);
 			this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
 			this.lines[0] = 0;
 			this.line = 1;
 			char c1 = '\0';
 			char c2 = '\0';
-			for (int i = 0; i != content.Length; i++)
+			for (int i = 0; i != content.Size; i++)
 			{
 				c1 = c2;
 				c2 = content[i];
@@ -99,7 +145,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the size in number of characters
 		/// </summary>
-		public override int Size { get { return content.Length; } }
+		public override int Size { get { return content.Size; } }
 
 		/// <summary>
 		/// Gets the substring beginning at the given index with the given length
@@ -111,7 +157,10 @@ namespace Hime.Redist.Lexer
 		{
 			if (length == 0)
 				return string.Empty;
-			return content.Substring(index, length);
+			if (buffer.Length < length)
+				buffer = new char[length];
+			content.CopyTo(index, length, buffer, 0);
+			return new string(buffer, 0, length);
 		}
 
 		/// <summary>
@@ -125,7 +174,7 @@ namespace Hime.Redist.Lexer
 			if (lines == null)
 				FindLines();
 			if (line == this.line)
-				return (content.Length - lines[this.line - 1]);
+				return (content.Size - lines[this.line - 1]);
 			return (lines[line] - lines[line - 1]);
 		}
 		#endregion

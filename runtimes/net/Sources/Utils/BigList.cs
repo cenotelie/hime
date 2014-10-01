@@ -30,7 +30,7 @@ namespace Hime.Redist.Utils
 	/// The internal representation is an array of pointers to arrays of T.
 	/// The basic arrays of T (chunks) have a fixed size.
 	/// </remarks>
-	class BigList<T>
+	public class BigList<T>
 	{
 		/// <summary>
 		/// The number of bits allocated to the lowest part of the index (within a chunk)
@@ -90,6 +90,33 @@ namespace Hime.Redist.Utils
 		{
 			get { return chunks[index >> UPPER_SHIFT][index & LOWER_MASK]; }
 			set { chunks[index >> UPPER_SHIFT][index & LOWER_MASK] = value; }
+		}
+
+		/// <summary>
+		/// Copies the specified range if items to the given buffer
+		/// </summary>
+		/// <param name="index">The starting index of the range of items to copy</param>
+		/// <param name="count">The size of the range of items to copy</param>
+		/// <param name="buffer">The buffer to copy the items in</param>
+		/// <param name="start">The starting index within the buffer to copy the items to</param>
+		public void CopyTo(int index, int count, T[] buffer, int start)
+		{
+			int indexUpper = index >> UPPER_SHIFT;
+			int indexLower = index & LOWER_MASK;
+			while (indexLower + count >= CHUNKS_SIZE)
+			{
+				// while we can copy chunks
+				int length = CHUNKS_SIZE - indexLower;
+				Array.Copy(chunks[indexUpper], indexLower, buffer, start, length);
+				count -= length;
+				start += length;
+				indexUpper++;
+				indexLower = 0;
+			}
+			if (count > 0)
+			{
+				Array.Copy(chunks[indexUpper], indexLower, buffer, start, count);
+			}
 		}
 
 		/// <summary>

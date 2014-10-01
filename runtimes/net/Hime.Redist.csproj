@@ -66,6 +66,14 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\AST.cs" />
+    <Compile Include="Sources\Lexer\BaseLexer.cs" />
+    <Compile Include="Sources\Lexer\BaseTokenizedText.cs" />
+    <Compile Include="Sources\Lexer\ContextSensitiveLexer.cs" />
+    <Compile Include="Sources\Lexer\ContextStack.cs" />
+    <Compile Include="Sources\Lexer\MatchedTerminal.cs" />
+    <Compile Include="Sources\Lexer\State.cs" />
+    <Compile Include="Sources\Lexer\StreamingText.cs" />
+    <Compile Include="Sources\Lexer\Transition.cs" />
     <Compile Include="Sources\Token.cs" />
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
@@ -111,7 +119,7 @@
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
     <Compile Include="Sources\Lexer\ILexer.cs" />
     <Compile Include="Sources\Lexer\PrefetchedText.cs" />
-    <Compile Include="Sources\Lexer\PrefetchedLexer.cs" />
+    <Compile Include="Sources\Lexer\ContextFreeLexer.cs" />
     <Compile Include="Sources\Parsers\GraphAST.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\Parsers\ASTImpl.cs" />

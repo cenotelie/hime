@@ -1,5 +1,5 @@
-/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+﻿/**********************************************************************
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,49 +17,41 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Handler for lexical errors
+	/// Represents a matched terminal information within a lexer's automaton
 	/// </summary>
-	/// <param name="error">The new error</param>
-	public delegate void AddLexicalError(ParseError error);
-
-
-	/// <summary>
-	/// Represents a lexer for a text stream
-	/// </summary>
-	public interface ILexer
+	public struct MatchedTerminal
 	{
 		/// <summary>
-		/// Gets the terminals matched by this lexer
+		/// The context
 		/// </summary>
-		IList<Symbol> Terminals { get; }
+		private ushort context;
+		/// <summary>
+		/// The terminal's index
+		/// </summary>
+		private ushort index;
 
 		/// <summary>
-		/// Gets the lexer's output as a tokenized text
+		/// Gets the context of the matched terminal
 		/// </summary>
-		TokenizedText Output { get; }
+		public int Context { get { return context; } }
+		/// <summary>
+		/// Gets the index of the matched terminal
+		/// </summary>
+		public int Index { get { return index; } }
 
 		/// <summary>
-		/// Events for lexical errors
+		/// Initializes this matched terminal data
 		/// </summary>
-		event AddLexicalError OnError;
-
-		/// <summary>
-		/// Gets the next token in the input
-		/// </summary>
-		/// <returns>The next token in the input</returns>
-		/// <remarks>This forces the use of the default context</remarks>
-		Token GetNextToken();
-
-		/// <summary>
-		/// Gets the next token in the input
-		/// </summary>
-		/// <param name="contexts">The current applicable contexts</param>
-		/// <returns>The next token in the input</returns>
-		Token GetNextToken(ContextStack contexts);
+		/// <param name="context">The context</param>
+		/// <param name="index">The terminal's index</param>
+		internal MatchedTerminal(ushort context, ushort index)
+		{
+			this.context = context;
+			this.index = index;
+		}
 	}
 }
