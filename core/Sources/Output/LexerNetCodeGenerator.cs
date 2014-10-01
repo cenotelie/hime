@@ -90,6 +90,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="file">The target file to generate code in</param>
 		public void Generate(string file)
 		{
+			string baseLexer = contexts.Count > 1 ? "ContextSensitiveLexer" : "ContextFreeLexer";
 			StreamWriter writer = new StreamWriter(file, false, new System.Text.UTF8Encoding(false));
 
 			WriteHeader(writer);
@@ -105,13 +106,13 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Represents a lexer");
 			writer.WriteLine("\t/// </summary>");
-			writer.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Lexer : PrefetchedLexer");
+			writer.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Lexer : " + baseLexer);
 			writer.WriteLine("\t{");
 
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// The automaton for this lexer");
 			writer.WriteLine("\t\t/// </summary>");
-			writer.WriteLine("\t\tprivate static readonly Automaton automaton = Automaton.Find(typeof(" + name + "Lexer), \"" + binResource + "\");");
+			writer.WriteLine("\t\tprivate static readonly Automaton commonAutomaton = Automaton.Find(typeof(" + name + "Lexer), \"" + binResource + "\");");
 
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// Contains the constant IDs for the terminals for this lexer");
@@ -175,13 +176,13 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("\t\t/// Initializes a new instance of the lexer");
 			writer.WriteLine("\t\t/// </summary>");
 			writer.WriteLine("\t\t/// <param name=\"input\">The lexer's input</param>");
-			writer.WriteLine("\t\tpublic " + name + "Lexer(string input) : base(automaton, terminals, 0x" + sep + ", input) {}");
+			writer.WriteLine("\t\tpublic " + name + "Lexer(string input) : base(commonAutomaton, terminals, 0x" + sep + ", input) {}");
 
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// Initializes a new instance of the lexer");
 			writer.WriteLine("\t\t/// </summary>");
 			writer.WriteLine("\t\t/// <param name=\"input\">The lexer's input</param>");
-			writer.WriteLine("\t\tpublic " + name + "Lexer(TextReader input) : base(automaton, terminals, 0x" + sep + ", input) {}");
+			writer.WriteLine("\t\tpublic " + name + "Lexer(TextReader input) : base(commonAutomaton, terminals, 0x" + sep + ", input) {}");
 
 			writer.WriteLine("\t}");
 			writer.WriteLine("}");

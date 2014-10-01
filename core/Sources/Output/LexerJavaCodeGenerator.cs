@@ -90,6 +90,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="file">The target file to generate code in</param>
 		public void Generate(string file)
 		{
+			string baseLexer = contexts.Count > 1 ? "ContextSensitiveLexer" : "ContextFreeLexer";
 			StreamWriter writer = new StreamWriter(file, false, new System.Text.UTF8Encoding(false));
 
 			WriteHeader(writer);
@@ -110,12 +111,12 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("/**");
 			writer.WriteLine(" * Represents a lexer");
 			writer.WriteLine(" */");
-			writer.WriteLine(mod + " class " + name + "Lexer extends PrefetchedLexer {");
+			writer.WriteLine(mod + " class " + name + "Lexer extends " + baseLexer + " {");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * The automaton for this lexer");
 			writer.WriteLine("     */");
-			writer.WriteLine("    private static final Automaton automaton = Automaton.find(" + name + "Lexer.class, \"" + binResource + "\");");
+			writer.WriteLine("    private static final Automaton commonAutomaton = Automaton.find(" + name + "Lexer.class, \"" + binResource + "\");");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * Contains the constant IDs for the terminals for this lexer");
@@ -179,7 +180,7 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("     * @param input The lexer's input");
 			writer.WriteLine("     */");
 			writer.WriteLine("    public " + name + "Lexer(String input) {");
-			writer.WriteLine("        super(automaton, terminals, 0x" + sep + ", input);");
+			writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
 			writer.WriteLine("    }");
 
 			writer.WriteLine("    /**");
@@ -188,7 +189,7 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("     * @param input The lexer's input");
 			writer.WriteLine("     */");
 			writer.WriteLine("    public " + name + "Lexer(InputStream input) throws IOException {");
-			writer.WriteLine("        super(automaton, terminals, 0x" + sep + ", input);");
+			writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
 			writer.WriteLine("    }");
 			writer.WriteLine("}");
 
