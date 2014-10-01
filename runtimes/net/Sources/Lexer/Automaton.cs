@@ -39,6 +39,10 @@ namespace Hime.Redist.Lexer
 		/// Identifier of inexistant state in an automaton
 		/// </summary>
 		public const int DEAD_STATE = 0xFFFF;
+		/// <summary>
+		/// Identifier of the default context
+		/// </summary>
+		public const int DEFAULT_CONTEXT = 0;
 
 		/// <summary>
 		/// Table of indices in the states table

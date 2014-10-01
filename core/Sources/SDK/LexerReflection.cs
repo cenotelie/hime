@@ -20,51 +20,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Hime.Redist;
+using Hime.Redist.Lexer;
+using Hime.CentralDogma.Grammars;
 
 namespace Hime.CentralDogma.SDK
 {
-	/// <summary>
-	/// Represents a marker for a matched terminal in a lexer DFA
-	/// </summary>
-	public class MatchedTerminal : Automata.FinalItem
-	{
-		/// <summary>
-		/// The terminal represented by this marker
-		/// </summary>
-		private Symbol terminal;
-
-		/// <summary>
-		/// Gets the terminal repesented by this marker
-		/// </summary>
-		public Symbol Terminal { get { return terminal; } }
-
-		/// <summary>
-		/// Gets the priority of this marker
-		/// </summary>
-		public int Priority { get { return 0; } }
-
-		/// <summary>
-		/// Initializes this marker
-		/// </summary>
-		/// <param name="t">The matched terminal</param>
-		public MatchedTerminal(Symbol t)
-		{
-			this.terminal = t;
-		}
-
-		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.SDK.MatchedTerminal"/>.
-		/// </summary>
-		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.SDK.MatchedTerminal"/>.
-		/// </returns>
-		public override string ToString()
-		{
-			return terminal.ToString();
-		}
-	}
-
 	/// <summary>
 	/// Utilities to decompile a lexer produced by Central Dogma
 	/// </summary>
@@ -73,19 +33,16 @@ namespace Hime.CentralDogma.SDK
 		/// <summary>
 		/// List of the terminals that can be matched
 		/// </summary>
-		private IList<Symbol> terminals;
-
+		private List<Terminal> terminals;
 		/// <summary>
 		/// DFA of the lexer
 		/// </summary>
 		private Automata.DFA dfa;
 
-
 		/// <summary>
 		/// Gets the terminals that can be matched by this lexer
 		/// </summary>
-		public ROList<Symbol> Terminals { get { return new ROList<Symbol>(terminals); } }
-
+		public ROList<Terminal> Terminals { get { return new ROList<Terminal>(terminals); } }
 		/// <summary>
 		/// Gets the lexer's dfa
 		/// </summary>
@@ -99,10 +56,7 @@ namespace Hime.CentralDogma.SDK
 		{
 			string input = "";
 			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
-			Hime.Redist.Lexer.ILexer lexer = ctor.Invoke(new object[] { input }) as Hime.Redist.Lexer.ILexer;
-
-			this.terminals = lexer.Terminals;
-			this.dfa = new Automata.DFA();
+			ILexer lexer = ctor.Invoke(new object[] { input }) as ILexer;
 
 			string[] resources = lexerType.Assembly.GetManifestResourceNames();
 			Stream stream = null;
@@ -119,32 +73,62 @@ namespace Hime.CentralDogma.SDK
 			Hime.Redist.Lexer.Automaton automaton = new Hime.Redist.Lexer.Automaton(reader);
 			reader.Close();
 
-			for (int i=0; i!=automaton.StatesCount; i++)
-				dfa.CreateState();
-			for (int i=0; i!=automaton.StatesCount; i++)
+			LoadTerminals(lexer);
+			LoadDFA(automaton);
+		}
+
+		/// <summary>
+		/// Loads the terminals from the specified lexers
+		/// </summary>
+		/// <param name="lexer">The lexer to investigate</param>
+		private void LoadTerminals(ILexer lexer)
+		{
+			terminals = new List<Terminal>();
+			terminals.Add(Epsilon.Instance);
+			terminals.Add(Dollar.Instance);
+			IList<Hime.Redist.Symbol> spec = lexer.Terminals;
+			for (int i = 2; i != spec.Count; i++)
 			{
-				Automata.DFAState current = this.dfa.States[i];
-				int offset = automaton.GetOffsetOf(i);
+				Hime.Redist.Symbol symbol = spec[i];
+				terminals.Add(new Terminal(symbol.ID, symbol.Name, symbol.Value, null, null));
+			}
+		}
 
-				int terminal = automaton.GetStateRecognizedTerminal(offset);
-				if (terminal != 0xFFFF)
-					current.AddItem(new MatchedTerminal(this.terminals[terminal]));
-
-				for (int j=0; j!=256; j++)
+		/// <summary>
+		/// Loads the specified DFA automaton
+		/// </summary>
+		/// <param name="automaton">An automaton</param>
+		private void LoadDFA(Automaton automaton)
+		{
+			dfa = new Automata.DFA();
+			for (int i = 0; i != automaton.StatesCount; i++)
+				dfa.CreateState();
+			for (int i = 0; i != automaton.StatesCount; i++)
+			{
+				Automata.DFAState current = dfa.States[i];
+				State stateData = automaton.GetState(i);
+				// retrieve the matched terminals
+				for (int j = 0; j != stateData.TerminalsCount; j++)
 				{
-					int next = automaton.GetStateCachedTransition(offset, j);
+					MatchedTerminal mt = stateData.GetTerminal(j);
+					Terminal terminal = terminals[mt.Index];
+					current.AddItem(terminal);
+					if (mt.Context != 0 && terminal.Context == null)
+						terminals[mt.Context].Context = mt.Context.ToString();
+				}
+				// retrieve the transitions
+				for (int j = 0; j != 256; j++)
+				{
+					int next = stateData.GetCachedTransition(j);
 					char c = System.Convert.ToChar(j);
-					if (next != 0xFFFF)
-						current.AddTransition(new CharSpan(c, c), this.dfa.States[next]);
+					if (next != Automaton.DEAD_STATE)
+						current.AddTransition(new CharSpan(c, c), dfa.States[next]);
 				}
 
-				int nNonCached = automaton.GetStateBulkTransitionsCount(offset);
-				for (int j=0; j!=nNonCached; j++)
+				for (int j = 0; j != stateData.BulkTransitionsCount; j++)
 				{
-					int begin = 0;
-					int end = 0;
-					int next = automaton.GetStateBulkTransition(offset, j, out begin, out end);
-					current.AddTransition(new CharSpan(System.Convert.ToChar(begin), System.Convert.ToChar(end)), this.dfa.States[next]);
+					Transition transition = stateData.GetBulkTransition(j);
+					current.AddTransition(new CharSpan(System.Convert.ToChar(transition.Start), System.Convert.ToChar(transition.End)), dfa.States[transition.Target]);
 				}
 				current.RepackTransitions();
 			}

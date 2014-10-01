@@ -38,7 +38,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Gets or sets the context of this terminal
 		/// </summary>
-		public string Context { get; protected set; }
+		public string Context { get; protected internal set; }
 
 		/// <summary>
 		///  Gets the priority of this marker 

@@ -97,7 +97,7 @@ namespace Hime.CentralDogma.Output
 			// build the transition data
 			ushort[] cache = new ushort[256];
 			for (int i = 0; i != 256; i++)
-				cache[i] = 0xFFFF;
+				cache[i] = Hime.Redist.Lexer.Automaton.DEAD_STATE;
 			ushort cached = 0; // the number of cached transitions
 			ushort slow = 0; // the number of non-cached transitions
 			foreach (CharSpan span in state.Transitions)
@@ -170,16 +170,18 @@ namespace Hime.CentralDogma.Output
 		/// </summary>
 		/// <param name="name">The name of a context</param>
 		/// <returns>The corresponding identifier</returns>
+		/// <exception cref="System.ArgumentException">When the specified context name is not found</exception>
 		private ushort GetContextID(string name)
 		{
 			if (name == null)
-				return 0;
+				return Hime.Redist.Lexer.Automaton.DEFAULT_CONTEXT;
 			for (ushort i = 1; i != contexts.Count; i++)
 			{
 				if (contexts[i].Name == name)
 					return i;
 			}
-			return 0xFFFF;
+			// should not happen
+			throw new System.ArgumentException("The specified context name (" + name + ") is not recognized", "name");
 		}
 	}
 }

@@ -148,7 +148,7 @@ namespace Hime.CentralDogma.Output
 			expected.Add(Grammars.Epsilon.Instance);
 			expected.Add(Grammars.Dollar.Instance);
 			contexts = new List<Grammars.Variable>();
-			contexts.Add(null);
+			contexts.Add(null); // the default context
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				List<Grammars.Variable> foundContexts = new List<Grammars.Variable>();
