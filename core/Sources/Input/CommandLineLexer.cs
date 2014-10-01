@@ -17,7 +17,7 @@ namespace Hime.CentralDogma.Input
 		/// <summary>
 		/// The automaton for this lexer
 		/// </summary>
-		private static readonly Automaton automaton = Automaton.Find(typeof(CommandLineLexer), "CommandLineLexer.bin");
+		private static readonly Automaton commonAutomaton = Automaton.Find(typeof(CommandLineLexer), "CommandLineLexer.bin");
 		/// <summary>
 		/// Contains the constant IDs for the terminals for this lexer
 		/// </summary>
@@ -73,11 +73,11 @@ namespace Hime.CentralDogma.Input
 		/// Initializes a new instance of the lexer
 		/// </summary>
 		/// <param name="input">The lexer's input</param>
-		public CommandLineLexer(string input) : base(automaton, terminals, 0x0003, input) {}
+		public CommandLineLexer(string input) : base(commonAutomaton, terminals, 0x0003, input) {}
 		/// <summary>
 		/// Initializes a new instance of the lexer
 		/// </summary>
 		/// <param name="input">The lexer's input</param>
-		public CommandLineLexer(TextReader input) : base(automaton, terminals, 0x0003, input) {}
+		public CommandLineLexer(TextReader input) : base(commonAutomaton, terminals, 0x0003, input) {}
 	}
 }
