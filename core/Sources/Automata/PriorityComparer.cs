@@ -27,6 +27,12 @@ namespace Hime.CentralDogma.Automata
 	/// </summary>
 	public class PriorityComparer : IComparer<int>
 	{
+		/// <summary>
+		/// Compares the specified piorities
+		/// </summary>
+		/// <param name="x">A priority</param>
+		/// <param name="y">Another priority</param>
+		/// <returns>The comparison result</returns>
 		public int Compare(int x, int y)
 		{
 			return (y - x);

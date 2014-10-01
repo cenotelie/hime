@@ -58,7 +58,7 @@ namespace Hime.Redist.Lexer
 		/// Initializes this text
 		/// </summary>
 		/// <param name="terminals">The terminal symbols</param>
-		/// <param name="content">The input text</param>
+		/// <param name="input">The input text</param>
 		public StreamingText(IList<Symbol> terminals, TextReader input)
 			: base(terminals)
 		{

@@ -44,6 +44,8 @@ namespace Hime.CentralDogma.Output
 		/// Initializes this generator
 		/// </summary>
 		/// <param name="dfa">The dfa to serialize</param>
+		/// <param name="expected">The terminals produced by the DFA</param>
+		/// <param name="contexts">The contexts supported by the DFA</param>
 		public LexerDataGenerator(Automata.DFA dfa, ROList<Grammars.Terminal> expected, ROList<Grammars.Variable> contexts)
 		{
 			this.dfa = dfa;
