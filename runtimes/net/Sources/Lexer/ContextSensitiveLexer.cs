@@ -121,7 +121,7 @@ namespace Hime.Redist.Lexer
 			if (text.IsEnd(inputIndex))
 			{
 				// At the end of input
-				return new Match(Symbol.SID_DOLLAR);
+				return new Match(1); // 1 is always the index of the $ terminal
 			}
 
 			Match result = new Match();
