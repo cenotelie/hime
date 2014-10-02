@@ -41,7 +41,7 @@ namespace Hime.Redist.Lexer
 		protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 			: base(automaton, terminals, separator, input)
 		{
-			defaultContext = new ContextStack(1);
+			defaultContext = new ContextStack();
 		}
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Hime.Redist.Lexer
 		protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 			: base(automaton, terminals, separator, input)
 		{
-			defaultContext = new ContextStack(1);
+			defaultContext = new ContextStack();
 		}
 
 		/// <summary>

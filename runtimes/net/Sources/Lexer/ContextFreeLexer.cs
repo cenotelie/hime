@@ -102,9 +102,9 @@ namespace Hime.Redist.Lexer
 					inputIndex += match.length;
 					continue;
 				}
-				if (match.terminal == Symbol.SID_NOTHING)
+				if (match.terminal == 0)
 				{
-					// This is an error
+					// This is the EPSILON terminal, failed to match anything
 					TextPosition position = text.GetPositionAt(inputIndex);
 					string unexpected = null;
 					int c = text.GetValue(inputIndex);
