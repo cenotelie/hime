@@ -100,7 +100,10 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine();
 			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
 			writer.WriteLine("import org.xowl.hime.redist.lexer.Automaton;");
-			writer.WriteLine("import org.xowl.hime.redist.lexer.PrefetchedLexer;");
+			if (contexts.Count > 1)
+				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextSensitiveLexer;");
+			else
+				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextFreeLexer;");
 			writer.WriteLine();
 			writer.WriteLine("import java.io.InputStream;");
 			writer.WriteLine("import java.io.IOException;");
