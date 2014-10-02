@@ -24,43 +24,103 @@ namespace Hime.Redist.Lexer
 	/// <summary>
 	/// Represents a stack of lexing contexts
 	/// </summary>
+	/// <remarks>
+	/// A context stack contains blocks of various size containing the contexts, e.g.
+	/// [1 2 3] [4 5]
+	/// is a stack with two blocks.
+	/// The first block of size 3 contains the contexts 1, 2 and 3.
+	/// The second block of size 2 contains the contexts 4 and 5.
+	/// </remarks>
 	public class ContextStack
 	{
+		private struct StackItem
+		{
+			/// <summary>
+			/// The context represented by this item
+			/// </summary>
+			public ushort context;
+			/// <summary>
+			/// The size of the block containing this item
+			/// </summary>
+			public ushort blockSize;
+		}
+
 		/// <summary>
-		/// The underlying stack
+		/// Initial size of the stack
 		/// </summary>
-		private int[] stack;
+		private const int INIT_STACK_SIZE = 1024;
+
+		/// <summary>
+		/// The underlying items
+		/// </summary>
+		private StackItem[] stack;
 		/// <summary>
 		/// Index of the stack's top item
 		/// </summary>
 		private int top;
 
 		/// <summary>
-		/// Initializes this stack
+		/// Initializes this stack as empty
 		/// </summary>
-		/// <param name="size">The maximum size of this stack</param>
-		public ContextStack(int size)
+		public ContextStack()
 		{
-			this.stack = new int[size];
-			this.top = 0;
+			this.stack = new StackItem[INIT_STACK_SIZE];
+			this.top = -1;
 		}
 
 		/// <summary>
-		/// Pushes the specified context onto the stack
+		/// Pushes a new block of contexts with the specified size onto this stack
 		/// </summary>
-		/// <param name="context">The context to push</param>
-		public void Push(int context)
+		/// <param name="size">The size of the block to push</param>
+		public void PushBlock(int size)
 		{
-			stack[top++] = context;
+			if (top + size >= stack.Length)
+			{
+				StackItem[] temp = new StackItem[stack.Length + INIT_STACK_SIZE];
+				System.Array.Copy(stack, temp, stack.Length);
+				stack = temp;
+			}
+			top += size;
+			stack[top].blockSize = (ushort)size;
 		}
 
 		/// <summary>
-		/// Pops the top-most contexts from the stack
+		/// Setups the value within the last block
 		/// </summary>
-		/// <param name="count">The number of contexts to pop</param>
-		public void Pop(int count)
+		/// <param name="index">The index of the item to set within the current top block</param>
+		/// <param name="context">The value to set</param>
+		public void SetupBlockItem(int index, int context)
 		{
-			top -= count;
+			stack[top - stack[top].blockSize + 1 + index].context = (ushort)context;
+		}
+
+		/// <summary>
+		/// Pushes a new empty block onto this stack
+		/// </summary>
+		public void PushEmptyBlock()
+		{
+			if (top + 1 >= stack.Length)
+			{
+				StackItem[] temp = new StackItem[stack.Length + INIT_STACK_SIZE];
+				System.Array.Copy(stack, temp, stack.Length);
+				stack = temp;
+			}
+			top++;
+			stack[top].blockSize = 1;
+			stack[top].context = Automaton.DEFAULT_CONTEXT;
+		}
+
+		/// <summary>
+		/// Pops the specified number of blocks from this stack
+		/// </summary>
+		/// <param name="count">The number of blocks to pop</param>
+		public void PopBlocks(int count)
+		{
+			while (count > 0)
+			{
+				top -= stack[top].blockSize;
+				count--;
+			}
 		}
 
 		/// <summary>
@@ -70,12 +130,12 @@ namespace Hime.Redist.Lexer
 		/// <returns><c>true</c> if the specified context is in the stack</returns>
 		public bool Contains(int context)
 		{
-			// the default context (0) is always the bottom element of the stack and therefore is always in the stack
-			if (context == 0)
+			// the default context is always the bottom element of the stack and therefore is always in the stack
+			if (context == Automaton.DEFAULT_CONTEXT)
 				return true;
 			for (int i = top; i != -1; i--)
 			{
-				if (stack[i] == context)
+				if (stack[i].context == context)
 					return true;
 			}
 			return false;
