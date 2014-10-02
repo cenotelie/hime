@@ -124,7 +124,7 @@ public abstract class ContextFreeLexer extends BaseLexer {
                     unexpected = text.getValue(inputIndex, inputIndex + 2);
                     inputIndex += 2;
                 } else {
-                    unexpected = text.getValue(inputIndex, inputIndex + 1);
+                    unexpected = Character.toString(text.getValue(inputIndex));
                     inputIndex++;
                 }
                 handler.handle(new UnexpectedCharError(unexpected, position));
