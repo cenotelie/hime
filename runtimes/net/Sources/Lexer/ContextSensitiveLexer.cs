@@ -88,7 +88,7 @@ namespace Hime.Redist.Lexer
 				}
 				if (match.terminal == Symbol.SID_NOTHING)
 				{
-					// This is the epsilon terminal, failed to match anything
+					// This is the EPSILON terminal, failed to match anything
 					TextPosition position = text.GetPositionAt(inputIndex);
 					string unexpected = null;
 					int c = text.GetValue(inputIndex);

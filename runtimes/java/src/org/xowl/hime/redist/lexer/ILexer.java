@@ -53,8 +53,17 @@ public interface ILexer {
 
     /**
      * Gets the next token in the input
+     * This forces the use of the default context
      *
      * @return The next token in the input
      */
     Token getNextToken();
+
+    /**
+     * Gets the next token in the input
+     *
+     * @param contexts The current applicable contexts
+     * @return The next token in the input
+     */
+    Token getNextToken(ContextStack contexts);
 }

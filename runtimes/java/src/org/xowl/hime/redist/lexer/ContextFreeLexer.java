@@ -20,79 +20,29 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.*;
-import org.xowl.hime.redist.utils.BinaryInput;
+import org.xowl.hime.redist.Symbol;
+import org.xowl.hime.redist.TextPosition;
+import org.xowl.hime.redist.Token;
+import org.xowl.hime.redist.UnexpectedCharError;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.InputStreamReader;
 
 /**
- * Represents a lexer for a prefetched piece of text, i.e. the text is already in memory
+ * Represents a context-free lexer (lexing rules do not depend on the context)
  */
-public abstract class PrefetchedLexer implements ILexer {
-    /**
-     * The handler of lexical error for this lexer
-     */
-    private LexicalErrorHandler handler;
-    /**
-     * This lexer's automaton
-     */
-    private Automaton lexAutomaton;
-    /**
-     * The terminals matched by this lexer
-     */
-    private List<Symbol> terminals;
-    /**
-     * Symbol ID of the SEPARATOR terminal
-     */
-    private int lexSeparator;
-    /**
-     * The lexer's full input
-     */
-    private String input;
-    /**
-     * The tokenized text
-     */
-    private PrefetchedText text;
-    /**
-     * The current index in the input
-     */
-    private int inputIndex;
+public abstract class ContextFreeLexer extends BaseLexer {
     /**
      * The index of the next token
      */
     private int tokenIndex;
-
     /**
-     * Gets the terminals matched by this lexer
-     *
-     * @return The terminals matched by this lexer
+     * The cache of DFA state data
      */
-    public List<Symbol> getTerminals() {
-        return terminals;
-    }
-
+    private State stateData;
     /**
-     * Gets the lexer's output as a tokenized text
-     *
-     * @return The lexer's output as a tokenized text
+     * The cache of matched terminal
      */
-    public TokenizedText getOutput() {
-        return text;
-    }
-
-    /**
-     * Sets the handler of lexical errors coming from this parser
-     *
-     * @param handler The handler
-     */
-    public void setErrorHandler(LexicalErrorHandler handler) {
-        this.handler = handler;
-    }
-
+    private MatchedTerminal matchedTerminal;
 
     /**
      * Initializes a new instance of the Lexer class with the given input
@@ -102,14 +52,11 @@ public abstract class PrefetchedLexer implements ILexer {
      * @param separator SID of the separator token
      * @param input     Input to this lexer
      */
-    protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
-        this.lexAutomaton = automaton;
-        this.terminals = Collections.unmodifiableList(Arrays.asList(terminals));
-        this.lexSeparator = separator;
-        this.input = input;
-        this.text = new PrefetchedText(this.terminals, this.input);
-        this.inputIndex = 0;
+    protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
+        super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
+        this.stateData = new State();
+        this.matchedTerminal = new MatchedTerminal();
     }
 
     /**
@@ -119,14 +66,17 @@ public abstract class PrefetchedLexer implements ILexer {
      * @param terminals Terminals recognized by this lexer
      * @param separator SID of the separator token
      * @param input     Input to this lexer
-     * @throws java.io.IOException if the lexer cannot read the input
      */
-    protected PrefetchedLexer(Automaton automaton, Symbol[] terminals, int separator, InputStream input) throws IOException {
-        this(automaton, terminals, separator, (new BinaryInput(input)).toString());
+    protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
+        super(automaton, terminals, separator, input);
+        this.tokenIndex = -1;
+        this.stateData = new State();
+        this.matchedTerminal = new MatchedTerminal();
     }
 
     /**
      * Gets the next token in the input
+     * This forces the use of the default context
      *
      * @return The next token in the input
      */
@@ -136,34 +86,20 @@ public abstract class PrefetchedLexer implements ILexer {
             findTokens();
             tokenIndex = 0;
         }
-        // no more tokens? return EPSILON
+        // no more tokens? return epsilon
         if (tokenIndex >= text.getTokenCount())
             return new Token(Symbol.SID_EPSILON, 0);
         return text.getTokenAt(tokenIndex++);
     }
 
     /**
-     * Represents a match in the input
+     * Gets the next token in the input
+     *
+     * @param contexts The current applicable contexts
+     * @return The next token in the input
      */
-    private class Match {
-        /**
-         * Index of the matched terminal
-         */
-        public int terminal;
-        /**
-         * Length of the matched input
-         */
-        public int length;
-
-        /**
-         * Initializes a match
-         *
-         * @param terminal Index of the matched terminal
-         */
-        public Match(int terminal) {
-            this.terminal = terminal;
-            this.length = 0;
-        }
+    public Token getNextToken(ContextStack contexts) {
+        return getNextToken();
     }
 
     /**
@@ -173,7 +109,7 @@ public abstract class PrefetchedLexer implements ILexer {
         while (true) {
             Match match = runDFA();
             if (match.length != 0) {
-                if (terminals.get(match.terminal).getID() != lexSeparator)
+                if (recognizedTerminals.get(match.terminal).getID() != separatorID)
                     text.addToken(match.terminal, inputIndex, match.length);
                 inputIndex += match.length;
                 continue;
@@ -182,13 +118,13 @@ public abstract class PrefetchedLexer implements ILexer {
                 // This is the EPSILON terminal, failed to match anything
                 TextPosition position = text.getPositionAt(inputIndex);
                 String unexpected = null;
-                int c = input.charAt(inputIndex);
+                int c = text.getValue(inputIndex);
                 if (c >= 0xD800 && c <= 0xDFFF) {
                     // this is a surrogate encoding point
-                    unexpected = input.substring(inputIndex, inputIndex + 2);
+                    unexpected = text.getValue(inputIndex, inputIndex + 2);
                     inputIndex += 2;
                 } else {
-                    unexpected = input.substring(inputIndex, inputIndex + 1);
+                    unexpected = text.getValue(inputIndex, inputIndex + 1);
                     inputIndex++;
                 }
                 handler.handle(new UnexpectedCharError(unexpected, position));
@@ -206,35 +142,33 @@ public abstract class PrefetchedLexer implements ILexer {
      * @return The matched terminal and length
      */
     private Match runDFA() {
-        if (inputIndex == input.length()) {
+        if (text.isEnd(inputIndex)) {
             // At the end of input
-            return new Match(1);
+            return new Match(1); // 1 is always the index of the $ terminal
         }
 
         Match result = new Match(0);
         int state = 0;
         int i = inputIndex;
 
-        while (state != 0xFFFF) {
-            int offset = lexAutomaton.getOffsetOf(state);
+        while (state != Automaton.DEAD_STATE) {
+            automaton.retrieveState(state, stateData);
             // Is this state a matching state ?
-            int terminal = lexAutomaton.getStateRecognizedTerminal(offset);
-            if (terminal != 0xFFFF) {
-                result.terminal = terminal;
+            if (stateData.getTerminalsCount() != 0) {
+                stateData.retrieveTerminal(0, matchedTerminal);
+                result.terminal = matchedTerminal.getIndex();
                 result.length = (i - inputIndex);
             }
             // No further transition => exit
-            if (lexAutomaton.isStateDeadEnd(offset))
+            if (stateData.isDeadEnd())
                 break;
             // At the end of the buffer
-            if (i == input.length())
+            if (text.isEnd(i))
                 break;
-            char current = input.charAt(i++);
+            char current = text.getValue(i);
+            i++;
             // Try to find a transition from this state with the read character
-            if (current <= 255)
-                state = lexAutomaton.getStateCachedTransition(offset, current);
-            else
-                state = lexAutomaton.getStateBulkTransition(offset, current);
+            state = stateData.getTargetBy(current);
         }
         return result;
     }
