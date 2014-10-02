@@ -105,8 +105,7 @@ namespace Hime.CentralDogma.Output
 			else
 				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextFreeLexer;");
 			writer.WriteLine();
-			writer.WriteLine("import java.io.InputStream;");
-			writer.WriteLine("import java.io.IOException;");
+			writer.WriteLine("import java.io.InputStreamReader;");
 			writer.WriteLine();
 
 			string mod = modifier == Modifier.Public ? "public" : "";
@@ -191,7 +190,7 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("     *");
 			writer.WriteLine("     * @param input The lexer's input");
 			writer.WriteLine("     */");
-			writer.WriteLine("    public " + name + "Lexer(InputStream input) throws IOException {");
+			writer.WriteLine("    public " + name + "Lexer(InputStreamReader input) {");
 			writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
 			writer.WriteLine("    }");
 			writer.WriteLine("}");
