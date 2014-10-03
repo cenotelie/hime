@@ -66,7 +66,7 @@ public class BigList<T> {
     /**
      * Initializes this list
      *
-     * @param type The type of stored elements
+     * @param type      The type of stored elements
      * @param typeArray The type of an array of stored elements
      */
     public BigList(Class<T> type, Class<T[]> typeArray) {
@@ -160,6 +160,16 @@ public class BigList<T> {
     }
 
     /**
+     * Removes the specified number of values from the end of this list
+     *
+     * @param count The number of values to remove
+     */
+    public void remove(int count) {
+        chunkIndex -= count >> UPPER_SHIFT;
+        cellIndex -= count & LOWER_MASK;
+    }
+
+    /**
      * Copies the given values at the end of this list
      *
      * @param values The values to add
@@ -186,10 +196,14 @@ public class BigList<T> {
      * Adds a new (empty) chunk of cells
      */
     private void addChunk() {
-        T[] t = (T[]) Array.newInstance(typeElement, CHUNKS_SIZE);
         if (chunkIndex == chunks.length - 1)
             chunks = Arrays.copyOf(chunks, chunks.length + INIT_CHUNK_COUNT);
-        chunks[++chunkIndex] = t;
+        chunkIndex++;
+        T[] chunk = chunks[chunkIndex];
+        if (chunk == null) {
+            chunk = (T[]) Array.newInstance(typeElement, CHUNKS_SIZE);
+            chunks[chunkIndex] = chunk;
+        }
         cellIndex = 0;
     }
 }

@@ -93,7 +93,7 @@ namespace Hime.Redist.Utils
 		}
 
 		/// <summary>
-		/// Copies the specified range if items to the given buffer
+		/// Copies the specified range of items to the given buffer
 		/// </summary>
 		/// <param name="index">The starting index of the range of items to copy</param>
 		/// <param name="count">The size of the range of items to copy</param>
@@ -174,6 +174,16 @@ namespace Hime.Redist.Utils
 		}
 
 		/// <summary>
+		/// Removes the specified number of values from the end of this list
+		/// </summary>
+		/// <param name="count">The number of values to remove</param>
+		public void Remove(int count)
+		{
+			chunkIndex -= count >> UPPER_SHIFT;
+			cellIndex -= count & LOWER_MASK;
+		}
+
+		/// <summary>
 		/// Copies the given values at the end of this list
 		/// </summary>
 		/// <param name="values">The values to add</param>
@@ -203,14 +213,19 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		private void AddChunk()
 		{
-			T[] t = new T[CHUNKS_SIZE];
 			if (chunkIndex == chunks.Length - 1)
 			{
 				T[][] r = new T[chunks.Length + INIT_CHUNK_COUNT][];
 				Array.Copy(chunks, r, chunks.Length);
 				chunks = r;
 			}
-			chunks[++chunkIndex] = t;
+			chunkIndex++;
+			T[] chunk = chunks[chunkIndex];
+			if (chunk == null)
+			{
+				chunk = new T[CHUNKS_SIZE];
+				chunks[chunkIndex] = chunk;
+			}
 			cellIndex = 0;
 		}
 	}
