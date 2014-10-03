@@ -28,52 +28,16 @@ namespace Hime.Redist.Parsers
 	public abstract class LRkParser : BaseLRParser
 	{
 		/// <summary>
-		/// The simulator for LR(k) parsers used for error recovery
-		/// </summary>
-		private class Simulator : LRkSimulator
-		{
-			/// <summary>
-			/// Initializes a new simulator based on the given LR(k) parser
-			/// </summary>
-			/// <param name="parser">The base LR(k) parser</param>
-			public Simulator(LRkParser parser)
-			{
-				this.parserAutomaton = parser.parserAutomaton;
-				this.parserVariables = parser.parserVariables;
-				this.input = parser.input;
-				this.stack = new int[MAX_STACK_SIZE];
-				this.head = parser.head;
-				System.Array.Copy(parser.stack, this.stack, parser.head + 1);
-			}
-		}
-
-		/// <summary>
 		/// The parser's automaton
 		/// </summary>
-		private LRkAutomaton parserAutomaton;
-
-		/// <summary>
-		/// The parser's input as a stream of tokens
-		/// </summary>
-		private RewindableTokenStream input;
-
+		protected LRkAutomaton automaton;
 		/// <summary>
 		/// The AST builder
 		/// </summary>
-		private LRkASTBuilder builder;
+		internal LRkASTBuilder builder;
 
 		/// <summary>
-		/// The parser's stack
-		/// </summary>
-		private int[] stack;
-
-		/// <summary>
-		/// Index of the stack's head
-		/// </summary>
-		private int head;
-
-		/// <summary>
-		/// Initializes a new instance of the LRkParser class with the given lexer
+		/// Initializes a new instance of the parser
 		/// </summary>
 		/// <param name="automaton">The parser's automaton</param>
 		/// <param name="variables">The parser's variables</param>
@@ -83,123 +47,34 @@ namespace Hime.Redist.Parsers
 		protected LRkParser(LRkAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
             : base(variables, virtuals, actions, lexer)
 		{
-			this.parserAutomaton = automaton;
-			this.input = new RewindableTokenStream(lexer);
+			this.automaton = automaton;
 			this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.Output, parserVariables, parserVirtuals);
 		}
 
 		/// <summary>
-		/// Raises an error on an unexepcted token
+		/// Raises an error on an unexpected token
 		/// </summary>
+		/// <param name="state">The current LR state</param>
 		/// <param name="token">The unexpected token</param>
 		/// <returns>The next token in the case the error is recovered</returns>
-		private Token OnUnexpectedToken(Token token)
+		protected Token OnUnexpectedToken(int state, Token token)
 		{
-			ICollection<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
+			ICollection<int> expectedIndices = automaton.GetExpected(state, lexer.Terminals.Count);
 			List<Symbol> expected = new List<Symbol>();
-			foreach (int index in expectedIDs)
+			foreach (int index in expectedIndices)
 				expected.Add(lexer.Terminals[index]);
 			allErrors.Add(new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected));
 			if (!recover)
-				return new Token(0, 0);
-			if (TryDrop1Unexpected())
-				return input.GetNextToken();
-			if (TryDrop2Unexpected())
-				return input.GetNextToken();
-			foreach (Symbol terminal in expected)
-			{
-				Token dummy = new Token(terminal.ID, 0);
-				if (TryInsertExpected(dummy))
-					return dummy;
-			}
-			return new Token(0, 0);
-		}
-
-		private bool TryDrop1Unexpected()
-		{
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
-			input.Rewind(used);
-			return success;
-		}
-
-		private bool TryDrop2Unexpected()
-		{
-			input.GetNextToken();
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
-			input.Rewind(used);
-			if (!success)
-				input.Rewind(1);
-			return success;
-		}
-
-		private bool TryInsertExpected(Token terminal)
-		{
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, terminal, out used);
-			input.Rewind(used);
-			return success;
-		}
-
-		/// <summary>
-		/// Parses the input and returns the result
-		/// </summary>
-		/// <returns>A ParseResult object containing the data about the result</returns>
-		public override ParseResult Parse()
-		{
-			this.stack = new int[MAX_STACK_SIZE];
-			Token nextToken = input.GetNextToken();
-			while (true)
-			{
-				LRActionCode action = ParseOnToken(nextToken);
-				if (action == LRActionCode.Shift)
-				{
-					nextToken = input.GetNextToken();
-					continue;
-				}
-				if (action == LRActionCode.Accept)
-					return new ParseResult(allErrors, lexer.Output, builder.GetTree());
-				nextToken = OnUnexpectedToken(nextToken);
-				if (nextToken.SymbolID == 0 || allErrors.Count >= MAX_ERROR_COUNT)
-					return new ParseResult(allErrors, lexer.Output);
-			}
-		}
-
-		/// <summary>
-		/// Parses the given token
-		/// </summary>
-		/// <param name="token">The token to parse</param>
-		/// <returns>The LR action on the token</returns>
-		private LRActionCode ParseOnToken(Token token)
-		{
-			while (true)
-			{
-				LRAction action = parserAutomaton.GetAction(stack[head], token.SymbolID);
-				if (action.Code == LRActionCode.Shift)
-				{
-					stack[++head] = action.Data;
-					builder.StackPushToken(token.Index);
-					return action.Code;
-				}
-				else if (action.Code == LRActionCode.Reduce)
-				{
-					LRProduction production = parserAutomaton.GetProduction(action.Data);
-					head -= production.ReductionLength;
-					Reduce(production);
-					action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].ID);
-					stack[++head] = action.Data;
-					continue;
-				}
-				return action.Code;
-			}
+				return new Token(Symbol.SID_NOTHING, 0);
+			// TODO: try to recover from the error
+			return new Token(Symbol.SID_NOTHING, 0);
 		}
 
 		/// <summary>
 		/// Executes the given LR reduction
 		/// </summary>
 		/// <param name="production">A LR reduction</param>
-		private void Reduce(LRProduction production)
+		protected void Reduce(LRProduction production)
 		{
 			Symbol variable = parserVariables[production.Head];
 			builder.ReductionPrepare(production.Head, production.ReductionLength, production.HeadAction);
