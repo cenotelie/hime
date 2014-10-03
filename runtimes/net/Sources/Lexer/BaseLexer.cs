@@ -68,10 +68,6 @@ namespace Hime.Redist.Lexer
 		/// The tokenized text
 		/// </summary>
 		protected BaseTokenizedText text;
-		/// <summary>
-		/// The current index in the input
-		/// </summary>
-		protected int inputIndex;
 
 		/// <summary>
 		/// Gets the terminals matched by this lexer
@@ -99,7 +95,6 @@ namespace Hime.Redist.Lexer
 			this.recognizedTerminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
 			this.separatorID = separator;
 			this.text = new PrefetchedText(this.recognizedTerminals, input);
-			this.inputIndex = 0;
 		}
 
 		/// <summary>
@@ -115,7 +110,6 @@ namespace Hime.Redist.Lexer
 			this.recognizedTerminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
 			this.separatorID = separator;
 			this.text = new StreamingText(terminals, input);
-			this.inputIndex = 0;
 		}
 
 		/// <summary>
@@ -130,14 +124,14 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the next token in the input
 		/// </summary>
-		/// <returns>The next token in the input</returns>
-		public abstract Token GetNextToken();
-
-		/// <summary>
-		/// Gets the next token in the input
-		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		public abstract Token GetNextToken(ContextStack contexts);
+		public abstract Token GetNextToken(IContextProvider contexts);
+
+		/// <summary>
+		/// Rewinds this lexer for a specified amount of tokens
+		/// </summary>
+		/// <param name="count">The number of tokens to rewind</param>
+		public abstract void RewindTokens(int count);
 	}
 }

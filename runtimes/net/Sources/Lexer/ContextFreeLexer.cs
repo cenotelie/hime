@@ -60,11 +60,11 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the next token in the input
 		/// </summary>
+		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		/// <remarks>This forces the use of the default context</remarks>
-		public override Token GetNextToken()
+		public override Token GetNextToken(IContextProvider contexts)
 		{
-			if (tokenIndex == -1)
+			if (text.TokenCount == 0)
 			{
 				// this is the first call to this method, prefetch the tokens
 				FindTokens();
@@ -77,13 +77,12 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the next token in the input
+		/// Rewinds this lexer for a specified amount of tokens
 		/// </summary>
-		/// <param name="contexts">The current applicable contexts</param>
-		/// <returns>The next token in the input</returns>
-		public override Token GetNextToken(ContextStack contexts)
+		/// <param name="count">The number of tokens to rewind</param>
+		public override void RewindTokens(int count)
 		{
-			return GetNextToken();
+			tokenIndex -= count;
 		}
 
 		/// <summary>
@@ -91,9 +90,10 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		private void FindTokens()
 		{
+			int inputIndex = 0;
 			while (true)
 			{
-				Match match = RunDFA();
+				Match match = RunDFA(inputIndex);
 				if (match.length != 0)
 				{
 					// matched something
@@ -131,8 +131,9 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Runs the lexer's DFA to match a terminal in the input ahead
 		/// </summary>
+		/// <param name="inputIndex">The current start index in the input text</param>
 		/// <returns>The matched terminal and length</returns>
-		private Match RunDFA()
+		private Match RunDFA(int inputIndex)
 		{
 			if (text.IsEnd(inputIndex))
 			{

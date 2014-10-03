@@ -76,12 +76,12 @@ public abstract class ContextFreeLexer extends BaseLexer {
 
     /**
      * Gets the next token in the input
-     * This forces the use of the default context
      *
+     * @param contexts The current applicable contexts
      * @return The next token in the input
      */
-    public Token getNextToken() {
-        if (tokenIndex == -1) {
+    public Token getNextToken(IContextProvider contexts) {
+        if (text.getTokenCount() == 0) {
             // this is the first call to this method, prefetch the tokens
             findTokens();
             tokenIndex = 0;
@@ -93,21 +93,21 @@ public abstract class ContextFreeLexer extends BaseLexer {
     }
 
     /**
-     * Gets the next token in the input
+     * Rewinds this lexer for a specified amount of tokens
      *
-     * @param contexts The current applicable contexts
-     * @return The next token in the input
+     * @param count The number of tokens to rewind
      */
-    public Token getNextToken(ContextStack contexts) {
-        return getNextToken();
+    public void rewindTokens(int count) {
+        tokenIndex -= count;
     }
 
     /**
      * Finds all the tokens in the lexer's input
      */
     private void findTokens() {
+        int inputIndex = 0;
         while (true) {
-            Match match = runDFA();
+            Match match = runDFA(inputIndex);
             if (match.length != 0) {
                 if (recognizedTerminals.get(match.terminal).getID() != separatorID)
                     text.addToken(match.terminal, inputIndex, match.length);
@@ -139,9 +139,10 @@ public abstract class ContextFreeLexer extends BaseLexer {
     /**
      * Runs the lexer's DFA to match a terminal in the input ahead
      *
+     * @param inputIndex The current start index in the input text
      * @return The matched terminal and length
      */
-    private Match runDFA() {
+    private Match runDFA(int inputIndex) {
         if (text.isEnd(inputIndex)) {
             // At the end of input
             return new Match(1); // 1 is always the index of the $ terminal

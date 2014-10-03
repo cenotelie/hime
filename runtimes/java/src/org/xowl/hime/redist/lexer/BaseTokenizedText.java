@@ -146,6 +146,18 @@ public abstract class BaseTokenizedText implements TokenizedText {
     }
 
     /**
+     * Drops the specified amount of tokens from the already matched tokens
+     *
+     * @param count The number of tokens to drop
+     * @return The length of the tokenized text without the dropped tokens
+     */
+    public int dropTokens(int count) {
+        Cell firstCell = cells.get(cells.size() - count + 1);
+        cells.remove(count);
+        return firstCell.start;
+    }
+
+    /**
      * Gets the number of lines
      *
      * @return The number of lines

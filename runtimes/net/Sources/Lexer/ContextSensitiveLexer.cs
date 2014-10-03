@@ -27,9 +27,9 @@ namespace Hime.Redist.Lexer
 	public abstract class ContextSensitiveLexer : BaseLexer
 	{
 		/// <summary>
-		/// Default context when none is provided
+		/// The current index in the input
 		/// </summary>
-		private ContextStack defaultContext;
+		protected int inputIndex;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -41,7 +41,7 @@ namespace Hime.Redist.Lexer
 		protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 			: base(automaton, terminals, separator, input)
 		{
-			defaultContext = new ContextStack();
+			this.inputIndex = 0;
 		}
 
 		/// <summary>
@@ -54,17 +54,7 @@ namespace Hime.Redist.Lexer
 		protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 			: base(automaton, terminals, separator, input)
 		{
-			defaultContext = new ContextStack();
-		}
-
-		/// <summary>
-		/// Gets the next token in the input
-		/// </summary>
-		/// <returns>The next token in the input</returns>
-		/// <remarks>This forces the use of the default context</remarks>
-		public override Token GetNextToken()
-		{
-			return GetNextToken(defaultContext);
+			this.inputIndex = 0;
 		}
 
 		/// <summary>
@@ -72,7 +62,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		public override Token GetNextToken(ContextStack contexts)
+		public override Token GetNextToken(IContextProvider contexts)
 		{
 			while (true)
 			{
@@ -112,11 +102,20 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
+		/// Rewinds this lexer for a specified amount of tokens
+		/// </summary>
+		/// <param name="count">The number of tokens to rewind</param>
+		public override void RewindTokens(int count)
+		{
+			inputIndex = text.DropTokens(count);
+		}
+
+		/// <summary>
 		/// Runs the lexer's DFA to match a terminal in the input ahead
 		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The matched terminal and length</returns>
-		private Match RunDFA(ContextStack contexts)
+		private Match RunDFA(IContextProvider contexts)
 		{
 			if (text.IsEnd(inputIndex))
 			{
@@ -135,7 +134,7 @@ namespace Hime.Redist.Lexer
 				for (int j = 0; i != stateData.TerminalsCount; j++ )
 				{
 					MatchedTerminal mt = stateData.GetTerminal(j);
-					if (contexts.Contains(mt.Context))
+					if (contexts.IsWithin(mt.Context))
 					{
 						result.terminal = mt.Index;
 						result.length = (i - inputIndex);

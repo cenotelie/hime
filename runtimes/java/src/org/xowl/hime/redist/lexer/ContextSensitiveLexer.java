@@ -32,9 +32,9 @@ import java.io.InputStreamReader;
  */
 public abstract class ContextSensitiveLexer extends BaseLexer {
     /**
-     * Default context when none is provided
+     * The current index in the input
      */
-    private ContextStack defaultContext;
+    protected int inputIndex;
     /**
      * The cache of DFA state data
      */
@@ -54,7 +54,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
      */
     protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
         super(automaton, terminals, separator, input);
-        this.defaultContext = new ContextStack();
+        this.inputIndex = 0;
         this.stateData = new State();
         this.matchedTerminal = new MatchedTerminal();
     }
@@ -69,19 +69,9 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
      */
     protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
         super(automaton, terminals, separator, input);
-        this.defaultContext = new ContextStack();
+        this.inputIndex = 0;
         this.stateData = new State();
         this.matchedTerminal = new MatchedTerminal();
-    }
-
-    /**
-     * Gets the next token in the input
-     * This forces the use of the default context
-     *
-     * @return The next token in the input
-     */
-    public Token getNextToken() {
-        return getNextToken(defaultContext);
     }
 
     /**
@@ -90,7 +80,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
      * @param contexts The current applicable contexts
      * @return The next token in the input
      */
-    public Token getNextToken(ContextStack contexts) {
+    public Token getNextToken(IContextProvider contexts) {
         while (true) {
             Match match = runDFA(contexts);
             if (match.length != 0) {
@@ -123,12 +113,21 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     }
 
     /**
+     * Rewinds this lexer for a specified amount of tokens
+     *
+     * @param count The number of tokens to rewind
+     */
+    public void rewindTokens(int count) {
+        inputIndex = text.dropTokens(count);
+    }
+
+    /**
      * Runs the lexer's DFA to match a terminal in the input ahead
      *
      * @param contexts The current applicable contexts
      * @return The matched terminal and length
      */
-    private Match runDFA(ContextStack contexts) {
+    private Match runDFA(IContextProvider contexts) {
         if (text.isEnd(inputIndex)) {
             // At the end of input
             return new Match(1); // 1 is always the index of the $ terminal
@@ -143,7 +142,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
             // Is this state a matching state ?
             for (int j = 0; j != stateData.getTerminalsCount(); j++) {
                 stateData.retrieveTerminal(j, matchedTerminal);
-                if (contexts.contains(matchedTerminal.getContext())) {
+                if (contexts.isWithin(matchedTerminal.getContext())) {
                     result.terminal = matchedTerminal.getIndex();
                     result.length = (i - inputIndex);
                     break;

@@ -179,6 +179,18 @@ namespace Hime.Redist.Lexer
 			Cell cell = cells[index];
 			return new Token(terminals[cell.terminal].ID, index);
 		}
+
+		/// <summary>
+		/// Drops the specified amount of tokens from the already matched tokens
+		/// </summary>
+		/// <param name="count">The number of tokens to drop</param>
+		/// <returns>The length of the tokenized text without the dropped tokens</returns>
+		public int DropTokens(int count)
+		{
+			Cell firstCell = cells[cells.Size - count + 1];
+			cells.Remove(count);
+			return firstCell.start;
+		}
 		#endregion
 
 

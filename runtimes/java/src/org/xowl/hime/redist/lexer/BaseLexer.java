@@ -53,10 +53,6 @@ public abstract class BaseLexer implements ILexer {
      */
     protected BaseTokenizedText text;
     /**
-     * The current index in the input
-     */
-    protected int inputIndex;
-    /**
      * Initializes a new instance of the Lexer class with the given input
      *
      * @param automaton DFA automaton for this lexer
@@ -69,7 +65,6 @@ public abstract class BaseLexer implements ILexer {
         this.recognizedTerminals = Collections.unmodifiableList(Arrays.asList(terminals));
         this.separatorID = separator;
         this.text = new PrefetchedText(this.recognizedTerminals, input);
-        this.inputIndex = 0;
     }
 
     /**
@@ -85,7 +80,6 @@ public abstract class BaseLexer implements ILexer {
         this.recognizedTerminals = Collections.unmodifiableList(Arrays.asList(terminals));
         this.separatorID = separator;
         this.text = new StreamingText(this.recognizedTerminals, input);
-        this.inputIndex = 0;
     }
 
     /**
@@ -118,7 +112,7 @@ public abstract class BaseLexer implements ILexer {
     /**
      * Represents a match in the input
      */
-    protected class Match {
+    protected static class Match {
         /**
          * Index of the matched terminal
          */
