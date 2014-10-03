@@ -91,7 +91,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
                 inputIndex += match.length;
                 return token;
             }
-            if (match.terminal == 0) {
+            if (match.terminal == Symbol.SID_NOTHING) {
                 // This is the EPSILON terminal, failed to match anything
                 TextPosition position = text.getPositionAt(inputIndex);
                 String unexpected = null;
