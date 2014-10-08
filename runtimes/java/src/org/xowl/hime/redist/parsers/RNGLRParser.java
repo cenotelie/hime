@@ -307,7 +307,7 @@ public class RNGLRParser extends BaseLRParser {
         shifts = new ArrayDeque<Shift>();
         int Ui = gss.createGeneration();
         int v0 = gss.createNode(0);
-        nextToken = lexer.getNextToken();
+        nextToken = lexer.getNextToken(gss);
 
         int count = parserAutomaton.getActionsCount(0, nextToken.getSymbolID());
         for (int i = 0; i != count; i++) {
@@ -315,14 +315,14 @@ public class RNGLRParser extends BaseLRParser {
             if (action.getCode() == LRAction.CODE_SHIFT)
                 shifts.add(new Shift(v0, action.getData()));
             else if (action.getCode() == LRAction.CODE_REDUCE)
-                reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), sppf.EPSILON));
+                reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), SPPFBuilder.EPSILON));
         }
 
         while (nextToken.getSymbolID() != Symbol.SID_EPSILON) // Wait for ε token
         {
             reducer(Ui);
             Token oldtoken = nextToken;
-            nextToken = lexer.getNextToken();
+            nextToken = lexer.getNextToken(gss);
             int Uj = shifter(oldtoken);
             GSS.Gen g = gss.getGeneration(Uj);
             if (g.count == 0) {
