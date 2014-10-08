@@ -161,7 +161,7 @@ public class RNGLRParser extends BaseLRParser {
                         ok = ok && (dependencies[r] == null);
                     if (ok) {
                         LRProduction prod = parserAutomaton.getNullableProduction(i);
-                        this.nullables[i] = buildSPPF(0, prod, sppf.EPSILON, null);
+                        this.nullables[i] = buildSPPF(0, prod, SPPFBuilder.EPSILON, null);
                         dependencies[i] = null;
                         solved++;
                     } else {

@@ -11,12 +11,12 @@ namespace Hime.CentralDogma.Input
 	/// <summary>
 	/// Represents a parser
 	/// </summary>
-	internal class CommandLineParser : LRkParser
+	internal class CommandLineParser : LRkContextFreeParser
 	{
 		/// <summary>
 		/// The automaton for this parser
 		/// </summary>
-		private static readonly LRkAutomaton automaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
+		private static readonly LRkAutomaton commonAutomaton = LRkAutomaton.Find(typeof(CommandLineParser), "CommandLineParser.bin");
 		/// <summary>
 		/// Contains the constant IDs for the variables and virtuals in this parser
 		/// </summary>
@@ -77,6 +77,6 @@ namespace Hime.CentralDogma.Input
 		/// Initializes a new instance of the parser
 		/// </summary>
 		/// <param name="lexer">The input lexer</param>
-		public CommandLineParser(CommandLineLexer lexer) : base (automaton, variables, virtuals, null, lexer) { }
+		public CommandLineParser(CommandLineLexer lexer) : base(commonAutomaton, variables, virtuals, null, lexer) { }
 	}
 }

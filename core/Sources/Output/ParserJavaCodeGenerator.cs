@@ -51,6 +51,10 @@ namespace Hime.CentralDogma.Output
 		/// The type of the parser to generate
 		/// </summary>
 		private string parserType;
+		/// <summary>
+		/// The type of the automaton
+		/// </summary>
+		private string automatonType;
 
 		/// <summary>
 		/// Initializes this code generator
@@ -65,9 +69,18 @@ namespace Hime.CentralDogma.Output
 			this.binResource = binResource;
 			this.grammar = unit.Grammar;
 			if (unit.Method == ParsingMethod.RNGLR1 || unit.Method == ParsingMethod.RNGLALR1)
-				this.parserType = "RNGLR";
+			{
+				this.parserType = "RNGLRParser";
+				this.automatonType = "RNGLRAutomaton";
+			}
 			else
-				this.parserType = "LRk";
+			{
+				if (unit.Contexts.Count > 1)
+					this.parserType = "LRkContextSensitiveParser";
+				else
+					this.parserType = "LRkContextFreeParser";
+				this.automatonType = "LRkAutomaton";
+			}
 		}
 
 		/// <summary>
@@ -99,8 +112,8 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("import org.xowl.hime.redist.SemanticBody;");
 			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
 			writer.WriteLine("import org.xowl.hime.redist.parsers.InitializationException;");
-			writer.WriteLine("import org.xowl.hime.redist.parsers." + parserType + "Automaton;");
-			writer.WriteLine("import org.xowl.hime.redist.parsers." + parserType + "Parser;");
+			writer.WriteLine("import org.xowl.hime.redist.parsers." + automatonType + ";");
+			writer.WriteLine("import org.xowl.hime.redist.parsers." + parserType + ";");
 			writer.WriteLine();
 			writer.WriteLine("import java.util.Map;");
 			writer.WriteLine();
@@ -110,12 +123,12 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("/**");
 			writer.WriteLine(" * Represents a parser");
 			writer.WriteLine(" */");
-			writer.WriteLine(mod + "class " + name + "Parser extends " + parserType + "Parser {");
+			writer.WriteLine(mod + "class " + name + "Parser extends " + parserType + " {");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * The automaton for this parser");
 			writer.WriteLine("     */");
-			writer.WriteLine("    private static final " + parserType + "Automaton automaton = " + parserType + "Automaton.find(" + name + "Parser.class, \"" + binResource + "\");");
+			writer.WriteLine("    private static final " + automatonType + " commonAutomaton = " + automatonType + ".find(" + name + "Parser.class, \"" + binResource + "\");");
 
 			GenerateCodeSymbols(writer);
 			GenerateCodeVariables(writer);
@@ -275,7 +288,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="stream">The output stream</param>
 		protected void GeneratorCodeConstructors(StreamWriter stream)
 		{
-			string ex = parserType != "RNGLR" ? "" : "throws InitializationException ";
+			string ex = parserType.StartsWith("RNGLR") ? "throws InitializationException " : "";
 
 			if (grammar.Actions.Count == 0)
 			{
@@ -285,7 +298,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("     * @param lexer The input lexer");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer) " + ex + "{");
-				stream.WriteLine("        super(automaton, variables, virtuals, null, lexer);");
+				stream.WriteLine("        super(commonAutomaton, variables, virtuals, null, lexer);");
 				stream.WriteLine("    }");
 			}
 			else
@@ -296,7 +309,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("     * @param lexer The input lexer");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer) " + ex + "{");
-				stream.WriteLine("        super(automaton, variables, virtuals, getUserActions(noActions), lexer);");
+				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
 				stream.WriteLine("    }");
 
 				stream.WriteLine("    /**");
@@ -306,7 +319,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("     * @param actions The set of semantic actions");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Actions actions) " + ex + "{");
-				stream.WriteLine("        super(automaton, variables, virtuals, getUserActions(noActions), lexer);");
+				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
 				stream.WriteLine("    }");
 
 				stream.WriteLine("    /**");
@@ -316,7 +329,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("     * @param actions The set of semantic actions");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Map<String, SemanticAction> actions) " + ex + "{");
-				stream.WriteLine("        super(automaton, variables, virtuals, getUserActions(noActions), lexer);");
+				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
 				stream.WriteLine("    }");
 			}
 		}

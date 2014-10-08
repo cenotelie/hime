@@ -51,6 +51,10 @@ namespace Hime.CentralDogma.Output
 		/// The type of the parser to generate
 		/// </summary>
 		private string parserType;
+		/// <summary>
+		/// The type of the automaton
+		/// </summary>
+		private string automatonType;
 
 		/// <summary>
 		/// Initializes this code generator
@@ -65,9 +69,18 @@ namespace Hime.CentralDogma.Output
 			this.binResource = binResource;
 			this.grammar = unit.Grammar;
 			if (unit.Method == ParsingMethod.RNGLR1 || unit.Method == ParsingMethod.RNGLALR1)
-				this.parserType = "RNGLR";
+			{
+				this.parserType = "RNGLRParser";
+				this.automatonType = "RNGLRAutomaton";
+			}
 			else
-				this.parserType = "LRk";
+			{
+				if (unit.Contexts.Count > 1)
+					this.parserType = "LRkContextSensitiveParser";
+				else
+					this.parserType = "LRkContextFreeParser";
+				this.automatonType = "LRkAutomaton";
+			}
 		}
 
 		/// <summary>
@@ -101,13 +114,13 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Represents a parser");
 			writer.WriteLine("\t/// </summary>");
-			writer.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Parser : " + parserType + "Parser");
+			writer.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Parser : " + parserType);
 			writer.WriteLine("\t{");
 
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// The automaton for this parser");
 			writer.WriteLine("\t\t/// </summary>");
-			writer.WriteLine("\t\tprivate static readonly " + parserType + "Automaton automaton = " + parserType + "Automaton.Find(typeof(" + name + "Parser), \"" + binResource + "\");");
+			writer.WriteLine("\t\tprivate static readonly " + automatonType + " commonAutomaton = " + automatonType + ".Find(typeof(" + name + "Parser), \"" + binResource + "\");");
 
 			GenerateCodeSymbols(writer);
 			GenerateCodeVariables(writer);
@@ -277,7 +290,7 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
 				stream.WriteLine("\t\t/// </summary>");
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
-				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, null, lexer) { }");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer) : base (commonAutomaton, variables, virtuals, null, lexer) { }");
 			}
 			else
 			{
@@ -285,21 +298,21 @@ namespace Hime.CentralDogma.Output
 				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
 				stream.WriteLine("\t\t/// </summary>");
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
-				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer) : base (automaton, variables, virtuals, GetUserActions(noActions), lexer) { }");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer) : base (commonAutomaton, variables, virtuals, GetUserActions(noActions), lexer) { }");
 
 				stream.WriteLine("\t\t/// <summary>");
 				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
 				stream.WriteLine("\t\t/// </summary>");
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
 				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
-				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Actions actions) : base (commonAutomaton, variables, virtuals, GetUserActions(actions), lexer) { }");
 
 				stream.WriteLine("\t\t/// <summary>");
 				stream.WriteLine("\t\t/// Initializes a new instance of the parser");
 				stream.WriteLine("\t\t/// </summary>");
 				stream.WriteLine("\t\t/// <param name=\"lexer\">The input lexer</param>");
 				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
-				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Dictionary<string, SemanticAction> actions) : base (automaton, variables, virtuals, GetUserActions(actions), lexer) { }");
+				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Dictionary<string, SemanticAction> actions) : base (commonAutomaton, variables, virtuals, GetUserActions(actions), lexer) { }");
 			}
 		}
 	}
