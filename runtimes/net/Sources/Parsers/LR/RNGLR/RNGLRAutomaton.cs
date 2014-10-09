@@ -168,7 +168,7 @@ namespace Hime.Redist.Parsers
 					return automaton;
 				}
 			}
-			return null;
+			throw new IOException(string.Format("The resource {0} cannot be found in the assembly {1}", resource, assembly.GetName().Name));
 		}
 
 		/// <summary>
