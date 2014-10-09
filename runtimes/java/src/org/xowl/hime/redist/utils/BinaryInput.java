@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 
 /**
  * Represents a binary input for the automata
@@ -68,7 +69,12 @@ public class BinaryInput {
      * @param name The name of the resource to load
      */
     public BinaryInput(Class type, String name) {
-        this(type.getResourceAsStream(name));
+        InputStream stream = type.getResourceAsStream(name);
+        if (stream == null) {
+            String message = String.format("The resource %s cannot be found in the same assembly as %s", name, type.getName());
+            throw new MissingResourceException(message, type.getName(), name);
+        }
+        init(stream);
     }
 
     /**
@@ -77,20 +83,36 @@ public class BinaryInput {
      * @param stream The input stream to load from
      */
     public BinaryInput(InputStream stream) {
+        if (stream == null)
+            throw new IllegalArgumentException("The stream cannot be null");
+        init(stream);
+    }
+
+    /**
+     * Initializes this input
+     *
+     * @param stream The input stream to load from
+     * @return {@code true} if the initialization succeeded, {@code false} otherwise
+     */
+    private boolean init(InputStream stream) {
         this.content = new ArrayList<byte[]>();
         this.size = 0;
+        boolean onError = false;
         try {
             load(stream);
         } catch (IOException ex) {
+            onError = true;
         }
         try {
             stream.close();
         } catch (IOException ex) {
+            onError = true;
         }
         this.buffer = ByteBuffer.wrap(buildFullBuffer());
         this.buffer.order(ByteOrder.LITTLE_ENDIAN);
         this.content.clear();
         this.content = null;
+        return !onError;
     }
 
     /**
