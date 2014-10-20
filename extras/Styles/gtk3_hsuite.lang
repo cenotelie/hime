@@ -42,6 +42,7 @@
       <keyword>options</keyword>
       <keyword>terminals</keyword>
       <keyword>rules</keyword>
+      <keyword>context</keyword>
       <keyword>fixture</keyword>
       <keyword>test</keyword>
       <keyword>parser</keyword>

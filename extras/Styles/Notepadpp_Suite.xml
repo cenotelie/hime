@@ -24,7 +24,7 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">grammar options terminals rules fixture test parser on yields differs fails outputs</Keywords>
+            <Keywords name="Keywords1">grammar options terminals rules context fixture test parser on yields differs fails outputs</Keywords>
             <Keywords name="Keywords2">Axiom Separator LR0 LR1 LALR1 RNGLR1 RNGLALR1</Keywords>
             <Keywords name="Keywords3"></Keywords>
             <Keywords name="Keywords4"></Keywords>
