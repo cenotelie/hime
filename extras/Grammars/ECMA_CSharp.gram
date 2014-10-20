@@ -439,9 +439,9 @@ grammar CSharp
 		class_declaration			-> attributes? class_modifiers? 'partial'? 'class' IDENTIFIER type_parameter_list? class_base? type_parameter_constraints_clauses? class_body ';'? ;
 		class_modifiers				-> class_modifier+ ;
 		class_modifier				-> 'new' | 'public' | 'protected' | 'internal' | 'private' | 'abstract' | 'sealed' | 'static' ;
-		class_base					-> ':' class_type
+		class_base					-> ':' (class_type
 									|  interface_type_list
-									|  class_type ',' interface_type_list ;
+									|  class_type ',' interface_type_list ) ;
 		interface_type_list			-> interface_type (',' interface_type)* ;
 		class_body					-> '{' class_member_declarations? '}' ;
 		class_member_declarations	-> class_member_declaration+ ;
