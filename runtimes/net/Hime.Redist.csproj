@@ -75,10 +75,6 @@
     <Compile Include="Sources\Lexer\StreamingText.cs" />
     <Compile Include="Sources\Lexer\Transition.cs" />
     <Compile Include="Sources\Parsers\LR\LRContexts.cs" />
-    <Compile Include="Sources\Parsers\LR\LRk\LRkContextFreeParser.cs" />
-    <Compile Include="Sources\Parsers\LR\LRk\LRkContextSensitiveParser.cs" />
-    <Compile Include="Sources\Parsers\LR\LRk\LRkStack.cs" />
-    <Compile Include="Sources\Parsers\LR\LRk\LRkStackBlock.cs" />
     <Compile Include="Sources\Token.cs" />
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />

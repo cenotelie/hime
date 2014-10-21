@@ -25,16 +25,24 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a base for all LR(k) parsers
 	/// </summary>
-	public abstract class LRkParser : BaseLRParser
+	public abstract class LRkParser : BaseLRParser, Lexer.IContextProvider
 	{
 		/// <summary>
 		/// The parser's automaton
 		/// </summary>
 		protected LRkAutomaton automaton;
 		/// <summary>
+		/// The parser's stack
+		/// </summary>
+		private int[] stack;
+		/// <summary>
+		/// Index of the stack's head
+		/// </summary>
+		private int head;
+		/// <summary>
 		/// The AST builder
 		/// </summary>
-		internal LRkASTBuilder builder;
+		private LRkASTBuilder builder;
 
 		/// <summary>
 		/// Initializes a new instance of the parser
@@ -52,12 +60,81 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
+		/// Gets whether the specified context is in effect
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <returns><c>true</c> if the specified context is in effect</returns>
+		public bool IsWithin(int context)
+		{
+			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
+				return true;
+			for (int i = head; i != -1; i--)
+				if (automaton.GetContexts(stack[i]).Contains(context))
+					return true;
+			return false;
+		}
+
+		/// <summary>
+		/// Parses the input and returns the result
+		/// </summary>
+		/// <returns>A ParseResult object containing the data about the result</returns>
+		public override ParseResult Parse()
+		{
+			this.stack = new int[MAX_STACK_SIZE];
+			this.head = 0;
+			Token nextToken = lexer.GetNextToken(this);
+			while (true)
+			{
+				LRActionCode action = ParseOnToken(nextToken);
+				if (action == LRActionCode.Shift)
+				{
+					nextToken = lexer.GetNextToken(this);
+					continue;
+				}
+				if (action == LRActionCode.Accept)
+					return new ParseResult(allErrors, lexer.Output, builder.GetTree());
+				nextToken = OnUnexpectedToken(stack[head], nextToken);
+				if (nextToken.SymbolID == Symbol.SID_NOTHING || allErrors.Count >= MAX_ERROR_COUNT)
+					return new ParseResult(allErrors, lexer.Output);
+			}
+		}
+
+		/// <summary>
+		/// Parses the given token
+		/// </summary>
+		/// <param name="token">The token to parse</param>
+		/// <returns>The LR action on the token</returns>
+		private LRActionCode ParseOnToken(Token token)
+		{
+			while (true)
+			{
+				LRAction action = automaton.GetAction(stack[head], token.SymbolID);
+				if (action.Code == LRActionCode.Shift)
+				{
+					stack[++head] = action.Data;
+					builder.StackPushToken(token.Index);
+					return action.Code;
+				}
+				else if (action.Code == LRActionCode.Reduce)
+				{
+					LRProduction production = automaton.GetProduction(action.Data);
+					head -= production.ReductionLength;
+					Reduce(production);
+					action = automaton.GetAction(stack[head], parserVariables[production.Head].ID);
+					stack[++head] = action.Data;
+					continue;
+				}
+				return action.Code;
+			}
+		}
+
+		/// <summary>
 		/// Raises an error on an unexpected token
 		/// </summary>
 		/// <param name="state">The current LR state</param>
 		/// <param name="token">The unexpected token</param>
 		/// <returns>The next token in the case the error is recovered</returns>
-		protected Token OnUnexpectedToken(int state, Token token)
+		private Token OnUnexpectedToken(int state, Token token)
 		{
 			ICollection<int> expectedIndices = automaton.GetExpected(state, lexer.Terminals.Count);
 			List<Symbol> expected = new List<Symbol>();
@@ -74,7 +151,7 @@ namespace Hime.Redist.Parsers
 		/// Executes the given LR reduction
 		/// </summary>
 		/// <param name="production">A LR reduction</param>
-		protected void Reduce(LRProduction production)
+		private void Reduce(LRProduction production)
 		{
 			Symbol variable = parserVariables[production.Head];
 			builder.ReductionPrepare(production.Head, production.ReductionLength, production.HeadAction);

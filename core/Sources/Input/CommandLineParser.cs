@@ -11,7 +11,7 @@ namespace Hime.CentralDogma.Input
 	/// <summary>
 	/// Represents a parser
 	/// </summary>
-	internal class CommandLineParser : LRkContextFreeParser
+	internal class CommandLineParser : LRkParser
 	{
 		/// <summary>
 		/// The automaton for this parser

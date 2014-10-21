@@ -11,7 +11,7 @@ namespace Hime.CentralDogma.Input
 	/// <summary>
 	/// Represents a parser
 	/// </summary>
-	internal class HimeGrammarParser : LRkContextFreeParser
+	internal class HimeGrammarParser : LRkParser
 	{
 		/// <summary>
 		/// The automaton for this parser

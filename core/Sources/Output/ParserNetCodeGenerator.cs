@@ -75,10 +75,7 @@ namespace Hime.CentralDogma.Output
 			}
 			else
 			{
-				if (unit.Contexts.Count > 1)
-					this.parserType = "LRkContextSensitiveParser";
-				else
-					this.parserType = "LRkContextFreeParser";
+				this.parserType = "LRkParser";
 				this.automatonType = "LRkAutomaton";
 			}
 		}
