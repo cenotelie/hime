@@ -37,17 +37,9 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private LRkStackBlock[] blocks;
 		/// <summary>
-		/// The lexical contexts in this stack
-		/// </summary>
-		private ushort[] contexts;
-		/// <summary>
 		/// The index of the top block
 		/// </summary>
 		private int headBlock;
-		/// <summary>
-		/// The index of the top context
-		/// </summary>
-		private int headContext;
 
 		/// <summary>
 		/// Gets the LR(k) state on this stack's head
@@ -60,9 +52,7 @@ namespace Hime.Redist.Parsers
 		public LRkStack()
 		{
 			this.blocks = new LRkStackBlock[INIT_STACK_SIZE];
-			this.contexts = new ushort[INIT_STACK_SIZE];
 			this.headBlock = -1;
-			this.headContext = -1;
 		}
 
 		/// <summary>
@@ -74,8 +64,8 @@ namespace Hime.Redist.Parsers
 		{
 			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
 				return true;
-			for (int i = headContext; i != -1; i--)
-				if (contexts[i] == context)
+			for (int i = headBlock; i != -1; i--)
+				if (blocks[i].Contexts.Contains(context))
 					return true;
 			return false;
 		}
@@ -84,8 +74,8 @@ namespace Hime.Redist.Parsers
 		/// Pushes a new block onto this stack
 		/// </summary>
 		/// <param name="state">The LR(k) state associated to the new block</param>
-		/// <param name="size">The block's size</param>
-		public void PushBlock(int state, int size)
+		/// <param name="contexts">The contexts opened at this state</param>
+		public void Push(int state, LRContexts contexts)
 		{
 			if (headBlock + 1 >= blocks.Length)
 			{
@@ -94,39 +84,16 @@ namespace Hime.Redist.Parsers
 				blocks = temp;
 			}
 			headBlock++;
-			blocks[headBlock].Setup((ushort)state, (ushort)size);
-
-			if (headContext + size >= contexts.Length)
-			{
-				ushort[] temp = new ushort[contexts.Length + INIT_STACK_SIZE];
-				Array.Copy(contexts, temp, contexts.Length);
-				contexts = temp;
-			}
-			headContext += size;
-		}
-
-		/// <summary>
-		/// Sets a context information in the top block of this stack
-		/// </summary>
-		/// <param name="index">The index within the top block</param>
-		/// <param name="context">The context to set</param>
-		public void SetContext(int index, int context)
-		{
-			contexts[headContext - blocks[headBlock].Size + 1 + index] = (ushort)context;
+			blocks[headBlock].Setup(state, contexts);
 		}
 
 		/// <summary>
 		/// Pops the specified amount of blocks from this stack
 		/// </summary>
 		/// <param name="count">The number of blocks to pop</param>
-		public void PopBlocks(int count)
+		public void Pop(int count)
 		{
-			while (count > 0)
-			{
-				headContext -= blocks[headBlock].Size;
-				headBlock--;
-				count--;
-			}
+			headBlock -= count;
 		}
 	}
 }

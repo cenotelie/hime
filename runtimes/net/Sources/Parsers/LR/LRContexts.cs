@@ -17,41 +17,53 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.IO;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
-	/// Represents a block in the stack of LR(k) parser
+	/// Represents the contexts of a LR state
 	/// </summary>
-	struct LRkStackBlock
+	public struct LRContexts
 	{
 		/// <summary>
-		/// The LR(k) automaton state associated with this block
+		/// The contexts
 		/// </summary>
-		private int state;
+		private ushort[] content;
+		
 		/// <summary>
-		/// The contexts opened at this state
+		/// Gets the number of contexts
 		/// </summary>
-		private LRContexts contexts;
-
+		public int Count { get { return content.Length; } }
+		
 		/// <summary>
-		/// Gets the LR(k) automaton state associated with this block
+		/// Gets the i-th context
 		/// </summary>
-		public int State { get { return state; } }
+		public int this[int index] { get { return content[index]; } }
+		
 		/// <summary>
-		/// Gets the contexts opened at this state
+		/// Loads the contexts from the specified input
 		/// </summary>
-		public LRContexts Contexts { get { return contexts; } }
-
-		/// <summary>
-		/// Setups this block
-		/// </summary>
-		/// <param name="state">The LR(k) automaton state associated with this block</param>
-		/// <param name="contexts">The contexts opened at this state</param>
-		public void Setup(int state, LRContexts contexts)
+		/// <param name="input">An input</param>
+		public LRContexts(BinaryReader input)
 		{
-			this.state = state;
-			this.contexts = contexts;
+			int count = input.ReadUInt16();
+			this.content = new ushort[count];
+			for (int i = 0; i != count; i++)
+				this.content[i] = input.ReadUInt16();
+		}
+		
+		/// <summary>
+		/// Gets whether the specified context is in this collection
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <returns><c>true</c> if the specified context is in this collection</returns>
+		public bool Contains(int context)
+		{
+			for (int i = 0; i != content.Length; i++)
+				if (content[i] == context)
+					return true;
+			return false;
 		}
 	}
 }

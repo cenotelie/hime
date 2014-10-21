@@ -52,7 +52,7 @@ namespace Hime.Redist.Parsers
 		public override ParseResult Parse()
 		{
 			stack = new LRkStack();
-			stack.PushBlock(0, 1);
+			stack.Push(0, automaton.GetContexts(0));
 			Token nextToken = lexer.GetNextToken(stack);
 			while (true)
 			{
@@ -82,17 +82,17 @@ namespace Hime.Redist.Parsers
 				LRAction action = automaton.GetAction(stack.HeadState, token.SymbolID);
 				if (action.Code == LRActionCode.Shift)
 				{
-					stack.PushBlock(action.Data, 1);
+					stack.Push(action.Data, automaton.GetContexts(action.Data));
 					builder.StackPushToken(token.Index);
 					return action.Code;
 				}
 				else if (action.Code == LRActionCode.Reduce)
 				{
 					LRProduction production = automaton.GetProduction(action.Data);
-					stack.PopBlocks(production.ReductionLength);
+					stack.Pop(production.ReductionLength);
 					Reduce(production);
 					action = automaton.GetAction(stack.HeadState, parserVariables[production.Head].ID);
-					stack.PushBlock(action.Data, 1);
+					stack.Push(action.Data, automaton.GetContexts(action.Data));
 					continue;
 				}
 				return action.Code;
