@@ -19,10 +19,9 @@
  **********************************************************************/
 package org.xowl.hime.redist.parsers;
 
-import org.xowl.hime.redist.SemanticAction;
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.Token;
-import org.xowl.hime.redist.UnexpectedTokenError;
+import org.xowl.hime.redist.*;
+import org.xowl.hime.redist.lexer.Automaton;
+import org.xowl.hime.redist.lexer.IContextProvider;
 import org.xowl.hime.redist.lexer.ILexer;
 
 import java.util.ArrayList;
@@ -31,15 +30,23 @@ import java.util.List;
 /**
  * Represents a base for all LR(k) parsers
  */
-public abstract class LRkParser extends BaseLRParser {
+public abstract class LRkParser extends BaseLRParser implements IContextProvider {
     /**
      * The parser's automaton
      */
     protected LRkAutomaton automaton;
     /**
+     * The parser's stack
+     */
+    private int[] stack;
+    /**
+     * Index of the stack's head
+     */
+    private int head;
+    /**
      * The AST builder
      */
-    protected LRkASTBuilder builder;
+    private LRkASTBuilder builder;
 
     /**
      * Initializes a new instance of the parser
@@ -57,13 +64,76 @@ public abstract class LRkParser extends BaseLRParser {
     }
 
     /**
+     * Gets whether the specified context is in effect
+     *
+     * @param context A context
+     * @return <code>true</code>  if the specified context is in effect
+     */
+    public boolean isWithin(int context) {
+        if (context == Automaton.DEFAULT_CONTEXT)
+            return true;
+        for (int i = head; i != -1; i--)
+            if (automaton.getContexts(stack[i]).contains(context))
+                return true;
+        return false;
+    }
+
+    /**
+     * Parses the input and returns the result
+     *
+     * @return A ParseResult object containing the data about the result
+     */
+    public ParseResult parse() {
+        stack = new int[MAX_STACK_SIZE];
+        head = 0;
+        Token nextToken = lexer.getNextToken(null);
+        while (true) {
+            char action = parseOnToken(nextToken);
+            if (action == LRAction.CODE_SHIFT) {
+                nextToken = lexer.getNextToken(null);
+                continue;
+            }
+            if (action == LRAction.CODE_ACCEPT)
+                return new ParseResult(allErrors, lexer.getOutput(), builder.GetTree());
+            nextToken = onUnexpectedToken(stack[head], nextToken);
+            if (nextToken.getSymbolID() == 0 || allErrors.size() >= MAX_ERROR_COUNT)
+                return new ParseResult(allErrors, lexer.getOutput());
+        }
+    }
+
+    /**
+     * Parses the given token
+     *
+     * @param token The token to parse
+     * @return The LR action on the token
+     */
+    private char parseOnToken(Token token) {
+        while (true) {
+            LRAction action = automaton.getAction(stack[head], token.getSymbolID());
+            if (action.getCode() == LRAction.CODE_SHIFT) {
+                stack[++head] = action.getData();
+                builder.stackPushToken(token.getIndex());
+                return action.getCode();
+            } else if (action.getCode() == LRAction.CODE_REDUCE) {
+                LRProduction production = automaton.getProduction(action.getData());
+                head -= production.getReductionLength();
+                reduce(production);
+                action = automaton.getAction(stack[head], parserVariables.get(production.getHead()).getID());
+                stack[++head] = action.getData();
+                continue;
+            }
+            return action.getCode();
+        }
+    }
+
+    /**
      * Raises an error on an unexpected token
      *
      * @param state The current LR state
      * @param token The unexpected token
      * @return The next token in the case the error is recovered
      */
-    protected Token onUnexpectedToken(int state, Token token) {
+    private Token onUnexpectedToken(int state, Token token) {
         List<Integer> expectedIDs = automaton.getExpected(state, lexer.getTerminals().size());
         List<Symbol> expected = new ArrayList<Symbol>();
         for (int index : expectedIDs)
@@ -80,7 +150,7 @@ public abstract class LRkParser extends BaseLRParser {
      *
      * @param production A LR reduction
      */
-    protected void reduce(LRProduction production) {
+    private void reduce(LRProduction production) {
         Symbol variable = parserVariables.get(production.getHead());
         builder.reductionPrepare(production.getHead(), production.getReductionLength(), production.getHeadAction());
         for (int i = 0; i != production.getBytecodeLength(); i++) {
