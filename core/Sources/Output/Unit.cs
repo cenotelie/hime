@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
+using System.Text;
 
 namespace Hime.CentralDogma.Output
 {
@@ -138,6 +139,7 @@ namespace Hime.CentralDogma.Output
 			reporter.Info("Preparing " + grammar.Name + " lexer's data ...");
 			// build the lexer's dfa
 			dfa = grammar.BuildDFA();
+			
 			// build the expected
 			expected = new List<Grammars.Terminal>();
 			expected.Add(Grammars.Epsilon.Instance);
@@ -150,48 +152,128 @@ namespace Hime.CentralDogma.Output
 						expected.Add(state.TopItem as Grammars.Terminal);
 				}	
 			}
-			// retrieve the separator
-			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
-			separator = name != null ? grammar.GetTerminalByName(name) : null;
-			if (name != null)
-			{
-				// a separator is defined
-				if (separator == null)
-				{
-					// but could not be found ...
-					reporter.Error(string.Format("Terminal {0} specified as the separator is undefined", name));
-					return false;
-				}
-				// look for the separator in the dfa
-				bool found = false;
-				Automata.FinalItem superceding = null;
-				foreach (Automata.DFAState state in dfa.States)
-				{
-					if (state.TopItem == separator)
-					{
-						found = true;
-						break;
-					}
-					else if (state.Items.Contains(separator))
-					{
-						superceding = state.TopItem;
-					}
-				}
-				if (!found)
-				{
-					if (superceding != null)
-						reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched, it is superceded by {1}", separator, superceding));
-					else
-						reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched", separator));
-					return false;
-				}
-			}
-			// check well-formedness
+
+			// perform diagnostics
+			bool result = true;
+			result &= CheckDFAWellformedness(reporter);
+			result &= CheckSeparatorAxiom(reporter);
+			result &= CheckRulesAgainstExpectedTerminals(reporter);
+			return result;
+		}
+
+		/// <summary>
+		/// Checks the wellformed-ness of the DFA
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <returns><c>true</c> if everything is OK</returns>
+		private bool CheckDFAWellformedness(Reporter reporter)
+		{
 			foreach (Automata.FinalItem item in dfa.Entry.Items)
 				reporter.Error(string.Format("Terminal {0} can be an empty string, this is forbidden", item.ToString()));
-			if (dfa.Entry.TopItem != null)
+			return (dfa.Entry.TopItem == null);
+		}
+
+		/// <summary>
+		/// Checks the wellformed-ness of the Separator axiom against the DFA
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <returns><c>true</c> if everything is OK</returns>
+		private bool CheckSeparatorAxiom(Reporter reporter)
+		{
+			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
+			separator = name != null ? grammar.GetTerminalByName(name) : null;
+			if (name == null)
+				return true;
+			// a separator is defined
+			if (separator == null)
+			{
+				// but could not be found ...
+				reporter.Error(string.Format("Terminal {0} specified as the separator is undefined", name));
 				return false;
-			return true;
+			}
+			// look for the separator in the dfa
+			bool found = false;
+			Automata.FinalItem superceding = null;
+			foreach (Automata.DFAState state in dfa.States)
+			{
+				if (state.TopItem == separator)
+				{
+					found = true;
+					break;
+				}
+				else if (state.Items.Contains(separator))
+				{
+					superceding = state.TopItem;
+				}
+			}
+			if (!found)
+			{
+				if (superceding != null)
+					reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched, it is superceded by {1}", separator, superceding));
+				else
+					reporter.Error(string.Format("Terminal {0} defined as the separator cannot be matched", separator));
+			}
+			return found;
+		}
+
+		/// <summary>
+		/// Checks the wellformed-ness of the syntactic rules against the DFA
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <returns><c>true</c> if everything is OK</returns>
+		private bool CheckRulesAgainstExpectedTerminals(Reporter reporter)
+		{
+			List<Grammars.Terminal> inError = new List<Grammars.Terminal>();
+			foreach (Grammars.Rule rule in grammar.Rules)
+			{
+				Grammars.RuleChoice choice = rule.Body.Choices[0];
+				for (int i = 0; i != choice.Length; i++)
+				{
+					Grammars.RuleBodyElement element = choice[i];
+					if (element.Symbol is Grammars.Terminal)
+					{
+						Grammars.Terminal terminal = element.Symbol as Grammars.Terminal;
+						if (!expected.Contains(terminal) && !inError.Contains(terminal))
+						{
+							List<Grammars.Terminal> supercedings = GetSupercedingsOf(dfa, terminal);
+							StringBuilder builder = new StringBuilder("Terminal ");
+							builder.Append(terminal.Value);
+							builder.Append(" is used in a syntactic rule but is not produced by the lexer, it is superceded by { ");
+							for (int j = 0; j != supercedings.Count; j++)
+							{
+								if (j != 0)
+									builder.Append(", ");
+								builder.Append(supercedings[j].Value);
+							}
+							builder.Append(" }");
+							reporter.Error(builder.ToString());
+							inError.Add(terminal);
+						}
+					}
+				}
+			}
+			return (inError.Count == 0);
+		}
+
+		/// <summary>
+		/// Gets all the superceding terminals of the specified one in a DFA
+		/// </summary>
+		/// <param name="dfa">A DFA</param>
+		/// <param name="terminal">A terminal</param>
+		/// <returns>All terminals that supercedes the specified one at least once</returns>
+		private List<Grammars.Terminal> GetSupercedingsOf(Automata.DFA dfa, Grammars.Terminal terminal)
+		{
+			List<Grammars.Terminal> result = new List<Grammars.Terminal>();
+			foreach (Automata.DFAState state in dfa.States)
+			{
+				if (state.Items.Contains(terminal) && state.TopItem != terminal)
+				{
+					Grammars.Terminal superceding = state.TopItem as Grammars.Terminal;
+					if (!result.Contains(superceding))
+						result.Add(superceding);
+				}
+			}
+			return result;
 		}
 
 		/// <summary>
