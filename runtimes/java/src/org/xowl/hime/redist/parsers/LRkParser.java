@@ -31,6 +31,11 @@ import java.util.List;
  */
 public abstract class LRkParser extends BaseLRParser {
     /**
+     * Initial size of the stack
+     */
+    protected static final int INIT_STACK_SIZE = 128;
+
+    /**
      * The simulator for LR(k) parsers used for error recovery
      */
     private class Simulator extends LRkSimulator {
@@ -41,8 +46,8 @@ public abstract class LRkParser extends BaseLRParser {
             this.parserAutomaton = LRkParser.this.parserAutomaton;
             this.parserVariables = LRkParser.this.parserVariables;
             this.input = LRkParser.this.input;
-            this.stack = Arrays.copyOf(LRkParser.this.stack, BaseLRParser.MAX_STACK_SIZE);
-            this.stack = new int[BaseLRParser.MAX_STACK_SIZE];
+            this.stack = Arrays.copyOf(LRkParser.this.stack, INIT_STACK_SIZE);
+            this.stack = new int[INIT_STACK_SIZE];
             this.head = LRkParser.this.head;
         }
     }
@@ -81,7 +86,7 @@ public abstract class LRkParser extends BaseLRParser {
         super(variables, virtuals, actions, lexer);
         this.parserAutomaton = automaton;
         this.input = new RewindableTokenStream(lexer);
-        this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.getOutput(), parserVariables, parserVirtuals);
+        this.builder = new LRkASTBuilder(lexer.getOutput(), parserVariables, parserVirtuals);
     }
 
     /**
@@ -140,7 +145,7 @@ public abstract class LRkParser extends BaseLRParser {
      * @return A ParseResult object containing the data about the result
      */
     public ParseResult parse() {
-        this.stack = new int[MAX_STACK_SIZE];
+        this.stack = new int[INIT_STACK_SIZE];
         Token nextToken = input.getNextToken();
         while (true) {
             char action = ParseOnToken(nextToken);
@@ -166,7 +171,10 @@ public abstract class LRkParser extends BaseLRParser {
         while (true) {
             LRAction action = parserAutomaton.getAction(stack[head], token.getSymbolID());
             if (action.getCode() == LRAction.CODE_SHIFT) {
-                stack[++head] = action.getData();
+                head++;
+                if (head == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                stack[head] = action.getData();
                 builder.stackPushToken(token.getIndex());
                 return action.getCode();
             } else if (action.getCode() == LRAction.CODE_REDUCE) {
@@ -174,7 +182,10 @@ public abstract class LRkParser extends BaseLRParser {
                 head -= production.getReductionLength();
                 reduce(production);
                 action = parserAutomaton.getAction(stack[head], parserVariables.get(production.getHead()).getID());
-                stack[++head] = action.getData();
+                head++;
+                if (head == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                stack[head] = action.getData();
                 continue;
             }
             return action.getCode();
