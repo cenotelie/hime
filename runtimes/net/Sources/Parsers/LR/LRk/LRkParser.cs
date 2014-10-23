@@ -28,6 +28,11 @@ namespace Hime.Redist.Parsers
 	public abstract class LRkParser : BaseLRParser
 	{
 		/// <summary>
+		/// Initial size of the stack
+		/// </summary>
+		protected internal const int INIT_STACK_SIZE = 128;
+
+		/// <summary>
 		/// The simulator for LR(k) parsers used for error recovery
 		/// </summary>
 		private class Simulator : LRkSimulator
@@ -41,7 +46,7 @@ namespace Hime.Redist.Parsers
 				this.parserAutomaton = parser.parserAutomaton;
 				this.parserVariables = parser.parserVariables;
 				this.input = parser.input;
-				this.stack = new int[MAX_STACK_SIZE];
+				this.stack = new int[parser.stack.Length];
 				this.head = parser.head;
 				System.Array.Copy(parser.stack, this.stack, parser.head + 1);
 			}
@@ -85,7 +90,7 @@ namespace Hime.Redist.Parsers
 		{
 			this.parserAutomaton = automaton;
 			this.input = new RewindableTokenStream(lexer);
-			this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.Output, parserVariables, parserVirtuals);
+			this.builder = new LRkASTBuilder(lexer.Output, parserVariables, parserVirtuals);
 		}
 
 		/// <summary>
@@ -148,7 +153,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>A ParseResult object containing the data about the result</returns>
 		public override ParseResult Parse()
 		{
-			this.stack = new int[MAX_STACK_SIZE];
+			this.stack = new int[INIT_STACK_SIZE];
 			Token nextToken = input.GetNextToken();
 			while (true)
 			{
@@ -178,7 +183,14 @@ namespace Hime.Redist.Parsers
 				LRAction action = parserAutomaton.GetAction(stack[head], token.SymbolID);
 				if (action.Code == LRActionCode.Shift)
 				{
-					stack[++head] = action.Data;
+					head++;
+					if (head == stack.Length)
+					{
+						int[] temp = new int[stack.Length + INIT_STACK_SIZE];
+						System.Array.Copy(stack, temp, stack.Length);
+						stack = temp;
+					}
+					stack[head] = action.Data;
 					builder.StackPushToken(token.Index);
 					return action.Code;
 				}
@@ -188,7 +200,14 @@ namespace Hime.Redist.Parsers
 					head -= production.ReductionLength;
 					Reduce(production);
 					action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].ID);
-					stack[++head] = action.Data;
+					head++;
+					if (head == stack.Length)
+					{
+						int[] temp = new int[stack.Length + INIT_STACK_SIZE];
+						System.Array.Copy(stack, temp, stack.Length);
+						stack = temp;
+					}
+					stack[head] = action.Data;
 					continue;
 				}
 				return action.Code;

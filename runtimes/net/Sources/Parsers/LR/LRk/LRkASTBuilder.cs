@@ -110,16 +110,15 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes the builder with the given stack size
 		/// </summary>
-		/// <param name="stackSize">The maximal size of the stack</param>
 		/// <param name="text">The tokenined text</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
-		public LRkASTBuilder(int stackSize, TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public LRkASTBuilder(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
 			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
-			this.stack = new SubTree[stackSize];
+			this.stack = new SubTree[LRkParser.INIT_STACK_SIZE];
 			this.stackNext = 0;
 			this.handle = new int[INIT_HANDLE_SIZE];
 			this.result = new SimpleAST(text, variables, virtuals);
@@ -133,6 +132,12 @@ namespace Hime.Redist.Parsers
 		{
 			SubTree single = poolSingle.Acquire();
 			single.SetupRoot(new SymbolRef(SymbolType.Token, index), TreeAction.None);
+			if (stackNext == stack.Length)
+			{
+				SubTree[] temp = new SubTree[stack.Length + LRkParser.INIT_STACK_SIZE];
+				Array.Copy(stack, temp, stack.Length);
+				stack = temp;
+			}
 			stack[stackNext++] = single;
 		}
 
@@ -255,6 +260,12 @@ namespace Hime.Redist.Parsers
 				ReduceTree();
 			}
 			// Put it on the stack
+			if (stackNext == stack.Length)
+			{
+				SubTree[] temp = new SubTree[stack.Length + 128];
+				Array.Copy(stack, temp, stack.Length);
+				stack = temp;
+			}
 			stack[stackNext++] = cache;
 		}
 

@@ -29,10 +29,6 @@ namespace Hime.Redist.Parsers
 	public abstract class BaseLRParser : IParser
 	{
 		/// <summary>
-		/// Maximal size of the stack
-		/// </summary>
-		protected const int MAX_STACK_SIZE = 128;
-		/// <summary>
 		/// Maximum number of errors
 		/// </summary>
 		protected const int MAX_ERROR_COUNT = 100;

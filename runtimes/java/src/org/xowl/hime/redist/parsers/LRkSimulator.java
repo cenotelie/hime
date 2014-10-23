@@ -22,6 +22,7 @@ package org.xowl.hime.redist.parsers;
 import org.xowl.hime.redist.Symbol;
 import org.xowl.hime.redist.Token;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -93,14 +94,20 @@ abstract class LRkSimulator {
         while (true) {
             LRAction action = parserAutomaton.getAction(stack[head], token.getSymbolID());
             if (action.getCode() == LRAction.CODE_SHIFT) {
-                stack[++head] = action.getData();
+                head++;
+                if (head == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + LRkParser.INIT_STACK_SIZE);
+                stack[head] = action.getData();
                 return action.getCode();
             } else if (action.getCode() == LRAction.CODE_REDUCE) {
                 LRProduction production = parserAutomaton.getProduction(action.getData());
                 Symbol var = parserVariables.get(production.getHead());
                 head -= production.getReductionLength();
                 action = parserAutomaton.getAction(stack[head], var.getID());
-                stack[++head] = action.getData();
+                head++;
+                if (head == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + LRkParser.INIT_STACK_SIZE);
+                stack[head] = action.getData();
                 continue;
             }
             return action.getCode();

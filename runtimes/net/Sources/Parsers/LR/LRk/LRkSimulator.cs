@@ -85,7 +85,14 @@ namespace Hime.Redist.Parsers
 				LRAction action = parserAutomaton.GetAction(stack[head], token.SymbolID);
 				if (action.Code == LRActionCode.Shift)
 				{
-					stack[++head] = action.Data;
+					head++;
+					if (head == stack.Length)
+					{
+						int[] temp = new int[stack.Length + LRkParser.INIT_STACK_SIZE];
+						System.Array.Copy(stack, temp, stack.Length);
+						stack = temp;
+					}
+					stack[head] = action.Data;
 					return action.Code;
 				}
 				else if (action.Code == LRActionCode.Reduce)
@@ -94,7 +101,14 @@ namespace Hime.Redist.Parsers
 					Symbol var = parserVariables[production.Head];
 					head -= production.ReductionLength;
 					action = parserAutomaton.GetAction(stack[head], var.ID);
-					stack[++head] = action.Data;
+					head++;
+					if (head == stack.Length)
+					{
+						int[] temp = new int[stack.Length + LRkParser.INIT_STACK_SIZE];
+						System.Array.Copy(stack, temp, stack.Length);
+						stack = temp;
+					}
+					stack[head] = action.Data;
 					continue;
 				}
 				return action.Code;
