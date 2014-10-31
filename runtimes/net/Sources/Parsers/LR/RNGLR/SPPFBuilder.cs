@@ -410,7 +410,6 @@ namespace Hime.Redist.Parsers
 			{
 				AddToCache(result.CopyNode(nullable.NodeIndex), action);
 			}
-			AddToCache(nullable, action);
 		}
 
 		/// <summary>

@@ -399,7 +399,6 @@ class SPPFBuilder implements SemanticBody {
         } else {
             addToCache(result.copyNode(nullable.getIndex()), action);
         }
-        addToCache(nullable, action);
     }
 
     /**
