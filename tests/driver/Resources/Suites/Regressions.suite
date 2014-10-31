@@ -9,3 +9,12 @@ test Issue009_RNGLR_WrongSPPFGenerationLookup:
 	parser RNGLALR1
 	on "!a"
 	yields axiom(unary(not(NOT unary(A))))
+
+test Issue021_RNGLR_DuplicatedNullables:
+	grammar Issue021_RNGLR_DuplicatedNullables { options {Axiom="axiom";} terminals { X->'X'; } rules {
+		axiom -> X nullable ;
+		nullable -> ;
+	} }
+	parser RNGLALR1
+	on "X"
+	yields axiom(X nullable)
