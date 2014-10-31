@@ -164,50 +164,109 @@ namespace Hime.CentralDogma.Automata
 		/// </summary>
 		public void Prune()
 		{
-			Dictionary<DFAState, List<DFAState>> inverses = new Dictionary<DFAState, List<DFAState>>();
-			List<DFAState> finals = new List<DFAState>();
-			foreach (DFAState state in states)
-			{
-				foreach (DFAState next in state.Children)
-				{
-					if (!inverses.ContainsKey(next))
-						inverses.Add(next, new List<DFAState>());
-					inverses[next].Add(state);
-				}
-				if (state.Items.Count != 0)
-					finals.Add(state);
-			}
-
+			DFAInverse inverse = new DFAInverse(this);
+			List<DFAState> finals = inverse.CloseByAntecedents(inverse.Finals);
+			
+			// no changes
+			if (finals.Count == states.Count)
+				return;
+			
+			// Prune the transitions
 			for (int i = 0; i != finals.Count; i++)
 			{
 				DFAState state = finals[i];
-				if (inverses.ContainsKey(state))
-					foreach (DFAState antecedent in inverses[state])
-						if (!finals.Contains(antecedent))
-							finals.Add(antecedent);
-			}
-
-			if (finals.Count == states.Count)
-				return;
-			for (int i = 0; i != states.Count; i++)
-			{
-				DFAState state = states[i];
-				if (!finals.Contains(state))
+				List<CharSpan> transitions = new List<CharSpan>(state.Transitions);
+				foreach (CharSpan key in transitions)
 				{
-					states.Remove(state);
-					i--;
-					if (inverses.ContainsKey(state))
+					DFAState child = state.GetChildBy(key);
+					if (!finals.Contains(child))
 					{
-						foreach (DFAState antecedent in inverses[state])
-						{
-							List<CharSpan> keys = new List<CharSpan>(antecedent.Transitions);
-							foreach (CharSpan key in keys)
-								if (antecedent.GetChildBy(key) == state)
-									antecedent.RemoveTransition(key);
-						}
+						// the child should be dropped
+						state.RemoveTransition(key);
 					}
 				}
 			}
+
+			// prune
+			DFAState first = states[0];
+			finals.Remove(states[0]);
+			states.Clear();
+			states.Add(first);
+			states.AddRange(finals);
+		}
+
+		/// <summary>
+		/// Extracts the sub-DFA that produces the specified final item
+		/// </summary>
+		/// <param name="final">A final item</param>
+		/// <returns>The sub-DFA for the specified item</returns>
+		public DFA ExtractSubFor(FinalItem final)
+		{
+			if (final == null)
+				throw new System.ArgumentException("The specified item must not be null");
+			List<DFAState> targets = new List<DFAState>();
+			foreach (DFAState state in states)
+				if (state.TopItem == final)
+					targets.Add(state);
+			if (targets.Count == 0)
+				throw new System.ArgumentException("The specified item is never produced by this DFA");
+			return ExtractSubTo(targets);
+		}
+
+		/// <summary>
+		/// Extracts the sub-DFA that leads to the specified state
+		/// </summary>
+		/// <param name="state">A state in this DFA</param>
+		/// <returns>The sub-DFA for the specified state</returns>
+		public DFA ExtractSubTo(DFAState state)
+		{
+			if (state == null)
+				throw new System.ArgumentException("The specified state must not be null");
+			if (!states.Contains(state))
+				throw new System.ArgumentException("The specified state is not in this DFA");
+			List<DFAState> targets = new List<DFAState>(1);
+			targets.Add(state);
+			return ExtractSubTo(targets);
+		}
+
+		/// <summary>
+		/// Extracts the sub-DFA that leads to any of the specified states
+		/// </summary>
+		/// <param name="state">States in this DFA</param>
+		/// <returns>The sub-DFA for the specified states</returns>
+		public DFA ExtractSubTo(IEnumerable<DFAState> targets)
+		{
+			if (targets == null)
+				throw new System.ArgumentException("The specified collection must not be null");	
+
+			// build a list of all the required states
+			DFAInverse inverse = new DFAInverse(this);
+			List<DFAState> originals = inverse.CloseByAntecedents(targets);
+
+			// setup the list
+			int index = originals.IndexOf(states[0]);
+			if (index == -1)
+				throw new System.ArgumentException("The specified states are not reachable from the starting state");
+			originals[index] = originals[0];
+			originals[0] = states[0];
+
+			// copies the states
+			List<DFAState> copy = new List<DFAState>();
+			for (int i = 0; i != originals.Count; i++)
+				copy.Add(new DFAState(i));
+			for (int i = 0; i != originals.Count; i++)
+			{
+				DFAState original = originals[i];
+				DFAState clone = copy[i];
+				clone.AddFinals(original.Items);
+				foreach (CharSpan key in original.Transitions)
+				{
+					index = originals.IndexOf(original.GetChildBy(key));
+					if (index != -1)
+						clone.AddTransition(key, copy[index]);
+				}
+			}
+			return new DFA(copy);
 		}
 	}
 }
