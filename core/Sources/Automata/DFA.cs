@@ -232,7 +232,7 @@ namespace Hime.CentralDogma.Automata
 		/// <summary>
 		/// Extracts the sub-DFA that leads to any of the specified states
 		/// </summary>
-		/// <param name="state">States in this DFA</param>
+		/// <param name="targets">States in this DFA</param>
 		/// <returns>The sub-DFA for the specified states</returns>
 		public DFA ExtractSubTo(IEnumerable<DFAState> targets)
 		{
