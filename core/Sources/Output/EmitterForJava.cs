@@ -91,7 +91,7 @@ namespace Hime.CentralDogma.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserJavaCodeGenerator(unit, "/" + unit.Namespace.Replace(".", "/") + "/" + unit.Name + suffixParserData);
+			return new ParserJavaCodeGenerator(unit, unit.Name + suffixParserData);
 		}
 
 		/// <summary>
