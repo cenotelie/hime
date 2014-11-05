@@ -320,13 +320,16 @@ class GSS {
      */
     private void cleanup() {
         int top = -1;
-        // first, enqueue all the non-reachable state of the penultimate generation
-        GSSGeneration genData = nodeGenerations.get(generation - 1);
-        while (genData.getCount() > stack.length)
-            stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
-        for (int i = genData.getStart(); i != genData.getStart() + genData.getCount(); i++) {
-            if (nodes.get(i).getIncomings() == 0)
-                stack[++top] = i;
+        // first, enqueue all the non-reachable state of the last 16 generations
+        int lastState = nodeGenerations.get(generation).getStart() - 1;
+        int firstState = nodeGenerations.get(generation - 16).getStart();
+        for (int i = lastState; i != firstState - 1; i--) {
+            if (nodes.get(i).getIncomings() == 0) {
+                top++;
+                if (top == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                stack[top] = i;
+            }
         }
 
         // traverse the GSS
@@ -334,7 +337,7 @@ class GSS {
             // pop the next state to inspect
             int origin = stack[top];
             top--;
-            genData = edgeGenerations.get(getGenerationOf(origin));
+            GSSGeneration genData = edgeGenerations.get(getGenerationOf(origin));
             for (int i = genData.getStart(); i != genData.getStart() + genData.getCount(); i++) {
                 GSSEdge edge = edges.get(i);
                 if (edge.getFrom() != origin)

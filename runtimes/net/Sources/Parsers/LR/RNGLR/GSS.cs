@@ -351,7 +351,7 @@ namespace Hime.Redist.Parsers
 		{
 			int top = -1;
 			// first, enqueue all the non-reachable state of the last 16 generations
-			int lastState = nodeGenerations[generation - 1].Start - 1;
+			int lastState = nodeGenerations[generation].Start - 1;
 			int firstState = nodeGenerations[generation - 16].Start;
 			for (int i = lastState; i != firstState - 1; i--)
 			{
