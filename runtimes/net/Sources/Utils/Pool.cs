@@ -88,12 +88,7 @@ namespace Hime.Redist.Utils
 		{
 			nextFree++;
 			if (nextFree == free.Length)
-			{
-				// The cache is not big enough => extend it to the number of allocated objects
-				T[] temp = new T[allocated];
-				Array.Copy(free, temp, free.Length);
-				free = temp;
-			}
+				Array.Resize(ref free, allocated);
 			free[nextFree] = obj;
 		}
 	}

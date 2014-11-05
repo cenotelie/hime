@@ -17,6 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -48,7 +49,7 @@ namespace Hime.Redist.Parsers
 				this.input = parser.input;
 				this.stack = new int[parser.stack.Length];
 				this.head = parser.head;
-				System.Array.Copy(parser.stack, this.stack, parser.head + 1);
+				Array.Copy(parser.stack, this.stack, parser.head + 1);
 			}
 		}
 
@@ -185,11 +186,7 @@ namespace Hime.Redist.Parsers
 				{
 					head++;
 					if (head == stack.Length)
-					{
-						int[] temp = new int[stack.Length + INIT_STACK_SIZE];
-						System.Array.Copy(stack, temp, stack.Length);
-						stack = temp;
-					}
+						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
 					stack[head] = action.Data;
 					builder.StackPushToken(token.Index);
 					return action.Code;
@@ -202,11 +199,7 @@ namespace Hime.Redist.Parsers
 					action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].ID);
 					head++;
 					if (head == stack.Length)
-					{
-						int[] temp = new int[stack.Length + INIT_STACK_SIZE];
-						System.Array.Copy(stack, temp, stack.Length);
-						stack = temp;
-					}
+						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
 					stack[head] = action.Data;
 					continue;
 				}
