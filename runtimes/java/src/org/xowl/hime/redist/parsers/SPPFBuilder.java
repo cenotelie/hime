@@ -308,7 +308,7 @@ class SPPFBuilder implements SemanticBody {
      * @param action The tree action to apply
      */
     private void addToCache(GSSLabel label, byte action) {
-        if (action != LROpCode.TREE_ACTION_DROP)
+        if (action == LROpCode.TREE_ACTION_DROP)
             return;
         if (label.isReplaceable()) {
             // this is replaceable sub-tree
