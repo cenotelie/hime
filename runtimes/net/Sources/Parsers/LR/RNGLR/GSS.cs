@@ -33,102 +33,37 @@ namespace Hime.Redist.Parsers
 		/// The initial size of the paths buffer in this GSS
 		/// </summary>
 		private const int INIT_PATHS_COUNT = 64;
+		/// <summary>
+		/// The initial size of the stack used for the traversal of this GSS
+		/// </summary>
+		private const int INIT_STACK_SIZE = 128;
 
 		/// <summary>
-		/// Represents an edge in a Graph-Structured Stack
+		/// The label (GLR state) on the GSS node for the given index
 		/// </summary>
-		private struct Edge
-		{
-			/// <summary>
-			/// The index of the node from which this edge starts
-			/// </summary>
-			private int from;
-			/// <summary>
-			/// The index of the node to which this edge arrives to
-			/// </summary>
-			private int to;
-			/// <summary>
-			/// Gets the index of the node from which this edge starts
-			/// </summary>
-			public int From { get { return from; } }
-			/// <summary>
-			/// Gets the index of the node to which this edge arrives to
-			/// </summary>
-			public int To { get { return to; } }
-			/// <summary>
-			/// Initializes this edge
-			/// </summary>
-			/// <param name="from">Index of the node from which this edge starts</param>
-			/// <param name="to">Index of the node to which this edge arrives to</param>
-			public Edge(int from, int to)
-			{
-				this.from = from;
-				this.to = to;
-			}
-		}
+		private Utils.BigList<int> nodeLabels;
+		/// <summary>
+		/// The number of live incoming edges to the GSS node for the given index
+		/// </summary>
+		private Utils.BigList<int> nodeIncomings;
+		/// <summary>
+		/// The generations of nodes in this GSS
+		/// </summary>
+		private Utils.BigList<GSSGeneration> nodeGenerations;
 
-		/// <summary>
-		/// Represents a generation in a Graph-Structured Stack
-		/// </summary>
-		/// <remarks>
-		/// Because GSS nodes are always created in the last generation,
-		/// a generation is basically a span in the list of GSS nodes,
-		/// i.e. the starting index in the list of nodes and the number of nodes
-		/// </remarks>
-		private struct Gen
-		{
-			/// <summary>
-			/// The start index of this generation in the list of nodes
-			/// </summary>
-			private int start;
-			/// <summary>
-			/// The number of nodes in this generation
-			/// </summary>
-			private int count;
-			/// <summary>
-			/// Gets the start index of this generation in the list of nodes
-			/// </summary>
-			public int Start { get { return start; } }
-			/// <summary>
-			/// Gets or sets the number of nodes in this generation
-			/// </summary>
-			public int Count
-			{
-				get { return count; }
-				set { count = value; }
-			}
-			/// <summary>
-			/// Initializes this generation
-			/// </summary>
-			/// <param name="start">The start index of this generation in the list of nodes</param>
-			public Gen(int start)
-			{
-				this.start = start;
-				this.count = 0;
-			}
-		}
-
-		/// <summary>
-		/// The nodes in this GSS.
-		/// A node simply contains the GLR state it represents
-		/// </summary>
-		private Utils.BigList<int> nodes;
-		/// <summary>
-		/// The generations in this GSS
-		/// </summary>
-		private Utils.BigList<Gen> genNodes;
 		/// <summary>
 		/// The edges in this GSS
 		/// </summary>
-		private Utils.BigList<Edge> edges;
+		private Utils.BigList<GSSEdge> edges;
 		/// <summary>
 		/// The labels on the edges in this GSS
 		/// </summary>
-		private Utils.BigList<GSSLabel> edgeData;
+		private Utils.BigList<GSSLabel> edgeLabels;
 		/// <summary>
 		/// The generations for the edges
 		/// </summary>
-		private Utils.BigList<Gen> genEdges;
+		private Utils.BigList<GSSGeneration> edgeGenerations;
+
 		/// <summary>
 		/// Index of the current generation
 		/// </summary>
@@ -139,7 +74,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private GSSPath path0;
 		/// <summary>
-		/// The single resuable buffer for returning 0-length GSS paths
+		/// The single reusable buffer for returning 0-length GSS paths
 		/// </summary>
 		private GSSPath[] paths0;
 		/// <summary>
@@ -148,55 +83,59 @@ namespace Hime.Redist.Parsers
 		private GSSPath[] paths;
 
 		/// <summary>
+		/// Stack of GSS nodes used for the traversal of the GSS
+		/// </summary>
+		private int[] stack;
+
+		/// <summary>
 		/// Initializes the GSS
 		/// </summary>
 		public GSS()
 		{
-			this.nodes = new BigList<int>();
-			this.genNodes = new BigList<Gen>();
-			this.edges = new BigList<Edge>();
-			this.edgeData = new BigList<GSSLabel>();
-			this.genEdges = new BigList<Gen>();
+			this.nodeLabels = new BigList<int>();
+			this.nodeIncomings = new BigList<int>();
+			this.nodeGenerations = new BigList<GSSGeneration>();
+			this.edges = new BigList<GSSEdge>();
+			this.edgeLabels = new BigList<GSSLabel>();
+			this.edgeGenerations = new BigList<GSSGeneration>();
 			this.generation = -1;
 			this.path0 = new GSSPath();
 			this.paths0 = new GSSPath[1] { path0 };
 			this.paths = new GSSPath[INIT_PATHS_COUNT];
+			this.stack = new int[INIT_STACK_SIZE];
 		}
 
 		/// <summary>
-		/// Gets the data of the given generation
+		/// Gets the data of the specified generation of node
 		/// </summary>
 		/// <param name="generation">A generation</param>
-		/// <param name="count">The number of nodes in the generation</param>
-		/// <returns>The generation's first node</returns>
-		public int GetGeneration(int generation, out int count)
+		/// <returns>The generation's data</returns>
+		public GSSGeneration GetGeneration(int generation)
 		{
-			Gen gen = genNodes[generation];
-			count = gen.Count;
-			return gen.Start;
+			return nodeGenerations[generation];
 		}
 
 		/// <summary>
-		/// Gets the GLR state represented by the given node
+		/// Gets the GLR state represented by the specified node
 		/// </summary>
 		/// <param name="node">A node</param>
 		/// <returns>The GLR state represented by the node</returns>
 		public int GetRepresentedState(int node)
 		{
-			return nodes[node];
+			return nodeLabels[node];
 		}
 
 		/// <summary>
-		/// Finds in the given generation contains a node representing the given GLR state
+		/// Finds in the given generation a node representing the given GLR state
 		/// </summary>
 		/// <param name="generation">A generation</param>
 		/// <param name="state">A GLR state</param>
 		/// <returns>The node representing the GLR state, or -1 if it is not found</returns>
 		public int FindNode(int generation, int state)
 		{
-			Gen data = genNodes[generation];
+			GSSGeneration data = nodeGenerations[generation];
 			for (int i=data.Start; i!=data.Start + data.Count; i++)
-				if (nodes[i] == state)
+				if (nodeLabels[i] == state)
 					return i;
 			return -1;
 		}
@@ -210,10 +149,10 @@ namespace Hime.Redist.Parsers
 		/// <returns><c>true</c> if this instance has the required edge; otherwise, <c>false</c></returns>
 		public bool HasEdge(int generation, int from, int to)
 		{
-			Gen data = genEdges[generation];
+			GSSGeneration data = edgeGenerations[generation];
 			for (int i=data.Start; i!=data.Start + data.Count; i++)
 			{
-				Edge edge = edges[i];
+				GSSEdge edge = edges[i];
 				if (edge.From == from && edge.To == to)
 					return true;
 			}
@@ -226,8 +165,14 @@ namespace Hime.Redist.Parsers
 		/// <returns>The index of the new generation</returns>
 		public int CreateGeneration()
 		{
-			genNodes.Add(new Gen(nodes.Size));
-			genEdges.Add(new Gen(edges.Size));
+			if (generation != 0 && ((generation & 0xF) == 0))
+			{
+				// the current generation is not 0 (first one) and is a multiple of 16
+				// => cleanup the GSS from unreachable data
+				Cleanup();
+			}
+			nodeGenerations.Add(new GSSGeneration(nodeLabels.Size));
+			edgeGenerations.Add(new GSSGeneration(edges.Size));
 			generation++;
 			return generation;
 		}
@@ -236,14 +181,15 @@ namespace Hime.Redist.Parsers
 		/// Creates a new node in the GSS
 		/// </summary>
 		/// <param name="state">The GLR state represented by the node</param>
-		/// <returns>The node identifier</returns>
+		/// <returns>The node's identifier</returns>
 		public int CreateNode(int state)
 		{
-			nodes.Add(state);
-			Gen data = genNodes[generation];
+			int node = nodeLabels.Add(state);
+			nodeIncomings.Add(0);
+			GSSGeneration data = nodeGenerations[generation];
 			data.Count++;
-			genNodes[generation] = data;
-			return nodes.Size - 1;
+			nodeGenerations[generation] = data;
+			return node;
 		}
 
 		/// <summary>
@@ -254,11 +200,12 @@ namespace Hime.Redist.Parsers
 		/// <param name="label">The edge's label</param>
 		public void CreateEdge(int from, int to, GSSLabel label)
 		{
-			edges.Add(new Edge(from, to));
-			edgeData.Add(label);
-			Gen data = genEdges[generation];
+			edges.Add(new GSSEdge(from, to));
+			edgeLabels.Add(label);
+			GSSGeneration data = edgeGenerations[generation];
 			data.Count++;
-			genEdges[generation] = data;
+			edgeGenerations[generation] = data;
+			nodeIncomings[to] = nodeIncomings[to] + 1;
 		}
 
 		/// <summary>
@@ -288,7 +235,7 @@ namespace Hime.Redist.Parsers
 		{
 			for (int i=generation; i!=-1; i--)
 			{
-				Gen gen = genNodes[i];
+				GSSGeneration gen = nodeGenerations[i];
 				if (node >= gen.Start && node < gen.Start + gen.Count)
 					return i;
 			}
@@ -328,19 +275,19 @@ namespace Hime.Redist.Parsers
 					int last = paths[p].Last;
 					int genIndex = paths[p].Generation;
 					// Look for new additional paths from last
-					Gen gen = genEdges[genIndex];
+					GSSGeneration gen = edgeGenerations[genIndex];
 					int firstEdgeTarget = -1;
 					GSSLabel firstEdgeLabel = new GSSLabel();
 					for (int e = gen.Start; e != gen.Start + gen.Count; e++)
 					{
-						Edge edge = edges[e];
+						GSSEdge edge = edges[e];
 						if (edge.From == last)
 						{
 							if (firstEdgeTarget == -1)
 							{
 								// This is the first edge
 								firstEdgeTarget = edge.To;
-								firstEdgeLabel = edgeData[e];
+								firstEdgeLabel = edgeLabels[e];
 							}
 							else
 							{
@@ -348,7 +295,7 @@ namespace Hime.Redist.Parsers
 								// Clone and extend the new path
 								SetupPath(next, edge.To, length);
 								paths[next].CopyLabelsFrom(paths[p], i);
-								paths[next][i] = edgeData[e];
+								paths[next][i] = edgeLabels[e];
 								// Go to next insert
 								next++;
 							}
@@ -398,6 +345,59 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
+		/// Cleanups this GSS by reclaiming the sub-trees on GSS labels that can no longer be reached
+		/// </summary>
+		private void Cleanup()
+		{
+			int top = -1;
+			// first, enqueue all the non-reachable state of the last 16 generations
+			int lastState = nodeGenerations[generation - 1].Start - 1;
+			int firstState = nodeGenerations[generation - 16].Start;
+			for (int i = lastState; i != firstState - 1; i--)
+			{
+				if (nodeIncomings[i] == 0)
+				{
+					top++;
+					if (top == stack.Length)
+						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
+					stack[top] = i;
+				}
+			}
+
+			// traverse the GSS
+			while (top != -1)
+			{
+				// pop the next state to inspect
+				int origin = stack[top];
+				top--;
+				GSSGeneration genData = edgeGenerations[GetGenerationOf(origin)];
+				for (int i = genData.Start; i != genData.Start + genData.Count; i++)
+				{
+					GSSEdge edge = edges[i];
+					if (edge.From != origin)
+						continue;
+					// here the edge is starting from the origin node
+					// get the label on this edge and free it if necessary
+					SubTree tree = edgeLabels[i].ReplaceableTree;
+					if (tree != null)
+						tree.Free();
+					// decrement the target's incoming edges counter
+					int counter = nodeIncomings[edge.To];
+					counter--;
+					nodeIncomings[edge.To] = counter;
+					if (counter == 0)
+					{
+						// the target node is now unreachable, enqueue it
+						top++;
+						if (top == stack.Length)
+							Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
+						stack[top] = edge.To;
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Prints this stack onto the console output
 		/// </summary>
 		public void Print()
@@ -430,10 +430,10 @@ namespace Hime.Redist.Parsers
 				writer.WriteLine("--- generation {0} ---", i);
 				// Retrieve the edges in this generation
 				Dictionary<int, List<int>> myedges = new Dictionary<int, List<int>>();
-				Gen cedges = genEdges[i];
+				GSSGeneration cedges = edgeGenerations[i];
 				for (int j = 0; j != cedges.Count; j++)
 				{
-					Edge edge = this.edges[cedges.Start + j];
+					GSSEdge edge = this.edges[cedges.Start + j];
 					if (!myedges.ContainsKey(edge.From))
 						myedges.Add(edge.From, new List<int>());
 					myedges[edge.From].Add(edge.To);
@@ -441,7 +441,7 @@ namespace Hime.Redist.Parsers
 						linked.Add(edge.To);
 				}
 				// Retrieve the nodes in this generation and reverse their order
-				Gen cnodes = genNodes[i];
+				GSSGeneration cnodes = nodeGenerations[i];
 				List<int> mynodes = new List<int>();
 				for (int j = 0; j != cnodes.Count; j++)
 					mynodes.Add(cnodes.Start + j);
@@ -456,14 +456,14 @@ namespace Hime.Redist.Parsers
 						{
 							int gen = GetGenerationOf(to);
 							if (gen == i)
-								writer.WriteLine("\t{0} {1} to {2}", mark, nodes[node], nodes[to]);
+								writer.WriteLine("\t{0} {1} to {2}", mark, nodeLabels[node], nodeLabels[to]);
 							else
-								writer.WriteLine("\t{0} {1} to {2} in gen {3}", mark, nodes[node], nodes[to], gen);
+								writer.WriteLine("\t{0} {1} to {2} in gen {3}", mark, nodeLabels[node], nodeLabels[to], gen);
 						}
 					}
 					else
 					{
-						writer.WriteLine("\t{0} {1}", mark, nodes[node]);
+						writer.WriteLine("\t{0} {1}", mark, nodeLabels[node]);
 					}
 				}
 			}

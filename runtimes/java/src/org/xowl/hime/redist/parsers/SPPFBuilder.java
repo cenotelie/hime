@@ -134,14 +134,6 @@ class SPPFBuilder implements SemanticBody {
      * The number of items popped from the stack
      */
     private int popCount;
-    /**
-     * List of collectable sub-trees
-     */
-    private SubTree[] collection;
-    /**
-     * Insertion index in the list of collectable sub-trees
-     */
-    private int collectionNext;
 
     /**
      * The AST being built
@@ -206,8 +198,6 @@ class SPPFBuilder implements SemanticBody {
         this.cacheActions = new byte[INIT_HANDLE_SIZE];
         this.handle = new int[INIT_HANDLE_SIZE];
         this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-        this.collection = new SubTree[INIT_HISTORY_PART_SIZE];
-        this.collectionNext = 0;
         this.result = new GraphAST(text, variables, virtuals);
     }
 
@@ -231,15 +221,6 @@ class SPPFBuilder implements SemanticBody {
         for (int i = 0; i != nextHP; i++)
             poolHPs.putBack(history[i]);
         nextHP = 0;
-    }
-
-    /**
-     * Collects the reusable sub-trees
-     */
-    public void collect() {
-        for (int i = 0; i != collectionNext; i++)
-            collection[i].free();
-        collectionNext = 0;
     }
 
     /**
@@ -327,24 +308,14 @@ class SPPFBuilder implements SemanticBody {
      * @param action The tree action to apply
      */
     private void addToCache(GSSLabel label, byte action) {
+        if (action != LROpCode.TREE_ACTION_DROP)
+            return;
         if (label.isReplaceable()) {
             // this is replaceable sub-tree
             SubTree sub = label.getTree();
-            if (action != LROpCode.TREE_ACTION_DROP) {
-                for (int i = 0; i != sub.getChildrenCountAt(0); i++)
-                    addToCache(SymbolRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
-            }
-            // add the sub-tree to the collectable list
-            // is-it already present?
-            for (int i = 0; i != collectionNext; i++)
-                if (collection[i] == sub)
-                    return;
-            // do we have enough space?
-            if (collection.length == collectionNext)
-                collection = Arrays.copyOf(collection, collection.length + INIT_HISTORY_PART_SIZE);
-            // insert the collectable sub-tree
-            collection[collectionNext++] = sub;
-        } else if (action != LROpCode.TREE_ACTION_DROP) {
+            for (int i = 0; i != sub.getChildrenCountAt(0); i++)
+                addToCache(SymbolRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
+        } else {
             // this is a simple reference to an existing SPPF node
             addToCache(label.getIndex(), action);
         }

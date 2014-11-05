@@ -231,8 +231,8 @@ public class RNGLRParser extends BaseLRParser {
     private void onUnexpectedToken(int gen, Token token) {
         List<Integer> indices = new ArrayList<Integer>();
         List<Symbol> expected = new ArrayList<Symbol>();
-        GSS.Gen generation = gss.getGeneration(gen);
-        for (int i = generation.start; i != generation.start + generation.count; i++) {
+        GSSGeneration generation = gss.getGeneration(gen);
+        for (int i = generation.getStart(); i != generation.getStart() + generation.getCount(); i++) {
             List<Integer> temp = parserAutomaton.getExpected(gss.getRepresentedState(i), lexer.getTerminals().size());
             for (int index : temp) {
                 if (!indices.contains(index)) {
@@ -324,8 +324,8 @@ public class RNGLRParser extends BaseLRParser {
             Token oldtoken = nextToken;
             nextToken = lexer.getNextToken();
             int Uj = shifter(oldtoken);
-            GSS.Gen g = gss.getGeneration(Uj);
-            if (g.count == 0) {
+            GSSGeneration g = gss.getGeneration(Uj);
+            if (g.getCount() == 0) {
                 // Generation is empty !
                 onUnexpectedToken(Ui, oldtoken);
                 return new ParseResult(allErrors, lexer.getOutput());
@@ -333,8 +333,8 @@ public class RNGLRParser extends BaseLRParser {
             Ui = Uj;
         }
 
-        GSS.Gen g = gss.getGeneration(Ui);
-        for (int i = g.start; i != g.start + g.count; i++) {
+        GSSGeneration g = gss.getGeneration(Ui);
+        for (int i = g.getStart(); i != g.getStart() + g.getCount(); i++) {
             int state = gss.getRepresentedState(i);
             if (parserAutomaton.isAcceptingState(state)) {
                 // Has reduction _Axiom_ -> axiom $ . on ε
@@ -355,7 +355,6 @@ public class RNGLRParser extends BaseLRParser {
         sppf.clearHistory();
         while (!reductions.isEmpty())
             executeReduction(generation, reductions.remove());
-        sppf.collect();
     }
 
     /**

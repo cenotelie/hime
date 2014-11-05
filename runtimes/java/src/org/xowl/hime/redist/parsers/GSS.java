@@ -20,7 +20,6 @@
 package org.xowl.hime.redist.parsers;
 
 import org.xowl.hime.redist.utils.BigList;
-import org.xowl.hime.redist.utils.IntBigList;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,64 +35,10 @@ class GSS {
      * The initial size of the paths buffer in this GSS
      */
     private static final int INIT_PATHS_COUNT = 64;
-
     /**
-     * Represents an edge in a Graph-Structured Stack
+     * The initial size of the stack used for the traversal of this GSS
      */
-    private static class Edge {
-        /**
-         * The index of the node from which this edge starts
-         */
-        public int from;
-        /**
-         * The index of the node to which this edge arrives to
-         */
-        public int to;
-        /**
-         * The label on this edge
-         */
-        public GSSLabel label;
-
-        /**
-         * Initializes this edge
-         *
-         * @param from Index of the node from which this edge starts
-         * @param to   Index of the node to which this edge arrives to
-         */
-        public Edge(int from, int to, GSSLabel label) {
-            this.from = from;
-            this.to = to;
-            this.label = label;
-        }
-    }
-
-    /**
-     * Represents a generation in a Graph-Structured Stack
-     * <p/>
-     * Because GSS nodes are always created in the last generation,
-     * a generation is basically a span in the list of GSS nodes,
-     * i.e. the starting index in the list of nodes and the number of nodes
-     */
-    public static class Gen {
-        /**
-         * The start index of this generation in the list of nodes
-         */
-        public int start;
-        /**
-         * The number of nodes in this generation
-         */
-        public int count;
-
-        /**
-         * Initializes this generation
-         *
-         * @param start The start index of this generation in the list of nodes
-         */
-        public Gen(int start) {
-            this.start = start;
-            this.count = 0;
-        }
-    }
+    private static final int INIT_STACK_SIZE = 128;
 
     /**
      * Represents a set of paths in this GSS
@@ -110,22 +55,21 @@ class GSS {
     }
 
     /**
-     * The nodes in this GSS.
-     * A node simply contains the GLR state it represents
+     * The nodes in this GSS
      */
-    private IntBigList nodes;
+    private BigList<GSSNode> nodes;
     /**
      * The generations in this GSS
      */
-    private BigList<Gen> genNodes;
+    private BigList<GSSGeneration> nodeGenerations;
     /**
      * The edges in this GSS
      */
-    private BigList<Edge> edges;
+    private BigList<GSSEdge> edges;
     /**
      * The generations for the edges
      */
-    private BigList<Gen> genEdges;
+    private BigList<GSSGeneration> edgeGenerations;
     /**
      * Index of the current generation
      */
@@ -134,52 +78,57 @@ class GSS {
      * A buffer of GSS paths
      */
     private PathSet set;
+    /**
+     * Stack of GSS nodes used for the traversal of the GSS
+     */
+    private int[] stack;
 
     /**
      * Initializes the GSS
      */
     public GSS() {
-        this.nodes = new IntBigList();
-        this.genNodes = new BigList<Gen>(Gen.class, Gen[].class);
-        this.edges = new BigList<Edge>(Edge.class, Edge[].class);
-        this.genEdges = new BigList<Gen>(Gen.class, Gen[].class);
+        this.nodes = new BigList<GSSNode>(GSSNode.class, GSSNode[].class);
+        this.nodeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
+        this.edges = new BigList<GSSEdge>(GSSEdge.class, GSSEdge[].class);
+        this.edgeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
         this.generation = -1;
         this.set = new PathSet();
         this.set.paths = new GSSPath[INIT_PATHS_COUNT];
         this.set.paths[0] = new GSSPath(1);
+        this.stack = new int[INIT_STACK_SIZE];
     }
 
     /**
-     * Gets the data of the given generation
+     * Gets the data of the specified generation
      *
      * @param generation A generation
      * @return The generation's first node
      */
-    public Gen getGeneration(int generation) {
-        return genNodes.get(generation);
+    public GSSGeneration getGeneration(int generation) {
+        return nodeGenerations.get(generation);
     }
 
     /**
-     * Gets the GLR state represented by the given node
+     * Gets the GLR state represented by the specified node
      *
      * @param node A node
      * @return The GLR state represented by the node
      */
     public int getRepresentedState(int node) {
-        return nodes.get(node);
+        return nodes.get(node).getState();
     }
 
     /**
-     * Finds in the given generation contains a node representing the given GLR state
+     * Finds in the given generation a node representing the given GLR state
      *
      * @param generation A generation
      * @param state      A GLR state
      * @return The node representing the GLR state, or -1 if it is not found
      */
     public int findNode(int generation, int state) {
-        Gen data = genNodes.get(generation);
-        for (int i = data.start; i != data.start + data.count; i++)
-            if (nodes.get(i) == state)
+        GSSGeneration data = nodeGenerations.get(generation);
+        for (int i = data.getStart(); i != data.getStart() + data.getCount(); i++)
+            if (nodes.get(i).getState() == state)
                 return i;
         return -1;
     }
@@ -193,10 +142,10 @@ class GSS {
      * @return true if this instance has the required edge; otherwise, false
      */
     public boolean hasEdge(int generation, int from, int to) {
-        Gen data = genNodes.get(generation);
-        for (int i = data.start; i != data.start + data.count; i++) {
-            Edge edge = edges.get(i);
-            if (edge.from == from && edge.to == to)
+        GSSGeneration data = nodeGenerations.get(generation);
+        for (int i = data.getStart(); i != data.getStart() + data.getCount(); i++) {
+            GSSEdge edge = edges.get(i);
+            if (edge.getFrom() == from && edge.getTo() == to)
                 return true;
         }
         return false;
@@ -208,8 +157,13 @@ class GSS {
      * @return The index of the new generation
      */
     public int createGeneration() {
-        genNodes.add(new Gen(nodes.size()));
-        genEdges.add(new Gen(edges.size()));
+        if (generation != 0 && ((generation & 0xF) == 0)) {
+            // the current generation is not 0 (first one) and is a multiple of 16
+            // => cleanup the GSS from unreachable data
+            cleanup();
+        }
+        nodeGenerations.add(new GSSGeneration(nodes.size()));
+        edgeGenerations.add(new GSSGeneration(edges.size()));
         generation++;
         return generation;
     }
@@ -221,10 +175,10 @@ class GSS {
      * @return The node identifier
      */
     public int createNode(int state) {
-        nodes.add(state);
-        Gen data = genNodes.get(generation);
-        data.count++;
-        return nodes.size() - 1;
+        int node = nodes.add(new GSSNode(state));
+        GSSGeneration data = nodeGenerations.get(generation);
+        data.increment();
+        return node;
     }
 
     /**
@@ -235,9 +189,10 @@ class GSS {
      * @param label The edge's label
      */
     public void createEdge(int from, int to, GSSLabel label) {
-        edges.add(new Edge(from, to, label));
-        Gen data = genEdges.get(generation);
-        data.count++;
+        edges.add(new GSSEdge(from, to, label));
+        GSSGeneration data = edgeGenerations.get(generation);
+        data.increment();
+        nodes.get(to).increment();
     }
 
     /**
@@ -266,8 +221,8 @@ class GSS {
      */
     private int getGenerationOf(int node) {
         for (int i = generation; i != -1; i--) {
-            Gen gen = genNodes.get(i);
-            if (node >= gen.start && node < gen.start + gen.count)
+            GSSGeneration gen = nodeGenerations.get(i);
+            if (node >= gen.getStart() && node < gen.getStart() + gen.getCount())
                 return i;
         }
         // should node happen
@@ -302,22 +257,22 @@ class GSS {
                 int last = set.paths[p].getLast();
                 int genIndex = set.paths[p].getGeneration();
                 // Look for new additional paths from last
-                Gen gen = genEdges.get(genIndex);
+                GSSGeneration gen = edgeGenerations.get(genIndex);
                 int firstEdgeTarget = -1;
                 GSSLabel firstEdgeLabel = null;
-                for (int e = gen.start; e != gen.start + gen.count; e++) {
-                    Edge edge = edges.get(e);
-                    if (edge.from == last) {
+                for (int e = gen.getStart(); e != gen.getStart() + gen.getCount(); e++) {
+                    GSSEdge edge = edges.get(e);
+                    if (edge.getFrom() == last) {
                         if (firstEdgeTarget == -1) {
                             // This is the first edge
-                            firstEdgeTarget = edge.to;
-                            firstEdgeLabel = edge.label;
+                            firstEdgeTarget = edge.getTo();
+                            firstEdgeLabel = edge.getLabel();
                         } else {
                             // Not the first edge
                             // Clone and extend the new path
-                            setupPath(next, edge.to, length);
+                            setupPath(next, edge.getTo(), length);
                             set.paths[next].copyLabelsFrom(set.paths[p], i);
-                            set.paths[next].set(i, edge.label);
+                            set.paths[next].set(i, edge.getLabel());
                             // Go to next insert
                             next++;
                         }
@@ -361,6 +316,49 @@ class GSS {
     }
 
     /**
+     * Cleanups this GSS by reclaiming the sub-trees on GSS labels that can no longer be reached
+     */
+    private void cleanup() {
+        int top = -1;
+        // first, enqueue all the non-reachable state of the penultimate generation
+        GSSGeneration genData = nodeGenerations.get(generation - 1);
+        while (genData.getCount() > stack.length)
+            stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+        for (int i = genData.getStart(); i != genData.getStart() + genData.getCount(); i++) {
+            if (nodes.get(i).getIncomings() == 0)
+                stack[++top] = i;
+        }
+
+        // traverse the GSS
+        while (top != -1) {
+            // pop the next state to inspect
+            int origin = stack[top];
+            top--;
+            genData = edgeGenerations.get(getGenerationOf(origin));
+            for (int i = genData.getStart(); i != genData.getStart() + genData.getCount(); i++) {
+                GSSEdge edge = edges.get(i);
+                if (edge.getFrom() != origin)
+                    continue;
+                // here the edge is starting from the origin node
+                // get the label on this edge and free it if necessary
+                SubTree tree = edge.getLabel().getTree();
+                if (tree != null)
+                    tree.free();
+                // decrement the target's incoming edges counter
+                GSSNode target = nodes.get(edge.getTo());
+                target.decrement();
+                if (target.getIncomings() == 0) {
+                    // the target node is now unreachable, enqueue it
+                    top++;
+                    if (top == stack.length)
+                        stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                    stack[top] = edge.getTo();
+                }
+            }
+        }
+    }
+
+    /**
      * Prints this stack onto the console output
      */
     public void print() {
@@ -401,19 +399,19 @@ class GSS {
             writer.write("--- generation " + i + " ---" + System.lineSeparator());
             // Retrieve the edges in this generation
             Map<Integer, List<Integer>> myedges = new HashMap<Integer, List<Integer>>();
-            Gen cedges = genEdges.get(i);
-            for (int j = 0; j != cedges.count; j++) {
-                Edge edge = this.edges.get(cedges.start + j);
-                if (!myedges.containsKey(edge.from))
-                    myedges.put(edge.from, new ArrayList<Integer>());
-                myedges.get(edge.from).add(edge.to);
-                linked.add(edge.to);
+            GSSGeneration cedges = edgeGenerations.get(i);
+            for (int j = 0; j != cedges.getCount(); j++) {
+                GSSEdge edge = this.edges.get(cedges.getStart() + j);
+                if (!myedges.containsKey(edge.getFrom()))
+                    myedges.put(edge.getFrom(), new ArrayList<Integer>());
+                myedges.get(edge.getFrom()).add(edge.getTo());
+                linked.add(edge.getTo());
             }
             // Retrieve the nodes in this generation and reverse their order
-            Gen cnodes = genNodes.get(i);
+            GSSGeneration cnodes = nodeGenerations.get(i);
             List<Integer> mynodes = new ArrayList<Integer>();
-            for (int j = 0; j != cnodes.count; j++)
-                mynodes.add(cnodes.start + j);
+            for (int j = 0; j != cnodes.getCount(); j++)
+                mynodes.add(cnodes.getStart() + j);
             Collections.reverse(mynodes);
             // print this generation
             for (int node : mynodes) {
@@ -422,12 +420,12 @@ class GSS {
                     for (int to : myedges.get(node)) {
                         int gen = getGenerationOf(to);
                         if (gen == i)
-                            writer.write("\t" + mark + " " + nodes.get(node) + " to " + nodes.get(to) + System.lineSeparator());
+                            writer.write("\t" + mark + " " + nodes.get(node).getState() + " to " + nodes.get(to).getState() + System.lineSeparator());
                         else
-                            writer.write("\t" + mark + " " + nodes.get(node) + " to " + nodes.get(to) + " in gen " + gen + System.lineSeparator());
+                            writer.write("\t" + mark + " " + nodes.get(node).getState() + " to " + nodes.get(to).getState() + " in gen " + gen + System.lineSeparator());
                     }
                 } else {
-                    writer.write("\t" + mark + " " + nodes.get(node) + System.lineSeparator());
+                    writer.write("\t" + mark + " " + nodes.get(node).getState() + System.lineSeparator());
                 }
             }
         }
