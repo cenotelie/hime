@@ -240,9 +240,8 @@ namespace Hime.Redist.Parsers
 		{
 			List<int> indices = new List<int>();
 			List<Symbol> expected = new List<Symbol>();
-			int count = 0;
-			int start = gss.GetGeneration(gen, out count);
-			for (int i=start; i!=start+count; i++)
+			GSSGeneration genData = gss.GetGeneration(gen);
+			for (int i = genData.Start; i != genData.Start + genData.Count; i++)
 			{
 				ICollection<int> temp = parserAutomaton.GetExpected(gss.GetRepresentedState(i), lexer.Terminals.Count);
 				foreach (int index in temp)
@@ -324,6 +323,7 @@ namespace Hime.Redist.Parsers
 		{
 			reductions = new Queue<Reduction>();
 			shifts = new Queue<Shift>();
+			GSSGeneration genData;
 			int Ui = gss.CreateGeneration();
 			int v0 = gss.CreateNode(0);
 			nextToken = lexer.GetNextToken();
@@ -344,8 +344,8 @@ namespace Hime.Redist.Parsers
 				Token oldtoken = nextToken;
 				nextToken = lexer.GetNextToken();
 				int Uj = Shifter(oldtoken);
-				gss.GetGeneration(Uj, out count);
-				if (count == 0)
+				genData = gss.GetGeneration(Uj);
+				if (genData.Count == 0)
 				{
 					// Generation is empty !
 					OnUnexpectedToken(Ui, oldtoken);
@@ -354,8 +354,8 @@ namespace Hime.Redist.Parsers
 				Ui = Uj;
 			}
 
-			int start = gss.GetGeneration(Ui, out count);
-			for (int i=start; i!=start+count; i++)
+			genData = gss.GetGeneration(Ui);
+			for (int i = genData.Start; i != genData.Start + genData.Count; i++)
 			{
 				int state = gss.GetRepresentedState(i);
 				if (parserAutomaton.IsAcceptingState(state))
@@ -378,7 +378,6 @@ namespace Hime.Redist.Parsers
 			sppf.ClearHistory();
 			while (reductions.Count != 0)
 				ExecuteReduction(generation, reductions.Dequeue());
-			sppf.Collect();
 		}
 
 		/// <summary>
