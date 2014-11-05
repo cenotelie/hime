@@ -270,11 +270,7 @@ namespace Hime.Redist.Parsers
 		private void SetupPath(int index, int last, int length)
 		{
 			if (index >= paths.Length)
-			{
-				GSSPath[] temp = new GSSPath[paths.Length + INIT_PATHS_COUNT];
-				System.Array.Copy(paths, temp, paths.Length);
-				paths = temp;
-			}
+				Array.Resize(ref paths, paths.Length + INIT_PATHS_COUNT);
 			if (paths[index] == null)
 				paths[index] = new GSSPath(length);
 			else

@@ -338,11 +338,7 @@ namespace Hime.Redist.Parsers
 						return;
 				// do we have enough space?
 				if (collection.Length == collectionNext)
-				{
-					SubTree[] temp = new SubTree[collection.Length + INIT_HISTORY_PART_SIZE];
-					Array.Copy(collection, temp, collection.Length);
-					collection = temp;
-				}
+					Array.Resize(ref collection, collection.Length + INIT_HISTORY_PART_SIZE);
 				// insert the collectable sub-tree
 				collection[collectionNext++] = sub;
 			}
@@ -516,19 +512,11 @@ namespace Hime.Redist.Parsers
 				hp.generation = generation;
 				hp.next = 0;
 				if (history.Length == nextHP)
-				{
-					HistoryPart[] temp = new HistoryPart[history.Length + INIT_HISTORY_SIZE];
-					Array.Copy(history, temp, history.Length);
-					history = temp;
-				}
+					Array.Resize(ref history, history.Length + INIT_HISTORY_SIZE);
 				history[nextHP++] = hp;
 			}
 			if (hp.next == hp.data.Length)
-			{
-				GSSLabel[] temp = new GSSLabel[hp.data.Length + INIT_HISTORY_PART_SIZE];
-				Array.Copy(hp.data, temp, hp.data.Length);
-				hp.data = temp;
-			}
+				Array.Resize(ref hp.data, hp.data.Length + INIT_HISTORY_PART_SIZE);
 			hp.data[hp.next++] = label;
 		}
 

@@ -133,11 +133,7 @@ namespace Hime.Redist.Parsers
 			SubTree single = poolSingle.Acquire();
 			single.SetupRoot(new SymbolRef(SymbolType.Token, index), TreeAction.None);
 			if (stackNext == stack.Length)
-			{
-				SubTree[] temp = new SubTree[stack.Length + LRkParser.INIT_STACK_SIZE];
-				Array.Copy(stack, temp, stack.Length);
-				stack = temp;
-			}
+				Array.Resize(ref stack, stack.Length + LRkParser.INIT_STACK_SIZE);
 			stack[stackNext++] = single;
 		}
 
@@ -185,11 +181,7 @@ namespace Hime.Redist.Parsers
 			{
 				int directChildrenCount = sub.GetChildrenCountAt(0);
 				while (handleNext + directChildrenCount >= handle.Length)
-				{
-					int[] temp = new int[handle.Length + INIT_HANDLE_SIZE];
-					Array.Copy(handle, temp, handle.Length);
-					handle = temp;
-				}
+					Array.Resize(ref handle, handle.Length + INIT_HANDLE_SIZE);
 				// copy the children to the cache
 				sub.CopyChildrenTo(cache, cacheNext);
 				// setup the handle
@@ -210,11 +202,7 @@ namespace Hime.Redist.Parsers
 					sub.SetActionAt(0, action);
 				// copy the complete sub-tree to the cache
 				if (handleNext == handle.Length)
-				{
-					int[] temp = new int[handle.Length + INIT_HANDLE_SIZE];
-					Array.Copy(handle, temp, handle.Length);
-					handle = temp;
-				}
+					Array.Resize(ref handle, handle.Length + INIT_HANDLE_SIZE);
 				sub.CopyTo(cache, cacheNext);
 				handle[handleNext++] = cacheNext;
 				cacheNext += sub.GetChildrenCountAt(0) + 1;
@@ -261,11 +249,7 @@ namespace Hime.Redist.Parsers
 			}
 			// Put it on the stack
 			if (stackNext == stack.Length)
-			{
-				SubTree[] temp = new SubTree[stack.Length + 128];
-				Array.Copy(stack, temp, stack.Length);
-				stack = temp;
-			}
+				Array.Resize(ref stack, stack.Length + LRkParser.INIT_STACK_SIZE);
 			stack[stackNext++] = cache;
 		}
 

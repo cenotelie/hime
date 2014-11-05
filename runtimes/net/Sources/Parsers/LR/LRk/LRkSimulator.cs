@@ -87,11 +87,7 @@ namespace Hime.Redist.Parsers
 				{
 					head++;
 					if (head == stack.Length)
-					{
-						int[] temp = new int[stack.Length + LRkParser.INIT_STACK_SIZE];
-						System.Array.Copy(stack, temp, stack.Length);
-						stack = temp;
-					}
+						System.Array.Resize(ref stack, stack.Length + LRkParser.INIT_STACK_SIZE);
 					stack[head] = action.Data;
 					return action.Code;
 				}
@@ -103,11 +99,7 @@ namespace Hime.Redist.Parsers
 					action = parserAutomaton.GetAction(stack[head], var.ID);
 					head++;
 					if (head == stack.Length)
-					{
-						int[] temp = new int[stack.Length + LRkParser.INIT_STACK_SIZE];
-						System.Array.Copy(stack, temp, stack.Length);
-						stack = temp;
-					}
+						System.Array.Resize(ref stack, stack.Length + LRkParser.INIT_STACK_SIZE);
 					stack[head] = action.Data;
 					continue;
 				}
