@@ -206,7 +206,7 @@ namespace Hime.CentralDogma.Automata
 				throw new System.ArgumentException("The specified item must not be null");
 			List<DFAState> targets = new List<DFAState>();
 			foreach (DFAState state in states)
-				if (state.TopItem == final)
+				if (state.IsFinal && state.Items[0] == final)
 					targets.Add(state);
 			if (targets.Count == 0)
 				throw new System.ArgumentException("The specified item is never produced by this DFA");
@@ -258,7 +258,7 @@ namespace Hime.CentralDogma.Automata
 			{
 				DFAState original = originals[i];
 				DFAState clone = copy[i];
-				clone.AddFinals(original.Items);
+				clone.AddItems(original.Items);
 				foreach (CharSpan key in original.Transitions)
 				{
 					index = originals.IndexOf(original.GetChildBy(key));

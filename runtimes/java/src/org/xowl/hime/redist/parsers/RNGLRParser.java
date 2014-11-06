@@ -33,7 +33,7 @@ import java.util.Queue;
 public class RNGLRParser extends BaseLRParser {
     /**
      * Represents a reduction operation to be performed
-     *
+     * <p/>
      * For reduction of length 0, the node is the GSS node on which it is applied, the first label then is epsilon
      * For others, the node is the SECOND GSS node on the path, not the head. The first label is then the label on the transition from the head
      */

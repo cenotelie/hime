@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
- *
+ * <p/>
  * A SPPF is a compact representation of multiple variants of an AST at once.
  * GLR algorithms originally builds the complete SPPF.
  * However we only need to build one of the variant, i.e. an AST for the user.
@@ -393,7 +393,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Executes the reduction as a normal reduction
      *
-     * @param varIndex   The reduced variable index
+     * @param varIndex The reduced variable index
      * @return The produced sub-tree
      */
     private GSSLabel reduceNormal(int varIndex) {
@@ -441,7 +441,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Executes the reduction as the reduction of a replaceable variable
      *
-     * @param varIndex   The reduced variable index
+     * @param varIndex The reduced variable index
      * @return The produced sub-tree
      */
     private GSSLabel reduceReplaceable(int varIndex) {

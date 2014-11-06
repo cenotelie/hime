@@ -52,6 +52,7 @@ public abstract class BaseLexer implements ILexer {
      * The tokenized text
      */
     protected BaseTokenizedText text;
+
     /**
      * Initializes a new instance of the Lexer class with the given input
      *

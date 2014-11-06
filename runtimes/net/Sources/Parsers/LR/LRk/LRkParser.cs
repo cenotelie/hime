@@ -29,6 +29,11 @@ namespace Hime.Redist.Parsers
 	public abstract class LRkParser : BaseLRParser, Lexer.IContextProvider
 	{
 		/// <summary>
+		/// Initial size of the stack
+		/// </summary>
+		protected internal const int INIT_STACK_SIZE = 128;
+
+		/// <summary>
 		/// The parser's automaton
 		/// </summary>
 		protected LRkAutomaton automaton;

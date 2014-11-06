@@ -25,12 +25,18 @@ import org.xowl.hime.redist.lexer.IContextProvider;
 import org.xowl.hime.redist.lexer.ILexer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Represents a base for all LR(k) parsers
  */
 public abstract class LRkParser extends BaseLRParser implements IContextProvider {
+    /**
+     * Initial size of the stack
+     */
+    protected static final int INIT_STACK_SIZE = 128;
+
     /**
      * The parser's automaton
      */
