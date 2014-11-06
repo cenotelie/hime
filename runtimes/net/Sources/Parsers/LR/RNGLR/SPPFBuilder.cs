@@ -144,14 +144,6 @@ namespace Hime.Redist.Parsers
 		/// The number of items popped from the stack
 		/// </summary>
 		private int popCount;
-		/// <summary>
-		/// List of collectable sub-trees
-		/// </summary>
-		private SubTree[] collection;
-		/// <summary>
-		/// Insertion index in the list of collectable sub-trees
-		/// </summary>
-		private int collectionNext;
 
 		/// <summary>
 		/// The AST being built
@@ -195,8 +187,6 @@ namespace Hime.Redist.Parsers
 			this.cacheActions = new TreeAction[INIT_HANDLE_SIZE];
 			this.handle = new int[INIT_HANDLE_SIZE];
 			this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-			this.collection = new SubTree[INIT_HISTORY_PART_SIZE];
-			this.collectionNext = 0;
 			this.result = new GraphAST(text, variables, virtuals);
 		}
 
@@ -221,16 +211,6 @@ namespace Hime.Redist.Parsers
 			for (int i = 0; i != nextHP; i++)
 				poolHPs.Return(history[i]);
 			nextHP = 0;
-		}
-
-		/// <summary>
-		/// Collects the reusable sub-trees
-		/// </summary>
-		public void Collect()
-		{
-			for (int i = 0; i != collectionNext; i++)
-				collection[i].Free();
-			collectionNext = 0;
 		}
 
 		/// <summary>
@@ -322,31 +302,16 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action to apply</param>
 		private void AddToCache(GSSLabel label, TreeAction action)
 		{
+			if (action == TreeAction.Drop)
+				return;
 			if (label.IsReplaceable)
 			{
 				// this is replaceable sub-tree
 				SubTree sub = label.ReplaceableTree;
-				if (action != TreeAction.Drop)
-				{
-					for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
-						AddToCache(sub.GetLabelAt(i + 1).Index, sub.GetActionAt(i + 1));
-				}
-				// add the sub-tree to the collectable list
-				// is-it already present?
-				for (int i = 0; i != collectionNext; i++)
-					if (collection[i] == sub)
-						return;
-				// do we have enough space?
-				if (collection.Length == collectionNext)
-				{
-					SubTree[] temp = new SubTree[collection.Length + INIT_HISTORY_PART_SIZE];
-					Array.Copy(collection, temp, collection.Length);
-					collection = temp;
-				}
-				// insert the collectable sub-tree
-				collection[collectionNext++] = sub;
+				for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
+					AddToCache(sub.GetLabelAt(i + 1).Index, sub.GetActionAt(i + 1));
 			}
-			else if (action != TreeAction.Drop)
+			else
 			{
 				// this is a simple reference to an existing SPPF node
 				AddToCache(label.NodeIndex, action);
@@ -410,7 +375,6 @@ namespace Hime.Redist.Parsers
 			{
 				AddToCache(result.CopyNode(nullable.NodeIndex), action);
 			}
-			AddToCache(nullable, action);
 		}
 
 		/// <summary>
@@ -517,19 +481,11 @@ namespace Hime.Redist.Parsers
 				hp.generation = generation;
 				hp.next = 0;
 				if (history.Length == nextHP)
-				{
-					HistoryPart[] temp = new HistoryPart[history.Length + INIT_HISTORY_SIZE];
-					Array.Copy(history, temp, history.Length);
-					history = temp;
-				}
+					Array.Resize(ref history, history.Length + INIT_HISTORY_SIZE);
 				history[nextHP++] = hp;
 			}
 			if (hp.next == hp.data.Length)
-			{
-				GSSLabel[] temp = new GSSLabel[hp.data.Length + INIT_HISTORY_PART_SIZE];
-				Array.Copy(hp.data, temp, hp.data.Length);
-				hp.data = temp;
-			}
+				Array.Resize(ref hp.data, hp.data.Length + INIT_HISTORY_PART_SIZE);
 			hp.data[hp.next++] = label;
 		}
 

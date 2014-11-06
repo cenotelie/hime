@@ -60,7 +60,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     protected LRkParser(LRkAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, ILexer lexer) {
         super(variables, virtuals, actions, lexer);
         this.automaton = automaton;
-        this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.getOutput(), parserVariables, parserVirtuals);
+        this.builder = new LRkASTBuilder(lexer.getOutput(), parserVariables, parserVirtuals);
     }
 
     /**
@@ -84,7 +84,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      * @return A ParseResult object containing the data about the result
      */
     public ParseResult parse() {
-        stack = new int[MAX_STACK_SIZE];
+        stack = new int[INIT_STACK_SIZE];
         head = 0;
         Token nextToken = lexer.getNextToken(null);
         while (true) {
@@ -111,7 +111,10 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
         while (true) {
             LRAction action = automaton.getAction(stack[head], token.getSymbolID());
             if (action.getCode() == LRAction.CODE_SHIFT) {
-                stack[++head] = action.getData();
+                head++;
+                if (head == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                stack[head] = action.getData();
                 builder.stackPushToken(token.getIndex());
                 return action.getCode();
             } else if (action.getCode() == LRAction.CODE_REDUCE) {
@@ -119,7 +122,10 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
                 head -= production.getReductionLength();
                 reduce(production);
                 action = automaton.getAction(stack[head], parserVariables.get(production.getHead()).getID());
-                stack[++head] = action.getData();
+                head++;
+                if (head == stack.length)
+                    stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                stack[head] = action.getData();
                 continue;
             }
             return action.getCode();

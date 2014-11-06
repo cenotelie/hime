@@ -35,10 +35,6 @@ import java.util.List;
  */
 public abstract class BaseLRParser implements IParser {
     /**
-     * Maximal size of the stack
-     */
-    protected static final int MAX_STACK_SIZE = 128;
-    /**
      * Maximum number of errors
      */
     protected static final int MAX_ERROR_COUNT = 100;

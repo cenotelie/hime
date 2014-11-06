@@ -561,6 +561,7 @@ namespace Hime.CentralDogma.Grammars
 			Automata.DFA finalDFA = new Automata.DFA(final);
 			finalDFA = finalDFA.Minimize();
 			finalDFA.RepackTransitions();
+			finalDFA.Prune();
 			return finalDFA;
 		}
 

@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
+using System.Text;
 
 namespace Hime.CentralDogma.Output
 {

@@ -17,6 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -56,7 +57,7 @@ namespace Hime.Redist.Parsers
             : base(variables, virtuals, actions, lexer)
 		{
 			this.automaton = automaton;
-			this.builder = new LRkASTBuilder(MAX_STACK_SIZE, lexer.Output, parserVariables, parserVirtuals);
+			this.builder = new LRkASTBuilder(lexer.Output, parserVariables, parserVirtuals);
 		}
 
 		/// <summary>
@@ -80,7 +81,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>A ParseResult object containing the data about the result</returns>
 		public override ParseResult Parse()
 		{
-			this.stack = new int[MAX_STACK_SIZE];
+			this.stack = new int[INIT_STACK_SIZE];
 			this.head = 0;
 			Token nextToken = lexer.GetNextToken(this);
 			while (true)
@@ -111,7 +112,10 @@ namespace Hime.Redist.Parsers
 				LRAction action = automaton.GetAction(stack[head], token.SymbolID);
 				if (action.Code == LRActionCode.Shift)
 				{
-					stack[++head] = action.Data;
+					head++;
+					if (head == stack.Length)
+						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
+					stack[head] = action.Data;
 					builder.StackPushToken(token.Index);
 					return action.Code;
 				}
@@ -121,7 +125,10 @@ namespace Hime.Redist.Parsers
 					head -= production.ReductionLength;
 					Reduce(production);
 					action = automaton.GetAction(stack[head], parserVariables[production.Head].ID);
-					stack[++head] = action.Data;
+					head++;
+					if (head == stack.Length)
+						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
+					stack[head] = action.Data;
 					continue;
 				}
 				return action.Code;

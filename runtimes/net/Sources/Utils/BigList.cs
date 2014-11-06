@@ -214,11 +214,7 @@ namespace Hime.Redist.Utils
 		private void AddChunk()
 		{
 			if (chunkIndex == chunks.Length - 1)
-			{
-				T[][] r = new T[chunks.Length + INIT_CHUNK_COUNT][];
-				Array.Copy(chunks, r, chunks.Length);
-				chunks = r;
-			}
+				Array.Resize(ref chunks, chunks.Length + INIT_CHUNK_COUNT);
 			chunkIndex++;
 			T[] chunk = chunks[chunkIndex];
 			if (chunk == null)
