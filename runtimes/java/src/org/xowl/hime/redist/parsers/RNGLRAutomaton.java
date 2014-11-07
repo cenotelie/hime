@@ -69,6 +69,10 @@ public class RNGLRAutomaton {
      */
     private ColumnMap columns;
     /**
+     * The contexts information
+     */
+    private LRContexts[] contexts;
+    /**
      * The RNGLR table
      */
     private Cell[] table;
@@ -121,6 +125,9 @@ public class RNGLRAutomaton {
         this.columns = new ColumnMap();
         for (int i = 0; i != ncols; i++)
             this.columns.add(columnsID[i], i);
+        this.contexts = new LRContexts[nstates];
+        for (int i = 0; i != nstates; i++)
+            this.contexts[i] = new LRContexts(input);
         this.table = new Cell[nstates * ncols];
         for (int i = 0; i != table.length; i++)
             this.table[i] = new Cell(input);

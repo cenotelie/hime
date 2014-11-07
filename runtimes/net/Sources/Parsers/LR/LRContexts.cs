@@ -1,5 +1,5 @@
 ﻿/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+* Copyright (c) 2014 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3

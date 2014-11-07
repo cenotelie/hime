@@ -94,6 +94,10 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private ColumnMap columns;
 		/// <summary>
+		/// The contexts information
+		/// </summary>
+		private LRContexts[] contexts;
+		/// <summary>
 		/// The RNGLR table
 		/// </summary>
 		private Cell[] table;
@@ -134,6 +138,9 @@ namespace Hime.Redist.Parsers
 			this.columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
 				this.columns.Add(reader.ReadUInt16(), i);
+			this.contexts = new LRContexts[nstates];
+			for (int i = 0; i != nstates; i++)
+				this.contexts[i] = new LRContexts(reader);
 			this.table = new Cell[nstates * ncols];
 			for (int i = 0; i != table.Length; i++)
 				this.table[i] = new Cell(reader);
@@ -169,6 +176,16 @@ namespace Hime.Redist.Parsers
 				}
 			}
 			throw new IOException(string.Format("The resource {0} cannot be found in the assembly {1}", resource, assembly.GetName().Name));
+		}
+
+		/// <summary>
+		/// Gets the contexts opened by the specified state
+		/// </summary>
+		/// <param name="state">State in the LR(k) automaton</param>
+		/// <returns>The opened contexts</returns>
+		public LRContexts GetContexts(int state)
+		{
+			return contexts[state];
 		}
 
 		/// <summary>
