@@ -39,7 +39,10 @@
     <Compile Include="..\..\..\releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Benchmark.cs" />
+    <Compile Include="Task.cs" />
+    <Compile Include="BenchmarkLexer.cs" />
+    <Compile Include="BenchmarkParser.cs" />
+    <Compile Include="InputStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

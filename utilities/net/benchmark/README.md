@@ -15,35 +15,16 @@ This component is not included in any binary distribution.
 
 
 
-### How to build ###
+### How to use ###
 
-On the .Net Framework with MSBuild:
-
-```
-$ msbuild /p:Configuration=Release Benchmark.csproj
-```
-
-On Mono with xbuild:
+Use the wrapper script on Windows:
 
 ```
-$ xbuild /p:Configuration=Release Benchmark.csproj
+$ utilities\benchmark.bat
 ```
 
-
-
-### How to run ###
-
-On the .Net Framework:
+Use the wrapper script on Linux:
 
 ```
-$ bin/Release/Hime.Benchmark.exe
+$ ./utilities/benchmark.sh
 ```
-
-On Mono:
-
-```
-$ mono bin/Release/Hime.Benchmark.exe
-```
-
-The benchmark uses the `extras/Grammars/CSharp4.gram` grammar as a base and generate a file with 600 times the original content in it to use as an input sample.
-Then, it measures the mean lexing and parsing times for this input.
