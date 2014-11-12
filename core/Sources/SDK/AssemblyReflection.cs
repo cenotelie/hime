@@ -93,6 +93,31 @@ namespace Hime.CentralDogma.SDK
 		}
 
 		/// <summary>
+		/// Gets an instance of the default lexer
+		/// </summary>
+		/// <param name="input">The input for the lexer</param>
+		/// <returns>The lexe</returns>
+		public Hime.Redist.Lexer.ILexer getLexer<T>(T input)
+		{
+			if (lexerTypes.Count == 0)
+				return null;
+			return getLexer(lexerTypes[0], input);
+		}
+
+		/// <summary>
+		/// Gets an instance of the specified lexer
+		/// </summary>
+		/// <param name="lexerType">The lexer's type</param>
+		/// <param name="input">The input for the lexer</param>
+		/// <returns>The lexe</returns>
+		public Hime.Redist.Lexer.ILexer getLexer<T>(Type lexerType, T input)
+		{
+			ConstructorInfo lexerCtor = lexerType.GetConstructor(new Type[] { typeof(T) });
+			object lexer = lexerCtor.Invoke(new object[] { input });
+			return (Hime.Redist.Lexer.ILexer) lexer;
+		}
+
+		/// <summary>
 		/// Gets an instance of the default parser
 		/// </summary>
 		/// <param name="input">The input for the associated lexer</param>
