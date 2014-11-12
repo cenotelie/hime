@@ -447,7 +447,7 @@ class SPPFBuilder implements SemanticBody {
      * @return The produced sub-tree
      */
     private GSSLabel reduceReplaceable(int varIndex) {
-        SubTree tree = getSubTree(cacheNext);
+        SubTree tree = getSubTree(handleNext + 1);
         tree.setupRoot(SymbolRef.encode(SymbolType.VARIABLE, varIndex), LROpCode.TREE_ACTION_REPLACE);
         tree.setChildrenCountAt(0, handleNext);
         for (int i = 0; i != handleNext; i++) {
