@@ -339,7 +339,9 @@ namespace Hime.Redist.Parsers
 			// add the node in the cache
 			cacheChildren[cacheNext] = node;
 			cacheActions[cacheNext] = action;
-			// setup the hanle to point to the root
+			// setup the handle to point to the root
+			if (handleNext == handle.Length)
+				Array.Resize(ref handle, handle.Length + INIT_HANDLE_SIZE);
 			handle[handleNext++] = cacheNext;
 			// copy the root's children
 			result.GetAdjacency(node, cacheChildren, cacheNext + 1);
