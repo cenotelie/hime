@@ -56,12 +56,12 @@ During the build, a common set of tests are executed on all runtime implementati
 The results are output in the JUnit format at `tests/TestResults.xml`.
 To execute the build process and run all the tests, execute either `build.sh` (Linux) or `build.bat` (Windows) at the root of the repository.
 This build process requires:
+
 * Windows:
 ** Local installation of Maven with:
 *** The environment variable M2_HOME and JAVA_HOME configured.
 *** mvn is in the path
 ** msbuild is in the path
-** Local mono installation: mono is in the path
 * Linux and MacOS:
 ** Local installation of Maven with:
 *** The environment variable M2_HOME and JAVA_HOME configured.

@@ -186,9 +186,7 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				System.Text.StringBuilder args = new System.Text.StringBuilder("executor.exe");
-				// add parser name argument
-				args.Append(" Hime.Tests.Generated.");
+				System.Text.StringBuilder args = new System.Text.StringBuilder("Hime.Tests.Generated.");
 				args.Append(fixture);
 				args.Append(".");
 				args.Append(Name);
@@ -196,7 +194,10 @@ namespace Hime.Tests.Driver
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
-				code = ExecuteCommand(reporter, "mono", args.ToString(), output);
+				if (IsOnWindows())
+					code = ExecuteCommand(reporter, "executor.exe", args.ToString(), output);
+				else
+					code = ExecuteCommand(reporter, "mono", "executor.exe " + args.ToString(), output);
 			}
 			catch (Exception ex)
 			{
