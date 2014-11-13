@@ -30,6 +30,26 @@ public class UnexpectedCharError extends ParseError {
     private String unexpected;
 
     /**
+     * Gets the error's type
+     *
+     * @return The error's type
+     */
+    @Override
+    public ParseErrorType getType() {
+        return ParseErrorType.UnexpectedChar;
+    }
+
+    /**
+     * Gets the error's message
+     *
+     * @return The error's message
+     */
+    @Override
+    public String getMessage() {
+        return buildMessage();
+    }
+
+    /**
      * Gets the unexpected char
      *
      * @return The unexpected char
@@ -39,13 +59,22 @@ public class UnexpectedCharError extends ParseError {
     }
 
     /**
-     * Initializes a new instance of the UnexpectedCharError class for the given character
+     * Initializes this error
      *
      * @param unexpected The errorneous character (as a string)
      * @param position   Error's position in the input
      */
     public UnexpectedCharError(String unexpected, TextPosition position) {
-        super(ParseErrorType.UnexpectedChar, position);
+        super(position);
+        this.unexpected = unexpected;
+    }
+
+    /**
+     * Builds the message for this error
+     *
+     * @return The message for this error
+     */
+    private String buildMessage() {
         StringBuilder builder = new StringBuilder("Unexpected character '");
         builder.append(unexpected);
         builder.append("' (U+");
@@ -58,6 +87,6 @@ public class UnexpectedCharError extends ParseError {
             builder.append(Integer.toHexString(cp));
         }
         builder.append(")");
-        this.message += builder.toString();
+        return builder.toString();
     }
 }

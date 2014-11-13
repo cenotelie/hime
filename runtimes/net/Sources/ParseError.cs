@@ -23,22 +23,36 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an error in a parser
 	/// </summary>
-	public class ParseError
+	public abstract class ParseError
 	{
+		/// <summary>
+		/// The error's position in the input text
+		/// </summary>
+		private TextPosition position;
+
 		/// <summary>
 		/// Gets the error's type
 		/// </summary>
-		public ParseErrorType Type { get; protected set; }
+		public abstract ParseErrorType Type { get; }
 
 		/// <summary>
 		/// Gets the error's position in the input
 		/// </summary>
-		public TextPosition Position { get; protected set; }
+		public TextPosition Position { get { return position; } }
 
 		/// <summary>
 		/// Gets the error's message
 		/// </summary>
-		public string Message { get; protected set; }
+		public abstract string Message { get; }
+
+		/// <summary>
+		/// Initializes this error
+		/// </summary>
+		/// <param name="position">Error's position in the input</param>
+		protected ParseError(TextPosition position)
+		{
+			this.position = position;
+		}
 
 		/// <summary>
 		/// Returns the string representation of this error
@@ -46,19 +60,7 @@ namespace Hime.Redist
 		/// <returns>The string representation of this error</returns>
 		public override string ToString()
 		{
-			return this.Message;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the ParserError
-		/// </summary>
-		/// <param name="type">Error's type</param>
-		/// <param name="position">Error's position in the input</param>
-		protected ParseError(ParseErrorType type, TextPosition position)
-		{
-			this.Type = type;
-			this.Position = position;
-			this.Message = "@(" + position.Line + ", " + position.Column + ") ";
+			return "@" + position.ToString() + " " + this.Message;
 		}
 	}
 }
