@@ -26,41 +26,58 @@ $ sh releng/toolkit/version-update.sh X.Y.Z
 
 
 
-### Releasing ###
+### Releasing Procedure ###
 
-1) Update the version numbers with:
+1) Setup the environment (first time):
+* Setup the NuGet API key for deployment.
+* Setup a GPG key with developer's name and email.
+* Setup the Maven confifguration for deployment (Nexus server).
+
+```
+$ nuget SetApiKey <key>
+```
+
+Configuration of the developer's Maven `settings.xml`:
+
+```
+<settings>
+  <servers>
+    <server>
+      <id>ossrh</id>
+      <username>your-jira-id</username>
+      <password>your-jira-pwd</password>
+    </server>
+  </servers>
+</settings>
+```
+
+2) Update the version numbers:
+* Run the version update script.
+* Commit the changed files with the new version number.
+* Add a Mercurial tag vX.Y.Z.
 
 ```
 $ sh releng/toolkit/version-update.sh X.Y.Z
 ```
 
-2) Commit the changed files with the new version number
-
-3) Add a Marcurial tag vX.Y.Z
-
-4) On Windows, build and release the Nuget packages
+3) Build and deploy:
 
 ```
-$ nuget SetApiKey <key>
-$ sh releng/release-nuget.sh
-$ nuget push Hime.Redist.X.Y.Z.0.nupkg
-$ nuget push Hime.SDK.X.Y.Z.0.nupkg
+$ releng\release.bat
+```
+
+or
+
+```
+$ sh releng/release.sh
 ```
 
 The <name>.symbols.nupkg are automatically pushed to SymbolSource.org when the <name>.nupkg is pushed to NuGet.org
 
-5) Build and release the Java packages
-
-Setup a GPG key with developer's name and email, then
-
-```
-$ mvn -f runtimes/java/pom.xml deploy
-```
-
 Go to [Sonatype Nexus](https://oss.sonatype.org/) to finalize the repository and push to Maven Central.
 
-6) Build and release the standalone package
+Upload the produced standalone package to bitbucket.
 
-```
-$ sh releng/release-standalone.sh
-```
+Update the links to the download package in the wiki.
+
+4) Build and publish the API documentation
