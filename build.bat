@@ -1,4 +1,4 @@
-ECHO OFF
+@ECHO OFF
 
 REM Gather parameters
 SET SKIP_TEST=false
@@ -6,6 +6,12 @@ SET SKIP_TEST=false
 IF "%1"=="--no-test" (
 	SET SKIP_TEST=true
 )
+
+REM Gather version info
+FOR /f "delims=" %%a IN ('CALL releng\toolkit\version.bat') DO @SET VERSION=%%a
+FOR /f "delims=" %%a IN ('hg log -l 1 --template "{node|short}\n"') DO @SET TAG=%%a
+
+ECHO "Building Hime version %VERSION%-%TAG%"
 
 
 REM Build the main components
@@ -26,17 +32,17 @@ IF "%SKIP_TEST%"=="false" (
 	IF NOT "%ERRORLEVEL%" == "0" EXIT /b
 	REM Setup the test components
 	MKDIR tests\results
-	COPY tests\driver\bin\Release\Hime.Redist.dll tests\results\Hime.Redist.dll
-	COPY tests\driver\bin\Release\Hime.CentralDogma.dll tests\results\Hime.CentralDogma.dll
-	COPY tests\driver\bin\Release\Tests.Driver.exe tests\results\driver.exe
-	COPY tests\net\bin\Release\Tests.Executor.exe tests\results\executor.exe
-	COPY tests\java\target\*.jar tests\results\executor.jar
-	COPY tests\java\target\dependency\*.jar tests\results\
+	COPY /B tests\driver\bin\Release\Hime.Redist.dll tests\results\Hime.Redist.dll > NUL
+	COPY /B tests\driver\bin\Release\Hime.CentralDogma.dll tests\results\Hime.CentralDogma.dll > NUL
+	COPY /B tests\driver\bin\Release\Tests.Driver.exe tests\results\driver.exe > NUL
+	COPY /B tests\net\bin\Release\Tests.Executor.exe tests\results\executor.exe > NUL
+	COPY /B tests\java\target\*.jar tests\results\executor.jar > NUL
+	COPY /B tests\java\target\dependency\*.jar tests\results\ > NUL
 	REM Execute the tests
 	CD tests\results
 	driver.exe --targets Net Java
 	CD ..\..
 	REM Cleanup the tests
-	MOVE tests\results\TestResults.xml tests\TestResults.xml
+	MOVE tests\results\TestResults.xml tests\TestResults.xml > NUL
 	RMDIR tests\results /S /Q
 )
