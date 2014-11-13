@@ -333,7 +333,7 @@ namespace Hime.Tests.Executor
 		/// <returns>The parser</returns>
 		private Hime.Redist.Parsers.IParser GetParser(string parserName, string input)
 		{
-			Assembly assembly = Assembly.LoadFile("Parsers.dll");
+			Assembly assembly = Assembly.LoadFile(System.IO.Path.GetFullPath("Parsers.dll"));
 			Type parserType = assembly.GetType(parserName);
 			ConstructorInfo parserCtor = parserType.GetConstructors()[0];
 			ParameterInfo[] parameters = parserCtor.GetParameters();

@@ -29,6 +29,7 @@ $ sh releng/toolkit/version-update.sh X.Y.Z
 ### Releasing Procedure ###
 
 1) Setup the environment (first time):
+
 * Setup the NuGet API key for deployment.
 * Setup a GPG key with developer's name and email.
 * Setup the Maven confifguration for deployment (Nexus server).
