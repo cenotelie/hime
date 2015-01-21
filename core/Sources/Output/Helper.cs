@@ -33,21 +33,10 @@ namespace Hime.CentralDogma.Output
 		/// <returns>The sanitized name of the symbol</returns>
 		public static string SanitizeNameCS(Grammars.Symbol symbol)
 		{
-			string original = symbol.Name;
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
-			foreach (char c in original)
-			{
-				if (c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-					builder.Append(c);
-				else if (c >= '0' && c <= '9')
-					builder.Append(c);
-				else if (c == '<' || c == '>' || c == '-')
-					builder.Append('_');
-			}
-			original = builder.ToString();
-			if (keywordsCS.Contains(original))
-				return "@" + original;
-			return original;
+			string name = RemoveSpecials(symbol.Name);
+			if (keywordsCS.Contains(name))
+				return "_" + name;
+			return name;
 		}
 
 		/// <summary>
@@ -57,9 +46,21 @@ namespace Hime.CentralDogma.Output
 		/// <returns>The sanitized name of the symbol</returns>
 		public static string SanitizeNameJava(Grammars.Symbol symbol)
 		{
-			string original = symbol.Name;
+			string name = RemoveSpecials(symbol.Name);
+			if (keywordsJava.Contains(name))
+				return "_" + name;
+			return name;
+		}
+
+		/// <summary>
+		/// Removes the specials characters that can arise a the specified symbol name
+		/// </summary>
+		/// <param name="name">A symbol name</param>
+		/// <returns>The cleaned-up name</returns>
+		private static string RemoveSpecials(string name)
+		{
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
-			foreach (char c in original)
+			foreach (char c in name)
 			{
 				if (c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
 					builder.Append(c);
@@ -67,10 +68,14 @@ namespace Hime.CentralDogma.Output
 					builder.Append(c);
 				else if (c == '<' || c == '>' || c == '-')
 					builder.Append('_');
+				// drop anything else
 			}
 			return builder.ToString();
 		}
 
+		/// <summary>
+		/// The reserved C# keywords
+		/// </summary>
 		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new string[] { "abstract",
 			"as",
 			"base",
@@ -148,5 +153,59 @@ namespace Hime.CentralDogma.Output
 			"void",
 			"volatile",
 			"while" }));
+
+		/// <summary>
+		/// The reserved Java keywords
+		/// </summary>
+		private static readonly ROList<string> keywordsJava = new ROList<string>(new List<string>(new string[] { "abstract",
+			"continue",
+			"for",
+			"new",
+			"switch",
+			"assert",
+			"default",
+			"if",
+			"package",
+			"synchronized",
+			"boolean",
+			"do",
+			"goto",
+			"private",
+			"this",
+			"break",
+			"double",
+			"implements",
+			"protected",
+			"throw",
+			"byte",
+			"else",
+			"import",
+			"public",
+			"throws",
+			"case",
+			"enum",
+			"instanceof",
+			"return",
+			"transient",
+			"catch",
+			"extends",
+			"int",
+			"short",
+			"try",
+			"char",
+			"final",
+			"interface",
+			"static",
+			"void",
+			"class",
+			"finally",
+			"long",
+			"strictfp",
+			"volatile",
+			"const",
+			"float",
+			"native",
+			"super",
+			"while"}));
 	}
 }
