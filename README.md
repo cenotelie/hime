@@ -58,15 +58,15 @@ To execute the build process and run all the tests, execute either `build.sh` (L
 This build process requires:
 
 * Windows:
-** Local installation of Maven with:
-*** The environment variable M2_HOME and JAVA_HOME configured.
-*** mvn is in the path
-** msbuild is in the path
+	* Local installation of Maven with:
+		* The environment variable M2_HOME and JAVA_HOME configured.
+		* mvn is in the path
+	* msbuild is in the path
 * Linux and MacOS:
-** Local installation of Maven with:
-*** The environment variable M2_HOME and JAVA_HOME configured.
-*** mvn is in the path
-** Local mono installation: mono and xbuild are in the path
+	* Local installation of Maven with:
+		* The environment variable M2_HOME and JAVA_HOME configured.
+		* mvn is in the path
+	* Local mono installation: mono and xbuild are in the path
 
 To individually build a component, see the README associated to it.
 
