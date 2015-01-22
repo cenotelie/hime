@@ -131,19 +131,22 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets a collection of the expected terminal indices
+		/// Gets the expected terminals for the specified state
 		/// </summary>
 		/// <param name="state">The DFA state</param>
-		/// <param name="terminalCount">The maximal number of terminals</param>
-		/// <returns>The expected terminal indices</returns>
-		public ICollection<int> GetExpected(int state, int terminalCount)
+		/// <param name="terminals">The possible terminals</param>
+		/// <returns>The expected terminals</returns>
+		public LRExpected GetExpected(int state, IList<Symbol> terminals)
 		{
-			List<int> result = new List<int>();
+			LRExpected result = new LRExpected();
 			int offset = ncols * state;
-			for (int i = 0; i != terminalCount; i++)
+			for (int i = 0; i != terminals.Count; i++)
 			{
-				if (table[offset].Code == LRActionCode.Shift)
-					result.Add(i);
+				LRAction action = table[offset];
+				if (action.Code == LRActionCode.Shift)
+					result.Shifts.Add(terminals[i]);
+				else if (action.Code == LRActionCode.Reduce)
+					result.Reductions.Add(terminals[i]);
 				offset++;
 			}
 			return result;

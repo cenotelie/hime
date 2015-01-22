@@ -90,6 +90,7 @@ namespace Hime.Tests.Driver
 			{
 				string temp = node.Children[i].Symbol.Value;
 				temp =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(temp.Substring(1, temp.Length - 2));
+				temp = temp.Replace("\\\"", "\"");
 				expected.Add(temp);
 			}
 			System.IO.File.WriteAllLines("expected.txt", expected, new System.Text.UTF8Encoding(false));

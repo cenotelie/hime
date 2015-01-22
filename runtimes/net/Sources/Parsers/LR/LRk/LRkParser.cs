@@ -101,11 +101,16 @@ namespace Hime.Redist.Parsers
 		/// <returns>The next token in the case the error is recovered</returns>
 		private Token OnUnexpectedToken(Token token)
 		{
-			ICollection<int> expectedIDs = parserAutomaton.GetExpected(stack[head], lexer.Terminals.Count);
-			List<Symbol> expected = new List<Symbol>();
-			foreach (int index in expectedIDs)
-				expected.Add(lexer.Terminals[index]);
+			LRExpected expectedOnHead = parserAutomaton.GetExpected(stack[head], lexer.Terminals);
+			// the terminals for shifts are always expected
+			List<Symbol> expected = new List<Symbol>(expectedOnHead.Shifts);
+			// check the terminals for reductions
+			foreach (Symbol terminal in expectedOnHead.Reductions)
+				if (CheckIsExpected(terminal))
+					expected.Add(terminal);
+			// register the error
 			allErrors.Add(new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected));
+			// try to recover, or not
 			if (!recover)
 				return new Token(0, 0);
 			if (TryDrop1Unexpected())
@@ -119,6 +124,47 @@ namespace Hime.Redist.Parsers
 					return dummy;
 			}
 			return new Token(0, 0);
+		}
+
+		/// <summary>
+		/// Checks whether the specified terminal is indeed expected for a reduction
+		/// </summary>
+		/// <param name="terminal">The terminal to check</param>
+		/// <returns><code>true</code> if the terminal is really expected</returns>
+		/// <remarks>
+		/// This check is required because in the case of a base LALR graph,
+		/// some terminals expected for reduction in the automaton are coming from other paths.
+		/// </remarks>
+		private bool CheckIsExpected(Symbol terminal)
+		{
+			// copy the stack to use for the simulation
+			int[] myStack = new int[stack.Length];
+			Array.Copy(stack, myStack, head + 1);
+			int myHead = head;
+			// get the action for the stack's head
+			LRAction action = parserAutomaton.GetAction(myStack[myHead], terminal.ID);
+			while (action.Code != LRActionCode.None)
+			{
+				if (action.Code == LRActionCode.Shift)
+					// yep, the terminal was expected
+					return true;
+				if (action.Code == LRActionCode.Reduce)
+				{
+					// execute the reduction
+					LRProduction production = parserAutomaton.GetProduction(action.Data);
+					myHead -= production.ReductionLength;
+					// this must be a shift
+					action = parserAutomaton.GetAction(myStack[myHead], parserVariables[production.Head].ID);
+					myHead++;
+					if (myHead == myStack.Length)
+						Array.Resize(ref myStack, myStack.Length + INIT_STACK_SIZE);
+					myStack[myHead] = action.Data;
+					// now, get the new action for the terminal
+					action = parserAutomaton.GetAction(action.Data, terminal.ID);
+				}
+			}
+			// nope, that was a pathological case in a LALR graph
+			return false;
 		}
 
 		private bool TryDrop1Unexpected()

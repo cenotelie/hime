@@ -22,10 +22,7 @@ package org.xowl.hime.redist.parsers;
 import org.xowl.hime.redist.*;
 import org.xowl.hime.redist.lexer.ILexer;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Represents a base for all RNGLR parsers
@@ -33,7 +30,7 @@ import java.util.Queue;
 public class RNGLRParser extends BaseLRParser {
     /**
      * Represents a reduction operation to be performed
-     *
+     * <p/>
      * For reduction of length 0, the node is the GSS node on which it is applied, the first label then is epsilon
      * For others, the node is the SECOND GSS node on the path, not the head. The first label is then the label on the transition from the head
      */
@@ -226,21 +223,27 @@ public class RNGLRParser extends BaseLRParser {
      * Raises an error on an unexpected token
      *
      * @param gen   The current GSS generation
+     * @param stem  The size of the generation's stem
      * @param token The unexpected token
      */
-    private void onUnexpectedToken(int gen, Token token) {
-        List<Integer> indices = new ArrayList<Integer>();
+    private void onUnexpectedToken(int gen, int stem, Token token) {
+        // build the list of expected terminals
         List<Symbol> expected = new ArrayList<Symbol>();
-        GSSGeneration generation = gss.getGeneration(gen);
-        for (int i = generation.getStart(); i != generation.getStart() + generation.getCount(); i++) {
-            List<Integer> temp = parserAutomaton.getExpected(gss.getRepresentedState(i), lexer.getTerminals().size());
-            for (int index : temp) {
-                if (!indices.contains(index)) {
-                    indices.add(index);
-                    expected.add(lexer.getTerminals().get(index));
-                }
+        GSSGeneration genData = gss.getGeneration(gen);
+        for (int i = 0; i != genData.getCount(); i++) {
+            LRExpected expectedOnHead = parserAutomaton.getExpected(gss.getRepresentedState(i + genData.getStart()), lexer.getTerminals());
+            // register the terminals for shift actions
+            for (Symbol terminal : expectedOnHead.getShifts())
+                if (!expected.contains(terminal))
+                    expected.add(terminal);
+            if (i < stem) {
+                // the state was in the stem, also look for reductions
+                for (Symbol terminal : expectedOnHead.getReductions())
+                    if (!expected.contains(terminal) && checkIsExpected(i + genData.getStart(), terminal))
+                        expected.add(terminal);
             }
         }
+        // register the error
         UnexpectedTokenError error = new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected);
         allErrors.add(error);
         if (debug) {
@@ -254,6 +257,89 @@ public class RNGLRParser extends BaseLRParser {
             System.out.println(context.getPointer());
             gss.print();
         }
+    }
+
+    /**
+     * Checks whether the specified terminal is indeed expected for a reduction.
+     * This check is required because in the case of a base LALR graph,
+     * some terminals expected for reduction in the automaton are coming from other paths.
+     *
+     * @param gssNode  The GSS node from which to reduce
+     * @param terminal The terminal to check
+     * @return true if the terminal is really expected
+     */
+    private boolean checkIsExpected(int gssNode, Symbol terminal) {
+        // queue of GLR states to inspect:
+        List<Integer> queueGSSHead = new ArrayList<Integer>();   // the related GSS head
+        List<int[]> queueVStack = new ArrayList<int[]>(); // the virtual stack
+
+        // first reduction
+        {
+            int count = parserAutomaton.getActionsCount(gss.getRepresentedState(gssNode), terminal.getID());
+            for (int j = 0; j != count; j++) {
+                LRAction action = parserAutomaton.getAction(gss.getRepresentedState(gssNode), terminal.getID(), j);
+                if (action.getCode() == LRAction.CODE_REDUCE) {
+                    // execute the reduction
+                    LRProduction production = parserAutomaton.getProduction(action.getData());
+                    GSS.PathSet paths = gss.getPaths(gssNode, production.getReductionLength());
+                    for (int k = 0; k != paths.count; k++) {
+                        GSSPath path = paths.paths[k];
+                        // get the target GLR state
+                        int next = getNextByVar(gss.getRepresentedState(path.getLast()), parserVariables.get(production.getHead()).getID());
+                        // enqueue the info, top GSS stack node and target GLR state
+                        queueGSSHead.add(path.getLast());
+                        queueVStack.add(new int[]{next});
+                    }
+                }
+            }
+        }
+
+        // now, close the queue
+        for (int i = 0; i != queueGSSHead.size(); i++) {
+            int head = queueVStack.get(i)[queueVStack.get(i).length - 1];
+            int count = parserAutomaton.getActionsCount(head, terminal.getID());
+            if (count == 0)
+                continue;
+            for (int j = 0; j != count; j++) {
+                LRAction action = parserAutomaton.getAction(head, terminal.getID(), j);
+                if (action.getCode() == LRAction.CODE_SHIFT)
+                    // yep, the terminal was expected
+                    return true;
+                if (action.getCode() == LRAction.CODE_REDUCE) {
+                    // execute the reduction
+                    LRProduction production = parserAutomaton.getProduction(action.getData());
+                    if (production.getReductionLength() == 0) {
+                        // 0-length reduction => start from the current head
+                        int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length + 1);
+                        virtualStack[virtualStack.length - 1] = getNextByVar(head, parserVariables.get(production.getHead()).getID());
+                        // enqueue
+                        queueGSSHead.add(queueGSSHead.get(i));
+                        queueVStack.add(virtualStack);
+                    } else if (production.getReductionLength() < queueVStack.get(i).length) {
+                        // we are still the virtual stack
+                        int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length - production.getReductionLength() + 1);
+                        virtualStack[virtualStack.length - 1] = getNextByVar(virtualStack[virtualStack.length - 2], parserVariables.get(production.getHead()).getID());
+                        // enqueue
+                        queueGSSHead.add(queueGSSHead.get(i));
+                        queueVStack.add(virtualStack);
+                    } else {
+                        // we reach the GSS
+                        GSS.PathSet paths = gss.getPaths(queueGSSHead.get(i), production.getReductionLength() - queueVStack.get(i).length);
+                        for (int k = 0; k != paths.count; k++) {
+                            GSSPath path = paths.paths[k];
+                            // get the target GLR state
+                            int next = getNextByVar(gss.getRepresentedState(path.getLast()), parserVariables.get(production.getHead()).getID());
+                            // enqueue the info, top GSS stack node and target GLR state
+                            queueGSSHead.add(path.getLast());
+                            queueVStack.add(new int[]{next});
+                        }
+                    }
+                }
+            }
+        }
+
+        // nope, that was a pathological case in a LALR graph
+        return false;
     }
 
     /**
@@ -320,6 +406,7 @@ public class RNGLRParser extends BaseLRParser {
 
         while (nextToken.getSymbolID() != Symbol.SID_EPSILON) // Wait for ε token
         {
+            int stem = gss.getGeneration(Ui).getCount();
             reducer(Ui);
             Token oldtoken = nextToken;
             nextToken = lexer.getNextToken();
@@ -327,7 +414,7 @@ public class RNGLRParser extends BaseLRParser {
             GSSGeneration g = gss.getGeneration(Uj);
             if (g.getCount() == 0) {
                 // Generation is empty !
-                onUnexpectedToken(Ui, oldtoken);
+                onUnexpectedToken(Ui, stem, oldtoken);
                 return new ParseResult(allErrors, lexer.getOutput());
             }
             Ui = Uj;

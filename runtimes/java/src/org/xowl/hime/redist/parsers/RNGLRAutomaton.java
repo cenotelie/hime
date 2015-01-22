@@ -19,9 +19,9 @@
  **********************************************************************/
 package org.xowl.hime.redist.parsers;
 
+import org.xowl.hime.redist.Symbol;
 import org.xowl.hime.redist.utils.BinaryInput;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -206,21 +206,22 @@ public class RNGLRAutomaton {
     }
 
     /**
-     * Gets a collection of the expected terminal indices
+     * Gets the expected terminals for the specified state
      *
-     * @param state         The DFA state
-     * @param terminalCount The maximal number of terminals
-     * @return The expected terminal indices
+     * @param state     The DFA state
+     * @param terminals The possible terminals
+     * @return The expected terminals
      */
-    public List<Integer> getExpected(int state, int terminalCount) {
-        List<Integer> result = new ArrayList<Integer>();
-        for (int i = 0; i != terminalCount; i++) {
+    public LRExpected getExpected(int state, List<Symbol> terminals) {
+        LRExpected result = new LRExpected();
+        for (int i = 0; i != terminals.size(); i++) {
             Cell cell = table[state * ncols + i];
             for (int j = 0; j != cell.count; j++) {
-                if (actions[cell.index + j].getCode() == LRAction.CODE_SHIFT) {
-                    result.add(i);
-                    break;
-                }
+                LRAction action = actions[cell.index + j];
+                if (action.getCode() == LRAction.CODE_SHIFT)
+                    result.addUniqueShift(terminals.get(i));
+                else if (action.getCode() == LRAction.CODE_REDUCE)
+                    result.addUniqueReduction(terminals.get(i));
             }
         }
         return result;

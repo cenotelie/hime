@@ -235,24 +235,29 @@ namespace Hime.Redist.Parsers
 		/// Raises an error on an unexepcted token
 		/// </summary>
 		/// <param name="gen">The current GSS generation</param>
+		/// <param name="stem">The size of the generation's stem</param>
 		/// <param name="token">The unexpected token</param>
-		private void OnUnexpectedToken(int gen, Token token)
+		private void OnUnexpectedToken(int gen, int stem, Token token)
 		{
-			List<int> indices = new List<int>();
+			// build the list of expected terminals
 			List<Symbol> expected = new List<Symbol>();
 			GSSGeneration genData = gss.GetGeneration(gen);
-			for (int i = genData.Start; i != genData.Start + genData.Count; i++)
+			for (int i = 0; i != genData.Count; i++)
 			{
-				ICollection<int> temp = parserAutomaton.GetExpected(gss.GetRepresentedState(i), lexer.Terminals.Count);
-				foreach (int index in temp)
+				LRExpected expectedOnHead = parserAutomaton.GetExpected(gss.GetRepresentedState(i + genData.Start), lexer.Terminals);
+				// register the terminals for shift actions
+				foreach (Symbol terminal in expectedOnHead.Shifts)
+					if (!expected.Contains(terminal))
+						expected.Add(terminal);
+				if (i < stem)
 				{
-					if (!indices.Contains(index))
-					{
-						indices.Add(index);
-						expected.Add(lexer.Terminals[index]);
-					}
+					// the state was in the stem, also look for reductions
+					foreach (Symbol terminal in expectedOnHead.Reductions)
+						if (!expected.Contains(terminal) && CheckIsExpected(i + genData.Start, terminal))
+							expected.Add(terminal);
 				}
 			}
+			// register the error
 			UnexpectedTokenError error = new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected);
 			allErrors.Add(error);
 			if (debug)
@@ -267,6 +272,107 @@ namespace Hime.Redist.Parsers
 				Console.WriteLine(context.Pointer);
 				gss.Print();
 			}
+		}
+
+		/// <summary>
+		/// Checks whether the specified terminal is indeed expected for a reduction
+		/// </summary>
+		/// <param name="gssNode">The GSS node from which to reduce</param>
+		/// <param name="terminal">The terminal to check</param>
+		/// <returns><code>true</code> if the terminal is really expected</returns>
+		/// <remarks>
+		/// This check is required because in the case of a base LALR graph,
+		/// some terminals expected for reduction in the automaton are coming from other paths.
+		/// </remarks>
+		private bool CheckIsExpected(int gssNode, Symbol terminal)
+		{
+			// queue of GLR states to inspect:
+			List<int> queueGSSHead = new List<int>();   // the related GSS head
+			List<int[]> queueVStack = new List<int[]>(); // the virtual stack
+
+			// first reduction
+			{
+				int count = parserAutomaton.GetActionsCount(gss.GetRepresentedState(gssNode), terminal.ID);
+				for (int j = 0; j != count; j++)
+				{
+					LRAction action = parserAutomaton.GetAction(gss.GetRepresentedState(gssNode), terminal.ID, j);
+					if (action.Code == LRActionCode.Reduce)
+					{
+						// execute the reduction
+						LRProduction production = parserAutomaton.GetProduction(action.Data);
+						int nbPaths = 0;
+						GSSPath[] paths = gss.GetPaths(gssNode, production.ReductionLength, out nbPaths); ;
+						for (int k = 0; k != nbPaths; k++)
+						{
+							GSSPath path = paths[k];
+							// get the target GLR state
+							int next = GetNextByVar(gss.GetRepresentedState(path.Last), parserVariables[production.Head].ID);
+							// enqueue the info, top GSS stack node and target GLR state
+							queueGSSHead.Add(path.Last);
+							queueVStack.Add(new int[] { next });
+						}
+					}
+				}
+			}
+
+			// now, close the queue
+			for (int i = 0; i != queueGSSHead.Count; i++)
+			{
+				int head = queueVStack[i][queueVStack[i].Length - 1];
+				int count = parserAutomaton.GetActionsCount(head, terminal.ID);
+				if (count == 0)
+					continue;
+				for (int j = 0; j != count; j++)
+				{
+					LRAction action = parserAutomaton.GetAction(head, terminal.ID, j);
+					if (action.Code == LRActionCode.Shift)
+						// yep, the terminal was expected
+						return true;
+					if (action.Code == LRActionCode.Reduce)
+					{
+						// execute the reduction
+						LRProduction production = parserAutomaton.GetProduction(action.Data);
+						if (production.ReductionLength == 0)
+						{
+							// 0-length reduction => start from the current head
+							int[] virtualStack = new int[queueVStack[i].Length + 1];
+							Array.Copy(queueVStack[i], virtualStack, queueVStack[i].Length);
+							virtualStack[virtualStack.Length - 1] = GetNextByVar(head, parserVariables[production.Head].ID);
+							// enqueue
+							queueGSSHead.Add(queueGSSHead[i]);
+							queueVStack.Add(virtualStack);
+						}
+						else if (production.ReductionLength < queueVStack[i].Length)
+						{
+							// we are still the virtual stack
+							int[] virtualStack = new int[queueVStack[i].Length - production.ReductionLength + 1];
+							Array.Copy(queueVStack[i], virtualStack, virtualStack.Length - 1);
+							virtualStack[virtualStack.Length - 1] = GetNextByVar(virtualStack[virtualStack.Length - 2], parserVariables[production.Head].ID);
+							// enqueue
+							queueGSSHead.Add(queueGSSHead[i]);
+							queueVStack.Add(virtualStack);
+						}
+						else
+						{
+							// we reach the GSS
+							int nbPaths = 0;
+							GSSPath[] paths = gss.GetPaths(queueGSSHead[i], production.ReductionLength - queueVStack[i].Length, out nbPaths);
+							for (int k = 0; k != nbPaths; k++)
+							{
+								GSSPath path = paths[k];
+								// get the target GLR state
+								int next = GetNextByVar(gss.GetRepresentedState(path.Last), parserVariables[production.Head].ID);
+								// enqueue the info, top GSS stack node and target GLR state
+								queueGSSHead.Add(path.Last);
+								queueVStack.Add(new int[] { next });
+							}
+						}
+					}
+				}
+			}
+
+			// nope, that was a pathological case in a LALR graph
+			return false;
 		}
 
 		/// <summary>
@@ -340,6 +446,7 @@ namespace Hime.Redist.Parsers
 
 			while (nextToken.SymbolID != Symbol.SID_EPSILON) // Wait for ε token
 			{
+				int stem = gss.GetGeneration(Ui).Count;
 				Reducer(Ui);
 				Token oldtoken = nextToken;
 				nextToken = lexer.GetNextToken();
@@ -348,7 +455,7 @@ namespace Hime.Redist.Parsers
 				if (genData.Count == 0)
 				{
 					// Generation is empty !
-					OnUnexpectedToken(Ui, oldtoken);
+					OnUnexpectedToken(Ui, stem, oldtoken);
 					return new ParseResult(allErrors, lexer.Output);
 				}
 				Ui = Uj;
