@@ -96,10 +96,14 @@ public abstract class LRkParser extends BaseLRParser {
      * @return The next token in the case the error is recovered
      */
     private Token onUnexpectedToken(Token token) {
-        List<Integer> expectedIDs = parserAutomaton.getExpected(stack[head], lexer.getTerminals().size());
-        List<Symbol> expected = new ArrayList<Symbol>();
-        for (int index : expectedIDs)
-            expected.add(lexer.getTerminals().get(index));
+        LRExpected expectedOnHead = parserAutomaton.getExpected(stack[head], lexer.getTerminals());
+        // the terminals for shifts are always expected
+        List<Symbol> expected = new ArrayList<Symbol>(expectedOnHead.getShifts());
+        // check the terminals for reductions
+        for (Symbol terminal : expectedOnHead.getReductions())
+            if (checkIsExpected(terminal))
+                expected.add(terminal);
+        // register the error
         allErrors.add(new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected));
         if (!recover)
             return new Token(0, 0);
@@ -113,6 +117,42 @@ public abstract class LRkParser extends BaseLRParser {
                 return dummy;
         }
         return new Token(0, 0);
+    }
+
+    /**
+     * Checks whether the specified terminal is indeed expected for a reduction.
+     * This check is required because in the case of a base LALR graph,
+     * some terminals expected for reduction in the automaton are coming from other paths.
+     *
+     * @param terminal The terminal to check
+     * @return true if the terminal is really expected
+     */
+    private boolean checkIsExpected(Symbol terminal) {
+        // copy the stack to use for the simulation
+        int[] myStack = Arrays.copyOf(stack, stack.length);
+        int myHead = head;
+        // get the action for the stack's head
+        LRAction action = parserAutomaton.getAction(myStack[myHead], terminal.getID());
+        while (action.getCode() != LRAction.CODE_NONE) {
+            if (action.getCode() == LRAction.CODE_SHIFT)
+                // yep, the terminal was expected
+                return true;
+            if (action.getCode() == LRAction.CODE_REDUCE) {
+                // execute the reduction
+                LRProduction production = parserAutomaton.getProduction(action.getData());
+                myHead -= production.getReductionLength();
+                // this must be a shift
+                action = parserAutomaton.getAction(myStack[myHead], parserVariables.get(production.getHead()).getID());
+                myHead++;
+                if (myHead == myStack.length)
+                    myStack = Arrays.copyOf(myStack, myStack.length + INIT_STACK_SIZE);
+                myStack[myHead] = action.getData();
+                // now, get the new action for the terminal
+                action = parserAutomaton.getAction(action.getData(), terminal.getID());
+            }
+        }
+        // nope, that was a pathological case in a LALR graph
+        return false;
     }
 
     private boolean tryDrop1Unexpected() {

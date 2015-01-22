@@ -66,6 +66,7 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\AST.cs" />
+    <Compile Include="Sources\Parsers\LR\LRExpected.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Token.cs" />
