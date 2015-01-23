@@ -163,7 +163,6 @@
     <Compile Include="Sources\Grammars\Loader.cs" />
     <Compile Include="Sources\Output\Mode.cs" />
     <Compile Include="Sources\Output\Modifier.cs" />
-    <Compile Include="Sources\Utils\ROList.cs" />
     <Compile Include="Sources\Output\Helper.cs" />
     <Compile Include="Sources\Reflection\Serializers.cs" />
     <Compile Include="Sources\Reflection\TracingAction.cs" />

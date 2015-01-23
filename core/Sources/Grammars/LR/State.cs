@@ -19,6 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars.LR
 {

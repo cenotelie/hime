@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Hime.Redist;
+using Hime.Redist.Utils;
 using Hime.SDK.Automata;
 
 namespace Hime.SDK.Reflection

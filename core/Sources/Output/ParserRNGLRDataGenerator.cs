@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Hime.Redist.Parsers;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK.Output
 {

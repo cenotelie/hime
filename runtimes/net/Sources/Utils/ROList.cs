@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.SDK
+namespace Hime.Redist.Utils
 {
 	/// <summary>
 	/// Represents a lightweight interface for a readonly list of T elements

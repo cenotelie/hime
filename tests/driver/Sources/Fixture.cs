@@ -23,6 +23,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.Redist;
+using Hime.Redist.Utils;
 using Hime.SDK;
 using Hime.SDK.Output;
 using Hime.SDK.Reflection;

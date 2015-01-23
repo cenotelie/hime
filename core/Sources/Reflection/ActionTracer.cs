@@ -19,6 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 using Hime.Redist;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK.Reflection
 {

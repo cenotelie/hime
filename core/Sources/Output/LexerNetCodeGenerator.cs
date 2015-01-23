@@ -17,8 +17,9 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using Hime.SDK.Grammars;
 using System.IO;
+using Hime.Redist.Utils;
+using Hime.SDK.Grammars;
 
 namespace Hime.SDK.Output
 {

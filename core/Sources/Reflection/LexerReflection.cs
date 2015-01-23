@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hime.Redist.Lexer;
+using Hime.Redist.Utils;
 using Hime.SDK.Grammars;
 
 namespace Hime.SDK.Reflection

@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars
 {

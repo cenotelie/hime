@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using Hime.SDK.Automata;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK
 {

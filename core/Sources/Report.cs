@@ -19,6 +19,7 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK
 {

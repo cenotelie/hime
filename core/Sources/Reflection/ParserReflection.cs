@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hime.Redist;
+using Hime.Redist.Utils;
 
 namespace Hime.SDK.Reflection
 {
