@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  * Represents the base implementation of the TokenizedText interface for all lexers
- * <p/>
  * All line numbers and column numbers are 1-based.
  * Indices in the content are 0-based.
  */
@@ -88,7 +87,6 @@ public abstract class BaseTokenizedText implements TokenizedText {
 
     /**
      * Determines whether [c1, c2] form a line ending sequence
-     * <p/>
      * Recognized sequences are:
      * [U+000D, U+000A] (this is Windows-style \r \n)
      * [U+????, U+000A] (this is unix style \n)
@@ -170,7 +168,6 @@ public abstract class BaseTokenizedText implements TokenizedText {
 
     /**
      * Gets the starting index of the i-th line
-     * <p/>
      * The line numbering is 1-based
      *
      * @param line The line number
@@ -184,7 +181,6 @@ public abstract class BaseTokenizedText implements TokenizedText {
 
     /**
      * Gets the string content of the i-th line
-     * <p/>
      * The line numbering is 1-based
      *
      * @param line The line number

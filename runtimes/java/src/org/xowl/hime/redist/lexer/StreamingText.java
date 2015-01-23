@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  * Text provider that uses a stream as a backend
- * <p/>
  * All line numbers and column numbers are 1-based.
  * Indices in the content are 0-based.
  */
@@ -235,7 +234,6 @@ public class StreamingText extends BaseTokenizedText {
 
     /**
      * Gets the length of the i-th line
-     * <p/>
      * The line numbering is 1-based
      *
      * @param line The line number

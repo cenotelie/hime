@@ -21,7 +21,6 @@ package org.xowl.hime.redist.parsers;
 
 /**
  * Represents a sub-tree in an AST
- * <p/>
  * A sub-tree is composed of a root with its children.
  * The children may also have children.
  * The maximum depth of a sub-tree is 2 (root, children and children's children), in which case the root is always a replaceable node.
@@ -145,7 +144,6 @@ class SubTree {
 
     /**
      * Copy the content of this sub-tree to the given sub-tree's buffer beginning at the given index
-     * <p/>
      * This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
      * The results of this method in the case of a depth 2 sub-tree is undetermined.
      *
@@ -165,7 +163,6 @@ class SubTree {
 
     /**
      * Copy the root's children of this sub-tree to the given sub-tree's buffer beginning at the given index
-     * <p/>
      * This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
      * The results of this method in the case of a depth 2 sub-tree is undetermined.
      *
@@ -182,7 +179,6 @@ class SubTree {
 
     /**
      * Commits the children of a sub-tree in this buffer to the final ast
-     * <p/>
      * If the index is 0, the root's children are commited, assuming this is a depth-1 sub-tree.
      * If not, the children of the child at the given index are commited.
      *

@@ -28,7 +28,6 @@ import java.util.List;
 
 /**
  * Represents a simple AST with a tree structure
- * <p/>
  * The nodes are stored in sequential arrays where the children of a node are an inner sequence.
  * The linkage is represented by each node storing its number of children and the index of its first child.
  */

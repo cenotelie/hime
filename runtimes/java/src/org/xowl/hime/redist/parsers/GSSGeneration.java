@@ -21,7 +21,6 @@ package org.xowl.hime.redist.parsers;
 
 /**
  * Represents a generation in a Graph-Structured Stack
- * <p/>
  * Because GSS nodes and edges are always created sequentially,
  * a generation basically describes a span in a buffer of GSS nodes or edges
  */
