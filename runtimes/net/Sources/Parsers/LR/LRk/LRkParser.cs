@@ -72,6 +72,13 @@ namespace Hime.Redist.Parsers
 		/// <returns><c>true</c> if the specified context is in effect</returns>
 		public bool IsWithin(int context)
 		{
+			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
+				return true;
+			for (int i = head; i != -1; i--)
+				if (automaton.GetContexts(stack[i]).Contains(context))
+					return true;
+			return false;
+		}
 
 		/// <summary>
 		/// Raises an error on an unexepcted token
@@ -79,7 +86,8 @@ namespace Hime.Redist.Parsers
 		/// <param name="token">The unexpected token</param>
 		/// <returns>The next token in the case the error is recovered</returns>
 		private Token OnUnexpectedToken(Token token)
-			LRExpected expectedOnHead = parserAutomaton.GetExpected(stack[head], lexer.Terminals);
+		{
+			LRExpected expectedOnHead = automaton.GetExpected(stack[head], lexer.Terminals);
 			// the terminals for shifts are always expected
 			List<Symbol> expected = new List<Symbol>(expectedOnHead.Shifts);
 			// check the terminals for reductions
@@ -91,23 +99,7 @@ namespace Hime.Redist.Parsers
 			// try to recover, or not
 			if (!recover)
 				return new Token(0, 0);
-			if (TryDrop1Unexpected())
-				return input.GetNextToken();
-			if (TryDrop2Unexpected())
-				return input.GetNextToken();
-			foreach (Symbol terminal in expected)
-			{
-				Token dummy = new Token(terminal.ID, 0);
-				if (TryInsertExpected(dummy))
-					return dummy;
-			}
 			return new Token(0, 0);
-			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
-				return true;
-			for (int i = head; i != -1; i--)
-				if (automaton.GetContexts(stack[i]).Contains(context))
-					return true;
-			return false;
 		}
 
 		/// <summary>
@@ -126,7 +118,7 @@ namespace Hime.Redist.Parsers
 			Array.Copy(stack, myStack, head + 1);
 			int myHead = head;
 			// get the action for the stack's head
-			LRAction action = parserAutomaton.GetAction(myStack[myHead], terminal.ID);
+			LRAction action = automaton.GetAction(myStack[myHead], terminal.ID);
 			while (action.Code != LRActionCode.None)
 			{
 				if (action.Code == LRActionCode.Shift)
@@ -135,47 +127,20 @@ namespace Hime.Redist.Parsers
 				if (action.Code == LRActionCode.Reduce)
 				{
 					// execute the reduction
-					LRProduction production = parserAutomaton.GetProduction(action.Data);
+					LRProduction production = automaton.GetProduction(action.Data);
 					myHead -= production.ReductionLength;
 					// this must be a shift
-					action = parserAutomaton.GetAction(myStack[myHead], parserVariables[production.Head].ID);
+					action = automaton.GetAction(myStack[myHead], parserVariables[production.Head].ID);
 					myHead++;
 					if (myHead == myStack.Length)
 						Array.Resize(ref myStack, myStack.Length + INIT_STACK_SIZE);
 					myStack[myHead] = action.Data;
 					// now, get the new action for the terminal
-					action = parserAutomaton.GetAction(action.Data, terminal.ID);
+					action = automaton.GetAction(action.Data, terminal.ID);
 				}
 			}
 			// nope, that was a pathological case in a LALR graph
 			return false;
-		}
-
-		private bool TryDrop1Unexpected()
-		{
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
-			input.Rewind(used);
-			return success;
-		}
-
-		private bool TryDrop2Unexpected()
-		{
-			input.GetNextToken();
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
-			input.Rewind(used);
-			if (!success)
-				input.Rewind(1);
-			return success;
-		}
-
-		private bool TryInsertExpected(Token terminal)
-		{
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, terminal, out used);
-			input.Rewind(used);
-			return success;
 		}
 
 		/// <summary>
@@ -197,7 +162,7 @@ namespace Hime.Redist.Parsers
 				}
 				if (action == LRActionCode.Accept)
 					return new ParseResult(allErrors, lexer.Output, builder.GetTree());
-				nextToken = OnUnexpectedToken(stack[head], nextToken);
+				nextToken = OnUnexpectedToken(nextToken);
 				if (nextToken.SymbolID == Symbol.SID_NOTHING || allErrors.Count >= MAX_ERROR_COUNT)
 					return new ParseResult(allErrors, lexer.Output);
 			}
@@ -236,25 +201,6 @@ namespace Hime.Redist.Parsers
 				}
 				return action.Code;
 			}
-		}
-
-		/// <summary>
-		/// Raises an error on an unexpected token
-		/// </summary>
-		/// <param name="state">The current LR state</param>
-		/// <param name="token">The unexpected token</param>
-		/// <returns>The next token in the case the error is recovered</returns>
-		private Token OnUnexpectedToken(int state, Token token)
-		{
-			ICollection<int> expectedIndices = automaton.GetExpected(state, lexer.Terminals.Count);
-			List<Symbol> expected = new List<Symbol>();
-			foreach (int index in expectedIndices)
-				expected.Add(lexer.Terminals[index]);
-			allErrors.Add(new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected));
-			if (!recover)
-				return new Token(Symbol.SID_NOTHING, 0);
-			// TODO: try to recover from the error
-			return new Token(Symbol.SID_NOTHING, 0);
 		}
 
 		/// <summary>

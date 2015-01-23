@@ -82,8 +82,16 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
             if (automaton.getContexts(stack[i]).contains(context))
                 return true;
         return false;
+    }
+
+    /**
+     * Raises an error on an unexpected token
+     *
+     * @param token The unexpected token
+     * @return The next token in the case the error is recovered
+     */
     private Token onUnexpectedToken(Token token) {
-        LRExpected expectedOnHead = parserAutomaton.getExpected(stack[head], lexer.getTerminals());
+        LRExpected expectedOnHead = automaton.getExpected(stack[head], lexer.getTerminals());
         // the terminals for shifts are always expected
         List<Symbol> expected = new ArrayList<Symbol>(expectedOnHead.getShifts());
         // check the terminals for reductions
@@ -94,15 +102,6 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
         allErrors.add(new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected));
         if (!recover)
             return new Token(0, 0);
-        if (tryDrop1Unexpected())
-            return input.getNextToken();
-        if (tryDrop2Unexpected())
-            return input.getNextToken();
-        for (Symbol terminal : expected) {
-            Token dummy = new Token(terminal.getID(), 0);
-            if (tryInsertExpected(dummy))
-                return dummy;
-        }
         return new Token(0, 0);
     }
 
@@ -119,51 +118,27 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
         int[] myStack = Arrays.copyOf(stack, stack.length);
         int myHead = head;
         // get the action for the stack's head
-        LRAction action = parserAutomaton.getAction(myStack[myHead], terminal.getID());
+        LRAction action = automaton.getAction(myStack[myHead], terminal.getID());
         while (action.getCode() != LRAction.CODE_NONE) {
             if (action.getCode() == LRAction.CODE_SHIFT)
                 // yep, the terminal was expected
                 return true;
             if (action.getCode() == LRAction.CODE_REDUCE) {
                 // execute the reduction
-                LRProduction production = parserAutomaton.getProduction(action.getData());
+                LRProduction production = automaton.getProduction(action.getData());
                 myHead -= production.getReductionLength();
                 // this must be a shift
-                action = parserAutomaton.getAction(myStack[myHead], parserVariables.get(production.getHead()).getID());
+                action = automaton.getAction(myStack[myHead], parserVariables.get(production.getHead()).getID());
                 myHead++;
                 if (myHead == myStack.length)
                     myStack = Arrays.copyOf(myStack, myStack.length + INIT_STACK_SIZE);
                 myStack[myHead] = action.getData();
                 // now, get the new action for the terminal
-                action = parserAutomaton.getAction(action.getData(), terminal.getID());
+                action = automaton.getAction(action.getData(), terminal.getID());
             }
         }
         // nope, that was a pathological case in a LALR graph
         return false;
-    }
-
-    private boolean tryDrop1Unexpected() {
-        Simulator sim = new Simulator();
-        boolean success = sim.testForLength(3, new Token(0, 0));
-        input.rewind(sim.getAdvance());
-        return (success);
-    }
-
-    private boolean tryDrop2Unexpected() {
-        input.getNextToken();
-        Simulator sim = new Simulator();
-        boolean success = sim.testForLength(3, new Token(0, 0));
-        input.rewind(sim.getAdvance());
-        if (!success)
-            input.rewind(1);
-        return success;
-    }
-
-    private boolean tryInsertExpected(Token terminal) {
-        Simulator sim = new Simulator();
-        boolean success = sim.testForLength(3, terminal);
-        input.rewind(sim.getAdvance());
-        return (success);
     }
 
     /**
@@ -183,7 +158,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
             }
             if (action == LRAction.CODE_ACCEPT)
                 return new ParseResult(allErrors, lexer.getOutput(), builder.GetTree());
-            nextToken = onUnexpectedToken(stack[head], nextToken);
+            nextToken = onUnexpectedToken(nextToken);
             if (nextToken.getSymbolID() == 0 || allErrors.size() >= MAX_ERROR_COUNT)
                 return new ParseResult(allErrors, lexer.getOutput());
         }
@@ -218,25 +193,6 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
             }
             return action.getCode();
         }
-    }
-
-    /**
-     * Raises an error on an unexpected token
-     *
-     * @param state The current LR state
-     * @param token The unexpected token
-     * @return The next token in the case the error is recovered
-     */
-    private Token onUnexpectedToken(int state, Token token) {
-        List<Integer> expectedIDs = automaton.getExpected(state, lexer.getTerminals().size());
-        List<Symbol> expected = new ArrayList<Symbol>();
-        for (int index : expectedIDs)
-            expected.add(lexer.getTerminals().get(index));
-        allErrors.add(new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected));
-        if (!recover)
-            return new Token(Symbol.SID_NOTHING, 0);
-        // TODO: try to recover from the error
-        return new Token(Symbol.SID_NOTHING, 0);
     }
 
     /**
