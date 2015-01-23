@@ -37,6 +37,26 @@ public class UnexpectedTokenError extends ParseError {
     private List<Symbol> expected;
 
     /**
+     * Gets the error's type
+     *
+     * @return The error's type
+     */
+    @Override
+    public ParseErrorType getType() {
+        return ParseErrorType.UnexpectedChar;
+    }
+
+    /**
+     * Gets the error's message
+     *
+     * @return The error's message
+     */
+    @Override
+    public String getMessage() {
+        return buildMessage();
+    }
+
+    /**
      * Gets the unexpected token
      *
      * @return The unexpected token
@@ -62,17 +82,28 @@ public class UnexpectedTokenError extends ParseError {
      * @param expected The expected terminals
      */
     public UnexpectedTokenError(Symbol token, TextPosition position, List<Symbol> expected) {
-        super(ParseErrorType.UnexpectedToken, position);
+        super(position);
         this.unexpected = token;
         this.expected = Collections.unmodifiableList(expected);
+    }
+
+    /**
+     * Builds the message for this error
+     *
+     * @return The message for this error
+     */
+    private String buildMessage() {
         StringBuilder builder = new StringBuilder("Unexpected token \"");
-        builder.append(token.getValue());
-        builder.append("\"; expected: ");
-        for (int i = 0; i != expected.size(); i++) {
-            if (i != 0)
-                builder.append(", ");
-            builder.append(expected.get(i).getName());
+        builder.append(unexpected.getValue());
+        builder.append("\"");
+        if (!expected.isEmpty()) {
+            builder.append("; expected: ");
+            for (int i = 0; i != expected.size(); i++) {
+                if (i != 0)
+                    builder.append(", ");
+                builder.append(expected.get(i).getName());
+            }
         }
-        this.message += builder.toString();
+        return builder.toString();
     }
 }

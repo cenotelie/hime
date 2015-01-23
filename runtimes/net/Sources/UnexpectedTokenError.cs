@@ -29,36 +29,68 @@ namespace Hime.Redist
 	public sealed class UnexpectedTokenError : ParseError
 	{
 		/// <summary>
+		/// The unexpected symbol
+		/// </summary>
+		private Symbol unexpected;
+
+		/// <summary>
+		/// The expected terminals
+		/// </summary>
+		private List<Symbol> expected;
+
+		/// <summary>
+		/// Gets the error's type
+		/// </summary>
+		public override ParseErrorType Type { get { return ParseErrorType.UnexpectedToken; } }
+
+		/// <summary>
+		/// Gets the error's message
+		/// </summary>
+		public override string Message { get { return BuildMessage(); } }
+
+		/// <summary>
 		/// Gets the unexpected token
 		/// </summary>
-		public Symbol UnexpectedToken { get; private set; }
+		public Symbol UnexpectedToken { get { return unexpected; } }
 
 		/// <summary>
-		/// Gets a list of the expected terminals
+		/// Gets the expected terminals
 		/// </summary>
-		public IList<Symbol> ExpectedTerminals { get; private set; }
+		public List<Symbol> ExpectedTerminals { get { return expected; } }
 
 		/// <summary>
-		/// Initializes a new instance of the UnexpectedTokenError class with a token and an array of expected names
+		/// Initializes this error
 		/// </summary>
 		/// <param name="token">The unexpected token</param>
 		/// <param name="position">Error's position in the input</param>
 		/// <param name="expected">The expected terminals</param>
-		internal UnexpectedTokenError(Symbol token, TextPosition position, IList<Symbol> expected)
-			: base(ParseErrorType.UnexpectedToken, position)
+		public UnexpectedTokenError(Symbol token, TextPosition position, List<Symbol> expected)
+			: base(position)
 		{
-			this.UnexpectedToken = token;
-			this.ExpectedTerminals = new ReadOnlyCollection<Symbol>(expected);
-			StringBuilder Builder = new StringBuilder("Unexpected token \"");
-			Builder.Append(token.Value);
-			Builder.Append("\"; expected: ");
-			for (int i = 0; i != expected.Count; i++)
+			this.unexpected = token;
+			this.expected = expected;
+		}
+
+		/// <summary>
+		/// Builds the message for this error
+		/// </summary>
+		/// <returns>The message for this error</returns>
+		private string BuildMessage()
+		{
+			StringBuilder builder = new StringBuilder("Unexpected token \"");
+			builder.Append(unexpected.Value);
+			builder.Append("\"");
+			if (expected.Count > 0)
 			{
-				if (i != 0)
-					Builder.Append(", ");
-				Builder.Append(expected[i].Name);
+				builder.Append("; expected: ");
+				for (int i = 0; i != expected.Count; i++)
+				{
+					if (i != 0)
+						builder.Append(", ");
+					builder.Append(expected[i].Name);
+				}
 			}
-			this.Message += Builder.ToString();
+			return builder.ToString();
 		}
 	}
 }

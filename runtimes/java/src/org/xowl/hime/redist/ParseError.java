@@ -25,26 +25,16 @@ package org.xowl.hime.redist;
  */
 public abstract class ParseError {
     /**
-     * The error's type
-     */
-    protected ParseErrorType type;
-    /**
      * The error's position in the input
      */
-    protected TextPosition position;
-    /**
-     * The error's message
-     */
-    protected String message;
+    private TextPosition position;
 
     /**
      * Gets the error's type
      *
      * @return The error's type
      */
-    public ParseErrorType getType() {
-        return type;
-    }
+    public abstract ParseErrorType getType();
 
     /**
      * Gets the error's position in the input
@@ -60,24 +50,19 @@ public abstract class ParseError {
      *
      * @return The error's message
      */
-    public String getMessage() {
-        return message;
-    }
+    public abstract String getMessage();
 
     /**
-     * Initializes a new instance of the ParserError
+     * Initializes this error
      *
-     * @param type     Error's type
      * @param position Error's position in the input
      */
-    protected ParseError(ParseErrorType type, TextPosition position) {
-        this.type = type;
+    protected ParseError(TextPosition position) {
         this.position = position;
-        this.message = "@" + position.toString() + " ";
     }
 
     @Override
     public String toString() {
-        return message;
+        return "@" + position.toString() + " " + getMessage();
     }
 }

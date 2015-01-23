@@ -90,6 +90,7 @@ namespace Hime.Tests.Driver
 			{
 				string temp = node.Children[i].Symbol.Value;
 				temp =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(temp.Substring(1, temp.Length - 2));
+				temp = temp.Replace("\\\"", "\"");
 				expected.Add(temp);
 			}
 			System.IO.File.WriteAllLines("expected.txt", expected, new System.Text.UTF8Encoding(false));
@@ -121,14 +122,15 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				System.Text.StringBuilder args = new System.Text.StringBuilder("executor.exe");
-				// add parser name argument
-				args.Append(" Hime.Tests.Generated.");
+				System.Text.StringBuilder args = new System.Text.StringBuilder("Hime.Tests.Generated.");
 				args.Append(fixture);
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser outputs");
-				code = ExecuteCommand(reporter, "mono", args.ToString(), output);
+				if (IsOnWindows())
+					code = ExecuteCommand(reporter, "executor.exe", args.ToString(), output);
+				else
+					code = ExecuteCommand(reporter, "mono", "executor.exe " + args.ToString(), output);
 			}
 			catch (Exception ex)
 			{

@@ -254,3 +254,109 @@ test Test_UnexpectedChar_SingleInsert:
 		"@(1, 1) Unexpected character 'y'"
 		"yx"
 		"^"
+
+test Test_ExpectedTerminals_LR_Shift:
+	grammar Test_ExpectedTerminals_LR_Shift { options {Axiom="top";} terminals {
+		A -> 'a';
+		B -> 'b';
+		X -> 'x';
+	} rules {
+		top -> A B ;
+	} }
+	parser LALR1
+	on "ax"
+	outputs
+		"@(1, 2) Unexpected token \"x\"; expected: B"
+		"ax"
+		" ^"
+
+test Test_ExpectedTerminals_GLR_Shift:
+	grammar Test_ExpectedTerminals_GLR_Shift { options {Axiom="top";} terminals {
+		A -> 'a';
+		B -> 'b';
+		X -> 'x';
+	} rules {
+		top -> A B ;
+	} }
+	parser RNGLALR1
+	on "ax"
+	outputs
+		"@(1, 2) Unexpected token \"x\"; expected: B"
+		"ax"
+		" ^"
+
+test Test_ExpectedTerminals_LR_Reduce:
+	grammar Test_ExpectedTerminals_LR_Reduce { options {Axiom="top";} terminals {
+		A -> 'a';
+		B -> 'b';
+		X -> 'x';
+	} rules {
+		top -> middle B ;
+		middle -> A ;
+	} }
+	parser LALR1
+	on "ax"
+	outputs
+		"@(1, 2) Unexpected token \"x\"; expected: B"
+		"ax"
+		" ^"
+
+test Test_ExpectedTerminals_GLR_Reduce:
+	grammar Test_ExpectedTerminals_GLR_Reduce { options {Axiom="top";} terminals {
+		A -> 'a';
+		B -> 'b';
+		X -> 'x';
+	} rules {
+		top -> middle B ;
+		middle -> A ;
+	} }
+	parser RNGLALR1
+	on "ax"
+	outputs
+		"@(1, 2) Unexpected token \"x\"; expected: B"
+		"ax"
+		" ^"
+
+test Test_ExpectedTerminals_LALR_Pathological:
+	grammar Test_ExpectedTerminals_LALR_Pathological { options {Axiom="top";} terminals {
+		A -> 'a';
+		B -> 'b';
+		C -> 'c';
+		X -> 'x';
+		Y -> 'y';
+		Z -> 'z';
+	} rules {
+		top -> X p1 B ;
+		top -> Y p2 C ;
+		p1 -> common ;
+		p2 -> common ;
+		common -> A ;
+	} }
+	parser LALR1
+	on "yaz"
+	outputs
+		"@(1, 3) Unexpected token \"z\"; expected: C"
+		"yaz"
+		"  ^"
+
+test Test_ExpectedTerminals_RNGLALR_Pathological:
+	grammar Test_ExpectedTerminals_RNGLALR_Pathological { options {Axiom="top";} terminals {
+		A -> 'a';
+		B -> 'b';
+		C -> 'c';
+		X -> 'x';
+		Y -> 'y';
+		Z -> 'z';
+	} rules {
+		top -> X p1 B ;
+		top -> Y p2 C ;
+		p1 -> common ;
+		p2 -> common ;
+		common -> A ;
+	} }
+	parser RNGLALR1
+	on "yaz"
+	outputs
+		"@(1, 3) Unexpected token \"z\"; expected: C"
+		"yaz"
+		"  ^"

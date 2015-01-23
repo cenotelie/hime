@@ -75,6 +75,7 @@
     <Compile Include="Sources\Lexer\StreamingText.cs" />
     <Compile Include="Sources\Lexer\Transition.cs" />
     <Compile Include="Sources\Parsers\LR\LRContexts.cs" />
+    <Compile Include="Sources\Parsers\LR\LRExpected.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
     <Compile Include="Sources\Token.cs" />
