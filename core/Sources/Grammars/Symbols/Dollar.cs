@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents the dollar symbol in a grammar, i.e. the marker of end of input

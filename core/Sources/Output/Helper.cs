@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Helpers for the emitters

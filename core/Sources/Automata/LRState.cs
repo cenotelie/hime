@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a state in an LR automaton
@@ -95,10 +95,10 @@ namespace Hime.CentralDogma.Automata
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.LRState"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.LRState"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.LRState"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.LRState"/>.
 		/// </returns>
 		public override string ToString()
 		{

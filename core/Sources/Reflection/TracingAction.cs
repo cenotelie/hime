@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Encapsulates a parser semantic action used for tracing purposes

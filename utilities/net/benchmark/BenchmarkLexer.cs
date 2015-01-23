@@ -21,7 +21,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Hime.CentralDogma.SDK;
+using Hime.SDK.Reflection;
 using Hime.Redist.Lexer;
 
 namespace Hime.Benchmark

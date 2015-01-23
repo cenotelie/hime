@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents the instance of a template rule

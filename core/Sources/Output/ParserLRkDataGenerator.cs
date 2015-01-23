@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Represents a generator for LR(k) parser data for the .Net platform

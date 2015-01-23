@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a base LR item
@@ -118,26 +118,26 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="Hime.CentralDogma.Grammars.LR.Item"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// Determines whether the specified <see cref="Hime.SDK.Grammars.LR.Item"/> is equal to the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </summary>
 		/// <param name='item'>
-		/// The <see cref="Hime.CentralDogma.Grammars.LR.Item"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// The <see cref="Hime.SDK.Grammars.LR.Item"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </param>
 		/// <returns>
-		/// <c>true</c> if the specified <see cref="Hime.CentralDogma.Grammars.LR.Item"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.Grammars.LR.Item"/>; otherwise, <c>false</c>.
+		/// <c>true</c> if the specified <see cref="Hime.SDK.Grammars.LR.Item"/> is equal to the current
+		/// <see cref="Hime.SDK.Grammars.LR.Item"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public abstract bool ItemEquals(Item item);
 
 		/// <summary>
-		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </summary>
 		/// <param name='obj'>
-		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </param>
 		/// <returns>
 		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.Grammars.LR.Item"/>; otherwise, <c>false</c>.
+		/// <see cref="Hime.SDK.Grammars.LR.Item"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
@@ -145,7 +145,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Serves as a hash function for a <see cref="Hime.CentralDogma.Grammars.LR.Item"/> object.
+		/// Serves as a hash function for a <see cref="Hime.SDK.Grammars.LR.Item"/> object.
 		/// </summary>
 		/// <returns>
 		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
@@ -156,10 +156,10 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </returns>
 		public override string ToString()
 		{
@@ -167,11 +167,11 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </summary>
 		/// <param name="withLookaheads">Whether to show the lookaheads</param>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </returns>
 		public string ToString(bool withLookaheads)
 		{

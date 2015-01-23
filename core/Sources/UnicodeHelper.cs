@@ -22,7 +22,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Contains a set of helper methods for the support of Unicode

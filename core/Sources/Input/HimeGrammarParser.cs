@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Hime.Redist;
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Input
+namespace Hime.SDK.Input
 {
 	/// <summary>
 	/// Represents a parser

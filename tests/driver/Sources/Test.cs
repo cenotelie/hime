@@ -21,9 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 using Hime.Redist;
-using Hime.CentralDogma;
-using Hime.CentralDogma.Input;
-using Hime.CentralDogma.Output;
+using Hime.SDK;
+using Hime.SDK.Input;
+using Hime.SDK.Output;
 
 namespace Hime.Tests.Driver
 {

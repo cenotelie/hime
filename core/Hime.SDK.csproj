@@ -8,7 +8,7 @@
     <ProjectGuid>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hime.CentralDogma</RootNamespace>
+    <RootNamespace>Hime.SDK</RootNamespace>
     <AssemblyName>Hime.CentralDogma</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -92,9 +92,9 @@
     <Compile Include="Sources\CompilationTask.cs" />
     <Compile Include="Sources\ParsingMethod.cs" />
     <Compile Include="Sources\Grammars\Grammar.cs" />
-    <Compile Include="Sources\SDK\DOTNodeShape.cs" />
-    <Compile Include="Sources\SDK\DOTSerializer.cs" />
-    <Compile Include="Sources\SDK\LexerReflection.cs" />
+    <Compile Include="Sources\Reflection\DOTNodeShape.cs" />
+    <Compile Include="Sources\Reflection\DOTSerializer.cs" />
+    <Compile Include="Sources\Reflection\LexerReflection.cs" />
     <Compile Include="Sources\UnicodeBlock.cs" />
     <Compile Include="Sources\UnicodeCategory.cs" />
     <Compile Include="Sources\CharSpan.cs" />
@@ -103,12 +103,12 @@
     <Compile Include="Sources\UnicodeSpan.cs" />
     <Compile Include="Sources\UnicodeBlocks.cs" />
     <Compile Include="Sources\UnicodeCategories.cs" />
-    <Compile Include="Sources\SDK\AssemblyReflection.cs" />
+    <Compile Include="Sources\Reflection\AssemblyReflection.cs" />
     <Compile Include="Sources\Automata\LRState.cs" />
     <Compile Include="Sources\Automata\LRTransition.cs" />
     <Compile Include="Sources\Automata\LRReduction.cs" />
     <Compile Include="Sources\Automata\LRAutomaton.cs" />
-    <Compile Include="Sources\SDK\ParserReflection.cs" />
+    <Compile Include="Sources\Reflection\ParserReflection.cs" />
     <Compile Include="Sources\Input\HimeGrammarLexer.cs" />
     <Compile Include="Sources\Input\HimeGrammarParser.cs" />
     <Compile Include="Sources\Grammars\Symbols\Action.cs" />
@@ -165,9 +165,9 @@
     <Compile Include="Sources\Output\Modifier.cs" />
     <Compile Include="Sources\Utils\ROList.cs" />
     <Compile Include="Sources\Output\Helper.cs" />
-    <Compile Include="Sources\SDK\Serializers.cs" />
-    <Compile Include="Sources\SDK\TracingAction.cs" />
-    <Compile Include="Sources\SDK\ActionTracer.cs" />
+    <Compile Include="Sources\Reflection\Serializers.cs" />
+    <Compile Include="Sources\Reflection\TracingAction.cs" />
+    <Compile Include="Sources\Reflection\ActionTracer.cs" />
     <Compile Include="Sources\Output\Runtime.cs" />
     <Compile Include="Sources\Output\LexerDataGenerator.cs" />
     <Compile Include="Sources\Output\LexerJavaCodeGenerator.cs" />
@@ -209,8 +209,5 @@
   </Target>
   -->
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Resources\" />
-    <Folder Include="Resources\Java\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

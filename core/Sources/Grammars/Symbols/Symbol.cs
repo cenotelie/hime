@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a symbol in a grammar
@@ -74,7 +74,7 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Serves as a hash function for a <see cref="Hime.CentralDogma.Grammars.Symbol"/> object.
+		/// Serves as a hash function for a <see cref="Hime.SDK.Grammars.Symbol"/> object.
 		/// </summary>
 		/// <returns>
 		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
@@ -85,14 +85,14 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.Symbol"/>.
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.SDK.Grammars.Symbol"/>.
 		/// </summary>
 		/// <param name='obj'>
-		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.Symbol"/>.
+		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.SDK.Grammars.Symbol"/>.
 		/// </param>
 		/// <returns>
 		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.Grammars.Symbol"/>; otherwise, <c>false</c>.
+		/// <see cref="Hime.SDK.Grammars.Symbol"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
@@ -103,10 +103,10 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Symbol"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Symbol"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Symbol"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Symbol"/>.
 		/// </returns>
 		public override string ToString()
 		{

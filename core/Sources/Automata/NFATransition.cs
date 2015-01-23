@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a transition in a Non-deterministic Finite Automaton

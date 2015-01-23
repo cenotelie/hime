@@ -19,7 +19,7 @@
 **********************************************************************/
 using System;
 using Hime.Redist;
-using Hime.CentralDogma.Input;
+using Hime.SDK.Input;
 
 namespace Hime.Benchmark
 {

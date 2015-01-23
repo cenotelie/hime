@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Represents a platform-agnostic emitter of lexer and parser for a given grammar
@@ -294,18 +294,18 @@ namespace Hime.CentralDogma.Output
 		private bool EmitDebugArtifacts(Unit unit)
 		{
 			reporter.Info("Exporting grammar debug data at " + GetArtifactDebugGrammar(unit) + " ...");
-			SDK.Serializers.Export(unit.Grammar, GetArtifactDebugGrammar(unit));
+			Reflection.Serializers.Export(unit.Grammar, GetArtifactDebugGrammar(unit));
 			if (unit.DFA != null)
 			{
 				reporter.Info("Exporting DFA debug data at " + GetArtifactDebugDFA(unit) + " ...");
-				SDK.Serializers.ExportDOT(unit.DFA, GetArtifactDebugDFA(unit));
+				Reflection.Serializers.ExportDOT(unit.DFA, GetArtifactDebugDFA(unit));
 			}
 			if (unit.Graph != null)
 			{
 				reporter.Info("Exporting LR graph debug data (txt) at " + GetArtifactDebugLRAsText(unit) + " ...");
-				SDK.Serializers.Export(unit.Graph, GetArtifactDebugLRAsText(unit));
+				Reflection.Serializers.Export(unit.Graph, GetArtifactDebugLRAsText(unit));
 				reporter.Info("Exporting LR graph debug data (dot) at " + GetArtifactDebugLRAsDOT(unit) + " ...");
-				SDK.Serializers.ExportDOT(unit.Graph, GetArtifactDebugLRAsDOT(unit));
+				Reflection.Serializers.ExportDOT(unit.Graph, GetArtifactDebugLRAsDOT(unit));
 			}
 			return true;
 		}

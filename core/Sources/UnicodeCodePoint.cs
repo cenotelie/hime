@@ -20,7 +20,7 @@
 using System;
 using System.Net;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a Unicode code point
@@ -156,12 +156,12 @@ namespace Hime.CentralDogma
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.CentralDogma.UnicodeCodePoint"/>.
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.SDK.UnicodeCodePoint"/>.
 		/// </summary>
-		/// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="Hime.CentralDogma.UnicodeCodePoint"/>.</param>
+		/// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="Hime.SDK.UnicodeCodePoint"/>.</param>
 		/// <returns>
 		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.UnicodeCodePoint"/>; otherwise, <c>false</c>.
+		/// <see cref="Hime.SDK.UnicodeCodePoint"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
@@ -174,7 +174,7 @@ namespace Hime.CentralDogma
 		}
 
 		/// <summary>
-		/// Serves as a hash function for a <see cref="Hime.CentralDogma.UnicodeCodePoint"/> object.
+		/// Serves as a hash function for a <see cref="Hime.SDK.UnicodeCodePoint"/> object.
 		/// </summary>
 		/// <returns>
 		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
@@ -185,10 +185,10 @@ namespace Hime.CentralDogma
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.UnicodeCodePoint"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.UnicodeCodePoint"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.UnicodeCodePoint"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.UnicodeCodePoint"/>.
 		/// </returns>
 		public override string ToString()
 		{

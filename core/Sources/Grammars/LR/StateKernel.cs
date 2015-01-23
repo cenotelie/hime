@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents the kernel of a LR state
@@ -110,15 +110,15 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/> is equal to
-		/// the current <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/>.
+		/// Determines whether the specified <see cref="Hime.SDK.Grammars.LR.StateKernel"/> is equal to
+		/// the current <see cref="Hime.SDK.Grammars.LR.StateKernel"/>.
 		/// </summary>
 		/// <param name='kernel'>
-		/// The <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/>.
+		/// The <see cref="Hime.SDK.Grammars.LR.StateKernel"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.StateKernel"/>.
 		/// </param>
 		/// <returns>
-		/// <c>true</c> if the specified <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/> is equal to the
-		/// current <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/>; otherwise, <c>false</c>.
+		/// <c>true</c> if the specified <see cref="Hime.SDK.Grammars.LR.StateKernel"/> is equal to the
+		/// current <see cref="Hime.SDK.Grammars.LR.StateKernel"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public bool Equals(StateKernel kernel)
 		{
@@ -151,14 +151,14 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/>.
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.SDK.Grammars.LR.StateKernel"/>.
 		/// </summary>
 		/// <param name='obj'>
-		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/>.
+		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.StateKernel"/>.
 		/// </param>
 		/// <returns>
 		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/>; otherwise, <c>false</c>.
+		/// <see cref="Hime.SDK.Grammars.LR.StateKernel"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
@@ -166,7 +166,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Serves as a hash function for a <see cref="Hime.CentralDogma.Grammars.LR.StateKernel"/> object.
+		/// Serves as a hash function for a <see cref="Hime.SDK.Grammars.LR.StateKernel"/> object.
 		/// </summary>
 		/// <returns>
 		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.

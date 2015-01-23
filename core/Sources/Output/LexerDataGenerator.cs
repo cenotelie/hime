@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Represents a generator of data and code for a lexer

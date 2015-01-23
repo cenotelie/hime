@@ -21,9 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 using Hime.Redist;
-using Hime.CentralDogma;
-using Hime.CentralDogma.Input;
-using Hime.CentralDogma.Output;
+using Hime.SDK;
+using Hime.SDK.Input;
+using Hime.SDK.Output;
 
 namespace Hime.Tests.Driver
 {
@@ -110,7 +110,7 @@ namespace Hime.Tests.Driver
 				builder.Append("'");
 				string value = node.Children[0].Children[1].Symbol.Value;
 				// Decode the read value by replacing all the escape sequences
-				value = Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(value.Substring(1, value.Length - 2)).Replace("\\'", "'");
+				value = Hime.SDK.Grammars.Loader.ReplaceEscapees(value.Substring(1, value.Length - 2)).Replace("\\'", "'");
 				// Reset escape sequences for single quotes and backslashes
 				value = value.Replace("\\", "\\\\").Replace("'", "\\'");
 				builder.Append(value);
@@ -153,7 +153,7 @@ namespace Hime.Tests.Driver
 		{
 			// Export input
 			string inputValue = node.Children[3].Symbol.Value;
-			inputValue =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
+			inputValue =  Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
 			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
 			// Export expected AST
 			if (expected != null)

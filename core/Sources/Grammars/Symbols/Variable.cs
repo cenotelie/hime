@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a variable in a grammar

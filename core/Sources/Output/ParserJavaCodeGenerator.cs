@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Represents a generator for parser code for the Java platform

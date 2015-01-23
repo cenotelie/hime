@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a lightweight interface for a readonly list of T elements

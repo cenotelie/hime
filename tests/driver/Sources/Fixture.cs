@@ -23,9 +23,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.Redist;
-using Hime.CentralDogma;
-using Hime.CentralDogma.Output;
-using Hime.CentralDogma.SDK;
+using Hime.SDK;
+using Hime.SDK.Output;
+using Hime.SDK.Reflection;
 
 namespace Hime.Tests.Driver
 {
@@ -51,9 +51,9 @@ namespace Hime.Tests.Driver
 			task.AddInputRaw(stream1);
 			task.AddInputRaw(stream2);
 			task.GrammarName = "Fixture";
-			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
+			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
-			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
+			task.Mode = Hime.SDK.Output.Mode.Assembly;
 			task.Namespace = "Hime.Tests.Driver";
 			task.Execute();
 			return new AssemblyReflection("Fixture.dll");

@@ -18,11 +18,11 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using Hime.CentralDogma.Input;
+using Hime.SDK.Input;
 using Hime.Redist.Parsers;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a loader for a grammar

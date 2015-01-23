@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a parsing method

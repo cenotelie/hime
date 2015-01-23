@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a phrase that can be produced by grammar.
@@ -86,10 +86,10 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Phrase"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Phrase"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Phrase"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Phrase"/>.
 		/// </returns>
 		public override string ToString()
 		{

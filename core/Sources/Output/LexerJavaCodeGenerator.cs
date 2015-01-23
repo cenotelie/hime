@@ -17,10 +17,10 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using Hime.CentralDogma.Grammars;
+using Hime.SDK.Grammars;
 using System.IO;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Represents a generator for lexer code for the Java platform

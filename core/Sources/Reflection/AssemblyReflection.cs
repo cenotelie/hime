@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Helper class for handling generated assembly containing lexers and parsers

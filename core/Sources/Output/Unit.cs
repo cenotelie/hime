@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hime.CentralDogma.Output
+namespace Hime.SDK.Output
 {
 	/// <summary>
 	/// Represent an output unit, i.e. a grammar with its compilation parameters

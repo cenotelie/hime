@@ -20,7 +20,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a set of unique terminals (sorted by ID)
@@ -203,10 +203,10 @@ namespace Hime.CentralDogma.Grammars
 		#endregion
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.TerminalSet"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.TerminalSet"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.TerminalSet"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.TerminalSet"/>.
 		/// </returns>
 		public override string ToString()
 		{

@@ -21,9 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 using Hime.Redist;
-using Hime.CentralDogma;
-using Hime.CentralDogma.Input;
-using Hime.CentralDogma.Output;
+using Hime.SDK;
+using Hime.SDK.Input;
+using Hime.SDK.Output;
 
 namespace Hime.Tests.Driver
 {
@@ -82,14 +82,14 @@ namespace Hime.Tests.Driver
 		{
 			// Export input
 			string inputValue = node.Children[3].Symbol.Value;
-			inputValue =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
+			inputValue =  Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
 			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
 			// Export expected output
 			List<string> expected = new List<string>();
 			for (int i=4; i!=node.Children.Count; i++)
 			{
 				string temp = node.Children[i].Symbol.Value;
-				temp =  Hime.CentralDogma.Grammars.Loader.ReplaceEscapees(temp.Substring(1, temp.Length - 2));
+				temp =  Hime.SDK.Grammars.Loader.ReplaceEscapees(temp.Substring(1, temp.Length - 2));
 				temp = temp.Replace("\\\"", "\"");
 				expected.Add(temp);
 			}

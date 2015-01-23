@@ -20,7 +20,7 @@
 using System;
 using Hime.Redist;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a logger producing a compilation report

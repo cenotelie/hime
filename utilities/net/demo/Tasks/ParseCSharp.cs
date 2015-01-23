@@ -20,8 +20,8 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Hime.CentralDogma;
-using Hime.CentralDogma.SDK;
+using Hime.SDK;
+using Hime.SDK.Reflection;
 using Hime.Redist;
 using Hime.Redist.Parsers;
 
@@ -42,11 +42,11 @@ namespace Hime.Demo.Tasks
 			// Build parser assembly
 			Stream stream = new FileStream(rootDir + Path.DirectorySeparatorChar + "extras" + Path.DirectorySeparatorChar + "Grammars" + Path.DirectorySeparatorChar + "ECMA_CSharp.gram", FileMode.Open);
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
+			task.Mode = Hime.SDK.Output.Mode.Assembly;
 			task.AddInputRaw("ECMA_CSharp.gram", stream);
 			task.Namespace = "Hime.Demo.Generated";
 			task.GrammarName = "CSharp";
-			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
+			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
 			task.Method = ParsingMethod.RNGLALR1;
 			Report report = task.Execute();
 			stream.Close();

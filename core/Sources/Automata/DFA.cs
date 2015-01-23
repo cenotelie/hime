@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a Deterministic Finite-state Automaton

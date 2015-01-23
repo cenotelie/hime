@@ -21,8 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml;
-using Hime.CentralDogma;
-using Hime.CentralDogma.Output;
+using Hime.SDK;
+using Hime.SDK.Output;
 using Hime.Redist;
 
 namespace Hime.Tests.Driver
@@ -73,7 +73,7 @@ namespace Hime.Tests.Driver
 			}
 
 			// Parse the arguments
-			ParseResult result = Hime.CentralDogma.Input.CommandLine.ParseArguments(args);
+			ParseResult result = Hime.SDK.Input.CommandLine.ParseArguments(args);
 			if (!result.IsSuccess || result.Errors.Count > 0)
 			{
 				Console.WriteLine("[ERROR] Could not parse the arguments");
@@ -93,11 +93,11 @@ namespace Hime.Tests.Driver
 				switch (arg.Symbol.Value)
 				{
 					case "--targets":
-						foreach (string name in Hime.CentralDogma.Input.CommandLine.GetValues(arg))
+						foreach (string name in Hime.SDK.Input.CommandLine.GetValues(arg))
 							targets.Add((Runtime)Enum.Parse(typeof(Runtime), name));
 						break;
 					case "--filter":
-						filter = new Regex(Hime.CentralDogma.Input.CommandLine.GetValue(arg));
+						filter = new Regex(Hime.SDK.Input.CommandLine.GetValue(arg));
 						break;
 					default:
 						Console.WriteLine("Unknown argument " + arg.Symbol.Value);
@@ -133,11 +133,11 @@ namespace Hime.Tests.Driver
 			// build the unit for the expected trees
 			System.IO.Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
 			System.IO.Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
-			Hime.CentralDogma.Input.Loader loader = new Hime.CentralDogma.Input.Loader();
+			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
 			loader.AddInputRaw(stream1);
 			loader.AddInputRaw(stream2);
-			List<Hime.CentralDogma.Grammars.Grammar> grammars = loader.Load();
-			foreach (Hime.CentralDogma.Grammars.Grammar grammar in grammars)
+			List<Hime.SDK.Grammars.Grammar> grammars = loader.Load();
+			foreach (Hime.SDK.Grammars.Grammar grammar in grammars)
 			{
 				if (grammar.Name == "ExpectedTree")
 				{

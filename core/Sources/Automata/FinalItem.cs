@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a marker for the final state of an automaton

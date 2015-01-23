@@ -7,7 +7,7 @@ using System.IO;
 using Hime.Redist;
 using Hime.Redist.Lexer;
 
-namespace Hime.CentralDogma.Input
+namespace Hime.SDK.Input
 {
 	/// <summary>
 	/// Represents a lexer

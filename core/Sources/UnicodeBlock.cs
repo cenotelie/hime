@@ -18,9 +18,9 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using Hime.CentralDogma.Automata;
+using Hime.SDK.Automata;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a Unicode block of characters

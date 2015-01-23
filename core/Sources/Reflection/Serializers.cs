@@ -20,9 +20,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Hime.Redist;
-using Hime.CentralDogma.Automata;
+using Hime.SDK.Automata;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Common serializers for debugging purposes

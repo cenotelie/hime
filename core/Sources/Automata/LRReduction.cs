@@ -19,7 +19,7 @@
 **********************************************************************/
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a reduction in a LR automaton
@@ -66,10 +66,10 @@ namespace Hime.CentralDogma.Automata
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.LRReduction"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.LRReduction"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.LRReduction"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.LRReduction"/>.
 		/// </returns>
 		public override string ToString()
 		{

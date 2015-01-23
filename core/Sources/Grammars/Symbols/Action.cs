@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a symbol for a semantic action in a grammar
@@ -36,10 +36,10 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Action"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Action"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Action"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Action"/>.
 		/// </returns>
 		public override string ToString()
 		{

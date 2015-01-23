@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hime.Redist.Lexer;
-using Hime.CentralDogma.Grammars;
+using Hime.SDK.Grammars;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Utilities to decompile a lexer produced by Central Dogma

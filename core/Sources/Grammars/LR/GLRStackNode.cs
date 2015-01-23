@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a node in a Graph-Structured Stack of a simulation of a GLR parser

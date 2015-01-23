@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Text;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Input
+namespace Hime.SDK.Input
 {
 	/// <summary>
 	/// Contains utilities for the manipulation of command line arguments

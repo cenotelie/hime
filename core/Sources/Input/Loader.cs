@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Input
+namespace Hime.SDK.Input
 {
 	/// <summary>
 	/// Represents a loader of inputs that produces grammars

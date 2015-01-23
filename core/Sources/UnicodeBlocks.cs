@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Contains the supported Unicode blocks

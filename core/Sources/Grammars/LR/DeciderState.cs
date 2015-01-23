@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a state in a decider automaton for the LR(*) parsing method
@@ -228,7 +228,7 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Serves as a hash function for a <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/> object.
+		/// Serves as a hash function for a <see cref="Hime.SDK.Grammars.LR.DeciderState"/> object.
 		/// </summary>
 		/// <returns>
 		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.
@@ -239,14 +239,14 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/>.
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Hime.SDK.Grammars.LR.DeciderState"/>.
 		/// </summary>
 		/// <param name='obj'>
-		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/>.
+		/// The <see cref="System.Object"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.DeciderState"/>.
 		/// </param>
 		/// <returns>
 		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.Grammars.LR.DeciderState"/>; otherwise, <c>false</c>.
+		/// <see cref="Hime.SDK.Grammars.LR.DeciderState"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{

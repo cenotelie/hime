@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Serializes graphs in the DOT format

@@ -33,26 +33,26 @@ namespace Hime.Demo.Tasks
 		{
 			string inlineGrammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
 			// load the grammar
-			Hime.CentralDogma.Input.Loader loader = new Hime.CentralDogma.Input.Loader();
+			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
 			loader.AddInputRaw(inlineGrammar);
-			List<Hime.CentralDogma.Grammars.Grammar> grammars = loader.Load();
+			List<Hime.SDK.Grammars.Grammar> grammars = loader.Load();
 			// prepare
-			Hime.CentralDogma.Grammars.Grammar grammar = grammars[0];
+			Hime.SDK.Grammars.Grammar grammar = grammars[0];
 			grammar.Prepare();
-			Hime.CentralDogma.SDK.Serializers.Export(grammar, "Demo.Grammar.txt");
+			Hime.SDK.Reflection.Serializers.Export(grammar, "Demo.Grammar.txt");
 			// get the NFA for a single lexical rule
-			Hime.CentralDogma.Grammars.Terminal terminalK = grammar.GetTerminalByName("K");
-			Hime.CentralDogma.SDK.Serializers.ExportDOT(terminalK.NFA, "Demo.NFA_K.dot");
+			Hime.SDK.Grammars.Terminal terminalK = grammar.GetTerminalByName("K");
+			Hime.SDK.Reflection.Serializers.ExportDOT(terminalK.NFA, "Demo.NFA_K.dot");
 			// build the global DFA an output it
-			Hime.CentralDogma.Automata.DFA dfa = grammar.BuildDFA();
-			Hime.CentralDogma.SDK.Serializers.ExportDOT(dfa, "Demo.DFA.dot");
+			Hime.SDK.Automata.DFA dfa = grammar.BuildDFA();
+			Hime.SDK.Reflection.Serializers.ExportDOT(dfa, "Demo.DFA.dot");
 			// build the LALR(1) automaton and output it
-			Hime.CentralDogma.Grammars.LR.Builder builder = new Hime.CentralDogma.Grammars.LR.Builder(grammar);
-			Hime.CentralDogma.Grammars.LR.Graph graph = builder.Build(Hime.CentralDogma.ParsingMethod.LALR1);
-			foreach (Hime.CentralDogma.Grammars.LR.Conflict conflict in builder.Conflicts)
+			Hime.SDK.Grammars.LR.Builder builder = new Hime.SDK.Grammars.LR.Builder(grammar);
+			Hime.SDK.Grammars.LR.Graph graph = builder.Build(Hime.SDK.ParsingMethod.LALR1);
+			foreach (Hime.SDK.Grammars.LR.Conflict conflict in builder.Conflicts)
 				System.Console.WriteLine(conflict);
-			Hime.CentralDogma.SDK.Serializers.ExportDOT(graph, "Demo.LR.dot");
-			Hime.CentralDogma.SDK.Serializers.Export(graph, "Demo.LR.txt");
+			Hime.SDK.Reflection.Serializers.ExportDOT(graph, "Demo.LR.dot");
+			Hime.SDK.Reflection.Serializers.Export(graph, "Demo.LR.txt");
 		}
 	}
 }

@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Represents a tracer of the execution of the semantic actions in a parser

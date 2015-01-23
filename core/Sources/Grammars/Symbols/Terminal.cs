@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a terminal symbol in a grammar
@@ -62,10 +62,10 @@ namespace Hime.CentralDogma.Grammars
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Terminal"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Terminal"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.Terminal"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.Terminal"/>.
 		/// </returns>
 		public override string ToString()
 		{

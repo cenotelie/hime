@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a LR conflict
@@ -117,10 +117,10 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Conflict"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.LR.Conflict"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Grammars.LR.Conflict"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Grammars.LR.Conflict"/>.
 		/// </returns>
 		public override string ToString()
 		{

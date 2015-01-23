@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents an LR automaton

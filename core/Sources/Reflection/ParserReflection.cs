@@ -22,7 +22,7 @@ using System.IO;
 using System.Reflection;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.SDK
+namespace Hime.SDK.Reflection
 {
 	/// <summary>
 	/// Utilities to decompile a parser produced by Central Dogma

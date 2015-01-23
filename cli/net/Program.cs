@@ -20,7 +20,7 @@
 using System;
 using System.Reflection;
 using System.Text;
-using Hime.CentralDogma;
+using Hime.SDK;
 using Hime.Redist;
 
 namespace Hime.HimeCC
@@ -92,7 +92,7 @@ namespace Hime.HimeCC
 			}
 
 			// Parse the arguments
-			ParseResult result = Hime.CentralDogma.Input.CommandLine.ParseArguments(args);
+			ParseResult result = Hime.SDK.Input.CommandLine.ParseArguments(args);
 			if (!result.IsSuccess || result.Errors.Count > 0)
 			{
 				Console.WriteLine(ErrorParsingArgs);
@@ -141,10 +141,10 @@ namespace Hime.HimeCC
 		{
 			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.CentralDogma.Output.Mode.Source;
+			task.Mode = Hime.SDK.Output.Mode.Source;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.CentralDogma.Input";
-			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Internal;
+			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
 			return report.Errors.Count;
@@ -158,11 +158,11 @@ namespace Hime.HimeCC
 		{
 			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.CentralDogma.Output.Mode.Source;
+			task.Mode = Hime.SDK.Output.Mode.Source;
 			task.AddInputRaw(stream);
 			task.GrammarName = "HimeGrammar";
 			task.Namespace = "Hime.CentralDogma.Input";
-			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Internal;
+			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
 			return report.Errors.Count;
@@ -197,27 +197,27 @@ namespace Hime.HimeCC
 				switch (arg.Symbol.Value)
 				{
 					case ArgOutputAssembly:
-						if (task.Mode == Hime.CentralDogma.Output.Mode.Source)
-							task.Mode = Hime.CentralDogma.Output.Mode.SourceAndAssembly;
+						if (task.Mode == Hime.SDK.Output.Mode.Source)
+							task.Mode = Hime.SDK.Output.Mode.SourceAndAssembly;
 						break;
 					case ArgOutputNoSources:
-						task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
+						task.Mode = Hime.SDK.Output.Mode.Assembly;
 						break;
 					case ArgOutputDebug:
-						task.Mode = Hime.CentralDogma.Output.Mode.Debug;
+						task.Mode = Hime.SDK.Output.Mode.Debug;
 						break;
 					case ArgTargetJava:
-						task.Target = Hime.CentralDogma.Output.Runtime.Java;
+						task.Target = Hime.SDK.Output.Runtime.Java;
 						break;
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
 							return null;
-						task.GrammarName = Hime.CentralDogma.Input.CommandLine.GetValue(arg);
+						task.GrammarName = Hime.SDK.Input.CommandLine.GetValue(arg);
 						break;
 					case ArgPath:
 						if (arg.Children.Count != 1)
 							return null;
-						task.OutputPath = Hime.CentralDogma.Input.CommandLine.GetValue(arg);
+						task.OutputPath = Hime.SDK.Input.CommandLine.GetValue(arg);
 						break;
 					case ArgMethodRNGLR:
 						task.Method = ParsingMethod.RNGLALR1;
@@ -225,10 +225,10 @@ namespace Hime.HimeCC
 					case ArgNamespace:
 						if (arg.Children.Count != 1)
 							return null;
-						task.Namespace = Hime.CentralDogma.Input.CommandLine.GetValue(arg);
+						task.Namespace = Hime.SDK.Input.CommandLine.GetValue(arg);
 						break;
 					case ArgAccessPublic:
-						task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
+						task.CodeAccess = Hime.SDK.Output.Modifier.Public;
 						break;
 					default:
 						Console.WriteLine("Unknown argument " + arg.Symbol.Value);

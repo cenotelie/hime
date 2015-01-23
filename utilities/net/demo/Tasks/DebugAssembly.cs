@@ -33,12 +33,12 @@ namespace Hime.Demo.Tasks
 			// build an assembly to be inspected
 			BuildAssembly();
 			// load the generated assembly and retrieve the lexer and parser
-			Hime.CentralDogma.SDK.AssemblyReflection assembly = new Hime.CentralDogma.SDK.AssemblyReflection("Demo.dll");
-			Hime.CentralDogma.SDK.LexerReflection lexer = new Hime.CentralDogma.SDK.LexerReflection(assembly.GetType("Hime.Demo.Generated.DemoLexer"));
-			Hime.CentralDogma.SDK.ParserReflection parser = new Hime.CentralDogma.SDK.ParserReflection(assembly.GetType("Hime.Demo.Generated.DemoParser"));
+			Hime.SDK.Reflection.AssemblyReflection assembly = new Hime.SDK.Reflection.AssemblyReflection("Demo.dll");
+			Hime.SDK.Reflection.LexerReflection lexer = new Hime.SDK.Reflection.LexerReflection(assembly.GetType("Hime.Demo.Generated.DemoLexer"));
+			Hime.SDK.Reflection.ParserReflection parser = new Hime.SDK.Reflection.ParserReflection(assembly.GetType("Hime.Demo.Generated.DemoParser"));
 			// Export the automata
-			Hime.CentralDogma.SDK.Serializers.ExportDOT(lexer.DFA, "Demo.Lexer.dot");
-			Hime.CentralDogma.SDK.Serializers.ExportDOT(parser.Automaton, "Demo.Parser.dot");
+			Hime.SDK.Reflection.Serializers.ExportDOT(lexer.DFA, "Demo.Lexer.dot");
+			Hime.SDK.Reflection.Serializers.ExportDOT(parser.Automaton, "Demo.Parser.dot");
 		}
 
 		/// <summary>
@@ -48,13 +48,13 @@ namespace Hime.Demo.Tasks
 		{
 			// Build parser assembly
 			string grammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
-			Hime.CentralDogma.CompilationTask task = new Hime.CentralDogma.CompilationTask();
-			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
+			Hime.SDK.CompilationTask task = new Hime.SDK.CompilationTask();
+			task.Mode = Hime.SDK.Output.Mode.Assembly;
 			task.AddInputRaw(grammar);
 			task.Namespace = "Hime.Demo.Generated";
 			task.GrammarName = "Demo";
-			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
-			task.Method = Hime.CentralDogma.ParsingMethod.LALR1;
+			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
+			task.Method = Hime.SDK.ParsingMethod.LALR1;
 			task.Execute();
 		}
 	}

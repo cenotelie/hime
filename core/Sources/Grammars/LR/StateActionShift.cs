@@ -19,7 +19,7 @@
 **********************************************************************/
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a shift action in a LR state

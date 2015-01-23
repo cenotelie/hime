@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Grammars
+namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a template rule in a grammar

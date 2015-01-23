@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a graph of LR kernels used to build a LALR(1) graph from a LR(0) graph

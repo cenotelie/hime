@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a set of reduction for a LR(1) state

@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
 
-namespace Hime.CentralDogma.Grammars.LR
+namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a LR(0) item
@@ -89,14 +89,14 @@ namespace Hime.CentralDogma.Grammars.LR
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="Hime.CentralDogma.Grammars.LR.Item"/> is equal to the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// Determines whether the specified <see cref="Hime.SDK.Grammars.LR.Item"/> is equal to the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </summary>
 		/// <param name='item'>
-		/// The <see cref="Hime.CentralDogma.Grammars.LR.Item"/> to compare with the current <see cref="Hime.CentralDogma.Grammars.LR.Item"/>.
+		/// The <see cref="Hime.SDK.Grammars.LR.Item"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.Item"/>.
 		/// </param>
 		/// <returns>
-		/// <c>true</c> if the specified <see cref="Hime.CentralDogma.Grammars.LR.Item"/> is equal to the current
-		/// <see cref="Hime.CentralDogma.Grammars.LR.Item"/>; otherwise, <c>false</c>.
+		/// <c>true</c> if the specified <see cref="Hime.SDK.Grammars.LR.Item"/> is equal to the current
+		/// <see cref="Hime.SDK.Grammars.LR.Item"/>; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool ItemEquals(Item item)
 		{

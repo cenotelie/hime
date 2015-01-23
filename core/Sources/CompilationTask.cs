@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Hime.CentralDogma
+namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a compilation task for the generation of lexers and parsers from grammars

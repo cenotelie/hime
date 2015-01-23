@@ -18,7 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a fake marker of a final state in an automaton
@@ -51,10 +51,10 @@ namespace Hime.CentralDogma.Automata
 		public int Priority { get { return -1; } }
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.DummyItem"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.DummyItem"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.DummyItem"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.DummyItem"/>.
 		/// </returns>
 		public override string ToString()
 		{

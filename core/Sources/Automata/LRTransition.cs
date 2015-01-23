@@ -19,7 +19,7 @@
 **********************************************************************/
 using Hime.Redist;
 
-namespace Hime.CentralDogma.Automata
+namespace Hime.SDK.Automata
 {
 	/// <summary>
 	/// Represents a transition in a LR automaton
@@ -56,10 +56,10 @@ namespace Hime.CentralDogma.Automata
 		}
 
 		/// <summary>
-		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.LRTransition"/>.
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.LRTransition"/>.
 		/// </summary>
 		/// <returns>
-		/// A <see cref="System.String"/> that represents the current <see cref="Hime.CentralDogma.Automata.LRTransition"/>.
+		/// A <see cref="System.String"/> that represents the current <see cref="Hime.SDK.Automata.LRTransition"/>.
 		/// </returns>
 		public override string ToString()
 		{

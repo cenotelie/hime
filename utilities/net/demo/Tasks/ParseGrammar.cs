@@ -20,8 +20,8 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Hime.CentralDogma;
-using Hime.CentralDogma.SDK;
+using Hime.SDK;
+using Hime.SDK.Reflection;
 using Hime.Redist;
 using Hime.Redist.Parsers;
 
@@ -40,11 +40,11 @@ namespace Hime.Demo.Tasks
 			// Build parser assembly
 			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.CentralDogma.Output.Mode.Assembly;
+			task.Mode = Hime.SDK.Output.Mode.Assembly;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.Demo.Generated";
 			task.GrammarName = "HimeGrammar";
-			task.CodeAccess = Hime.CentralDogma.Output.Modifier.Public;
+			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
 			task.Execute();
 			stream.Close();
