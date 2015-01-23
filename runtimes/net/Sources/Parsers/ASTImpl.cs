@@ -35,7 +35,7 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// The node's symbol reference
 			/// </summary>
-			public SymbolRef symbol;
+			public TableElemRef symbol;
 			/// <summary>
 			/// The number of children
 			/// </summary>
@@ -49,7 +49,7 @@ namespace Hime.Redist.Parsers
 			/// Initializes this node
 			/// </summary>
 			/// <param name="symbol">The node's symbol</param>
-			public Node(SymbolRef symbol)
+			public Node(TableElemRef symbol)
 			{
 				this.symbol = symbol;
 				this.count = 0;
@@ -60,7 +60,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The table of tokens
 		/// </summary>
-		protected TokenizedText tableTokens;
+		protected TokenDataProvider tableTokens;
 		/// <summary>
 		/// The table of variables
 		/// </summary>
@@ -82,7 +82,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this AST
 		/// </summary>
-		public ASTImpl(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public ASTImpl(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.tableTokens = text;
 			this.tableVariables = variables;
@@ -139,8 +139,8 @@ namespace Hime.Redist.Parsers
 		/// <returns>The position in the text</returns>
 		public TextPosition GetPosition(int node)
 		{
-			SymbolRef sym = nodes[node].symbol;
-			if (sym.Type == SymbolType.Token)
+			TableElemRef sym = nodes[node].symbol;
+			if (sym.Type == TableType.Token)
 				return tableTokens.GetPositionOf(sym.Index);
 			return new TextPosition(0, 0);
 		}
@@ -151,15 +151,15 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="symRef">A symbol reference</param>
 		/// <returns>The corresponding symbol</returns>
-		public Symbol GetSymbolFor(SymbolRef symRef)
+		public Symbol GetSymbolFor(TableElemRef symRef)
 		{
 			switch (symRef.Type)
 			{
-				case SymbolType.Token:
+				case TableType.Token:
 					return tableTokens[symRef.Index];
-				case SymbolType.Variable:
+				case TableType.Variable:
 					return tableVariables[symRef.Index];
-				case SymbolType.Virtual:
+				case TableType.Virtual:
 					return tableVirtuals[symRef.Index];
 			}
 			// This cannot happen

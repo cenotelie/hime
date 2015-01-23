@@ -17,47 +17,29 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
-using Hime.Redist.Utils;
 
-namespace Hime.Redist.Lexer
+namespace Hime.Redist
 {
 	/// <summary>
-	/// Handler for lexical errors
+	/// Represents a type of table
 	/// </summary>
-	/// <param name="error">The new error</param>
-	public delegate void AddLexicalError(ParseError error);
-
-
-	/// <summary>
-	/// Represents a lexer for a text stream
-	/// </summary>
-	public interface ILexer
+	enum TableType : byte
 	{
 		/// <summary>
-		/// Gets the terminals matched by this lexer
+		/// Marks as other (used for SPPF nodes)
 		/// </summary>
-		ROList<Symbol> Terminals { get; }
-
+		None = 0,
 		/// <summary>
-		/// Events for lexical errors
+		/// Table of tokens
 		/// </summary>
-		event AddLexicalError OnError;
-
+		Token = 1,
 		/// <summary>
-		/// Gets the lexer's input text
+		/// Table of variables
 		/// </summary>
-		Text Input { get; }
-
+		Variable = 2,
 		/// <summary>
-		/// Gets the lexer's output stream of tokens
+		/// Tables of virtuals
 		/// </summary>
-		IEnumerable<Token> Output { get; }
-
-		/// <summary>
-		/// Gets the next token in the input
-		/// </summary>
-		/// <returns>The next token in the input</returns>
-		Token GetNextToken();
+		Virtual = 3
 	}
 }

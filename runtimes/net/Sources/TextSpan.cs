@@ -1,5 +1,5 @@
-/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+﻿/**********************************************************************
+* Copyright (c) 2015 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,47 +17,36 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
-using Hime.Redist.Utils;
 
-namespace Hime.Redist.Lexer
+namespace Hime.Redist
 {
 	/// <summary>
-	/// Handler for lexical errors
+	/// Represents a span of text in an input as a starting index and length
 	/// </summary>
-	/// <param name="error">The new error</param>
-	public delegate void AddLexicalError(ParseError error);
-
-
-	/// <summary>
-	/// Represents a lexer for a text stream
-	/// </summary>
-	public interface ILexer
+	public struct TextSpan
 	{
-		/// <summary>
-		/// Gets the terminals matched by this lexer
-		/// </summary>
-		ROList<Symbol> Terminals { get; }
+		private int index;
+		private int length;
 
 		/// <summary>
-		/// Events for lexical errors
+		/// Gets the starting index of this span
 		/// </summary>
-		event AddLexicalError OnError;
+		public int Index { get { return index } }
 
 		/// <summary>
-		/// Gets the lexer's input text
+		/// Gets the length of this span
 		/// </summary>
-		Text Input { get; }
+		public int Length { get { return length; } }
 
 		/// <summary>
-		/// Gets the lexer's output stream of tokens
+		/// Initializes this span
 		/// </summary>
-		IEnumerable<Token> Output { get; }
-
-		/// <summary>
-		/// Gets the next token in the input
-		/// </summary>
-		/// <returns>The next token in the input</returns>
-		Token GetNextToken();
+		/// <param name="index">The span's index</param>
+		/// <param name="length">The span's length</param>
+		public TextSpan(int index, int length)
+		{
+			this.index = index;
+			this.length = length;
+		}
 	}
 }

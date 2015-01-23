@@ -62,17 +62,17 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		public override Token GetNextToken(IContextProvider contexts)
+		internal override TokenKernel GetNextToken(IContextProvider contexts)
 		{
 			while (true)
 			{
 				Match match = RunDFA(contexts);
 				if (match.length != 0)
 				{
-					int id = recognizedTerminals[match.terminal].ID;
+					int id = terminals[match.terminal].ID;
 					if (id == separatorID)
 						continue;
-					Token token = new Token(id, text.AddToken(match.terminal, inputIndex, match.length));
+					TokenKernel token = new TokenKernel(id, tokens.Add(match.terminal, inputIndex, match.length));
 					inputIndex += match.length;
 					return token;
 				}
@@ -97,17 +97,8 @@ namespace Hime.Redist.Lexer
 					continue;
 				}
 				// This is the dollar terminal, at the end of the input
-				return new Token(Symbol.SID_DOLLAR, text.AddToken(match.terminal, inputIndex, match.length));
+				return new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(match.terminal, inputIndex, match.length));
 			}
-		}
-
-		/// <summary>
-		/// Rewinds this lexer for a specified amount of tokens
-		/// </summary>
-		/// <param name="count">The number of tokens to rewind</param>
-		public override void RewindTokens(int count)
-		{
-			inputIndex = text.DropTokens(count);
 		}
 
 		/// <summary>
@@ -129,7 +120,7 @@ namespace Hime.Redist.Lexer
 
 			while (state != Automaton.DEAD_STATE)
 			{
-				State stateData = automaton.GetState(state);
+				AutomatonState stateData = automaton.GetState(state);
 				// Is this state a matching state ?
 				for (int j = 0; i != stateData.TerminalsCount; j++ )
 				{

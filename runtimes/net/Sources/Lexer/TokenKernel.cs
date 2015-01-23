@@ -1,5 +1,5 @@
-/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+﻿/**********************************************************************
+* Copyright (c) 2015 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,29 +17,44 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Collections.Generic;
+using Hime.Redist.Utils;
 
-namespace Hime.Redist
+namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents the type of symbol
+	/// Represents the kernel of a token
 	/// </summary>
-	enum SymbolType : byte
+	struct TokenKernel
 	{
 		/// <summary>
-		/// Marks as other (used for SPPF nodes)
+		/// The identifier of the matched terminal
 		/// </summary>
-		None = 0,
+		private int terminalID;
 		/// <summary>
-		/// Marks a token symbol
+		/// The token's index in its repository
 		/// </summary>
-		Token = 1,
+		private int index;
+
 		/// <summary>
-		/// Marks a variable symbol
+		/// Gets the identifier of the matched terminal
 		/// </summary>
-		Variable = 2,
+		public int TerminalID { get { return terminalID; } }
+
 		/// <summary>
-		/// Marks a virtual symbol
+		/// Gets the token's index in its repository
 		/// </summary>
-		Virtual = 3
+		public int Index { get { return index; } }
+
+		/// <summary>
+		/// Initializes this kernel
+		/// </summary>
+		/// <param name="id">The identifier of the matched terminal</param>
+		/// <param name="index">The token's index in its repository</param>
+		public TokenKernel(int id, int index)
+		{
+			this.terminalID = id;
+			this.index = index;
+		}
 	}
 }

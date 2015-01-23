@@ -18,17 +18,17 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist
 {
 	/// <summary>
 	/// Represents the output of a parser
 	/// </summary>
-	public sealed class ParseResult
+	public class ParseResult
 	{
-		private IList<ParseError> errors;
-		private TokenizedText text;
+		private List<ParseError> errors;
+		private Text text;
 		private AST ast;
 
 		/// <summary>
@@ -36,9 +36,9 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="errors">The list of errors</param>
 		/// <param name="text">The parsed text</param>
-		internal ParseResult(List<ParseError> errors, TokenizedText text)
+		internal ParseResult(List<ParseError> errors, Text text)
 		{
-			this.errors = new ReadOnlyCollection<ParseError>(errors);
+			this.errors = errors;
 			this.text = text;
 		}
 
@@ -48,9 +48,9 @@ namespace Hime.Redist
 		/// <param name="errors">The list of errors</param>
 		/// <param name="text">The parsed text</param>
 		/// <param name="ast">The produced AST</param>
-		internal ParseResult(List<ParseError> errors, TokenizedText text, AST ast)
+		internal ParseResult(List<ParseError> errors, Text text, AST ast)
 		{
-			this.errors = new ReadOnlyCollection<ParseError>(errors);
+			this.errors = errors;
 			this.text = text;
 			this.ast = ast;
 		}
@@ -63,12 +63,12 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets a list of the parsing errors
 		/// </summary>
-		public IList<ParseError> Errors { get { return errors; } }
+		public ROList<ParseError> Errors { get { return new ROList<ParseError>(errors); } }
 
 		/// <summary>
 		/// Gets the text that has been parsed
 		/// </summary>
-		public TokenizedText Input { get { return text; } }
+		public Text Input { get { return text; } }
 
 		/// <summary>
 		/// Gets the root of the produced parse tree

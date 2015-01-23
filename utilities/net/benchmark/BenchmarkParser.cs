@@ -53,7 +53,7 @@ namespace Hime.Benchmark
 
 			foreach (Hime.Redist.ParseError error in result.Errors)
 			{
-				Hime.Redist.Context context = result.Input.GetContext(error.Position);
+				Hime.Redist.TextContext context = result.Input.GetContext(error.Position);
 				Console.WriteLine(error);
 				Console.WriteLine("\t" + context.Content);
 				Console.WriteLine("\t" + context.Pointer);

@@ -53,7 +53,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">The index within the buffer</param>
 		/// <returns>The label in the buffer</returns>
-		public SymbolRef GetLabelAt(int index)
+		public TableElemRef GetLabelAt(int index)
 		{
 			return nodes[index].symbol;
 		}
@@ -146,7 +146,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="symbol">The root's symbol</param>
 		/// <param name="action">The tree action applied on the root</param>
-		public void SetupRoot(SymbolRef symbol, TreeAction action)
+		public void SetupRoot(TableElemRef symbol, TreeAction action)
 		{
 			nodes[0] = new SimpleAST.Node(symbol);
 			actions[0] = action;
@@ -225,7 +225,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="index">The index of the item to set</param>
 		/// <param name="symbol">The symbol</param>
 		/// <param name="action">The tree action</param>
-		public void SetAt(int index, SymbolRef symbol, TreeAction action)
+		public void SetAt(int index, TableElemRef symbol, TreeAction action)
 		{
 			nodes[index] = new SimpleAST.Node(symbol);
 			actions[index] = action;

@@ -23,7 +23,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents a node in an Abstract Syntax Tree
 	/// </summary>
-	public struct ASTNode
+	public struct ASTNode : ParseAtom
 	{
 		/// <summary>
 		/// The parent parse tree
@@ -35,9 +35,9 @@ namespace Hime.Redist
 		private int index;
 
 		/// <summary>
-		/// Gets the symbol in this node
+		/// Gets the children of this node
 		/// </summary>
-		public Symbol Symbol { get { return tree.GetSymbol(index); } }
+		public ASTFamily Children { get { return new ASTFamily(tree, index); } }
 
 		/// <summary>
 		/// Gets the position in the input text of this node
@@ -45,9 +45,24 @@ namespace Hime.Redist
 		public TextPosition Position { get { return tree.GetPosition(index); } }
 
 		/// <summary>
-		/// Gets the children of this node
+		/// Gets the span in the input text of this node
 		/// </summary>
-		public ASTFamily Children { get { return new ASTFamily(tree, index); } }
+		public TextSpan Span { get { return tree.GetSpan(index); } }
+
+		/// <summary>
+		/// Gets the context of this node in the input
+		/// </summary>
+		public TextContext Context { get { return tree.GetContext(index); } }
+
+		/// <summary>
+		/// Gets the grammar symbol associated to this node
+		/// </summary>
+		public Symbol Symbol { get { return tree.GetSymbol(index); } }
+
+		/// <summary>
+		/// Gets the value of this node
+		/// </summary>
+		public string Value { get { return tree.GetValue(index); } }
 
 		/// <summary>
 		/// Initializes this node
@@ -63,10 +78,14 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets a string representation of this node
 		/// </summary>
-		/// <returns>The string representation of the associated symbol</returns>
+		/// <returns>The string representation of this node</returns>
 		public override string ToString()
 		{
-			return tree.GetSymbol(index).ToString();
+			string name = tree.GetSymbol(index).Name;
+			string value = tree.GetValue(index);
+			if (value != null)
+				return name + " = " + value;
+			return name;
 		}
 	}
 }

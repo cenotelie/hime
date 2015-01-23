@@ -22,52 +22,18 @@ using System.Collections.Generic;
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents the base implementation of the TokenizedText interface for all lexers
+	/// Represents the base implementation of Text
 	/// </summary>
 	/// <remarks>
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	public abstract class BaseTokenizedText : TokenizedText
+	abstract class BaseText : Text
 	{
 		/// <summary>
 		/// The initiaal size of the cache of line start indices
 		/// </summary>
 		protected const int INIT_LINE_COUNT_CACHE_SIZE = 10000;
-
-		/// <summary>
-		/// Represents the metadata of a token
-		/// </summary>
-		protected struct Cell
-		{
-			/// <summary>
-			/// The terminal's index
-			/// </summary>
-			public int terminal;
-
-			/// <summary>
-			/// Start index of the text
-			/// </summary>
-			public int start;
-
-			/// <summary>
-			/// Length of the token
-			/// </summary>
-			public int length;
-
-			/// <summary>
-			/// Initializes this cell
-			/// </summary>
-			/// <param name="terminal">The terminal's index</param>
-			/// <param name="start">Start index of the text</param>
-			/// <param name="length">Length of the token</param>
-			public Cell(int terminal, int start, int length)
-			{
-				this.terminal = terminal;
-				this.start = start;
-				this.length = length;
-			}
-		}
 
 		/// <summary>
 		/// Cache of the starting indices of each line within the text
@@ -77,26 +43,8 @@ namespace Hime.Redist.Lexer
 		/// Index of the next line
 		/// </summary>
 		protected int line;
-		/// <summary>
-		/// The terminal symbols matched in this content
-		/// </summary>
-		protected IList<Symbol> terminals;
-		/// <summary>
-		/// The token data in this content
-		/// </summary>
-		protected Utils.BigList<Cell> cells;
 
-		/// <summary>
-		/// Initializes this text
-		/// </summary>
-		/// <param name="terminals">The terminal symbols</param>
-		public BaseTokenizedText(IList<Symbol> terminals)
-		{
-			this.terminals = terminals;
-			this.cells = new Hime.Redist.Utils.BigList<Cell>();
-		}
 
-		#region Internal API
 		/// <summary>
 		/// Gets the character at the specified index
 		/// </summary>
@@ -158,43 +106,22 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Adds a detected token in this text
+		/// Finds the index in the cache of the line at the given input index in the content
 		/// </summary>
-		/// <param name="terminal">Index of the matched terminal</param>
-		/// <param name="start">Start index in the text</param>
-		/// <param name="length">Length of the token</param>
-		/// <returns>The index of the new token</returns>
-		public int AddToken(int terminal, int start, int length)
+		/// <param name="index">The index within this content</param>
+		/// <returns>The index of the corresponding line in the cache</returns>
+		protected int FindLineAt(int index)
 		{
-			return cells.Add(new Cell(terminal, start, length));
+			if (lines == null)
+				FindLines();
+			for (int i = 1; i != line; i++)
+			{
+				if (index < lines[i])
+					return i - 1;
+			}
+			return line - 1;
 		}
 
-		/// <summary>
-		/// Gets the token at the specified index
-		/// </summary>
-		/// <param name="index">A token's index</param>
-		/// <returns>The token at the specified index</returns>
-		public Token GetTokenAt(int index)
-		{
-			Cell cell = cells[index];
-			return new Token(terminals[cell.terminal].ID, index);
-		}
-
-		/// <summary>
-		/// Drops the specified amount of tokens from the already matched tokens
-		/// </summary>
-		/// <param name="count">The number of tokens to drop</param>
-		/// <returns>The length of the tokenized text without the dropped tokens</returns>
-		public int DropTokens(int count)
-		{
-			Cell firstCell = cells[cells.Size - count + 1];
-			cells.Remove(count);
-			return firstCell.start;
-		}
-		#endregion
-
-
-		#region Implementation of Text
 		/// <summary>
 		/// Gets the number of lines
 		/// </summary>
@@ -220,6 +147,16 @@ namespace Hime.Redist.Lexer
 		/// <param name="length">Length of the substring</param>
 		/// <returns>The substring</returns>
 		public abstract string GetValue(int index, int length);
+
+		/// <summary>
+		/// Get the substring corresponding to the specified span
+		/// </summary>
+		/// <param name="span">A span in this text</param>
+		/// <returns>The substring</returns>
+		public string GetValue(TextSpan span)
+		{
+			return GetValue(span.Index, span.Length);
+		}
 
 		/// <summary>
 		/// Gets the starting index of the i-th line
@@ -269,11 +206,22 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="position">The position in this text</param>
 		/// <returns>The context description</returns>
-		public Context GetContext(TextPosition position)
+		public TextContext GetContext(TextPosition position)
+		{
+			return GetContext(position, 1);
+		}
+
+		/// <summary>
+		/// Gets the context description for the current text at the specified position
+		/// </summary>
+		/// <param name="position">The position in this text</param>
+		/// <param name="length">The length of the element to contextualize</param>
+		/// <returns>The context description</returns>
+		public TextContext GetContext(TextPosition position, int length)
 		{
 			string content = GetLineContent(position.Line);
 			if (content.Length == 0)
-				return new Context("", "^" );
+				return new TextContext("", "^");
 			int end = content.Length - 1;
 			while (end != 1 && (content[end] == '\n' || content[end] == '\r'))
 				end--;
@@ -285,120 +233,22 @@ namespace Hime.Redist.Lexer
 			if (position.Column - 1 > end)
 				end = content.Length - 1;
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
-			for (int i=start; i!=position.Column - 1; i++)
+			for (int i = start; i != position.Column - 1; i++)
 				builder.Append(content[i] == '\t' ? '\t' : ' ');
-			builder.Append("^");
-			return new Context(content.Substring(start, end - start + 1), builder.ToString());
+			for (int i = 0; i != length; i++)
+				builder.Append("^");
+			return new TextContext(content.Substring(start, end - start + 1), builder.ToString());
 		}
 
 		/// <summary>
-		/// Finds the index in the cache of the line at the given input index in the content
+		/// Gets the context description for the current text at the specified span
 		/// </summary>
-		/// <param name="index">The index within this content</param>
-		/// <returns>The index of the corresponding line in the cache</returns>
-		private int FindLineAt(int index)
+		/// <param name="span">The span of text to contextualize</param>
+		/// <returns>The context description</returns>
+		public TextContext GetContext(TextSpan span)
 		{
-			if (lines == null)
-				FindLines();
-			for (int i = 1; i != line; i++)
-			{
-				if (index < lines[i])
-					return i - 1;
-			}
-			return line - 1;
+			TextPosition position = GetPositionAt(span.Index);
+			return GetContext(position, span.Length);
 		}
-		#endregion
-
-
-		#region Implementation of IEnumerable
-		/// <summary>
-		/// Gets an enumerator of the contained tokens
-		/// </summary>
-		/// <returns>An enumerator of tokens</returns>
-		public IEnumerator<Symbol> GetEnumerator()
-		{
-			return new SymbolEnumerator(this);
-		}
-
-		/// <summary>
-		/// Gets an enumerator of the contained tokens
-		/// </summary>
-		/// <returns>An enumerator of tokens</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return new SymbolEnumerator(this);
-		}
-
-		/// <summary>
-		/// Represents an enumerator of tokens
-		/// </summary>
-		private class SymbolEnumerator : IEnumerator<Symbol>
-		{
-			private BaseTokenizedText text;
-			private int index;
-
-			public SymbolEnumerator(BaseTokenizedText text)
-			{
-				this.text = text;
-				this.index = -1;
-			}
-
-			public Symbol Current { get { return text[index]; } }
-
-			object System.Collections.IEnumerator.Current { get { return text[index]; } }
-
-			public bool MoveNext()
-			{
-				index++;
-				return (index == text.cells.Size);
-			}
-
-			public void Reset()
-			{
-				index = -1;
-			}
-
-			public void Dispose()
-			{
-				text = null;
-			}
-		}
-		#endregion
-
-
-		#region Implementation of TokenizedText
-		/// <summary>
-		/// Gets the number of tokens in this text
-		/// </summary>
-		public int TokenCount { get { return cells.Size; } }
-
-		/// <summary>
-		/// Gets the token at the given index
-		/// </summary>
-		/// <param name="index">An index</param>
-		/// <returns>The token</returns>
-		public Symbol this[int index]
-		{
-			get
-			{
-				Cell cell = cells[index];
-				Symbol terminal = terminals[cell.terminal];
-				if (terminal.ID == Symbol.SID_DOLLAR || terminal.ID == Symbol.SID_EPSILON)
-					return new Symbol(terminal.ID, terminal.Name, "<EOF>");
-				return new Symbol(terminal.ID, terminal.Name, GetValue(cell.start, cell.length));
-			}
-		}
-
-		/// <summary>
-		/// Gets the position of the token at the given index
-		/// </summary>
-		/// <param name="tokenIndex">The index of a token</param>
-		/// <returns>The position (line and column) of the token</returns>
-		public TextPosition GetPositionOf(int tokenIndex)
-		{
-			Cell cell = cells[tokenIndex];
-			return GetPositionAt(cell.start);
-		}
-		#endregion
 	}
 }

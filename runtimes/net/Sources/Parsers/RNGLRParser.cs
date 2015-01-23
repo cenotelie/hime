@@ -265,7 +265,7 @@ namespace Hime.Redist.Parsers
 				Console.WriteLine("==== RNGLR parsing error:");
 				Console.Write("\t");
 				Console.WriteLine(error.ToString());
-				Context context = lexer.Output.GetContext(error.Position);
+				TextContext context = lexer.Output.GetContext(error.Position);
 				Console.Write("\t");
 				Console.WriteLine(context.Content);
 				Console.Write("\t");
@@ -519,7 +519,7 @@ namespace Hime.Redist.Parsers
 			// Get the rule's head
 			Symbol head = parserVariables[reduction.prod.Head];
 			// Resolve the sub-root
-			GSSLabel label = sppf.GetLabelFor(path.Generation, new SymbolRef(SymbolType.Variable, reduction.prod.Head));
+			GSSLabel label = sppf.GetLabelFor(path.Generation, new TableElemRef(TableType.Variable, reduction.prod.Head));
 			if (label.IsEpsilon)
 			{
 				// not in history, build the SPPF here
@@ -592,7 +592,7 @@ namespace Hime.Redist.Parsers
 			int gen = gss.CreateGeneration();
 
 			// Create the GSS label to be used for the transitions
-			SymbolRef sym = new SymbolRef(SymbolType.Token, oldtoken.Index);
+			TableElemRef sym = new TableElemRef(TableType.Token, oldtoken.Index);
 			GSSLabel label = new GSSLabel(sym, sppf.GetSingleNode(sym));
 
 			// Execute all shifts in the queue at this point

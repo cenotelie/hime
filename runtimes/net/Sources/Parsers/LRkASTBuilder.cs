@@ -113,7 +113,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="text">The tokenined text</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
-		public LRkASTBuilder(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public LRkASTBuilder(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
@@ -131,7 +131,7 @@ namespace Hime.Redist.Parsers
 		public void StackPushToken(int index)
 		{
 			SubTree single = poolSingle.Acquire();
-			single.SetupRoot(new SymbolRef(SymbolType.Token, index), TreeAction.None);
+			single.SetupRoot(new TableElemRef(TableType.Token, index), TreeAction.None);
 			if (stackNext == stack.Length)
 				Array.Resize(ref stack, stack.Length + LRkParser.INIT_STACK_SIZE);
 			stack[stackNext++] = single;
@@ -150,7 +150,7 @@ namespace Hime.Redist.Parsers
 			for (int i = 0; i != length; i++)
 				estimation += stack[stackNext + i].GetSize();
 			cache = GetSubTree(estimation);
-			cache.SetupRoot(new SymbolRef(SymbolType.Variable, varIndex), action);
+			cache.SetupRoot(new TableElemRef(TableType.Variable, varIndex), action);
 			cacheNext = 1;
 			handleNext = 0;
 			popCount = 0;
@@ -230,7 +230,7 @@ namespace Hime.Redist.Parsers
 		{
 			if (action == TreeAction.Drop)
 				return; // why would you do this?
-			cache.SetAt(cacheNext, new SymbolRef(SymbolType.Virtual, index), action);
+			cache.SetAt(cacheNext, new TableElemRef(TableType.Virtual, index), action);
 			handle[handleNext++] = cacheNext++;
 		}
 

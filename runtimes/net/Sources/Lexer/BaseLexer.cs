@@ -18,8 +18,8 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Lexer
 {
@@ -59,24 +59,35 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The terminals matched by this lexer
 		/// </summary>
-		protected IList<Symbol> recognizedTerminals;
+		protected List<Symbol> terminals;
 		/// <summary>
 		/// Symbol ID of the SEPARATOR terminal
 		/// </summary>
 		protected int separatorID;
 		/// <summary>
-		/// The tokenized text
+		/// The input text
 		/// </summary>
-		protected BaseTokenizedText text;
+		internal BaseText text;
+		/// <summary>
+		/// The token repository
+		/// </summary>
+		internal TokenRepository tokens;
 
 		/// <summary>
 		/// Gets the terminals matched by this lexer
 		/// </summary>
-		public IList<Symbol> Terminals { get { return recognizedTerminals; } }
+		public ROList<Symbol> Terminals { get { return new ROList<Symbol>(terminals); } }
+
 		/// <summary>
-		/// Gets the lexer's output as a tokenized text
+		/// Gets the lexer's input text
 		/// </summary>
-		public TokenizedText Output { get { return text; } }
+		public Text Input { get { return text; } }
+
+		/// <summary>
+		/// Gets the lexer's output stream of tokens
+		/// </summary>
+		public IEnumerable<Token> Output { get { return tokens; } }
+
 		/// <summary>
 		/// Events for lexical errors
 		/// </summary>
@@ -92,9 +103,10 @@ namespace Hime.Redist.Lexer
 		protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 		{
 			this.automaton = automaton;
-			this.recognizedTerminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
+			this.terminals = new List<Symbol>(terminals);
 			this.separatorID = separator;
-			this.text = new PrefetchedText(this.recognizedTerminals, input);
+			this.text = new PrefetchedText(input);
+			this.tokens = new TokenRepository(new ROList<Symbol>(this.terminals), this.text);
 		}
 
 		/// <summary>
@@ -107,9 +119,20 @@ namespace Hime.Redist.Lexer
 		protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 		{
 			this.automaton = automaton;
-			this.recognizedTerminals = new ReadOnlyCollection<Symbol>(new List<Symbol>(terminals));
+			this.terminals = new List<Symbol>(terminals);
 			this.separatorID = separator;
-			this.text = new StreamingText(terminals, input);
+			this.text = new StreamingText(input);
+			this.tokens = new TokenRepository(new ROList<Symbol>(this.terminals), this.text);
+		}
+
+		/// <summary>
+		/// Gets the next token in the input
+		/// </summary>
+		/// <returns>The next token in the input</returns>
+		public Token GetNextToken()
+		{
+			TokenKernel kernel = GetNextToken(null);
+			return tokens[kernel.Index];
 		}
 
 		/// <summary>
@@ -126,12 +149,6 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		public abstract Token GetNextToken(IContextProvider contexts);
-
-		/// <summary>
-		/// Rewinds this lexer for a specified amount of tokens
-		/// </summary>
-		/// <param name="count">The number of tokens to rewind</param>
-		public abstract void RewindTokens(int count);
+		internal abstract TokenKernel GetNextToken(IContextProvider contexts);
 	}
 }

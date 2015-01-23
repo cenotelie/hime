@@ -38,7 +38,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The original symbol of the SPPF node
 		/// </summary>
-		private SymbolRef original;
+		private TableElemRef original;
 		/// <summary>
 		/// The index of the SPPF node
 		/// </summary>
@@ -51,7 +51,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the original symbol of the SPPF node
 		/// </summary>
-		public SymbolRef Original { get { return original; } }
+		public TableElemRef Original { get { return original; } }
 		/// <summary>
 		/// Gets the index of the SPPF node
 		/// </summary>
@@ -73,7 +73,7 @@ namespace Hime.Redist.Parsers
 		public GSSLabel(SubTree tree)
 		{
 			this.tree = tree;
-			this.original = new SymbolRef();
+			this.original = new TableElemRef();
 			this.nodeIndex = -1;
 		}
 
@@ -82,7 +82,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="original">The original symbol of the SPPF node</param>
 		/// <param name="index">The index of the SPPF node</param>
-		public GSSLabel(SymbolRef original, int index)
+		public GSSLabel(TableElemRef original, int index)
 		{
 			this.tree = null;
 			this.original = original;

@@ -67,17 +67,21 @@
     </Compile>
     <Compile Include="Sources\AST.cs" />
     <Compile Include="Sources\Lexer\BaseLexer.cs" />
-    <Compile Include="Sources\Lexer\BaseTokenizedText.cs" />
+    <Compile Include="Sources\Lexer\BaseText.cs" />
+    <Compile Include="Sources\Lexer\TokenKernel.cs" />
+    <Compile Include="Sources\Lexer\TokenRepository.cs" />
     <Compile Include="Sources\Lexer\ContextSensitiveLexer.cs" />
     <Compile Include="Sources\Lexer\IContextProvider.cs" />
     <Compile Include="Sources\Lexer\MatchedTerminal.cs" />
-    <Compile Include="Sources\Lexer\State.cs" />
+    <Compile Include="Sources\Lexer\AutomatonState.cs" />
     <Compile Include="Sources\Lexer\StreamingText.cs" />
-    <Compile Include="Sources\Lexer\Transition.cs" />
+    <Compile Include="Sources\Lexer\AutomatonTransition.cs" />
     <Compile Include="Sources\Parsers\LRContexts.cs" />
     <Compile Include="Sources\Parsers\LRExpected.cs" />
     <Compile Include="Sources\Parsers\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\GSSGeneration.cs" />
+    <Compile Include="Sources\ParseAtom.cs" />
+    <Compile Include="Sources\TextSpan.cs" />
     <Compile Include="Sources\Token.cs" />
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
@@ -94,7 +98,7 @@
     <Compile Include="Sources\Parsers\LRkAutomaton.cs" />
     <Compile Include="Sources\Parsers\LROpCode.cs" />
     <Compile Include="Sources\Parsers\LROpCodeValues.cs" />
-    <Compile Include="Sources\TokenizedText.cs" />
+    <Compile Include="Sources\TokenDataProvider.cs" />
     <Compile Include="Sources\TreeAction.cs" />
     <Compile Include="Sources\Parsers\GSSPath.cs" />
     <Compile Include="Sources\Parsers\RNGLRAutomaton.cs" />
@@ -114,8 +118,8 @@
     <Compile Include="Sources\Utils\Factory.cs" />
     <Compile Include="Sources\Parsers\SimpleAST.cs" />
     <Compile Include="Sources\Parsers\SubTree.cs" />
-    <Compile Include="Sources\SymbolType.cs" />
-    <Compile Include="Sources\SymbolRef.cs" />
+    <Compile Include="Sources\Parsers\TableType.cs" />
+    <Compile Include="Sources\Parsers\TableElemRef.cs" />
     <Compile Include="Sources\Parsers\LROpCodeBase.cs" />
     <Compile Include="Sources\Parsers\GSSLabel.cs" />
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
@@ -125,7 +129,7 @@
     <Compile Include="Sources\Parsers\GraphAST.cs" />
     <Compile Include="Sources\Parsers\SPPFBuilder.cs" />
     <Compile Include="Sources\Parsers\ASTImpl.cs" />
-    <Compile Include="Sources\Context.cs" />
+    <Compile Include="Sources\TextContext.cs" />
     <Compile Include="Sources\Utils\ROList.cs" />
   </ItemGroup>
   <ItemGroup />

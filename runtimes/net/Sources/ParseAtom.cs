@@ -1,5 +1,5 @@
 ﻿/**********************************************************************
-* Copyright (c) 2014 Laurent Wouters and others
+* Copyright (c) 2015 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,32 +17,37 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents the output of a lexer as a tokenized text
+	/// Represents a piece of parsing data
 	/// </summary>
-	public interface TokenizedText : Text, IEnumerable<Symbol>
+	public interface ParseAtom
 	{
 		/// <summary>
-		/// Gets the number of tokens in this text
+		/// Gets the position in the input text of this element
 		/// </summary>
-		int TokenCount { get; }
+		TextPosition Position { get; }
 
 		/// <summary>
-		/// Gets the token at the given index
+		/// Gets the span in the input text of this element
 		/// </summary>
-		/// <param name="index">An index</param>
-		/// <returns>The token</returns>
-		Symbol this[int index] { get; }
+		TextSpan Span { get; }
 
 		/// <summary>
-		/// Gets the position of the token at the given index
+		/// Gets the context of this element in the input
 		/// </summary>
-		/// <param name="tokenIndex">The index of a token</param>
-		/// <returns>The position (line and column) of the token</returns>
-		TextPosition GetPositionOf(int tokenIndex);
+		TextContext Context { get; }
+
+		/// <summary>
+		/// Gets the grammar symbol associated to this element
+		/// </summary>
+		Symbol Symbol { get; }
+
+		/// <summary>
+		/// Gets the value of this element, if any
+		/// </summary>
+		string Value { get; }
 	}
 }

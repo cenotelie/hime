@@ -33,13 +33,6 @@ namespace Hime.Redist
 		ASTNode Root { get; }
 
 		/// <summary>
-		/// Gets the symbol of the given node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The node's symbol</returns>
-		Symbol GetSymbol(int node);
-
-		/// <summary>
 		/// Gets the number of children of the given node
 		/// </summary>
 		/// <param name="node">A node</param>
@@ -67,5 +60,33 @@ namespace Hime.Redist
 		/// <param name="node">A node</param>
 		/// <returns>The position in the text</returns>
 		TextPosition GetPosition(int node);
+
+		/// <summary>
+		/// Gets the span in the input text of the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The span in the text</returns>
+		TextSpan GetSpan(int node);
+
+		/// <summary>
+		/// Gets the context in the input of the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The context</returns>
+		TextContext GetContext(int node);
+
+		/// <summary>
+		/// Gets the grammar symbol associated to the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The associated symbol</returns>
+		Symbol GetSymbol(int node);
+
+		/// <summary>
+		/// Gets the value of the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The associated value</returns>
+		string GetValue(int node);
 	}
 }

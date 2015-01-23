@@ -35,7 +35,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this AST
 		/// </summary>
-		public SimpleAST(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public SimpleAST(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
 			: base(text, variables, virtuals)
 		{
 		}

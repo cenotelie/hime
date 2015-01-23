@@ -28,7 +28,7 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	class PrefetchedText : BaseTokenizedText
+	class PrefetchedText : BaseText
 	{
 		/// <summary>
 		/// The full content of the input
@@ -38,15 +38,12 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Initializes this text
 		/// </summary>
-		/// <param name="terminals">The terminal symbols</param>
 		/// <param name="content">The full lexer's input as a string</param>
-		public PrefetchedText(IList<Symbol> terminals, string content)
-			: base(terminals)
+		public PrefetchedText(string content)
 		{
 			this.content = content;
 		}
 
-		#region Internal API
 		/// <summary>
 		/// Gets the character at the specified index
 		/// </summary>
@@ -92,10 +89,7 @@ namespace Hime.Redist.Lexer
 				}
 			}
 		}
-		#endregion
 
-
-		#region Implementation of Text
 		/// <summary>
 		/// Gets the size in number of characters
 		/// </summary>
@@ -128,6 +122,5 @@ namespace Hime.Redist.Lexer
 				return (content.Length - lines[this.line - 1]);
 			return (lines[line] - lines[line - 1]);
 		}
-		#endregion
 	}
 }

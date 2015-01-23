@@ -62,27 +62,20 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		public override Token GetNextToken(IContextProvider contexts)
+		internal override TokenKernel GetNextToken(IContextProvider contexts)
 		{
-			if (text.TokenCount == 0)
+			if (tokens.Size == 0)
 			{
 				// this is the first call to this method, prefetch the tokens
 				FindTokens();
 				tokenIndex = 0;
 			}
 			// no more tokens? return epsilon
-			if (tokenIndex >= text.TokenCount)
-				return new Token(Symbol.SID_EPSILON, 0);
-			return text.GetTokenAt(tokenIndex++);
-		}
-
-		/// <summary>
-		/// Rewinds this lexer for a specified amount of tokens
-		/// </summary>
-		/// <param name="count">The number of tokens to rewind</param>
-		public override void RewindTokens(int count)
-		{
-			tokenIndex -= count;
+			if (tokenIndex >= tokens.Size)
+				return new TokenKernel(Symbol.SID_EPSILON, 0);
+			TokenKernel result = new TokenKernel(tokens.GetSymbol(tokenIndex).ID, tokenIndex);
+			tokenIndex++;
+			return result;
 		}
 
 		/// <summary>
@@ -97,8 +90,8 @@ namespace Hime.Redist.Lexer
 				if (match.length != 0)
 				{
 					// matched something
-					if (recognizedTerminals[match.terminal].ID != separatorID)
-						text.AddToken(match.terminal, inputIndex, match.length);
+					if (terminals[match.terminal].ID != separatorID)
+						tokens.Add(match.terminal, inputIndex, match.length);
 					inputIndex += match.length;
 					continue;
 				}
@@ -123,7 +116,7 @@ namespace Hime.Redist.Lexer
 					continue;
 				}
 				// This is the dollar terminal, at the end of the input
-				text.AddToken(match.terminal, inputIndex, match.length);
+				tokens.Add(match.terminal, inputIndex, match.length);
 				return;
 			}
 		}
@@ -147,7 +140,7 @@ namespace Hime.Redist.Lexer
 
 			while (state != Automaton.DEAD_STATE)
 			{
-				State stateData = automaton.GetState(state);
+				AutomatonState stateData = automaton.GetState(state);
 				// Is this state a matching state ?
 				if (stateData.TerminalsCount != 0)
 				{

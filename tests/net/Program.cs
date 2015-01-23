@@ -115,7 +115,7 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				Console.WriteLine(error);
-				Context context = result.Input.GetContext(error.Position);
+				TextContext context = result.Input.GetContext(error.Position);
 				Console.WriteLine(context.Content);
 				Console.WriteLine(context.Pointer);
 			}
@@ -150,7 +150,7 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				Console.WriteLine(error);
-				Context context = result.Input.GetContext(error.Position);
+				TextContext context = result.Input.GetContext(error.Position);
 				Console.WriteLine(context.Content);
 				Console.WriteLine(context.Pointer);
 			}
@@ -192,7 +192,7 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				Console.WriteLine(error);
-				Context context = result.Input.GetContext(error.Position);
+				TextContext context = result.Input.GetContext(error.Position);
 				Console.WriteLine(context.Content);
 				Console.WriteLine(context.Pointer);
 			}
@@ -249,7 +249,7 @@ namespace Hime.Tests.Executor
 				foreach (ParseError error in result.Errors)
 				{
 					Console.WriteLine(error);
-					Context context = result.Input.GetContext(error.Position);
+					TextContext context = result.Input.GetContext(error.Position);
 					Console.WriteLine(context.Content);
 					Console.WriteLine(context.Pointer);
 				}
@@ -260,7 +260,7 @@ namespace Hime.Tests.Executor
 			foreach (ParseError error in result.Errors)
 			{
 				string message = error.ToString();
-				Context context = result.Input.GetContext(error.Position);
+				TextContext context = result.Input.GetContext(error.Position);
 				if (i + 2 >= output.Length)
 				{
 					Console.WriteLine("Unexpected error:");

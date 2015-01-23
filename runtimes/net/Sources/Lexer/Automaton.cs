@@ -112,9 +112,9 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="state">A state's index</param>
 		/// <returns>The data of the specified state</returns>
-		public State GetState(int state)
+		public AutomatonState GetState(int state)
 		{
-			return new State(states, (int) table[state]);
+			return new AutomatonState(states, (int) table[state]);
 		}
 	}
 }

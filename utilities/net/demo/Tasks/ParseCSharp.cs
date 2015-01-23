@@ -80,7 +80,7 @@ namespace Hime.Demo.Tasks
 					foreach (ParseError error in result.Errors)
 					{
 						Console.WriteLine("[ERROR] " + error.Message);
-						Context context = result.Input.GetContext(error.Position);
+						TextContext context = result.Input.GetContext(error.Position);
 						Console.Write("\t");
 						Console.WriteLine(context.Content);
 						Console.Write("\t");

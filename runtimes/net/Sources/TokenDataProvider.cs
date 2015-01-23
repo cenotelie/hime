@@ -17,54 +17,48 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Collections.Generic;
 
-namespace Hime.Redist.Lexer
+namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents a transition in a lexer's automaton
-	/// A transition is matched by a range of UTF-16 code points
-	/// Its target is a state in the automaton
+	/// Represents the output of a lexer as a tokenized text
 	/// </summary>
-	public struct Transition
+	interface TokenDataProvider
 	{
 		/// <summary>
-		/// Start of the range
+		/// Gets the position in the input text of the given token
 		/// </summary>
-		private ushort start;
-		/// <summary>
-		/// End of the range
-		/// </summary>
-		private ushort end;
-		/// <summary>
-		/// The transition's target
-		/// </summary>
-		private int target;
+		/// <param name="token">A token's index</param>
+		/// <returns>The position in the text</returns>
+		TextPosition GetPosition(int token);
 
 		/// <summary>
-		/// Gets the start of the UTF-16 code point range
+		/// Gets the span in the input text of the given token
 		/// </summary>
-		public int Start { get { return start; } }
+		/// <param name="token">A token's index</param>
+		/// <returns>The span in the text</returns>
+		TextSpan GetSpan(int token);
 
 		/// <summary>
-		/// Gets the end of the UTF-16 code point range
+		/// Gets the context in the input of the given token
 		/// </summary>
-		public int End { get { return end; } }
+		/// <param name="node">A token's index</param>
+		/// <returns>The context</returns>
+		TextContext GetContext(int token);
 
 		/// <summary>
-		/// Gets the target if this transition
+		/// Gets the grammar symbol associated to the given token
 		/// </summary>
-		public int Target { get { return target; } }
+		/// <param name="token">A token's index</param>
+		/// <returns>The associated symbol</returns>
+		Symbol GetSymbol(int token);
 
 		/// <summary>
-		/// Initializes this transition
+		/// Gets the value of the given token
 		/// </summary>
-		/// <param name="table">The table containing the transition</param>
-		/// <param name="offset">The offset of this transition in the table</param>
-		internal Transition(ushort[] table, int offset)
-		{
-			start = table[offset];
-			end = table[offset + 1];
-			target = table[offset + 2];
-		}
+		/// <param name="token">A token's index</param>
+		/// <returns>The associated value</returns>
+		string GetValue(int token);
 	}
 }

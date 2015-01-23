@@ -30,7 +30,7 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	class StreamingText : BaseTokenizedText
+	class StreamingText : BaseText
 	{
 		/// <summary>
 		/// The size of text block
@@ -57,10 +57,8 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Initializes this text
 		/// </summary>
-		/// <param name="terminals">The terminal symbols</param>
 		/// <param name="input">The input text</param>
-		public StreamingText(IList<Symbol> terminals, TextReader input)
-			: base(terminals)
+		public StreamingText(TextReader input)
 		{
 			this.input = input;
 			this.content = new BigList<char>();
@@ -68,7 +66,6 @@ namespace Hime.Redist.Lexer
 			this.atEnd = false;
 		}
 
-		#region Internal API
 		/// <summary>
 		/// Reads the input so as to make the specified index available
 		/// </summary>
@@ -138,10 +135,7 @@ namespace Hime.Redist.Lexer
 				}
 			}
 		}
-		#endregion
 
-
-		#region Implementation of Text
 		/// <summary>
 		/// Gets the size in number of characters
 		/// </summary>
@@ -177,6 +171,5 @@ namespace Hime.Redist.Lexer
 				return (content.Size - lines[this.line - 1]);
 			return (lines[line] - lines[line - 1]);
 		}
-		#endregion
 	}
 }

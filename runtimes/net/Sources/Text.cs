@@ -48,6 +48,13 @@ namespace Hime.Redist
 		string GetValue(int index, int length);
 
 		/// <summary>
+		/// Get the substring corresponding to the specified span
+		/// </summary>
+		/// <param name="span">A span in this text</param>
+		/// <returns>The substring</returns>
+		string GetValue(TextSpan span);
+
+		/// <summary>
 		/// Gets the starting index of the i-th line
 		/// </summary>
 		/// <param name="line">The line number</param>
@@ -83,6 +90,21 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="position">The position in this text</param>
 		/// <returns>The context description</returns>
-		Context GetContext(TextPosition position);
+		TextContext GetContext(TextPosition position);
+
+		/// <summary>
+		/// Gets the context description for the current text at the specified position
+		/// </summary>
+		/// <param name="position">The position in this text</param>
+		/// <param name="length">The length of the element to contextualize</param>
+		/// <returns>The context description</returns>
+		TextContext GetContext(TextPosition position, int length);
+
+		/// <summary>
+		/// Gets the context description for the current text at the specified span
+		/// </summary>
+		/// <param name="span">The span of text to contextualize</param>
+		/// <returns>The context description</returns>
+		TextContext GetContext(TextSpan span);
 	}
 }

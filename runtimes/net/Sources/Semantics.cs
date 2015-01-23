@@ -26,11 +26,11 @@ namespace Hime.Redist
 	public interface SemanticBody
 	{
 		/// <summary>
-		/// Gets the symbol at the i-th index
+		/// Gets the atom at the i-th index
 		/// </summary>
-		/// <param name="index">Index of the symbol</param>
-		/// <returns>The symbol at the given index</returns>
-		Symbol this[int index] { get; }
+		/// <param name="index">Index of the atom</param>
+		/// <returns>The atom at the given index</returns>
+		ParseAtom this[int index] { get; }
 
 		/// <summary>
 		/// Gets the length of this body
@@ -39,9 +39,9 @@ namespace Hime.Redist
 	}
 
 	/// <summary>
-	/// Delegate for a user-defined semantic action on the given body and with the given parent
+	/// Delegate for a user-defined semantic action
 	/// </summary>
-	/// <param name="head">The semantic object for the head</param>
+	/// <param name="head">The grammar variable representing the head of the reduced rule</param>
 	/// <param name="body">The current body at the time of the action</param>
 	public delegate void SemanticAction(Symbol head, SemanticBody body);
 }

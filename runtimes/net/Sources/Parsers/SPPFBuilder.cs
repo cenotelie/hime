@@ -175,7 +175,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="text">The tokenined text</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
-		public SPPFBuilder(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public SPPFBuilder(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
 		{
 			this.pool8 = new Pool<SubTree>(new SubTreeFactory(8), 1024);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
@@ -219,7 +219,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="generation">The index of a GSS generation</param>
 		/// <param name="symbol">A symbol to look for</param>
 		/// <returns>The existing GSS label, or the epsilon label</returns>
-		public GSSLabel GetLabelFor(int generation, SymbolRef symbol)
+		public GSSLabel GetLabelFor(int generation, TableElemRef symbol)
 		{
 			HistoryPart hp = GetHistoryPart(generation);
 			if (hp == null)
@@ -245,7 +245,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="symbol">The symbol as the node's label</param>
 		/// <returns>The created node's index in the SPPF</returns>
-		public int GetSingleNode(SymbolRef symbol)
+		public int GetSingleNode(TableElemRef symbol)
 		{
 			return result.Store(symbol);
 		}
@@ -357,7 +357,7 @@ namespace Hime.Redist.Parsers
 		{
 			if (action == TreeAction.Drop)
 				return; // why would you do this?
-			AddToCache(result.Store(new SymbolRef(SymbolType.Virtual, index)), action);
+			AddToCache(result.Store(new TableElemRef(TableType.Virtual, index)), action);
 		}
 
 		/// <summary>
@@ -440,12 +440,12 @@ namespace Hime.Redist.Parsers
 			if (root == -1)
 			{
 				// no promotion, create the node for the root
-				root = result.Store(new SymbolRef(SymbolType.Variable, varIndex));
+				root = result.Store(new TableElemRef(TableType.Variable, varIndex));
 			}
 			// setup the adjacency for the new root
 			result.SetAdjacency(root, result.Store(cacheChildren, insertion), insertion);
 			// create the GSS label
-			GSSLabel label = new GSSLabel(new SymbolRef(SymbolType.Variable, varIndex), root);
+			GSSLabel label = new GSSLabel(new TableElemRef(TableType.Variable, varIndex), root);
 			return label;
 		}
 
@@ -457,13 +457,13 @@ namespace Hime.Redist.Parsers
 		private GSSLabel ReduceReplaceable(int varIndex)
 		{
 			SubTree tree = GetSubTree(handleNext + 1);
-			tree.SetupRoot(new SymbolRef(SymbolType.Variable, varIndex), TreeAction.Replace);
+			tree.SetupRoot(new TableElemRef(TableType.Variable, varIndex), TreeAction.Replace);
 			tree.SetChildrenCountAt(0, handleNext);
 			for (int i = 0; i != handleNext; i++)
 			{
 				int node = cacheChildren[handle[i]];
 				TreeAction action = cacheActions[handle[i]];
-				tree.SetAt(i + 1, new SymbolRef(SymbolType.None, node), action);
+				tree.SetAt(i + 1, new TableElemRef(TableType.None, node), action);
 			}
 			GSSLabel label = new GSSLabel(tree);
 			return label;

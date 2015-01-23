@@ -23,30 +23,62 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents a token as an output element of a lexer
 	/// </summary>
-	public struct Token
+	public struct Token : ParseAtom
 	{
-		private int sid;
+		/// <summary>
+		/// The tokenized text containing this token
+		/// </summary>
+		private TokenDataProvider repository;
+		/// <summary>
+		/// The index of this token in the text
+		/// </summary>
 		private int index;
 
 		/// <summary>
-		/// Gets the id of the terminal symbol associated to this token
+		/// Gets the position in the input text of this token
 		/// </summary>
-		public int SymbolID { get { return sid; } }
+		public TextPosition Position { get { return repository.GetPosition(index); } }
 
 		/// <summary>
-		/// Gets the index of this token in a lexer's stream of token
+		/// Gets the span in the input text of this token
 		/// </summary>
-		public int Index { get { return index; } }
+		public TextSpan Span { get { return repository.GetSpan(index); } }
+
+		/// <summary>
+		/// Gets the context of this token in the input
+		/// </summary>
+		public TextContext Context { get { return repository.GetContext(index); } }
+
+		/// <summary>
+		/// Gets the terminal associated to this token
+		/// </summary>
+		public Symbol Symbol { get { return repository.GetSymbol(index); } }
+
+		/// <summary>
+		/// Gets the value of this token
+		/// </summary>
+		public string Value { get { return repository.GetValue(index); } }
 
 		/// <summary>
 		/// Initializes this token
 		/// </summary>
-		/// <param name="sid">The terminal's id</param>
+		/// <param name="repository">The repository containing the token</param>
 		/// <param name="index">The token's index</param>
-		public Token(int sid, int index)
+		internal Token(TokenDataProvider repository, int index)
 		{
-			this.sid = sid;
+			this.repository = repository;
 			this.index = index;
+		}
+
+		/// <summary>
+		/// Gets a string representation of this token
+		/// </summary>
+		/// <returns>The string representation of the token</returns>
+		public override string ToString()
+		{
+			string name = repository.GetSymbol(index).Name;
+			string value = repository.GetValue(index);
+			return name + " = " + value;
 		}
 	}
 }

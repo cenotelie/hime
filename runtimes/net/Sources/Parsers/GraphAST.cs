@@ -35,7 +35,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
-		public GraphAST(TokenizedText text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public GraphAST(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
 			: base(text, variables, virtuals)
 		{
 			this.adjacency = new Utils.BigList<int>();
@@ -125,7 +125,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="symbol">The symbol to store</param>
 		/// <returns>The index of the new node</returns>
-		public int Store(SymbolRef symbol)
+		public int Store(TableElemRef symbol)
 		{
 			return nodes.Add(new SimpleAST.Node(symbol));
 		}

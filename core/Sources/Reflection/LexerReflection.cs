@@ -107,7 +107,7 @@ namespace Hime.SDK.Reflection
 			for (int i = 0; i != automaton.StatesCount; i++)
 			{
 				Automata.DFAState current = dfa.States[i];
-				State stateData = automaton.GetState(i);
+				AutomatonState stateData = automaton.GetState(i);
 				// retrieve the matched terminals
 				for (int j = 0; j != stateData.TerminalsCount; j++)
 				{
@@ -128,7 +128,7 @@ namespace Hime.SDK.Reflection
 
 				for (int j = 0; j != stateData.BulkTransitionsCount; j++)
 				{
-					Transition transition = stateData.GetBulkTransition(j);
+					AutomatonTransition transition = stateData.GetBulkTransition(j);
 					current.AddTransition(new CharSpan(System.Convert.ToChar(transition.Start), System.Convert.ToChar(transition.End)), dfa.States[transition.Target]);
 				}
 				current.RepackTransitions();

@@ -18,8 +18,8 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Text;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist
 {
@@ -31,7 +31,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// The unexpected symbol
 		/// </summary>
-		private Symbol unexpected;
+		private Token unexpected;
 
 		/// <summary>
 		/// The expected terminals
@@ -51,12 +51,12 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the unexpected token
 		/// </summary>
-		public Symbol UnexpectedToken { get { return unexpected; } }
+		public Token UnexpectedToken { get { return unexpected; } }
 
 		/// <summary>
 		/// Gets the expected terminals
 		/// </summary>
-		public List<Symbol> ExpectedTerminals { get { return expected; } }
+		public ROList<Symbol> ExpectedTerminals { get { return new ROList<Symbol>(expected); } }
 
 		/// <summary>
 		/// Initializes this error
@@ -64,7 +64,7 @@ namespace Hime.Redist
 		/// <param name="token">The unexpected token</param>
 		/// <param name="position">Error's position in the input</param>
 		/// <param name="expected">The expected terminals</param>
-		public UnexpectedTokenError(Symbol token, TextPosition position, List<Symbol> expected)
+		public UnexpectedTokenError(Token token, TextPosition position, List<Symbol> expected)
 			: base(position)
 		{
 			this.unexpected = token;

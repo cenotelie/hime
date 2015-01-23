@@ -18,65 +18,53 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-namespace Hime.Redist
+namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents a grammar symbol (terminal, variable or virtual)
+	/// Represents a transition in a lexer's automaton
+	/// A transition is matched by a range of UTF-16 code points
+	/// Its target is a state in the automaton
 	/// </summary>
-	public struct Symbol
+	public struct AutomatonTransition
 	{
 		/// <summary>
-		/// Symbol ID for inexistant symbol
+		/// Start of the range
 		/// </summary>
-		public const int SID_NOTHING = 0;
+		private ushort start;
+		/// <summary>
+		/// End of the range
+		/// </summary>
+		private ushort end;
+		/// <summary>
+		/// The transition's target
+		/// </summary>
+		private int target;
 
 		/// <summary>
-		/// Symbol ID of the Epsilon terminal
+		/// Gets the start of the UTF-16 code point range
 		/// </summary>
-		public const int SID_EPSILON = 1;
+		public int Start { get { return start; } }
 
 		/// <summary>
-		/// Symbol ID of the Dollar terminal
+		/// Gets the end of the UTF-16 code point range
 		/// </summary>
-		public const int SID_DOLLAR = 2;
+		public int End { get { return end; } }
 
 		/// <summary>
-		/// The symbol's unique identifier
+		/// Gets the target if this transition
 		/// </summary>
-		private int id;
-		/// <summary>
-		/// The symbol's name
-		/// </summary>
-		private string name;
+		public int Target { get { return target; } }
 
 		/// <summary>
-		/// Gets the symbol's unique identifier
+		/// Initializes this transition
 		/// </summary>
-		public int ID { get { return id; } }
-
-		/// <summary>
-		/// Gets the symbol's name
-		/// </summary>
-		public string Name { get { return name; } }
-
-		/// <summary>
-		/// Initializes this symbol
-		/// </summary>
-		/// <param name="id">The id</param>
-		/// <param name="name">The symbol's name</param>
-		public Symbol(int id, string name)
+		/// <param name="table">The table containing the transition</param>
+		/// <param name="offset">The offset of this transition in the table</param>
+		internal AutomatonTransition(ushort[] table, int offset)
 		{
-			this.id = id;
-			this.name = name;
-		}
-
-		/// <summary>
-		/// Gets a string representation of this symbol
-		/// </summary>
-		/// <returns>The value of this symbol</returns>
-		public override string ToString()
-		{
-			return name;
+			start = table[offset];
+			end = table[offset + 1];
+			target = table[offset + 2];
 		}
 	}
 }

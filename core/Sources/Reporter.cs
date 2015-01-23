@@ -118,7 +118,7 @@ namespace Hime.SDK
 		/// <param name="position">The position within the input</param>
 		protected void OutputContext(Text input, TextPosition position)
 		{
-			Context context = input.GetContext(position);
+			TextContext context = input.GetContext(position);
 			Console.Write('\t');
 			Console.WriteLine(context.Content);
 			Console.Write('\t');

@@ -39,7 +39,7 @@ namespace Hime.Redist.Lexer
 	/// uint16: end of the range
 	/// uint16: next state's index
 	/// </remarks>
-	public struct State
+	public struct AutomatonState
 	{
 		/// <summary>
 		/// The automaton table
@@ -55,7 +55,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="table">The automaton table</param>
 		/// <param name="offset">The offset of this state within the table</param>
-		internal State(ushort[] table, int offset)
+		internal AutomatonState(ushort[] table, int offset)
 		{
 			this.table = table;
 			this.offset = offset;
@@ -120,9 +120,9 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="index">The non-cached transition index</param>
 		/// <returns>The transition</returns>
-		public Transition GetBulkTransition(int index)
+		public AutomatonTransition GetBulkTransition(int index)
 		{
-			return new Transition(table, offset + 3 + TerminalsCount * 2 + 256 + index * 3);
+			return new AutomatonTransition(table, offset + 3 + TerminalsCount * 2 + 256 + index * 3);
 		}
 	}
 }

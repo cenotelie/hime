@@ -30,7 +30,7 @@ namespace Hime.Redist
 	/// content = "public Struct Context"
 	/// pointer = "       ^"
 	/// </summary>
-	public struct Context
+	public struct TextContext
 	{
 		/// <summary>
 		/// The text content being represented
@@ -58,7 +58,7 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="content">The text being begin represented</param>
 		/// <param name="pointer">The pointer textual representation</param>
-		public Context(string content, string pointer)
+		public TextContext(string content, string pointer)
 		{
 			this.content = content;
 			this.pointer = pointer;
