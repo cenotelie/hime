@@ -28,10 +28,10 @@ MKDIR hime-%VERSION%-%TAG%
 COPY /B LICENSE.txt hime-%VERSION%-%TAG%\README.txt
 COPY /B releng\standalone\README.txt hime-%VERSION%-%TAG%\README.txt
 COPY /B runtimes\java\target\*.jar hime-%VERSION%-%TAG%\
-COPY /B runtimes\net/Bin\Release\Hime.Redist.dll hime-%VERSION%-%TAG%\Hime.Redist.dll
-COPY /B runtimes\net/Bin\Release\Hime.Redist.XML hime-%VERSION%-%TAG%\Hime.Redist.xml
-COPY /B core/Bin\Release\Hime.CentralDogma.dll hime-%VERSION%-%TAG%\Hime.CentralDogma.dll
-COPY /B core/Bin\Release\Hime.CentralDogma.XML hime-%VERSION%-%TAG%\Hime.CentralDogma.xml
-COPY /B cli\net/Bin\Release\himecc.exe hime-%VERSION%-%TAG%\himecc.exe
+COPY /B runtimes\net\bin\Release\Hime.Redist.dll hime-%VERSION%-%TAG%\Hime.Redist.dll
+COPY /B runtimes\net\b\Release\Hime.Redist.XML hime-%VERSION%-%TAG%\Hime.Redist.xml
+COPY /B core\bin\Release\Hime.CentralDogma.dll hime-%VERSION%-%TAG%\Hime.CentralDogma.dll
+COPY /B core\bin\Release\Hime.CentralDogma.XML hime-%VERSION%-%TAG%\Hime.CentralDogma.xml
+COPY /B cli\net\bin\Release\himecc.exe hime-%VERSION%-%TAG%\himecc.exe
 zip hime-%VERSION%-%TAG%.zip hime-%VERSION%-%TAG%\*
 RMDIR hime-%VERSION%-%TAG% /S /Q
