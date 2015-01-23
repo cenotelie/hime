@@ -139,11 +139,11 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private int GenerateCLParser()
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.CommandLine.gram");
+			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Hime.SDK.Output.Mode.Source;
 			task.AddInputRaw(stream);
-			task.Namespace = "Hime.CentralDogma.Input";
+			task.Namespace = "Hime.SDK.Input";
 			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
@@ -156,12 +156,12 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private int GenerateCDParser()
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
+			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Hime.SDK.Output.Mode.Source;
 			task.AddInputRaw(stream);
 			task.GrammarName = "HimeGrammar";
-			task.Namespace = "Hime.CentralDogma.Input";
+			task.Namespace = "Hime.SDK.Input";
 			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();

@@ -26,11 +26,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Hime.CentralDogma")]
+[assembly: AssemblyTitle("Hime.SDK")]
 [assembly: AssemblyDescription("Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Laurent Wouters")]
-[assembly: AssemblyProduct("Hime.CentralDogma")]
+[assembly: AssemblyProduct("Hime.SDK")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

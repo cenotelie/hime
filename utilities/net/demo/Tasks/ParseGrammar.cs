@@ -28,7 +28,7 @@ using Hime.Redist.Parsers;
 namespace Hime.Demo.Tasks
 {
 	/// <summary>
-	/// This tasks regenerates the parser for the CentralDogma inputs and re-parses the input grammar with the generated parser
+	/// This tasks regenerates the parser for the SDK inputs and re-parses the input grammar with the generated parser
 	/// </summary>
 	class ParseGrammar : IExecutable
 	{
@@ -38,7 +38,7 @@ namespace Hime.Demo.Tasks
 		public void Execute()
 		{
 			// Build parser assembly
-			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
+			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Hime.SDK.Output.Mode.Assembly;
 			task.AddInputRaw(stream);
@@ -53,7 +53,7 @@ namespace Hime.Demo.Tasks
 			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "HimeGrammar.dll"));
 
 			// Re-parse the input grammar with the generated parser
-			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram"));
+			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram"));
 			IParser parser = assembly.GetParser(input);
 			ParseResult result = parser.Parse();
 			input.Close();

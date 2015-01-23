@@ -139,7 +139,7 @@ namespace Hime.SDK
 			writer.WriteLine();
 			writer.WriteLine("using System.Collections.Generic;");
 			writer.WriteLine();
-			writer.WriteLine("namespace Hime.CentralDogma");
+			writer.WriteLine("namespace Hime.SDK");
 			writer.WriteLine("{");
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Contains the supported Unicode blocks");
@@ -256,7 +256,7 @@ namespace Hime.SDK
 			writer.WriteLine();
 			writer.WriteLine("using System.Collections.Generic;");
 			writer.WriteLine();
-			writer.WriteLine("namespace Hime.CentralDogma");
+			writer.WriteLine("namespace Hime.SDK");
 			writer.WriteLine("{");
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Contains the supported Unicode categories");

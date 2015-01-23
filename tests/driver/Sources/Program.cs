@@ -132,7 +132,7 @@ namespace Hime.Tests.Driver
 
 			// build the unit for the expected trees
 			System.IO.Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
-			System.IO.Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
+			System.IO.Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
 			loader.AddInputRaw(stream1);
 			loader.AddInputRaw(stream2);

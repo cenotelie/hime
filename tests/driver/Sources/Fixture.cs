@@ -46,7 +46,7 @@ namespace Hime.Tests.Driver
 		private static AssemblyReflection BuildFixtureParser()
 		{
 			Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
-			Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CentralDogma.Sources.Input.HimeGrammar.gram");
+			Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.AddInputRaw(stream1);
 			task.AddInputRaw(stream2);

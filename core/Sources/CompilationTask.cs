@@ -159,7 +159,7 @@ namespace Hime.SDK
 		/// </summary>
 		protected void ExecuteDo()
 		{
-			reporter.Info("Hime.CentralDogma " + Version);
+			reporter.Info("Hime.SDK " + Version);
 
 			// Load data
 			List<Grammars.Grammar> inputs = loader.Load();

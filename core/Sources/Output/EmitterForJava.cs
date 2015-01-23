@@ -180,7 +180,7 @@ namespace Hime.SDK.Output
 		private void ExportResource(string name, string file)
 		{
 			System.Reflection.Assembly assembly = (typeof(EmitterForJava)).Assembly;
-			BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream("Hime.CentralDogma.Resources." + name));
+			BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream("Hime.SDK.Resources." + name));
 			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
 			while (true)
 			{
