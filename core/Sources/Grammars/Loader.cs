@@ -279,14 +279,37 @@ namespace Hime.CentralDogma.Grammars
 		private void LoadBlockTerminals(ASTNode node)
 		{
 			foreach (ASTNode child in node.Children)
-				LoadTerminal(child);
+			{
+				switch (child.Symbol.ID)
+				{
+					case HimeGrammarLexer.ID.BLOCK_CONTEXT:
+						LoadTerminalContext(child);
+						break;
+					case HimeGrammarParser.ID.terminal_rule:
+						LoadTerminalRule(child, null);
+						break;
+				}
+			}
 		}
 
 		/// <summary>
-		/// Loads the terminal in the given AST
+		/// Loads the terminal context in the given AST
+		/// </summary>
+		/// <param name="node">The AST node of a terminal context</param>
+		private void LoadTerminalContext(ASTNode node)
+		{
+			ASTFamily children = node.Children;
+			string name = children[0].Symbol.Value;
+			for (int i=1; i!=children.Count; i++)
+				LoadTerminalRule(children[i], name);
+		}
+
+		/// <summary>
+		/// Loads the terminal rule in the given AST
 		/// </summary>
 		/// <param name="node">The AST node of a terminal rule</param>
-		private void LoadTerminal(ASTNode node)
+		/// <param name="context">The current context</param>
+		private void LoadTerminalRule(ASTNode node, string context)
 		{
 			ASTNode nameNode = node.Children[0];
 			// Resolve the terminal
@@ -297,9 +320,9 @@ namespace Hime.CentralDogma.Grammars
 				// Build the NFA
 				Automata.NFA nfa = BuildNFA(node.Children[1]);
 				// Create the terminal in the grammar
-				terminal = grammar.AddTerminalNamed(nameNode.Symbol.Value, nfa);
+				terminal = grammar.AddTerminalNamed(nameNode.Symbol.Value, nfa, context);
 				// Marks the final NFA state with the new terminal
-				nfa.StateExit.Item = terminal;
+				nfa.StateExit.AddItem(terminal);
 			}
 			else
 			{
@@ -916,7 +939,7 @@ namespace Hime.CentralDogma.Grammars
 				// Create the terminal
 				Automata.NFA nfa = BuildNFAFromText(node);
 				terminal = grammar.AddTerminalAnon(value, nfa);
-				nfa.StateExit.Item = terminal;
+				nfa.StateExit.AddItem(terminal);
 			}
 			// Create the definition set
 			RuleBodySet set = new RuleBodySet();

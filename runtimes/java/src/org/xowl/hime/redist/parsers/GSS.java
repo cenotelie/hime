@@ -19,6 +19,8 @@
  **********************************************************************/
 package org.xowl.hime.redist.parsers;
 
+import org.xowl.hime.redist.lexer.Automaton;
+import org.xowl.hime.redist.lexer.IContextProvider;
 import org.xowl.hime.redist.utils.BigList;
 
 import java.io.FileOutputStream;
@@ -30,7 +32,7 @@ import java.util.*;
 /**
  * Represents Graph-Structured Stacks for GLR parsers
  */
-class GSS {
+class GSS implements IContextProvider {
     /**
      * The initial size of the paths buffer in this GSS
      */
@@ -96,6 +98,17 @@ class GSS {
         this.set.paths = new GSSPath[INIT_PATHS_COUNT];
         this.set.paths[0] = new GSSPath(1);
         this.stack = new int[INIT_STACK_SIZE];
+    }
+
+    /**
+     * Gets whether the specified context is in effect
+     *
+     * @param context A context
+     * @return <code>true</code>  if the specified context is in effect
+     */
+    @Override
+    public boolean isWithin(int context) {
+        return (context == Automaton.DEFAULT_CONTEXT);
     }
 
     /**

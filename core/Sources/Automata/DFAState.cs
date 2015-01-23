@@ -24,37 +24,21 @@ namespace Hime.CentralDogma.Automata
 	/// <summary>
 	/// Represents a state in a Deterministic Finite Automaton
 	/// </summary>
-	public class DFAState
+	public class DFAState : State
 	{
+		/// <summary>
+		/// This state's id
+		/// </summary>
+		private int id;
 		/// <summary>
 		/// The transitions from this state
 		/// </summary>
 		private Dictionary<CharSpan, DFAState> transitions;
 
 		/// <summary>
-		/// The top marker for this state
+		/// Gets the ID of this state
 		/// </summary>
-		private FinalItem item;
-
-		/// <summary>
-		/// The list of the current markers for this state
-		/// </summary>
-		private List<FinalItem> items;
-
-		/// <summary>
-		/// This state's id
-		/// </summary>
-		private int id;
-
-		/// <summary>
-		/// Gets the top marker for this state
-		/// </summary>
-		public FinalItem TopItem { get { return item; } }
-
-		/// <summary>
-		/// Gets the list of the markers for this state
-		/// </summary>
-		public ROList<FinalItem> Items { get { return new ROList<FinalItem>(items); } }
+		public int ID { get { return id; } }
 
 		/// <summary>
 		/// Gets the transitions from this state
@@ -67,57 +51,13 @@ namespace Hime.CentralDogma.Automata
 		public ICollection<DFAState> Children { get { return transitions.Values; } }
 
 		/// <summary>
-		/// Gets the ID of this state
-		/// </summary>
-		public int ID { get { return id; } }
-
-		/// <summary>
 		/// Initialize this state
 		/// </summary>
 		/// <param name="id">Identifier for this state</param>
 		public DFAState(int id)
 		{
-			this.items = new List<FinalItem>();
 			this.transitions = new Dictionary<CharSpan, DFAState>();
 			this.id = id;
-		}
-
-		/// <summary>
-		/// Adds a new marker making this state a final state
-		/// </summary>
-		/// <param name="item">The new marker</param>
-		public void AddFinal(FinalItem item)
-		{
-			if (!items.Contains(item))
-			{
-				items.Add(item);
-				if (this.item == null)
-					this.item = item;
-				else
-				{
-					if (item.Priority > this.item.Priority)
-						this.item = item;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Adds new markers making this state a final state
-		/// </summary>
-		/// <param name="items">The new markers</param>
-		public void AddFinals(IEnumerable<FinalItem> items)
-		{
-			foreach (FinalItem item in items)
-				AddFinal(item);
-		}
-
-		/// <summary>
-		/// Clears all markers for this states making it non-final
-		/// </summary>
-		public void ClearFinals()
-		{
-			items.Clear();
-			item = null;
 		}
 
 		/// <summary>

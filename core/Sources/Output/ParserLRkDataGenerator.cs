@@ -37,6 +37,10 @@ namespace Hime.CentralDogma.Output
 		/// </summary>
 		private ROList<Grammars.Terminal> terminals;
 		/// <summary>
+		/// The existing contexts in the parser
+		/// </summary>
+		private ROList<Grammars.Variable> contexts;
+		/// <summary>
 		/// The variables to be exported
 		/// </summary>
 		private List<Grammars.Variable> variables;
@@ -61,6 +65,7 @@ namespace Hime.CentralDogma.Output
 		{
 			this.graph = unit.Graph;
 			this.terminals = unit.Expected;
+			this.contexts = unit.Contexts;
 			this.variables = new List<Grammars.Variable>(unit.Grammar.Variables);
 			this.virtuals = new List<Grammars.Virtual>(unit.Grammar.Virtuals);
 			this.actions = new List<Grammars.Action>(unit.Grammar.Actions);
@@ -85,12 +90,41 @@ namespace Hime.CentralDogma.Output
 				writer.Write((ushort)variable.ID);
 
 			foreach (Grammars.LR.State state in graph.States)
+				GenerateDataContexts(writer, state);
+
+			foreach (Grammars.LR.State state in graph.States)
 				GenerateDataLRTable(writer, state);
 
 			foreach (Grammars.Rule rule in rules)
 				GenerateDataProduction(writer, rule);
 
 			writer.Close();
+		}
+
+		/// <summary>
+		/// Generates the parser's binary data for the contexts
+		/// </summary>
+		/// <param name="writer">The output writer</param>
+		/// <param name="state">The LR state</param>
+		private void GenerateDataContexts(BinaryWriter writer, Grammars.LR.State state)
+		{
+			// retrieve the contexts
+			List<ushort> result = new List<ushort>();
+			foreach (Grammars.LR.Item item in state.Items)
+			{
+				if (item.DotPosition == 0)
+				{
+					Grammars.Variable head = item.BaseRule.Head;
+					int index = contexts.IndexOf(head);
+					if (index != -1)
+						result.Add((ushort) index);
+				}
+			}
+			
+			// output
+			writer.Write((ushort) result.Count);
+			for (int i = 0; i != result.Count; i++)
+				writer.Write(result[i]);
 		}
 
 		/// <summary>

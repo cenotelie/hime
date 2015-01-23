@@ -42,6 +42,7 @@
       <keyword>options</keyword>
       <keyword>terminals</keyword>
       <keyword>rules</keyword>
+      <keyword>context</keyword>
     </context>
 
     <context id="specials" style-ref="special">

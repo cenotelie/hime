@@ -66,6 +66,15 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\AST.cs" />
+    <Compile Include="Sources\Lexer\BaseLexer.cs" />
+    <Compile Include="Sources\Lexer\BaseTokenizedText.cs" />
+    <Compile Include="Sources\Lexer\ContextSensitiveLexer.cs" />
+    <Compile Include="Sources\Lexer\IContextProvider.cs" />
+    <Compile Include="Sources\Lexer\MatchedTerminal.cs" />
+    <Compile Include="Sources\Lexer\State.cs" />
+    <Compile Include="Sources\Lexer\StreamingText.cs" />
+    <Compile Include="Sources\Lexer\Transition.cs" />
+    <Compile Include="Sources\Parsers\LR\LRContexts.cs" />
     <Compile Include="Sources\Parsers\LR\LRExpected.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSEdge.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSSGeneration.cs" />
@@ -73,7 +82,6 @@
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
     <Compile Include="Sources\ParseResult.cs" />
-    <Compile Include="Sources\Parsers\RewindableTokenStream.cs" />
     <Compile Include="Sources\Semantics.cs" />
     <Compile Include="Sources\Parsers\LR\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\GSS.cs" />
@@ -84,7 +92,6 @@
     <Compile Include="Sources\Parsers\LR\LRAction.cs" />
     <Compile Include="Sources\Parsers\LR\LRActionCode.cs" />
     <Compile Include="Sources\Parsers\LR\LRk\LRkAutomaton.cs" />
-    <Compile Include="Sources\Parsers\LR\LRk\LRkSimulator.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCode.cs" />
     <Compile Include="Sources\Parsers\LR\LROpCodeValues.cs" />
     <Compile Include="Sources\TokenizedText.cs" />
@@ -114,7 +121,7 @@
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
     <Compile Include="Sources\Lexer\ILexer.cs" />
     <Compile Include="Sources\Lexer\PrefetchedText.cs" />
-    <Compile Include="Sources\Lexer\PrefetchedLexer.cs" />
+    <Compile Include="Sources\Lexer\ContextFreeLexer.cs" />
     <Compile Include="Sources\Parsers\GraphAST.cs" />
     <Compile Include="Sources\Parsers\LR\RNGLR\SPPFBuilder.cs" />
     <Compile Include="Sources\Parsers\ASTImpl.cs" />

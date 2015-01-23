@@ -41,6 +41,10 @@ public class LRkAutomaton {
      */
     private ColumnMap columns;
     /**
+     * The contexts information
+     */
+    private LRContexts[] contexts;
+    /**
      * The LR table
      */
     private LRAction[] table;
@@ -73,6 +77,9 @@ public class LRkAutomaton {
         this.columns = new ColumnMap();
         for (int i = 0; i != ncols; i++)
             this.columns.add(columnsID[i], i);
+        this.contexts = new LRContexts[nstates];
+        for (int i = 0; i != nstates; i++)
+            this.contexts[i] = new LRContexts(input);
         this.table = new LRAction[nstates * ncols];
         for (int i = 0; i != table.length; i++)
             this.table[i] = new LRAction(input);
@@ -91,6 +98,16 @@ public class LRkAutomaton {
     public static LRkAutomaton find(Class parserType, String name) {
         BinaryInput input = new BinaryInput(parserType, name);
         return new LRkAutomaton(input);
+    }
+
+    /**
+     * Gets the contexts opened by the specified state
+     *
+     * @param state State in the LR(k) automaton
+     * @return The opened contexts
+     */
+    public LRContexts getContexts(int state) {
+        return contexts[state];
     }
 
     /**

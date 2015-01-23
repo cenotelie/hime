@@ -432,7 +432,7 @@ namespace Hime.Redist.Parsers
 			GSSGeneration genData;
 			int Ui = gss.CreateGeneration();
 			int v0 = gss.CreateNode(0);
-			nextToken = lexer.GetNextToken();
+			nextToken = lexer.GetNextToken(gss);
 
 			int count = parserAutomaton.GetActionsCount(0, nextToken.SymbolID);
 			for (int i = 0; i != count; i++)
@@ -449,7 +449,7 @@ namespace Hime.Redist.Parsers
 				int stem = gss.GetGeneration(Ui).Count;
 				Reducer(Ui);
 				Token oldtoken = nextToken;
-				nextToken = lexer.GetNextToken();
+				nextToken = lexer.GetNextToken(gss);
 				int Uj = Shifter(oldtoken);
 				genData = gss.GetGeneration(Uj);
 				if (genData.Count == 0)

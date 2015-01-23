@@ -27,7 +27,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents Graph-Structured Stacks for GLR parsers
 	/// </summary>
-	class GSS
+	class GSS : Lexer.IContextProvider
 	{
 		/// <summary>
 		/// The initial size of the paths buffer in this GSS
@@ -103,6 +103,16 @@ namespace Hime.Redist.Parsers
 			this.paths0 = new GSSPath[1] { path0 };
 			this.paths = new GSSPath[INIT_PATHS_COUNT];
 			this.stack = new int[INIT_STACK_SIZE];
+		}
+
+		/// <summary>
+		/// Gets whether the specified context is in effect
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <returns><c>true</c> if the specified context is in effect</returns>
+		public bool IsWithin(int context)
+		{
+			return (context == Lexer.Automaton.DEFAULT_CONTEXT);
 		}
 
 		/// <summary>

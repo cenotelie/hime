@@ -32,7 +32,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
-		private Epsilon() : base(1, "ε", "ε", null)
+		private Epsilon() : base(1, "ε", "ε", null, null)
 		{
 		}
 

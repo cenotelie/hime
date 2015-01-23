@@ -51,7 +51,14 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the next token in the input
 		/// </summary>
+		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
-		Token GetNextToken();
+		Token GetNextToken(IContextProvider contexts);
+
+		/// <summary>
+		/// Rewinds this lexer for a specified amount of tokens
+		/// </summary>
+		/// <param name="count">The number of tokens to rewind</param>
+		void RewindTokens(int count);
 	}
 }

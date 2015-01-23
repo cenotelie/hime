@@ -26,7 +26,7 @@ namespace Hime.CentralDogma.Automata
 	public interface FinalItem
 	{
 		/// <summary>
-		/// Gets the priority of this marker
+		/// Gets the priority of this item
 		/// </summary>
 		int Priority { get; }
 	}

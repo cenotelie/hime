@@ -110,14 +110,18 @@ public abstract class BaseLRParser implements IParser {
      *
      * @return Whether this parser is in debug mode
      */
-    public boolean isDebugMode() { return debug; }
+    public boolean isDebugMode() {
+        return debug;
+    }
 
     /**
      * Sets whether this parser is in debug mode
      *
      * @param mode Whether this parser is in debug mode
      */
-    public void setDebugMode(boolean mode) { this.debug = mode; }
+    public void setDebugMode(boolean mode) {
+        this.debug = mode;
+    }
 
     /**
      * Initializes a new instance of the LRkParser class with the given lexer

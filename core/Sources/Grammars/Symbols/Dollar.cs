@@ -32,7 +32,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
-		private Dollar() : base(2, "$", "$", null)
+		private Dollar() : base(2, "$", "$", null, null)
 		{
 		}
 

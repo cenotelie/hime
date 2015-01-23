@@ -25,6 +25,10 @@ package org.xowl.hime.redist;
  */
 public class Symbol {
     /**
+     * Symbol ID for inexistant symbol
+     */
+    public static final int SID_NOTHING = 0;
+    /**
      * Symbol ID of the Epsilon terminal
      */
     public static final int SID_EPSILON = 1;

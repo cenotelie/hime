@@ -54,7 +54,15 @@ public interface ILexer {
     /**
      * Gets the next token in the input
      *
+     * @param contexts The current applicable contexts
      * @return The next token in the input
      */
-    Token getNextToken();
+    Token getNextToken(IContextProvider contexts);
+
+    /**
+     * Rewinds this lexer for a specified amount of tokens
+     *
+     * @param count The number of tokens to rewind
+     */
+    void rewindTokens(int count);
 }

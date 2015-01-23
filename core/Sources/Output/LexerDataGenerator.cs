@@ -30,7 +30,11 @@ namespace Hime.CentralDogma.Output
 		/// <summary>
 		/// The terminals matched by the lexer
 		/// </summary>
-		private List<Grammars.Terminal> terminals;
+		private ROList<Grammars.Terminal> terminals;
+		/// <summary>
+		/// The contexts for the lexer
+		/// </summary>
+		private ROList<Grammars.Variable> contexts;
 		/// <summary>
 		/// The lexer's DFA
 		/// </summary>
@@ -40,20 +44,13 @@ namespace Hime.CentralDogma.Output
 		/// Initializes this generator
 		/// </summary>
 		/// <param name="dfa">The dfa to serialize</param>
-		public LexerDataGenerator(Automata.DFA dfa)
+		/// <param name="expected">The terminals produced by the DFA</param>
+		/// <param name="contexts">The contexts supported by the DFA</param>
+		public LexerDataGenerator(Automata.DFA dfa, ROList<Grammars.Terminal> expected, ROList<Grammars.Variable> contexts)
 		{
 			this.dfa = dfa;
-			this.terminals = new List<Grammars.Terminal>();
-			this.terminals.Add(Grammars.Epsilon.Instance);
-			this.terminals.Add(Grammars.Dollar.Instance);
-			foreach (Automata.DFAState state in dfa.States)
-			{
-				if (state.TopItem != null)
-				{
-					if (!terminals.Contains(state.TopItem as Grammars.Terminal))
-						terminals.Add(state.TopItem as Grammars.Terminal);
-				}	
-			}
+			this.terminals = expected;
+			this.contexts = contexts;
 		}
 
 		/// <summary>
@@ -66,14 +63,26 @@ namespace Hime.CentralDogma.Output
 
 			writer.Write((uint)dfa.StatesCount);
 			uint offset = 0;
+			List<string> contexts = new List<string>();
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				writer.Write(offset);
 				offset += 3 + 256;
+				contexts.Clear();
+				foreach (Automata.FinalItem item in state.Items)
+				{
+					Grammars.Terminal terminal = item as Grammars.Terminal;
+					if (!contexts.Contains(terminal.Context))
+					{
+						contexts.Add(terminal.Context);
+						offset += 2;
+					}
+				}
 				foreach (CharSpan key in state.Transitions)
 					if (key.End >= 256)
 						offset += 3;
 			}
+
 			foreach (Automata.DFAState state in dfa.States)
 				GenerateDataFor(writer, state);
 
@@ -87,11 +96,12 @@ namespace Hime.CentralDogma.Output
 		/// <param name="state">The state to export</param>
 		private void GenerateDataFor(BinaryWriter writer, Automata.DFAState state)
 		{
+			// build the transition data
 			ushort[] cache = new ushort[256];
 			for (int i = 0; i != 256; i++)
-				cache[i] = 0xFFFF;
-			ushort cached = 0;
-			ushort slow = 0;
+				cache[i] = Hime.Redist.Lexer.Automaton.DEAD_STATE;
+			ushort cached = 0; // the number of cached transitions
+			ushort slow = 0; // the number of non-cached transitions
 			foreach (CharSpan span in state.Transitions)
 			{
 				if (span.Begin <= 255)
@@ -110,16 +120,38 @@ namespace Hime.CentralDogma.Output
 					slow++;
 			}
 
-			if (state.TopItem != null)
-				writer.Write((ushort)terminals.IndexOf(state.TopItem as Grammars.Terminal));
-			else
-				writer.Write((ushort)0xFFFF);
-			writer.Write((ushort)(slow + cached));
-			writer.Write(slow);
+			// build the matched terminals data
+			List<ushort> contexts = new List<ushort>();
+			List<ushort> matched = new List<ushort>();
+			foreach (Automata.FinalItem item in state.Items)
+			{
+				Grammars.Terminal terminal = item as Grammars.Terminal;
+				ushort context = GetContextID(terminal.Context);
+				if (!contexts.Contains(context))
+				{
+					// this is the first time this context is found in the current DFA state
+					// this is the terminal with the most priority for this context
+					contexts.Add(context);
+					matched.Add((ushort)terminals.IndexOf(terminal));
+				}
+			}
 
+			// write the number of matched terminals
+			writer.Write((ushort)matched.Count);
+			// write the total numer of transitions
+			writer.Write((ushort)(slow + cached));
+			// write the number of non-cached transitions
+			writer.Write(slow);
+			// write the matched terminals
+			for (int i = 0; i != matched.Count; i++)
+			{
+				writer.Write(contexts[i]);
+				writer.Write(matched[i]);
+			}
+			// write the cached transitions
 			for (int i = 0; i != 256; i++)
 				writer.Write(cache[i]);
-
+			// write the non-cached transitions
 			List<CharSpan> keys = new List<CharSpan>(state.Transitions);
 			keys.Sort(new System.Comparison<CharSpan>(CharSpan.CompareReverse));
 			foreach (CharSpan span in keys)
@@ -132,8 +164,26 @@ namespace Hime.CentralDogma.Output
 				writer.Write(begin);
 				writer.Write(System.Convert.ToUInt16(span.End));
 				writer.Write((ushort)state.GetChildBy(span).ID);
-				slow--;
 			}
+		}
+
+		/// <summary>
+		/// Gets the identifier fo the specified context's name
+		/// </summary>
+		/// <param name="name">The name of a context</param>
+		/// <returns>The corresponding identifier</returns>
+		/// <exception cref="System.ArgumentException">When the specified context name is not found</exception>
+		private ushort GetContextID(string name)
+		{
+			if (name == null)
+				return Hime.Redist.Lexer.Automaton.DEFAULT_CONTEXT;
+			for (ushort i = 1; i != contexts.Count; i++)
+			{
+				if (contexts[i].Name == name)
+					return i;
+			}
+			// should not happen
+			throw new System.ArgumentException("The specified context name (" + name + ") is not recognized", "name");
 		}
 	}
 }

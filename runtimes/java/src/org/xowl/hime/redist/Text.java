@@ -22,7 +22,7 @@ package org.xowl.hime.redist;
 
 /**
  * Represents the input of parser with some metadata for line endings
- *
+ * <p/>
  * All line numbers and column numbers are 1-based.
  * Indices in the content are 0-based.
  */
@@ -52,7 +52,7 @@ public interface Text {
 
     /**
      * Gets the starting index of the i-th line
-     *
+     * <p/>
      * The line numbering is 1-based
      *
      * @param line The line number
@@ -62,7 +62,7 @@ public interface Text {
 
     /**
      * Gets the length of the i-th line
-     *
+     * <p/>
      * The line numbering is 1-based
      *
      * @param line The line number
@@ -72,7 +72,7 @@ public interface Text {
 
     /**
      * Gets the string content of the i-th line
-     *
+     * <p/>
      * The line numbering is 1-based
      *
      * @param line The line number

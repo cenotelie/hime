@@ -32,7 +32,7 @@ namespace Hime.CentralDogma.Grammars
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
-		private NullTerminal() : base(0, string.Empty, string.Empty, null)
+		private NullTerminal() : base(0, string.Empty, string.Empty, null, null)
 		{
 		}
 

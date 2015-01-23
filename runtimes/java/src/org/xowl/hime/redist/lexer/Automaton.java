@@ -27,6 +27,15 @@ import org.xowl.hime.redist.utils.BinaryInput;
  */
 public class Automaton {
     /**
+     * Identifier of inexistant state in an automaton
+     */
+    public static final int DEAD_STATE = 0xFFFF;
+    /**
+     * Identifier of the default context
+     */
+    public static final int DEFAULT_CONTEXT = 0;
+
+    /**
      * Table of indices in the states table
      */
     private int[] table;
@@ -38,15 +47,6 @@ public class Automaton {
      * The number of states in this automaton
      */
     private int statesCount;
-
-    /**
-     * Gets the number of states in this automaton
-     *
-     * @return the number of states in this automaton
-     */
-    public int getStatesCount() {
-        return statesCount;
-    }
 
     /**
      * Initializes a new automaton from the given binary stream
@@ -76,71 +76,21 @@ public class Automaton {
     }
 
     /**
-     * Gets the offset of the given state in the table
+     * Gets the number of states in this automaton
      *
-     * @param state he DFA state which offset shall be retrieved
-     * @return The offset of the given DFA state
+     * @return the number of states in this automaton
      */
-    public int getOffsetOf(int state) {
-        return table[state];
+    public int getStatesCount() {
+        return statesCount;
     }
 
     /**
-     * Gets the recognized terminal index for the DFA at the given offset
+     * Retrieves the data of the specified state
      *
-     * @param offset The DFA state's offset
-     * @return The index of the terminal recognized at this state, or 0xFFFF if none
+     * @param state A state's index
+     * @param data  The data of the specified state
      */
-    public int getStateRecognizedTerminal(int offset) {
-        return states[offset];
-    }
-
-    /**
-     * Checks whether the DFA state at the given offset does not have any transition
-     *
-     * @param offset The DFA state's offset
-     * @return true if the state at the given offset has no transition
-     */
-    public boolean isStateDeadEnd(int offset) {
-        return (states[offset + 1] == 0);
-    }
-
-    /**
-     * Gets the number of non-cached transitions from the DFA state at the given offset
-     *
-     * @param offset The DFA state's offset
-     * @return The number of non-cached transitions
-     */
-    public int getStateBulkTransitionsCount(int offset) {
-        return states[offset + 2];
-    }
-
-    /**
-     * Gets the transition from the DFA state at the given offset with the input value (max 255)
-     *
-     * @param offset The DFA state's offset
-     * @param value  The input value
-     * @return The state obtained by the transition, or 0xFFFF if none is found
-     */
-    public int getStateCachedTransition(int offset, int value) {
-        return states[offset + 3 + value];
-    }
-
-    /**
-     * Gets the transition from the DFA state at the given offset with the input value (min 256)
-     *
-     * @param offset The DFA state's offset
-     * @param value  The input value
-     * @return The state obtained by the transition, or 0xFFFF if none is found
-     */
-    public int getStateBulkTransition(int offset, int value) {
-        int count = states[offset + 2];
-        offset += 259;
-        for (int i = 0; i != count; i++) {
-            if (value >= states[offset] && value <= states[offset + 1])
-                return states[offset + 2];
-            offset += 3;
-        }
-        return 0xFFFF;
+    public void retrieveState(int state, State data) {
+        data.setup(states, table[state]);
     }
 }

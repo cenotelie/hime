@@ -30,7 +30,7 @@ namespace Hime.Redist.Utils
 	/// The internal representation is an array of pointers to arrays of T.
 	/// The basic arrays of T (chunks) have a fixed size.
 	/// </remarks>
-	class BigList<T>
+	public class BigList<T>
 	{
 		/// <summary>
 		/// The number of bits allocated to the lowest part of the index (within a chunk)
@@ -93,6 +93,33 @@ namespace Hime.Redist.Utils
 		}
 
 		/// <summary>
+		/// Copies the specified range of items to the given buffer
+		/// </summary>
+		/// <param name="index">The starting index of the range of items to copy</param>
+		/// <param name="count">The size of the range of items to copy</param>
+		/// <param name="buffer">The buffer to copy the items in</param>
+		/// <param name="start">The starting index within the buffer to copy the items to</param>
+		public void CopyTo(int index, int count, T[] buffer, int start)
+		{
+			int indexUpper = index >> UPPER_SHIFT;
+			int indexLower = index & LOWER_MASK;
+			while (indexLower + count >= CHUNKS_SIZE)
+			{
+				// while we can copy chunks
+				int length = CHUNKS_SIZE - indexLower;
+				Array.Copy(chunks[indexUpper], indexLower, buffer, start, length);
+				count -= length;
+				start += length;
+				indexUpper++;
+				indexLower = 0;
+			}
+			if (count > 0)
+			{
+				Array.Copy(chunks[indexUpper], indexLower, buffer, start, count);
+			}
+		}
+
+		/// <summary>
 		/// Adds the given value at the end of this list
 		/// </summary>
 		/// <param name="value">The value to add</param>
@@ -147,6 +174,16 @@ namespace Hime.Redist.Utils
 		}
 
 		/// <summary>
+		/// Removes the specified number of values from the end of this list
+		/// </summary>
+		/// <param name="count">The number of values to remove</param>
+		public void Remove(int count)
+		{
+			chunkIndex -= count >> UPPER_SHIFT;
+			cellIndex -= count & LOWER_MASK;
+		}
+
+		/// <summary>
 		/// Copies the given values at the end of this list
 		/// </summary>
 		/// <param name="values">The values to add</param>
@@ -176,10 +213,15 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		private void AddChunk()
 		{
-			T[] t = new T[CHUNKS_SIZE];
 			if (chunkIndex == chunks.Length - 1)
 				Array.Resize(ref chunks, chunks.Length + INIT_CHUNK_COUNT);
-			chunks[++chunkIndex] = t;
+			chunkIndex++;
+			T[] chunk = chunks[chunkIndex];
+			if (chunk == null)
+			{
+				chunk = new T[CHUNKS_SIZE];
+				chunks[chunkIndex] = chunk;
+			}
 			cellIndex = 0;
 		}
 	}

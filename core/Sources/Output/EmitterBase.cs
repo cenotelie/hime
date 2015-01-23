@@ -276,8 +276,8 @@ namespace Hime.CentralDogma.Output
 			bool ok = true;
 			// prepare the unit
 			ok = unit.Prepare(reporter);
-			if (ok) ok = unit.BuildDFA(reporter);
-			if (ok) ok = unit.BuildGraph(reporter);
+			if (ok) ok = unit.BuildLexerData(reporter);
+			if (ok) ok = unit.BuildParserData(reporter);
 			// output the artifacts
 			if (ok) ok = GenerateLexer(unit);
 			if (ok) ok = GenerateParser(unit);
@@ -319,7 +319,7 @@ namespace Hime.CentralDogma.Output
 		{
 			// generate the lexer's data
 			reporter.Info("Exporting lexer data at " + GetArtifactLexerData(unit) + " ...");
-			LexerDataGenerator genData = new LexerDataGenerator(unit.DFA);
+			LexerDataGenerator genData = new LexerDataGenerator(unit.DFA, unit.Expected, unit.Contexts);
 			genData.Generate(GetArtifactLexerData(unit));
 
 			// generate the lexer's code

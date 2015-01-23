@@ -48,6 +48,10 @@ namespace Hime.CentralDogma.Output
 		/// </summary>
 		private ROList<Terminal> terminals;
 		/// <summary>
+		/// The contexts for the lexer
+		/// </summary>
+		private ROList<Variable> contexts;
+		/// <summary>
 		/// The separator terminal
 		/// </summary>
 		private Terminal separator;
@@ -64,6 +68,7 @@ namespace Hime.CentralDogma.Output
 			this.name = unit.Name;
 			this.binResource = binResource;
 			this.terminals = unit.Expected;
+			this.contexts = unit.Contexts;
 			this.separator = unit.Separator;
 		}
 
@@ -85,6 +90,7 @@ namespace Hime.CentralDogma.Output
 		/// <param name="file">The target file to generate code in</param>
 		public void Generate(string file)
 		{
+			string baseLexer = contexts.Count > 1 ? "ContextSensitiveLexer" : "ContextFreeLexer";
 			StreamWriter writer = new StreamWriter(file, false, new System.Text.UTF8Encoding(false));
 
 			WriteHeader(writer);
@@ -94,10 +100,12 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine();
 			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
 			writer.WriteLine("import org.xowl.hime.redist.lexer.Automaton;");
-			writer.WriteLine("import org.xowl.hime.redist.lexer.PrefetchedLexer;");
+			if (contexts.Count > 1)
+				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextSensitiveLexer;");
+			else
+				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextFreeLexer;");
 			writer.WriteLine();
-			writer.WriteLine("import java.io.InputStream;");
-			writer.WriteLine("import java.io.IOException;");
+			writer.WriteLine("import java.io.InputStreamReader;");
 			writer.WriteLine();
 
 			string mod = modifier == Modifier.Public ? "public" : "";
@@ -105,12 +113,12 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("/**");
 			writer.WriteLine(" * Represents a lexer");
 			writer.WriteLine(" */");
-			writer.WriteLine(mod + " class " + name + "Lexer extends PrefetchedLexer {");
+			writer.WriteLine(mod + " class " + name + "Lexer extends " + baseLexer + " {");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * The automaton for this lexer");
 			writer.WriteLine("     */");
-			writer.WriteLine("    private static final Automaton automaton = Automaton.find(" + name + "Lexer.class, \"" + binResource + "\");");
+			writer.WriteLine("    private static final Automaton commonAutomaton = Automaton.find(" + name + "Lexer.class, \"" + binResource + "\");");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * Contains the constant IDs for the terminals for this lexer");
@@ -125,6 +133,24 @@ namespace Hime.CentralDogma.Output
 				writer.WriteLine("         * The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("         */");
 				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(terminal), terminal.ID.ToString("X4"));
+			}
+			writer.WriteLine("    }");
+
+			writer.WriteLine("    /**");
+			writer.WriteLine("     * Contains the constant IDs for the contexts for this lexer");
+			writer.WriteLine("     */");
+			writer.WriteLine("    public static class Context {");
+			writer.WriteLine("        /**");
+			writer.WriteLine("         * The unique identifier for the default context");
+			writer.WriteLine("         */");
+			writer.WriteLine("        public static final int DEFAULT = 0;");
+			for (int i = 1; i != contexts.Count; i++)
+			{
+				Variable context = contexts[i];
+				writer.WriteLine("        /**");
+				writer.WriteLine("         * The unique identifier for context " + context.Name);
+				writer.WriteLine("         */");
+				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(context), i.ToString("X4"));
 			}
 			writer.WriteLine("    }");
 
@@ -156,7 +182,7 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("     * @param input The lexer's input");
 			writer.WriteLine("     */");
 			writer.WriteLine("    public " + name + "Lexer(String input) {");
-			writer.WriteLine("        super(automaton, terminals, 0x" + sep + ", input);");
+			writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
 			writer.WriteLine("    }");
 
 			writer.WriteLine("    /**");
@@ -164,8 +190,8 @@ namespace Hime.CentralDogma.Output
 			writer.WriteLine("     *");
 			writer.WriteLine("     * @param input The lexer's input");
 			writer.WriteLine("     */");
-			writer.WriteLine("    public " + name + "Lexer(InputStream input) throws IOException {");
-			writer.WriteLine("        super(automaton, terminals, 0x" + sep + ", input);");
+			writer.WriteLine("    public " + name + "Lexer(InputStreamReader input) {");
+			writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
 			writer.WriteLine("    }");
 			writer.WriteLine("}");
 

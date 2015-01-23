@@ -26,7 +26,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a base for all LR(k) parsers
 	/// </summary>
-	public abstract class LRkParser : BaseLRParser
+	public abstract class LRkParser : BaseLRParser, Lexer.IContextProvider
 	{
 		/// <summary>
 		/// Initial size of the stack
@@ -34,52 +34,24 @@ namespace Hime.Redist.Parsers
 		protected internal const int INIT_STACK_SIZE = 128;
 
 		/// <summary>
-		/// The simulator for LR(k) parsers used for error recovery
-		/// </summary>
-		private class Simulator : LRkSimulator
-		{
-			/// <summary>
-			/// Initializes a new simulator based on the given LR(k) parser
-			/// </summary>
-			/// <param name="parser">The base LR(k) parser</param>
-			public Simulator(LRkParser parser)
-			{
-				this.parserAutomaton = parser.parserAutomaton;
-				this.parserVariables = parser.parserVariables;
-				this.input = parser.input;
-				this.stack = new int[parser.stack.Length];
-				this.head = parser.head;
-				Array.Copy(parser.stack, this.stack, parser.head + 1);
-			}
-		}
-
-		/// <summary>
 		/// The parser's automaton
 		/// </summary>
-		private LRkAutomaton parserAutomaton;
-
+		protected LRkAutomaton automaton;
 		/// <summary>
-		/// The parser's input as a stream of tokens
+		/// The parser's stack
 		/// </summary>
-		private RewindableTokenStream input;
-
+		private int[] stack;
+		/// <summary>
+		/// Index of the stack's head
+		/// </summary>
+		private int head;
 		/// <summary>
 		/// The AST builder
 		/// </summary>
 		private LRkASTBuilder builder;
 
 		/// <summary>
-		/// The parser's stack
-		/// </summary>
-		private int[] stack;
-
-		/// <summary>
-		/// Index of the stack's head
-		/// </summary>
-		private int head;
-
-		/// <summary>
-		/// Initializes a new instance of the LRkParser class with the given lexer
+		/// Initializes a new instance of the parser
 		/// </summary>
 		/// <param name="automaton">The parser's automaton</param>
 		/// <param name="variables">The parser's variables</param>
@@ -89,9 +61,23 @@ namespace Hime.Redist.Parsers
 		protected LRkParser(LRkAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
             : base(variables, virtuals, actions, lexer)
 		{
-			this.parserAutomaton = automaton;
-			this.input = new RewindableTokenStream(lexer);
+			this.automaton = automaton;
 			this.builder = new LRkASTBuilder(lexer.Output, parserVariables, parserVirtuals);
+		}
+
+		/// <summary>
+		/// Gets whether the specified context is in effect
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <returns><c>true</c> if the specified context is in effect</returns>
+		public bool IsWithin(int context)
+		{
+			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
+				return true;
+			for (int i = head; i != -1; i--)
+				if (automaton.GetContexts(stack[i]).Contains(context))
+					return true;
+			return false;
 		}
 
 		/// <summary>
@@ -101,7 +87,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The next token in the case the error is recovered</returns>
 		private Token OnUnexpectedToken(Token token)
 		{
-			LRExpected expectedOnHead = parserAutomaton.GetExpected(stack[head], lexer.Terminals);
+			LRExpected expectedOnHead = automaton.GetExpected(stack[head], lexer.Terminals);
 			// the terminals for shifts are always expected
 			List<Symbol> expected = new List<Symbol>(expectedOnHead.Shifts);
 			// check the terminals for reductions
@@ -113,16 +99,6 @@ namespace Hime.Redist.Parsers
 			// try to recover, or not
 			if (!recover)
 				return new Token(0, 0);
-			if (TryDrop1Unexpected())
-				return input.GetNextToken();
-			if (TryDrop2Unexpected())
-				return input.GetNextToken();
-			foreach (Symbol terminal in expected)
-			{
-				Token dummy = new Token(terminal.ID, 0);
-				if (TryInsertExpected(dummy))
-					return dummy;
-			}
 			return new Token(0, 0);
 		}
 
@@ -142,7 +118,7 @@ namespace Hime.Redist.Parsers
 			Array.Copy(stack, myStack, head + 1);
 			int myHead = head;
 			// get the action for the stack's head
-			LRAction action = parserAutomaton.GetAction(myStack[myHead], terminal.ID);
+			LRAction action = automaton.GetAction(myStack[myHead], terminal.ID);
 			while (action.Code != LRActionCode.None)
 			{
 				if (action.Code == LRActionCode.Shift)
@@ -151,47 +127,20 @@ namespace Hime.Redist.Parsers
 				if (action.Code == LRActionCode.Reduce)
 				{
 					// execute the reduction
-					LRProduction production = parserAutomaton.GetProduction(action.Data);
+					LRProduction production = automaton.GetProduction(action.Data);
 					myHead -= production.ReductionLength;
 					// this must be a shift
-					action = parserAutomaton.GetAction(myStack[myHead], parserVariables[production.Head].ID);
+					action = automaton.GetAction(myStack[myHead], parserVariables[production.Head].ID);
 					myHead++;
 					if (myHead == myStack.Length)
 						Array.Resize(ref myStack, myStack.Length + INIT_STACK_SIZE);
 					myStack[myHead] = action.Data;
 					// now, get the new action for the terminal
-					action = parserAutomaton.GetAction(action.Data, terminal.ID);
+					action = automaton.GetAction(action.Data, terminal.ID);
 				}
 			}
 			// nope, that was a pathological case in a LALR graph
 			return false;
-		}
-
-		private bool TryDrop1Unexpected()
-		{
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
-			input.Rewind(used);
-			return success;
-		}
-
-		private bool TryDrop2Unexpected()
-		{
-			input.GetNextToken();
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, new Token(0, 0), out used);
-			input.Rewind(used);
-			if (!success)
-				input.Rewind(1);
-			return success;
-		}
-
-		private bool TryInsertExpected(Token terminal)
-		{
-			int used = 0;
-			bool success = (new Simulator(this)).TestForLength(3, terminal, out used);
-			input.Rewind(used);
-			return success;
 		}
 
 		/// <summary>
@@ -201,19 +150,20 @@ namespace Hime.Redist.Parsers
 		public override ParseResult Parse()
 		{
 			this.stack = new int[INIT_STACK_SIZE];
-			Token nextToken = input.GetNextToken();
+			this.head = 0;
+			Token nextToken = lexer.GetNextToken(this);
 			while (true)
 			{
 				LRActionCode action = ParseOnToken(nextToken);
 				if (action == LRActionCode.Shift)
 				{
-					nextToken = input.GetNextToken();
+					nextToken = lexer.GetNextToken(this);
 					continue;
 				}
 				if (action == LRActionCode.Accept)
 					return new ParseResult(allErrors, lexer.Output, builder.GetTree());
 				nextToken = OnUnexpectedToken(nextToken);
-				if (nextToken.SymbolID == 0 || allErrors.Count >= MAX_ERROR_COUNT)
+				if (nextToken.SymbolID == Symbol.SID_NOTHING || allErrors.Count >= MAX_ERROR_COUNT)
 					return new ParseResult(allErrors, lexer.Output);
 			}
 		}
@@ -227,7 +177,7 @@ namespace Hime.Redist.Parsers
 		{
 			while (true)
 			{
-				LRAction action = parserAutomaton.GetAction(stack[head], token.SymbolID);
+				LRAction action = automaton.GetAction(stack[head], token.SymbolID);
 				if (action.Code == LRActionCode.Shift)
 				{
 					head++;
@@ -239,10 +189,10 @@ namespace Hime.Redist.Parsers
 				}
 				else if (action.Code == LRActionCode.Reduce)
 				{
-					LRProduction production = parserAutomaton.GetProduction(action.Data);
+					LRProduction production = automaton.GetProduction(action.Data);
 					head -= production.ReductionLength;
 					Reduce(production);
-					action = parserAutomaton.GetAction(stack[head], parserVariables[production.Head].ID);
+					action = automaton.GetAction(stack[head], parserVariables[production.Head].ID);
 					head++;
 					if (head == stack.Length)
 						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
