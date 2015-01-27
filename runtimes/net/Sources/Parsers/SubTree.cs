@@ -42,7 +42,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The nodes in this buffer
 		/// </summary>
-		private SimpleAST.Node[] nodes;
+		private ASTSimpleTree.Node[] nodes;
 		/// <summary>
 		/// The tree actions for the nodes
 		/// </summary>
@@ -55,7 +55,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The label in the buffer</returns>
 		public TableElemRef GetLabelAt(int index)
 		{
-			return nodes[index].symbol;
+			return nodes[index].label;
 		}
 
 		/// <summary>
@@ -120,7 +120,7 @@ namespace Hime.Redist.Parsers
 		public SubTree(Pool<SubTree> pool, int capacity)
 		{
 			this.pool = pool;
-			this.nodes = new SimpleAST.Node[capacity];
+			this.nodes = new ASTSimpleTree.Node[capacity];
 			this.actions = new TreeAction[capacity];
 		}
 
@@ -148,7 +148,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action applied on the root</param>
 		public void SetupRoot(TableElemRef symbol, TreeAction action)
 		{
-			nodes[0] = new SimpleAST.Node(symbol);
+			nodes[0] = new ASTSimpleTree.Node(symbol);
 			actions[0] = action;
 		}
 
@@ -203,7 +203,7 @@ namespace Hime.Redist.Parsers
 		/// If the index is 0, the root's children are commited, assuming this is a depth-1 sub-tree.
 		/// If not, the children of the child at the given index are commited.
 		/// </remarks>
-		public void CommitChildrenOf(int index, SimpleAST ast)
+		public void CommitChildrenOf(int index, ASTSimpleTree ast)
 		{
 			if (nodes[index].count != 0)
 				nodes[index].first = ast.Store(nodes, index + 1, nodes[index].count);
@@ -213,7 +213,7 @@ namespace Hime.Redist.Parsers
 		/// Commits this buffer to the final ast
 		/// </summary>
 		/// <param name="ast">The ast to commit to</param>
-		public void Commit(SimpleAST ast)
+		public void Commit(ASTSimpleTree ast)
 		{
 			CommitChildrenOf(0, ast);
 			ast.StoreRoot(nodes[0]);
@@ -227,7 +227,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action</param>
 		public void SetAt(int index, TableElemRef symbol, TreeAction action)
 		{
-			nodes[index] = new SimpleAST.Node(symbol);
+			nodes[index] = new ASTSimpleTree.Node(symbol);
 			actions[index] = action;
 		}
 

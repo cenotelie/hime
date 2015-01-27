@@ -29,30 +29,6 @@ namespace Hime.Redist.Lexer
 	public abstract class BaseLexer : ILexer
 	{
 		/// <summary>
-		/// Represents a match in the input
-		/// </summary>
-		protected struct Match
-		{
-			/// <summary>
-			/// Index of the matched terminal
-			/// </summary>
-			public int terminal;
-			/// <summary>
-			/// Length of the matched input
-			/// </summary>
-			public int length;
-			/// <summary>
-			/// Initializes a match
-			/// </summary>
-			/// <param name='terminal'>Index of the matched terminal</param>
-			public Match(int terminal)
-			{
-				this.terminal = terminal;
-				this.length = 0;
-			}
-		}
-
-		/// <summary>
 		/// This lexer's automaton
 		/// </summary>
 		protected Automaton automaton;
@@ -150,5 +126,12 @@ namespace Hime.Redist.Lexer
 		/// <param name="contexts">The current applicable contexts</param>
 		/// <returns>The next token in the input</returns>
 		internal abstract TokenKernel GetNextToken(IContextProvider contexts);
+
+		/// <summary>
+		/// Gets the possible next tokens in the input
+		/// </summary>
+		/// <param name="contexts">The current applicable contexts</param>
+		/// <returns>The possible next tokens in the input</returns>
+		internal abstract Buffer<TokenKernel> GetNextTokens(IContextProvider contexts);
 	}
 }

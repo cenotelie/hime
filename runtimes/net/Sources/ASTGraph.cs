@@ -19,13 +19,14 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using Hime.Redist.Utils;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
 	/// <summary>
 	/// Represents an AST using a graph structure
 	/// </summary>
-	class GraphAST : ASTImpl
+	class ASTGraph : ASTBaseImpl
 	{
 		/// <summary>
 		/// The adjacency table
@@ -33,10 +34,13 @@ namespace Hime.Redist.Parsers
 		private Utils.BigList<int> adjacency;
 
 		/// <summary>
-		/// Initializes this SPPF
+		/// Initializes this AST
 		/// </summary>
-		public GraphAST(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
-			: base(text, variables, virtuals)
+		/// <param name="tokens">The table of tokens</param>
+		/// <param name="variables">The table of variables</param>
+		/// <param name="virtuals">The table of virtuals</param>
+		public ASTGraph(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
+			: base(tokens, variables, virtuals)
 		{
 			this.adjacency = new Utils.BigList<int>();
 		}
@@ -69,15 +73,15 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private class ChildEnumerator : IEnumerator<ASTNode>
 		{
-			private GraphAST ast;
+			private ASTGraph ast;
 			private int first;
 			private int current;
 			private int end;
 
-			public ChildEnumerator(GraphAST ast, int node)
+			public ChildEnumerator(ASTGraph ast, int node)
 			{
 				this.ast = ast;
-				SimpleAST.Node n = ast.nodes[node];
+				ASTSimpleTree.Node n = ast.nodes[node];
 				this.first = n.first;
 				this.current = this.first - 1;
 				this.end = this.first + n.count;
@@ -127,7 +131,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The index of the new node</returns>
 		public int Store(TableElemRef symbol)
 		{
-			return nodes.Add(new SimpleAST.Node(symbol));
+			return nodes.Add(new ASTSimpleTree.Node(symbol));
 		}
 
 		/// <summary>
@@ -149,7 +153,7 @@ namespace Hime.Redist.Parsers
 		public int CopyNode(int node)
 		{
 			int result = nodes.Add(nodes[node]);
-			SimpleAST.Node copy = nodes[result];
+			ASTSimpleTree.Node copy = nodes[result];
 			if (copy.count != 0)
 			{
 				copy.first = adjacency.Duplicate(copy.first, copy.count);
@@ -167,8 +171,8 @@ namespace Hime.Redist.Parsers
 		/// <returns>The number of adjacents</returns>
 		public int GetAdjacency(int node, int[] buffer, int index)
 		{
-			SimpleAST.Node temp = nodes[node];
-			for (int i=0; i!=temp.count; i++)
+			ASTSimpleTree.Node temp = nodes[node];
+			for (int i = 0; i != temp.count; i++)
 				buffer[index + i] = adjacency[temp.first + i];
 			return temp.count;
 		}
@@ -181,7 +185,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="count">The number of adjacency items</param>
 		public void SetAdjacency(int node, int first, int count)
 		{
-			SimpleAST.Node temp = nodes[node];
+			ASTSimpleTree.Node temp = nodes[node];
 			temp.first = first;
 			temp.count = count;
 			nodes[node] = temp;

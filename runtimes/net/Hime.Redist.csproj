@@ -69,7 +69,7 @@
     <Compile Include="Sources\Lexer\BaseLexer.cs" />
     <Compile Include="Sources\Lexer\BaseText.cs" />
     <Compile Include="Sources\Lexer\TokenKernel.cs" />
-    <Compile Include="Sources\Lexer\TokenRepository.cs" />
+    <Compile Include="Sources\TokenRepository.cs" />
     <Compile Include="Sources\Lexer\ContextSensitiveLexer.cs" />
     <Compile Include="Sources\Lexer\IContextProvider.cs" />
     <Compile Include="Sources\Lexer\MatchedTerminal.cs" />
@@ -114,21 +114,22 @@
     <Compile Include="Sources\Parsers\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sources\Utils\BigList.cs" />
+    <Compile Include="Sources\Utils\Buffer.cs" />
     <Compile Include="Sources\Utils\Pool.cs" />
     <Compile Include="Sources\Utils\Factory.cs" />
-    <Compile Include="Sources\Parsers\SimpleAST.cs" />
+    <Compile Include="Sources\ASTSimpleTree.cs" />
     <Compile Include="Sources\Parsers\SubTree.cs" />
-    <Compile Include="Sources\Parsers\TableType.cs" />
-    <Compile Include="Sources\Parsers\TableElemRef.cs" />
+    <Compile Include="Sources\TableType.cs" />
+    <Compile Include="Sources\TableElemRef.cs" />
     <Compile Include="Sources\Parsers\LROpCodeBase.cs" />
     <Compile Include="Sources\Parsers\GSSLabel.cs" />
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
     <Compile Include="Sources\Lexer\ILexer.cs" />
     <Compile Include="Sources\Lexer\PrefetchedText.cs" />
     <Compile Include="Sources\Lexer\ContextFreeLexer.cs" />
-    <Compile Include="Sources\Parsers\GraphAST.cs" />
+    <Compile Include="Sources\ASTGraph.cs" />
     <Compile Include="Sources\Parsers\SPPFBuilder.cs" />
-    <Compile Include="Sources\Parsers\ASTImpl.cs" />
+    <Compile Include="Sources\ASTBaseImpl.cs" />
     <Compile Include="Sources\TextContext.cs" />
     <Compile Include="Sources\Utils\ROList.cs" />
   </ItemGroup>

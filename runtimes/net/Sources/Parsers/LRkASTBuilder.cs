@@ -91,7 +91,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		protected SimpleAST result;
+		protected ASTSimpleTree result;
 
 		#region Implementation of SemanticBody
 		/// <summary>
@@ -121,7 +121,7 @@ namespace Hime.Redist.Parsers
 			this.stack = new SubTree[LRkParser.INIT_STACK_SIZE];
 			this.stackNext = 0;
 			this.handle = new int[INIT_HANDLE_SIZE];
-			this.result = new SimpleAST(text, variables, virtuals);
+			this.result = new ASTSimpleTree(text, variables, virtuals);
 		}
 
 		/// <summary>

@@ -19,13 +19,14 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using Hime.Redist.Utils;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
 	/// <summary>
 	/// Represents a base class for AST implementations
 	/// </summary>
-	abstract class ASTImpl : AST
+	abstract class ASTBaseImpl : AST
 	{
 		/// <summary>
 		/// Represents a node in this AST
@@ -33,9 +34,9 @@ namespace Hime.Redist.Parsers
 		public struct Node
 		{
 			/// <summary>
-			/// The node's symbol reference
+			/// The node's label
 			/// </summary>
-			public TableElemRef symbol;
+			public TableElemRef label;
 			/// <summary>
 			/// The number of children
 			/// </summary>
@@ -48,10 +49,10 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// Initializes this node
 			/// </summary>
-			/// <param name="symbol">The node's symbol</param>
-			public Node(TableElemRef symbol)
+			/// <param name="label">The node's label</param>
+			public Node(TableElemRef label)
 			{
-				this.symbol = symbol;
+				this.label = label;
 				this.count = 0;
 				this.first = -1;
 			}
@@ -60,19 +61,19 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The table of tokens
 		/// </summary>
-		protected TokenDataProvider tableTokens;
+		protected TokenRepository tableTokens;
 		/// <summary>
 		/// The table of variables
 		/// </summary>
-		protected IList<Symbol> tableVariables;
+		protected ROList<Symbol> tableVariables;
 		/// <summary>
 		/// The table of virtuals
 		/// </summary>
-		protected IList<Symbol> tableVirtuals;
+		protected ROList<Symbol> tableVirtuals;
 		/// <summary>
 		/// The nodes' labels
 		/// </summary>
-		protected Utils.BigList<Node> nodes;
+		protected BigList<Node> nodes;
 		/// <summary>
 		/// The index of the tree's root node
 		/// </summary>
@@ -82,12 +83,15 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this AST
 		/// </summary>
-		public ASTImpl(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
+		/// <param name="tokens">The table of tokens</param>
+		/// <param name="variables">The table of variables</param>
+		/// <param name="virtuals">The table of virtuals</param>
+		public ASTBaseImpl(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 		{
-			this.tableTokens = text;
+			this.tableTokens = tokens;
 			this.tableVariables = variables;
 			this.tableVirtuals = virtuals;
-			this.nodes = new Utils.BigList<Node>();
+			this.nodes = new BigList<Node>();
 			this.root = -1;
 		}
 
@@ -96,16 +100,6 @@ namespace Hime.Redist.Parsers
 		/// Gets the root node of this tree
 		/// </summary>
 		public ASTNode Root { get { return new ASTNode(this, this.root); } }
-
-		/// <summary>
-		/// Gets the symbol of the given node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The node's symbol</returns>
-		public Symbol GetSymbol(int node)
-		{
-			return GetSymbolFor(nodes[node].symbol);
-		}
 
 		/// <summary>
 		/// Gets the number of children of the given node
@@ -139,28 +133,77 @@ namespace Hime.Redist.Parsers
 		/// <returns>The position in the text</returns>
 		public TextPosition GetPosition(int node)
 		{
-			TableElemRef sym = nodes[node].symbol;
+			TableElemRef sym = nodes[node].label;
 			if (sym.Type == TableType.Token)
-				return tableTokens.GetPositionOf(sym.Index);
+				return tableTokens.GetPosition(sym.Index);
 			return new TextPosition(0, 0);
+		}
+
+		/// <summary>
+		/// Gets the span in the input text of the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The span in the text</returns>
+		public TextSpan GetSpan(int node)
+		{
+			TableElemRef sym = nodes[node].label;
+			if (sym.Type == TableType.Token)
+				return tableTokens.GetSpan(sym.Index);
+			return new TextSpan(0, 0);
+		}
+
+		/// <summary>
+		/// Gets the context in the input of the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The context</returns>
+		public TextContext GetContext(int node)
+		{
+			TableElemRef sym = nodes[node].label;
+			if (sym.Type == TableType.Token)
+				return tableTokens.GetContext(sym.Index);
+			return new TextContext();
+		}
+
+		/// <summary>
+		/// Gets the grammar symbol associated to the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The associated symbol</returns>
+		public Symbol GetSymbol(int node)
+		{
+			return GetSymbolFor(nodes[node].label);
+		}
+
+		/// <summary>
+		/// Gets the value of the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The associated value</returns>
+		public string GetValue(int node)
+		{
+			TableElemRef sym = nodes[node].label;
+			if (sym.Type == TableType.Token)
+				return tableTokens.GetValue(sym.Index);
+			return null;
 		}
 		#endregion
 
 		/// <summary>
-		/// Gets the symbol corresponding to the given symbol reference
+		/// Gets the symbol corresponding to the specified label
 		/// </summary>
-		/// <param name="symRef">A symbol reference</param>
+		/// <param name="label">A node label</param>
 		/// <returns>The corresponding symbol</returns>
-		public Symbol GetSymbolFor(TableElemRef symRef)
+		public Symbol GetSymbolFor(TableElemRef label)
 		{
-			switch (symRef.Type)
+			switch (label.Type)
 			{
 				case TableType.Token:
-					return tableTokens[symRef.Index];
+					return tableTokens.GetSymbol(label.Index);
 				case TableType.Variable:
-					return tableVariables[symRef.Index];
+					return tableVariables[label.Index];
 				case TableType.Virtual:
-					return tableVirtuals[symRef.Index];
+					return tableVirtuals[label.Index];
 			}
 			// This cannot happen
 			return new Symbol(0, string.Empty);

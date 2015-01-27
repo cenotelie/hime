@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.IO;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Lexer
 {
@@ -27,9 +28,37 @@ namespace Hime.Redist.Lexer
 	public abstract class ContextFreeLexer : BaseLexer
 	{
 		/// <summary>
+		/// Represents a match in the input
+		/// </summary>
+		private struct Match
+		{
+			/// <summary>
+			/// Index of the matched terminal
+			/// </summary>
+			public int terminal;
+			/// <summary>
+			/// Length of the matched input
+			/// </summary>
+			public int length;
+			/// <summary>
+			/// Initializes a match
+			/// </summary>
+			/// <param name='terminal'>Index of the matched terminal</param>
+			public Match(int terminal)
+			{
+				this.terminal = terminal;
+				this.length = 0;
+			}
+		}
+
+		/// <summary>
 		/// Index of the next token
 		/// </summary>
-		protected int tokenIndex = -1;
+		private int tokenIndex = -1;
+		/// <summary>
+		/// The buffer for token kernels
+		/// </summary>
+		private Buffer<TokenKernel> buffer;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -42,6 +71,7 @@ namespace Hime.Redist.Lexer
 			: base(automaton, terminals, separator, input)
 		{
 			this.tokenIndex = -1;
+			this.buffer = new Buffer<TokenKernel>(1);
 		}
 
 		/// <summary>
@@ -55,6 +85,7 @@ namespace Hime.Redist.Lexer
 			: base(automaton, terminals, separator, input)
 		{
 			this.tokenIndex = -1;
+			this.buffer = new Buffer<TokenKernel>(1);
 		}
 
 		/// <summary>
@@ -76,6 +107,18 @@ namespace Hime.Redist.Lexer
 			TokenKernel result = new TokenKernel(tokens.GetSymbol(tokenIndex).ID, tokenIndex);
 			tokenIndex++;
 			return result;
+		}
+
+		/// <summary>
+		/// Gets the possible next tokens in the input
+		/// </summary>
+		/// <param name="contexts">The current applicable contexts</param>
+		/// <returns>The possible next tokens in the input</returns>
+		internal override Buffer<TokenKernel> GetNextTokens(IContextProvider contexts)
+		{
+			buffer.Reset();
+			buffer.Add(GetNextToken(contexts));
+			return buffer;
 		}
 
 		/// <summary>

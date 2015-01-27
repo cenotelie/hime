@@ -148,7 +148,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		private GraphAST result;
+		private ASTGraph result;
 
 		#region Implementation of SemanticBody
 		/// <summary>
@@ -187,7 +187,7 @@ namespace Hime.Redist.Parsers
 			this.cacheActions = new TreeAction[INIT_HANDLE_SIZE];
 			this.handle = new int[INIT_HANDLE_SIZE];
 			this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-			this.result = new GraphAST(text, variables, virtuals);
+			this.result = new ASTGraph(text, variables, virtuals);
 		}
 
 		/// <summary>

@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
-namespace Hime.Redist.Lexer
+namespace Hime.Redist
 {
 	/// <summary>
 	/// A repository of matched tokens

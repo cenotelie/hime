@@ -31,5 +31,12 @@ namespace Hime.Redist.Lexer
 		/// <param name="context">A context</param>
 		/// <returns><c>true</c> if the specified context is in effect</returns>
 		bool IsWithin(int context);
+
+		/// <summary>
+		/// Gets whether the terminal at the specified index would be of use
+		/// </summary>
+		/// <param name="terminalIndex">The index of the terminal</param>
+		/// <returns><c>true</c> if the terminal would be of use</returns>
+		bool CanUse(int terminalIndex);
 	}
 }

@@ -19,8 +19,9 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
+using Hime.Redist.Utils;
 
-namespace Hime.Redist.Parsers
+namespace Hime.Redist
 {
 	/// <summary>
 	/// Represents a simple AST with a tree structure
@@ -29,14 +30,17 @@ namespace Hime.Redist.Parsers
 	/// The nodes are stored in sequentials arrays where the children of a node are an inner sequence.
 	/// The linkage is represented by each node storing its number of children and the index of its first child.
 	/// </remarks>
-	class SimpleAST : ASTImpl
+	class ASTSimpleTree : ASTBaseImpl
 	{
 
 		/// <summary>
 		/// Initializes this AST
 		/// </summary>
-		public SimpleAST(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
-			: base(text, variables, virtuals)
+		/// <param name="tokens">The table of tokens</param>
+		/// <param name="variables">The table of variables</param>
+		/// <param name="virtuals">The table of virtuals</param>
+		public ASTSimpleTree(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
+			: base(tokens, variables, virtuals)
 		{
 		}
 
@@ -77,12 +81,12 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private class ChildEnumerator : IEnumerator<ASTNode>
 		{
-			private SimpleAST ast;
+			private ASTSimpleTree ast;
 			private int first;
 			private int current;
 			private int end;
 
-			public ChildEnumerator(SimpleAST ast, int node)
+			public ChildEnumerator(ASTSimpleTree ast, int node)
 			{
 				this.ast = ast;
 				Node n = ast.nodes[node];
