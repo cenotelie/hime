@@ -19,7 +19,7 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
@@ -32,27 +32,36 @@ namespace Hime.Redist.Parsers
 		/// Maximum number of errors
 		/// </summary>
 		protected const int MAX_ERROR_COUNT = 100;
+		/// <summary>
+		/// The default value of the recover mode
+		/// </summary>
+		protected const bool DEFAULT_MODE_RECOVER = true;
+		/// <summary>
+		/// The default value of the debug mode
+		/// </summary>
+		protected const bool DEFAULT_MODE_DEBUG = false;
+
 
 		/// <summary>
 		/// Determines whether the parser will try to recover from errors
 		/// </summary>
-		protected bool recover = true;
+		protected bool modeRecover;
 		/// <summary>
 		/// Value indicating whether this parser is in debug mode
 		/// </summary>
-		protected bool debug = false;
+		protected bool modeDebug;
 		/// <summary>
-		/// Parser's variables
+		/// Parser's variable symbols
 		/// </summary>
-		protected IList<Symbol> parserVariables;
+		protected ROList<Symbol> symVariables;
 		/// <summary>
-		/// Parser's virtuals
+		/// Parser's virtual symbols
 		/// </summary>
-		protected IList<Symbol> parserVirtuals;
+		protected ROList<Symbol> symVirtuals;
 		/// <summary>
-		/// Parser's actions
+		/// Parser's action symbols
 		/// </summary>
-		protected SemanticAction[] parserActions;
+		protected ROList<SemanticAction> symActions;
 		/// <summary>
 		/// List of the encountered syntaxic errors
 		/// </summary>
@@ -60,32 +69,37 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Lexer associated to this parser
 		/// </summary>
-		protected Lexer.ILexer lexer;
+		protected Lexer.BaseLexer lexer;
 
 
 		/// <summary>
 		/// Gets the variable symbols used by this parser
 		/// </summary>
-		public IList<Symbol> Variables { get { return parserVariables; } }
+		public ROList<Symbol> SymbolVariables { get { return symVariables; } }
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
-		public IList<Symbol> Virtuals { get { return parserVirtuals; } }
+		public ROList<Symbol> SymbolVirtuals { get { return symVirtuals; } }
+		/// <summary>
+		/// Gets the action symbols used by this parser
+		/// </summary>
+		public ROList<SemanticAction> SymbolActions { get { return symActions; } }
+
 		/// <summary>
 		/// Gets or sets whether the paser should try to recover from errors
 		/// </summary>
-		public bool RecoverErrors
+		public bool ModeRecoverErrors
 		{
-			get { return recover; }
-			set { recover = value; }
+			get { return modeRecover; }
+			set { modeRecover = value; }
 		}
 		/// <summary>
 		/// Gets or sets a value indicating whether this parser is in debug mode
 		/// </summary>
-		public bool DebugMode
+		public bool ModeDebug
 		{
-			get { return debug; }
-			set { debug = value; }
+			get { return modeDebug; }
+			set { modeDebug = value; }
 		}
 
 		/// <summary>
@@ -95,12 +109,14 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The parser's virtuals</param>
 		/// <param name="actions">The parser's actions</param>
 		/// <param name="lexer">The input lexer</param>
-		protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
+		protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.BaseLexer lexer)
 		{
-			this.parserVariables = new ReadOnlyCollection<Symbol>(new List<Symbol>(variables));
-			this.parserVirtuals = new ReadOnlyCollection<Symbol>(new List<Symbol>(virtuals));
-			this.parserActions = actions;
-			this.recover = true;
+			this.modeRecover = DEFAULT_MODE_RECOVER;
+			this.modeDebug = DEFAULT_MODE_DEBUG;
+			this.symVariables = new ROList<Symbol>(new List<Symbol>(variables));
+			this.symVirtuals = new ROList<Symbol>(new List<Symbol>(virtuals));
+			this.symActions = new ROList<SemanticAction>(new List<SemanticAction>(actions));
+			this.modeRecover = true;
 			this.allErrors = new List<ParseError>();
 			this.lexer = lexer;
 			this.lexer.OnError += OnLexicalError;

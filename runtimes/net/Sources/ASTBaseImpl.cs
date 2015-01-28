@@ -210,6 +210,26 @@ namespace Hime.Redist
 		}
 
 		/// <summary>
+		/// Gets the atom corresponding to the specified label
+		/// </summary>
+		/// <param name="label">A node label</param>
+		/// <returns>The corresponding atom</returns>
+		public ParseAtom GetAtomFor(TableElemRef label)
+		{
+			switch (label.Type)
+			{
+				case TableType.Token:
+					return tableTokens[label.Index];
+				case TableType.Variable:
+					return new SymbolRef(tableVariables[label.Index]);
+				case TableType.Virtual:
+					return new SymbolRef(tableVirtuals[label.Index]);
+			}
+			// This cannot happen
+			return null;
+		}
+
+		/// <summary>
 		/// Stores some children nodes in this AST
 		/// </summary>
 		/// <param name="nodes">The nodes to store</param>

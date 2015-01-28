@@ -35,7 +35,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The terminals matched by this lexer
 		/// </summary>
-		protected List<Symbol> terminals;
+		protected ROList<Symbol> symTerminals;
 		/// <summary>
 		/// Symbol ID of the SEPARATOR terminal
 		/// </summary>
@@ -52,7 +52,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the terminals matched by this lexer
 		/// </summary>
-		public ROList<Symbol> Terminals { get { return new ROList<Symbol>(terminals); } }
+		public ROList<Symbol> Terminals { get { return symTerminals; } }
 
 		/// <summary>
 		/// Gets the lexer's input text
@@ -79,10 +79,10 @@ namespace Hime.Redist.Lexer
 		protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 		{
 			this.automaton = automaton;
-			this.terminals = new List<Symbol>(terminals);
+			this.symTerminals = new ROList<Symbol>(new List<Symbol>(terminals));
 			this.separatorID = separator;
 			this.text = new PrefetchedText(input);
-			this.tokens = new TokenRepository(new ROList<Symbol>(this.terminals), this.text);
+			this.tokens = new TokenRepository(this.symTerminals, this.text);
 		}
 
 		/// <summary>
@@ -95,10 +95,10 @@ namespace Hime.Redist.Lexer
 		protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 		{
 			this.automaton = automaton;
-			this.terminals = new List<Symbol>(terminals);
+			this.symTerminals = new ROList<Symbol>(new List<Symbol>(terminals));
 			this.separatorID = separator;
 			this.text = new StreamingText(input);
-			this.tokens = new TokenRepository(new ROList<Symbol>(this.terminals), this.text);
+			this.tokens = new TokenRepository(this.symTerminals, this.text);
 		}
 
 		/// <summary>

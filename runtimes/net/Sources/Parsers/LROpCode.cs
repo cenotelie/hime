@@ -30,11 +30,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Bit mask for the tree action part of an instruction
 		/// </summary>
-		private const int MaskTreeAction = 0x0003;
+		private const int MASK_TREE_ACTION = 0x0003;
 		/// <summary>
 		/// Bit mask for the base part of an instruction
 		/// </summary>
-		private const int MaskBase = 0xFFFC;
+		private const int MASK_BASE = 0xFFFC;
 
 		/// <summary>
 		/// The op-code value
@@ -49,12 +49,12 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the tree action included in this code
 		/// </summary>
-		public TreeAction TreeAction { get { return (TreeAction)(code & MaskTreeAction); } }
+		public TreeAction TreeAction { get { return (TreeAction)(code & MASK_TREE_ACTION); } }
 
 		/// <summary>
 		/// Gets the base instruction in this code
 		/// </summary>
-		public LROpCodeBase Base { get { return (LROpCodeBase)(code & MaskBase); } }
+		public LROpCodeBase Base { get { return (LROpCodeBase)(code & MASK_BASE); } }
 
 		/// <summary>
 		/// Loads this op-code from the specified input

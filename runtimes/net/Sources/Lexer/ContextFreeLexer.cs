@@ -25,7 +25,7 @@ namespace Hime.Redist.Lexer
 	/// <summary>
 	/// Represents a context-free lexer (lexing rules do not depend on the context)
 	/// </summary>
-	public abstract class ContextFreeLexer : BaseLexer
+	public class ContextFreeLexer : BaseLexer
 	{
 		/// <summary>
 		/// Represents a match in the input
@@ -133,7 +133,7 @@ namespace Hime.Redist.Lexer
 				if (match.length != 0)
 				{
 					// matched something
-					if (terminals[match.terminal].ID != separatorID)
+					if (symTerminals[match.terminal].ID != separatorID)
 						tokens.Add(match.terminal, inputIndex, match.length);
 					inputIndex += match.length;
 					continue;

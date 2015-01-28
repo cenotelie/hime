@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Collections.Generic;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
@@ -32,7 +31,6 @@ namespace Hime.Redist.Parsers
 		/// The initial size of the reduction handle
 		/// </summary>
 		protected const int INIT_HANDLE_SIZE = 1024;
-
 		/// <summary>
 		/// The bias for estimating the size of the reduced sub-tree
 		/// </summary>
@@ -42,52 +40,42 @@ namespace Hime.Redist.Parsers
 		/// The pool of single node sub-trees
 		/// </summary>
 		protected Pool<SubTree> poolSingle;
-
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 128 nodes
 		/// </summary>
 		protected Pool<SubTree> pool128;
-
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 1024 nodes
 		/// </summary>
 		protected Pool<SubTree> pool1024;
-
 		/// <summary>
 		/// The stack of semantic objects
 		/// </summary>
 		protected SubTree[] stack;
-
 		/// <summary>
 		/// Index of the available cell on top of the stack's head
 		/// </summary>
 		protected int stackNext;
-
 		/// <summary>
 		/// The sub-tree build-up cache
 		/// </summary>
 		protected SubTree cache;
-
 		/// <summary>
 		/// The new available node in the current cache
 		/// </summary>
 		protected int cacheNext;
-
 		/// <summary>
 		/// The number of items popped from the stack
 		/// </summary>
 		protected int popCount;
-
 		/// <summary>
 		/// The reduction handle represented as the indices of the sub-trees in the cache
 		/// </summary>
 		protected int[] handle;
-
 		/// <summary>
 		/// The index of the next available slot in the handle
 		/// </summary>
 		protected int handleNext;
-
 		/// <summary>
 		/// The AST being built
 		/// </summary>
@@ -99,7 +87,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">Index of the symbol</param>
 		/// <returns>The symbol at the given index</returns>
-		public Symbol this[int index] { get { return result.GetSymbolFor(cache.GetLabelAt(handle[index])); } }
+		public ParseAtom this[int index] { get { return result.GetAtomFor(cache.GetLabelAt(handle[index])); } }
 
 		/// <summary>
 		/// Gets the length of this body
@@ -110,10 +98,10 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes the builder with the given stack size
 		/// </summary>
-		/// <param name="text">The tokenined text</param>
+		/// <param name="text">The table of tokens</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
-		public LRkASTBuilder(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public LRkASTBuilder(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 		{
 			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
 			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
@@ -121,7 +109,7 @@ namespace Hime.Redist.Parsers
 			this.stack = new SubTree[LRkParser.INIT_STACK_SIZE];
 			this.stackNext = 0;
 			this.handle = new int[INIT_HANDLE_SIZE];
-			this.result = new ASTSimpleTree(text, variables, virtuals);
+			this.result = new ASTSimpleTree(tokens, variables, virtuals);
 		}
 
 		/// <summary>

@@ -17,7 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
@@ -29,20 +29,24 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the variable symbols used by this parser
 		/// </summary>
-		IList<Symbol> Variables { get; }
+		ROList<Symbol> SymbolVariables { get; }
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
-		IList<Symbol> Virtuals { get; }
+		ROList<Symbol> SymbolVirtuals { get; }
+		/// <summary>
+		/// Gets the action symbols used by this parser
+		/// </summary>
+		ROList<SemanticAction> SymbolActions { get; }
 
 		/// <summary>
 		/// Gets or sets whether the paser should try to recover from errors
 		/// </summary>
-		bool RecoverErrors { get; set; }
+		bool ModeRecoverErrors { get; set; }
 		/// <summary>
 		/// Gets or sets a value indicating whether this parser is in debug mode
 		/// </summary>
-		bool DebugMode { get; set; }
+		bool ModeDebug { get; set; }
 
 		/// <summary>
 		/// Parses the input and returns the result

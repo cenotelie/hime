@@ -36,7 +36,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// The expected terminals
 		/// </summary>
-		private List<Symbol> expected;
+		private ROList<Symbol> expected;
 
 		/// <summary>
 		/// Gets the error's type
@@ -56,16 +56,15 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the expected terminals
 		/// </summary>
-		public ROList<Symbol> ExpectedTerminals { get { return new ROList<Symbol>(expected); } }
+		public ROList<Symbol> ExpectedTerminals { get { return expected; } }
 
 		/// <summary>
 		/// Initializes this error
 		/// </summary>
 		/// <param name="token">The unexpected token</param>
-		/// <param name="position">Error's position in the input</param>
 		/// <param name="expected">The expected terminals</param>
-		public UnexpectedTokenError(Token token, TextPosition position, List<Symbol> expected)
-			: base(position)
+		public UnexpectedTokenError(Token token, ROList<Symbol> expected)
+			: base(token.Position)
 		{
 			this.unexpected = token;
 			this.expected = expected;

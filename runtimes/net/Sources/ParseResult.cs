@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist
@@ -27,7 +26,7 @@ namespace Hime.Redist
 	/// </summary>
 	public class ParseResult
 	{
-		private List<ParseError> errors;
+		private ROList<ParseError> errors;
 		private Text text;
 		private AST ast;
 
@@ -36,7 +35,7 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="errors">The list of errors</param>
 		/// <param name="text">The parsed text</param>
-		internal ParseResult(List<ParseError> errors, Text text)
+		internal ParseResult(ROList<ParseError> errors, Text text)
 		{
 			this.errors = errors;
 			this.text = text;
@@ -48,7 +47,7 @@ namespace Hime.Redist
 		/// <param name="errors">The list of errors</param>
 		/// <param name="text">The parsed text</param>
 		/// <param name="ast">The produced AST</param>
-		internal ParseResult(List<ParseError> errors, Text text, AST ast)
+		internal ParseResult(ROList<ParseError> errors, Text text, AST ast)
 		{
 			this.errors = errors;
 			this.text = text;
@@ -63,7 +62,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets a list of the parsing errors
 		/// </summary>
-		public ROList<ParseError> Errors { get { return new ROList<ParseError>(errors); } }
+		public ROList<ParseError> Errors { get { return errors; } }
 
 		/// <summary>
 		/// Gets the text that has been parsed

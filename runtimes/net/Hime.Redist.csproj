@@ -65,10 +65,12 @@
     <Compile Include="..\..\releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="SemanticBody.cs" />
     <Compile Include="Sources\AST.cs" />
     <Compile Include="Sources\Lexer\BaseLexer.cs" />
     <Compile Include="Sources\Lexer\BaseText.cs" />
     <Compile Include="Sources\Lexer\TokenKernel.cs" />
+    <Compile Include="Sources\SymbolRef.cs" />
     <Compile Include="Sources\TokenRepository.cs" />
     <Compile Include="Sources\Lexer\ContextSensitiveLexer.cs" />
     <Compile Include="Sources\Lexer\IContextProvider.cs" />
@@ -86,7 +88,7 @@
     <Compile Include="Sources\Symbol.cs" />
     <Compile Include="Sources\Text.cs" />
     <Compile Include="Sources\ParseResult.cs" />
-    <Compile Include="Sources\Semantics.cs" />
+    <Compile Include="Sources\SemanticAction.cs" />
     <Compile Include="Sources\Parsers\ColumnMap.cs" />
     <Compile Include="Sources\Parsers\GSS.cs" />
     <Compile Include="Sources\TextPosition.cs" />

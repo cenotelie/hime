@@ -130,7 +130,7 @@ namespace Hime.Redist.Parsers
 		{
 			this.parserAutomaton = automaton;
 			this.gss = new GSS();
-			this.sppf = new SPPFBuilder(lexer.Output, parserVariables, parserVirtuals);
+			this.sppf = new SPPFBuilder(lexer.Output, variables, virtuals);
 			BuildNullables(variables.Length);
 			sppf.ClearHistory();
 		}
@@ -260,7 +260,7 @@ namespace Hime.Redist.Parsers
 			// register the error
 			UnexpectedTokenError error = new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected);
 			allErrors.Add(error);
-			if (debug)
+			if (modeDebug)
 			{
 				Console.WriteLine("==== RNGLR parsing error:");
 				Console.Write("\t");
@@ -306,7 +306,7 @@ namespace Hime.Redist.Parsers
 						{
 							GSSPath path = paths[k];
 							// get the target GLR state
-							int next = GetNextByVar(gss.GetRepresentedState(path.Last), parserVariables[production.Head].ID);
+							int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 							// enqueue the info, top GSS stack node and target GLR state
 							queueGSSHead.Add(path.Last);
 							queueVStack.Add(new int[] { next });
@@ -337,7 +337,7 @@ namespace Hime.Redist.Parsers
 							// 0-length reduction => start from the current head
 							int[] virtualStack = new int[queueVStack[i].Length + 1];
 							Array.Copy(queueVStack[i], virtualStack, queueVStack[i].Length);
-							virtualStack[virtualStack.Length - 1] = GetNextByVar(head, parserVariables[production.Head].ID);
+							virtualStack[virtualStack.Length - 1] = GetNextByVar(head, symVariables[production.Head].ID);
 							// enqueue
 							queueGSSHead.Add(queueGSSHead[i]);
 							queueVStack.Add(virtualStack);
@@ -347,7 +347,7 @@ namespace Hime.Redist.Parsers
 							// we are still the virtual stack
 							int[] virtualStack = new int[queueVStack[i].Length - production.ReductionLength + 1];
 							Array.Copy(queueVStack[i], virtualStack, virtualStack.Length - 1);
-							virtualStack[virtualStack.Length - 1] = GetNextByVar(virtualStack[virtualStack.Length - 2], parserVariables[production.Head].ID);
+							virtualStack[virtualStack.Length - 1] = GetNextByVar(virtualStack[virtualStack.Length - 2], symVariables[production.Head].ID);
 							// enqueue
 							queueGSSHead.Add(queueGSSHead[i]);
 							queueVStack.Add(virtualStack);
@@ -361,7 +361,7 @@ namespace Hime.Redist.Parsers
 							{
 								GSSPath path = paths[k];
 								// get the target GLR state
-								int next = GetNextByVar(gss.GetRepresentedState(path.Last), parserVariables[production.Head].ID);
+								int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 								// enqueue the info, top GSS stack node and target GLR state
 								queueGSSHead.Add(path.Last);
 								queueVStack.Add(new int[] { next });
@@ -385,7 +385,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The corresponding SPPF part</returns>
 		private GSSLabel BuildSPPF(int generation, LRProduction production, GSSLabel first, GSSPath path)
 		{
-			Symbol variable = parserVariables[production.Head];
+			Symbol variable = symVariables[production.Head];
 			sppf.ReductionPrepare(first, path, production.ReductionLength);
 			for (int i = 0; i != production.BytecodeLength; i++)
 			{
@@ -394,7 +394,7 @@ namespace Hime.Redist.Parsers
 				{
 					case LROpCodeBase.SemanticAction:
 						{
-							SemanticAction action = parserActions[production[i + 1].DataValue];
+							SemanticAction action = symActions[production[i + 1].DataValue];
 							i++;
 							action.Invoke(variable, sppf);
 							break;
@@ -517,7 +517,7 @@ namespace Hime.Redist.Parsers
 		private void ExecuteReduction(int generation, Reduction reduction, GSSPath path)
 		{
 			// Get the rule's head
-			Symbol head = parserVariables[reduction.prod.Head];
+			Symbol head = symVariables[reduction.prod.Head];
 			// Resolve the sub-root
 			GSSLabel label = sppf.GetLabelFor(path.Generation, new TableElemRef(TableType.Variable, reduction.prod.Head));
 			if (label.IsEpsilon)

@@ -17,8 +17,8 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using System.IO;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
@@ -153,7 +153,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="state">The DFA state</param>
 		/// <param name="terminals">The possible terminals</param>
 		/// <returns>The expected terminals</returns>
-		public LRExpected GetExpected(int state, IList<Symbol> terminals)
+		public LRExpected GetExpected(int state, ROList<Symbol> terminals)
 		{
 			LRExpected result = new LRExpected();
 			int offset = ncols * state;

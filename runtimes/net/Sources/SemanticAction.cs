@@ -21,24 +21,6 @@
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents the semantic body of a rule being reduced
-	/// </summary>
-	public interface SemanticBody
-	{
-		/// <summary>
-		/// Gets the atom at the i-th index
-		/// </summary>
-		/// <param name="index">Index of the atom</param>
-		/// <returns>The atom at the given index</returns>
-		ParseAtom this[int index] { get; }
-
-		/// <summary>
-		/// Gets the length of this body
-		/// </summary>
-		int Length { get; }
-	}
-
-	/// <summary>
 	/// Delegate for a user-defined semantic action
 	/// </summary>
 	/// <param name="head">The grammar variable representing the head of the reduced rule</param>

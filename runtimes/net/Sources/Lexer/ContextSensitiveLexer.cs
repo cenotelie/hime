@@ -25,7 +25,7 @@ namespace Hime.Redist.Lexer
 	/// <summary>
 	/// Represents a context-free lexer (lexing rules do not depend on the context)
 	/// </summary>
-	public abstract class ContextSensitiveLexer : BaseLexer
+	public class ContextSensitiveLexer : BaseLexer
 	{
 		/// <summary>
 		/// The current index in the input
@@ -84,7 +84,7 @@ namespace Hime.Redist.Lexer
 				{
 					// matched something !
 					int terminalIndex = matches[0];
-					int terminalID = terminals[terminalIndex].ID;
+					int terminalID = symTerminals[terminalIndex].ID;
 					if (terminalID == separatorID)
 						continue;
 					TokenKernel token = new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length));
@@ -133,7 +133,7 @@ namespace Hime.Redist.Lexer
 					for (int i = 0; i != matches.Size; i++)
 					{
 						int terminalIndex = matches[i];
-						int terminalID = terminals[terminalIndex].ID;
+						int terminalID = symTerminals[terminalIndex].ID;
 						if (terminalID == separatorID)
 							// filter out the separators
 							continue;
