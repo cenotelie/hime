@@ -68,29 +68,24 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets whether the specified context is in effect
+		/// Gets whether a terminal is acceptable
 		/// </summary>
-		/// <param name="context">A context</param>
-		/// <returns><c>true</c> if the specified context is in effect</returns>
-		public bool IsWithin(int context)
+		/// <param name="context">The terminal's context</param>
+		/// <param name="terminalIndex">The terminal's index</param>
+		/// <returns><code>true</code> if the terminal is acceptable</returns>
+		public bool IsAcceptable(int context, int terminalIndex)
 		{
+			// check that there is an action for this terminal
+			LRAction action = automaton.GetAction(stack[head], lexer.Terminals[terminalIndex].ID);
+			if (action.Code == LRActionCode.None)
+				return false;
+			// check that the parser is in the right context
 			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
 				return true;
 			for (int i = head; i != -1; i--)
 				if (automaton.GetContexts(stack[i]).Contains(context))
 					return true;
 			return false;
-		}
-
-		/// <summary>
-		/// Gets whether the terminal at the specified index would be of use
-		/// </summary>
-		/// <param name="terminalIndex">The index of the terminal</param>
-		/// <returns><c>true</c> if the terminal would be of use</returns>
-		public bool CanUse(int terminalIndex)
-		{
-			LRAction action = automaton.GetAction(stack[head], lexer.Terminals[terminalIndex].ID);
-			return action.Code != LRActionCode.None;
 		}
 
 		/// <summary>

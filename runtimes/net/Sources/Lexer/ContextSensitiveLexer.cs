@@ -199,7 +199,7 @@ namespace Hime.Redist.Lexer
 				for (int j = 0; i != stateData.TerminalsCount; j++)
 				{
 					MatchedTerminal mt = stateData.GetTerminal(j);
-					if (contexts.IsWithin(mt.Context) && contexts.CanUse(mt.Index))
+					if (contexts.IsAcceptable(mt.Context, mt.Index))
 					{
 						if (firstMatch)
 						{
