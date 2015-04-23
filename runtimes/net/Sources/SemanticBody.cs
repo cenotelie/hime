@@ -21,33 +21,20 @@
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents a piece of parsing data
+	/// Represents the semantic body of a rule being reduced
 	/// </summary>
-	public interface ParseAtom
+	public interface SemanticBody
 	{
 		/// <summary>
-		/// Gets the position in the input text of this element
+		/// Gets the element at the i-th index
 		/// </summary>
-		TextPosition Position { get; }
+		/// <param name="index">Index of the element</param>
+		/// <returns>The element at the given index</returns>
+		SemanticElement this[int index] { get; }
 
 		/// <summary>
-		/// Gets the span in the input text of this element
+		/// Gets the length of this body
 		/// </summary>
-		TextSpan Span { get; }
-
-		/// <summary>
-		/// Gets the context of this element in the input
-		/// </summary>
-		TextContext Context { get; }
-
-		/// <summary>
-		/// Gets the grammar symbol associated to this element
-		/// </summary>
-		Symbol Symbol { get; }
-
-		/// <summary>
-		/// Gets the value of this element, if any
-		/// </summary>
-		string Value { get; }
+		int Length { get; }
 	}
 }

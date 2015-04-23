@@ -43,11 +43,11 @@ namespace Hime.Redist
 		/// <summary>
 		/// The symbol's unique identifier
 		/// </summary>
-		private int id;
+		private readonly int id;
 		/// <summary>
 		/// The symbol's name
 		/// </summary>
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// Gets the symbol's unique identifier

@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using System.Text;
 using Hime.Redist.Utils;
 
@@ -31,12 +30,11 @@ namespace Hime.Redist
 		/// <summary>
 		/// The unexpected symbol
 		/// </summary>
-		private Token unexpected;
-
+		private readonly Token unexpected;
 		/// <summary>
 		/// The expected terminals
 		/// </summary>
-		private ROList<Symbol> expected;
+		private readonly ROList<Symbol> expected;
 
 		/// <summary>
 		/// Gets the error's type

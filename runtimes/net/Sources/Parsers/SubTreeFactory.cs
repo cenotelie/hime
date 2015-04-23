@@ -17,20 +17,19 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
-	/// Represents factories of SubTrees
+	/// Represents of factory of sub-trees that have a specified capacity
 	/// </summary>
-	class SubTreeFactory : Factory<SubTree>
+	sealed class SubTreeFactory : Factory<SubTree>
 	{
 		/// <summary>
 		/// The capacity of the SubTrees produced by this factory
 		/// </summary>
-		private int capacity;
+		private readonly int capacity;
 
 		/// <summary>
 		/// Initializes this SubTree factory

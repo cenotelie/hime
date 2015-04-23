@@ -17,13 +17,12 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 
 namespace Hime.Redist
 {
 	/// <summary>
 	/// Represents the context description of a position in a piece of text.
-	/// A context two pieces of text, the line content and the pointer.
+	/// A context is composed of two pieces of text, the line content and the pointer.
 	/// For example, given the piece of text:
 	/// "public Struct Context"
 	/// A context pointing to the second word will look like:
@@ -35,11 +34,11 @@ namespace Hime.Redist
 		/// <summary>
 		/// The text content being represented
 		/// </summary>
-		private string content;
+		private readonly string content;
 		/// <summary>
 		/// The pointer textual representation
 		/// </summary>
-		private string pointer;
+		private readonly string pointer;
 
 		/// <summary>
 		/// Gets the text content being represented

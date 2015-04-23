@@ -28,7 +28,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// The error's position in the input text
 		/// </summary>
-		private TextPosition position;
+		private readonly TextPosition position;
 
 		/// <summary>
 		/// Gets the error's type

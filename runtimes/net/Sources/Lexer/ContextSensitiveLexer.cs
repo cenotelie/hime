@@ -50,9 +50,9 @@ namespace Hime.Redist.Lexer
 		protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 			: base(automaton, terminals, separator, input)
 		{
-			this.inputIndex = 0;
-			this.buffer = new Buffer<TokenKernel>(5);
-			this.matches = new Buffer<int>(5);
+			inputIndex = 0;
+			buffer = new Buffer<TokenKernel>(5);
+			matches = new Buffer<int>(5);
 		}
 
 		/// <summary>
@@ -65,9 +65,9 @@ namespace Hime.Redist.Lexer
 		protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 			: base(automaton, terminals, separator, input)
 		{
-			this.inputIndex = 0;
-			this.buffer = new Buffer<TokenKernel>(5);
-			this.matches = new Buffer<int>(5);
+			inputIndex = 0;
+			buffer = new Buffer<TokenKernel>(5);
+			matches = new Buffer<int>(5);
 		}
 
 		/// <summary>
@@ -98,7 +98,7 @@ namespace Hime.Redist.Lexer
 				}
 				// Failed to match anything
 				TextPosition position = text.GetPositionAt(inputIndex);
-				string unexpected = null;
+				string unexpected;
 				int c = text.GetValue(inputIndex);
 				if (c >= 0xD800 && c <= 0xDFFF)
 				{
@@ -137,7 +137,7 @@ namespace Hime.Redist.Lexer
 						if (terminalID == separatorID)
 							// filter out the separators
 							continue;
-						TokenKernel token = new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length));
+						buffer.Add(new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length)));
 						inputIndex += length;
 					}
 					if (buffer.Size > 0)

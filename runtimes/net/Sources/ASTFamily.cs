@@ -30,11 +30,11 @@ namespace Hime.Redist
 		/// <summary>
 		/// The original parse tree
 		/// </summary>
-		private AST tree;
+		private readonly AST tree;
 		/// <summary>
 		/// The index of the parent node in the parse tree
 		/// </summary>
-		private int parent;
+		private readonly int parent;
 
 		/// <summary>
 		/// Gets the number of children

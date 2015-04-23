@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Text;
 
 namespace Hime.Redist
@@ -30,7 +29,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// The unexpected character
 		/// </summary>
-		private string unexpected;
+		private readonly string unexpected;
 
 		/// <summary>
 		/// Gets the error's type

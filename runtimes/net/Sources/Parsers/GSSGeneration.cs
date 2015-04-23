@@ -32,11 +32,12 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The start index of this generation in the list of nodes
 		/// </summary>
-		private int start;
+		private readonly int start;
 		/// <summary>
 		/// The number of nodes in this generation
 		/// </summary>
 		private int count;
+
 		/// <summary>
 		/// Gets the start index of this generation in the list of nodes
 		/// </summary>
@@ -49,6 +50,7 @@ namespace Hime.Redist.Parsers
 			get { return count; }
 			set { count = value; }
 		}
+
 		/// <summary>
 		/// Initializes this generation
 		/// </summary>
@@ -56,7 +58,7 @@ namespace Hime.Redist.Parsers
 		public GSSGeneration(int start)
 		{
 			this.start = start;
-			this.count = 0;
+			count = 0;
 		}
 	}
 }

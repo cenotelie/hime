@@ -21,7 +21,7 @@
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents a transition in a lexer's automaton
+	/// Represents a transition in the automaton of a lexer
 	/// A transition is matched by a range of UTF-16 code points
 	/// Its target is a state in the automaton
 	/// </summary>
@@ -30,15 +30,15 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Start of the range
 		/// </summary>
-		private ushort start;
+		private readonly ushort start;
 		/// <summary>
 		/// End of the range
 		/// </summary>
-		private ushort end;
+		private readonly ushort end;
 		/// <summary>
 		/// The transition's target
 		/// </summary>
-		private int target;
+		private readonly int target;
 
 		/// <summary>
 		/// Gets the start of the UTF-16 code point range

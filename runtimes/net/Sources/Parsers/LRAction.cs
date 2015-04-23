@@ -29,12 +29,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The LR action code
 		/// </summary>
-		private LRActionCode code;
-
+		private readonly LRActionCode code;
 		/// <summary>
 		/// The data associated with the action
 		/// </summary>
-		private int data;
+		private readonly int data;
 
 		/// <summary>
 		/// Gets the action code

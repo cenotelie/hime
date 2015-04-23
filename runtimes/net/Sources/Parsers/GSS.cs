@@ -27,7 +27,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents Graph-Structured Stacks for GLR parsers
 	/// </summary>
-	class GSS : Lexer.IContextProvider
+	sealed class GSS : Lexer.IContextProvider
 	{
 		/// <summary>
 		/// The initial size of the paths buffer in this GSS
@@ -41,28 +41,28 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The label (GLR state) on the GSS node for the given index
 		/// </summary>
-		private Utils.BigList<int> nodeLabels;
+		private readonly BigList<int> nodeLabels;
 		/// <summary>
 		/// The number of live incoming edges to the GSS node for the given index
 		/// </summary>
-		private Utils.BigList<int> nodeIncomings;
+		private readonly BigList<int> nodeIncomings;
 		/// <summary>
 		/// The generations of nodes in this GSS
 		/// </summary>
-		private Utils.BigList<GSSGeneration> nodeGenerations;
+		private readonly BigList<GSSGeneration> nodeGenerations;
 
 		/// <summary>
 		/// The edges in this GSS
 		/// </summary>
-		private Utils.BigList<GSSEdge> edges;
+		private readonly BigList<GSSEdge> edges;
 		/// <summary>
 		/// The labels on the edges in this GSS
 		/// </summary>
-		private Utils.BigList<GSSLabel> edgeLabels;
+		private readonly BigList<GSSLabel> edgeLabels;
 		/// <summary>
 		/// The generations for the edges
 		/// </summary>
-		private Utils.BigList<GSSGeneration> edgeGenerations;
+		private readonly BigList<GSSGeneration> edgeGenerations;
 
 		/// <summary>
 		/// Index of the current generation
@@ -72,11 +72,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// A single reusable GSS paths for returning 0-length GSS paths
 		/// </summary>
-		private GSSPath path0;
+		private readonly GSSPath path0;
 		/// <summary>
 		/// The single reusable buffer for returning 0-length GSS paths
 		/// </summary>
-		private GSSPath[] paths0;
+		private readonly GSSPath[] paths0;
 		/// <summary>
 		/// A buffer of GSS paths
 		/// </summary>
@@ -92,25 +92,26 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public GSS()
 		{
-			this.nodeLabels = new BigList<int>();
-			this.nodeIncomings = new BigList<int>();
-			this.nodeGenerations = new BigList<GSSGeneration>();
-			this.edges = new BigList<GSSEdge>();
-			this.edgeLabels = new BigList<GSSLabel>();
-			this.edgeGenerations = new BigList<GSSGeneration>();
-			this.generation = -1;
-			this.path0 = new GSSPath();
-			this.paths0 = new GSSPath[1] { path0 };
-			this.paths = new GSSPath[INIT_PATHS_COUNT];
-			this.stack = new int[INIT_STACK_SIZE];
+			nodeLabels = new BigList<int>();
+			nodeIncomings = new BigList<int>();
+			nodeGenerations = new BigList<GSSGeneration>();
+			edges = new BigList<GSSEdge>();
+			edgeLabels = new BigList<GSSLabel>();
+			edgeGenerations = new BigList<GSSGeneration>();
+			generation = -1;
+			path0 = new GSSPath();
+			paths0 = new [] { path0 };
+			paths = new GSSPath[INIT_PATHS_COUNT];
+			stack = new int[INIT_STACK_SIZE];
 		}
 
 		/// <summary>
-		/// Gets whether the specified context is in effect
+		/// Gets whether a terminal is acceptable
 		/// </summary>
-		/// <param name="context">A context</param>
-		/// <returns><c>true</c> if the specified context is in effect</returns>
-		public bool IsWithin(int context)
+		/// <param name="context">The terminal's context</param>
+		/// <param name="terminalIndex">The terminal's index</param>
+		/// <returns><code>true</code> if the terminal is acceptable</returns>
+		public bool IsAcceptable(int context, int terminalIndex)
 		{
 			return (context == Lexer.Automaton.DEFAULT_CONTEXT);
 		}
@@ -443,7 +444,7 @@ namespace Hime.Redist.Parsers
 				GSSGeneration cedges = edgeGenerations[i];
 				for (int j = 0; j != cedges.Count; j++)
 				{
-					GSSEdge edge = this.edges[cedges.Start + j];
+					GSSEdge edge = edges[cedges.Start + j];
 					if (!myedges.ContainsKey(edge.From))
 						myedges.Add(edge.From, new List<int>());
 					myedges[edge.From].Add(edge.To);

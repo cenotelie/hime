@@ -25,13 +25,19 @@ namespace Hime.Redist
 	/// </summary>
 	public struct TextSpan
 	{
-		private int index;
-		private int length;
+		/// <summary>
+		/// The starting index
+		/// </summary>
+		private readonly int index;
+		/// <summary>
+		/// The length
+		/// </summary>
+		private readonly int length;
 
 		/// <summary>
 		/// Gets the starting index of this span
 		/// </summary>
-		public int Index { get { return index } }
+		public int Index { get { return index; } }
 
 		/// <summary>
 		/// Gets the length of this span

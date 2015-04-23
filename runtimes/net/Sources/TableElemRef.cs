@@ -21,33 +21,33 @@
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents a compact reference to a symbol in a table
+	/// Represents a compact reference to an element in a table
 	/// </summary>
 	struct TableElemRef
 	{
 		/// <summary>
 		/// The backend data
 		/// </summary>
-		private uint data;
+		private readonly uint data;
 
 		/// <summary>
-		/// Gets the symbol's type
+		/// Gets the element's type
 		/// </summary>
 		public TableType Type { get { return (TableType)(data >> 30); } }
 
 		/// <summary>
-		/// Gets the symbol's index in its respective table
+		/// Gets the element's index in its respective table
 		/// </summary>
 		public int Index { get { return (int)(data & 0x3FFFFFFF); } }
 
 		/// <summary>
 		/// Initializes this reference
 		/// </summary>
-		/// <param name="type">The symbol's type</param>
-		/// <param name="index">The symbol's index in its table</param>
+		/// <param name="type">The element's type</param>
+		/// <param name="index">The element's index in its table</param>
 		public TableElemRef(TableType type, int index)
 		{
-			this.data = (((uint)type) << 30) | (uint)index;
+			data = (((uint)type) << 30) | (uint)index;
 		}
 
 		public static bool operator==(TableElemRef left, TableElemRef right)
@@ -83,12 +83,7 @@ namespace Hime.Redist
 		/// </returns>
 		public override bool Equals(object obj)
 		{
-			if (obj is TableElemRef)
-			{
-				TableElemRef temp = (TableElemRef)obj;
-				return (this.data == temp.data);
-			}
-			return false;
+			return (data == ((TableElemRef)obj).data);
 		}
 	}
 }

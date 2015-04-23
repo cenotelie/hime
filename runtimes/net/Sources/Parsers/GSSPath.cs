@@ -18,28 +18,19 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
 	/// Represents a path in a GSS
 	/// </summary>
-	class GSSPath
+	sealed class GSSPath
 	{
 		/// <summary>
 		/// The initial size of the label buffer
 		/// </summary>
 		private const int INIT_BUFFER_SIZE = 64;
 
-		/// <summary>
-		/// The last GSS node in this path
-		/// </summary>
-		private int last;
-		/// <summary>
-		/// The generation containing the last GSS node in this path
-		/// </summary>
-		private int generation;
 		/// <summary>
 		/// The labels on this GSS path
 		/// </summary>
@@ -50,19 +41,17 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public int Last
 		{
-			get { return last; }
-			set { last = value; }
+			get;
+			set;
 		}
-
 		/// <summary>
 		/// Gets or sets the generation containing the final target of this path
 		/// </summary>
 		public int Generation
 		{
-			get { return generation; }
-			set { generation = value; }
+			get;
+			set;
 		}
-
 		/// <summary>
 		/// Gets or sets the i-th label of the edges traversed by this path
 		/// </summary>
@@ -77,8 +66,8 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public GSSPath(int length)
 		{
-			this.last = 0;
-			this.labels = new GSSLabel[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
+			Last = 0;
+			labels = new GSSLabel[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
 		}
 
 		/// <summary>
@@ -86,8 +75,8 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public GSSPath()
 		{
-			this.last = 0;
-			this.labels = null;
+			Last = 0;
+			labels = null;
 		}
 
 		/// <summary>
@@ -107,7 +96,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="length">The path's length</param>
 		public void CopyLabelsFrom(GSSPath path, int length)
 		{
-			Array.Copy(path.labels, this.labels, length);
+			Array.Copy(path.labels, labels, length);
 		}
 	}
 }

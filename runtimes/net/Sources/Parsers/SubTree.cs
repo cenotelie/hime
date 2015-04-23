@@ -38,7 +38,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The pool containing this object
 		/// </summary>
-		private Pool<SubTree> pool;
+		private readonly Pool<SubTree> pool;
 		/// <summary>
 		/// The nodes in this buffer
 		/// </summary>
@@ -120,8 +120,8 @@ namespace Hime.Redist.Parsers
 		public SubTree(Pool<SubTree> pool, int capacity)
 		{
 			this.pool = pool;
-			this.nodes = new ASTSimpleTree.Node[capacity];
-			this.actions = new TreeAction[capacity];
+			nodes = new ASTSimpleTree.Node[capacity];
+			actions = new TreeAction[capacity];
 		}
 
 		/// <summary>
@@ -130,14 +130,10 @@ namespace Hime.Redist.Parsers
 		/// <returns>The clone</returns>
 		public SubTree Clone()
 		{
-			SubTree result = null;
-			if (this.pool != null)
-				result = this.pool.Acquire();
-			else
-				result = new SubTree(null, this.nodes.Length);
+			SubTree result = pool != null ? pool.Acquire () : new SubTree (null, nodes.Length);
 			int size = GetSize();
-			Array.Copy(this.nodes, result.nodes, size);
-			Array.Copy(this.actions, result.actions, size);
+			Array.Copy(nodes, result.nodes, size);
+			Array.Copy(actions, result.actions, size);
 			return result;
 		}
 
@@ -163,16 +159,16 @@ namespace Hime.Redist.Parsers
 		/// </remarks>
 		public void CopyTo(SubTree destination, int index)
 		{
-			if (this.nodes[0].count == 0)
+			if (nodes[0].count == 0)
 			{
-				destination.nodes[index] = this.nodes[0];
-				destination.actions[index] = this.actions[0];
+				destination.nodes[index] = nodes[0];
+				destination.actions[index] = actions[0];
 			}
 			else
 			{
-				int size = this.nodes[0].count + 1;
-				Array.Copy(this.nodes, 0, destination.nodes, index, size);
-				Array.Copy(this.actions, 0, destination.actions, index, size);
+				int size = nodes[0].count + 1;
+				Array.Copy(nodes, 0, destination.nodes, index, size);
+				Array.Copy(actions, 0, destination.actions, index, size);
 			}
 		}
 
@@ -187,11 +183,11 @@ namespace Hime.Redist.Parsers
 		/// </remarks>
 		public void CopyChildrenTo(SubTree destination, int index)
 		{
-			if (this.nodes[0].count == 0)
+			if (nodes[0].count == 0)
 				return;
 			int size = GetSize() - 1;
-			Array.Copy(this.nodes, 1, destination.nodes, index, size);
-			Array.Copy(this.actions, 1, destination.actions, index, size);
+			Array.Copy(nodes, 1, destination.nodes, index, size);
+			Array.Copy(actions, 1, destination.actions, index, size);
 		}
 
 		/// <summary>
@@ -238,7 +234,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="to">The destination index for the item</param>
 		public void Move(int from, int to)
 		{
-			this.nodes[to] = this.nodes[from];
+			nodes[to] = nodes[from];
 		}
 
 		/// <summary>

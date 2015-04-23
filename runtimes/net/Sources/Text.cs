@@ -27,17 +27,17 @@ namespace Hime.Redist
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	public interface Text
+	public abstract class Text
 	{
 		/// <summary>
 		/// Gets the number of lines
 		/// </summary>
-		int LineCount { get; }
+		public abstract int LineCount { get; }
 
 		/// <summary>
 		/// Gets the size in number of characters
 		/// </summary>
-		int Size { get; }
+		public abstract int Size { get; }
 
 		/// <summary>
 		/// Gets the substring beginning at the given index with the given length
@@ -45,14 +45,14 @@ namespace Hime.Redist
 		/// <param name="index">Index of the substring from the start</param>
 		/// <param name="length">Length of the substring</param>
 		/// <returns>The substring</returns>
-		string GetValue(int index, int length);
+		public abstract string GetValue(int index, int length);
 
 		/// <summary>
 		/// Get the substring corresponding to the specified span
 		/// </summary>
 		/// <param name="span">A span in this text</param>
 		/// <returns>The substring</returns>
-		string GetValue(TextSpan span);
+		public abstract string GetValue(TextSpan span);
 
 		/// <summary>
 		/// Gets the starting index of the i-th line
@@ -60,7 +60,7 @@ namespace Hime.Redist
 		/// <param name="line">The line number</param>
 		/// <returns>The starting index of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		int GetLineIndex(int line);
+		public abstract int GetLineIndex(int line);
 
 		/// <summary>
 		/// Gets the length of the i-th line
@@ -68,7 +68,7 @@ namespace Hime.Redist
 		/// <param name="line">The line number</param>
 		/// <returns>The length of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		int GetLineLength(int line);
+		public abstract int GetLineLength(int line);
 
 		/// <summary>
 		/// Gets the string content of the i-th line
@@ -76,21 +76,21 @@ namespace Hime.Redist
 		/// <param name="line">The line number</param>
 		/// <returns>The string content of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		string GetLineContent(int line);
+		public abstract string GetLineContent(int line);
 
 		/// <summary>
 		/// Gets the position at the given index
 		/// </summary>
 		/// <param name="index">Index from the start</param>
 		/// <returns>The position (line and column) at the index</returns>
-		TextPosition GetPositionAt(int index);
+		public abstract TextPosition GetPositionAt(int index);
 
 		/// <summary>
 		/// Gets the context description for the current text at the specified position
 		/// </summary>
 		/// <param name="position">The position in this text</param>
 		/// <returns>The context description</returns>
-		TextContext GetContext(TextPosition position);
+		public abstract TextContext GetContext(TextPosition position);
 
 		/// <summary>
 		/// Gets the context description for the current text at the specified position
@@ -98,13 +98,13 @@ namespace Hime.Redist
 		/// <param name="position">The position in this text</param>
 		/// <param name="length">The length of the element to contextualize</param>
 		/// <returns>The context description</returns>
-		TextContext GetContext(TextPosition position, int length);
+		public abstract TextContext GetContext(TextPosition position, int length);
 
 		/// <summary>
 		/// Gets the context description for the current text at the specified span
 		/// </summary>
 		/// <param name="span">The span of text to contextualize</param>
 		/// <returns>The context description</returns>
-		TextContext GetContext(TextSpan span);
+		public abstract TextContext GetContext(TextSpan span);
 	}
 }

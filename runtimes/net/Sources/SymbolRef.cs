@@ -23,12 +23,12 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents a reference to a symbol
 	/// </summary>
-	struct SymbolRef : ParseAtom
+	struct SymbolRef : SemanticElement
 	{
 		/// <summary>
 		/// The symbol being referenced
 		/// </summary>
-		private Symbol symbol;
+		private readonly Symbol symbol;
 
 		/// <summary>
 		/// Gets the position in the input text of this element

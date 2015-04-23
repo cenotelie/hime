@@ -34,24 +34,24 @@ namespace Hime.Redist.Parsers
 	/// --- production's bytecode
 	/// See LRBytecode
 	/// </remarks>
-	public class LRProduction
+	public sealed class LRProduction
 	{
 		/// <summary>
 		/// Index of the rule's head in the parser's array of variables
 		/// </summary>
-		private int head;
+		private readonly int head;
 		/// <summary>
 		/// Action of the rule's head (replace or not)
 		/// </summary>
-		private TreeAction headAction;
+		private readonly TreeAction headAction;
 		/// <summary>
 		/// Size of the rule's body by only counting terminals and variables
 		/// </summary>
-		private int reducLength;
+		private readonly int reducLength;
 		/// <summary>
 		/// Bytecode for the rule's production
 		/// </summary>
-		private LROpCode[] bytecode;
+		private readonly LROpCode[] bytecode;
 
 		/// <summary>
 		/// Gets the index of the rule's head in the parser's array of variables
@@ -81,12 +81,12 @@ namespace Hime.Redist.Parsers
 		/// <param name="reader">The binary reader to read from</param>
 		public LRProduction(BinaryReader reader)
 		{
-			this.head = reader.ReadUInt16();
-			this.headAction = (TreeAction)reader.ReadByte();
-			this.reducLength = reader.ReadByte();
-			this.bytecode = new LROpCode[reader.ReadByte()];
+			head = reader.ReadUInt16();
+			headAction = (TreeAction)reader.ReadByte();
+			reducLength = reader.ReadByte();
+			bytecode = new LROpCode[reader.ReadByte()];
 			for (int i=0; i!=bytecode.Length; i++)
-				this.bytecode[i] = new LROpCode(reader);
+				bytecode[i] = new LROpCode(reader);
 		}
 	}
 }

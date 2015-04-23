@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.Redist.Lexer
 {
@@ -125,7 +124,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Gets the number of lines
 		/// </summary>
-		public int LineCount
+		public override int LineCount
 		{
 			get
 			{
@@ -136,24 +135,11 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the size in number of characters
-		/// </summary>
-		public abstract int Size { get; }
-
-		/// <summary>
-		/// Gets the substring beginning at the given index with the given length
-		/// </summary>
-		/// <param name="index">Index of the substring from the start</param>
-		/// <param name="length">Length of the substring</param>
-		/// <returns>The substring</returns>
-		public abstract string GetValue(int index, int length);
-
-		/// <summary>
 		/// Get the substring corresponding to the specified span
 		/// </summary>
 		/// <param name="span">A span in this text</param>
 		/// <returns>The substring</returns>
-		public string GetValue(TextSpan span)
+		public override string GetValue(TextSpan span)
 		{
 			return GetValue(span.Index, span.Length);
 		}
@@ -164,7 +150,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="line">The line number</param>
 		/// <returns>The starting index of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		public int GetLineIndex(int line)
+		public override int GetLineIndex(int line)
 		{
 			if (lines == null)
 				FindLines();
@@ -172,20 +158,12 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the length of the i-th line
-		/// </summary>
-		/// <param name="line">The line number</param>
-		/// <returns>The length of the line</returns>
-		/// <remarks>The line numbering is 1-based</remarks>
-		public abstract int GetLineLength(int line);
-
-		/// <summary>
 		/// Gets the string content of the i-th line
 		/// </summary>
 		/// <param name="line">The line number</param>
 		/// <returns>The string content of the line</returns>
 		/// <remarks>The line numbering is 1-based</remarks>
-		public string GetLineContent(int line)
+		public override string GetLineContent(int line)
 		{
 			return GetValue(GetLineIndex(line), GetLineLength(line));
 		}
@@ -195,7 +173,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="index">Index from the start</param>
 		/// <returns>The position (line and column) at the index</returns>
-		public TextPosition GetPositionAt(int index)
+		public override TextPosition GetPositionAt(int index)
 		{
 			int l = FindLineAt(index);
 			return new TextPosition(l + 1, index - lines[l] + 1);
@@ -206,7 +184,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="position">The position in this text</param>
 		/// <returns>The context description</returns>
-		public TextContext GetContext(TextPosition position)
+		public override TextContext GetContext(TextPosition position)
 		{
 			return GetContext(position, 1);
 		}
@@ -217,7 +195,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="position">The position in this text</param>
 		/// <param name="length">The length of the element to contextualize</param>
 		/// <returns>The context description</returns>
-		public TextContext GetContext(TextPosition position, int length)
+		public override TextContext GetContext(TextPosition position, int length)
 		{
 			string content = GetLineContent(position.Line);
 			if (content.Length == 0)
@@ -245,7 +223,7 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="span">The span of text to contextualize</param>
 		/// <returns>The context description</returns>
-		public TextContext GetContext(TextSpan span)
+		public override TextContext GetContext(TextSpan span)
 		{
 			TextPosition position = GetPositionAt(span.Index);
 			return GetContext(position, span.Length);

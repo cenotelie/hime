@@ -1,5 +1,5 @@
 ﻿/**********************************************************************
-* Copyright (c) 2014 Laurent Wouters and others
+* Copyright (c) 2015 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -17,48 +17,37 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents the output of a lexer as a tokenized text
+	/// Represents an element of parsing data
 	/// </summary>
-	interface TokenDataProvider
+	public interface SemanticElement
 	{
 		/// <summary>
-		/// Gets the position in the input text of the given token
+		/// Gets the position in the input text of this element
 		/// </summary>
-		/// <param name="token">A token's index</param>
-		/// <returns>The position in the text</returns>
-		TextPosition GetPosition(int token);
+		TextPosition Position { get; }
 
 		/// <summary>
-		/// Gets the span in the input text of the given token
+		/// Gets the span in the input text of this element
 		/// </summary>
-		/// <param name="token">A token's index</param>
-		/// <returns>The span in the text</returns>
-		TextSpan GetSpan(int token);
+		TextSpan Span { get; }
 
 		/// <summary>
-		/// Gets the context in the input of the given token
+		/// Gets the context of this element in the input
 		/// </summary>
-		/// <param name="node">A token's index</param>
-		/// <returns>The context</returns>
-		TextContext GetContext(int token);
+		TextContext Context { get; }
 
 		/// <summary>
-		/// Gets the grammar symbol associated to the given token
+		/// Gets the grammar symbol associated to this element
 		/// </summary>
-		/// <param name="token">A token's index</param>
-		/// <returns>The associated symbol</returns>
-		Symbol GetSymbol(int token);
+		Symbol Symbol { get; }
 
 		/// <summary>
-		/// Gets the value of the given token
+		/// Gets the value of this element, if any
 		/// </summary>
-		/// <param name="token">A token's index</param>
-		/// <returns>The associated value</returns>
-		string GetValue(int token);
+		string Value { get; }
 	}
 }

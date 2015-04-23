@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -30,9 +29,8 @@ namespace Hime.Redist
 	/// The nodes are stored in sequentials arrays where the children of a node are an inner sequence.
 	/// The linkage is represented by each node storing its number of children and the index of its first child.
 	/// </remarks>
-	class ASTSimpleTree : ASTBaseImpl
+	sealed class ASTSimpleTree : AST
 	{
-
 		/// <summary>
 		/// Initializes this AST
 		/// </summary>
@@ -44,7 +42,6 @@ namespace Hime.Redist
 		{
 		}
 
-		#region Implementation of AST interface
 		/// <summary>
 		/// Gets the i-th child of the given node
 		/// </summary>
@@ -65,7 +62,6 @@ namespace Hime.Redist
 		{
 			return new ChildEnumerator(this, parent);
 		}
-		#endregion
 
 		/// <summary>
 		/// Stores the root of this tree
@@ -73,7 +69,7 @@ namespace Hime.Redist
 		/// <param name="node">The root</param>
 		public void StoreRoot(Node node)
 		{
-			this.root = this.nodes.Add(node);
+			root = nodes.Add(node);
 		}
 
 		/// <summary>

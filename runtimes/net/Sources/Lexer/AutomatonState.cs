@@ -21,7 +21,7 @@
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents a state in a lexer's automaton
+	/// Represents a state in the automaton of a lexer
 	/// </summary>
 	/// <remarks>
 	/// Binary data structure:
@@ -44,11 +44,11 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The automaton table
 		/// </summary>
-		private ushort[] table;
+		private readonly ushort[] table;
 		/// <summary>
 		/// The offset of this state within the table
 		/// </summary>
-		private int offset;
+		private readonly int offset;
 
 		/// <summary>
 		/// Initializes this state

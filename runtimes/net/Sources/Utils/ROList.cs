@@ -30,7 +30,7 @@ namespace Hime.Redist.Utils
 		/// <summary>
 		/// The inner data set
 		/// </summary>
-		private IList<T> inner;
+		private readonly IList<T> inner;
 
 		/// <summary>
 		/// Gets the number of elements in this list

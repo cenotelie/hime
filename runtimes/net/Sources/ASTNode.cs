@@ -23,16 +23,16 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents a node in an Abstract Syntax Tree
 	/// </summary>
-	public struct ASTNode : ParseAtom
+	public struct ASTNode : SemanticElement
 	{
 		/// <summary>
 		/// The parent parse tree
 		/// </summary>
-		private AST tree;
+		private readonly AST tree;
 		/// <summary>
 		/// The index of this node in the parse tree
 		/// </summary>
-		private int index;
+		private readonly int index;
 
 		/// <summary>
 		/// Gets the children of this node

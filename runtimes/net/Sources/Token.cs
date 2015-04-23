@@ -23,16 +23,16 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents a token as an output element of a lexer
 	/// </summary>
-	public struct Token : ParseAtom
+	public struct Token : SemanticElement
 	{
 		/// <summary>
 		/// The tokenized text containing this token
 		/// </summary>
-		private TokenDataProvider repository;
+		private readonly TokenRepository repository;
 		/// <summary>
 		/// The index of this token in the text
 		/// </summary>
-		private int index;
+		private readonly int index;
 
 		/// <summary>
 		/// Gets the position in the input text of this token
@@ -64,7 +64,7 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="repository">The repository containing the token</param>
 		/// <param name="index">The token's index</param>
-		internal Token(TokenDataProvider repository, int index)
+		internal Token(TokenRepository repository, int index)
 		{
 			this.repository = repository;
 			this.index = index;

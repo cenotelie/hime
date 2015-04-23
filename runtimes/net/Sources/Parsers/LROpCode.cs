@@ -39,7 +39,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The op-code value
 		/// </summary>
-		private int code;
+		private readonly int code;
 
 		/// <summary>
 		/// Gets the value of the data interpretation of this op-code

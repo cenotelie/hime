@@ -31,7 +31,7 @@ namespace Hime.Redist.Parsers
 	/// GLR algorithms originally builds the complete SPPF.
 	/// However we only need to build one of the variant, i.e. an AST for the user.
 	/// </remarks>
-	class SPPFBuilder : SemanticBody
+	sealed class SPPFBuilder : SemanticBody
 	{
 		/// <summary>
 		/// The initial size of the reduction handle
@@ -69,9 +69,9 @@ namespace Hime.Redist.Parsers
 			/// </summary>
 			public HistoryPart()
 			{
-				this.generation = 0;
-				this.data = new GSSLabel[INIT_HISTORY_PART_SIZE];
-				this.next = 0;
+				generation = 0;
+				data = new GSSLabel[INIT_HISTORY_PART_SIZE];
+				next = 0;
 			}
 		}
 
@@ -94,19 +94,19 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 8 nodes
 		/// </summary>
-		private Pool<SubTree> pool8;
+		private readonly Pool<SubTree> pool8;
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 128 nodes
 		/// </summary>
-		private Pool<SubTree> pool128;
+		private readonly Pool<SubTree> pool128;
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 1024 nodes
 		/// </summary>
-		private Pool<SubTree> pool1024;
+		private readonly Pool<SubTree> pool1024;
 		/// <summary>
 		/// The pool of history parts
 		/// </summary>
-		private Pool<HistoryPart> poolHPs;
+		private readonly Pool<HistoryPart> poolHPs;
 		/// <summary>
 		/// The history
 		/// </summary>
@@ -148,7 +148,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		private ASTGraph result;
+		private readonly ASTGraph result;
 
 		#region Implementation of SemanticBody
 		/// <summary>
@@ -156,7 +156,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">Index of the symbol</param>
 		/// <returns>The symbol at the given index</returns>
-		public Symbol this[int index] { get { return  result.GetSymbol(cacheChildren[handle[index]]); } }
+		public SemanticElement this[int index] { get { return  result.GetSemanticElementFor(cacheChildren[handle[index]]); } }
 
 		/// <summary>
 		/// Gets the length of this body
@@ -172,22 +172,22 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
-		/// <param name="text">The tokenined text</param>
+		/// <param name="tokens">The token table</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
-		public SPPFBuilder(TokenDataProvider text, IList<Symbol> variables, IList<Symbol> virtuals)
+		public SPPFBuilder(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 		{
-			this.pool8 = new Pool<SubTree>(new SubTreeFactory(8), 1024);
-			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
-			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
-			this.poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), INIT_HISTORY_SIZE);
-			this.history = new HistoryPart[INIT_HISTORY_SIZE];
-			this.nextHP = 0;
-			this.cacheChildren = new int[INIT_HANDLE_SIZE];
-			this.cacheActions = new TreeAction[INIT_HANDLE_SIZE];
-			this.handle = new int[INIT_HANDLE_SIZE];
-			this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-			this.result = new ASTGraph(text, variables, virtuals);
+			pool8 = new Pool<SubTree>(new SubTreeFactory(8), 1024);
+			pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
+			pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
+			poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), INIT_HISTORY_SIZE);
+			history = new HistoryPart[INIT_HISTORY_SIZE];
+			nextHP = 0;
+			cacheChildren = new int[INIT_HANDLE_SIZE];
+			cacheActions = new TreeAction[INIT_HANDLE_SIZE];
+			handle = new int[INIT_HANDLE_SIZE];
+			stack = new GSSLabel[INIT_HANDLE_SIZE];
+			result = new ASTGraph(tokens, variables, virtuals);
 		}
 
 		/// <summary>
@@ -281,9 +281,9 @@ namespace Hime.Redist.Parsers
 				stack[length - 1] = first;
 			}
 			// initialize the reduction data
-			this.cacheNext = 0;
-			this.handleNext = 0;
-			this.popCount = 0;
+			cacheNext = 0;
+			handleNext = 0;
+			popCount = 0;
 		}
 
 		/// <summary>
@@ -388,11 +388,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The produced sub-tree</returns>
 		public GSSLabel Reduce(int generation, int varIndex, bool replaceable)
 		{
-			GSSLabel label = Epsilon;
-			if (replaceable)
-				label = ReduceReplaceable(varIndex);
-			else
-				label = ReduceNormal(varIndex);
+			GSSLabel label = replaceable ? ReduceReplaceable (varIndex) : ReduceNormal (varIndex);
 			AddToHistory(generation, label);
 			return label;
 		}

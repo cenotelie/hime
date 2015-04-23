@@ -25,61 +25,61 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents the builder of Parse Trees for LR(k) parsers
 	/// </summary>
-	class LRkASTBuilder : SemanticBody
+	sealed class LRkASTBuilder : SemanticBody
 	{
 		/// <summary>
 		/// The initial size of the reduction handle
 		/// </summary>
-		protected const int INIT_HANDLE_SIZE = 1024;
+		private const int INIT_HANDLE_SIZE = 1024;
 		/// <summary>
 		/// The bias for estimating the size of the reduced sub-tree
 		/// </summary>
-		protected const int ESTIMATION_BIAS = 5;
+		private const int ESTIMATION_BIAS = 5;
 
 		/// <summary>
 		/// The pool of single node sub-trees
 		/// </summary>
-		protected Pool<SubTree> poolSingle;
+		private readonly Pool<SubTree> poolSingle;
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 128 nodes
 		/// </summary>
-		protected Pool<SubTree> pool128;
+		private readonly Pool<SubTree> pool128;
 		/// <summary>
 		/// The pool of sub-tree with a capacity of 1024 nodes
 		/// </summary>
-		protected Pool<SubTree> pool1024;
+		private readonly Pool<SubTree> pool1024;
 		/// <summary>
 		/// The stack of semantic objects
 		/// </summary>
-		protected SubTree[] stack;
+		private SubTree[] stack;
 		/// <summary>
 		/// Index of the available cell on top of the stack's head
 		/// </summary>
-		protected int stackNext;
+		private int stackNext;
 		/// <summary>
 		/// The sub-tree build-up cache
 		/// </summary>
-		protected SubTree cache;
+		private SubTree cache;
 		/// <summary>
 		/// The new available node in the current cache
 		/// </summary>
-		protected int cacheNext;
+		private int cacheNext;
 		/// <summary>
 		/// The number of items popped from the stack
 		/// </summary>
-		protected int popCount;
+		private int popCount;
 		/// <summary>
 		/// The reduction handle represented as the indices of the sub-trees in the cache
 		/// </summary>
-		protected int[] handle;
+		private int[] handle;
 		/// <summary>
 		/// The index of the next available slot in the handle
 		/// </summary>
-		protected int handleNext;
+		private int handleNext;
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		protected ASTSimpleTree result;
+		private readonly ASTSimpleTree result;
 
 		#region Implementation of SemanticBody
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">Index of the symbol</param>
 		/// <returns>The symbol at the given index</returns>
-		public ParseAtom this[int index] { get { return result.GetAtomFor(cache.GetLabelAt(handle[index])); } }
+		public SemanticElement this[int index] { get { return result.GetSemanticElementFor(cache.GetLabelAt(handle[index])); } }
 
 		/// <summary>
 		/// Gets the length of this body
@@ -98,18 +98,18 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Initializes the builder with the given stack size
 		/// </summary>
-		/// <param name="text">The table of tokens</param>
+		/// <param name="tokens">The table of tokens</param>
 		/// <param name="variables">The table of parser variables</param>
 		/// <param name="virtuals">The table of parser virtuals</param>
 		public LRkASTBuilder(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 		{
-			this.poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
-			this.pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
-			this.pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
-			this.stack = new SubTree[LRkParser.INIT_STACK_SIZE];
-			this.stackNext = 0;
-			this.handle = new int[INIT_HANDLE_SIZE];
-			this.result = new ASTSimpleTree(tokens, variables, virtuals);
+			poolSingle = new Pool<SubTree>(new SubTreeFactory(1), 512);
+			pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
+			pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
+			stack = new SubTree[LRkParser.INIT_STACK_SIZE];
+			stackNext = 0;
+			handle = new int[INIT_HANDLE_SIZE];
+			result = new ASTSimpleTree(tokens, variables, virtuals);
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace Hime.Redist.Parsers
 		/// Gets a pooled sub-tree with the given maximal size
 		/// </summary>
 		/// <param name="size">The size of the sub-tree</param>
-		protected SubTree GetSubTree(int size)
+		private SubTree GetSubTree(int size)
 		{
 			if (size <= 128)
 				return pool128.Acquire();
@@ -163,7 +163,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="sub">The sub-tree</param>
 		/// <param name="action">The tree action applied onto the symbol</param>
-		protected void ReductionAddSub(SubTree sub, TreeAction action)
+		private void ReductionAddSub(SubTree sub, TreeAction action)
 		{
 			if (sub.GetActionAt(0) == TreeAction.Replace)
 			{
@@ -244,7 +244,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Applies the promotion tree actions to the cache and commits to the final AST
 		/// </summary>
-		protected void ReduceTree()
+		private void ReduceTree()
 		{
 			// promotion data
 			bool promotion = false;

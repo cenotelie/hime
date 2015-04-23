@@ -24,30 +24,36 @@ using Hime.Redist.Utils;
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
+	/// Handler for lexical errors
+	/// </summary>
+	/// <param name="error">The new error</param>
+	public delegate void AddLexicalError(ParseError error);
+
+	/// <summary>
 	/// Represents a base lexer
 	/// </summary>
-	public abstract class BaseLexer : ILexer
+	public abstract class BaseLexer
 	{
 		/// <summary>
 		/// This lexer's automaton
 		/// </summary>
-		protected Automaton automaton;
+		protected readonly Automaton automaton;
 		/// <summary>
 		/// The terminals matched by this lexer
 		/// </summary>
-		protected ROList<Symbol> symTerminals;
+		protected readonly ROList<Symbol> symTerminals;
 		/// <summary>
 		/// Symbol ID of the SEPARATOR terminal
 		/// </summary>
-		protected int separatorID;
+		protected readonly int separatorID;
 		/// <summary>
 		/// The input text
 		/// </summary>
-		internal BaseText text;
+		internal readonly BaseText text;
 		/// <summary>
 		/// The token repository
 		/// </summary>
-		internal TokenRepository tokens;
+		internal readonly TokenRepository tokens;
 
 		/// <summary>
 		/// Gets the terminals matched by this lexer
@@ -107,8 +113,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The next token in the input</returns>
 		public Token GetNextToken()
 		{
-			TokenKernel kernel = GetNextToken(null);
-			return tokens[kernel.Index];
+			return tokens[GetNextToken(null).Index];
 		}
 
 		/// <summary>

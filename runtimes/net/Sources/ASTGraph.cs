@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -26,12 +25,12 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an AST using a graph structure
 	/// </summary>
-	class ASTGraph : ASTBaseImpl
+	sealed class ASTGraph : AST
 	{
 		/// <summary>
 		/// The adjacency table
 		/// </summary>
-		private Utils.BigList<int> adjacency;
+		private readonly BigList<int> adjacency;
 
 		/// <summary>
 		/// Initializes this AST
@@ -42,10 +41,9 @@ namespace Hime.Redist
 		public ASTGraph(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 			: base(tokens, variables, virtuals)
 		{
-			this.adjacency = new Utils.BigList<int>();
+			adjacency = new BigList<int>();
 		}
 
-		#region Implementation of AST interface
 		/// <summary>
 		/// Gets the i-th child of the given node
 		/// </summary>
@@ -66,7 +64,6 @@ namespace Hime.Redist
 		{
 			return new ChildEnumerator(this, parent);
 		}
-		#endregion
 
 		/// <summary>
 		/// Represents and iterator for adjacents in this graph
@@ -197,7 +194,7 @@ namespace Hime.Redist
 		/// <param name="node">Index of the root node</param>
 		public void SetRoot(int node)
 		{
-			this.root = node;
+			root = node;
 		}
 	}
 }

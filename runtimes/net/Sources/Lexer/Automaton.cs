@@ -22,7 +22,7 @@ using System.IO;
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Data structure for a text lexer automaton
+	/// Represents the automaton of a lexer
 	/// </summary>
 	/// <remarks>
 	/// Binary data structure of lexers:
@@ -33,7 +33,7 @@ namespace Hime.Redist.Lexer
 	/// -- states table
 	/// See State
 	/// </remarks>
-	public class Automaton
+	public sealed class Automaton
 	{
 		/// <summary>
 		/// Identifier of inexistant state in an automaton
@@ -47,17 +47,15 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Table of indices in the states table
 		/// </summary>
-		private uint[] table;
-
+		private readonly uint[] table;
 		/// <summary>
 		/// Lexer's DFA table of states
 		/// </summary>
-		private ushort[] states;
-
+		private readonly ushort[] states;
 		/// <summary>
 		/// The number of states in this automaton
 		/// </summary>
-		private int statesCount;
+		private readonly int statesCount;
 
 		/// <summary>
 		/// Gets the number of states in this automaton

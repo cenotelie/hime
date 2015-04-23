@@ -25,8 +25,14 @@ namespace Hime.Redist
 	/// </summary>
 	public struct TextPosition
 	{
-		private int line;
-		private int column;
+		/// <summary>
+		/// The line number
+		/// </summary>
+		private readonly int line;
+		/// <summary>
+		/// The column number
+		/// </summary>
+		private readonly int column;
 
 		/// <summary>
 		/// Gets the line number

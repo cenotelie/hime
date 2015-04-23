@@ -19,7 +19,7 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Text;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
@@ -40,15 +40,15 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// The GSS node to reduce from
 			/// </summary>
-			public int node;
+			public readonly int node;
 			/// <summary>
 			/// The LR production for the reduction
 			/// </summary>
-			public LRProduction prod;
+			public readonly LRProduction prod;
 			/// <summary>
 			/// The first label in the GSS
 			/// </summary>
-			public GSSLabel first;
+			public readonly GSSLabel first;
 			/// <summary>
 			/// Initializes this operation
 			/// </summary>
@@ -71,11 +71,11 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// GSS node to shift from
 			/// </summary>
-			public int from;
+			public readonly int from;
 			/// <summary>
 			/// The target RNGLR state
 			/// </summary>
-			public int to;
+			public readonly int to;
 			/// <summary>
 			/// Initializes this operation
 			/// </summary>
@@ -91,23 +91,23 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The parser automaton
 		/// </summary>
-		private RNGLRAutomaton parserAutomaton;
+		private readonly RNGLRAutomaton parserAutomaton;
 		/// <summary>
 		/// The GSS for this parser
 		/// </summary>
-		private GSS gss;
+		private readonly GSS gss;
 		/// <summary>
 		/// The SPPF being built
 		/// </summary>
-		private SPPFBuilder sppf;
+		private readonly SPPFBuilder sppf;
 		/// <summary>
 		/// The sub-trees for the constant nullable variables
 		/// </summary>
-		private GSSLabel[] nullables;
+		private readonly GSSLabel[] nullables;
 		/// <summary>
 		/// The next token
 		/// </summary>
-		private Token nextToken;
+		private Lexer.TokenKernel nextToken;
 		/// <summary>
 		/// The queue of reduction operations
 		/// </summary>
@@ -125,12 +125,13 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The parser's virtuals</param>
 		/// <param name="actions">The parser's actions</param>
 		/// <param name="lexer">The input lexer</param>
-		public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.ILexer lexer)
-            : base(variables, virtuals, actions, lexer)
+		public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.BaseLexer lexer)
+			: base(variables, virtuals, actions, lexer)
 		{
-			this.parserAutomaton = automaton;
-			this.gss = new GSS();
-			this.sppf = new SPPFBuilder(lexer.Output, variables, virtuals);
+			parserAutomaton = automaton;
+			gss = new GSS();
+			sppf = new SPPFBuilder(lexer.tokens, symVariables, symVirtuals);
+			nullables = new GSSLabel[variables.Length];
 			BuildNullables(variables.Length);
 			sppf.ClearHistory();
 		}
@@ -141,7 +142,6 @@ namespace Hime.Redist.Parsers
 		/// <param name="varCount">The total number of variables</param>
 		private void BuildNullables(int varCount)
 		{
-			this.nullables = new GSSLabel[varCount];
 			// Get the dependency table
 			List<int>[] dependencies = BuildNullableDependencies(varCount);
 			// Solve and build
@@ -161,7 +161,7 @@ namespace Hime.Redist.Parsers
 						if (ok)
 						{
 							LRProduction prod = parserAutomaton.GetNullableProduction(i);
-							this.nullables[i] = BuildSPPF(0, prod, sppf.Epsilon, null);
+							nullables[i] = BuildSPPF(0, prod, sppf.Epsilon, null);
 							dependencies[i] = null;
 							solved++;
 						}
@@ -202,7 +202,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="production">The production of a nullable variable</param>
 		/// <returns>The list of the nullable variables' indices that this production depends on</returns>
-		private List<int> GetNullableDependencies(LRProduction production)
+		private static List<int> GetNullableDependencies(LRProduction production)
 		{
 			List<int> result = new List<int>();
 			for (int i = 0; i != production.BytecodeLength; i++)
@@ -237,7 +237,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="gen">The current GSS generation</param>
 		/// <param name="stem">The size of the generation's stem</param>
 		/// <param name="token">The unexpected token</param>
-		private void OnUnexpectedToken(int gen, int stem, Token token)
+		private void OnUnexpectedToken(int gen, int stem, Lexer.TokenKernel token)
 		{
 			// build the list of expected terminals
 			List<Symbol> expected = new List<Symbol>();
@@ -258,14 +258,14 @@ namespace Hime.Redist.Parsers
 				}
 			}
 			// register the error
-			UnexpectedTokenError error = new UnexpectedTokenError(lexer.Output[token.Index], lexer.Output.GetPositionOf(token.Index), expected);
+			UnexpectedTokenError error = new UnexpectedTokenError(lexer.tokens[token.Index], new ROList<Symbol>(expected));
 			allErrors.Add(error);
-			if (modeDebug)
+			if (ModeDebug)
 			{
 				Console.WriteLine("==== RNGLR parsing error:");
 				Console.Write("\t");
-				Console.WriteLine(error.ToString());
-				TextContext context = lexer.Output.GetContext(error.Position);
+				Console.WriteLine(error);
+				TextContext context = lexer.Input.GetContext(error.Position);
 				Console.Write("\t");
 				Console.WriteLine(context.Content);
 				Console.Write("\t");
@@ -300,8 +300,8 @@ namespace Hime.Redist.Parsers
 					{
 						// execute the reduction
 						LRProduction production = parserAutomaton.GetProduction(action.Data);
-						int nbPaths = 0;
-						GSSPath[] paths = gss.GetPaths(gssNode, production.ReductionLength, out nbPaths); ;
+						int nbPaths;
+						GSSPath[] paths = gss.GetPaths(gssNode, production.ReductionLength, out nbPaths);
 						for (int k = 0; k != nbPaths; k++)
 						{
 							GSSPath path = paths[k];
@@ -309,7 +309,7 @@ namespace Hime.Redist.Parsers
 							int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 							// enqueue the info, top GSS stack node and target GLR state
 							queueGSSHead.Add(path.Last);
-							queueVStack.Add(new int[] { next });
+							queueVStack.Add(new [] { next });
 						}
 					}
 				}
@@ -355,7 +355,7 @@ namespace Hime.Redist.Parsers
 						else
 						{
 							// we reach the GSS
-							int nbPaths = 0;
+							int nbPaths;
 							GSSPath[] paths = gss.GetPaths(queueGSSHead[i], production.ReductionLength - queueVStack[i].Length, out nbPaths);
 							for (int k = 0; k != nbPaths; k++)
 							{
@@ -364,7 +364,7 @@ namespace Hime.Redist.Parsers
 								int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 								// enqueue the info, top GSS stack node and target GLR state
 								queueGSSHead.Add(path.Last);
-								queueVStack.Add(new int[] { next });
+								queueVStack.Add(new [] { next });
 							}
 						}
 					}
@@ -434,21 +434,21 @@ namespace Hime.Redist.Parsers
 			int v0 = gss.CreateNode(0);
 			nextToken = lexer.GetNextToken(gss);
 
-			int count = parserAutomaton.GetActionsCount(0, nextToken.SymbolID);
+			int count = parserAutomaton.GetActionsCount(0, nextToken.TerminalID);
 			for (int i = 0; i != count; i++)
 			{
-				LRAction action = parserAutomaton.GetAction(0, nextToken.SymbolID, i);
+				LRAction action = parserAutomaton.GetAction(0, nextToken.TerminalID, i);
 				if (action.Code == LRActionCode.Shift)
 					shifts.Enqueue(new Shift(v0, action.Data));
 				else if (action.Code == LRActionCode.Reduce)
 					reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), sppf.Epsilon));
 			}
 
-			while (nextToken.SymbolID != Symbol.SID_EPSILON) // Wait for ε token
+			while (nextToken.TerminalID != Symbol.SID_EPSILON) // Wait for ε token
 			{
 				int stem = gss.GetGeneration(Ui).Count;
 				Reducer(Ui);
-				Token oldtoken = nextToken;
+				Lexer.TokenKernel oldtoken = nextToken;
 				nextToken = lexer.GetNextToken(gss);
 				int Uj = Shifter(oldtoken);
 				genData = gss.GetGeneration(Uj);
@@ -456,7 +456,7 @@ namespace Hime.Redist.Parsers
 				{
 					// Generation is empty !
 					OnUnexpectedToken(Ui, stem, oldtoken);
-					return new ParseResult(allErrors, lexer.Output);
+					return new ParseResult(new ROList<ParseError>(allErrors), lexer.Input);
 				}
 				Ui = Uj;
 			}
@@ -469,11 +469,11 @@ namespace Hime.Redist.Parsers
 				{
 					// Has reduction _Axiom_ -> axiom $ . on ε
 					GSSPath[] paths = gss.GetPaths(i, 2, out count);
-					return new ParseResult(allErrors, lexer.Output, sppf.GetTree(paths[0][1]));
+					return new ParseResult(new ROList<ParseError>(allErrors), lexer.Input, sppf.GetTree(paths[0][1]));
 				}
 			}
 			// At end of input but was still waiting for tokens
-			return new ParseResult(allErrors, lexer.Output);
+			return new ParseResult(new ROList<ParseError>(allErrors), lexer.Input);
 		}
 
 		/// <summary>
@@ -495,8 +495,8 @@ namespace Hime.Redist.Parsers
 		private void ExecuteReduction(int generation, Reduction reduction)
 		{
 			// Get all path from the reduction node
-			int count = 0;
-			GSSPath[] paths = null;
+			int count;
+			GSSPath[] paths;
 			if (reduction.prod.ReductionLength == 0)
 				paths = gss.GetPaths(reduction.node, 0, out count);
 			else
@@ -540,10 +540,10 @@ namespace Hime.Redist.Parsers
 					// Look for the new reductions at this state
 					if (reduction.prod.ReductionLength != 0)
 					{
-						int count = parserAutomaton.GetActionsCount(to, nextToken.SymbolID);
+						int count = parserAutomaton.GetActionsCount(to, nextToken.TerminalID);
 						for (int i = 0; i != count; i++)
 						{
-							LRAction action = parserAutomaton.GetAction(to, nextToken.SymbolID, i);
+							LRAction action = parserAutomaton.GetAction(to, nextToken.TerminalID, i);
 							if (action.Code == LRActionCode.Reduce)
 							{
 								LRProduction prod = parserAutomaton.GetProduction(action.Data);
@@ -561,10 +561,10 @@ namespace Hime.Redist.Parsers
 				w = gss.CreateNode(to);
 				gss.CreateEdge(w, path.Last, label);
 				// Look for all the reductions and shifts at this state
-				int count = parserAutomaton.GetActionsCount(to, nextToken.SymbolID);
+				int count = parserAutomaton.GetActionsCount(to, nextToken.TerminalID);
 				for (int i = 0; i != count; i++)
 				{
-					LRAction action = parserAutomaton.GetAction(to, nextToken.SymbolID, i);
+					LRAction action = parserAutomaton.GetAction(to, nextToken.TerminalID, i);
 					if (action.Code == LRActionCode.Shift)
 					{
 						shifts.Enqueue(new Shift(w, action.Data));
@@ -586,7 +586,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="oldtoken">A token</param>
 		/// <returns>The next generation</returns>
-		private int Shifter(Token oldtoken)
+		private int Shifter(Lexer.TokenKernel oldtoken)
 		{
 			// Create next generation
 			int gen = gss.CreateGeneration();
@@ -616,10 +616,10 @@ namespace Hime.Redist.Parsers
 				// A node for the target state is already in the GSS
 				gss.CreateEdge(w, shift.from, label);
 				// Look for the new reductions at this state
-				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
+				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.TerminalID);
 				for (int i = 0; i != count; i++)
 				{
-					LRAction action = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i);
+					LRAction action = parserAutomaton.GetAction(shift.to, nextToken.TerminalID, i);
 					if (action.Code == LRActionCode.Reduce)
 					{
 						LRProduction prod = parserAutomaton.GetProduction(action.Data);
@@ -635,10 +635,10 @@ namespace Hime.Redist.Parsers
 				w = gss.CreateNode(shift.to);
 				gss.CreateEdge(w, shift.from, label);
 				// Look for all the reductions and shifts at this state
-				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.SymbolID);
+				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.TerminalID);
 				for (int i = 0; i != count; i++)
 				{
-					LRAction action = parserAutomaton.GetAction(shift.to, nextToken.SymbolID, i);
+					LRAction action = parserAutomaton.GetAction(shift.to, nextToken.TerminalID, i);
 					if (action.Code == LRActionCode.Shift)
 						shifts.Enqueue(new Shift(w, action.Data));
 					else if (action.Code == LRActionCode.Reduce)

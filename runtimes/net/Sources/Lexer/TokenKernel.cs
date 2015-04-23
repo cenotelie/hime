@@ -17,24 +17,22 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
-using Hime.Redist.Utils;
 
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents the kernel of a token
+	/// Represents the kernel of a token, i.e. the identifying information of a token
 	/// </summary>
 	struct TokenKernel
 	{
 		/// <summary>
 		/// The identifier of the matched terminal
 		/// </summary>
-		private int terminalID;
+		private readonly int terminalID;
 		/// <summary>
 		/// The token's index in its repository
 		/// </summary>
-		private int index;
+		private readonly int index;
 
 		/// <summary>
 		/// Gets the identifier of the matched terminal

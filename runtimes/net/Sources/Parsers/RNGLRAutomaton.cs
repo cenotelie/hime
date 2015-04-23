@@ -19,7 +19,7 @@
 **********************************************************************/
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
 {
@@ -46,7 +46,7 @@ namespace Hime.Redist.Parsers
 	/// --- null production table
 	/// indices of the null productions
 	/// </remarks>
-	public class RNGLRAutomaton
+	public sealed class RNGLRAutomaton
 	{
 		/// <summary>
 		/// Represents a cell in a RNGLR parse table
@@ -56,11 +56,11 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// The number of actions in this cell
 			/// </summary>
-			private int count;
+			private readonly int count;
 			/// <summary>
 			/// Index of the cell's data
 			/// </summary>
-			private int index;
+			private readonly int index;
 			/// <summary>
 			/// Gets the number of actions in the cell
 			/// </summary>
@@ -72,47 +72,47 @@ namespace Hime.Redist.Parsers
 
 			public Cell(BinaryReader input)
 			{
-				this.count = input.ReadUInt16();
-				this.index = (int)input.ReadUInt32();
+				count = input.ReadUInt16();
+				index = (int)input.ReadUInt32();
 			}
 		}
 
 		/// <summary>
 		/// Index of the axiom variable
 		/// </summary>
-		private int axiom;
+		private readonly int axiom;
 		/// <summary>
 		/// The number of columns in the LR table
 		/// </summary>
-		private ushort ncols;
+		private readonly ushort ncols;
 		/// <summary>
 		/// The number of states in the automaton
 		/// </summary>
-		private int nstates;
+		private readonly int nstates;
 		/// <summary>
 		/// Map of symbol ID to column index in the LR table
 		/// </summary>
-		private ColumnMap columns;
+		private readonly ColumnMap columns;
 		/// <summary>
 		/// The contexts information
 		/// </summary>
-		private LRContexts[] contexts;
+		private readonly LRContexts[] contexts;
 		/// <summary>
 		/// The RNGLR table
 		/// </summary>
-		private Cell[] table;
+		private readonly Cell[] table;
 		/// <summary>
 		/// The action table
 		/// </summary>
-		private LRAction[] actions;
+		private readonly LRAction[] actions;
 		/// <summary>
 		/// The table of LR productions
 		/// </summary>
-		private LRProduction[] productions;
+		private readonly LRProduction[] productions;
 		/// <summary>
 		/// The table of nullable variables
 		/// </summary>
-		private ushort[] nullables;
+		private readonly ushort[] nullables;
 
 		/// <summary>
 		/// Gets the index of the axiom
@@ -129,30 +129,30 @@ namespace Hime.Redist.Parsers
 		/// <param name="reader">The binary stream to load from</param>
 		public RNGLRAutomaton(BinaryReader reader)
 		{
-			this.axiom = reader.ReadUInt16();
-			this.ncols = reader.ReadUInt16();
-			this.nstates = reader.ReadUInt16();
+			axiom = reader.ReadUInt16();
+			ncols = reader.ReadUInt16();
+			nstates = reader.ReadUInt16();
 			int nactions = (int)reader.ReadUInt32();
 			int nprod = reader.ReadUInt16();
 			int nnprod = reader.ReadUInt16();
-			this.columns = new ColumnMap();
+			columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
-				this.columns.Add(reader.ReadUInt16(), i);
-			this.contexts = new LRContexts[nstates];
+				columns.Add(reader.ReadUInt16(), i);
+			contexts = new LRContexts[nstates];
 			for (int i = 0; i != nstates; i++)
-				this.contexts[i] = new LRContexts(reader);
-			this.table = new Cell[nstates * ncols];
+				contexts[i] = new LRContexts(reader);
+			table = new Cell[nstates * ncols];
 			for (int i = 0; i != table.Length; i++)
-				this.table[i] = new Cell(reader);
-			this.actions = new LRAction[nactions];
+				table[i] = new Cell(reader);
+			actions = new LRAction[nactions];
 			for (int i = 0; i != nactions; i++)
-				this.actions[i] = new LRAction(reader);
-			this.productions = new LRProduction[nprod];
+				actions[i] = new LRAction(reader);
+			productions = new LRProduction[nprod];
 			for (int i = 0; i != nprod; i++)
-				this.productions[i] = new LRProduction(reader);
-			this.nullables = new ushort[nnprod];
+				productions[i] = new LRProduction(reader);
+			nullables = new ushort[nnprod];
 			for (int i = 0; i != nnprod; i++)
-				this.nullables[i] = reader.ReadUInt16();
+				nullables[i] = reader.ReadUInt16();
 		}
 
 		/// <summary>
@@ -229,9 +229,7 @@ namespace Hime.Redist.Parsers
 		public LRProduction GetNullableProduction(int index)
 		{
 			int temp = nullables[index];
-			if (temp == 0xFFFF)
-				return null;
-			return productions[temp];
+			return temp == 0xFFFF ? null : productions [temp];
 		}
 
 		/// <summary>
@@ -241,9 +239,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>True if the state is the accepting state, false otherwise</returns>
 		public bool IsAcceptingState(int state)
 		{
-			if (table[state * ncols].ActionsCount != 1)
-				return false;
-			return (actions[table[state * ncols].ActionsIndex].Code == LRActionCode.Accept);
+			return (table[state * ncols].ActionsCount == 1) && (actions[table[state * ncols].ActionsIndex].Code == LRActionCode.Accept);
 		}
 
 		/// <summary>
@@ -252,7 +248,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="state">The DFA state</param>
 		/// <param name="terminals">The possible terminals</param>
 		/// <returns>The expected terminals</returns>
-		public LRExpected GetExpected(int state, IList<Symbol> terminals)
+		public LRExpected GetExpected(int state, ROList<Symbol> terminals)
 		{
 			LRExpected result = new LRExpected();
 			for (int i = 0; i != terminals.Count; i++)

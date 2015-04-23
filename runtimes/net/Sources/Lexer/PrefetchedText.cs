@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.Redist.Lexer
 {
@@ -28,12 +27,12 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	class PrefetchedText : BaseText
+	sealed class PrefetchedText : BaseText
 	{
 		/// <summary>
 		/// The full content of the input
 		/// </summary>
-		private string content;
+		private readonly string content;
 
 		/// <summary>
 		/// Initializes this text
@@ -69,9 +68,9 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		protected override void FindLines()
 		{
-			this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
-			this.lines[0] = 0;
-			this.line = 1;
+			lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
+			lines[0] = 0;
+			line = 1;
 			char c1 = '\0';
 			char c2 = '\0';
 			for (int i = 0; i != content.Length; i++)
@@ -103,9 +102,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The substring</returns>
 		public override string GetValue(int index, int length)
 		{
-			if (length == 0)
-				return string.Empty;
-			return content.Substring(index, length);
+			return length == 0 ? string.Empty : content.Substring (index, length);
 		}
 
 		/// <summary>
@@ -118,9 +115,7 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
-			if (line == this.line)
-				return (content.Length - lines[this.line - 1]);
-			return (lines[line] - lines[line - 1]);
+			return line == this.line ? (content.Length - lines [this.line - 1]) : (lines [line] - lines [line - 1]);
 		}
 	}
 }

@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using System.IO;
 using Hime.Redist.Utils;
 
@@ -30,7 +29,7 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	class StreamingText : BaseText
+	sealed class StreamingText : BaseText
 	{
 		/// <summary>
 		/// The size of text block
@@ -40,11 +39,11 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The input to use
 		/// </summary>
-		private TextReader input;
+		private readonly TextReader input;
 		/// <summary>
 		/// The content read so far
 		/// </summary>
-		private BigList<char> content;
+		private readonly BigList<char> content;
 		/// <summary>
 		/// A buffer for reading text
 		/// </summary>
@@ -115,9 +114,9 @@ namespace Hime.Redist.Lexer
 		{
 			if (!atEnd)
 				MakeAvailable(System.Int32.MaxValue);
-			this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
-			this.lines[0] = 0;
-			this.line = 1;
+			lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
+			lines[0] = 0;
+			line = 1;
 			char c1 = '\0';
 			char c2 = '\0';
 			for (int i = 0; i != content.Size; i++)
@@ -167,9 +166,7 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
-			if (line == this.line)
-				return (content.Size - lines[this.line - 1]);
-			return (lines[line] - lines[line - 1]);
+			return line == this.line ? (content.Size - lines [this.line - 1]) : (lines [line] - lines [line - 1]);
 		}
 	}
 }

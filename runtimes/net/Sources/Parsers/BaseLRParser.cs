@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -26,7 +25,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a base LR parser
 	/// </summary>
-	public abstract class BaseLRParser : IParser
+	public abstract class BaseLRParser
 	{
 		/// <summary>
 		/// Maximum number of errors
@@ -41,35 +40,26 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		protected const bool DEFAULT_MODE_DEBUG = false;
 
-
-		/// <summary>
-		/// Determines whether the parser will try to recover from errors
-		/// </summary>
-		protected bool modeRecover;
-		/// <summary>
-		/// Value indicating whether this parser is in debug mode
-		/// </summary>
-		protected bool modeDebug;
 		/// <summary>
 		/// Parser's variable symbols
 		/// </summary>
-		protected ROList<Symbol> symVariables;
+		protected readonly ROList<Symbol> symVariables;
 		/// <summary>
 		/// Parser's virtual symbols
 		/// </summary>
-		protected ROList<Symbol> symVirtuals;
+		protected readonly ROList<Symbol> symVirtuals;
 		/// <summary>
 		/// Parser's action symbols
 		/// </summary>
-		protected ROList<SemanticAction> symActions;
+		protected readonly ROList<SemanticAction> symActions;
 		/// <summary>
 		/// List of the encountered syntaxic errors
 		/// </summary>
-		protected List<ParseError> allErrors;
+		protected readonly List<ParseError> allErrors;
 		/// <summary>
 		/// Lexer associated to this parser
 		/// </summary>
-		protected Lexer.BaseLexer lexer;
+		protected readonly Lexer.BaseLexer lexer;
 
 
 		/// <summary>
@@ -90,16 +80,16 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public bool ModeRecoverErrors
 		{
-			get { return modeRecover; }
-			set { modeRecover = value; }
+			get;
+			set;
 		}
 		/// <summary>
 		/// Gets or sets a value indicating whether this parser is in debug mode
 		/// </summary>
 		public bool ModeDebug
 		{
-			get { return modeDebug; }
-			set { modeDebug = value; }
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -111,13 +101,13 @@ namespace Hime.Redist.Parsers
 		/// <param name="lexer">The input lexer</param>
 		protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, Lexer.BaseLexer lexer)
 		{
-			this.modeRecover = DEFAULT_MODE_RECOVER;
-			this.modeDebug = DEFAULT_MODE_DEBUG;
-			this.symVariables = new ROList<Symbol>(new List<Symbol>(variables));
-			this.symVirtuals = new ROList<Symbol>(new List<Symbol>(virtuals));
-			this.symActions = new ROList<SemanticAction>(new List<SemanticAction>(actions));
-			this.modeRecover = true;
-			this.allErrors = new List<ParseError>();
+			ModeRecoverErrors = DEFAULT_MODE_RECOVER;
+			ModeDebug = DEFAULT_MODE_DEBUG;
+			symVariables = new ROList<Symbol>(new List<Symbol>(variables));
+			symVirtuals = new ROList<Symbol>(new List<Symbol>(virtuals));
+			symActions = new ROList<SemanticAction>(new List<SemanticAction>(actions));
+			ModeRecoverErrors = true;
+			allErrors = new List<ParseError>();
 			this.lexer = lexer;
 			this.lexer.OnError += OnLexicalError;
 		}

@@ -58,7 +58,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// The buffer for token kernels
 		/// </summary>
-		private Buffer<TokenKernel> buffer;
+		private readonly Buffer<TokenKernel> buffer;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -70,8 +70,8 @@ namespace Hime.Redist.Lexer
 		protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 			: base(automaton, terminals, separator, input)
 		{
-			this.tokenIndex = -1;
-			this.buffer = new Buffer<TokenKernel>(1);
+			tokenIndex = -1;
+			buffer = new Buffer<TokenKernel>(1);
 		}
 
 		/// <summary>
@@ -84,8 +84,8 @@ namespace Hime.Redist.Lexer
 		protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 			: base(automaton, terminals, separator, input)
 		{
-			this.tokenIndex = -1;
-			this.buffer = new Buffer<TokenKernel>(1);
+			tokenIndex = -1;
+			buffer = new Buffer<TokenKernel>(1);
 		}
 
 		/// <summary>

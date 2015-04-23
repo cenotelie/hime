@@ -25,21 +25,21 @@ namespace Hime.Redist
 	/// <summary>
 	/// A repository of matched tokens
 	/// </summary>
-	class TokenRepository : TokenDataProvider, IEnumerable<Token>
+	sealed class TokenRepository : IEnumerable<Token>
 	{
 		/// <summary>
 		/// Represents the metadata of a token
 		/// </summary>
-		protected struct Cell
+		private struct Cell
 		{
 			/// <summary>
 			/// The terminal's index
 			/// </summary>
-			public int terminal;
+			public readonly int terminal;
 			/// <summary>
 			/// The span of this token
 			/// </summary>
-			public TextSpan span;
+			public readonly TextSpan span;
 
 			/// <summary>
 			/// Initializes this cell
@@ -56,12 +56,12 @@ namespace Hime.Redist
 		/// <summary>
 		/// Represents an iterator over all the tokens in this repository
 		/// </summary>
-		protected class LinearEnumerator : IEnumerator<Token>
+		private class LinearEnumerator : IEnumerator<Token>
 		{
 			/// <summary>
 			/// The repository
 			/// </summary>
-			private TokenRepository repo;
+			private TokenRepository repository;
 			/// <summary>
 			/// The index of the current token
 			/// </summary>
@@ -70,22 +70,22 @@ namespace Hime.Redist
 			/// <summary>
 			/// Initializes this iterator
 			/// </summary>
-			/// <param name="repo">The repository</param>
-			public LinearEnumerator(TokenRepository repo)
+			/// <param name="repository">The repository</param>
+			public LinearEnumerator(TokenRepository repository)
 			{
-				this.repo = repo;
+				this.repository = repository;
 				this.current = -1;
 			}
 
 			/// <summary>
 			/// Gets the current token
 			/// </summary>
-			public Token Current { get { return repo[current]; } }
+			public Token Current { get { return repository[current]; } }
 
 			/// <summary>
 			/// Gets the current token
 			/// </summary>
-			object System.Collections.IEnumerator.Current { get { return repo[current]; } }
+			object System.Collections.IEnumerator.Current { get { return repository[current]; } }
 
 			/// <summary>
 			/// Moves to the next elmeent
@@ -93,10 +93,10 @@ namespace Hime.Redist
 			/// <returns>true if there is a next element</returns>
 			public bool MoveNext()
 			{
-				if (current >= repo.Size)
+				if (current >= repository.Size)
 					return false;
 				current++;
-				return (current >= repo.Size);
+				return (current >= repository.Size);
 			}
 
 			/// <summary>
@@ -112,22 +112,22 @@ namespace Hime.Redist
 			/// </summary>
 			public void Dispose()
 			{
-				repo = null;
+				repository = null;
 			}
 		}
 
 		/// <summary>
 		/// The terminal symbols matched in this content
 		/// </summary>
-		protected ROList<Symbol> terminals;
+		private readonly ROList<Symbol> terminals;
 		/// <summary>
 		/// The base text
 		/// </summary>
-		protected Text text;
+		private readonly Text text;
 		/// <summary>
 		/// The token data in this content
 		/// </summary>
-		protected Utils.BigList<Cell> cells;
+		private readonly BigList<Cell> cells;
 
 		/// <summary>
 		/// Gets the number of tokens in this repository
@@ -150,17 +150,17 @@ namespace Hime.Redist
 		{
 			this.terminals = terminals;
 			this.text = text;
-			this.cells = new Hime.Redist.Utils.BigList<Cell>();
+			this.cells = new BigList<Cell>();
 		}
 
 		/// <summary>
 		/// Gets the position in the input text of the given token
 		/// </summary>
-		/// <param name="token">A token's index</param>
+		/// <param name="index">A token's index</param>
 		/// <returns>The position in the text</returns>
-		public TextPosition GetPosition(int token)
+		public TextPosition GetPosition(int index)
 		{
-			return text.GetPositionAt(cells[token].span.Index);
+			return text.GetPositionAt(cells[index].span.Index);
 		}
 
 		/// <summary>
@@ -176,31 +176,31 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the context in the input of the given token
 		/// </summary>
-		/// <param name="node">A token's index</param>
+		/// <param name="index">A token's index</param>
 		/// <returns>The context</returns>
-		public TextContext GetContext(int token)
+		public TextContext GetContext(int index)
 		{
-			return text.GetContext(cells[token].span);
+			return text.GetContext(cells[index].span);
 		}
 
 		/// <summary>
 		/// Gets the grammar symbol associated to the given token
 		/// </summary>
-		/// <param name="token">A token's index</param>
+		/// <param name="index">A token's index</param>
 		/// <returns>The associated symbol</returns>
-		public Symbol GetSymbol(int token)
+		public Symbol GetSymbol(int index)
 		{
-			return terminals[cells[token].terminal];
+			return terminals[cells[index].terminal];
 		}
 
 		/// <summary>
 		/// Gets the value of the given token
 		/// </summary>
-		/// <param name="token">A token's index</param>
+		/// <param name="index">A token's index</param>
 		/// <returns>The associated value</returns>
-		public string GetValue(int token)
+		public string GetValue(int index)
 		{
-			return text.GetValue(cells[token].span);
+			return text.GetValue(cells[index].span);
 		}
 
 		/// <summary>

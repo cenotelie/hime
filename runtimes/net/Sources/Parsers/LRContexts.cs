@@ -29,7 +29,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The contexts
 		/// </summary>
-		private ushort[] content;
+		private readonly ushort[] content;
 		
 		/// <summary>
 		/// Gets the number of contexts

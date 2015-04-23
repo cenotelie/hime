@@ -28,11 +28,12 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The index of the node from which this edge starts
 		/// </summary>
-		private int from;
+		private readonly int from;
 		/// <summary>
 		/// The index of the node to which this edge arrives to
 		/// </summary>
-		private int to;
+		private readonly int to;
+
 		/// <summary>
 		/// Gets the index of the node from which this edge starts
 		/// </summary>
@@ -41,6 +42,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the index of the node to which this edge arrives to
 		/// </summary>
 		public int To { get { return to; } }
+
 		/// <summary>
 		/// Initializes this edge
 		/// </summary>

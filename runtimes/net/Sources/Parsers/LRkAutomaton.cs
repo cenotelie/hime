@@ -38,32 +38,32 @@ namespace Hime.Redist.Parsers
 	/// --- productions table
 	/// See LRProduction
 	/// </remarks>
-	public class LRkAutomaton
+	public sealed class LRkAutomaton
 	{
 		/// <summary>
 		/// The number of columns in the LR table
 		/// </summary>
-		private ushort ncols;
+		private readonly ushort ncols;
 		/// <summary>
 		/// The number of states in the LR table
 		/// </summary>
-		private ushort nstates;
+		private readonly ushort nstates;
 		/// <summary>
 		/// Map of symbol ID to column index in the LR table
 		/// </summary>
-		private ColumnMap columns;
+		private readonly ColumnMap columns;
 		/// <summary>
 		/// The contexts information
 		/// </summary>
-		private LRContexts[] contexts;
+		private readonly LRContexts[] contexts;
 		/// <summary>
 		/// The LR table
 		/// </summary>
-		private LRAction[] table;
+		private readonly LRAction[] table;
 		/// <summary>
 		/// The table of LR productions
 		/// </summary>
-		private LRProduction[] productions;
+		private readonly LRProduction[] productions;
 
 		/// <summary>
 		/// Gets the number of states in this automaton
@@ -76,21 +76,21 @@ namespace Hime.Redist.Parsers
 		/// <param name="reader">The binary stream to load from</param>
 		public LRkAutomaton(BinaryReader reader)
 		{
-			this.ncols = reader.ReadUInt16();
-			this.nstates = reader.ReadUInt16();
+			ncols = reader.ReadUInt16();
+			nstates = reader.ReadUInt16();
 			int nprod = reader.ReadUInt16();
-			this.columns = new ColumnMap();
+			columns = new ColumnMap();
 			for (int i = 0; i != ncols; i++)
-				this.columns.Add(reader.ReadUInt16(), i);
-			this.contexts = new LRContexts[nstates];
+				columns.Add(reader.ReadUInt16(), i);
+			contexts = new LRContexts[nstates];
 			for (int i = 0; i != nstates; i++)
-				this.contexts[i] = new LRContexts(reader);
-			this.table = new LRAction[nstates * ncols];
+				contexts[i] = new LRContexts(reader);
+			table = new LRAction[nstates * ncols];
 			for (int i=0; i!=nstates * ncols; i++)
-				this.table[i] = new LRAction(reader);
-			this.productions = new LRProduction[nprod];
+				table[i] = new LRAction(reader);
+			productions = new LRProduction[nprod];
 			for (int i = 0; i != nprod; i++)
-				this.productions[i] = new LRProduction(reader);
+				productions[i] = new LRProduction(reader);
 		}
 
 		/// <summary>

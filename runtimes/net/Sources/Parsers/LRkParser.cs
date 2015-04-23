@@ -36,7 +36,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The parser's automaton
 		/// </summary>
-		protected LRkAutomaton automaton;
+		protected readonly LRkAutomaton automaton;
 		/// <summary>
 		/// The parser's stack
 		/// </summary>
@@ -48,7 +48,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The AST builder
 		/// </summary>
-		private LRkASTBuilder builder;
+		private readonly LRkASTBuilder builder;
 
 		/// <summary>
 		/// Initializes a new instance of the parser
@@ -62,9 +62,9 @@ namespace Hime.Redist.Parsers
 			: base(variables, virtuals, actions, lexer)
 		{
 			this.automaton = automaton;
-			this.stack = new int[INIT_STACK_SIZE];
-			this.head = 0;
-			this.builder = new LRkASTBuilder(lexer.tokens, this.symVariables, this.symVirtuals);
+			stack = new int[INIT_STACK_SIZE];
+			head = 0;
+			builder = new LRkASTBuilder(lexer.tokens, symVariables, symVirtuals);
 		}
 
 		/// <summary>
@@ -104,9 +104,7 @@ namespace Hime.Redist.Parsers
 					expected.Add(terminal);
 			// register the error
 			allErrors.Add(new UnexpectedTokenError(lexer.tokens[kernel.Index], new ROList<Symbol>(expected)));
-			// try to recover, or not
-			if (!modeRecover)
-				return new Lexer.TokenKernel(Symbol.SID_NOTHING, -1);
+			// TODO: try to recover, or not
 			return new Lexer.TokenKernel(Symbol.SID_NOTHING, -1);
 		}
 

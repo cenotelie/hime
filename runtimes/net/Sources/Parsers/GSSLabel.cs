@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Runtime.InteropServices;
 
 namespace Hime.Redist.Parsers
 {
@@ -34,15 +33,15 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// A sub-tree with a replaceable root
 		/// </summary>
-		private SubTree tree;
+		private readonly SubTree tree;
 		/// <summary>
 		/// The original symbol of the SPPF node
 		/// </summary>
-		private TableElemRef original;
+		private readonly TableElemRef original;
 		/// <summary>
 		/// The index of the SPPF node
 		/// </summary>
-		private int nodeIndex;
+		private readonly int nodeIndex;
 
 		/// <summary>
 		/// Gets the sub-tree with a repleaceable root
@@ -73,8 +72,8 @@ namespace Hime.Redist.Parsers
 		public GSSLabel(SubTree tree)
 		{
 			this.tree = tree;
-			this.original = new TableElemRef();
-			this.nodeIndex = -1;
+			original = new TableElemRef();
+			nodeIndex = -1;
 		}
 
 		/// <summary>
@@ -84,9 +83,9 @@ namespace Hime.Redist.Parsers
 		/// <param name="index">The index of the SPPF node</param>
 		public GSSLabel(TableElemRef original, int index)
 		{
-			this.tree = null;
+			tree = null;
 			this.original = original;
-			this.nodeIndex = index;
+			nodeIndex = index;
 		}
 	}
 }

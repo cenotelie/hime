@@ -24,16 +24,16 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Container for the expected terminals for a LR state
 	/// </summary>
-	public class LRExpected
+	public sealed class LRExpected
 	{
 		/// <summary>
 		/// The terminals expected for shift actions
 		/// </summary>
-		private List<Symbol> shifts;
+		private readonly List<Symbol> shifts;
 		/// <summary>
 		/// The terminals expected for reduction actions
 		/// </summary>
-		private List<Symbol> reductions;
+		private readonly List<Symbol> reductions;
 
 		/// <summary>
 		/// Gets the terminals expected for shift actions
@@ -50,8 +50,8 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public LRExpected()
 		{
-			this.shifts = new List<Symbol>();
-			this.reductions = new List<Symbol>();
+			shifts = new List<Symbol>();
+			reductions = new List<Symbol>();
 		}
 
 		/// <summary>

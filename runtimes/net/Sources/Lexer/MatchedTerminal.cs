@@ -21,25 +21,25 @@
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents a matched terminal information within a lexer's automaton
+	/// Represents the information of a terminal matched at the state of a lexer's automaton
 	/// </summary>
 	public struct MatchedTerminal
 	{
 		/// <summary>
 		/// The context
 		/// </summary>
-		private ushort context;
+		private readonly ushort context;
 		/// <summary>
 		/// The terminal's index
 		/// </summary>
-		private ushort index;
+		private readonly ushort index;
 
 		/// <summary>
-		/// Gets the context of the matched terminal
+		/// Gets the context required for the terminal to be matched
 		/// </summary>
 		public int Context { get { return context; } }
 		/// <summary>
-		/// Gets the index of the matched terminal
+		/// Gets the index of the matched terminal in the terminal table of the associated lexer
 		/// </summary>
 		public int Index { get { return index; } }
 

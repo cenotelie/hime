@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 
 namespace Hime.Redist.Parsers
@@ -26,12 +25,12 @@ namespace Hime.Redist.Parsers
 	/// Represent a map from symbols' IDs to the index of their corresponding column in an LR table.
 	/// It is optimized for IDs from 0x0000 to 0x01FF (the first 512 symbols) with hope they are the most frequent.
 	/// </summary>
-	class ColumnMap
+	sealed class ColumnMap
 	{
 		/// <summary>
 		/// Cache for ids from 0x00 to 0xFF
 		/// </summary>
-		private int[] cache1;
+		private readonly int[] cache1;
 		/// <summary>
 		/// Cache for ids from 0x100 to 0x1FF
 		/// </summary>
