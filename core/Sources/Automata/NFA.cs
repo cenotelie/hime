@@ -45,7 +45,7 @@ namespace Hime.SDK.Automata
 		/// <summary>
 		/// Represents the value epsilon on NFA transtions
 		/// </summary>
-		public static readonly CharSpan Epsilon = CharSpan.Null;
+		public static readonly CharSpan Epsilon = CharSpan.NULL;
 
 		/// <summary>
 		/// Gets the collection of states in this automaton

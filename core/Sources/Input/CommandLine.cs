@@ -59,7 +59,7 @@ namespace Hime.SDK.Input
 		{
 			if (argument.Children.Count == 0)
 				return null;
-			string value = argument.Children[0].Symbol.Value;
+			string value = argument.Children[0].Value;
 			if (value.StartsWith("\""))
 				return value.Substring(1, value.Length - 2);
 			return value;
@@ -75,7 +75,7 @@ namespace Hime.SDK.Input
 			List<string> values = new List<string>();
 			foreach (ASTNode child in argument.Children)
 			{
-				string value = child.Symbol.Value;
+				string value = child.Value;
 				if (value.StartsWith("\""))
 					value = value.Substring(1, value.Length - 2);
 				values.Add(value);

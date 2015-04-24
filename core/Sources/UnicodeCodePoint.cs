@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Net;
 
 namespace Hime.SDK
 {
@@ -30,7 +29,7 @@ namespace Hime.SDK
 		/// <summary>
 		/// The code point value
 		/// </summary>
-		private int value;
+		private readonly int value;
 
 		/// <summary>
 		/// Gets the code point value
@@ -69,12 +68,12 @@ namespace Hime.SDK
 			if (value <= 0xFFFF)
 			{
 				// plane 0
-				return new char[1] { (char)value };
+				return new [] { (char)value };
 			}
 			uint temp = (uint)value - 0x10000;
 			uint lead = (temp >> 10) + 0xD800;
 			uint trail = (temp & 0x03FF) + 0xDC00;
-			return new char[2] { (char)lead, (char)trail };
+			return new [] { (char)lead, (char)trail };
 		}
 
 		/// <summary>
@@ -152,7 +151,7 @@ namespace Hime.SDK
 		/// </returns>
 		public int CompareTo(UnicodeCodePoint other)
 		{
-			return this.value.CompareTo(other.value);
+			return value.CompareTo(other.value);
 		}
 
 		/// <summary>
@@ -168,7 +167,7 @@ namespace Hime.SDK
 			if (obj is UnicodeCodePoint)
 			{
 				UnicodeCodePoint cp = (UnicodeCodePoint)obj;
-				return (this.value == cp.value);
+				return (value == cp.value);
 			}
 			return false;
 		}
@@ -181,7 +180,7 @@ namespace Hime.SDK
 		/// </returns>
 		public override int GetHashCode()
 		{
-			return (int)this.value;
+			return value;
 		}
 
 		/// <summary>
@@ -213,7 +212,7 @@ namespace Hime.SDK
 				case System.Globalization.UnicodeCategory.Surrogate:
 				case System.Globalization.UnicodeCategory.PrivateUse:
 				case System.Globalization.UnicodeCategory.OtherNotAssigned:
-					return "U+" + System.Convert.ToUInt16(c).ToString("X");
+					return "U+" + Convert.ToUInt16(c).ToString("X");
 				default:
 					return c.ToString();
 			}

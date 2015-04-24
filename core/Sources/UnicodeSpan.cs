@@ -17,8 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
-using System.Collections.Generic;
 
 namespace Hime.SDK
 {
@@ -30,12 +28,11 @@ namespace Hime.SDK
 		/// <summary>
 		/// Beginning of the range (included)
 		/// </summary>
-		private UnicodeCodePoint spanBegin;
-
+		private readonly UnicodeCodePoint spanBegin;
 		/// <summary>
 		/// End of the range (included)
 		/// </summary>
-		private UnicodeCodePoint spanEnd;
+		private readonly UnicodeCodePoint spanEnd;
 
 		/// <summary>
 		/// Gets the first (included) character of the range
@@ -89,7 +86,7 @@ namespace Hime.SDK
 				return string.Empty;
 			if (spanBegin == spanEnd)
 				return spanBegin.ToString();
-			return "[" + spanBegin.ToString() + "-" + spanEnd.ToString() + "]";
+			return "[" + spanBegin + "-" + spanEnd + "]";
 		}
 	}
 }

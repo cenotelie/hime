@@ -61,8 +61,8 @@ namespace Hime.SDK.Reflection
 			this.assembly = assembly;
 			this.lexerTypes = new List<Type>();
 			this.parserTypes = new List<Type>();
-			Type baseLexer = typeof(Hime.Redist.Lexer.ILexer);
-			Type baseParser = typeof(Hime.Redist.Parsers.IParser);
+			Type baseLexer = typeof(Hime.Redist.Lexer.BaseLexer);
+			Type baseParser = typeof(Hime.Redist.Parsers.BaseLRParser);
 			foreach (Type t in assembly.GetTypes())
 			{
 				if (t.IsClass)
@@ -98,7 +98,7 @@ namespace Hime.SDK.Reflection
 		/// </summary>
 		/// <param name="input">The input for the lexer</param>
 		/// <returns>The lexe</returns>
-		public Hime.Redist.Lexer.ILexer getLexer<T>(T input)
+		public Hime.Redist.Lexer.BaseLexer getLexer<T>(T input)
 		{
 			if (lexerTypes.Count == 0)
 				return null;
@@ -111,11 +111,11 @@ namespace Hime.SDK.Reflection
 		/// <param name="lexerType">The lexer's type</param>
 		/// <param name="input">The input for the lexer</param>
 		/// <returns>The lexe</returns>
-		public Hime.Redist.Lexer.ILexer getLexer<T>(Type lexerType, T input)
+		public Hime.Redist.Lexer.BaseLexer getLexer<T>(Type lexerType, T input)
 		{
 			ConstructorInfo lexerCtor = lexerType.GetConstructor(new Type[] { typeof(T) });
 			object lexer = lexerCtor.Invoke(new object[] { input });
-			return (Hime.Redist.Lexer.ILexer) lexer;
+			return (Hime.Redist.Lexer.BaseLexer) lexer;
 		}
 
 		/// <summary>
@@ -123,7 +123,7 @@ namespace Hime.SDK.Reflection
 		/// </summary>
 		/// <param name="input">The input for the associated lexer</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(T input)
+		public Hime.Redist.Parsers.BaseLRParser GetParser<T>(T input)
 		{
 			if (parserTypes.Count == 0)
 				return null;
@@ -136,7 +136,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="input">The input for the associated lexer</param>
 		/// <param name="actions">The semantic actions for the parser</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
+		public Hime.Redist.Parsers.BaseLRParser GetParser<T>(T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
 		{
 			if (parserTypes.Count == 0)
 				return null;
@@ -149,7 +149,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="name">The parser's fully qualified name</param>
 		/// <param name="input">The input for the associated lexer</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(string name, T input)
+		public Hime.Redist.Parsers.BaseLRParser GetParser<T>(string name, T input)
 		{
 			return GetParser(assembly.GetType(name), input, null);
 		}
@@ -161,7 +161,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="input">The input for the associated lexer</param>
 		/// <param name="actions">The semantic actions for the parser</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(string name, T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
+		public Hime.Redist.Parsers.BaseLRParser GetParser<T>(string name, T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
 		{
 			return GetParser(assembly.GetType(name), input, actions);
 		}
@@ -172,7 +172,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="parserType">The parser's type</param>
 		/// <param name="input">The input for the associated lexer</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(Type parserType, T input)
+		public Hime.Redist.Parsers.BaseLRParser GetParser<T>(Type parserType, T input)
 		{
 			return GetParser(parserType, input, null);
 		}
@@ -184,7 +184,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="input">The input for the associated lexer</param>
 		/// <param name="actions">The semantic actions for the parser</param>
 		/// <returns>The parser</returns>
-		public Hime.Redist.Parsers.IParser GetParser<T>(Type parserType, T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
+		public Hime.Redist.Parsers.BaseLRParser GetParser<T>(Type parserType, T input, Dictionary<string, Hime.Redist.SemanticAction> actions)
 		{
 			ConstructorInfo[] ctors = parserType.GetConstructors();
 			ConstructorInfo parserCtor = null;
@@ -213,7 +213,7 @@ namespace Hime.SDK.Reflection
 				parser = parserCtor.Invoke(new object[] { lexer });
 			else
 				parser = parserCtor.Invoke(new object[] { lexer, actions });
-			return (Hime.Redist.Parsers.IParser)parser;
+			return (Hime.Redist.Parsers.BaseLRParser)parser;
 		}
 	}
 }

@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.SDK
 {
@@ -29,17 +28,17 @@ namespace Hime.SDK
 		/// <summary>
 		/// Beginning of the range (included)
 		/// </summary>
-		private char spanBegin;
+		private readonly char spanBegin;
 
 		/// <summary>
 		/// End of the range (included)
 		/// </summary>
-		private char spanEnd;
+		private readonly char spanEnd;
 
 		/// <summary>
 		/// Constant value for an invalid value
 		/// </summary>
-		public static readonly CharSpan Null = new CharSpan((char)1, (char)0);
+		public static readonly CharSpan NULL = new CharSpan((char)1, (char)0);
 
 		/// <summary>
 		/// Gets the first (included) character of the range
@@ -78,7 +77,7 @@ namespace Hime.SDK
 			if (left.spanBegin < right.spanBegin)
 			{
 				if (left.spanEnd < right.spanBegin)
-					return Null;
+					return NULL;
 				if (left.spanEnd < right.spanEnd)
 					return new CharSpan(right.spanBegin, left.spanEnd);
 				return new CharSpan(right.spanBegin, right.spanEnd);
@@ -86,7 +85,7 @@ namespace Hime.SDK
 			else
 			{
 				if (right.spanEnd < left.spanBegin)
-					return Null;
+					return NULL;
 				if (right.spanEnd < left.spanEnd)
 					return new CharSpan(left.spanBegin, right.spanEnd);
 				return new CharSpan(left.spanBegin, left.spanEnd);
@@ -104,14 +103,14 @@ namespace Hime.SDK
 		{
 			if (original.spanBegin == splitter.spanBegin)
 			{
-				rest = Null;
+				rest = NULL;
 				if (original.spanEnd == splitter.spanEnd)
-					return Null;
+					return NULL;
 				return new CharSpan(System.Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
 			}
 			if (original.spanEnd == splitter.spanEnd)
 			{
-				rest = Null;
+				rest = NULL;
 				return new CharSpan(original.spanBegin, System.Convert.ToChar(splitter.spanBegin - 1));
 			}
 			rest = new CharSpan(System.Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
@@ -158,7 +157,7 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="c">A character</param>
 		/// <returns>The string representation</returns>
-		private string CharToString(char c)
+		private static string CharToString(char c)
 		{
 			System.Globalization.UnicodeCategory cat = char.GetUnicodeCategory(c);
 			switch (cat)
@@ -186,7 +185,7 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="c">A non-printable character</param>
 		/// <returns>The string representation</returns>
-		private string CharToString_NonPrintable(char c)
+		private static string CharToString_NonPrintable(char c)
 		{
 			string result = "U+" + System.Convert.ToUInt16(c).ToString("X");
 			return result;

@@ -57,7 +57,7 @@ namespace Hime.SDK.Reflection
 		{
 			string input = "";
 			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
-			ILexer lexer = ctor.Invoke(new object[] { input }) as ILexer;
+			BaseLexer lexer = ctor.Invoke(new object[] { input }) as BaseLexer;
 
 			string[] resources = lexerType.Assembly.GetManifestResourceNames();
 			Stream stream = null;
@@ -82,16 +82,16 @@ namespace Hime.SDK.Reflection
 		/// Loads the terminals from the specified lexers
 		/// </summary>
 		/// <param name="lexer">The lexer to investigate</param>
-		private void LoadTerminals(ILexer lexer)
+		private void LoadTerminals(BaseLexer lexer)
 		{
 			terminals = new List<Terminal>();
 			terminals.Add(Epsilon.Instance);
 			terminals.Add(Dollar.Instance);
-			IList<Hime.Redist.Symbol> spec = lexer.Terminals;
+			ROList<Hime.Redist.Symbol> spec = lexer.Terminals;
 			for (int i = 2; i != spec.Count; i++)
 			{
 				Hime.Redist.Symbol symbol = spec[i];
-				terminals.Add(new Terminal(symbol.ID, symbol.Name, symbol.Value, null, null));
+				terminals.Add(new Terminal(symbol.ID, symbol.Name, "", null, null));
 			}
 		}
 

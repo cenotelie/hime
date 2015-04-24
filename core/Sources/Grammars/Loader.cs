@@ -88,8 +88,8 @@ namespace Hime.SDK.Grammars
 			this.input = input;
 			this.inherited = new List<string>();
 			foreach (ASTNode child in root.Children[1].Children)
-				inherited.Add(child.Symbol.Value);
-			this.grammar = new Grammar(root.Children[0].Symbol.Value);
+				inherited.Add(child.Value);
+			this.grammar = new Grammar(root.Children[0].Value);
 			this.caseInsensitive = false;
 			if (inherited.Count == 0)
 				LoadGrammarContent(root);
@@ -267,8 +267,8 @@ namespace Hime.SDK.Grammars
 		/// <param name="node">The AST node of a grammar option</param>
 		private void LoadOption(ASTNode node)
 		{
-			string name = node.Children[0].Symbol.Value;
-			string value = node.Children[1].Symbol.Value;
+			string name = node.Children[0].Value;
+			string value = node.Children[1].Value;
 			value = ReplaceEscapees(value.Substring(1, value.Length - 2));
 			grammar.AddOption(name, value);
 		}
@@ -300,7 +300,7 @@ namespace Hime.SDK.Grammars
 		private void LoadTerminalContext(ASTNode node)
 		{
 			ASTFamily children = node.Children;
-			string name = children[0].Symbol.Value;
+			string name = children[0].Value;
 			for (int i=1; i!=children.Count; i++)
 				LoadTerminalRule(children[i], name);
 		}
@@ -314,21 +314,21 @@ namespace Hime.SDK.Grammars
 		{
 			ASTNode nameNode = node.Children[0];
 			// Resolve the terminal
-			Terminal terminal = grammar.GetTerminalByName(nameNode.Symbol.Value);
+			Terminal terminal = grammar.GetTerminalByName(nameNode.Value);
 			if (terminal == null)
 			{
 				// The terminal does not already exists
 				// Build the NFA
 				Automata.NFA nfa = BuildNFA(node.Children[1]);
 				// Create the terminal in the grammar
-				terminal = grammar.AddTerminalNamed(nameNode.Symbol.Value, nfa, context);
+				terminal = grammar.AddTerminalNamed(nameNode.Value, nfa, context);
 				// Marks the final NFA state with the new terminal
 				nfa.StateExit.AddItem(terminal);
 			}
 			else
 			{
 				// Tried to override the terminal
-				OnError(nameNode.Position, "Overriding the definition of terminal {0}", nameNode.Symbol.Value);
+				OnError(nameNode.Position, "Overriding the definition of terminal {0}", nameNode.Value);
 			}
 		}
 
@@ -389,10 +389,10 @@ namespace Hime.SDK.Grammars
 			if (symbol.Name == "range")
 			{
 				Automata.NFA inner = BuildNFA(node.Children[0]);
-				int min = System.Convert.ToInt32(node.Children[1].Symbol.Value);
+				int min = System.Convert.ToInt32(node.Children[1].Value);
 				int max = min;
 				if (node.Children.Count > 2)
-					max = System.Convert.ToInt32(node.Children[2].Symbol.Value);
+					max = System.Convert.ToInt32(node.Children[2].Value);
 				return Automata.NFA.NewRepeatRange(inner, false, min, max);
 			}
 			if (symbol.Name == "concat")
@@ -430,7 +430,7 @@ namespace Hime.SDK.Grammars
 			automata.StateExit = automata.StateEntry;
 
 			// build the raw piece of text
-			string value = node.Symbol.Value;
+			string value = node.Value;
 			bool insensitive = caseInsensitive;
 			if (value.StartsWith("~"))
 			{
@@ -468,7 +468,7 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildNFAFromCodepoint(ASTNode node)
 		{
 			// extract the code point value
-			string value = node.Symbol.Value;
+			string value = node.Value;
 			value = value.Substring(2, value.Length - 2);
 			int cpValue = System.Convert.ToInt32(value, 16);
 			if (cpValue < 0 || (cpValue >= 0xD800 && cpValue <= 0xDFFF) || cpValue >= 0x110000)
@@ -501,7 +501,7 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildNFAFromClass(ASTNode node)
 		{
 			// extract the value
-			string value = node.Symbol.Value;
+			string value = node.Value;
 			value = value.Substring(1, value.Length - 2);
 			value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
 			bool positive = true;
@@ -595,7 +595,7 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildNFAFromUnicodeCategory(ASTNode node)
 		{
 			// extract the value
-			string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
+			string value = node.Value.Substring(3, node.Value.Length - 4);
 			UnicodeCategory category = UnicodeCategories.GetCategory(value);
 			if (category == null)
 			{
@@ -617,7 +617,7 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildNFAFromUnicodeBlock(ASTNode node)
 		{
 			// extract the value
-			string value = node.Symbol.Value.Substring(3, node.Symbol.Value.Length - 4);
+			string value = node.Value.Substring(3, node.Value.Length - 4);
 			UnicodeBlock block = UnicodeBlocks.GetBlock(value);
 			if (block == null)
 			{
@@ -640,8 +640,8 @@ namespace Hime.SDK.Grammars
 			// extract the values
 			int spanBegin = 0;
 			int spanEnd = 0;
-			spanBegin = System.Convert.ToInt32(node.Children[0].Symbol.Value.Substring(2), 16);
-			spanEnd = System.Convert.ToInt32(node.Children[1].Symbol.Value.Substring(2), 16);
+			spanBegin = System.Convert.ToInt32(node.Children[0].Value.Substring(2), 16);
+			spanEnd = System.Convert.ToInt32(node.Children[1].Value.Substring(2), 16);
 			if (spanBegin > spanEnd)
 			{
 				OnError(node.Position, "Invalid unicode character span, the end is before the beginning");
@@ -679,10 +679,10 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildNFAFromReference(ASTNode node)
 		{
 			// rerieve the reference
-			Terminal reference = grammar.GetTerminalByName(node.Symbol.Value);
+			Terminal reference = grammar.GetTerminalByName(node.Value);
 			if (reference == null)
 			{
-				OnError(node.Position, "Reference to unknown terminal {0}", node.Symbol.Value);
+				OnError(node.Position, "Reference to unknown terminal {0}", node.Value);
 				return BuildEpsilonNFA();
 			}
 			return reference.NFA.Clone(false);
@@ -704,7 +704,7 @@ namespace Hime.SDK.Grammars
 			{
 				if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_simple)
 				{
-					string name = child.Children[0].Symbol.Value;
+					string name = child.Children[0].Value;
 					Variable var = grammar.GetVariable(name);
 					if (var == null)
 						var = grammar.AddVariable(name);
@@ -727,7 +727,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="node">The AST node of a syntactic rule</param>
 		private void LoadRule(Context context, ASTNode node)
 		{
-			string name = node.Children[0].Symbol.Value;
+			string name = node.Children[0].Value;
 			Variable var = grammar.GetVariable(name);
 			RuleBodySet defs = BuildDefinitions(context, node.Children[1]);
 			foreach (RuleBody def in defs)
@@ -845,7 +845,7 @@ namespace Hime.SDK.Grammars
 		private RuleBodySet BuildAtomicAction(ASTNode node)
 		{
 			RuleBodySet set = new RuleBodySet();
-			string name = node.Children[0].Symbol.Value;
+			string name = node.Children[0].Value;
 			Action action = grammar.GetAction(name);
 			if (action == null)
 				action = grammar.AddAction(name);
@@ -861,7 +861,7 @@ namespace Hime.SDK.Grammars
 		private RuleBodySet BuildAtomicVirtual(ASTNode node)
 		{
 			RuleBodySet set = new RuleBodySet();
-			string name = node.Children[0].Symbol.Value;
+			string name = node.Children[0].Value;
 			name = ReplaceEscapees(name.Substring(1, name.Length - 2));
 			Virtual vir = grammar.GetVirtual(name);
 			if (vir == null)
@@ -879,10 +879,10 @@ namespace Hime.SDK.Grammars
 		private RuleBodySet BuildAtomicSimpleReference(Context context, ASTNode node)
 		{
 			RuleBodySet defs = new RuleBodySet();
-			Symbol symbol = ResolveSymbol(node.Children[0].Symbol.Value, context);
+			Symbol symbol = ResolveSymbol(node.Children[0].Value, context);
 			if (symbol == null)
 			{
-				OnError(node.Children[0].Position, "Unknown symbol {0} in rule definition", node.Children[0].Symbol.Value);
+				OnError(node.Children[0].Position, "Unknown symbol {0} in rule definition", node.Children[0].Value);
 				defs.Add(new RuleBody());
 			}
 			else
@@ -902,7 +902,7 @@ namespace Hime.SDK.Grammars
 		{
 			RuleBodySet defs = new RuleBodySet();
 			// Get the information
-			string name = node.Children[0].Symbol.Value;
+			string name = node.Children[0].Value;
 			int paramCount = node.Children[1].Children.Count;
 			// check for meta-rule existence
 			if (!context.IsTemplateRule(name, paramCount))
@@ -930,7 +930,7 @@ namespace Hime.SDK.Grammars
 		private RuleBodySet BuildAtomicInlineText(ASTNode node)
 		{
 			// Construct the terminal name
-			string value = node.Symbol.Value;
+			string value = node.Value;
 			value = value.Substring(1, value.Length - 2);
 			value = ReplaceEscapees(value).Replace("\\'", "'");
 			// Check for previous instance in the grammar

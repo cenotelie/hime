@@ -30,16 +30,16 @@ namespace Hime.SDK
 	/// <remarks>
 	/// The current supported Unicode version is 6.3.0
 	/// </remarks>
-	public class UnicodeHelper
+	public static class UnicodeHelper
 	{
 		/// <summary>
 		/// The URL of the latest specification of Unicode blocks
 		/// </summary>
-		public const string urlUnicodeBlocks = "http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt";
+		private const string URL_UNICODE_BLOCKS = "http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt";
 		/// <summary>
 		/// The URL of the latest specification of Unicode code points
 		/// </summary>
-		public const string urlUnicodeData = "http://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt";
+		private const string URL_UNICODE_DATA = "http://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt";
 
 		/// <summary>
 		/// Gets the latest unicode blocks from the Unicode web site
@@ -50,9 +50,9 @@ namespace Hime.SDK
 		public static ICollection<UnicodeBlock> GetLatestBlocks()
 		{
 			System.Net.WebClient client = new System.Net.WebClient();
-			byte[] buffer = client.DownloadData(urlUnicodeBlocks);
+			byte[] buffer = client.DownloadData(URL_UNICODE_BLOCKS);
 			string content = Encoding.UTF8.GetString(buffer);
-			string[] lines = content.Split(new char[] { '\n' });
+			string[] lines = content.Split('\n' );
 			Regex exp = new Regex("(?<begin>[0-9A-F]+)\\.\\.(?<end>[0-9A-F]+);\\s+(?<name>(\\w|\\s|-)+)");
 			List<UnicodeBlock> blocks = new List<UnicodeBlock>();
 			foreach (string line in lines)
@@ -85,9 +85,9 @@ namespace Hime.SDK
 		public static ICollection<UnicodeCategory> GetLatestCategories()
 		{
 			System.Net.WebClient client = new System.Net.WebClient();
-			byte[] buffer = client.DownloadData(urlUnicodeData);
+			byte[] buffer = client.DownloadData(URL_UNICODE_DATA);
 			string content = Encoding.UTF8.GetString(buffer);
-			string[] lines = content.Split(new char[] { '\n' });
+			string[] lines = content.Split('\n');
 			Regex exp = new Regex("(?<code>[0-9A-F]+);([^;]+);(?<cat>[^;]+);.*");
 			Dictionary<string, UnicodeCategory> categories = new Dictionary<string, UnicodeCategory>();
 			string currentName = null;
@@ -205,7 +205,7 @@ namespace Hime.SDK
 			{
 				string csName = block.Name.Replace("-", "");
 
-				string values = null;
+				string values;
 				if (block.Span.Begin.Value <= 0xFFFF)
 					values = "\\u" + block.Span.Begin.Value.ToString("X4");
 				else

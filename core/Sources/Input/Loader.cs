@@ -177,7 +177,7 @@ namespace Hime.SDK.Input
 		/// <returns><c>true</c> if the operation succeed</returns>
 		private bool LoadInput(ASTNode node, Text input)
 		{
-			Grammars.Loader loader = new Grammars.Loader(node.Children[0].Symbol.Value, input, node, reporter);
+			Grammars.Loader loader = new Grammars.Loader(node.Children[0].Value, input, node, reporter);
 			inners.Add(loader.Grammar.Name, loader);
 			return true;
 		}

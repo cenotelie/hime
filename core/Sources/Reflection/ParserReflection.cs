@@ -33,15 +33,15 @@ namespace Hime.SDK.Reflection
 		/// <summary>
 		/// List of the terminals matched by the associated lexer
 		/// </summary>
-		private IList<Symbol> terminals;
+		private ROList<Symbol> terminals;
 		/// <summary>
 		/// List of the variables in this parser
 		/// </summary>
-		private IList<Symbol> variables;
+		private ROList<Symbol> variables;
 		/// <summary>
 		/// List of the virtuals in this parser
 		/// </summary>
-		private IList<Symbol> virtuals;
+		private ROList<Symbol> virtuals;
 		/// <summary>
 		/// The LR automaton used by the parser
 		/// </summary>
@@ -50,15 +50,15 @@ namespace Hime.SDK.Reflection
 		/// <summary>
 		/// Gets the terminals that can be matched by the associated lexer
 		/// </summary>
-		public ROList<Symbol> Terminals { get { return new ROList<Symbol>(terminals); } }
+		public ROList<Symbol> Terminals { get { return terminals; } }
 		/// <summary>
 		/// Gets the variable symbols used by this parser
 		/// </summary>
-		public ROList<Symbol> Variables { get { return new ROList<Symbol>(variables); } }
+		public ROList<Symbol> Variables { get { return variables; } }
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
-		public ROList<Symbol> Virtuals { get { return new ROList<Symbol>(virtuals); } }
+		public ROList<Symbol> Virtuals { get { return virtuals; } }
 		/// <summary>
 		/// Gets this parser's LR automaton
 		/// </summary>
@@ -89,9 +89,9 @@ namespace Hime.SDK.Reflection
 			object lexer = lexerCtor.Invoke(new object[] { input });
 			object parser = parserCtor.Invoke(new object[] { lexer });
 
-			this.terminals = (lexer as Hime.Redist.Lexer.ILexer).Terminals;
-			this.variables = (parser as Hime.Redist.Parsers.IParser).Variables;
-			this.virtuals = (parser as Hime.Redist.Parsers.IParser).Virtuals;
+			this.terminals = (lexer as Hime.Redist.Lexer.BaseLexer).Terminals;
+			this.variables = (parser as Hime.Redist.Parsers.BaseLRParser).SymbolVariables;
+			this.virtuals = (parser as Hime.Redist.Parsers.BaseLRParser).SymbolVirtuals;
 			this.automaton = new Automata.LRAutomaton();
 
 			string[] resources = parserType.Assembly.GetManifestResourceNames();

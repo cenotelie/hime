@@ -75,11 +75,11 @@ namespace Hime.SDK.Grammars
 		{
 			this.instances = new List<TemplateRuleInstance>();
 			this.grammar = grammar;
-			this.head = ruleNode.Children[0].Symbol.Value;
+			this.head = ruleNode.Children[0].Value;
 			this.parameters = new List<string>();
 			this.root = ruleNode;
 			foreach (ASTNode child in ruleNode.Children[1].Children)
-				this.parameters.Add(child.Symbol.Value);
+				this.parameters.Add(child.Value);
 		}
 
 		/// <summary>
