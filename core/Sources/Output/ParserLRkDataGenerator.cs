@@ -27,36 +27,36 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for LR(k) parser data for the .Net platform
 	/// </summary>
-	public class ParserLRkDataGenerator : Generator
+	public sealed class ParserLRkDataGenerator : Generator
 	{
 		/// <summary>
 		/// LR graph for the parser
 		/// </summary>
-		private Grammars.LR.Graph graph;
+		private readonly Grammars.LR.Graph graph;
 		/// <summary>
 		/// The terminals matched by the associated lexer
 		/// </summary>
-		private ROList<Grammars.Terminal> terminals;
+		private readonly ROList<Grammars.Terminal> terminals;
 		/// <summary>
 		/// The existing contexts in the parser
 		/// </summary>
-		private ROList<Grammars.Variable> contexts;
+		private readonly ROList<Grammars.Variable> contexts;
 		/// <summary>
 		/// The variables to be exported
 		/// </summary>
-		private List<Grammars.Variable> variables;
+		private readonly List<Grammars.Variable> variables;
 		/// <summary>
 		/// The virtual symbols to be exported
 		/// </summary>
-		private List<Grammars.Virtual> virtuals;
+		private readonly List<Grammars.Virtual> virtuals;
 		/// <summary>
 		/// The action symbols to be exported
 		/// </summary>
-		private List<Grammars.Action> actions;
+		private readonly List<Grammars.Action> actions;
 		/// <summary>
 		/// The grammar rules
 		/// </summary>
-		private List<Grammars.Rule> rules;
+		private readonly List<Grammars.Rule> rules;
 
 		/// <summary>
 		/// Initializes this parser generator
@@ -64,13 +64,13 @@ namespace Hime.SDK.Output
 		/// <param name="unit">The unit to generate a parser for</param>
 		public ParserLRkDataGenerator(Unit unit)
 		{
-			this.graph = unit.Graph;
-			this.terminals = unit.Expected;
-			this.contexts = unit.Contexts;
-			this.variables = new List<Grammars.Variable>(unit.Grammar.Variables);
-			this.virtuals = new List<Grammars.Virtual>(unit.Grammar.Virtuals);
-			this.actions = new List<Grammars.Action>(unit.Grammar.Actions);
-			this.rules = new List<Grammars.Rule>(unit.Grammar.Rules);
+			graph = unit.Graph;
+			terminals = unit.Expected;
+			contexts = unit.Contexts;
+			variables = new List<Grammars.Variable>(unit.Grammar.Variables);
+			virtuals = new List<Grammars.Virtual>(unit.Grammar.Virtuals);
+			actions = new List<Grammars.Action>(unit.Grammar.Actions);
+			rules = new List<Grammars.Rule>(unit.Grammar.Rules);
 		}
 
 		/// <summary>

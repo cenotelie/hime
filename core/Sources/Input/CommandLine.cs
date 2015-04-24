@@ -27,7 +27,7 @@ namespace Hime.SDK.Input
 	/// <summary>
 	/// Contains utilities for the manipulation of command line arguments
 	/// </summary>
-	public class CommandLine
+	public static class CommandLine
 	{
 		/// <summary>
 		/// Parses the command line arguments
@@ -60,9 +60,7 @@ namespace Hime.SDK.Input
 			if (argument.Children.Count == 0)
 				return null;
 			string value = argument.Children[0].Value;
-			if (value.StartsWith("\""))
-				return value.Substring(1, value.Length - 2);
-			return value;
+			return value.StartsWith ("\"") ? value.Substring (1, value.Length - 2) : value;
 		}
 
 		/// <summary>

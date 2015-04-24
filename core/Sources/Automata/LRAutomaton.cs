@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using Hime.Redist;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Automata
@@ -26,12 +25,12 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents an LR automaton
 	/// </summary>
-	public class LRAutomaton
+	public sealed class LRAutomaton
 	{
 		/// <summary>
 		/// The states
 		/// </summary>
-		private List<LRState> states;
+		private readonly List<LRState> states;
 
 		/// <summary>
 		/// Gets the states in this automaton
@@ -43,7 +42,7 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		public LRAutomaton()
 		{
-			this.states = new List<LRState>();
+			states = new List<LRState>();
 		}
 
 		/// <summary>

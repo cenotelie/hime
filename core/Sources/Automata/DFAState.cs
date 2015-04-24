@@ -24,16 +24,16 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a state in a Deterministic Finite Automaton
 	/// </summary>
-	public class DFAState : State
+	public sealed class DFAState : State
 	{
 		/// <summary>
 		/// This state's id
 		/// </summary>
-		private int id;
+		private readonly int id;
 		/// <summary>
 		/// The transitions from this state
 		/// </summary>
-		private Dictionary<CharSpan, DFAState> transitions;
+		private readonly Dictionary<CharSpan, DFAState> transitions;
 
 		/// <summary>
 		/// Gets the ID of this state
@@ -56,7 +56,7 @@ namespace Hime.SDK.Automata
 		/// <param name="id">Identifier for this state</param>
 		public DFAState(int id)
 		{
-			this.transitions = new Dictionary<CharSpan, DFAState>();
+			transitions = new Dictionary<CharSpan, DFAState>();
 			this.id = id;
 		}
 

@@ -30,7 +30,7 @@ namespace Hime.SDK.Automata
 		/// <summary>
 		/// List of the items on this state
 		/// </summary>
-		private SortedList<int, FinalItem> items;
+		private readonly SortedList<int, FinalItem> items;
 
 		/// <summary>
 		/// Gets the items on this state
@@ -47,7 +47,7 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		public State()
 		{
-			this.items = new SortedList<int, FinalItem>(new PriorityComparer());
+			items = new SortedList<int, FinalItem>(new PriorityComparer());
 		}
 
 		/// <summary>

@@ -26,20 +26,20 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator of data and code for a lexer
 	/// </summary>
-	public class LexerDataGenerator : Generator
+	public sealed class LexerDataGenerator : Generator
 	{
 		/// <summary>
 		/// The terminals matched by the lexer
 		/// </summary>
-		private ROList<Grammars.Terminal> terminals;
+		private readonly ROList<Grammars.Terminal> terminals;
 		/// <summary>
 		/// The contexts for the lexer
 		/// </summary>
-		private ROList<Grammars.Variable> contexts;
+		private readonly ROList<Grammars.Variable> contexts;
 		/// <summary>
 		/// The lexer's DFA
 		/// </summary>
-		private Automata.DFA dfa;
+		private readonly Automata.DFA dfa;
 
 		/// <summary>
 		/// Initializes this generator
@@ -50,7 +50,7 @@ namespace Hime.SDK.Output
 		public LexerDataGenerator(Automata.DFA dfa, ROList<Grammars.Terminal> expected, ROList<Grammars.Variable> contexts)
 		{
 			this.dfa = dfa;
-			this.terminals = expected;
+			terminals = expected;
 			this.contexts = contexts;
 		}
 
@@ -64,18 +64,18 @@ namespace Hime.SDK.Output
 
 			writer.Write((uint)dfa.StatesCount);
 			uint offset = 0;
-			List<string> contexts = new List<string>();
+			List<string> contextNames = new List<string>();
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				writer.Write(offset);
 				offset += 3 + 256;
-				contexts.Clear();
+				contextNames.Clear();
 				foreach (Automata.FinalItem item in state.Items)
 				{
 					Grammars.Terminal terminal = item as Grammars.Terminal;
-					if (!contexts.Contains(terminal.Context))
+					if (!contextNames.Contains(terminal.Context))
 					{
-						contexts.Add(terminal.Context);
+						contextNames.Add(terminal.Context);
 						offset += 2;
 					}
 				}
@@ -122,17 +122,17 @@ namespace Hime.SDK.Output
 			}
 
 			// build the matched terminals data
-			List<ushort> contexts = new List<ushort>();
+			List<ushort> contextIDs = new List<ushort>();
 			List<ushort> matched = new List<ushort>();
 			foreach (Automata.FinalItem item in state.Items)
 			{
 				Grammars.Terminal terminal = item as Grammars.Terminal;
 				ushort context = GetContextID(terminal.Context);
-				if (!contexts.Contains(context))
+				if (!contextIDs.Contains(context))
 				{
 					// this is the first time this context is found in the current DFA state
 					// this is the terminal with the most priority for this context
-					contexts.Add(context);
+					contextIDs.Add(context);
 					matched.Add((ushort)terminals.IndexOf(terminal));
 				}
 			}
@@ -146,7 +146,7 @@ namespace Hime.SDK.Output
 			// write the matched terminals
 			for (int i = 0; i != matched.Count; i++)
 			{
-				writer.Write(contexts[i]);
+				writer.Write(contextIDs[i]);
 				writer.Write(matched[i]);
 			}
 			// write the cached transitions

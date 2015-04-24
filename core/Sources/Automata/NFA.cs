@@ -25,27 +25,17 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a Non-deterministic Finite Automaton
 	/// </summary>
-	public class NFA
+	public sealed class NFA
 	{
 		/// <summary>
 		/// The list of all the states in this automaton
 		/// </summary>
-		private List<NFAState> states;
-
-		/// <summary>
-		/// The entry state
-		/// </summary>
-		private NFAState stateEntry;
-
-		/// <summary>
-		/// The exit state
-		/// </summary>
-		private NFAState stateExit;
+		private readonly List<NFAState> states;
 
 		/// <summary>
 		/// Represents the value epsilon on NFA transtions
 		/// </summary>
-		public static readonly CharSpan Epsilon = CharSpan.NULL;
+		public static readonly CharSpan EPSILON = CharSpan.NULL;
 
 		/// <summary>
 		/// Gets the collection of states in this automaton
@@ -60,17 +50,19 @@ namespace Hime.SDK.Automata
 		/// <summary>
 		/// Gets or sets the entry set for this automaton
 		/// </summary>
-		public NFAState StateEntry {
-			get { return stateEntry; }
-			set { stateEntry = value; }
+		public NFAState StateEntry
+		{
+			get;
+			set;
 		}
 
 		/// <summary>
 		/// Gets ot sets the exit state for this automaton
 		/// </summary>
-		public NFAState StateExit {
-			get { return stateExit; }
-			set { stateExit = value; }
+		public NFAState StateExit
+		{
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -90,7 +82,7 @@ namespace Hime.SDK.Automata
 		{
 			states = new List<NFAState>();
 			List<DFAState> dfaStates = new List<DFAState>(dfa.States);
-			foreach (DFAState state in dfaStates)
+			for (int i = 0; i != dfaStates.Count; i++)
 				states.Add(new NFAState());
 			for (int i = 0; i != dfaStates.Count; i++)
 			{
@@ -98,7 +90,7 @@ namespace Hime.SDK.Automata
 				foreach (CharSpan transition in dfaStates[i].Transitions)
 					states[i].AddTransition(transition, states[dfaStates.IndexOf(dfaStates[i].GetChildBy(transition))]);
 			}
-			stateEntry = states[0];
+			StateEntry = states[0];
 		}
 
 		/// <summary>
@@ -145,10 +137,10 @@ namespace Hime.SDK.Automata
 				foreach (NFATransition transition in states[i].Transitions)
 					copy.states[i].AddTransition(transition.Span, copy.states[states.IndexOf(transition.Next)]);
 			}
-			if (stateEntry != null)
-				copy.stateEntry = copy.states[states.IndexOf(stateEntry)];
-			if (stateExit != null)
-				copy.stateExit = copy.states[states.IndexOf(stateExit)];
+			if (StateEntry != null)
+				copy.StateEntry = copy.states[states.IndexOf(StateEntry)];
+			if (StateExit != null)
+				copy.StateExit = copy.states[states.IndexOf(StateExit)];
 			return copy;
 		}
 
@@ -169,8 +161,8 @@ namespace Hime.SDK.Automata
 		public static NFA NewMinimal()
 		{
 			NFA result = new NFA();
-			result.stateEntry = result.AddNewState();
-			result.stateExit = result.AddNewState();
+			result.StateEntry = result.AddNewState();
+			result.StateExit = result.AddNewState();
 			return result;
 		}
 
@@ -187,9 +179,9 @@ namespace Hime.SDK.Automata
 			if (useClones)
 				sub = sub.Clone();
 			final.states.AddRange(sub.states);
-			final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
-			final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
-			sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+			final.StateEntry.AddTransition(NFA.EPSILON, sub.StateEntry);
+			final.StateEntry.AddTransition(NFA.EPSILON, final.StateExit);
+			sub.StateExit.AddTransition(NFA.EPSILON, final.StateExit);
 			return final;
 		}
 
@@ -206,10 +198,10 @@ namespace Hime.SDK.Automata
 			if (useClones)
 				sub = sub.Clone();
 			final.states.AddRange(sub.states);
-			final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
-			final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
-			sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
-			final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
+			final.StateEntry.AddTransition(NFA.EPSILON, sub.StateEntry);
+			final.StateEntry.AddTransition(NFA.EPSILON, final.StateExit);
+			sub.StateExit.AddTransition(NFA.EPSILON, final.StateExit);
+			final.StateExit.AddTransition(NFA.EPSILON, sub.StateEntry);
 			return final;
 		}
 
@@ -226,9 +218,9 @@ namespace Hime.SDK.Automata
 			if (useClones)
 				sub = sub.Clone();
 			final.states.AddRange(sub.states);
-			final.stateEntry.AddTransition(NFA.Epsilon, sub.stateEntry);
-			sub.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
-			final.stateExit.AddTransition(NFA.Epsilon, sub.stateEntry);
+			final.StateEntry.AddTransition(NFA.EPSILON, sub.StateEntry);
+			sub.StateExit.AddTransition(NFA.EPSILON, final.StateExit);
+			final.StateExit.AddTransition(NFA.EPSILON, sub.StateEntry);
 			return final;
 		}
 
@@ -236,34 +228,33 @@ namespace Hime.SDK.Automata
 		/// Creates an automaton that repeats the sub-automaton a number of times in the given range [min, max]
 		/// </summary>
 		/// <param name="sub">The sub-automaton</param>
-		/// <param name="useClones">True to completely clone the sub-automaton</param>
 		/// <param name="min">The minimum (included) number of time to repeat</param>
 		/// <param name="max">The maximum (included) number of time to repeat</param>
 		/// <returns>The new automaton</returns>
 		// TODO: should get rid of static methods
-		public static NFA NewRepeatRange(NFA sub, bool useClones, int min, int max)
+		public static NFA NewRepeatRange(NFA sub, int min, int max)
 		{
 			NFA final = NewMinimal();
 
-			NFAState last = final.stateEntry;
+			NFAState last = final.StateEntry;
 			for (int i = 0; i != min; i++)
 			{
 				NFA inner = sub.Clone();
 				final.states.AddRange(inner.states);
-				last.AddTransition(NFA.Epsilon, inner.stateEntry);
-				last = inner.stateExit;
+				last.AddTransition(NFA.EPSILON, inner.StateEntry);
+				last = inner.StateExit;
 			}
 			for (int i = min; i != max; i++)
 			{
 				NFA inner = NewOptional(sub, true);
 				final.states.AddRange(inner.states);
-				last.AddTransition(NFA.Epsilon, inner.stateEntry);
-				last = inner.stateExit;
+				last.AddTransition(NFA.EPSILON, inner.StateEntry);
+				last = inner.StateExit;
 			}
-			last.AddTransition(NFA.Epsilon, final.stateExit);
+			last.AddTransition(NFA.EPSILON, final.StateExit);
 
 			if (min == 0)
-				final.stateEntry.AddTransition(NFA.Epsilon, final.stateExit);
+				final.StateEntry.AddTransition(NFA.EPSILON, final.StateExit);
 			return final;
 		}
 
@@ -285,10 +276,10 @@ namespace Hime.SDK.Automata
 			}
 			final.states.AddRange(left.states);
 			final.states.AddRange(right.states);
-			final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
-			final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
-			left.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
-			right.stateExit.AddTransition(NFA.Epsilon, final.stateExit);
+			final.StateEntry.AddTransition(NFA.EPSILON, left.StateEntry);
+			final.StateEntry.AddTransition(NFA.EPSILON, right.StateEntry);
+			left.StateExit.AddTransition(NFA.EPSILON, final.StateExit);
+			right.StateExit.AddTransition(NFA.EPSILON, final.StateExit);
 			return final;
 		}
 
@@ -310,9 +301,9 @@ namespace Hime.SDK.Automata
 			}
 			final.states.AddRange(left.states);
 			final.states.AddRange(right.states);
-			final.stateEntry = left.stateEntry;
-			final.stateExit = right.stateExit;
-			left.stateExit.AddTransition(NFA.Epsilon, right.stateEntry);
+			final.StateEntry = left.StateEntry;
+			final.StateExit = right.StateExit;
+			left.StateExit.AddTransition(NFA.EPSILON, right.StateEntry);
 			return final;
 		}
 
@@ -339,23 +330,23 @@ namespace Hime.SDK.Automata
 			}
 			final.states.AddRange(left.states);
 			final.states.AddRange(right.states);
-			final.stateEntry.AddTransition(NFA.Epsilon, left.stateEntry);
-			final.stateEntry.AddTransition(NFA.Epsilon, right.stateEntry);
-			left.stateExit.AddTransition(NFA.Epsilon, statePositive);
-			right.stateExit.AddTransition(NFA.Epsilon, stateNegative);
-			statePositive.AddTransition(NFA.Epsilon, final.stateExit);
+			final.StateEntry.AddTransition(NFA.EPSILON, left.StateEntry);
+			final.StateEntry.AddTransition(NFA.EPSILON, right.StateEntry);
+			left.StateExit.AddTransition(NFA.EPSILON, statePositive);
+			right.StateExit.AddTransition(NFA.EPSILON, stateNegative);
+			statePositive.AddTransition(NFA.EPSILON, final.StateExit);
 
-			final.stateExit.AddItem(DummyItem.Instance);
+			final.StateExit.AddItem(DummyItem.Instance);
 			DFA equivalent = new DFA(final);
 			equivalent.Prune();
 			final = new NFA(equivalent);
-			final.stateExit = final.AddNewState();
+			final.StateExit = final.AddNewState();
 			foreach (NFAState state in final.states)
 			{
 				if (state.Items.Contains(DummyItem.Instance))
 				{
 					state.ClearItems();
-					state.AddTransition(NFA.Epsilon, final.stateExit);
+					state.AddTransition(NFA.EPSILON, final.StateExit);
 				}
 			}
 			return final;

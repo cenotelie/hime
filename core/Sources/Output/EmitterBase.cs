@@ -30,31 +30,31 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The suffix for the emitted lexer data files
 		/// </summary>
-		public const string suffixLexerData = "Lexer.bin";
+		public const string SUFFIX_LEXER_DATA = "Lexer.bin";
 		/// <summary>
 		/// The suffix for the emitted parser data files
 		/// </summary>
-		public const string suffixParserData = "Parser.bin";
+		public const string SUFFIX_PARSER_DATA = "Parser.bin";
 		/// <summary>
 		/// The suffix for the emitted debug grammar data
 		/// </summary>
-		public const string suffixDebugGrammar = "Grammar.txt";
+		public const string SUFFIX_DEBUG_GRAMMAR = "Grammar.txt";
 		/// <summary>
 		/// The suffix for the emitted debug DFA data
 		/// </summary>
-		public const string suffixDebugDFA = "DFA.dot";
+		public const string SUFFIX_DEBUG_DFA = "DFA.dot";
 		/// <summary>
 		/// The suffix for the emitted debug LR graph as text
 		/// </summary>
-		public const string suffixDebugLRAsText = "LRGraph.txt";
+		public const string SUFFIX_DEBUG_LR_AS_TEXT = "LRGraph.txt";
 		/// <summary>
 		/// The suffix for the emitted debug LR graph as DOT
 		/// </summary>
-		public const string suffixDebugLRAsDOT = "LRGraph.dot";
+		public const string SUFFIX_DEBUG_LR_AS_DOT = "LRGraph.dot";
 		/// <summary>
 		/// The default name of the assembly when it contains multiple parsers
 		/// </summary>
-		public const string defaultCompositeAssemblyName = "Parsers";
+		public const string DEFAULT_COMPOSITE_ASSEMBLY_NAME = "Parsers";
 
 		/// <summary>
 		/// Gets the suffix for the emitted lexer code files
@@ -74,11 +74,11 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The reporter
 		/// </summary>
-		protected Reporter reporter;
+		protected readonly Reporter reporter;
 		/// <summary>
 		/// The units to emit artifacts for
 		/// </summary>
-		protected List<Unit> units;
+		protected readonly List<Unit> units;
 		/// <summary>
 		/// The path for the emitted artifacts
 		/// </summary>
@@ -92,7 +92,7 @@ namespace Hime.SDK.Output
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="units">The units to emit data for</param>
-		public EmitterBase(List<Unit> units) : this(new Reporter(), units)
+		protected EmitterBase(List<Unit> units) : this(new Reporter(), units)
 		{
 		}
 
@@ -100,7 +100,7 @@ namespace Hime.SDK.Output
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		public EmitterBase(Unit unit) : this(new Reporter(), unit)
+		protected EmitterBase(Unit unit) : this(new Reporter(), unit)
 		{
 		}
 
@@ -109,7 +109,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
 		/// <param name="units">The units to emit data for</param>
-		public EmitterBase(Reporter reporter, List<Unit> units)
+		protected EmitterBase(Reporter reporter, List<Unit> units)
 		{
 			this.reporter = reporter;
 			this.units = new List<Unit>(units);
@@ -120,11 +120,11 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
 		/// <param name="unit">The unit to emit data for</param>
-		public EmitterBase(Reporter reporter, Unit unit)
+		protected EmitterBase(Reporter reporter, Unit unit)
 		{
 			this.reporter = reporter;
-			this.units = new List<Unit>();
-			this.units.Add(unit);
+			units = new List<Unit>();
+			units.Add(unit);
 		}
 
 		/// <summary>
@@ -144,7 +144,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactLexerData(Unit unit)
 		{
-			return path + unit.Name + suffixLexerData;
+			return path + unit.Name + SUFFIX_LEXER_DATA;
 		}
 
 		/// <summary>
@@ -164,7 +164,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactParserData(Unit unit)
 		{
-			return path + unit.Name + suffixParserData;
+			return path + unit.Name + SUFFIX_PARSER_DATA;
 		}
 
 		/// <summary>
@@ -175,7 +175,7 @@ namespace Hime.SDK.Output
 		{
 			if (units.Count == 1)
 				return path + units[0].Name + SuffixAssembly;
-			return path + defaultCompositeAssemblyName + SuffixAssembly;
+			return path + DEFAULT_COMPOSITE_ASSEMBLY_NAME + SuffixAssembly;
 		}
 
 		/// <summary>
@@ -185,7 +185,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugGrammar(Unit unit)
 		{
-			return path + unit.Name + suffixDebugGrammar;
+			return path + unit.Name + SUFFIX_DEBUG_GRAMMAR;
 		}
 
 		/// <summary>
@@ -195,7 +195,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugDFA(Unit unit)
 		{
-			return path + unit.Name + suffixDebugDFA;
+			return path + unit.Name + SUFFIX_DEBUG_DFA;
 		}
 
 		/// <summary>
@@ -205,7 +205,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugLRAsText(Unit unit)
 		{
-			return path + unit.Name + suffixDebugLRAsText;
+			return path + unit.Name + SUFFIX_DEBUG_LR_AS_TEXT;
 		}
 
 		/// <summary>
@@ -215,7 +215,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugLRAsDOT(Unit unit)
 		{
-			return path + unit.Name + suffixDebugLRAsDOT;
+			return path + unit.Name + SUFFIX_DEBUG_LR_AS_DOT;
 		}
 
 		/// <summary>
@@ -273,9 +273,8 @@ namespace Hime.SDK.Output
 		/// <returns><c>true</c> if this operation succeeded</returns>
 		private bool EmitBaseArtifacts(Unit unit)
 		{
-			bool ok = true;
 			// prepare the unit
-			ok = unit.Prepare(reporter);
+			bool ok = unit.Prepare(reporter);
 			if (ok) ok = unit.BuildLexerData(reporter);
 			if (ok) ok = unit.BuildParserData(reporter);
 			// output the artifacts

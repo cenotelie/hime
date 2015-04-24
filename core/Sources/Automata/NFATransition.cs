@@ -23,23 +23,21 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a transition in a Non-deterministic Finite Automaton
 	/// </summary>
-	public class NFATransition
+	public sealed class NFATransition
 	{
 		/// <summary>
 		/// The value on this transition
 		/// </summary>
-		private CharSpan span;
-
+		private readonly CharSpan span;
 		/// <summary>
 		/// The next state by this transition
 		/// </summary>
-		private NFAState next;
+		private readonly NFAState next;
 
 		/// <summary>
 		/// Gets the value on this transition
 		/// </summary>
 		public CharSpan Span { get { return span; } }
-
 		/// <summary>
 		/// Gets the next state by this transition
 		/// </summary>

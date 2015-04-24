@@ -25,12 +25,12 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a Deterministic Finite-state Automaton
 	/// </summary>
-	public class DFA
+	public sealed class DFA
 	{
 		/// <summary>
 		/// The list of states in this automaton
 		/// </summary>
-		private List<DFAState> states;
+		private readonly List<DFAState> states;
 
 		/// <summary>
 		/// Gets the states in this automaton
@@ -52,7 +52,7 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		public DFA()
 		{
-			this.states = new List<DFAState>();
+			states = new List<DFAState>();
 		}
 
 		/// <summary>

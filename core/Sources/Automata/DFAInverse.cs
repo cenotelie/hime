@@ -25,20 +25,20 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents the inverse graph of a DFA
 	/// </summary>
-	public class DFAInverse
+	public sealed class DFAInverse
 	{
 		/// <summary>
 		/// The reachable states
 		/// </summary>
-		private List<DFAState> reachable;
+		private readonly List<DFAState> reachable;
 		/// <summary>
 		/// The inverse graph data
 		/// </summary>
-		private Dictionary<DFAState, List<DFAState>> inverses;
+		private readonly Dictionary<DFAState, List<DFAState>> inverses;
 		/// <summary>
 		/// The final states
 		/// </summary>
-		private List<DFAState> finals;
+		private readonly List<DFAState> finals;
 
 		/// <summary>
 		/// Gets the reachable states of the DFA
@@ -59,9 +59,9 @@ namespace Hime.SDK.Automata
 		/// <param name="dfa">A DFA</param>
 		public DFAInverse(DFA dfa)
 		{
-			this.reachable = new List<DFAState>();
-			this.inverses = new Dictionary<DFAState, List<DFAState>>();
-			this.finals = new List<DFAState>();
+			reachable = new List<DFAState>();
+			inverses = new Dictionary<DFAState, List<DFAState>>();
+			finals = new List<DFAState>();
 
 			// transitive closure of the first state
 			reachable.Add(dfa.States[0]);

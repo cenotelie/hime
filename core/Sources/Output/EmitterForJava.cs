@@ -25,7 +25,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents an emitter of lexer and parser for a given grammar on the Java platform
 	/// </summary>
-	public class EmitterForJava : EmitterBase
+	public sealed class EmitterForJava : EmitterBase
 	{
 		/// <summary>
 		/// Gets the suffix for the emitted lexer code files
@@ -81,7 +81,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of lexer code</returns>
 		protected override Generator GetLexerCodeGenerator(Unit unit)
 		{
-			return new LexerJavaCodeGenerator(unit, unit.Name + suffixLexerData);
+			return new LexerJavaCodeGenerator(unit, unit.Name + SUFFIX_LEXER_DATA);
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserJavaCodeGenerator(unit, unit.Name + suffixParserData);
+			return new ParserJavaCodeGenerator(unit, unit.Name + SUFFIX_PARSER_DATA);
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace Hime.SDK.Output
 			CreateMavenProject();
 			// compile
 			System.PlatformID platform = System.Environment.OSVersion.Platform;
-			bool success = false;
+			bool success;
 			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
 				success = ExecuteCommand("mvn", "package");
 			else
@@ -132,10 +132,10 @@ namespace Hime.SDK.Output
 		/// <param name="origin">The directory to start from</param>
 		/// <param name="unit">The unit</param>
 		/// <returns>The resulting folder</returns>
-		private string CreateFolderFor(string origin, Unit unit)
+		private static string CreateFolderFor(string origin, Unit unit)
 		{
 			string current = origin;
-			string[] parts = unit.Namespace.Split(new char[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = unit.Namespace.Split(new [] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
 			for (int i=0; i!=parts.Length; i++)
 			{
 				current = Path.Combine(current, parts[i]);
@@ -164,8 +164,8 @@ namespace Hime.SDK.Output
 			foreach (Unit unit in units)
 			{
 				string folder = CreateFolderFor(res, unit);
-				File.Copy(GetArtifactLexerData(unit), Path.Combine(folder, unit.Name + suffixLexerData), true);
-				File.Copy(GetArtifactParserData(unit), Path.Combine(folder, unit.Name + suffixParserData), true);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(folder, unit.Name + SUFFIX_LEXER_DATA), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(folder, unit.Name + SUFFIX_PARSER_DATA), true);
 			}
 
 			// export the pom
@@ -177,7 +177,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="name">The name of the resource to export</param>
 		/// <param name="file">The file to export to</param>
-		private void ExportResource(string name, string file)
+		private static void ExportResource(string name, string file)
 		{
 			System.Reflection.Assembly assembly = (typeof(EmitterForJava)).Assembly;
 			BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream("Hime.SDK.Resources." + name));
@@ -212,7 +212,7 @@ namespace Hime.SDK.Output
 			while (true)
 			{
 				string line = process.StandardOutput.ReadLine();
-				if (line == null || line.Length == 0)
+				if (string.IsNullOrEmpty(line))
 					break;
 				if (line.StartsWith("[ERROR]"))
 				{

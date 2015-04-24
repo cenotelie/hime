@@ -25,19 +25,19 @@ namespace Hime.SDK.Automata
 	/// Represents a set of states in a Non-deterministic Finite Automaton
 	/// A state can only appear once in a set
 	/// </summary>
-	class NFAStateSet
+	sealed class NFAStateSet
 	{
 		/// <summary>
 		/// The backend storage for the states in this set
 		/// </summary>
-		private List<NFAState> backend;
+		private readonly List<NFAState> backend;
 
 		/// <summary>
 		/// Initializes this set
 		/// </summary>
 		public NFAStateSet()
 		{
-			this.backend = new List<NFAState>();
+			backend = new List<NFAState>();
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Hime.SDK.Automata
 		{
 			for (int i = 0; i != backend.Count; i++)
 				foreach (NFATransition transition in backend[i].Transitions)
-					if (transition.Span.Equals(NFA.Epsilon))
+					if (transition.Span.Equals(NFA.EPSILON))
 						Add(transition.Next);
 		}
 
@@ -96,7 +96,7 @@ namespace Hime.SDK.Automata
 			// remove the states immediately reached with epsilon from the positive state
 			if (statePositive != null && stateNegative != null)
 				foreach (NFATransition transition in statePositive.Transitions)
-					if (transition.Span.Equals(NFA.Epsilon))
+					if (transition.Span.Equals(NFA.EPSILON))
 						backend.Remove(transition.Next);
 		}
 
@@ -118,14 +118,14 @@ namespace Hime.SDK.Automata
 					for (int t1 = 0; t1 != backend[s1].Transitions.Count; t1++)
 					{
 						// If this is an ε transition, go to next transition
-						if (backend[s1].Transitions[t1].Span.Equals(NFA.Epsilon))
+						if (backend[s1].Transitions[t1].Span.Equals(NFA.EPSILON))
 							continue;
 						//Confront to each transition in each NFA state of the set
 						for (int s2 = 0; s2 != backend.Count; s2++)
 						{
 							for (int t2 = 0; t2 != backend[s2].Transitions.Count; t2++)
 							{
-								if (backend[s2].Transitions[t2].Span.Equals(NFA.Epsilon))
+								if (backend[s2].Transitions[t2].Span.Equals(NFA.EPSILON))
 									continue;
 								// If these are not the same transitions of the same state
 								if ((s1 != s2) || (t1 != t2))
@@ -179,7 +179,7 @@ namespace Hime.SDK.Automata
 				foreach (NFATransition transition in State.Transitions)
 				{
 					// If this is an ε-transition : pass
-					if (transition.Span.Equals(NFA.Epsilon))
+					if (transition.Span.Equals(NFA.EPSILON))
 						continue;
 					// Add the transition's target to set's transitions dictionnary
 					if (transitions.ContainsKey(transition.Span))
@@ -218,20 +218,17 @@ namespace Hime.SDK.Automata
 		/// <returns>True of the object is equal to this set</returns>
 		public override bool Equals(object obj)
 		{
-			if (obj is NFAStateSet)
-			{
-				NFAStateSet right = (NFAStateSet)obj;
-				if (this.backend.Count != right.backend.Count)
-					return false;
-				foreach (NFAState state in this.backend)
-				{
-					if (!right.backend.Contains(state))
-						return false;
-				}
-				return true;
-			}
-			else
+			NFAStateSet right = obj as NFAStateSet;
+			if (right == null)
 				return false;
+			if (backend.Count != right.backend.Count)
+				return false;
+			foreach (NFAState state in backend)
+			{
+				if (!right.backend.Contains(state))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>

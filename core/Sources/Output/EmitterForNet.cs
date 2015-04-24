@@ -100,7 +100,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of lexer code</returns>
 		protected override Generator GetLexerCodeGenerator(Unit unit)
 		{
-			return new LexerNetCodeGenerator(unit, unit.Name + suffixLexerData);
+			return new LexerNetCodeGenerator(unit, unit.Name + SUFFIX_LEXER_DATA);
 		}
 
 		/// <summary>
@@ -110,7 +110,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserNetCodeGenerator(unit, unit.Name + suffixParserData);
+			return new ParserNetCodeGenerator(unit, unit.Name + SUFFIX_PARSER_DATA);
 		}
 
 		/// <summary>

@@ -24,12 +24,12 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a group of DFA states within a partition
 	/// </summary>
-	public class DFAStateGroup
+	public sealed class DFAStateGroup
 	{
 		/// <summary>
 		/// The states in this group
 		/// </summary>
-		private List<DFAState> states;
+		private readonly List<DFAState> states;
 
 		/// <summary>
 		/// Gets the states in this group

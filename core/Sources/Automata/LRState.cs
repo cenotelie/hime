@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using Hime.Redist;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Automata
@@ -26,24 +25,20 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a state in an LR automaton
 	/// </summary>
-	public class LRState
+	public sealed class LRState
 	{
 		/// <summary>
 		/// The state's identifier
 		/// </summary>
-		private int id;
+		private readonly int id;
 		/// <summary>
 		/// The transitions from this state
 		/// </summary>
-		private List<LRTransition> transitions;
+		private readonly List<LRTransition> transitions;
 		/// <summary>
 		/// The reductions in this state
 		/// </summary>
-		private List<LRReduction> reductions;
-		/// <summary>
-		/// Whether this state is an accepting state
-		/// </summary>
-		private bool accept;
+		private readonly List<LRReduction> reductions;
 
 		/// <summary>
 		/// Gets this state's identifier
@@ -62,8 +57,8 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		public bool IsAccept
 		{
-			get { return accept; }
-			set { accept = value; }
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -73,8 +68,8 @@ namespace Hime.SDK.Automata
 		public LRState(int id)
 		{
 			this.id = id;
-			this.transitions = new List<LRTransition>();
-			this.reductions = new List<LRReduction>();
+			transitions = new List<LRTransition>();
+			reductions = new List<LRReduction>();
 		}
 
 		/// <summary>

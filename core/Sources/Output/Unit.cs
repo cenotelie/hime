@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.Collections.Generic;
-using System.Text;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Output
@@ -26,24 +25,24 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represent an output unit, i.e. a grammar with its compilation parameters
 	/// </summary>
-	public class Unit
+	public sealed class Unit
 	{
 		/// <summary>
 		/// The represented grammar
 		/// </summary>
-		private Grammars.Grammar grammar;
+		private readonly Grammars.Grammar grammar;
 		/// <summary>
 		/// The parsing method to use
 		/// </summary>
-		private ParsingMethod method;
+		private readonly ParsingMethod method;
 		/// <summary>
 		/// The namespace for the generated code
 		/// </summary>
-		private string nmspace;
+		private readonly string nmspace;
 		/// <summary>
 		/// The access modifier for the generated code
 		/// </summary>
-		private Modifier modifier;
+		private readonly Modifier modifier;
 		/// <summary>
 		/// The DFA to emit in a lexer
 		/// </summary>
@@ -80,7 +79,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Gets the namespace to use for the generated code
 		/// </summary>
-		public string Namespace { get { return nmspace == null ? grammar.Name : nmspace; } }
+		public string Namespace { get { return nmspace ?? grammar.Name; } }
 		/// <summary>
 		/// Gets the visibility modifier to use for the generated code
 		/// </summary>
@@ -247,7 +246,7 @@ namespace Hime.SDK.Output
 			dfa = grammar.BuildDFA();
 			// check well-formedness
 			foreach (Automata.FinalItem item in dfa.Entry.Items)
-				reporter.Error(string.Format("Terminal {0} can be an empty string, this is forbidden", item.ToString()));
+				reporter.Error(string.Format("Terminal {0} can be an empty string, this is forbidden", item));
 			if (dfa.Entry.IsFinal)
 				return false;
 			// build the expected terminals

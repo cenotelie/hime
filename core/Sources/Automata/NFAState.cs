@@ -25,16 +25,12 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a state in a Non-deterministic Finite Automaton
 	/// </summary>
-	public class NFAState : State
+	public sealed class NFAState : State
 	{
 		/// <summary>
 		/// The list of transitions
 		/// </summary>
-		private List<NFATransition> transitions;
-		/// <summary>
-		/// The watermark for this state
-		/// </summary>
-		private int mark;
+		private readonly List<NFATransition> transitions;
 
 		/// <summary>
 		/// Gets the list of transitions from this state
@@ -46,8 +42,8 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		public int Mark
 		{
-			get { return mark; }
-			set { mark = value; }
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -56,7 +52,7 @@ namespace Hime.SDK.Automata
 		public NFAState()
 		{
 			transitions = new List<NFATransition>();
-			mark = 0;
+			Mark = 0;
 		}
 
 		/// <summary>

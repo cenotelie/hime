@@ -556,7 +556,7 @@ namespace Hime.SDK.Grammars
 			{
 				Automata.NFA sub = terminal.NFA.Clone();
 				final.InsertSubNFA(sub);
-				final.StateEntry.AddTransition(Automata.NFA.Epsilon, sub.StateEntry);
+				final.StateEntry.AddTransition(Automata.NFA.EPSILON, sub.StateEntry);
 			}
 			// Construct the equivalent DFA and minimize it
 			Automata.DFA finalDFA = new Automata.DFA(final);

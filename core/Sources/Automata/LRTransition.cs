@@ -29,11 +29,11 @@ namespace Hime.SDK.Automata
 		/// <summary>
 		/// The label on this transition
 		/// </summary>
-		private Symbol label;
+		private readonly Symbol label;
 		/// <summary>
 		/// The transition's target
 		/// </summary>
-		private LRState target;
+		private readonly LRState target;
 
 		/// <summary>
 		/// Gets the label on this transition

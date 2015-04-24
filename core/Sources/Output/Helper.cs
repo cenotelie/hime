@@ -25,7 +25,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Helpers for the emitters
 	/// </summary>
-	public class Helper
+	public static class Helper
 	{
 		/// <summary>
 		/// Sanitizes the name of a symbol for output in C# code
@@ -77,7 +77,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The reserved C# keywords
 		/// </summary>
-		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new string[] { "abstract",
+		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new [] { "abstract",
 			"as",
 			"base",
 			"bool",
@@ -158,7 +158,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The reserved Java keywords
 		/// </summary>
-		private static readonly ROList<string> keywordsJava = new ROList<string>(new List<string>(new string[] { "abstract",
+		private static readonly ROList<string> keywordsJava = new ROList<string>(new List<string>(new [] { "abstract",
 			"continue",
 			"for",
 			"new",

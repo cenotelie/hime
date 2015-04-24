@@ -29,7 +29,7 @@ namespace Hime.SDK.Input
 	/// <remarks>
 	/// This class will close all the streams it is passed after loading the data from them.
 	/// </remarks>
-	public class Loader
+	public sealed class Loader
 	{
 		/// <summary>
 		/// Next unique identifier for raw (anonymous) inputs
@@ -38,19 +38,19 @@ namespace Hime.SDK.Input
 		/// <summary>
 		/// Repositories of inputs
 		/// </summary>
-		private List<KeyValuePair<string, TextReader>> inputs;
+		private readonly List<KeyValuePair<string, TextReader>> inputs;
 		/// <summary>
 		/// Repositories of pre-parsed inputs
 		/// </summary>
-		private List<KeyValuePair<ASTNode, Text>> preReadInputs;
+		private readonly List<KeyValuePair<ASTNode, Text>> preReadInputs;
 		/// <summary>
 		/// Repositories of inner loaders
 		/// </summary>
-		private Dictionary<string, Grammars.Loader> inners;
+		private readonly Dictionary<string, Grammars.Loader> inners;
 		/// <summary>
 		/// The reporter
 		/// </summary>
-		private Reporter reporter;
+		private readonly Reporter reporter;
 
 		/// <summary>
 		/// Initializes this loader
@@ -64,10 +64,10 @@ namespace Hime.SDK.Input
 		/// <param name="reporter">The reporter to use</param>
 		public Loader(Reporter reporter)
 		{
-			this.nextRawID = 0;
-			this.inputs = new List<KeyValuePair<string, TextReader>>();
-			this.preReadInputs = new List<KeyValuePair<ASTNode, Text>>();
-			this.inners = new Dictionary<string, Grammars.Loader>();
+			nextRawID = 0;
+			inputs = new List<KeyValuePair<string, TextReader>>();
+			preReadInputs = new List<KeyValuePair<ASTNode, Text>>();
+			inners = new Dictionary<string, Grammars.Loader>();
 			this.reporter = reporter;
 		}
 
@@ -192,8 +192,8 @@ namespace Hime.SDK.Input
 		{
 			reporter.Info("Reading input " + name + " ...");
 			bool hasErrors = false;
-			Input.HimeGrammarLexer lexer = new Input.HimeGrammarLexer(reader);
-			Input.HimeGrammarParser parser = new Input.HimeGrammarParser(lexer);
+			HimeGrammarLexer lexer = new HimeGrammarLexer(reader);
+			HimeGrammarParser parser = new HimeGrammarParser(lexer);
 			ParseResult result = null;
 			try
 			{

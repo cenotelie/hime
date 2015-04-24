@@ -393,7 +393,7 @@ namespace Hime.SDK.Grammars
 				int max = min;
 				if (node.Children.Count > 2)
 					max = System.Convert.ToInt32(node.Children[2].Value);
-				return Automata.NFA.NewRepeatRange(inner, false, min, max);
+				return Automata.NFA.NewRepeatRange(inner, min, max);
 			}
 			if (symbol.Name == "concat")
 			{
@@ -415,7 +415,7 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildEpsilonNFA()
 		{
 			Automata.NFA final = Automata.NFA.NewMinimal();
-			final.StateEntry.AddTransition(Automata.NFA.Epsilon, final.StateExit);
+			final.StateEntry.AddTransition(Automata.NFA.EPSILON, final.StateExit);
 			return final;
 		}
 

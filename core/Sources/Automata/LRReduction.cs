@@ -24,20 +24,20 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a reduction in a LR automaton
 	/// </summary>
-	public class LRReduction
+	public sealed class LRReduction
 	{
 		/// <summary>
 		/// The lookahead to reduce on
 		/// </summary>
-		private Symbol lookahead;
+		private readonly Symbol lookahead;
 		/// <summary>
 		/// The reduced variable
 		/// </summary>
-		private Symbol head;
+		private readonly Symbol head;
 		/// <summary>
 		/// The reduction's length
 		/// </summary>
-		private int length;
+		private readonly int length;
 
 		/// <summary>
 		/// Gets the lookahead terminal to reduce on
