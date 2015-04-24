@@ -116,7 +116,7 @@ namespace Hime.SDK.Grammars.LR
 		private Graph GetGraphLR0()
 		{
 			// Create the base LR(0) graph
-			Variable axiom = grammar.GetVariable(Grammar.generatedAxiom);
+			Variable axiom = grammar.GetVariable(Grammar.GENERATED_AXIOM);
 			ItemLR0 item = new ItemLR0(axiom.Rules[0], 0);
 			StateKernel kernel = new StateKernel();
 			kernel.AddItem(item);
@@ -135,7 +135,7 @@ namespace Hime.SDK.Grammars.LR
 		private Graph GetGraphLR1()
 		{
 			// Create the first set
-			Variable axiom = grammar.GetVariable(Grammar.generatedAxiom);
+			Variable axiom = grammar.GetVariable(Grammar.GENERATED_AXIOM);
 			ItemLR1 item = new ItemLR1(axiom.Rules[0], 0, Epsilon.Instance);
 			StateKernel kernel = new StateKernel();
 			kernel.AddItem(item);

@@ -19,7 +19,6 @@
 **********************************************************************/
 using System.Collections.Generic;
 using Hime.Redist;
-using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
 using Hime.SDK.Input;
 
@@ -28,32 +27,32 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a loader for a grammar
 	/// </summary>
-	public class Loader
+	public sealed class Loader
 	{
 		/// <summary>
 		/// The name of the resource containing the data that are loaded by this instance
 		/// </summary>
-		private string resource;
+		private readonly string resource;
 		/// <summary>
 		/// The input from which the grammar is loaded
 		/// </summary>
-		private Text input;
+		private readonly Text input;
 		/// <summary>
 		/// The root to load from
 		/// </summary>
-		private ASTNode root;
+		private readonly ASTNode root;
 		/// <summary>
 		/// The log
 		/// </summary>
-		private Reporter reporter;
+		private readonly Reporter reporter;
 		/// <summary>
 		/// Lists of the inherited grammars
 		/// </summary>
-		private List<string> inherited;
+		private readonly List<string> inherited;
 		/// <summary>
 		/// The resulting grammar
 		/// </summary>
-		private Grammar grammar;
+		private readonly Grammar grammar;
 		/// <summary>
 		/// Flag for the global casing of the grammar
 		/// </summary>
@@ -84,13 +83,13 @@ namespace Hime.SDK.Grammars
 		{
 			this.reporter = reporter;
 			this.root = root;
-			this.resource = resName;
+			resource = resName;
 			this.input = input;
-			this.inherited = new List<string>();
+			inherited = new List<string>();
 			foreach (ASTNode child in root.Children[1].Children)
 				inherited.Add(child.Value);
-			this.grammar = new Grammar(root.Children[0].Value);
-			this.caseInsensitive = false;
+			grammar = new Grammar(root.Children[0].Value);
+			caseInsensitive = false;
 			if (inherited.Count == 0)
 				LoadGrammarContent(root);
 		}
@@ -112,7 +111,7 @@ namespace Hime.SDK.Grammars
 				Loader loader = siblings[parent];
 				if (!loader.IsSolved)
 					continue;
-				this.grammar.Inherit(loader.Grammar);
+				grammar.Inherit(loader.Grammar);
 				inherited.Remove(parent);
 			}
 			if (inherited.Count == 0)
@@ -162,7 +161,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="automata">The target NFA</param>
 		/// <param name="span">The unicode span to add</param>
-		private void AddUnicodeSpanToNFA(Automata.NFA automata, UnicodeSpan span)
+		private static void AddUnicodeSpanToNFA(Automata.NFA automata, UnicodeSpan span)
 		{
 			char[] b = span.Begin.GetUTF16();
 			char[] e = span.End.GetUTF16();
@@ -354,7 +353,7 @@ namespace Hime.SDK.Grammars
 			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_SPAN_MARKER)
 				return BuildNFAFromUnicodeSpan(node);
 			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_ANY)
-				return BuildNFAFromAny(node);
+				return BuildNFAFromAny();
 
 			if (symbol.ID == HimeGrammarLexer.ID.NAME)
 				return BuildNFAFromReference(node);
@@ -412,7 +411,7 @@ namespace Hime.SDK.Grammars
 		/// Builds a NFA that does nothing
 		/// </summary>
 		/// <returns>A NFA</returns>
-		private Automata.NFA BuildEpsilonNFA()
+		private static Automata.NFA BuildEpsilonNFA()
 		{
 			Automata.NFA final = Automata.NFA.NewMinimal();
 			final.StateEntry.AddTransition(Automata.NFA.EPSILON, final.StateExit);
@@ -638,10 +637,8 @@ namespace Hime.SDK.Grammars
 		private Automata.NFA BuildNFAFromUnicodeSpan(ASTNode node)
 		{
 			// extract the values
-			int spanBegin = 0;
-			int spanEnd = 0;
-			spanBegin = System.Convert.ToInt32(node.Children[0].Value.Substring(2), 16);
-			spanEnd = System.Convert.ToInt32(node.Children[1].Value.Substring(2), 16);
+			int spanBegin = System.Convert.ToInt32(node.Children[0].Value.Substring(2), 16);
+			int spanEnd = System.Convert.ToInt32(node.Children[1].Value.Substring(2), 16);
 			if (spanBegin > spanEnd)
 			{
 				OnError(node.Position, "Invalid unicode character span, the end is before the beginning");
@@ -656,9 +653,8 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Builds a NFA that matches everything (a single character)
 		/// </summary>
-		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromAny(ASTNode node)
+		private static Automata.NFA BuildNFAFromAny()
 		{
 			Automata.NFA automata = Automata.NFA.NewMinimal();
 			// plane 0 transitions
@@ -705,9 +701,8 @@ namespace Hime.SDK.Grammars
 				if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_simple)
 				{
 					string name = child.Children[0].Value;
-					Variable var = grammar.GetVariable(name);
-					if (var == null)
-						var = grammar.AddVariable(name);
+					if (grammar.GetVariable(name) == null)
+						grammar.AddVariable(name);
 				}
 				else if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_template)
 					context.AddTemplateRule(grammar.AddTemplateRule(child));
@@ -846,9 +841,7 @@ namespace Hime.SDK.Grammars
 		{
 			RuleBodySet set = new RuleBodySet();
 			string name = node.Children[0].Value;
-			Action action = grammar.GetAction(name);
-			if (action == null)
-				action = grammar.AddAction(name);
+			Action action = grammar.GetAction(name) ?? grammar.AddAction(name);
 			set.Add(new RuleBody(action));
 			return set;
 		}
@@ -863,9 +856,7 @@ namespace Hime.SDK.Grammars
 			RuleBodySet set = new RuleBodySet();
 			string name = node.Children[0].Value;
 			name = ReplaceEscapees(name.Substring(1, name.Length - 2));
-			Virtual vir = grammar.GetVirtual(name);
-			if (vir == null)
-				vir = grammar.AddVirtual(name);
+			Virtual vir = grammar.GetVirtual(name) ?? grammar.AddVirtual(name);
 			set.Add(new RuleBody(vir));
 			return set;
 		}

@@ -142,7 +142,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t{");
 			foreach (Grammars.Variable var in grammar.Variables)
 			{
-				if (var.Name.StartsWith(Grammars.Grammar.prefixGeneratedVariable))
+				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The unique identifier for variable " + var.Name);

@@ -128,7 +128,7 @@ namespace Hime.SDK.Output
 			for (int i = 2; i != terminals.Count; i++)
 			{
 				Terminal terminal = terminals[i];
-				if (terminal.Name.StartsWith(Grammar.prefixGeneratedTerminal))
+				if (terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				writer.WriteLine("        /**");
 				writer.WriteLine("         * The unique identifier for terminal " + terminal.Name);

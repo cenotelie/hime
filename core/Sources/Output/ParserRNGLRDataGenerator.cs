@@ -141,7 +141,7 @@ namespace Hime.SDK.Output
 
 			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
 
-			writer.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammars.Grammar.optionAxiom))));
+			writer.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammars.Grammar.OPTION_AXIOM))));
 			writer.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
 			writer.Write((ushort)graph.States.Count);                   // Nb or rows
 			writer.Write(total);                   						// Nb of actions

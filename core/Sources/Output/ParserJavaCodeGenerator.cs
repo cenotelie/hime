@@ -148,7 +148,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("    public static class ID {");
 			foreach (Grammars.Variable var in grammar.Variables)
 			{
-				if (var.Name.StartsWith(Grammars.Grammar.prefixGeneratedVariable))
+				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for variable " + var.Name);

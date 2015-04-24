@@ -24,20 +24,20 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the context of a loader
 	/// </summary>
-	public class Context
+	public sealed class Context
 	{
 		/// <summary>
 		/// The loader
 		/// </summary>
-		private Loader loader;
+		private readonly Loader loader;
 		/// <summary>
 		/// The current template rules
 		/// </summary>
-		private List<TemplateRule> templateRules;
+		private readonly List<TemplateRule> templateRules;
 		/// <summary>
 		/// The binding of template parameters to their value
 		/// </summary>
-		private Dictionary<string, Symbol> references;
+		private readonly Dictionary<string, Symbol> references;
 
 		/// <summary>
 		/// Gets the loader to which this context is associated
@@ -51,8 +51,8 @@ namespace Hime.SDK.Grammars
 		public Context(Loader loader)
 		{
 			this.loader = loader;
-			this.templateRules = new List<TemplateRule>();
-			this.references = new Dictionary<string, Symbol>();
+			templateRules = new List<TemplateRule>();
+			references = new Dictionary<string, Symbol>();
 		}
 
 		/// <summary>
@@ -132,9 +132,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The bound value</returns>
 		public Symbol GetBinding(string name)
 		{
-			if (references.ContainsKey(name))
-				return references[name];
-			return null;
+			return references.ContainsKey(name) ? references [name] : null;
 		}
 	}
 }

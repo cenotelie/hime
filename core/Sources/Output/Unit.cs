@@ -185,7 +185,7 @@ namespace Hime.SDK.Output
 		/// <returns><c>true</c> if the operation succeeded</returns>
 		private bool BuildSeparator(Reporter reporter)
 		{
-			string name = grammar.GetOption(Grammars.Grammar.optionSeparator);
+			string name = grammar.GetOption(Grammars.Grammar.OPTION_SEPARATOR);
 			if (name == null)
 			{
 				// no separator defined ... this is ok

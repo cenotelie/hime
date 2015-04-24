@@ -25,12 +25,12 @@ namespace Hime.SDK.Grammars
 	/// Represents a phrase that can be produced by grammar.
 	/// It is essentially a list of terminals
 	/// </summary>
-	public class Phrase : IEnumerable<Terminal>
+	public sealed class Phrase : IEnumerable<Terminal>
 	{
 		/// <summary>
 		/// The content
 		/// </summary>
-		protected List<Terminal> content;
+		private readonly List<Terminal> content;
 
 		/// <summary>
 		/// Gets the length of this phrase
@@ -47,7 +47,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		public Phrase()
 		{
-			this.content = new List<Terminal>();
+			content = new List<Terminal>();
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="copied">The phrase to copy</param>
 		public Phrase(Phrase copied)
 		{
-			this.content = new List<Terminal>(copied.content);
+			content = new List<Terminal>(copied.content);
 		}
 
 		/// <summary>

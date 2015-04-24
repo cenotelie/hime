@@ -25,38 +25,38 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a grammar
 	/// </summary>
-	public class Grammar
+	public sealed class Grammar
 	{
 		/// <summary>
 		/// The prefix for the generated terminal names
 		/// </summary>
-		public const string prefixGeneratedTerminal = "_gen_T";
+		public const string PREFIX_GENERATED_TERMINAL = "_gen_T";
 		/// <summary>
 		/// The prefix for the generated variable names
 		/// </summary>
-		public const string prefixGeneratedVariable = "_gen_V";
+		public const string PREFIX_GENERATED_VARIABLE = "_gen_V";
 		/// <summary>
 		/// The name of the generated axiom variable
 		/// </summary>
-		public const string generatedAxiom = "_Axiom_";
+		public const string GENERATED_AXIOM = "_Axiom_";
 		/// <summary>
 		/// Name of the grammar option specifying the grammar's axiom variable
 		/// </summary>
-		public const string optionAxiom = "Axiom";
+		public const string OPTION_AXIOM = "Axiom";
 		/// <summary>
 		/// Name of the grammar option specifying the grammar's separator terminal
 		/// </summary>
-		public const string optionSeparator = "Separator";
+		public const string OPTION_SEPARATOR = "Separator";
 
 		/// <summary>
 		/// The counter for the generation of unique names across multiple grammars
 		/// </summary>
-		private static int unique = 0;
+		private static int unique;
 
 		/// <summary>
 		/// The grammar's name
 		/// </summary>
-		private string name;
+		private readonly string name;
 		/// <summary>
 		/// The next unique symbol identifier for this grammar
 		/// </summary>
@@ -64,31 +64,31 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The grammar's options
 		/// </summary>
-		private Dictionary<string, string> options;
+		private readonly Dictionary<string, string> options;
 		/// <summary>
 		/// The grammar's terminals, by name
 		/// </summary>
-		private Dictionary<string, Terminal> terminalsByName;
+		private readonly Dictionary<string, Terminal> terminalsByName;
 		/// <summary>
 		/// The grammar's terminals, by value
 		/// </summary>
-		private Dictionary<string, Terminal> terminalsByValue;
+		private readonly Dictionary<string, Terminal> terminalsByValue;
 		/// <summary>
 		/// The grammar's variables
 		/// </summary>
-		private Dictionary<string, Variable> variables;
+		private readonly Dictionary<string, Variable> variables;
 		/// <summary>
 		/// The grammar's virtual symbols
 		/// </summary>
-		private Dictionary<string, Virtual> virtuals;
+		private readonly Dictionary<string, Virtual> virtuals;
 		/// <summary>
 		/// The grammar's action symbols
 		/// </summary>
-		private Dictionary<string, Action> actions;
+		private readonly Dictionary<string, Action> actions;
 		/// <summary>
 		/// The grammar's template rules
 		/// </summary>
-		private List<TemplateRule> templateRules;
+		private readonly List<TemplateRule> templateRules;
 
 		/// <summary>
 		/// Gets the grammar's name
@@ -138,22 +138,22 @@ namespace Hime.SDK.Grammars
 		/// <param name="name">The grammar's name</param>
 		public Grammar(string name)
 		{
-			this.options = new Dictionary<string, string>();
-			this.terminalsByName = new Dictionary<string, Terminal>();
-			this.terminalsByValue = new Dictionary<string, Terminal>();
-			this.variables = new Dictionary<string, Variable>();
-			this.virtuals = new Dictionary<string, Virtual>();
-			this.actions = new Dictionary<string, Action>();
-			this.templateRules = new List<TemplateRule>();
+			options = new Dictionary<string, string>();
+			terminalsByName = new Dictionary<string, Terminal>();
+			terminalsByValue = new Dictionary<string, Terminal>();
+			variables = new Dictionary<string, Variable>();
+			virtuals = new Dictionary<string, Virtual>();
+			actions = new Dictionary<string, Action>();
+			templateRules = new List<TemplateRule>();
 			this.name = name;
-			this.nextSID = 3;
+			nextSID = 3;
 		}
 
 		/// <summary>
 		/// Generates a unique identifier
 		/// </summary>
 		/// <returns>A unique identifier</returns>
-		protected string GenerateID()
+		private static string GenerateID()
 		{
 			return (unique++).ToString("X4");
 		}
@@ -178,9 +178,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The option's value, or <c>null</c> if the option is not set</returns>
 		public string GetOption(string name)
 		{
-			if (options.ContainsKey(name))
-				return options[name];
-			return null;
+			return options.ContainsKey(name) ? options[name] : null;
 		}
 
 		/// <summary>
@@ -209,7 +207,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The new terminal</returns>
 		public Terminal AddTerminalAnon(string value, Automata.NFA nfa)
 		{
-			string name = prefixGeneratedTerminal + GenerateID();
+			string name = PREFIX_GENERATED_TERMINAL + GenerateID();
 			return AddTerminal(name, value, nfa, null);
 		}
 
@@ -249,9 +247,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The corresponding terminal, or <c>null</c> if it does not exists</returns>
 		public Terminal GetTerminalByName(string name)
 		{
-			if (!terminalsByName.ContainsKey(name))
-				return null;
-			return terminalsByName[name];
+			return !terminalsByName.ContainsKey(name) ? null : terminalsByName[name];
 		}
 
 		/// <summary>
@@ -261,9 +257,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The corresponding terminal, or <c>null</c> if it does not exists</returns>
 		public Terminal GetTerminalByValue(string value)
 		{
-			if (!terminalsByValue.ContainsKey(value))
-				return null;
-			return terminalsByValue[value];
+			return !terminalsByValue.ContainsKey(value) ? null : terminalsByValue[value];
 		}
 
 		/// <summary>
@@ -272,8 +266,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>A new variable</returns>
 		public Variable GenerateVariable()
 		{
-			string name = prefixGeneratedVariable + nextSID;
-			return AddVariable(name);
+			return AddVariable(PREFIX_GENERATED_VARIABLE + nextSID);
 		}
 
 		/// <summary>
@@ -298,9 +291,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The corresponding variable, or <c>null</c> if it does not exists</returns>
 		public Variable GetVariable(string name)
 		{
-			if (!variables.ContainsKey(name))
-				return null;
-			return variables[name];
+			return !variables.ContainsKey(name) ? null : variables[name];
 		}
 
 		/// <summary>
@@ -325,9 +316,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The corresponding virtual, or <c>null</c> if it does not exists</returns>
 		public Virtual GetVirtual(string name)
 		{
-			if (!virtuals.ContainsKey(name))
-				return null;
-			return virtuals[name];
+			return !virtuals.ContainsKey(name) ? null : virtuals[name];
 		}
 
 		/// <summary>
@@ -352,9 +341,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The corresponding action, or <c>null</c> if it does not exists</returns>
 		public Action GetAction(string name)
 		{
-			if (!actions.ContainsKey(name))
-				return null;
-			return actions[name];
+			return !actions.ContainsKey(name) ? null : actions[name];
 		}
 
 		/// <summary>
@@ -375,7 +362,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="parent">The parent's grammar</param>
 		public void Inherit(Grammar parent)
 		{
-			bool doClone = (this.nextSID == 3);
+			bool doClone = (nextSID == 3);
 			InheritOptions(parent);
 			InheritTerminals(parent, doClone);
 			InheritVirtuals(parent, doClone);
@@ -384,16 +371,16 @@ namespace Hime.SDK.Grammars
 			InheritTemplateRules(parent);
 			if (doClone)
 			{
-				foreach (Terminal terminal in this.terminalsByName.Values)
+				foreach (Terminal terminal in terminalsByName.Values)
 					if (terminal.ID > nextSID)
 						nextSID = terminal.ID;
-				foreach (Variable variable in this.variables.Values)
+				foreach (Variable variable in variables.Values)
 					if (variable.ID > nextSID)
 						nextSID = variable.ID;
-				foreach (Virtual virt in this.virtuals.Values)
+				foreach (Virtual virt in virtuals.Values)
 					if (virt.ID > nextSID)
 						nextSID = virt.ID;
-				foreach (Action action in this.actions.Values)
+				foreach (Action action in actions.Values)
 					if (action.ID > nextSID)
 						nextSID = action.ID;
 				nextSID += 1;
@@ -404,7 +391,7 @@ namespace Hime.SDK.Grammars
 		/// Inherits the options from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
-		protected void InheritOptions(Grammar parent)
+		private void InheritOptions(Grammar parent)
 		{
 			foreach (string option in parent.Options)
 				AddOption(option, parent.GetOption(option));
@@ -415,7 +402,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
 		/// <param name="doClone">Clone the symbols</param>
-		protected void InheritTerminals(Grammar parent, bool doClone)
+		private void InheritTerminals(Grammar parent, bool doClone)
 		{
 			List<Terminal> inherited = new List<Terminal>(parent.terminalsByName.Values);
 			inherited.Sort(new Terminal.PriorityComparer());
@@ -435,8 +422,8 @@ namespace Hime.SDK.Grammars
 				{
 					Terminal clone = new Terminal(terminal.ID, terminal.Name, terminal.Value, terminal.NFA.Clone(false), terminal.Context);
 					clone.NFA.StateExit.AddItem(clone);
-					this.terminalsByName.Add(clone.Name, terminal);
-					this.terminalsByValue.Add(clone.Value, terminal);
+					terminalsByName.Add(clone.Name, terminal);
+					terminalsByValue.Add(clone.Value, terminal);
 				}
 				else
 				{
@@ -451,14 +438,14 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
 		/// <param name="doClone">Clone the symbols</param>
-		protected void InheritVariables(Grammar parent, bool doClone)
+		private void InheritVariables(Grammar parent, bool doClone)
 		{
 			foreach (Variable variable in parent.Variables)
 			{
 				if (doClone)
 				{
 					Variable clone = new Variable(variable.ID, variable.Name);
-					this.variables.Add(clone.Name, clone);
+					variables.Add(clone.Name, clone);
 				}
 				else
 				{
@@ -495,14 +482,14 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
 		/// <param name="doClone">Clone the symbols</param>
-		protected void InheritVirtuals(Grammar parent, bool doClone)
+		private void InheritVirtuals(Grammar parent, bool doClone)
 		{
 			foreach (Virtual vir in parent.Virtuals)
 			{
 				if (doClone)
 				{
 					Virtual clone = new Virtual(vir.ID, vir.Name);
-					this.virtuals.Add(clone.Name, clone);
+					virtuals.Add(clone.Name, clone);
 				}
 				else
 				{
@@ -517,14 +504,14 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
 		/// <param name="doClone">Clone the symbols</param>
-		protected void InheritActions(Grammar parent, bool doClone)
+		private void InheritActions(Grammar parent, bool doClone)
 		{
 			foreach (Action action in parent.Actions)
 			{
 				if (doClone)
 				{
 					Action clone = new Action(action.ID, action.Name);
-					this.actions.Add(clone.Name, clone);
+					actions.Add(clone.Name, clone);
 				}
 				else
 				{
@@ -538,7 +525,7 @@ namespace Hime.SDK.Grammars
 		/// Inherits the template rules from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
-		protected void InheritTemplateRules(Grammar parent)
+		private void InheritTemplateRules(Grammar parent)
 		{
 			foreach (TemplateRule tRule in parent.TemplateRules)
 				templateRules.Add(new TemplateRule(tRule, this));
@@ -590,15 +577,15 @@ namespace Hime.SDK.Grammars
 		private string AddRealAxiom()
 		{
 			// Search for Axiom option
-			if (!options.ContainsKey(optionAxiom))
+			if (!options.ContainsKey(OPTION_AXIOM))
 				return "No axiom variable has been defined for grammar " + this.name;
 			// Search for the variable specified as the Axiom
-			string name = options[optionAxiom];
+			string name = options[OPTION_AXIOM];
 			if (!variables.ContainsKey(name))
 				return "The specified axiom variable " + name + " is undefined";
 
 			// Create the real axiom rule variable and rule
-			Variable axiom = AddVariable(generatedAxiom);
+			Variable axiom = AddVariable(GENERATED_AXIOM);
 			List<RuleBodyElement> parts = new List<RuleBodyElement>();
 			parts.Add(new RuleBodyElement(variables[name], Hime.Redist.TreeAction.Promote));
 			parts.Add(new RuleBodyElement(Dollar.Instance, Hime.Redist.TreeAction.Drop));
@@ -617,8 +604,7 @@ namespace Hime.SDK.Grammars
 			{
 				mod = false;
 				foreach (Variable var in variables.Values)
-					if (var.ComputeFirsts())
-						mod = true;
+					mod |= var.ComputeFirsts ();
 			}
 		}
 
@@ -636,8 +622,7 @@ namespace Hime.SDK.Grammars
 			{
 				mod = false;
 				foreach (Variable var in variables.Values)
-					if (var.ComputeFollowers_Step23())
-						mod = true;
+					mod |= var.ComputeFollowers_Step23 ();
 			}
 		}
 	}
