@@ -30,7 +30,7 @@ namespace Hime.SDK
 		/// <summary>
 		/// The resulting report
 		/// </summary>
-		private Report report;
+		private readonly Report report;
 
 		/// <summary>
 		/// Gets the current report

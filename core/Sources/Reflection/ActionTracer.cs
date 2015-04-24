@@ -26,16 +26,16 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Represents a tracer of the execution of the semantic actions in a parser
 	/// </summary>
-	public class ActionTracer
+	public sealed class ActionTracer
 	{
 		/// <summary>
 		/// The semantic actions
 		/// </summary>
-		private Dictionary<string, SemanticAction> actions;
+		private readonly Dictionary<string, SemanticAction> actions;
 		/// <summary>
 		/// The produced trace as a list of indices in the list of names
 		/// </summary>
-		private List<string> trace;
+		private readonly List<string> trace;
 
 		/// <summary>
 		/// Gets the produced trace as a list of semantic actions' names
@@ -53,11 +53,11 @@ namespace Hime.SDK.Reflection
 		/// <param name="parserType">The parser's type</param>
 		public ActionTracer(System.Type parserType)
 		{
-			this.actions = new Dictionary<string, SemanticAction>();
-			this.trace = new List<string>();
+			actions = new Dictionary<string, SemanticAction>();
+			trace = new List<string>();
 			System.Type innerType = parserType.GetNestedType("Actions");
-			System.Type typeSymbol = typeof(Hime.Redist.Symbol);
-			System.Type typeBody = typeof(Hime.Redist.SemanticBody);
+			System.Type typeSymbol = typeof(Symbol);
+			System.Type typeBody = typeof(SemanticBody);
 			foreach (System.Reflection.MethodInfo method in innerType.GetMethods())
 			{
 				System.Reflection.ParameterInfo[] parameters = method.GetParameters();
@@ -68,8 +68,8 @@ namespace Hime.SDK.Reflection
 				if (parameters[1].ParameterType != typeBody)
 					continue;
 				string name = method.Name;
-				TracingAction<string> action = new TracingAction<string>(this.trace, name);
-				this.actions.Add(name, new SemanticAction(action.Callback));
+				TracingAction<string> action = new TracingAction<string>(trace, name);
+				actions.Add(name, new SemanticAction(action.Callback));
 			}
 		}
 	}

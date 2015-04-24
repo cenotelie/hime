@@ -84,12 +84,12 @@ namespace Hime.SDK
 		/// <param name="reporter">The reported to use</param>
 		public CompilationTask(Reporter reporter)
 		{
-			this.Mode = Output.Mode.Source;
-			this.Target = Output.Runtime.Net;
-			this.Method = ParsingMethod.LALR1;
-			this.CodeAccess = Output.Modifier.Internal;
+			Mode = Output.Mode.Source;
+			Target = Output.Runtime.Net;
+			Method = ParsingMethod.LALR1;
+			CodeAccess = Output.Modifier.Internal;
 			this.reporter = reporter;
-			this.loader = new Input.Loader(this.reporter);
+			loader = new Input.Loader(this.reporter);
 		}
 
 		/// <summary>
@@ -208,7 +208,7 @@ namespace Hime.SDK
 					emitter = new Output.EmitterForJava(reporter, units);
 					break;
 			}
-			bool success = emitter.Emit((OutputPath != null) ? OutputPath : "", Mode);
+			bool success = emitter.Emit (OutputPath ?? "", Mode);
 			if (!success)
 				reporter.Error("Failed to emit some output");
 		}

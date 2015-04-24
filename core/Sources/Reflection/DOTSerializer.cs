@@ -17,8 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Hime.SDK.Reflection
@@ -26,12 +24,12 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Serializes graphs in the DOT format
 	/// </summary>
-	public class DOTSerializer
+	public sealed class DOTSerializer
 	{
 		/// <summary>
 		/// The writer
 		/// </summary>
-		private StreamWriter writer;
+		private readonly StreamWriter writer;
 
 		/// <summary>
 		/// Initializes a new instance of the serializer
@@ -40,7 +38,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to serialize to</param>
 		public DOTSerializer(string name, string file)
 		{
-			writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
+			writer = new StreamWriter(file, false, System.Text.Encoding.UTF8);
 			writer.WriteLine("digraph " + name + " {");
 		}
 
@@ -50,7 +48,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="id">Node's ID</param>
 		public void WriteNode(string id)
 		{
-			this.WriteNode(id, id);
+			WriteNode(id, id);
 		}
 
 		/// <summary>
@@ -81,7 +79,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="shape">Node's shape</param>
 		public void WriteNode(string id, string label, DOTNodeShape shape)
 		{
-			writer.WriteLine("    " + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape.ToString() + "];");
+			writer.WriteLine("    " + id + " [label=\"" + SanitizeString(label) + "\",shape=" + shape + "];");
 		}
 
 		/// <summary>
@@ -114,7 +112,7 @@ namespace Hime.SDK.Reflection
 				builder.Append(" }");
 			}
 			builder.Append(" }\", shape=\"record\"];");
-			writer.WriteLine(builder.ToString());
+			writer.WriteLine(builder);
 		}
 
 		/// <summary>
@@ -129,7 +127,7 @@ namespace Hime.SDK.Reflection
 		/// <summary>
 		/// Sanitizes the given string for the DOT format
 		/// </summary>
-		private string SanitizeString(string original)
+		private static string SanitizeString(string original)
 		{
 			return original.Replace("\"", "\\\"").Replace("\\", "\\\\");
 		}

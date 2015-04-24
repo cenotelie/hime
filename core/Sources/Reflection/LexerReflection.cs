@@ -29,7 +29,7 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Utilities to decompile a lexer produced by Central Dogma
 	/// </summary>
-	public class LexerReflection
+	public sealed class LexerReflection
 	{
 		/// <summary>
 		/// List of the terminals that can be matched
@@ -55,9 +55,8 @@ namespace Hime.SDK.Reflection
 		/// <param name="lexerType">The lexer's type</param>
 		public LexerReflection(System.Type lexerType)
 		{
-			string input = "";
-			ConstructorInfo ctor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
-			BaseLexer lexer = ctor.Invoke(new object[] { input }) as BaseLexer;
+			ConstructorInfo ctor = lexerType.GetConstructor(new [] { typeof(string) });
+			BaseLexer lexer = ctor.Invoke(new object[] { "" }) as BaseLexer;
 
 			string[] resources = lexerType.Assembly.GetManifestResourceNames();
 			Stream stream = null;
@@ -71,7 +70,7 @@ namespace Hime.SDK.Reflection
 			}
 
 			BinaryReader reader = new BinaryReader(stream);
-			Hime.Redist.Lexer.Automaton automaton = new Hime.Redist.Lexer.Automaton(reader);
+			Automaton automaton = new Automaton(reader);
 			reader.Close();
 
 			LoadTerminals(lexer);

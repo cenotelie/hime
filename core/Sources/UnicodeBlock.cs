@@ -17,25 +17,22 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
-using Hime.SDK.Automata;
 
 namespace Hime.SDK
 {
 	/// <summary>
 	/// Represents a Unicode block of characters
 	/// </summary>
-	public class UnicodeBlock
+	public sealed class UnicodeBlock
 	{
 		/// <summary>
 		/// The block's name
 		/// </summary>
-		private string name;
-
+		private readonly string name;
 		/// <summary>
 		/// The block's character span
 		/// </summary>
-		private UnicodeSpan span;
+		private readonly UnicodeSpan span;
 
 		/// <summary>
 		/// Get this block's name
@@ -56,7 +53,7 @@ namespace Hime.SDK
 		public UnicodeBlock(string name, int begin, int end)
 		{
 			this.name = name;
-			this.span = new UnicodeSpan(begin, end);
+			span = new UnicodeSpan(begin, end);
 		}
 
 		/// <summary>
@@ -65,7 +62,7 @@ namespace Hime.SDK
 		/// <returns>The string representation</returns>
 		public override string ToString()
 		{
-			return name + " " + span.ToString();
+			return name + " " + span;
 		}
 	}
 }

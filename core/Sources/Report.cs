@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -31,15 +30,15 @@ namespace Hime.SDK
 		/// <summary>
 		/// The list of info messages in this report
 		/// </summary>
-		private List<object> infos;
+		private readonly List<object> infos;
 		/// <summary>
 		/// The list of warnings in this report
 		/// </summary>
-		private List<object> warnings;
+		private readonly List<object> warnings;
 		/// <summary>
 		/// The list of errors in this report
 		/// </summary>
-		private List<object> errors;
+		private readonly List<object> errors;
 
 		/// <summary>
 		/// Gets the informational entries in this report
@@ -59,9 +58,9 @@ namespace Hime.SDK
 		/// </summary>
 		public Report()
 		{
-			this.infos = new List<object>();
-			this.warnings = new List<object>();
-			this.errors = new List<object>();
+			infos = new List<object>();
+			warnings = new List<object>();
+			errors = new List<object>();
 		}
 
 		/// <summary>

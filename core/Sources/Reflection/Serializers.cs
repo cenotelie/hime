@@ -37,7 +37,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to export to</param>
 		public static void Export(Grammars.Grammar grammar, string file)
 		{
-			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
+			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, Encoding.UTF8);
 			writer.WriteLine("Name: {0}", grammar.Name);
 			writer.WriteLine("Options:");
 			foreach (string option in grammar.Options)
@@ -45,37 +45,26 @@ namespace Hime.SDK.Reflection
 
 			writer.WriteLine("Terminals:");
 			List<Grammars.Terminal> terminals = new List<Grammars.Terminal>(grammar.Terminals);
-			terminals.Sort(new System.Comparison<Grammars.Terminal>(CompareTerminal));
+			terminals.Sort(new System.Comparison<Grammars.Terminal>(CompareSymbol));
 			foreach (Grammars.Terminal terminal in terminals)
-				writer.WriteLine("\t{0} = {1}", terminal.Name, terminal.ToString());
+				writer.WriteLine("\t{0} = {1}", terminal.Name, terminal);
 
 			writer.WriteLine("Rules:");
 			List<Grammars.Variable> variables = new List<Grammars.Variable>(grammar.Variables);
-			variables.Sort(new System.Comparison<Grammars.Variable>(CompareVariable));
+			variables.Sort(new System.Comparison<Grammars.Variable>(CompareSymbol));
 			foreach (Grammars.Variable variable in variables)
 				foreach (Grammars.Rule rule in variable.Rules)
-					writer.WriteLine("\t{0}", rule.ToString());
+					writer.WriteLine("\t{0}", rule);
 			writer.Close();
 		}
 
 		/// <summary>
-		/// Compares two terminals by name
+		/// Compares two symbols by name
 		/// </summary>
-		/// <param name="t1">Terminal one</param>
-		/// <param name="t2">Terminal two</param>
+		/// <param name="t1">Symbol one</param>
+		/// <param name="t2">Symbol two</param>
 		/// <returns>The ordinal comparison</returns>
-		private static int CompareTerminal(Grammars.Terminal t1, Grammars.Terminal t2)
-		{
-			return t1.Name.CompareTo(t2.Name);
-		}
-
-		/// <summary>
-		/// Compares two variables by name
-		/// </summary>
-		/// <param name="t1">Variable one</param>
-		/// <param name="t2">Variable two</param>
-		/// <returns>The ordinal comparison</returns>
-		private static int CompareVariable(Grammars.Variable t1, Grammars.Variable t2)
+		private static int CompareSymbol(Grammars.Symbol t1, Grammars.Symbol t2)
 		{
 			return t1.Name.CompareTo(t2.Name);
 		}
@@ -87,7 +76,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to export to</param>
 		public static void Export(Grammars.LR.Graph graph, string file)
 		{
-			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
+			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, Encoding.UTF8);
 			foreach (Grammars.LR.State state in graph.States)
 				ExportLRState(writer, state);
 			writer.Close();
@@ -98,13 +87,13 @@ namespace Hime.SDK.Reflection
 		/// </summary>
 		/// <param name="writer">The writer to export with</param>
 		/// <param name="state">The LR state to export</param>
-		private static void ExportLRState(System.IO.StreamWriter writer, Grammars.LR.State state)
+		private static void ExportLRState(System.IO.TextWriter writer, Grammars.LR.State state)
 		{
 			writer.WriteLine();
-			writer.WriteLine("State {0}:", state.ID.ToString());
+			writer.WriteLine("State {0}:", state.ID);
 			writer.WriteLine("\tTransitions:");
 			foreach (Grammars.Symbol symbol in state.Transitions)
-				writer.WriteLine("\t\tOn {0} shift to {1}", symbol.ToString(), state.GetChildBy(symbol).ID.ToString());
+				writer.WriteLine("\t\tOn {0} shift to {1}", symbol, state.GetChildBy(symbol).ID);
 			writer.WriteLine("\tItems:");
 			foreach (Grammars.LR.Item item in state.Items)
 				writer.WriteLine("\t\t" + item.ToString(true));
@@ -118,15 +107,15 @@ namespace Hime.SDK.Reflection
 		/// </summary>
 		/// <param name="writer">The writer to export with</param>
 		/// <param name="conflict">The LR conflict to export</param>
-		private static void ExportLRConflict(System.IO.StreamWriter writer, Grammars.LR.Conflict conflict)
+		private static void ExportLRConflict(System.IO.TextWriter writer, Grammars.LR.Conflict conflict)
 		{
 			writer.WriteLine("\t\tConflict {0} on {1}:", conflict.ConflictType, conflict.ConflictSymbol);
 			writer.WriteLine("\t\t\tItems:");
 			foreach (Grammars.LR.Item item in conflict.Items)
-				writer.WriteLine("\t\t\t\t" + item.ToString());
+				writer.WriteLine("\t\t\t\t" + item);
 			writer.WriteLine("\t\t\tExamples:");
 			foreach (Grammars.Phrase example in conflict.Examples)
-				writer.WriteLine("\t\t\t\t" + example.ToString());
+				writer.WriteLine("\t\t\t\t" + example);
 		}
 
 		/// <summary>
@@ -136,7 +125,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to export to</param>
 		public static void Export(ASTNode root, string file)
 		{
-			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, System.Text.Encoding.UTF8);
+			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, Encoding.UTF8);
 			ExportNode(writer, "", root);
 			writer.Close();
 		}
@@ -149,8 +138,8 @@ namespace Hime.SDK.Reflection
 		/// <param name="node">The node to serialize</param>
 		private static void ExportNode(System.IO.StreamWriter writer, string tab, ASTNode node)
 		{
-			writer.WriteLine(tab + node.ToString());
-			foreach (Hime.Redist.ASTNode child in node.Children)
+			writer.WriteLine(tab + node);
+			foreach (ASTNode child in node.Children)
 				ExportNode(writer, tab + "\t", child);
 		}
 
@@ -209,16 +198,16 @@ namespace Hime.SDK.Reflection
 							builder.Append(", ");
 						builder.Append(items[i].ToString());
 					}
-					serializer.WriteNode("state" + state.ID.ToString(), builder.ToString(), DOTNodeShape.doubleoctagon);
+					serializer.WriteNode("state" + state.ID, builder.ToString(), DOTNodeShape.doubleoctagon);
 				}
 				else
 				{
-					serializer.WriteNode("state" + state.ID.ToString(), state.ID.ToString());
+					serializer.WriteNode("state" + state.ID, state.ID.ToString());
 				}
 			}
 			foreach (DFAState state in dfa.States)
 				foreach (CharSpan value in state.Transitions)
-					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.GetChildBy(value).ID.ToString(), value.ToString());
+					serializer.WriteEdge("state" + state.ID, "state" + state.GetChildBy(value).ID, value.ToString());
 			serializer.Close();
 		}
 
@@ -244,11 +233,11 @@ namespace Hime.SDK.Reflection
 							builder.Append(", ");
 						builder.Append(items[j].ToString());
 					}
-					serializer.WriteNode("state" + i.ToString(), builder.ToString(), DOTNodeShape.doubleoctagon);
+					serializer.WriteNode("state" + i, builder.ToString(), DOTNodeShape.doubleoctagon);
 				}
 				else
 				{
-					serializer.WriteNode("state" + i.ToString(), i.ToString());
+					serializer.WriteNode("state" + i, i.ToString());
 				}
 			}
 			for (int i=0; i!=nfa.States.Count; i++)
@@ -257,7 +246,7 @@ namespace Hime.SDK.Reflection
 				foreach (NFATransition transition in state.Transitions)
 				{
 					int to = nfa.States.IndexOf(transition.Next);
-					serializer.WriteEdge("state" + i.ToString(), "state" + to.ToString(), transition.Span.ToString());
+					serializer.WriteEdge("state" + i, "state" + to, transition.Span.ToString());
 				}
 			}
 			serializer.Close();
@@ -276,12 +265,12 @@ namespace Hime.SDK.Reflection
 				string[] items = new string[state.Reductions.Count];
 				for (int i=0; i!=state.Reductions.Count; i++)
 					items[i] = state.Reductions[i].ToString();
-				string label = state.IsAccept ? state.ID.ToString() + "=Accept" : state.ID.ToString();
-				serializer.WriteStructure("state" + state.ID.ToString(), label, items);
+				string label = state.IsAccept ? state.ID + "=Accept" : state.ID.ToString();
+				serializer.WriteStructure("state" + state.ID, label, items);
 			}
 			foreach (LRState state in automaton.States)
 				foreach (LRTransition transition in state.Transitions)
-					serializer.WriteEdge("state" + state.ID.ToString(), "state" + transition.Target.ID.ToString(), transition.Label.ToString());
+					serializer.WriteEdge("state" + state.ID, "state" + transition.Target.ID, transition.Label.ToString());
 			serializer.Close();
 		}
 
@@ -301,11 +290,11 @@ namespace Hime.SDK.Reflection
 					if (item.Action == Hime.Redist.Parsers.LRActionCode.Reduce)
 						items.Add(item.ToString());
 				}
-				serializer.WriteStructure("state" + state.ID.ToString(), state.ID.ToString(), items.ToArray());
+				serializer.WriteStructure("state" + state.ID, state.ID.ToString(), items.ToArray());
 			}
 			foreach (Grammars.LR.State state in graph.States)
 				foreach (Grammars.Symbol symbol in state.Transitions)
-					serializer.WriteEdge("state" + state.ID.ToString(), "state" + state.GetChildBy(symbol).ID.ToString(), symbol.ToString());
+					serializer.WriteEdge("state" + state.ID, "state" + state.GetChildBy(symbol).ID, symbol.ToString());
 			serializer.Close();
 		}
 	}

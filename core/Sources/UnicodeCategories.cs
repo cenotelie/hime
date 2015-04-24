@@ -10,7 +10,7 @@ namespace Hime.SDK
 	/// <summary>
 	/// Contains the supported Unicode categories
 	/// </summary>
-	public class UnicodeCategories
+	public static class UnicodeCategories
 	{
 		/// <summary>
 		/// Gets the Unicode category Cc
@@ -3208,7 +3208,7 @@ namespace Hime.SDK
 		/// <summary>
 		/// The database of Unicode categories accesible by names
 		/// </summary>
-		private static Dictionary<string, UnicodeCategory> db = null;
+		private static Dictionary<string, UnicodeCategory> db;
 		/// <summary>
 		/// Builds the category database
 		/// </summary>
@@ -3260,8 +3260,7 @@ namespace Hime.SDK
 		public static UnicodeCategory GetCategory(string name)
 		{
 			if (db == null) BuildDB();
-			if (!db.ContainsKey(name)) return null;
-			return db[name];
+			return !db.ContainsKey (name) ? null : db [name];
 		}
 	}
 }

@@ -25,12 +25,12 @@ namespace Hime.SDK
 	/// <summary>
 	/// Represents a Unicode category
 	/// </summary>
-	public class UnicodeCategory
+	public sealed class UnicodeCategory
 	{
 		/// <summary>
 		/// The category's name
 		/// </summary>
-		private string name;
+		private readonly string name;
 
 		/// <summary>
 		/// The list of character spans contained in this category
@@ -63,7 +63,7 @@ namespace Hime.SDK
 		/// <param name="category">The category to aggregate</param>
 		public void Aggregate(UnicodeCategory category)
 		{
-			this.spans.AddRange(category.spans);
+			spans.AddRange(category.spans);
 		}
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace Hime.SDK
 		public UnicodeCategory(string name)
 		{
 			this.name = name;
-			this.spans = new List<UnicodeSpan>();
+			spans = new List<UnicodeSpan>();
 		}
 
 		/// <summary>

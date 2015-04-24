@@ -10,7 +10,7 @@ namespace Hime.SDK
 	/// <summary>
 	/// Contains the supported Unicode blocks
 	/// </summary>
-	public class UnicodeBlocks
+	public static class UnicodeBlocks
 	{
 		/// <summary>
 		/// Gets the Unicode block BasicLatin
@@ -1261,7 +1261,7 @@ namespace Hime.SDK
 		/// <summary>
 		/// The database of Unicode blocks accesible by names
 		/// </summary>
-		private static Dictionary<string, UnicodeBlock> db = null;
+		private static Dictionary<string, UnicodeBlock> db;
 		/// <summary>
 		/// Builds the blocks database
 		/// </summary>
@@ -1526,8 +1526,7 @@ namespace Hime.SDK
 		public static UnicodeBlock GetBlock(string name)
 		{
 			if (db == null) BuildDB();
-			if (!db.ContainsKey(name)) return null;
-			 return db[name];
+			return !db.ContainsKey (name) ? null : db [name];
 		}
 	}
 }

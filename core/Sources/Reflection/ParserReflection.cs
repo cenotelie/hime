@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hime.Redist;
@@ -28,24 +27,24 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Utilities to decompile a parser produced by Central Dogma
 	/// </summary>
-	public class ParserReflection
+	public sealed class ParserReflection
 	{
 		/// <summary>
 		/// List of the terminals matched by the associated lexer
 		/// </summary>
-		private ROList<Symbol> terminals;
+		private readonly ROList<Symbol> terminals;
 		/// <summary>
 		/// List of the variables in this parser
 		/// </summary>
-		private ROList<Symbol> variables;
+		private readonly ROList<Symbol> variables;
 		/// <summary>
 		/// List of the virtuals in this parser
 		/// </summary>
-		private ROList<Symbol> virtuals;
+		private readonly ROList<Symbol> virtuals;
 		/// <summary>
 		/// The LR automaton used by the parser
 		/// </summary>
-		private Automata.LRAutomaton automaton;
+		private readonly Automata.LRAutomaton automaton;
 
 		/// <summary>
 		/// Gets the terminals that can be matched by the associated lexer
@@ -70,7 +69,6 @@ namespace Hime.SDK.Reflection
 		/// <param name="parserType">The parser's type</param>
 		public ParserReflection(System.Type parserType)
 		{
-			string input = "";
 			ConstructorInfo[] ctors = parserType.GetConstructors();
 			ConstructorInfo parserCtor = null;
 			System.Type lexerType = null;
@@ -85,14 +83,14 @@ namespace Hime.SDK.Reflection
 					break;
 				}
 			}
-			lexerCtor = lexerType.GetConstructor(new System.Type[] { typeof(string) });
-			object lexer = lexerCtor.Invoke(new object[] { input });
-			object parser = parserCtor.Invoke(new object[] { lexer });
+			lexerCtor = lexerType.GetConstructor(new [] { typeof(string) });
+			object lexer = lexerCtor.Invoke(new object[] { "" });
+			object parser = parserCtor.Invoke(new [] { lexer });
 
-			this.terminals = (lexer as Hime.Redist.Lexer.BaseLexer).Terminals;
-			this.variables = (parser as Hime.Redist.Parsers.BaseLRParser).SymbolVariables;
-			this.virtuals = (parser as Hime.Redist.Parsers.BaseLRParser).SymbolVirtuals;
-			this.automaton = new Automata.LRAutomaton();
+			terminals = (lexer as Hime.Redist.Lexer.BaseLexer).Terminals;
+			variables = (parser as Hime.Redist.Parsers.BaseLRParser).SymbolVariables;
+			virtuals = (parser as Hime.Redist.Parsers.BaseLRParser).SymbolVirtuals;
+			automaton = new Automata.LRAutomaton();
 
 			string[] resources = parserType.Assembly.GetManifestResourceNames();
 			Stream stream = null;
@@ -121,7 +119,7 @@ namespace Hime.SDK.Reflection
 		{
 			Hime.Redist.Parsers.LRkAutomaton temp = new Hime.Redist.Parsers.LRkAutomaton(reader);
 			for (int i=0; i!=temp.StatesCount; i++)
-				this.automaton.AddState(new Automata.LRState(i));
+				automaton.AddState(new Automata.LRState(i));
 			for (int i=0; i!=temp.StatesCount; i++)
 			{
 				Automata.LRState state = automaton.States[i];
@@ -161,7 +159,7 @@ namespace Hime.SDK.Reflection
 		{
 			Hime.Redist.Parsers.RNGLRAutomaton temp = new Hime.Redist.Parsers.RNGLRAutomaton(reader);
 			for (int i=0; i!=temp.StatesCount; i++)
-				this.automaton.AddState(new Automata.LRState(i));
+				automaton.AddState(new Automata.LRState(i));
 			for (int i=0; i!=temp.StatesCount; i++)
 			{
 				Automata.LRState state = automaton.States[i];
