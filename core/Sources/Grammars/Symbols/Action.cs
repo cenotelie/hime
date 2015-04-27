@@ -17,14 +17,13 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a symbol for a semantic action in a grammar
 	/// </summary>
-	public class Action : Symbol
+	public sealed class Action : Symbol
 	{
 		/// <summary>
 		/// Initializes this symbol

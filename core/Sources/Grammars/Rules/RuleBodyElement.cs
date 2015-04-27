@@ -17,23 +17,19 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
+using Hime.Redist;
 
 namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents an element in the body of a grammar rule
 	/// </summary>
-	public class RuleBodyElement
+	public sealed class RuleBodyElement
 	{
 		/// <summary>
 		/// The symbol of this element
 		/// </summary>
-		private Symbol symbol;
-		/// <summary>
-		/// The action applied on this element
-		/// </summary>
-		private Hime.Redist.TreeAction action;
+		private readonly Symbol symbol;
 
 		/// <summary>
 		/// Gets the symbol of this element
@@ -43,10 +39,10 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Gets or sets the action applied on this element
 		/// </summary>
-		public Hime.Redist.TreeAction Action
+		public TreeAction Action
 		{
-			get { return action; }
-			set { action = value; }
+			get;
+			set;
 		}
 
 		/// <summary>
@@ -54,10 +50,10 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="symbol">The element's symbol</param>
 		/// <param name="action">The action applied on the element</param>
-		public RuleBodyElement(Symbol symbol, Hime.Redist.TreeAction action)
+		public RuleBodyElement(Symbol symbol, TreeAction action)
 		{
 			this.symbol = symbol;
-			this.action = action;
+			Action = action;
 		}
 
 		/// <summary>
@@ -84,9 +80,7 @@ namespace Hime.SDK.Grammars
 		public override bool Equals(object obj)
 		{
 			RuleBodyElement temp = obj as RuleBodyElement;
-			if (temp == null)
-				return false;
-			return (this.symbol.Equals(temp.symbol) && this.action == temp.action);
+			return (temp != null && symbol.Equals(temp.symbol) && Action == temp.Action);
 		}
 
 		/// <summary>
@@ -98,9 +92,9 @@ namespace Hime.SDK.Grammars
 		public override string ToString()
 		{
 			string s = symbol.ToString();
-			if (action == Hime.Redist.TreeAction.Promote)
+			if (Action == TreeAction.Promote)
 				return (s + "^");
-			else if (action == Hime.Redist.TreeAction.Drop)
+			else if (Action == TreeAction.Drop)
 				return (s + "!");
 			else
 				return s;

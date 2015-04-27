@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the absence of terminal, used as a marker by LR-related algorithms
 	/// </summary>
-	public class NullTerminal : Terminal
+	public sealed class NullTerminal : Terminal
 	{
 		/// <summary>
 		/// The singleton instance

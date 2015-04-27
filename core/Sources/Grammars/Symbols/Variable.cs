@@ -17,9 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars
@@ -32,15 +30,15 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The rules for this variable
 		/// </summary>
-		private List<Rule> rules;
+		private readonly List<Rule> rules;
 		/// <summary>
 		/// The FIRSTS set for this variable
 		/// </summary>
-		private TerminalSet firsts;
+		private readonly TerminalSet firsts;
 		/// <summary>
 		/// The FOLLOWERS set for this variable
 		/// </summary>
-		private TerminalSet followers;
+		private readonly TerminalSet followers;
 
 		/// <summary>
 		/// Gets the rules for this variables
@@ -62,9 +60,9 @@ namespace Hime.SDK.Grammars
 		/// <param name="name">The symbol's name</param>
 		public Variable(int sid, string name) : base(sid, name)
 		{
-			this.rules = new List<Rule>();
-			this.firsts = new TerminalSet();
-			this.followers = new TerminalSet();
+			rules = new List<Rule>();
+			firsts = new TerminalSet();
+			followers = new TerminalSet();
 		}
 
 		/// <summary>
@@ -92,10 +90,8 @@ namespace Hime.SDK.Grammars
 			{
 				TerminalSet rulefirsts = rule.Body.Firsts;
 				if (rulefirsts != null)
-					if (firsts.AddRange(rulefirsts))
-						mod = true;
-				if (rule.Body.ComputeFirsts())
-					mod = true;
+					mod |= firsts.AddRange(rulefirsts);
+				mod |= rule.Body.ComputeFirsts();
 			}
 			return mod;
 		}
@@ -117,8 +113,7 @@ namespace Hime.SDK.Grammars
 		{
 			bool mod = false;
 			foreach (Rule rule in rules)
-				if (rule.Body.ComputeFollowers_Step23(this))
-					mod = true;
+				mod |= rule.Body.ComputeFollowers_Step23(this);
 			return mod;
 		}
 	}

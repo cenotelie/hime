@@ -43,8 +43,8 @@ namespace Hime.SDK.Grammars
 		/// <param name="name">The symbol's name</param>
 		public Symbol(int sid, string name)
 		{
-			this.ID = sid;
-			this.Name = name;
+			ID = sid;
+			Name = name;
 		}
 
 		/// <summary>
@@ -97,9 +97,7 @@ namespace Hime.SDK.Grammars
 		public override bool Equals(object obj)
 		{
 			Symbol temp  = obj as Symbol;
-			if (temp == null)
-				return false;
-			return (this.ID == temp.ID);
+			return (temp != null && ID == temp.ID);
 		}
 
 		/// <summary>

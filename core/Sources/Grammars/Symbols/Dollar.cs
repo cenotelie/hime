@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the dollar symbol in a grammar, i.e. the marker of end of input
 	/// </summary>
-	public class Dollar : Terminal
+	public sealed class Dollar : Terminal
 	{
 		/// <summary>
 		/// The singleton instance

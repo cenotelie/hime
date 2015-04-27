@@ -25,20 +25,20 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the instance of a template rule
 	/// </summary>
-	public class TemplateRuleInstance
+	public sealed class TemplateRuleInstance
 	{
 		/// <summary>
 		/// The parent rule
 		/// </summary>
-		private TemplateRule templateRule;
+		private readonly TemplateRule templateRule;
 		/// <summary>
 		/// The produced variable
 		/// </summary>
-		private Variable variable;
+		private readonly Variable variable;
 		/// <summary>
 		/// The parameter values
 		/// </summary>
-		private List<Symbol> parameters;
+		private readonly List<Symbol> parameters;
 
 		/// <summary>
 		/// Gets the head variable for this rule
@@ -70,19 +70,18 @@ namespace Hime.SDK.Grammars
 			builder.Append(">");
 			string name = builder.ToString();
 			// Create and add the variable to the grammar
-			this.variable = grammar.AddVariable(name);
+			variable = grammar.AddVariable(name);
 			// Copy parameters
 			this.parameters = new List<Symbol>(parameters);
 			// Set parent template rule
-			this.templateRule = tRule;
+			templateRule = tRule;
 		}
 
 		/// <summary>
 		/// Compile this rule and generate the associated grammar rule
 		/// </summary>
-		/// <param name="grammar">The parent grammar</param>
 		/// <param name="context">The current context</param>
-		public void Compile(Grammar grammar, Context context)
+		public void Compile(Context context)
 		{
 			// Create a new context for recognizing the rule
 			Context newContext = new Context(context);

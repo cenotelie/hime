@@ -17,27 +17,26 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.SDK.Grammars
 {
 	/// <summary>
 	/// Represents a grammar rule
 	/// </summary>
-	public class Rule
+	public sealed class Rule
 	{
 		/// <summary>
 		/// The rule's head variable
 		/// </summary>
-		private Variable head;
+		private readonly Variable head;
 		/// <summary>
 		/// The rule's body
 		/// </summary>
-		private RuleBody body;
+		private readonly RuleBody body;
 		/// <summary>
 		/// Whether this rule has been generated
 		/// </summary>
-		private bool generated;
+		private readonly bool generated;
 
 		/// <summary>
 		/// Gets the rule's head variable
@@ -89,11 +88,7 @@ namespace Hime.SDK.Grammars
 		public override bool Equals(object obj)
 		{
 			Rule temp = obj as Rule;
-			if (temp == null)
-				return false;
-			if (!this.head.Equals(temp.head))
-				return false;
-			return (this.body.Equals(temp.body));
+			return (temp != null && head.Equals(temp.head) && body.Equals(temp.body));
 		}
 
 		/// <summary>

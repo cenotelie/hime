@@ -26,28 +26,28 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a template rule in a grammar
 	/// </summary>
-	public class TemplateRule
+	public sealed class TemplateRule
 	{
 		/// <summary>
 		/// The existing instances of this template rule
 		/// </summary>
-		private List<TemplateRuleInstance> instances;
+		private readonly List<TemplateRuleInstance> instances;
 		/// <summary>
 		/// The parent grammar
 		/// </summary>
-		private Grammar grammar;
+		private readonly Grammar grammar;
 		/// <summary>
 		/// The name of the head variable
 		/// </summary>
-		private string head;
+		private readonly string head;
 		/// <summary>
 		/// The list of the parameters
 		/// </summary>
-		private List<string> parameters;
+		private readonly List<string> parameters;
 		/// <summary>
 		/// The root AST for the definition of this rule
 		/// </summary>
-		private ASTNode root;
+		private readonly ASTNode root;
 
 		/// <summary>
 		/// Gets the name of the head variable
@@ -73,13 +73,13 @@ namespace Hime.SDK.Grammars
 		/// <param name="ruleNode">The root AST for this rule</param>
 		public TemplateRule(Grammar grammar, ASTNode ruleNode)
 		{
-			this.instances = new List<TemplateRuleInstance>();
+			instances = new List<TemplateRuleInstance>();
 			this.grammar = grammar;
-			this.head = ruleNode.Children[0].Value;
-			this.parameters = new List<string>();
-			this.root = ruleNode;
+			head = ruleNode.Children[0].Value;
+			parameters = new List<string>();
+			root = ruleNode;
 			foreach (ASTNode child in ruleNode.Children[1].Children)
-				this.parameters.Add(child.Value);
+				parameters.Add(child.Value);
 		}
 
 		/// <summary>
@@ -89,11 +89,11 @@ namespace Hime.SDK.Grammars
 		/// <param name="grammar">The parent grammar</param>
 		public TemplateRule(TemplateRule copied, Grammar grammar)
 		{
-			this.instances = new List<TemplateRuleInstance>();
+			instances = new List<TemplateRuleInstance>();
 			this.grammar = grammar;
-			this.head = copied.head;
-			this.parameters = new List<string>(copied.parameters);
-			this.root = copied.root;
+			head = copied.head;
+			parameters = new List<string>(copied.parameters);
+			root = copied.root;
 			foreach (TemplateRuleInstance instance in copied.instances)
 			{
 				List<Symbol> param = new List<Symbol>();
@@ -118,7 +118,7 @@ namespace Hime.SDK.Grammars
 			}
 			TemplateRuleInstance newInstance = new TemplateRuleInstance(this, parameters, grammar);
 			instances.Add(newInstance);
-			newInstance.Compile(grammar, context);
+			newInstance.Compile(context);
 			return newInstance.HeadVariable;
 		}
 	}

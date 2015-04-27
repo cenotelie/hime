@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the body of a grammar rule
 	/// </summary>
-	public class RuleBody : RuleChoice
+	public sealed class RuleBody : RuleChoice
 	{
 		/// <summary>
 		/// The choices in this body
@@ -40,7 +40,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Initializes this body as empty
 		/// </summary>
-		public RuleBody() : base()
+		public RuleBody()
 		{
 		}
 
@@ -56,7 +56,7 @@ namespace Hime.SDK.Grammars
 		/// Initializes this body as a copy of the given elements
 		/// </summary>
 		/// <param name="parts">The elements to copy</param>
-		public RuleBody(ICollection<RuleBodyElement> parts) : base()
+		public RuleBody(ICollection<RuleBodyElement> parts)
 		{
 			this.parts.AddRange(parts);
 		}
@@ -102,7 +102,7 @@ namespace Hime.SDK.Grammars
 			}
 			// Create a new empty choice
 			choices.Add(new RuleChoice());
-			setFirsts = choices[0].Firsts;
+			setFirsts.AddRange(choices[0].Firsts);
 		}
 
 		/// <summary>
@@ -113,11 +113,10 @@ namespace Hime.SDK.Grammars
 			// For all choices but the last (empty)
 			for (int i = 0; i != choices.Count - 1; i++)
 			{
-				// TODO: is and casts are not nice => try to remove all of them. They shouldn't be necessary
+				Variable var = choices[i][0].Symbol as Variable;
 				// If the first symbol of the choice is a variable
-				if (choices[i][0].Symbol is Variable)
+				if (var != null)
 				{
-					Variable var = choices[i][0].Symbol as Variable;
 					// Add the FIRSTS set of the next choice to the variable followers except ε
 					foreach (Terminal first in choices[i + 1].Firsts)
 					{
@@ -139,15 +138,14 @@ namespace Hime.SDK.Grammars
 			// For all choices but the last (empty)
 			for (int i = 0; i != choices.Count - 1; i++)
 			{
+				Variable var = choices[i][0].Symbol as Variable;
 				// If the first symbol of the choice is a variable
-				if (choices[i][0].Symbol is Variable)
+				if (var != null)
 				{
-					Variable var = choices[i][0].Symbol as Variable;
 					// If the next choice FIRSTS set contains ε
 					// add the FOLLOWERS of the head variable to the FOLLOWERS of the found variable
-					if (choices[i + 1].Firsts.Contains(Epsilon.Instance))
-					if (var.Followers.AddRange(ruleVar.Followers))
-						mod = true;
+					if (choices [i + 1].Firsts.Contains (Epsilon.Instance))
+						mod |= var.Followers.AddRange(ruleVar.Followers);
 				}
 			}
 			return mod;
@@ -202,10 +200,10 @@ namespace Hime.SDK.Grammars
 			RuleBody temp = obj as RuleBody;
 			if (temp == null)
 				return false;
-			if (this.parts.Count != temp.parts.Count)
+			if (parts.Count != temp.parts.Count)
 				return false;
-			for (int i = 0; i != this.parts.Count; i++)
-				if (!this.parts[i].Equals(temp.parts[i]))
+			for (int i = 0; i != parts.Count; i++)
+				if (!parts[i].Equals(temp.parts[i]))
 					return false;
 			return true;
 		}

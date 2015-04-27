@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 
 namespace Hime.SDK.Grammars
@@ -25,12 +24,12 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a set of unique terminals (sorted by ID)
 	/// </summary>
-	public class TerminalSet : IList<Terminal>
+	public sealed class TerminalSet : IList<Terminal>
 	{
 		/// <summary>
 		/// The backing content
 		/// </summary>
-		protected SortedList<int, Terminal> content;
+		private readonly SortedList<int, Terminal> content;
 
 		/// <summary>
 		/// Initializes this set as empty

@@ -29,11 +29,11 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The elements in this body
 		/// </summary>
-		protected List<RuleBodyElement> parts;
+		protected readonly List<RuleBodyElement> parts;
 		/// <summary>
 		/// The FIRSTS set of terminals
 		/// </summary>
-        protected TerminalSet setFirsts;
+        protected readonly TerminalSet setFirsts;
 
 		/// <summary>
 		/// Gets the length of this body
@@ -54,8 +54,8 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		public RuleChoice()
 		{
-			this.parts = new List<RuleBodyElement>();
-			this.setFirsts = new TerminalSet();
+			parts = new List<RuleBodyElement>();
+			setFirsts = new TerminalSet();
 		}
 
 		/// <summary>
@@ -64,9 +64,9 @@ namespace Hime.SDK.Grammars
 		/// <param name="symbol">The single element's symbol</param>
 		public RuleChoice(Symbol symbol)
 		{
-			this.parts = new List<RuleBodyElement>();
-			this.parts.Add(new RuleBodyElement(symbol, Hime.Redist.TreeAction.None));
-			this.setFirsts = new TerminalSet();
+			parts = new List<RuleBodyElement>();
+			parts.Add(new RuleBodyElement(symbol, Hime.Redist.TreeAction.None));
+			setFirsts = new TerminalSet();
 		}
 
 		/// <summary>
@@ -107,8 +107,9 @@ namespace Hime.SDK.Grammars
 
 			Symbol symbol = parts[0].Symbol;
 			// If the first symbol in the choice is a terminal : Add terminal as first and return
-			if (symbol is Terminal)
-				return setFirsts.Add(symbol as Terminal);
+			var terminal = symbol as Terminal;
+			if (terminal != null)
+				return setFirsts.Add(terminal);
 
 			// Here the first symbol in the current choice is a variable
 			Variable variable = symbol as Variable;

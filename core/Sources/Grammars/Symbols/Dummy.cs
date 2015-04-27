@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a fake terminal, used as a marker by LR-related algorithms
 	/// </summary>
-	public class Dummy : Terminal
+	public sealed class Dummy : Terminal
 	{
 		/// <summary>
 		/// The singleton instance
