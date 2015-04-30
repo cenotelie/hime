@@ -18,8 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Reflection;
-using System.Text;
 using Hime.SDK;
 using Hime.Redist;
 
@@ -73,17 +71,6 @@ namespace Hime.HimeCC
 		/// <returns>The error code, or 0 if none</returns>
 		public static int Main(string[] args)
 		{
-			Program program = new Program();
-			return program.Run(args);
-		}
-
-		/// <summary>
-		/// Runs the himecc program
-		/// </summary>
-		/// <param name="args">The command line arguments</param>
-		/// <returns>The error code, or 0 if none</returns>
-		private int Run(string[] args)
-		{
 			// If no argument is given, print the help screen and return OK
 			if (args == null || args.Length == 0)
 			{
@@ -128,16 +115,14 @@ namespace Hime.HimeCC
 
 			// Execute the task
 			Report report = task.Execute();
-			if (report.Errors.Count != 0)
-				return ResultErrorCompiling;
-			return ResultOK;
+			return report.Errors.Count != 0 ? ResultErrorCompiling : ResultOK;
 		}
 
 		/// <summary>
 		/// Generates the parser for the command line
 		/// </summary>
 		/// <returns>The number of errors (should be 0)</returns>
-		private int GenerateCLParser()
+		private static int GenerateCLParser()
 		{
 			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
@@ -154,7 +139,7 @@ namespace Hime.HimeCC
 		/// Generates the parser for the input files of this compiler (.gram files)
 		/// </summary>
 		/// <returns>The number of errors (should be 0)</returns>
-		private int GenerateCDParser()
+		private static int GenerateCDParser()
 		{
 			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
@@ -173,10 +158,10 @@ namespace Hime.HimeCC
 		/// </summary>
 		/// <param name="line">The AST representation of the command line</param>
 		/// <returns>The name of the first argument, or null if none</returns>
-		private string GetSpecialCommand(ASTNode line)
+		private static string GetSpecialCommand(ASTNode line)
 		{
 			if (line.Children[0].Children.Count == 0 && line.Children[1].Children.Count == 1)
-				return line.Children[1].Children[0].Symbol.Value;
+				return line.Children[1].Children[0].Value;
 			return null;
 		}
 
@@ -185,7 +170,7 @@ namespace Hime.HimeCC
 		/// </summary>
 		/// <param name="line">The parsed command line as an AST</param>
 		/// <returns>The corresponding compilation task, or null if there is any error</returns>
-		private CompilationTask BuildTask(ASTNode line)
+		private static CompilationTask BuildTask(ASTNode line)
 		{
 			CompilationTask task = new CompilationTask();
 			// All single values before the arguments shall be inputs
@@ -194,7 +179,7 @@ namespace Hime.HimeCC
 			// Inspect each passed argument
 			foreach (ASTNode arg in line.Children[1].Children)
 			{
-				switch (arg.Symbol.Value)
+				switch (arg.Value)
 				{
 					case ArgOutputAssembly:
 						if (task.Mode == Hime.SDK.Output.Mode.Source)
@@ -231,7 +216,7 @@ namespace Hime.HimeCC
 						task.CodeAccess = Hime.SDK.Output.Modifier.Public;
 						break;
 					default:
-						Console.WriteLine("Unknown argument " + arg.Symbol.Value);
+						Console.WriteLine("Unknown argument " + arg.Value);
 						return null;
 				}
 			}
@@ -243,9 +228,9 @@ namespace Hime.HimeCC
 		/// </summary>
 		/// <param name="task">The compilation task</param>
 		/// <param name="node">The input as a parsed data in the command line</param>
-		private void AddInput(CompilationTask task, ASTNode node)
+		private static void AddInput(CompilationTask task, ASTNode node)
 		{
-			string value = node.Symbol.Value;
+			string value = node.Value;
 			if (value == null)
 				return;
 			if (value.StartsWith("\""))
@@ -256,9 +241,9 @@ namespace Hime.HimeCC
 		/// <summary>
 		/// Prints the help screen for this program
 		/// </summary>
-		private void PrintHelp()
+		private static void PrintHelp()
 		{
-			Console.WriteLine("himecc " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (LGPL 3)");
+			Console.WriteLine("himecc " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Hime parser generator, generates lexers and parsers in C# 2.0.");
 			Console.WriteLine();
 			Console.WriteLine("usage: himecc <files> [options]");
