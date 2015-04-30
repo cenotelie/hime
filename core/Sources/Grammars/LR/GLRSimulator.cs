@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a simulator of GLR parsers
 	/// </summary>
-	public class GLRSimulator : GraphInverse
+	public sealed class GLRSimulator : GraphInverse
 	{
 		/// <summary>
 		/// Initializes this simulator from the specified LR graph

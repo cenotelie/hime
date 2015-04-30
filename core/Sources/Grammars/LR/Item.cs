@@ -52,9 +52,7 @@ namespace Hime.SDK.Grammars.LR
 		{
 			get
 			{
-				if (position != rule.Body.Choices[0].Length)
-					return LRActionCode.Shift;
-				return LRActionCode.Reduce;
+				return position != rule.Body.Choices[0].Length ? LRActionCode.Shift : LRActionCode.Reduce;
 			}
 		}
 
@@ -68,7 +66,7 @@ namespace Hime.SDK.Grammars.LR
 		/// </summary>
 		/// <param name="rule">The underlying rule</param>
 		/// <param name="position">The dot position in the rule</param>
-		public Item(Rule rule, int position)
+		protected Item(Rule rule, int position)
 		{
 			this.rule = rule;
 			this.position = position;
@@ -112,9 +110,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <returns>The equality result</returns>
 		public bool BaseEquals(Item item)
 		{
-			if (this.rule != item.rule)
-				return false;
-			return (this.position == item.position);
+			return (rule == item.rule && position == item.position);
 		}
 
 		/// <summary>

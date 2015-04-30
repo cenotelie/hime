@@ -157,8 +157,6 @@
     <Compile Include="Sources\Grammars\LR\StateActionRNReduce.cs" />
     <Compile Include="Sources\Grammars\LR\StateReductionsRNGLALR1.cs" />
     <Compile Include="Sources\Grammars\LR\StateReductionsRNGLR1.cs" />
-    <Compile Include="Sources\Grammars\LR\DeciderState.cs" />
-    <Compile Include="Sources\Grammars\LR\Decider.cs" />
     <Compile Include="Sources\Input\Loader.cs" />
     <Compile Include="Sources\Grammars\Loader.cs" />
     <Compile Include="Sources\Output\Mode.cs" />

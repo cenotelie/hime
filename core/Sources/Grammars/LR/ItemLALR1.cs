@@ -25,12 +25,12 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LALR(1) item
 	/// </summary>
-	public class ItemLALR1 : Item
+	public sealed class ItemLALR1 : Item
 	{
 		/// <summary>
 		/// The lookaheads for this item
 		/// </summary>
-		private TerminalSet lookaheads;
+		private readonly TerminalSet lookaheads;
 
 		/// <summary>
 		///  Gets the lookaheads for this item
@@ -54,7 +54,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <param name="copied">The item to copy</param>
 		public ItemLALR1(Item copied) : base(copied.BaseRule, copied.DotPosition)
 		{
-			this.lookaheads = new TerminalSet();
+			lookaheads = new TerminalSet();
 		}
 
 		/// <summary>
@@ -63,9 +63,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <returns>The child of this item</returns>
 		public override Item GetChild()
 		{
-			if (Action == LRActionCode.Reduce)
-				return null;
-			return new ItemLALR1(rule, position + 1, new TerminalSet(lookaheads));
+			return Action == LRActionCode.Reduce ? null : new ItemLALR1(rule, position + 1, new TerminalSet(lookaheads));
 		}
 
 		/// <summary>
@@ -137,9 +135,9 @@ namespace Hime.SDK.Grammars.LR
 			ItemLALR1 tested = (ItemLALR1)item;
 			if (!BaseEquals(tested))
 				return false;
-			if (this.lookaheads.Count != tested.lookaheads.Count)
+			if (lookaheads.Count != tested.lookaheads.Count)
 				return false;
-			foreach (Terminal terminal in this.lookaheads)
+			foreach (Terminal terminal in lookaheads)
 			{
 				if (!tested.lookaheads.Contains(terminal))
 					return false;

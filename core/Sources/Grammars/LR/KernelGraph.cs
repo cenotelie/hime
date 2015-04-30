@@ -25,28 +25,28 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a graph of LR kernels used to build a LALR(1) graph from a LR(0) graph
 	/// </summary>
-	public class KernelGraph
+	public sealed class KernelGraph
 	{
 		/// <summary>
 		/// The LR(0) graph
 		/// </summary>
-		private Graph graphLR0;
+		private readonly Graph graphLR0;
 		/// <summary>
 		/// The result LALR(1) graph
 		/// </summary>
-		private Graph graphLALR1;
+		private readonly Graph graphLALR1;
 		/// <summary>
 		/// The produced kernels
 		/// </summary>
-		private List<StateKernel> kernels;
+		private readonly List<StateKernel> kernels;
 		/// <summary>
 		/// The origins of propagations
 		/// </summary>
-		private List<ItemLALR1> propagOrigins;
+		private readonly List<ItemLALR1> propagOrigins;
 		/// <summary>
 		/// The targets of propagations
 		/// </summary>
-		private List<ItemLALR1> propagTargets;
+		private readonly List<ItemLALR1> propagTargets;
 
 		/// <summary>
 		/// Initializes this graph of kernels
@@ -55,9 +55,10 @@ namespace Hime.SDK.Grammars.LR
 		public KernelGraph(Graph graphLR0)
 		{
 			this.graphLR0 = graphLR0;
-			this.kernels = new List<StateKernel>();
-			this.propagOrigins = new List<ItemLALR1>();
-			this.propagTargets = new List<ItemLALR1>();
+			graphLALR1 = new Graph();
+			kernels = new List<StateKernel>();
+			propagOrigins = new List<ItemLALR1>();
+			propagTargets = new List<ItemLALR1>();
 		}
 
 		/// <summary>
@@ -179,7 +180,6 @@ namespace Hime.SDK.Grammars.LR
 		private void BuildGraphLALR1()
 		{
 			// Build states
-			graphLALR1 = new Graph();
 			foreach (StateKernel kernelLALR1 in kernels)
 				graphLALR1.Add(kernelLALR1.GetClosure());
 			// Link and build actions for each LALR(1) set

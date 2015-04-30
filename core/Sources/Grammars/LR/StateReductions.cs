@@ -31,21 +31,21 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		/// The reductions in this set
 		/// </summary>
-		private List<StateActionReduce> content;
+		private readonly List<StateActionReduce> content;
 		/// <summary>
 		/// The conflicts raised by this set
 		/// </summary>
-		private List<Conflict> conflicts;
+		private readonly List<Conflict> conflicts;
 
 		/// <summary>
 		/// Gets the number of reductions in this set
 		/// </summary>
-		public int Count { get { return this.content.Count; } }
+		public int Count { get { return content.Count; } }
 		/// <summary>
 		/// Gets the reductions a the specifie index
 		/// </summary>
 		/// <param name='index'>An index</param>
-		public StateActionReduce this[int index] { get { return this.content[index]; } }
+		public StateActionReduce this[int index] { get { return content[index]; } }
 		/// <summary>
 		/// Gets the conflicts raised by this set
 		/// </summary>
@@ -54,22 +54,22 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		/// Initializes this set of reductions as empty
 		/// </summary>
-		public StateReductions()
+		protected StateReductions()
 		{
-			this.content = new List<StateActionReduce>();
-			this.conflicts = new List<Conflict>();
+			content = new List<StateActionReduce>();
+			conflicts = new List<Conflict>();
 		}
 
 		/// <summary>
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		public IEnumerator<StateActionReduce> GetEnumerator() { return this.content.GetEnumerator(); }
+		public IEnumerator<StateActionReduce> GetEnumerator() { return content.GetEnumerator(); }
 		/// <summary>
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return this.content.GetEnumerator(); }
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return content.GetEnumerator(); }
 
 		/// <summary>
 		/// Adds a reduction to this set
@@ -77,7 +77,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <param name="action">The reduction to add</param>
 		public void Add(StateActionReduce action)
 		{
-			this.content.Add(action);
+			content.Add(action);
 		}
 
 		/// <summary>

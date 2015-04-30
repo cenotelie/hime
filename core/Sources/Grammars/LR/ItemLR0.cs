@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LR(0) item
 	/// </summary>
-	public class ItemLR0 : Item
+	public sealed class ItemLR0 : Item
 	{
 		/// <summary>
 		/// Initializes this item
@@ -48,9 +48,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <returns>The child of this item</returns>
 		public override Item GetChild()
 		{
-			if (Action == LRActionCode.Reduce)
-				return null;
-			return new ItemLR0(rule, position + 1);
+			return Action == LRActionCode.Reduce ? null : new ItemLR0(rule, position + 1);
 		}
 
 		/// <summary>

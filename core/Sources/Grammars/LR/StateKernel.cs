@@ -24,16 +24,16 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents the kernel of a LR state
 	/// </summary>
-	public class StateKernel
+	public sealed class StateKernel
 	{
 		/// <summary>
 		/// The items in this kernel, organized in in a map
 		/// </summary>
-		private Dictionary<Rule, Dictionary<int, List<Item>>> dictItems;
+		private readonly Dictionary<Rule, Dictionary<int, List<Item>>> dictItems;
 		/// <summary>
 		/// The items in this kernel
 		/// </summary>
-		private List<Item> items;
+		private readonly List<Item> items;
 
 		/// <summary>
 		/// Gets the kernel's size
@@ -78,9 +78,7 @@ namespace Hime.SDK.Grammars.LR
 			if (!dictItems.ContainsKey(item.BaseRule))
 				return false;
 			Dictionary<int, List<Item>> sub = dictItems[item.BaseRule];
-			if (!sub.ContainsKey(item.DotPosition))
-				return false;
-			return sub[item.DotPosition].Contains(item);
+			return (sub.ContainsKey(item.DotPosition) && sub[item.DotPosition].Contains(item));
 		}
 
 		/// <summary>
@@ -122,15 +120,15 @@ namespace Hime.SDK.Grammars.LR
 		/// </returns>
 		public bool Equals(StateKernel kernel)
 		{
-			if (this.items.Count != kernel.items.Count)
+			if (items.Count != kernel.items.Count)
 				return false;
-			if (this.dictItems.Count != kernel.dictItems.Count)
+			if (dictItems.Count != kernel.dictItems.Count)
 				return false;
-			foreach (Rule rule in this.dictItems.Keys)
+			foreach (Rule rule in dictItems.Keys)
 			{
 				if (!kernel.dictItems.ContainsKey(rule))
 					return false;
-				Dictionary<int, List<Item>> left = this.dictItems[rule];
+				Dictionary<int, List<Item>> left = dictItems[rule];
 				Dictionary<int, List<Item>> right = kernel.dictItems[rule];
 				if (left.Count != right.Count)
 					return false;

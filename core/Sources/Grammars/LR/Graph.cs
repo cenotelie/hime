@@ -25,12 +25,12 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LR graph
 	/// </summary>
-	public class Graph
+	public sealed class Graph
 	{
 		/// <summary>
 		/// The states in this graph
 		/// </summary>
-		private List<State> states;
+		private readonly List<State> states;
 
 		/// <summary>
 		/// Gets the states in this graph

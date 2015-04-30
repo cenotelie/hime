@@ -25,12 +25,12 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a generation in the simulation of a GLR parser
 	/// </summary>
-	public class GLRGeneration : IEnumerable<GLRStackNode>
+	public sealed class GLRGeneration : IEnumerable<GLRStackNode>
 	{
 		/// <summary>
 		/// The stack nodes in this generation
 		/// </summary>
-		private List<GLRStackNode> nodes;
+		private readonly List<GLRStackNode> nodes;
 
 		/// <summary>
 		/// Gets the stack nodes in this generation

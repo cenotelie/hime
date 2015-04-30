@@ -26,20 +26,20 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LR state
 	/// </summary>
-	public class State
+	public sealed class State
 	{
 		/// <summary>
 		/// The state's kernel
 		/// </summary>
-		private StateKernel kernel;
+		private readonly StateKernel kernel;
 		/// <summary>
 		/// The state's item
 		/// </summary>
-		private List<Item> items;
+		private readonly List<Item> items;
 		/// <summary>
 		/// The state's children
 		/// </summary>
-		private Dictionary<Symbol, State> children;
+		private readonly Dictionary<Symbol, State> children;
 		/// <summary>
 		/// The reductions in this state
 		/// </summary>
@@ -79,7 +79,7 @@ namespace Hime.SDK.Grammars.LR
 		{
 			this.kernel = kernel;
 			this.items = items;
-			this.children = new Dictionary<Symbol, State>(new Symbol.EqualityComparer());
+			children = new Dictionary<Symbol, State>(new Symbol.EqualityComparer());
 		}
 
 		/// <summary>
@@ -132,19 +132,19 @@ namespace Hime.SDK.Grammars.LR
 					shifts[next].AddItem(item.GetChild());
 				else
 				{
-					StateKernel Kernel = new StateKernel();
-					Kernel.AddItem(item.GetChild());
-					shifts.Add(next, Kernel);
+					StateKernel nextKernel = new StateKernel();
+					nextKernel.AddItem(item.GetChild());
+					shifts.Add(next, nextKernel);
 				}
 			}
 			// Close the children and add them to the graph
 			foreach (Symbol next in shifts.Keys)
 			{
-				StateKernel kernel = shifts[next];
-				State child = graph.ContainsState(kernel);
+				StateKernel nextKernel = shifts[next];
+				State child = graph.ContainsState(nextKernel);
 				if (child == null)
 				{
-					child = kernel.GetClosure();
+					child = nextKernel.GetClosure();
 					graph.Add(child);
 				}
 				children.Add(next, child);

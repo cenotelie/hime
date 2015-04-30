@@ -29,11 +29,11 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		/// The lookahead to reduce on
 		/// </summary>
-		private Terminal lookahead;
+		private readonly Terminal lookahead;
 		/// <summary>
 		/// The rule to reduce
 		/// </summary>
-		private Rule toReduce;
+		private readonly Rule toReduce;
 
 		/// <summary>
 		///  Gets the type of action 
@@ -61,7 +61,7 @@ namespace Hime.SDK.Grammars.LR
 		public StateActionReduce(Terminal lookahead, Rule rule)
 		{
 			this.lookahead = lookahead;
-			this.toReduce = rule;
+			toReduce = rule;
 		}
 	}
 }

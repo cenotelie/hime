@@ -24,16 +24,16 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a node in a Graph-Structured Stack of a simulation of a GLR parser
 	/// </summary>
-	public class GLRStackNode
+	public sealed class GLRStackNode
 	{
 		/// <summary>
 		/// The state represented by this node
 		/// </summary>
-		private State state;
+		private readonly State state;
 		/// <summary>
 		/// The edges from this node
 		/// </summary>
-		private List<KeyValuePair<Symbol, GLRStackNode>> edges;
+		private readonly List<KeyValuePair<Symbol, GLRStackNode>> edges;
 
 		/// <summary>
 		/// Gets this node's identifier
@@ -52,7 +52,7 @@ namespace Hime.SDK.Grammars.LR
 		public GLRStackNode(State state)
 		{
 			this.state = state;
-			this.edges = new List<KeyValuePair<Symbol, GLRStackNode>>();
+			edges = new List<KeyValuePair<Symbol, GLRStackNode>>();
 		}
 
 		/// <summary>

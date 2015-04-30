@@ -25,16 +25,16 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LR(1) item
 	/// </summary>
-	public class ItemLR1 : Item
+	public sealed class ItemLR1 : Item
 	{
 		/// <summary>
 		/// The lookahead for this item
 		/// </summary>
-		private Terminal lookahead;
+		private readonly Terminal lookahead;
 		/// <summary>
 		/// The lookaheads for this item (just the one)
 		/// </summary>
-		private TerminalSet lookaheads;
+		private readonly TerminalSet lookaheads;
 
 		/// <summary>
 		///  Gets the lookahead for this item
@@ -54,8 +54,8 @@ namespace Hime.SDK.Grammars.LR
 		public ItemLR1(Rule rule, int position, Terminal lookahead) : base(rule, position)
 		{
 			this.lookahead = lookahead;
-			this.lookaheads = new TerminalSet();
-			this.lookaheads.Add(lookahead);
+			lookaheads = new TerminalSet();
+			lookaheads.Add(lookahead);
 		}
 
 		/// <summary>
@@ -64,9 +64,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <returns>The child of this item</returns>
 		public override Item GetChild()
 		{
-			if (Action == LRActionCode.Reduce)
-				return null;
-			return new ItemLR1(rule, position + 1, lookahead);
+			return Action == LRActionCode.Reduce ? null : new ItemLR1(rule, position + 1, lookahead);
 		}
 
 		/// <summary>
@@ -146,9 +144,7 @@ namespace Hime.SDK.Grammars.LR
 		public override bool ItemEquals(Item item)
 		{
 			ItemLR1 tested = item as ItemLR1;
-			if (this.lookahead.ID != tested.lookahead.ID)
-				return false;
-			return BaseEquals(tested);
+			return (lookahead.ID == tested.lookahead.ID && BaseEquals(tested));
 		}
 	}
 }

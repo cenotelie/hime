@@ -24,16 +24,16 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a shift action in a LR state
 	/// </summary>
-	public class StateActionShift : StateAction
+	public sealed class StateActionShift : StateAction
 	{
 		/// <summary>
 		/// The trigger symbol
 		/// </summary>
-		private Symbol symbol;
+		private readonly Symbol symbol;
 		/// <summary>
 		/// The target of the shift action
 		/// </summary>
-		private State target;
+		private readonly State target;
 
 		/// <summary>
 		///  Gets the type of action 
@@ -56,7 +56,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <param name="target">The shift target</param>
 		public StateActionShift(Symbol trigger, State target)
 		{
-			this.symbol = trigger;
+			symbol = trigger;
 			this.target = target;
 		}
 	}

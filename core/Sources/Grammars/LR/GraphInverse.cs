@@ -29,11 +29,11 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		/// The original graph
 		/// </summary>
-		protected Graph graph;
+		protected readonly Graph graph;
 		/// <summary>
 		/// The inverse graph
 		/// </summary>
-		protected Dictionary<int, Dictionary<Symbol, List<State>>> inverseGraph;
+		protected readonly Dictionary<int, Dictionary<Symbol, List<State>>> inverseGraph;
 
 		/// <summary>
 		/// Determines whether the given state has incoming transitions
@@ -73,7 +73,7 @@ namespace Hime.SDK.Grammars.LR
 		public GraphInverse(Graph graph)
 		{
 			this.graph = graph;
-			this.inverseGraph = new Dictionary<int, Dictionary<Symbol, List<State>>>();
+			inverseGraph = new Dictionary<int, Dictionary<Symbol, List<State>>>();
 			BuildInverse();
 		}
 

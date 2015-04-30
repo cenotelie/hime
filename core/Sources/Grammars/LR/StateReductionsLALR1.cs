@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a set of reduction for a LALR(1) state
 	/// </summary>
-	public class StateReductionsLALR1 : StateReductions
+	public sealed class StateReductionsLALR1 : StateReductions
 	{
 		/// <summary>
 		/// Gets the set of the expected terminals in this set of reductions
@@ -40,13 +40,6 @@ namespace Hime.SDK.Grammars.LR
 					result.Add(reduction.Lookahead);
 				return result;
 			}
-		}
-
-		/// <summary>
-		/// Initializes this set of reductions as empty
-		/// </summary>
-		public StateReductionsLALR1() : base()
-		{
 		}
 
 		/// <summary>
@@ -73,7 +66,7 @@ namespace Hime.SDK.Grammars.LR
 					else // No conflict
 					{
 						reductions.Add(lookahead, item);
-						this.Add(new StateActionReduce(lookahead, item.BaseRule));
+						Add(new StateActionReduce(lookahead, item.BaseRule));
 					}
 				}
 			}

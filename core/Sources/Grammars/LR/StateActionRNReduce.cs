@@ -17,14 +17,13 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 
 namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
 	/// Represents a reduction action in a RNGLR state
 	/// </summary>
-	public class StateActionRNReduce : StateActionReduce
+	public sealed class StateActionRNReduce : StateActionReduce
 	{
 		/// <summary>
 		/// Gets the reduction length
@@ -39,7 +38,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <param name="length">The length of the reduction</param>
 		public StateActionRNReduce(Terminal lookahead, Rule rule, int length) : base(lookahead, rule)
 		{
-			this.ReduceLength = length;
+			ReduceLength = length;
 		}
 	}
 }

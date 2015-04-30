@@ -26,28 +26,28 @@ namespace Hime.SDK.Grammars.LR
 	/// Represents a LR conflict
 	/// </summary>
 	// should not inherit from Entry, rather should build an entry when needed!!
-	public class Conflict
+	public sealed class Conflict
 	{
 		/// <summary>
 		/// The state raising this conflict
 		/// </summary>
-		private State state;
+		private readonly State state;
 		/// <summary>
 		/// The conflict's type
 		/// </summary>
-		private ConflictType type;
+		private readonly ConflictType type;
 		/// <summary>
 		/// The conflictuous lookahead
 		/// </summary>
-		private Terminal lookahead;
+		private readonly Terminal lookahead;
 		/// <summary>
 		/// The set of conflictuous items
 		/// </summary>
-		private List<Item> items;
+		private readonly List<Item> items;
 		/// <summary>
 		/// The example of conflictuous input
 		/// </summary>
-		private List<Phrase> examples;
+		private readonly List<Phrase> examples;
 
 		/// <summary>
 		/// Gets the state raising this conflict
@@ -81,8 +81,8 @@ namespace Hime.SDK.Grammars.LR
 			this.state = state;
 			this.type = type;
 			this.lookahead = lookahead;
-			this.items = new List<Item>();
-			this.examples = new List<Phrase>();
+			items = new List<Item>();
+			examples = new List<Phrase>();
 		}
 
 		/// <summary>
@@ -94,9 +94,9 @@ namespace Hime.SDK.Grammars.LR
 		{
 			this.state = state;
 			this.type = type;
-			this.lookahead = null;
-			this.items = new List<Item>();
-			this.examples = new List<Phrase>();
+			lookahead = null;
+			items = new List<Item>();
+			examples = new List<Phrase>();
 		}
 
 		/// <summary>

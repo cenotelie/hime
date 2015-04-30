@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a builder of LR graphs
 	/// </summary>
-	public class Builder
+	public sealed class Builder
 	{
 		/// <summary>
 		/// The grammar to build
@@ -56,7 +56,7 @@ namespace Hime.SDK.Grammars.LR
 		public Builder(Grammar grammar)
 		{
 			this.grammar = grammar;
-			this.conflicts = new List<Conflict>();
+			conflicts = new List<Conflict>();
 		}
 
 		/// <summary>

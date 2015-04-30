@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using Hime.Redist.Parsers;
 
 namespace Hime.SDK.Grammars.LR
@@ -25,20 +24,13 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a set of reduction for a LR(0) state
 	/// </summary>
-	public class StateReductionsLR0 : StateReductions
+	public sealed class StateReductionsLR0 : StateReductions
 	{
 		/// <summary>
 		/// Gets the set of the expected terminals in this set of reductions
 		/// </summary>
 		/// <remarks>This is always an empty set</remarks>
 		public override TerminalSet ExpectedTerminals { get { return new TerminalSet(); } }
-
-		/// <summary>
-		/// Initializes this set of reductions as empty
-		/// </summary>
-		public StateReductionsLR0() : base()
-		{
-		}
 
 		/// <summary>
 		/// Build this set from the given LR state
