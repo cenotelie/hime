@@ -47,7 +47,7 @@ namespace Hime.Demo.Tasks
 		private void BuildAssembly()
 		{
 			// Build parser assembly
-			string grammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
+			const string grammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
 			Hime.SDK.CompilationTask task = new Hime.SDK.CompilationTask();
 			task.Mode = Hime.SDK.Output.Mode.Assembly;
 			task.AddInputRaw(grammar);

@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 
-using System;
 using System.Windows.Forms;
 using Hime.Redist;
 
@@ -49,8 +48,7 @@ namespace Hime.Demo
         {
             foreach (ASTNode child in snode.Children)
             {
-                TreeNode vchild = null;
-                vchild = vnode.Nodes.Add(GetString(child));
+                TreeNode vchild = vnode.Nodes.Add(GetString(child));
                 AddSubTree(vchild, child);
             }
         }
@@ -62,10 +60,8 @@ namespace Hime.Demo
 		/// <returns>The string representation of the node</returns>
         private string GetString(ASTNode node)
         {
-            Symbol symbol = node.Symbol;
-            if (symbol.Value != null)
-                return symbol.Value;
-            return symbol.Name;
+			string value = node.Value;
+			return (value ?? node.Symbol.Name);
         }
     }
 }

@@ -19,7 +19,6 @@
 **********************************************************************/
 using System;
 using System.IO;
-using System.Reflection;
 using Hime.SDK;
 using Hime.SDK.Reflection;
 using Hime.Redist;
@@ -74,7 +73,7 @@ namespace Hime.Demo.Tasks
 				{
 					Console.WriteLine("== Parsing " + Path.Combine(folder, file));
 					StreamReader input = new StreamReader(new FileStream(Path.Combine(folder, file), FileMode.Open));
-					IParser parser = assembly.GetParser(input);
+					BaseLRParser parser = assembly.GetParser(input);
 					ParseResult result = parser.Parse();
 					input.Close();
 					foreach (ParseError error in result.Errors)

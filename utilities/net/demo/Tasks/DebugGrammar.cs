@@ -31,7 +31,7 @@ namespace Hime.Demo.Tasks
 		/// </summary>
 		public void Execute()
 		{
-			string inlineGrammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
+			const string inlineGrammar = "grammar Demo { options {Axiom=\"e\";} terminals {K->ub{Katakana}; H->ub{Hiragana};} rules { e->K H; } }";
 			// load the grammar
 			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
 			loader.AddInputRaw(inlineGrammar);

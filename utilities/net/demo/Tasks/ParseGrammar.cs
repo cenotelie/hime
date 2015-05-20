@@ -19,7 +19,6 @@
 **********************************************************************/
 using System;
 using System.IO;
-using System.Reflection;
 using Hime.SDK;
 using Hime.SDK.Reflection;
 using Hime.Redist;
@@ -54,13 +53,13 @@ namespace Hime.Demo.Tasks
 
 			// Re-parse the input grammar with the generated parser
 			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram"));
-			IParser parser = assembly.GetParser(input);
+			BaseLRParser parser = assembly.GetParser(input);
 			ParseResult result = parser.Parse();
 			input.Close();
 
 			// Display the errors if any
 			foreach (ParseError error in result.Errors)
-				Console.WriteLine(error.ToString());
+				Console.WriteLine(error);
 			if (!result.IsSuccess)
 				return;
 			WinTreeView win = new WinTreeView(result.Root);
