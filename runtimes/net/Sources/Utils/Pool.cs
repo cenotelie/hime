@@ -25,7 +25,7 @@ namespace Hime.Redist.Utils
 	/// Represents a pool of reusable objects
 	/// </summary>
 	/// <typeparam name="T">Type of the pooled objects</typeparam>
-	sealed class Pool<T>
+	class Pool<T>
 	{
 		/// <summary>
 		/// The factory for this pool

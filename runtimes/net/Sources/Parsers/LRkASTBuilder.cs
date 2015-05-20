@@ -25,7 +25,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents the builder of Parse Trees for LR(k) parsers
 	/// </summary>
-	sealed class LRkASTBuilder : SemanticBody
+	class LRkASTBuilder : SemanticBody
 	{
 		/// <summary>
 		/// The initial size of the reduction handle

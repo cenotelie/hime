@@ -46,7 +46,7 @@ namespace Hime.Redist.Parsers
 	/// --- null production table
 	/// indices of the null productions
 	/// </remarks>
-	public sealed class RNGLRAutomaton
+	public class RNGLRAutomaton
 	{
 		/// <summary>
 		/// Represents a cell in a RNGLR parse table

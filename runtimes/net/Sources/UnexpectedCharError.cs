@@ -24,7 +24,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an unexpected character error in the input stream of a lexer
 	/// </summary>
-	public sealed class UnexpectedCharError : ParseError
+	public class UnexpectedCharError : ParseError
 	{
 		/// <summary>
 		/// The unexpected character

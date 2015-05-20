@@ -31,7 +31,7 @@ namespace Hime.Redist.Parsers
 	/// GLR algorithms originally builds the complete SPPF.
 	/// However we only need to build one of the variant, i.e. an AST for the user.
 	/// </remarks>
-	sealed class SPPFBuilder : SemanticBody
+	class SPPFBuilder : SemanticBody
 	{
 		/// <summary>
 		/// The initial size of the reduction handle

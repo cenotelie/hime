@@ -25,7 +25,7 @@ namespace Hime.Redist.Parsers
 	/// Represent a map from symbols' IDs to the index of their corresponding column in an LR table.
 	/// It is optimized for IDs from 0x0000 to 0x01FF (the first 512 symbols) with hope they are the most frequent.
 	/// </summary>
-	sealed class ColumnMap
+	class ColumnMap
 	{
 		/// <summary>
 		/// Cache for ids from 0x00 to 0xFF

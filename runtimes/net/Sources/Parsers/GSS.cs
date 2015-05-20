@@ -27,7 +27,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents Graph-Structured Stacks for GLR parsers
 	/// </summary>
-	sealed class GSS : Lexer.IContextProvider
+	class GSS : Lexer.IContextProvider
 	{
 		/// <summary>
 		/// The initial size of the paths buffer in this GSS

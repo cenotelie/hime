@@ -27,7 +27,7 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	sealed class PrefetchedText : BaseText
+	class PrefetchedText : BaseText
 	{
 		/// <summary>
 		/// The full content of the input

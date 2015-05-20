@@ -25,7 +25,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an unexpected token error in a parser
 	/// </summary>
-	public sealed class UnexpectedTokenError : ParseError
+	public class UnexpectedTokenError : ParseError
 	{
 		/// <summary>
 		/// The unexpected symbol

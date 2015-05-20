@@ -25,7 +25,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// Represents an AST using a graph structure
 	/// </summary>
-	sealed class ASTGraph : AST
+	class ASTGraph : AST
 	{
 		/// <summary>
 		/// The adjacency table

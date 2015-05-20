@@ -24,7 +24,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents of factory of sub-trees that have a specified capacity
 	/// </summary>
-	sealed class SubTreeFactory : Factory<SubTree>
+	class SubTreeFactory : Factory<SubTree>
 	{
 		/// <summary>
 		/// The capacity of the SubTrees produced by this factory

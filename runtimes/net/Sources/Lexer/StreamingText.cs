@@ -29,7 +29,7 @@ namespace Hime.Redist.Lexer
 	/// All line numbers and column numbers are 1-based.
 	/// Indices in the content are 0-based.
 	/// </remarks>
-	sealed class StreamingText : BaseText
+	class StreamingText : BaseText
 	{
 		/// <summary>
 		/// The size of text block

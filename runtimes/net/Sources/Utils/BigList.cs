@@ -30,7 +30,7 @@ namespace Hime.Redist.Utils
 	/// The internal representation is an array of pointers to arrays of T.
 	/// The basic arrays of T (chunks) have a fixed size.
 	/// </remarks>
-	public sealed class BigList<T>
+	public class BigList<T>
 	{
 		/// <summary>
 		/// The number of bits allocated to the lowest part of the index (within a chunk)

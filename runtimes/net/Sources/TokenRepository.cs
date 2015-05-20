@@ -25,7 +25,7 @@ namespace Hime.Redist
 	/// <summary>
 	/// A repository of matched tokens
 	/// </summary>
-	sealed class TokenRepository : IEnumerable<Token>
+	class TokenRepository : IEnumerable<Token>
 	{
 		/// <summary>
 		/// Represents the metadata of a token

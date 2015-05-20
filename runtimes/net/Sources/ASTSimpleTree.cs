@@ -29,7 +29,7 @@ namespace Hime.Redist
 	/// The nodes are stored in sequentials arrays where the children of a node are an inner sequence.
 	/// The linkage is represented by each node storing its number of children and the index of its first child.
 	/// </remarks>
-	sealed class ASTSimpleTree : AST
+	class ASTSimpleTree : AST
 	{
 		/// <summary>
 		/// Initializes this AST

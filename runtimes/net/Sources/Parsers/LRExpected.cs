@@ -24,7 +24,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Container for the expected terminals for a LR state
 	/// </summary>
-	public sealed class LRExpected
+	public class LRExpected
 	{
 		/// <summary>
 		/// The terminals expected for shift actions

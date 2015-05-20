@@ -34,7 +34,7 @@ namespace Hime.Redist.Parsers
 	/// --- production's bytecode
 	/// See LRBytecode
 	/// </remarks>
-	public sealed class LRProduction
+	public class LRProduction
 	{
 		/// <summary>
 		/// Index of the rule's head in the parser's array of variables

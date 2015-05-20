@@ -38,7 +38,7 @@ namespace Hime.Redist.Parsers
 	/// --- productions table
 	/// See LRProduction
 	/// </remarks>
-	public sealed class LRkAutomaton
+	public class LRkAutomaton
 	{
 		/// <summary>
 		/// The number of columns in the LR table

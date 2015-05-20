@@ -33,7 +33,7 @@ namespace Hime.Redist.Lexer
 	/// -- states table
 	/// See State
 	/// </remarks>
-	public sealed class Automaton
+	public class Automaton
 	{
 		/// <summary>
 		/// Identifier of inexistant state in an automaton

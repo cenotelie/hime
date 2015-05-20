@@ -24,7 +24,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a path in a GSS
 	/// </summary>
-	sealed class GSSPath
+	class GSSPath
 	{
 		/// <summary>
 		/// The initial size of the label buffer
