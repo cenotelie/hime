@@ -54,5 +54,14 @@ namespace Hime.Redist
 			this.index = index;
 			this.length = length;
 		}
+
+		/// <summary>
+		/// Gets a string representation of this position
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+		{
+			return "@" + index + "+" + length;
+		}
 	}
 }
