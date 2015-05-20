@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 using Hime.Redist;
@@ -88,7 +87,7 @@ namespace Hime.Tests.Executor
 		{
 			byte[] buffer = System.IO.File.ReadAllBytes("input.txt");
 			string input = new string(System.Text.Encoding.UTF8.GetChars(buffer));
-			Hime.Redist.Parsers.IParser parser = GetParser(parserName, input);
+			Hime.Redist.Parsers.BaseLRParser parser = GetParser(parserName, input);
 			switch (verb)
 			{
 				case VERB_MATCHES:
@@ -107,10 +106,10 @@ namespace Hime.Tests.Executor
 		/// Gets the serialized expected AST
 		/// </summary>
 		/// <returns>The expected AST, or null if an error occurred</returns>
-		private Nullable<ASTNode> GetExpectedAST()
+		private static ASTNode? GetExpectedAST()
 		{
 			string expectedText = System.IO.File.ReadAllText("expected.txt", System.Text.Encoding.UTF8);
-			Hime.Redist.Parsers.IParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+			Hime.Redist.Parsers.BaseLRParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
 			ParseResult result = expectedParser.Parse();
 			foreach (ParseError error in result.Errors)
 			{
@@ -119,16 +118,14 @@ namespace Hime.Tests.Executor
 				Console.WriteLine(context.Content);
 				Console.WriteLine(context.Pointer);
 			}
-			if (result.Errors.Count > 0)
-				return new Nullable<ASTNode>();
-			return new Nullable<ASTNode>(result.Root);
+			return result.Errors.Count > 0 ? new ASTNode?() : (result.Root);
 		}
 
 		/// <summary>
 		/// Gets the serialized expected output
 		/// </summary>
 		/// <returns>The expected output lines</returns>
-		private string[] GetExpectedOutput()
+		private static string[] GetExpectedOutput()
 		{
 			return System.IO.File.ReadAllLines("expected.txt", System.Text.Encoding.UTF8);
 		}
@@ -138,9 +135,9 @@ namespace Hime.Tests.Executor
 		/// </summary>
 		/// <param name="parser">The parser to use</param>
 		/// <returns>The test result</returns>
-		private int TestMatches(Hime.Redist.Parsers.IParser parser)
+		private int TestMatches(Hime.Redist.Parsers.BaseLRParser parser)
 		{
-			Nullable<ASTNode> expected = GetExpectedAST();
+			ASTNode? expected = GetExpectedAST();
 			if (!expected.HasValue)
 			{
 				Console.WriteLine("Failed to parse the expected AST");
@@ -180,9 +177,9 @@ namespace Hime.Tests.Executor
 		/// </summary>
 		/// <param name="parser">The parser to use</param>
 		/// <returns>The test result</returns>
-		private int TestNoMatches(Hime.Redist.Parsers.IParser parser)
+		private int TestNoMatches(Hime.Redist.Parsers.BaseLRParser parser)
 		{
-			Nullable<ASTNode> expected = GetExpectedAST();
+			ASTNode? expected = GetExpectedAST();
 			if (!expected.HasValue)
 			{
 				Console.WriteLine("Failed to parse the expected AST");
@@ -222,7 +219,7 @@ namespace Hime.Tests.Executor
 		/// </summary>
 		/// <param name="parser">The parser to use</param>
 		/// <returns>The test result</returns>
-		private int TestFails(Hime.Redist.Parsers.IParser parser)
+		private static int TestFails(Hime.Redist.Parsers.BaseLRParser parser)
 		{
 			ParseResult result = parser.Parse();
 			if (!result.IsSuccess)
@@ -238,7 +235,7 @@ namespace Hime.Tests.Executor
 		/// </summary>
 		/// <param name="parser">The parser to use</param>
 		/// <returns>The test result</returns>
-		private int TestOutputs(Hime.Redist.Parsers.IParser parser)
+		private static int TestOutputs(Hime.Redist.Parsers.BaseLRParser parser)
 		{
 			string[] output = GetExpectedOutput();
 			ParseResult result = parser.Parse();
@@ -304,14 +301,14 @@ namespace Hime.Tests.Executor
 		/// <returns><c>true</c> if the nodes match</returns>
 		private bool Compare(ASTNode expected, ASTNode node)
 		{
-			if (node.Symbol.Name != expected.Symbol.Value)
+			if (node.Symbol.Name != expected.Value)
 				return false;
 			if (expected.Children[0].Children.Count > 0)
 			{
-				string test = expected.Children[0].Children[0].Symbol.Value;
-				string vRef = expected.Children[0].Children[1].Symbol.Value;
+				string test = expected.Children[0].Children[0].Value;
+				string vRef = expected.Children[0].Children[1].Value;
 				vRef = vRef.Substring(1, vRef.Length - 2).Replace("\\'", "'").Replace("\\\\", "\\");
-				string vReal = node.Symbol.Value;
+				string vReal = node.Value;
 				if (test == "=" && vReal != vRef)
 					return false;
 				if (test == "!=" && vReal == vRef)
@@ -331,16 +328,16 @@ namespace Hime.Tests.Executor
 		/// <param name="parserName">The parser's name</param>
 		/// <param name="input">An input for the parser</param>
 		/// <returns>The parser</returns>
-		private Hime.Redist.Parsers.IParser GetParser(string parserName, string input)
+		private static Hime.Redist.Parsers.BaseLRParser GetParser(string parserName, string input)
 		{
 			Assembly assembly = Assembly.LoadFile(System.IO.Path.GetFullPath("Parsers.dll"));
 			Type parserType = assembly.GetType(parserName);
 			ConstructorInfo parserCtor = parserType.GetConstructors()[0];
 			ParameterInfo[] parameters = parserCtor.GetParameters();
 			Type lexerType = parameters[0].ParameterType;
-			ConstructorInfo lexerCtor = lexerType.GetConstructor(new Type[] { typeof(string) });
+			ConstructorInfo lexerCtor = lexerType.GetConstructor(new [] { typeof(string) });
 			object lexer = lexerCtor.Invoke(new object[] { input });
-			return (Hime.Redist.Parsers.IParser)parserCtor.Invoke(new object[] { lexer });
+			return (Hime.Redist.Parsers.BaseLRParser)parserCtor.Invoke(new [] { lexer });
 		}
 	}
 }

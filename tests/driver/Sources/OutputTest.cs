@@ -19,7 +19,6 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using Hime.Redist;
 using Hime.SDK;
 using Hime.SDK.Input;
@@ -44,14 +43,14 @@ namespace Hime.Tests.Driver
 		/// <summary>
 		/// Gets the test's name
 		/// </summary>
-		public override string Name { get { return node.Children[0].Symbol.Value; } }
+		public override string Name { get { return node.Children[0].Value; } }
 
 		/// <summary>
 		/// Initializes this test
 		/// </summary>
 		/// <param name="node">The test specification</param>
 		/// <param name="originalInput">The original input for the test specification</param>
-		public OutputTest(ASTNode node, Text originalInput) : base()
+		public OutputTest(ASTNode node, Text originalInput)
 		{
 			this.node = node;
 			this.originalInput = originalInput;
@@ -67,7 +66,7 @@ namespace Hime.Tests.Driver
 			loader.AddInput(node.Children[1], originalInput);
 			return new Unit(
 				loader.Load()[0],
-				(ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Symbol.Value),
+				(ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Value),
 				"Hime.Tests.Generated." + fixture,
 				Modifier.Public);
 		}
@@ -81,14 +80,14 @@ namespace Hime.Tests.Driver
 		public override void Execute(Reporter reporter, List<Runtime> targets, string fixture)
 		{
 			// Export input
-			string inputValue = node.Children[3].Symbol.Value;
+			string inputValue = node.Children[3].Value;
 			inputValue =  Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
 			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
 			// Export expected output
 			List<string> expected = new List<string>();
 			for (int i=4; i!=node.Children.Count; i++)
 			{
-				string temp = node.Children[i].Symbol.Value;
+				string temp = node.Children[i].Value;
 				temp =  Hime.SDK.Grammars.Loader.ReplaceEscapees(temp.Substring(1, temp.Length - 2));
 				temp = temp.Replace("\\\"", "\"");
 				expected.Add(temp);
@@ -100,10 +99,10 @@ namespace Hime.Tests.Driver
 				switch (runtime)
 				{
 					case Runtime.Net:
-						this.results.Add(runtime, ExecuteOnNet(reporter, fixture));
+						results.Add(runtime, ExecuteOnNet(reporter, fixture));
 						break;
 					case Runtime.Java:
-						this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
+						results.Add(runtime, ExecuteOnJava(reporter, fixture));
 						break;
 				}
 			}
@@ -127,10 +126,7 @@ namespace Hime.Tests.Driver
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser outputs");
-				if (IsOnWindows())
-					code = ExecuteCommand(reporter, "executor.exe", args.ToString(), output);
-				else
-					code = ExecuteCommand(reporter, "mono", "executor.exe " + args.ToString(), output);
+				code = IsOnWindows() ? ExecuteCommand(reporter, "executor.exe", args.ToString(), output) : ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
 			}
 			catch (Exception ex)
 			{

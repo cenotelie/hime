@@ -63,7 +63,7 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		public TestResult()
 		{
-			this.startTime = DateTime.Now;
+			startTime = DateTime.Now;
 		}
 
 		/// <summary>
@@ -73,8 +73,8 @@ namespace Hime.Tests.Driver
 		/// <param name="output">The test console output</param>
 		public void Finish(int result, List<string> output)
 		{
-			this.spentTime = (DateTime.Now - this.startTime);
-			this.executorResult = result;
+			spentTime = (DateTime.Now - startTime);
+			executorResult = result;
 			this.output = output;
 		}
 
@@ -89,12 +89,12 @@ namespace Hime.Tests.Driver
 			root.Attributes.Append(doc.CreateAttribute("name"));
 			root.Attributes.Append(doc.CreateAttribute("classname"));
 			root.Attributes.Append(doc.CreateAttribute("time"));
-			root.Attributes["time"].Value = this.spentTime.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			root.Attributes["time"].Value = spentTime.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
 			if (executorResult == RESULT_FAILURE_PARSING)
 			{
 				XmlElement error = doc.CreateElement("error");
 				System.Text.StringBuilder builder = new System.Text.StringBuilder();
-				foreach (string line in this.output)
+				foreach (string line in output)
 				{
 					builder.Append(line);
 					builder.Append(Environment.NewLine);
@@ -106,7 +106,7 @@ namespace Hime.Tests.Driver
 			{
 				XmlElement error = doc.CreateElement("failure");
 				System.Text.StringBuilder builder = new System.Text.StringBuilder();
-				foreach (string line in this.output)
+				foreach (string line in output)
 				{
 					builder.Append(line);
 					builder.Append(Environment.NewLine);
@@ -115,7 +115,7 @@ namespace Hime.Tests.Driver
 				root.AppendChild(error);
 			}
 			ReportData data = new ReportData();
-			data.spent = this.spentTime;
+			data.spent = spentTime;
 			data.passed = executorResult == RESULT_SUCCESS ? 1 : 0;
 			data.errors = executorResult == RESULT_FAILURE_PARSING ? 1 : 0;
 			data.failed = executorResult == RESULT_FAILURE_VERB ? 1 : 0;

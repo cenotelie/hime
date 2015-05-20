@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -52,9 +51,9 @@ namespace Hime.Tests.Driver
 			task.AddInputRaw(stream1);
 			task.AddInputRaw(stream2);
 			task.GrammarName = "Fixture";
-			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
+			task.CodeAccess = Modifier.Public;
 			task.Method = ParsingMethod.LALR1;
-			task.Mode = Hime.SDK.Output.Mode.Assembly;
+			task.Mode = Mode.Assembly;
 			task.Namespace = "Hime.Tests.Driver";
 			task.Execute();
 			return new AssemblyReflection("Fixture.dll");
@@ -63,11 +62,11 @@ namespace Hime.Tests.Driver
 		/// <summary>
 		/// The fixture's name
 		/// </summary>
-		private string name;
+		private readonly string name;
 		/// <summary>
 		/// The contained tests
 		/// </summary>
-		private List<Test> tests;
+		private readonly List<Test> tests;
 
 		/// <summary>
 		/// Gets the fixture's name
@@ -92,16 +91,16 @@ namespace Hime.Tests.Driver
 			TextReader reader = new StreamReader(stream, System.Text.Encoding.UTF8);
 			string content = reader.ReadToEnd();
 			reader.Close();
-			Hime.Redist.Parsers.IParser parser = parserFixture.GetParser(content);
+			Hime.Redist.Parsers.BaseLRParser parser = parserFixture.GetParser(content);
 			ParseResult result = parser.Parse();
 			foreach (ParseError error in result.Errors)
 				reporter.Error(error, result.Input, error.Position);
 			ASTNode fixtureNode = result.Root;
-			this.name = fixtureNode.Symbol.Value;
-			this.tests = new List<Test>();
+			this.name = fixtureNode.Value;
+			tests = new List<Test>();
 			foreach (ASTNode testNode in fixtureNode.Children)
 			{
-				Test test = null;
+				Test test;
 				switch (testNode.Symbol.Name)
 				{
 					case "test_output":

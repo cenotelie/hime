@@ -19,7 +19,6 @@
 **********************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using Hime.Redist;
 using Hime.SDK;
 using Hime.SDK.Input;
@@ -65,34 +64,34 @@ namespace Hime.Tests.Driver
 		/// <summary>
 		/// Gets the test's name
 		/// </summary>
-		public override string Name { get { return node.Children[0].Symbol.Value; } }
+		public override string Name { get { return node.Children[0].Value; } }
 
 		/// <summary>
 		/// Initializes this test
 		/// </summary>
 		/// <param name="node">The test specification</param>
 		/// <param name="originalInput">The original input for the test specification</param>
-		public ParsingTest(ASTNode node, Text originalInput) : base()
+		public ParsingTest(ASTNode node, Text originalInput)
 		{
 			this.node = node;
 			this.originalInput = originalInput;
 			switch (node.Symbol.Name)
 			{
 				case "test_matches":
-					this.verb = VERB_MATCHES;
+					verb = VERB_MATCHES;
 					break;
 				case "test_no_match":
-					this.verb = VERB_NOMATCHES;
+					verb = VERB_NOMATCHES;
 					break;
 				case "test_fails":
-					this.verb = VERB_FAILS;
+					verb = VERB_FAILS;
 					break;
 			}
 			if (node.Children.Count >= 5)
 			{
 				System.Text.StringBuilder builder = new System.Text.StringBuilder();
 				BuildExpected(builder, node.Children[4]);
-				this.expected = builder.ToString();
+				expected = builder.ToString();
 			}
 		}
 
@@ -103,12 +102,12 @@ namespace Hime.Tests.Driver
 		/// <param name="node">The current node to build</param>
 		private void BuildExpected(System.Text.StringBuilder builder, ASTNode node)
 		{
-			builder.Append(node.Symbol.Value);
+			builder.Append(node.Value);
 			if (node.Children[0].Children.Count > 0)
 			{
-				builder.Append(node.Children[0].Children[0].Symbol.Value);
+				builder.Append(node.Children[0].Children[0].Value);
 				builder.Append("'");
-				string value = node.Children[0].Children[1].Symbol.Value;
+				string value = node.Children[0].Children[1].Value;
 				// Decode the read value by replacing all the escape sequences
 				value = Hime.SDK.Grammars.Loader.ReplaceEscapees(value.Substring(1, value.Length - 2)).Replace("\\'", "'");
 				// Reset escape sequences for single quotes and backslashes
@@ -138,7 +137,7 @@ namespace Hime.Tests.Driver
 			loader.AddInput(node.Children[1], originalInput);
 			return new Unit(
 				loader.Load()[0],
-				(ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Symbol.Value),
+				(ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Value),
 				"Hime.Tests.Generated." + fixture,
 				Modifier.Public);
 		}
@@ -152,7 +151,7 @@ namespace Hime.Tests.Driver
 		public override void Execute(Reporter reporter, List<Runtime> targets, string fixture)
 		{
 			// Export input
-			string inputValue = node.Children[3].Symbol.Value;
+			string inputValue = node.Children[3].Value;
 			inputValue =  Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
 			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
 			// Export expected AST
@@ -164,10 +163,10 @@ namespace Hime.Tests.Driver
 				switch (runtime)
 				{
 					case Runtime.Net:
-						this.results.Add(runtime, ExecuteOnNet(reporter, fixture));
+						results.Add(runtime, ExecuteOnNet(reporter, fixture));
 						break;
 					case Runtime.Java:
-						this.results.Add(runtime, ExecuteOnJava(reporter, fixture));
+						results.Add(runtime, ExecuteOnJava(reporter, fixture));
 						break;
 				}
 			}
@@ -194,10 +193,7 @@ namespace Hime.Tests.Driver
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
-				if (IsOnWindows())
-					code = ExecuteCommand(reporter, "executor.exe", args.ToString(), output);
-				else
-					code = ExecuteCommand(reporter, "mono", "executor.exe " + args.ToString(), output);
+				code = IsOnWindows() ? ExecuteCommand(reporter, "executor.exe", args.ToString (), output) : ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
 			}
 			catch (Exception ex)
 			{

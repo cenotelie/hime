@@ -19,8 +19,6 @@
 **********************************************************************/
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 [assembly: AssemblyCopyright("Copyright © 2015")]
 [assembly: AssemblyVersion("2.0.0.0")]

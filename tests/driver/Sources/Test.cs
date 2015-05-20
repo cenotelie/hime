@@ -20,9 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using Hime.Redist;
 using Hime.SDK;
-using Hime.SDK.Input;
 using Hime.SDK.Output;
 
 namespace Hime.Tests.Driver
@@ -45,7 +43,7 @@ namespace Hime.Tests.Driver
 		/// <summary>
 		/// Initializes the test
 		/// </summary>
-		public Test()
+		protected Test()
 		{
 			results = new Dictionary<Runtime, TestResult>();
 		}
@@ -83,11 +81,11 @@ namespace Hime.Tests.Driver
 			}
 		}
 
-		// <summary>
+		/// <summary>
 		/// Executes the specified command
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
-		/// <param name="verb">The program to execute</param>
+		/// <param name="command">The command to execute</param>
 		/// <param name="arguments">The arguments</param>
 		/// <param name="output">Storage for the console output lines</param>
 		/// <returns>The command exit code</returns>
@@ -103,7 +101,7 @@ namespace Hime.Tests.Driver
 			while (true)
 			{
 				string line = process.StandardOutput.ReadLine();
-				if (line == null || line.Length == 0)
+				if (string.IsNullOrEmpty(line))
 					break;
 				output.Add(line);
 				reporter.Info(line);

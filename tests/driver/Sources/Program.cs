@@ -90,7 +90,7 @@ namespace Hime.Tests.Driver
 			// Loads the arguments from the command line
 			foreach (ASTNode arg in result.Root.Children[1].Children)
 			{
-				switch (arg.Symbol.Value)
+				switch (arg.Value)
 				{
 					case "--targets":
 						foreach (string name in Hime.SDK.Input.CommandLine.GetValues(arg))
@@ -100,7 +100,7 @@ namespace Hime.Tests.Driver
 						filter = new Regex(Hime.SDK.Input.CommandLine.GetValue(arg));
 						break;
 					default:
-						Console.WriteLine("Unknown argument " + arg.Symbol.Value);
+						Console.WriteLine("Unknown argument " + arg.Value);
 						break;
 				}
 			}
@@ -220,9 +220,9 @@ namespace Hime.Tests.Driver
 		/// <summary>
 		/// Prints the help screen for this program
 		/// </summary>
-		private void PrintHelp()
+		private static void PrintHelp()
 		{
-			Console.WriteLine("driver " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (LGPL 3)");
+			Console.WriteLine("driver " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Tests driver for the multiplatform tests of the Hime parser generator");
 			Console.WriteLine();
 			Console.WriteLine("usage: mono driver.exe --targets <NAMES> [--filter REGEXP]");
@@ -236,7 +236,7 @@ namespace Hime.Tests.Driver
 			{
 				if (!first)
 					Console.Write(", ");
-				Console.Write(v.ToString());
+				Console.Write(v);
 				first = false;
 			}
 			Console.WriteLine();
