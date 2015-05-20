@@ -105,7 +105,7 @@ namespace Hime.Redist.Parsers
 			ModeDebug = DEFAULT_MODE_DEBUG;
 			symVariables = new ROList<Symbol>(new List<Symbol>(variables));
 			symVirtuals = new ROList<Symbol>(new List<Symbol>(virtuals));
-			symActions = new ROList<SemanticAction>(new List<SemanticAction>(actions));
+			symActions = new ROList<SemanticAction>(actions != null ? new List<SemanticAction>(actions) : new List<SemanticAction>());
 			ModeRecoverErrors = true;
 			allErrors = new List<ParseError>();
 			this.lexer = lexer;
