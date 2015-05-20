@@ -23,7 +23,7 @@ namespace Hime.SDK
 	/// <summary>
 	/// Represents a Unicode block of characters
 	/// </summary>
-	public sealed class UnicodeBlock
+	public class UnicodeBlock
 	{
 		/// <summary>
 		/// The block's name

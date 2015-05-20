@@ -24,7 +24,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a reduction in a LR automaton
 	/// </summary>
-	public sealed class LRReduction
+	public class LRReduction
 	{
 		/// <summary>
 		/// The lookahead to reduce on

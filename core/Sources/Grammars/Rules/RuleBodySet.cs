@@ -24,7 +24,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents an ordered set of grammar rule bodies
 	/// </summary>
-	public sealed class RuleBodySet : List<RuleBody>
+	public class RuleBodySet : List<RuleBody>
 	{
 		/// <summary>
 		/// Builds the union of the left and right set

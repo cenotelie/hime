@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a grammar
 	/// </summary>
-	public sealed class Grammar
+	public class Grammar
 	{
 		/// <summary>
 		/// The prefix for the generated terminal names

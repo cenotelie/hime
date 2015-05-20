@@ -27,7 +27,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a loader for a grammar
 	/// </summary>
-	public sealed class Loader
+	public class Loader
 	{
 		/// <summary>
 		/// The name of the resource containing the data that are loaded by this instance

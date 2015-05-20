@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a virtual symbol in a grammar
 	/// </summary>
-	public sealed class Virtual : Symbol
+	public class Virtual : Symbol
 	{
 		/// <summary>
 		/// Initializes this symbol

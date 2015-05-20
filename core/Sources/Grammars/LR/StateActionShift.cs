@@ -24,7 +24,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a shift action in a LR state
 	/// </summary>
-	public sealed class StateActionShift : StateAction
+	public class StateActionShift : StateAction
 	{
 		/// <summary>
 		/// The trigger symbol

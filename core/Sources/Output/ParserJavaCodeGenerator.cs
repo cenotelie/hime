@@ -24,7 +24,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for parser code for the Java platform
 	/// </summary>
-	public sealed class ParserJavaCodeGenerator : Generator
+	public class ParserJavaCodeGenerator : Generator
 	{
 		/// <summary>
 		/// The nmespace of the generated code

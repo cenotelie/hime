@@ -24,7 +24,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the context of a loader
 	/// </summary>
-	public sealed class Context
+	public class Context
 	{
 		/// <summary>
 		/// The loader

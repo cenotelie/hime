@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a builder of LR graphs
 	/// </summary>
-	public sealed class Builder
+	public class Builder
 	{
 		/// <summary>
 		/// The grammar to build

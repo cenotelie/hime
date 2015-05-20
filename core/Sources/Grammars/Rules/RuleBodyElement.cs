@@ -24,7 +24,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents an element in the body of a grammar rule
 	/// </summary>
-	public sealed class RuleBodyElement
+	public class RuleBodyElement
 	{
 		/// <summary>
 		/// The symbol of this element

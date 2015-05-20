@@ -26,7 +26,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LR state
 	/// </summary>
-	public sealed class State
+	public class State
 	{
 		/// <summary>
 		/// The state's kernel

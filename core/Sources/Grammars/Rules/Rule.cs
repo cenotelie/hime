@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a grammar rule
 	/// </summary>
-	public sealed class Rule
+	public class Rule
 	{
 		/// <summary>
 		/// The rule's head variable

@@ -25,7 +25,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represent an output unit, i.e. a grammar with its compilation parameters
 	/// </summary>
-	public sealed class Unit
+	public class Unit
 	{
 		/// <summary>
 		/// The represented grammar

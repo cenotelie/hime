@@ -25,7 +25,7 @@ namespace Hime.SDK
 	/// <summary>
 	/// Represents a Unicode category
 	/// </summary>
-	public sealed class UnicodeCategory
+	public class UnicodeCategory
 	{
 		/// <summary>
 		/// The category's name

@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// Represents a set of states in a Non-deterministic Finite Automaton
 	/// A state can only appear once in a set
 	/// </summary>
-	sealed class NFAStateSet
+	class NFAStateSet
 	{
 		/// <summary>
 		/// The backend storage for the states in this set

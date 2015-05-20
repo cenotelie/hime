@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a LALR(1) item
 	/// </summary>
-	public sealed class ItemLALR1 : Item
+	public class ItemLALR1 : Item
 	{
 		/// <summary>
 		/// The lookaheads for this item

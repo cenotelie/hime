@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a graph of LR kernels used to build a LALR(1) graph from a LR(0) graph
 	/// </summary>
-	public sealed class KernelGraph
+	public class KernelGraph
 	{
 		/// <summary>
 		/// The LR(0) graph

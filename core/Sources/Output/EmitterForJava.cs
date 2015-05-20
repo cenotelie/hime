@@ -25,7 +25,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents an emitter of lexer and parser for a given grammar on the Java platform
 	/// </summary>
-	public sealed class EmitterForJava : EmitterBase
+	public class EmitterForJava : EmitterBase
 	{
 		/// <summary>
 		/// Gets the suffix for the emitted lexer code files

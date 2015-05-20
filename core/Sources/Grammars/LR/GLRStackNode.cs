@@ -24,7 +24,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a node in a Graph-Structured Stack of a simulation of a GLR parser
 	/// </summary>
-	public sealed class GLRStackNode
+	public class GLRStackNode
 	{
 		/// <summary>
 		/// The state represented by this node

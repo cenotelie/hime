@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a set of reduction for a RNGLALR(1) state
 	/// </summary>
-	public sealed class StateReductionsRNGLALR1 : StateReductions
+	public class StateReductionsRNGLALR1 : StateReductions
 	{
 		/// <summary>
 		/// Gets the set of the expected terminals in this set of reductions

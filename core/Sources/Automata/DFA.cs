@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a Deterministic Finite-state Automaton
 	/// </summary>
-	public sealed class DFA
+	public class DFA
 	{
 		/// <summary>
 		/// The list of states in this automaton

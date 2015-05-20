@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents the inverse graph of a DFA
 	/// </summary>
-	public sealed class DFAInverse
+	public class DFAInverse
 	{
 		/// <summary>
 		/// The reachable states

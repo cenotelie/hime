@@ -27,7 +27,7 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Utilities to decompile a parser produced by Central Dogma
 	/// </summary>
-	public sealed class ParserReflection
+	public class ParserReflection
 	{
 		/// <summary>
 		/// List of the terminals matched by the associated lexer

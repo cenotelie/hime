@@ -85,7 +85,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Represents a comparer that works on the priority of the terminals
 		/// </summary>
-		public sealed class PriorityComparer : System.Collections.Generic.IComparer<Terminal>
+		public class PriorityComparer : System.Collections.Generic.IComparer<Terminal>
 		{
 			/// <summary>
 			/// Compare the specified terminals

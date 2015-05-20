@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the instance of a template rule
 	/// </summary>
-	public sealed class TemplateRuleInstance
+	public class TemplateRuleInstance
 	{
 		/// <summary>
 		/// The parent rule

@@ -24,7 +24,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a set of unique terminals (sorted by ID)
 	/// </summary>
-	public sealed class TerminalSet : IList<Terminal>
+	public class TerminalSet : IList<Terminal>
 	{
 		/// <summary>
 		/// The backing content

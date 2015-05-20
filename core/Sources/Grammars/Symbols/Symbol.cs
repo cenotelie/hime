@@ -50,7 +50,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Represents an equality comparer for grammar symbols
 		/// </summary>
-		public sealed class EqualityComparer : IEqualityComparer<Symbol>
+		public class EqualityComparer : IEqualityComparer<Symbol>
 		{
 			/// <summary>
 			/// Checks whether two symbols are the same

@@ -26,7 +26,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for lexer code for the Java platform
 	/// </summary>
-	public sealed class LexerJavaCodeGenerator : Generator
+	public class LexerJavaCodeGenerator : Generator
 	{
 		/// <summary>
 		/// The nmespace of the generated code

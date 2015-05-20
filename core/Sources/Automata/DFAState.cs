@@ -24,7 +24,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a state in a Deterministic Finite Automaton
 	/// </summary>
-	public sealed class DFAState : State
+	public class DFAState : State
 	{
 		/// <summary>
 		/// This state's id

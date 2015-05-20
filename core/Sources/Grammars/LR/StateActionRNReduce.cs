@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents a reduction action in a RNGLR state
 	/// </summary>
-	public sealed class StateActionRNReduce : StateActionReduce
+	public class StateActionRNReduce : StateActionReduce
 	{
 		/// <summary>
 		/// Gets the reduction length

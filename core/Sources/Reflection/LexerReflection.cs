@@ -29,7 +29,7 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Utilities to decompile a lexer produced by Central Dogma
 	/// </summary>
-	public sealed class LexerReflection
+	public class LexerReflection
 	{
 		/// <summary>
 		/// List of the terminals that can be matched

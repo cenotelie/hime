@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars
 	/// Represents a phrase that can be produced by grammar.
 	/// It is essentially a list of terminals
 	/// </summary>
-	public sealed class Phrase : IEnumerable<Terminal>
+	public class Phrase : IEnumerable<Terminal>
 	{
 		/// <summary>
 		/// The content

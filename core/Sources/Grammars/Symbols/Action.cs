@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a symbol for a semantic action in a grammar
 	/// </summary>
-	public sealed class Action : Symbol
+	public class Action : Symbol
 	{
 		/// <summary>
 		/// Initializes this symbol

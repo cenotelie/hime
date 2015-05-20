@@ -26,7 +26,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator of data and code for a lexer
 	/// </summary>
-	public sealed class LexerDataGenerator : Generator
+	public class LexerDataGenerator : Generator
 	{
 		/// <summary>
 		/// The terminals matched by the lexer

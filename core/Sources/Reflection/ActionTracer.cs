@@ -26,7 +26,7 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Represents a tracer of the execution of the semantic actions in a parser
 	/// </summary>
-	public sealed class ActionTracer
+	public class ActionTracer
 	{
 		/// <summary>
 		/// The semantic actions

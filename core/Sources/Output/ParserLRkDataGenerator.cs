@@ -27,7 +27,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for LR(k) parser data for the .Net platform
 	/// </summary>
-	public sealed class ParserLRkDataGenerator : Generator
+	public class ParserLRkDataGenerator : Generator
 	{
 		/// <summary>
 		/// LR graph for the parser

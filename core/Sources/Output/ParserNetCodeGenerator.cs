@@ -24,7 +24,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for parser code for the .Net platform
 	/// </summary>
-	public sealed class ParserNetCodeGenerator : Generator
+	public class ParserNetCodeGenerator : Generator
 	{
 		/// <summary>
 		/// The nmespace of the generated code

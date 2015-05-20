@@ -23,7 +23,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a transition in a Non-deterministic Finite Automaton
 	/// </summary>
-	public sealed class NFATransition
+	public class NFATransition
 	{
 		/// <summary>
 		/// The value on this transition

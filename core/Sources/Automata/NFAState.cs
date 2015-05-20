@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a state in a Non-deterministic Finite Automaton
 	/// </summary>
-	public sealed class NFAState : State
+	public class NFAState : State
 	{
 		/// <summary>
 		/// The list of transitions

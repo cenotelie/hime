@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the body of a grammar rule
 	/// </summary>
-	public sealed class RuleBody : RuleChoice
+	public class RuleBody : RuleChoice
 	{
 		/// <summary>
 		/// The choices in this body

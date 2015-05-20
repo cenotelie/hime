@@ -29,7 +29,7 @@ namespace Hime.SDK.Input
 	/// <remarks>
 	/// This class will close all the streams it is passed after loading the data from them.
 	/// </remarks>
-	public sealed class Loader
+	public class Loader
 	{
 		/// <summary>
 		/// Next unique identifier for raw (anonymous) inputs

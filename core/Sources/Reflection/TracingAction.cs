@@ -26,7 +26,7 @@ namespace Hime.SDK.Reflection
 	/// Encapsulates a parser semantic action used for tracing purposes
 	/// </summary>
 	/// <typeparam name="T">The payload's type</typeparam>
-	public sealed class TracingAction<T>
+	public class TracingAction<T>
 	{
 		/// <summary>
 		/// The common trace

@@ -31,7 +31,7 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Helper class for handling generated assembly containing lexers and parsers
 	/// </summary>
-	public sealed class AssemblyReflection
+	public class AssemblyReflection
 	{
 		/// <summary>
 		/// The inspected assembly

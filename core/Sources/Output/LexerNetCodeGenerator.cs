@@ -26,7 +26,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for lexer code for the .Net platform
 	/// </summary>
-	public sealed class LexerNetCodeGenerator : Generator
+	public class LexerNetCodeGenerator : Generator
 	{
 		/// <summary>
 		/// The nmespace of the generated code

@@ -27,7 +27,7 @@ namespace Hime.SDK.Output
 	/// <summary>
 	/// Represents a generator for RNGLR parser data for the .Net platform
 	/// </summary>
-	public sealed class ParserRNGLRDataGenerator : Generator
+	public class ParserRNGLRDataGenerator : Generator
 	{
 		/// <summary>
 		/// The grammar to generate a parser for

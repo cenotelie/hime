@@ -26,7 +26,7 @@ namespace Hime.SDK.Grammars.LR
 	/// Represents a LR conflict
 	/// </summary>
 	// should not inherit from Entry, rather should build an entry when needed!!
-	public sealed class Conflict
+	public class Conflict
 	{
 		/// <summary>
 		/// The state raising this conflict

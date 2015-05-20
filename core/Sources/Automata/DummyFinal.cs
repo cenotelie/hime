@@ -24,7 +24,7 @@ namespace Hime.SDK.Automata
 	/// Represents a fake marker of a final state in an automaton
 	/// </summary>
 	/// <remarks>This class is a singleton</remarks>
-	public sealed class DummyItem : FinalItem
+	public class DummyItem : FinalItem
 	{
 		/// <summary>
 		/// The single instance

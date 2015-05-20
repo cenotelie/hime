@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents a Non-deterministic Finite Automaton
 	/// </summary>
-	public sealed class NFA
+	public class NFA
 	{
 		/// <summary>
 		/// The list of all the states in this automaton

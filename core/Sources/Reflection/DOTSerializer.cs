@@ -24,7 +24,7 @@ namespace Hime.SDK.Reflection
 	/// <summary>
 	/// Serializes graphs in the DOT format
 	/// </summary>
-	public sealed class DOTSerializer
+	public class DOTSerializer
 	{
 		/// <summary>
 		/// The writer

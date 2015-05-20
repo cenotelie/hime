@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// <summary>
 	/// Represents an LR automaton
 	/// </summary>
-	public sealed class LRAutomaton
+	public class LRAutomaton
 	{
 		/// <summary>
 		/// The states

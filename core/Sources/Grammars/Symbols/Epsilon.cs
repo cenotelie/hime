@@ -23,7 +23,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents the epsilon symbol in a grammar, i.e. a terminal with an empty value
 	/// </summary>
-	public sealed class Epsilon : Terminal
+	public class Epsilon : Terminal
 	{
 		/// <summary>
 		/// The singleton instance

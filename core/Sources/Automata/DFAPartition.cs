@@ -25,7 +25,7 @@ namespace Hime.SDK.Automata
 	/// Represents a partition of a DFA
 	/// This is used to compute minimal DFAs
 	/// </summary>
-	public sealed class DFAPartition
+	public class DFAPartition
 	{
 		/// <summary>
 		/// The groups in this partition

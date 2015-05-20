@@ -26,7 +26,7 @@ namespace Hime.SDK.Grammars
 	/// <summary>
 	/// Represents a template rule in a grammar
 	/// </summary>
-	public sealed class TemplateRule
+	public class TemplateRule
 	{
 		/// <summary>
 		/// The existing instances of this template rule
