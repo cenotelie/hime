@@ -20,7 +20,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Hime.SDK.Reflection;
 using Hime.Redist.Parsers;
 
@@ -40,11 +39,7 @@ namespace Hime.Benchmark
 		public void Execute(string assembly, string input, bool useStream)
 		{
 			AssemblyReflection asm = new AssemblyReflection(assembly);
-			IParser parser = null;
-			if (useStream)
-				parser = asm.GetParser(new StreamReader(new FileStream(input, FileMode.Open)));
-			else
-				parser = asm.GetParser(File.ReadAllText(input));
+			BaseLRParser parser = useStream ? asm.GetParser(new StreamReader(new FileStream(input, FileMode.Open))) : asm.GetParser(File.ReadAllText(input));
 
 			Stopwatch watch = new Stopwatch();
 			watch.Start();

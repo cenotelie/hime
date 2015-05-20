@@ -34,17 +34,6 @@ namespace Hime.Benchmark
 		/// <param name="args">Command line arguments</param>
 		public static int Main(string[] args)
 		{
-			Program program = new Program();
-			return program.Run(args);
-		}
-
-		/// <summary>
-		/// Runs this program
-		/// </summary>
-		/// <param name="args">The command line arguments</param>
-		/// <returns>The error code, or 0 if none</returns>
-		private int Run(string[] args)
-		{
 			// If no argument is given, print the help screen and return OK
 			if (args == null || args.Length == 0)
 			{
@@ -75,12 +64,12 @@ namespace Hime.Benchmark
 			}
 
 			Task task = null;
-			string assemblyPath = inputs.Children[0].Symbol.Value;
-			string inputPath = inputs.Children[1].Symbol.Value;
+			string assemblyPath = inputs.Children[0].Value;
+			string inputPath = inputs.Children[1].Value;
 			bool useStream = false;
 			foreach (ASTNode arg in line.Children[1].Children)
 			{
-				switch (arg.Symbol.Value)
+				switch (arg.Value)
 				{
 					case "--stream":
 						useStream = true;
@@ -103,9 +92,9 @@ namespace Hime.Benchmark
 		/// <summary>
 		/// Prints the help screen for this program
 		/// </summary>
-		private void PrintHelp()
+		private static void PrintHelp()
 		{
-			Console.WriteLine("Hime.Benchmark " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " (LGPL 3)");
+			Console.WriteLine("Hime.Benchmark " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Benchmarking facility for the Hime parsers");
 			Console.WriteLine();
 			Console.WriteLine("usage: Hime.Benchmark <assembly> <input> [options]");

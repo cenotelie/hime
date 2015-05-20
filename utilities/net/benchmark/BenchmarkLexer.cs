@@ -20,7 +20,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Hime.SDK.Reflection;
 using Hime.Redist.Lexer;
 
@@ -40,19 +39,14 @@ namespace Hime.Benchmark
 		public void Execute(string assembly, string input, bool useStream)
 		{
 			AssemblyReflection asm = new AssemblyReflection(assembly);
-			ILexer lexer = null;
-			if (useStream)
-				lexer = asm.getLexer(new StreamReader(new FileStream(input, FileMode.Open)));
-			else
-				lexer = asm.getLexer(File.ReadAllText(input));
+			BaseLexer lexer = useStream ? asm.getLexer(new StreamReader(new FileStream(input, FileMode.Open))) : asm.getLexer(File.ReadAllText(input));
 
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
 			Hime.Redist.Token token = lexer.GetNextToken();
-			while (token.SymbolID != Hime.Redist.Symbol.SID_EPSILON)
+			while (token.Symbol.ID != Hime.Redist.Symbol.SID_EPSILON)
 				token = lexer.GetNextToken();
 			watch.Stop();
-
 			Console.WriteLine(watch.ElapsedMilliseconds);
 		}
 	}

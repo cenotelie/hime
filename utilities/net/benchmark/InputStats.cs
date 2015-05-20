@@ -18,11 +18,9 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using Hime.SDK.Reflection;
 using Hime.Redist.Lexer;
+using Hime.SDK.Reflection;
 
 namespace Hime.Benchmark
 {
@@ -43,15 +41,12 @@ namespace Hime.Benchmark
 			Console.WriteLine("Size (bytes): " + file.Length);
 
 			AssemblyReflection asm = new AssemblyReflection(assembly);
-			ILexer lexer = null;
-			if (useStream)
-				lexer = asm.getLexer(new StreamReader(new FileStream(input, FileMode.Open)));
-			else
-				lexer = asm.getLexer(File.ReadAllText(input));
+			BaseLexer lexer;
+			lexer = useStream ? asm.getLexer (new StreamReader (new FileStream (input, FileMode.Open))) : asm.getLexer (File.ReadAllText (input));
 
 			int count = 0;
 			Hime.Redist.Token token = lexer.GetNextToken();
-			while (token.SymbolID != Hime.Redist.Symbol.SID_EPSILON)
+			while (token.Symbol.ID != Hime.Redist.Symbol.SID_EPSILON)
 			{
 				token = lexer.GetNextToken();
 				count++;
