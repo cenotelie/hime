@@ -71,7 +71,7 @@ namespace Hime.Redist.Lexer
 			lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
 			lines[0] = 0;
 			line = 1;
-			char c1 = '\0';
+			char c1;
 			char c2 = '\0';
 			for (int i = 0; i != content.Length; i++)
 			{
@@ -102,7 +102,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The substring</returns>
 		public override string GetValue(int index, int length)
 		{
-			return length == 0 ? string.Empty : content.Substring (index, length);
+			return length == 0 ? string.Empty : content.Substring(index, length);
 		}
 
 		/// <summary>
@@ -115,7 +115,7 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
-			return line == this.line ? (content.Length - lines [this.line - 1]) : (lines [line] - lines [line - 1]);
+			return line == this.line ? (content.Length - lines[this.line - 1]) : (lines[line] - lines[line - 1]);
 		}
 	}
 }

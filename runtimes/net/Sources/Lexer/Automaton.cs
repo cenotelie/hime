@@ -74,11 +74,11 @@ namespace Hime.Redist.Lexer
 		{
 			statesCount = reader.ReadInt32();
 			table = new uint[statesCount];
-			for (int i=0; i!=statesCount; i++)
+			for (int i = 0; i != statesCount; i++)
 				table[i] = reader.ReadUInt32();
 			long rest = (reader.BaseStream.Length - table.Length * 4 - 4) / 2;
 			states = new ushort[rest];
-			for (int i=0; i!=rest; i++)
+			for (int i = 0; i != rest; i++)
 				states[i] = reader.ReadUInt16();
 		}
 
@@ -112,7 +112,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The data of the specified state</returns>
 		public AutomatonState GetState(int state)
 		{
-			return new AutomatonState(states, (int) table[state]);
+			return new AutomatonState(states, (int)table[state]);
 		}
 	}
 }

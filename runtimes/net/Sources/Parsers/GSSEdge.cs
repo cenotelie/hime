@@ -38,6 +38,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the index of the node from which this edge starts
 		/// </summary>
 		public int From { get { return from; } }
+
 		/// <summary>
 		/// Gets the index of the node to which this edge arrives to
 		/// </summary>

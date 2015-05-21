@@ -132,7 +132,7 @@ namespace Hime.Redist
 		public TextPosition GetPosition(int node)
 		{
 			TableElemRef sym = nodes[node].label;
-			return sym.Type == TableType.Token ? tableTokens.GetPosition (sym.Index) : new TextPosition (0, 0);
+			return sym.Type == TableType.Token ? tableTokens.GetPosition(sym.Index) : new TextPosition(0, 0);
 		}
 
 		/// <summary>
@@ -143,7 +143,7 @@ namespace Hime.Redist
 		public TextSpan GetSpan(int node)
 		{
 			TableElemRef sym = nodes[node].label;
-			return sym.Type == TableType.Token ? tableTokens.GetSpan (sym.Index) : new TextSpan (0, 0);
+			return sym.Type == TableType.Token ? tableTokens.GetSpan(sym.Index) : new TextSpan(0, 0);
 		}
 
 		/// <summary>
@@ -154,7 +154,7 @@ namespace Hime.Redist
 		public TextContext GetContext(int node)
 		{
 			TableElemRef sym = nodes[node].label;
-			return sym.Type == TableType.Token ? tableTokens.GetContext (sym.Index) : new TextContext ();
+			return sym.Type == TableType.Token ? tableTokens.GetContext(sym.Index) : new TextContext();
 		}
 
 		/// <summary>
@@ -175,7 +175,7 @@ namespace Hime.Redist
 		public string GetValue(int node)
 		{
 			TableElemRef sym = nodes[node].label;
-			return sym.Type == TableType.Token ? tableTokens.GetValue (sym.Index) : null;
+			return sym.Type == TableType.Token ? tableTokens.GetValue(sym.Index) : null;
 		}
 
 		/// <summary>
@@ -225,7 +225,7 @@ namespace Hime.Redist
 		/// <returns>The corresponding semantic element</returns>
 		public SemanticElement GetSemanticElementFor(int node)
 		{
-			return GetSemanticElementFor(nodes [node].label);
+			return GetSemanticElementFor(nodes[node].label);
 		}
 
 		/// <summary>

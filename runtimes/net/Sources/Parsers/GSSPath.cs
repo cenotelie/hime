@@ -44,6 +44,7 @@ namespace Hime.Redist.Parsers
 			get;
 			set;
 		}
+
 		/// <summary>
 		/// Gets or sets the generation containing the final target of this path
 		/// </summary>
@@ -52,6 +53,7 @@ namespace Hime.Redist.Parsers
 			get;
 			set;
 		}
+
 		/// <summary>
 		/// Gets or sets the i-th label of the edges traversed by this path
 		/// </summary>

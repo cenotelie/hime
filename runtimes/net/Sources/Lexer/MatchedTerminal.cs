@@ -38,6 +38,7 @@ namespace Hime.Redist.Lexer
 		/// Gets the context required for the terminal to be matched
 		/// </summary>
 		public int Context { get { return context; } }
+
 		/// <summary>
 		/// Gets the index of the matched terminal in the terminal table of the associated lexer
 		/// </summary>

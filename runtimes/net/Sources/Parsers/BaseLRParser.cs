@@ -66,10 +66,12 @@ namespace Hime.Redist.Parsers
 		/// Gets the variable symbols used by this parser
 		/// </summary>
 		public ROList<Symbol> SymbolVariables { get { return symVariables; } }
+
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
 		public ROList<Symbol> SymbolVirtuals { get { return symVirtuals; } }
+
 		/// <summary>
 		/// Gets the action symbols used by this parser
 		/// </summary>
@@ -83,6 +85,7 @@ namespace Hime.Redist.Parsers
 			get;
 			set;
 		}
+
 		/// <summary>
 		/// Gets or sets a value indicating whether this parser is in debug mode
 		/// </summary>

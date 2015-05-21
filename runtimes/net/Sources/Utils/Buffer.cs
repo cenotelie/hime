@@ -53,8 +53,8 @@ namespace Hime.Redist.Utils
 		/// <param name="capacity">The initial capacity</param>
 		public Buffer(int capacity)
 		{
-			this.inner = new T[capacity];
-			this.size = 0;
+			inner = new T[capacity];
+			size = 0;
 		}
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		public void Reset()
 		{
-			this.size = 0;
+			size = 0;
 		}
 
 		/// <summary>

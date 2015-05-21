@@ -60,7 +60,7 @@ namespace Hime.Redist
 		/// <returns>The string representation of this error</returns>
 		public override string ToString()
 		{
-			return "@" + position.ToString() + " " + this.Message;
+			return "@" + position + " " + Message;
 		}
 	}
 }

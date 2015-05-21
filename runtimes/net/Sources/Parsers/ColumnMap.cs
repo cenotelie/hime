@@ -76,8 +76,10 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="key">The key for the data</param>
 		/// <returns>The data corresponding to the key</returns>
-		public int this[int key] {
-			get {
+		public int this[int key]
+		{
+			get
+			{
 				if (key <= 0xFF)
 					return cache1[key];
 				else if (key <= 0x1FF)

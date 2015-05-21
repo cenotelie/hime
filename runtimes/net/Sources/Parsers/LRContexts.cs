@@ -30,17 +30,17 @@ namespace Hime.Redist.Parsers
 		/// The contexts
 		/// </summary>
 		private readonly ushort[] content;
-		
+
 		/// <summary>
 		/// Gets the number of contexts
 		/// </summary>
 		public int Count { get { return content.Length; } }
-		
+
 		/// <summary>
 		/// Gets the i-th context
 		/// </summary>
 		public int this[int index] { get { return content[index]; } }
-		
+
 		/// <summary>
 		/// Loads the contexts from the specified input
 		/// </summary>
@@ -48,11 +48,11 @@ namespace Hime.Redist.Parsers
 		public LRContexts(BinaryReader input)
 		{
 			int count = input.ReadUInt16();
-			this.content = new ushort[count];
+			content = new ushort[count];
 			for (int i = 0; i != count; i++)
-				this.content[i] = input.ReadUInt16();
+				content[i] = input.ReadUInt16();
 		}
-		
+
 		/// <summary>
 		/// Gets whether the specified context is in this collection
 		/// </summary>

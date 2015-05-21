@@ -145,7 +145,7 @@ namespace Hime.Redist.Parsers
 		public int FindNode(int generation, int state)
 		{
 			GSSGeneration data = nodeGenerations[generation];
-			for (int i=data.Start; i!=data.Start + data.Count; i++)
+			for (int i = data.Start; i != data.Start + data.Count; i++)
 				if (nodeLabels[i] == state)
 					return i;
 			return -1;
@@ -161,7 +161,7 @@ namespace Hime.Redist.Parsers
 		public bool HasEdge(int generation, int from, int to)
 		{
 			GSSGeneration data = edgeGenerations[generation];
-			for (int i=data.Start; i!=data.Start + data.Count; i++)
+			for (int i = data.Start; i != data.Start + data.Count; i++)
 			{
 				GSSEdge edge = edges[i];
 				if (edge.From == from && edge.To == to)
@@ -244,7 +244,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The index of the generation containing the node</returns>
 		private int GetGenerationOf(int node)
 		{
-			for (int i=generation; i!=-1; i--)
+			for (int i = generation; i != -1; i--)
 			{
 				GSSGeneration gen = nodeGenerations[i];
 				if (node >= gen.Start && node < gen.Start + gen.Count)

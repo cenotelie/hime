@@ -49,6 +49,7 @@ namespace Hime.Redist.Parsers
 			/// The first label in the GSS
 			/// </summary>
 			public readonly GSSLabel first;
+
 			/// <summary>
 			/// Initializes this operation
 			/// </summary>
@@ -76,6 +77,7 @@ namespace Hime.Redist.Parsers
 			/// The target RNGLR state
 			/// </summary>
 			public readonly int to;
+
 			/// <summary>
 			/// Initializes this operation
 			/// </summary>
@@ -210,17 +212,17 @@ namespace Hime.Redist.Parsers
 				LROpCode op = production[i];
 				switch (op.Base)
 				{
-					case LROpCodeBase.SemanticAction:
+				case LROpCodeBase.SemanticAction:
 					{
 						i++;
 						break;
 					}
-					case LROpCodeBase.AddVirtual:
+				case LROpCodeBase.AddVirtual:
 					{
 						i++;
 						break;
 					}
-					case LROpCodeBase.AddNullVariable:
+				case LROpCodeBase.AddNullVariable:
 					{
 						result.Add(production[i + 1].DataValue);
 						i++;
@@ -392,30 +394,30 @@ namespace Hime.Redist.Parsers
 				LROpCode op = production[i];
 				switch (op.Base)
 				{
-					case LROpCodeBase.SemanticAction:
-						{
-							SemanticAction action = symActions[production[i + 1].DataValue];
-							i++;
-							action.Invoke(variable, sppf);
-							break;
-						}
-					case LROpCodeBase.AddVirtual:
-						{
-							int index = production[i + 1].DataValue;
-							sppf.ReductionAddVirtual(index, op.TreeAction);
-							i++;
-							break;
-						}
-					case LROpCodeBase.AddNullVariable:
-						{
-							int index = production[i + 1].DataValue;
-							sppf.ReductionAddNullable(nullables[index], op.TreeAction);
-							i++;
-							break;
-						}
-					default:
-						sppf.ReductionPop(op.TreeAction);
+				case LROpCodeBase.SemanticAction:
+					{
+						SemanticAction action = symActions[production[i + 1].DataValue];
+						i++;
+						action.Invoke(variable, sppf);
 						break;
+					}
+				case LROpCodeBase.AddVirtual:
+					{
+						int index = production[i + 1].DataValue;
+						sppf.ReductionAddVirtual(index, op.TreeAction);
+						i++;
+						break;
+					}
+				case LROpCodeBase.AddNullVariable:
+					{
+						int index = production[i + 1].DataValue;
+						sppf.ReductionAddNullable(nullables[index], op.TreeAction);
+						i++;
+						break;
+					}
+				default:
+					sppf.ReductionPop(op.TreeAction);
+					break;
 				}
 			}
 			return sppf.Reduce(generation, production.Head, production.HeadAction == TreeAction.Replace);

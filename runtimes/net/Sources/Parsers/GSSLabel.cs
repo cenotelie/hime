@@ -47,10 +47,12 @@ namespace Hime.Redist.Parsers
 		/// Gets the sub-tree with a repleaceable root
 		/// </summary>
 		public SubTree ReplaceableTree { get { return tree; } }
+
 		/// <summary>
 		/// Gets the original symbol of the SPPF node
 		/// </summary>
 		public TableElemRef Original { get { return original; } }
+
 		/// <summary>
 		/// Gets the index of the SPPF node
 		/// </summary>
@@ -60,6 +62,7 @@ namespace Hime.Redist.Parsers
 		/// Wether this label is an epsilon label
 		/// </summary>
 		public bool IsEpsilon { get { return (tree == null && nodeIndex == -1); } }
+
 		/// <summary>
 		/// Whether this label represents a sub-tree with a replaceable root
 		/// </summary>

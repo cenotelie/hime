@@ -67,10 +67,10 @@ namespace Hime.Redist.Utils
 		/// </summary>
 		public BigList()
 		{
-			this.chunks = new T[INIT_CHUNK_COUNT][];
-			this.chunks[0] = new T[CHUNKS_SIZE];
-			this.chunkIndex = 0;
-			this.cellIndex = 0;
+			chunks = new T[INIT_CHUNK_COUNT][];
+			chunks[0] = new T[CHUNKS_SIZE];
+			chunkIndex = 0;
+			cellIndex = 0;
 		}
 
 		/// <summary>

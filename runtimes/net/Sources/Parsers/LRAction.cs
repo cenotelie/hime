@@ -55,8 +55,8 @@ namespace Hime.Redist.Parsers
 		/// <param name="input">An input</param>
 		public LRAction(BinaryReader input)
 		{
-			this.code = (LRActionCode)(input.ReadUInt16());
-			this.data = input.ReadUInt16();
+			code = (LRActionCode)(input.ReadUInt16());
+			data = input.ReadUInt16();
 		}
 	}
 }

@@ -42,6 +42,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the start index of this generation in the list of nodes
 		/// </summary>
 		public int Start { get { return start; } }
+
 		/// <summary>
 		/// Gets or sets the number of nodes in this generation
 		/// </summary>

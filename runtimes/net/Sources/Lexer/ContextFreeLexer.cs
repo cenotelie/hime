@@ -40,6 +40,7 @@ namespace Hime.Redist.Lexer
 			/// Length of the matched input
 			/// </summary>
 			public int length;
+
 			/// <summary>
 			/// Initializes a match
 			/// </summary>
@@ -47,7 +48,7 @@ namespace Hime.Redist.Lexer
 			public Match(int terminal)
 			{
 				this.terminal = terminal;
-				this.length = 0;
+				length = 0;
 			}
 		}
 
@@ -142,7 +143,7 @@ namespace Hime.Redist.Lexer
 				{
 					// This is the EPSILON terminal, failed to match anything
 					TextPosition position = text.GetPositionAt(inputIndex);
-					string unexpected = null;
+					string unexpected;
 					int c = text.GetValue(inputIndex);
 					if (c >= 0xD800 && c <= 0xDFFF)
 					{

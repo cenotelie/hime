@@ -51,7 +51,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="index">The token's index in its repository</param>
 		public TokenKernel(int id, int index)
 		{
-			this.terminalID = id;
+			terminalID = id;
 			this.index = index;
 		}
 	}

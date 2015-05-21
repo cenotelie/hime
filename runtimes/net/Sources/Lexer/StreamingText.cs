@@ -60,9 +60,9 @@ namespace Hime.Redist.Lexer
 		public StreamingText(TextReader input)
 		{
 			this.input = input;
-			this.content = new BigList<char>();
-			this.buffer = new char[BLOCK_SIZE];
-			this.atEnd = false;
+			content = new BigList<char>();
+			buffer = new char[BLOCK_SIZE];
+			atEnd = false;
 		}
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace Hime.Redist.Lexer
 			lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
 			lines[0] = 0;
 			line = 1;
-			char c1 = '\0';
+			char c1;
 			char c2 = '\0';
 			for (int i = 0; i != content.Size; i++)
 			{
@@ -166,7 +166,7 @@ namespace Hime.Redist.Lexer
 		{
 			if (lines == null)
 				FindLines();
-			return line == this.line ? (content.Size - lines [this.line - 1]) : (lines [line] - lines [line - 1]);
+			return line == this.line ? (content.Size - lines[this.line - 1]) : (lines[line] - lines[line - 1]);
 		}
 	}
 }

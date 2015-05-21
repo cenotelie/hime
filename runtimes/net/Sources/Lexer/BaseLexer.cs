@@ -85,10 +85,10 @@ namespace Hime.Redist.Lexer
 		protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, string input)
 		{
 			this.automaton = automaton;
-			this.symTerminals = new ROList<Symbol>(new List<Symbol>(terminals));
-			this.separatorID = separator;
-			this.text = new PrefetchedText(input);
-			this.tokens = new TokenRepository(this.symTerminals, this.text);
+			symTerminals = new ROList<Symbol>(new List<Symbol>(terminals));
+			separatorID = separator;
+			text = new PrefetchedText(input);
+			tokens = new TokenRepository(symTerminals, text);
 		}
 
 		/// <summary>
@@ -101,10 +101,10 @@ namespace Hime.Redist.Lexer
 		protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, TextReader input)
 		{
 			this.automaton = automaton;
-			this.symTerminals = new ROList<Symbol>(new List<Symbol>(terminals));
-			this.separatorID = separator;
-			this.text = new StreamingText(input);
-			this.tokens = new TokenRepository(this.symTerminals, this.text);
+			symTerminals = new ROList<Symbol>(new List<Symbol>(terminals));
+			separatorID = separator;
+			text = new StreamingText(input);
+			tokens = new TokenRepository(symTerminals, text);
 		}
 
 		/// <summary>

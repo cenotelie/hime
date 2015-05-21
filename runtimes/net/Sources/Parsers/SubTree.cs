@@ -130,7 +130,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The clone</returns>
 		public SubTree Clone()
 		{
-			SubTree result = pool != null ? pool.Acquire () : new SubTree (null, nodes.Length);
+			SubTree result = pool != null ? pool.Acquire() : new SubTree(null, nodes.Length);
 			int size = GetSize();
 			Array.Copy(nodes, result.nodes, size);
 			Array.Copy(actions, result.actions, size);

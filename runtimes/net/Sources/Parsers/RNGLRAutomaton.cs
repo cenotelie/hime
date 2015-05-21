@@ -17,7 +17,6 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
-using System.Collections.Generic;
 using System.IO;
 using Hime.Redist.Utils;
 
@@ -61,10 +60,12 @@ namespace Hime.Redist.Parsers
 			/// Index of the cell's data
 			/// </summary>
 			private readonly int index;
+
 			/// <summary>
 			/// Gets the number of actions in the cell
 			/// </summary>
 			public int ActionsCount { get { return count; } }
+
 			/// <summary>
 			/// Gets the index of the first action in the Actions table
 			/// </summary>
@@ -118,6 +119,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the index of the axiom
 		/// </summary>
 		public int Axiom { get { return axiom; } }
+
 		/// <summary>
 		/// Gets the number of states in the RNGLR table
 		/// </summary>
@@ -229,7 +231,7 @@ namespace Hime.Redist.Parsers
 		public LRProduction GetNullableProduction(int index)
 		{
 			int temp = nullables[index];
-			return temp == 0xFFFF ? null : productions [temp];
+			return temp == 0xFFFF ? null : productions[temp];
 		}
 
 		/// <summary>

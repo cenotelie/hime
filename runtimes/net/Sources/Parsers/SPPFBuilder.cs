@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Collections.Generic;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
@@ -64,6 +63,7 @@ namespace Hime.Redist.Parsers
 			/// The next available slot in the data
 			/// </summary>
 			public int next;
+
 			/// <summary>
 			/// Initializes a new instance
 			/// </summary>
@@ -151,6 +151,7 @@ namespace Hime.Redist.Parsers
 		private readonly ASTGraph result;
 
 		#region Implementation of SemanticBody
+
 		/// <summary>
 		/// Gets the symbol at the i-th index
 		/// </summary>
@@ -162,6 +163,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the length of this body
 		/// </summary>
 		public int Length { get { return handleNext; } }
+
 		#endregion
 
 		/// <summary>
@@ -276,7 +278,7 @@ namespace Hime.Redist.Parsers
 			// build the stack
 			if (length > 0)
 			{
-				for (int i=0; i<length-1; i++)
+				for (int i = 0; i < length - 1; i++)
 					stack[i] = path[length - 2 - i];
 				stack[length - 1] = first;
 			}
@@ -388,7 +390,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The produced sub-tree</returns>
 		public GSSLabel Reduce(int generation, int varIndex, bool replaceable)
 		{
-			GSSLabel label = replaceable ? ReduceReplaceable (varIndex) : ReduceNormal (varIndex);
+			GSSLabel label = replaceable ? ReduceReplaceable(varIndex) : ReduceNormal(varIndex);
 			AddToHistory(generation, label);
 			return label;
 		}
@@ -406,31 +408,31 @@ namespace Hime.Redist.Parsers
 			{
 				switch (cacheActions[handle[i]])
 				{
-					case TreeAction.Promote:
-						if (root != -1)
-						{
-							// not the first promotion
-							// store the adjacency data for the previously promoted node
-							int index = result.Store(cacheChildren, insertion);
-							result.SetAdjacency(root, index, insertion);
-							// put the previously promoted node in the cache
-							cacheChildren[0] = root;
-							insertion = 1;
-						}
+				case TreeAction.Promote:
+					if (root != -1)
+					{
+						// not the first promotion
+						// store the adjacency data for the previously promoted node
+						int index = result.Store(cacheChildren, insertion);
+						result.SetAdjacency(root, index, insertion);
+						// put the previously promoted node in the cache
+						cacheChildren[0] = root;
+						insertion = 1;
+					}
 						// save the new promoted node
-						root = cacheChildren[handle[i]];
+					root = cacheChildren[handle[i]];
                         // repack the children on the left if any
-						int nb = result.GetChildrenCount(root);
-						Array.Copy(cacheChildren, handle[i] + 1, cacheChildren, insertion, nb);
-						Array.Copy(cacheActions, handle[i] + 1, cacheActions, insertion, nb);
-						insertion += nb;
-						break;
-					default:
+					int nb = result.GetChildrenCount(root);
+					Array.Copy(cacheChildren, handle[i] + 1, cacheChildren, insertion, nb);
+					Array.Copy(cacheActions, handle[i] + 1, cacheActions, insertion, nb);
+					insertion += nb;
+					break;
+				default:
                         // Repack the sub-root on the left
-						if (insertion != handle[i])
-							cacheChildren[insertion] = cacheChildren[handle[i]];
-						insertion++;
-						break;
+					if (insertion != handle[i])
+						cacheChildren[insertion] = cacheChildren[handle[i]];
+					insertion++;
+					break;
 				}
 			}
 			if (root == -1)

@@ -57,18 +57,22 @@ namespace Hime.Redist.Parsers
 		/// Gets the index of the rule's head in the parser's array of variables
 		/// </summary>
 		public int Head { get { return head; } }
+
 		/// <summary>
 		/// Gets the action of the rule's head (replace or not)
 		/// </summary>
 		public TreeAction HeadAction { get { return headAction; } }
+
 		/// <summary>
 		/// Gets the size of the rule's body by only counting terminals and variables
 		/// </summary>
 		public int ReductionLength { get { return reducLength; } }
+
 		/// <summary>
 		/// Gets the length of the bytecode
 		/// </summary>
 		public int BytecodeLength { get { return bytecode.Length; } }
+
 		/// <summary>
 		/// Gets the op-code at the specified index in the bytecode
 		/// </summary>
@@ -85,7 +89,7 @@ namespace Hime.Redist.Parsers
 			headAction = (TreeAction)reader.ReadByte();
 			reducLength = reader.ReadByte();
 			bytecode = new LROpCode[reader.ReadByte()];
-			for (int i=0; i!=bytecode.Length; i++)
+			for (int i = 0; i != bytecode.Length; i++)
 				bytecode[i] = new LROpCode(reader);
 		}
 	}

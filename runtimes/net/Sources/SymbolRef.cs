@@ -34,18 +34,22 @@ namespace Hime.Redist
 		/// Gets the position in the input text of this element
 		/// </summary>
 		public TextPosition Position { get { return new TextPosition(0, 0); } }
+
 		/// <summary>
 		/// Gets the span in the input text of this element
 		/// </summary>
 		public TextSpan Span { get { return new TextSpan(0, 0); } }
+
 		/// <summary>
 		/// Gets the context of this element in the input
 		/// </summary>
 		public TextContext Context { get { return new TextContext(); } }
+
 		/// <summary>
 		/// Gets the grammar symbol associated to this element
 		/// </summary>
 		public Symbol Symbol { get { return symbol; } }
+
 		/// <summary>
 		/// Gets the value of this element, if any
 		/// </summary>

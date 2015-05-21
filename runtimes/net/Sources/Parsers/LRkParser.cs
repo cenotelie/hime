@@ -220,23 +220,23 @@ namespace Hime.Redist.Parsers
 				LROpCode op = production[i];
 				switch (op.Base)
 				{
-					case LROpCodeBase.SemanticAction:
-						{
-							SemanticAction action = symActions[production[i + 1].DataValue];
-							i++;
-							action.Invoke(variable, builder);
-							break;
-						}
-					case LROpCodeBase.AddVirtual:
-						{
-							int index = production[i + 1].DataValue;
-							builder.ReductionAddVirtual(index, op.TreeAction);
-							i++;
-							break;
-						}
-					default:
-						builder.ReductionPop(op.TreeAction);
+				case LROpCodeBase.SemanticAction:
+					{
+						SemanticAction action = symActions[production[i + 1].DataValue];
+						i++;
+						action.Invoke(variable, builder);
 						break;
+					}
+				case LROpCodeBase.AddVirtual:
+					{
+						int index = production[i + 1].DataValue;
+						builder.ReductionAddVirtual(index, op.TreeAction);
+						i++;
+						break;
+					}
+				default:
+					builder.ReductionPop(op.TreeAction);
+					break;
 				}
 			}
 			builder.Reduce();

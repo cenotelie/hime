@@ -86,9 +86,9 @@ namespace Hime.Redist
 			{
 				this.ast = ast;
 				Node n = ast.nodes[node];
-				this.first = n.first;
-				this.current = this.first - 1;
-				this.end = this.first + n.count;
+				first = n.first;
+				current = first - 1;
+				end = first + n.count;
 			}
 
 			/// <summary>

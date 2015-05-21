@@ -62,7 +62,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="input">An input</param>
 		public LROpCode(BinaryReader input)
 		{
-			this.code = input.ReadUInt16();
+			code = input.ReadUInt16();
 		}
 	}
 }

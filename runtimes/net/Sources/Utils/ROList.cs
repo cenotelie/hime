@@ -49,7 +49,7 @@ namespace Hime.Redist.Utils
 		/// <param name="original">The original items</param>
 		public ROList(IList<T> original)
 		{
-			this.inner = original;
+			inner = original;
 		}
 
 		/// <summary>

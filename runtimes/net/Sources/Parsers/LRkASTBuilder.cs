@@ -82,6 +82,7 @@ namespace Hime.Redist.Parsers
 		private readonly ASTSimpleTree result;
 
 		#region Implementation of SemanticBody
+
 		/// <summary>
 		/// Gets the symbol at the i-th index
 		/// </summary>
@@ -93,6 +94,7 @@ namespace Hime.Redist.Parsers
 		/// Gets the length of this body
 		/// </summary>
 		public int Length { get { return handleNext; } }
+
 		#endregion
 
 		/// <summary>
@@ -183,7 +185,8 @@ namespace Hime.Redist.Parsers
 				}
 			}
 			else if (action == TreeAction.Drop)
-			{ }
+			{
+			}
 			else
 			{
 				if (action != TreeAction.None)
@@ -253,33 +256,33 @@ namespace Hime.Redist.Parsers
 			{
 				switch (cache.GetActionAt(handle[i]))
 				{
-					case TreeAction.Promote:
-						if (promotion)
-						{
-							// This is not the first promotion
-							// Commit the previously promoted node's children
-							cache.SetChildrenCountAt(0, insertion - 1);
-							cache.CommitChildrenOf(0, result);
-							// Reput the previously promoted node in the cache
-							cache.Move(0, 1);
-							insertion = 2;
-						}
-						promotion = true;
+				case TreeAction.Promote:
+					if (promotion)
+					{
+						// This is not the first promotion
+						// Commit the previously promoted node's children
+						cache.SetChildrenCountAt(0, insertion - 1);
+						cache.CommitChildrenOf(0, result);
+						// Reput the previously promoted node in the cache
+						cache.Move(0, 1);
+						insertion = 2;
+					}
+					promotion = true;
                         // Save the new promoted node
-						cache.Move(handle[i], 0);
+					cache.Move(handle[i], 0);
                         // Repack the children on the left if any
-						int nb = cache.GetChildrenCountAt(0);
-						cache.MoveRange(handle[i] + 1, insertion, nb);
-						insertion += nb;
-						break;
-					default:
+					int nb = cache.GetChildrenCountAt(0);
+					cache.MoveRange(handle[i] + 1, insertion, nb);
+					insertion += nb;
+					break;
+				default:
                         // Commit the children if any
-						cache.CommitChildrenOf(handle[i], result);
+					cache.CommitChildrenOf(handle[i], result);
                         // Repack the sub-root on the left
-						if (insertion != handle[i])
-							cache.Move(handle[i], insertion);
-						insertion++;
-						break;
+					if (insertion != handle[i])
+						cache.Move(handle[i], insertion);
+					insertion++;
+					break;
 				}
 			}
 			// finalize the sub-tree data

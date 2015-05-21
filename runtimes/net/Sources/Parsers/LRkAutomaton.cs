@@ -86,7 +86,7 @@ namespace Hime.Redist.Parsers
 			for (int i = 0; i != nstates; i++)
 				contexts[i] = new LRContexts(reader);
 			table = new LRAction[nstates * ncols];
-			for (int i=0; i!=nstates * ncols; i++)
+			for (int i = 0; i != nstates * ncols; i++)
 				table[i] = new LRAction(reader);
 			productions = new LRProduction[nprod];
 			for (int i = 0; i != nprod; i++)
