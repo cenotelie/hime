@@ -623,13 +623,13 @@ namespace Hime.SDK.Grammars
 			bool mod = true;
 			// Apply step 1 to each variable
 			foreach (Variable var in variables.Values)
-				var.ComputeFollowers_Step1();
+				var.ComputeInitialFollowers();
 			// Apply step 2 and 3 while some modification has occured
 			while (mod)
 			{
 				mod = false;
 				foreach (Variable var in variables.Values)
-					mod |= var.ComputeFollowers_Step23();
+					mod |= var.PropagateFollowers();
 			}
 		}
 	}

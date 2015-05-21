@@ -106,9 +106,9 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
-		/// Computes the FOLLOWERS sets, step 1
+		/// Computes the initial FOLLOWERS sets
 		/// </summary>
-		public void ComputeFollowers_Step1()
+		public void ComputeInitialFollowers()
 		{
 			// For all choices but the last (empty)
 			for (int i = 0; i != choices.Count - 1; i++)
@@ -128,11 +128,11 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
-		/// Computes the FOLLOWERS sets, step2
+		/// Propagate the followers
 		/// </summary>
 		/// <param name='ruleVar'>The head variable of this rule's body</param>
 		/// <returns><c>true</c> if there has been modifications</returns>
-		public bool ComputeFollowers_Step23(Variable ruleVar)
+		public bool PropagateFollowers(Variable ruleVar)
 		{
 			bool mod = false;
 			// For all choices but the last (empty)

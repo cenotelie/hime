@@ -99,23 +99,23 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
-		/// Computes the FOLLOWERS sets, step 1
+		/// Computes the initial FOLLOWERS sets
 		/// </summary>
-		public void ComputeFollowers_Step1()
+		public void ComputeInitialFollowers()
 		{
 			foreach (Rule rule in rules)
-				rule.Body.ComputeFollowers_Step1();
+				rule.Body.ComputeInitialFollowers();
 		}
 
 		/// <summary>
-		/// Computes the FOLLOWERS sets, step2
+		/// Propagate the followers
 		/// </summary>
 		/// <returns><c>true</c> if there has been modifications</returns>
-		public bool ComputeFollowers_Step23()
+		public bool PropagateFollowers()
 		{
 			bool mod = false;
 			foreach (Rule rule in rules)
-				mod |= rule.Body.ComputeFollowers_Step23(this);
+				mod |= rule.Body.PropagateFollowers(this);
 			return mod;
 		}
 	}
