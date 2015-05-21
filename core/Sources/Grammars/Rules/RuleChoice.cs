@@ -123,10 +123,10 @@ namespace Hime.SDK.Grammars
 				// If the symbol is ε
 				if (first == Epsilon.Instance)
                     // Add the Firsts set of the next choice to the current Firsts set
-					mod = mod || setFirsts.AddRange(next.setFirsts);
+					mod |= setFirsts.AddRange(next.setFirsts);
 				else
                     // Symbol is not ε : Add the symbol to the Firsts set
-					mod = mod || setFirsts.Add(first);
+					mod |= setFirsts.Add(first);
 			}
 			return mod;
 		}

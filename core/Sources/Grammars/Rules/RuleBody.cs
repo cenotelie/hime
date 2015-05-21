@@ -75,10 +75,11 @@ namespace Hime.SDK.Grammars
 			for (int i = choices.Count - 1; i != -1; i--)
 			{
 				if (i == choices.Count - 1)
-					mod = mod || choices[i].ComputeFirsts(null);
+					mod |= choices[i].ComputeFirsts(null);
 				else
-					mod = mod || choices[i].ComputeFirsts(choices[i + 1]);
+					mod |= choices[i].ComputeFirsts(choices[i + 1]);
 			}
+			mod |= setFirsts.AddRange(choices[0].Firsts);
 			return mod;
 		}
 
