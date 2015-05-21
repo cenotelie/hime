@@ -52,7 +52,7 @@ namespace Hime.SDK
 			System.Net.WebClient client = new System.Net.WebClient();
 			byte[] buffer = client.DownloadData(URL_UNICODE_BLOCKS);
 			string content = Encoding.UTF8.GetString(buffer);
-			string[] lines = content.Split('\n' );
+			string[] lines = content.Split('\n');
 			Regex exp = new Regex("(?<begin>[0-9A-F]+)\\.\\.(?<end>[0-9A-F]+);\\s+(?<name>(\\w|\\s|-)+)");
 			List<UnicodeBlock> blocks = new List<UnicodeBlock>();
 			foreach (string line in lines)

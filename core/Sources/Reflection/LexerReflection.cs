@@ -44,6 +44,7 @@ namespace Hime.SDK.Reflection
 		/// Gets the terminals that can be matched by this lexer
 		/// </summary>
 		public ROList<Terminal> Terminals { get { return new ROList<Terminal>(terminals); } }
+
 		/// <summary>
 		/// Gets the lexer's dfa
 		/// </summary>

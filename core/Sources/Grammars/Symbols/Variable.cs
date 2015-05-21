@@ -44,10 +44,12 @@ namespace Hime.SDK.Grammars
 		/// Gets the rules for this variables
 		/// </summary>
 		public ROList<Rule> Rules { get { return new ROList<Rule>(rules); } }
+
 		/// <summary>
 		/// Gets the FIRSTS set of this variable
 		/// </summary>
 		public TerminalSet Firsts { get { return firsts; } }
+
 		/// <summary>
 		/// Gets the FOLLOWERS set of this variable
 		/// </summary>

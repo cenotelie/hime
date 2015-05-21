@@ -68,38 +68,47 @@ namespace Hime.SDK.Output
 		/// Gets the unit's name
 		/// </summary>
 		public string Name { get { return grammar.Name; } }
+
 		/// <summary>
 		/// Gets the represented grammar
 		/// </summary>
 		public Grammars.Grammar Grammar { get { return grammar; } }
+
 		/// <summary>
 		/// Gets the associated parsing method to generate code against
 		/// </summary>
 		public ParsingMethod Method { get { return method; } }
+
 		/// <summary>
 		/// Gets the namespace to use for the generated code
 		/// </summary>
 		public string Namespace { get { return nmspace ?? grammar.Name; } }
+
 		/// <summary>
 		/// Gets the visibility modifier to use for the generated code
 		/// </summary>
 		public Modifier Modifier { get { return modifier; } }
+
 		/// <summary>
 		/// Gets the DFA for this unit
 		/// </summary>
 		public Automata.DFA DFA { get { return dfa; } }
+
 		/// <summary>
 		/// Gets the separator terminal for the associated lexer
 		/// </summary>
 		public Grammars.Terminal Separator { get { return separator; } }
+
 		/// <summary>
 		/// Gets the expected terminals produced by the associated lexer
 		/// </summary>
 		public ROList<Grammars.Terminal> Expected { get { return new ROList<Grammars.Terminal>(expected); } }
+
 		/// <summary>
 		/// Gets the contexts supported by the associated lexer
 		/// </summary>
 		public ROList<Grammars.Variable> Contexts { get { return new ROList<Grammars.Variable>(contexts); } }
+
 		/// <summary>
 		/// Gets the LR graph for the associated parser
 		/// </summary>

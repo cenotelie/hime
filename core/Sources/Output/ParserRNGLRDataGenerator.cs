@@ -103,7 +103,7 @@ namespace Hime.SDK.Output
 				{
 
 					// look for a nullable rule
-					for (int i=0; i!=temp.Count; i++)
+					for (int i = 0; i != temp.Count; i++)
 					{
 						if (temp[i].Value == 0)
 						{
@@ -115,7 +115,7 @@ namespace Hime.SDK.Output
 					if (nullIndex == 0xFFFF)
 					{
 						// no 0-length reduction rule => create a new 0-length reduction with a nullable rule
-						for (int i=0; i!=temp.Count; i++)
+						for (int i = 0; i != temp.Count; i++)
 						{
 							Grammars.Rule rule = temp[i].Key;
 							if (rule.Body.Choices[0].Firsts.Contains(Grammars.Epsilon.Instance))
@@ -190,12 +190,12 @@ namespace Hime.SDK.Output
 					Grammars.Variable head = item.BaseRule.Head;
 					int index = contexts.IndexOf(head);
 					if (index != -1)
-						result.Add((ushort) index);
+						result.Add((ushort)index);
 				}
 			}
 			
 			// output
-			writer.Write((ushort) result.Count);
+			writer.Write((ushort)result.Count);
 			for (int i = 0; i != result.Count; i++)
 				writer.Write(result[i]);
 		}

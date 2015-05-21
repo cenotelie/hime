@@ -132,7 +132,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The bound value</returns>
 		public Symbol GetBinding(string name)
 		{
-			return references.ContainsKey(name) ? references [name] : null;
+			return references.ContainsKey(name) ? references[name] : null;
 		}
 	}
 }

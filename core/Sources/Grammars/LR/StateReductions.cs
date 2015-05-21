@@ -41,11 +41,13 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the number of reductions in this set
 		/// </summary>
 		public int Count { get { return content.Count; } }
+
 		/// <summary>
 		/// Gets the reductions a the specifie index
 		/// </summary>
 		/// <param name='index'>An index</param>
 		public StateActionReduce this[int index] { get { return content[index]; } }
+
 		/// <summary>
 		/// Gets the conflicts raised by this set
 		/// </summary>
@@ -64,12 +66,19 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		public IEnumerator<StateActionReduce> GetEnumerator() { return content.GetEnumerator(); }
+		public IEnumerator<StateActionReduce> GetEnumerator()
+		{
+			return content.GetEnumerator();
+		}
+
 		/// <summary>
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return content.GetEnumerator(); }
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return content.GetEnumerator();
+		}
 
 		/// <summary>
 		/// Adds a reduction to this set

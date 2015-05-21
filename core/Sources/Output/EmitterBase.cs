@@ -70,7 +70,7 @@ namespace Hime.SDK.Output
 		/// Gets suffix for the emitted assemblies
 		/// </summary>
 		public abstract string SuffixAssembly { get; }
-		
+
 		/// <summary>
 		/// The reporter
 		/// </summary>
@@ -233,7 +233,7 @@ namespace Hime.SDK.Output
 			this.mode = mode;
 
 			bool errors = false;
-			for (int i=0; i!=units.Count; i++)
+			for (int i = 0; i != units.Count; i++)
 			{
 				if (!EmitBaseArtifacts(units[i]))
 				{
@@ -275,11 +275,15 @@ namespace Hime.SDK.Output
 		{
 			// prepare the unit
 			bool ok = unit.Prepare(reporter);
-			if (ok) ok = unit.BuildLexerData(reporter);
-			if (ok) ok = unit.BuildParserData(reporter);
+			if (ok)
+				ok = unit.BuildLexerData(reporter);
+			if (ok)
+				ok = unit.BuildParserData(reporter);
 			// output the artifacts
-			if (ok) ok = GenerateLexer(unit);
-			if (ok) ok = GenerateParser(unit);
+			if (ok)
+				ok = GenerateLexer(unit);
+			if (ok)
+				ok = GenerateParser(unit);
 			if (mode == Mode.Debug && ok)
 				ok = EmitDebugArtifacts(unit);
 			return ok;
@@ -339,15 +343,15 @@ namespace Hime.SDK.Output
 			Generator generator = null;
 			switch (unit.Method)
 			{
-				case ParsingMethod.LR0:
-				case ParsingMethod.LR1:
-				case ParsingMethod.LALR1:
-					generator = new ParserLRkDataGenerator(unit);
-					break;
-				case ParsingMethod.RNGLR1:
-				case ParsingMethod.RNGLALR1:
-					generator = new ParserRNGLRDataGenerator(unit);
-					break;
+			case ParsingMethod.LR0:
+			case ParsingMethod.LR1:
+			case ParsingMethod.LALR1:
+				generator = new ParserLRkDataGenerator(unit);
+				break;
+			case ParsingMethod.RNGLR1:
+			case ParsingMethod.RNGLALR1:
+				generator = new ParserRNGLRDataGenerator(unit);
+				break;
 			}
 
 			// generate the parser's data

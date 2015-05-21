@@ -33,17 +33,19 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The FIRSTS set of terminals
 		/// </summary>
-        protected readonly TerminalSet setFirsts;
+		protected readonly TerminalSet setFirsts;
 
 		/// <summary>
 		/// Gets the length of this body
 		/// </summary>
 		public int Length { get { return parts.Count; } }
+
 		/// <summary>
 		/// Gets the element at the specified index.
 		/// </summary>
 		/// <param name="index">The index of an element</param>
 		public RuleBodyElement this[int index] { get { return parts[index]; } }
+
 		/// <summary>
 		/// Gets the FIRSTS set
 		/// </summary>
@@ -77,6 +79,7 @@ namespace Hime.SDK.Grammars
 		{
 			return parts.GetEnumerator();
 		}
+
 		/// <summary>
 		/// Gets the enumerator of the inner parts
 		/// </summary>

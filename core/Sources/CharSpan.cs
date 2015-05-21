@@ -162,21 +162,21 @@ namespace Hime.SDK
 			System.Globalization.UnicodeCategory cat = char.GetUnicodeCategory(c);
 			switch (cat)
 			{
-				case System.Globalization.UnicodeCategory.ModifierLetter:
-				case System.Globalization.UnicodeCategory.NonSpacingMark:
-				case System.Globalization.UnicodeCategory.SpacingCombiningMark:
-				case System.Globalization.UnicodeCategory.EnclosingMark:
-				case System.Globalization.UnicodeCategory.SpaceSeparator:
-				case System.Globalization.UnicodeCategory.LineSeparator:
-				case System.Globalization.UnicodeCategory.ParagraphSeparator:
-				case System.Globalization.UnicodeCategory.Control:
-				case System.Globalization.UnicodeCategory.Format:
-				case System.Globalization.UnicodeCategory.Surrogate:
-				case System.Globalization.UnicodeCategory.PrivateUse:
-				case System.Globalization.UnicodeCategory.OtherNotAssigned:
-					return CharToString_NonPrintable(c);
-				default:
-					return c.ToString();
+			case System.Globalization.UnicodeCategory.ModifierLetter:
+			case System.Globalization.UnicodeCategory.NonSpacingMark:
+			case System.Globalization.UnicodeCategory.SpacingCombiningMark:
+			case System.Globalization.UnicodeCategory.EnclosingMark:
+			case System.Globalization.UnicodeCategory.SpaceSeparator:
+			case System.Globalization.UnicodeCategory.LineSeparator:
+			case System.Globalization.UnicodeCategory.ParagraphSeparator:
+			case System.Globalization.UnicodeCategory.Control:
+			case System.Globalization.UnicodeCategory.Format:
+			case System.Globalization.UnicodeCategory.Surrogate:
+			case System.Globalization.UnicodeCategory.PrivateUse:
+			case System.Globalization.UnicodeCategory.OtherNotAssigned:
+				return CharToString_NonPrintable(c);
+			default:
+				return c.ToString();
 			}
 		}
 

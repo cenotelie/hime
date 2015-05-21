@@ -40,10 +40,12 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the base rule for this item
 		/// </summary>
 		public Rule BaseRule { get { return rule; } }
+
 		/// <summary>
 		/// Gets the dot position in the grammar rule
 		/// </summary>
 		public int DotPosition { get { return position; } }
+
 		/// <summary>
 		/// Gets the action code for this item
 		/// </summary>

@@ -118,12 +118,12 @@ namespace Hime.SDK.Output
 					Grammars.Variable head = item.BaseRule.Head;
 					int index = contexts.IndexOf(head);
 					if (index != -1)
-						result.Add((ushort) index);
+						result.Add((ushort)index);
 				}
 			}
 			
 			// output
-			writer.Write((ushort) result.Count);
+			writer.Write((ushort)result.Count);
 			for (int i = 0; i != result.Count; i++)
 				writer.Write(result[i]);
 		}

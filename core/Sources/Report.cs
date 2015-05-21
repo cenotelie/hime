@@ -44,10 +44,12 @@ namespace Hime.SDK
 		/// Gets the informational entries in this report
 		/// </summary>
 		public ROList<object> Infos { get { return new ROList<object>(infos); } }
+
 		/// <summary>
 		/// Gets the informational entries in this report
 		/// </summary>
 		public ROList<object> Warnings { get { return new ROList<object>(warnings); } }
+
 		/// <summary>
 		/// Gets the informational entries in this report
 		/// </summary>

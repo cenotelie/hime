@@ -219,7 +219,7 @@ namespace Hime.SDK.Reflection
 		public static void ExportDOT(NFA nfa, string file)
 		{
 			DOTSerializer serializer = new DOTSerializer("DFA", file);
-			for (int i=0; i!=nfa.States.Count; i++)
+			for (int i = 0; i != nfa.States.Count; i++)
 			{
 				NFAState state = nfa.States[i];
 				if (state.IsFinal)
@@ -240,7 +240,7 @@ namespace Hime.SDK.Reflection
 					serializer.WriteNode("state" + i, i.ToString());
 				}
 			}
-			for (int i=0; i!=nfa.States.Count; i++)
+			for (int i = 0; i != nfa.States.Count; i++)
 			{
 				NFAState state = nfa.States[i];
 				foreach (NFATransition transition in state.Transitions)
@@ -263,7 +263,7 @@ namespace Hime.SDK.Reflection
 			foreach (LRState state in automaton.States)
 			{
 				string[] items = new string[state.Reductions.Count];
-				for (int i=0; i!=state.Reductions.Count; i++)
+				for (int i = 0; i != state.Reductions.Count; i++)
 					items[i] = state.Reductions[i].ToString();
 				string label = state.IsAccept ? state.ID + "=Accept" : state.ID.ToString();
 				serializer.WriteStructure("state" + state.ID, label, items);

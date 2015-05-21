@@ -38,6 +38,7 @@ namespace Hime.SDK.Automata
 		/// Gets the value on this transition
 		/// </summary>
 		public CharSpan Span { get { return span; } }
+
 		/// <summary>
 		/// Gets the next state by this transition
 		/// </summary>

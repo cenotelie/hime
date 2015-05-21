@@ -40,6 +40,7 @@ namespace Hime.SDK.Grammars.LR
 		/// Same as the identifier of the LR state it represents
 		/// </summary>
 		public int ID { get { return state.ID; } }
+
 		/// <summary>
 		/// Gets the state represented by this node
 		/// </summary>

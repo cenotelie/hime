@@ -53,14 +53,17 @@ namespace Hime.SDK.Grammars
 		/// Gets the name of the head variable
 		/// </summary>
 		public string HeadName { get { return head; } }
+
 		/// <summary>
 		/// Gets the parameters of this rule
 		/// </summary>
 		public ROList<string> Parameters { get { return new ROList<string>(parameters); } }
+
 		/// <summary>
 		/// Gets root AST node for this rule
 		/// </summary>
 		public ASTNode RuleNode { get { return root; } }
+
 		/// <summary>
 		/// Gets AST node for this rule's definition (body)
 		/// </summary>
@@ -102,7 +105,7 @@ namespace Hime.SDK.Grammars
 				instances.Add(new TemplateRuleInstance(this, param, grammar));
 			}
 		}
-		
+
 		/// <summary>
 		/// Instantiate this rule with the given context
 		/// </summary>

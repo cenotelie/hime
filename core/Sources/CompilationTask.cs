@@ -37,34 +37,41 @@ namespace Hime.SDK
 		/// When only one grammar is loaded, it will be automatically selected.
 		/// </summary>
 		public string GrammarName { get; set; }
+
 		/// <summary>
 		/// Gets ot sets the compiler's mode
 		/// </summary>
 		public Output.Mode Mode { get; set; }
+
 		/// <summary>
 		/// Gets or sets the target runtime
 		/// </summary>
 		public Output.Runtime Target { get; set; }
+
 		/// <summary>
 		/// Gets ot sets the compiler's output files' path.
 		/// If this property is not set, the path will be the current directory.
 		/// </summary>
 		public string OutputPath { get; set; }
+
 		/// <summary>
 		/// Gets or sets the namespace in which the generated Lexer and Parser classes will be put.
 		/// If this property is not set, the namespace will be the name of the grammar.
 		/// </summary>
 		public string Namespace { get; set; }
+
 		/// <summary>
 		/// Gets or sets the access modifiers for the generated Lexer and Parser classes.
 		/// The default value is Internal.
 		/// </summary>
 		public Output.Modifier CodeAccess { get; set; }
+
 		/// <summary>
 		/// Gets or sets the parsing method to use.
 		/// The default value is LALR1.
 		/// </summary>
 		public ParsingMethod Method { get; set; }
+
 		/// <summary>
 		/// The reporter
 		/// </summary>
@@ -77,7 +84,10 @@ namespace Hime.SDK
 		/// <summary>
 		/// Initializes a new compilation task
 		/// </summary>
-		public CompilationTask() : this(new Reporter()) { }
+		public CompilationTask() : this(new Reporter())
+		{
+		}
+
 		/// <summary>
 		/// Initializes a new compilation task
 		/// </summary>
@@ -96,46 +106,77 @@ namespace Hime.SDK
 		/// Adds a new file as input
 		/// </summary>
 		/// <param name="file">The input file</param>
-		public void AddInputFile(string file) { loader.AddInputFile(file); }
+		public void AddInputFile(string file)
+		{
+			loader.AddInputFile(file);
+		}
+
 		/// <summary>
 		/// Adds a new data string as input
 		/// </summary>
 		/// <param name="data">The data string</param>
-		public void AddInputRaw(string data) { loader.AddInputRaw(data); }
+		public void AddInputRaw(string data)
+		{
+			loader.AddInputRaw(data);
+		}
+
 		/// <summary>
 		/// Adds a new named data string as input
 		/// </summary>
 		/// <param name="name">The input's name</param>
 		/// <param name="data">The data string</param>
-		public void AddInputRaw(string name, string data) { loader.AddInputRaw(name, data); }
+		public void AddInputRaw(string name, string data)
+		{
+			loader.AddInputRaw(name, data);
+		}
+
 		/// <summary>
 		/// Adds a new data stream as input
 		/// </summary>
 		/// <param name="stream">The input stream</param>
-		public void AddInputRaw(Stream stream) { loader.AddInputRaw(stream); }
+		public void AddInputRaw(Stream stream)
+		{
+			loader.AddInputRaw(stream);
+		}
+
 		/// <summary>
 		/// Adds a new named data stream as input
 		/// </summary>
 		/// <param name="name">The input's name</param>
 		/// <param name="stream">The input stream</param>
-		public void AddInputRaw(string name, Stream stream) { loader.AddInputRaw(name, stream); }
+		public void AddInputRaw(string name, Stream stream)
+		{
+			loader.AddInputRaw(name, stream);
+		}
+
 		/// <summary>
 		/// Adds a new data reader as input
 		/// </summary>
 		/// <param name="reader">The input reader</param>
-		public void AddInputRaw(TextReader reader) { loader.AddInputRaw(reader); }
+		public void AddInputRaw(TextReader reader)
+		{
+			loader.AddInputRaw(reader);
+		}
+
 		/// <summary>
 		/// Adds a new named data reader as input
 		/// </summary>
 		/// <param name="name">The input's name</param>
 		/// <param name="reader">The input reader</param>
-		public void AddInputRaw(string name, TextReader reader) { loader.AddInputRaw(name, reader); }
+		public void AddInputRaw(string name, TextReader reader)
+		{
+			loader.AddInputRaw(name, reader);
+		}
+
 		/// <summary>
 		/// Adds the specified pre-parsed grammar to the inputs
 		/// </summary>
 		/// <param name="node">The parse tree of a grammar</param>
 		/// <param name="input">The input that contains the grammar</param>
-		public void AddInput(Hime.Redist.ASTNode node, Hime.Redist.Text input) { loader.AddInput(node, input); }
+		public void AddInput(Hime.Redist.ASTNode node, Hime.Redist.Text input)
+		{
+			loader.AddInput(node, input);
+		}
 
 		/// <summary>
 		/// Executes this compilation task
@@ -201,14 +242,14 @@ namespace Hime.SDK
 			Output.EmitterBase emitter = null;
 			switch (Target)
 			{
-				case Output.Runtime.Net:
-					emitter = new Output.EmitterForNet(reporter, units);
-					break;
-				case Output.Runtime.Java:
-					emitter = new Output.EmitterForJava(reporter, units);
-					break;
+			case Output.Runtime.Net:
+				emitter = new Output.EmitterForNet(reporter, units);
+				break;
+			case Output.Runtime.Java:
+				emitter = new Output.EmitterForJava(reporter, units);
+				break;
 			}
-			bool success = emitter.Emit (OutputPath ?? "", Mode);
+			bool success = emitter.Emit(OutputPath ?? "", Mode);
 			if (!success)
 				reporter.Error("Failed to emit some output");
 		}

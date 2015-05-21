@@ -297,7 +297,7 @@ namespace Hime.SDK.Grammars.LR
 			// push the rule definition to use onto the stack
 			stack.Push(def);
 			// walk the rule definition to build the sample
-			for (int i=0; i!=def.Length; i++)
+			for (int i = 0; i != def.Length; i++)
 			{
 				RuleBodyElement part = def[i];
 				if (part.Symbol is Terminal)
@@ -315,7 +315,7 @@ namespace Hime.SDK.Grammars.LR
 					foreach (RuleChoice definition in stackElements)
 					{
 						// for all elements
-						for (int j=0; j!=definition.Length; j++)
+						for (int j = 0; j != definition.Length; j++)
 						{
 							RuleBodyElement definitionPart = definition[j];
 							if (definitionPart.Symbol.Equals(part.Symbol))

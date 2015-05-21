@@ -42,10 +42,12 @@ namespace Hime.SDK.Grammars
 		/// Gets the rule's head variable
 		/// </summary>
 		public Variable Head { get { return head; } }
+
 		/// <summary>
 		/// Gets the rule's body
 		/// </summary>
 		public RuleBody Body { get { return body; } }
+
 		/// <summary>
 		/// Gets a value indicating whether the rule is generated
 		/// </summary>

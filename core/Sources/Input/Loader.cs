@@ -58,6 +58,7 @@ namespace Hime.SDK.Input
 		public Loader() : this(new Reporter())
 		{
 		}
+
 		/// <summary>
 		/// Initializes this loader
 		/// </summary>
@@ -88,6 +89,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(file, new StreamReader(file)));
 		}
+
 		/// <summary>
 		/// Adds a new data string as input
 		/// </summary>
@@ -96,6 +98,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(GetRawInputID(), new StringReader(data)));
 		}
+
 		/// <summary>
 		/// Adds a new named data string as input
 		/// </summary>
@@ -105,6 +108,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(name, new StringReader(data)));
 		}
+
 		/// <summary>
 		/// Adds a new data stream as input
 		/// </summary>
@@ -113,6 +117,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(GetRawInputID(), new StreamReader(stream)));
 		}
+
 		/// <summary>
 		/// Adds a new named data stream as input
 		/// </summary>
@@ -122,6 +127,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(name, new StreamReader(stream)));
 		}
+
 		/// <summary>
 		/// Adds a new data reader as input
 		/// </summary>
@@ -130,6 +136,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(GetRawInputID(), reader));
 		}
+
 		/// <summary>
 		/// Adds a new named data reader as input
 		/// </summary>
@@ -139,6 +146,7 @@ namespace Hime.SDK.Input
 		{
 			inputs.Add(new KeyValuePair<string, TextReader>(name, reader));
 		}
+
 		/// <summary>
 		/// Adds the specified pre-parsed grammar to the inputs
 		/// </summary>

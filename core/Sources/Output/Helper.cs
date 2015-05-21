@@ -153,7 +153,8 @@ namespace Hime.SDK.Output
 			"virtual",
 			"void",
 			"volatile",
-			"while" }));
+			"while"
+		}));
 
 		/// <summary>
 		/// The reserved Java keywords
@@ -207,6 +208,7 @@ namespace Hime.SDK.Output
 			"float",
 			"native",
 			"super",
-			"while"}));
+			"while"
+		}));
 	}
 }

@@ -50,10 +50,12 @@ namespace Hime.SDK.Output
 		/// Gets the suffix for the emitted lexer code files
 		/// </summary>
 		public override string SuffixLexerCode { get { return "Lexer.cs"; } }
+
 		/// <summary>
 		/// Gets suffix for the emitted parser code files
 		/// </summary>
 		public override string SuffixParserCode { get { return "Parser.cs"; } }
+
 		/// <summary>
 		/// Gets suffix for the emitted assemblies
 		/// </summary>
@@ -92,7 +94,7 @@ namespace Hime.SDK.Output
 		public EmitterForNet(Reporter reporter, Unit unit) : base(reporter, unit)
 		{
 		}
-		
+
 		/// <summary>
 		/// Gets the runtime-specific generator of lexer code
 		/// </summary>

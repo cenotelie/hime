@@ -50,14 +50,17 @@ namespace Hime.SDK.Reflection
 		/// Gets the terminals that can be matched by the associated lexer
 		/// </summary>
 		public ROList<Symbol> Terminals { get { return terminals; } }
+
 		/// <summary>
 		/// Gets the variable symbols used by this parser
 		/// </summary>
 		public ROList<Symbol> Variables { get { return variables; } }
+
 		/// <summary>
 		/// Gets the virtual symbols used by this parser
 		/// </summary>
 		public ROList<Symbol> Virtuals { get { return virtuals; } }
+
 		/// <summary>
 		/// Gets this parser's LR automaton
 		/// </summary>
@@ -73,7 +76,7 @@ namespace Hime.SDK.Reflection
 			ConstructorInfo parserCtor = null;
 			System.Type lexerType = null;
 			ConstructorInfo lexerCtor = null;
-			for (int i=0; i!=ctors.Length; i++)
+			for (int i = 0; i != ctors.Length; i++)
 			{
 				ParameterInfo[] parameters = ctors[i].GetParameters();
 				if (parameters.Length == 1)
@@ -105,8 +108,8 @@ namespace Hime.SDK.Reflection
 
 			BinaryReader reader = new BinaryReader(stream);
 			if ((typeof(Hime.Redist.Parsers.LRkParser).IsAssignableFrom(parserType)))
-			    LoadLRk(reader);
-			  else
+				LoadLRk(reader);
+			else
 				LoadRNGLR(reader);
 			reader.Close();
 		}
@@ -118,9 +121,9 @@ namespace Hime.SDK.Reflection
 		private void LoadLRk(BinaryReader reader)
 		{
 			Hime.Redist.Parsers.LRkAutomaton temp = new Hime.Redist.Parsers.LRkAutomaton(reader);
-			for (int i=0; i!=temp.StatesCount; i++)
+			for (int i = 0; i != temp.StatesCount; i++)
 				automaton.AddState(new Automata.LRState(i));
-			for (int i=0; i!=temp.StatesCount; i++)
+			for (int i = 0; i != temp.StatesCount; i++)
 			{
 				Automata.LRState state = automaton.States[i];
 				foreach (Symbol terminal in terminals)
@@ -128,16 +131,16 @@ namespace Hime.SDK.Reflection
 					Hime.Redist.Parsers.LRAction action = temp.GetAction(i, terminal.ID);
 					switch (action.Code)
 					{
-						case Hime.Redist.Parsers.LRActionCode.Accept:
-							state.IsAccept = true;
-							break;
-						case Hime.Redist.Parsers.LRActionCode.Shift:
-							state.AddTransition(new Automata.LRTransition(terminal, automaton.States[action.Data]));
-							break;
-						case Hime.Redist.Parsers.LRActionCode.Reduce:
-							Hime.Redist.Parsers.LRProduction prod = temp.GetProduction(action.Data);
-							state.AddReduction(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
-							break;
+					case Hime.Redist.Parsers.LRActionCode.Accept:
+						state.IsAccept = true;
+						break;
+					case Hime.Redist.Parsers.LRActionCode.Shift:
+						state.AddTransition(new Automata.LRTransition(terminal, automaton.States[action.Data]));
+						break;
+					case Hime.Redist.Parsers.LRActionCode.Reduce:
+						Hime.Redist.Parsers.LRProduction prod = temp.GetProduction(action.Data);
+						state.AddReduction(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
+						break;
 					}
 				}
 				foreach (Symbol variable in variables)
@@ -158,36 +161,36 @@ namespace Hime.SDK.Reflection
 		private void LoadRNGLR(BinaryReader reader)
 		{
 			Hime.Redist.Parsers.RNGLRAutomaton temp = new Hime.Redist.Parsers.RNGLRAutomaton(reader);
-			for (int i=0; i!=temp.StatesCount; i++)
+			for (int i = 0; i != temp.StatesCount; i++)
 				automaton.AddState(new Automata.LRState(i));
-			for (int i=0; i!=temp.StatesCount; i++)
+			for (int i = 0; i != temp.StatesCount; i++)
 			{
 				Automata.LRState state = automaton.States[i];
 				foreach (Symbol terminal in terminals)
 				{
 					int count = temp.GetActionsCount(i, terminal.ID);
-					for (int j=0; j!=count; j++)
+					for (int j = 0; j != count; j++)
 					{
 						Hime.Redist.Parsers.LRAction action = temp.GetAction(i, terminal.ID, j);
 						switch (action.Code)
 						{
-							case Hime.Redist.Parsers.LRActionCode.Accept:
-								state.IsAccept = true;
-								break;
-							case Hime.Redist.Parsers.LRActionCode.Shift:
-								state.AddTransition(new Automata.LRTransition(terminal, automaton.States[action.Data]));
-								break;
-							case Hime.Redist.Parsers.LRActionCode.Reduce:
-								Hime.Redist.Parsers.LRProduction prod = temp.GetProduction(action.Data);
-								state.AddReduction(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
-								break;
+						case Hime.Redist.Parsers.LRActionCode.Accept:
+							state.IsAccept = true;
+							break;
+						case Hime.Redist.Parsers.LRActionCode.Shift:
+							state.AddTransition(new Automata.LRTransition(terminal, automaton.States[action.Data]));
+							break;
+						case Hime.Redist.Parsers.LRActionCode.Reduce:
+							Hime.Redist.Parsers.LRProduction prod = temp.GetProduction(action.Data);
+							state.AddReduction(new Automata.LRReduction(terminal, variables[prod.Head], prod.ReductionLength));
+							break;
 						}
 					}
 				}
 				foreach (Symbol variable in variables)
 				{
 					int count = temp.GetActionsCount(i, variable.ID);
-					for (int j=0; j!=count; j++)
+					for (int j = 0; j != count; j++)
 					{
 						Hime.Redist.Parsers.LRAction action = temp.GetAction(i, variable.ID, j);
 						if (action.Code == Hime.Redist.Parsers.LRActionCode.Shift)

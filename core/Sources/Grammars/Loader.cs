@@ -62,10 +62,12 @@ namespace Hime.SDK.Grammars
 		/// Gets the result of this loader
 		/// </summary>
 		public Grammar Grammar { get { return grammar; } }
+
 		/// <summary>
 		/// Gets a value indicating whether all dependencies are solved
 		/// </summary>
 		public bool IsSolved { get { return (inherited.Count == 0); } }
+
 		/// <summary>
 		/// Gets the remaining unsolved dependencies
 		/// </summary>
@@ -282,12 +284,12 @@ namespace Hime.SDK.Grammars
 			{
 				switch (child.Symbol.ID)
 				{
-					case HimeGrammarLexer.ID.BLOCK_CONTEXT:
-						LoadTerminalContext(child);
-						break;
-					case HimeGrammarParser.ID.terminal_rule:
-						LoadTerminalRule(child, null);
-						break;
+				case HimeGrammarLexer.ID.BLOCK_CONTEXT:
+					LoadTerminalContext(child);
+					break;
+				case HimeGrammarParser.ID.terminal_rule:
+					LoadTerminalRule(child, null);
+					break;
 				}
 			}
 		}
@@ -300,7 +302,7 @@ namespace Hime.SDK.Grammars
 		{
 			ASTFamily children = node.Children;
 			string name = children[0].Value;
-			for (int i=1; i!=children.Count; i++)
+			for (int i = 1; i != children.Count; i++)
 				LoadTerminalRule(children[i], name);
 		}
 

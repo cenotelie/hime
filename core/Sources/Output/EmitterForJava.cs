@@ -31,15 +31,17 @@ namespace Hime.SDK.Output
 		/// Gets the suffix for the emitted lexer code files
 		/// </summary>
 		public override string SuffixLexerCode { get { return "Lexer.java"; } }
+
 		/// <summary>
 		/// Gets suffix for the emitted parser code files
 		/// </summary>
 		public override string SuffixParserCode { get { return "Parser.java"; } }
+
 		/// <summary>
 		/// Gets suffix for the emitted assemblies
 		/// </summary>
 		public override string SuffixAssembly { get { return ".jar"; } }
-		
+
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
@@ -136,7 +138,7 @@ namespace Hime.SDK.Output
 		{
 			string current = origin;
 			string[] parts = unit.Namespace.Split(new [] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
-			for (int i=0; i!=parts.Length; i++)
+			for (int i = 0; i != parts.Length; i++)
 			{
 				current = Path.Combine(current, parts[i]);
 				if (!Directory.Exists(current))

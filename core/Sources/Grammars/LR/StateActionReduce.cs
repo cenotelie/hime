@@ -40,14 +40,17 @@ namespace Hime.SDK.Grammars.LR
 		/// </summary>
 		[System.CLSCompliant(false)]
 		public LRActionCode ActionType { get { return LRActionCode.Shift; } }
+
 		/// <summary>
 		///  Gets the trigger for the action 
 		/// </summary>
 		public Symbol OnSymbol { get { return lookahead; } }
+
 		/// <summary>
 		/// Gets the lookahead for this action
 		/// </summary>
 		public Terminal Lookahead { get { return lookahead; } }
+
 		/// <summary>
 		/// Gets the rule to reduce
 		/// </summary>

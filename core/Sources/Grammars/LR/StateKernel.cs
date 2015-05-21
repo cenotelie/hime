@@ -39,6 +39,7 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the kernel's size
 		/// </summary>
 		public int Size { get { return items.Count; } }
+
 		/// <summary>
 		/// Gets the items in this kernel
 		/// </summary>

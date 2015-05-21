@@ -39,6 +39,7 @@ namespace Hime.SDK.Automata
 		/// Gets the label on this transition
 		/// </summary>
 		public Symbol Label { get { return label; } }
+
 		/// <summary>
 		/// Gets the target of this transition
 		/// </summary>

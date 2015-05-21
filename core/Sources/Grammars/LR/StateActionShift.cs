@@ -40,10 +40,12 @@ namespace Hime.SDK.Grammars.LR
 		/// </summary>
 		[System.CLSCompliant(false)]
 		public LRActionCode ActionType { get { return LRActionCode.Shift; } }
+
 		/// <summary>
 		///  Gets the trigger for the action 
 		/// </summary>
 		public Symbol OnSymbol { get { return symbol; } }
+
 		/// <summary>
 		/// Gets the target of this action
 		/// </summary>

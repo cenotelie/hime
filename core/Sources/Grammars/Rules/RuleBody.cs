@@ -144,7 +144,7 @@ namespace Hime.SDK.Grammars
 				{
 					// If the next choice FIRSTS set contains ε
 					// add the FOLLOWERS of the head variable to the FOLLOWERS of the found variable
-					if (choices [i + 1].Firsts.Contains (Epsilon.Instance))
+					if (choices[i + 1].Firsts.Contains(Epsilon.Instance))
 						mod |= var.Followers.AddRange(ruleVar.Followers);
 				}
 			}

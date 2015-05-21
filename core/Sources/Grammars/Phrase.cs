@@ -36,6 +36,7 @@ namespace Hime.SDK.Grammars
 		/// Gets the length of this phrase
 		/// </summary>
 		public int Length { get { return content.Count; } }
+
 		/// <summary>
 		/// Gets the terminal at the given index in this phrase
 		/// </summary>
@@ -67,6 +68,7 @@ namespace Hime.SDK.Grammars
 		{
 			return content.GetEnumerator();
 		}
+
 		/// <summary>
 		/// Gets the enumerator of terminals in this phrase
 		/// </summary>

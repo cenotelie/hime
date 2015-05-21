@@ -44,14 +44,17 @@ namespace Hime.SDK.Automata
 		/// Gets this state's identifier
 		/// </summary>
 		public int ID { get { return id; } }
+
 		/// <summary>
 		/// Gets the transitions from this state
 		/// </summary>
 		public ROList<LRTransition> Transitions { get { return new ROList<LRTransition>(transitions); } }
+
 		/// <summary>
 		/// Gets the reductions in this state
 		/// </summary>
 		public ROList<LRReduction> Reductions { get { return new ROList<LRReduction>(reductions); } }
+
 		/// <summary>
 		/// Gets or sets whether this state is an accepting state
 		/// </summary>

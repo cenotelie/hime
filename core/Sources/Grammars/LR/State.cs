@@ -49,22 +49,27 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets or sets the state's identifier
 		/// </summary>
 		public int ID { get; set; }
+
 		/// <summary>
 		/// Gets the state's kernel
 		/// </summary>
 		public StateKernel Kernel { get { return kernel; } }
+
 		/// <summary>
 		/// Gets the state's reduction
 		/// </summary>
 		public StateReductions Reductions { get { return reductions; } }
+
 		/// <summary>
 		/// Gets the items in this state
 		/// </summary>
 		public ROList<Item> Items { get { return new ROList<Item>(items); } }
+
 		/// <summary>
 		/// Gets the conflicts in this state
 		/// </summary>
 		public ROList<Conflict> Conflicts { get { return reductions.Conflicts; } }
+
 		/// <summary>
 		/// Gets the symbols that triggers transitions from this state
 		/// </summary>

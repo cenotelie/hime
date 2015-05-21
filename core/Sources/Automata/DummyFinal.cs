@@ -31,12 +31,15 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		private static DummyItem instance;
 
-		private DummyItem() { }
+		private DummyItem()
+		{
+		}
 
 		/// <summary>
 		/// Gets the single instance
 		/// </summary>
-		public static FinalItem Instance {
+		public static FinalItem Instance
+		{
 			get
 			{
 				if (instance == null)

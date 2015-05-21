@@ -53,18 +53,22 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the state raising this conflict
 		/// </summary>
 		public State State { get { return state; } }
+
 		/// <summary>
 		/// Gets the type of the conflict
 		/// </summary>
 		public ConflictType ConflictType { get { return type; } }
+
 		/// <summary>
 		/// Gets the conflictuous terminal
 		/// </summary>
 		public Terminal ConflictSymbol { get { return lookahead; } }
+
 		/// <summary>
 		/// Gets the list of conflictuous items
 		/// </summary>
 		public ROList<Item> Items { get { return new ROList<Item>(items); } }
+
 		/// <summary>
 		/// Gets a list of examples of conflictuous examples
 		/// </summary>

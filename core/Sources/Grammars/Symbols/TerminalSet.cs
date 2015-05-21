@@ -49,6 +49,7 @@ namespace Hime.SDK.Grammars
 		}
 
 		#region Implementation of IList<Terminal>
+
 		/// <summary>
 		/// Adds the specified item
 		/// </summary>
@@ -199,6 +200,7 @@ namespace Hime.SDK.Grammars
 		{
 			return content.Values.GetEnumerator();
 		}
+
 		#endregion
 
 		/// <summary>

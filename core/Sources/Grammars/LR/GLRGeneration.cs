@@ -57,12 +57,19 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		public IEnumerator<GLRStackNode> GetEnumerator() { return nodes.GetEnumerator(); }
+		public IEnumerator<GLRStackNode> GetEnumerator()
+		{
+			return nodes.GetEnumerator();
+		}
+
 		/// <summary>
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return nodes.GetEnumerator(); }
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return nodes.GetEnumerator();
+		}
 
 		/// <summary>
 		/// Resolves a stack node in this generation for the given LR state

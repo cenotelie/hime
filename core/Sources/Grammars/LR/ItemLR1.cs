@@ -40,6 +40,7 @@ namespace Hime.SDK.Grammars.LR
 		///  Gets the lookahead for this item
 		/// </summary>
 		public Terminal Lookahead { get { return lookahead; } }
+
 		/// <summary>
 		///  Gets the lookaheads for this item
 		/// </summary>

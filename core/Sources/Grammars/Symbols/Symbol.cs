@@ -62,6 +62,7 @@ namespace Hime.SDK.Grammars
 			{
 				return (x.ID == y.ID);
 			}
+
 			/// <summary>
 			/// Returns a hash code for the specified object
 			/// </summary>
@@ -96,7 +97,7 @@ namespace Hime.SDK.Grammars
 		/// </returns>
 		public override bool Equals(object obj)
 		{
-			Symbol temp  = obj as Symbol;
+			Symbol temp = obj as Symbol;
 			return (temp != null && ID == temp.ID);
 		}
 

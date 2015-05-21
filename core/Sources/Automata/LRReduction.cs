@@ -43,10 +43,12 @@ namespace Hime.SDK.Automata
 		/// Gets the lookahead terminal to reduce on
 		/// </summary>
 		public Symbol Lookahead { get { return lookahead; } }
+
 		/// <summary>
 		/// Gets the head (variable) of the reduced rule
 		/// </summary>
 		public Symbol Head { get { return head; } }
+
 		/// <summary>
 		/// Gets the reduction's length
 		/// </summary>
@@ -76,7 +78,7 @@ namespace Hime.SDK.Automata
 			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
 			builder.Append(head);
 			builder.Append(" ->");
-			for (int i=0; i!=length; i++)
+			for (int i = 0; i != length; i++)
 				builder.Append(" ?");
 			builder.Append("] on ");
 			builder.Append(lookahead);

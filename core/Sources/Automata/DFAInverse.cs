@@ -44,10 +44,12 @@ namespace Hime.SDK.Automata
 		/// Gets the reachable states of the DFA
 		/// </summary>
 		public ROList<DFAState> Reachable { get { return new ROList<DFAState>(reachable); } }
+
 		/// <summary>
 		/// Gets the inverse transitions
 		/// </summary>
 		public Dictionary<DFAState, List<DFAState>> Inverses { get { return inverses; } }
+
 		/// <summary>
 		/// Gets the final states of the original DFA
 		/// </summary>

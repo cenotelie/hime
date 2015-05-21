@@ -50,6 +50,7 @@ namespace Hime.SDK.Reflection
 		/// Gets the lexers in this assembly
 		/// </summary>
 		public ROList<Type> Lexers { get { return new ROList<Type>(lexerTypes); } }
+
 		/// <summary>
 		/// Gets the parsers in this assembly
 		/// </summary>
@@ -103,7 +104,7 @@ namespace Hime.SDK.Reflection
 		/// <returns>The lexe</returns>
 		public BaseLexer getLexer<T>(T input)
 		{
-			return lexerTypes.Count == 0 ? null : getLexer (lexerTypes [0], input);
+			return lexerTypes.Count == 0 ? null : getLexer(lexerTypes[0], input);
 		}
 
 		/// <summary>
@@ -116,7 +117,7 @@ namespace Hime.SDK.Reflection
 		{
 			ConstructorInfo lexerCtor = lexerType.GetConstructor(new [] { typeof(T) });
 			object lexer = lexerCtor.Invoke(new object[] { input });
-			return (BaseLexer) lexer;
+			return (BaseLexer)lexer;
 		}
 
 		/// <summary>
@@ -126,7 +127,7 @@ namespace Hime.SDK.Reflection
 		/// <returns>The parser</returns>
 		public BaseLRParser GetParser<T>(T input)
 		{
-			return parserTypes.Count == 0 ? null : GetParser (parserTypes [0], input, null);
+			return parserTypes.Count == 0 ? null : GetParser(parserTypes[0], input, null);
 		}
 
 		/// <summary>
@@ -137,7 +138,7 @@ namespace Hime.SDK.Reflection
 		/// <returns>The parser</returns>
 		public BaseLRParser GetParser<T>(T input, Dictionary<string, SemanticAction> actions)
 		{
-			return parserTypes.Count == 0 ? null : GetParser (parserTypes [0], input, actions);
+			return parserTypes.Count == 0 ? null : GetParser(parserTypes[0], input, actions);
 		}
 
 		/// <summary>
@@ -187,7 +188,7 @@ namespace Hime.SDK.Reflection
 			ConstructorInfo parserCtor = null;
 			Type lexerType = null;
 			ConstructorInfo lexerCtor = null;
-			for (int i=0; i!=ctors.Length; i++)
+			for (int i = 0; i != ctors.Length; i++)
 			{
 				ParameterInfo[] parameters = ctors[i].GetParameters();
 				if (actions == null && parameters.Length == 1)

@@ -44,6 +44,7 @@ namespace Hime.SDK.Grammars
 		/// Gets the head variable for this rule
 		/// </summary>
 		public Variable HeadVariable { get { return variable; } }
+
 		/// <summary>
 		/// Gets the parameter values
 		/// </summary>

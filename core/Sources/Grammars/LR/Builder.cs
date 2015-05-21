@@ -69,21 +69,21 @@ namespace Hime.SDK.Grammars.LR
 			// build the graph
 			switch (method)
 			{
-				case ParsingMethod.LR0:
-					graph = GetGraphLR0();
-					break;
-				case ParsingMethod.LR1:
-					graph = GetGraphLR1();
-					break;
-				case ParsingMethod.LALR1:
-					graph = GetGaphLALR1();
-					break;
-				case ParsingMethod.RNGLR1:
-					graph = GetGraphRNGLR1();
-					break;
-				case ParsingMethod.RNGLALR1:
-					graph = GetGraphRNGLALR1();
-					break;
+			case ParsingMethod.LR0:
+				graph = GetGraphLR0();
+				break;
+			case ParsingMethod.LR1:
+				graph = GetGraphLR1();
+				break;
+			case ParsingMethod.LALR1:
+				graph = GetGaphLALR1();
+				break;
+			case ParsingMethod.RNGLR1:
+				graph = GetGraphRNGLR1();
+				break;
+			case ParsingMethod.RNGLALR1:
+				graph = GetGraphRNGLALR1();
+				break;
 			}
 
 			// builds the set of conflicts

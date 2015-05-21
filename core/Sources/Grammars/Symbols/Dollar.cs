@@ -29,6 +29,7 @@ namespace Hime.SDK.Grammars
 		/// The singleton instance
 		/// </summary>
 		private static Dollar instance;
+
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>

@@ -94,26 +94,32 @@ namespace Hime.SDK.Grammars
 		/// Gets the grammar's name
 		/// </summary>
 		public string Name { get { return name; } }
+
 		/// <summary>
 		/// Gets the grammar's options
 		/// </summary>
 		public ICollection<string> Options { get { return options.Keys; } }
+
 		/// <summary>
 		/// Gets the grammar's terminals
 		/// </summary>
 		public ICollection<Terminal> Terminals { get { return terminalsByName.Values; } }
+
 		/// <summary>
 		/// Gets teh grammar's variables
 		/// </summary>
 		public ICollection<Variable> Variables { get { return variables.Values; } }
+
 		/// <summary>
 		/// Gets the grammar's virtual symbols
 		/// </summary>
 		public ICollection<Virtual> Virtuals { get { return virtuals.Values; } }
+
 		/// <summary>
 		/// Gets the grammar's action symbols
 		/// </summary>
 		public ICollection<Action> Actions { get { return actions.Values; } }
+
 		/// <summary>
 		/// Gets a list of all the rules in this grammar
 		/// </summary>
@@ -127,6 +133,7 @@ namespace Hime.SDK.Grammars
 				return rules;
 			}
 		}
+
 		/// <summary>
 		/// Gets the template rules in this grammar
 		/// </summary>
@@ -604,7 +611,7 @@ namespace Hime.SDK.Grammars
 			{
 				mod = false;
 				foreach (Variable var in variables.Values)
-					mod |= var.ComputeFirsts ();
+					mod |= var.ComputeFirsts();
 			}
 		}
 
@@ -622,7 +629,7 @@ namespace Hime.SDK.Grammars
 			{
 				mod = false;
 				foreach (Variable var in variables.Values)
-					mod |= var.ComputeFollowers_Step23 ();
+					mod |= var.ComputeFollowers_Step23();
 			}
 		}
 	}
