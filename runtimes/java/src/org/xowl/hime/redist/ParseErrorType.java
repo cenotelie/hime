@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,20 +16,22 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
 /**
  * Specifies the type of error
+ *
+ * @author Laurent Wouters
  */
 public enum ParseErrorType {
     /**
-     * Lexical error occuring when an unexpected character is encountered in the input preventing to match tokens
+     * Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
      */
     UnexpectedChar,
     /**
-     * Syntactic error occuring when an unexpected token is encountered by the parser
+     * Syntactic error occurring when an unexpected token is encountered by the parser
      */
     UnexpectedToken
 }

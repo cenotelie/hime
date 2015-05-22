@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,18 +16,20 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
 /**
  * Represents an error in a parser
+ *
+ * @author Laurent Wouters
  */
 public abstract class ParseError {
     /**
-     * The error's position in the input
+     * The error's position in the input text
      */
-    private TextPosition position;
+    private final TextPosition position;
 
     /**
      * Gets the error's type

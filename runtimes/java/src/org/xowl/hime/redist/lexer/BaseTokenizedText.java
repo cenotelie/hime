@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,12 +16,15 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist.lexer;
 
 
-import org.xowl.hime.redist.*;
+import org.xowl.hime.redist.Symbol;
+import org.xowl.hime.redist.TextContext;
+import org.xowl.hime.redist.TextPosition;
+import org.xowl.hime.redist.Token;
 import org.xowl.hime.redist.utils.BigList;
 
 import java.util.Arrays;
@@ -207,10 +210,10 @@ public abstract class BaseTokenizedText implements TokenizedText {
      * @param position The position in this text
      * @return The context description
      */
-    public Context getContext(TextPosition position) {
+    public TextContext getContext(TextPosition position) {
         String content = getLineContent(position.getLine());
         if (content.length() == 0)
-            return new Context("", "^");
+            return new TextContext("", "^");
         int end = content.length() - 1;
         while (end != -1 && (content.charAt(end) == '\n' || content.charAt(end) == '\r'))
             end--;
@@ -229,7 +232,7 @@ public abstract class BaseTokenizedText implements TokenizedText {
         for (int i = start; i != position.getColumn() - 1; i++)
             builder.append(content.charAt(i) == '\t' ? '\t' : ' ');
         builder.append("^");
-        return new Context(content.substring(start, end + 1), builder.toString());
+        return new TextContext(content.substring(start, end + 1), builder.toString());
     }
 
     /**

@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,7 +16,7 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
@@ -24,34 +24,18 @@ import java.util.List;
 
 /**
  * Represents a node in an Abstract Syntax Tree
+ *
+ * @author Laurent Wouters
  */
-public class ASTNode {
+public class ASTNode implements SemanticElement {
     /**
      * The parent parse tree
      */
-    private AST tree;
+    private final AST tree;
     /**
      * The index of this node in the parse tree
      */
-    private int index;
-
-    /**
-     * Gets the symbol in this node
-     *
-     * @return The symbol in this node
-     */
-    public Symbol getSymbol() {
-        return tree.getSymbol(index);
-    }
-
-    /**
-     * Gets the position in the input text of this node
-     *
-     * @return The position in the input text of this node
-     */
-    public TextPosition getPosition() {
-        return tree.getPosition(index);
-    }
+    private final int index;
 
     /**
      * Gets the children of this node
@@ -60,6 +44,31 @@ public class ASTNode {
      */
     public List<ASTNode> getChildren() {
         return tree.getChildren(index);
+    }
+
+    @Override
+    public TextPosition getPosition() {
+        return tree.getPosition(index);
+    }
+
+    @Override
+    public TextSpan getSpan() {
+        return tree.getSpan(index);
+    }
+
+    @Override
+    public TextContext getContext() {
+        return tree.getContext(index);
+    }
+
+    @Override
+    public Symbol getSymbol() {
+        return tree.getSymbol(index);
+    }
+
+    @Override
+    public String getValue() {
+        return tree.getValue(index);
     }
 
     /**
@@ -75,6 +84,10 @@ public class ASTNode {
 
     @Override
     public String toString() {
-        return tree.getSymbol(index).toString();
+        String name = tree.getSymbol(index).getName();
+        String value = tree.getValue(index);
+        if (value != null)
+            return name + " = " + value;
+        return name;
     }
 }

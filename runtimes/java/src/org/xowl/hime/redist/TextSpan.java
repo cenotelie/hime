@@ -21,51 +21,51 @@
 package org.xowl.hime.redist;
 
 /**
- * Represents a position in term of line and column in a text input
+ * Represents a span of text in an input as a starting index and length
  *
  * @author Laurent Wouters
  */
-public class TextPosition {
+public class TextSpan {
     /**
-     * The line number
+     * The starting index
      */
-    private final int line;
+    private final int index;
     /**
-     * The column number
+     * The length
      */
-    private final int column;
+    private final int length;
 
     /**
-     * Gets the line number
+     * Gets the starting index of this span
      *
-     * @return The line number
+     * @return The starting index of this span
      */
-    public int getLine() {
-        return line;
+    public int getIndex() {
+        return index;
     }
 
     /**
-     * Gets the column number
+     * Gets the length of this span
      *
-     * @return The column number
+     * @return The length of this span
      */
-    public int getColumn() {
-        return column;
+    public int getLength() {
+        return length;
     }
 
     /**
-     * Initializes this position with the given line and column numbers
+     * Initializes this span
      *
-     * @param line   The line number
-     * @param column The column number
+     * @param index  The span's index
+     * @param length The span's length
      */
-    public TextPosition(int line, int column) {
-        this.line = line;
-        this.column = column;
+    public TextSpan(int index, int length) {
+        this.index = index;
+        this.length = length;
     }
 
     @Override
     public String toString() {
-        return "(" + line + ", " + column + ")";
+        return "@" + index + "+" + length;
     }
 }

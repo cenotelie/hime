@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,7 +16,7 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
@@ -28,16 +28,18 @@ package org.xowl.hime.redist;
  * A context pointing to the second word will look like:
  * content = "public Struct Context"
  * pointer = "       ^"
+ *
+ * @author Laurent Wouters
  */
-public class Context {
+public class TextContext {
     /**
      * The text content being represented
      */
-    private String content;
+    private final String content;
     /**
      * The pointer textual representation
      */
-    private String pointer;
+    private final String pointer;
 
     /**
      * Gets the text content being represented
@@ -58,12 +60,20 @@ public class Context {
     }
 
     /**
+     * Initializes this empty context
+     */
+    public TextContext() {
+        this.content = null;
+        this.pointer = null;
+    }
+
+    /**
      * Initializes this context
      *
      * @param content The text being begin represented
      * @param pointer The pointer textual representation
      */
-    public Context(String content, String pointer) {
+    public TextContext(String content, String pointer) {
         this.content = content;
         this.pointer = pointer;
     }

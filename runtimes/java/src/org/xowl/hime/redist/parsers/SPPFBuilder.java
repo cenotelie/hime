@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,13 +16,13 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 package org.xowl.hime.redist.parsers;
 
 import org.xowl.hime.redist.AST;
+import org.xowl.hime.redist.ASTGraph;
 import org.xowl.hime.redist.SemanticBody;
 import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TokenizedText;
 
 import java.util.Arrays;
 import java.util.List;
@@ -137,7 +137,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The AST being built
      */
-    private GraphAST result;
+    private ASTGraph result;
 
     /**
      * Gets the symbol at the i-th index
@@ -197,7 +197,7 @@ class SPPFBuilder implements SemanticBody {
         this.cacheActions = new byte[INIT_HANDLE_SIZE];
         this.handle = new int[INIT_HANDLE_SIZE];
         this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-        this.result = new GraphAST(text, variables, virtuals);
+        this.result = new ASTGraph(text, variables, virtuals);
     }
 
     /**

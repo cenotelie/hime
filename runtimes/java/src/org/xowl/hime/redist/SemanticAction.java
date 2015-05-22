@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,18 +16,20 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
 /**
  * Represents a user-defined semantic action on the given body and with the given parent
+ *
+ * @author Laurent Wouters
  */
 public interface SemanticAction {
     /**
      * Executes this action
      *
-     * @param head The semantic object for the head
+     * @param head The grammar variable representing the head of the reduced rule
      * @param body The current body at the time of the action
      */
     void execute(Symbol head, SemanticBody body);

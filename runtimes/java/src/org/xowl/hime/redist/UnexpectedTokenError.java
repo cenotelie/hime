@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,7 +16,7 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
@@ -25,16 +25,18 @@ import java.util.List;
 
 /**
  * Represents an unexpected token error in a parser
+ *
+ * @author Laurent Wouters
  */
 public class UnexpectedTokenError extends ParseError {
     /**
      * The unexpected token
      */
-    private Symbol unexpected;
+    private final Token unexpected;
     /**
-     * A list of the expected terminals
+     * The expected terminals
      */
-    private List<Symbol> expected;
+    private final List<Symbol> expected;
 
     /**
      * Gets the error's type
@@ -43,7 +45,7 @@ public class UnexpectedTokenError extends ParseError {
      */
     @Override
     public ParseErrorType getType() {
-        return ParseErrorType.UnexpectedChar;
+        return ParseErrorType.UnexpectedToken;
     }
 
     /**
@@ -61,7 +63,7 @@ public class UnexpectedTokenError extends ParseError {
      *
      * @return The unexpected token
      */
-    public Symbol getUnexpectedToken() {
+    public Token getUnexpectedToken() {
         return unexpected;
     }
 
@@ -75,14 +77,13 @@ public class UnexpectedTokenError extends ParseError {
     }
 
     /**
-     * Initializes a new instance of the UnexpectedTokenError class with a token and an array of expected names
+     * Initializes this error
      *
      * @param token    The unexpected token
-     * @param position Error's position in the input
      * @param expected The expected terminals
      */
-    public UnexpectedTokenError(Symbol token, TextPosition position, List<Symbol> expected) {
-        super(position);
+    public UnexpectedTokenError(Token token, List<Symbol> expected) {
+        super(token.getPosition());
         this.unexpected = token;
         this.expected = Collections.unmodifiableList(expected);
     }

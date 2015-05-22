@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,7 +16,7 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
@@ -24,6 +24,8 @@ package org.xowl.hime.redist;
  * Represents the input of parser with some metadata for line endings
  * All line numbers and column numbers are 1-based.
  * Indices in the content are 0-based.
+ *
+ * @author Laurent Wouters
  */
 public interface Text {
     /**
@@ -48,6 +50,14 @@ public interface Text {
      * @return The substring
      */
     String getValue(int index, int length);
+
+    /**
+     * Get the substring corresponding to the specified span
+     *
+     * @param span A span in this text
+     * @return The substring
+     */
+    String getValue(TextSpan span);
 
     /**
      * Gets the starting index of the i-th line
@@ -90,5 +100,22 @@ public interface Text {
      * @param position The position in this text
      * @return The context description
      */
-    Context getContext(TextPosition position);
+    TextContext getContext(TextPosition position);
+
+    /**
+     * Gets the context description for the current text at the specified position
+     *
+     * @param position The position in this text
+     * @param length   The length of the element to contextualize
+     * @return The context description
+     */
+    TextContext getContext(TextPosition position, int length);
+
+    /**
+     * Gets the context description for the current text at the specified span
+     *
+     * @param span The span of text to contextualize
+     * @return The context description
+     */
+    TextContext getContext(TextSpan span);
 }

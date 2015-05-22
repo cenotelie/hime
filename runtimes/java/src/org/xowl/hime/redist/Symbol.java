@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,14 +16,16 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
 /**
- * Represents a symbol in an AST
+ * Represents a grammar symbol (terminal, variable or virtual)
+ *
+ * @author Laurent Wouters
  */
-public class Symbol {
+public class Symbol implements SemanticElement {
     /**
      * Symbol ID for inexistant symbol
      */
@@ -40,15 +42,11 @@ public class Symbol {
     /**
      * The symbol's unique identifier
      */
-    private int id;
+    private final int id;
     /**
      * The symbol's name
      */
-    private String name;
-    /**
-     * The symbol's value
-     */
-    private String value;
+    private final String name;
 
     /**
      * Gets the symbol's unique identifier
@@ -69,15 +67,6 @@ public class Symbol {
     }
 
     /**
-     * Gets the symbol's value
-     *
-     * @return The symbol's value
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
      * Initializes this symbol
      *
      * @param id   The id
@@ -86,24 +75,35 @@ public class Symbol {
     public Symbol(int id, String name) {
         this.id = id;
         this.name = name;
-        this.value = name;
     }
 
-    /**
-     * Initializes this symbol
-     *
-     * @param id    The id
-     * @param name  The symbol's name
-     * @param value The symbol's value
-     */
-    public Symbol(int id, String name, String value) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
+    @Override
+    public TextPosition getPosition() {
+        return new TextPosition(0, 0);
+    }
+
+    @Override
+    public TextSpan getSpan() {
+        return new TextSpan(0, 0);
+    }
+
+    @Override
+    public TextContext getContext() {
+        return new TextContext();
+    }
+
+    @Override
+    public Symbol getSymbol() {
+        return this;
+    }
+
+    @Override
+    public String getValue() {
+        return null;
     }
 
     @Override
     public String toString() {
-        return value;
+        return name;
     }
 }

@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,18 +16,20 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
 /**
  * Represents an unexpected character error in the input stream of a lexer
+ *
+ * @author Laurent Wouters
  */
 public class UnexpectedCharError extends ParseError {
     /**
      * The unexpected char
      */
-    private String unexpected;
+    private final String unexpected;
 
     /**
      * Gets the error's type
@@ -54,7 +56,7 @@ public class UnexpectedCharError extends ParseError {
      *
      * @return The unexpected char
      */
-    public String getUnexpected() {
+    public String getUnexpectedChar() {
         return unexpected;
     }
 

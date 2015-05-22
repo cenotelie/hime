@@ -17,57 +17,39 @@
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
-package org.xowl.hime.redist.parsers;
-
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.hime.redist.ASTSimpleTree;
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TokenizedText;
+package org.xowl.hime.redist;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents a simple AST with a tree structure
  * The nodes are stored in sequential arrays where the children of a node are an inner sequence.
  * The linkage is represented by each node storing its number of children and the index of its first child.
+ *
+ * @author Laurent Wouters
  */
-class SimpleAST extends ASTSimpleTree {
-
+public class ASTSimpleTree extends AST {
     /**
      * Initializes this AST
      *
-     * @param text      The table of tokens
+     * @param tokens    The table of tokens
      * @param variables The table of variables
      * @param virtuals  The table of virtuals
      */
-    public SimpleAST(TokenizedText text, List<Symbol> variables, List<Symbol> virtuals) {
-        super(text, variables, virtuals);
+    public ASTSimpleTree(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
+        super(tokens, variables, virtuals);
     }
 
-    /**
-     * Gets the i-th child of the given node
-     *
-     * @param parent A node
-     * @param i      The child's number
-     * @return The i-th child
-     */
-    public ASTNode getChild(int parent, int i) {
-        return new ASTNode(this, nodes.get(parent).first + i);
-    }
-
-    /**
-     * Gets the children of the given node
-     *
-     * @param parent A node
-     * @return The children
-     */
+    @Override
     public List<ASTNode> getChildren(int parent) {
         List<ASTNode> result = new ArrayList<ASTNode>();
         Node node = nodes.get(parent);
-        for (int i = 0; i != node.count; i++)
+        for (int i = 0; i != node.count; i++) {
             result.add(new ASTNode(this, node.first + i));
-        return result;
+        }
+        return Collections.unmodifiableList(result);
     }
 
     /**
@@ -75,8 +57,7 @@ class SimpleAST extends ASTSimpleTree {
      *
      * @param node The root
      */
-    public void StoreRoot(Node node) {
-        this.root = this.nodes.size();
-        this.nodes.add(node);
+    public void storeRoot(Node node) {
+        root = nodes.add(node);
     }
 }

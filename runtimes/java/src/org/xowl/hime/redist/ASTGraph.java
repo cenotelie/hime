@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,21 +16,21 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
-package org.xowl.hime.redist.parsers;
+ ******************************************************************************/
+package org.xowl.hime.redist;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TokenizedText;
 import org.xowl.hime.redist.utils.IntBigList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents an AST using a graph structure
+ *
+ * @author Laurent Wouters
  */
-class GraphAST extends ASTImpl {
+public class ASTGraph extends AST {
     /**
      * The adjacency table
      */
@@ -43,34 +43,18 @@ class GraphAST extends ASTImpl {
      * @param variables The table of variables
      * @param virtuals  The table of virtuals
      */
-    public GraphAST(TokenizedText text, List<Symbol> variables, List<Symbol> virtuals) {
+    public ASTGraph(TokenRepository text, List<Symbol> variables, List<Symbol> virtuals) {
         super(text, variables, virtuals);
         this.adjacency = new IntBigList();
     }
 
-    /**
-     * Gets the i-th child of the given node
-     *
-     * @param parent A node
-     * @param i      The child's number
-     * @return The i-th child
-     */
-    public ASTNode getChild(int parent, int i) {
-        return new ASTNode(this, adjacency.get(nodes.get(parent).first + i));
-    }
-
-    /**
-     * Gets the children of the given node
-     *
-     * @param parent A node
-     * @return The children
-     */
+    @Override
     public List<ASTNode> getChildren(int parent) {
         List<ASTNode> result = new ArrayList<ASTNode>();
         Node node = nodes.get(parent);
         for (int i = 0; i != node.count; i++)
             result.add(new ASTNode(this, adjacency.get(node.first + i)));
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
     /**
@@ -80,7 +64,7 @@ class GraphAST extends ASTImpl {
      * @return The index of the new node
      */
     public int store(int symbol) {
-        return nodes.add(new SimpleAST.Node(symbol));
+        return nodes.add(new Node(symbol));
     }
 
     /**
@@ -102,7 +86,7 @@ class GraphAST extends ASTImpl {
      */
     public int copyNode(int node) {
         int result = nodes.add(nodes.get(node));
-        SimpleAST.Node copy = nodes.get(result).clone();
+        Node copy = nodes.get(result).clone();
         if (copy.count != 0) {
             copy.first = adjacency.duplicate(copy.first, copy.count);
             nodes.set(result, copy);
@@ -119,7 +103,7 @@ class GraphAST extends ASTImpl {
      * @return The number of adjacents
      */
     public int getAdjacency(int node, int[] buffer, int index) {
-        SimpleAST.Node temp = nodes.get(node);
+        Node temp = nodes.get(node);
         for (int i = 0; i != temp.count; i++)
             buffer[index + i] = adjacency.get(temp.first + i);
         return temp.count;
@@ -133,7 +117,7 @@ class GraphAST extends ASTImpl {
      * @param count The number of adjacency items
      */
     public void setAdjacency(int node, int first, int count) {
-        SimpleAST.Node temp = nodes.get(node);
+        Node temp = nodes.get(node);
         temp.first = first;
         temp.count = count;
     }

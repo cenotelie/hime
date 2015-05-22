@@ -17,55 +17,46 @@
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
-
 package org.xowl.hime.redist;
 
 /**
- * Represents a position in term of line and column in a text input
+ * Represents an element of parsing data
  *
  * @author Laurent Wouters
  */
-public class TextPosition {
+public interface SemanticElement {
     /**
-     * The line number
-     */
-    private final int line;
-    /**
-     * The column number
-     */
-    private final int column;
-
-    /**
-     * Gets the line number
+     * Gets the position in the input text of this element
      *
-     * @return The line number
+     * @return The position in the input text of this element
      */
-    public int getLine() {
-        return line;
-    }
+    TextPosition getPosition();
 
     /**
-     * Gets the column number
+     * Gets the span in the input text of this element
      *
-     * @return The column number
+     * @return The span in the input text of this element
      */
-    public int getColumn() {
-        return column;
-    }
+    TextSpan getSpan();
 
     /**
-     * Initializes this position with the given line and column numbers
+     * Gets the context of this element in the input
      *
-     * @param line   The line number
-     * @param column The column number
+     * @return The context of this element in the input
      */
-    public TextPosition(int line, int column) {
-        this.line = line;
-        this.column = column;
-    }
+    TextContext getContext();
 
-    @Override
-    public String toString() {
-        return "(" + line + ", " + column + ")";
-    }
+    /**
+     * Gets the grammar symbol associated to this element
+     *
+     * @return The grammar symbol associated to this element
+     */
+    Symbol getSymbol();
+
+    /**
+     * Gets the value of this element, if any
+     *
+     * @return The value of this element, if any
+     */
+    String getValue();
 }

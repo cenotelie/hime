@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,7 +16,7 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 package org.xowl.hime.redist.parsers;
 
 import org.xowl.hime.redist.*;
@@ -249,7 +249,7 @@ public class RNGLRParser extends BaseLRParser {
             System.out.println("==== RNGLR parsing error:");
             System.out.print("\t");
             System.out.println(error.toString());
-            Context context = lexer.getOutput().getContext(error.getPosition());
+            TextContext context = lexer.getOutput().getContext(error.getPosition());
             System.out.print("\t");
             System.out.println(context.getContent());
             System.out.print("\t");

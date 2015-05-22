@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,43 +16,65 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 
 package org.xowl.hime.redist;
 
 /**
  * Represents a token as an output element of a lexer
+ *
+ * @author Laurent Wouters
  */
-public class Token {
-    private int sid;
-    private int index;
-
+public class Token implements SemanticElement {
     /**
-     * Gets the id of the terminal symbol associated to this token
-     *
-     * @return The id of the terminal symbol associated to this token
+     * The repository containing this token
      */
-    public int getSymbolID() {
-        return sid;
-    }
-
+    private final TokenRepository repository;
     /**
-     * Gets the index of this token in a lexer's stream of token
-     *
-     * @return The index of this token in a lexer's stream of token
+     * The index of this token in the text
      */
-    public int getIndex() {
-        return index;
-    }
+    private final int index;
 
     /**
      * Initializes this token
      *
-     * @param sid   The terminal's id
-     * @param index The token's index
+     * @param repository The repository containing the token
+     * @param index      The token's index
      */
-    public Token(int sid, int index) {
-        this.sid = sid;
+    public Token(TokenRepository repository, int index) {
+        this.repository = repository;
         this.index = index;
+    }
+
+    @Override
+    public TextPosition getPosition() {
+        return repository.getPosition(index);
+    }
+
+    @Override
+    public TextSpan getSpan() {
+        return repository.getSpan(index);
+    }
+
+    @Override
+    public TextContext getContext() {
+        return repository.getContext(index);
+    }
+
+    @Override
+    public Symbol getSymbol() {
+        return repository.getSymbol(index);
+    }
+
+    @Override
+    public String getValue() {
+        return repository.getValue(index);
+    }
+
+    @Override
+    public String toString() {
+        String name = repository.getSymbol(index).getName();
+        String value = repository.getValue(index);
+        return name + " = " + value;
     }
 }
