@@ -26,7 +26,7 @@ namespace Hime.Redist
 	public struct Token : SemanticElement
 	{
 		/// <summary>
-		/// The tokenized text containing this token
+		/// The repository containing this token
 		/// </summary>
 		private readonly TokenRepository repository;
 		/// <summary>

@@ -103,7 +103,7 @@ namespace Hime.Redist
 		/// Gets the number of children of the given node
 		/// </summary>
 		/// <param name="node">A node</param>
-		/// <returns>The node's numer of children</returns>
+		/// <returns>The node's number of children</returns>
 		public int GetChildrenCount(int node)
 		{
 			return nodes[node].count;

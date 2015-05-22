@@ -26,7 +26,7 @@ namespace Hime.Redist
 	/// Represents a simple AST with a tree structure
 	/// </summary>
 	/// <remarks>
-	/// The nodes are stored in sequentials arrays where the children of a node are an inner sequence.
+	/// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 	/// The linkage is represented by each node storing its number of children and the index of its first child.
 	/// </remarks>
 	class ASTSimpleTree : AST

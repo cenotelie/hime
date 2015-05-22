@@ -26,11 +26,11 @@ namespace Hime.Redist
 	public enum ParseErrorType
 	{
 		/// <summary>
-		/// Lexical error occuring when an unexpected character is encountered in the input preventing to match tokens
+		/// Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
 		/// </summary>
 		UnexpectedChar,
 		/// <summary>
-		/// Syntactic error occuring when an unexpected token is encountered by the parser
+		/// Syntactic error occurring when an unexpected token is encountered by the parser
 		/// </summary>
 		UnexpectedToken
 	}
