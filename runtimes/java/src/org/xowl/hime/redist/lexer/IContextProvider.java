@@ -22,13 +22,16 @@ package org.xowl.hime.redist.lexer;
 
 /**
  * Represents an entity providing information about the current contexts
+ *
+ * @author Laurent Wouters
  */
 public interface IContextProvider {
     /**
-     * Gets whether the specified context is in effect
+     * Gets whether a terminal is acceptable
      *
-     * @param context A context
-     * @return <code>true</code>  if the specified context is in effect
+     * @param context       The terminal's context
+     * @param terminalIndex The terminal's index
+     * @return <code>true</code>  if the terminal is acceptable
      */
-    boolean isWithin(int context);
+    boolean isAcceptable(int context, int terminalIndex);
 }

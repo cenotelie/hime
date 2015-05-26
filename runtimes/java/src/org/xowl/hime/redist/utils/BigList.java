@@ -27,6 +27,7 @@ import java.util.Arrays;
  * Items cannot be removed or inserted.
  *
  * @param <T> The type of the stored items
+ * @author Laurent Wouters
  */
 public class BigList<T> {
     /**

@@ -33,6 +33,8 @@ import java.util.MissingResourceException;
  * This class is required because we are forced to read the resource from InputStream without previous knowledge
  * of the stream size. That, plus .Net uses little endian whereas Java uses big endian ...
  * This class provides a set of methods to read as a stream of little endian data.
+ *
+ * @author Laurent Wouters
  */
 public class BinaryInput {
     /**

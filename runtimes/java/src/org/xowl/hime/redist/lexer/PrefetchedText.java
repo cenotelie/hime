@@ -20,29 +20,25 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.Symbol;
-
-import java.util.List;
-
 /**
  * Text provider that fetches and stores the full content of an input lexer
  * All line numbers and column numbers are 1-based.
  * Indices in the content are 0-based.
+ *
+ * @author Laurent Wouters
  */
-public class PrefetchedText extends BaseTokenizedText {
+public class PrefetchedText extends BaseText {
     /**
      * The full content of the input
      */
-    private String content;
+    private final String content;
 
     /**
      * Initializes this text
      *
-     * @param terminals The terminal symbols
-     * @param content   The full lexer's input as a string
+     * @param content The full lexer's input as a string
      */
-    public PrefetchedText(List<Symbol> terminals, String content) {
-        super(terminals);
+    public PrefetchedText(String content) {
         this.content = content;
     }
 
@@ -76,7 +72,7 @@ public class PrefetchedText extends BaseTokenizedText {
         this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
         this.lines[0] = 0;
         this.line = 1;
-        char c1 = '\0';
+        char c1;
         char c2 = '\0';
         for (int i = 0; i != content.length(); i++) {
             c1 = c2;

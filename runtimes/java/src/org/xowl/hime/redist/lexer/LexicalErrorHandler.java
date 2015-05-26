@@ -24,6 +24,8 @@ import org.xowl.hime.redist.ParseError;
 
 /**
  * Handler for lexical errors
+ *
+ * @author Laurent Wouters
  */
 public interface LexicalErrorHandler {
     /**

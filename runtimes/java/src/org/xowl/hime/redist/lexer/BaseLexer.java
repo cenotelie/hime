@@ -20,8 +20,7 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TokenizedText;
+import org.xowl.hime.redist.*;
 
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -30,8 +29,10 @@ import java.util.List;
 
 /**
  * Represents a base lexer
+ *
+ * @author Laurent Wouters
  */
-public abstract class BaseLexer implements ILexer {
+public abstract class BaseLexer {
     /**
      * The handler of lexical error for this lexer
      */
@@ -39,49 +40,23 @@ public abstract class BaseLexer implements ILexer {
     /**
      * This lexer's automaton
      */
-    protected Automaton automaton;
+    protected final Automaton automaton;
     /**
      * The terminals matched by this lexer
      */
-    protected List<Symbol> recognizedTerminals;
+    protected final List<Symbol> symTerminals;
     /**
      * Symbol ID of the SEPARATOR terminal
      */
-    protected int separatorID;
+    protected final int separatorID;
     /**
-     * The tokenized text
+     * The input text
      */
-    protected BaseTokenizedText text;
-
+    protected final BaseText text;
     /**
-     * Initializes a new instance of the Lexer class with the given input
-     *
-     * @param automaton DFA automaton for this lexer
-     * @param terminals Terminals recognized by this lexer
-     * @param separator SID of the separator token
-     * @param input     Input to this lexer
+     * The token repository
      */
-    protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
-        this.automaton = automaton;
-        this.recognizedTerminals = Collections.unmodifiableList(Arrays.asList(terminals));
-        this.separatorID = separator;
-        this.text = new PrefetchedText(this.recognizedTerminals, input);
-    }
-
-    /**
-     * Initializes a new instance of the Lexer class with the given input
-     *
-     * @param automaton DFA automaton for this lexer
-     * @param terminals Terminals recognized by this lexer
-     * @param separator SID of the separator token
-     * @param input     Input to this lexer
-     */
-    protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
-        this.automaton = automaton;
-        this.recognizedTerminals = Collections.unmodifiableList(Arrays.asList(terminals));
-        this.separatorID = separator;
-        this.text = new StreamingText(this.recognizedTerminals, input);
-    }
+    protected final TokenRepository tokens;
 
     /**
      * Gets the terminals matched by this lexer
@@ -89,16 +64,25 @@ public abstract class BaseLexer implements ILexer {
      * @return The terminals matched by this lexer
      */
     public List<Symbol> getTerminals() {
-        return recognizedTerminals;
+        return symTerminals;
     }
 
     /**
-     * Gets the lexer's output as a tokenized text
+     * Gets the lexer's input text
      *
-     * @return The lexer's output as a tokenized text
+     * @return The lexer's input text
      */
-    public TokenizedText getOutput() {
+    public Text getInput() {
         return text;
+    }
+
+    /**
+     * Gets the lexer's output stream of tokens
+     *
+     * @return The lexer's output stream of tokens
+     */
+    public Iterable<Token> getOutput() {
+        return tokens;
     }
 
     /**
@@ -111,26 +95,68 @@ public abstract class BaseLexer implements ILexer {
     }
 
     /**
-     * Represents a match in the input
+     * Initializes a new instance of the Lexer class with the given input
+     *
+     * @param automaton DFA automaton for this lexer
+     * @param terminals Terminals recognized by this lexer
+     * @param separator SID of the separator token
+     * @param input     Input to this lexer
      */
-    protected static class Match {
-        /**
-         * Index of the matched terminal
-         */
-        public int terminal;
-        /**
-         * Length of the matched input
-         */
-        public int length;
-
-        /**
-         * Initializes a match
-         *
-         * @param terminal Index of the matched terminal
-         */
-        public Match(int terminal) {
-            this.terminal = terminal;
-            this.length = 0;
-        }
+    protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
+        this.automaton = automaton;
+        this.symTerminals = Collections.unmodifiableList(Arrays.asList(terminals));
+        this.separatorID = separator;
+        this.text = new PrefetchedText(input);
+        this.tokens = new TokenRepository(symTerminals, text);
     }
+
+    /**
+     * Initializes a new instance of the Lexer class with the given input
+     *
+     * @param automaton DFA automaton for this lexer
+     * @param terminals Terminals recognized by this lexer
+     * @param separator SID of the separator token
+     * @param input     Input to this lexer
+     */
+    protected BaseLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
+        this.automaton = automaton;
+        this.symTerminals = Collections.unmodifiableList(Arrays.asList(terminals));
+        this.separatorID = separator;
+        this.text = new StreamingText(input);
+        this.tokens = new TokenRepository(symTerminals, text);
+    }
+
+    /**
+     * Gets the next token in the input
+     *
+     * @return The next token in the input
+     */
+    public Token getNextToken() {
+        return tokens.at(getNextToken(null).getIndex());
+    }
+
+    /**
+     * Raises the specified error
+     *
+     * @param error An error raised by this lexer
+     */
+    protected void raiseError(ParseError error) {
+        handler.handle(error);
+    }
+
+    /**
+     * Gets the next token in the input
+     *
+     * @param contexts The current applicable contexts
+     * @return The next token in the input
+     */
+    protected abstract TokenKernel getNextToken(IContextProvider contexts);
+
+    /**
+     * Gets the possible next tokens in the input
+     *
+     * @param contexts The current applicable contexts
+     * @return The possible next tokens in the input
+     */
+    protected abstract Buffer getNextTokens(IContextProvider contexts);
 }

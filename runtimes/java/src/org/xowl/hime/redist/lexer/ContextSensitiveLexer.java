@@ -84,7 +84,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
         while (true) {
             Match match = runDFA(contexts);
             if (match.length != 0) {
-                int id = recognizedTerminals.get(match.terminal).getID();
+                int id = symTerminals.get(match.terminal).getID();
                 if (id == separatorID)
                     continue;
                 Token token = new Token(id, text.addToken(match.terminal, inputIndex, match.length));

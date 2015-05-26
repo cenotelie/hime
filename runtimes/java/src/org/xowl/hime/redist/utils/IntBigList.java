@@ -21,6 +21,12 @@ package org.xowl.hime.redist.utils;
 
 import java.util.Arrays;
 
+/**
+ * Represents a list of integers that is efficient in storage and addition.
+ * Items cannot be removed or inserted.
+ *
+ * @author Laurent Wouters
+ */
 public class IntBigList {
     /**
      * The number of bits allocated to the lowest part of the index (within a chunk)

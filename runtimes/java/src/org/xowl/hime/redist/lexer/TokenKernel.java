@@ -20,49 +20,47 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.Token;
-import org.xowl.hime.redist.TokenizedText;
-
-import java.util.List;
-
 /**
- * Represents a lexer for a text stream
+ * Represents the kernel of a token, i.e. the identifying information of a token
+ *
+ * @author Laurent Wouters
  */
-public interface ILexer {
+public class TokenKernel {
     /**
-     * Gets the terminals matched by this lexer
-     *
-     * @return The terminals matched by this lexer
+     * The identifier of the matched terminal
      */
-    List<Symbol> getTerminals();
+    private final int terminalID;
+    /**
+     * The token's index in its repository
+     */
+    private final int index;
 
     /**
-     * Gets the lexer's output as a tokenized text
+     * Gets the identifier of the matched terminal
      *
-     * @return The lexer's output as a tokenized text
+     * @return The identifier of the matched terminal
      */
-    TokenizedText getOutput();
+    public int getTerminalID() {
+        return terminalID;
+    }
 
     /**
-     * Sets the handler of lexical errors coming from this parser
+     * Gets the token's index in its repository
      *
-     * @param handler The handler
+     * @return The token's index in its repository
      */
-    void setErrorHandler(LexicalErrorHandler handler);
+    public int getIndex() {
+        return index;
+    }
 
     /**
-     * Gets the next token in the input
+     * Initializes this kernel
      *
-     * @param contexts The current applicable contexts
-     * @return The next token in the input
+     * @param id    The identifier of the matched terminal
+     * @param index The token's index in its repository
      */
-    Token getNextToken(IContextProvider contexts);
-
-    /**
-     * Rewinds this lexer for a specified amount of tokens
-     *
-     * @param count The number of tokens to rewind
-     */
-    void rewindTokens(int count);
+    public TokenKernel(int id, int index) {
+        this.terminalID = id;
+        this.index = index;
+    }
 }

@@ -20,19 +20,18 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.Symbol;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Text provider that uses a stream as a backend
  * All line numbers and column numbers are 1-based.
  * Indices in the content are 0-based.
+ *
+ * @author Laurent Wouters
  */
-public class StreamingText extends BaseTokenizedText {
+public class StreamingText extends BaseText {
     /**
      * The size of text block
      */
@@ -74,11 +73,9 @@ public class StreamingText extends BaseTokenizedText {
     /**
      * Initializes this text
      *
-     * @param terminals The terminal symbols
-     * @param input     The input text
+     * @param input The input text
      */
-    public StreamingText(List<Symbol> terminals, InputStreamReader input) {
-        super(terminals);
+    public StreamingText(InputStreamReader input) {
         this.input = input;
         this.content = new char[BLOCK_SIZE][];
         this.contentUpperIndex = 0;
@@ -184,7 +181,7 @@ public class StreamingText extends BaseTokenizedText {
         this.lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
         this.lines[0] = 0;
         this.line = 1;
-        char c1 = '\0';
+        char c1;
         char c2 = '\0';
         for (int i = 0; i != size(); i++) {
             c1 = c2;

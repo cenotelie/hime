@@ -23,7 +23,16 @@ package org.xowl.hime.redist.lexer;
 import org.xowl.hime.redist.utils.BinaryInput;
 
 /**
- * Data structure for a text lexer automaton
+ * Represents the automaton of a lexer
+ * Binary data structure of lexers:
+ * uint32: number of entries in the states index table
+ * -- states offset table
+ * each entry is of the form:
+ * uint32: offset of the state from the beginning of the states table in number of uint16
+ * -- states table
+ * See AutomatonState
+ *
+ * @author Laurent Wouters
  */
 public class Automaton {
     /**
@@ -38,15 +47,24 @@ public class Automaton {
     /**
      * Table of indices in the states table
      */
-    private int[] table;
+    private final int[] table;
     /**
      * Lexer's DFA table of states
      */
-    private char[] states;
+    private final char[] states;
     /**
      * The number of states in this automaton
      */
-    private int statesCount;
+    private final int statesCount;
+
+    /**
+     * Gets the number of states in this automaton
+     *
+     * @return the number of states in this automaton
+     */
+    public int getStatesCount() {
+        return statesCount;
+    }
 
     /**
      * Initializes a new automaton from the given binary stream
@@ -76,21 +94,12 @@ public class Automaton {
     }
 
     /**
-     * Gets the number of states in this automaton
-     *
-     * @return the number of states in this automaton
-     */
-    public int getStatesCount() {
-        return statesCount;
-    }
-
-    /**
      * Retrieves the data of the specified state
      *
      * @param state A state's index
      * @param data  The data of the specified state
      */
-    public void retrieveState(int state, State data) {
+    public void retrieveState(int state, AutomatonState data) {
         data.setup(states, table[state]);
     }
 }

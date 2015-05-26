@@ -109,7 +109,7 @@ public abstract class ContextFreeLexer extends BaseLexer {
         while (true) {
             Match match = runDFA(inputIndex);
             if (match.length != 0) {
-                if (recognizedTerminals.get(match.terminal).getID() != separatorID)
+                if (symTerminals.get(match.terminal).getID() != separatorID)
                     text.addToken(match.terminal, inputIndex, match.length);
                 inputIndex += match.length;
                 continue;

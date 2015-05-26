@@ -22,16 +22,18 @@ package org.xowl.hime.redist.lexer;
 
 /**
  * Represents a matched terminal information within a lexer's automaton
+ *
+ * @author Laurent Wouters
  */
 public class MatchedTerminal {
     /**
      * The context
      */
-    private char context;
+    private final char context;
     /**
      * The terminal's index
      */
-    private char index;
+    private final char index;
 
     /**
      * Gets the context of the matched terminal
@@ -57,7 +59,7 @@ public class MatchedTerminal {
      * @param context The context
      * @param index   The terminal's index
      */
-    void setup(char context, char index) {
+    protected MatchedTerminal(char context, char index) {
         this.context = context;
         this.index = index;
     }
