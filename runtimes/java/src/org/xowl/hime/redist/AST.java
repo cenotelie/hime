@@ -37,7 +37,7 @@ public abstract class AST {
         /**
          * The node's label
          */
-        public int label;
+        public final int label;
         /**
          * The number of children
          */
@@ -70,23 +70,23 @@ public abstract class AST {
     /**
      * The table of tokens
      */
-    protected final TokenRepository tableTokens;
+    private final TokenRepository tableTokens;
     /**
      * The table of variables
      */
-    protected final List<Symbol> tableVariables;
+    private final List<Symbol> tableVariables;
     /**
      * The table of virtuals
      */
-    protected final List<Symbol> tableVirtuals;
+    private final List<Symbol> tableVirtuals;
     /**
      * The nodes' labels
      */
-    protected final BigList<Node> nodes;
+    final BigList<Node> nodes;
     /**
      * The index of the tree's root node
      */
-    protected int root;
+    int root;
 
     /**
      * Initializes this AST
@@ -95,7 +95,7 @@ public abstract class AST {
      * @param variables The table of variables
      * @param virtuals  The table of virtuals
      */
-    public AST(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
+    AST(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
         this.tableTokens = tokens;
         this.tableVariables = variables;
         this.tableVirtuals = virtuals;
@@ -217,7 +217,7 @@ public abstract class AST {
      * @param label A node label
      * @return The corresponding semantic element
      */
-    public SemanticElement getSemanticElementForLabel(int label) {
+    private SemanticElement getSemanticElementForLabel(int label) {
         switch (TableElemRef.getType(label)) {
             case TableElemRef.TABLE_TOKEN:
                 return tableTokens.at(TableElemRef.getIndex(label));

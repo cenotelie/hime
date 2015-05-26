@@ -39,27 +39,27 @@ public abstract class BaseLexer {
     /**
      * The handler of lexical error for this lexer
      */
-    protected LexicalErrorHandler handler;
+    LexicalErrorHandler handler;
     /**
      * This lexer's automaton
      */
-    protected final Automaton automaton;
+    final Automaton automaton;
     /**
      * The terminals matched by this lexer
      */
-    protected final List<Symbol> symTerminals;
+    final List<Symbol> symTerminals;
     /**
      * Symbol ID of the SEPARATOR terminal
      */
-    protected final int separatorID;
+    final int separatorID;
     /**
      * The input text
      */
-    protected final BaseText text;
+    final BaseText text;
     /**
      * The token repository
      */
-    protected final TokenRepository tokens;
+    final TokenRepository tokens;
 
     /**
      * Gets the terminals matched by this lexer

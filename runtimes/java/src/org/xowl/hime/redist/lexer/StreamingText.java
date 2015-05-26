@@ -48,7 +48,7 @@ public class StreamingText extends BaseText {
     /**
      * The input to use
      */
-    private InputStreamReader input;
+    private final InputStreamReader input;
     /**
      * The content read so far
      */
@@ -64,7 +64,7 @@ public class StreamingText extends BaseText {
     /**
      * A buffer for reading text
      */
-    private char[] buffer;
+    private final char[] buffer;
     /**
      * Whether the complete input has been read
      */

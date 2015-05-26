@@ -34,7 +34,7 @@ public class ASTGraph extends AST {
     /**
      * The adjacency table
      */
-    private IntBigList adjacency;
+    private final IntBigList adjacency;
 
     /**
      * Initializes this AST

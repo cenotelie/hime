@@ -59,7 +59,7 @@ public abstract class ParseError {
      *
      * @param position Error's position in the input
      */
-    protected ParseError(TextPosition position) {
+    ParseError(TextPosition position) {
         this.position = position;
     }
 

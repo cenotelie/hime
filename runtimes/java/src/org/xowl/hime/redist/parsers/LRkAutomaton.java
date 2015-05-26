@@ -69,7 +69,7 @@ public class LRkAutomaton {
      *
      * @param input A binary stream
      */
-    public LRkAutomaton(BinaryInput input) {
+    private LRkAutomaton(BinaryInput input) {
         this.ncols = input.readChar();
         this.nstates = input.readChar();
         int nprod = input.readChar();

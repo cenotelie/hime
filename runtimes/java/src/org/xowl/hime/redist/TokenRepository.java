@@ -144,7 +144,7 @@ public class TokenRepository implements Iterable<Token> {
      * @param index A token's index
      * @return The position in the text
      */
-    protected TextPosition getPosition(int index) {
+    TextPosition getPosition(int index) {
         return text.getPositionAt(cells.get(index).inputIndex);
     }
 
@@ -154,7 +154,7 @@ public class TokenRepository implements Iterable<Token> {
      * @param index A token's index
      * @return The span in the text
      */
-    protected TextSpan getSpan(int index) {
+    TextSpan getSpan(int index) {
         Cell cell = cells.get(index);
         return new TextSpan(cell.inputIndex, cell.inputLength);
     }
@@ -165,7 +165,7 @@ public class TokenRepository implements Iterable<Token> {
      * @param index A token's index
      * @return The context
      */
-    protected TextContext getContext(int index) {
+    TextContext getContext(int index) {
         return text.getContext(getSpan(index));
     }
 
@@ -185,7 +185,7 @@ public class TokenRepository implements Iterable<Token> {
      * @param index A token's index
      * @return The associated value
      */
-    protected String getValue(int index) {
+    String getValue(int index) {
         Cell cell = cells.get(index);
         return text.getValue(cell.inputIndex, cell.inputLength);
     }

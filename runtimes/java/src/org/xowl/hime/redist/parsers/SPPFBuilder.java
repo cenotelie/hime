@@ -127,7 +127,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The stack of semantic objects for the reduction
      */
-    private GSSLabel[] stack;
+    private final GSSLabel[] stack;
     /**
      * The number of items popped from the stack
      */
@@ -136,7 +136,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The AST being built
      */
-    private ASTGraph result;
+    private final ASTGraph result;
 
     /**
      * Gets the symbol at the i-th index
@@ -168,25 +168,25 @@ class SPPFBuilder implements SemanticBody {
     public SPPFBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
         this.pool8 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
-            public SubTree createNew(Pool<SubTree> pool) {
+            public SubTree createNew() {
                 return new SubTree(pool8, 8);
             }
         }, 1024, SubTree.class);
         this.pool128 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
-            public SubTree createNew(Pool<SubTree> pool) {
+            public SubTree createNew() {
                 return new SubTree(pool128, 128);
             }
         }, 128, SubTree.class);
         this.pool1024 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
-            public SubTree createNew(Pool<SubTree> pool) {
+            public SubTree createNew() {
                 return new SubTree(pool1024, 1024);
             }
         }, 16, SubTree.class);
         this.poolHPs = new Pool<HistoryPart>(new Factory<HistoryPart>() {
             @Override
-            public HistoryPart createNew(Pool<HistoryPart> pool) {
+            public HistoryPart createNew() {
                 return new HistoryPart();
             }
         }, INIT_HISTORY_SIZE, HistoryPart.class);

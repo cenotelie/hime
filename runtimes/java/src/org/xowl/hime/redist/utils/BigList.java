@@ -62,7 +62,7 @@ public class BigList<T> {
     /**
      * The type of the stored elements (T)
      */
-    private Class typeElement;
+    private final Class typeElement;
 
     /**
      * Initializes this list

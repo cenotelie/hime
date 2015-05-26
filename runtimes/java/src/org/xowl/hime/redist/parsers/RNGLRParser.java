@@ -248,7 +248,7 @@ public class RNGLRParser extends BaseLRParser {
         // register the error
         UnexpectedTokenError error = new UnexpectedTokenError(lexer.getTokens().at(token.getIndex()), expected);
         allErrors.add(error);
-        if (modeDebug) {
+        if (isModeDebug()) {
             System.out.println("==== RNGLR parsing error:");
             System.out.print("\t");
             System.out.println(error.toString());

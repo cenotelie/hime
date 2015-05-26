@@ -32,7 +32,7 @@ class Pool<T> {
     /**
      * The factory for this pool
      */
-    private Factory<T> factory;
+    private final Factory<T> factory;
     /**
      * Cache of the free objects in this pool
      */
@@ -68,7 +68,7 @@ class Pool<T> {
     public T acquire() {
         if (nextFree == -1) {
             // No free object => create new one
-            T result = factory.createNew(this);
+            T result = factory.createNew();
             allocated++;
             return result;
         } else {

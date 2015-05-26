@@ -41,12 +41,12 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     /**
      * Initial size of the stack
      */
-    protected static final int INIT_STACK_SIZE = 128;
+    static final int INIT_STACK_SIZE = 128;
 
     /**
      * The parser's automaton
      */
-    protected final LRkAutomaton automaton;
+    private final LRkAutomaton automaton;
     /**
      * The parser's stack
      */
@@ -58,7 +58,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     /**
      * The AST builder
      */
-    private LRkASTBuilder builder;
+    private final LRkASTBuilder builder;
 
     /**
      * Initializes a new instance of the parser

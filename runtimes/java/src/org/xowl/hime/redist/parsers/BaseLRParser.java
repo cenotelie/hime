@@ -40,44 +40,44 @@ public abstract class BaseLRParser {
     /**
      * Maximum number of errors
      */
-    protected static final int MAX_ERROR_COUNT = 100;
+    static final int MAX_ERROR_COUNT = 100;
     /**
      * The default value of the recover mode
      */
-    protected static final boolean DEFAULT_MODE_RECOVER = true;
+    private static final boolean DEFAULT_MODE_RECOVER = true;
     /**
      * The default value of the debug mode
      */
-    protected static final boolean DEFAULT_MODE_DEBUG = false;
+    private static final boolean DEFAULT_MODE_DEBUG = false;
 
     /**
      * Determines whether the parser will try to recover from errors
      */
-    protected boolean modeRecover;
+    private boolean modeRecover;
     /**
      * Value indicating whether this parser is in debug mode
      */
-    protected boolean modeDebug;
+    private boolean modeDebug;
     /**
      * Parser's variables
      */
-    protected List<Symbol> symVariables;
+    final List<Symbol> symVariables;
     /**
      * Parser's virtuals
      */
-    protected List<Symbol> symVirtuals;
+    final List<Symbol> symVirtuals;
     /**
      * Parser's actions
      */
-    protected List<SemanticAction> symActions;
+    final List<SemanticAction> symActions;
     /**
      * List of the encountered syntaxic errors
      */
-    protected List<ParseError> allErrors;
+    final List<ParseError> allErrors;
     /**
      * Lexer associated to this parser
      */
-    protected BaseLexer lexer;
+    final BaseLexer lexer;
 
 
     /**
@@ -148,7 +148,6 @@ public abstract class BaseLRParser {
         this.symVariables = Collections.unmodifiableList(Arrays.asList(variables));
         this.symVirtuals = Collections.unmodifiableList(Arrays.asList(virtuals));
         this.symActions = Collections.unmodifiableList(Arrays.asList(actions));
-        ;
         this.allErrors = new ArrayList<ParseError>();
         this.lexer = lexer;
         this.lexer.setErrorHandler(new LexicalErrorHandler() {

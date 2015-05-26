@@ -29,8 +29,7 @@ interface Factory<T> {
     /**
      * Creates a new object
      *
-     * @param pool The enclosing pool
      * @return The created object
      */
-    T createNew(Pool<T> pool);
+    T createNew();
 }

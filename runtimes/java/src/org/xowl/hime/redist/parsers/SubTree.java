@@ -41,11 +41,11 @@ class SubTree {
     /**
      * The nodes in this buffer
      */
-    private AST.Node[] nodes;
+    private final AST.Node[] nodes;
     /**
      * The tree actions for the nodes
      */
-    private byte[] actions;
+    private final byte[] actions;
 
     /**
      * Gets the label of the node at the given index

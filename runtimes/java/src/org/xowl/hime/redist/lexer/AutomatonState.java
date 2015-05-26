@@ -40,7 +40,7 @@ package org.xowl.hime.redist.lexer;
  *
  * @author Laurent Wouters
  */
-public class AutomatonState {
+class AutomatonState {
     /**
      * The automaton table
      */
@@ -56,7 +56,7 @@ public class AutomatonState {
      * @param table  The automaton table
      * @param offset The offset of this state within the table
      */
-    protected void setup(char[] table, int offset) {
+    void setup(char[] table, int offset) {
         this.table = table;
         this.offset = offset;
     }

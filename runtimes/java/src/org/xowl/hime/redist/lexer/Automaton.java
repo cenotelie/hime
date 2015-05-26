@@ -71,7 +71,7 @@ public class Automaton {
      *
      * @param input A binary stream
      */
-    public Automaton(BinaryInput input) {
+    private Automaton(BinaryInput input) {
         this.statesCount = input.readInt();
         this.table = new int[this.statesCount];
         for (int i = 0; i != this.statesCount; i++)

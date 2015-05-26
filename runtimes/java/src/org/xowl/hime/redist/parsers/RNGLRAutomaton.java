@@ -114,7 +114,7 @@ public class RNGLRAutomaton {
      *
      * @param input The binary stream to load from
      */
-    public RNGLRAutomaton(BinaryInput input) {
+    private RNGLRAutomaton(BinaryInput input) {
         this.axiom = input.readChar();
         this.ncols = input.readChar();
         this.nstates = input.readChar();
@@ -127,9 +127,9 @@ public class RNGLRAutomaton {
         this.columns = new ColumnMap();
         for (int i = 0; i != ncols; i++)
             this.columns.add(columnsID[i], i);
-        this.contexts = new LRContexts[nstates];
+        contexts = new LRContexts[nstates];
         for (int i = 0; i != nstates; i++)
-            this.contexts[i] = new LRContexts(input);
+            contexts[i] = new LRContexts(input);
         this.table = new Cell[nstates * ncols];
         for (int i = 0; i != table.length; i++)
             this.table[i] = new Cell(input);
@@ -154,6 +154,16 @@ public class RNGLRAutomaton {
     public static RNGLRAutomaton find(Class parserType, String name) {
         BinaryInput input = new BinaryInput(parserType, name);
         return new RNGLRAutomaton(input);
+    }
+
+    /**
+     * Gets the contexts opened by the specified state
+     *
+     * @param state State in the LR(k) automaton
+     * @return The opened contexts
+     */
+    public LRContexts getContexts(int state) {
+        return contexts[state];
     }
 
     /**
@@ -209,9 +219,7 @@ public class RNGLRAutomaton {
      * @return True if the state is the accepting state, false otherwise
      */
     public boolean isAcceptingState(int state) {
-        if (table[state * ncols].count != 1)
-            return false;
-        return (actions[table[state * ncols].index].getCode() == LRAction.CODE_ACCEPT);
+        return table[state * ncols].count == 1 && (actions[table[state * ncols].index].getCode() == LRAction.CODE_ACCEPT);
     }
 
     /**

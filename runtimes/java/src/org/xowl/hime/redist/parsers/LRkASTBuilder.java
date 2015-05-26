@@ -33,11 +33,11 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * The initial size of the reduction handle
      */
-    protected static final int INIT_HANDLE_SIZE = 1024;
+    private static final int INIT_HANDLE_SIZE = 1024;
     /**
      * The bias for estimating the size of the reduced sub-tree
      */
-    protected static final int ESTIMATION_BIAS = 5;
+    private static final int ESTIMATION_BIAS = 5;
 
     /**
      * The pool of single node sub-trees
@@ -113,19 +113,19 @@ class LRkASTBuilder implements SemanticBody {
     public LRkASTBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
         this.poolSingle = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
-            public SubTree createNew(Pool<SubTree> pool) {
+            public SubTree createNew() {
                 return new SubTree(poolSingle, 1);
             }
         }, 512, SubTree.class);
         this.pool128 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
-            public SubTree createNew(Pool<SubTree> pool) {
+            public SubTree createNew() {
                 return new SubTree(pool128, 128);
             }
         }, 128, SubTree.class);
         this.pool1024 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
-            public SubTree createNew(Pool<SubTree> pool) {
+            public SubTree createNew() {
                 return new SubTree(pool1024, 1024);
             }
         }, 16, SubTree.class);
@@ -173,7 +173,7 @@ class LRkASTBuilder implements SemanticBody {
      * @param size The size of the sub-tree
      * @return A pooled sub-tree with the given maximal size
      */
-    protected SubTree getSubTree(int size) {
+    private SubTree getSubTree(int size) {
         if (size <= 128)
             return pool128.acquire();
         else if (size <= 1024)
@@ -188,7 +188,7 @@ class LRkASTBuilder implements SemanticBody {
      * @param sub    The sub-tree
      * @param action The tree action applied onto the symbol
      */
-    protected void reductionAddSub(SubTree sub, byte action) {
+    private void reductionAddSub(SubTree sub, byte action) {
         if (sub.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE) {
             int directChildrenCount = sub.getChildrenCountAt(0);
             while (handleNext + directChildrenCount >= handle.length)
@@ -259,7 +259,7 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * Applies the promotion tree actions to the cache and commits to the final AST
      */
-    protected void ReduceTree() {
+    private void ReduceTree() {
         // promotion data
         boolean promotion = false;
         int insertion = 1;

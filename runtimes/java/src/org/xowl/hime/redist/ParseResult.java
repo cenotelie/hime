@@ -27,15 +27,15 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public final class ParseResult {
+public class ParseResult {
     /**
      * The list of errors
      */
-    private List<ParseError> errors;
+    private final List<ParseError> errors;
     /**
      * The parsed text
      */
-    private Text text;
+    private final Text text;
     /**
      * The produced AST
      */

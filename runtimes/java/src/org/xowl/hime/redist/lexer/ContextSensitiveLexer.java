@@ -36,7 +36,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     /**
      * The current index in the input
      */
-    protected int inputIndex;
+    private int inputIndex;
     /**
      * The buffer for token kernels
      */

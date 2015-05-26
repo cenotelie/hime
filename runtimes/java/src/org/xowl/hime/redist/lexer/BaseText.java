@@ -39,15 +39,15 @@ public abstract class BaseText implements Text {
     /**
      * The initial size of the cache of line start indices
      */
-    protected static final int INIT_LINE_COUNT_CACHE_SIZE = 10000;
+    static final int INIT_LINE_COUNT_CACHE_SIZE = 10000;
     /**
      * Cache of the starting indices of each line within the text
      */
-    protected int[] lines;
+    int[] lines;
     /**
      * Index of the next line
      */
-    protected int line;
+    int line;
 
 
     /**
@@ -84,14 +84,12 @@ public abstract class BaseText implements Text {
      * @param c2 Second character
      * @return true  if this is a line ending sequence
      */
-    protected boolean isLineEnding(char c1, char c2) {
+    boolean isLineEnding(char c1, char c2) {
         // other characters
         if (c2 == '\u000B' || c2 == '\u000C' || c2 == '\u0085' || c2 == '\u2028' || c2 == '\u2029')
             return true;
         // matches [\r, \n] [\r, ??] and  [??, \n]
-        if (c1 == '\r' || c2 == '\n')
-            return true;
-        return false;
+        return c1 == '\r' || c2 == '\n';
     }
 
     /**
@@ -99,7 +97,7 @@ public abstract class BaseText implements Text {
      *
      * @param index An index in the content
      */
-    protected void addLine(int index) {
+    void addLine(int index) {
         if (line >= lines.length)
             lines = Arrays.copyOf(lines, lines.length + INIT_LINE_COUNT_CACHE_SIZE);
         lines[line] = index;
@@ -112,7 +110,7 @@ public abstract class BaseText implements Text {
      * @param index The index within this content
      * @return The index of the corresponding line in the cache
      */
-    protected int findLineAt(int index) {
+    private int findLineAt(int index) {
         if (lines == null)
             findLines();
         for (int i = 1; i != line; i++) {

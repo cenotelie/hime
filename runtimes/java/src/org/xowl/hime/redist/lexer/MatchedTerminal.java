@@ -25,7 +25,7 @@ package org.xowl.hime.redist.lexer;
  *
  * @author Laurent Wouters
  */
-public class MatchedTerminal {
+class MatchedTerminal {
     /**
      * The context
      */
@@ -59,7 +59,7 @@ public class MatchedTerminal {
      * @param context The context
      * @param index   The terminal's index
      */
-    protected void setup(char context, char index) {
+    void setup(char context, char index) {
         this.context = context;
         this.index = index;
     }
