@@ -265,7 +265,7 @@ class GSS implements IContextProvider {
     public PathSet getPaths(int from, int length) {
         if (length == 0) {
             // use the common 0-length GSS path to avoid new memory allocation
-            paths.content[0].setLast(from);
+            setupPath(0, from, 1);
             paths.count = 1;
             return paths;
         }

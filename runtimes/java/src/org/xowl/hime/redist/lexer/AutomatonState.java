@@ -76,7 +76,7 @@ class AutomatonState {
      * @return The index of the matched terminal
      */
     public int getTerminal() {
-        return table[offset + 3];
+        return table[offset + 4];
     }
 
     /**

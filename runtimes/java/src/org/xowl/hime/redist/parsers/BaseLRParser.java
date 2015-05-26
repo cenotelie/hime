@@ -112,7 +112,7 @@ public abstract class BaseLRParser {
      *
      * @param recover Whether the parser should try to recover from errors
      */
-    public void setModeReciverErrors(boolean recover) {
+    public void setModeRecoverErrors(boolean recover) {
         this.modeRecover = recover;
     }
 
@@ -130,7 +130,7 @@ public abstract class BaseLRParser {
      *
      * @param mode Whether this parser is in debug mode
      */
-    public void setModeDEbug(boolean mode) {
+    public void setModeDebug(boolean mode) {
         this.modeDebug = mode;
     }
 
@@ -147,7 +147,7 @@ public abstract class BaseLRParser {
         this.modeDebug = DEFAULT_MODE_DEBUG;
         this.symVariables = Collections.unmodifiableList(Arrays.asList(variables));
         this.symVirtuals = Collections.unmodifiableList(Arrays.asList(virtuals));
-        this.symActions = Collections.unmodifiableList(Arrays.asList(actions));
+        this.symActions = Collections.unmodifiableList(actions != null ? Arrays.asList(actions) : new ArrayList<SemanticAction>());
         this.allErrors = new ArrayList<ParseError>();
         this.lexer = lexer;
         this.lexer.setErrorHandler(new LexicalErrorHandler() {
