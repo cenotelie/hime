@@ -20,12 +20,15 @@
 package org.xowl.hime.redist.parsers;
 
 import org.xowl.hime.redist.*;
-import org.xowl.hime.redist.lexer.ILexer;
+import org.xowl.hime.redist.lexer.BaseLexer;
+import org.xowl.hime.redist.lexer.TokenKernel;
 
 import java.util.*;
 
 /**
  * Represents a base for all RNGLR parsers
+ *
+ * @author Laurent Wouters
  */
 public class RNGLRParser extends BaseLRParser {
     /**
@@ -37,15 +40,15 @@ public class RNGLRParser extends BaseLRParser {
         /**
          * The GSS node to reduce from
          */
-        public int node;
+        public final int node;
         /**
          * The LR production for the reduction
          */
-        public LRProduction prod;
+        public final LRProduction prod;
         /**
          * The first label in the GSS
          */
-        public GSSLabel first;
+        public final GSSLabel first;
 
         /**
          * Initializes this operation
@@ -68,11 +71,11 @@ public class RNGLRParser extends BaseLRParser {
         /**
          * GSS node to shift from
          */
-        public int from;
+        public final int from;
         /**
          * The target RNGLR state
          */
-        public int to;
+        public final int to;
 
         /**
          * Initializes this operation
@@ -89,23 +92,23 @@ public class RNGLRParser extends BaseLRParser {
     /**
      * The parser automaton
      */
-    private RNGLRAutomaton parserAutomaton;
+    private final RNGLRAutomaton parserAutomaton;
     /**
      * The GSS for this parser
      */
-    private GSS gss;
+    private final GSS gss;
     /**
      * The SPPF being built
      */
-    private SPPFBuilder sppf;
+    private final SPPFBuilder sppf;
     /**
      * The sub-trees for the constant nullable variables
      */
-    private GSSLabel[] nullables;
+    private final GSSLabel[] nullables;
     /**
      * The next token
      */
-    private Token nextToken;
+    private TokenKernel nextToken;
     /**
      * The queue of reduction operations
      */
@@ -125,11 +128,12 @@ public class RNGLRParser extends BaseLRParser {
      * @param lexer     The input lexer
      * @throws InitializationException if the parser failed to initialize the nullable rules
      */
-    public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, ILexer lexer) throws InitializationException {
+    public RNGLRParser(RNGLRAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, BaseLexer lexer) throws InitializationException {
         super(variables, virtuals, actions, lexer);
         this.parserAutomaton = automaton;
         this.gss = new GSS();
-        this.sppf = new SPPFBuilder(lexer.getOutput(), parserVariables, parserVirtuals);
+        this.sppf = new SPPFBuilder(lexer.getTokens(), symVariables, symVirtuals);
+        nullables = new GSSLabel[variables.length];
         buildNullables(variables.length);
         this.sppf.clearHistory();
     }
@@ -141,7 +145,6 @@ public class RNGLRParser extends BaseLRParser {
      * @throws InitializationException
      */
     private void buildNullables(int varCount) throws InitializationException {
-        this.nullables = new GSSLabel[varCount];
         // Get the dependency table
         List<Integer>[] dependencies = buildNullableDependencies(varCount);
         // Solve and build
@@ -225,7 +228,7 @@ public class RNGLRParser extends BaseLRParser {
      * @param stem  The size of the generation's stem
      * @param token The unexpected token
      */
-    private void onUnexpectedToken(int gen, int stem, Token token) {
+    private void onUnexpectedToken(int gen, int stem, TokenKernel token) {
         // build the list of expected terminals
         List<Symbol> expected = new ArrayList<Symbol>();
         GSSGeneration genData = gss.getGeneration(gen);
@@ -243,13 +246,13 @@ public class RNGLRParser extends BaseLRParser {
             }
         }
         // register the error
-        UnexpectedTokenError error = new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected);
+        UnexpectedTokenError error = new UnexpectedTokenError(lexer.getTokens().at(token.getIndex()), expected);
         allErrors.add(error);
-        if (debug) {
+        if (modeDebug) {
             System.out.println("==== RNGLR parsing error:");
             System.out.print("\t");
             System.out.println(error.toString());
-            TextContext context = lexer.getOutput().getContext(error.getPosition());
+            TextContext context = lexer.getInput().getContext(error.getPosition());
             System.out.print("\t");
             System.out.println(context.getContent());
             System.out.print("\t");
@@ -282,9 +285,9 @@ public class RNGLRParser extends BaseLRParser {
                     LRProduction production = parserAutomaton.getProduction(action.getData());
                     GSS.PathSet paths = gss.getPaths(gssNode, production.getReductionLength());
                     for (int k = 0; k != paths.count; k++) {
-                        GSSPath path = paths.paths[k];
+                        GSSPath path = paths.content[k];
                         // get the target GLR state
-                        int next = getNextByVar(gss.getRepresentedState(path.getLast()), parserVariables.get(production.getHead()).getID());
+                        int next = getNextByVar(gss.getRepresentedState(path.getLast()), symVariables.get(production.getHead()).getID());
                         // enqueue the info, top GSS stack node and target GLR state
                         queueGSSHead.add(path.getLast());
                         queueVStack.add(new int[]{next});
@@ -310,14 +313,14 @@ public class RNGLRParser extends BaseLRParser {
                     if (production.getReductionLength() == 0) {
                         // 0-length reduction => start from the current head
                         int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length + 1);
-                        virtualStack[virtualStack.length - 1] = getNextByVar(head, parserVariables.get(production.getHead()).getID());
+                        virtualStack[virtualStack.length - 1] = getNextByVar(head, symVariables.get(production.getHead()).getID());
                         // enqueue
                         queueGSSHead.add(queueGSSHead.get(i));
                         queueVStack.add(virtualStack);
                     } else if (production.getReductionLength() < queueVStack.get(i).length) {
                         // we are still the virtual stack
                         int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length - production.getReductionLength() + 1);
-                        virtualStack[virtualStack.length - 1] = getNextByVar(virtualStack[virtualStack.length - 2], parserVariables.get(production.getHead()).getID());
+                        virtualStack[virtualStack.length - 1] = getNextByVar(virtualStack[virtualStack.length - 2], symVariables.get(production.getHead()).getID());
                         // enqueue
                         queueGSSHead.add(queueGSSHead.get(i));
                         queueVStack.add(virtualStack);
@@ -325,9 +328,9 @@ public class RNGLRParser extends BaseLRParser {
                         // we reach the GSS
                         GSS.PathSet paths = gss.getPaths(queueGSSHead.get(i), production.getReductionLength() - queueVStack.get(i).length);
                         for (int k = 0; k != paths.count; k++) {
-                            GSSPath path = paths.paths[k];
+                            GSSPath path = paths.content[k];
                             // get the target GLR state
-                            int next = getNextByVar(gss.getRepresentedState(path.getLast()), parserVariables.get(production.getHead()).getID());
+                            int next = getNextByVar(gss.getRepresentedState(path.getLast()), symVariables.get(production.getHead()).getID());
                             // enqueue the info, top GSS stack node and target GLR state
                             queueGSSHead.add(path.getLast());
                             queueVStack.add(new int[]{next});
@@ -351,13 +354,13 @@ public class RNGLRParser extends BaseLRParser {
      * @return The corresponding SPPF part
      */
     private GSSLabel buildSPPF(int generation, LRProduction production, GSSLabel first, GSSPath path) {
-        Symbol variable = parserVariables.get(production.getHead());
+        Symbol variable = symVariables.get(production.getHead());
         sppf.reductionPrepare(first, path, production.getReductionLength());
         for (int i = 0; i != production.getBytecodeLength(); i++) {
             char op = production.getOpcode(i);
             switch (LROpCode.getBase(op)) {
                 case LROpCode.BASE_SEMANTIC_ACTION: {
-                    SemanticAction action = parserActions[production.getOpcode(i + 1)];
+                    SemanticAction action = symActions.get(production.getOpcode(i + 1));
                     i++;
                     action.execute(variable, sppf);
                     break;
@@ -394,27 +397,27 @@ public class RNGLRParser extends BaseLRParser {
         int v0 = gss.createNode(0);
         nextToken = lexer.getNextToken(gss);
 
-        int count = parserAutomaton.getActionsCount(0, nextToken.getSymbolID());
+        int count = parserAutomaton.getActionsCount(0, nextToken.getTerminalID());
         for (int i = 0; i != count; i++) {
-            LRAction action = parserAutomaton.getAction(0, nextToken.getSymbolID(), i);
+            LRAction action = parserAutomaton.getAction(0, nextToken.getTerminalID(), i);
             if (action.getCode() == LRAction.CODE_SHIFT)
                 shifts.add(new Shift(v0, action.getData()));
             else if (action.getCode() == LRAction.CODE_REDUCE)
                 reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), SPPFBuilder.EPSILON));
         }
 
-        while (nextToken.getSymbolID() != Symbol.SID_EPSILON) // Wait for ε token
+        while (nextToken.getTerminalID() != Symbol.SID_EPSILON) // Wait for ε token
         {
             int stem = gss.getGeneration(Ui).getCount();
             reducer(Ui);
-            Token oldtoken = nextToken;
+            TokenKernel oldtoken = nextToken;
             nextToken = lexer.getNextToken(gss);
             int Uj = shifter(oldtoken);
             GSSGeneration g = gss.getGeneration(Uj);
             if (g.getCount() == 0) {
                 // Generation is empty !
                 onUnexpectedToken(Ui, stem, oldtoken);
-                return new ParseResult(allErrors, lexer.getOutput());
+                return new ParseResult(allErrors, lexer.getInput());
             }
             Ui = Uj;
         }
@@ -424,12 +427,12 @@ public class RNGLRParser extends BaseLRParser {
             int state = gss.getRepresentedState(i);
             if (parserAutomaton.isAcceptingState(state)) {
                 // Has reduction _Axiom_ -> axiom $ . on ε
-                GSS.PathSet set = gss.getPaths(i, 2);
-                return new ParseResult(allErrors, lexer.getOutput(), sppf.getTree(set.paths[0].get(1)));
+                GSS.PathSet paths = gss.getPaths(i, 2);
+                return new ParseResult(allErrors, lexer.getInput(), sppf.getTree(paths.content[0].get(1)));
             }
         }
         // At end of input but was still waiting for tokens
-        return new ParseResult(allErrors, lexer.getOutput());
+        return new ParseResult(allErrors, lexer.getInput());
     }
 
     /**
@@ -451,16 +454,16 @@ public class RNGLRParser extends BaseLRParser {
      */
     private void executeReduction(int generation, Reduction reduction) {
         // Get all path from the reduction node
-        GSS.PathSet set = null;
+        GSS.PathSet paths;
         if (reduction.prod.getReductionLength() == 0)
-            set = gss.getPaths(reduction.node, 0);
+            paths = gss.getPaths(reduction.node, 0);
         else
             // The given GSS node is the second on the path, so start from it with length - 1
-            set = gss.getPaths(reduction.node, reduction.prod.getReductionLength() - 1);
+            paths = gss.getPaths(reduction.node, reduction.prod.getReductionLength() - 1);
 
         // Execute the reduction on all paths
-        for (int i = 0; i != set.count; i++)
-            executeReduction(generation, reduction, set.paths[i]);
+        for (int i = 0; i != paths.count; i++)
+            executeReduction(generation, reduction, paths.content[i]);
     }
 
     /**
@@ -472,9 +475,9 @@ public class RNGLRParser extends BaseLRParser {
      */
     private void executeReduction(int generation, Reduction reduction, GSSPath path) {
         // Get the rule's head
-        Symbol head = parserVariables.get(reduction.prod.getHead());
+        Symbol head = symVariables.get(reduction.prod.getHead());
         // Resolve the sub-root
-        GSSLabel label = sppf.getLabelFor(path.getGeneration(), SymbolRef.encode(SymbolType.VARIABLE, reduction.prod.getHead()));
+        GSSLabel label = sppf.getLabelFor(path.getGeneration(), TableElemRef.encode(TableElemRef.TABLE_VARIABLE, reduction.prod.getHead()));
         if (label.isEpsilon()) {
             // not in history, build the SPPF here
             label = buildSPPF(generation, reduction.prod, reduction.first, path);
@@ -491,9 +494,9 @@ public class RNGLRParser extends BaseLRParser {
                 gss.createEdge(w, path.getLast(), label);
                 // Look for the new reductions at this state
                 if (reduction.prod.getReductionLength() != 0) {
-                    int count = parserAutomaton.getActionsCount(to, nextToken.getSymbolID());
+                    int count = parserAutomaton.getActionsCount(to, nextToken.getTerminalID());
                     for (int i = 0; i != count; i++) {
-                        LRAction action = parserAutomaton.getAction(to, nextToken.getSymbolID(), i);
+                        LRAction action = parserAutomaton.getAction(to, nextToken.getTerminalID(), i);
                         if (action.getCode() == LRAction.CODE_REDUCE) {
                             LRProduction prod = parserAutomaton.getProduction(action.getData());
                             // length 0 reduction are not considered here because they already exist at this point
@@ -508,9 +511,9 @@ public class RNGLRParser extends BaseLRParser {
             w = gss.createNode(to);
             gss.createEdge(w, path.getLast(), label);
             // Look for all the reductions and shifts at this state
-            int count = parserAutomaton.getActionsCount(to, nextToken.getSymbolID());
+            int count = parserAutomaton.getActionsCount(to, nextToken.getTerminalID());
             for (int i = 0; i != count; i++) {
-                LRAction action = parserAutomaton.getAction(to, nextToken.getSymbolID(), i);
+                LRAction action = parserAutomaton.getAction(to, nextToken.getTerminalID(), i);
                 if (action.getCode() == LRAction.CODE_SHIFT) {
                     shifts.add(new Shift(w, action.getData()));
                 } else if (action.getCode() == LRAction.CODE_REDUCE) {
@@ -530,12 +533,12 @@ public class RNGLRParser extends BaseLRParser {
      * @param oldtoken A token
      * @return The next generation
      */
-    private int shifter(Token oldtoken) {
+    private int shifter(TokenKernel oldtoken) {
         // Create next generation
         int gen = gss.createGeneration();
 
         // Create the GSS label to be used for the transitions
-        int sym = SymbolRef.encode(SymbolType.TOKEN, oldtoken.getIndex());
+        int sym = TableElemRef.encode(TableElemRef.TABLE_TOKEN, oldtoken.getIndex());
         GSSLabel label = new GSSLabel(sym, sppf.getSingleNode(sym));
 
         // Execute all shifts in the queue at this point
@@ -558,9 +561,9 @@ public class RNGLRParser extends BaseLRParser {
             // A node for the target state is already in the GSS
             gss.createEdge(w, shift.from, label);
             // Look for the new reductions at this state
-            int count = parserAutomaton.getActionsCount(shift.to, nextToken.getSymbolID());
+            int count = parserAutomaton.getActionsCount(shift.to, nextToken.getTerminalID());
             for (int i = 0; i != count; i++) {
-                LRAction action = parserAutomaton.getAction(shift.to, nextToken.getSymbolID(), i);
+                LRAction action = parserAutomaton.getAction(shift.to, nextToken.getTerminalID(), i);
                 if (action.getCode() == LRAction.CODE_REDUCE) {
                     LRProduction prod = parserAutomaton.getProduction(action.getData());
                     // length 0 reduction are not considered here because they already exist at this point
@@ -573,9 +576,9 @@ public class RNGLRParser extends BaseLRParser {
             w = gss.createNode(shift.to);
             gss.createEdge(w, shift.from, label);
             // Look for all the reductions and shifts at this state
-            int count = parserAutomaton.getActionsCount(shift.to, nextToken.getSymbolID());
+            int count = parserAutomaton.getActionsCount(shift.to, nextToken.getTerminalID());
             for (int i = 0; i != count; i++) {
-                LRAction action = parserAutomaton.getAction(shift.to, nextToken.getSymbolID(), i);
+                LRAction action = parserAutomaton.getAction(shift.to, nextToken.getTerminalID(), i);
                 if (action.getCode() == LRAction.CODE_SHIFT)
                     shifts.add(new Shift(w, action.getData()));
                 else if (action.getCode() == LRAction.CODE_REDUCE) {

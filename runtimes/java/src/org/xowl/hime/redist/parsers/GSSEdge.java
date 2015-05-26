@@ -21,20 +21,22 @@ package org.xowl.hime.redist.parsers;
 
 /**
  * Represents an edge in a Graph-Structured Stack
+ *
+ * @author Laurent Wouters
  */
 class GSSEdge {
     /**
      * The index of the node from which this edge starts
      */
-    private int from;
+    private final int from;
     /**
      * The index of the node to which this edge arrives to
      */
-    private int to;
+    private final int to;
     /**
      * The label on this edge
      */
-    private GSSLabel label;
+    private final GSSLabel label;
 
     /**
      * Gets the index of the node from which this edge starts

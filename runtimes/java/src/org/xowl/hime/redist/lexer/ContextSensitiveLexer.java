@@ -93,7 +93,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     }
 
     @Override
-    protected TokenKernel getNextToken(IContextProvider contexts) {
+    public TokenKernel getNextToken(IContextProvider contexts) {
         while (true) {
             int length = runDFA(contexts);
             if (length != 0) {
@@ -127,7 +127,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     }
 
     @Override
-    protected TokenKernelBuffer getNextTokens(IContextProvider contexts) {
+    public TokenKernelBuffer getNextTokens(IContextProvider contexts) {
         while (true) {
             int length = runDFA(contexts);
             if (length != 0) {

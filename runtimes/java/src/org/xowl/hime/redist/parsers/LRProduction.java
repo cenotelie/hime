@@ -23,24 +23,26 @@ import org.xowl.hime.redist.utils.BinaryInput;
 
 /**
  * Represents a rule's production in a LR parser
+ *
+ * @author Laurent Wouters
  */
 class LRProduction {
     /**
      * Index of the rule's head in the parser's array of variables
      */
-    private int head;
+    private final int head;
     /**
      * Action of the rule's head (replace or not)
      */
-    private byte headAction;
+    private final byte headAction;
     /**
      * Size of the rule's body by only counting terminals and variables
      */
-    private int reducLength;
+    private final int reducLength;
     /**
      * Bytecode for the rule's production
      */
-    private char[] bytecode;
+    private final char[] bytecode;
 
     /**
      * Gets the index of the rule's head in the parser's array of variables
@@ -81,8 +83,8 @@ class LRProduction {
     /**
      * Gets the op-code at the specified index in the bytecode
      *
-     * @param index
-     * @return Index in the bytecode
+     * @param index Index in the bytecode
+     * @return The op-code at the specified index in the bytecode
      */
     public char getOpcode(int index) {
         return bytecode[index];

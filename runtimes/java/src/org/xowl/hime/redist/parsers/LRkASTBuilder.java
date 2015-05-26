@@ -19,15 +19,15 @@
  ******************************************************************************/
 package org.xowl.hime.redist.parsers;
 
-import org.xowl.hime.redist.AST;
-import org.xowl.hime.redist.SemanticBody;
-import org.xowl.hime.redist.Symbol;
+import org.xowl.hime.redist.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Represents the builder of Parse Trees for LR(k) parsers
+ *
+ * @author Laurent Wouters
  */
 class LRkASTBuilder implements SemanticBody {
     /**
@@ -42,15 +42,15 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * The pool of single node sub-trees
      */
-    private Pool<SubTree> poolSingle;
+    private final Pool<SubTree> poolSingle;
     /**
      * The pool of sub-tree with a capacity of 128 nodes
      */
-    private Pool<SubTree> pool128;
+    private final Pool<SubTree> pool128;
     /**
      * The pool of sub-tree with a capacity of 1024 nodes
      */
-    private Pool<SubTree> pool1024;
+    private final Pool<SubTree> pool1024;
     /**
      * The stack of semantic objects
      */
@@ -82,7 +82,7 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * The AST being built
      */
-    private SimpleAST result;
+    private final ASTSimpleTree result;
 
     /**
      * Gets the symbol at the i-th index
@@ -106,11 +106,11 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * Initializes the builder with the given stack size
      *
-     * @param text      The tokenined text
+     * @param tokens    The table of tokens
      * @param variables The table of parser variables
      * @param virtuals  The table of parser virtuals
      */
-    public LRkASTBuilder(TokenizedText text, List<Symbol> variables, List<Symbol> virtuals) {
+    public LRkASTBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
         this.poolSingle = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
             public SubTree createNew(Pool<SubTree> pool) {
@@ -132,7 +132,7 @@ class LRkASTBuilder implements SemanticBody {
         this.stack = new SubTree[LRkParser.INIT_STACK_SIZE];
         this.stackNext = 0;
         this.handle = new int[INIT_HANDLE_SIZE];
-        this.result = new SimpleAST(text, variables, virtuals);
+        this.result = new ASTSimpleTree(tokens, variables, virtuals);
     }
 
     /**
@@ -142,7 +142,7 @@ class LRkASTBuilder implements SemanticBody {
      */
     public void stackPushToken(int index) {
         SubTree single = poolSingle.acquire();
-        single.setupRoot(SymbolRef.encode(SymbolType.TOKEN, index), LROpCode.TREE_ACTION_NONE);
+        single.setupRoot(TableElemRef.encode(TableElemRef.TABLE_TOKEN, index), LROpCode.TREE_ACTION_NONE);
         if (stackNext == stack.length)
             stack = Arrays.copyOf(stack, stack.length + LRkParser.INIT_STACK_SIZE);
         stack[stackNext++] = single;
@@ -161,7 +161,7 @@ class LRkASTBuilder implements SemanticBody {
         for (int i = 0; i != length; i++)
             estimation += stack[stackNext + i].size();
         cache = getSubTree(estimation);
-        cache.setupRoot(SymbolRef.encode(SymbolType.VARIABLE, varIndex), action);
+        cache.setupRoot(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex), action);
         cacheNext = 1;
         handleNext = 0;
         popCount = 0;
@@ -237,7 +237,7 @@ class LRkASTBuilder implements SemanticBody {
     public void reductionAddVirtual(int index, byte action) {
         if (action == LROpCode.TREE_ACTION_DROP)
             return; // why would you do this?
-        cache.setAt(cacheNext, SymbolRef.encode(SymbolType.VIRTUAL, index), action);
+        cache.setAt(cacheNext, TableElemRef.encode(TableElemRef.TABLE_VIRTUAL, index), action);
         handle[handleNext++] = cacheNext++;
     }
 

@@ -21,6 +21,8 @@ package org.xowl.hime.redist.parsers;
 
 /**
  * Represents an exception on a parser's initialization
+ *
+ * @author Laurent Wouters
  */
 public class InitializationException extends Exception {
     /**

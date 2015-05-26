@@ -23,6 +23,8 @@ import org.xowl.hime.redist.utils.BinaryInput;
 
 /**
  * Represents a LR action in a LR parse table
+ *
+ * @author Laurent Wouters
  */
 class LRAction {
     /**
@@ -45,11 +47,11 @@ class LRAction {
     /**
      * The LR action code
      */
-    private char code;
+    private final char code;
     /**
      * The data associated with the action
      */
-    private char data;
+    private final char data;
 
     /**
      * Gets the action code

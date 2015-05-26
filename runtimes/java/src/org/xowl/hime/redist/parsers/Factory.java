@@ -23,6 +23,7 @@ package org.xowl.hime.redist.parsers;
  * Represents a factory of objects for a pool
  *
  * @param <T> The type of the pooled objects
+ * @author Laurent Wouters
  */
 interface Factory<T> {
     /**

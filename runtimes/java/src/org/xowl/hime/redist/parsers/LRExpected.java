@@ -26,16 +26,18 @@ import java.util.Collection;
 
 /**
  * Container for the expected terminals for a LR state
+ *
+ * @author Laurent Wouters
  */
 public class LRExpected {
     /**
      * The terminals expected for shift actions
      */
-    private Collection<Symbol> shifts;
+    private final Collection<Symbol> shifts;
     /**
      * The terminals expected for reduction actions
      */
-    private Collection<Symbol> reductions;
+    private final Collection<Symbol> reductions;
 
     /**
      * Gets the terminals expected for shift actions

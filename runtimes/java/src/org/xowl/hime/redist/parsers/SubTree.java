@@ -19,6 +19,9 @@
  ******************************************************************************/
 package org.xowl.hime.redist.parsers;
 
+import org.xowl.hime.redist.AST;
+import org.xowl.hime.redist.ASTSimpleTree;
+
 /**
  * Represents a sub-tree in an AST
  * A sub-tree is composed of a root with its children.
@@ -27,16 +30,18 @@ package org.xowl.hime.redist.parsers;
  * The internal representation of a sub-tree is based on arrays.
  * The organization is that a node's children are immediately following it in the array.
  * For example, the tree A(B(CD)E(FG)) is represented as [ABCDEFG].
+ *
+ * @author Laurent wouters
  */
 class SubTree {
     /**
      * The pool containing this object
      */
-    private Pool<SubTree> pool;
+    private final Pool<SubTree> pool;
     /**
      * The nodes in this buffer
      */
-    private SimpleAST.Node[] nodes;
+    private AST.Node[] nodes;
     /**
      * The tree actions for the nodes
      */
@@ -49,7 +54,7 @@ class SubTree {
      * @return The label in the buffer
      */
     public int getLabelAt(int index) {
-        return nodes[index].symbol;
+        return nodes[index].label;
     }
 
     /**
@@ -115,16 +120,12 @@ class SubTree {
      */
     public SubTree(Pool<SubTree> pool, int capacity) {
         this.pool = pool;
-        this.nodes = new SimpleAST.Node[capacity];
+        this.nodes = new AST.Node[capacity];
         this.actions = new byte[capacity];
     }
 
     public SubTree clone() {
-        SubTree result = null;
-        if (this.pool != null)
-            result = this.pool.acquire();
-        else
-            result = new SubTree(null, this.nodes.length);
+        SubTree result = (pool != null) ? pool.acquire() : new SubTree(null, nodes.length);
         int size = size();
         System.arraycopy(this.nodes, 0, result.nodes, 0, size);
         System.arraycopy(this.actions, 0, result.actions, 0, size);
@@ -138,7 +139,7 @@ class SubTree {
      * @param action The tree action applied on the root
      */
     public void setupRoot(int symbol, byte action) {
-        nodes[0] = new SimpleAST.Node(symbol);
+        nodes[0] = new AST.Node(symbol);
         actions[0] = action;
     }
 
@@ -185,7 +186,7 @@ class SubTree {
      * @param index The starting index of the sub-tree
      * @param ast   The ast to commit to
      */
-    public void commitChildrenOf(int index, SimpleAST ast) {
+    public void commitChildrenOf(int index, AST ast) {
         if (nodes[index].count != 0)
             nodes[index].first = ast.Store(nodes, index + 1, nodes[index].count);
     }
@@ -195,9 +196,9 @@ class SubTree {
      *
      * @param ast The ast to commit to
      */
-    public void commit(SimpleAST ast) {
+    public void commit(ASTSimpleTree ast) {
         commitChildrenOf(0, ast);
-        ast.StoreRoot(nodes[0]);
+        ast.storeRoot(nodes[0]);
     }
 
     /**
@@ -208,7 +209,7 @@ class SubTree {
      * @param action The tree action
      */
     public void setAt(int index, int symbol, byte action) {
-        nodes[index] = new SimpleAST.Node(symbol);
+        nodes[index] = new AST.Node(symbol);
         actions[index] = action;
     }
 

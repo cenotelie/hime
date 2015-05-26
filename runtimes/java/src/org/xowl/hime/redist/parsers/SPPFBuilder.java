@@ -19,10 +19,7 @@
  ******************************************************************************/
 package org.xowl.hime.redist.parsers;
 
-import org.xowl.hime.redist.AST;
-import org.xowl.hime.redist.ASTGraph;
-import org.xowl.hime.redist.SemanticBody;
-import org.xowl.hime.redist.Symbol;
+import org.xowl.hime.redist.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +29,8 @@ import java.util.List;
  * A SPPF is a compact representation of multiple variants of an AST at once.
  * GLR algorithms originally builds the complete SPPF.
  * However we only need to build one of the variant, i.e. an AST for the user.
+ *
+ * @author Laurent Wouters
  */
 class SPPFBuilder implements SemanticBody {
     /**
@@ -83,19 +82,19 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The pool of sub-tree with a capacity of 128 nodes
      */
-    private Pool<SubTree> pool8;
+    private final Pool<SubTree> pool8;
     /**
      * The pool of sub-tree with a capacity of 128 nodes
      */
-    private Pool<SubTree> pool128;
+    private final Pool<SubTree> pool128;
     /**
      * The pool of sub-tree with a capacity of 1024 nodes
      */
-    private Pool<SubTree> pool1024;
+    private final Pool<SubTree> pool1024;
     /**
      * The pool of history parts
      */
-    private Pool<HistoryPart> poolHPs;
+    private final Pool<HistoryPart> poolHPs;
     /**
      * The history
      */
@@ -162,11 +161,11 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Initializes this SPPF
      *
-     * @param text      The tokenined text
+     * @param tokens    The token table
      * @param variables The table of parser variables
      * @param virtuals  The table of parser virtuals
      */
-    public SPPFBuilder(TokenizedText text, List<Symbol> variables, List<Symbol> virtuals) {
+    public SPPFBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
         this.pool8 = new Pool<SubTree>(new Factory<SubTree>() {
             @Override
             public SubTree createNew(Pool<SubTree> pool) {
@@ -197,7 +196,7 @@ class SPPFBuilder implements SemanticBody {
         this.cacheActions = new byte[INIT_HANDLE_SIZE];
         this.handle = new int[INIT_HANDLE_SIZE];
         this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-        this.result = new ASTGraph(text, variables, virtuals);
+        this.result = new ASTGraph(tokens, variables, virtuals);
     }
 
     /**
@@ -313,7 +312,7 @@ class SPPFBuilder implements SemanticBody {
             // this is replaceable sub-tree
             SubTree sub = label.getTree();
             for (int i = 0; i != sub.getChildrenCountAt(0); i++)
-                addToCache(SymbolRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
+                addToCache(TableElemRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
         } else {
             // this is a simple reference to an existing SPPF node
             addToCache(label.getIndex(), action);
@@ -354,7 +353,7 @@ class SPPFBuilder implements SemanticBody {
     public void reductionAddVirtual(int index, byte action) {
         if (action == LROpCode.TREE_ACTION_DROP)
             return; // why would you do this?
-        addToCache(result.store(SymbolRef.encode(SymbolType.VIRTUAL, index)), action);
+        addToCache(result.store(TableElemRef.encode(TableElemRef.TABLE_VIRTUAL, index)), action);
     }
 
     /**
@@ -382,11 +381,7 @@ class SPPFBuilder implements SemanticBody {
      * @return The produced sub-tree
      */
     public GSSLabel reduce(int generation, int varIndex, boolean replaceable) {
-        GSSLabel label = EPSILON;
-        if (replaceable)
-            label = reduceReplaceable(varIndex);
-        else
-            label = reduceNormal(varIndex);
+        GSSLabel label = replaceable ? reduceReplaceable(varIndex) : reduceNormal(varIndex);
         addToHistory(generation, label);
         return label;
     }
@@ -430,13 +425,12 @@ class SPPFBuilder implements SemanticBody {
         }
         if (root == -1) {
             // no promotion, create the node for the root
-            root = result.store(SymbolRef.encode(SymbolType.VARIABLE, varIndex));
+            root = result.store(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex));
         }
         // setup the adjacency for the new root
         result.setAdjacency(root, result.store(cacheChildren, insertion), insertion);
         // create the GSS label
-        GSSLabel label = new GSSLabel(SymbolRef.encode(SymbolType.VARIABLE, varIndex), root);
-        return label;
+        return new GSSLabel(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex), root);
     }
 
     /**
@@ -447,15 +441,14 @@ class SPPFBuilder implements SemanticBody {
      */
     private GSSLabel reduceReplaceable(int varIndex) {
         SubTree tree = getSubTree(handleNext + 1);
-        tree.setupRoot(SymbolRef.encode(SymbolType.VARIABLE, varIndex), LROpCode.TREE_ACTION_REPLACE);
+        tree.setupRoot(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex), LROpCode.TREE_ACTION_REPLACE);
         tree.setChildrenCountAt(0, handleNext);
         for (int i = 0; i != handleNext; i++) {
             int node = cacheChildren[handle[i]];
             byte action = cacheActions[handle[i]];
-            tree.setAt(i + 1, SymbolRef.encode(SymbolType.NONE, node), action);
+            tree.setAt(i + 1, TableElemRef.encode(TableElemRef.TABLE_NONE, node), action);
         }
-        GSSLabel label = new GSSLabel(tree);
-        return label;
+        return new GSSLabel(tree);
     }
 
     /**

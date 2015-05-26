@@ -24,6 +24,8 @@ import java.util.List;
 
 /**
  * Represents the output of a parser
+ *
+ * @author Laurent Wouters
  */
 public final class ParseResult {
     /**
@@ -33,7 +35,7 @@ public final class ParseResult {
     /**
      * The parsed text
      */
-    private TokenizedText text;
+    private Text text;
     /**
      * The produced AST
      */
@@ -45,7 +47,7 @@ public final class ParseResult {
      * @param errors The list of errors
      * @param text   The parsed text
      */
-    public ParseResult(List<ParseError> errors, TokenizedText text) {
+    public ParseResult(List<ParseError> errors, Text text) {
         this.errors = Collections.unmodifiableList(errors);
         this.text = text;
     }
@@ -57,7 +59,7 @@ public final class ParseResult {
      * @param text   The parsed text
      * @param ast    The produced AST
      */
-    public ParseResult(List<ParseError> errors, TokenizedText text, AST ast) {
+    public ParseResult(List<ParseError> errors, Text text, AST ast) {
         this.errors = Collections.unmodifiableList(errors);
         this.text = text;
         this.ast = ast;
@@ -86,7 +88,7 @@ public final class ParseResult {
      *
      * @return The parsed text
      */
-    public TokenizedText getInput() {
+    public Text getInput() {
         return text;
     }
 

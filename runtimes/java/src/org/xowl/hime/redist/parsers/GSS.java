@@ -22,6 +22,7 @@ package org.xowl.hime.redist.parsers;
 import org.xowl.hime.redist.lexer.Automaton;
 import org.xowl.hime.redist.lexer.IContextProvider;
 import org.xowl.hime.redist.utils.BigList;
+import org.xowl.hime.redist.utils.IntBigList;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +32,8 @@ import java.util.*;
 
 /**
  * Represents Graph-Structured Stacks for GLR parsers
+ *
+ * @author Laurent Wouters
  */
 class GSS implements IContextProvider {
     /**
@@ -43,43 +46,59 @@ class GSS implements IContextProvider {
     private static final int INIT_STACK_SIZE = 128;
 
     /**
-     * Represents a set of paths in this GSS
+     * Represents a set of paths
      */
     public static class PathSet {
         /**
-         * The paths in this set
+         * The represented paths
          */
-        public GSSPath[] paths;
+        public GSSPath[] content;
         /**
          * The number of paths in this set
          */
         public int count;
+
+        /**
+         * Initializes this set
+         */
+        public PathSet() {
+            this.content = new GSSPath[INIT_PATHS_COUNT];
+            this.count = 0;
+        }
     }
 
     /**
-     * The nodes in this GSS
+     * The label (GLR state) on the GSS node for the given index
      */
-    private BigList<GSSNode> nodes;
+    private final IntBigList nodeLabels;
+    /**
+     * The number of live incoming edges to the GSS node for the given index
+     */
+    private final IntBigList nodeIncomings;
     /**
      * The generations in this GSS
      */
-    private BigList<GSSGeneration> nodeGenerations;
+    private final BigList<GSSGeneration> nodeGenerations;
+
     /**
      * The edges in this GSS
      */
-    private BigList<GSSEdge> edges;
+    private final BigList<GSSEdge> edges;
     /**
      * The generations for the edges
      */
-    private BigList<GSSGeneration> edgeGenerations;
+    private final BigList<GSSGeneration> edgeGenerations;
+
     /**
      * Index of the current generation
      */
     private int generation;
+
     /**
      * A buffer of GSS paths
      */
-    private PathSet set;
+    private final PathSet paths;
+
     /**
      * Stack of GSS nodes used for the traversal of the GSS
      */
@@ -89,25 +108,18 @@ class GSS implements IContextProvider {
      * Initializes the GSS
      */
     public GSS() {
-        this.nodes = new BigList<GSSNode>(GSSNode.class, GSSNode[].class);
+        this.nodeLabels = new IntBigList();
+        this.nodeIncomings = new IntBigList();
         this.nodeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
         this.edges = new BigList<GSSEdge>(GSSEdge.class, GSSEdge[].class);
         this.edgeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
         this.generation = -1;
-        this.set = new PathSet();
-        this.set.paths = new GSSPath[INIT_PATHS_COUNT];
-        this.set.paths[0] = new GSSPath(1);
+        this.paths = new PathSet();
         this.stack = new int[INIT_STACK_SIZE];
     }
 
-    /**
-     * Gets whether the specified context is in effect
-     *
-     * @param context A context
-     * @return <code>true</code>  if the specified context is in effect
-     */
     @Override
-    public boolean isWithin(int context) {
+    public boolean isAcceptable(int context, int terminalIndex) {
         return (context == Automaton.DEFAULT_CONTEXT);
     }
 
@@ -128,7 +140,7 @@ class GSS implements IContextProvider {
      * @return The GLR state represented by the node
      */
     public int getRepresentedState(int node) {
-        return nodes.get(node).getState();
+        return nodeLabels.get(node);
     }
 
     /**
@@ -141,7 +153,7 @@ class GSS implements IContextProvider {
     public int findNode(int generation, int state) {
         GSSGeneration data = nodeGenerations.get(generation);
         for (int i = data.getStart(); i != data.getStart() + data.getCount(); i++)
-            if (nodes.get(i).getState() == state)
+            if (nodeLabels.get(i) == state)
                 return i;
         return -1;
     }
@@ -175,7 +187,7 @@ class GSS implements IContextProvider {
             // => cleanup the GSS from unreachable data
             cleanup();
         }
-        nodeGenerations.add(new GSSGeneration(nodes.size()));
+        nodeGenerations.add(new GSSGeneration(nodeLabels.size()));
         edgeGenerations.add(new GSSGeneration(edges.size()));
         generation++;
         return generation;
@@ -188,7 +200,8 @@ class GSS implements IContextProvider {
      * @return The node identifier
      */
     public int createNode(int state) {
-        int node = nodes.add(new GSSNode(state));
+        int node = nodeLabels.add(state);
+        nodeIncomings.add(0);
         GSSGeneration data = nodeGenerations.get(generation);
         data.increment();
         return node;
@@ -205,7 +218,7 @@ class GSS implements IContextProvider {
         edges.add(new GSSEdge(from, to, label));
         GSSGeneration data = edgeGenerations.get(generation);
         data.increment();
-        nodes.get(to).increment();
+        nodeIncomings.set(to, nodeIncomings.get(to) + 1);
     }
 
     /**
@@ -216,14 +229,14 @@ class GSS implements IContextProvider {
      * @param length The path's length
      */
     private void setupPath(int index, int last, int length) {
-        if (index >= set.paths.length)
-            set.paths = Arrays.copyOf(set.paths, set.paths.length + INIT_PATHS_COUNT);
-        if (set.paths[index] == null)
-            set.paths[index] = new GSSPath(length);
+        if (index >= paths.content.length)
+            paths.content = Arrays.copyOf(paths.content, paths.content.length + INIT_PATHS_COUNT);
+        if (paths.content[index] == null)
+            paths.content[index] = new GSSPath(length);
         else
-            set.paths[index].ensure(length);
-        set.paths[index].setLast(last);
-        set.paths[index].setGeneration(getGenerationOf(last));
+            paths.content[index].ensure(length);
+        paths.content[index].setLast(last);
+        paths.content[index].setGeneration(getGenerationOf(last));
     }
 
     /**
@@ -252,9 +265,9 @@ class GSS implements IContextProvider {
     public PathSet getPaths(int from, int length) {
         if (length == 0) {
             // use the common 0-length GSS path to avoid new memory allocation
-            set.paths[0].setLast(from);
-            set.count = 1;
-            return set;
+            paths.content[0].setLast(from);
+            paths.count = 1;
+            return paths;
         }
 
         // Initializes the first path
@@ -267,8 +280,8 @@ class GSS implements IContextProvider {
             int m = 0;          // Insertion index for the compaction process
             int next = total;   // Insertion index for new paths
             for (int p = 0; p != total; p++) {
-                int last = set.paths[p].getLast();
-                int genIndex = set.paths[p].getGeneration();
+                int last = paths.content[p].getLast();
+                int genIndex = paths.content[p].getGeneration();
                 // Look for new additional paths from last
                 GSSGeneration gen = edgeGenerations.get(genIndex);
                 int firstEdgeTarget = -1;
@@ -284,8 +297,8 @@ class GSS implements IContextProvider {
                             // Not the first edge
                             // Clone and extend the new path
                             setupPath(next, edge.getTo(), length);
-                            set.paths[next].copyLabelsFrom(set.paths[p], i);
-                            set.paths[next].set(i, edge.getLabel());
+                            paths.content[next].copyLabelsFrom(paths.content[p], i);
+                            paths.content[next].set(i, edge.getLabel());
                             // Go to next insert
                             next++;
                         }
@@ -295,13 +308,13 @@ class GSS implements IContextProvider {
                 if (firstEdgeTarget != -1) {
                     // Continue the current path
                     if (m != p) {
-                        GSSPath t = set.paths[m];
-                        set.paths[m] = set.paths[p];
-                        set.paths[p] = t;
+                        GSSPath t = paths.content[m];
+                        paths.content[m] = paths.content[p];
+                        paths.content[p] = t;
                     }
-                    set.paths[m].setLast(firstEdgeTarget);
-                    set.paths[m].setGeneration(getGenerationOf(firstEdgeTarget));
-                    set.paths[m].set(i, firstEdgeLabel);
+                    paths.content[m].setLast(firstEdgeTarget);
+                    paths.content[m].setGeneration(getGenerationOf(firstEdgeTarget));
+                    paths.content[m].set(i, firstEdgeLabel);
                     // goto next
                     m++;
                 }
@@ -310,9 +323,9 @@ class GSS implements IContextProvider {
                 // if some previous paths have been removed
                 // => compact the list if needed
                 for (int p = total; p != next; p++) {
-                    GSSPath t = set.paths[m];
-                    set.paths[m] = set.paths[p];
-                    set.paths[p] = t;
+                    GSSPath t = paths.content[m];
+                    paths.content[m] = paths.content[p];
+                    paths.content[p] = t;
                     m++;
                 }
                 // m is now the exact number of paths
@@ -324,8 +337,8 @@ class GSS implements IContextProvider {
             }
         }
 
-        set.count = total;
-        return set;
+        paths.count = total;
+        return paths;
     }
 
     /**
@@ -337,7 +350,7 @@ class GSS implements IContextProvider {
         int lastState = nodeGenerations.get(generation).getStart() - 1;
         int firstState = nodeGenerations.get(generation - 16).getStart();
         for (int i = lastState; i != firstState - 1; i--) {
-            if (nodes.get(i).getIncomings() == 0) {
+            if (nodeIncomings.get(i) == 0) {
                 top++;
                 if (top == stack.length)
                     stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
@@ -361,9 +374,10 @@ class GSS implements IContextProvider {
                 if (tree != null)
                     tree.free();
                 // decrement the target's incoming edges counter
-                GSSNode target = nodes.get(edge.getTo());
-                target.decrement();
-                if (target.getIncomings() == 0) {
+                int counter = nodeIncomings.get(edge.getTo());
+                counter--;
+                nodeIncomings.set(edge.getTo(), counter);
+                if (counter == 0) {
                     // the target node is now unreachable, enqueue it
                     top++;
                     if (top == stack.length)
@@ -436,12 +450,12 @@ class GSS implements IContextProvider {
                     for (int to : myedges.get(node)) {
                         int gen = getGenerationOf(to);
                         if (gen == i)
-                            writer.write("\t" + mark + " " + nodes.get(node).getState() + " to " + nodes.get(to).getState() + System.lineSeparator());
+                            writer.write("\t" + mark + " " + nodeLabels.get(node) + " to " + nodeLabels.get(to) + System.lineSeparator());
                         else
-                            writer.write("\t" + mark + " " + nodes.get(node).getState() + " to " + nodes.get(to).getState() + " in gen " + gen + System.lineSeparator());
+                            writer.write("\t" + mark + " " + nodeLabels.get(node) + " to " + nodeLabels.get(to) + " in gen " + gen + System.lineSeparator());
                     }
                 } else {
-                    writer.write("\t" + mark + " " + nodes.get(node).getState() + System.lineSeparator());
+                    writer.write("\t" + mark + " " + nodeLabels.get(node) + System.lineSeparator());
                 }
             }
         }

@@ -443,8 +443,7 @@ namespace Hime.Redist.Parsers
 			// setup the adjacency for the new root
 			result.SetAdjacency(root, result.Store(cacheChildren, insertion), insertion);
 			// create the GSS label
-			GSSLabel label = new GSSLabel(new TableElemRef(TableType.Variable, varIndex), root);
-			return label;
+			return new GSSLabel(new TableElemRef(TableType.Variable, varIndex), root);
 		}
 
 		/// <summary>
@@ -463,8 +462,7 @@ namespace Hime.Redist.Parsers
 				TreeAction action = cacheActions[handle[i]];
 				tree.SetAt(i + 1, new TableElemRef(TableType.None, node), action);
 			}
-			GSSLabel label = new GSSLabel(tree);
-			return label;
+			return new GSSLabel(tree);
 		}
 
 		/// <summary>

@@ -26,6 +26,8 @@ import java.util.List;
 
 /**
  * Represents the RNGLR parsing table and productions
+ *
+ * @author Laurent Wouters
  */
 public class RNGLRAutomaton {
     /**
@@ -35,11 +37,11 @@ public class RNGLRAutomaton {
         /**
          * The number of actions in this cell
          */
-        public char count;
+        public final char count;
         /**
          * Index of the cell's data
          */
-        public int index;
+        public final int index;
 
         /**
          * Loads this cell from the specified input
@@ -55,39 +57,39 @@ public class RNGLRAutomaton {
     /**
      * Index of the axiom variable
      */
-    private int axiom;
+    private final int axiom;
     /**
      * The number of columns in the LR table
      */
-    private char ncols;
+    private final char ncols;
     /**
      * The number of states in the automaton
      */
-    private int nstates;
+    private final int nstates;
     /**
      * Map of symbol ID to column index in the LR table
      */
-    private ColumnMap columns;
+    private final ColumnMap columns;
     /**
      * The contexts information
      */
-    private LRContexts[] contexts;
+    private final LRContexts[] contexts;
     /**
      * The RNGLR table
      */
-    private Cell[] table;
+    private final Cell[] table;
     /**
      * The action table
      */
-    private LRAction[] actions;
+    private final LRAction[] actions;
     /**
      * The table of LR productions
      */
-    private LRProduction[] productions;
+    private final LRProduction[] productions;
     /**
      * The table of nullable variables
      */
-    private char[] nullables;
+    private final char[] nullables;
 
     /**
      * Gets the index of the axiom

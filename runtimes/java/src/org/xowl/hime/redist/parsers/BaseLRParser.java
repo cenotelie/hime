@@ -20,9 +20,10 @@
 package org.xowl.hime.redist.parsers;
 
 import org.xowl.hime.redist.ParseError;
+import org.xowl.hime.redist.ParseResult;
 import org.xowl.hime.redist.SemanticAction;
 import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.lexer.ILexer;
+import org.xowl.hime.redist.lexer.BaseLexer;
 import org.xowl.hime.redist.lexer.LexicalErrorHandler;
 
 import java.util.ArrayList;
@@ -32,33 +33,43 @@ import java.util.List;
 
 /**
  * Represents a base LR parser
+ *
+ * @author Laurent Wouters
  */
-public abstract class BaseLRParser implements IParser {
+public abstract class BaseLRParser {
     /**
      * Maximum number of errors
      */
     protected static final int MAX_ERROR_COUNT = 100;
+    /**
+     * The default value of the recover mode
+     */
+    protected static final boolean DEFAULT_MODE_RECOVER = true;
+    /**
+     * The default value of the debug mode
+     */
+    protected static final boolean DEFAULT_MODE_DEBUG = false;
 
     /**
      * Determines whether the parser will try to recover from errors
      */
-    protected boolean recover = true;
+    protected boolean modeRecover;
     /**
      * Value indicating whether this parser is in debug mode
      */
-    protected boolean debug = false;
+    protected boolean modeDebug;
     /**
      * Parser's variables
      */
-    protected List<Symbol> parserVariables;
+    protected List<Symbol> symVariables;
     /**
      * Parser's virtuals
      */
-    protected List<Symbol> parserVirtuals;
+    protected List<Symbol> symVirtuals;
     /**
      * Parser's actions
      */
-    protected SemanticAction[] parserActions;
+    protected List<SemanticAction> symActions;
     /**
      * List of the encountered syntaxic errors
      */
@@ -66,7 +77,7 @@ public abstract class BaseLRParser implements IParser {
     /**
      * Lexer associated to this parser
      */
-    protected ILexer lexer;
+    protected BaseLexer lexer;
 
 
     /**
@@ -75,7 +86,7 @@ public abstract class BaseLRParser implements IParser {
      * @return The variable symbols used by this parser
      */
     public List<Symbol> getVariables() {
-        return parserVariables;
+        return symVariables;
     }
 
     /**
@@ -84,7 +95,7 @@ public abstract class BaseLRParser implements IParser {
      * @return The virtual symbols used by this parser
      */
     public List<Symbol> getVirtuals() {
-        return parserVirtuals;
+        return symVirtuals;
     }
 
     /**
@@ -92,8 +103,8 @@ public abstract class BaseLRParser implements IParser {
      *
      * @return Whether the parser should try to recover from errors
      */
-    public boolean getRecover() {
-        return recover;
+    public boolean getModeRecoverErrors() {
+        return modeRecover;
     }
 
     /**
@@ -101,8 +112,8 @@ public abstract class BaseLRParser implements IParser {
      *
      * @param recover Whether the parser should try to recover from errors
      */
-    public void setRecover(boolean recover) {
-        this.recover = recover;
+    public void setModeReciverErrors(boolean recover) {
+        this.modeRecover = recover;
     }
 
     /**
@@ -110,8 +121,8 @@ public abstract class BaseLRParser implements IParser {
      *
      * @return Whether this parser is in debug mode
      */
-    public boolean isDebugMode() {
-        return debug;
+    public boolean isModeDebug() {
+        return modeDebug;
     }
 
     /**
@@ -119,8 +130,8 @@ public abstract class BaseLRParser implements IParser {
      *
      * @param mode Whether this parser is in debug mode
      */
-    public void setDebugMode(boolean mode) {
-        this.debug = mode;
+    public void setModeDEbug(boolean mode) {
+        this.modeDebug = mode;
     }
 
     /**
@@ -131,11 +142,13 @@ public abstract class BaseLRParser implements IParser {
      * @param actions   The parser's actions
      * @param lexer     The input lexer
      */
-    protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, ILexer lexer) {
-        this.parserVariables = Collections.unmodifiableList(Arrays.asList(variables));
-        this.parserVirtuals = Collections.unmodifiableList(Arrays.asList(virtuals));
-        this.parserActions = actions;
-        this.recover = true;
+    protected BaseLRParser(Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, BaseLexer lexer) {
+        this.modeRecover = DEFAULT_MODE_RECOVER;
+        this.modeDebug = DEFAULT_MODE_DEBUG;
+        this.symVariables = Collections.unmodifiableList(Arrays.asList(variables));
+        this.symVirtuals = Collections.unmodifiableList(Arrays.asList(virtuals));
+        this.symActions = Collections.unmodifiableList(Arrays.asList(actions));
+        ;
         this.allErrors = new ArrayList<ParseError>();
         this.lexer = lexer;
         this.lexer.setErrorHandler(new LexicalErrorHandler() {
@@ -145,4 +158,11 @@ public abstract class BaseLRParser implements IParser {
             }
         });
     }
+
+    /**
+     * Parses the input and returns the result
+     *
+     * @return A ParseResult object containing the data about the result
+     */
+    public abstract ParseResult parse();
 }

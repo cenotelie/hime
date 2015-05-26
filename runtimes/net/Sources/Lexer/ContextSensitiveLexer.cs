@@ -137,8 +137,8 @@ namespace Hime.Redist.Lexer
 							// filter out the separators
 							continue;
 						buffer.Add(new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length)));
-						inputIndex += length;
 					}
+					inputIndex += length;
 					if (buffer.Size > 0)
 						return buffer;
 					continue;

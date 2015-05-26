@@ -23,12 +23,14 @@ import org.xowl.hime.redist.utils.BinaryInput;
 
 /**
  * Represents the contexts of a LR state
+ *
+ * @author Laurent Wouters
  */
 public class LRContexts {
     /**
      * The contexts
      */
-    private char[] content;
+    private final char[] content;
 
     /**
      * Gets the number of contexts

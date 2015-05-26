@@ -26,32 +26,34 @@ import java.util.List;
 
 /**
  * Represents the LR(k) parsing table and productions
+ *
+ * @author Laurent Wouters
  */
 public class LRkAutomaton {
     /**
      * The number of columns in the LR table
      */
-    private char ncols;
+    private final char ncols;
     /**
      * The number of states in the LR table
      */
-    private char nstates;
+    private final char nstates;
     /**
      * Map of symbol ID to column index in the LR table
      */
-    private ColumnMap columns;
+    private final ColumnMap columns;
     /**
      * The contexts information
      */
-    private LRContexts[] contexts;
+    private final LRContexts[] contexts;
     /**
      * The LR table
      */
-    private LRAction[] table;
+    private final LRAction[] table;
     /**
      * The table of LR productions
      */
-    private LRProduction[] productions;
+    private final LRProduction[] productions;
 
     /**
      * Gets the number of states in this automaton

@@ -89,6 +89,15 @@ public abstract class BaseLexer {
     }
 
     /**
+     * Gets the token repository for this lexer
+     *
+     * @return The token repository for this lexer
+     */
+    public TokenRepository getTokens() {
+        return tokens;
+    }
+
+    /**
      * Sets the handler of lexical errors coming from this parser
      *
      * @param handler The handler
@@ -144,7 +153,7 @@ public abstract class BaseLexer {
      * @param contexts The current applicable contexts
      * @return The next token in the input
      */
-    protected abstract TokenKernel getNextToken(IContextProvider contexts);
+    public abstract TokenKernel getNextToken(IContextProvider contexts);
 
     /**
      * Gets the possible next tokens in the input
@@ -152,5 +161,5 @@ public abstract class BaseLexer {
      * @param contexts The current applicable contexts
      * @return The possible next tokens in the input
      */
-    protected abstract TokenKernelBuffer getNextTokens(IContextProvider contexts);
+    public abstract TokenKernelBuffer getNextTokens(IContextProvider contexts);
 }

@@ -22,6 +22,8 @@ package org.xowl.hime.redist.parsers;
 /**
  * Represent an op-code for a LR production
  * An op-code can be either an instruction or raw data
+ *
+ * @author Laurent Wouters
  */
 class LROpCode {
     /**

@@ -19,10 +19,14 @@
  ******************************************************************************/
 package org.xowl.hime.redist.parsers;
 
-import org.xowl.hime.redist.*;
+import org.xowl.hime.redist.ParseResult;
+import org.xowl.hime.redist.SemanticAction;
+import org.xowl.hime.redist.Symbol;
+import org.xowl.hime.redist.UnexpectedTokenError;
 import org.xowl.hime.redist.lexer.Automaton;
+import org.xowl.hime.redist.lexer.BaseLexer;
 import org.xowl.hime.redist.lexer.IContextProvider;
-import org.xowl.hime.redist.lexer.ILexer;
+import org.xowl.hime.redist.lexer.TokenKernel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +34,8 @@ import java.util.List;
 
 /**
  * Represents a base for all LR(k) parsers
+ *
+ * @author Laurent Wouters
  */
 public abstract class LRkParser extends BaseLRParser implements IContextProvider {
     /**
@@ -40,7 +46,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     /**
      * The parser's automaton
      */
-    protected LRkAutomaton automaton;
+    protected final LRkAutomaton automaton;
     /**
      * The parser's stack
      */
@@ -63,19 +69,21 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      * @param actions   The parser's actions
      * @param lexer     The input lexer
      */
-    protected LRkParser(LRkAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, ILexer lexer) {
+    protected LRkParser(LRkAutomaton automaton, Symbol[] variables, Symbol[] virtuals, SemanticAction[] actions, BaseLexer lexer) {
         super(variables, virtuals, actions, lexer);
         this.automaton = automaton;
-        this.builder = new LRkASTBuilder(lexer.getOutput(), parserVariables, parserVirtuals);
+        this.stack = new int[INIT_STACK_SIZE];
+        this.head = 0;
+        this.builder = new LRkASTBuilder(lexer.getTokens(), symVariables, symVirtuals);
     }
 
-    /**
-     * Gets whether the specified context is in effect
-     *
-     * @param context A context
-     * @return <code>true</code>  if the specified context is in effect
-     */
-    public boolean isWithin(int context) {
+    @Override
+    public boolean isAcceptable(int context, int terminalIndex) {
+        // check that there is an action for this terminal
+        LRAction action = automaton.getAction(stack[head], lexer.getTerminals().get(terminalIndex).getID());
+        if (action.getCode() == LRAction.CODE_NONE)
+            return false;
+        // check that the parser is in the right context
         if (context == Automaton.DEFAULT_CONTEXT)
             return true;
         for (int i = head; i != -1; i--)
@@ -87,10 +95,10 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     /**
      * Raises an error on an unexpected token
      *
-     * @param token The unexpected token
-     * @return The next token in the case the error is recovered
+     * @param kernel The unexpected token's kernel
+     * @return The next token kernel in the case the error is recovered
      */
-    private Token onUnexpectedToken(Token token) {
+    private TokenKernel onUnexpectedToken(TokenKernel kernel) {
         LRExpected expectedOnHead = automaton.getExpected(stack[head], lexer.getTerminals());
         // the terminals for shifts are always expected
         List<Symbol> expected = new ArrayList<Symbol>(expectedOnHead.getShifts());
@@ -99,10 +107,9 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
             if (checkIsExpected(terminal))
                 expected.add(terminal);
         // register the error
-        allErrors.add(new UnexpectedTokenError(lexer.getOutput().at(token.getIndex()), lexer.getOutput().getPositionOf(token.getIndex()), expected));
-        if (!recover)
-            return new Token(0, 0);
-        return new Token(0, 0);
+        allErrors.add(new UnexpectedTokenError(lexer.getTokens().at(kernel.getIndex()), expected));
+        // TODO: try to recover, or not
+        return new TokenKernel(Symbol.SID_NOTHING, -1);
     }
 
     /**
@@ -128,7 +135,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
                 LRProduction production = automaton.getProduction(action.getData());
                 myHead -= production.getReductionLength();
                 // this must be a shift
-                action = automaton.getAction(myStack[myHead], parserVariables.get(production.getHead()).getID());
+                action = automaton.getAction(myStack[myHead], symVariables.get(production.getHead()).getID());
                 myHead++;
                 if (myHead == myStack.length)
                     myStack = Arrays.copyOf(myStack, myStack.length + INIT_STACK_SIZE);
@@ -147,20 +154,18 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      * @return A ParseResult object containing the data about the result
      */
     public ParseResult parse() {
-        stack = new int[INIT_STACK_SIZE];
-        head = 0;
-        Token nextToken = lexer.getNextToken(null);
+        TokenKernel nextKernel = lexer.getNextToken(null);
         while (true) {
-            char action = parseOnToken(nextToken);
+            char action = parseOnToken(nextKernel);
             if (action == LRAction.CODE_SHIFT) {
-                nextToken = lexer.getNextToken(null);
+                nextKernel = lexer.getNextToken(null);
                 continue;
             }
             if (action == LRAction.CODE_ACCEPT)
-                return new ParseResult(allErrors, lexer.getOutput(), builder.GetTree());
-            nextToken = onUnexpectedToken(nextToken);
-            if (nextToken.getSymbolID() == 0 || allErrors.size() >= MAX_ERROR_COUNT)
-                return new ParseResult(allErrors, lexer.getOutput());
+                return new ParseResult(allErrors, lexer.getInput(), builder.GetTree());
+            nextKernel = onUnexpectedToken(nextKernel);
+            if (nextKernel.getTerminalID() == Symbol.SID_NOTHING || allErrors.size() >= MAX_ERROR_COUNT)
+                return new ParseResult(allErrors, lexer.getInput());
         }
     }
 
@@ -170,9 +175,9 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      * @param token The token to parse
      * @return The LR action on the token
      */
-    private char parseOnToken(Token token) {
+    private char parseOnToken(TokenKernel token) {
         while (true) {
-            LRAction action = automaton.getAction(stack[head], token.getSymbolID());
+            LRAction action = automaton.getAction(stack[head], token.getTerminalID());
             if (action.getCode() == LRAction.CODE_SHIFT) {
                 head++;
                 if (head == stack.length)
@@ -184,7 +189,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
                 LRProduction production = automaton.getProduction(action.getData());
                 head -= production.getReductionLength();
                 reduce(production);
-                action = automaton.getAction(stack[head], parserVariables.get(production.getHead()).getID());
+                action = automaton.getAction(stack[head], symVariables.get(production.getHead()).getID());
                 head++;
                 if (head == stack.length)
                     stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
@@ -201,13 +206,13 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      * @param production A LR reduction
      */
     private void reduce(LRProduction production) {
-        Symbol variable = parserVariables.get(production.getHead());
+        Symbol variable = symVariables.get(production.getHead());
         builder.reductionPrepare(production.getHead(), production.getReductionLength(), production.getHeadAction());
         for (int i = 0; i != production.getBytecodeLength(); i++) {
             char op = production.getOpcode(i);
             switch (LROpCode.getBase(op)) {
                 case LROpCode.BASE_SEMANTIC_ACTION: {
-                    SemanticAction action = parserActions[production.getOpcode(i + 1)];
+                    SemanticAction action = symActions.get(production.getOpcode(i + 1));
                     i++;
                     action.execute(variable, builder);
                     break;

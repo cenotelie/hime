@@ -24,20 +24,22 @@ package org.xowl.hime.redist.parsers;
  * The data in this structure can have two interpretations:
  * 1) It can represent a sub-tree with a replaceable root.
  * 2) It can represent a reference to a single node in a SPPF.
+ *
+ * @author Laurent Wouters
  */
 class GSSLabel {
     /**
      * A sub-tree with a replaceable root
      */
-    private SubTree tree;
+    private final SubTree tree;
     /**
      * The original symbol of the SPPF node
      */
-    private int original;
+    private final int original;
     /**
      * The index of the SPPF node
      */
-    private int nodeIndex;
+    private final int nodeIndex;
 
     /**
      * Gets the sub-tree with a repleaceable root

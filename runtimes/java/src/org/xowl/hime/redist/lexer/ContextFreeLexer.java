@@ -80,7 +80,7 @@ public abstract class ContextFreeLexer extends BaseLexer {
     }
 
     @Override
-    protected TokenKernel getNextToken(IContextProvider contexts) {
+    public TokenKernel getNextToken(IContextProvider contexts) {
         if (tokens.size() == 0) {
             // this is the first call to this method, prefetch the tokens
             findTokens();
@@ -95,7 +95,7 @@ public abstract class ContextFreeLexer extends BaseLexer {
     }
 
     @Override
-    protected TokenKernelBuffer getNextTokens(IContextProvider contexts) {
+    public TokenKernelBuffer getNextTokens(IContextProvider contexts) {
         buffer.reset();
         buffer.add(getNextToken(contexts));
         return buffer;

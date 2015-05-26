@@ -25,12 +25,14 @@ import java.util.Map;
 /**
  * Represent a map from symbols' IDs to the index of their corresponding column in an LR table.
  * It is optimized for IDs from 0x0000 to 0x01FF (the first 512 symbols) with hope they are the most frequent.
+ *
+ * @author Laurent Wouters
  */
 class ColumnMap {
     /**
      * Cache for ids from 0x00 to 0xFF
      */
-    private int[] cache1;
+    private final int[] cache1;
     /**
      * Cache for ids from 0x100 to 0x1FF
      */

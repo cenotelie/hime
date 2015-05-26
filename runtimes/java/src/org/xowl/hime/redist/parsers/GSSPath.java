@@ -21,6 +21,8 @@ package org.xowl.hime.redist.parsers;
 
 /**
  * Represents a path in a GSS
+ *
+ * @author Laurent Wouters
  */
 class GSSPath {
     /**

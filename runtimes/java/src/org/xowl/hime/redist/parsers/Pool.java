@@ -26,6 +26,7 @@ import java.util.Arrays;
  * Represents a pool of reusable objects
  *
  * @param <T> Type of the pooled objects
+ * @author Laurent Wouters
  */
 class Pool<T> {
     /**
