@@ -199,12 +199,13 @@ namespace Hime.Redist
 		}
 
 		/// <summary>
-		/// Gets the semantic element corresponding to the specified label
+		/// Gets the semantic element corresponding to the specified node
 		/// </summary>
-		/// <param name="label">A node label</param>
+		/// <param name="node">A node</param>
 		/// <returns>The corresponding semantic element</returns>
-		public SemanticElement GetSemanticElementFor(TableElemRef label)
+		public SemanticElement GetSemanticElementFor(int node)
 		{
+			TableElemRef label = nodes[node].label;
 			switch (label.Type)
 			{
 			case TableType.Token:
@@ -216,16 +217,6 @@ namespace Hime.Redist
 			}
 			// This cannot happen
 			return null;
-		}
-
-		/// <summary>
-		/// Gets the semantic element corresponding to the specified node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The corresponding semantic element</returns>
-		public SemanticElement GetSemanticElementFor(int node)
-		{
-			return GetSemanticElementFor(nodes[node].label);
 		}
 
 		/// <summary>

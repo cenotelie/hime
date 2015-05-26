@@ -25,7 +25,7 @@ package org.xowl.hime.redist;
  *
  * @author Laurent Wouters
  */
-public class Symbol implements SemanticElement {
+public class Symbol {
     /**
      * Symbol ID for inexistant symbol
      */
@@ -75,31 +75,6 @@ public class Symbol implements SemanticElement {
     public Symbol(int id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    @Override
-    public TextPosition getPosition() {
-        return new TextPosition(0, 0);
-    }
-
-    @Override
-    public TextSpan getSpan() {
-        return new TextSpan(0, 0);
-    }
-
-    @Override
-    public TextContext getContext() {
-        return new TextContext();
-    }
-
-    @Override
-    public Symbol getSymbol() {
-        return this;
-    }
-
-    @Override
-    public String getValue() {
-        return null;
     }
 
     @Override

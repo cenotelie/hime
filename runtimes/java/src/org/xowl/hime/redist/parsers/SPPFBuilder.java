@@ -144,8 +144,8 @@ class SPPFBuilder implements SemanticBody {
      * @param index Index of the symbol
      * @return The symbol at the given index
      */
-    public Symbol at(int index) {
-        return result.getSymbol(cacheChildren[handle[index]]);
+    public SemanticElement at(int index) {
+        return result.getSemanticElementFor(cacheChildren[handle[index]]);
     }
 
     /**

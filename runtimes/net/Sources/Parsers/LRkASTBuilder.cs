@@ -88,7 +88,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">Index of the symbol</param>
 		/// <returns>The symbol at the given index</returns>
-		public SemanticElement this[int index] { get { return result.GetSemanticElementFor(cache.GetLabelAt(handle[index])); } }
+		public SemanticElement this[int index] { get { return result.GetSemanticElementFor(handle[index]); } }
 
 		/// <summary>
 		/// Gets the length of this body

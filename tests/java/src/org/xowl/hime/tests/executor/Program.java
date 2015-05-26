@@ -306,13 +306,13 @@ public class Program {
      * @return True if the nodes match
      */
     private boolean compare(ASTNode expected, ASTNode node) {
-        if (!node.getSymbol().getName().equals(expected.getSymbol().getValue()))
+        if (!node.getSymbol().getName().equals(expected.getValue()))
             return false;
         if (expected.getChildren().get(0).getChildren().size() > 0) {
-            String test = expected.getChildren().get(0).getChildren().get(0).getSymbol().getValue();
-            String vRef = expected.getChildren().get(0).getChildren().get(1).getSymbol().getValue();
+            String test = expected.getChildren().get(0).getChildren().get(0).getValue();
+            String vRef = expected.getChildren().get(0).getChildren().get(1).getValue();
             vRef = vRef.substring(1, vRef.length() - 1).replace("\\'", "'").replace("\\\\", "\\");
-            String vReal = node.getSymbol().getValue();
+            String vReal = node.getValue();
             if ("=".equals(test) && !vRef.equals(vReal))
                 return false;
             if ("!=".equals(test) && vRef.equals(vReal))

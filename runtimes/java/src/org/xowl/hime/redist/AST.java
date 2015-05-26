@@ -212,32 +212,23 @@ public abstract class AST {
     }
 
     /**
-     * Gets the semantic element corresponding to the specified label
-     *
-     * @param label A node label
-     * @return The corresponding semantic element
-     */
-    private SemanticElement getSemanticElementForLabel(int label) {
-        switch (TableElemRef.getType(label)) {
-            case TableElemRef.TABLE_TOKEN:
-                return tableTokens.at(TableElemRef.getIndex(label));
-            case TableElemRef.TABLE_VARIABLE:
-                return tableVariables.get(TableElemRef.getIndex(label));
-            case TableElemRef.TABLE_VIRTUAL:
-                return tableVirtuals.get(TableElemRef.getIndex(label));
-        }
-        // This cannot happen
-        return null;
-    }
-
-    /**
      * Gets the semantic element corresponding to the specified node
      *
      * @param node A node
      * @return The corresponding semantic element
      */
-    public SemanticElement getSemanticElementForNode(int node) {
-        return getSemanticElementForLabel(nodes.get(node).label);
+    public SemanticElement getSemanticElementFor(int node) {
+        int label = nodes.get(node).label;
+        switch (TableElemRef.getType(label)) {
+            case TableElemRef.TABLE_TOKEN:
+                return tableTokens.at(TableElemRef.getIndex(label));
+            case TableElemRef.TABLE_VARIABLE:
+                return new SymbolRef(tableVariables.get(TableElemRef.getIndex(label)));
+            case TableElemRef.TABLE_VIRTUAL:
+                return new SymbolRef(tableVirtuals.get(TableElemRef.getIndex(label)));
+        }
+        // This cannot happen
+        return null;
     }
 
     /**

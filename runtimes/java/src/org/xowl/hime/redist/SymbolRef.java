@@ -21,23 +21,52 @@
 package org.xowl.hime.redist;
 
 /**
- * Represents the semantic body of a rule being reduced
+ * Represents a reference to a symbol
  *
  * @author Laurent Wouters
  */
-public interface SemanticBody {
+class SymbolRef implements SemanticElement {
     /**
-     * Gets the element at the i-th index
-     *
-     * @param index Index of the symbol
-     * @return The element at the given index
+     * The symbol being referenced
      */
-    SemanticElement at(int index);
+    private final Symbol symbol;
+
+    @Override
+    public TextPosition getPosition() {
+        return new TextPosition(0, 0);
+    }
+
+    @Override
+    public TextSpan getSpan() {
+        return new TextSpan(0, 0);
+    }
+
+    @Override
+    public TextContext getContext() {
+        return new TextContext();
+    }
+
+    @Override
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    @Override
+    public String getValue() {
+        return null;
+    }
 
     /**
-     * Gets the length of this body
+     * Initializes this reference
      *
-     * @return The length of this body
+     * @param symbol The symbol being referenced
      */
-    int length();
+    public SymbolRef(Symbol symbol) {
+        this.symbol = symbol;
+    }
+
+    @Override
+    public String toString() {
+        return symbol.getName();
+    }
 }
