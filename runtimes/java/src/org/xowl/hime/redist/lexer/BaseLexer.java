@@ -20,7 +20,10 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.*;
+import org.xowl.hime.redist.Symbol;
+import org.xowl.hime.redist.Text;
+import org.xowl.hime.redist.Token;
+import org.xowl.hime.redist.TokenRepository;
 
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -136,15 +139,6 @@ public abstract class BaseLexer {
     }
 
     /**
-     * Raises the specified error
-     *
-     * @param error An error raised by this lexer
-     */
-    protected void raiseError(ParseError error) {
-        handler.handle(error);
-    }
-
-    /**
      * Gets the next token in the input
      *
      * @param contexts The current applicable contexts
@@ -158,5 +152,5 @@ public abstract class BaseLexer {
      * @param contexts The current applicable contexts
      * @return The possible next tokens in the input
      */
-    protected abstract Buffer getNextTokens(IContextProvider contexts);
+    protected abstract TokenKernelBuffer getNextTokens(IContextProvider contexts);
 }

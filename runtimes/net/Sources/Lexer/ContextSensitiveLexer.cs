@@ -112,7 +112,6 @@ namespace Hime.Redist.Lexer
 					inputIndex++;
 				}
 				RaiseError(new UnexpectedCharError(unexpected, position));
-				continue;
 			}
 		}
 

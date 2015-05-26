@@ -71,13 +71,22 @@ public class AutomatonState {
     }
 
     /**
+     * Gets the index of the first terminal matched in this state
+     *
+     * @return The index of the matched terminal
+     */
+    public int getTerminal() {
+        return table[offset + 3];
+    }
+
+    /**
      * Gets the i-th matched terminal in this state
      *
      * @param index The index of the matched terminal
-     * @return The matched terminal data
+     * @param cache The matched terminal data
      */
-    public MatchedTerminal getTerminal(int index) {
-        return new MatchedTerminal(table[offset + index * 2 + 3], table[offset + index * 2 + 4]);
+    public void getTerminal(int index, MatchedTerminal cache) {
+        cache.setup(table[offset + index * 2 + 3], table[offset + index * 2 + 4]);
     }
 
     /**

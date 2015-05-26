@@ -55,7 +55,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Index of the next token
 		/// </summary>
-		private int tokenIndex = -1;
+		private int tokenIndex;
 		/// <summary>
 		/// The buffer for token kernels
 		/// </summary>

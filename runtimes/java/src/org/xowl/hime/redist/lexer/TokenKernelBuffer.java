@@ -27,7 +27,7 @@ import java.util.Arrays;
  *
  * @author Laurent Wouters
  */
-public class Buffer {
+public class TokenKernelBuffer {
     /**
      * The inner data backing this buffer
      */
@@ -42,7 +42,7 @@ public class Buffer {
      *
      * @return The number of elements in this buffer
      */
-    public int getSize() {
+    public int size() {
         return size;
     }
 
@@ -61,7 +61,7 @@ public class Buffer {
      *
      * @param capacity The initial capacity
      */
-    public Buffer(int capacity) {
+    public TokenKernelBuffer(int capacity) {
         this.inner = new TokenKernel[capacity];
         this.size = 0;
     }

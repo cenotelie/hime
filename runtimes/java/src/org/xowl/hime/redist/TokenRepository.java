@@ -175,7 +175,7 @@ public class TokenRepository implements Iterable<Token> {
      * @param index A token's index
      * @return The associated symbol
      */
-    protected Symbol getSymbol(int index) {
+    public Symbol getSymbol(int index) {
         return terminals.get(cells.get(index).terminal);
     }
 

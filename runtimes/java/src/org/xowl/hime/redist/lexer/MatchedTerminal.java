@@ -29,11 +29,11 @@ public class MatchedTerminal {
     /**
      * The context
      */
-    private final char context;
+    private char context;
     /**
      * The terminal's index
      */
-    private final char index;
+    private char index;
 
     /**
      * Gets the context of the matched terminal
@@ -54,12 +54,12 @@ public class MatchedTerminal {
     }
 
     /**
-     * Initializes this matched terminal data
+     * Setups this matched terminal data
      *
      * @param context The context
      * @param index   The terminal's index
      */
-    protected MatchedTerminal(char context, char index) {
+    protected void setup(char context, char index) {
         this.context = context;
         this.index = index;
     }

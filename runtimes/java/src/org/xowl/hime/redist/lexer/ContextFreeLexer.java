@@ -22,13 +22,14 @@ package org.xowl.hime.redist.lexer;
 
 import org.xowl.hime.redist.Symbol;
 import org.xowl.hime.redist.TextPosition;
-import org.xowl.hime.redist.Token;
 import org.xowl.hime.redist.UnexpectedCharError;
 
 import java.io.InputStreamReader;
 
 /**
  * Represents a context-free lexer (lexing rules do not depend on the context)
+ *
+ * @author Laurent Wouters
  */
 public abstract class ContextFreeLexer extends BaseLexer {
     /**
@@ -36,13 +37,17 @@ public abstract class ContextFreeLexer extends BaseLexer {
      */
     private int tokenIndex;
     /**
-     * The cache of DFA state data
+     * The buffer for token kernels
      */
-    private State stateData;
+    private final TokenKernelBuffer buffer;
     /**
-     * The cache of matched terminal
+     * The cached automaton state
      */
-    private MatchedTerminal matchedTerminal;
+    private final AutomatonState stateCache;
+    /**
+     * Length of the matched input
+     */
+    private int matchedLength;
 
     /**
      * Initializes a new instance of the Lexer class with the given input
@@ -55,8 +60,8 @@ public abstract class ContextFreeLexer extends BaseLexer {
     protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
         super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
-        this.stateData = new State();
-        this.matchedTerminal = new MatchedTerminal();
+        this.buffer = new TokenKernelBuffer(1);
+        this.stateCache = new AutomatonState();
     }
 
     /**
@@ -70,35 +75,30 @@ public abstract class ContextFreeLexer extends BaseLexer {
     protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
         super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
-        this.stateData = new State();
-        this.matchedTerminal = new MatchedTerminal();
+        this.buffer = new TokenKernelBuffer(1);
+        this.stateCache = new AutomatonState();
     }
 
-    /**
-     * Gets the next token in the input
-     *
-     * @param contexts The current applicable contexts
-     * @return The next token in the input
-     */
-    public Token getNextToken(IContextProvider contexts) {
-        if (text.getTokenCount() == 0) {
+    @Override
+    protected TokenKernel getNextToken(IContextProvider contexts) {
+        if (tokens.size() == 0) {
             // this is the first call to this method, prefetch the tokens
             findTokens();
             tokenIndex = 0;
         }
         // no more tokens? return epsilon
-        if (tokenIndex >= text.getTokenCount())
-            return new Token(Symbol.SID_EPSILON, 0);
-        return text.getTokenAt(tokenIndex++);
+        if (tokenIndex >= tokens.size())
+            return new TokenKernel(Symbol.SID_EPSILON, 0);
+        TokenKernel result = new TokenKernel(tokens.getSymbol(tokenIndex).getID(), tokenIndex);
+        tokenIndex++;
+        return result;
     }
 
-    /**
-     * Rewinds this lexer for a specified amount of tokens
-     *
-     * @param count The number of tokens to rewind
-     */
-    public void rewindTokens(int count) {
-        tokenIndex -= count;
+    @Override
+    protected TokenKernelBuffer getNextTokens(IContextProvider contexts) {
+        buffer.reset();
+        buffer.add(getNextToken(contexts));
+        return buffer;
     }
 
     /**
@@ -107,17 +107,17 @@ public abstract class ContextFreeLexer extends BaseLexer {
     private void findTokens() {
         int inputIndex = 0;
         while (true) {
-            Match match = runDFA(inputIndex);
-            if (match.length != 0) {
-                if (symTerminals.get(match.terminal).getID() != separatorID)
-                    text.addToken(match.terminal, inputIndex, match.length);
-                inputIndex += match.length;
+            int matchedIndex = runDFA(inputIndex);
+            if (matchedLength != 0) {
+                if (symTerminals.get(matchedIndex).getID() != separatorID)
+                    tokens.add(matchedIndex, inputIndex, matchedLength);
+                inputIndex += matchedLength;
                 continue;
             }
-            if (match.terminal == 0) {
+            if (matchedIndex == 0) {
                 // This is the EPSILON terminal, failed to match anything
                 TextPosition position = text.getPositionAt(inputIndex);
-                String unexpected = null;
+                String unexpected;
                 int c = text.getValue(inputIndex);
                 if (c >= 0xD800 && c <= 0xDFFF) {
                     // this is a surrogate encoding point
@@ -131,7 +131,7 @@ public abstract class ContextFreeLexer extends BaseLexer {
                 continue;
             }
             // This is the dollar terminal, at the end of the input
-            text.addToken(match.terminal, inputIndex, match.length);
+            tokens.add(matchedIndex, inputIndex, matchedLength);
             return;
         }
     }
@@ -140,28 +140,28 @@ public abstract class ContextFreeLexer extends BaseLexer {
      * Runs the lexer's DFA to match a terminal in the input ahead
      *
      * @param inputIndex The current start index in the input text
-     * @return The matched terminal and length
+     * @return The index of the matched terminal
      */
-    private Match runDFA(int inputIndex) {
+    private int runDFA(int inputIndex) {
+        matchedLength = 0;
         if (text.isEnd(inputIndex)) {
             // At the end of input
-            return new Match(1); // 1 is always the index of the $ terminal
+            return 1; // 1 is always the index of the $ terminal
         }
 
-        Match result = new Match(0);
+        int result = 0;
         int state = 0;
         int i = inputIndex;
 
         while (state != Automaton.DEAD_STATE) {
-            automaton.retrieveState(state, stateData);
+            automaton.retrieveState(state, stateCache);
             // Is this state a matching state ?
-            if (stateData.getTerminalsCount() != 0) {
-                stateData.retrieveTerminal(0, matchedTerminal);
-                result.terminal = matchedTerminal.getIndex();
-                result.length = (i - inputIndex);
+            if (stateCache.getTerminalCount() != 0) {
+                result = stateCache.getTerminal();
+                matchedLength = (i - inputIndex);
             }
             // No further transition => exit
-            if (stateData.isDeadEnd())
+            if (stateCache.isDeadEnd())
                 break;
             // At the end of the buffer
             if (text.isEnd(i))
@@ -169,7 +169,7 @@ public abstract class ContextFreeLexer extends BaseLexer {
             char current = text.getValue(i);
             i++;
             // Try to find a transition from this state with the read character
-            state = stateData.getTargetBy(current);
+            state = stateCache.getTargetBy(current);
         }
         return result;
     }
