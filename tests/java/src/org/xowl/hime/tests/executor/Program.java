@@ -1,5 +1,5 @@
-/**********************************************************************
- * Copyright (c) 2014 Laurent Wouters and others
+/*******************************************************************************
+ * Copyright (c) 2015 Laurent Wouters and others
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -16,14 +16,14 @@
  *
  * Contributors:
  *     Laurent Wouters - lwouters@xowl.org
- **********************************************************************/
+ ******************************************************************************/
 package org.xowl.hime.tests.executor;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.hime.redist.Context;
 import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
-import org.xowl.hime.redist.parsers.IParser;
+import org.xowl.hime.redist.TextContext;
+import org.xowl.hime.redist.parsers.BaseLRParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +36,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Executor of tests for the Java runtime
+ *
+ * @author Laurent Wouters
+ */
 public class Program {
     /**
      * The parser must produce an AST that matches the expected one
@@ -105,7 +110,7 @@ public class Program {
      */
     public int execute(String parserName, String verb) {
         String input = readAllText("input.txt");
-        IParser parser = getParser(parserName, input);
+        BaseLRParser parser = getParser(parserName, input);
         if (VERB_MATCHES.equals(verb))
             return testMatches(parser);
         if (VERB_NOMATCHES.equals(verb))
@@ -124,11 +129,11 @@ public class Program {
      */
     private ASTNode getExpectedAST() {
         String expectedText = readAllText("expected.txt");
-        IParser expectedParser = getParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+        BaseLRParser expectedParser = getParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
         ParseResult result = expectedParser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error.toString());
-            Context context = result.getInput().getContext(error.getPosition());
+            TextContext context = result.getInput().getContext(error.getPosition());
             System.out.println(context.getContent());
             System.out.println(context.getPointer());
         }
@@ -157,7 +162,7 @@ public class Program {
      * @param parser The parser to use
      * @return The test result
      */
-    private int testMatches(IParser parser) {
+    private int testMatches(BaseLRParser parser) {
         ASTNode expected = getExpectedAST();
         if (expected == null) {
             System.out.println("Failed to parse the expected AST");
@@ -166,7 +171,7 @@ public class Program {
         ParseResult result = parser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error);
-            Context context = result.getInput().getContext(error.getPosition());
+            TextContext context = result.getInput().getContext(error.getPosition());
             System.out.println(context.getContent());
             System.out.println(context.getPointer());
         }
@@ -192,7 +197,7 @@ public class Program {
      * @param parser The parser to use
      * @return The test result
      */
-    private int testNoMatches(IParser parser) {
+    private int testNoMatches(BaseLRParser parser) {
         ASTNode expected = getExpectedAST();
         if (expected == null) {
             System.out.println("Failed to parse the expected AST");
@@ -201,7 +206,7 @@ public class Program {
         ParseResult result = parser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error);
-            Context context = result.getInput().getContext(error.getPosition());
+            TextContext context = result.getInput().getContext(error.getPosition());
             System.out.println(context.getContent());
             System.out.println(context.getPointer());
         }
@@ -227,7 +232,7 @@ public class Program {
      * @param parser The parser to use
      * @return The test result
      */
-    private int testFails(IParser parser) {
+    private int testFails(BaseLRParser parser) {
         ParseResult result = parser.parse();
         if (!result.isSuccess())
             return RESULT_SUCCESS;
@@ -243,7 +248,7 @@ public class Program {
      * @param parser The parser to use
      * @return The test result
      */
-    private int testOutputs(IParser parser) {
+    private int testOutputs(BaseLRParser parser) {
         List<String> output = getExpectedOutput();
         ParseResult result = parser.parse();
         if (output.size() == 0 || (output.size() == 1 && output.get(0).length() == 0)) {
@@ -251,7 +256,7 @@ public class Program {
                 return RESULT_SUCCESS;
             for (ParseError error : result.getErrors()) {
                 System.out.println(error);
-                Context context = result.getInput().getContext(error.getPosition());
+                TextContext context = result.getInput().getContext(error.getPosition());
                 System.out.println(context.getContent());
                 System.out.println(context.getPointer());
             }
@@ -261,7 +266,7 @@ public class Program {
         int i = 0;
         for (ParseError error : result.getErrors()) {
             String message = error.toString();
-            Context context = result.getInput().getContext(error.getPosition());
+            TextContext context = result.getInput().getContext(error.getPosition());
             if (i + 2 >= output.size()) {
                 System.out.println("Unexpected error:");
                 System.out.println(message);
@@ -328,14 +333,14 @@ public class Program {
      * @param input      An input for the parser
      * @return The parser
      */
-    private IParser getParser(String parserName, String input) {
+    private BaseLRParser getParser(String parserName, String input) {
         loadJar("Parsers.jar");
         try {
             Class lexerClass = Class.forName(parserName.substring(0, parserName.length() - 6) + "Lexer");
             Class parserClass = Class.forName(parserName);
             Object lexer = lexerClass.getConstructor(String.class).newInstance(input);
             Object parser = parserClass.getConstructor(lexerClass).newInstance(lexer);
-            return (IParser) parser;
+            return (BaseLRParser) parser;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
