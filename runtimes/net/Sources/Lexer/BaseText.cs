@@ -30,7 +30,7 @@ namespace Hime.Redist.Lexer
 	abstract class BaseText : Text
 	{
 		/// <summary>
-		/// The initiaal size of the cache of line start indices
+		/// The initial size of the cache of line start indices
 		/// </summary>
 		protected const int INIT_LINE_COUNT_CACHE_SIZE = 10000;
 

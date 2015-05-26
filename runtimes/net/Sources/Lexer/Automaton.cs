@@ -31,7 +31,7 @@ namespace Hime.Redist.Lexer
 	/// each entry is of the form:
 	/// uint32: offset of the state from the beginning of the states table in number of uint16
 	/// -- states table
-	/// See State
+	/// See AutomatonState
 	/// </remarks>
 	public class Automaton
 	{
