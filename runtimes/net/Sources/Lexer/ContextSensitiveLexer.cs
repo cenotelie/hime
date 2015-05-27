@@ -85,10 +85,10 @@ namespace Hime.Redist.Lexer
 					// matched something !
 					int terminalIndex = matches[0];
 					int terminalID = symTerminals[terminalIndex].ID;
+					inputIndex += length;
 					if (terminalID == separatorID)
 						continue;
 					TokenKernel token = new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length));
-					inputIndex += length;
 					return token;
 				}
 				if (matches.Size > 0)
@@ -195,7 +195,7 @@ namespace Hime.Redist.Lexer
 				AutomatonState stateData = automaton.GetState(state);
 				// Is this state a matching state ?
 				bool firstMatch = true;
-				for (int j = 0; i != stateData.TerminalsCount; j++)
+				for (int j = 0; j != stateData.TerminalsCount; j++)
 				{
 					MatchedTerminal mt = stateData.GetTerminal(j);
 					if (contexts.IsAcceptable(mt.Context, mt.Index))

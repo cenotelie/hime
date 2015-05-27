@@ -100,10 +100,10 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
                 // matched something!
                 int terminalIndex = matches[0];
                 int terminalID = symTerminals.get(terminalIndex).getID();
+                inputIndex += length;
                 if (terminalID == separatorID)
                     continue;
                 TokenKernel token = new TokenKernel(terminalID, tokens.add(terminalIndex, inputIndex, length));
-                inputIndex += length;
                 return token;
             }
             if (matchesCount > 0) {
