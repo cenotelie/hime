@@ -57,6 +57,10 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
      * The number of matches
      */
     private int matchesCount;
+    /**
+     * Whether the end-of-input dollar marker has already been emitted
+     */
+    private boolean isDollarEmitted;
 
     /**
      * Initializes a new instance of the Lexer class with the given input
@@ -94,20 +98,26 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
 
     @Override
     public TokenKernel getNextToken(IContextProvider contexts) {
+        if (isDollarEmitted)
+            return new TokenKernel(Symbol.SID_EPSILON, -1);
+
         while (true) {
             int length = runDFA(contexts);
             if (length != 0) {
                 // matched something!
                 int terminalIndex = matches[0];
                 int terminalID = symTerminals.get(terminalIndex).getID();
-                inputIndex += length;
-                if (terminalID == separatorID)
+                if (terminalID == separatorID) {
+                    inputIndex += length;
                     continue;
+                }
                 TokenKernel token = new TokenKernel(terminalID, tokens.add(terminalIndex, inputIndex, length));
+                inputIndex += length;
                 return token;
             }
             if (matchesCount > 0) {
                 // This is the dollar terminal, at the end of the input
+                isDollarEmitted = true;
                 return new TokenKernel(Symbol.SID_DOLLAR, tokens.add(matches[0], inputIndex, 0));
             }
             // Failed to match anything
@@ -128,6 +138,12 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
 
     @Override
     public TokenKernelBuffer getNextTokens(IContextProvider contexts) {
+        if (isDollarEmitted) {
+            buffer.reset();
+            buffer.add(new TokenKernel(Symbol.SID_EPSILON, -1));
+            return buffer;
+        }
+
         while (true) {
             int length = runDFA(contexts);
             if (length != 0) {
@@ -148,6 +164,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
             }
             if (matchesCount > 0) {
                 // This is the dollar terminal, at the end of the input
+                isDollarEmitted = true;
                 buffer.reset();
                 buffer.add(new TokenKernel(Symbol.SID_DOLLAR, tokens.add(matches[0], inputIndex, 0)));
                 return buffer;

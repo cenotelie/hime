@@ -114,6 +114,10 @@ namespace Hime.Redist.Parsers
 		/// The table of nullable variables
 		/// </summary>
 		private readonly ushort[] nullables;
+		/// <summary>
+		/// The number of contexts in this automaton
+		/// </summary>
+		private int contextCount;
 
 		/// <summary>
 		/// Gets the index of the axiom
@@ -124,6 +128,11 @@ namespace Hime.Redist.Parsers
 		/// Gets the number of states in the RNGLR table
 		/// </summary>
 		public int StatesCount { get { return nstates; } }
+
+		/// <summary>
+		/// Gets the number of contexts in this automaton
+		/// </summary>
+		public int ContextsCount { get { return contextCount; } }
 
 		/// <summary>
 		/// Initializes a new automaton from the given binary stream
@@ -155,6 +164,19 @@ namespace Hime.Redist.Parsers
 			nullables = new ushort[nnprod];
 			for (int i = 0; i != nnprod; i++)
 				nullables[i] = reader.ReadUInt16();
+			contextCount = 0;
+			// contexts IDs are sequential, therefore the max+1 is the number of contexts
+			for (int i = 0; i != nstates; i++)
+			{
+				for (int j = 0; j != contexts[i].Count; j++)
+				{
+					int value = contexts[i][j];
+					if (value > contextCount)
+						contextCount = value;
+				}
+			}
+			// account for default context 0
+			contextCount = contextCount + 1;
 		}
 
 		/// <summary>

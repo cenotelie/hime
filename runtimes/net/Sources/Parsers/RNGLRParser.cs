@@ -18,6 +18,7 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -26,7 +27,7 @@ namespace Hime.Redist.Parsers
 	/// <summary>
 	/// Represents a base for all RNGLR parsers
 	/// </summary>
-	public class RNGLRParser : BaseLRParser
+	public class RNGLRParser : BaseLRParser, Lexer.IContextProvider
 	{
 		/// <summary>
 		/// Represents a reduction operation to be performed
@@ -118,6 +119,10 @@ namespace Hime.Redist.Parsers
 		/// The queue of shift operations
 		/// </summary>
 		private Queue<Shift> shifts;
+		/// <summary>
+		/// The active contexts
+		/// </summary>
+		private BitArray contexts;
 
 		/// <summary>
 		/// Initializes a new instance of the LRkParser class with the given lexer
@@ -424,6 +429,28 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
+		/// Gets whether a terminal is acceptable
+		/// </summary>
+		/// <param name="context">The terminal's context</param>
+		/// <param name="terminalIndex">The terminal's index</param>
+		/// <returns><code>true</code> if the terminal is acceptable</returns>
+		public bool IsAcceptable(int context, int terminalIndex)
+		{
+			return context == Lexer.Automaton.DEFAULT_CONTEXT || contexts[context];
+		}
+
+		/// <summary>
+		/// Applies to the current contexts the contexts for the specified state
+		/// </summary>
+		/// <param name="state">A RNGLR state</param>
+		private void ApplyContexts(int state)
+		{
+			LRContexts stateContexts = parserAutomaton.GetContexts(state);
+			for (int i = 0; i != stateContexts.Count; i++)
+				contexts[stateContexts[i]] = true;
+		}
+
+		/// <summary>
 		/// Parses the input and returns the produced AST
 		/// </summary>
 		/// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
@@ -431,10 +458,12 @@ namespace Hime.Redist.Parsers
 		{
 			reductions = new Queue<Reduction>();
 			shifts = new Queue<Shift>();
+			contexts = new BitArray(parserAutomaton.ContextsCount);
+			ApplyContexts(0);
 			GSSGeneration genData;
 			int Ui = gss.CreateGeneration();
-			int v0 = gss.CreateNode(0);
-			nextToken = lexer.GetNextToken(gss);
+			int v0 = gss.CreateNode(0, parserAutomaton.GetContexts(0), parserAutomaton.ContextsCount);
+			nextToken = lexer.GetNextToken(this);
 
 			int count = parserAutomaton.GetActionsCount(0, nextToken.TerminalID);
 			for (int i = 0; i != count; i++)
@@ -451,7 +480,13 @@ namespace Hime.Redist.Parsers
 				int stem = gss.GetGeneration(Ui).Count;
 				Reducer(Ui);
 				Lexer.TokenKernel oldtoken = nextToken;
-				nextToken = lexer.GetNextToken(gss);
+				genData = gss.GetGeneration(Ui);
+				contexts = new BitArray(parserAutomaton.ContextsCount);
+				for (int i = 0; i != genData.Count; i++)
+					contexts = contexts.Or(gss.GetContexts(genData.Start + i));
+				foreach (Shift shift in shifts)
+					ApplyContexts(shift.to);
+				nextToken = lexer.GetNextToken(this);
 				int Uj = Shifter(oldtoken);
 				genData = gss.GetGeneration(Uj);
 				if (genData.Count == 0)
@@ -560,7 +595,7 @@ namespace Hime.Redist.Parsers
 			else
 			{
 				// Create the new corresponding node in the GSS
-				w = gss.CreateNode(to);
+				w = gss.CreateNode(to, parserAutomaton.GetContexts(to), parserAutomaton.ContextsCount);
 				gss.CreateEdge(w, path.Last, label);
 				// Look for all the reductions and shifts at this state
 				int count = parserAutomaton.GetActionsCount(to, nextToken.TerminalID);
@@ -634,7 +669,7 @@ namespace Hime.Redist.Parsers
 			else
 			{
 				// Create the new corresponding node in the GSS
-				w = gss.CreateNode(shift.to);
+				w = gss.CreateNode(shift.to, parserAutomaton.GetContexts(shift.to), parserAutomaton.ContextsCount);
 				gss.CreateEdge(w, shift.from, label);
 				// Look for all the reductions and shifts at this state
 				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.TerminalID);

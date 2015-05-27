@@ -37,7 +37,7 @@ public class LRContexts {
      *
      * @return The number of contexts
      */
-    public int getCount() {
+    public int size() {
         return content.length;
     }
 

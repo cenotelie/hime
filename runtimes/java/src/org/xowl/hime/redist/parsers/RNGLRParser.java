@@ -20,7 +20,9 @@
 package org.xowl.hime.redist.parsers;
 
 import org.xowl.hime.redist.*;
+import org.xowl.hime.redist.lexer.Automaton;
 import org.xowl.hime.redist.lexer.BaseLexer;
+import org.xowl.hime.redist.lexer.IContextProvider;
 import org.xowl.hime.redist.lexer.TokenKernel;
 
 import java.util.*;
@@ -30,7 +32,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class RNGLRParser extends BaseLRParser {
+public class RNGLRParser extends BaseLRParser implements IContextProvider {
     /**
      * Represents a reduction operation to be performed
      * For reduction of length 0, the node is the GSS node on which it is applied, the first label then is epsilon
@@ -117,6 +119,10 @@ public class RNGLRParser extends BaseLRParser {
      * The queue of shift operations
      */
     private Queue<Shift> shifts;
+    /**
+     * The active contexts
+     */
+    private BitSet contexts;
 
     /**
      * Initializes a new instance of the LRkParser class with the given lexer
@@ -385,6 +391,22 @@ public class RNGLRParser extends BaseLRParser {
         return sppf.reduce(generation, production.getHead(), production.getHeadAction() == LROpCode.TREE_ACTION_REPLACE);
     }
 
+    @Override
+    public boolean isAcceptable(int context, int terminalIndex) {
+        return context == Automaton.DEFAULT_CONTEXT || contexts.get(context);
+    }
+
+    /**
+     * Applies to the current contexts the contexts for the specified state
+     *
+     * @param state A RNGLR state
+     */
+    private void applyContexts(int state) {
+        LRContexts stateContexts = parserAutomaton.getContexts(state);
+        for (int i = 0; i != stateContexts.size(); i++)
+            contexts.set(stateContexts.get(i), true);
+    }
+
     /**
      * Parses the input and returns the result
      *
@@ -393,9 +415,11 @@ public class RNGLRParser extends BaseLRParser {
     public ParseResult parse() {
         reductions = new ArrayDeque<Reduction>();
         shifts = new ArrayDeque<Shift>();
+        contexts = new BitSet(parserAutomaton.getContextsCount());
+        applyContexts(0);
         int Ui = gss.createGeneration();
-        int v0 = gss.createNode(0);
-        nextToken = lexer.getNextToken(gss);
+        int v0 = gss.createNode(0, parserAutomaton.getContexts(0), parserAutomaton.getContextsCount());
+        nextToken = lexer.getNextToken(this);
 
         int count = parserAutomaton.getActionsCount(0, nextToken.getTerminalID());
         for (int i = 0; i != count; i++) {
@@ -411,10 +435,16 @@ public class RNGLRParser extends BaseLRParser {
             int stem = gss.getGeneration(Ui).getCount();
             reducer(Ui);
             TokenKernel oldtoken = nextToken;
-            nextToken = lexer.getNextToken(gss);
+            GSSGeneration genData = gss.getGeneration(Ui);
+            contexts.clear();
+            for (int i = 0; i != genData.getCount(); i++)
+                contexts.or(gss.getContexts(genData.getStart() + i));
+            for (Shift shift : shifts)
+                applyContexts(shift.to);
+            nextToken = lexer.getNextToken(this);
             int Uj = shifter(oldtoken);
-            GSSGeneration g = gss.getGeneration(Uj);
-            if (g.getCount() == 0) {
+            genData = gss.getGeneration(Uj);
+            if (genData.getCount() == 0) {
                 // Generation is empty !
                 onUnexpectedToken(Ui, stem, oldtoken);
                 return new ParseResult(allErrors, lexer.getInput());
@@ -508,7 +538,7 @@ public class RNGLRParser extends BaseLRParser {
             }
         } else {
             // Create the new corresponding node in the GSS
-            w = gss.createNode(to);
+            w = gss.createNode(to, parserAutomaton.getContexts(to), parserAutomaton.getContextsCount());
             gss.createEdge(w, path.getLast(), label);
             // Look for all the reductions and shifts at this state
             int count = parserAutomaton.getActionsCount(to, nextToken.getTerminalID());
@@ -573,7 +603,7 @@ public class RNGLRParser extends BaseLRParser {
             }
         } else {
             // Create the new corresponding node in the GSS
-            w = gss.createNode(shift.to);
+            w = gss.createNode(shift.to, parserAutomaton.getContexts(shift.to), parserAutomaton.getContextsCount());
             gss.createEdge(w, shift.from, label);
             // Look for all the reductions and shifts at this state
             int count = parserAutomaton.getActionsCount(shift.to, nextToken.getTerminalID());

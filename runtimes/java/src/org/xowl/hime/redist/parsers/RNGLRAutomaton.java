@@ -90,6 +90,10 @@ public class RNGLRAutomaton {
      * The table of nullable variables
      */
     private final char[] nullables;
+    /**
+     * The number of contexts in this automaton
+     */
+    private int contextCount;
 
     /**
      * Gets the index of the axiom
@@ -107,6 +111,15 @@ public class RNGLRAutomaton {
      */
     public int getStatesCount() {
         return nstates;
+    }
+
+    /**
+     * Gets the number of contexts in this automaton
+     *
+     * @return The number of contexts in this automaton
+     */
+    public int getContextsCount() {
+        return contextCount;
     }
 
     /**
@@ -142,6 +155,16 @@ public class RNGLRAutomaton {
         this.nullables = new char[nnprod];
         for (int i = 0; i != nullables.length; i++)
             this.nullables[i] = input.readChar();
+        // contexts IDs are sequential, therefore the max+1 is the number of contexts
+        for (int i = 0; i != nstates; i++) {
+            for (int j = 0; j != contexts[i].size(); j++) {
+                int value = contexts[i].get(j);
+                if (value > contextCount)
+                    contextCount = value;
+            }
+        }
+        // account for default context 0
+        contextCount = contextCount + 1;
     }
 
     /**

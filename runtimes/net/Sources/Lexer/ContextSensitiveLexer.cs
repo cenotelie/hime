@@ -39,6 +39,10 @@ namespace Hime.Redist.Lexer
 		/// The buffer of matches
 		/// </summary>
 		private Buffer<int> matches;
+		/// <summary>
+		/// Whether the end-of-input dollar marker has already been emitted
+		/// </summary>
+		private bool isDollarEmitted;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -77,6 +81,9 @@ namespace Hime.Redist.Lexer
 		/// <returns>The next token in the input</returns>
 		internal override TokenKernel GetNextToken(IContextProvider contexts)
 		{
+			if (isDollarEmitted)
+				return new TokenKernel(Symbol.SID_EPSILON, -1);
+
 			while (true)
 			{
 				int length = RunDFA(contexts);
@@ -85,15 +92,19 @@ namespace Hime.Redist.Lexer
 					// matched something !
 					int terminalIndex = matches[0];
 					int terminalID = symTerminals[terminalIndex].ID;
-					inputIndex += length;
 					if (terminalID == separatorID)
+					{
+						inputIndex += length;
 						continue;
+					}
 					TokenKernel token = new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length));
+					inputIndex += length;
 					return token;
 				}
 				if (matches.Size > 0)
 				{
 					// This is the dollar terminal, at the end of the input
+					isDollarEmitted = true;
 					return new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(matches[0], inputIndex, 0));
 				}
 				// Failed to match anything
@@ -122,6 +133,13 @@ namespace Hime.Redist.Lexer
 		/// <returns>The possible next tokens in the input</returns>
 		internal override Buffer<TokenKernel> GetNextTokens(IContextProvider contexts)
 		{
+			if (isDollarEmitted)
+			{
+				buffer.Reset();
+				buffer.Add(new TokenKernel(Symbol.SID_EPSILON, -1));
+				return buffer;
+			}
+
 			while (true)
 			{
 				int length = RunDFA(contexts);
@@ -146,6 +164,7 @@ namespace Hime.Redist.Lexer
 				if (matches.Size > 0)
 				{
 					// This is the dollar terminal, at the end of the input
+					isDollarEmitted = true;
 					buffer.Reset();
 					buffer.Add(new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(matches[0], inputIndex, 0)));
 					return buffer;
