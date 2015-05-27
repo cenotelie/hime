@@ -71,6 +71,9 @@ grammar CSharp
 		PP_DIRECTIVES	-> WHITE_SPACE* '#' (.* - (.* NEW_LINE .*)) NEW_LINE ;
 
 		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK | PP_DIRECTIVES)+;
+
+		context get_accessor_name { GET -> 'get'; }
+		context set_accessor_name { SET -> 'set'; }
 	}
 	rules
 	{
@@ -489,8 +492,10 @@ grammar CSharp
 		property_modifier			-> 'new' | 'public' | 'protected' | 'internal' | 'private' | 'static' | 'virtual' | 'sealed' | 'override' | 'abstract' | 'extern' ;
 		accessor_declarations		-> get_accessor_declaration set_accessor_declaration?
 									|  set_accessor_declaration get_accessor_declaration? ;
-		get_accessor_declaration	-> attributes? accessor_modifier? 'get' accessor_body ;
-		set_accessor_declaration	-> attributes? accessor_modifier? 'set' accessor_body ;
+		get_accessor_declaration	-> attributes? accessor_modifier? get_accessor_name accessor_body ;
+		get_accessor_name			-> GET^ ;
+		set_accessor_declaration	-> attributes? accessor_modifier? set_accessor_name accessor_body ;
+		set_accessor_name			-> SET^ ;
 		accessor_modifier			-> 'protected' | 'internal' | 'private' | 'protected' 'internal' | 'internal' 'protected' ;
 		accessor_body				-> block | ';' ;
 		event_declaration			-> attributes? event_modifiers? 'event' type variable_declarators ';'
@@ -572,10 +577,10 @@ grammar CSharp
 										|  interface_indexer_declaration ;
 		interface_method_declaration	-> attributes? 'new'? return_type IDENTIFIER type_parameter_list? '(' formal_parameter_list? ')' type_parameter_constraints_clauses? ';' ;
 		interface_property_declaration	-> attributes? 'new'? type IDENTIFIER '{' interface_accessors '}' ;
-		interface_accessors				-> attributes? 'get' ';'
-										|  attributes? 'set' ';'
-										|  attributes? 'get' ';' attributes? 'set' ';'
-										|  attributes? 'set' ';' attributes? 'get' ';' ;
+		interface_accessors				-> attributes? get_accessor_name ';'
+										|  attributes? set_accessor_name ';'
+										|  attributes? get_accessor_name ';' attributes? set_accessor_name ';'
+										|  attributes? set_accessor_name ';' attributes? get_accessor_name ';' ;
 		interface_event_declaration		-> attributes? 'new'? 'event' type IDENTIFIER ';' ;
 		interface_indexer_declaration	-> attributes? 'new'? type 'this' '[' formal_parameter_list ']' '{' interface_accessors '}' ;
 
