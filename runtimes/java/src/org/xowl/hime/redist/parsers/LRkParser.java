@@ -154,11 +154,11 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      * @return A ParseResult object containing the data about the result
      */
     public ParseResult parse() {
-        TokenKernel nextKernel = lexer.getNextToken(null);
+        TokenKernel nextKernel = lexer.getNextToken(this);
         while (true) {
             char action = parseOnToken(nextKernel);
             if (action == LRAction.CODE_SHIFT) {
-                nextKernel = lexer.getNextToken(null);
+                nextKernel = lexer.getNextToken(this);
                 continue;
             }
             if (action == LRAction.CODE_ACCEPT)

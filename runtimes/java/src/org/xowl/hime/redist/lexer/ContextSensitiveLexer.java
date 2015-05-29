@@ -198,6 +198,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
         if (text.isEnd(inputIndex)) {
             // At the end of input
             matches[0] = 1; // 1 is always the index of the $ terminal
+            matchesCount = 1;
             return 0;
         }
 
