@@ -65,6 +65,7 @@
     <EmbeddedResource Include="Resources\Suites\TreeActions.suite" />
     <EmbeddedResource Include="Resources\Suites\UnicodeBlocks.suite" />
     <EmbeddedResource Include="Resources\Suites\Regressions.suite" />
+    <EmbeddedResource Include="Resources\Suites\ContextSensitive.suite" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
