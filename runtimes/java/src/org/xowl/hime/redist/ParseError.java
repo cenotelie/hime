@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters and others
+ * Copyright (c) 2015 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -46,6 +46,13 @@ public abstract class ParseError {
     public TextPosition getPosition() {
         return position;
     }
+
+    /**
+     * Gets the error's length in the input (in number of characters)
+     *
+     * @return The error's length in the input (in number of characters)
+     */
+    public abstract int getLength();
 
     /**
      * Gets the error's message

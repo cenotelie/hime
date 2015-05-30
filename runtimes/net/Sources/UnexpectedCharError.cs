@@ -37,6 +37,11 @@ namespace Hime.Redist
 		public override ParseErrorType Type { get { return ParseErrorType.UnexpectedChar; } }
 
 		/// <summary>
+		/// Gets the error's length in the input (in number of characters)
+		/// </summary>
+		public override int Length { get { return unexpected.Length; } }
+
+		/// <summary>
 		/// Gets the error's message
 		/// </summary>
 		public override string Message { get { return BuildMessage(); } }

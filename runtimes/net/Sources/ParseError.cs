@@ -41,6 +41,11 @@ namespace Hime.Redist
 		public TextPosition Position { get { return position; } }
 
 		/// <summary>
+		/// Gets the error's length in the input (in number of characters)
+		/// </summary>
+		public abstract int Length { get; }
+
+		/// <summary>
 		/// Gets the error's message
 		/// </summary>
 		public abstract string Message { get; }

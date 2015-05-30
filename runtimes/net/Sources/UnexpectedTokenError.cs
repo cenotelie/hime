@@ -42,6 +42,11 @@ namespace Hime.Redist
 		public override ParseErrorType Type { get { return ParseErrorType.UnexpectedToken; } }
 
 		/// <summary>
+		/// Gets the error's length in the input (in number of characters)
+		/// </summary>
+		public override int Length { get { return unexpected.Span.Length; } }
+
+		/// <summary>
 		/// Gets the error's message
 		/// </summary>
 		public override string Message { get { return BuildMessage(); } }
@@ -64,7 +69,7 @@ namespace Hime.Redist
 		public UnexpectedTokenError(Token token, ROList<Symbol> expected)
 			: base(token.Position)
 		{
-			this.unexpected = token;
+			unexpected = token;
 			this.expected = expected;
 		}
 
