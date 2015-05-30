@@ -83,6 +83,7 @@
     <Compile Include="Tasks\DebugGrammar.cs" />
     <Compile Include="Tasks\DebugAssembly.cs" />
     <Compile Include="Tasks\ParseCSharp.cs" />
+    <Compile Include="Tasks\ParseTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WinTreeView.resx">

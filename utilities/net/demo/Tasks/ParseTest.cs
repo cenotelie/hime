@@ -29,7 +29,7 @@ namespace Hime.Demo.Tasks
 	/// <summary>
 	/// This tasks regenerates the parser for the SDK inputs and re-parses the input grammar with the generated parser
 	/// </summary>
-	class ParseGrammar : IExecutable
+	class ParseTest : IExecutable
 	{
 		/// <summary>
 		/// Execute this instance.
@@ -37,25 +37,20 @@ namespace Hime.Demo.Tasks
 		public void Execute()
 		{
 			// Build parser assembly
-			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Hime.SDK.Output.Mode.Assembly;
-			task.AddInputRaw(stream);
+			task.AddInputRaw("grammar Test {\n\t\toptions {Axiom=\"e\";}\n\t\tterminals {\n\t\t\tX0 -> 'x';\n\t\t\tcontext inner1 { X1 -> 'x'; }\n\t\t\tcontext inner2 { X2 -> 'x'; }\n\t\t}\n\t\trules {\n\t\t\tsub1 -> '('! inner1 ')'!;\n\t\t\tinner1 -> (X1 | sub1 | sub2)* ;\n\t\t\tsub2 -> '['! inner2 ']'!;\n\t\t\tinner2 -> (X2 | sub1 | sub2)*;\n\t\t\te -> (X0 | sub1 | sub2)* ;\n\t\t}\n\t}");
 			task.Namespace = "Hime.Demo.Generated";
-			task.GrammarName = "HimeGrammar";
 			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
-			task.Method = ParsingMethod.LALR1;
+			task.Method = ParsingMethod.RNGLALR1;
 			task.Execute();
-			stream.Close();
 
 			// Load the generated assembly
-			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "HimeGrammar.dll"));
+			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "Test.dll"));
 
 			// Re-parse the input grammar with the generated parser
-			StreamReader input = new StreamReader(typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram"));
-			BaseLRParser parser = assembly.GetParser(input);
+			BaseLRParser parser = assembly.GetParser("x[x(x)]");
 			ParseResult result = parser.Parse();
-			input.Close();
 
 			// Display the errors if any
 			Program.PrintErrors(result);
@@ -66,4 +61,3 @@ namespace Hime.Demo.Tasks
 		}
 	}
 }
-

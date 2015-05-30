@@ -76,15 +76,7 @@ namespace Hime.Demo.Tasks
 					BaseLRParser parser = assembly.GetParser(input);
 					ParseResult result = parser.Parse();
 					input.Close();
-					foreach (ParseError error in result.Errors)
-					{
-						Console.WriteLine("[ERROR] " + error.Message);
-						TextContext context = result.Input.GetContext(error.Position);
-						Console.Write("\t");
-						Console.WriteLine(context.Content);
-						Console.Write("\t");
-						Console.WriteLine(context.Pointer);
-					}
+					Program.PrintErrors(result);
 				}
 			}
 			string[] subs = Directory.GetDirectories(folder);

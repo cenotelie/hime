@@ -20,6 +20,7 @@
 using System;
 using System.IO;
 using Hime.Demo.Tasks;
+using Hime.Redist;
 
 namespace Hime.Demo
 {
@@ -33,7 +34,7 @@ namespace Hime.Demo
 		/// </summary>
 		static void Main()
 		{
-			IExecutable executable = new ParseGrammar();
+			IExecutable executable = new ParseCSharp();
 			executable.Execute();
 		}
 
@@ -51,6 +52,23 @@ namespace Hime.Demo
 				subs = current.GetDirectories("core");
 			}
 			return current.FullName;
+		}
+
+		/// <summary>
+		/// Prints the errors in the specified parse result, if any
+		/// </summary>
+		/// <param name="result">The result of a parsing task</param>
+		public static void PrintErrors(ParseResult result)
+		{
+			foreach (ParseError error in result.Errors)
+			{
+				Console.WriteLine("[ERROR] " + error.Message);
+				TextContext context = result.Input.GetContext(error.Position, error.Length);
+				Console.Write("\t");
+				Console.WriteLine(context.Content);
+				Console.Write("\t");
+				Console.WriteLine(context.Pointer);
+			}
 		}
 	}
 }
