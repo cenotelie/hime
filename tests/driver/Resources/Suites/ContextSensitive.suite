@@ -68,6 +68,42 @@ test Test_CS_SingleContext_GLR:
 	on "x(x)"
 	yields e(X0 sub1(inner1(X1)))
 
+test Test_CS_MatchingSeparator_LR:
+	grammar Test_CS_MatchingSeparator_LR {
+		options {Axiom="e"; Separator="SEP";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			SEP -> ' '+;
+		}
+		rules {
+			sub1 -> '('! inner1 ')'!;
+			inner1 -> X1* ;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser LALR1
+	on "x( x )"
+	yields e(X0 sub1(inner1(X1)))
+
+test Test_CS_MatchingSeparator_GLR:
+	grammar Test_CS_MatchingSeparator_GLR {
+		options {Axiom="e"; Separator="SEP";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			SEP -> ' '+;
+		}
+		rules {
+			sub1 -> '('! inner1 ')'!;
+			inner1 -> X1* ;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x( x )"
+	yields e(X0 sub1(inner1(X1)))
+
 test Test_CS_MultipleContext_LR:
 	grammar Test_CS_MultipleContext_LR {
 		options {Axiom="e";}
@@ -187,3 +223,83 @@ test Test_CS_ContextStack_2_GLR:
 	parser RNGLALR1
 	on "x[x(x)]"
 	yields e(X0 sub2(inner2(X2 sub1(inner1(X1)))))
+
+test Test_CS_MatchLongest_1_LR:
+	grammar Test_CS_MatchLongest_1_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! inner1 ')'!;
+			inner1 -> (X1 | sub1 | sub2)* ;
+			sub2 -> '['! inner2 ']'!;
+			inner2 -> (X2 | sub1 | sub2)*;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "(xx[xxx]xx)"
+	yields e(sub1(inner1(X1 sub2(inner2(X2)) X1)))
+
+test Test_CS_MatchLongest_1_GLR:
+	grammar Test_CS_MatchLongest_1_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! inner1 ')'!;
+			inner1 -> (X1 | sub1 | sub2)* ;
+			sub2 -> '['! inner2 ']'!;
+			inner2 -> (X2 | sub1 | sub2)*;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "(xx[xxx]xx)"
+	yields e(sub1(inner1(X1 sub2(inner2(X2)) X1)))
+
+test Test_CS_MatchLongest_2_LR:
+	grammar Test_CS_MatchLongest_2_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! inner1 ')'!;
+			inner1 -> (X1 | sub1 | sub2)* ;
+			sub2 -> '['! inner2 ']'!;
+			inner2 -> (X2 | sub1 | sub2)*;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "(xx[xxxxx]xx)"
+	fails
+
+test Test_CS_MatchLongest_2_GLR:
+	grammar Test_CS_MatchLongest_2_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! inner1 ')'!;
+			inner1 -> (X1 | sub1 | sub2)* ;
+			sub2 -> '['! inner2 ']'!;
+			inner2 -> (X2 | sub1 | sub2)*;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "(xx[xxxxx]xx)"
+	fails
