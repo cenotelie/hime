@@ -80,7 +80,8 @@ grammar ECMAScript
 									
 								)*
 								'/' (IdStart | [0-9])* ;
-		
+		context prop_get { GET -> 'get'; }
+		context prop_set { SET -> 'set'; }
 	}
 	rules {
 		literal				-> 'null'
@@ -100,8 +101,10 @@ grammar ECMAScript
 							|  '{' properties ','? '}' ;
 		properties			-> prop_assign (',' prop_assign)* ;
 		prop_assign			-> prop_name ':' exp_assign
-							|  'get' prop_name '(' ')' '{' function_body '}'
-							|  'set' prop_name '(' prop_set_params ')' '{' function_body '}' ;
+							|  prop_get prop_name '(' ')' '{' function_body '}'
+							|  prop_set prop_name '(' prop_set_params ')' '{' function_body '}' ;
+		prop_get			-> GET^;
+		prop_set			-> SET^;
 		prop_name			-> Identifier | lit_string | lit_numeric ;
 		prop_set_params		-> Identifier ;
 		
