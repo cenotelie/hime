@@ -119,10 +119,6 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      * The queue of shift operations
      */
     private Queue<Shift> shifts;
-    /**
-     * The active contexts
-     */
-    private BitSet contexts;
 
     /**
      * Initializes a new instance of the LRkParser class with the given lexer
@@ -142,6 +138,71 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         nullables = new GSSLabel[variables.length];
         buildNullables(variables.length);
         this.sppf.clearHistory();
+    }
+
+    @Override
+    public boolean isExpected(int terminalID) {
+        for (Shift shift : shifts)
+            if (parserAutomaton.getActionsCount(shift.to, terminalID) > 0)
+                return false;
+        return false;
+    }
+
+    @Override
+    public boolean isInContext(int context, int onTerminalID) {
+        int[] queue = new int[LRkParser.INIT_STACK_SIZE];
+        int queueLast = 0;
+        for (Shift shift : shifts) {
+            if (parserAutomaton.getActionsCount(shift.to, onTerminalID) > 0) {
+                if (context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(shift.to).contains(context) || parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).contains(context))
+                    // the context at the specified state is there
+                    return true;
+                // enqueue
+                if (queueLast >= queue.length)
+                    queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
+                queue[queueLast] = shift.from;
+                queueLast++;
+            }
+        }
+        if (queueLast == 0) {
+            // no scheduled shift action, we are at the very beginning
+            // the only GSS node is for the state 0
+            if (context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(0).contains(context))
+                // the context is there for state 0
+                return true;
+        }
+        if (queueLast == 0)
+            // the track is empty, the terminal is unexpected
+            return false;
+        // explore the GSS to find the specified context
+        for (int i = 0; i != queueLast; i++) {
+            int count;
+            GSS.PathSet paths = gss.getPaths(queue[i], 1);
+            for (int p = 0; p != paths.count; p++) {
+                int to = paths.content[p].getLast();
+                boolean found = false;
+                for (int j = 0; j != queueLast; j++) {
+                    if (queue[j] == to) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    // this target node is not yet explored
+                    LRContexts contexts = parserAutomaton.getContexts(gss.getRepresentedState(to));
+                    if (contexts.contains(context))
+                        // found it!
+                        return true;
+                    // enqueue for further exploration
+                    if (queueLast >= queue.length)
+                        queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
+                    queue[queueLast] = to;
+                    queueLast++;
+                }
+            }
+        }
+        // not found
+        return false;
     }
 
     /**
@@ -230,14 +291,12 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
     /**
      * Raises an error on an unexpected token
      *
-     * @param gen   The current GSS generation
-     * @param stem  The size of the generation's stem
-     * @param token The unexpected token
+     * @param stem The size of the generation's stem
      */
-    private void onUnexpectedToken(int gen, int stem, TokenKernel token) {
+    private void onUnexpectedToken(int stem) {
         // build the list of expected terminals
         List<Symbol> expected = new ArrayList<Symbol>();
-        GSSGeneration genData = gss.getGeneration(gen);
+        GSSGeneration genData = gss.getGeneration();
         for (int i = 0; i != genData.getCount(); i++) {
             LRExpected expectedOnHead = parserAutomaton.getExpected(gss.getRepresentedState(i + genData.getStart()), lexer.getTerminals());
             // register the terminals for shift actions
@@ -252,7 +311,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
             }
         }
         // register the error
-        UnexpectedTokenError error = new UnexpectedTokenError(lexer.getTokens().at(token.getIndex()), expected);
+        UnexpectedTokenError error = new UnexpectedTokenError(lexer.getTokens().at(nextToken.getIndex()), expected);
         allErrors.add(error);
         if (isModeDebug()) {
             System.out.println("==== RNGLR parsing error:");
@@ -391,22 +450,6 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         return sppf.reduce(generation, production.getHead(), production.getHeadAction() == LROpCode.TREE_ACTION_REPLACE);
     }
 
-    @Override
-    public boolean isAcceptable(int context, int terminalIndex) {
-        return context == Automaton.DEFAULT_CONTEXT || contexts.get(context);
-    }
-
-    /**
-     * Applies to the current contexts the contexts for the specified state
-     *
-     * @param state A RNGLR state
-     */
-    private void applyContexts(int state) {
-        LRContexts stateContexts = parserAutomaton.getContexts(state);
-        for (int i = 0; i != stateContexts.size(); i++)
-            contexts.set(stateContexts.get(i), true);
-    }
-
     /**
      * Parses the input and returns the result
      *
@@ -415,12 +458,11 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
     public ParseResult parse() {
         reductions = new ArrayDeque<Reduction>();
         shifts = new ArrayDeque<Shift>();
-        contexts = new BitSet(parserAutomaton.getContextsCount());
-        applyContexts(0);
         int Ui = gss.createGeneration();
-        int v0 = gss.createNode(0, parserAutomaton.getContexts(0), parserAutomaton.getContextsCount());
+        int v0 = gss.createNode(0);
         nextToken = lexer.getNextToken(this);
 
+        // bootstrap the shifts and reductions queues
         int count = parserAutomaton.getActionsCount(0, nextToken.getTerminalID());
         for (int i = 0; i != count; i++) {
             LRAction action = parserAutomaton.getAction(0, nextToken.getTerminalID(), i);
@@ -430,30 +472,27 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                 reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), SPPFBuilder.EPSILON));
         }
 
-        while (nextToken.getTerminalID() != Symbol.SID_EPSILON) // Wait for ε token
-        {
+        while (nextToken.getTerminalID() != Symbol.SID_EPSILON) {
+            // Wait for ε token
+            // the stem length (initial number of nodes in the generation before reductions)
             int stem = gss.getGeneration(Ui).getCount();
+            // apply all reduction actions
             reducer(Ui);
-            TokenKernel oldtoken = nextToken;
-            GSSGeneration genData = gss.getGeneration(Ui);
-            contexts.clear();
-            for (int i = 0; i != genData.getCount(); i++)
-                contexts.or(gss.getContexts(genData.getStart() + i));
-            for (Shift shift : shifts)
-                applyContexts(shift.to);
-            nextToken = lexer.getNextToken(this);
-            int Uj = shifter(oldtoken);
-            genData = gss.getGeneration(Uj);
-            if (genData.getCount() == 0) {
-                // Generation is empty !
-                onUnexpectedToken(Ui, stem, oldtoken);
+            // no scheduled shift actions?
+            if (shifts.isEmpty()) {
+                // the next token was not expected
+                onUnexpectedToken(stem);
                 return new ParseResult(allErrors, lexer.getInput());
             }
-            Ui = Uj;
+            // look for the next next-token
+            TokenKernel oldtoken = nextToken;
+            nextToken = lexer.getNextToken(this);
+            // apply the scheduled shift actions
+            Ui = shifter(oldtoken);
         }
 
-        GSSGeneration g = gss.getGeneration(Ui);
-        for (int i = g.getStart(); i != g.getStart() + g.getCount(); i++) {
+        GSSGeneration genData = gss.getGeneration(Ui);
+        for (int i = genData.getStart(); i != genData.getStart() + genData.getCount(); i++) {
             int state = gss.getRepresentedState(i);
             if (parserAutomaton.isAcceptingState(state)) {
                 // Has reduction _Axiom_ -> axiom $ . on ε
@@ -538,7 +577,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
             }
         } else {
             // Create the new corresponding node in the GSS
-            w = gss.createNode(to, parserAutomaton.getContexts(to), parserAutomaton.getContextsCount());
+            w = gss.createNode(to);
             gss.createEdge(w, path.getLast(), label);
             // Look for all the reductions and shifts at this state
             int count = parserAutomaton.getActionsCount(to, nextToken.getTerminalID());
@@ -603,7 +642,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
             }
         } else {
             // Create the new corresponding node in the GSS
-            w = gss.createNode(shift.to, parserAutomaton.getContexts(shift.to), parserAutomaton.getContextsCount());
+            w = gss.createNode(shift.to);
             gss.createEdge(w, shift.from, label);
             // Look for all the reductions and shifts at this state
             int count = parserAutomaton.getActionsCount(shift.to, nextToken.getTerminalID());

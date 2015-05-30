@@ -26,11 +26,18 @@ namespace Hime.Redist.Lexer
 	public interface IContextProvider
 	{
 		/// <summary>
-		/// Gets whether a terminal is acceptable
+		/// Gets whether the terminal with the specified ID is expected
 		/// </summary>
-		/// <param name="context">The terminal's context</param>
-		/// <param name="terminalIndex">The terminal's index</param>
-		/// <returns><code>true</code> if the terminal is acceptable</returns>
-		bool IsAcceptable(int context, int terminalIndex);
+		/// <param name="terminalID">The identifier of a terminal</param>
+		/// <returns>true if the corresponding terminal is expected</returns>
+		bool IsExpected(int terminalID);
+
+		/// <summary>
+		/// Gets whether the specified context in in effect
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <param name="onTerminalID">The identifier of a terminal</param>
+		/// <returns>true if the context is in effect</returns>
+		bool IsInContext(int context, int onTerminalID);
 	}
 }

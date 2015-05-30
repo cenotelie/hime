@@ -154,12 +154,4 @@ public abstract class BaseLexer {
      * @return The next token in the input
      */
     public abstract TokenKernel getNextToken(IContextProvider contexts);
-
-    /**
-     * Gets the possible next tokens in the input
-     *
-     * @param contexts The current applicable contexts
-     * @return The possible next tokens in the input
-     */
-    public abstract TokenKernelBuffer getNextTokens(IContextProvider contexts);
 }

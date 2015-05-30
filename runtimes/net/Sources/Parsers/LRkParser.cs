@@ -68,18 +68,23 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets whether a terminal is acceptable
+		/// Gets whether the terminal with the specified ID is expected
 		/// </summary>
-		/// <param name="context">The terminal's context</param>
-		/// <param name="terminalIndex">The terminal's index</param>
-		/// <returns><code>true</code> if the terminal is acceptable</returns>
-		public bool IsAcceptable(int context, int terminalIndex)
+		/// <param name="terminalID">The identifier of a terminal</param>
+		/// <returns>true if the corresponding terminal is expected</returns>
+		public bool IsExpected(int terminalID)
 		{
-			// check that there is an action for this terminal
-			LRAction action = automaton.GetAction(stack[head], lexer.Terminals[terminalIndex].ID);
-			if (action.Code == LRActionCode.None)
-				return false;
-			// check that the parser is in the right context
+			return automaton.GetAction(stack[head], terminalID).Code != LRActionCode.None;
+		}
+
+		/// <summary>
+		/// Gets whether the specified context in in effect
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <param name="onTerminalID">The identifier of a terminal</param>
+		/// <returns>true if the context is in effect</returns>
+		public bool IsInContext(int context, int onTerminalID)
+		{
 			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
 				return true;
 			for (int i = head; i != -1; i--)
@@ -191,7 +196,7 @@ namespace Hime.Redist.Parsers
 					builder.StackPushToken(kernel.Index);
 					return action.Code;
 				}
-				else if (action.Code == LRActionCode.Reduce)
+				if (action.Code == LRActionCode.Reduce)
 				{
 					LRProduction production = automaton.GetProduction(action.Data);
 					head -= production.ReductionLength;

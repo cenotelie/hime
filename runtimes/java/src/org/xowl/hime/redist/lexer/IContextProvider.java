@@ -27,11 +27,19 @@ package org.xowl.hime.redist.lexer;
  */
 public interface IContextProvider {
     /**
-     * Gets whether a terminal is acceptable
+     * Gets whether the terminal with the specified ID is expected
      *
-     * @param context       The terminal's context
-     * @param terminalIndex The terminal's index
-     * @return <code>true</code>  if the terminal is acceptable
+     * @param terminalID The identifier of a terminal
+     * @return true if the corresponding terminal is expected
      */
-    boolean isAcceptable(int context, int terminalIndex);
+    boolean isExpected(int terminalID);
+
+    /**
+     * Gets whether the specified context in in effect
+     *
+     * @param context      A context
+     * @param onTerminalID The identifier of a terminal
+     * @return true if the context is in effect
+     */
+    boolean isInContext(int context, int onTerminalID);
 }

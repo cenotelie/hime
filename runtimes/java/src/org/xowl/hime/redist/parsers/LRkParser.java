@@ -78,12 +78,12 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     }
 
     @Override
-    public boolean isAcceptable(int context, int terminalIndex) {
-        // check that there is an action for this terminal
-        LRAction action = automaton.getAction(stack[head], lexer.getTerminals().get(terminalIndex).getID());
-        if (action.getCode() == LRAction.CODE_NONE)
-            return false;
-        // check that the parser is in the right context
+    public boolean isExpected(int terminalID) {
+        return automaton.getAction(stack[head], terminalID).getCode() != LRAction.CODE_NONE;
+    }
+
+    @Override
+    public boolean isInContext(int context, int onTerminalID) {
         if (context == Automaton.DEFAULT_CONTEXT)
             return true;
         for (int i = head; i != -1; i--)

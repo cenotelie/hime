@@ -74,10 +74,6 @@ class GSS {
      */
     private final IntBigList nodeIncomings;
     /**
-     * The contexts available on the GSS node for the given index
-     */
-    private final BigList<BitSet> nodeContexts;
-    /**
      * The generations in this GSS
      */
     private final BigList<GSSGeneration> nodeGenerations;
@@ -112,13 +108,21 @@ class GSS {
     public GSS() {
         this.nodeLabels = new IntBigList();
         this.nodeIncomings = new IntBigList();
-        this.nodeContexts = new BigList<BitSet>(BitSet.class, BitSet[].class);
         this.nodeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
         this.edges = new BigList<GSSEdge>(GSSEdge.class, GSSEdge[].class);
         this.edgeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
         this.generation = -1;
         this.paths = new PathSet();
         this.stack = new int[INIT_STACK_SIZE];
+    }
+
+    /**
+     * Gets the data of the current generation
+     *
+     * @return The generation's first node
+     */
+    public GSSGeneration getGeneration() {
+        return nodeGenerations.get(generation);
     }
 
     /**
@@ -139,16 +143,6 @@ class GSS {
      */
     public int getRepresentedState(int node) {
         return nodeLabels.get(node);
-    }
-
-    /**
-     * Gets the available contexts at the specified node
-     *
-     * @param node A node
-     * @return The available contexts at the specified node
-     */
-    public BitSet getContexts(int node) {
-        return nodeContexts.get(node);
     }
 
     /**
@@ -204,18 +198,12 @@ class GSS {
     /**
      * Creates a new node in the GSS
      *
-     * @param state         The GLR state represented by the node
-     * @param contexts      The original context for the node
-     * @param contextsCount The total number of contexts in the automaton
+     * @param state The GLR state represented by the node
      * @return The node identifier
      */
-    public int createNode(int state, LRContexts contexts, int contextsCount) {
+    public int createNode(int state) {
         int node = nodeLabels.add(state);
         nodeIncomings.add(0);
-        BitSet buffer = new BitSet(contextsCount);
-        for (int i = 0; i != contexts.size(); i++)
-            buffer.set(contexts.get(i), true);
-        nodeContexts.add(buffer);
         GSSGeneration data = nodeGenerations.get(generation);
         data.increment();
         return node;
@@ -233,7 +221,6 @@ class GSS {
         GSSGeneration data = edgeGenerations.get(generation);
         data.increment();
         nodeIncomings.set(to, nodeIncomings.get(to) + 1);
-        nodeContexts.get(from).or(nodeContexts.get(to));
     }
 
     /**

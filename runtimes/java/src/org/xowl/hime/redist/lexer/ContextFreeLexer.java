@@ -37,10 +37,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
      */
     private int tokenIndex;
     /**
-     * The buffer for token kernels
-     */
-    private final TokenKernelBuffer buffer;
-    /**
      * The cached automaton state
      */
     private final AutomatonState stateCache;
@@ -60,7 +56,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
     protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
         super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
-        this.buffer = new TokenKernelBuffer(1);
         this.stateCache = new AutomatonState();
     }
 
@@ -75,7 +70,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
     protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
         super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
-        this.buffer = new TokenKernelBuffer(1);
         this.stateCache = new AutomatonState();
     }
 
@@ -92,13 +86,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
         TokenKernel result = new TokenKernel(tokens.getSymbol(tokenIndex).getID(), tokenIndex);
         tokenIndex++;
         return result;
-    }
-
-    @Override
-    public TokenKernelBuffer getNextTokens(IContextProvider contexts) {
-        buffer.reset();
-        buffer.add(getNextToken(contexts));
-        return buffer;
     }
 
     /**

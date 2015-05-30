@@ -19,7 +19,6 @@
 **********************************************************************/
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -47,10 +46,6 @@ namespace Hime.Redist.Parsers
 		/// The number of live incoming edges to the GSS node for the given index
 		/// </summary>
 		private readonly BigList<int> nodeIncomings;
-		/// <summary>
-		/// The contexts available on the GSS node for the given index
-		/// </summary>
-		private readonly BigList<BitArray> nodeContexts;
 		/// <summary>
 		/// The generations of nodes in this GSS
 		/// </summary>
@@ -99,7 +94,6 @@ namespace Hime.Redist.Parsers
 		{
 			nodeLabels = new BigList<int>();
 			nodeIncomings = new BigList<int>();
-			nodeContexts = new BigList<BitArray>();
 			nodeGenerations = new BigList<GSSGeneration>();
 			edges = new BigList<GSSEdge>();
 			edgeLabels = new BigList<GSSLabel>();
@@ -112,7 +106,16 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets the data of the specified generation of node
+		/// Gets the data of the current generation
+		/// </summary>
+		/// <returns>The generation's data</returns>
+		public GSSGeneration GetGeneration()
+		{
+			return nodeGenerations[generation];
+		}
+
+		/// <summary>
+		/// Gets the data of the specified generation of nodes
 		/// </summary>
 		/// <param name="generation">A generation</param>
 		/// <returns>The generation's data</returns>
@@ -129,16 +132,6 @@ namespace Hime.Redist.Parsers
 		public int GetRepresentedState(int node)
 		{
 			return nodeLabels[node];
-		}
-
-		/// <summary>
-		/// Gets the available contexts at the specified node
-		/// </summary>
-		/// <param name="node">A node</param>
-		/// <returns>The available contexts at the specified node</returns>
-		public BitArray GetContexts(int node)
-		{
-			return nodeContexts[node];
 		}
 
 		/// <summary>
@@ -197,17 +190,11 @@ namespace Hime.Redist.Parsers
 		/// Creates a new node in the GSS
 		/// </summary>
 		/// <param name="state">The GLR state represented by the node</param>
-		/// <param name="contexts">The original context for the node</param>
-		/// <param name="contextsCount">The total number of contexts in the automaton</param>
 		/// <returns>The node's identifier</returns>
-		public int CreateNode(int state, LRContexts contexts, int contextsCount)
+		public int CreateNode(int state)
 		{
 			int node = nodeLabels.Add(state);
 			nodeIncomings.Add(0);
-			BitArray buffer = new BitArray(contextsCount);
-			for (int i = 0; i != contexts.Count; i++)
-				buffer[contexts[i]] = true;
-			nodeContexts.Add(buffer);
 			GSSGeneration data = nodeGenerations[generation];
 			data.Count++;
 			nodeGenerations[generation] = data;
@@ -228,7 +215,6 @@ namespace Hime.Redist.Parsers
 			data.Count++;
 			edgeGenerations[generation] = data;
 			nodeIncomings[to] = nodeIncomings[to] + 1;
-			nodeContexts[from] = nodeContexts[from].Or(nodeContexts[to]);
 		}
 
 		/// <summary>

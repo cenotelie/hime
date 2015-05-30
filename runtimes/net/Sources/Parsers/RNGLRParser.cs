@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -119,10 +118,6 @@ namespace Hime.Redist.Parsers
 		/// The queue of shift operations
 		/// </summary>
 		private Queue<Shift> shifts;
-		/// <summary>
-		/// The active contexts
-		/// </summary>
-		private BitArray contexts;
 
 		/// <summary>
 		/// Initializes a new instance of the LRkParser class with the given lexer
@@ -141,6 +136,74 @@ namespace Hime.Redist.Parsers
 			nullables = new GSSLabel[variables.Length];
 			BuildNullables(variables.Length);
 			sppf.ClearHistory();
+		}
+
+		/// <summary>
+		/// Gets whether the terminal with the specified ID is expected
+		/// </summary>
+		/// <param name="terminalID">The identifier of a terminal</param>
+		/// <returns>true if the corresponding terminal is expected</returns>
+		public bool IsExpected(int terminalID)
+		{
+			foreach (Shift shift in shifts)
+				if (parserAutomaton.GetActionsCount(shift.to, terminalID) > 0)
+					return false;
+			return false;
+		}
+
+		/// <summary>
+		/// Gets whether the specified context in in effect
+		/// </summary>
+		/// <param name="context">A context</param>
+		/// <param name="onTerminalID">The identifier of a terminal</param>
+		/// <returns>true if the context is in effect</returns>
+		public bool IsInContext(int context, int onTerminalID)
+		{
+			List<int> queue = new List<int>();
+			foreach (Shift shift in shifts)
+			{
+				if (parserAutomaton.GetActionsCount(shift.to, onTerminalID) > 0)
+				{
+					if (context == Lexer.Automaton.DEFAULT_CONTEXT || parserAutomaton.GetContexts(shift.to).Contains(context) || parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Contains(context))
+						// the context at the specified state is there
+						return true;
+					// enqueue
+					queue.Add(shift.from);
+				}
+			}
+			if (shifts.Count == 0)
+			{
+				// no scheduled shift action, we are at the very beginning
+				// the only GSS node is for the state 0
+				if (context == Lexer.Automaton.DEFAULT_CONTEXT || parserAutomaton.GetContexts(0).Contains(context))
+					// the context is there for state 0
+					return true;
+			}
+			if (queue.Count == 0)
+				// the track is empty, the terminal is unexpected
+				return false;
+			// explore the GSS to find the specified context
+			for (int i = 0; i != queue.Count; i++)
+			{
+				int count;
+				GSSPath[] paths = gss.GetPaths(queue[i], 1, out count);
+				for (int p = 0; p != count; p++)
+				{
+					int to = paths[p].Last;
+					if (!queue.Contains(to))
+					{
+						// this target node is not yet explored
+						LRContexts contexts = parserAutomaton.GetContexts(gss.GetRepresentedState(to));
+						if (contexts.Contains(context))
+							// found it!
+							return true;
+						// enqueue for further exploration
+						queue.Add(to);
+					}
+				}
+			}
+			// not found
+			return false;
 		}
 
 		/// <summary>
@@ -241,14 +304,12 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Raises an error on an unexepcted token
 		/// </summary>
-		/// <param name="gen">The current GSS generation</param>
 		/// <param name="stem">The size of the generation's stem</param>
-		/// <param name="token">The unexpected token</param>
-		private void OnUnexpectedToken(int gen, int stem, Lexer.TokenKernel token)
+		private void OnUnexpectedToken(int stem)
 		{
 			// build the list of expected terminals
 			List<Symbol> expected = new List<Symbol>();
-			GSSGeneration genData = gss.GetGeneration(gen);
+			GSSGeneration genData = gss.GetGeneration();
 			for (int i = 0; i != genData.Count; i++)
 			{
 				LRExpected expectedOnHead = parserAutomaton.GetExpected(gss.GetRepresentedState(i + genData.Start), lexer.Terminals);
@@ -265,7 +326,7 @@ namespace Hime.Redist.Parsers
 				}
 			}
 			// register the error
-			UnexpectedTokenError error = new UnexpectedTokenError(lexer.tokens[token.Index], new ROList<Symbol>(expected));
+			UnexpectedTokenError error = new UnexpectedTokenError(lexer.tokens[nextToken.Index], new ROList<Symbol>(expected));
 			allErrors.Add(error);
 			if (ModeDebug)
 			{
@@ -429,28 +490,6 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets whether a terminal is acceptable
-		/// </summary>
-		/// <param name="context">The terminal's context</param>
-		/// <param name="terminalIndex">The terminal's index</param>
-		/// <returns><code>true</code> if the terminal is acceptable</returns>
-		public bool IsAcceptable(int context, int terminalIndex)
-		{
-			return context == Lexer.Automaton.DEFAULT_CONTEXT || contexts[context];
-		}
-
-		/// <summary>
-		/// Applies to the current contexts the contexts for the specified state
-		/// </summary>
-		/// <param name="state">A RNGLR state</param>
-		private void ApplyContexts(int state)
-		{
-			LRContexts stateContexts = parserAutomaton.GetContexts(state);
-			for (int i = 0; i != stateContexts.Count; i++)
-				contexts[stateContexts[i]] = true;
-		}
-
-		/// <summary>
 		/// Parses the input and returns the produced AST
 		/// </summary>
 		/// <returns>AST produced by the parser representing the input, or null if unrecoverable errors were encountered</returns>
@@ -458,13 +497,11 @@ namespace Hime.Redist.Parsers
 		{
 			reductions = new Queue<Reduction>();
 			shifts = new Queue<Shift>();
-			contexts = new BitArray(parserAutomaton.ContextsCount);
-			ApplyContexts(0);
-			GSSGeneration genData;
 			int Ui = gss.CreateGeneration();
-			int v0 = gss.CreateNode(0, parserAutomaton.GetContexts(0), parserAutomaton.ContextsCount);
+			int v0 = gss.CreateNode(0);
 			nextToken = lexer.GetNextToken(this);
 
+			// bootstrap the shifts and reductions queues
 			int count = parserAutomaton.GetActionsCount(0, nextToken.TerminalID);
 			for (int i = 0; i != count; i++)
 			{
@@ -477,28 +514,25 @@ namespace Hime.Redist.Parsers
 
 			while (nextToken.TerminalID != Symbol.SID_EPSILON) // Wait for ε token
 			{
+				// the stem length (initial number of nodes in the generation before reductions)
 				int stem = gss.GetGeneration(Ui).Count;
+				// apply all reduction actions
 				Reducer(Ui);
-				Lexer.TokenKernel oldtoken = nextToken;
-				genData = gss.GetGeneration(Ui);
-				contexts = new BitArray(parserAutomaton.ContextsCount);
-				for (int i = 0; i != genData.Count; i++)
-					contexts = contexts.Or(gss.GetContexts(genData.Start + i));
-				foreach (Shift shift in shifts)
-					ApplyContexts(shift.to);
-				nextToken = lexer.GetNextToken(this);
-				int Uj = Shifter(oldtoken);
-				genData = gss.GetGeneration(Uj);
-				if (genData.Count == 0)
+				// no scheduled shift actions?
+				if (shifts.Count == 0)
 				{
-					// Generation is empty !
-					OnUnexpectedToken(Ui, stem, oldtoken);
+					// the next token was not expected
+					OnUnexpectedToken(stem);
 					return new ParseResult(new ROList<ParseError>(allErrors), lexer.Input);
 				}
-				Ui = Uj;
+				// look for the next next-token
+				Lexer.TokenKernel oldtoken = nextToken;
+				nextToken = lexer.GetNextToken(this);
+				// apply the scheduled shift actions
+				Ui = Shifter(oldtoken);
 			}
 
-			genData = gss.GetGeneration(Ui);
+			GSSGeneration genData = gss.GetGeneration(Ui);
 			for (int i = genData.Start; i != genData.Start + genData.Count; i++)
 			{
 				int state = gss.GetRepresentedState(i);
@@ -595,7 +629,7 @@ namespace Hime.Redist.Parsers
 			else
 			{
 				// Create the new corresponding node in the GSS
-				w = gss.CreateNode(to, parserAutomaton.GetContexts(to), parserAutomaton.ContextsCount);
+				w = gss.CreateNode(to);
 				gss.CreateEdge(w, path.Last, label);
 				// Look for all the reductions and shifts at this state
 				int count = parserAutomaton.GetActionsCount(to, nextToken.TerminalID);
@@ -669,7 +703,7 @@ namespace Hime.Redist.Parsers
 			else
 			{
 				// Create the new corresponding node in the GSS
-				w = gss.CreateNode(shift.to, parserAutomaton.GetContexts(shift.to), parserAutomaton.ContextsCount);
+				w = gss.CreateNode(shift.to);
 				gss.CreateEdge(w, shift.from, label);
 				// Look for all the reductions and shifts at this state
 				int count = parserAutomaton.GetActionsCount(shift.to, nextToken.TerminalID);

@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.IO;
-using Hime.Redist.Utils;
 
 namespace Hime.Redist.Lexer
 {
@@ -31,14 +30,6 @@ namespace Hime.Redist.Lexer
 		/// The current index in the input
 		/// </summary>
 		private int inputIndex;
-		/// <summary>
-		/// The buffer for token kernels
-		/// </summary>
-		private Buffer<TokenKernel> buffer;
-		/// <summary>
-		/// The buffer of matches
-		/// </summary>
-		private Buffer<int> matches;
 		/// <summary>
 		/// Whether the end-of-input dollar marker has already been emitted
 		/// </summary>
@@ -55,8 +46,6 @@ namespace Hime.Redist.Lexer
 			: base(automaton, terminals, separator, input)
 		{
 			inputIndex = 0;
-			buffer = new Buffer<TokenKernel>(5);
-			matches = new Buffer<int>(5);
 		}
 
 		/// <summary>
@@ -70,8 +59,6 @@ namespace Hime.Redist.Lexer
 			: base(automaton, terminals, separator, input)
 		{
 			inputIndex = 0;
-			buffer = new Buffer<TokenKernel>(5);
-			matches = new Buffer<int>(5);
 		}
 
 		/// <summary>
@@ -86,26 +73,25 @@ namespace Hime.Redist.Lexer
 
 			while (true)
 			{
-				int length = RunDFA(contexts);
-				if (length != 0)
+				Match match = RunDFA(contexts);
+				if (match.length != 0)
 				{
 					// matched something !
-					int terminalIndex = matches[0];
-					int terminalID = symTerminals[terminalIndex].ID;
+					int terminalID = symTerminals[match.terminal].ID;
 					if (terminalID == separatorID)
 					{
-						inputIndex += length;
+						inputIndex += match.length;
 						continue;
 					}
-					TokenKernel token = new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length));
-					inputIndex += length;
+					TokenKernel token = new TokenKernel(terminalID, tokens.Add(match.terminal, inputIndex, match.length));
+					inputIndex += match.length;
 					return token;
 				}
-				if (matches.Size > 0)
+				if (match.terminal == 1)
 				{
 					// This is the dollar terminal, at the end of the input
 					isDollarEmitted = true;
-					return new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(matches[0], inputIndex, 0));
+					return new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(1, inputIndex, 0));
 				}
 				// Failed to match anything
 				TextPosition position = text.GetPositionAt(inputIndex);
@@ -127,107 +113,32 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Gets the possible next tokens in the input
-		/// </summary>
-		/// <param name="contexts">The current applicable contexts</param>
-		/// <returns>The possible next tokens in the input</returns>
-		internal override Buffer<TokenKernel> GetNextTokens(IContextProvider contexts)
-		{
-			if (isDollarEmitted)
-			{
-				buffer.Reset();
-				buffer.Add(new TokenKernel(Symbol.SID_EPSILON, -1));
-				return buffer;
-			}
-
-			while (true)
-			{
-				int length = RunDFA(contexts);
-				if (length != 0)
-				{
-					// matched something !
-					buffer.Reset();
-					for (int i = 0; i != matches.Size; i++)
-					{
-						int terminalIndex = matches[i];
-						int terminalID = symTerminals[terminalIndex].ID;
-						if (terminalID == separatorID)
-							// filter out the separators
-							continue;
-						buffer.Add(new TokenKernel(terminalID, tokens.Add(terminalIndex, inputIndex, length)));
-					}
-					inputIndex += length;
-					if (buffer.Size > 0)
-						return buffer;
-					continue;
-				}
-				if (matches.Size > 0)
-				{
-					// This is the dollar terminal, at the end of the input
-					isDollarEmitted = true;
-					buffer.Reset();
-					buffer.Add(new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(matches[0], inputIndex, 0)));
-					return buffer;
-				}
-				// Failed to match anything
-				TextPosition position = text.GetPositionAt(inputIndex);
-				string unexpected = null;
-				int c = text.GetValue(inputIndex);
-				if (c >= 0xD800 && c <= 0xDFFF)
-				{
-					// this is a surrogate encoding point
-					unexpected = text.GetValue(inputIndex, 2);
-					inputIndex += 2;
-				}
-				else
-				{
-					unexpected = text.GetValue(inputIndex).ToString();
-					inputIndex++;
-				}
-				RaiseError(new UnexpectedCharError(unexpected, position));
-				continue;
-			}
-		}
-
-		/// <summary>
 		/// Runs the lexer's DFA to match a terminal in the input ahead
 		/// </summary>
 		/// <param name="contexts">The current applicable contexts</param>
-		/// <returns>The length of the matches</returns>
-		private int RunDFA(IContextProvider contexts)
+		/// <returns>The matched terminal and length</returns>
+		private Match RunDFA(IContextProvider contexts)
 		{
-			matches.Reset();
-
 			if (text.IsEnd(inputIndex))
 			{
 				// At the end of input
-				matches.Add(1); // 1 is always the index of the $ terminal
-				return 0; // length is 0
+				return new Match(1, 0); // 1 is always the index of the $ terminal
 			}
 
+			AutomatonState stateData;
+			int matchingState = -1;
+			int matchingLength = 0;
 			int state = 0;
 			int i = inputIndex;
-			int length = 0;
 
 			while (state != Automaton.DEAD_STATE)
 			{
-				AutomatonState stateData = automaton.GetState(state);
+				stateData = automaton.GetState(state);
 				// Is this state a matching state ?
-				bool firstMatch = true;
-				for (int j = 0; j != stateData.TerminalsCount; j++)
+				if (stateData.TerminalsCount != 0)
 				{
-					MatchedTerminal mt = stateData.GetTerminal(j);
-					if (contexts.IsAcceptable(mt.Context, mt.Index))
-					{
-						if (firstMatch)
-						{
-							// this is the first match in this state, the longest input
-							matches.Reset();
-							length = i - inputIndex;
-							firstMatch = false;
-						}
-						matches.Add(mt.Index);
-					}
+					matchingState = state;
+					matchingLength = i - inputIndex;
 				}
 				// No further transition => exit
 				if (stateData.IsDeadEnd)
@@ -240,7 +151,30 @@ namespace Hime.Redist.Lexer
 				// Try to find a transition from this state with the read character
 				state = stateData.GetTargetBy(current);
 			}
-			return length;
+
+			if (matchingState == -1)
+				// no match
+				return new Match();
+
+			stateData = automaton.GetState(matchingState);
+			// look for a perfect match
+			for (int j = 0; j != stateData.TerminalsCount; j++)
+			{
+				MatchedTerminal mt = stateData.GetTerminal(j);
+				int id = symTerminals[mt.Index].ID;
+				if (id == separatorID || (contexts.IsExpected(id) && contexts.IsInContext(mt.Context, id)))
+					return new Match(mt.Index, matchingLength);
+			}
+			// look for the correct context
+			for (int j = 0; j != stateData.TerminalsCount; j++)
+			{
+				MatchedTerminal mt = stateData.GetTerminal(j);
+				int id = symTerminals[mt.Index].ID;
+				if (mt.Context == Automaton.DEFAULT_CONTEXT || contexts.IsInContext(mt.Context, id))
+					return new Match(mt.Index, matchingLength);
+			}
+			// nope, just return the first match
+			return new Match(stateData.GetTerminal(0).Index, matchingLength);
 		}
 	}
 }

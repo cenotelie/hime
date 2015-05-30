@@ -38,7 +38,7 @@ public class LRContexts {
      * @return The number of contexts
      */
     public int size() {
-        return content.length;
+        return content != null ? content.length : 0;
     }
 
     /**
@@ -58,9 +58,13 @@ public class LRContexts {
      */
     public LRContexts(BinaryInput input) {
         int count = input.readChar();
-        this.content = new char[count];
-        for (int i = 0; i != count; i++) {
-            this.content[i] = input.readChar();
+        if (count > 0) {
+            this.content = new char[count];
+            for (int i = 0; i != count; i++) {
+                this.content[i] = input.readChar();
+            }
+        } else {
+            this.content = null;
         }
     }
 
@@ -71,9 +75,11 @@ public class LRContexts {
      * @return <code>true</code> if the specified context is in this collection
      */
     public boolean contains(int context) {
-        for (int i = 0; i != content.length; i++)
-            if (content[i] == context)
-                return true;
+        if (content != null) {
+            for (int i = 0; i != content.length; i++)
+                if (content[i] == context)
+                    return true;
+        }
         return false;
     }
 }

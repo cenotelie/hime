@@ -18,7 +18,6 @@
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
 using System.IO;
-using Hime.Redist.Utils;
 
 namespace Hime.Redist.Lexer
 {
@@ -28,38 +27,9 @@ namespace Hime.Redist.Lexer
 	public class ContextFreeLexer : BaseLexer
 	{
 		/// <summary>
-		/// Represents a match in the input
-		/// </summary>
-		private struct Match
-		{
-			/// <summary>
-			/// Index of the matched terminal
-			/// </summary>
-			public int terminal;
-			/// <summary>
-			/// Length of the matched input
-			/// </summary>
-			public int length;
-
-			/// <summary>
-			/// Initializes a match
-			/// </summary>
-			/// <param name='terminal'>Index of the matched terminal</param>
-			public Match(int terminal)
-			{
-				this.terminal = terminal;
-				length = 0;
-			}
-		}
-
-		/// <summary>
 		/// Index of the next token
 		/// </summary>
 		private int tokenIndex;
-		/// <summary>
-		/// The buffer for token kernels
-		/// </summary>
-		private readonly Buffer<TokenKernel> buffer;
 
 		/// <summary>
 		/// Initializes a new instance of the Lexer class with the given input
@@ -72,7 +42,6 @@ namespace Hime.Redist.Lexer
 			: base(automaton, terminals, separator, input)
 		{
 			tokenIndex = -1;
-			buffer = new Buffer<TokenKernel>(1);
 		}
 
 		/// <summary>
@@ -86,7 +55,6 @@ namespace Hime.Redist.Lexer
 			: base(automaton, terminals, separator, input)
 		{
 			tokenIndex = -1;
-			buffer = new Buffer<TokenKernel>(1);
 		}
 
 		/// <summary>
@@ -108,18 +76,6 @@ namespace Hime.Redist.Lexer
 			TokenKernel result = new TokenKernel(tokens.GetSymbol(tokenIndex).ID, tokenIndex);
 			tokenIndex++;
 			return result;
-		}
-
-		/// <summary>
-		/// Gets the possible next tokens in the input
-		/// </summary>
-		/// <param name="contexts">The current applicable contexts</param>
-		/// <returns>The possible next tokens in the input</returns>
-		internal override Buffer<TokenKernel> GetNextTokens(IContextProvider contexts)
-		{
-			buffer.Reset();
-			buffer.Add(GetNextToken(contexts));
-			return buffer;
 		}
 
 		/// <summary>
@@ -175,7 +131,7 @@ namespace Hime.Redist.Lexer
 			if (text.IsEnd(inputIndex))
 			{
 				// At the end of input
-				return new Match(1); // 1 is always the index of the $ terminal
+				return new Match(1, 0); // 1 is always the index of the $ terminal
 			}
 
 			Match result = new Match();
@@ -187,10 +143,7 @@ namespace Hime.Redist.Lexer
 				AutomatonState stateData = automaton.GetState(state);
 				// Is this state a matching state ?
 				if (stateData.TerminalsCount != 0)
-				{
-					result.terminal = stateData.GetTerminal(0).Index;
-					result.length = (i - inputIndex);
-				}
+					result = new Match(stateData.GetTerminal(0).Index, i - inputIndex);
 				// No further transition => exit
 				if (stateData.IsDeadEnd)
 					break;
