@@ -33,10 +33,6 @@ namespace Hime.SDK.Output
 		/// </summary>
 		private readonly ROList<Grammars.Terminal> terminals;
 		/// <summary>
-		/// The contexts for the lexer
-		/// </summary>
-		private readonly ROList<Grammars.Variable> contexts;
-		/// <summary>
 		/// The lexer's DFA
 		/// </summary>
 		private readonly Automata.DFA dfa;
@@ -46,12 +42,10 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="dfa">The dfa to serialize</param>
 		/// <param name="expected">The terminals produced by the DFA</param>
-		/// <param name="contexts">The contexts supported by the DFA</param>
-		public LexerDataGenerator(Automata.DFA dfa, ROList<Grammars.Terminal> expected, ROList<Grammars.Variable> contexts)
+		public LexerDataGenerator(Automata.DFA dfa, ROList<Grammars.Terminal> expected)
 		{
 			this.dfa = dfa;
 			terminals = expected;
-			this.contexts = contexts;
 		}
 
 		/// <summary>
@@ -64,18 +58,18 @@ namespace Hime.SDK.Output
 
 			writer.Write((uint)dfa.StatesCount);
 			uint offset = 0;
-			List<string> contextNames = new List<string>();
+			List<int> currentContexts = new List<int>();
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				writer.Write(offset);
 				offset += 3 + 256;
-				contextNames.Clear();
+				currentContexts.Clear();
 				foreach (Automata.FinalItem item in state.Items)
 				{
 					Grammars.Terminal terminal = item as Grammars.Terminal;
-					if (!contextNames.Contains(terminal.Context))
+					if (!currentContexts.Contains(terminal.Context))
 					{
-						contextNames.Add(terminal.Context);
+						currentContexts.Add(terminal.Context);
 						offset += 2;
 					}
 				}
@@ -127,12 +121,11 @@ namespace Hime.SDK.Output
 			foreach (Automata.FinalItem item in state.Items)
 			{
 				Grammars.Terminal terminal = item as Grammars.Terminal;
-				ushort context = GetContextID(terminal.Context);
-				if (!contextIDs.Contains(context))
+				if (!contextIDs.Contains((ushort)terminal.Context))
 				{
 					// this is the first time this context is found in the current DFA state
 					// this is the terminal with the most priority for this context
-					contextIDs.Add(context);
+					contextIDs.Add((ushort)terminal.Context);
 					matched.Add((ushort)terminals.IndexOf(terminal));
 				}
 			}
@@ -166,25 +159,6 @@ namespace Hime.SDK.Output
 				writer.Write(System.Convert.ToUInt16(span.End));
 				writer.Write((ushort)state.GetChildBy(span).ID);
 			}
-		}
-
-		/// <summary>
-		/// Gets the identifier fo the specified context's name
-		/// </summary>
-		/// <param name="name">The name of a context</param>
-		/// <returns>The corresponding identifier</returns>
-		/// <exception cref="System.ArgumentException">When the specified context name is not found</exception>
-		private ushort GetContextID(string name)
-		{
-			if (name == null)
-				return Hime.Redist.Lexer.Automaton.DEFAULT_CONTEXT;
-			for (ushort i = 1; i != contexts.Count; i++)
-			{
-				if (contexts[i].Name == name)
-					return i;
-			}
-			// should not happen
-			throw new System.ArgumentException("The specified context name (" + name + ") is not recognized", "name");
 		}
 	}
 }

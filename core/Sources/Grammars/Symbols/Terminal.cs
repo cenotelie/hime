@@ -38,7 +38,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Gets or sets the context of this terminal
 		/// </summary>
-		public string Context { get; protected internal set; }
+		public int Context { get; protected internal set; }
 
 		/// <summary>
 		///  Gets the priority of this marker 
@@ -48,17 +48,17 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Initializes this symbol
 		/// </summary>
-		/// <param name="sid">The symbol's unique identifier</param>
-		/// <param name="name">The symbol's name</param>
-		/// <param name="value">The symbol's inline value</param>
-		/// <param name="nfa">The symbol's name</param>
-		/// <param name="context">The symbol's context</param>
-		public Terminal(int sid, string name, string value, Automata.NFA nfa, string context)
+		/// <param name="sid">The terminal's unique identifier</param>
+		/// <param name="name">The terminal's name</param>
+		/// <param name="value">The terminal's inline value</param>
+		/// <param name="nfa">The terminal's matching NFA</param>
+		/// <param name="context">The terminal's lexical context</param>
+		public Terminal(int sid, string name, string value, Automata.NFA nfa, int context)
 			: base(sid, name)
 		{
-			this.Value = value;
-			this.NFA = nfa;
-			this.Context = context;
+			Value = value;
+			NFA = nfa;
+			Context = context;
 		}
 
 		/// <summary>

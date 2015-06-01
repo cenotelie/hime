@@ -47,6 +47,10 @@ namespace Hime.SDK.Grammars
 		/// Name of the grammar option specifying the grammar's separator terminal
 		/// </summary>
 		public const string OPTION_SEPARATOR = "Separator";
+		/// <summary>
+		/// The name of the default lexical context
+		/// </summary>
+		public const string DEFAULT_CONTEXT_NAME = "_default_";
 
 		/// <summary>
 		/// The counter for the generation of unique names across multiple grammars
@@ -65,6 +69,10 @@ namespace Hime.SDK.Grammars
 		/// The grammar's options
 		/// </summary>
 		private readonly Dictionary<string, string> options;
+		/// <summary>
+		/// The lexical contexts defined in this grammar
+		/// </summary>
+		private readonly List<string> contexts;
 		/// <summary>
 		/// The grammar's terminals, by name
 		/// </summary>
@@ -99,6 +107,11 @@ namespace Hime.SDK.Grammars
 		/// Gets the grammar's options
 		/// </summary>
 		public ICollection<string> Options { get { return options.Keys; } }
+
+		/// <summary>
+		/// Gets the contexts defined in this grammar
+		/// </summary>
+		public ROList<string> Contexts { get { return new ROList<string>(contexts); } }
 
 		/// <summary>
 		/// Gets the grammar's terminals
@@ -146,6 +159,8 @@ namespace Hime.SDK.Grammars
 		public Grammar(string name)
 		{
 			options = new Dictionary<string, string>();
+			contexts = new List<string>();
+			contexts.Add(DEFAULT_CONTEXT_NAME);
 			terminalsByName = new Dictionary<string, Terminal>();
 			terminalsByValue = new Dictionary<string, Terminal>();
 			variables = new Dictionary<string, Variable>();
@@ -207,6 +222,20 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
+		/// Resolves the specified lexical context name for this grammar
+		/// </summary>
+		/// <param name="context">The name of a lexical context</param>
+		/// <returns>The identifier of the resolved lexical context</returns>
+		public int ResolveContext(string context)
+		{
+			int index = contexts.IndexOf(context);
+			if (index >= 0)
+				return index;
+			contexts.Add(context);
+			return contexts.Count - 1;
+		}
+
+		/// <summary>
 		/// Adds the given anonymous terminal to this grammar
 		/// </summary>
 		/// <param name="value">The terminal's value</param>
@@ -214,8 +243,8 @@ namespace Hime.SDK.Grammars
 		/// <returns>The new terminal</returns>
 		public Terminal AddTerminalAnon(string value, Automata.NFA nfa)
 		{
-			string name = PREFIX_GENERATED_TERMINAL + GenerateID();
-			return AddTerminal(name, value, nfa, null);
+			string tName = PREFIX_GENERATED_TERMINAL + GenerateID();
+			return AddTerminal(tName, value, nfa, DEFAULT_CONTEXT_NAME);
 		}
 
 		/// <summary>
@@ -233,16 +262,16 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Adds the given terminal to this grammar
 		/// </summary>
-		/// <param name="name">The terminal's name</param>
+		/// <param name="tName">The terminal's name</param>
 		/// <param name="value">The terminal's value</param>
 		/// <param name="nfa">The terminal's NFA</param>
 		/// <param name="context">The terminal's context</param>
 		/// <returns>The new terminal</returns>
-		private Terminal AddTerminal(string name, string value, Automata.NFA nfa, string context)
+		private Terminal AddTerminal(string tName, string value, Automata.NFA nfa, string context)
 		{
-			Terminal terminal = new Terminal(nextSID, name, value, nfa, context);
+			Terminal terminal = new Terminal(nextSID, tName, value, nfa, ResolveContext(context));
 			nextSID++;
-			terminalsByName.Add(name, terminal);
+			terminalsByName.Add(tName, terminal);
 			terminalsByValue.Add(value, terminal);
 			return terminal;
 		}
@@ -420,12 +449,14 @@ namespace Hime.SDK.Grammars
 					// this is a redefinition of a named terminal
 					// TODO: Output an error in the log
 				}
-				else if (terminalsByValue.ContainsKey(terminal.Value))
+				else
+				if (terminalsByValue.ContainsKey(terminal.Value))
 				{
 					// this is a redefinition of an inline terminal
 					// => do nothing, simply reuse the one with the same value
 				}
-				else if (doClone)
+				else
+				if (doClone)
 				{
 					Terminal clone = new Terminal(terminal.ID, terminal.Name, terminal.Value, terminal.NFA.Clone(false), terminal.Context);
 					clone.NFA.StateExit.AddItem(clone);
@@ -434,7 +465,7 @@ namespace Hime.SDK.Grammars
 				}
 				else
 				{
-					Terminal clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false), terminal.Context);
+					Terminal clone = AddTerminal(terminal.Name, terminal.Value, terminal.NFA.Clone(false), parent.contexts[terminal.Context]);
 					clone.NFA.StateExit.AddItem(clone);
 				}
 			}
@@ -471,15 +502,18 @@ namespace Hime.SDK.Grammars
 						Symbol symbol = null;
 						if (part.Symbol is Variable)
 							symbol = variables[part.Symbol.Name];
-						else if (part.Symbol is Terminal)
+						else
+						if (part.Symbol is Terminal)
 							symbol = terminalsByName[part.Symbol.Name];
-						else if (part.Symbol is Virtual)
+						else
+						if (part.Symbol is Virtual)
 							symbol = virtuals[part.Symbol.Name];
-						else if (part.Symbol is Action)
+						else
+						if (part.Symbol is Action)
 							symbol = actions[part.Symbol.Name];
 						parts.Add(new RuleBodyElement(symbol, part.Action));
 					}
-					clone.AddRule(new Rule(clone, new RuleBody(parts), rule.IsGenerated));
+					clone.AddRule(new Rule(clone, new RuleBody(parts), rule.IsGenerated, ResolveContext(parent.contexts[rule.Context])));
 				}
 			}
 		}
@@ -585,18 +619,18 @@ namespace Hime.SDK.Grammars
 		{
 			// Search for Axiom option
 			if (!options.ContainsKey(OPTION_AXIOM))
-				return "No axiom variable has been defined for grammar " + this.name;
+				return "No axiom variable has been defined for grammar " + name;
 			// Search for the variable specified as the Axiom
-			string name = options[OPTION_AXIOM];
-			if (!variables.ContainsKey(name))
-				return "The specified axiom variable " + name + " is undefined";
+			string axiomName = options[OPTION_AXIOM];
+			if (!variables.ContainsKey(axiomName))
+				return "The specified axiom variable " + axiomName + " is undefined";
 
 			// Create the real axiom rule variable and rule
 			Variable axiom = AddVariable(GENERATED_AXIOM);
 			List<RuleBodyElement> parts = new List<RuleBodyElement>();
-			parts.Add(new RuleBodyElement(variables[name], Hime.Redist.TreeAction.Promote));
+			parts.Add(new RuleBodyElement(variables[axiomName], Hime.Redist.TreeAction.Promote));
 			parts.Add(new RuleBodyElement(Dollar.Instance, Hime.Redist.TreeAction.Drop));
-			axiom.AddRule(new Rule(axiom, new RuleBody(parts), false));
+			axiom.AddRule(new Rule(axiom, new RuleBody(parts), false, 0));
 			return null;
 		}
 

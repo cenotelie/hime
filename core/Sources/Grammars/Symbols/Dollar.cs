@@ -33,7 +33,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
-		private Dollar() : base(2, "$", "$", null, null)
+		private Dollar() : base(2, "$", "$", null, 0)
 		{
 		}
 

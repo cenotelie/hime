@@ -128,7 +128,6 @@
     <Compile Include="Sources\Grammars\Rules\RuleChoice.cs" />
     <Compile Include="Sources\Grammars\Rules\TemplateRule.cs" />
     <Compile Include="Sources\Grammars\Rules\TemplateRuleInstance.cs" />
-    <Compile Include="Sources\Grammars\Context.cs" />
     <Compile Include="Sources\Report.cs" />
     <Compile Include="Sources\Reporter.cs" />
     <Compile Include="Sources\Grammars\Phrase.cs" />
@@ -181,6 +180,7 @@
     <Compile Include="Sources\Input\CommandLineLexer.cs" />
     <Compile Include="Sources\Input\CommandLineParser.cs" />
     <Compile Include="Sources\Input\CommandLine.cs" />
+    <Compile Include="Sources\Grammars\LoaderContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />

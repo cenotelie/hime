@@ -56,10 +56,6 @@ namespace Hime.SDK.Output
 		/// </summary>
 		private List<Grammars.Terminal> expected;
 		/// <summary>
-		/// The available contexts for the lexer
-		/// </summary>
-		private List<Grammars.Variable> contexts;
-		/// <summary>
 		/// The LR graph to emit in a parser
 		/// </summary>
 		private Grammars.LR.Graph graph;
@@ -105,11 +101,6 @@ namespace Hime.SDK.Output
 		public ROList<Grammars.Terminal> Expected { get { return new ROList<Grammars.Terminal>(expected); } }
 
 		/// <summary>
-		/// Gets the contexts supported by the associated lexer
-		/// </summary>
-		public ROList<Grammars.Variable> Contexts { get { return new ROList<Grammars.Variable>(contexts); } }
-
-		/// <summary>
 		/// Gets the LR graph for the associated parser
 		/// </summary>
 		public Grammars.LR.Graph Graph { get { return graph; } }
@@ -147,44 +138,24 @@ namespace Hime.SDK.Output
 		}
 
 		/// <summary>
-		/// Builds the expected terminals and the contexts for the lexer
+		/// Builds the expected terminals and the lexical contexts for the lexer
 		/// </summary>
-		/// <param name="reporter">The reporter to use</param>
 		/// <returns><c>true</c> if the operation succeeded</returns>
-		private bool BuildExpected(Reporter reporter)
+		private bool BuildExpected()
 		{
-			bool errors = false;
 			expected = new List<Grammars.Terminal>();
 			expected.Add(Grammars.Epsilon.Instance);
 			expected.Add(Grammars.Dollar.Instance);
-			contexts = new List<Grammars.Variable>();
-			contexts.Add(null); // the default context
 			foreach (Automata.DFAState state in dfa.States)
 			{
-				List<Grammars.Variable> foundContexts = new List<Grammars.Variable>();
 				foreach (Automata.FinalItem item in state.Items)
 				{
 					Grammars.Terminal terminal = item as Grammars.Terminal;
-					if (expected.Contains(terminal))
-						break;
-					Grammars.Variable context = terminal.Context == null ? null : grammar.GetVariable(terminal.Context);
-					if (context == null && terminal.Context != null)
-					{
-						reporter.Error(string.Format("Terminal {0} is in unknown context {1} (not the name of a variable)", terminal, terminal.Context));
-						errors = true;
-					}
-					if (!foundContexts.Contains(context))
-					{
-						// this is the first time this context is found in the current DFA state
-						// this is the terminal with the most priority for this context
+					if (!expected.Contains(terminal))
 						expected.Add(terminal);
-						foundContexts.Add(context);
-						if (!contexts.Contains(context))
-							contexts.Add(context);
-					}
 				}
 			}
-			return !errors;
+			return true;
 		}
 
 		/// <summary>
@@ -209,8 +180,8 @@ namespace Hime.SDK.Output
 				return false;
 			}
 			// warn if the separator is context-sensitive
-			if (separator.Context != null)
-				reporter.Warn(string.Format("Terminal {0} specified as the separator has non-default context {1}", name, separator.Context));
+			if (separator.Context != 0)
+				reporter.Warn(string.Format("Terminal {0} specified as the separator has non-default context {1}", name, grammar.Contexts[separator.Context]));
 			// if the separator is among the expected terminals, then everything is find
 			if (expected.Contains(separator))
 				return true;
@@ -259,7 +230,7 @@ namespace Hime.SDK.Output
 			if (dfa.Entry.IsFinal)
 				return false;
 			// build the expected terminals
-			if (!BuildExpected(reporter))
+			if (!BuildExpected())
 				return false;
 			// build the separator
 			return BuildSeparator(reporter);

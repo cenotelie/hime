@@ -38,8 +38,16 @@ namespace Hime.Demo.Tasks
 		{
 			// Build parser assembly
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.SDK.Output.Mode.Assembly;
-			task.AddInputRaw("grammar Test {\n\t\toptions {Axiom=\"e\";}\n\t\tterminals {\n\t\t\tX0 -> 'x';\n\t\t\tcontext inner1 { X1 -> 'x'; }\n\t\t\tcontext inner2 { X2 -> 'x'; }\n\t\t}\n\t\trules {\n\t\t\tsub1 -> '('! inner1 ')'!;\n\t\t\tinner1 -> (X1 | sub1 | sub2)* ;\n\t\t\tsub2 -> '['! inner2 ']'!;\n\t\t\tinner2 -> (X2 | sub1 | sub2)*;\n\t\t\te -> (X0 | sub1 | sub2)* ;\n\t\t}\n\t}");
+			task.Mode = Hime.SDK.Output.Mode.SourceAndAssembly;
+			task.AddInputRaw("grammar Test { options {Axiom=\"e\";} terminals {" +
+				"X0 -> 'x';" +
+				"context inner1 { X1 -> 'x'; }" +
+				"context inner2 { X2 -> 'x'; } }" +
+				"rules {" +
+				"sub1 -> '('! #inner1{(X1 | sub1 | sub2)*} ')'!;" +
+				"sub2 -> '['! #inner2{(X2 | sub1 | sub2)*} ']'!;" +
+				"e -> (X0 | sub1 | sub2)* ;" +
+				"} }");
 			task.Namespace = "Hime.Demo.Generated";
 			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
 			task.Method = ParsingMethod.RNGLALR1;

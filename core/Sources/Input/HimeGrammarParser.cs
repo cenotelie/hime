@@ -91,85 +91,89 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int rule_def_atom = 0x002F;
 			/// <summary>
+			/// The unique identifier for variable rule_def_context
+			/// </summary>
+			public const int rule_def_context = 0x0030;
+			/// <summary>
 			/// The unique identifier for variable rule_def_element
 			/// </summary>
-			public const int rule_def_element = 0x0030;
+			public const int rule_def_element = 0x0031;
 			/// <summary>
 			/// The unique identifier for variable rule_def_tree_action
 			/// </summary>
-			public const int rule_def_tree_action = 0x0031;
+			public const int rule_def_tree_action = 0x0032;
 			/// <summary>
 			/// The unique identifier for variable rule_def_repetition
 			/// </summary>
-			public const int rule_def_repetition = 0x0032;
+			public const int rule_def_repetition = 0x0033;
 			/// <summary>
 			/// The unique identifier for variable rule_def_fragment
 			/// </summary>
-			public const int rule_def_fragment = 0x0033;
+			public const int rule_def_fragment = 0x0034;
 			/// <summary>
 			/// The unique identifier for variable rule_def_choice
 			/// </summary>
-			public const int rule_def_choice = 0x0034;
+			public const int rule_def_choice = 0x0035;
 			/// <summary>
 			/// The unique identifier for variable rule_definition
 			/// </summary>
-			public const int rule_definition = 0x0035;
+			public const int rule_definition = 0x0036;
 			/// <summary>
 			/// The unique identifier for variable rule_template_params
 			/// </summary>
-			public const int rule_template_params = 0x0036;
+			public const int rule_template_params = 0x0037;
 			/// <summary>
 			/// The unique identifier for variable cf_rule_template
 			/// </summary>
-			public const int cf_rule_template = 0x0037;
+			public const int cf_rule_template = 0x0038;
 			/// <summary>
 			/// The unique identifier for variable cf_rule_simple
 			/// </summary>
-			public const int cf_rule_simple = 0x0038;
+			public const int cf_rule_simple = 0x0039;
 			/// <summary>
 			/// The unique identifier for variable cf_rule
 			/// </summary>
-			public const int cf_rule = 0x0039;
+			public const int cf_rule = 0x003A;
 			/// <summary>
 			/// The unique identifier for variable grammar_options
 			/// </summary>
-			public const int grammar_options = 0x003A;
+			public const int grammar_options = 0x003B;
 			/// <summary>
 			/// The unique identifier for variable grammar_terminals
 			/// </summary>
-			public const int grammar_terminals = 0x003B;
+			public const int grammar_terminals = 0x003C;
 			/// <summary>
 			/// The unique identifier for variable grammar_cf_rules
 			/// </summary>
-			public const int grammar_cf_rules = 0x003C;
+			public const int grammar_cf_rules = 0x003D;
 			/// <summary>
 			/// The unique identifier for variable grammar_parency
 			/// </summary>
-			public const int grammar_parency = 0x003D;
+			public const int grammar_parency = 0x003E;
 			/// <summary>
 			/// The unique identifier for variable cf_grammar
 			/// </summary>
-			public const int cf_grammar = 0x003E;
+			public const int cf_grammar = 0x003F;
 			/// <summary>
 			/// The unique identifier for variable file
 			/// </summary>
-			public const int file = 0x003F;
+			public const int file = 0x0040;
 			/// <summary>
 			/// The unique identifier for variable _Axiom_
 			/// </summary>
-			public const int _Axiom_ = 0x005C;
+			public const int _Axiom_ = 0x005F;
 			/// <summary>
 			/// The unique identifier for virtual range
 			/// </summary>
-			public const int range = 0x0044;
+			public const int range = 0x0045;
 			/// <summary>
 			/// The unique identifier for virtual concat
 			/// </summary>
-			public const int concat = 0x0048;
+			public const int concat = 0x0049;
 			/// <summary>
 			/// The unique identifier for virtual emptypart
 			/// </summary>
-			public const int emptypart = 0x0052;
+			public const int emptypart = 0x0055;
 		}
 		/// <summary>
 		/// The collection of variables matched by this parser
@@ -196,36 +200,37 @@ namespace Hime.SDK.Input
 			new Symbol(0x002D, "rule_sym_ref_template"), 
 			new Symbol(0x002E, "rule_sym_ref_simple"), 
 			new Symbol(0x002F, "rule_def_atom"), 
-			new Symbol(0x0030, "rule_def_element"), 
-			new Symbol(0x0031, "rule_def_tree_action"), 
-			new Symbol(0x0032, "rule_def_repetition"), 
-			new Symbol(0x0033, "rule_def_fragment"), 
-			new Symbol(0x0034, "rule_def_choice"), 
-			new Symbol(0x0035, "rule_definition"), 
-			new Symbol(0x0036, "rule_template_params"), 
-			new Symbol(0x0037, "cf_rule_template"), 
-			new Symbol(0x0038, "cf_rule_simple"), 
-			new Symbol(0x0039, "cf_rule"), 
-			new Symbol(0x003A, "grammar_options"), 
-			new Symbol(0x003B, "grammar_terminals"), 
-			new Symbol(0x003C, "grammar_cf_rules"), 
-			new Symbol(0x003D, "grammar_parency"), 
-			new Symbol(0x003E, "cf_grammar"), 
-			new Symbol(0x003F, "file"), 
-			new Symbol(0x0049, "_gen_V73"), 
+			new Symbol(0x0030, "rule_def_context"), 
+			new Symbol(0x0031, "rule_def_element"), 
+			new Symbol(0x0032, "rule_def_tree_action"), 
+			new Symbol(0x0033, "rule_def_repetition"), 
+			new Symbol(0x0034, "rule_def_fragment"), 
+			new Symbol(0x0035, "rule_def_choice"), 
+			new Symbol(0x0036, "rule_definition"), 
+			new Symbol(0x0037, "rule_template_params"), 
+			new Symbol(0x0038, "cf_rule_template"), 
+			new Symbol(0x0039, "cf_rule_simple"), 
+			new Symbol(0x003A, "cf_rule"), 
+			new Symbol(0x003B, "grammar_options"), 
+			new Symbol(0x003C, "grammar_terminals"), 
+			new Symbol(0x003D, "grammar_cf_rules"), 
+			new Symbol(0x003E, "grammar_parency"), 
+			new Symbol(0x003F, "cf_grammar"), 
+			new Symbol(0x0040, "file"), 
 			new Symbol(0x004A, "_gen_V74"), 
 			new Symbol(0x004B, "_gen_V75"), 
-			new Symbol(0x004D, "_gen_V77"), 
-			new Symbol(0x004F, "_gen_V79"), 
+			new Symbol(0x004C, "_gen_V76"), 
+			new Symbol(0x004E, "_gen_V78"), 
 			new Symbol(0x0051, "_gen_V81"), 
-			new Symbol(0x0053, "_gen_V83"), 
 			new Symbol(0x0054, "_gen_V84"), 
-			new Symbol(0x0055, "_gen_V85"), 
 			new Symbol(0x0056, "_gen_V86"), 
 			new Symbol(0x0057, "_gen_V87"), 
+			new Symbol(0x0058, "_gen_V88"), 
 			new Symbol(0x0059, "_gen_V89"), 
-			new Symbol(0x005B, "_gen_V91"), 
-			new Symbol(0x005C, "_Axiom_") };
+			new Symbol(0x005A, "_gen_V90"), 
+			new Symbol(0x005C, "_gen_V92"), 
+			new Symbol(0x005E, "_gen_V94"), 
+			new Symbol(0x005F, "_Axiom_") };
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>
@@ -234,13 +239,13 @@ namespace Hime.SDK.Input
 		/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table
 		/// </remarks>
 		private static readonly Symbol[] virtuals = {
-			new Symbol(0x0044, "range"), 
-			new Symbol(0x0048, "concat"), 
-			new Symbol(0x0052, "emptypart") };
+			new Symbol(0x0045, "range"), 
+			new Symbol(0x0049, "concat"), 
+			new Symbol(0x0055, "emptypart") };
 		/// <summary>
 		/// Initializes a new instance of the parser
 		/// </summary>
 		/// <param name="lexer">The input lexer</param>
-		public HimeGrammarParser(HimeGrammarLexer lexer) : base(commonAutomaton, variables, virtuals, null, lexer) { }
+		public HimeGrammarParser(HimeGrammarLexer lexer) : base (commonAutomaton, variables, virtuals, null, lexer) { }
 	}
 }

@@ -22,9 +22,9 @@ using System.Collections.Generic;
 namespace Hime.SDK.Grammars
 {
 	/// <summary>
-	/// Represents the context of a loader
+	/// Represents the lexical context of a loader
 	/// </summary>
-	public class Context
+	public class LoaderContext
 	{
 		/// <summary>
 		/// The loader
@@ -48,7 +48,7 @@ namespace Hime.SDK.Grammars
 		/// Initializes this context
 		/// </summary>
 		/// <param name="loader">The parent loader</param>
-		public Context(Loader loader)
+		public LoaderContext(Loader loader)
 		{
 			this.loader = loader;
 			templateRules = new List<TemplateRule>();
@@ -59,7 +59,7 @@ namespace Hime.SDK.Grammars
 		/// Initializes this context from a parent one
 		/// </summary>
 		/// <param name="copied">The context to copy</param>
-		public Context(Context copied)
+		public LoaderContext(LoaderContext copied)
 		{
 			loader = copied.Loader;
 			templateRules = new List<TemplateRule>(copied.templateRules);

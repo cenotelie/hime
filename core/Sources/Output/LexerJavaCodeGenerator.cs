@@ -51,7 +51,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The contexts for the lexer
 		/// </summary>
-		private readonly ROList<Variable> contexts;
+		private readonly ROList<string> contexts;
 		/// <summary>
 		/// The separator terminal
 		/// </summary>
@@ -69,7 +69,7 @@ namespace Hime.SDK.Output
 			name = unit.Name;
 			this.binResource = binResource;
 			terminals = unit.Expected;
-			contexts = unit.Contexts;
+			contexts = unit.Grammar.Contexts;
 			separator = unit.Separator;
 		}
 
@@ -147,11 +147,11 @@ namespace Hime.SDK.Output
 			writer.WriteLine("        public static final int DEFAULT = 0;");
 			for (int i = 1; i != contexts.Count; i++)
 			{
-				Variable context = contexts[i];
+				string context = contexts[i];
 				writer.WriteLine("        /**");
-				writer.WriteLine("         * The unique identifier for context " + context.Name);
+				writer.WriteLine("         * The unique identifier for context " + context);
 				writer.WriteLine("         */");
-				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(context), i.ToString("X4"));
+				writer.WriteLine("        public static final int {0} = 0x{1};", context, i.ToString("X4"));
 			}
 			writer.WriteLine("    }");
 

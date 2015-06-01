@@ -37,6 +37,10 @@ namespace Hime.SDK.Grammars
 		/// Whether this rule has been generated
 		/// </summary>
 		private readonly bool generated;
+		/// <summary>
+		/// The lexical context pushed by this rule
+		/// </summary>
+		private readonly int context;
 
 		/// <summary>
 		/// Gets the rule's head variable
@@ -54,16 +58,23 @@ namespace Hime.SDK.Grammars
 		public bool IsGenerated { get { return generated; } }
 
 		/// <summary>
+		/// Gets the lexical context pushed by this rule
+		/// </summary>
+		public int Context { get { return context; } }
+
+		/// <summary>
 		/// Initializes this rule
 		/// </summary>
 		/// <param name='head'>The rule's head</param>
 		/// <param name='body'>The rule's body</param>
 		/// <param name='generated'>Whether this rule is generated</param>
-		public Rule(Variable head, RuleBody body, bool generated)
+		/// <param name='context'>The lexical context pushed by this rule</param>
+		public Rule(Variable head, RuleBody body, bool generated, int context)
 		{
 			this.head = head;
 			this.body = body;
 			this.generated = generated;
+			this.context = context;
 		}
 
 		/// <summary>

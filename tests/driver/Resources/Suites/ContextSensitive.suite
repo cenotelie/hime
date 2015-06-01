@@ -8,8 +8,7 @@ test Test_CS_NoContext_LR:
 			context inner1 { X1 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
+			sub1 -> '('! #inner1{ X1* } ')'!;
 			e -> (X0 | sub1)* ;
 		}
 	}
@@ -25,8 +24,7 @@ test Test_CS_NoContext_GLR:
 			context inner1 { X1 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
+			sub1 -> '('! #inner1{ X1* } ')'!;
 			e -> (X0 | sub1)* ;
 		}
 	}
@@ -42,14 +40,13 @@ test Test_CS_SingleContext_LR:
 			context inner1 { X1 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
+			sub1 -> '('! #inner1{ X1* } ')'!;
 			e -> (X0 | sub1)* ;
 		}
 	}
 	parser LALR1
 	on "x(x)"
-	yields e(X0 sub1(inner1(X1)))
+	yields e(X0 sub1(X1))
 
 test Test_CS_SingleContext_GLR:
 	grammar Test_CS_SingleContext_GLR {
@@ -59,14 +56,13 @@ test Test_CS_SingleContext_GLR:
 			context inner1 { X1 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
+			sub1 -> '('! #inner1{ X1* } ')'!;
 			e -> (X0 | sub1)* ;
 		}
 	}
 	parser RNGLALR1
 	on "x(x)"
-	yields e(X0 sub1(inner1(X1)))
+	yields e(X0 sub1(X1))
 
 test Test_CS_MatchingSeparator_LR:
 	grammar Test_CS_MatchingSeparator_LR {
@@ -77,14 +73,13 @@ test Test_CS_MatchingSeparator_LR:
 			SEP -> ' '+;
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
+			sub1 -> '('! #inner1{ X1* } ')'!;
 			e -> (X0 | sub1)* ;
 		}
 	}
 	parser LALR1
 	on "x( x )"
-	yields e(X0 sub1(inner1(X1)))
+	yields e(X0 sub1(X1))
 
 test Test_CS_MatchingSeparator_GLR:
 	grammar Test_CS_MatchingSeparator_GLR {
@@ -95,14 +90,13 @@ test Test_CS_MatchingSeparator_GLR:
 			SEP -> ' '+;
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
+			sub1 -> '('! #inner1{ X1* } ')'!;
 			e -> (X0 | sub1)* ;
 		}
 	}
 	parser RNGLALR1
 	on "x( x )"
-	yields e(X0 sub1(inner1(X1)))
+	yields e(X0 sub1(X1))
 
 test Test_CS_MultipleContext_LR:
 	grammar Test_CS_MultipleContext_LR {
@@ -113,16 +107,14 @@ test Test_CS_MultipleContext_LR:
 			context inner2 { X2 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> X2;
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			sub2 -> '['! #inner2{ X2* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser LALR1
 	on "x(x)[x]"
-	yields e(X0 sub1(inner1(X1)) sub2(inner2(X2)))
+	yields e(X0 sub1(X1) sub2(X2))
 
 test Test_CS_MultipleContext_GLR:
 	grammar Test_CS_MultipleContext_GLR {
@@ -133,16 +125,14 @@ test Test_CS_MultipleContext_GLR:
 			context inner2 { X2 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> X1* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> X2;
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			sub2 -> '['! #inner2{ X2* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser RNGLALR1
 	on "x(x)[x]"
-	yields e(X0 sub1(inner1(X1)) sub2(inner2(X2)))
+	yields e(X0 sub1(X1) sub2(X2))
 
 test Test_CS_ContextStack_1_LR:
 	grammar Test_CS_ContextStack_1_LR {
@@ -153,16 +143,15 @@ test Test_CS_ContextStack_1_LR:
 			context inner2 { X2 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			inner2 -> ;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser LALR1
 	on "x(x[x])"
-	yields e(X0 sub1(inner1(X1 sub2(inner2(X2)))))
+	yields e(X0 sub1(X1 sub2(X2)))
 
 test Test_CS_ContextStack_1_GLR:
 	grammar Test_CS_ContextStack_1_GLR {
@@ -173,16 +162,14 @@ test Test_CS_ContextStack_1_GLR:
 			context inner2 { X2 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser RNGLALR1
 	on "x(x[x])"
-	yields e(X0 sub1(inner1(X1 sub2(inner2(X2)))))
+	yields e(X0 sub1(X1 sub2(X2)))
 
 test Test_CS_ContextStack_2_LR:
 	grammar Test_CS_ContextStack_2_LR {
@@ -193,16 +180,14 @@ test Test_CS_ContextStack_2_LR:
 			context inner2 { X2 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser LALR1
 	on "x[x(x)]"
-	yields e(X0 sub2(inner2(X2 sub1(inner1(X1)))))
+	yields e(X0 sub2(X2 sub1(X1)))
 
 test Test_CS_ContextStack_2_GLR:
 	grammar Test_CS_ContextStack_2_GLR {
@@ -213,16 +198,14 @@ test Test_CS_ContextStack_2_GLR:
 			context inner2 { X2 -> 'x'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser RNGLALR1
 	on "x[x(x)]"
-	yields e(X0 sub2(inner2(X2 sub1(inner1(X1)))))
+	yields e(X0 sub2(X2 sub1(X1)))
 
 test Test_CS_MatchLongest_1_LR:
 	grammar Test_CS_MatchLongest_1_LR {
@@ -233,16 +216,14 @@ test Test_CS_MatchLongest_1_LR:
 			context inner2 { X2 -> 'xxx'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser LALR1
 	on "(xx[xxx]xx)"
-	yields e(sub1(inner1(X1 sub2(inner2(X2)) X1)))
+	yields e(sub1(X1 sub2(X2) X1))
 
 test Test_CS_MatchLongest_1_GLR:
 	grammar Test_CS_MatchLongest_1_GLR {
@@ -253,16 +234,14 @@ test Test_CS_MatchLongest_1_GLR:
 			context inner2 { X2 -> 'xxx'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
 	parser RNGLALR1
 	on "(xx[xxx]xx)"
-	yields e(sub1(inner1(X1 sub2(inner2(X2)) X1)))
+	yields e(sub1(X1 sub2(X2) X1))
 
 test Test_CS_MatchLongest_2_LR:
 	grammar Test_CS_MatchLongest_2_LR {
@@ -273,10 +252,8 @@ test Test_CS_MatchLongest_2_LR:
 			context inner2 { X2 -> 'xxx'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}
@@ -293,10 +270,8 @@ test Test_CS_MatchLongest_2_GLR:
 			context inner2 { X2 -> 'xxx'; }
 		}
 		rules {
-			sub1 -> '('! inner1 ')'!;
-			inner1 -> (X1 | sub1 | sub2)* ;
-			sub2 -> '['! inner2 ']'!;
-			inner2 -> (X2 | sub1 | sub2)*;
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
 			e -> (X0 | sub1 | sub2)* ;
 		}
 	}

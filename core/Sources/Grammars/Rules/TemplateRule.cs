@@ -112,7 +112,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="context">The context</param>
 		/// <param name="parameters">The parameter values</param>
 		/// <returns>The generated variable containing the instantiated rule</returns>
-		public Variable Instantiate(Context context, List<Symbol> parameters)
+		public Variable Instantiate(LoaderContext context, List<Symbol> parameters)
 		{
 			foreach (TemplateRuleInstance instance in instances)
 			{

@@ -107,7 +107,7 @@ grammar HimeGrammar
 
 
 		/* Define symbols for grammar rules */
-		rule_sym_action			-> '{'! NAME '}'! ;
+		rule_sym_action			-> '@'! NAME ;
 		rule_sym_virtual		-> LITERAL_STRING ;
 		rule_sym_ref_params		-> '<'! rule_def_atom (','! rule_def_atom)* '>'! ;
 		rule_sym_ref_template	-> NAME rule_sym_ref_params ;
@@ -119,7 +119,8 @@ grammar HimeGrammar
 								|  rule_sym_ref_simple^
 								|  rule_sym_ref_template^
 								|  LITERAL_TEXT^ ;
-		rule_def_element	-> rule_def_atom^ | '('! rule_definition^ ')'!;
+		rule_def_context	-> '#'! NAME '{'! rule_definition '}'! ;
+		rule_def_element	-> rule_def_atom^ | rule_def_context^ | '('! rule_definition^ ')'!;
 		rule_def_tree_action-> rule_def_element^ (TREE_ACTION_PROMOTE | TREE_ACTION_DROP)^?;
 		rule_def_repetition	-> rule_def_tree_action^ (OPERATOR_OPTIONAL | OPERATOR_ONEMORE | OPERATOR_ZEROMORE)^?;
 		rule_def_fragment	-> rule_def_repetition^ ("concat"^ rule_def_repetition)*;

@@ -322,7 +322,7 @@ namespace Hime.SDK.Output
 		{
 			// generate the lexer's data
 			reporter.Info("Exporting lexer data at " + GetArtifactLexerData(unit) + " ...");
-			LexerDataGenerator genData = new LexerDataGenerator(unit.DFA, unit.Expected, unit.Contexts);
+			LexerDataGenerator genData = new LexerDataGenerator(unit.DFA, unit.Expected);
 			genData.Generate(GetArtifactLexerData(unit));
 
 			// generate the lexer's code

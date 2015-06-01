@@ -77,6 +77,6 @@ namespace Hime.SDK.Input
 		/// Initializes a new instance of the parser
 		/// </summary>
 		/// <param name="lexer">The input lexer</param>
-		public CommandLineParser(CommandLineLexer lexer) : base(commonAutomaton, variables, virtuals, null, lexer) { }
+		public CommandLineParser(CommandLineLexer lexer) : base (commonAutomaton, variables, virtuals, null, lexer) { }
 	}
 }

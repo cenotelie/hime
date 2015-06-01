@@ -33,7 +33,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
-		private NullTerminal() : base(0, string.Empty, string.Empty, null, null)
+		private NullTerminal() : base(0, string.Empty, string.Empty, null, 0)
 		{
 		}
 

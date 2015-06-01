@@ -82,10 +82,10 @@ namespace Hime.SDK.Grammars
 		/// Compile this rule and generate the associated grammar rule
 		/// </summary>
 		/// <param name="context">The current context</param>
-		public void Compile(Context context)
+		public void Compile(LoaderContext context)
 		{
 			// Create a new context for recognizing the rule
-			Context newContext = new Context(context);
+			LoaderContext newContext = new LoaderContext(context);
 			// Add the parameters as references in the new context
 			for (int i = 0; i != parameters.Count; i++)
 				newContext.AddBinding(templateRule.Parameters[i], parameters[i]);
@@ -93,7 +93,7 @@ namespace Hime.SDK.Grammars
 			RuleBodySet set = newContext.Loader.BuildDefinitions(newContext, templateRule.DefinitionNode);
 			// Add recognized rules to the variable
 			foreach (RuleBody def in set)
-				variable.AddRule(new Rule(variable, def, false));
+				variable.AddRule(new Rule(variable, def, false, 0));
 		}
 
 		/// <summary>

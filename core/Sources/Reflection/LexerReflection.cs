@@ -91,7 +91,7 @@ namespace Hime.SDK.Reflection
 			for (int i = 2; i != spec.Count; i++)
 			{
 				Hime.Redist.Symbol symbol = spec[i];
-				terminals.Add(new Terminal(symbol.ID, symbol.Name, "", null, null));
+				terminals.Add(new Terminal(symbol.ID, symbol.Name, "", null, 0));
 			}
 		}
 
@@ -114,8 +114,8 @@ namespace Hime.SDK.Reflection
 					MatchedTerminal mt = stateData.GetTerminal(j);
 					Terminal terminal = terminals[mt.Index];
 					current.AddItem(terminal);
-					if (mt.Context != 0 && terminal.Context == null)
-						terminals[mt.Context].Context = mt.Context.ToString();
+					if (mt.Context != 0)
+						terminals[mt.Index].Context = mt.Context;
 				}
 				// retrieve the transitions
 				for (int j = 0; j != 256; j++)

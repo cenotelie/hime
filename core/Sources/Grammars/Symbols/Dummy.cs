@@ -33,7 +33,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Initializes the singleton
 		/// </summary>
-		private Dummy() : base(0, "#", "#", null, null)
+		private Dummy() : base(0, "#", "#", null, 0)
 		{
 		}
 

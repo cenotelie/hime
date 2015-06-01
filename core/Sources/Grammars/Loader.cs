@@ -149,7 +149,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="name">A name</param>
 		/// <param name="context">The current context</param>
-		private Symbol ResolveSymbol(string name, Context context)
+		private Symbol ResolveSymbol(string name, LoaderContext context)
 		{
 			// is this a reference to a template parameter?
 			if (context.IsBound(name))
@@ -288,7 +288,7 @@ namespace Hime.SDK.Grammars
 					LoadTerminalContext(child);
 					break;
 				case HimeGrammarParser.ID.terminal_rule:
-					LoadTerminalRule(child, null);
+					LoadTerminalRule(child, Grammar.DEFAULT_CONTEXT_NAME);
 					break;
 				}
 			}
@@ -693,7 +693,7 @@ namespace Hime.SDK.Grammars
 		private void LoadBlockRules(ASTNode node)
 		{
 			// Create a new context
-			Context context = new Context(this);
+			LoaderContext context = new LoaderContext(this);
 			// Add existing meta-rules that may have been inherited
 			foreach (TemplateRule templateRule in grammar.TemplateRules)
 				context.AddTemplateRule(templateRule);
@@ -722,13 +722,13 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
-		private void LoadRule(Context context, ASTNode node)
+		private void LoadRule(LoaderContext context, ASTNode node)
 		{
 			string name = node.Children[0].Value;
 			Variable var = grammar.GetVariable(name);
 			RuleBodySet defs = BuildDefinitions(context, node.Children[1]);
 			foreach (RuleBody def in defs)
-				var.AddRule(new Rule(var, def, false));
+				var.AddRule(new Rule(var, def, false, 0));
 		}
 
 		/// <summary>
@@ -737,9 +737,20 @@ namespace Hime.SDK.Grammars
 		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
-		public RuleBodySet BuildDefinitions(Context context, ASTNode node)
+		public RuleBodySet BuildDefinitions(LoaderContext context, ASTNode node)
 		{
-			if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
+			if (node.Symbol.ID == HimeGrammarParser.ID.rule_def_context)
+			{
+				int contextID = grammar.ResolveContext(node.Children[0].Value);
+				RuleBodySet setInner = BuildDefinitions(context, node.Children[1]);
+				Variable subVar = grammar.GenerateVariable();
+				foreach (RuleBody def in setInner)
+					subVar.AddRule(new Rule(subVar, def, true, contextID));
+				RuleBodySet setVar = new RuleBodySet();
+				setVar.Add(new RuleBody(subVar));
+				return setVar;
+			}
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
 			{
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				setInner.Insert(0, new RuleBody());
@@ -750,12 +761,12 @@ namespace Hime.SDK.Grammars
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				Variable subVar = grammar.GenerateVariable();
 				foreach (RuleBody def in setInner)
-					subVar.AddRule(new Rule(subVar, def, true));
+					subVar.AddRule(new Rule(subVar, def, true, 0));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				setVar = RuleBodySet.Multiply(setVar, setInner);
 				foreach (RuleBody def in setVar)
-					subVar.AddRule(new Rule(subVar, def, true));
+					subVar.AddRule(new Rule(subVar, def, true, 0));
 				setVar = new RuleBodySet();
 				setVar.Add(new RuleBody());
 				setVar.Add(new RuleBody(subVar));
@@ -766,12 +777,12 @@ namespace Hime.SDK.Grammars
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				Variable subVar = grammar.GenerateVariable();
 				foreach (RuleBody def in setInner)
-					subVar.AddRule(new Rule(subVar, def, true));
+					subVar.AddRule(new Rule(subVar, def, true, 0));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				setVar = RuleBodySet.Multiply(setVar, setInner);
 				foreach (RuleBody def in setVar)
-					subVar.AddRule(new Rule(subVar, def, true));
+					subVar.AddRule(new Rule(subVar, def, true, 0));
 				setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				return setVar;
@@ -815,7 +826,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
-		private RuleBodySet BuildAtomicDefinition(Context context, ASTNode node)
+		private RuleBodySet BuildAtomicDefinition(LoaderContext context, ASTNode node)
 		{
 			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_action)
 				return BuildAtomicAction(node);
@@ -869,7 +880,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
-		private RuleBodySet BuildAtomicSimpleReference(Context context, ASTNode node)
+		private RuleBodySet BuildAtomicSimpleReference(LoaderContext context, ASTNode node)
 		{
 			RuleBodySet defs = new RuleBodySet();
 			Symbol symbol = ResolveSymbol(node.Children[0].Value, context);
@@ -891,7 +902,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="context">The current context</param>
 		/// <param name="node">The AST node of a syntactic rule</param>
 		/// <returns>The set of possible rule definitions</returns>
-		private RuleBodySet BuildAtomicTemplateReference(Context context, ASTNode node)
+		private RuleBodySet BuildAtomicTemplateReference(LoaderContext context, ASTNode node)
 		{
 			RuleBodySet defs = new RuleBodySet();
 			// Get the information
