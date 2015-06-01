@@ -109,12 +109,12 @@ namespace Hime.SDK.Output
 			writer.WriteLine("import java.io.InputStreamReader;");
 			writer.WriteLine();
 
-			string mod = modifier == Modifier.Public ? "public" : "";
+			string mod = modifier == Modifier.Public ? "public " : "";
 
 			writer.WriteLine("/**");
 			writer.WriteLine(" * Represents a lexer");
 			writer.WriteLine(" */");
-			writer.WriteLine(mod + " class " + name + "Lexer extends " + baseLexer + " {");
+			writer.WriteLine(mod + "class " + name + "Lexer extends " + baseLexer + " {");
 
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * The automaton for this lexer");
