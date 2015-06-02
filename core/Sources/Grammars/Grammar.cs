@@ -74,6 +74,10 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		private readonly List<string> contexts;
 		/// <summary>
+		/// The fragments of terminals (used in the definition of complete terminals)
+		/// </summary>
+		private readonly Dictionary<string, Terminal> fragments;
+		/// <summary>
 		/// The grammar's terminals, by name
 		/// </summary>
 		private readonly Dictionary<string, Terminal> terminalsByName;
@@ -112,6 +116,11 @@ namespace Hime.SDK.Grammars
 		/// Gets the contexts defined in this grammar
 		/// </summary>
 		public ROList<string> Contexts { get { return new ROList<string>(contexts); } }
+
+		/// <summary>
+		/// Gets the terminal fragments in this grammar
+		/// </summary>
+		public ICollection<Terminal> Fragments { get { return fragments.Values; } }
 
 		/// <summary>
 		/// Gets the grammar's terminals
@@ -161,6 +170,7 @@ namespace Hime.SDK.Grammars
 			options = new Dictionary<string, string>();
 			contexts = new List<string>();
 			contexts.Add(DEFAULT_CONTEXT_NAME);
+			fragments = new Dictionary<string, Terminal>();
 			terminalsByName = new Dictionary<string, Terminal>();
 			terminalsByValue = new Dictionary<string, Terminal>();
 			variables = new Dictionary<string, Variable>();
@@ -233,6 +243,30 @@ namespace Hime.SDK.Grammars
 				return index;
 			contexts.Add(context);
 			return contexts.Count - 1;
+		}
+
+		/// <summary>
+		/// Adds the given fragment to this grammar
+		/// </summary>
+		/// <param name="name">The fragment's name</param>
+		/// <param name="nfa">The fragment's NFA</param>
+		/// <returns>The new fragment</returns>
+		public Terminal AddFragment(string name, Automata.NFA nfa)
+		{
+			Terminal fragment = new Terminal(nextSID, name, name, nfa, 0);
+			nextSID++;
+			fragments.Add(name, fragment);
+			return fragment;
+		}
+
+		/// <summary>
+		/// Gets the fragment with the given name
+		/// </summary>
+		/// <param name="name">A fragment's name</param>
+		/// <returns>The corresponding fragment, or <c>null</c> if it does not exists</returns>
+		public Terminal GetFragment(string name)
+		{
+			return fragments.ContainsKey(name) ? fragments[name] : null;
 		}
 
 		/// <summary>
@@ -400,6 +434,7 @@ namespace Hime.SDK.Grammars
 		{
 			bool doClone = (nextSID == 3);
 			InheritOptions(parent);
+			InheritFragments(parent, doClone);
 			InheritTerminals(parent, doClone);
 			InheritVirtuals(parent, doClone);
 			InheritActions(parent, doClone);
@@ -434,6 +469,36 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
+		/// Inherits the fragments from the parent grammar
+		/// </summary>
+		/// <param name="parent">The parent's grammar</param>
+		/// <param name="doClone">Clone the symbols</param>
+		private void InheritFragments(Grammar parent, bool doClone)
+		{
+			List<Terminal> inherited = new List<Terminal>(parent.fragments.Values);
+			inherited.Sort(new Terminal.PriorityComparer());
+			foreach (Terminal fragment in inherited)
+			{
+				if (fragments.ContainsKey(fragment.Name))
+				{
+					// this is a redefinition of a named terminal
+					// TODO: Output an error in the log
+				}
+				else if (doClone)
+				{
+					Terminal clone = new Terminal(fragment.ID, fragment.Name, fragment.Value, fragment.NFA.Clone(false), fragment.Context);
+					clone.NFA.StateExit.AddItem(clone);
+					fragments.Add(fragment.Name, fragment);
+				}
+				else
+				{
+					Terminal clone = AddFragment(fragment.Name, fragment.NFA.Clone(false));
+					clone.NFA.StateExit.AddItem(clone);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Inherits the terminals from the parent grammar
 		/// </summary>
 		/// <param name="parent">The parent's grammar</param>
@@ -449,14 +514,12 @@ namespace Hime.SDK.Grammars
 					// this is a redefinition of a named terminal
 					// TODO: Output an error in the log
 				}
-				else
-				if (terminalsByValue.ContainsKey(terminal.Value))
+				else if (terminalsByValue.ContainsKey(terminal.Value))
 				{
 					// this is a redefinition of an inline terminal
 					// => do nothing, simply reuse the one with the same value
 				}
-				else
-				if (doClone)
+				else if (doClone)
 				{
 					Terminal clone = new Terminal(terminal.ID, terminal.Name, terminal.Value, terminal.NFA.Clone(false), terminal.Context);
 					clone.NFA.StateExit.AddItem(clone);
@@ -502,14 +565,11 @@ namespace Hime.SDK.Grammars
 						Symbol symbol = null;
 						if (part.Symbol is Variable)
 							symbol = variables[part.Symbol.Name];
-						else
-						if (part.Symbol is Terminal)
+						else if (part.Symbol is Terminal)
 							symbol = terminalsByName[part.Symbol.Name];
-						else
-						if (part.Symbol is Virtual)
+						else if (part.Symbol is Virtual)
 							symbol = virtuals[part.Symbol.Name];
-						else
-						if (part.Symbol is Action)
+						else if (part.Symbol is Action)
 							symbol = actions[part.Symbol.Name];
 						parts.Add(new RuleBodyElement(symbol, part.Action));
 					}

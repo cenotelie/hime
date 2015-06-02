@@ -287,6 +287,9 @@ namespace Hime.SDK.Grammars
 				case HimeGrammarLexer.ID.BLOCK_CONTEXT:
 					LoadTerminalContext(child);
 					break;
+				case HimeGrammarParser.ID.terminal_fragment:
+					LoadTerminalFragment(child);
+					break;
 				case HimeGrammarParser.ID.terminal_rule:
 					LoadTerminalRule(child, Grammar.DEFAULT_CONTEXT_NAME);
 					break;
@@ -304,6 +307,32 @@ namespace Hime.SDK.Grammars
 			string name = children[0].Value;
 			for (int i = 1; i != children.Count; i++)
 				LoadTerminalRule(children[i], name);
+		}
+
+		/// <summary>
+		/// Loads the terminal fragment in the given AST
+		/// </summary>
+		/// <param name="node">The AST node of a terminal rule</param>
+		private void LoadTerminalFragment(ASTNode node)
+		{
+			ASTNode nameNode = node.Children[0];
+			// Resolve the terminal
+			Terminal fragment = grammar.GetFragment(nameNode.Value);
+			if (fragment == null)
+			{
+				// The terminal does not already exists
+				// Build the NFA
+				Automata.NFA nfa = BuildNFA(node.Children[1]);
+				// Create the terminal in the grammar
+				fragment = grammar.AddFragment(nameNode.Value, nfa);
+				// Marks the final NFA state with the new terminal
+				nfa.StateExit.AddItem(fragment);
+			}
+			else
+			{
+				// Tried to override the terminal
+				OnError(nameNode.Position, "Overriding the definition of fragment {0}", nameNode.Value);
+			}
 		}
 
 		/// <summary>
@@ -676,14 +705,16 @@ namespace Hime.SDK.Grammars
 		/// <returns>The equivalent NFA</returns>
 		private Automata.NFA BuildNFAFromReference(ASTNode node)
 		{
-			// rerieve the reference
-			Terminal reference = grammar.GetTerminalByName(node.Value);
-			if (reference == null)
-			{
-				OnError(node.Position, "Reference to unknown terminal {0}", node.Value);
-				return BuildEpsilonNFA();
-			}
-			return reference.NFA.Clone(false);
+			// is it a reference to a fragment?
+			Terminal reference = grammar.GetFragment(node.Value);
+			if (reference != null)
+				return reference.NFA.Clone(false);
+			// is it a reference to another terminal?
+			reference = grammar.GetTerminalByName(node.Value);
+			if (reference != null)
+				return reference.NFA.Clone(false);
+			OnError(node.Position, "Reference to unknown terminal {0}", node.Value);
+			return BuildEpsilonNFA();
 		}
 
 		/// <summary>

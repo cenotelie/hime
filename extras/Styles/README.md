@@ -28,8 +28,8 @@ $ sudo chmod go+r /usr/share/gtksourceview-2.0/language-specs/hgram.lang
 $ sudo chmod go+r /usr/share/gtksourceview-2.0/language-specs/hsuite.lang
 
 # For GTK Source View 3.0
-$ sudo cp extras/Styles/gtk2_hgram.lang /usr/share/gtksourceview-3.0/language-specs/hgram.lang
-$ sudo cp extras/Styles/gtk2_hsuite.lang /usr/share/gtksourceview-3.0/language-specs/hsuite.lang
+$ sudo cp extras/Styles/gtk3_hgram.lang /usr/share/gtksourceview-3.0/language-specs/hgram.lang
+$ sudo cp extras/Styles/gtk3_hsuite.lang /usr/share/gtksourceview-3.0/language-specs/hsuite.lang
 $ sudo chmod go+r /usr/share/gtksourceview-3.0/language-specs/hgram.lang
 $ sudo chmod go+r /usr/share/gtksourceview-3.0/language-specs/hsuite.lang
 ```

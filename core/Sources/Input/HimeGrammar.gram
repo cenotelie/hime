@@ -102,8 +102,9 @@ grammar HimeGrammar
 		terminal_def_restrict		-> terminal_def_fragment^ (OPERATOR_DIFFERENCE^ terminal_def_fragment)* ;
 		terminal_definition			-> terminal_def_restrict^ (OPERATOR_UNION^ terminal_def_restrict)*;
 		terminal_rule				-> NAME '->'! terminal_definition ';'! ;
+		terminal_fragment			-> 'fragment'! NAME '->'! terminal_definition ';'! ;
 		terminal_context			-> BLOCK_CONTEXT^ NAME '{'! terminal_rule* '}'! ;
-		terminal_item				-> terminal_rule^ | terminal_context^ ;
+		terminal_item				-> terminal_rule^ | terminal_fragment^ | terminal_context^ ;
 
 
 		/* Define symbols for grammar rules */

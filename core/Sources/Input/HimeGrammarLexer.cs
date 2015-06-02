@@ -28,6 +28,10 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int NAME = 0x0009;
 			/// <summary>
+			/// The unique identifier for terminal NAME_FIRST
+			/// </summary>
+			public const int NAME_FIRST = 0x0008;
+			/// <summary>
 			/// The unique identifier for terminal LITERAL_ANY
 			/// </summary>
 			public const int LITERAL_ANY = 0x000D;
@@ -64,6 +68,14 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int SEPARATOR = 0x0007;
 			/// <summary>
+			/// The unique identifier for terminal NEW_LINE
+			/// </summary>
+			public const int NEW_LINE = 0x0003;
+			/// <summary>
+			/// The unique identifier for terminal WHITE_SPACE
+			/// </summary>
+			public const int WHITE_SPACE = 0x0004;
+			/// <summary>
 			/// The unique identifier for terminal INTEGER
 			/// </summary>
 			public const int INTEGER = 0x000A;
@@ -80,6 +92,10 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int ESCAPEES = 0x000B;
 			/// <summary>
+			/// The unique identifier for terminal COMMENT_LINE
+			/// </summary>
+			public const int COMMENT_LINE = 0x0005;
+			/// <summary>
 			/// The unique identifier for terminal UNICODE_CODEPOINT
 			/// </summary>
 			public const int UNICODE_CODEPOINT = 0x0012;
@@ -91,6 +107,10 @@ namespace Hime.SDK.Input
 			/// The unique identifier for terminal LITERAL_TEXT
 			/// </summary>
 			public const int LITERAL_TEXT = 0x000E;
+			/// <summary>
+			/// The unique identifier for terminal COMMENT_BLOCK
+			/// </summary>
+			public const int COMMENT_BLOCK = 0x0006;
 			/// <summary>
 			/// The unique identifier for terminal UNICODE_BLOCK
 			/// </summary>
@@ -137,6 +157,7 @@ namespace Hime.SDK.Input
 			new Symbol(0x0001, "ε"),
 			new Symbol(0x0002, "$"),
 			new Symbol(0x0009, "NAME"),
+			new Symbol(0x0008, "NAME_FIRST"),
 			new Symbol(0x000D, "LITERAL_ANY"),
 			new Symbol(0x0014, "OPERATOR_OPTIONAL"),
 			new Symbol(0x0015, "OPERATOR_ZEROMORE"),
@@ -145,33 +166,38 @@ namespace Hime.SDK.Input
 			new Symbol(0x0018, "OPERATOR_DIFFERENCE"),
 			new Symbol(0x0019, "TREE_ACTION_PROMOTE"),
 			new Symbol(0x001A, "TREE_ACTION_DROP"),
-			new Symbol(0x0041, "="),
-			new Symbol(0x0042, ";"),
-			new Symbol(0x0043, "("),
-			new Symbol(0x0044, ")"),
-			new Symbol(0x0046, "{"),
-			new Symbol(0x0047, ","),
-			new Symbol(0x0048, "}"),
-			new Symbol(0x004F, "@"),
-			new Symbol(0x0050, "<"),
-			new Symbol(0x0052, ">"),
-			new Symbol(0x0053, "#"),
-			new Symbol(0x005B, ":"),
+			new Symbol(0x0042, "="),
+			new Symbol(0x0043, ";"),
+			new Symbol(0x0044, "("),
+			new Symbol(0x0045, ")"),
+			new Symbol(0x0047, "{"),
+			new Symbol(0x0048, ","),
+			new Symbol(0x0049, "}"),
+			new Symbol(0x0051, "@"),
+			new Symbol(0x0052, "<"),
+			new Symbol(0x0054, ">"),
+			new Symbol(0x0055, "#"),
+			new Symbol(0x005D, ":"),
 			new Symbol(0x0007, "SEPARATOR"),
+			new Symbol(0x0003, "NEW_LINE"),
+			new Symbol(0x0004, "WHITE_SPACE"),
 			new Symbol(0x000A, "INTEGER"),
 			new Symbol(0x000C, "LITERAL_STRING"),
 			new Symbol(0x0013, "UNICODE_SPAN_MARKER"),
-			new Symbol(0x004D, "->"),
+			new Symbol(0x004E, "->"),
 			new Symbol(0x000B, "ESCAPEES"),
+			new Symbol(0x0005, "COMMENT_LINE"),
 			new Symbol(0x0012, "UNICODE_CODEPOINT"),
 			new Symbol(0x000F, "LITERAL_CLASS"),
 			new Symbol(0x000E, "LITERAL_TEXT"),
+			new Symbol(0x0006, "COMMENT_BLOCK"),
 			new Symbol(0x0010, "UNICODE_BLOCK"),
 			new Symbol(0x0011, "UNICODE_CATEGORY"),
 			new Symbol(0x001D, "BLOCK_RULES"),
 			new Symbol(0x001B, "BLOCK_OPTIONS"),
 			new Symbol(0x001E, "BLOCK_CONTEXT"),
-			new Symbol(0x005D, "grammar"),
+			new Symbol(0x005F, "grammar"),
+			new Symbol(0x004F, "fragment"),
 			new Symbol(0x001C, "BLOCK_TERMINALS") };
 		/// <summary>
 		/// Initializes a new instance of the lexer

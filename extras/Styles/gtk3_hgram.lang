@@ -43,6 +43,7 @@
       <keyword>terminals</keyword>
       <keyword>rules</keyword>
       <keyword>context</keyword>
+      <keyword>fragment</keyword>
     </context>
 
     <context id="specials" style-ref="special">
