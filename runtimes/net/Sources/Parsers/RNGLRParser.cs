@@ -145,9 +145,13 @@ namespace Hime.Redist.Parsers
 		/// <returns>true if the corresponding terminal is expected</returns>
 		public bool IsExpected(int terminalID)
 		{
+			if (lexer.tokens.Size == 0)
+				// this is for the first token
+				return parserAutomaton.GetActionsCount(0, terminalID) > 0;
+			// not the first token, look on the outstanding shift actions
 			foreach (Shift shift in shifts)
 				if (parserAutomaton.GetActionsCount(shift.to, terminalID) > 0)
-					return false;
+					return true;
 			return false;
 		}
 
@@ -159,7 +163,12 @@ namespace Hime.Redist.Parsers
 		/// <returns>true if the context is in effect</returns>
 		public bool IsInContext(int context, int onTerminalID)
 		{
+			if (lexer.tokens.Size == 0)
+				// this is for the first token
+				return (context == Lexer.Automaton.DEFAULT_CONTEXT || parserAutomaton.GetContexts(0).Contains(context));
+
 			List<int> queue = new List<int>();
+			// try to only look at stack heads that expect the terminal
 			foreach (Shift shift in shifts)
 			{
 				if (parserAutomaton.GetActionsCount(shift.to, onTerminalID) > 0)
@@ -171,17 +180,13 @@ namespace Hime.Redist.Parsers
 					queue.Add(shift.from);
 				}
 			}
-			if (shifts.Count == 0)
-			{
-				// no scheduled shift action, we are at the very beginning
-				// the only GSS node is for the state 0
-				if (context == Lexer.Automaton.DEFAULT_CONTEXT || parserAutomaton.GetContexts(0).Contains(context))
-					// the context is there for state 0
-					return true;
-			}
 			if (queue.Count == 0)
+			{
 				// the track is empty, the terminal is unexpected
-				return false;
+				// still look for the correct context
+				foreach (Shift shift in shifts)
+					queue.Add(shift.from);
+			}
 			// explore the GSS to find the specified context
 			for (int i = 0; i != queue.Count; i++)
 			{

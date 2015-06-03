@@ -142,16 +142,25 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
 
     @Override
     public boolean isExpected(int terminalID) {
+        if (shifts.isEmpty())
+            // this is for the first token
+            return parserAutomaton.getActionsCount(0, terminalID) > 0;
+        // not the first token, look on the outstanding shift actions
         for (Shift shift : shifts)
             if (parserAutomaton.getActionsCount(shift.to, terminalID) > 0)
-                return false;
+                return true;
         return false;
     }
 
     @Override
     public boolean isInContext(int context, int onTerminalID) {
+        if (shifts.isEmpty())
+            // this is for the first token
+            return context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(0).contains(context);
+
         int[] queue = new int[LRkParser.INIT_STACK_SIZE];
         int queueLast = 0;
+        // try to only look at stack heads that expect the terminal
         for (Shift shift : shifts) {
             if (parserAutomaton.getActionsCount(shift.to, onTerminalID) > 0) {
                 if (context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(shift.to).contains(context) || parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).contains(context))
@@ -165,15 +174,16 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
             }
         }
         if (queueLast == 0) {
-            // no scheduled shift action, we are at the very beginning
-            // the only GSS node is for the state 0
-            if (context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(0).contains(context))
-                // the context is there for state 0
-                return true;
-        }
-        if (queueLast == 0)
             // the track is empty, the terminal is unexpected
+            // still look for the correct context
+            for (Shift shift : shifts) {
+                if (queueLast >= queue.length)
+                    queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
+                queue[queueLast] = shift.from;
+                queueLast++;
+            }
             return false;
+        }
         // explore the GSS to find the specified context
         for (int i = 0; i != queueLast; i++) {
             int count;

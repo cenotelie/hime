@@ -115,9 +115,9 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Runs the lexer's DFA to match a terminal in the input ahead
 		/// </summary>
-		/// <param name="contexts">The current applicable contexts</param>
+		/// <param name="provider">The provider of contextual information</param>
 		/// <returns>The matched terminal and length</returns>
-		private Match RunDFA(IContextProvider contexts)
+		private Match RunDFA(IContextProvider provider)
 		{
 			if (text.IsEnd(inputIndex))
 			{
@@ -126,8 +126,8 @@ namespace Hime.Redist.Lexer
 			}
 
 			AutomatonState stateData;
-			int matchingState = -1;
-			int matchingLength = 0;
+			int matchState = 0;
+			int matchLength = 0;
 			int state = 0;
 			int i = inputIndex;
 
@@ -137,8 +137,8 @@ namespace Hime.Redist.Lexer
 				// Is this state a matching state ?
 				if (stateData.TerminalsCount != 0)
 				{
-					matchingState = state;
-					matchingLength = i - inputIndex;
+					matchState = state;
+					matchLength = i - inputIndex;
 				}
 				// No further transition => exit
 				if (stateData.IsDeadEnd)
@@ -152,29 +152,36 @@ namespace Hime.Redist.Lexer
 				state = stateData.GetTargetBy(current);
 			}
 
-			if (matchingState == -1)
+			if (matchLength == 0)
 				// no match
-				return new Match();
+				return new Match(-1, 0);
 
-			stateData = automaton.GetState(matchingState);
-			// look for a perfect match
+			stateData = automaton.GetState(matchState);
+			Match contextual = new Match();
 			for (int j = 0; j != stateData.TerminalsCount; j++)
 			{
 				MatchedTerminal mt = stateData.GetTerminal(j);
 				int id = symTerminals[mt.Index].ID;
-				if (id == separatorID || (contexts.IsExpected(id) && contexts.IsInContext(mt.Context, id)))
-					return new Match(mt.Index, matchingLength);
+				if (id == separatorID)
+					return new Match(mt.Index, matchLength);
+				if (provider.IsExpected(id))
+				{
+					if (provider.IsInContext(mt.Context, id))
+						// perfect match
+						return new Match(mt.Index, matchLength);
+					// not in context, do not match
+				}
+				else if (provider.IsInContext(mt.Context, id))
+				{
+					// in the right context, but not expected
+					if (contextual.length == 0)
+						// this is the first, register it
+						contextual = new Match(mt.Index, matchLength);
+				}
 			}
-			// look for the correct context
-			for (int j = 0; j != stateData.TerminalsCount; j++)
-			{
-				MatchedTerminal mt = stateData.GetTerminal(j);
-				int id = symTerminals[mt.Index].ID;
-				if (mt.Context == Automaton.DEFAULT_CONTEXT || contexts.IsInContext(mt.Context, id))
-					return new Match(mt.Index, matchingLength);
-			}
-			// nope, just return the first match
-			return new Match(stateData.GetTerminal(0).Index, matchingLength);
+			// at this point we do not have a perfect match
+			// return the match with the highest priority that is possible in the contexts
+			return contextual;
 		}
 	}
 }

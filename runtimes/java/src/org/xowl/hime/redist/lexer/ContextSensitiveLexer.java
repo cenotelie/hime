@@ -125,17 +125,17 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     /**
      * Runs the lexer's DFA to match a terminal in the input ahead
      *
-     * @param contexts The current applicable contexts
+     * @param provider The provider of contextual information
      * @return The index of the matched terminal
      */
-    private int runDFA(IContextProvider contexts) {
+    private int runDFA(IContextProvider provider) {
         matchedLength = 0;
         if (text.isEnd(inputIndex)) {
             // At the end of input
             return 1; // 1 is always the index of the $ terminal
         }
 
-        int matchingState = -1;
+        int matchedState = -1;
         int state = 0;
         int i = inputIndex;
 
@@ -143,7 +143,7 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
             automaton.retrieveState(state, stateCache);
             // Is this state a matching state ?
             if (stateCache.getTerminalCount() != 0) {
-                matchingState = state;
+                matchedState = state;
                 matchedLength = (i - inputIndex);
             }
             // No further transition => exit
@@ -158,26 +158,33 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
             state = stateCache.getTargetBy(current);
         }
 
-        if (matchingState == -1)
+        if (matchedLength == 0)
             // no match
             return 0;
 
-        automaton.retrieveState(matchingState, stateCache);
-        // look for a perfect match
+        automaton.retrieveState(matchedState, stateCache);
+        int contextual = -1;
         for (int j = 0; j != stateCache.getTerminalCount(); j++) {
             stateCache.getTerminal(j, terminalCache);
             int id = symTerminals.get(terminalCache.getIndex()).getID();
-            if (id == separatorID || (contexts.isExpected(id) && contexts.isInContext(terminalCache.getContext(), id)))
+            if (id == separatorID)
                 return terminalCache.getIndex();
+            if (provider.isExpected(id)) {
+                if (provider.isInContext(terminalCache.getContext(), id))
+                    // perfect match
+                    return terminalCache.getIndex();
+                // not in context, do not match
+            } else if (provider.isInContext(terminalCache.getContext(), id)) {
+                // in the right context, but not expected
+                if (contextual == -1)
+                    // this is the first, register it
+                    contextual = terminalCache.getIndex();
+            }
         }
-        // look for the correct context
-        for (int j = 0; j != stateCache.getTerminalCount(); j++) {
-            stateCache.getTerminal(j, terminalCache);
-            int id = symTerminals.get(terminalCache.getIndex()).getID();
-            if (terminalCache.getContext() == Automaton.DEFAULT_CONTEXT || contexts.isInContext(terminalCache.getContext(), id))
-                return terminalCache.getIndex();
-        }
-        // nope, just return the first match
-        return stateCache.getTerminal();
+        // at this point we do not have a perfect match
+        // return the match with the highest priority that is possible in the contexts
+        if (contextual == -1)
+            matchedLength = 0;
+        return contextual;
     }
 }
