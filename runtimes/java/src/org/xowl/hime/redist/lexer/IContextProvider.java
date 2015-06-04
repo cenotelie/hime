@@ -27,19 +27,13 @@ package org.xowl.hime.redist.lexer;
  */
 public interface IContextProvider {
     /**
-     * Gets whether the terminal with the specified ID is expected
-     *
-     * @param terminalID The identifier of a terminal
-     * @return true if the corresponding terminal is expected
-     */
-    boolean isExpected(int terminalID);
-
-    /**
-     * Gets whether the specified context in in effect
+     * Gets the priority of the specified context required by the specified terminal
+     * The priority is a positive integer. The lesser the value the higher the priority.
+     * A negative value represents the unavailability of the required context.
      *
      * @param context      A context
-     * @param onTerminalID The identifier of a terminal
-     * @return true if the context is in effect
+     * @param onTerminalID The identifier of the terminal requiring the context
+     * @return The context priority, or a negative value if the context is unavailable
      */
-    boolean isInContext(int context, int onTerminalID);
+    int getContextPriority(int context, int onTerminalID);
 }

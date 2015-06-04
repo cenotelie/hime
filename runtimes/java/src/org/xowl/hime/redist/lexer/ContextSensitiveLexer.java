@@ -162,29 +162,27 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
             // no match
             return 0;
 
+        // return the match with the highest priority that is possible in the contexts
         automaton.retrieveState(matchedState, stateCache);
-        int contextual = -1;
-        for (int j = 0; j != stateCache.getTerminalCount(); j++) {
+        stateCache.getTerminal(0, terminalCache);
+        int id = symTerminals.get(terminalCache.getIndex()).getID();
+        int currentResult = terminalCache.getIndex();
+        if (id == separatorID)
+            // the separator trumps all
+            return currentResult;
+        int currentPriority = provider.getContextPriority(terminalCache.getContext(), id);
+        for (int j = 1; j != stateCache.getTerminalCount(); j++) {
             stateCache.getTerminal(j, terminalCache);
-            int id = symTerminals.get(terminalCache.getIndex()).getID();
+            id = symTerminals.get(terminalCache.getIndex()).getID();
             if (id == separatorID)
+                // the separator trumps all
                 return terminalCache.getIndex();
-            if (provider.isExpected(id)) {
-                if (provider.isInContext(terminalCache.getContext(), id))
-                    // perfect match
-                    return terminalCache.getIndex();
-                // not in context, do not match
-            } else if (provider.isInContext(terminalCache.getContext(), id)) {
-                // in the right context, but not expected
-                if (contextual == -1)
-                    // this is the first, register it
-                    contextual = terminalCache.getIndex();
+            int priority = provider.getContextPriority(terminalCache.getContext(), id);
+            if (currentPriority < 0 || (priority >= 0 && priority < currentPriority)) {
+                currentResult = terminalCache.getIndex();
+                currentPriority = priority;
             }
         }
-        // at this point we do not have a perfect match
-        // return the match with the highest priority that is possible in the contexts
-        if (contextual == -1)
-            matchedLength = 0;
-        return contextual;
+        return currentResult;
     }
 }

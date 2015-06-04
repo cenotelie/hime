@@ -141,31 +141,22 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
     }
 
     @Override
-    public boolean isExpected(int terminalID) {
-        if (shifts.isEmpty())
-            // this is for the first token
-            return parserAutomaton.getActionsCount(0, terminalID) > 0;
-        // not the first token, look on the outstanding shift actions
-        for (Shift shift : shifts)
-            if (parserAutomaton.getActionsCount(shift.to, terminalID) > 0)
-                return true;
-        return false;
-    }
-
-    @Override
-    public boolean isInContext(int context, int onTerminalID) {
-        if (shifts.isEmpty())
-            // this is for the first token
-            return context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(0).contains(context);
-
+    public int getContextPriority(int context, int onTerminalID) {
+        // the default context is always active
+        if (context == Automaton.DEFAULT_CONTEXT)
+            return Integer.MAX_VALUE;
+        // this is for the first token
+        if (lexer.getTokens().size() == 0)
+            return parserAutomaton.getContexts(0).contains(context) ? 0 : -1;
+        // try to only look at stack heads that expect the terminal
         int[] queue = new int[LRkParser.INIT_STACK_SIZE];
         int queueLast = 0;
-        // try to only look at stack heads that expect the terminal
         for (Shift shift : shifts) {
             if (parserAutomaton.getActionsCount(shift.to, onTerminalID) > 0) {
-                if (context == Automaton.DEFAULT_CONTEXT || parserAutomaton.getContexts(shift.to).contains(context) || parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).contains(context))
-                    // the context at the specified state is there
-                    return true;
+                if (parserAutomaton.getContexts(shift.to).contains(context))
+                    return 1;
+                if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).contains(context))
+                    return 2;
                 // enqueue
                 if (queueLast >= queue.length)
                     queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
@@ -182,11 +173,9 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                 queue[queueLast] = shift.from;
                 queueLast++;
             }
-            return false;
         }
         // explore the GSS to find the specified context
         for (int i = 0; i != queueLast; i++) {
-            int count;
             GSS.PathSet paths = gss.getPaths(queue[i], 1);
             for (int p = 0; p != paths.count; p++) {
                 int to = paths.content[p].getLast();
@@ -202,7 +191,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                     LRContexts contexts = parserAutomaton.getContexts(gss.getRepresentedState(to));
                     if (contexts.contains(context))
                         // found it!
-                        return true;
+                        return i + 3;
                     // enqueue for further exploration
                     if (queueLast >= queue.length)
                         queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
@@ -211,8 +200,71 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                 }
             }
         }
-        // not found
-        return false;
+        // at this point, the requested context is not yet open
+        // can it be open by a token with the specified terminal ID?
+        // queue of GLR states to inspect:
+        List<Integer> queueGSSHead = new ArrayList<Integer>();   // the related GSS head
+        List<int[]> queueVStack = new ArrayList<int[]>(); // the virtual stack
+        // first reduction
+        for (Shift shift : shifts) {
+            int count = parserAutomaton.getActionsCount(shift.to, onTerminalID);
+            if (count > 0) {
+                queueGSSHead.add(shift.from);
+                queueVStack.add(new int[]{shift.to});
+            }
+        }
+        // now, close the queue
+        for (int i = 0; i != queueGSSHead.size(); i++) {
+            int head = queueVStack.get(i)[queueVStack.get(i).length - 1];
+            int count = parserAutomaton.getActionsCount(head, onTerminalID);
+            if (count == 0)
+                continue;
+            for (int j = 0; j != count; j++) {
+                LRAction action = parserAutomaton.getAction(head, onTerminalID, j);
+                if (action.getCode() != LRAction.CODE_REDUCE)
+                    continue;
+                LRProduction production = parserAutomaton.getProduction(action.getData());
+                if (production.getReductionLength() == 0) {
+                    // 0-length reduction => start from the current head
+                    int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length + 1);
+                    int next = getNextByVar(head, symVariables.get(production.getHead()).getID());
+                    if (parserAutomaton.getContexts(next).contains(context))
+                        // the context opens at this state
+                        return 0;
+                    virtualStack[virtualStack.length - 1] = next;
+                    // enqueue
+                    queueGSSHead.add(queueGSSHead.get(i));
+                    queueVStack.add(virtualStack);
+                } else if (production.getReductionLength() < queueVStack.get(i).length) {
+                    // we are still the virtual stack
+                    int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length - production.getReductionLength() + 1);
+                    int next = getNextByVar(virtualStack[virtualStack.length - 2], symVariables.get(production.getHead()).getID());
+                    if (parserAutomaton.getContexts(next).contains(context))
+                        // the context opens at this state
+                        return 0;
+                    virtualStack[virtualStack.length - 1] = next;
+                    // enqueue
+                    queueGSSHead.add(queueGSSHead.get(i));
+                    queueVStack.add(virtualStack);
+                } else {
+                    // we reach the GSS
+                    GSS.PathSet paths = gss.getPaths(queueGSSHead.get(i), production.getReductionLength() - queueVStack.get(i).length);
+                    for (int k = 0; k != paths.count; k++) {
+                        GSSPath path = paths.content[k];
+                        // get the target GLR state
+                        int next = getNextByVar(gss.getRepresentedState(path.getLast()), symVariables.get(production.getHead()).getID());
+                        if (parserAutomaton.getContexts(next).contains(context))
+                            // the context opens at this state
+                            return 0;
+                        // enqueue the info, top GSS stack node and target GLR state
+                        queueGSSHead.add(path.getLast());
+                        queueVStack.add(new int[]{next});
+                    }
+                }
+            }
+        }
+        // the context is still unavailable
+        return -1;
     }
 
     /**

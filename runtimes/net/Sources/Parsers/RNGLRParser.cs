@@ -139,43 +139,31 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets whether the terminal with the specified ID is expected
-		/// </summary>
-		/// <param name="terminalID">The identifier of a terminal</param>
-		/// <returns>true if the corresponding terminal is expected</returns>
-		public bool IsExpected(int terminalID)
-		{
-			if (lexer.tokens.Size == 0)
-				// this is for the first token
-				return parserAutomaton.GetActionsCount(0, terminalID) > 0;
-			// not the first token, look on the outstanding shift actions
-			foreach (Shift shift in shifts)
-				if (parserAutomaton.GetActionsCount(shift.to, terminalID) > 0)
-					return true;
-			return false;
-		}
-
-		/// <summary>
-		/// Gets whether the specified context in in effect
+		/// Gets the priority of the specified context required by the specified terminal
+		/// The priority is a positive integer. The lesser the value the higher the priority.
+		/// A value of -1 represents the unavailability of the required context.
 		/// </summary>
 		/// <param name="context">A context</param>
-		/// <param name="onTerminalID">The identifier of a terminal</param>
-		/// <returns>true if the context is in effect</returns>
-		public bool IsInContext(int context, int onTerminalID)
+		/// <param name="onTerminalID">The identifier of the terminal requiring the context</param>
+		/// <returns>The context priority, or -1 if the context is unavailable</returns>
+		public int GetContextPriority(int context, int onTerminalID)
 		{
+			// the default context is always active
+			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
+				return int.MaxValue;
+			// this is for the first token
 			if (lexer.tokens.Size == 0)
-				// this is for the first token
-				return (context == Lexer.Automaton.DEFAULT_CONTEXT || parserAutomaton.GetContexts(0).Contains(context));
-
-			List<int> queue = new List<int>();
+				return parserAutomaton.GetContexts(0).Contains(context) ? 0 : -1;
 			// try to only look at stack heads that expect the terminal
+			List<int> queue = new List<int>();
 			foreach (Shift shift in shifts)
 			{
 				if (parserAutomaton.GetActionsCount(shift.to, onTerminalID) > 0)
 				{
-					if (context == Lexer.Automaton.DEFAULT_CONTEXT || parserAutomaton.GetContexts(shift.to).Contains(context) || parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Contains(context))
-						// the context at the specified state is there
-						return true;
+					if (parserAutomaton.GetContexts(shift.to).Contains(context))
+						return  1;
+					if (parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Contains(context))
+						return 2;
 					// enqueue
 					queue.Add(shift.from);
 				}
@@ -187,7 +175,7 @@ namespace Hime.Redist.Parsers
 				foreach (Shift shift in shifts)
 					queue.Add(shift.from);
 			}
-			// explore the GSS to find the specified context
+			// explore the current GSS to find the specified context
 			for (int i = 0; i != queue.Count; i++)
 			{
 				int count;
@@ -201,14 +189,92 @@ namespace Hime.Redist.Parsers
 						LRContexts contexts = parserAutomaton.GetContexts(gss.GetRepresentedState(to));
 						if (contexts.Contains(context))
 							// found it!
-							return true;
+							return i + 3;
 						// enqueue for further exploration
 						queue.Add(to);
 					}
 				}
 			}
-			// not found
-			return false;
+			// at this point, the requested context is not yet open
+			// can it be open by a token with the specified terminal ID?
+			// queue of GLR states to inspect:
+			List<int> queueGSSHead = new List<int>();   // the related GSS head
+			List<int[]> queueVStack = new List<int[]>(); // the virtual stack
+			// first reduction
+			foreach (Shift shift in shifts)
+			{
+				int count = parserAutomaton.GetActionsCount(shift.to, onTerminalID);
+				if (count > 0)
+				{
+					// enqueue the info, top GSS stack node and target GLR state
+					queueGSSHead.Add(shift.from);
+					queueVStack.Add(new [] { shift.to });
+				}
+			}
+			// now, close the queue
+			for (int i = 0; i != queueGSSHead.Count; i++)
+			{
+				int head = queueVStack[i][queueVStack[i].Length - 1];
+				int count = parserAutomaton.GetActionsCount(head, onTerminalID);
+				if (count == 0)
+					continue;
+				for (int j = 0; j != count; j++)
+				{
+					LRAction action = parserAutomaton.GetAction(head, onTerminalID, j);
+					if (action.Code != LRActionCode.Reduce)
+						continue;
+					// execute the reduction
+					LRProduction production = parserAutomaton.GetProduction(action.Data);
+					if (production.ReductionLength == 0)
+					{
+						// 0-length reduction => start from the current head
+						int[] virtualStack = new int[queueVStack[i].Length + 1];
+						Array.Copy(queueVStack[i], virtualStack, queueVStack[i].Length);
+						int next = GetNextByVar(head, symVariables[production.Head].ID);
+						if (parserAutomaton.GetContexts(next).Contains(context))
+							// the context opens at this state
+							return 0;
+						virtualStack[virtualStack.Length - 1] = next;
+						// enqueue
+						queueGSSHead.Add(queueGSSHead[i]);
+						queueVStack.Add(virtualStack);
+					}
+					else if (production.ReductionLength < queueVStack[i].Length)
+					{
+						// we are still the virtual stack
+						int[] virtualStack = new int[queueVStack[i].Length - production.ReductionLength + 1];
+						Array.Copy(queueVStack[i], virtualStack, virtualStack.Length - 1);
+						int next = GetNextByVar(virtualStack[virtualStack.Length - 2], symVariables[production.Head].ID);
+						if (parserAutomaton.GetContexts(next).Contains(context))
+							// the context opens at this state
+							return 0;
+						virtualStack[virtualStack.Length - 1] = next;
+						// enqueue
+						queueGSSHead.Add(queueGSSHead[i]);
+						queueVStack.Add(virtualStack);
+					}
+					else
+					{
+						// we reach the GSS
+						int nbPaths;
+						GSSPath[] paths = gss.GetPaths(queueGSSHead[i], production.ReductionLength - queueVStack[i].Length, out nbPaths);
+						for (int k = 0; k != nbPaths; k++)
+						{
+							GSSPath path = paths[k];
+							// get the target GLR state
+							int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
+							if (parserAutomaton.GetContexts(next).Contains(context))
+								// the context opens at this state
+								return 0;
+							// enqueue the info, top GSS stack node and target GLR state
+							queueGSSHead.Add(path.Last);
+							queueVStack.Add(new [] { next });
+						}
+					}
+				}
+			}
+			// the context is still unavailable
+			return -1;
 		}
 
 		/// <summary>

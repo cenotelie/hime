@@ -278,3 +278,37 @@ test Test_CS_MatchLongest_2_GLR:
 	parser RNGLALR1
 	on "(xx[xxxxx]xx)"
 	fails
+
+test Test_CS_HiddenContext_LR:
+	grammar Test_CS_HiddenContext_LR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a #c1 { X1 } ;
+			a -> A ;
+		}
+	}
+	parser LALR1
+	on "ax"
+	yields e(a(A) X1)
+
+test Test_CS_HiddenContext_GLR:
+	grammar Test_CS_HiddenContext_GLR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a #c1 { X1 } ;
+			a -> A ;
+		}
+	}
+	parser RNGLALR1
+	on "ax"
+	yields e(a(A) X1)

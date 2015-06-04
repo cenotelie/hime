@@ -156,32 +156,30 @@ namespace Hime.Redist.Lexer
 				// no match
 				return new Match(-1, 0);
 
+			// return the match with the highest priority that is possible in the contexts
 			stateData = automaton.GetState(matchState);
-			Match contextual = new Match();
-			for (int j = 0; j != stateData.TerminalsCount; j++)
+			MatchedTerminal mt = stateData.GetTerminal(0);
+			int id = symTerminals[mt.Index].ID;
+			Match currentResult = new Match(mt.Index, matchLength);
+			if (id == separatorID)
+				// the separator trumps all
+				return currentResult;
+			int currentPriority = provider.GetContextPriority(mt.Context, id);
+			for (int j = 1; j != stateData.TerminalsCount; j++)
 			{
-				MatchedTerminal mt = stateData.GetTerminal(j);
-				int id = symTerminals[mt.Index].ID;
+				mt = stateData.GetTerminal(j);
+				id = symTerminals[mt.Index].ID;
 				if (id == separatorID)
+					// the separator trumps all
 					return new Match(mt.Index, matchLength);
-				if (provider.IsExpected(id))
+				int priority = provider.GetContextPriority(mt.Context, id);
+				if (currentPriority < 0 || (priority >= 0 && priority < currentPriority))
 				{
-					if (provider.IsInContext(mt.Context, id))
-						// perfect match
-						return new Match(mt.Index, matchLength);
-					// not in context, do not match
-				}
-				else if (provider.IsInContext(mt.Context, id))
-				{
-					// in the right context, but not expected
-					if (contextual.length == 0)
-						// this is the first, register it
-						contextual = new Match(mt.Index, matchLength);
+					currentResult = new Match(mt.Index, matchLength);
+					currentPriority = priority;
 				}
 			}
-			// at this point we do not have a perfect match
-			// return the match with the highest priority that is possible in the contexts
-			return contextual;
+			return currentResult;
 		}
 	}
 }

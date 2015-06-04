@@ -68,29 +68,54 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets whether the terminal with the specified ID is expected
-		/// </summary>
-		/// <param name="terminalID">The identifier of a terminal</param>
-		/// <returns>true if the corresponding terminal is expected</returns>
-		public bool IsExpected(int terminalID)
-		{
-			return automaton.GetAction(stack[head], terminalID).Code != LRActionCode.None;
-		}
-
-		/// <summary>
-		/// Gets whether the specified context in in effect
+		/// Gets the priority of the specified context required by the specified terminal
+		/// The priority is a positive integer. The lesser the value the higher the priority.
+		/// A value of -1 represents the unavailability of the required context.
 		/// </summary>
 		/// <param name="context">A context</param>
-		/// <param name="onTerminalID">The identifier of a terminal</param>
-		/// <returns>true if the context is in effect</returns>
-		public bool IsInContext(int context, int onTerminalID)
+		/// <param name="onTerminalID">The identifier of the terminal requiring the context</param>
+		/// <returns>The context priority, or -1 if the context is unavailable</returns>
+		public int GetContextPriority(int context, int onTerminalID)
 		{
+			// the default context is always active
 			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
-				return true;
+				return int.MaxValue;
+			// is the requested coontext already open?
 			for (int i = head; i != -1; i--)
 				if (automaton.GetContexts(stack[i]).Contains(context))
-					return true;
-			return false;
+					// yes, the context is already in effect
+					return head - i;
+			// at this point, the requested context is not yet open
+			// can it be open by a token with the specified terminal ID?
+			LRAction action = automaton.GetAction(stack[head], onTerminalID);
+			// if the action is something else than a reduction, the context can never be produced
+			// for the context to open, a new state must be pushed onto the stack
+			// this means that the provided terminal must trigger a chain of at least one reduction
+			if (action.Code != LRActionCode.Reduce)
+				return -1;
+			// there is at least one reduction, simulate
+			int[] myStack = new int[stack.Length];
+			Array.Copy(stack, myStack, head + 1);
+			int myHead = head;
+			while (action.Code == LRActionCode.Reduce)
+			{
+				// execute the reduction
+				LRProduction production = automaton.GetProduction(action.Data);
+				myHead -= production.ReductionLength;
+				// this must be a shift
+				action = automaton.GetAction(myStack[myHead], symVariables[production.Head].ID);
+				if (automaton.GetContexts(action.Data).Contains(context))
+					// the context opens at this state
+					return 0;
+				myHead++;
+				if (myHead == myStack.Length)
+					Array.Resize(ref myStack, myStack.Length + INIT_STACK_SIZE);
+				myStack[myHead] = action.Data;
+				// now, get the new action for the terminal
+				action = automaton.GetAction(action.Data, onTerminalID);
+			}
+			// the context is still unavailable
+			return -1;
 		}
 
 		/// <summary>

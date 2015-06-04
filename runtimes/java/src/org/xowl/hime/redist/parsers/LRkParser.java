@@ -78,18 +78,42 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     }
 
     @Override
-    public boolean isExpected(int terminalID) {
-        return automaton.getAction(stack[head], terminalID).getCode() != LRAction.CODE_NONE;
-    }
-
-    @Override
-    public boolean isInContext(int context, int onTerminalID) {
+    public int getContextPriority(int context, int onTerminalID) {
+        // the default context is always active
         if (context == Automaton.DEFAULT_CONTEXT)
-            return true;
+            return Integer.MAX_VALUE;
+        // is the requested coontext already open?
         for (int i = head; i != -1; i--)
             if (automaton.getContexts(stack[i]).contains(context))
-                return true;
-        return false;
+                return head - i;
+        // at this point, the requested context is not yet open
+        // can it be open by a token with the specified terminal ID?
+        LRAction action = automaton.getAction(stack[head], onTerminalID);
+        // if the action is something else than a reduction, the context can never be produced
+        // for the context to open, a new state must be pushed onto the stack
+        // this means that the provided terminal must trigger a chain of at least one reduction
+        if (action.getCode() != LRAction.CODE_REDUCE)
+            return -1;
+        int[] myStack = Arrays.copyOf(stack, stack.length);
+        int myHead = head;
+        while (action.getCode() == LRAction.CODE_REDUCE) {
+            // execute the reduction
+            LRProduction production = automaton.getProduction(action.getData());
+            myHead -= production.getReductionLength();
+            // this must be a shift
+            action = automaton.getAction(myStack[myHead], symVariables.get(production.getHead()).getID());
+            if (automaton.getContexts(action.getData()).contains(context))
+                // the context opens at this state
+                return 0;
+            myHead++;
+            if (myHead == myStack.length)
+                myStack = Arrays.copyOf(myStack, myStack.length + INIT_STACK_SIZE);
+            myStack[myHead] = action.getData();
+            // now, get the new action for the terminal
+            action = automaton.getAction(action.getData(), onTerminalID);
+        }
+        // the context is still unavailable
+        return -1;
     }
 
     /**
