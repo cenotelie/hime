@@ -111,7 +111,7 @@ namespace Hime.SDK.Grammars.LR
 			// Look for previous conflict
 			foreach (Conflict previous in conflicts)
 			{
-				if (previous.ConflictType == ConflictType.ShiftReduce && previous.ConflictSymbol == lookahead)
+				if (previous.ErrorType == ErrorType.ConflictShiftReduce && previous.ConflictSymbol == lookahead)
 				{
 					// Previous conflict
 					previous.AddItem(item);
@@ -119,7 +119,7 @@ namespace Hime.SDK.Grammars.LR
 				}
 			}
 			// No previous conflict was found
-			Conflict conflict = new Conflict(state, ConflictType.ShiftReduce, lookahead);
+			Conflict conflict = new Conflict(state, ErrorType.ConflictShiftReduce, lookahead);
 			foreach (Item potential in state.Items)
 				if (potential.Action == LRActionCode.Shift && potential.GetNextSymbol().ID == lookahead.ID)
 					conflict.AddItem(potential);
@@ -139,7 +139,7 @@ namespace Hime.SDK.Grammars.LR
 			// Look for previous conflict
 			foreach (Conflict previous in conflicts)
 			{
-				if (previous.ConflictType == ConflictType.ReduceReduce && previous.ConflictSymbol == lookahead)
+				if (previous.ErrorType == ErrorType.ConflictReduceReduce && previous.ConflictSymbol == lookahead)
 				{
 					// Previous conflict
 					previous.AddItem(currentItem);
@@ -147,7 +147,7 @@ namespace Hime.SDK.Grammars.LR
 				}
 			}
 			// No previous conflict was found
-			Conflict conflict = new Conflict(state, ConflictType.ReduceReduce, lookahead);
+			Conflict conflict = new Conflict(state, ErrorType.ConflictReduceReduce, lookahead);
 			conflict.AddItem(previousItem);
 			conflict.AddItem(currentItem);
 			conflicts.Add(conflict);

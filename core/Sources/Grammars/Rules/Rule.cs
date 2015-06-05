@@ -114,7 +114,7 @@ namespace Hime.SDK.Grammars
 		{
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
 			builder.Append(head.Name);
-			builder.Append(" \u2192");
+			builder.Append(" ->");
 			builder.Append(body.ToString());
 			return builder.ToString();
 		}

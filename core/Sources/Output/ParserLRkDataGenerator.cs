@@ -111,7 +111,7 @@ namespace Hime.SDK.Output
 				if (item.DotPosition == 0)
 				{
 					ushort id = (ushort)item.BaseRule.Context;
-					if (!result.Contains(id))
+					if (id != 0 && !result.Contains(id))
 						result.Add(id);
 				}
 			}

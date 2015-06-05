@@ -132,9 +132,6 @@
     <Compile Include="Sources\Reporter.cs" />
     <Compile Include="Sources\Grammars\Phrase.cs" />
     <Compile Include="Sources\Grammars\LR\Conflict.cs" />
-    <Compile Include="Sources\Grammars\LR\ConflictType.cs" />
-    <Compile Include="Sources\Grammars\LR\GLRSimulator.cs" />
-    <Compile Include="Sources\Grammars\LR\GLRStackNode.cs" />
     <Compile Include="Sources\Grammars\LR\Graph.cs" />
     <Compile Include="Sources\Grammars\LR\GraphInverse.cs" />
     <Compile Include="Sources\Grammars\LR\Item.cs" />
@@ -144,7 +141,6 @@
     <Compile Include="Sources\Grammars\LR\StateActionShift.cs" />
     <Compile Include="Sources\Grammars\LR\StateKernel.cs" />
     <Compile Include="Sources\Grammars\LR\StateReductions.cs" />
-    <Compile Include="Sources\Grammars\LR\GLRGeneration.cs" />
     <Compile Include="Sources\Grammars\LR\Builder.cs" />
     <Compile Include="Sources\Grammars\LR\KernelGraph.cs" />
     <Compile Include="Sources\Grammars\LR\ItemLALR1.cs" />
@@ -181,6 +177,9 @@
     <Compile Include="Sources\Input\CommandLineParser.cs" />
     <Compile Include="Sources\Input\CommandLine.cs" />
     <Compile Include="Sources\Grammars\LoaderContext.cs" />
+    <Compile Include="Sources\Grammars\LR\Error.cs" />
+    <Compile Include="Sources\Grammars\LR\ErrorType.cs" />
+    <Compile Include="Sources\Grammars\LR\ContextualError.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />

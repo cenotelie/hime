@@ -244,6 +244,8 @@ namespace Hime.SDK.Output
 					errors = true;
 				}
 			}
+			if (units.Count == 0)
+				return !errors;
 
 			if (mode == Mode.Assembly || mode == Mode.SourceAndAssembly)
 			{

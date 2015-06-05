@@ -173,23 +173,23 @@ namespace Hime.SDK.Grammars.LR
 		/// </returns>
 		public string ToString(bool withLookaheads)
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("\u3014");
+			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
 			builder.Append(rule.Head.ToString());
-			builder.Append(" \u2192");
+			builder.Append(" ->");
 			int i = 0;
-			foreach (RuleBodyElement Part in rule.Body.Choices[0])
+			foreach (RuleBodyElement part in rule.Body.Choices[0])
 			{
 				if (i == position)
 					builder.Append(" \u25CF");
 				builder.Append(" ");
-				builder.Append(Part.ToString());
+				builder.Append(part.ToString());
 				i++;
 			}
 			if (i == position)
 				builder.Append(" \u25CF");
 			if (withLookaheads)
 			{
-				builder.Append(" \u25B6 ");
+				builder.Append(" | ");
 				TerminalSet lookaheads = Lookaheads;
 				for (int j = 0; j != lookaheads.Count; j++)
 				{
@@ -198,7 +198,7 @@ namespace Hime.SDK.Grammars.LR
 					builder.Append(lookaheads[j].ToString());
 				}
 			}
-			builder.Append("\u3015");
+			builder.Append("]");
 			return builder.ToString();
 		}
 	}

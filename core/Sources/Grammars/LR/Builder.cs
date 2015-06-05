@@ -30,24 +30,33 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		/// The grammar to build
 		/// </summary>
-		private Grammar grammar;
+		private readonly Grammar grammar;
+		/// <summary>
+		/// The found conflicts
+		/// </summary>
+		private readonly List<Conflict> conflicts;
+		/// <summary>
+		/// The other errors
+		/// </summary>
+		private readonly List<Error> errors;
 		/// <summary>
 		/// The graph to build
 		/// </summary>
 		private Graph graph;
 		/// <summary>
-		/// The found conflicts
-		/// </summary>
-		private List<Conflict> conflicts;
-		/// <summary>
 		/// A GLR simulator
 		/// </summary>
-		private GLRSimulator simulator;
+		private GraphInverse inverse;
 
 		/// <summary>
-		/// Gets the conflicts produced by this builder
+		/// Gets all the conflicts produced by this builder
 		/// </summary>
 		public ROList<Conflict> Conflicts { get { return new ROList<Conflict>(conflicts); } }
+
+		/// <summary>
+		/// Gets all the errors produced by this builder (other than the conflicts)
+		/// </summary>
+		public ROList<Error> Errors { get { return new ROList<Error>(errors); } }
 
 		/// <summary>
 		/// Initializes this builder
@@ -57,6 +66,7 @@ namespace Hime.SDK.Grammars.LR
 		{
 			this.grammar = grammar;
 			conflicts = new List<Conflict>();
+			errors = new List<Error>();
 		}
 
 		/// <summary>
@@ -87,13 +97,12 @@ namespace Hime.SDK.Grammars.LR
 			}
 
 			// builds the set of conflicts
-			simulator = new GLRSimulator(graph);
-			conflicts = new List<Conflict>();
+			inverse = new GraphInverse(graph);
 			foreach (State state in graph.States)
 			{
 				if (state.Conflicts.Count != 0)
 				{
-					List<Phrase> samples = simulator.GetInputsFor(state);
+					List<Phrase> samples = inverse.GetInputsFor(state);
 					foreach (Conflict conflict in state.Conflicts)
 					{
 						foreach (Phrase sample in samples)
@@ -103,6 +112,47 @@ namespace Hime.SDK.Grammars.LR
 							conflict.AddExample(temp);
 						}
 						conflicts.Add(conflict);
+					}
+				}
+				List<List<State>> paths = null;
+				foreach (Symbol symbol in state.Transitions)
+				{
+					Terminal terminal = symbol as Terminal;
+					if (terminal == null)
+						continue;
+					if (terminal.Context == 0)
+						continue;
+					// this is a contextual terminal, can we reach this state without the right context being available
+					if (paths == null)
+						paths = inverse.GetStatePathsTo(state);
+					foreach (List<State> path in paths)
+					{
+						path.Add(state); // append this state
+						bool found = false;
+						foreach (State element in path)
+						{
+							foreach (Item item in element.Items)
+							{
+								if (item.DotPosition == 0 && item.BaseRule.Context == terminal.Context)
+								{
+									found = true;
+									break;
+								}
+							}
+							if (found)
+								break;
+						}
+						if (!found)
+						{
+							// this is problematic path
+							ContextualError error = new ContextualError(state);
+							foreach (Item item in state.Items)
+							{
+								if (item.Action == Hime.Redist.Parsers.LRActionCode.Shift && item.GetNextSymbol() == terminal)
+									error.AddItem(item);
+							}
+							errors.Add(error);
+						}
 					}
 				}
 			}
@@ -121,11 +171,11 @@ namespace Hime.SDK.Grammars.LR
 			StateKernel kernel = new StateKernel();
 			kernel.AddItem(item);
 			State state0 = kernel.GetClosure();
-			Graph graph = new Graph(state0);
+			Graph result = new Graph(state0);
 			// Construct the graph
-			foreach (State state in graph.States)
+			foreach (State state in result.States)
 				state.BuildReductions(new StateReductionsLR0());
-			return graph;
+			return result;
 		}
 
 		/// <summary>
@@ -140,11 +190,11 @@ namespace Hime.SDK.Grammars.LR
 			StateKernel kernel = new StateKernel();
 			kernel.AddItem(item);
 			State state0 = kernel.GetClosure();
-			Graph graph = new Graph(state0);
+			Graph result = new Graph(state0);
 			// Construct the graph
-			foreach (State state in graph.States)
+			foreach (State state in result.States)
 				state.BuildReductions(new StateReductionsLR1());
-			return graph;
+			return result;
 		}
 
 		/// <summary>

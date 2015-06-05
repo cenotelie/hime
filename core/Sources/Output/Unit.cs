@@ -256,15 +256,18 @@ namespace Hime.SDK.Output
 			}
 			else
 			{
-				// for LR(k) methods, conflicts prevent the generation of the automaton
-				if (builder.Conflicts.Count > 0)
-				{
-					foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
-						reporter.Error(conflict);
-					return false;
-				}
+				foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
+					reporter.Error(conflict);
 			}
-			return true;
+			// report the errors
+			foreach (Grammars.LR.Error error in builder.Errors)
+				reporter.Error(error);
+			if (builder.Errors.Count > 0)
+				return false;
+			if (method == ParsingMethod.RNGLR1 || method == ParsingMethod.RNGLALR1)
+				return true;
+			// for LR(k) methods, conflicts prevent the generation of the automaton
+			return (builder.Errors.Count == 0);
 		}
 	}
 }

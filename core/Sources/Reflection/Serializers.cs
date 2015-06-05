@@ -109,7 +109,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="conflict">The LR conflict to export</param>
 		private static void ExportLRConflict(System.IO.TextWriter writer, Grammars.LR.Conflict conflict)
 		{
-			writer.WriteLine("\t\tConflict {0} on {1}:", conflict.ConflictType, conflict.ConflictSymbol);
+			writer.WriteLine("\t\tConflict {0} on {1}:", conflict.ErrorType, conflict.ConflictSymbol);
 			writer.WriteLine("\t\t\tItems:");
 			foreach (Grammars.LR.Item item in conflict.Items)
 				writer.WriteLine("\t\t\t\t" + item);

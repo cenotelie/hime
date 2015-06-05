@@ -23,15 +23,19 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents the type of a LR conflict
 	/// </summary>
-	public enum ConflictType
+	public enum ErrorType
 	{
 		/// <summary>
 		/// Represents a Shift-Reduce conflict
 		/// </summary>
-		ShiftReduce,
+		ConflictShiftReduce,
 		/// <summary>
 		/// Represents a Reduce-Reduce conflict
 		/// </summary>
-		ReduceReduce
+		ConflictReduceReduce,
+		/// <summary>
+		/// Represents the error of a contextual terminal expected outside of its context
+		/// </summary>
+		ErrorContextualTerminal,
 	}
 }
