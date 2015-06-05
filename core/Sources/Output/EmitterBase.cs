@@ -286,7 +286,7 @@ namespace Hime.SDK.Output
 				ok = GenerateLexer(unit);
 			if (ok)
 				ok = GenerateParser(unit);
-			if (mode == Mode.Debug && ok)
+			if (mode == Mode.Debug)
 				ok = EmitDebugArtifacts(unit);
 			return ok;
 		}
