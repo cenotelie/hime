@@ -129,18 +129,28 @@ namespace Hime.SDK.Grammars.LR
 					{
 						path.Add(state); // append this state
 						bool found = false;
-						foreach (State element in path)
+						for (int i = 0; i != path.Count - 1; i++)
 						{
+							State element = path[i];
 							foreach (Item item in element.Items)
 							{
 								if (item.DotPosition == 0 && item.BaseRule.Context == terminal.Context)
 								{
-									found = true;
+									// this is the opening of a context only if we are not going to the next state using the associated variable
+									found |= !state.HasTransition(item.BaseRule.Head) || state.GetChildBy(item.BaseRule.Head) != path[i + 1];
 									break;
 								}
 							}
 							if (found)
 								break;
+						}
+						foreach (Item item in state.Items)
+						{
+							if (item.DotPosition == 0 && item.BaseRule.Context == terminal.Context)
+							{
+								found = true;
+								break;
+							}
 						}
 						if (!found)
 						{
