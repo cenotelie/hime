@@ -312,3 +312,39 @@ test Test_CS_HiddenContext_GLR:
 	parser RNGLALR1
 	on "ax"
 	yields e(a(A) X1)
+
+test Test_CS_ContextNotOpened_LR:
+	grammar Test_CS_ContextNotOpened_LR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ; B -> 'b' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a | b ;
+			a -> #c1 { A X1 } ;
+			b -> B B B B X0 ;
+		}
+	}
+	parser LALR1
+	on "bbbbx"
+	yields e(b(B B B B X0))
+
+test Test_CS_ContextNotOpened_GLR:
+	grammar Test_CS_ContextNotOpened_GLR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ; B -> 'b' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a | b ;
+			a -> #c1 { A X1 } ;
+			b -> B B B B X0 ;
+		}
+	}
+	parser RNGLALR1
+	on "bbbbx"
+	yields e(b(B B B B X0))
