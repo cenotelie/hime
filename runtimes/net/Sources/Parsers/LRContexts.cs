@@ -22,7 +22,7 @@ using System.IO;
 namespace Hime.Redist.Parsers
 {
 	/// <summary>
-	/// Represents the contexts of a LR state
+	/// Represents the contexts opening by transitions from a state
 	/// </summary>
 	public struct LRContexts
 	{
@@ -50,8 +50,8 @@ namespace Hime.Redist.Parsers
 			int count = input.ReadUInt16();
 			if (count > 0)
 			{
-				content = new ushort[count];
-				for (int i = 0; i != count; i++)
+				content = new ushort[count * 2];
+				for (int i = 0; i != count * 2; i++)
 					content[i] = input.ReadUInt16();
 			}
 			else
@@ -61,18 +61,26 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Gets whether the specified context is in this collection
+		/// Gets whether the specified context opens by a transition using the specified terminal ID
 		/// </summary>
+		/// <param name="terminalID">The identifier of a terminal</param>
 		/// <param name="context">A context</param>
-		/// <returns><c>true</c> if the specified context is in this collection</returns>
-		public bool Contains(int context)
+		/// <returns><c>true</c> if the specified context is opened</returns>
+		public bool Opens(int terminalID, int context)
 		{
-			if (content != null)
-			{
-				for (int i = 0; i != content.Length; i++)
-					if (content[i] == context)
-						return true;
+			if (content == null)
 				return false;
+			int index = 0;
+			while (index != content.Length && content[index] != terminalID)
+				index += 2;
+			if (index == content.Length)
+				// not found
+				return false;
+			while (index != content.Length && content[index] == terminalID)
+			{
+				if (content[index + 1] == context)
+					return true;
+				index += 2;
 			}
 			return false;
 		}

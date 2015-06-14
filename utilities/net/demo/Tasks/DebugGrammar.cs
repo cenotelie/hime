@@ -52,7 +52,7 @@ namespace Hime.Demo.Tasks
 			foreach (Hime.SDK.Grammars.LR.Conflict conflict in builder.Conflicts)
 				System.Console.WriteLine(conflict);
 			Hime.SDK.Reflection.Serializers.ExportDOT(graph, "Demo.LR.dot");
-			Hime.SDK.Reflection.Serializers.Export(graph, "Demo.LR.txt");
+			Hime.SDK.Reflection.Serializers.Export(graph, grammar, "Demo.LR.txt");
 		}
 	}
 }

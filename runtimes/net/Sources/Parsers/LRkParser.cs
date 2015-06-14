@@ -42,6 +42,10 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private int[] stack;
 		/// <summary>
+		/// The identifiers of the items on the stack
+		/// </summary>
+		private int[] stackIDs;
+		/// <summary>
 		/// Index of the stack's head
 		/// </summary>
 		private int head;
@@ -63,6 +67,7 @@ namespace Hime.Redist.Parsers
 		{
 			this.automaton = automaton;
 			stack = new int[INIT_STACK_SIZE];
+			stackIDs = new int[INIT_STACK_SIZE];
 			head = 0;
 			builder = new LRkASTBuilder(lexer.tokens, symVariables, symVirtuals);
 		}
@@ -80,15 +85,31 @@ namespace Hime.Redist.Parsers
 			// the default context is always active
 			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
 				return int.MaxValue;
-			// is the requested coontext already open?
-			for (int i = head; i != -1; i--)
-				if (automaton.GetContexts(stack[i]).Contains(context))
-					// yes, the context is already in effect
-					return head - i;
-			// at this point, the requested context is not yet open
-			// can it be open by a token with the specified terminal ID?
+			if (lexer.tokens.Size == 0)
+			{
+				// this is the first token, does it open the context?
+				return automaton.GetContexts(0).Opens(onTerminalID, context) ? 0 : -1;
+			}
+			// retrieve the action for this terminal and the production, if appropriate
 			LRAction action = automaton.GetAction(stack[head], onTerminalID);
-			// if the action is something else than a reduction, the context can never be produced
+			// does the context opens with the terminal?
+			if (action.Code == LRActionCode.Shift && automaton.GetContexts(stack[head]).Opens(onTerminalID, context))
+				return 0;
+			LRProduction production = (action.Code == LRActionCode.Reduce) ? automaton.GetProduction(action.Data) : null;
+			// look into the stack for the opening of the context
+			for (int i = head - 1; i != 0; i--)
+			{
+				if (automaton.GetContexts(stack[i]).Opens(stackIDs[i+1], context))
+				{
+					// the context is opened here
+					// but is it closed by the reduction (if any)?
+					if (production == null || i < head - production.ReductionLength)
+						// no, we are still in the context
+						return head - i;
+				}
+			}
+			// at this point, the requested context is not yet open or is closed by a reduction
+			// now, if the action is something else than a reduction (accept or error), the context can never be produced
 			// for the context to open, a new state must be pushed onto the stack
 			// this means that the provided terminal must trigger a chain of at least one reduction
 			if (action.Code != LRActionCode.Reduce)
@@ -100,13 +121,10 @@ namespace Hime.Redist.Parsers
 			while (action.Code == LRActionCode.Reduce)
 			{
 				// execute the reduction
-				LRProduction production = automaton.GetProduction(action.Data);
+				production = automaton.GetProduction(action.Data);
 				myHead -= production.ReductionLength;
 				// this must be a shift
 				action = automaton.GetAction(myStack[myHead], symVariables[production.Head].ID);
-				if (automaton.GetContexts(action.Data).Contains(context))
-					// the context opens at this state
-					return 0;
 				myHead++;
 				if (myHead == myStack.Length)
 					Array.Resize(ref myStack, myStack.Length + INIT_STACK_SIZE);
@@ -114,8 +132,8 @@ namespace Hime.Redist.Parsers
 				// now, get the new action for the terminal
 				action = automaton.GetAction(action.Data, onTerminalID);
 			}
-			// the context is still unavailable
-			return -1;
+			// is this a shift action that opens the context?
+			return ((action.Code == LRActionCode.Shift && automaton.GetContexts(myStack[myHead]).Opens(onTerminalID, context)) ? 0 : -1);
 		}
 
 		/// <summary>
@@ -216,8 +234,12 @@ namespace Hime.Redist.Parsers
 				{
 					head++;
 					if (head == stack.Length)
+					{
 						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
+						Array.Resize(ref stackIDs, stackIDs.Length + INIT_STACK_SIZE);
+					}
 					stack[head] = action.Data;
+					stackIDs[head] = kernel.TerminalID;
 					builder.StackPushToken(kernel.Index);
 					return action.Code;
 				}
@@ -229,8 +251,12 @@ namespace Hime.Redist.Parsers
 					action = automaton.GetAction(stack[head], symVariables[production.Head].ID);
 					head++;
 					if (head == stack.Length)
+					{
 						Array.Resize(ref stack, stack.Length + INIT_STACK_SIZE);
+						Array.Resize(ref stackIDs, stackIDs.Length + INIT_STACK_SIZE);
+					}
 					stack[head] = action.Data;
+					stackIDs[head] = symVariables[production.Head].ID;
 					continue;
 				}
 				return action.Code;
