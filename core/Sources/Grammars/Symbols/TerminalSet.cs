@@ -160,7 +160,7 @@ namespace Hime.SDK.Grammars
 		/// <remarks>This method is not supported</remarks>
 		public void CopyTo(Terminal[] array, int arrayIndex)
 		{
-			throw new System.NotImplementedException();
+			content.Values.CopyTo(array, arrayIndex);
 		}
 
 		/// <summary>

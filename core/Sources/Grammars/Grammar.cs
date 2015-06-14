@@ -30,15 +30,15 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The prefix for the generated terminal names
 		/// </summary>
-		public const string PREFIX_GENERATED_TERMINAL = "_gen_T";
+		public const string PREFIX_GENERATED_TERMINAL = "__T";
 		/// <summary>
 		/// The prefix for the generated variable names
 		/// </summary>
-		public const string PREFIX_GENERATED_VARIABLE = "_gen_V";
+		public const string PREFIX_GENERATED_VARIABLE = "__V";
 		/// <summary>
 		/// The name of the generated axiom variable
 		/// </summary>
-		public const string GENERATED_AXIOM = "_Axiom_";
+		public const string GENERATED_AXIOM = "__axiom";
 		/// <summary>
 		/// Name of the grammar option specifying the grammar's axiom variable
 		/// </summary>
@@ -50,7 +50,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The name of the default lexical context
 		/// </summary>
-		public const string DEFAULT_CONTEXT_NAME = "_default_";
+		public const string DEFAULT_CONTEXT_NAME = "__default";
 
 		/// <summary>
 		/// The counter for the generation of unique names across multiple grammars
@@ -243,6 +243,16 @@ namespace Hime.SDK.Grammars
 				return index;
 			contexts.Add(context);
 			return contexts.Count - 1;
+		}
+
+		/// <summary>
+		/// Gets the name of the context with the specified identifier
+		/// </summary>
+		/// <param name="contextID">The identifier of a context</param>
+		/// <returns>The name of the identified context</returns>
+		public string GetContextName(int contextID)
+		{
+			return contexts[contextID];
 		}
 
 		/// <summary>

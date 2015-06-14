@@ -180,16 +180,16 @@ namespace Hime.SDK.Grammars.LR
 			foreach (RuleBodyElement part in rule.Body.Choices[0])
 			{
 				if (i == position)
-					builder.Append(" \u25CF");
+					builder.Append(" *");
 				builder.Append(" ");
 				builder.Append(part.ToString());
 				i++;
 			}
 			if (i == position)
-				builder.Append(" \u25CF");
+				builder.Append(" *");
 			if (withLookaheads)
 			{
-				builder.Append(" | ");
+				builder.Append(" ][ ");
 				TerminalSet lookaheads = Lookaheads;
 				for (int j = 0; j != lookaheads.Count; j++)
 				{

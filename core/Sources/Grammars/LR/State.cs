@@ -44,6 +44,10 @@ namespace Hime.SDK.Grammars.LR
 		/// The reductions in this state
 		/// </summary>
 		private StateReductions reductions;
+		/// <summary>
+		/// The contexts opening by transitions from this state
+		/// </summary>
+		private readonly Dictionary<Terminal, List<int>> openingContexts;
 
 		/// <summary>
 		/// Gets or sets the state's identifier
@@ -85,6 +89,7 @@ namespace Hime.SDK.Grammars.LR
 			this.kernel = kernel;
 			this.items = items;
 			children = new Dictionary<Symbol, State>(new Symbol.EqualityComparer());
+			openingContexts = new Dictionary<Terminal, List<int>>();
 		}
 
 		/// <summary>
@@ -108,6 +113,16 @@ namespace Hime.SDK.Grammars.LR
 		}
 
 		/// <summary>
+		/// Gets the contexts opened by a transition on the specified terminal
+		/// </summary>
+		/// <param name="terminal">A terminal</param>
+		/// <returns>The opened contexts</returns>
+		public ROList<int> GetContextsOpenedBy(Terminal terminal)
+		{
+			return !openingContexts.ContainsKey(terminal) ? new ROList<int>(new List<int>(0)) : new ROList<int>(openingContexts[terminal]);
+		}
+
+		/// <summary>
 		/// Adds a transition to a child
 		/// </summary>
 		/// <param name="symbol">The transition symbol</param>
@@ -115,6 +130,17 @@ namespace Hime.SDK.Grammars.LR
 		public void AddChild(Symbol symbol, State child)
 		{
 			children.Add(symbol, child);
+		}
+
+		/// <summary>
+		/// Copies the context information of the specified state (replaces any existing one)
+		/// </summary>
+		/// <param name="state">A state</param>
+		public void CopyContextsOf(State state)
+		{
+			openingContexts.Clear();
+			foreach (Terminal terminal in state.openingContexts.Keys)
+				openingContexts.Add(terminal, new List<int>(state.openingContexts[terminal]));
 		}
 
 		/// <summary>
@@ -154,6 +180,33 @@ namespace Hime.SDK.Grammars.LR
 				}
 				children.Add(next, child);
 			}
+			// Build the context data
+			foreach (Item item in items)
+			{
+				if (item.BaseRule.Context != 0 && item.DotPosition == 0 && item.Action == LRActionCode.Shift)
+				{
+					// this is the opening of a context
+					List<Terminal> openingTerminals = new List<Terminal>();
+					Symbol first = item.GetNextSymbol();
+					if (first is Terminal)
+						openingTerminals.Add(first as Terminal);
+					else
+						openingTerminals.AddRange((first as Variable).Firsts);
+					foreach (Terminal terminal in openingTerminals)
+					{
+						List<int> contexts;
+						if (openingContexts.ContainsKey(terminal))
+							contexts = openingContexts[terminal];
+						else
+						{
+							contexts = new List<int>();
+							openingContexts.Add(terminal, contexts);
+						}
+						if (!contexts.Contains(item.BaseRule.Context))
+							contexts.Add(item.BaseRule.Context);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -170,16 +223,16 @@ namespace Hime.SDK.Grammars.LR
 		/// Determines whether the specified <see cref="Hime.SDK.Grammars.LR.State"/> is equal to the
 		/// current <see cref="Hime.SDK.Grammars.LR.State"/>.
 		/// </summary>
-		/// <param name='Set'>
+		/// <param name='state'>
 		/// The <see cref="Hime.SDK.Grammars.LR.State"/> to compare with the current <see cref="Hime.SDK.Grammars.LR.State"/>.
 		/// </param>
 		/// <returns>
 		/// <c>true</c> if the specified <see cref="Hime.SDK.Grammars.LR.State"/> is equal to the current
 		/// <see cref="Hime.SDK.Grammars.LR.State"/>; otherwise, <c>false</c>.
 		/// </returns>
-		public bool Equals(State Set)
+		public bool Equals(State state)
 		{
-			return (kernel.Equals(Set.kernel));
+			return (kernel.Equals(state.kernel));
 		}
 
 		/// <summary>

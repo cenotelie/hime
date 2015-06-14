@@ -73,12 +73,13 @@ namespace Hime.SDK.Reflection
 		/// Export the content of the given LR graph to the specified file
 		/// </summary>
 		/// <param name="graph">The LR graph to export</param>
+		/// <param name="grammar">The associated grammar</param>
 		/// <param name="file">File to export to</param>
-		public static void Export(Grammars.LR.Graph graph, string file)
+		public static void Export(Grammars.LR.Graph graph, Grammars.Grammar grammar, string file)
 		{
 			System.IO.StreamWriter writer = new System.IO.StreamWriter(file, false, Encoding.UTF8);
 			foreach (Grammars.LR.State state in graph.States)
-				ExportLRState(writer, state);
+				ExportLRState(writer, state, grammar);
 			writer.Close();
 		}
 
@@ -87,10 +88,22 @@ namespace Hime.SDK.Reflection
 		/// </summary>
 		/// <param name="writer">The writer to export with</param>
 		/// <param name="state">The LR state to export</param>
-		private static void ExportLRState(System.IO.TextWriter writer, Grammars.LR.State state)
+		/// <param name="grammar">The associated grammar</param>
+		private static void ExportLRState(System.IO.TextWriter writer, Grammars.LR.State state, Grammars.Grammar grammar)
 		{
 			writer.WriteLine();
 			writer.WriteLine("State {0}:", state.ID);
+			writer.WriteLine("\tContexts:");
+			foreach (Grammars.Symbol symbol in state.Transitions)
+			{
+				Grammars.Terminal terminal = symbol as Grammars.Terminal;
+				if (terminal != null)
+				{
+					ROList<int> contexts = state.GetContextsOpenedBy(terminal);
+					foreach (int context in contexts)
+						writer.WriteLine("\t\tOn {0} opening context {1}: {2}", terminal, context, grammar.GetContextName(context));
+				}
+			}
 			writer.WriteLine("\tTransitions:");
 			foreach (Grammars.Symbol symbol in state.Transitions)
 				writer.WriteLine("\t\tOn {0} shift to {1}", symbol, state.GetChildBy(symbol).ID);

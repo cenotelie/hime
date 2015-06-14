@@ -149,7 +149,28 @@ namespace Hime.SDK.Output
 				writer.Write((ushort)variable.ID);
 
 			foreach (Grammars.LR.State state in graph.States)
-				GenerateDataContexts(writer, state);
+			{
+				int count = 0;
+				foreach (Grammars.Symbol symbol in state.Transitions)
+				{
+					Grammars.Terminal terminal = symbol as Grammars.Terminal;
+					if (terminal != null)
+						count += state.GetContextsOpenedBy(terminal).Count;
+				}
+				writer.Write((ushort)count);
+				foreach (Grammars.Symbol symbol in state.Transitions)
+				{
+					Grammars.Terminal terminal = symbol as Grammars.Terminal;
+					if (terminal != null)
+					{
+						foreach (int context in state.GetContextsOpenedBy(terminal))
+						{
+							writer.Write((ushort)terminal.ID);
+							writer.Write((ushort)context);
+						}
+					}
+				}
+			}
 
 			for (int i = 0; i != offsets.Count; i++)
 			{
@@ -167,31 +188,6 @@ namespace Hime.SDK.Output
 				writer.Write((ushort)index);
 
 			writer.Close();
-		}
-
-		/// <summary>
-		/// Generates the parser's binary data for the contexts
-		/// </summary>
-		/// <param name="writer">The output writer</param>
-		/// <param name="state">The LR state</param>
-		private void GenerateDataContexts(BinaryWriter writer, Grammars.LR.State state)
-		{
-			// retrieve the contexts
-			List<ushort> result = new List<ushort>();
-			foreach (Grammars.LR.Item item in state.Items)
-			{
-				if (item.DotPosition == 0)
-				{
-					ushort id = (ushort)item.BaseRule.Context;
-					if (id != 0 && !result.Contains(id))
-						result.Add(id);
-				}
-			}
-			
-			// output
-			writer.Write((ushort)result.Count);
-			for (int i = 0; i != result.Count; i++)
-				writer.Write(result[i]);
 		}
 
 		/// <summary>
@@ -299,8 +295,7 @@ namespace Hime.SDK.Output
 			{
 				if (elem.Symbol is Grammars.Virtual || elem.Symbol is Grammars.Action)
 					bcl += 2;
-				else
-				if (pop >= length)
+				else if (pop >= length)
 					bcl += 2;
 				else
 				{
@@ -316,28 +311,24 @@ namespace Hime.SDK.Output
 				{
 					if (elem.Action == Hime.Redist.TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.AddVirtualDrop);
-					else
-					if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == Hime.Redist.TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.AddVirtualPromote);
 					else
 						writer.Write((ushort)LROpCodeValues.AddVirtualNoAction);
 					writer.Write((ushort)virtuals.IndexOf(elem.Symbol as Grammars.Virtual));
 				}
-				else
-				if (elem.Symbol is Grammars.Action)
+				else if (elem.Symbol is Grammars.Action)
 				{
 					writer.Write((ushort)LROpCodeValues.SemanticAction);
 					writer.Write((ushort)actions.IndexOf(elem.Symbol as Grammars.Action));
 				}
-				else
-				if (pop >= length)
+				else if (pop >= length)
 				{
 					// Here the symbol must be a variable
 					ushort index = (ushort)variables.IndexOf(elem.Symbol as Grammars.Variable);
 					if (elem.Action == Hime.Redist.TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.AddNullVariableDrop);
-					else
-					if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == Hime.Redist.TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.AddNullVariablePromote);
 					else
 						writer.Write((ushort)LROpCodeValues.AddNullVariableNoAction);
@@ -347,8 +338,7 @@ namespace Hime.SDK.Output
 				{
 					if (elem.Action == Hime.Redist.TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.PopStackDrop);
-					else
-					if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == Hime.Redist.TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.PopStackPromote);
 					else
 						writer.Write((ushort)LROpCodeValues.PopStackNoAction);

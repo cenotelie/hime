@@ -308,7 +308,7 @@ namespace Hime.SDK.Output
 			if (unit.Graph != null)
 			{
 				reporter.Info("Exporting LR graph debug data (txt) at " + GetArtifactDebugLRAsText(unit) + " ...");
-				Reflection.Serializers.Export(unit.Graph, GetArtifactDebugLRAsText(unit));
+				Reflection.Serializers.Export(unit.Graph, unit.Grammar, GetArtifactDebugLRAsText(unit));
 				reporter.Info("Exporting LR graph debug data (dot) at " + GetArtifactDebugLRAsDOT(unit) + " ...");
 				Reflection.Serializers.ExportDOT(unit.Graph, GetArtifactDebugLRAsDOT(unit));
 			}

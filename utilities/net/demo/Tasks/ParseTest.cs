@@ -38,26 +38,26 @@ namespace Hime.Demo.Tasks
 		{
 			// Build parser assembly
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.SDK.Output.Mode.SourceAndAssembly;
+			task.Mode = Hime.SDK.Output.Mode.Debug;
 			task.AddInputRaw("grammar Test { options {Axiom=\"e\";} terminals {" +
 				"X0 -> 'x';" +
 				"context inner1 { X1 -> 'x'; }" +
-				"context inner2 { X2 -> 'x'; } }" +
-				"rules {" +
-				"sub1 -> '('! #inner1{(X1 | sub1 | sub2)*} ')'!;" +
-				"sub2 -> '['! #inner2{(X2 | sub1 | sub2)*} ']'!;" +
+				"context inner2 { X2 -> 'x'; }" +
+				"} rules {" +
+				"sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;" +
+				"sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;" +
 				"e -> (X0 | sub1 | sub2)* ;" +
 				"} }");
 			task.Namespace = "Hime.Demo.Generated";
 			task.CodeAccess = Hime.SDK.Output.Modifier.Public;
-			task.Method = ParsingMethod.RNGLALR1;
+			task.Method = ParsingMethod.LALR1;
 			task.Execute();
 
 			// Load the generated assembly
 			AssemblyReflection assembly = new AssemblyReflection(Path.Combine(Environment.CurrentDirectory, "Test.dll"));
 
 			// Re-parse the input grammar with the generated parser
-			BaseLRParser parser = assembly.GetParser("x[x(x)]");
+			BaseLRParser parser = assembly.GetParser("x(x[x])");
 			ParseResult result = parser.Parse();
 
 			// Display the errors if any

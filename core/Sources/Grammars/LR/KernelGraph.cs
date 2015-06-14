@@ -195,6 +195,8 @@ namespace Hime.SDK.Grammars.LR
 					State childLALR1 = graphLALR1.States[stateLR0.GetChildBy(symbol).ID];
 					stateLALR1.AddChild(symbol, childLALR1);
 				}
+				// Propagate the contexts
+				stateLALR1.CopyContextsOf(stateLR0);
 				// Build
 				stateLALR1.BuildReductions(new StateReductionsLALR1());
 			}
