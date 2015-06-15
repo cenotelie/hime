@@ -399,7 +399,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      */
     private boolean checkIsExpected(int gssNode, Symbol terminal) {
         // queue of GLR states to inspect:
-        List<Integer> queueGSSHead = new ArrayList<Integer>();   // the related GSS head
+        IntList queueGSSHead = new IntList(LRkParser.INIT_STACK_SIZE);   // the related GSS head
         List<int[]> queueVStack = new ArrayList<int[]>(); // the virtual stack
 
         // first reduction
