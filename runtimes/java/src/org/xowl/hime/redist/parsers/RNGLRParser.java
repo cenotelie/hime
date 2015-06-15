@@ -152,22 +152,53 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         }
         // try to only look at stack heads that expect the terminal
         IntList queue = new IntList(LRkParser.INIT_STACK_SIZE);
+        List<LRProduction> productions = new ArrayList<LRProduction>();
         IntList distances = new IntList(LRkParser.INIT_STACK_SIZE);
+        boolean foundOnPreviousShift = false;
         for (Shift shift : shifts) {
-            if (parserAutomaton.getActionsCount(shift.to, onTerminalID) > 0) {
-                // does the context opens with the terminal?
-                if (parserAutomaton.getContexts(shift.to).opens(onTerminalID, context))
-                    return 0;
-                // looking at the immediate history, does the context opens from the shift just before?
-                if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).opens(nextToken.getTerminalID(), context))
-                    return 1;
-                // no, enqueue
-                if (!queue.contains(shift.from)) {
-                    queue.add(shift.from);
-                    distances.add(2);
+            int count = parserAutomaton.getActionsCount(shift.to, onTerminalID);
+            if (count == 0)
+                continue;
+            for (int i = 0; i != count; i++) {
+                LRAction action = parserAutomaton.getAction(shift.to, onTerminalID, i);
+                if (action.getCode() == LRAction.CODE_SHIFT) {
+                    // does the context opens with the terminal?
+                    if (parserAutomaton.getContexts(shift.to).opens(onTerminalID, context))
+                        return 0;
+                    // looking at the immediate history, does the context opens from the shift just before?
+                    if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).opens(nextToken.getTerminalID(), context)) {
+                        foundOnPreviousShift = true;
+                        break;
+                    }
+                    // no, enqueue
+                    if (!queue.contains(shift.from)) {
+                        queue.add(shift.from);
+                        productions.add(null);
+                        distances.add(2);
+                    }
+                } else {
+                    // this is reduction
+                    LRProduction production = parserAutomaton.getProduction(action.getData());
+                    // looking at the immediate history, does the context opens from the shift just before?
+                    if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).opens(nextToken.getTerminalID(), context)) {
+                        if (production.getReductionLength() < 1) {
+                            // the reduction does not close the context
+                            foundOnPreviousShift = true;
+                            break;
+                        }
+                    }
+                    // no, enqueue
+                    if (!queue.contains(shift.from)) {
+                        queue.add(shift.from);
+                        productions.add(production);
+                        distances.add(2);
+                    }
                 }
             }
         }
+        if (foundOnPreviousShift)
+            // found the context opening on the previous shift (and was not immediately closed by a reduction)
+            return 1;
         if (queue.size() == 0) {
             // the track is empty, the terminal is unexpected
             return -1;
@@ -179,12 +210,16 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                 int from = paths.content[p].getLast();
                 int symbolID = sppf.getSymbolOn(paths.content[p].get(0)).getID();
                 int distance = distances.get(i);
+                LRProduction production = productions.get(i);
                 // was the context open on this transition?
-                if (parserAutomaton.getContexts(gss.getRepresentedState(from)).opens(symbolID, context))
-                    return distance;
+                if (parserAutomaton.getContexts(gss.getRepresentedState(from)).opens(symbolID, context)) {
+                    if (production == null || production.getReductionLength() < distance)
+                        return distance;
+                }
                 // no, enqueue
                 if (!queue.contains(from)) {
                     queue.add(from);
+                    productions.add(production);
                     distances.add(distance + 1);
                 }
             }

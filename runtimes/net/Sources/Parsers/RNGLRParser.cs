@@ -158,30 +158,66 @@ namespace Hime.Redist.Parsers
 			}
 			// try to only look at stack heads that expect the terminal
 			List<int> queue = new List<int>();
+			List<LRProduction> productions = new List<LRProduction>();
 			List<int> distances = new List<int>();
+			bool foundOnPreviousShift = false;
 			foreach (Shift shift in shifts)
 			{
-				if (parserAutomaton.GetActionsCount(shift.to, onTerminalID) > 0)
+				int count = parserAutomaton.GetActionsCount(shift.to, onTerminalID);
+				if (count == 0)
+					continue;
+				for (int i = 0; i != count; i++)
 				{
-					// does the context opens with the terminal?
-					if (parserAutomaton.GetContexts(shift.to).Opens(onTerminalID, context))
-						return 0;
-					// looking at the immediate history, does the context opens from the shift just before?
-					if (parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Opens(nextToken.TerminalID, context))
-						return 1;
-					// no, enqueue
-					if (!queue.Contains(shift.from))
+					LRAction action = parserAutomaton.GetAction(shift.to, onTerminalID, i);
+					if (action.Code == LRActionCode.Shift)
 					{
-						queue.Add(shift.from);
-						distances.Add(2);
+						// does the context opens with the terminal?
+						if (parserAutomaton.GetContexts(shift.to).Opens(onTerminalID, context))
+							return 0;
+						// looking at the immediate history, does the context opens from the shift just before?
+						if (parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Opens(nextToken.TerminalID, context))
+						{
+							foundOnPreviousShift = true;
+							break;
+						}
+						// no, enqueue
+						if (!queue.Contains(shift.from))
+						{
+							queue.Add(shift.from);
+							productions.Add(null);
+							distances.Add(2);
+						}
+					}
+					else
+					{
+						// this is reduction
+						LRProduction production = parserAutomaton.GetProduction(action.Data);
+						// looking at the immediate history, does the context opens from the shift just before?
+						if (parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Opens(nextToken.TerminalID, context))
+						{
+							if (production.ReductionLength < 1)
+							{
+								// the reduction does not close the context
+								foundOnPreviousShift = true;
+								break;
+							}
+						}
+						// no, enqueue
+						if (!queue.Contains(shift.from))
+						{
+							queue.Add(shift.from);
+							productions.Add(production);
+							distances.Add(2);
+						}
 					}
 				}
 			}
+			if (foundOnPreviousShift)
+				// found the context opening on the previous shift (and was not immediately closed by a reduction)
+				return 1;
 			if (queue.Count == 0)
-			{
 				// the track is empty, the terminal is unexpected
 				return -1;
-			}
 			// explore the current GSS to find the specified context
 			for (int i = 0; i != queue.Count; i++)
 			{
@@ -192,13 +228,18 @@ namespace Hime.Redist.Parsers
 					int from = paths[p].Last;
 					int symbolID = sppf.GetSymbolOn(paths[p][0]).ID;
 					int distance = distances[i];
-					// was the context open on this transition?
+					LRProduction production = productions[i];
+					// was the context opened on this transition?
 					if (parserAutomaton.GetContexts(gss.GetRepresentedState(from)).Opens(symbolID, context))
-						return distance;
+					{
+						if (production == null || production.ReductionLength < distance)
+							return distance;
+					}
 					// no, enqueue
 					if (!queue.Contains(from))
 					{
 						queue.Add(from);
+						productions.Add(production);
 						distances.Add(distance + 1);
 					}
 				}

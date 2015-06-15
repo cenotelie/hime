@@ -349,8 +349,8 @@ test Test_CS_ContextNotOpened_GLR:
 	on "bbbbx"
 	yields e(b(B B B B X0))
 
-test Test_CS_ContextClosing_LR:
-	grammar Test_CS_ContextClosing_LR {
+test Test_CS_ContextClosing1_LR:
+	grammar Test_CS_ContextClosing1_LR {
 		options {Axiom="e";}
 		terminals {
 			X0 -> 'x';
@@ -364,8 +364,8 @@ test Test_CS_ContextClosing_LR:
 	on "xxx"
 	yields e(X0 X1 X0)
 
-test Test_CS_ContextClosing_GLR:
-	grammar Test_CS_ContextClosing_GLR {
+test Test_CS_ContextClosing1_GLR:
+	grammar Test_CS_ContextClosing1_GLR {
 		options {Axiom="e";}
 		terminals {
 			X0 -> 'x';
@@ -378,3 +378,65 @@ test Test_CS_ContextClosing_GLR:
 	parser RNGLALR1
 	on "xxx"
 	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing2_LR:
+	grammar Test_CS_ContextClosing2_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } (X1 | X0) ;
+		}
+	}
+	parser LALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing2_GLR:
+	grammar Test_CS_ContextClosing2_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } (X1 | X0) ;
+		}
+	}
+	parser RNGLALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing3_LR:
+	grammar Test_CS_ContextClosing3_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 inner X1 } (X1 | X0) ;
+			inner -> X1 ;
+		}
+	}
+	parser LALR1
+	on "xxxxx"
+	yields e(X0 X1 inner(X1) X1 X0)
+
+test Test_CS_ContextClosing3_GLR:
+	grammar Test_CS_ContextClosing3_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 inner X1 } (X1 | X0) ;
+			inner -> X1 ;
+		}
+	}
+	parser RNGLALR1
+	on "xxxxx"
+	yields e(X0 X1 inner(X1) X1 X0)
