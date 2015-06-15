@@ -97,7 +97,7 @@ namespace Hime.Redist.Parsers
 				return 0;
 			LRProduction production = (action.Code == LRActionCode.Reduce) ? automaton.GetProduction(action.Data) : null;
 			// look into the stack for the opening of the context
-			for (int i = head - 1; i != 0; i--)
+			for (int i = head - 1; i != -1; i--)
 			{
 				if (automaton.GetContexts(stack[i]).Opens(stackIDs[i + 1], context))
 				{

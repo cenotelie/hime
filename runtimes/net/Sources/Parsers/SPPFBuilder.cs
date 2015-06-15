@@ -218,7 +218,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets the symbol on the specified GSS edge label
 		/// </summary>
-		/// <param name="label">a lobal o</param>
+		/// <param name="label">The label of a GSS edge</param>
 		/// <returns>The symbol on the edge</returns>
 		public Symbol GetSymbolOn(GSSLabel label)
 		{
