@@ -28,6 +28,10 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int ARG_VALUE_NAME = 0x0007;
 			/// <summary>
+			/// The unique identifier for terminal ARG_VALUE_NAME_CHAR
+			/// </summary>
+			public const int ARG_VALUE_NAME_CHAR = 0x0006;
+			/// <summary>
 			/// The unique identifier for terminal ARG_VALUE_NUMBER
 			/// </summary>
 			public const int ARG_VALUE_NUMBER = 0x0008;
@@ -65,6 +69,7 @@ namespace Hime.SDK.Input
 			new Symbol(0x0001, "ε"),
 			new Symbol(0x0002, "$"),
 			new Symbol(0x0007, "ARG_VALUE_NAME"),
+			new Symbol(0x0006, "ARG_VALUE_NAME_CHAR"),
 			new Symbol(0x0008, "ARG_VALUE_NUMBER"),
 			new Symbol(0x0003, "WHITE_SPACE"),
 			new Symbol(0x0004, "ARG_NAME"),

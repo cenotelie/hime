@@ -43,9 +43,9 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int line = 0x000D;
 			/// <summary>
-			/// The unique identifier for variable _Axiom_
+			/// The unique identifier for variable __axiom
 			/// </summary>
-			public const int _Axiom_ = 0x0011;
+			public const int __axiom = 0x0011;
 		}
 		/// <summary>
 		/// The collection of variables matched by this parser
@@ -60,10 +60,10 @@ namespace Hime.SDK.Input
 			new Symbol(0x000B, "values"), 
 			new Symbol(0x000C, "arguments"), 
 			new Symbol(0x000D, "line"), 
-			new Symbol(0x000E, "_gen_V14"), 
-			new Symbol(0x000F, "_gen_V15"), 
-			new Symbol(0x0010, "_gen_V16"), 
-			new Symbol(0x0011, "_Axiom_") };
+			new Symbol(0x000E, "__V14"), 
+			new Symbol(0x000F, "__V15"), 
+			new Symbol(0x0010, "__V16"), 
+			new Symbol(0x0011, "__axiom") };
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>

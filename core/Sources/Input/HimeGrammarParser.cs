@@ -163,9 +163,9 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int file = 0x0041;
 			/// <summary>
-			/// The unique identifier for variable _Axiom_
+			/// The unique identifier for variable __axiom
 			/// </summary>
-			public const int _Axiom_ = 0x0061;
+			public const int __axiom = 0x0061;
 			/// <summary>
 			/// The unique identifier for virtual range
 			/// </summary>
@@ -222,20 +222,20 @@ namespace Hime.SDK.Input
 			new Symbol(0x003F, "grammar_parency"), 
 			new Symbol(0x0040, "cf_grammar"), 
 			new Symbol(0x0041, "file"), 
-			new Symbol(0x004B, "_gen_V75"), 
-			new Symbol(0x004C, "_gen_V76"), 
-			new Symbol(0x004D, "_gen_V77"), 
-			new Symbol(0x0050, "_gen_V80"), 
-			new Symbol(0x0053, "_gen_V83"), 
-			new Symbol(0x0056, "_gen_V86"), 
-			new Symbol(0x0058, "_gen_V88"), 
-			new Symbol(0x0059, "_gen_V89"), 
-			new Symbol(0x005A, "_gen_V90"), 
-			new Symbol(0x005B, "_gen_V91"), 
-			new Symbol(0x005C, "_gen_V92"), 
-			new Symbol(0x005E, "_gen_V94"), 
-			new Symbol(0x0060, "_gen_V96"), 
-			new Symbol(0x0061, "_Axiom_") };
+			new Symbol(0x004B, "__V75"), 
+			new Symbol(0x004C, "__V76"), 
+			new Symbol(0x004D, "__V77"), 
+			new Symbol(0x0050, "__V80"), 
+			new Symbol(0x0053, "__V83"), 
+			new Symbol(0x0056, "__V86"), 
+			new Symbol(0x0058, "__V88"), 
+			new Symbol(0x0059, "__V89"), 
+			new Symbol(0x005A, "__V90"), 
+			new Symbol(0x005B, "__V91"), 
+			new Symbol(0x005C, "__V92"), 
+			new Symbol(0x005E, "__V94"), 
+			new Symbol(0x0060, "__V96"), 
+			new Symbol(0x0061, "__axiom") };
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>

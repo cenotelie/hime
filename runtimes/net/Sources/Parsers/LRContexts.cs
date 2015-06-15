@@ -43,22 +43,7 @@ namespace Hime.Redist.Parsers
 		public LRContexts(BinaryReader input)
 		{
 			int count = input.ReadUInt16();
-			if (count == 1)
-			{
-				ushort first = input.ReadUInt16();
-				if (first != 0)
-				{
-					content = new ushort[count * 2];
-					content[0] = first;
-					for (int i = 1; i != count * 2; i++)
-						content[i] = input.ReadUInt16();
-				}
-				else
-				{
-					content = null;
-				}
-			}
-			else if (count > 0)
+			if (count > 0)
 			{
 				content = new ushort[count * 2];
 				for (int i = 0; i != count * 2; i++)
