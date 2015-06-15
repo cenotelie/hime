@@ -52,6 +52,10 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
      */
     private int[] stack;
     /**
+     * The identifiers of the items on the stack
+     */
+    private int[] stackIDs;
+    /**
      * Index of the stack's head
      */
     private int head;
@@ -73,6 +77,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
         super(variables, virtuals, actions, lexer);
         this.automaton = automaton;
         this.stack = new int[INIT_STACK_SIZE];
+        this.stackIDs = new int[INIT_STACK_SIZE];
         this.head = 0;
         this.builder = new LRkASTBuilder(lexer.getTokens(), symVariables, symVirtuals);
     }
@@ -82,29 +87,41 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
         // the default context is always active
         if (context == Automaton.DEFAULT_CONTEXT)
             return Integer.MAX_VALUE;
-        // is the requested coontext already open?
-        for (int i = head; i != -1; i--)
-            if (automaton.getContexts(stack[i]).contains(context))
-                return head - i;
-        // at this point, the requested context is not yet open
-        // can it be open by a token with the specified terminal ID?
+        if (lexer.getTokens().size() == 0) {
+            // this is the first token, does it open the context?
+            return automaton.getContexts(0).opens(onTerminalID, context) ? 0 : -1;
+        }
+        // retrieve the action for this terminal
         LRAction action = automaton.getAction(stack[head], onTerminalID);
-        // if the action is something else than a reduction, the context can never be produced
+        // does the context opens with the terminal?
+        if (action.getCode() == LRAction.CODE_SHIFT && automaton.getContexts(stack[head]).opens(onTerminalID, context))
+            return 0;
+        LRProduction production = (action.getCode() == LRAction.CODE_REDUCE) ? automaton.getProduction(action.getData()) : null;
+        // look into the stack for the opening of the context
+        for (int i = head - 1; i != -1; i--) {
+            if (automaton.getContexts(stack[i]).opens(stackIDs[i + 1], context)) {
+                // the context opens here
+                // but is it closed by the reduction (if any)?
+                if (production == null || i < head - production.getReductionLength())
+                    // no, we are still in the context
+                    return head - i;
+            }
+        }
+        // at this point, the requested context is not yet open or is closed by a reduction
+        // now, if the action is something else than a reduction (shift, accept or error), the context can never be produced
         // for the context to open, a new state must be pushed onto the stack
         // this means that the provided terminal must trigger a chain of at least one reduction
         if (action.getCode() != LRAction.CODE_REDUCE)
             return -1;
+        // there is at least one reduction, simulate
         int[] myStack = Arrays.copyOf(stack, stack.length);
         int myHead = head;
         while (action.getCode() == LRAction.CODE_REDUCE) {
             // execute the reduction
-            LRProduction production = automaton.getProduction(action.getData());
+            production = automaton.getProduction(action.getData());
             myHead -= production.getReductionLength();
             // this must be a shift
             action = automaton.getAction(myStack[myHead], symVariables.get(production.getHead()).getID());
-            if (automaton.getContexts(action.getData()).contains(context))
-                // the context opens at this state
-                return 0;
             myHead++;
             if (myHead == myStack.length)
                 myStack = Arrays.copyOf(myStack, myStack.length + INIT_STACK_SIZE);
@@ -112,8 +129,8 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
             // now, get the new action for the terminal
             action = automaton.getAction(action.getData(), onTerminalID);
         }
-        // the context is still unavailable
-        return -1;
+        // is this a shift action that opens the context?
+        return ((action.getCode() == LRAction.CODE_SHIFT && automaton.getContexts(myStack[myHead]).opens(onTerminalID, context)) ? 0 : -1);
     }
 
     /**
@@ -194,20 +211,23 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     }
 
     /**
-     * Parses the given token
+     * Parses on the specified token kernel
      *
-     * @param token The token to parse
-     * @return The LR action on the token
+     * @param kernel The token kernel to parse on
+     * @return The LR action that was used
      */
-    private char parseOnToken(TokenKernel token) {
+    private char parseOnToken(TokenKernel kernel) {
         while (true) {
-            LRAction action = automaton.getAction(stack[head], token.getTerminalID());
+            LRAction action = automaton.getAction(stack[head], kernel.getTerminalID());
             if (action.getCode() == LRAction.CODE_SHIFT) {
                 head++;
-                if (head == stack.length)
+                if (head == stack.length) {
                     stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                    stackIDs = Arrays.copyOf(stackIDs, stackIDs.length + INIT_STACK_SIZE);
+                }
                 stack[head] = action.getData();
-                builder.stackPushToken(token.getIndex());
+                stackIDs[head] = kernel.getTerminalID();
+                builder.stackPushToken(kernel.getIndex());
                 return action.getCode();
             } else if (action.getCode() == LRAction.CODE_REDUCE) {
                 LRProduction production = automaton.getProduction(action.getData());
@@ -215,9 +235,12 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
                 reduce(production);
                 action = automaton.getAction(stack[head], symVariables.get(production.getHead()).getID());
                 head++;
-                if (head == stack.length)
+                if (head == stack.length) {
                     stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
+                    stackIDs = Arrays.copyOf(stackIDs, stackIDs.length + INIT_STACK_SIZE);
+                }
                 stack[head] = action.getData();
+                stackIDs[head] = symVariables.get(production.getHead()).getID();
                 continue;
             }
             return action.getCode();

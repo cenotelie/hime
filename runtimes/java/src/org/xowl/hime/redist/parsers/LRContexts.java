@@ -22,7 +22,7 @@ package org.xowl.hime.redist.parsers;
 import org.xowl.hime.redist.utils.BinaryInput;
 
 /**
- * Represents the contexts of a LR state
+ * Represents the contexts opening by transitions from a state
  *
  * @author Laurent Wouters
  */
@@ -42,16 +42,6 @@ public class LRContexts {
     }
 
     /**
-     * Gets the i-th context
-     *
-     * @param index An index
-     * @return The i-th context
-     */
-    public int get(int index) {
-        return content[index];
-    }
-
-    /**
      * Loads the contexts from the specified input
      *
      * @param input An input
@@ -59,8 +49,8 @@ public class LRContexts {
     public LRContexts(BinaryInput input) {
         int count = input.readChar();
         if (count > 0) {
-            this.content = new char[count];
-            for (int i = 0; i != count; i++) {
+            this.content = new char[count * 2];
+            for (int i = 0; i != count * 2; i++) {
                 this.content[i] = input.readChar();
             }
         } else {
@@ -69,16 +59,25 @@ public class LRContexts {
     }
 
     /**
-     * Gets whether the specified context is in this collection
+     * Gets whether the specified context opens by a transition using the specified terminal ID
      *
-     * @param context A context
-     * @return <code>true</code> if the specified context is in this collection
+     * @param terminalID The identifier of a terminal
+     * @param context    A context
+     * @return <code>true</code> if the specified context is opened
      */
-    public boolean contains(int context) {
-        if (content != null) {
-            for (int i = 0; i != content.length; i++)
-                if (content[i] == context)
-                    return true;
+    public boolean opens(int terminalID, int context) {
+        if (content == null)
+            return false;
+        int index = 0;
+        while (index != content.length && content[index] != terminalID)
+            index += 2;
+        if (index == content.length)
+            // not found
+            return false;
+        while (index != content.length && content[index] == terminalID) {
+            if (content[index + 1] == context)
+                return true;
+            index += 2;
         }
         return false;
     }

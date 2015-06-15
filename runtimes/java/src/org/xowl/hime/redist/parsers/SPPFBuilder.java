@@ -222,6 +222,17 @@ class SPPFBuilder implements SemanticBody {
     }
 
     /**
+     * Gets the symbol on the specified GSS edge label
+     *
+     * @param label The label of a GSS edge
+     * @return The symbol on the edge
+     */
+    public Symbol getSymbolOn(GSSLabel label) {
+        int reference = label.isReplaceable() ? label.getTree().getLabelAt(0) : label.getOriginal();
+        return result.getSymbolFor(reference);
+    }
+
+    /**
      * Gets the GSS label already in history for the given GSS generation and symbol
      *
      * @param generation The index of a GSS generation

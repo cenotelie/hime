@@ -24,6 +24,7 @@ import org.xowl.hime.redist.lexer.Automaton;
 import org.xowl.hime.redist.lexer.BaseLexer;
 import org.xowl.hime.redist.lexer.IContextProvider;
 import org.xowl.hime.redist.lexer.TokenKernel;
+import org.xowl.hime.redist.utils.IntList;
 
 import java.util.*;
 
@@ -145,65 +146,63 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         // the default context is always active
         if (context == Automaton.DEFAULT_CONTEXT)
             return Integer.MAX_VALUE;
-        // this is for the first token
-        if (lexer.getTokens().size() == 0)
-            return parserAutomaton.getContexts(0).contains(context) ? 0 : -1;
+        if (lexer.getTokens().size() == 0) {
+            // this is the first token, does it open the context?
+            return parserAutomaton.getContexts(0).opens(onTerminalID, context) ? 0 : -1;
+        }
         // try to only look at stack heads that expect the terminal
-        int[] queue = new int[LRkParser.INIT_STACK_SIZE];
-        int queueLast = 0;
+        IntList queue = new IntList(LRkParser.INIT_STACK_SIZE);
+        IntList distances = new IntList(LRkParser.INIT_STACK_SIZE);
         for (Shift shift : shifts) {
             if (parserAutomaton.getActionsCount(shift.to, onTerminalID) > 0) {
-                if (parserAutomaton.getContexts(shift.to).contains(context))
+                // does the context opens with the terminal?
+                if (parserAutomaton.getContexts(shift.to).opens(onTerminalID, context))
+                    return 0;
+                // looking at the immediate history, does the context opens from the shift just before?
+                if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).opens(nextToken.getTerminalID(), context))
                     return 1;
-                if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).contains(context))
-                    return 2;
-                // enqueue
-                if (queueLast >= queue.length)
-                    queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
-                queue[queueLast] = shift.from;
-                queueLast++;
+                // no, enqueue
+                if (!queue.contains(shift.from)) {
+                    queue.add(shift.from);
+                    distances.add(2);
+                }
             }
         }
-        if (queueLast == 0) {
+        if (queue.size() == 0) {
             // the track is empty, the terminal is unexpected
             // still look for the correct context
             for (Shift shift : shifts) {
-                if (queueLast >= queue.length)
-                    queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
-                queue[queueLast] = shift.from;
-                queueLast++;
+                // looking at the immediate history, does the context opens from the shift just before?
+                if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).opens(nextToken.getTerminalID(), context))
+                    return 1;
+                // no, enqueue
+                if (!queue.contains(shift.from)) {
+                    queue.add(shift.from);
+                    distances.add(2);
+                }
             }
         }
         // explore the GSS to find the specified context
-        for (int i = 0; i != queueLast; i++) {
-            GSS.PathSet paths = gss.getPaths(queue[i], 1);
+        for (int i = 0; i != queue.size(); i++) {
+            GSS.PathSet paths = gss.getPaths(queue.get(i), 1);
             for (int p = 0; p != paths.count; p++) {
-                int to = paths.content[p].getLast();
-                boolean found = false;
-                for (int j = 0; j != queueLast; j++) {
-                    if (queue[j] == to) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    // this target node is not yet explored
-                    LRContexts contexts = parserAutomaton.getContexts(gss.getRepresentedState(to));
-                    if (contexts.contains(context))
-                        // found it!
-                        return i + 3;
-                    // enqueue for further exploration
-                    if (queueLast >= queue.length)
-                        queue = Arrays.copyOf(queue, queue.length + LRkParser.INIT_STACK_SIZE);
-                    queue[queueLast] = to;
-                    queueLast++;
+                int from = paths.content[p].getLast();
+                int symbolID = sppf.getSymbolOn(paths.content[p].get(0)).getID();
+                int distance = distances.get(i);
+                // was the context open on this transition?
+                if (parserAutomaton.getContexts(gss.getRepresentedState(from)).opens(symbolID, context))
+                    return distance;
+                // no, enqueue
+                if (!queue.contains(from)) {
+                    queue.add(from);
+                    distances.add(distance + 1);
                 }
             }
         }
         // at this point, the requested context is not yet open
         // can it be open by a token with the specified terminal ID?
         // queue of GLR states to inspect:
-        List<Integer> queueGSSHead = new ArrayList<Integer>();   // the related GSS head
+        IntList queueGSSHead = new IntList(LRkParser.INIT_STACK_SIZE);   // the related GSS head
         List<int[]> queueVStack = new ArrayList<int[]>(); // the virtual stack
         // first reduction
         for (Shift shift : shifts) {
@@ -228,9 +227,6 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                     // 0-length reduction => start from the current head
                     int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length + 1);
                     int next = getNextByVar(head, symVariables.get(production.getHead()).getID());
-                    if (parserAutomaton.getContexts(next).contains(context))
-                        // the context opens at this state
-                        return 0;
                     virtualStack[virtualStack.length - 1] = next;
                     // enqueue
                     queueGSSHead.add(queueGSSHead.get(i));
@@ -239,9 +235,6 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                     // we are still the virtual stack
                     int[] virtualStack = Arrays.copyOf(queueVStack.get(i), queueVStack.get(i).length - production.getReductionLength() + 1);
                     int next = getNextByVar(virtualStack[virtualStack.length - 2], symVariables.get(production.getHead()).getID());
-                    if (parserAutomaton.getContexts(next).contains(context))
-                        // the context opens at this state
-                        return 0;
                     virtualStack[virtualStack.length - 1] = next;
                     // enqueue
                     queueGSSHead.add(queueGSSHead.get(i));
@@ -253,14 +246,21 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                         GSSPath path = paths.content[k];
                         // get the target GLR state
                         int next = getNextByVar(gss.getRepresentedState(path.getLast()), symVariables.get(production.getHead()).getID());
-                        if (parserAutomaton.getContexts(next).contains(context))
-                            // the context opens at this state
-                            return 0;
                         // enqueue the info, top GSS stack node and target GLR state
                         queueGSSHead.add(path.getLast());
                         queueVStack.add(new int[]{next});
                     }
                 }
+            }
+        }
+        for (int[] vstack : queueVStack) {
+            int state = vstack[vstack.length - 1];
+            int count = parserAutomaton.getActionsCount(state, onTerminalID);
+            for (int i = 0; i != count; i++) {
+                LRAction action = parserAutomaton.getAction(state, onTerminalID, i);
+                if (action.getCode() == LRAction.CODE_SHIFT && parserAutomaton.getContexts(state).opens(onTerminalID, context))
+                    // the context opens here
+                    return 0;
             }
         }
         // the context is still unavailable
