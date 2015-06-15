@@ -90,7 +90,7 @@ namespace Hime.Redist.Parsers
 				// this is the first token, does it open the context?
 				return automaton.GetContexts(0).Opens(onTerminalID, context) ? 0 : -1;
 			}
-			// retrieve the action for this terminal and the production, if appropriate
+			// retrieve the action for this terminal
 			LRAction action = automaton.GetAction(stack[head], onTerminalID);
 			// does the context opens with the terminal?
 			if (action.Code == LRActionCode.Shift && automaton.GetContexts(stack[head]).Opens(onTerminalID, context))
@@ -99,9 +99,9 @@ namespace Hime.Redist.Parsers
 			// look into the stack for the opening of the context
 			for (int i = head - 1; i != 0; i--)
 			{
-				if (automaton.GetContexts(stack[i]).Opens(stackIDs[i+1], context))
+				if (automaton.GetContexts(stack[i]).Opens(stackIDs[i + 1], context))
 				{
-					// the context is opened here
+					// the context opens here
 					// but is it closed by the reduction (if any)?
 					if (production == null || i < head - production.ReductionLength)
 						// no, we are still in the context
@@ -109,7 +109,7 @@ namespace Hime.Redist.Parsers
 				}
 			}
 			// at this point, the requested context is not yet open or is closed by a reduction
-			// now, if the action is something else than a reduction (accept or error), the context can never be produced
+			// now, if the action is something else than a reduction (shift, accept or error), the context can never be produced
 			// for the context to open, a new state must be pushed onto the stack
 			// this means that the provided terminal must trigger a chain of at least one reduction
 			if (action.Code != LRActionCode.Reduce)

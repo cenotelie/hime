@@ -158,7 +158,7 @@ namespace Hime.Redist.Parsers
 			}
 			// try to only look at stack heads that expect the terminal
 			List<int> queue = new List<int>();
-			List<int> distance = new List<int>();
+			List<int> distances = new List<int>();
 			foreach (Shift shift in shifts)
 			{
 				if (parserAutomaton.GetActionsCount(shift.to, onTerminalID) > 0)
@@ -173,7 +173,7 @@ namespace Hime.Redist.Parsers
 					if (!queue.Contains(shift.from))
 					{
 						queue.Add(shift.from);
-						distance.Add(1);
+						distances.Add(2);
 					}
 				}
 			}
@@ -190,7 +190,7 @@ namespace Hime.Redist.Parsers
 					if (!queue.Contains(shift.from))
 					{
 						queue.Add(shift.from);
-						distance.Add(1);
+						distances.Add(2);
 					}
 				}
 			}
@@ -202,9 +202,17 @@ namespace Hime.Redist.Parsers
 				for (int p = 0; p != count; p++)
 				{
 					int from = paths[p].Last;
-					GSSLabel label = paths[p][0];
-					//if (!queue.Contains(to))
-					//	queue.Add(to);
+					int symbolID = sppf.GetSymbolOn(paths[p][0]).ID;
+					int distance = distances[i];
+					// was the context open on this transition?
+					if (parserAutomaton.GetContexts(gss.GetRepresentedState(from)).Opens(symbolID, context))
+						return distance;
+					// no, enqueue
+					if (!queue.Contains(from))
+					{
+						queue.Add(from);
+						distances.Add(distance + 1);
+					}
 				}
 			}
 			// at this point, the requested context is not yet open
@@ -283,7 +291,7 @@ namespace Hime.Redist.Parsers
 				for (int i = 0; i != count; i++)
 				{
 					LRAction action = parserAutomaton.GetAction(state, onTerminalID, i);
-					if (action.Code == LRActionCode.Shift && parserAutomaton.GetContexts(action.Data).Opens(onTerminalID, context))
+					if (action.Code == LRActionCode.Shift && parserAutomaton.GetContexts(state).Opens(onTerminalID, context))
 						// the context opens here
 						return 0;
 				}

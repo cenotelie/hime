@@ -216,6 +216,17 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
+		/// Gets the symbol on the specified GSS edge label
+		/// </summary>
+		/// <param name="label">a lobal o</param>
+		/// <returns>The symbol on the edge</returns>
+		public Symbol GetSymbolOn(GSSLabel label)
+		{
+			TableElemRef reference = label.IsReplaceable ? label.ReplaceableTree.GetLabelAt(0) : label.Original;
+			return result.GetSymbolFor(reference);
+		}
+
+		/// <summary>
 		/// Gets the GSS label already in history for the given GSS generation and symbol
 		/// </summary>
 		/// <param name="generation">The index of a GSS generation</param>
