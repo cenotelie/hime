@@ -348,3 +348,33 @@ test Test_CS_ContextNotOpened_GLR:
 	parser RNGLALR1
 	on "bbbbx"
 	yields e(b(B B B B X0))
+
+test Test_CS_ContextClosing_LR:
+	grammar Test_CS_ContextClosing_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } X0 ;
+		}
+	}
+	parser LALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing_GLR:
+	grammar Test_CS_ContextClosing_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } X0 ;
+		}
+	}
+	parser RNGLALR1
+	on "xxx"
+	yields e(X0 X1 X0)

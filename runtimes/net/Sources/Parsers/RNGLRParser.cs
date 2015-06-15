@@ -180,19 +180,7 @@ namespace Hime.Redist.Parsers
 			if (queue.Count == 0)
 			{
 				// the track is empty, the terminal is unexpected
-				// still look for the correct context
-				foreach (Shift shift in shifts)
-				{
-					// looking at the immediate history, does the context opens from the shift just before?
-					if (parserAutomaton.GetContexts(gss.GetRepresentedState(shift.from)).Opens(nextToken.TerminalID, context))
-						return 1;
-					// no, enqueue
-					if (!queue.Contains(shift.from))
-					{
-						queue.Add(shift.from);
-						distances.Add(2);
-					}
-				}
+				return -1;
 			}
 			// explore the current GSS to find the specified context
 			for (int i = 0; i != queue.Count; i++)

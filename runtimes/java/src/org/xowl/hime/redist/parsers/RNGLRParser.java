@@ -170,17 +170,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         }
         if (queue.size() == 0) {
             // the track is empty, the terminal is unexpected
-            // still look for the correct context
-            for (Shift shift : shifts) {
-                // looking at the immediate history, does the context opens from the shift just before?
-                if (parserAutomaton.getContexts(gss.getRepresentedState(shift.from)).opens(nextToken.getTerminalID(), context))
-                    return 1;
-                // no, enqueue
-                if (!queue.contains(shift.from)) {
-                    queue.add(shift.from);
-                    distances.add(2);
-                }
-            }
+            return -1;
         }
         // explore the GSS to find the specified context
         for (int i = 0; i != queue.size(); i++) {

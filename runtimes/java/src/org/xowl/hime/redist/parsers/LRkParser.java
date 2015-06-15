@@ -93,6 +93,9 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
         }
         // retrieve the action for this terminal
         LRAction action = automaton.getAction(stack[head], onTerminalID);
+        // if the terminal is unexpected, do not validate
+        if (action.getCode() == LRAction.CODE_NONE)
+            return -1;
         // does the context opens with the terminal?
         if (action.getCode() == LRAction.CODE_SHIFT && automaton.getContexts(stack[head]).opens(onTerminalID, context))
             return 0;

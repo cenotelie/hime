@@ -92,6 +92,9 @@ namespace Hime.Redist.Parsers
 			}
 			// retrieve the action for this terminal
 			LRAction action = automaton.GetAction(stack[head], onTerminalID);
+			// if the terminal is unexpected, do not validate
+			if (action.Code == LRActionCode.None)
+				return -1;
 			// does the context opens with the terminal?
 			if (action.Code == LRActionCode.Shift && automaton.GetContexts(stack[head]).Opens(onTerminalID, context))
 				return 0;
