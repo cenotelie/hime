@@ -64,7 +64,7 @@ public class StreamingText extends BaseText {
     /**
      * A buffer for reading text
      */
-    private final char[] buffer;
+    private char[] buffer;
     /**
      * Whether the complete input has been read
      */
@@ -216,17 +216,24 @@ public class StreamingText extends BaseText {
     public String getValue(int index, int length) {
         if (length == 0)
             return "";
-        StringBuilder builder = new StringBuilder();
-        int upper = index >> UPPER_SHIFT;
-        int lower = index & LOWER_MASK;
-        while (length > 0) {
-            int count = BLOCK_SIZE - lower;
-            builder.append(content[upper], lower, count);
-            length -= count;
-            upper++;
-            lower = 0;
+        if (buffer.length < length)
+            buffer = new char[length];
+        int start = 0;
+        int count = length;
+        int indexUpper = index >> UPPER_SHIFT;
+        int indexLower = index & LOWER_MASK;
+        while (indexLower + count >= BLOCK_SIZE) {
+            // while we can copy chunks
+            int copyLength = BLOCK_SIZE - indexLower;
+            System.arraycopy(content[indexUpper], indexLower, buffer, start, copyLength);
+            count -= copyLength;
+            start += copyLength;
+            indexUpper++;
+            indexLower = 0;
         }
-        return builder.toString();
+        if (count > 0)
+            System.arraycopy(content[indexUpper], indexLower, buffer, start, count);
+        return new String(buffer, 0, length);
     }
 
     /**
