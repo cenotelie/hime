@@ -74,7 +74,7 @@ public class IntBigList {
      * @return The size of this list
      */
     public int size() {
-        return (chunkIndex * chunksSize) + cellIndex;
+        return (chunkIndex << upperShift) + cellIndex;
     }
 
     /**

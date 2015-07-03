@@ -84,7 +84,7 @@ public class BigList<T> {
      * @return The size of this list
      */
     public int size() {
-        return (chunkIndex * CHUNKS_SIZE) + cellIndex;
+        return (chunkIndex << UPPER_SHIFT) + cellIndex;
     }
 
     /**

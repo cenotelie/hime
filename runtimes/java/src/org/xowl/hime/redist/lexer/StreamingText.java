@@ -203,7 +203,7 @@ public class StreamingText extends BaseText {
      * @return The size in number of characters
      */
     public int size() {
-        return contentUpperIndex << UPPER_SHIFT + contentLowerIndex;
+        return (contentUpperIndex << UPPER_SHIFT) + contentLowerIndex;
     }
 
     /**
