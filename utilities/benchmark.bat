@@ -30,39 +30,40 @@ REM Build the inputs
 CD %SANDBOX%
 ECHO == Building inputs >_ && type _ && type _ >> result.txt
 himecc.exe HimeGrammar.gram -a:public -o:assembly -n Hime.Benchmark.Generated
+MOVE HimeGrammar.dll HimeGrammarLALR.dll
+himecc.exe HimeGrammar.gram -a:public -o:assembly -n Hime.Benchmark.Generated -m:rnglr
+MOVE HimeGrammar.dll HimeGrammarRNGLR.dll
 himecc.exe CSharp.gram -a:public -o:assembly -n Hime.Benchmark.Generated -m:rnglr
-TYPE NUL > InputLALR_50.gram
-TYPE NUL > InputRNGLR_50.cs
-TYPE NUL > InputLALR.gram
-TYPE NUL > InputRNGLR.cs
-FOR /l %%x IN (1, 1, 50) DO (
-  COPY /B InputLALR_50.gram + CSharp.gram InputLALR_50.gram > NUL
-  COPY /B InputRNGLR_50.cs + SampleCS.cs InputRNGLR_50.cs > NUL
+TYPE NUL > InputGram.txt
+TYPE NUL > InputCS.txt
+FOR /l %%x IN (1, 1, 200) DO (
+  COPY /B InputGram.txt + HimeGrammar.gram InputGram.txt > NUL
 )
-FOR /l %%x IN (1, 1, 10) DO (
-  COPY /B InputLALR.gram + InputLALR_50.gram InputLALR.gram > NUL
+FOR /l %%x IN (1, 1, 3000) DO (
+  COPY /B InputCS.txt + SampleCS.cs InputCS.txt > NUL
 )
-FOR /l %%x IN (1, 1, 100) DO (
-  COPY /B InputRNGLR.cs + InputRNGLR_50.cs InputRNGLR.cs > NUL
-)
-ECHO Input LALR >_ && type _ && type _ >> result.txt
-Hime.Benchmark.exe HimeGrammar.dll InputLALR.gram --stats >_ && type _ && type _ >> result.txt
-ECHO Input RNGLR >_ && type _ && type _ >> result.txt
-Hime.Benchmark.exe CSharp.dll InputRNGLR.cs --stats >_ && type _ && type _ >> result.txt
+ECHO Input Grammar >_ && type _ && type _ >> result.txt
+Hime.Benchmark.exe HimeGrammarLALR.dll InputGram.txt --stats >_ && type _ && type _ >> result.txt
+ECHO Input C# >_ && type _ && type _ >> result.txt
+Hime.Benchmark.exe CSharp.dll InputCS.txt --stats >_ && type _ && type _ >> result.txt
 
 
 REM Execute the benchmark
-ECHO == Lexer >_ && type _ && type _ >> result.txt
+ECHO == Lexer on Input Grammar >_ && type _ && type _ >> result.txt
 FOR /l %%x IN (1, 1, %ITERATIONS%) DO (
-  Hime.Benchmark.exe HimeGrammar.dll InputLALR.gram --lexer >_ && type _ && type _ >> result.txt
+  Hime.Benchmark.exe HimeGrammarLALR.dll InputGram.txt --lexer >_ && type _ && type _ >> result.txt
 )
-ECHO == LALR >_ && type _ && type _ >> result.txt
+ECHO == LALR on Input Grammar >_ && type _ && type _ >> result.txt
 FOR /l %%x IN (1, 1, %ITERATIONS%) DO (
-  Hime.Benchmark.exe HimeGrammar.dll InputLALR.gram >_ && type _ && type _ >> result.txt
+  Hime.Benchmark.exe HimeGrammarLALR.dll InputGram.txt >_ && type _ && type _ >> result.txt
 )
-ECHO == RNGLR >_ && type _ && type _ >> result.txt
+ECHO == RNGLR on Input Grammar >_ && type _ && type _ >> result.txt
 FOR /l %%x IN (1, 1, %ITERATIONS%) DO (
-  Hime.Benchmark.exe CSharp.dll InputRNGLR.cs >_ && type _ && type _ >> result.txt
+  Hime.Benchmark.exe HimeGrammarRNGLR.dll InputGram.txt >_ && type _ && type _ >> result.txt
+)
+ECHO == RNGLR on Input C# >_ && type _ && type _ >> result.txt
+FOR /l %%x IN (1, 1, %ITERATIONS%) DO (
+  Hime.Benchmark.exe CSharp.dll InputCS.txt >_ && type _ && type _ >> result.txt
 )
 
 

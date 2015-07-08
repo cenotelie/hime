@@ -30,41 +30,38 @@ cp runtimes/net/Sources/TextPosition.cs $SANDBOX/SampleCS.cs
 cd $SANDBOX
 echo "== Building inputs" | tee -a result.txt
 mono himecc.exe HimeGrammar.gram -a:public -o:assembly -n Hime.Benchmark.Generated
+mv HimeGrammar.dll HimeGrammarLALR.dll
+mono himecc.exe HimeGrammar.gram -a:public -o:assembly -n Hime.Benchmark.Generated -m:rnglr
+mv HimeGrammar.dll HimeGrammarRNGLR.dll
 mono himecc.exe CSharp.gram -a:public -o:assembly -n Hime.Benchmark.Generated -m:rnglr
-for ((i=1;i<=50;i++));
-do
-  cat CSharp.gram >> InputLALR_50.gram
-  cat SampleCS.cs >> InputRNGLR_50.cs
+for i in $(seq 1 200); do
+  cat CSharp.gram >> InputGram.txt
 done
-for ((i=1;i<=10;i++));
-do
-  cat InputLALR_50.gram >> InputLALR.gram
+for i in $(seq 1 3000); do
+  cat SampleCS.cs >> InputCS.txt
 done
-for ((i=1;i<=100;i++));
-do
-  cat InputRNGLR_50.cs >> InputRNGLR.cs
-done
-echo "Input LALR" | tee -a result.txt
-mono Hime.Benchmark.exe HimeGrammar.dll InputLALR.gram --stats | tee -a result.txt
-echo "Input RNGLR" | tee -a result.txt
-mono Hime.Benchmark.exe CSharp.dll InputRNGLR.cs --stats | tee -a result.txt
+echo "Input Grammar" | tee -a result.txt
+mono Hime.Benchmark.exe HimeGrammarLALR.dll InputGram.txt --stats | tee -a result.txt
+echo "Input C#" | tee -a result.txt
+mono Hime.Benchmark.exe CSharp.dll InputCS.txt --stats | tee -a result.txt
 
 
 # Execute the benchmark
-echo "== Lexer" | tee -a result.txt
-for ((i=1;i<=$ITERATIONS;i++));
-do
-  mono Hime.Benchmark.exe HimeGrammar.dll InputLALR.gram --lexer | tee -a result.txt
+echo "== Lexer on Input Grammar" | tee -a result.txt
+for i in $(seq 1 $ITERATIONS); do
+  mono Hime.Benchmark.exe HimeGrammarLALR.dll InputGram.txt --lexer | tee -a result.txt
 done
-echo "== LALR" | tee -a result.txt
-for ((i=1;i<=$ITERATIONS;i++));
-do
-  mono Hime.Benchmark.exe HimeGrammar.dll InputLALR.gram | tee -a result.txt
+echo "== LALR on Input Grammar" | tee -a result.txt
+for i in $(seq 1 $ITERATIONS); do
+  mono Hime.Benchmark.exe HimeGrammarLALR.dll InputGram.txt | tee -a result.txt
 done
-echo "== RNGLR" | tee -a result.txt
-for ((i=1;i<=$ITERATIONS;i++));
-do
-  mono Hime.Benchmark.exe CSharp.dll InputRNGLR.cs | tee -a result.txt
+echo "== RNGLR on Input Grammar" | tee -a result.txt
+for i in $(seq 1 $ITERATIONS); do
+  mono Hime.Benchmark.exe HimeGrammarRNGLR.dll InputGram.txt | tee -a result.txt
+done
+echo "== RNGLR on Input C#" | tee -a result.txt
+for i in $(seq 1 $ITERATIONS); do
+  mono Hime.Benchmark.exe CSharp.dll InputCS.txt | tee -a result.txt
 done
 
 
