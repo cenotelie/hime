@@ -37,6 +37,21 @@ import java.util.List;
  */
 public abstract class BaseLexer {
     /**
+     * The default context provider
+     */
+    private static class DefaultContextProvider implements IContextProvider {
+        @Override
+        public int getContextPriority(int context, int onTerminalID) {
+            return context == Automaton.DEFAULT_CONTEXT ? Integer.MAX_VALUE : 0;
+        }
+    }
+
+    /**
+     * The default context provider
+     */
+    private static final DefaultContextProvider DEFAULT_CONTEXT_PROVIDER = new DefaultContextProvider();
+
+    /**
      * The handler of lexical error for this lexer
      */
     LexicalErrorHandler handler;
@@ -144,7 +159,7 @@ public abstract class BaseLexer {
      * @return The next token in the input
      */
     public Token getNextToken() {
-        return tokens.at(getNextToken(null).getIndex());
+        return tokens.at(getNextToken(DEFAULT_CONTEXT_PROVIDER).getIndex());
     }
 
     /**

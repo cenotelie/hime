@@ -35,6 +35,22 @@ namespace Hime.Redist.Lexer
 	public abstract class BaseLexer
 	{
 		/// <summary>
+		/// The default context provider
+		/// </summary>
+		private class DefaultContextProvider : IContextProvider
+		{
+			public int GetContextPriority(int context, int onTerminalID)
+			{
+				return context == Automaton.DEFAULT_CONTEXT ? int.MaxValue : 0;
+			}
+		}
+
+		/// <summary>
+		/// The default context provider
+		/// </summary>
+		private static readonly DefaultContextProvider DEFAULT_CONTEXT_PROVIDER = new DefaultContextProvider();
+
+		/// <summary>
 		/// Represents a match in the input
 		/// </summary>
 		internal struct Match
@@ -139,7 +155,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The next token in the input</returns>
 		public Token GetNextToken()
 		{
-			return tokens[GetNextToken(null).Index];
+			return tokens[GetNextToken(DEFAULT_CONTEXT_PROVIDER).Index];
 		}
 
 		/// <summary>
