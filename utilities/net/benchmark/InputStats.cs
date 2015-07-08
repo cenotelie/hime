@@ -46,7 +46,7 @@ namespace Hime.Benchmark
 
 			int count = 0;
 			Hime.Redist.Token token = lexer.GetNextToken();
-			while (token.Symbol.ID != Hime.Redist.Symbol.SID_EPSILON)
+			while (token.Symbol.ID != Hime.Redist.Symbol.SID_DOLLAR)
 			{
 				token = lexer.GetNextToken();
 				count++;

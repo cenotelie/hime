@@ -44,7 +44,7 @@ namespace Hime.Benchmark
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
 			Hime.Redist.Token token = lexer.GetNextToken();
-			while (token.Symbol.ID != Hime.Redist.Symbol.SID_EPSILON)
+			while (token.Symbol.ID != Hime.Redist.Symbol.SID_DOLLAR)
 				token = lexer.GetNextToken();
 			watch.Stop();
 			Console.WriteLine(watch.ElapsedMilliseconds);
