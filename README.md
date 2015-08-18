@@ -23,9 +23,9 @@ The parser generator requires the .Net runtime (or Mono) for the generation of p
 
 ### How do I use this software? ###
 
-All user documentation is available in the [wiki](https://bitbucket.org/laurentw/hime/wiki/Home).
-
-
+* [Kickstart in 5 mins](https://bitbucket.org/laurentw/hime/wiki/Kickstart)
+* [User documentation](https://bitbucket.org/laurentw/hime/wiki/Home)
+* [Grammar library](https://bitbucket.org/laurentw/hime-grams)
 
 ### Repository structure ###
 
