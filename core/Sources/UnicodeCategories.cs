@@ -172,6 +172,7 @@ namespace Hime.SDK
 			catPo.AddSpan(0xA874, 0xA877);
 			catPo.AddSpan(0xA8CE, 0xA8CF);
 			catPo.AddSpan(0xA8F8, 0xA8FA);
+			catPo.AddSpan(0xA8FC, 0xA8FC);
 			catPo.AddSpan(0xA92E, 0xA92F);
 			catPo.AddSpan(0xA95F, 0xA95F);
 			catPo.AddSpan(0xA9C1, 0xA9CD);
@@ -216,17 +217,23 @@ namespace Hime.SDK
 			catPo.AddSpan(0x110BE, 0x110C1);
 			catPo.AddSpan(0x11140, 0x11143);
 			catPo.AddSpan(0x11174, 0x11175);
-			catPo.AddSpan(0x111C5, 0x111CD);
+			catPo.AddSpan(0x111C5, 0x111C9);
+			catPo.AddSpan(0x111CD, 0x111CD);
+			catPo.AddSpan(0x111DB, 0x111DB);
+			catPo.AddSpan(0x111DD, 0x111DF);
 			catPo.AddSpan(0x11238, 0x1123D);
+			catPo.AddSpan(0x112A9, 0x112A9);
 			catPo.AddSpan(0x114C6, 0x114C6);
-			catPo.AddSpan(0x115C1, 0x115C9);
+			catPo.AddSpan(0x115C1, 0x115D7);
 			catPo.AddSpan(0x11641, 0x11643);
+			catPo.AddSpan(0x1173C, 0x1173E);
 			catPo.AddSpan(0x12470, 0x12474);
 			catPo.AddSpan(0x16A6E, 0x16A6F);
 			catPo.AddSpan(0x16AF5, 0x16AF5);
 			catPo.AddSpan(0x16B37, 0x16B3B);
 			catPo.AddSpan(0x16B44, 0x16B44);
 			catPo.AddSpan(0x1BC9F, 0x1BC9F);
+			catPo.AddSpan(0x1DA87, 0x1DA8B);
 		}
 
 		/// <summary>
@@ -257,7 +264,7 @@ namespace Hime.SDK
 			catSc.AddSpan(0xBF9, 0xBF9);
 			catSc.AddSpan(0xE3F, 0xE3F);
 			catSc.AddSpan(0x17DB, 0x17DB);
-			catSc.AddSpan(0x20A0, 0x20BD);
+			catSc.AddSpan(0x20A0, 0x20BE);
 			catSc.AddSpan(0xA838, 0xA838);
 			catSc.AddSpan(0xFDFC, 0xFDFC);
 			catSc.AddSpan(0xFE69, 0xFE69);
@@ -637,6 +644,7 @@ namespace Hime.SDK
 			catNd.AddSpan(0x114D0, 0x114D9);
 			catNd.AddSpan(0x11650, 0x11659);
 			catNd.AddSpan(0x116C0, 0x116C9);
+			catNd.AddSpan(0x11730, 0x11739);
 			catNd.AddSpan(0x118E0, 0x118E9);
 			catNd.AddSpan(0x16A60, 0x16A69);
 			catNd.AddSpan(0x16B50, 0x16B59);
@@ -931,6 +939,7 @@ namespace Hime.SDK
 			catLu.AddSpan(0x52E, 0x52E);
 			catLu.AddSpan(0x531, 0x556);
 			catLu.AddSpan(0x10A0, 0x10CD);
+			catLu.AddSpan(0x13A0, 0x13F5);
 			catLu.AddSpan(0x1E00, 0x1E00);
 			catLu.AddSpan(0x1E02, 0x1E02);
 			catLu.AddSpan(0x1E04, 0x1E04);
@@ -1239,9 +1248,11 @@ namespace Hime.SDK
 			catLu.AddSpan(0xA7A4, 0xA7A4);
 			catLu.AddSpan(0xA7A6, 0xA7A6);
 			catLu.AddSpan(0xA7A8, 0xA7A8);
-			catLu.AddSpan(0xA7AA, 0xA7B1);
+			catLu.AddSpan(0xA7AA, 0xA7B4);
+			catLu.AddSpan(0xA7B6, 0xA7B6);
 			catLu.AddSpan(0xFF21, 0xFF3A);
 			catLu.AddSpan(0x10400, 0x10427);
+			catLu.AddSpan(0x10C80, 0x10CB2);
 			catLu.AddSpan(0x118A0, 0x118BF);
 			catLu.AddSpan(0x1D400, 0x1D419);
 			catLu.AddSpan(0x1D434, 0x1D44D);
@@ -1310,6 +1321,7 @@ namespace Hime.SDK
 			catSk.AddSpan(0xFF3E, 0xFF3E);
 			catSk.AddSpan(0xFF40, 0xFF40);
 			catSk.AddSpan(0xFFE3, 0xFFE3);
+			catSk.AddSpan(0x1F3FB, 0x1F3FF);
 		}
 
 		/// <summary>
@@ -1626,6 +1638,7 @@ namespace Hime.SDK
 			catLl.AddSpan(0x52D, 0x52D);
 			catLl.AddSpan(0x52F, 0x52F);
 			catLl.AddSpan(0x561, 0x587);
+			catLl.AddSpan(0x13F8, 0x13FD);
 			catLl.AddSpan(0x1D00, 0x1D2B);
 			catLl.AddSpan(0x1D6B, 0x1D77);
 			catLl.AddSpan(0x1D79, 0x1D9A);
@@ -1938,12 +1951,15 @@ namespace Hime.SDK
 			catLl.AddSpan(0xA7A5, 0xA7A5);
 			catLl.AddSpan(0xA7A7, 0xA7A7);
 			catLl.AddSpan(0xA7A9, 0xA7A9);
+			catLl.AddSpan(0xA7B5, 0xA7B5);
+			catLl.AddSpan(0xA7B7, 0xA7B7);
 			catLl.AddSpan(0xA7FA, 0xA7FA);
 			catLl.AddSpan(0xAB30, 0xAB5A);
-			catLl.AddSpan(0xAB64, 0xAB65);
+			catLl.AddSpan(0xAB60, 0xABBF);
 			catLl.AddSpan(0xFB00, 0xFB17);
 			catLl.AddSpan(0xFF41, 0xFF5A);
 			catLl.AddSpan(0x10428, 0x1044F);
+			catLl.AddSpan(0x10CC0, 0x10CF2);
 			catLl.AddSpan(0x118C0, 0x118DF);
 			catLl.AddSpan(0x1D41A, 0x1D433);
 			catLl.AddSpan(0x1D44E, 0x1D467);
@@ -2036,6 +2052,7 @@ namespace Hime.SDK
 			catSo.AddSpan(0x214A, 0x214A);
 			catSo.AddSpan(0x214C, 0x214D);
 			catSo.AddSpan(0x214F, 0x214F);
+			catSo.AddSpan(0x218A, 0x218B);
 			catSo.AddSpan(0x2195, 0x2199);
 			catSo.AddSpan(0x219C, 0x219F);
 			catSo.AddSpan(0x21A1, 0x21A2);
@@ -2062,7 +2079,7 @@ namespace Hime.SDK
 			catSo.AddSpan(0x2800, 0x28FF);
 			catSo.AddSpan(0x2B00, 0x2B2F);
 			catSo.AddSpan(0x2B45, 0x2B46);
-			catSo.AddSpan(0x2B4D, 0x2BD1);
+			catSo.AddSpan(0x2B4D, 0x2BEF);
 			catSo.AddSpan(0x2CE5, 0x2CEA);
 			catSo.AddSpan(0x2E80, 0x2FFB);
 			catSo.AddSpan(0x3004, 0x3004);
@@ -2095,6 +2112,7 @@ namespace Hime.SDK
 			catSo.AddSpan(0x1018C, 0x101FC);
 			catSo.AddSpan(0x10877, 0x10878);
 			catSo.AddSpan(0x10AC8, 0x10AC8);
+			catSo.AddSpan(0x1173F, 0x1173F);
 			catSo.AddSpan(0x16B3C, 0x16B3F);
 			catSo.AddSpan(0x16B45, 0x16B45);
 			catSo.AddSpan(0x1BC9C, 0x1BC9C);
@@ -2104,8 +2122,14 @@ namespace Hime.SDK
 			catSo.AddSpan(0x1D18C, 0x1D1A9);
 			catSo.AddSpan(0x1D1AE, 0x1D241);
 			catSo.AddSpan(0x1D245, 0x1D356);
+			catSo.AddSpan(0x1D800, 0x1D9FF);
+			catSo.AddSpan(0x1DA37, 0x1DA3A);
+			catSo.AddSpan(0x1DA6D, 0x1DA74);
+			catSo.AddSpan(0x1DA76, 0x1DA83);
+			catSo.AddSpan(0x1DA85, 0x1DA86);
 			catSo.AddSpan(0x1F000, 0x1F0F5);
-			catSo.AddSpan(0x1F110, 0x1F8AD);
+			catSo.AddSpan(0x1F110, 0x1F3FA);
+			catSo.AddSpan(0x1F400, 0x1F9C0);
 		}
 
 		/// <summary>
@@ -2147,7 +2171,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0x7CA, 0x7EA);
 			catLo.AddSpan(0x800, 0x815);
 			catLo.AddSpan(0x840, 0x858);
-			catLo.AddSpan(0x8A0, 0x8B2);
+			catLo.AddSpan(0x8A0, 0x8B4);
 			catLo.AddSpan(0x904, 0x939);
 			catLo.AddSpan(0x93D, 0x93D);
 			catLo.AddSpan(0x950, 0x950);
@@ -2164,6 +2188,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0xA85, 0xAB9);
 			catLo.AddSpan(0xABD, 0xABD);
 			catLo.AddSpan(0xAD0, 0xAE1);
+			catLo.AddSpan(0xAF9, 0xAF9);
 			catLo.AddSpan(0xB05, 0xB39);
 			catLo.AddSpan(0xB3D, 0xB3D);
 			catLo.AddSpan(0xB5C, 0xB61);
@@ -2178,7 +2203,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0xCF1, 0xCF2);
 			catLo.AddSpan(0xD05, 0xD3D);
 			catLo.AddSpan(0xD4E, 0xD4E);
-			catLo.AddSpan(0xD60, 0xD61);
+			catLo.AddSpan(0xD5F, 0xD61);
 			catLo.AddSpan(0xD7A, 0xD7F);
 			catLo.AddSpan(0xD85, 0xDC6);
 			catLo.AddSpan(0xE01, 0xE30);
@@ -2202,7 +2227,6 @@ namespace Hime.SDK
 			catLo.AddSpan(0x10D0, 0x10FA);
 			catLo.AddSpan(0x10FD, 0x135A);
 			catLo.AddSpan(0x1380, 0x138F);
-			catLo.AddSpan(0x13A0, 0x13F4);
 			catLo.AddSpan(0x1401, 0x166C);
 			catLo.AddSpan(0x166F, 0x167F);
 			catLo.AddSpan(0x1681, 0x169A);
@@ -2216,8 +2240,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0x1820, 0x1842);
 			catLo.AddSpan(0x1844, 0x18A8);
 			catLo.AddSpan(0x18AA, 0x191E);
-			catLo.AddSpan(0x1950, 0x19AB);
-			catLo.AddSpan(0x19C1, 0x19C7);
+			catLo.AddSpan(0x1950, 0x19C9);
 			catLo.AddSpan(0x1A00, 0x1A16);
 			catLo.AddSpan(0x1A20, 0x1A54);
 			catLo.AddSpan(0x1B05, 0x1B33);
@@ -2251,6 +2274,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0xA62A, 0xA62B);
 			catLo.AddSpan(0xA66E, 0xA66E);
 			catLo.AddSpan(0xA6A0, 0xA6E5);
+			catLo.AddSpan(0xA78F, 0xA78F);
 			catLo.AddSpan(0xA7F7, 0xA7F7);
 			catLo.AddSpan(0xA7FB, 0xA801);
 			catLo.AddSpan(0xA803, 0xA805);
@@ -2260,6 +2284,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0xA882, 0xA8B3);
 			catLo.AddSpan(0xA8F2, 0xA8F7);
 			catLo.AddSpan(0xA8FB, 0xA8FB);
+			catLo.AddSpan(0xA8FD, 0xA8FD);
 			catLo.AddSpan(0xA90A, 0xA925);
 			catLo.AddSpan(0xA930, 0xA946);
 			catLo.AddSpan(0xA960, 0xA97C);
@@ -2306,9 +2331,12 @@ namespace Hime.SDK
 			catLo.AddSpan(0x10600, 0x10855);
 			catLo.AddSpan(0x10860, 0x10876);
 			catLo.AddSpan(0x10880, 0x1089E);
+			catLo.AddSpan(0x108E0, 0x108F5);
 			catLo.AddSpan(0x10900, 0x10915);
 			catLo.AddSpan(0x10920, 0x10939);
-			catLo.AddSpan(0x10980, 0x10A00);
+			catLo.AddSpan(0x10980, 0x109B7);
+			catLo.AddSpan(0x109BE, 0x109BF);
+			catLo.AddSpan(0x10A00, 0x10A00);
 			catLo.AddSpan(0x10A10, 0x10A33);
 			catLo.AddSpan(0x10A60, 0x10A7C);
 			catLo.AddSpan(0x10A80, 0x10A9C);
@@ -2328,20 +2356,25 @@ namespace Hime.SDK
 			catLo.AddSpan(0x11183, 0x111B2);
 			catLo.AddSpan(0x111C1, 0x111C4);
 			catLo.AddSpan(0x111DA, 0x111DA);
+			catLo.AddSpan(0x111DC, 0x111DC);
 			catLo.AddSpan(0x11200, 0x1122B);
+			catLo.AddSpan(0x11280, 0x112A8);
 			catLo.AddSpan(0x112B0, 0x112DE);
 			catLo.AddSpan(0x11305, 0x11339);
 			catLo.AddSpan(0x1133D, 0x1133D);
+			catLo.AddSpan(0x11350, 0x11350);
 			catLo.AddSpan(0x1135D, 0x11361);
 			catLo.AddSpan(0x11480, 0x114AF);
 			catLo.AddSpan(0x114C4, 0x114C5);
 			catLo.AddSpan(0x114C7, 0x114C7);
 			catLo.AddSpan(0x11580, 0x115AE);
+			catLo.AddSpan(0x115D8, 0x115DB);
 			catLo.AddSpan(0x11600, 0x1162F);
 			catLo.AddSpan(0x11644, 0x11644);
 			catLo.AddSpan(0x11680, 0x116AA);
-			catLo.AddSpan(0x118FF, 0x12398);
-			catLo.AddSpan(0x13000, 0x16A5E);
+			catLo.AddSpan(0x11700, 0x11719);
+			catLo.AddSpan(0x118FF, 0x12399);
+			catLo.AddSpan(0x12480, 0x16A5E);
 			catLo.AddSpan(0x16AD0, 0x16AED);
 			catLo.AddSpan(0x16B00, 0x16B2F);
 			catLo.AddSpan(0x16B63, 0x16F50);
@@ -2471,7 +2504,10 @@ namespace Hime.SDK
 			catNo.AddSpan(0x10858, 0x1085F);
 			catNo.AddSpan(0x10879, 0x1087F);
 			catNo.AddSpan(0x108A7, 0x108AF);
+			catNo.AddSpan(0x108FB, 0x108FF);
 			catNo.AddSpan(0x10916, 0x1091B);
+			catNo.AddSpan(0x109BC, 0x109BD);
+			catNo.AddSpan(0x109C0, 0x109FF);
 			catNo.AddSpan(0x10A40, 0x10A47);
 			catNo.AddSpan(0x10A7D, 0x10A7E);
 			catNo.AddSpan(0x10A9D, 0x10A9F);
@@ -2479,9 +2515,10 @@ namespace Hime.SDK
 			catNo.AddSpan(0x10B58, 0x10B5F);
 			catNo.AddSpan(0x10B78, 0x10B7F);
 			catNo.AddSpan(0x10BA9, 0x10BAF);
-			catNo.AddSpan(0x10E60, 0x10E7E);
+			catNo.AddSpan(0x10CFA, 0x10E7E);
 			catNo.AddSpan(0x11052, 0x11065);
 			catNo.AddSpan(0x111E1, 0x111F4);
+			catNo.AddSpan(0x1173A, 0x1173B);
 			catNo.AddSpan(0x118EA, 0x118F2);
 			catNo.AddSpan(0x16B5B, 0x16B61);
 			catNo.AddSpan(0x1D360, 0x1D371);
@@ -2666,7 +2703,7 @@ namespace Hime.SDK
 			catMn.AddSpan(0x825, 0x827);
 			catMn.AddSpan(0x829, 0x82D);
 			catMn.AddSpan(0x859, 0x85B);
-			catMn.AddSpan(0x8E4, 0x902);
+			catMn.AddSpan(0x8E3, 0x902);
 			catMn.AddSpan(0x93A, 0x93A);
 			catMn.AddSpan(0x93C, 0x93C);
 			catMn.AddSpan(0x941, 0x948);
@@ -2795,7 +2832,7 @@ namespace Hime.SDK
 			catMn.AddSpan(0x3099, 0x309A);
 			catMn.AddSpan(0xA66F, 0xA66F);
 			catMn.AddSpan(0xA674, 0xA67D);
-			catMn.AddSpan(0xA69F, 0xA69F);
+			catMn.AddSpan(0xA69E, 0xA69F);
 			catMn.AddSpan(0xA6F0, 0xA6F1);
 			catMn.AddSpan(0xA802, 0xA802);
 			catMn.AddSpan(0xA806, 0xA806);
@@ -2828,7 +2865,7 @@ namespace Hime.SDK
 			catMn.AddSpan(0xABED, 0xABED);
 			catMn.AddSpan(0xFB1E, 0xFB1E);
 			catMn.AddSpan(0xFE00, 0xFE0F);
-			catMn.AddSpan(0xFE20, 0xFE2D);
+			catMn.AddSpan(0xFE20, 0xFE2F);
 			catMn.AddSpan(0x101FD, 0x101FD);
 			catMn.AddSpan(0x102E0, 0x102E0);
 			catMn.AddSpan(0x10376, 0x1037A);
@@ -2846,12 +2883,13 @@ namespace Hime.SDK
 			catMn.AddSpan(0x11173, 0x11173);
 			catMn.AddSpan(0x11180, 0x11181);
 			catMn.AddSpan(0x111B6, 0x111BE);
+			catMn.AddSpan(0x111CA, 0x111CC);
 			catMn.AddSpan(0x1122F, 0x11231);
 			catMn.AddSpan(0x11234, 0x11234);
 			catMn.AddSpan(0x11236, 0x11237);
 			catMn.AddSpan(0x112DF, 0x112DF);
 			catMn.AddSpan(0x112E3, 0x112EA);
-			catMn.AddSpan(0x11301, 0x11301);
+			catMn.AddSpan(0x11300, 0x11301);
 			catMn.AddSpan(0x1133C, 0x1133C);
 			catMn.AddSpan(0x11340, 0x11340);
 			catMn.AddSpan(0x11366, 0x11374);
@@ -2862,6 +2900,7 @@ namespace Hime.SDK
 			catMn.AddSpan(0x115B2, 0x115B5);
 			catMn.AddSpan(0x115BC, 0x115BD);
 			catMn.AddSpan(0x115BF, 0x115C0);
+			catMn.AddSpan(0x115DC, 0x115DD);
 			catMn.AddSpan(0x11633, 0x1163A);
 			catMn.AddSpan(0x1163D, 0x1163D);
 			catMn.AddSpan(0x1163F, 0x11640);
@@ -2869,6 +2908,9 @@ namespace Hime.SDK
 			catMn.AddSpan(0x116AD, 0x116AD);
 			catMn.AddSpan(0x116B0, 0x116B5);
 			catMn.AddSpan(0x116B7, 0x116B7);
+			catMn.AddSpan(0x1171D, 0x1171F);
+			catMn.AddSpan(0x11722, 0x11725);
+			catMn.AddSpan(0x11727, 0x1172B);
 			catMn.AddSpan(0x16AF0, 0x16AF4);
 			catMn.AddSpan(0x16B30, 0x16B36);
 			catMn.AddSpan(0x16F8F, 0x16F92);
@@ -2878,6 +2920,11 @@ namespace Hime.SDK
 			catMn.AddSpan(0x1D185, 0x1D18B);
 			catMn.AddSpan(0x1D1AA, 0x1D1AD);
 			catMn.AddSpan(0x1D242, 0x1D244);
+			catMn.AddSpan(0x1DA00, 0x1DA36);
+			catMn.AddSpan(0x1DA3B, 0x1DA6C);
+			catMn.AddSpan(0x1DA75, 0x1DA75);
+			catMn.AddSpan(0x1DA84, 0x1DA84);
+			catMn.AddSpan(0x1DA9B, 0x1DAAF);
 			catMn.AddSpan(0x1E8D0, 0x1E8D6);
 			catMn.AddSpan(0xE0100, 0xE01EF);
 		}
@@ -2981,8 +3028,6 @@ namespace Hime.SDK
 			catMc.AddSpan(0x1923, 0x1926);
 			catMc.AddSpan(0x1929, 0x1931);
 			catMc.AddSpan(0x1933, 0x1938);
-			catMc.AddSpan(0x19B0, 0x19C0);
-			catMc.AddSpan(0x19C8, 0x19C9);
 			catMc.AddSpan(0x1A19, 0x1A1A);
 			catMc.AddSpan(0x1A55, 0x1A55);
 			catMc.AddSpan(0x1A57, 0x1A57);
@@ -3043,7 +3088,8 @@ namespace Hime.SDK
 			catMc.AddSpan(0x112E0, 0x112E2);
 			catMc.AddSpan(0x11302, 0x11303);
 			catMc.AddSpan(0x1133E, 0x1133F);
-			catMc.AddSpan(0x11341, 0x11357);
+			catMc.AddSpan(0x11341, 0x1134D);
+			catMc.AddSpan(0x11357, 0x11357);
 			catMc.AddSpan(0x11362, 0x11363);
 			catMc.AddSpan(0x114B0, 0x114B2);
 			catMc.AddSpan(0x114B9, 0x114B9);
@@ -3058,6 +3104,8 @@ namespace Hime.SDK
 			catMc.AddSpan(0x116AC, 0x116AC);
 			catMc.AddSpan(0x116AE, 0x116AF);
 			catMc.AddSpan(0x116B6, 0x116B6);
+			catMc.AddSpan(0x11720, 0x11721);
+			catMc.AddSpan(0x11726, 0x11726);
 			catMc.AddSpan(0x16F51, 0x16F7E);
 			catMc.AddSpan(0x1D165, 0x1D166);
 			catMc.AddSpan(0x1D16D, 0x1D172);

@@ -1692,6 +1692,18 @@ test Test_UnicodeBlock_LatinExtendedE_RightBound:
 	on "\uAB6F"
 	yields e(X='\uAB6F')
 
+test Test_UnicodeBlock_CherokeeSupplement_LeftBound:
+	grammar Test_UnicodeBlock_CherokeeSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{CherokeeSupplement};} rules { e->X; } }
+	parser LALR1
+	on "\uAB70"
+	yields e(X='\uAB70')
+
+test Test_UnicodeBlock_CherokeeSupplement_RightBound:
+	grammar Test_UnicodeBlock_CherokeeSupplement_RightBound { options {Axiom="e";} terminals {X->ub{CherokeeSupplement};} rules { e->X; } }
+	parser LALR1
+	on "\uABBF"
+	yields e(X='\uABBF')
+
 test Test_UnicodeBlock_MeeteiMayek_LeftBound:
 	grammar Test_UnicodeBlock_MeeteiMayek_LeftBound { options {Axiom="e";} terminals {X->ub{MeeteiMayek};} rules { e->X; } }
 	parser LALR1
@@ -2160,6 +2172,18 @@ test Test_UnicodeBlock_Nabataean_RightBound:
 	on "\u000108AF"
 	yields e(X='\u000108AF')
 
+test Test_UnicodeBlock_Hatran_LeftBound:
+	grammar Test_UnicodeBlock_Hatran_LeftBound { options {Axiom="e";} terminals {X->ub{Hatran};} rules { e->X; } }
+	parser LALR1
+	on "\u000108E0"
+	yields e(X='\u000108E0')
+
+test Test_UnicodeBlock_Hatran_RightBound:
+	grammar Test_UnicodeBlock_Hatran_RightBound { options {Axiom="e";} terminals {X->ub{Hatran};} rules { e->X; } }
+	parser LALR1
+	on "\u000108FF"
+	yields e(X='\u000108FF')
+
 test Test_UnicodeBlock_Phoenician_LeftBound:
 	grammar Test_UnicodeBlock_Phoenician_LeftBound { options {Axiom="e";} terminals {X->ub{Phoenician};} rules { e->X; } }
 	parser LALR1
@@ -2316,6 +2340,18 @@ test Test_UnicodeBlock_OldTurkic_RightBound:
 	on "\u00010C4F"
 	yields e(X='\u00010C4F')
 
+test Test_UnicodeBlock_OldHungarian_LeftBound:
+	grammar Test_UnicodeBlock_OldHungarian_LeftBound { options {Axiom="e";} terminals {X->ub{OldHungarian};} rules { e->X; } }
+	parser LALR1
+	on "\u00010C80"
+	yields e(X='\u00010C80')
+
+test Test_UnicodeBlock_OldHungarian_RightBound:
+	grammar Test_UnicodeBlock_OldHungarian_RightBound { options {Axiom="e";} terminals {X->ub{OldHungarian};} rules { e->X; } }
+	parser LALR1
+	on "\u00010CFF"
+	yields e(X='\u00010CFF')
+
 test Test_UnicodeBlock_RumiNumeralSymbols_LeftBound:
 	grammar Test_UnicodeBlock_RumiNumeralSymbols_LeftBound { options {Axiom="e";} terminals {X->ub{RumiNumeralSymbols};} rules { e->X; } }
 	parser LALR1
@@ -2424,6 +2460,18 @@ test Test_UnicodeBlock_Khojki_RightBound:
 	on "\u0001124F"
 	yields e(X='\u0001124F')
 
+test Test_UnicodeBlock_Multani_LeftBound:
+	grammar Test_UnicodeBlock_Multani_LeftBound { options {Axiom="e";} terminals {X->ub{Multani};} rules { e->X; } }
+	parser LALR1
+	on "\u00011280"
+	yields e(X='\u00011280')
+
+test Test_UnicodeBlock_Multani_RightBound:
+	grammar Test_UnicodeBlock_Multani_RightBound { options {Axiom="e";} terminals {X->ub{Multani};} rules { e->X; } }
+	parser LALR1
+	on "\u000112AF"
+	yields e(X='\u000112AF')
+
 test Test_UnicodeBlock_Khudawadi_LeftBound:
 	grammar Test_UnicodeBlock_Khudawadi_LeftBound { options {Axiom="e";} terminals {X->ub{Khudawadi};} rules { e->X; } }
 	parser LALR1
@@ -2496,6 +2544,18 @@ test Test_UnicodeBlock_Takri_RightBound:
 	on "\u000116CF"
 	yields e(X='\u000116CF')
 
+test Test_UnicodeBlock_Ahom_LeftBound:
+	grammar Test_UnicodeBlock_Ahom_LeftBound { options {Axiom="e";} terminals {X->ub{Ahom};} rules { e->X; } }
+	parser LALR1
+	on "\u00011700"
+	yields e(X='\u00011700')
+
+test Test_UnicodeBlock_Ahom_RightBound:
+	grammar Test_UnicodeBlock_Ahom_RightBound { options {Axiom="e";} terminals {X->ub{Ahom};} rules { e->X; } }
+	parser LALR1
+	on "\u0001173F"
+	yields e(X='\u0001173F')
+
 test Test_UnicodeBlock_WarangCiti_LeftBound:
 	grammar Test_UnicodeBlock_WarangCiti_LeftBound { options {Axiom="e";} terminals {X->ub{WarangCiti};} rules { e->X; } }
 	parser LALR1
@@ -2544,6 +2604,18 @@ test Test_UnicodeBlock_CuneiformNumbersandPunctuation_RightBound:
 	on "\u0001247F"
 	yields e(X='\u0001247F')
 
+test Test_UnicodeBlock_EarlyDynasticCuneiform_LeftBound:
+	grammar Test_UnicodeBlock_EarlyDynasticCuneiform_LeftBound { options {Axiom="e";} terminals {X->ub{EarlyDynasticCuneiform};} rules { e->X; } }
+	parser LALR1
+	on "\u00012480"
+	yields e(X='\u00012480')
+
+test Test_UnicodeBlock_EarlyDynasticCuneiform_RightBound:
+	grammar Test_UnicodeBlock_EarlyDynasticCuneiform_RightBound { options {Axiom="e";} terminals {X->ub{EarlyDynasticCuneiform};} rules { e->X; } }
+	parser LALR1
+	on "\u0001254F"
+	yields e(X='\u0001254F')
+
 test Test_UnicodeBlock_EgyptianHieroglyphs_LeftBound:
 	grammar Test_UnicodeBlock_EgyptianHieroglyphs_LeftBound { options {Axiom="e";} terminals {X->ub{EgyptianHieroglyphs};} rules { e->X; } }
 	parser LALR1
@@ -2555,6 +2627,18 @@ test Test_UnicodeBlock_EgyptianHieroglyphs_RightBound:
 	parser LALR1
 	on "\u0001342F"
 	yields e(X='\u0001342F')
+
+test Test_UnicodeBlock_AnatolianHieroglyphs_LeftBound:
+	grammar Test_UnicodeBlock_AnatolianHieroglyphs_LeftBound { options {Axiom="e";} terminals {X->ub{AnatolianHieroglyphs};} rules { e->X; } }
+	parser LALR1
+	on "\u00014400"
+	yields e(X='\u00014400')
+
+test Test_UnicodeBlock_AnatolianHieroglyphs_RightBound:
+	grammar Test_UnicodeBlock_AnatolianHieroglyphs_RightBound { options {Axiom="e";} terminals {X->ub{AnatolianHieroglyphs};} rules { e->X; } }
+	parser LALR1
+	on "\u0001467F"
+	yields e(X='\u0001467F')
 
 test Test_UnicodeBlock_BamumSupplement_LeftBound:
 	grammar Test_UnicodeBlock_BamumSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{BamumSupplement};} rules { e->X; } }
@@ -2724,6 +2808,18 @@ test Test_UnicodeBlock_MathematicalAlphanumericSymbols_RightBound:
 	on "\u0001D7FF"
 	yields e(X='\u0001D7FF')
 
+test Test_UnicodeBlock_SuttonSignWriting_LeftBound:
+	grammar Test_UnicodeBlock_SuttonSignWriting_LeftBound { options {Axiom="e";} terminals {X->ub{SuttonSignWriting};} rules { e->X; } }
+	parser LALR1
+	on "\u0001D800"
+	yields e(X='\u0001D800')
+
+test Test_UnicodeBlock_SuttonSignWriting_RightBound:
+	grammar Test_UnicodeBlock_SuttonSignWriting_RightBound { options {Axiom="e";} terminals {X->ub{SuttonSignWriting};} rules { e->X; } }
+	parser LALR1
+	on "\u0001DAAF"
+	yields e(X='\u0001DAAF')
+
 test Test_UnicodeBlock_MendeKikakui_LeftBound:
 	grammar Test_UnicodeBlock_MendeKikakui_LeftBound { options {Axiom="e";} terminals {X->ub{MendeKikakui};} rules { e->X; } }
 	parser LALR1
@@ -2892,6 +2988,18 @@ test Test_UnicodeBlock_SupplementalArrowsC_RightBound:
 	on "\u0001F8FF"
 	yields e(X='\u0001F8FF')
 
+test Test_UnicodeBlock_SupplementalSymbolsandPictographs_LeftBound:
+	grammar Test_UnicodeBlock_SupplementalSymbolsandPictographs_LeftBound { options {Axiom="e";} terminals {X->ub{SupplementalSymbolsandPictographs};} rules { e->X; } }
+	parser LALR1
+	on "\u0001F900"
+	yields e(X='\u0001F900')
+
+test Test_UnicodeBlock_SupplementalSymbolsandPictographs_RightBound:
+	grammar Test_UnicodeBlock_SupplementalSymbolsandPictographs_RightBound { options {Axiom="e";} terminals {X->ub{SupplementalSymbolsandPictographs};} rules { e->X; } }
+	parser LALR1
+	on "\u0001F9FF"
+	yields e(X='\u0001F9FF')
+
 test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_LeftBound:
 	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionB_LeftBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionB};} rules { e->X; } }
 	parser LALR1
@@ -2927,6 +3035,18 @@ test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionD_RightBound:
 	parser LALR1
 	on "\u0002B81F"
 	yields e(X='\u0002B81F')
+
+test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionE_LeftBound:
+	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionE_LeftBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionE};} rules { e->X; } }
+	parser LALR1
+	on "\u0002B820"
+	yields e(X='\u0002B820')
+
+test Test_UnicodeBlock_CJKUnifiedIdeographsExtensionE_RightBound:
+	grammar Test_UnicodeBlock_CJKUnifiedIdeographsExtensionE_RightBound { options {Axiom="e";} terminals {X->ub{CJKUnifiedIdeographsExtensionE};} rules { e->X; } }
+	parser LALR1
+	on "\u0002CEAF"
+	yields e(X='\u0002CEAF')
 
 test Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_LeftBound:
 	grammar Test_UnicodeBlock_CJKCompatibilityIdeographsSupplement_LeftBound { options {Axiom="e";} terminals {X->ub{CJKCompatibilityIdeographsSupplement};} rules { e->X; } }

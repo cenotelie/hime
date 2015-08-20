@@ -1000,6 +1000,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockLatinExtendedE = new UnicodeBlock("LatinExtended-E", 0xAB30, 0xAB6F);
 
 		/// <summary>
+		/// Gets the Unicode block CherokeeSupplement
+		/// </summary>
+		public static UnicodeBlock CherokeeSupplement { get { return blockCherokeeSupplement; } }
+
+		private static readonly UnicodeBlock blockCherokeeSupplement = new UnicodeBlock("CherokeeSupplement", 0xAB70, 0xABBF);
+
+		/// <summary>
 		/// Gets the Unicode block MeeteiMayek
 		/// </summary>
 		public static UnicodeBlock MeeteiMayek { get { return blockMeeteiMayek; } }
@@ -1273,6 +1280,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockNabataean = new UnicodeBlock("Nabataean", 0x10880, 0x108AF);
 
 		/// <summary>
+		/// Gets the Unicode block Hatran
+		/// </summary>
+		public static UnicodeBlock Hatran { get { return blockHatran; } }
+
+		private static readonly UnicodeBlock blockHatran = new UnicodeBlock("Hatran", 0x108E0, 0x108FF);
+
+		/// <summary>
 		/// Gets the Unicode block Phoenician
 		/// </summary>
 		public static UnicodeBlock Phoenician { get { return blockPhoenician; } }
@@ -1364,6 +1378,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockOldTurkic = new UnicodeBlock("OldTurkic", 0x10C00, 0x10C4F);
 
 		/// <summary>
+		/// Gets the Unicode block OldHungarian
+		/// </summary>
+		public static UnicodeBlock OldHungarian { get { return blockOldHungarian; } }
+
+		private static readonly UnicodeBlock blockOldHungarian = new UnicodeBlock("OldHungarian", 0x10C80, 0x10CFF);
+
+		/// <summary>
 		/// Gets the Unicode block RumiNumeralSymbols
 		/// </summary>
 		public static UnicodeBlock RumiNumeralSymbols { get { return blockRumiNumeralSymbols; } }
@@ -1427,6 +1448,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockKhojki = new UnicodeBlock("Khojki", 0x11200, 0x1124F);
 
 		/// <summary>
+		/// Gets the Unicode block Multani
+		/// </summary>
+		public static UnicodeBlock Multani { get { return blockMultani; } }
+
+		private static readonly UnicodeBlock blockMultani = new UnicodeBlock("Multani", 0x11280, 0x112AF);
+
+		/// <summary>
 		/// Gets the Unicode block Khudawadi
 		/// </summary>
 		public static UnicodeBlock Khudawadi { get { return blockKhudawadi; } }
@@ -1469,6 +1497,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockTakri = new UnicodeBlock("Takri", 0x11680, 0x116CF);
 
 		/// <summary>
+		/// Gets the Unicode block Ahom
+		/// </summary>
+		public static UnicodeBlock Ahom { get { return blockAhom; } }
+
+		private static readonly UnicodeBlock blockAhom = new UnicodeBlock("Ahom", 0x11700, 0x1173F);
+
+		/// <summary>
 		/// Gets the Unicode block WarangCiti
 		/// </summary>
 		public static UnicodeBlock WarangCiti { get { return blockWarangCiti; } }
@@ -1497,11 +1532,25 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockCuneiformNumbersandPunctuation = new UnicodeBlock("CuneiformNumbersandPunctuation", 0x12400, 0x1247F);
 
 		/// <summary>
+		/// Gets the Unicode block EarlyDynasticCuneiform
+		/// </summary>
+		public static UnicodeBlock EarlyDynasticCuneiform { get { return blockEarlyDynasticCuneiform; } }
+
+		private static readonly UnicodeBlock blockEarlyDynasticCuneiform = new UnicodeBlock("EarlyDynasticCuneiform", 0x12480, 0x1254F);
+
+		/// <summary>
 		/// Gets the Unicode block EgyptianHieroglyphs
 		/// </summary>
 		public static UnicodeBlock EgyptianHieroglyphs { get { return blockEgyptianHieroglyphs; } }
 
 		private static readonly UnicodeBlock blockEgyptianHieroglyphs = new UnicodeBlock("EgyptianHieroglyphs", 0x13000, 0x1342F);
+
+		/// <summary>
+		/// Gets the Unicode block AnatolianHieroglyphs
+		/// </summary>
+		public static UnicodeBlock AnatolianHieroglyphs { get { return blockAnatolianHieroglyphs; } }
+
+		private static readonly UnicodeBlock blockAnatolianHieroglyphs = new UnicodeBlock("AnatolianHieroglyphs", 0x14400, 0x1467F);
 
 		/// <summary>
 		/// Gets the Unicode block BamumSupplement
@@ -1602,6 +1651,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockMathematicalAlphanumericSymbols = new UnicodeBlock("MathematicalAlphanumericSymbols", 0x1D400, 0x1D7FF);
 
 		/// <summary>
+		/// Gets the Unicode block SuttonSignWriting
+		/// </summary>
+		public static UnicodeBlock SuttonSignWriting { get { return blockSuttonSignWriting; } }
+
+		private static readonly UnicodeBlock blockSuttonSignWriting = new UnicodeBlock("SuttonSignWriting", 0x1D800, 0x1DAAF);
+
+		/// <summary>
 		/// Gets the Unicode block MendeKikakui
 		/// </summary>
 		public static UnicodeBlock MendeKikakui { get { return blockMendeKikakui; } }
@@ -1700,6 +1756,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockSupplementalArrowsC = new UnicodeBlock("SupplementalArrows-C", 0x1F800, 0x1F8FF);
 
 		/// <summary>
+		/// Gets the Unicode block SupplementalSymbolsandPictographs
+		/// </summary>
+		public static UnicodeBlock SupplementalSymbolsandPictographs { get { return blockSupplementalSymbolsandPictographs; } }
+
+		private static readonly UnicodeBlock blockSupplementalSymbolsandPictographs = new UnicodeBlock("SupplementalSymbolsandPictographs", 0x1F900, 0x1F9FF);
+
+		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionB
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionB { get { return blockCJKUnifiedIdeographsExtensionB; } }
@@ -1719,6 +1782,13 @@ namespace Hime.SDK
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionD { get { return blockCJKUnifiedIdeographsExtensionD; } }
 
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionD = new UnicodeBlock("CJKUnifiedIdeographsExtensionD", 0x2B740, 0x2B81F);
+
+		/// <summary>
+		/// Gets the Unicode block CJKUnifiedIdeographsExtensionE
+		/// </summary>
+		public static UnicodeBlock CJKUnifiedIdeographsExtensionE { get { return blockCJKUnifiedIdeographsExtensionE; } }
+
+		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionE = new UnicodeBlock("CJKUnifiedIdeographsExtensionE", 0x2B820, 0x2CEAF);
 
 		/// <summary>
 		/// Gets the Unicode block CJKCompatibilityIdeographsSupplement
@@ -1907,6 +1977,7 @@ namespace Hime.SDK
 			db.Add("MeeteiMayekExtensions", MeeteiMayekExtensions);
 			db.Add("EthiopicExtended-A", EthiopicExtendedA);
 			db.Add("LatinExtended-E", LatinExtendedE);
+			db.Add("CherokeeSupplement", CherokeeSupplement);
 			db.Add("MeeteiMayek", MeeteiMayek);
 			db.Add("HangulSyllables", HangulSyllables);
 			db.Add("HangulJamoExtended-B", HangulJamoExtendedB);
@@ -1946,6 +2017,7 @@ namespace Hime.SDK
 			db.Add("ImperialAramaic", ImperialAramaic);
 			db.Add("Palmyrene", Palmyrene);
 			db.Add("Nabataean", Nabataean);
+			db.Add("Hatran", Hatran);
 			db.Add("Phoenician", Phoenician);
 			db.Add("Lydian", Lydian);
 			db.Add("MeroiticHieroglyphs", MeroiticHieroglyphs);
@@ -1959,6 +2031,7 @@ namespace Hime.SDK
 			db.Add("InscriptionalPahlavi", InscriptionalPahlavi);
 			db.Add("PsalterPahlavi", PsalterPahlavi);
 			db.Add("OldTurkic", OldTurkic);
+			db.Add("OldHungarian", OldHungarian);
 			db.Add("RumiNumeralSymbols", RumiNumeralSymbols);
 			db.Add("Brahmi", Brahmi);
 			db.Add("Kaithi", Kaithi);
@@ -1968,17 +2041,21 @@ namespace Hime.SDK
 			db.Add("Sharada", Sharada);
 			db.Add("SinhalaArchaicNumbers", SinhalaArchaicNumbers);
 			db.Add("Khojki", Khojki);
+			db.Add("Multani", Multani);
 			db.Add("Khudawadi", Khudawadi);
 			db.Add("Grantha", Grantha);
 			db.Add("Tirhuta", Tirhuta);
 			db.Add("Siddham", Siddham);
 			db.Add("Modi", Modi);
 			db.Add("Takri", Takri);
+			db.Add("Ahom", Ahom);
 			db.Add("WarangCiti", WarangCiti);
 			db.Add("PauCinHau", PauCinHau);
 			db.Add("Cuneiform", Cuneiform);
 			db.Add("CuneiformNumbersandPunctuation", CuneiformNumbersandPunctuation);
+			db.Add("EarlyDynasticCuneiform", EarlyDynasticCuneiform);
 			db.Add("EgyptianHieroglyphs", EgyptianHieroglyphs);
+			db.Add("AnatolianHieroglyphs", AnatolianHieroglyphs);
 			db.Add("BamumSupplement", BamumSupplement);
 			db.Add("Mro", Mro);
 			db.Add("BassaVah", BassaVah);
@@ -1993,6 +2070,7 @@ namespace Hime.SDK
 			db.Add("TaiXuanJingSymbols", TaiXuanJingSymbols);
 			db.Add("CountingRodNumerals", CountingRodNumerals);
 			db.Add("MathematicalAlphanumericSymbols", MathematicalAlphanumericSymbols);
+			db.Add("SuttonSignWriting", SuttonSignWriting);
 			db.Add("MendeKikakui", MendeKikakui);
 			db.Add("ArabicMathematicalAlphabeticSymbols", ArabicMathematicalAlphabeticSymbols);
 			db.Add("MahjongTiles", MahjongTiles);
@@ -2007,9 +2085,11 @@ namespace Hime.SDK
 			db.Add("AlchemicalSymbols", AlchemicalSymbols);
 			db.Add("GeometricShapesExtended", GeometricShapesExtended);
 			db.Add("SupplementalArrows-C", SupplementalArrowsC);
+			db.Add("SupplementalSymbolsandPictographs", SupplementalSymbolsandPictographs);
 			db.Add("CJKUnifiedIdeographsExtensionB", CJKUnifiedIdeographsExtensionB);
 			db.Add("CJKUnifiedIdeographsExtensionC", CJKUnifiedIdeographsExtensionC);
 			db.Add("CJKUnifiedIdeographsExtensionD", CJKUnifiedIdeographsExtensionD);
+			db.Add("CJKUnifiedIdeographsExtensionE", CJKUnifiedIdeographsExtensionE);
 			db.Add("CJKCompatibilityIdeographsSupplement", CJKCompatibilityIdeographsSupplement);
 			db.Add("Tags", Tags);
 			db.Add("VariationSelectorsSupplement", VariationSelectorsSupplement);

@@ -144,7 +144,7 @@ namespace Hime.SDK
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Contains the supported Unicode blocks");
 			writer.WriteLine("\t/// </summary>");
-			writer.WriteLine("\tpublic class UnicodeBlocks");
+			writer.WriteLine("\tpublic static class UnicodeBlocks");
 			writer.WriteLine("\t{");
 			foreach (UnicodeBlock block in blocks)
 			{
@@ -160,7 +160,7 @@ namespace Hime.SDK
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// The database of Unicode blocks accesible by names");
 			writer.WriteLine("\t\t/// </summary>");
-			writer.WriteLine("\t\tprivate static Dictionary<string, UnicodeBlock> db = null;");
+			writer.WriteLine("\t\tprivate static Dictionary<string, UnicodeBlock> db;");
 
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// Builds the blocks database");
@@ -183,8 +183,7 @@ namespace Hime.SDK
 			writer.WriteLine("\t\tpublic static UnicodeBlock GetBlock(string name)");
 			writer.WriteLine("\t\t{");
 			writer.WriteLine("\t\t\tif (db == null) BuildDB();");
-			writer.WriteLine("\t\t\tif (!db.ContainsKey(name)) return null;");
-			writer.WriteLine("\t\t\t return db[name];");
+			writer.WriteLine("\t\t\treturn !db.ContainsKey(name) ? null : db[name];");
 			writer.WriteLine("\t\t}");
 
 			writer.WriteLine("\t}");
@@ -261,7 +260,7 @@ namespace Hime.SDK
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Contains the supported Unicode categories");
 			writer.WriteLine("\t/// </summary>");
-			writer.WriteLine("\tpublic class UnicodeCategories");
+			writer.WriteLine("\tpublic static class UnicodeCategories");
 			writer.WriteLine("\t{");
 			foreach (UnicodeCategory category in categories.Values)
 			{
@@ -310,7 +309,7 @@ namespace Hime.SDK
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// The database of Unicode categories accesible by names");
 			writer.WriteLine("\t\t/// </summary>");
-			writer.WriteLine("\t\tprivate static Dictionary<string, UnicodeCategory> db = null;");
+			writer.WriteLine("\t\tprivate static Dictionary<string, UnicodeCategory> db;");
 
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// Builds the category database");
@@ -332,8 +331,7 @@ namespace Hime.SDK
 			writer.WriteLine("\t\tpublic static UnicodeCategory GetCategory(string name)");
 			writer.WriteLine("\t\t{");
 			writer.WriteLine("\t\t\tif (db == null) BuildDB();");
-			writer.WriteLine("\t\t\tif (!db.ContainsKey(name)) return null;");
-			writer.WriteLine("\t\t\treturn db[name];");
+			writer.WriteLine("\t\t\treturn !db.ContainsKey(name) ? null : db[name];");
 			writer.WriteLine("\t\t}");
 
 			writer.WriteLine("\t}");
