@@ -28,29 +28,44 @@ namespace Hime.SDK.Output
 	public static class Helper
 	{
 		/// <summary>
+		/// The prefixing string for reserved C# keywords
+		/// </summary>
+		private const string CS_KEYWORD_PREFIXING = "_";
+
+		/// <summary>
+		/// The prefixing string for reserved Java keywords
+		/// </summary>
+		private const string JAVA_KEYWORD_PREFIXING = "_";
+
+		/// <summary>
+		/// The suffix for virtual symbols that have the same name as a variable
+		/// </summary>
+		public const string VIRTUAL_SUFFIX = "_virtual";
+
+		/// <summary>
 		/// Sanitizes the name of a symbol for output in C# code
 		/// </summary>
-		/// <param name="symbol">A symbol</param>
+		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string SanitizeNameCS(Grammars.Symbol symbol)
+		public static string SanitizeNameCS(string name)
 		{
-			string name = RemoveSpecials(symbol.Name);
-			if (keywordsCS.Contains(name))
-				return "_" + name;
-			return name;
+			string result = RemoveSpecials(name);
+			if (keywordsCS.Contains(result))
+				return CS_KEYWORD_PREFIXING + result;
+			return result;
 		}
 
 		/// <summary>
 		/// Sanitizes the name of a symbol for output in Java code
 		/// </summary>
-		/// <param name="symbol">A symbol</param>
+		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string SanitizeNameJava(Grammars.Symbol symbol)
+		public static string SanitizeNameJava(string name)
 		{
-			string name = RemoveSpecials(symbol.Name);
-			if (keywordsJava.Contains(name))
-				return "_" + name;
-			return name;
+			string result = RemoveSpecials(name);
+			if (keywordsJava.Contains(result))
+				return JAVA_KEYWORD_PREFIXING + result;
+			return result;
 		}
 
 		/// <summary>

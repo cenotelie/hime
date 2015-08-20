@@ -128,7 +128,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("\t\t\t/// <summary>");
 				writer.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("\t\t\t/// </summary>");
-				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(terminal), terminal.ID.ToString("X4"));
+				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine("\t\t}");
 

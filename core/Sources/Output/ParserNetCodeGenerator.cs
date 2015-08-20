@@ -17,6 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Collections.Generic;
 using System.IO;
 
 namespace Hime.SDK.Output
@@ -135,26 +136,40 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
+			Dictionary<Grammars.Variable, string> nameVariables = new Dictionary<Grammars.Variable, string>();
+			Dictionary<Grammars.Virtual, string> nameVirtuals = new Dictionary<Grammars.Virtual, string>();
+			foreach (Grammars.Variable var in grammar.Variables)
+			{
+				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
+				nameVariables.Add(var, Helper.SanitizeNameCS(var.Name));
+			}
+			foreach (Grammars.Virtual var in grammar.Virtuals)
+			{
+				string name = Helper.SanitizeNameCS(var.Name);
+				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
+					name += Helper.VIRTUAL_SUFFIX;
+				nameVirtuals.Add(var, name);
+			}
+
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Contains the constant IDs for the variables and virtuals in this parser");
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\tpublic class ID");
 			stream.WriteLine("\t\t{");
-			foreach (Grammars.Variable var in grammar.Variables)
+			foreach (KeyValuePair<Grammars.Variable, string> pair in nameVariables)
 			{
-				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
-					continue;
 				stream.WriteLine("\t\t\t/// <summary>");
-				stream.WriteLine("\t\t\t/// The unique identifier for variable " + var.Name);
+				stream.WriteLine("\t\t\t/// The unique identifier for variable " + pair.Key.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(var), var.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
-			foreach (Grammars.Virtual var in grammar.Virtuals)
+			foreach (KeyValuePair<Grammars.Virtual, string> pair in nameVirtuals)
 			{
 				stream.WriteLine("\t\t\t/// <summary>");
-				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + var.Name);
+				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + pair.Key.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(var), var.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
 			stream.WriteLine("\t\t}");
 		}

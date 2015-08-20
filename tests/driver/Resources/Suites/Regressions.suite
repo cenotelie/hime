@@ -35,3 +35,29 @@ test Issue028_KeywordEscape:
 	parser LALR1
 	on "X"
 	yields while(X)
+
+test Issue029_VariableVirtualClash_1:
+	grammar Issue029_VariableVirtualClash_1 { options {Axiom="e";} terminals { X->'X'; } rules {
+		e -> "e" X ;
+	} }
+	parser LALR1
+	on "X"
+	yields e(e X)
+
+test Issue029_VariableVirtualClash_2:
+	grammar Issue029_VariableVirtualClash_2 { options {Axiom="e";} terminals { X->'X'; } rules {
+		e_virtual -> ;
+		e -> "e" X ;
+	} }
+	parser LALR1
+	on "X"
+	yields e(e X)
+
+test Issue029_VariableVirtualClash_3:
+	grammar Issue029_VariableVirtualClash_3 { options {Axiom="e";} terminals { X->'X'; } rules {
+		f -> "e_virtual" ;
+		e -> "e" X ;
+	} }
+	parser LALR1
+	on "X"
+	yields e(e X)

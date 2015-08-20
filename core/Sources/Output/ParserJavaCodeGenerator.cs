@@ -17,6 +17,7 @@
 * Contributors:
 *     Laurent Wouters - lwouters@xowl.org
 **********************************************************************/
+using System.Collections.Generic;
 using System.IO;
 
 namespace Hime.SDK.Output
@@ -142,25 +143,39 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * Contains the constant IDs for the variables and virtuals in this parser");
-			stream.WriteLine("     */");
-			stream.WriteLine("    public static class ID {");
+			Dictionary<Grammars.Variable, string> nameVariables = new Dictionary<Grammars.Variable, string>();
+			Dictionary<Grammars.Virtual, string> nameVirtuals = new Dictionary<Grammars.Virtual, string>();
 			foreach (Grammars.Variable var in grammar.Variables)
 			{
 				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				stream.WriteLine("        /**");
-				stream.WriteLine("         * The unique identifier for variable " + var.Name);
-				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(var), var.ID.ToString("X4"));
+				nameVariables.Add(var, Helper.SanitizeNameJava(var.Name));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
+				string name = Helper.SanitizeNameJava(var.Name);
+				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
+					name += Helper.VIRTUAL_SUFFIX;
+				nameVirtuals.Add(var, name);
+			}
+
+			stream.WriteLine("    /**");
+			stream.WriteLine("     * Contains the constant IDs for the variables and virtuals in this parser");
+			stream.WriteLine("     */");
+			stream.WriteLine("    public static class ID {");
+			foreach (KeyValuePair<Grammars.Variable, string> pair in nameVariables)
+			{
 				stream.WriteLine("        /**");
-				stream.WriteLine("         * The unique identifier for virtual " + var.Name);
+				stream.WriteLine("         * The unique identifier for variable " + pair.Key.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(var), var.ID.ToString("X4"));
+				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+			}
+			foreach (KeyValuePair<Grammars.Virtual, string> pair in nameVirtuals)
+			{
+				stream.WriteLine("        /**");
+				stream.WriteLine("         * The unique identifier for virtual " + pair.Key.Name);
+				stream.WriteLine("         */");
+				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
 			stream.WriteLine("    }");
 		}

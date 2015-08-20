@@ -133,7 +133,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("        /**");
 				writer.WriteLine("         * The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("         */");
-				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(terminal), terminal.ID.ToString("X4"));
+				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine("    }");
 
