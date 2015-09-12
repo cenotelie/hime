@@ -36,6 +36,10 @@ public class ASTNode implements SemanticElement {
      * The index of this node in the parse tree
      */
     private final int index;
+    /**
+     * The cache for the children
+     */
+    private List<ASTNode> children;
 
     /**
      * Gets the children of this node
@@ -43,7 +47,9 @@ public class ASTNode implements SemanticElement {
      * @return The children of this node
      */
     public List<ASTNode> getChildren() {
-        return tree.getChildren(index);
+        if (children == null)
+            children = tree.getChildren(index);
+        return children;
     }
 
     @Override
