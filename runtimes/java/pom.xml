@@ -4,7 +4,7 @@
 	<groupId>org.xowl.hime</groupId>
 	<artifactId>redist</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0.0</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<name>Hime Runtime</name>
 	<description>Redistributable Java runtime for the parsers generated with Hime</description>
 	<url>https://bitbucket.org/laurentw/hime</url>
@@ -19,12 +19,12 @@
 			<name>Laurent Wouters</name>
 			<email>lwouters@xowl.org</email>
 			<organization>xowl.org</organization>
-			<organizationUrl>http://hime.xowl.org</organizationUrl>
+			<organizationUrl>http://xowl.org/</organizationUrl>
 		</developer>
 	</developers>
 	<scm>
 		<connection>scm:hg:https://bitbucket.org/laurentw/hime</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/laurentw/hime</developerConnection>
+		<developerConnection>scm:hg:ssh://hg@bitbucket.org/laurentw/hime</developerConnection>
 		<url>https://bitbucket.org/laurentw/hime</url>
 	</scm>
 	<distributionManagement>
@@ -116,6 +116,7 @@
 					<useReleaseProfile>false</useReleaseProfile>
 					<releaseProfiles>release</releaseProfiles>
 					<goals>deploy</goals>
+					<pushChanges>false</pushChanges>
 				</configuration>
 			</plugin>
 		</plugins>
