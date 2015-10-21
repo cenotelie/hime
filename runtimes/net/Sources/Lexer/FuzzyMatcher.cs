@@ -197,9 +197,9 @@ namespace Hime.Redist.Lexer
 			{
 				// favor a match if
 				// * this is the first one
-				// * or, it is strictly closer to the original input
-				// * or, it is at the same instance to the original input, but strictly matches more input
-				if (matching == null || head.distance < matching.distance || (head.distance == matching.distance && head.length > matching.length))
+				// * or, it is strictly longer
+				// * or, it is the same length but closer to the input
+				if (matching == null || head.length > matching.length || (head.length == matching.length && head.distance < matching.distance))
 					matching = head;
 			}
 
