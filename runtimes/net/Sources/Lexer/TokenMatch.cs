@@ -40,13 +40,6 @@ namespace Hime.Redist.Lexer
 		public bool IsSuccess { get { return state != Automaton.DEAD_STATE; } }
 
 		/// <summary>
-		/// Initializes a failing match of length 0
-		/// </summary>
-		public TokenMatch() : this(0)
-		{
-		}
-
-		/// <summary>
 		/// Initializes a failing match
 		/// </summary>
 		/// <param name='length'>the number of characters to advance in the input</param>

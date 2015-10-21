@@ -163,7 +163,7 @@ namespace Hime.Redist.Lexer
 				return new TokenMatch(0, 0);
 			}
 
-			TokenMatch result = new TokenMatch();
+			TokenMatch result = new TokenMatch(0);
 			int state = 0;
 			int i = index;
 

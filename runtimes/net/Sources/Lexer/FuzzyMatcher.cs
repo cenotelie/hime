@@ -23,7 +23,9 @@ namespace Hime.Redist.Lexer
 {
 	/// <summary>
 	/// A fuzzy DFA matcher
-	/// This matcher uses the Levenshtein distance to match the input ahead against the current DFA automaton
+	/// This matcher uses the Levenshtein distance to match the input ahead against the current DFA automaton.
+	/// The matcher favors solutions that are the closest to the original input.
+	/// When multiple solutions are at the same Levenshtein distance to the input, the longest one is preferred.
 	/// </summary>
 	class FuzzyMatcher
 	{
@@ -143,8 +145,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The solution</returns>
 		public TokenMatch Run()
 		{
-			InspectFix(new Node(null, 0, 0, 0));
-			// we do not expect a match on the first try because we are supposed to be on an error here
+			queue.Add(new Node(null, 0, 0, 0));
 			for (int i = 0; i != queue.Count; i++)
 				Inspect(queue[i]);
 			return matching != null ? OnSuccess(matching) : OnFailure();
@@ -179,196 +180,147 @@ namespace Hime.Redist.Lexer
 			return new TokenMatch(1);
 		}
 
-
 		/// <summary>
 		/// Inspects the current stack head
 		/// </summary>
 		/// <param name="head">The head of a DFA stack</param>
 		private void Inspect(Node head)
 		{
+			// gather data for this node
 			int index = originIndex + head.length;
+			bool atEnd = text.IsEnd(index);
+			char current = atEnd ? '\0' : text.GetValue(index);
 			AutomatonState stateData = automaton.GetState(head.state);
-			if (stateData.TerminalsCount > 0)
+
+			// is it a matching state
+			if (stateData.TerminalsCount != 0)
 			{
-				if (matching == null || head.length > matching.length)
+				// favor a match if
+				// * this is the first one
+				// * or, it is strictly closer to the original input
+				// * or, it is at the same instance to the original input, but strictly matches more input
+				if (matching == null || head.distance < matching.distance || (head.distance == matching.distance && head.length > matching.length))
 					matching = head;
 			}
-			if (head.distance >= maxDistance || stateData.IsDeadEnd || text.IsEnd(index))
+
+			if (!atEnd && head.distance < maxDistance)
 			{
-				// reached max Levenshtein distance, or the state is a dead end, or reached the end of input
-				return;
+				// not at end and not at the maximum distance, we can drop
+				queue.Add(new Node(head,
+					head.state,
+					head.length + 1,
+					head.distance + 1,
+					new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
 			}
 
-			// try to drop the unexpected character
-			InspectFix(new Node(head,
-				head.state,
-				head.length + 1,
-				head.distance + 1,
-				new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
+			if (stateData.IsDeadEnd)
+				return;
 
 			for (int i = 0; i != 256; i++)
 			{
 				int target = stateData.GetCachedTransition(i);
 				if (target == Automaton.DEAD_STATE)
 					continue;
-				// try to replace the next character by an expected one
-				InspectFix(new Node(head,
-					target,
-					head.length + 1,
-					head.distance + 1,
-					new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
-				// try to insert the expected character
-				InspectFix(new Node(head,
-					target,
-					head.length,
-					head.distance + 1,
-					new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
+				if (current == i)
+				{
+					// this is the current input value
+					Enqueue(head,
+						target,
+						head.length + 1,
+						head.distance,
+						null);
+				}
+				if (head.distance < maxDistance)
+				{
+					// not at the max distance
+					if (!atEnd)
+					{
+						// not at the end
+						// try to replace the next character by an expected one
+						Enqueue(head,
+							target,
+							head.length + 1,
+							head.distance + 1,
+							new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index)));
+
+					}
+					// try to insert the expected character
+					Enqueue(head,
+						target,
+						head.length,
+						head.distance + 1,
+						new UnexpectedCharError(atEnd ? "" : text.GetValue(index).ToString(), text.GetPositionAt(index)));
+				}
 			}
 
 			for (int i = 0; i != stateData.BulkTransitionsCount; i++)
 			{
-				int target = stateData.GetBulkTransition(i).Target;
-				// try to replace the next character by an expected one
-				InspectFix(new Node(head,
-					target,
-					head.length + 1,
-					head.distance + 1,
-					new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
-				// try to insert the expected character
-				InspectFix(new Node(head,
-					target,
-					head.length,
-					head.distance + 1,
-					new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
+				AutomatonTransition transition = stateData.GetBulkTransition(i);
+				if (current >= transition.Start && current <= transition.End)
+				{
+					// this is the current input value
+					Enqueue(head,
+						transition.Target,
+						head.length + 1,
+						head.distance,
+						null);
+				}
+				if (head.distance < maxDistance)
+				{
+					// not at the max distance
+					if (!atEnd)
+					{
+						// not at the end
+						// try to replace the next character by an expected one
+						Enqueue(head,
+							transition.Target,
+							head.length + 1,
+							head.distance + 1,
+							new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index)));
+
+					}
+					// try to insert the expected character
+					Enqueue(head,
+						transition.Target,
+						head.length,
+						head.distance + 1,
+						new UnexpectedCharError(atEnd ? "" : text.GetValue(index).ToString(), text.GetPositionAt(index)));
+				}
 			}
-			// low (value >= 0xDC00 && value <= 0xDFFF)
-			// high (value >= 0xD800 && value <= 0xDBFF)
 		}
 
 		/// <summary>
-		/// Inspects the fixing node
+		/// Enqueues a new head if it is of interest.
+		/// A new head is of interest if:
+		/// * This is the first time the DFA state has been reached
+		/// * Or, for the same state, it is a strictly longer input match
+		/// * Or, for the same state, and the same length, the Levenshtein distance is strictly less
 		/// </summary>
-		/// <param name="node">A fixing node</param>
-		private void InspectFix(Node node)
+		/// <param name="previous">The parent head</param>
+		/// <param name="state">The target DFA state</param>
+		/// <param name="length">The matched input length</param>
+		/// <param name="distance">The Levenshtein distance between the matched input and the DFA</param>
+		/// <param name="error">The raised error, if any</param>
+		private void Enqueue(Node previous, int state, int length, int distance, ParseError error)
 		{
-			queue.Add(node);
-			Node node2 = BuildDFAStack(node);
-			if (node2 != node)
-				queue.Add(node2);
-		}
-
-
-		/// <summary>
-		/// Tries to fix the current unexpected low surrogate
-		/// </summary>
-		/// <returns>true if the issue is fixed</returns>
-		private bool FixIncorrectLowSurrogate()
-		{
-			return false;
-			// is it preceded by a high surrogate?
-			/*char value = text.GetValue(currentIndex);
-			char previous = currentIndex > originIndex ? text.GetValue(currentIndex - 1) : '\0';
-			TokenMatch head = stack[stack.Count - 1];
-			if (currentIndex == originIndex || previous < 0xD800 || previous > 0xDBFF)
+			for (int i = queue.Count - 1; i != -1; i--)
 			{
-				// no preceding high surrogate
-				AutomatonState stateData = automaton.GetState(head.state);
-				errors(new IncorrectEncodingSequence(text.GetPositionAt(currentIndex), new [] { value }, ParseErrorType.IncorrectUTF16NoHighSurrogate));
-				// try to fix this by simulating the presence of a high surrogate before the current character
-				for (int k = 0; k != stateData.BulkTransitionsCount; k++)
-				{
-					AutomatonTransition transition = stateData.GetBulkTransition(k);
-					if ((transition.Start >= 0xD800 && transition.Start <= 0xDBFF)
-					    && (transition.End >= 0xD800 && transition.End <= 0xDBFF)
-					    && automaton.GetState(transition.Target).GetTargetBy(value) != Automaton.DEAD_STATE)
-					{
-						stack.Add(new TokenMatch(transition.Target, head.length));
-						distance.Add(distance[distance.Count - 1] + 1); // an insertion
-						return true;
-					}
-				}
-				// failed, try to drop the low surrogate
-				return FixDropHead();
+				if (queue[i].state != state)
+					// not the same state, could be of interest
+					continue;
+				// this is the same DFA state
+				// the length if strictly less that the one already enqueued, not of interest
+				if (length < queue[i].length)
+					return;
+				if (length > queue[i].length)
+					// strictly longer, could be of interest
+					continue;
+				// same DFA state and same length
+				if (distance >= queue[i].distance)
+					// the distance is the same, or even longer, not of interset
+					return;
 			}
-			else
-			{
-				// preceded by a high surrogate that was expected
-				// try to fix this by replacing the unexpected low surrogate by an expected one
-				errors(new UnexpectedCharError(new string(new [] { previous, value }), text.GetPositionAt(currentIndex - 1)));
-				AutomatonState stateData = automaton.GetState(head.state);
-				if (text.IsEnd(currentIndex + 1))
-				{
-					// end of input, simply replace
-					for (int k = 0; k != stateData.BulkTransitionsCount; k++)
-					{
-						AutomatonTransition transition = stateData.GetBulkTransition(k);
-						if ((transition.Start >= 0xDC00 && transition.Start <= 0xDFFF)
-						    && (transition.End >= 0xDC00 && transition.End <= 0xDFFF)
-						    && automaton.GetState(transition.Target).TerminalsCount > 0)
-						{
-							stack.Add(new TokenMatch(transition.Target, head.length + 1));
-							distance.Add(distance[distance.Count - 1] + 1); // a substitution
-							return true;
-						}
-					}
-					// no transition for a low surrogate to a final matching state, this is weird
-					return false;
-				}
-				// look for a suitable replacement
-				char next = text.GetValue(currentIndex + 1);
-				for (int k = 0; k != stateData.BulkTransitionsCount; k++)
-				{
-					AutomatonTransition transition = stateData.GetBulkTransition(k);
-					if ((transition.Start >= 0xDC00 && transition.Start <= 0xDFFF)
-					    && (transition.End >= 0xDC00 && transition.End <= 0xDFFF))
-					{
-						AutomatonState nextStateData = automaton.GetState(transition.Target);
-						if (nextStateData.TerminalsCount > 0 || nextStateData.GetTargetBy(next) != Automaton.DEAD_STATE)
-						{
-							// either we reached a matching state, or the next character is expected, this could be the solution
-							stack.Add(new TokenMatch(transition.Target, head.length + 1));
-							distance.Add(distance[distance.Count - 1] + 1); // a substitution
-							return true;
-						}
-					}
-				}
-				// could not find a transition with a suitable replacement
-				return false;
-			}*/
-		}
-
-		/// <summary>
-		/// Builds the DFA stack for matching a token in the input ahead
-		/// </summary>
-		/// <param name="head">The stack node to begin from</param>
-		/// <returns>The new head</returns>
-		private Node BuildDFAStack(Node head)
-		{
-			int index = originIndex + head.length;
-			while (true)
-			{
-				AutomatonState stateData = automaton.GetState(head.state);
-				if (stateData.TerminalsCount != 0)
-				{
-					if (matching == null || head.length > matching.length)
-						matching = head;
-				}
-				// No further transition => exit
-				if (stateData.IsDeadEnd)
-					break;
-				// At the end of the buffer
-				if (text.IsEnd(index))
-					break;
-				char current = text.GetValue(index);
-				index++;
-				// Try to find a transition from this state with the read character
-				int nextState = stateData.GetTargetBy(current);
-				if (nextState == Automaton.DEAD_STATE)
-					break;
-				// ok, continue
-				head = new Node(head, nextState, head.length + 1, head.distance);
-			}
-			return head;
+			queue.Add(new Node(previous, state, length, distance, error));
 		}
 	}
 }
