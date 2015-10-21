@@ -73,109 +73,73 @@ namespace Hime.Redist.Lexer
 
 			while (true)
 			{
-				Match match = RunDFA(contexts);
-				if (match.length != 0)
+				TokenMatch match = RunDFA(inputIndex);
+				if (!match.IsSuccess)
 				{
-					// matched something !
-					int terminalID = symTerminals[match.terminal].ID;
-					if (terminalID == separatorID)
+					// failed to match, retry with error handling
+					match = RunDFAOnError(inputIndex);
+				}
+				if (match.IsSuccess)
+				{
+					if (match.state == 0)
 					{
-						inputIndex += match.length;
-						continue;
+						// this is the dollar terminal, at the end of the input
+						// the index of the $ symbol is always 1
+						isDollarEmitted = true;
+						return new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(1, inputIndex, 0));
 					}
-					TokenKernel token = new TokenKernel(terminalID, tokens.Add(match.terminal, inputIndex, match.length));
-					inputIndex += match.length;
-					return token;
-				}
-				if (match.terminal == 1)
-				{
-					// This is the dollar terminal, at the end of the input
-					isDollarEmitted = true;
-					return new TokenKernel(Symbol.SID_DOLLAR, tokens.Add(1, inputIndex, 0));
-				}
-				// Failed to match anything
-				TextPosition position = text.GetPositionAt(inputIndex);
-				string unexpected;
-				int c = text.GetValue(inputIndex);
-				if (c >= 0xD800 && c <= 0xDFFF)
-				{
-					// this is a surrogate encoding point
-					unexpected = text.GetValue(inputIndex, 2);
-					inputIndex += 2;
+					else
+					{
+						// matched something
+						int tIndex = GetTerminalFor(match.state, contexts);
+						int tID = symTerminals[tIndex].ID;
+						if (tID == separatorID)
+						{
+							inputIndex += match.length;
+							continue;
+						}
+						else
+						{
+							TokenKernel token = new TokenKernel(tID, tokens.Add(tIndex, inputIndex, match.length));
+							inputIndex += match.length;
+							return token;
+						}
+					}
 				}
 				else
 				{
-					unexpected = text.GetValue(inputIndex).ToString();
-					inputIndex++;
+					inputIndex += match.length;
 				}
-				RaiseError(new UnexpectedCharError(unexpected, position));
 			}
 		}
 
 		/// <summary>
-		/// Runs the lexer's DFA to match a terminal in the input ahead
+		/// Gets the index of the terminal with the highest priority that is possible in the contexts
 		/// </summary>
-		/// <param name="provider">The provider of contextual information</param>
-		/// <returns>The matched terminal and length</returns>
-		private Match RunDFA(IContextProvider provider)
+		/// <param name="state">The DFA state</param>
+		/// <param name="provider">The current applicable contexts</param>
+		/// <returns>The index of the terminal</returns>
+		private int GetTerminalFor(int state, IContextProvider provider)
 		{
-			if (text.IsEnd(inputIndex))
-			{
-				// At the end of input
-				return new Match(1, 0); // 1 is always the index of the $ terminal
-			}
-
-			AutomatonState stateData;
-			int matchState = 0;
-			int matchLength = 0;
-			int state = 0;
-			int i = inputIndex;
-
-			while (state != Automaton.DEAD_STATE)
-			{
-				stateData = automaton.GetState(state);
-				// Is this state a matching state ?
-				if (stateData.TerminalsCount != 0)
-				{
-					matchState = state;
-					matchLength = i - inputIndex;
-				}
-				// No further transition => exit
-				if (stateData.IsDeadEnd)
-					break;
-				// At the end of the buffer
-				if (text.IsEnd(i))
-					break;
-				char current = text.GetValue(i);
-				i++;
-				// Try to find a transition from this state with the read character
-				state = stateData.GetTargetBy(current);
-			}
-
-			if (matchLength == 0)
-				// no match
-				return new Match(-1, 0);
-
-			// return the match with the highest priority that is possible in the contexts
-			stateData = automaton.GetState(matchState);
+			AutomatonState stateData = automaton.GetState(state);
 			MatchedTerminal mt = stateData.GetTerminal(0);
 			int id = symTerminals[mt.Index].ID;
-			Match currentResult = new Match(mt.Index, matchLength);
+			int currentResult = mt.Index;
 			if (id == separatorID)
 				// the separator trumps all
 				return currentResult;
 			int currentPriority = provider.GetContextPriority(mt.Context, id);
-			for (int j = 1; j != stateData.TerminalsCount; j++)
+			for (int i = 1; i != stateData.TerminalsCount; i++)
 			{
-				mt = stateData.GetTerminal(j);
+				mt = stateData.GetTerminal(i);
 				id = symTerminals[mt.Index].ID;
 				if (id == separatorID)
 					// the separator trumps all
-					return new Match(mt.Index, matchLength);
+					return mt.Index;
 				int priority = provider.GetContextPriority(mt.Context, id);
 				if (currentPriority < 0 || (priority >= 0 && priority < currentPriority))
 				{
-					currentResult = new Match(mt.Index, matchLength);
+					currentResult = mt.Index;
 					currentPriority = priority;
 				}
 			}

@@ -130,6 +130,9 @@
     <Compile Include="Sources\Utils\ROList.cs" />
     <Compile Include="Sources\SemanticBody.cs" />
     <Compile Include="Sources\SemanticElement.cs" />
+    <Compile Include="Sources\IncorrectEncodingSequence.cs" />
+    <Compile Include="Sources\Lexer\TokenMatch.cs" />
+    <Compile Include="Sources\Lexer\FuzzyMatcher.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

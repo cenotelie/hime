@@ -21,38 +21,50 @@
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
-	/// Represents the kernel of a token, i.e. the identifying information of a token
+	/// Represents a match in the input
 	/// </summary>
-	struct TokenKernel
+	struct TokenMatch
 	{
 		/// <summary>
-		/// The identifier of the matched terminal
+		/// The matching DFA state
 		/// </summary>
-		private readonly int terminalID;
+		public readonly int state;
 		/// <summary>
-		/// The token's index in its repository
+		/// Length of the matched input
 		/// </summary>
-		private readonly int index;
+		public readonly int length;
 
 		/// <summary>
-		/// Gets the identifier of the matched terminal
+		/// Gets whether this is match indicates a success
 		/// </summary>
-		public int TerminalID { get { return terminalID; } }
+		public bool IsSuccess { get { return state != Automaton.DEAD_STATE; } }
 
 		/// <summary>
-		/// Gets the token's index in its repository
+		/// Initializes a failing match of length 0
 		/// </summary>
-		public int Index { get { return index; } }
-
-		/// <summary>
-		/// Initializes this kernel
-		/// </summary>
-		/// <param name="id">The identifier of the matched terminal</param>
-		/// <param name="index">The token's index in its repository</param>
-		public TokenKernel(int id, int index)
+		public TokenMatch() : this(0)
 		{
-			terminalID = id;
-			this.index = index;
+		}
+
+		/// <summary>
+		/// Initializes a failing match
+		/// </summary>
+		/// <param name='length'>the number of characters to advance in the input</param>
+		public TokenMatch(int  length)
+		{
+			state = Automaton.DEAD_STATE;
+			this.length = length;
+		}
+
+		/// <summary>
+		/// Initializes a match
+		/// </summary>
+		/// <param name='state'>The matching DFA state</param>
+		/// <param name='length'>Length of the matched input</param>
+		public TokenMatch(int state, int length)
+		{
+			this.state = state;
+			this.length = length;
 		}
 	}
 }

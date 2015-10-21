@@ -86,76 +86,35 @@ namespace Hime.Redist.Lexer
 			int inputIndex = 0;
 			while (true)
 			{
-				Match match = RunDFA(inputIndex);
-				if (match.length != 0)
+				TokenMatch match = RunDFA(inputIndex);
+				if (!match.IsSuccess)
 				{
-					// matched something
-					if (symTerminals[match.terminal].ID != separatorID)
-						tokens.Add(match.terminal, inputIndex, match.length);
-					inputIndex += match.length;
-					continue;
+					// failed to match, retry with error handling
+					match = RunDFAOnError(inputIndex);
 				}
-				if (match.terminal == 0)
+				if (match.IsSuccess)
 				{
-					// This is the EPSILON terminal, failed to match anything
-					TextPosition position = text.GetPositionAt(inputIndex);
-					string unexpected;
-					int c = text.GetValue(inputIndex);
-					if (c >= 0xD800 && c <= 0xDFFF)
+					if (match.state == 0)
 					{
-						// this is a surrogate encoding point
-						unexpected = text.GetValue(inputIndex, 2);
-						inputIndex += 2;
+						// this is the dollar terminal, at the end of the input
+						// the index of the $ symbol is always 1
+						tokens.Add(1, inputIndex, 0);
+						return;
 					}
 					else
 					{
-						unexpected = text.GetValue(inputIndex).ToString();
-						inputIndex++;
+						// matched something
+						int tIndex = automaton.GetState(match.state).GetTerminal(0).Index;
+						if (symTerminals[tIndex].ID != separatorID)
+							tokens.Add(tIndex, inputIndex, match.length);
+						inputIndex += match.length;
 					}
-					RaiseError(new UnexpectedCharError(unexpected, position));
-					continue;
 				}
-				// This is the dollar terminal, at the end of the input
-				tokens.Add(match.terminal, inputIndex, match.length);
-				return;
+				else
+				{
+					inputIndex += match.length;
+				}
 			}
-		}
-
-		/// <summary>
-		/// Runs the lexer's DFA to match a terminal in the input ahead
-		/// </summary>
-		/// <param name="inputIndex">The current start index in the input text</param>
-		/// <returns>The matched terminal and length</returns>
-		private Match RunDFA(int inputIndex)
-		{
-			if (text.IsEnd(inputIndex))
-			{
-				// At the end of input
-				return new Match(1, 0); // 1 is always the index of the $ terminal
-			}
-
-			Match result = new Match();
-			int state = 0;
-			int i = inputIndex;
-
-			while (state != Automaton.DEAD_STATE)
-			{
-				AutomatonState stateData = automaton.GetState(state);
-				// Is this state a matching state ?
-				if (stateData.TerminalsCount != 0)
-					result = new Match(stateData.GetTerminal(0).Index, i - inputIndex);
-				// No further transition => exit
-				if (stateData.IsDeadEnd)
-					break;
-				// At the end of the buffer
-				if (text.IsEnd(i))
-					break;
-				char current = text.GetValue(i);
-				i++;
-				// Try to find a transition from this state with the read character
-				state = stateData.GetTargetBy(current);
-			}
-			return result;
 		}
 	}
 }

@@ -35,6 +35,11 @@ namespace Hime.Redist.Lexer
 	public abstract class BaseLexer
 	{
 		/// <summary>
+		/// The default maximum Levenshtein distance to go to for the recovery of a matching failure
+		/// </summary>
+		protected const int DEFAULT_RECOVERY_MATCHING_DISTANCE = 3;
+
+		/// <summary>
 		/// The default context provider
 		/// </summary>
 		private class DefaultContextProvider : IContextProvider
@@ -49,32 +54,6 @@ namespace Hime.Redist.Lexer
 		/// The default context provider
 		/// </summary>
 		private static readonly DefaultContextProvider DEFAULT_CONTEXT_PROVIDER = new DefaultContextProvider();
-
-		/// <summary>
-		/// Represents a match in the input
-		/// </summary>
-		internal struct Match
-		{
-			/// <summary>
-			/// Index of the matched terminal
-			/// </summary>
-			public readonly int terminal;
-			/// <summary>
-			/// Length of the matched input
-			/// </summary>
-			public readonly int length;
-
-			/// <summary>
-			/// Initializes a match
-			/// </summary>
-			/// <param name='terminal'>Index of the matched terminal</param>
-			/// <param name='length'>Length of the matched input</param>
-			public Match(int terminal, int length)
-			{
-				this.terminal = terminal;
-				this.length = length;
-			}
-		}
 
 		/// <summary>
 		/// This lexer's automaton
@@ -113,6 +92,16 @@ namespace Hime.Redist.Lexer
 		public IEnumerable<Token> Output { get { return tokens; } }
 
 		/// <summary>
+		/// Gets or sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+		/// A distance of 0 indicates no recovery.
+		/// </summary>
+		public int RecoveryDistance
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// Events for lexical errors
 		/// </summary>
 		public event AddLexicalError OnError;
@@ -131,6 +120,7 @@ namespace Hime.Redist.Lexer
 			separatorID = separator;
 			text = new PrefetchedText(input);
 			tokens = new TokenRepository(symTerminals, text);
+			RecoveryDistance = DEFAULT_RECOVERY_MATCHING_DISTANCE;
 		}
 
 		/// <summary>
@@ -147,6 +137,7 @@ namespace Hime.Redist.Lexer
 			separatorID = separator;
 			text = new StreamingText(input);
 			tokens = new TokenRepository(symTerminals, text);
+			RecoveryDistance = DEFAULT_RECOVERY_MATCHING_DISTANCE;
 		}
 
 		/// <summary>
@@ -159,12 +150,60 @@ namespace Hime.Redist.Lexer
 		}
 
 		/// <summary>
-		/// Raises the specified error
+		/// Runs the lexer's DFA to match a terminal in the input ahead
 		/// </summary>
-		/// <param name="error">An error raised by this lexer</param>
-		protected void RaiseError(ParseError error)
+		/// <param name="index">The current start index in the input text</param>
+		/// <returns>The matching DFA state and length</returns>
+		internal TokenMatch RunDFA(int index)
 		{
-			OnError(error);
+			if (text.IsEnd(index))
+			{
+				// At the end of input
+				// The only terminal matched at state index 0 is $
+				return new TokenMatch(0, 0);
+			}
+
+			TokenMatch result = new TokenMatch();
+			int state = 0;
+			int i = index;
+
+			while (state != Automaton.DEAD_STATE)
+			{
+				AutomatonState stateData = automaton.GetState(state);
+				// Is this state a matching state ?
+				if (stateData.TerminalsCount != 0)
+					result = new TokenMatch(state, i - index);
+				// No further transition => exit
+				if (stateData.IsDeadEnd)
+					break;
+				// At the end of the buffer
+				if (text.IsEnd(i))
+					break;
+				char current = text.GetValue(i);
+				i++;
+				// Try to find a transition from this state with the read character
+				state = stateData.GetTargetBy(current);
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// When an error was encountered, runs the lexer's DFA to match a terminal in the input ahead
+		/// </summary>
+		/// <param name="originIndex">The current start index in the input text</param>
+		/// <returns>The matching DFA state and length</returns>
+		internal TokenMatch RunDFAOnError(int originIndex)
+		{
+			if (RecoveryDistance <= 0)
+			{
+				OnError(new UnexpectedCharError(text.GetValue(originIndex).ToString(), text.GetPositionAt(originIndex)));
+				return new TokenMatch(1);
+			}
+			else
+			{
+				FuzzyMatcher handler = new FuzzyMatcher(automaton, text, OnError, RecoveryDistance, originIndex);
+				return handler.Run();
+			}
 		}
 
 		/// <summary>
