@@ -51,9 +51,9 @@ namespace Hime.Redist.Lexer
 			/// </summary>
 			public readonly int distance;
 			/// <summary>
-			/// The raised lexical error to reach this state
+			/// The index of the errorneous character, or -1
 			/// </summary>
-			public readonly ParseError error;
+			public readonly int error;
 
 
 			/// <summary>
@@ -69,7 +69,7 @@ namespace Hime.Redist.Lexer
 				this.state = state;
 				this.length = length;
 				this.distance = distance;
-				error = null;
+				error = -1;
 			}
 
 			/// <summary>
@@ -79,14 +79,13 @@ namespace Hime.Redist.Lexer
 			/// <param name="state">The represented DFA state</param>
 			/// <param name="length">The required length in the input to reach this node</param>
 			/// <param name="distance">The Levenshtein distance of this node from the input</param>
-			/// <param name="error">The raised lexical error to reach this state</param>
-			public Node(Node previous, int state, int length, int distance, ParseError error)
+			/// <param name="error">The index of the errorneous character, or -1</param>
+			public Node(Node previous, int state, int length, int distance, int error)
 			{
 				this.previous = previous;
 				this.state = state;
 				this.length = length;
 				this.distance = distance;
-				this.error = null;
 				this.error = error;
 			}
 		}
@@ -162,8 +161,12 @@ namespace Hime.Redist.Lexer
 			Node current = node;
 			while (current != null)
 			{
-				if (current.error != null)
-					myErrors.Add(current.error);
+				if (current.error != -1)
+				{
+					bool atEnd = text.IsEnd(current.error);
+					string value = atEnd ? "" : text.GetValue(current.error).ToString();
+					myErrors.Add(new UnexpectedCharError(value, text.GetPositionAt(current.error)));
+				}
 				current = current.previous;
 			}
 			for (int i = myErrors.Count - 1; i != -1; i--)
@@ -206,11 +209,11 @@ namespace Hime.Redist.Lexer
 			if (!atEnd && head.distance < maxDistance)
 			{
 				// not at end and not at the maximum distance, we can drop
-				queue.Add(new Node(head,
+				Enqueue(head,
 					head.state,
 					head.length + 1,
 					head.distance + 1,
-					new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index))));
+					index);
 			}
 
 			if (stateData.IsDeadEnd)
@@ -228,7 +231,7 @@ namespace Hime.Redist.Lexer
 						target,
 						head.length + 1,
 						head.distance,
-						null);
+						-1);
 				}
 				if (head.distance < maxDistance)
 				{
@@ -241,7 +244,7 @@ namespace Hime.Redist.Lexer
 							target,
 							head.length + 1,
 							head.distance + 1,
-							new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index)));
+							index);
 
 					}
 					// try to insert the expected character
@@ -249,7 +252,7 @@ namespace Hime.Redist.Lexer
 						target,
 						head.length,
 						head.distance + 1,
-						new UnexpectedCharError(atEnd ? "" : text.GetValue(index).ToString(), text.GetPositionAt(index)));
+						index);
 				}
 			}
 
@@ -263,7 +266,7 @@ namespace Hime.Redist.Lexer
 						transition.Target,
 						head.length + 1,
 						head.distance,
-						null);
+						-1);
 				}
 				if (head.distance < maxDistance)
 				{
@@ -276,7 +279,7 @@ namespace Hime.Redist.Lexer
 							transition.Target,
 							head.length + 1,
 							head.distance + 1,
-							new UnexpectedCharError(text.GetValue(index).ToString(), text.GetPositionAt(index)));
+							index);
 
 					}
 					// try to insert the expected character
@@ -284,7 +287,7 @@ namespace Hime.Redist.Lexer
 						transition.Target,
 						head.length,
 						head.distance + 1,
-						new UnexpectedCharError(atEnd ? "" : text.GetValue(index).ToString(), text.GetPositionAt(index)));
+						index);
 				}
 			}
 		}
@@ -300,8 +303,8 @@ namespace Hime.Redist.Lexer
 		/// <param name="state">The target DFA state</param>
 		/// <param name="length">The matched input length</param>
 		/// <param name="distance">The Levenshtein distance between the matched input and the DFA</param>
-		/// <param name="error">The raised error, if any</param>
-		private void Enqueue(Node previous, int state, int length, int distance, ParseError error)
+		/// <param name="error">The index of the errorneous character, or -1</param>
+		private void Enqueue(Node previous, int state, int length, int distance, int error)
 		{
 			for (int i = queue.Count - 1; i != -1; i--)
 			{
