@@ -29,7 +29,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// The incorrect sequence
 		/// </summary>
-		private readonly char[] sequence;
+		private readonly char sequence;
 		/// <summary>
 		/// The precise error type
 		/// </summary>
@@ -43,7 +43,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the error's length in the input (in number of characters)
 		/// </summary>
-		public override int Length { get { return sequence.Length; } }
+		public override int Length { get { return 1; } }
 
 		/// <summary>
 		/// Gets the error's message
@@ -53,7 +53,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the incorrect sequence
 		/// </summary>
-		public char[] Sequence { get { return (char[]) sequence.Clone(); } }
+		public char Sequence { get { return sequence; } }
 
 		/// <summary>
 		/// Initializes this error
@@ -61,7 +61,7 @@ namespace Hime.Redist
 		/// <param name="position">Error's position in the input</param>
 		/// <param name="sequence">The incorrect sequence</param>
 		/// <param name="errorType">The precise error type</param>
-		public IncorrectEncodingSequence(TextPosition position, char[] sequence, ParseErrorType errorType)
+		public IncorrectEncodingSequence(TextPosition position, char sequence, ParseErrorType errorType)
 			: base(position)
 		{
 			this.sequence = sequence;
@@ -74,12 +74,21 @@ namespace Hime.Redist
 		/// <returns>The message for this error</returns>
 		private string BuildMessage()
 		{
-			StringBuilder builder = new StringBuilder("Incorrect encoding sequence:");
-			for (int i = 0; i != sequence.Length; i++)
+			StringBuilder builder = new StringBuilder("Incorrect encoding sequence: [");
+			switch (type)
 			{
-				builder.Append(" 0x");
-				builder.Append(((int)sequence[i]).ToString("X4"));
+			case ParseErrorType.IncorrectUTF16NoHighSurrogate:
+				builder.Append("<missing> ");
+				builder.Append("0x");
+				builder.Append(((int)sequence).ToString("X4"));
+				break;
+			case ParseErrorType.IncorrectUTF16NoLowSurrogate:
+				builder.Append("0x");
+				builder.Append(((int)sequence).ToString("X4"));
+				builder.Append(" <missing>");
+				break;
 			}
+			builder.Append("]");
 			return builder.ToString();
 		}
 	}

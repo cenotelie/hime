@@ -1,5 +1,5 @@
-/**********************************************************************
-* Copyright (c) 2013 Laurent Wouters and others
+﻿/**********************************************************************
+* Copyright (c) 2015 Laurent Wouters and others
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as
 * published by the Free Software Foundation, either version 3
@@ -21,29 +21,31 @@
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Specifies the type of error
+	/// Represents the unexpected of the input text while more characters were expected
 	/// </summary>
-	public enum ParseErrorType
+	public class UnexpectedEndOfInput : ParseError
 	{
 		/// <summary>
-		/// Lexical error occuring when the end of input has been encountered while more characters were expected
+		/// Gets the error's type
 		/// </summary>
-		UnexpectedEndOfInput,
+		public override ParseErrorType Type { get { return ParseErrorType.UnexpectedEndOfInput; } }
+
 		/// <summary>
-		/// Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
+		/// Gets the error's length in the input (in number of characters)
 		/// </summary>
-		UnexpectedChar,
+		public override int Length { get { return 0; } }
+
 		/// <summary>
-		/// Syntactic error occurring when an unexpected token is encountered by the parser
+		/// Gets the error's message
 		/// </summary>
-		UnexpectedToken,
+		public override string Message { get { return "Unexpected end of input"; } }
+
 		/// <summary>
-		/// Lexical error occuring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+		/// Initializes this error
 		/// </summary>
-		IncorrectUTF16NoLowSurrogate,
-		/// <summary>
-		/// Lexical error occuring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
-		/// </summary>
-        IncorrectUTF16NoHighSurrogate
+		/// <param name="position">Error's position in the input</param>
+		public UnexpectedEndOfInput(TextPosition position) : base(position)
+		{
+		}
 	}
 }

@@ -165,9 +165,24 @@ namespace Hime.Redist.Lexer
 				if (current.error != -1)
 				{
 					int errorIndex = current.error;
+					ParseErrorType errorType = ParseErrorType.UnexpectedChar;
 					bool atEnd = text.IsEnd(errorIndex);
 					string value = "";
-					if (!atEnd)
+					if (atEnd)
+					{
+						// the end of input was not expected
+						// there is necessarily some input before because an empty input would have matched the $
+						char c = text.GetValue(errorIndex - 1);
+						if (c >= 0xD800 && c <= 0xDBFF)
+						{
+							// a trailing UTF-16 high surrogate
+							errorIndex--;
+							errorType = ParseErrorType.IncorrectUTF16NoLowSurrogate;
+						}
+						else
+							errorType = ParseErrorType.UnexpectedEndOfInput;
+					}
+					else
 					{
 						char c = text.GetValue(errorIndex);
 						if (c >= 0xD800 && c <= 0xDBFF && !text.IsEnd(errorIndex + 1))
@@ -175,7 +190,10 @@ namespace Hime.Redist.Lexer
 							// a UTF-16 high surrogate
 							// if next next character is a low surrogate, also get it
 							char c2 = text.GetValue(errorIndex + 1);
-							value = (c2 >= 0xDC00 && c2 <= 0xDFFF) ? new string(new [] { c, c2 }) : c.ToString();
+							if (c2 >= 0xDC00 && c2 <= 0xDFFF)
+								value = new string(new [] { c, c2 });
+							else
+								errorType = ParseErrorType.IncorrectUTF16NoLowSurrogate;
 						}
 						else if (c >= 0xDC00 && c <= 0xDFFF && errorIndex > 0)
 						{
@@ -187,13 +205,27 @@ namespace Hime.Redist.Lexer
 								errorIndex--;
 								value = new string(new [] { c2, c });
 							}
+							else
+								errorType = ParseErrorType.IncorrectUTF16NoHighSurrogate;
 						}
 						if (value.Length == 0)
 							value = c.ToString();
 					}
 					if (errorIndex != lastErrorIndex)
 					{
-						myErrors.Add(new UnexpectedCharError(value, text.GetPositionAt(current.error)));
+						switch (errorType)
+						{
+						case ParseErrorType.UnexpectedEndOfInput:
+							myErrors.Add(new UnexpectedEndOfInput(text.GetPositionAt(errorIndex)));
+							break;
+						case ParseErrorType.UnexpectedChar:
+							myErrors.Add(new UnexpectedCharError(value, text.GetPositionAt(current.error)));
+							break;
+						case ParseErrorType.IncorrectUTF16NoHighSurrogate:
+						case ParseErrorType.IncorrectUTF16NoLowSurrogate:
+							myErrors.Add(new IncorrectEncodingSequence(text.GetPositionAt(errorIndex), text.GetValue(errorIndex), errorType));
+							break;
+						}
 						lastErrorIndex = errorIndex;
 					}
 				}

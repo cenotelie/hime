@@ -213,7 +213,8 @@ namespace Hime.Redist.Lexer
 			System.Text.StringBuilder builder = new System.Text.StringBuilder();
 			for (int i = start; i != position.Column - 1; i++)
 				builder.Append(content[i] == '\t' ? '\t' : ' ');
-			for (int i = 0; i != length; i++)
+			builder.Append("^");
+			for (int i = 1; i < length; i++)
 				builder.Append("^");
 			return new TextContext(content.Substring(start, end - start + 1), builder.ToString());
 		}

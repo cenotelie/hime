@@ -133,6 +133,7 @@
     <Compile Include="Sources\IncorrectEncodingSequence.cs" />
     <Compile Include="Sources\Lexer\TokenMatch.cs" />
     <Compile Include="Sources\Lexer\FuzzyMatcher.cs" />
+    <Compile Include="Sources\UnexpectedEndOfInput.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
