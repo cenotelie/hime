@@ -159,13 +159,43 @@ namespace Hime.Redist.Lexer
 		{
 			List<ParseError> myErrors = new List<ParseError>();
 			Node current = node;
+			int lastErrorIndex = -1;
 			while (current != null)
 			{
 				if (current.error != -1)
 				{
-					bool atEnd = text.IsEnd(current.error);
-					string value = atEnd ? "" : text.GetValue(current.error).ToString();
-					myErrors.Add(new UnexpectedCharError(value, text.GetPositionAt(current.error)));
+					int errorIndex = current.error;
+					bool atEnd = text.IsEnd(errorIndex);
+					string value = "";
+					if (!atEnd)
+					{
+						char c = text.GetValue(errorIndex);
+						if (c >= 0xD800 && c <= 0xDBFF && !text.IsEnd(errorIndex + 1))
+						{
+							// a UTF-16 high surrogate
+							// if next next character is a low surrogate, also get it
+							char c2 = text.GetValue(errorIndex + 1);
+							value = (c2 >= 0xDC00 && c2 <= 0xDFFF) ? new string(new [] { c, c2 }) : c.ToString();
+						}
+						else if (c >= 0xDC00 && c <= 0xDFFF && errorIndex > 0)
+						{
+							// a UTF-16 low surrogate
+							// if the previous character is a high surrogate, also get it
+							char c2 = text.GetValue(errorIndex - 1);
+							if (c2 >= 0xD800 && c2 <= 0xDBFF)
+							{
+								errorIndex--;
+								value = new string(new [] { c2, c });
+							}
+						}
+						if (value.Length == 0)
+							value = c.ToString();
+					}
+					if (errorIndex != lastErrorIndex)
+					{
+						myErrors.Add(new UnexpectedCharError(value, text.GetPositionAt(current.error)));
+						lastErrorIndex = errorIndex;
+					}
 				}
 				current = current.previous;
 			}
