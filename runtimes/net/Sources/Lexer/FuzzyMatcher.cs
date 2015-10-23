@@ -75,12 +75,12 @@ namespace Hime.Redist.Lexer
 			/// </summary>
 			/// <param name="previous">The previous head</param>
 			/// <param name="state">The associated DFA state</param>
-			/// <param name="errorIndex">The index of the new error</param>
-			public Head(Head previous, int state, int errorIndex)
+			/// <param name="offset">The offset of the error from the original index</param>
+			public Head(Head previous, int state, int offset)
 			{
 				data = new int[previous.data.Length + 1];
 				data[0] = state;
-				data[data.Length - 1] = errorIndex;
+				data[data.Length - 1] = offset;
 				System.Array.Copy(previous.data, 1, data, 1, previous.data.Length - 1);
 			}
 
@@ -89,22 +89,22 @@ namespace Hime.Redist.Lexer
 			/// </summary>
 			/// <param name="previous">The previous head</param>
 			/// <param name="state">The associated DFA state</param>
-			/// <param name="errorIndex">The index of the new error</param>
+			/// <param name="offset">The offset of the error from the original index</param>
 			/// <param name="distance">The distance to reach</param>
-			public Head(Head previous, int state, int errorIndex, int distance)
+			public Head(Head previous, int state, int offset, int distance)
 			{
 				if (distance < previous.Distance + 1)
 					throw new System.ArgumentException("The distance for the new head must be at least one more than the distance of the previous head", "distance");
 				data = new int[distance + 1];
 				data[0] = state;
-				data[data.Length - 1] = errorIndex;
+				data[data.Length - 1] = offset;
 				System.Array.Copy(previous.data, 1, data, 1, previous.data.Length - 1);
 				for (int i = previous.data.Length; i != data.Length; i++)
-					data[i] = errorIndex;
+					data[i] = offset;
 			}
 
 			/// <summary>
-			/// Gets the index in the input of the i-th lexical error on this head
+			/// Gets the offset in the input of the i-th lexical error on this head
 			/// </summary>
 			/// <param name="i">Index of the error</param>
 			/// <returns>The index of the i-th error in the input</returns>
@@ -183,28 +183,26 @@ namespace Hime.Redist.Lexer
 			insertionsCount = 0;
 			matchHead = new Head(0);
 			matchLength = 0;
-			int length = 0;
-			int index = originIndex;
-			bool atEnd = text.IsEnd(index);
-			char current = atEnd ? '\0' : text.GetValue(index);
+			int offset = 0;
+			bool atEnd = text.IsEnd(originIndex + offset);
+			char current = atEnd ? '\0' : text.GetValue(originIndex + offset);
 			if (atEnd)
-				InspectAtEnd(matchHead, index, length);
+				InspectAtEnd(matchHead, offset);
 			else
-				Inspect(matchHead, index, length, current);
+				Inspect(matchHead, offset, current);
 			while (heads.Count != 0)
 			{
-				length++;
-				index++;
-				atEnd = text.IsEnd(index);
-				current = atEnd ? '\0' : text.GetValue(index);
+				offset++;
+				atEnd = text.IsEnd(originIndex + offset);
+				current = atEnd ? '\0' : text.GetValue(originIndex + offset);
 				List<Head> temp = new List<Head>(heads);
 				heads.Clear();
 				foreach (Head head in temp)
 				{
 					if (atEnd)
-						InspectAtEnd(head, index, length);
+						InspectAtEnd(head, offset);
 					else
-						Inspect(head, index, length, current);
+						Inspect(head, offset, current);
 				}
 			}
 			return matchLength == 0 ? OnFailure() : OnSuccess();
@@ -219,7 +217,7 @@ namespace Hime.Redist.Lexer
 			int lastErrorIndex = -1;
 			for (int i = 0; i != matchHead.Distance; i++)
 			{
-				int errorIndex = matchHead.GetError(i);
+				int errorIndex = originIndex + matchHead.GetError(i);
 				if (errorIndex != lastErrorIndex)
 					OnError(errorIndex);
 				lastErrorIndex = errorIndex;
@@ -318,10 +316,10 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="previous">The previous head</param>
 		/// <param name="state">The associated DFA state</param>
-		/// <param name="errorIndex">The index of the new error</param>
-		private void PushHead(Head previous, int state, int errorIndex)
+		/// <param name="offset">The offset of the error from the original index</param>
+		private void PushHead(Head previous, int state, int offset)
 		{
-			PushHead(previous, state, errorIndex, previous.Distance + 1);
+			PushHead(previous, state, offset, previous.Distance + 1);
 		}
 
 		/// <summary>
@@ -329,68 +327,63 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="previous">The previous head</param>
 		/// <param name="state">The associated DFA state</param>
-		/// <param name="errorIndex">The index of the new error</param>
+		/// <param name="offset">The offset of the error from the original index</param>
 		/// <param name="distance">The distance to reach</param>
-		private void PushHead(Head previous, int state, int errorIndex, int distance)
+		private void PushHead(Head previous, int state, int offset, int distance)
 		{
 			for (int i = heads.Count - 1; i != -1; i--)
 				if (heads[i].State == state && heads[i].Distance <= distance)
 					return;
-			if (errorIndex == -1)
+			if (offset == -1)
 				heads.Add(new Head(previous, state));
 			else
-				heads.Add(new Head(previous, state, errorIndex, distance));
+				heads.Add(new Head(previous, state, offset, distance));
 		}
 
 		/// <summary>
 		/// Inspects a head while at the end of the input
 		/// </summary>
 		/// <param name="head">The head to inspect</param>
-		/// <param name="index">The current index in the input</param>
-		/// <param name="length">The current length</param>
-		private void InspectAtEnd(Head head, int index, int length)
+		/// <param name="offset">The current offset from the original index</param>
+		private void InspectAtEnd(Head head, int offset)
 		{
 			AutomatonState stateData = automaton.GetState(head.State);
 			// is it a matching state
 			if (stateData.TerminalsCount != 0)
-				OnMatchingHead(head, length);
+				OnMatchingHead(head, offset);
 			if (head.Distance >= maxDistance || stateData.IsDeadEnd)
 				// cannot stray further
 				return;
 			// lookup the transitions
-			ExploreTransitions(head, stateData, index, true);
-			ExploreInsertions(head, index, length, true, '\0');
+			ExploreTransitions(head, stateData, offset, true);
+			ExploreInsertions(head, offset, true, '\0');
 		}
 
 		/// <summary>
 		/// Inspects a head with a specified character ahead
 		/// </summary>
 		/// <param name="head">The head to inspect</param>
-		/// <param name="index">The current index in the input</param>
-		/// <param name="length">The current length from the original index</param>
+		/// <param name="offset">The current offset from the original index</param>
 		/// <param name="current">The leading character in the input</param>
-		private void Inspect(Head head, int index, int length, char current)
+		private void Inspect(Head head, int offset, char current)
 		{
 			AutomatonState stateData = automaton.GetState(head.State);
 			// is it a matching state
 			if (stateData.TerminalsCount != 0)
-				OnMatchingHead(head, length);
+				OnMatchingHead(head, offset);
 			if (head.Distance >= maxDistance || stateData.IsDeadEnd)
 				// cannot stray further
 				return;
 			// could be a straight match
 			int target = stateData.GetTargetBy(current);
 			if (target != Automaton.DEAD_STATE)
-			{
 				// it is!
 				PushHead(head, target);
-				return;
-			}
 			// could try a drop
-			PushHead(head, head.State, index);
+			PushHead(head, head.State, offset);
 			// lookup the transitions
-			ExploreTransitions(head, stateData, index, false);
-			ExploreInsertions(head, index, length, false, current);
+			ExploreTransitions(head, stateData, offset, false);
+			ExploreInsertions(head, offset, false, current);
 		}
 
 		/// <summary>
@@ -398,20 +391,20 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="head">The current head</param>
 		/// <param name="stateData">The data of the DFA state</param>
-		/// <param name="index">The current index in the input</param>
+		/// <param name="offset">The current offset from the original index</param>
 		/// <param name="atEnd">Whether the current index is at the end of the input</param>
-		private void ExploreTransitions(Head head, AutomatonState stateData, int index, bool atEnd)
+		private void ExploreTransitions(Head head, AutomatonState stateData, int offset, bool atEnd)
 		{
 			for (int i = 0; i != 256; i++)
 			{
 				int target = stateData.GetCachedTransition(i);
 				if (target == Automaton.DEAD_STATE)
 					continue;
-				ExploreTransitionToTarget(head, target, index, atEnd);
+				ExploreTransitionToTarget(head, target, offset, atEnd);
 			}
 			for (int i = 0; i != stateData.BulkTransitionsCount; i++)
 			{
-				ExploreTransitionToTarget(head, stateData.GetBulkTransition(i).Target, index, atEnd);
+				ExploreTransitionToTarget(head, stateData.GetBulkTransition(i).Target, offset, atEnd);
 			}
 		}
 
@@ -420,14 +413,14 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		/// <param name="head">The current head</param>
 		/// <param name="target">The target DFA state</param>
-		/// <param name="index">The current index in the input</param>
+		/// <param name="offset">The current offset from the original index</param>
 		/// <param name="atEnd">Whether the current index is at the end of the input</param>
-		private void ExploreTransitionToTarget(Head head, int target, int index, bool atEnd)
+		private void ExploreTransitionToTarget(Head head, int target, int offset, bool atEnd)
 		{
 			if (!atEnd)
 			{
 				// try replace
-				PushHead(head, target, index);
+				PushHead(head, target, offset);
 			}
 			// try to insert
 			bool found = false;
@@ -451,11 +444,10 @@ namespace Hime.Redist.Lexer
 		/// Explores the current insertions
 		/// </summary>
 		/// <param name="head">The head to inspect</param>
-		/// <param name="index">The current index in the input</param>
-		/// <param name="length">The current length from the original index</param>
+		/// <param name="offset">The current offset from the original index</param>
 		/// <param name="atEnd">Whether the current index is at the end of the input</param>
 		/// <param name="current">The leading character in the input</param>
-		private void ExploreInsertions(Head head, int index, int length, bool atEnd, char current)
+		private void ExploreInsertions(Head head, int offset, bool atEnd, char current)
 		{
 			// setup the first round
 			int distance = head.Distance + 1;
@@ -467,7 +459,7 @@ namespace Hime.Redist.Lexer
 				for (int i = start; i != end; i++)
 				{
 					// examine insertion i
-					ExploreInsertion(head, index, length, atEnd, current, insertions[i], distance);
+					ExploreInsertion(head, offset, atEnd, current, insertions[i], distance);
 				}
 				// prepare next round
 				distance++;
@@ -482,43 +474,40 @@ namespace Hime.Redist.Lexer
 		/// Explores an insertion
 		/// </summary>
 		/// <param name="head">The head to inspect</param>
-		/// <param name="index">The current index in the input</param>
-		/// <param name="length">The current length from the original index</param>
+		/// <param name="offset">The current offset from the original index</param>
 		/// <param name="atEnd">Whether the current index is at the end of the input</param>
 		/// <param name="current">The leading character in the input</param>
 		/// <param name="state">The DFA state for the insertion</param>
 		/// <param name="distance">The distance associated to this insertion</param>
-		private void ExploreInsertion(Head head, int index, int length, bool atEnd, char current, int state, int distance)
+		private void ExploreInsertion(Head head, int offset, bool atEnd, char current, int state, int distance)
 		{
 			AutomatonState stateData = automaton.GetState(state);
 			if (stateData.TerminalsCount != 0)
-				OnMatchingInsertion(head, index, state, distance, length);
+				OnMatchingInsertion(head, offset, state, distance);
 			if (!atEnd)
 			{
 				int target = stateData.GetTargetBy(current);
 				if (target != Automaton.DEAD_STATE)
-				{
-					PushHead(head, target, index, distance);
-					return;
-				}
+					PushHead(head, target, offset, distance);
 			}
 			if (distance >= maxDistance)
 				return;
 			// continue insertion
-			ExploreTransitions(head, stateData, index, true);
+			ExploreTransitions(head, stateData, offset, true);
 		}
 
 		/// <summary>
 		/// When a matching head is encountered
 		/// </summary>
 		/// <param name="head">The matching head</param>
-		/// <param name="length">The lenght of the match in the input</param>
-		private void OnMatchingHead(Head head, int length)
+		/// <param name="offset">The current offset from the original index</param>
+		private void OnMatchingHead(Head head, int offset)
 		{
-			if (length > matchLength)
+			if ((head.Distance <= matchHead.Distance && offset > matchLength)
+				|| (head.Distance < matchHead.Distance && offset >= matchLength))
 			{
 				matchHead = head;
-				matchLength = length;
+				matchLength = offset;
 			}
 		}
 
@@ -526,16 +515,15 @@ namespace Hime.Redist.Lexer
 		/// When a matching insertion is encountered
 		/// </summary>
 		/// <param name="previous">The previous head</param>
-		/// <param name="index">The current index in the input</param>
+		/// <param name="offset">The current offset from the original index</param>
 		/// <param name="target">The DFA state for the insertion</param>
 		/// <param name="distance">The distance associated to this insertion</param>
-		/// <param name="length">The current length from the original index</param>
-		private void OnMatchingInsertion(Head previous, int index, int target, int distance, int length)
+		private void OnMatchingInsertion(Head previous, int offset, int target, int distance)
 		{
-			if (length > matchLength)
+			if (offset > matchLength)
 			{
-				matchHead = new Head(previous, target, index, distance);
-				matchLength = length;
+				matchHead = new Head(previous, target, offset, distance);
+				matchLength = offset;
 			}
 		}
 	}
