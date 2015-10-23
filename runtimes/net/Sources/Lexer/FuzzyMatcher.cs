@@ -30,27 +30,6 @@ namespace Hime.Redist.Lexer
 	class FuzzyMatcher
 	{
 		/// <summary>
-		/// Flag for a DROP operation
-		/// </summary>
-		private const uint OP_DROP = 0x80000000;
-		/// <summary>
-		/// Flag for the INSERT operation
-		/// </summary>
-		private const uint OP_INSERT = 0x40000000;
-		/// <summary>
-		/// Flag for the REPLACE operation
-		/// </summary>
-		private const uint OP_REPLACE = 0xC0000000;
-		/// <summary>
-		/// Mask for the operation flags
-		/// </summary>
-		private const uint MASK_OP = 0xC0000000;
-		/// <summary>
-		/// Mask for the offset data
-		/// </summary>
-		private const uint MASK_OFFSET = 0x3FFFFFFF;
-
-		/// <summary>
 		/// Represents a DFA stack head
 		/// </summary>
 		private struct Head
@@ -558,7 +537,7 @@ namespace Hime.Redist.Lexer
 		/// <param name="head">The matching head</param>
 		/// <param name="length">The matching length in the input</param>
 		/// <returns>The comparable length</returns>
-		private int GetComparableLength(Head head, int length)
+		private static int GetComparableLength(Head head, int length)
 		{
 			int result = length;
 			for (int i = head.Distance - 1; i != -1; i--)
