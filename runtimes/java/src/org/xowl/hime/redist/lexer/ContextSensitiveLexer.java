@@ -21,8 +21,6 @@
 package org.xowl.hime.redist.lexer;
 
 import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TextPosition;
-import org.xowl.hime.redist.UnexpectedCharError;
 
 import java.io.InputStreamReader;
 
@@ -37,17 +35,9 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
      */
     private int inputIndex;
     /**
-     * The cached automaton state
-     */
-    private final AutomatonState stateCache;
-    /**
      * The cached matched terminal
      */
     private final MatchedTerminal terminalCache;
-    /**
-     * Length of the matched input
-     */
-    private int matchedLength;
     /**
      * Whether the end-of-input dollar marker has already been emitted
      */
@@ -64,8 +54,8 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
         super(automaton, terminals, separator, input);
         this.inputIndex = 0;
-        this.stateCache = new AutomatonState();
         this.terminalCache = new MatchedTerminal();
+        this.isDollarEmitted = false;
     }
 
     /**
@@ -79,8 +69,8 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
     protected ContextSensitiveLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
         super(automaton, terminals, separator, input);
         this.inputIndex = 0;
-        this.stateCache = new AutomatonState();
         this.terminalCache = new MatchedTerminal();
+        this.isDollarEmitted = false;
     }
 
     @Override
@@ -89,81 +79,46 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
             return new TokenKernel(Symbol.SID_EPSILON, -1);
 
         while (true) {
-            int matchedIndex = runDFA(contexts);
-            if (matchedLength != 0) {
-                // matched something!
-                int terminalID = symTerminals.get(matchedIndex).getID();
-                if (terminalID == separatorID) {
-                    inputIndex += matchedLength;
-                    continue;
+            TokenMatch match = runDFA(inputIndex);
+            if (!match.isSuccess()) {
+                // failed to match, retry with error handling
+                match = runDFAOnError(inputIndex);
+            }
+            if (match.isSuccess()) {
+                if (match.state == 0) {
+                    // this is the dollar terminal, at the end of the input
+                    // the index of the $ symbol is always 1
+                    isDollarEmitted = true;
+                    return new TokenKernel(Symbol.SID_DOLLAR, tokens.add(1, inputIndex, 0));
+                } else {
+                    // matched something
+                    int tIndex = getTerminalFor(match.state, contexts);
+                    int tID = symTerminals.get(tIndex).getID();
+                    if (tID == separatorID) {
+                        inputIndex += match.length;
+                        continue;
+                    } else {
+                        TokenKernel token = new TokenKernel(tID, tokens.add(tIndex, inputIndex, match.length));
+                        inputIndex += match.length;
+                        return token;
+                    }
                 }
-                TokenKernel token = new TokenKernel(terminalID, tokens.add(matchedIndex, inputIndex, matchedLength));
-                inputIndex += matchedLength;
-                return token;
-            }
-            if (matchedIndex == 1) {
-                // This is the dollar terminal, at the end of the input
-                isDollarEmitted = true;
-                return new TokenKernel(Symbol.SID_DOLLAR, tokens.add(1, inputIndex, 0));
-            }
-            // Failed to match anything
-            TextPosition position = text.getPositionAt(inputIndex);
-            String unexpected;
-            int c = text.getValue(inputIndex);
-            if (c >= 0xD800 && c <= 0xDFFF) {
-                // this is a surrogate encoding point
-                unexpected = text.getValue(inputIndex, inputIndex + 2);
-                inputIndex += 2;
             } else {
-                unexpected = Character.toString(text.getValue(inputIndex));
-                inputIndex++;
+                inputIndex += match.length;
             }
-            handler.handle(new UnexpectedCharError(unexpected, position));
         }
     }
 
     /**
-     * Runs the lexer's DFA to match a terminal in the input ahead
+     * Gets the index of the terminal with the highest priority that is possible in the contexts
      *
-     * @param provider The provider of contextual information
-     * @return The index of the matched terminal
+     * @param state    The DFA state
+     * @param provider The current applicable contexts
+     * @return The index of the terminal
      */
-    private int runDFA(IContextProvider provider) {
-        matchedLength = 0;
-        if (text.isEnd(inputIndex)) {
-            // At the end of input
-            return 1; // 1 is always the index of the $ terminal
-        }
-
-        int matchedState = -1;
-        int state = 0;
-        int i = inputIndex;
-
-        while (state != Automaton.DEAD_STATE) {
-            automaton.retrieveState(state, stateCache);
-            // Is this state a matching state ?
-            if (stateCache.getTerminalCount() != 0) {
-                matchedState = state;
-                matchedLength = (i - inputIndex);
-            }
-            // No further transition => exit
-            if (stateCache.isDeadEnd())
-                break;
-            // At the end of the buffer
-            if (text.isEnd(i))
-                break;
-            char current = text.getValue(i);
-            i++;
-            // Try to find a transition from this state with the read character
-            state = stateCache.getTargetBy(current);
-        }
-
-        if (matchedLength == 0)
-            // no match
-            return 0;
-
+    private int getTerminalFor(int state, IContextProvider provider) {
         // return the match with the highest priority that is possible in the contexts
-        automaton.retrieveState(matchedState, stateCache);
+        automaton.retrieveState(state, stateCache);
         stateCache.getTerminal(0, terminalCache);
         int id = symTerminals.get(terminalCache.getIndex()).getID();
         int currentResult = terminalCache.getIndex();

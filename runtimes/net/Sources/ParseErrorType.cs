@@ -26,7 +26,7 @@ namespace Hime.Redist
 	public enum ParseErrorType
 	{
 		/// <summary>
-		/// Lexical error occuring when the end of input has been encountered while more characters were expected
+		/// Lexical error occurring when the end of input has been encountered while more characters were expected
 		/// </summary>
 		UnexpectedEndOfInput,
 		/// <summary>
@@ -38,11 +38,11 @@ namespace Hime.Redist
 		/// </summary>
 		UnexpectedToken,
 		/// <summary>
-		/// Lexical error occuring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+		/// Lexical error occurring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
 		/// </summary>
 		IncorrectUTF16NoLowSurrogate,
 		/// <summary>
-		/// Lexical error occuring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+		/// Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
 		/// </summary>
         IncorrectUTF16NoHighSurrogate
 	}

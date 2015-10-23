@@ -177,7 +177,8 @@ public abstract class BaseText implements Text {
         StringBuilder builder = new StringBuilder();
         for (int i = start; i != position.getColumn() - 1; i++)
             builder.append(content.charAt(i) == '\t' ? '\t' : ' ');
-        for (int i = 0; i != length; i++)
+        builder.append("^");
+        for (int i = 1; i != length; i++)
             builder.append("^");
         return new TextContext(content.substring(start, end + 1), builder.toString());
     }

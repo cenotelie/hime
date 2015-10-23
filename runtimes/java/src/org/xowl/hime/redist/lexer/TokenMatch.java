@@ -18,32 +18,50 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.hime.redist;
+package org.xowl.hime.redist.lexer;
 
 /**
- * Specifies the type of error
+ * Represents a match in the input
  *
  * @author Laurent Wouters
  */
-public enum ParseErrorType {
+public class TokenMatch {
     /**
-     * Lexical error occurring when the end of input has been encountered while more characters were expected
+     * The matching DFA state
      */
-    UnexpectedEndOfInput,
+    public final int state;
     /**
-     * Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
+     * Length of the matched input
      */
-    UnexpectedChar,
+    public final int length;
+
     /**
-     * Syntactic error occurring when an unexpected token is encountered by the parser
+     * Gets whether this is match indicates a success
+     *
+     * @return Whether this is match indicates a success
      */
-    UnexpectedToken,
+    public boolean isSuccess() {
+        return state != Automaton.DEAD_STATE;
+    }
+
     /**
-     * Lexical error occurring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+     * Initializes a failing match
+     *
+     * @param length The number of characters to advance in the input
      */
-    IncorrectUTF16NoLowSurrogate,
+    public TokenMatch(int length) {
+        this.state = Automaton.DEAD_STATE;
+        this.length = length;
+    }
+
     /**
-     * Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+     * Initializes a match
+     *
+     * @param state  The matching DFA state
+     * @param length Length of the matched input
      */
-    IncorrectUTF16NoHighSurrogate
+    public TokenMatch(int state, int length) {
+        this.state = state;
+        this.length = length;
+    }
 }

@@ -99,6 +99,15 @@ class AutomatonState {
     }
 
     /**
+     * Gets the number of non-cached transitions in this state
+     *
+     * @return The number of non-cached transitions in this state
+     */
+    public int getBulkTransitionCount() {
+        return table[offset + 2];
+    }
+
+    /**
      * Gets the target of a transition from this state on the specified value
      *
      * @param value An input value
@@ -114,5 +123,25 @@ class AutomatonState {
             current += 3;
         }
         return Automaton.DEAD_STATE;
+    }
+
+    /**
+     * Gets the target of the cached transition for the specified value
+     *
+     * @param value An input value
+     * @return The target of the cached transition
+     */
+    public int getCachedTransition(int value) {
+        return table[offset + getTerminalCount() * 2 + 3 + value];
+    }
+
+    /**
+     * Gets the target of the i-th non-cached transition in this state
+     *
+     * @param index The non-cached transition index
+     * @return The target of the transition
+     */
+    public int getBulkTransition(int index) {
+        return table[offset + 3 + getTerminalCount() * 2 + 256 + index * 3 + 2];
     }
 }

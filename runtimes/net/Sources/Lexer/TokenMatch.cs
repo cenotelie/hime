@@ -42,7 +42,7 @@ namespace Hime.Redist.Lexer
 		/// <summary>
 		/// Initializes a failing match
 		/// </summary>
-		/// <param name='length'>the number of characters to advance in the input</param>
+		/// <param name='length'>The number of characters to advance in the input</param>
 		public TokenMatch(int  length)
 		{
 			state = Automaton.DEAD_STATE;

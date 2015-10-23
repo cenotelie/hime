@@ -21,8 +21,6 @@
 package org.xowl.hime.redist.lexer;
 
 import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.TextPosition;
-import org.xowl.hime.redist.UnexpectedCharError;
 
 import java.io.InputStreamReader;
 
@@ -36,14 +34,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
      * The index of the next token
      */
     private int tokenIndex;
-    /**
-     * The cached automaton state
-     */
-    private final AutomatonState stateCache;
-    /**
-     * Length of the matched input
-     */
-    private int matchedLength;
 
     /**
      * Initializes a new instance of the Lexer class with the given input
@@ -56,7 +46,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
     protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, String input) {
         super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
-        this.stateCache = new AutomatonState();
     }
 
     /**
@@ -70,7 +59,6 @@ public abstract class ContextFreeLexer extends BaseLexer {
     protected ContextFreeLexer(Automaton automaton, Symbol[] terminals, int separator, InputStreamReader input) {
         super(automaton, terminals, separator, input);
         this.tokenIndex = -1;
-        this.stateCache = new AutomatonState();
     }
 
     @Override
@@ -94,70 +82,28 @@ public abstract class ContextFreeLexer extends BaseLexer {
     private void findTokens() {
         int inputIndex = 0;
         while (true) {
-            int matchedIndex = runDFA(inputIndex);
-            if (matchedLength != 0) {
-                if (symTerminals.get(matchedIndex).getID() != separatorID)
-                    tokens.add(matchedIndex, inputIndex, matchedLength);
-                inputIndex += matchedLength;
-                continue;
+            TokenMatch match = runDFA(inputIndex);
+            if (!match.isSuccess()) {
+                // failed to match, retry with error handling
+                match = runDFAOnError(inputIndex);
             }
-            if (matchedIndex == 0) {
-                // This is the EPSILON terminal, failed to match anything
-                TextPosition position = text.getPositionAt(inputIndex);
-                String unexpected;
-                int c = text.getValue(inputIndex);
-                if (c >= 0xD800 && c <= 0xDFFF) {
-                    // this is a surrogate encoding point
-                    unexpected = text.getValue(inputIndex, inputIndex + 2);
-                    inputIndex += 2;
+            if (match.isSuccess()) {
+                if (match.state == 0) {
+                    // this is the dollar terminal, at the end of the input
+                    // the index of the $ symbol is always 1
+                    tokens.add(1, inputIndex, 0);
+                    return;
                 } else {
-                    unexpected = Character.toString(text.getValue(inputIndex));
-                    inputIndex++;
+                    // matched something
+                    automaton.retrieveState(match.state, stateCache);
+                    int tIndex = stateCache.getTerminal();
+                    if (symTerminals.get(tIndex).getID() != separatorID)
+                        tokens.add(tIndex, inputIndex, match.length);
+                    inputIndex += match.length;
                 }
-                handler.handle(new UnexpectedCharError(unexpected, position));
-                continue;
+            } else {
+                inputIndex += match.length;
             }
-            // This is the dollar terminal, at the end of the input
-            tokens.add(matchedIndex, inputIndex, matchedLength);
-            return;
         }
-    }
-
-    /**
-     * Runs the lexer's DFA to match a terminal in the input ahead
-     *
-     * @param inputIndex The current start index in the input text
-     * @return The index of the matched terminal
-     */
-    private int runDFA(int inputIndex) {
-        matchedLength = 0;
-        if (text.isEnd(inputIndex)) {
-            // At the end of input
-            return 1; // 1 is always the index of the $ terminal
-        }
-
-        int result = 0;
-        int state = 0;
-        int i = inputIndex;
-
-        while (state != Automaton.DEAD_STATE) {
-            automaton.retrieveState(state, stateCache);
-            // Is this state a matching state ?
-            if (stateCache.getTerminalCount() != 0) {
-                result = stateCache.getTerminal();
-                matchedLength = (i - inputIndex);
-            }
-            // No further transition => exit
-            if (stateCache.isDeadEnd())
-                break;
-            // At the end of the buffer
-            if (text.isEnd(i))
-                break;
-            char current = text.getValue(i);
-            i++;
-            // Try to find a transition from this state with the read character
-            state = stateCache.getTargetBy(current);
-        }
-        return result;
     }
 }

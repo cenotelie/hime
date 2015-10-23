@@ -76,20 +76,6 @@ namespace Hime.Redist.Lexer
 			/// <param name="previous">The previous head</param>
 			/// <param name="state">The associated DFA state</param>
 			/// <param name="offset">The offset of the error from the original index</param>
-			public Head(Head previous, int state, int offset)
-			{
-				data = new int[previous.data.Length + 1];
-				data[0] = state;
-				data[data.Length - 1] = offset;
-				System.Array.Copy(previous.data, 1, data, 1, previous.data.Length - 1);
-			}
-
-			/// <summary>
-			/// Initializes this head from a previous one
-			/// </summary>
-			/// <param name="previous">The previous head</param>
-			/// <param name="state">The associated DFA state</param>
-			/// <param name="offset">The offset of the error from the original index</param>
 			/// <param name="distance">The distance to reach</param>
 			public Head(Head previous, int state, int offset, int distance)
 			{
@@ -107,7 +93,7 @@ namespace Hime.Redist.Lexer
 			/// Gets the offset in the input of the i-th lexical error on this head
 			/// </summary>
 			/// <param name="i">Index of the error</param>
-			/// <returns>The index of the i-th error in the input</returns>
+			/// <returns>The offset of the i-th error in the input</returns>
 			public int GetError(int i)
 			{
 				return data[i + 1];

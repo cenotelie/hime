@@ -20,10 +20,7 @@
 
 package org.xowl.hime.redist.lexer;
 
-import org.xowl.hime.redist.Symbol;
-import org.xowl.hime.redist.Text;
-import org.xowl.hime.redist.Token;
-import org.xowl.hime.redist.TokenRepository;
+import org.xowl.hime.redist.*;
 
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -36,6 +33,11 @@ import java.util.List;
  * @author Laurent Wouters
  */
 public abstract class BaseLexer {
+    /**
+     * The default maximum Levenshtein distance to go to for the recovery of a matching failure
+     */
+    protected static final int DEFAULT_RECOVERY_MATCHING_DISTANCE = 3;
+
     /**
      * The default context provider
      */
@@ -75,6 +77,14 @@ public abstract class BaseLexer {
      * The token repository
      */
     final TokenRepository tokens;
+    /**
+     * The maximum Levenshtein distance to go to for the recovery of a matching failure.
+     */
+    int recoveryDistance;
+    /**
+     * The cached automaton state
+     */
+    final AutomatonState stateCache;
 
     /**
      * Gets the terminals matched by this lexer
@@ -122,6 +132,26 @@ public abstract class BaseLexer {
     }
 
     /**
+     * Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+     * A distance of 0 indicates no recovery.
+     *
+     * @return The maximum Levenshtein distance to go to for the recovery of a matching failure
+     */
+    public int getRecoveryDistance() {
+        return recoveryDistance;
+    }
+
+    /**
+     * Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+     * A distance of 0 indicates no recovery.
+     *
+     * @param distance The maximum Levenshtein distance to go to for the recovery of a matching failure
+     */
+    public void setRecoveryDistance(int distance) {
+        this.recoveryDistance = distance;
+    }
+
+    /**
      * Initializes a new instance of the Lexer class with the given input
      *
      * @param automaton DFA automaton for this lexer
@@ -135,6 +165,8 @@ public abstract class BaseLexer {
         this.separatorID = separator;
         this.text = new PrefetchedText(input);
         this.tokens = new TokenRepository(symTerminals, text);
+        this.recoveryDistance = DEFAULT_RECOVERY_MATCHING_DISTANCE;
+        this.stateCache = new AutomatonState();
     }
 
     /**
@@ -151,6 +183,8 @@ public abstract class BaseLexer {
         this.separatorID = separator;
         this.text = new StreamingText(input);
         this.tokens = new TokenRepository(symTerminals, text);
+        this.recoveryDistance = DEFAULT_RECOVERY_MATCHING_DISTANCE;
+        this.stateCache = new AutomatonState();
     }
 
     /**
@@ -169,4 +203,57 @@ public abstract class BaseLexer {
      * @return The next token in the input
      */
     public abstract TokenKernel getNextToken(IContextProvider contexts);
+
+    /**
+     * Runs the lexer's DFA to match a terminal in the input ahead
+     *
+     * @param index The current start index in the input text
+     * @return The matching DFA state and length
+     */
+    protected TokenMatch runDFA(int index) {
+        if (text.isEnd(index)) {
+            // At the end of input
+            // The only terminal matched at state index 0 is $
+            return new TokenMatch(0, 0);
+        }
+
+        TokenMatch result = new TokenMatch(0);
+        AutomatonState stateData = new AutomatonState();
+        int state = 0;
+        int i = index;
+
+        while (state != Automaton.DEAD_STATE) {
+            automaton.retrieveState(state, stateData);
+            // Is this state a matching state ?
+            if (stateData.getTerminalCount() != 0)
+                result = new TokenMatch(state, i - index);
+            // No further transition => exit
+            if (stateData.isDeadEnd())
+                break;
+            // At the end of the buffer
+            if (text.isEnd(i))
+                break;
+            char current = text.getValue(i);
+            i++;
+            // Try to find a transition from this state with the read character
+            state = stateData.getTargetBy(current);
+        }
+        return result;
+    }
+
+    /**
+     * When an error was encountered, runs the lexer's DFA to match a terminal in the input ahead
+     *
+     * @param originIndex The current start index in the input text
+     * @return The matching DFA state and length
+     */
+    protected TokenMatch runDFAOnError(int originIndex) {
+        if (recoveryDistance <= 0) {
+            handler.handle(new UnexpectedCharError(Character.toString(text.getValue(originIndex)), text.getPositionAt(originIndex)));
+            return new TokenMatch(1);
+        } else {
+            FuzzyMatcher matcher = new FuzzyMatcher(automaton, text, handler, recoveryDistance, originIndex);
+            return matcher.run();
+        }
+    }
 }

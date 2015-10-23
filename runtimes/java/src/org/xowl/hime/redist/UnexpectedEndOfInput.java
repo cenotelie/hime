@@ -21,29 +21,32 @@
 package org.xowl.hime.redist;
 
 /**
- * Specifies the type of error
+ * Represents the unexpected of the input text while more characters were expected
  *
  * @author Laurent Wouters
  */
-public enum ParseErrorType {
+public class UnexpectedEndOfInput extends ParseError {
+    @Override
+    public ParseErrorType getType() {
+        return ParseErrorType.UnexpectedEndOfInput;
+    }
+
+    @Override
+    public int getLength() {
+        return 0;
+    }
+
+    @Override
+    public String getMessage() {
+        return "Unexpected end of input";
+    }
+
     /**
-     * Lexical error occurring when the end of input has been encountered while more characters were expected
+     * Initializes this error
+     *
+     * @param position Error's position in the input
      */
-    UnexpectedEndOfInput,
-    /**
-     * Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
-     */
-    UnexpectedChar,
-    /**
-     * Syntactic error occurring when an unexpected token is encountered by the parser
-     */
-    UnexpectedToken,
-    /**
-     * Lexical error occurring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
-     */
-    IncorrectUTF16NoLowSurrogate,
-    /**
-     * Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
-     */
-    IncorrectUTF16NoHighSurrogate
+    public UnexpectedEndOfInput(TextPosition position) {
+        super(position);
+    }
 }
