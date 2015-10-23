@@ -30,6 +30,27 @@ namespace Hime.Redist.Lexer
 	class FuzzyMatcher
 	{
 		/// <summary>
+		/// Flag for a DROP operation
+		/// </summary>
+		private const uint OP_DROP = 0x80000000;
+		/// <summary>
+		/// Flag for the INSERT operation
+		/// </summary>
+		private const uint OP_INSERT = 0x40000000;
+		/// <summary>
+		/// Flag for the REPLACE operation
+		/// </summary>
+		private const uint OP_REPLACE = 0xC0000000;
+		/// <summary>
+		/// Mask for the operation flags
+		/// </summary>
+		private const uint MASK_OP = 0xC0000000;
+		/// <summary>
+		/// Mask for the offset data
+		/// </summary>
+		private const uint MASK_OFFSET = 0x3FFFFFFF;
+
+		/// <summary>
 		/// Represents a DFA stack head
 		/// </summary>
 		private struct Head
@@ -503,8 +524,9 @@ namespace Hime.Redist.Lexer
 		/// <param name="offset">The current offset from the original index</param>
 		private void OnMatchingHead(Head head, int offset)
 		{
-			if ((head.Distance <= matchHead.Distance && offset > matchLength)
-				|| (head.Distance < matchHead.Distance && offset >= matchLength))
+			int clCurrent = GetComparableLength(matchHead, matchLength);
+			int clCandidate = GetComparableLength(head, offset);
+			if (matchLength == 0 || clCandidate > clCurrent)
 			{
 				matchHead = head;
 				matchLength = offset;
@@ -520,11 +542,32 @@ namespace Hime.Redist.Lexer
 		/// <param name="distance">The distance associated to this insertion</param>
 		private void OnMatchingInsertion(Head previous, int offset, int target, int distance)
 		{
-			if (offset > matchLength)
+			int d = distance - previous.Distance;
+			int clCurrent = GetComparableLength(matchHead, matchLength);
+			int clCandidate = GetComparableLength(previous, offset - d);
+			if (matchLength == 0 || clCandidate > clCurrent)
 			{
 				matchHead = new Head(previous, target, offset, distance);
 				matchLength = offset;
 			}
+		}
+
+		/// <summary>
+		/// Computes the comparable length of the specified match
+		/// </summary>
+		/// <param name="head">The matching head</param>
+		/// <param name="length">The matching length in the input</param>
+		/// <returns>The comparable length</returns>
+		private int GetComparableLength(Head head, int length)
+		{
+			int result = length;
+			for (int i = head.Distance - 1; i != -1; i--)
+			{
+				if (head.GetError(i) < result - 1)
+					break;
+				result--;
+			}
+			return result;
 		}
 	}
 }
