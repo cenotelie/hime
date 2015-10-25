@@ -18,12 +18,12 @@ def update_hime_version(file, version):
 
     group_id = pom.getElementsByTagName("groupId")[0].firstChild.data
     if "org.xowl.hime" in group_id:
-        pom.getElementsByTagName("version")[0].firstChild.data = version
+        pom.getElementsByTagName("version")[0].firstChild.data = version + "-SNAPSHOT"
 
     for dependency in pom.getElementsByTagName("dependency"):
         group_id = dependency.getElementsByTagName("groupId")[0].firstChild.data
         if "org.xowl.hime" in group_id:
-            dependency.getElementsByTagName("version")[0].firstChild.data = version
+            dependency.getElementsByTagName("version")[0].firstChild.data = version + "-SNAPSHOT"
 
     xmlutils.output(pom, file)
 

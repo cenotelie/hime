@@ -26,8 +26,8 @@
 		<connection>scm:hg:https://bitbucket.org/laurentw/hime</connection>
 		<developerConnection>scm:hg:ssh://hg@bitbucket.org/laurentw/hime</developerConnection>
 		<url>https://bitbucket.org/laurentw/hime</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
