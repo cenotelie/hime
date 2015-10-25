@@ -252,7 +252,14 @@ public abstract class BaseLexer {
             handler.handle(new UnexpectedCharError(Character.toString(text.getValue(originIndex)), text.getPositionAt(originIndex)));
             return new TokenMatch(1);
         } else {
-            FuzzyMatcher matcher = new FuzzyMatcher(automaton, text, handler, recoveryDistance, originIndex);
+            int index = -1;
+            for (int i = 0; i != symTerminals.size(); i++) {
+                if (symTerminals.get(i).getID() == separatorID) {
+                    index = i;
+                    break;
+                }
+            }
+            FuzzyMatcher matcher = new FuzzyMatcher(automaton, index, text, handler, recoveryDistance, originIndex);
             return matcher.run();
         }
     }

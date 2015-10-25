@@ -105,6 +105,10 @@ namespace Hime.Redist.Lexer
 		/// </summary>
 		private readonly Automaton automaton;
 		/// <summary>
+		/// Terminal index of the SEPARATOR terminal
+		/// </summary>
+		private readonly int separator;
+		/// <summary>
 		/// The input text
 		/// </summary>
 		private readonly BaseText text;
@@ -145,13 +149,15 @@ namespace Hime.Redist.Lexer
 		/// Initializes this matcher
 		/// </summary>
 		/// <param name="automaton">This lexer's automaton</param>
+		/// <param name="separator">Terminal index of the SEPARATOR terminal</param>
 		/// <param name="text">The input text</param>
 		/// <param name="errors">Delegate for raising errors</param>
 		/// <param name="maxDistance">The maximum Levenshtein distance between the input and the DFA</param>
 		/// <param name="index">The index in the input from wich the error was raised</param>
-		public FuzzyMatcher(Automaton automaton, BaseText text, AddLexicalError errors, int maxDistance, int index)
+		public FuzzyMatcher(Automaton automaton, int separator, BaseText text, AddLexicalError errors, int maxDistance, int index)
 		{
 			this.automaton = automaton;
+			this.separator = separator;
 			this.text = text;
 			this.errors = errors;
 			this.maxDistance = maxDistance;
@@ -335,7 +341,7 @@ namespace Hime.Redist.Lexer
 		{
 			AutomatonState stateData = automaton.GetState(head.State);
 			// is it a matching state
-			if (stateData.TerminalsCount != 0)
+			if (stateData.TerminalsCount != 0 && stateData.GetTerminal(0).Index != separator)
 				OnMatchingHead(head, offset);
 			if (head.Distance >= maxDistance || stateData.IsDeadEnd)
 				// cannot stray further
@@ -355,7 +361,7 @@ namespace Hime.Redist.Lexer
 		{
 			AutomatonState stateData = automaton.GetState(head.State);
 			// is it a matching state
-			if (stateData.TerminalsCount != 0)
+			if (stateData.TerminalsCount != 0 && stateData.GetTerminal(0).Index != separator)
 				OnMatchingHead(head, offset);
 			if (head.Distance >= maxDistance || stateData.IsDeadEnd)
 				// cannot stray further
@@ -468,7 +474,7 @@ namespace Hime.Redist.Lexer
 		private void ExploreInsertion(Head head, int offset, bool atEnd, char current, int state, int distance)
 		{
 			AutomatonState stateData = automaton.GetState(state);
-			if (stateData.TerminalsCount != 0)
+			if (stateData.TerminalsCount != 0 && stateData.GetTerminal(0).Index != separator)
 				OnMatchingInsertion(head, offset, state, distance);
 			if (!atEnd)
 			{

@@ -201,7 +201,17 @@ namespace Hime.Redist.Lexer
 			}
 			else
 			{
-				FuzzyMatcher handler = new FuzzyMatcher(automaton, text, OnError, RecoveryDistance, originIndex);
+				int index = -1;
+				// index of the separator terminal, if any
+				for (int i = 0; i != symTerminals.Count; i++)
+				{
+					if (symTerminals[i].ID == separatorID)
+					{
+						index = i;
+						break;
+					}
+				}
+				FuzzyMatcher handler = new FuzzyMatcher(automaton, index, text, OnError, RecoveryDistance, originIndex);
 				return handler.Run();
 			}
 		}

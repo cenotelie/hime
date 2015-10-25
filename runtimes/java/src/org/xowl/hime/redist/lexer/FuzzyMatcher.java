@@ -43,6 +43,10 @@ class FuzzyMatcher {
      */
     private final Automaton automaton;
     /**
+     * Terminal index of the SEPARATOR terminal
+     */
+    private final int separator;
+    /**
      * The input text
      */
     private final BaseText text;
@@ -87,13 +91,15 @@ class FuzzyMatcher {
      * Initializes this matcher
      *
      * @param automaton   This lexer's automaton
+     * @param separator   Terminal index of the SEPARATOR terminal
      * @param text        The input text
      * @param errors      Delegate for raising errors
      * @param maxDistance The maximum Levenshtein distance between the input and the DFA
      * @param index       The index in the input from wich the error was raised
      */
-    public FuzzyMatcher(Automaton automaton, BaseText text, LexicalErrorHandler errors, int maxDistance, int index) {
+    public FuzzyMatcher(Automaton automaton, int separator, BaseText text, LexicalErrorHandler errors, int maxDistance, int index) {
         this.automaton = automaton;
+        this.separator = separator;
         this.text = text;
         this.errors = errors;
         this.maxDistance = maxDistance;
@@ -265,7 +271,7 @@ class FuzzyMatcher {
     private void inspectAtEnd(int[] head, int offset) {
         automaton.retrieveState(getHeadState(head), stateData);
         // is it a matching state
-        if (stateData.getTerminalCount() != 0)
+        if (stateData.getTerminalCount() != 0 && stateData.getTerminal() != separator)
             onMatchingHead(head, offset);
         if (getHeadDistance(head) >= maxDistance || stateData.isDeadEnd())
             // cannot stray further
@@ -286,7 +292,7 @@ class FuzzyMatcher {
     private void inspect(int[] head, int offset, char current) {
         automaton.retrieveState(getHeadState(head), stateData);
         // is it a matching state
-        if (stateData.getTerminalCount() != 0)
+        if (stateData.getTerminalCount() != 0 && stateData.getTerminal() != separator)
             onMatchingHead(head, offset);
         if (getHeadDistance(head) >= maxDistance || stateData.isDeadEnd())
             // cannot stray further
@@ -390,7 +396,7 @@ class FuzzyMatcher {
      */
     private void exploreInsertion(int[] head, int offset, boolean atEnd, char current, int state, int distance) {
         automaton.retrieveState(state, stateData);
-        if (stateData.getTerminalCount() != 0)
+        if (stateData.getTerminalCount() != 0 && stateData.getTerminal() != separator)
             onMatchingInsertion(head, offset, state, distance);
         if (!atEnd) {
             int target = stateData.getTargetBy(current);
