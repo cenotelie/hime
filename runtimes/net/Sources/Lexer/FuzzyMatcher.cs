@@ -525,14 +525,7 @@ namespace Hime.Redist.Lexer
 		/// <returns>The comparable length</returns>
 		private static int GetComparableLength(Head head, int length)
 		{
-			int result = length;
-			for (int i = head.Distance - 1; i != -1; i--)
-			{
-				if (head.GetError(i) < result - 1)
-					break;
-				result--;
-			}
-			return result;
+			return length - head.Distance;
 		}
 	}
 }

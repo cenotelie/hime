@@ -475,13 +475,7 @@ class FuzzyMatcher {
      * @return The comparable length
      */
     private static int getHeadComparableLegnth(int[] data, int length) {
-        int result = length;
-        for (int i = getHeadDistance(data) - 1; i != -1; i--) {
-            if (getHeadError(data, i) < result - 1)
-                break;
-            result--;
-        }
-        return result;
+        return length - getHeadDistance(data);
     }
 
     /**
