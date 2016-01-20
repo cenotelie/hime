@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.xowl.hime</groupId>
 	<artifactId>redist</artifactId>
-	<packaging>jar</packaging>
+	<packaging>bundle</packaging>
 	<version>2.0.2-SNAPSHOT</version>
 	<name>Hime Runtime</name>
 	<description>Redistributable Java runtime for the parsers generated with Hime</description>
@@ -14,6 +14,10 @@
 			<url>http://www.gnu.org/licenses/lgpl.txt</url>
 		</license>
 	</licenses>
+	<organization>
+		<name>xOWL</name>
+		<url>http://xowl.org/</url>
+	</organization>
 	<developers>
 		<developer>
 			<name>Laurent Wouters</name>
@@ -118,6 +122,21 @@
 					<goals>deploy</goals>
 					<pushChanges>false</pushChanges>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>3.0.1</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
