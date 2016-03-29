@@ -13,20 +13,19 @@ import xml.dom.minidom  # Minimal XML
 import xmlutils  # XML utilities
 
 
-def update_hime_version(file, version):
+def update_hime_version(file, version, dev):
     pom = xml.dom.minidom.parse(file)
 
     group_id = pom.getElementsByTagName("groupId")[0].firstChild.data
     if "org.xowl.hime" in group_id:
-        pom.getElementsByTagName("version")[0].firstChild.data = version + "-SNAPSHOT"
+        pom.getElementsByTagName("version")[0].firstChild.data = version + ("-SNAPSHOT" if dev else "")
 
     for dependency in pom.getElementsByTagName("dependency"):
         group_id = dependency.getElementsByTagName("groupId")[0].firstChild.data
         if "org.xowl.hime" in group_id:
-            dependency.getElementsByTagName("version")[0].firstChild.data = version + "-SNAPSHOT"
+            dependency.getElementsByTagName("version")[0].firstChild.data = version + ("-SNAPSHOT" if dev else "")
 
     xmlutils.output(pom, file)
 
 if __name__ == "__main__":
-    if sys.argv[1] == "version":
-        update_hime_version(sys.argv[2], sys.argv[3])
+    update_hime_version(sys.argv[1], sys.argv[2], sys.argv[3] == "dev")
