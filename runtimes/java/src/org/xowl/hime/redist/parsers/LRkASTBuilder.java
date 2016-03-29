@@ -91,7 +91,7 @@ class LRkASTBuilder implements SemanticBody {
      * @return The symbol at the given index
      */
     public SemanticElement at(int index) {
-        return result.getSemanticElementFor(handle[index]);
+        return result.getSemanticElementForLabel(cache.getLabelAt(handle[index]));
     }
 
     /**

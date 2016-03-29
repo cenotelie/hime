@@ -203,9 +203,18 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="node">A node</param>
 		/// <returns>The corresponding semantic element</returns>
-		public SemanticElement GetSemanticElementFor(int node)
+		public SemanticElement GetSemanticElementForNode(int node)
 		{
-			TableElemRef label = nodes[node].label;
+			return GetSemanticElementForLabel(nodes[node].label);
+		}
+
+		/// <summary>
+		/// Gets the semantic element corresponding to the specified label
+		/// </summary>
+		/// <param name="label">The label of an AST node</param>
+		/// <returns>The corresponding semantic element</returns>
+		public SemanticElement GetSemanticElementForLabel(TableElemRef label)
+		{
 			switch (label.Type)
 			{
 			case TableType.Token:

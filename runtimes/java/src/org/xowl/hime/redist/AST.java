@@ -217,8 +217,17 @@ public abstract class AST {
      * @param node A node
      * @return The corresponding semantic element
      */
-    public SemanticElement getSemanticElementFor(int node) {
-        int label = nodes.get(node).label;
+    public SemanticElement getSemanticElementForNode(int node) {
+        return getSemanticElementForLabel(nodes.get(node).label);
+    }
+
+    /**
+     * Gets the semantic element corresponding to the specified label
+     *
+     * @param label The label of an AST node
+     * @return The corresponding semantic element
+     */
+    public SemanticElement getSemanticElementForLabel(int label) {
         switch (TableElemRef.getType(label)) {
             case TableElemRef.TABLE_TOKEN:
                 return tableTokens.at(TableElemRef.getIndex(label));
