@@ -92,6 +92,11 @@ public class TokenRepository implements Iterable<Token> {
             }
             return result;
         }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not implemented");
+        }
     }
 
     /**
