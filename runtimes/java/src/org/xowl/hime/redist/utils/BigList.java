@@ -133,7 +133,7 @@ public class BigList<T> {
     public int add(T[] values, int index, int length) {
         int start = size();
         if (length > 0)
-            docopy(values, index, length);
+            doCopy(values, index, length);
         return start;
     }
 
@@ -151,12 +151,12 @@ public class BigList<T> {
         int chunk = from >> UPPER_SHIFT;     // The current chunk to copy from
         int cell = from & LOWER_MASK;        // The current starting index in the chunk
         while (cell + count > CHUNKS_SIZE) {
-            docopy(chunks[chunk], cell, CHUNKS_SIZE - cell);
+            doCopy(chunks[chunk], cell, CHUNKS_SIZE - cell);
             count -= CHUNKS_SIZE - cell;
             chunk++;
             cell = 0;
         }
-        docopy(chunks[chunk], cell, count);
+        doCopy(chunks[chunk], cell, count);
         return start;
     }
 
@@ -177,7 +177,7 @@ public class BigList<T> {
      * @param index  The starting index of the values to store
      * @param length The number of values to store
      */
-    private void docopy(T[] values, int index, int length) {
+    private void doCopy(T[] values, int index, int length) {
         while (cellIndex + length > CHUNKS_SIZE) {
             int count = CHUNKS_SIZE - cellIndex;
             if (count == 0) {

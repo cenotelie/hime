@@ -97,7 +97,7 @@ public class BinaryInput {
      * @return {@code true} if the initialization succeeded, {@code false} otherwise
      */
     private boolean init(InputStream stream) {
-        this.content = new ArrayList<byte[]>();
+        this.content = new ArrayList<>();
         this.size = 0;
         boolean onError = false;
         try {

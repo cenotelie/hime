@@ -145,7 +145,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
     private TokenKernel onUnexpectedToken(TokenKernel kernel) {
         LRExpected expectedOnHead = automaton.getExpected(stack[head], lexer.getTerminals());
         // the terminals for shifts are always expected
-        List<Symbol> expected = new ArrayList<Symbol>(expectedOnHead.getShifts());
+        List<Symbol> expected = new ArrayList<>(expectedOnHead.getShifts());
         // check the terminals for reductions
         for (Symbol terminal : expectedOnHead.getReductions())
             if (checkIsExpected(terminal))

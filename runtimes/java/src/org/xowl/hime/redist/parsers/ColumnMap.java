@@ -64,7 +64,7 @@ class ColumnMap {
             cache2[key - 0x100] = value;
         } else {
             if (others == null)
-                others = new HashMap<Integer, Integer>();
+                others = new HashMap<>();
             others.put(key, value);
         }
     }

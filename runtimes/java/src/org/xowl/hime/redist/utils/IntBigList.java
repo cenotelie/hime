@@ -123,7 +123,7 @@ public class IntBigList {
     public int add(int[] values, int index, int length) {
         int start = size();
         if (length > 0)
-            docopy(values, index, length);
+            doCopy(values, index, length);
         return start;
     }
 
@@ -141,12 +141,12 @@ public class IntBigList {
         int chunk = from >> upperShift;     // The current chunk to copy from
         int cell = from & lowerMask;        // The current starting index in the chunk
         while (cell + count > chunksSize) {
-            docopy(chunks[chunk], cell, chunksSize - cell);
+            doCopy(chunks[chunk], cell, chunksSize - cell);
             count -= chunksSize - cell;
             chunk++;
             cell = 0;
         }
-        docopy(chunks[chunk], cell, count);
+        doCopy(chunks[chunk], cell, count);
         return start;
     }
 
@@ -157,7 +157,7 @@ public class IntBigList {
      * @param index  The starting index of the values to store
      * @param length The number of values to store
      */
-    private void docopy(int[] values, int index, int length) {
+    private void doCopy(int[] values, int index, int length) {
         while (cellIndex + length > chunksSize) {
             int count = chunksSize - cellIndex;
             if (count == 0) {

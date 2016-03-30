@@ -152,7 +152,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         }
         // try to only look at stack heads that expect the terminal
         IntList queue = new IntList(LRkParser.INIT_STACK_SIZE);
-        List<LRProduction> productions = new ArrayList<LRProduction>();
+        List<LRProduction> productions = new ArrayList<>();
         IntList distances = new IntList(LRkParser.INIT_STACK_SIZE);
         boolean foundOnPreviousShift = false;
         for (Shift shift : shifts) {
@@ -228,7 +228,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         // can it be open by a token with the specified terminal ID?
         // queue of GLR states to inspect:
         IntList queueGSSHead = new IntList(LRkParser.INIT_STACK_SIZE);   // the related GSS head
-        List<int[]> queueVStack = new ArrayList<int[]>(); // the virtual stack
+        List<int[]> queueVStack = new ArrayList<>(); // the virtual stack
         // first reduction
         for (Shift shift : shifts) {
             int count = parserAutomaton.getActionsCount(shift.to, onTerminalID);
@@ -353,7 +353,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      * @return The list of the nullable variables' indices that this production depends on
      */
     private List<Integer> getNullableDependencies(LRProduction production) {
-        List<Integer> result = new ArrayList<Integer>();
+        List<Integer> result = new ArrayList<>();
         for (int i = 0; i != production.getBytecodeLength(); i++) {
             char op = production.getOpcode(i);
             switch (LROpCode.getBase(op)) {
@@ -382,7 +382,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      */
     private void onUnexpectedToken(int stem) {
         // build the list of expected terminals
-        List<Symbol> expected = new ArrayList<Symbol>();
+        List<Symbol> expected = new ArrayList<>();
         GSSGeneration genData = gss.getGeneration();
         for (int i = 0; i != genData.getCount(); i++) {
             LRExpected expectedOnHead = parserAutomaton.getExpected(gss.getRepresentedState(i + genData.getStart()), lexer.getTerminals());
@@ -425,7 +425,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
     private boolean checkIsExpected(int gssNode, Symbol terminal) {
         // queue of GLR states to inspect:
         IntList queueGSSHead = new IntList(LRkParser.INIT_STACK_SIZE);   // the related GSS head
-        List<int[]> queueVStack = new ArrayList<int[]>(); // the virtual stack
+        List<int[]> queueVStack = new ArrayList<>(); // the virtual stack
 
         // first reduction
         {
@@ -543,8 +543,8 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      * @return A ParseResult object containing the data about the result
      */
     public ParseResult parse() {
-        reductions = new ArrayDeque<Reduction>();
-        shifts = new ArrayDeque<Shift>();
+        reductions = new ArrayDeque<>();
+        shifts = new ArrayDeque<>();
         int Ui = gss.createGeneration();
         int v0 = gss.createNode(0);
         nextToken = lexer.getNextToken(this);

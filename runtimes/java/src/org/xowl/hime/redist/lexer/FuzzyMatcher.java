@@ -112,7 +112,7 @@ class FuzzyMatcher {
      * @return The solution
      */
     public TokenMatch run() {
-        heads = new ArrayList<int[]>();
+        heads = new ArrayList<>();
         insertions = new int[16];
         insertionsCount = 0;
         matchHead = newHead(0);
@@ -129,7 +129,7 @@ class FuzzyMatcher {
             offset++;
             atEnd = text.isEnd(originIndex + offset);
             current = atEnd ? '\0' : text.getValue(originIndex + offset);
-            List<int[]> temp = new ArrayList<int[]>(heads);
+            List<int[]> temp = new ArrayList<>(heads);
             heads.clear();
             for (int[] head : temp) {
                 if (atEnd)

@@ -148,7 +148,7 @@ public abstract class BaseLRParser {
         this.symVariables = Collections.unmodifiableList(Arrays.asList(variables));
         this.symVirtuals = Collections.unmodifiableList(Arrays.asList(virtuals));
         this.symActions = Collections.unmodifiableList(actions != null ? Arrays.asList(actions) : new ArrayList<SemanticAction>());
-        this.allErrors = new ArrayList<ParseError>();
+        this.allErrors = new ArrayList<>();
         this.lexer = lexer;
         this.lexer.setErrorHandler(new LexicalErrorHandler() {
             @Override

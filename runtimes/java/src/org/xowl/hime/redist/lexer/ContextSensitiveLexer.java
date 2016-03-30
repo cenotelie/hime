@@ -96,7 +96,6 @@ public abstract class ContextSensitiveLexer extends BaseLexer {
                     int tID = symTerminals.get(tIndex).getID();
                     if (tID == separatorID) {
                         inputIndex += match.length;
-                        continue;
                     } else {
                         TokenKernel token = new TokenKernel(tID, tokens.add(tIndex, inputIndex, match.length));
                         inputIndex += match.length;

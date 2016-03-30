@@ -111,19 +111,19 @@ class LRkASTBuilder implements SemanticBody {
      * @param virtuals  The table of parser virtuals
      */
     public LRkASTBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
-        this.poolSingle = new Pool<SubTree>(new Factory<SubTree>() {
+        this.poolSingle = new Pool<>(new Factory<SubTree>() {
             @Override
             public SubTree createNew() {
                 return new SubTree(poolSingle, 1);
             }
         }, 512, SubTree.class);
-        this.pool128 = new Pool<SubTree>(new Factory<SubTree>() {
+        this.pool128 = new Pool<>(new Factory<SubTree>() {
             @Override
             public SubTree createNew() {
                 return new SubTree(pool128, 128);
             }
         }, 128, SubTree.class);
-        this.pool1024 = new Pool<SubTree>(new Factory<SubTree>() {
+        this.pool1024 = new Pool<>(new Factory<SubTree>() {
             @Override
             public SubTree createNew() {
                 return new SubTree(pool1024, 1024);
@@ -203,8 +203,7 @@ class LRkASTBuilder implements SemanticBody {
                 cacheNext += size;
                 index += size;
             }
-        } else if (action == LROpCode.TREE_ACTION_DROP) {
-        } else {
+        } else if (action != LROpCode.TREE_ACTION_DROP) {
             if (action != LROpCode.TREE_ACTION_NONE)
                 sub.setActionAt(0, action);
             if (handleNext == handle.length)
@@ -248,7 +247,7 @@ class LRkASTBuilder implements SemanticBody {
         if (cache.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE) {
             cache.setChildrenCountAt(0, handleNext);
         } else {
-            ReduceTree();
+            reduceTree();
         }
         // Put it on the stack
         if (stackNext == stack.length)
@@ -259,7 +258,7 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * Applies the promotion tree actions to the cache and commits to the final AST
      */
-    private void ReduceTree() {
+    private void reduceTree() {
         // promotion data
         boolean promotion = false;
         int insertion = 1;

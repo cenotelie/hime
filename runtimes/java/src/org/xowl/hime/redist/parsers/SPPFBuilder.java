@@ -166,25 +166,25 @@ class SPPFBuilder implements SemanticBody {
      * @param virtuals  The table of parser virtuals
      */
     public SPPFBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
-        this.pool8 = new Pool<SubTree>(new Factory<SubTree>() {
+        this.pool8 = new Pool<>(new Factory<SubTree>() {
             @Override
             public SubTree createNew() {
                 return new SubTree(pool8, 8);
             }
         }, 1024, SubTree.class);
-        this.pool128 = new Pool<SubTree>(new Factory<SubTree>() {
+        this.pool128 = new Pool<>(new Factory<SubTree>() {
             @Override
             public SubTree createNew() {
                 return new SubTree(pool128, 128);
             }
         }, 128, SubTree.class);
-        this.pool1024 = new Pool<SubTree>(new Factory<SubTree>() {
+        this.pool1024 = new Pool<>(new Factory<SubTree>() {
             @Override
             public SubTree createNew() {
                 return new SubTree(pool1024, 1024);
             }
         }, 16, SubTree.class);
-        this.poolHPs = new Pool<HistoryPart>(new Factory<HistoryPart>() {
+        this.poolHPs = new Pool<>(new Factory<HistoryPart>() {
             @Override
             public HistoryPart createNew() {
                 return new HistoryPart();

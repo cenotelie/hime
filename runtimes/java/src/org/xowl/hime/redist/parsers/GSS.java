@@ -108,9 +108,9 @@ class GSS {
     public GSS() {
         this.nodeLabels = new IntBigList();
         this.nodeIncomings = new IntBigList();
-        this.nodeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
-        this.edges = new BigList<GSSEdge>(GSSEdge.class, GSSEdge[].class);
-        this.edgeGenerations = new BigList<GSSGeneration>(GSSGeneration.class, GSSGeneration[].class);
+        this.nodeGenerations = new BigList<>(GSSGeneration.class, GSSGeneration[].class);
+        this.edges = new BigList<>(GSSEdge.class, GSSEdge[].class);
+        this.edgeGenerations = new BigList<>(GSSGeneration.class, GSSGeneration[].class);
         this.generation = -1;
         this.paths = new PathSet();
         this.stack = new int[INIT_STACK_SIZE];
@@ -425,12 +425,12 @@ class GSS {
      */
     public void printTo(Writer writer) throws IOException {
         // list of all nodes having at least one child
-        Set<Integer> linked = new HashSet<Integer>();
+        Set<Integer> linked = new HashSet<>();
 
         for (int i = generation; i != -1; i--) {
             writer.write("--- generation " + i + " ---" + System.lineSeparator());
             // Retrieve the edges in this generation
-            Map<Integer, List<Integer>> myedges = new HashMap<Integer, List<Integer>>();
+            Map<Integer, List<Integer>> myedges = new HashMap<>();
             GSSGeneration cedges = edgeGenerations.get(i);
             for (int j = 0; j != cedges.getCount(); j++) {
                 GSSEdge edge = this.edges.get(cedges.getStart() + j);
@@ -441,7 +441,7 @@ class GSS {
             }
             // Retrieve the nodes in this generation and reverse their order
             GSSGeneration cnodes = nodeGenerations.get(i);
-            List<Integer> mynodes = new ArrayList<Integer>();
+            List<Integer> mynodes = new ArrayList<>();
             for (int j = 0; j != cnodes.getCount(); j++)
                 mynodes.add(cnodes.getStart() + j);
             Collections.reverse(mynodes);

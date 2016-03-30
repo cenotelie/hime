@@ -61,8 +61,8 @@ public class LRExpected {
      * Initializes this container
      */
     public LRExpected() {
-        this.shifts = new ArrayList<Symbol>();
-        this.reductions = new ArrayList<Symbol>();
+        this.shifts = new ArrayList<>();
+        this.reductions = new ArrayList<>();
     }
 
     /**
