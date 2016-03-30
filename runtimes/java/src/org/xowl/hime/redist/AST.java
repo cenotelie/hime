@@ -99,7 +99,7 @@ public abstract class AST {
         this.tableTokens = tokens;
         this.tableVariables = variables;
         this.tableVirtuals = virtuals;
-        this.nodes = new BigList<Node>(Node.class, Node[].class);
+        this.nodes = new BigList<>(Node.class, Node[].class);
         this.root = -1;
     }
 
@@ -248,7 +248,7 @@ public abstract class AST {
      * @param count The number of nodes to store
      * @return The index of the first inserted node in this tree
      */
-    public int Store(Node[] nodes, int index, int count) {
+    public int store(Node[] nodes, int index, int count) {
         int result = this.nodes.size();
         for (int i = index; i != index + count; i++)
             this.nodes.add(nodes[i]);

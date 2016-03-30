@@ -140,7 +140,7 @@ public class TokenRepository implements Iterable<Token> {
     public TokenRepository(List<Symbol> terminals, Text text) {
         this.terminals = terminals;
         this.text = text;
-        this.cells = new BigList<Cell>(Cell.class, Cell[].class);
+        this.cells = new BigList<>(Cell.class, Cell[].class);
     }
 
     /**

@@ -188,7 +188,7 @@ class SubTree {
      */
     public void commitChildrenOf(int index, AST ast) {
         if (nodes[index].count != 0)
-            nodes[index].first = ast.Store(nodes, index + 1, nodes[index].count);
+            nodes[index].first = ast.store(nodes, index + 1, nodes[index].count);
     }
 
     /**

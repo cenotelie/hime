@@ -44,7 +44,7 @@ public class ASTSimpleTree extends AST {
 
     @Override
     public List<ASTNode> getChildren(int parent) {
-        List<ASTNode> result = new ArrayList<ASTNode>();
+        List<ASTNode> result = new ArrayList<>();
         Node node = nodes.get(parent);
         for (int i = 0; i != node.count; i++) {
             result.add(new ASTNode(this, node.first + i));
