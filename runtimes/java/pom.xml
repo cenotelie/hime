@@ -15,15 +15,15 @@
 		</license>
 	</licenses>
 	<organization>
-		<name>xOWL</name>
-		<url>http://xowl.org/</url>
+		<name>Laurent Wouters</name>
+		<url>https://wouters-net.fr/</url>
 	</organization>
 	<developers>
 		<developer>
 			<name>Laurent Wouters</name>
 			<email>lwouters@xowl.org</email>
-			<organization>xowl.org</organization>
-			<organizationUrl>http://xowl.org/</organizationUrl>
+			<organization>Laurent Wouters</organization>
+			<organizationUrl>https://wouters-net.fr/</organizationUrl>
 		</developer>
 	</developers>
 	<scm>

@@ -14,18 +14,23 @@
 			<url>http://www.gnu.org/licenses/lgpl.txt</url>
 		</license>
 	</licenses>
+	<organization>
+		<name>Laurent Wouters</name>
+		<url>https://wouters-net.fr/</url>
+	</organization>
 	<developers>
 		<developer>
 			<name>Laurent Wouters</name>
 			<email>lwouters@xowl.org</email>
-			<organization>xowl.org</organization>
-			<organizationUrl>http://hime.xowl.org</organizationUrl>
+			<organization>Laurent Wouters</organization>
+			<organizationUrl>https://wouters-net.fr/</organizationUrl>
 		</developer>
 	</developers>
 	<scm>
 		<connection>scm:hg:https://bitbucket.org/laurentw/hime</connection>
 		<developerConnection>scm:hg:https://bitbucket.org/laurentw/hime</developerConnection>
 		<url>https://bitbucket.org/laurentw/hime</url>
+		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
