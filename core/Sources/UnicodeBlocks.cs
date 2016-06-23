@@ -440,6 +440,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockOlChiki = new UnicodeBlock("OlChiki", 0x1C50, 0x1C7F);
 
 		/// <summary>
+		/// Gets the Unicode block CyrillicExtended-C
+		/// </summary>
+		public static UnicodeBlock CyrillicExtendedC { get { return blockCyrillicExtendedC; } }
+
+		private static readonly UnicodeBlock blockCyrillicExtendedC = new UnicodeBlock("CyrillicExtended-C", 0x1C80, 0x1C8F);
+
+		/// <summary>
 		/// Gets the Unicode block SundaneseSupplement
 		/// </summary>
 		public static UnicodeBlock SundaneseSupplement { get { return blockSundaneseSupplement; } }
@@ -1231,6 +1238,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockOsmanya = new UnicodeBlock("Osmanya", 0x10480, 0x104AF);
 
 		/// <summary>
+		/// Gets the Unicode block Osage
+		/// </summary>
+		public static UnicodeBlock Osage { get { return blockOsage; } }
+
+		private static readonly UnicodeBlock blockOsage = new UnicodeBlock("Osage", 0x104B0, 0x104FF);
+
+		/// <summary>
 		/// Gets the Unicode block Elbasan
 		/// </summary>
 		public static UnicodeBlock Elbasan { get { return blockElbasan; } }
@@ -1469,6 +1483,13 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockGrantha = new UnicodeBlock("Grantha", 0x11300, 0x1137F);
 
 		/// <summary>
+		/// Gets the Unicode block Newa
+		/// </summary>
+		public static UnicodeBlock Newa { get { return blockNewa; } }
+
+		private static readonly UnicodeBlock blockNewa = new UnicodeBlock("Newa", 0x11400, 0x1147F);
+
+		/// <summary>
 		/// Gets the Unicode block Tirhuta
 		/// </summary>
 		public static UnicodeBlock Tirhuta { get { return blockTirhuta; } }
@@ -1488,6 +1509,13 @@ namespace Hime.SDK
 		public static UnicodeBlock Modi { get { return blockModi; } }
 
 		private static readonly UnicodeBlock blockModi = new UnicodeBlock("Modi", 0x11600, 0x1165F);
+
+		/// <summary>
+		/// Gets the Unicode block MongolianSupplement
+		/// </summary>
+		public static UnicodeBlock MongolianSupplement { get { return blockMongolianSupplement; } }
+
+		private static readonly UnicodeBlock blockMongolianSupplement = new UnicodeBlock("MongolianSupplement", 0x11660, 0x1167F);
 
 		/// <summary>
 		/// Gets the Unicode block Takri
@@ -1516,6 +1544,20 @@ namespace Hime.SDK
 		public static UnicodeBlock PauCinHau { get { return blockPauCinHau; } }
 
 		private static readonly UnicodeBlock blockPauCinHau = new UnicodeBlock("PauCinHau", 0x11AC0, 0x11AFF);
+
+		/// <summary>
+		/// Gets the Unicode block Bhaiksuki
+		/// </summary>
+		public static UnicodeBlock Bhaiksuki { get { return blockBhaiksuki; } }
+
+		private static readonly UnicodeBlock blockBhaiksuki = new UnicodeBlock("Bhaiksuki", 0x11C00, 0x11C6F);
+
+		/// <summary>
+		/// Gets the Unicode block Marchen
+		/// </summary>
+		public static UnicodeBlock Marchen { get { return blockMarchen; } }
+
+		private static readonly UnicodeBlock blockMarchen = new UnicodeBlock("Marchen", 0x11C70, 0x11CBF);
 
 		/// <summary>
 		/// Gets the Unicode block Cuneiform
@@ -1588,6 +1630,27 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockMiao = new UnicodeBlock("Miao", 0x16F00, 0x16F9F);
 
 		/// <summary>
+		/// Gets the Unicode block IdeographicSymbolsandPunctuation
+		/// </summary>
+		public static UnicodeBlock IdeographicSymbolsandPunctuation { get { return blockIdeographicSymbolsandPunctuation; } }
+
+		private static readonly UnicodeBlock blockIdeographicSymbolsandPunctuation = new UnicodeBlock("IdeographicSymbolsandPunctuation", 0x16FE0, 0x16FFF);
+
+		/// <summary>
+		/// Gets the Unicode block Tangut
+		/// </summary>
+		public static UnicodeBlock Tangut { get { return blockTangut; } }
+
+		private static readonly UnicodeBlock blockTangut = new UnicodeBlock("Tangut", 0x17000, 0x187FF);
+
+		/// <summary>
+		/// Gets the Unicode block TangutComponents
+		/// </summary>
+		public static UnicodeBlock TangutComponents { get { return blockTangutComponents; } }
+
+		private static readonly UnicodeBlock blockTangutComponents = new UnicodeBlock("TangutComponents", 0x18800, 0x18AFF);
+
+		/// <summary>
 		/// Gets the Unicode block KanaSupplement
 		/// </summary>
 		public static UnicodeBlock KanaSupplement { get { return blockKanaSupplement; } }
@@ -1658,11 +1721,25 @@ namespace Hime.SDK
 		private static readonly UnicodeBlock blockSuttonSignWriting = new UnicodeBlock("SuttonSignWriting", 0x1D800, 0x1DAAF);
 
 		/// <summary>
+		/// Gets the Unicode block GlagoliticSupplement
+		/// </summary>
+		public static UnicodeBlock GlagoliticSupplement { get { return blockGlagoliticSupplement; } }
+
+		private static readonly UnicodeBlock blockGlagoliticSupplement = new UnicodeBlock("GlagoliticSupplement", 0x1E000, 0x1E02F);
+
+		/// <summary>
 		/// Gets the Unicode block MendeKikakui
 		/// </summary>
 		public static UnicodeBlock MendeKikakui { get { return blockMendeKikakui; } }
 
 		private static readonly UnicodeBlock blockMendeKikakui = new UnicodeBlock("MendeKikakui", 0x1E800, 0x1E8DF);
+
+		/// <summary>
+		/// Gets the Unicode block Adlam
+		/// </summary>
+		public static UnicodeBlock Adlam { get { return blockAdlam; } }
+
+		private static readonly UnicodeBlock blockAdlam = new UnicodeBlock("Adlam", 0x1E900, 0x1E95F);
 
 		/// <summary>
 		/// Gets the Unicode block ArabicMathematicalAlphabeticSymbols
@@ -1897,6 +1974,7 @@ namespace Hime.SDK
 			db.Add("Batak", Batak);
 			db.Add("Lepcha", Lepcha);
 			db.Add("OlChiki", OlChiki);
+			db.Add("CyrillicExtended-C", CyrillicExtendedC);
 			db.Add("SundaneseSupplement", SundaneseSupplement);
 			db.Add("VedicExtensions", VedicExtensions);
 			db.Add("PhoneticExtensions", PhoneticExtensions);
@@ -2010,6 +2088,7 @@ namespace Hime.SDK
 			db.Add("Deseret", Deseret);
 			db.Add("Shavian", Shavian);
 			db.Add("Osmanya", Osmanya);
+			db.Add("Osage", Osage);
 			db.Add("Elbasan", Elbasan);
 			db.Add("CaucasianAlbanian", CaucasianAlbanian);
 			db.Add("LinearA", LinearA);
@@ -2044,13 +2123,17 @@ namespace Hime.SDK
 			db.Add("Multani", Multani);
 			db.Add("Khudawadi", Khudawadi);
 			db.Add("Grantha", Grantha);
+			db.Add("Newa", Newa);
 			db.Add("Tirhuta", Tirhuta);
 			db.Add("Siddham", Siddham);
 			db.Add("Modi", Modi);
+			db.Add("MongolianSupplement", MongolianSupplement);
 			db.Add("Takri", Takri);
 			db.Add("Ahom", Ahom);
 			db.Add("WarangCiti", WarangCiti);
 			db.Add("PauCinHau", PauCinHau);
+			db.Add("Bhaiksuki", Bhaiksuki);
+			db.Add("Marchen", Marchen);
 			db.Add("Cuneiform", Cuneiform);
 			db.Add("CuneiformNumbersandPunctuation", CuneiformNumbersandPunctuation);
 			db.Add("EarlyDynasticCuneiform", EarlyDynasticCuneiform);
@@ -2061,6 +2144,9 @@ namespace Hime.SDK
 			db.Add("BassaVah", BassaVah);
 			db.Add("PahawhHmong", PahawhHmong);
 			db.Add("Miao", Miao);
+			db.Add("IdeographicSymbolsandPunctuation", IdeographicSymbolsandPunctuation);
+			db.Add("Tangut", Tangut);
+			db.Add("TangutComponents", TangutComponents);
 			db.Add("KanaSupplement", KanaSupplement);
 			db.Add("Duployan", Duployan);
 			db.Add("ShorthandFormatControls", ShorthandFormatControls);
@@ -2071,7 +2157,9 @@ namespace Hime.SDK
 			db.Add("CountingRodNumerals", CountingRodNumerals);
 			db.Add("MathematicalAlphanumericSymbols", MathematicalAlphanumericSymbols);
 			db.Add("SuttonSignWriting", SuttonSignWriting);
+			db.Add("GlagoliticSupplement", GlagoliticSupplement);
 			db.Add("MendeKikakui", MendeKikakui);
+			db.Add("Adlam", Adlam);
 			db.Add("ArabicMathematicalAlphabeticSymbols", ArabicMathematicalAlphabeticSymbols);
 			db.Add("MahjongTiles", MahjongTiles);
 			db.Add("DominoTiles", DominoTiles);
