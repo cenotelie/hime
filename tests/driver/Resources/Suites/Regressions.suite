@@ -61,3 +61,12 @@ test Issue029_VariableVirtualClash_3:
 	parser LALR1
 	on "X"
 	yields e(e X)
+
+test Issue034_RNGLR_Tree_Actions:
+	grammar Issue034_RNGLR_Tree_Actions { options {Axiom="s";} terminals { X->'x'; A->'a'; B->'b'; } rules {
+		s->A^ s (B! s)?;
+		s->X^;
+	} }
+	parser RNGLALR1
+	on "axbx"
+	yields A(X X)
