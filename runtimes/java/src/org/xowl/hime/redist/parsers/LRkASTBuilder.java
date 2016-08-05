@@ -301,7 +301,7 @@ class LRkASTBuilder implements SemanticBody {
      *
      * @return The final parse tree
      */
-    public AST GetTree() {
+    public AST getTree() {
         // Get the axiom's sub tree
         SubTree sub = stack[stackNext - 2];
         // Commit the remaining sub-tree

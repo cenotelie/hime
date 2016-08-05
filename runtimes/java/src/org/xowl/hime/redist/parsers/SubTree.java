@@ -33,7 +33,7 @@ import org.xowl.hime.redist.ASTSimpleTree;
  *
  * @author Laurent wouters
  */
-class SubTree {
+class SubTree implements Cloneable {
     /**
      * The pool containing this object
      */

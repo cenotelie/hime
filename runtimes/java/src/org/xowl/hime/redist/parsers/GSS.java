@@ -394,10 +394,8 @@ class GSS {
      * Prints this stack onto the console output
      */
     public void print() {
-        try {
-            OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
+        try (OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8")) {
             printTo(writer);
-            writer.close();
         } catch (IOException ex) {
             // ignore
         }
@@ -410,11 +408,9 @@ class GSS {
      * @throws IOException When failing to write
      */
     public void printTo(String file) throws IOException {
-        FileOutputStream stream = new FileOutputStream(file, false);
-        OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8");
-        printTo(writer);
-        writer.close();
-        stream.close();
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false), "UTF-8")) {
+            printTo(writer);
+        }
     }
 
     /**

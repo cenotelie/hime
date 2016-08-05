@@ -33,7 +33,7 @@ public abstract class AST {
     /**
      * Represents a node in this AST
      */
-    public static class Node {
+    public static final class Node implements Cloneable {
         /**
          * The node's label
          */

@@ -81,6 +81,8 @@ public class IncorrectEncodingSequence extends ParseError {
                 builder.append(Integer.toHexString((int) sequence));
                 builder.append(" <missing>");
                 break;
+            default:
+                break;
         }
         builder.append("]");
         return builder.toString();

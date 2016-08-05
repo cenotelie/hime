@@ -80,6 +80,16 @@ class SPPFBuilder implements SemanticBody {
     }
 
     /**
+     * A factory of history parts
+     */
+    private static class HistoryPartFactory implements Factory<HistoryPart> {
+        @Override
+        public HistoryPart createNew() {
+            return new HistoryPart();
+        }
+    }
+
+    /**
      * The pool of sub-tree with a capacity of 128 nodes
      */
     private final Pool<SubTree> pool8;
@@ -184,12 +194,7 @@ class SPPFBuilder implements SemanticBody {
                 return new SubTree(pool1024, 1024);
             }
         }, 16, SubTree.class);
-        this.poolHPs = new Pool<>(new Factory<HistoryPart>() {
-            @Override
-            public HistoryPart createNew() {
-                return new HistoryPart();
-            }
-        }, INIT_HISTORY_SIZE, HistoryPart.class);
+        this.poolHPs = new Pool<>(new HistoryPartFactory(), INIT_HISTORY_SIZE, HistoryPart.class);
         this.history = new HistoryPart[INIT_HISTORY_SIZE];
         this.nextHP = 0;
         this.cacheChildren = new int[INIT_HANDLE_SIZE];

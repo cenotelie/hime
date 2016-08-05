@@ -206,7 +206,7 @@ public abstract class LRkParser extends BaseLRParser implements IContextProvider
                 continue;
             }
             if (action == LRAction.CODE_ACCEPT)
-                return new ParseResult(allErrors, lexer.getInput(), builder.GetTree());
+                return new ParseResult(allErrors, lexer.getInput(), builder.getTree());
             nextKernel = onUnexpectedToken(nextKernel);
             if (nextKernel.getTerminalID() == Symbol.SID_NOTHING || allErrors.size() >= MAX_ERROR_COUNT)
                 return new ParseResult(allErrors, lexer.getInput());

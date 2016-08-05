@@ -370,6 +370,8 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                     i++;
                     break;
                 }
+                default:
+                    break;
             }
         }
         return result;

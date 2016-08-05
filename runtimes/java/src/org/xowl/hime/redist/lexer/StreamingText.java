@@ -92,7 +92,7 @@ public class StreamingText extends BaseText {
     private void makeAvailable(int index) {
         if (atEnd)
             return;
-        while (index > (contentUpperIndex << UPPER_SHIFT + contentLowerIndex)) {
+        while (index > ((contentUpperIndex << UPPER_SHIFT) + contentLowerIndex)) {
             try {
                 int read = input.read(buffer, 0, BLOCK_SIZE);
                 if (read <= 0) {

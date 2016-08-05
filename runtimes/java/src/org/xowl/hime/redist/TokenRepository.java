@@ -24,6 +24,7 @@ import org.xowl.hime.redist.utils.BigList;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * A repository of matched tokens
@@ -85,11 +86,10 @@ public class TokenRepository implements Iterable<Token> {
 
         @Override
         public Token next() {
-            Token result = null;
-            if (current < cells.size()) {
-                result = at(current);
-                current++;
-            }
+            if (current >= cells.size())
+                throw new NoSuchElementException();
+            Token result = at(current);
+            current++;
             return result;
         }
 

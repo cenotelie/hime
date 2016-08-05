@@ -210,6 +210,8 @@ class FuzzyMatcher {
             case IncorrectUTF16NoLowSurrogate:
                 errors.handle(new IncorrectEncodingSequence(text.getPositionAt(index), text.getValue(index), errorType));
                 break;
+            default:
+                break;
         }
     }
 

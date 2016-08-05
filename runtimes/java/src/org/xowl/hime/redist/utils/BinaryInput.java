@@ -71,50 +71,22 @@ public class BinaryInput {
      * @param name The name of the resource to load
      */
     public BinaryInput(Class type, String name) {
-        InputStream stream = type.getResourceAsStream(name);
-        if (stream == null) {
-            String message = String.format("The resource %s cannot be found in the same assembly as %s", name, type.getName());
-            throw new MissingResourceException(message, type.getName(), name);
-        }
-        init(stream);
-    }
-
-    /**
-     * Initializes this input
-     *
-     * @param stream The input stream to load from
-     */
-    public BinaryInput(InputStream stream) {
-        if (stream == null)
-            throw new IllegalArgumentException("The stream cannot be null");
-        init(stream);
-    }
-
-    /**
-     * Initializes this input
-     *
-     * @param stream The input stream to load from
-     * @return {@code true} if the initialization succeeded, {@code false} otherwise
-     */
-    private boolean init(InputStream stream) {
-        this.content = new ArrayList<>();
-        this.size = 0;
-        boolean onError = false;
-        try {
+        try (InputStream stream = type.getResourceAsStream(name)) {
+            if (stream == null) {
+                String message = String.format("The resource %s cannot be found in the same assembly as %s", name, type.getName());
+                throw new MissingResourceException(message, type.getName(), name);
+            }
+            this.content = new ArrayList<>();
+            this.size = 0;
             load(stream);
-        } catch (IOException ex) {
-            onError = true;
+            this.buffer = ByteBuffer.wrap(buildFullBuffer());
+            this.buffer.order(ByteOrder.LITTLE_ENDIAN);
+            this.content.clear();
+            this.content = null;
+        } catch (IOException exception) {
+            this.size = 0;
+            this.buffer = null;
         }
-        try {
-            stream.close();
-        } catch (IOException ex) {
-            onError = true;
-        }
-        this.buffer = ByteBuffer.wrap(buildFullBuffer());
-        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
-        this.content.clear();
-        this.content = null;
-        return !onError;
     }
 
     /**
@@ -192,14 +164,5 @@ public class BinaryInput {
      */
     public int readInt() {
         return buffer.getInt();
-    }
-
-    /**
-     * Gets the full content of this input as a String
-     *
-     * @return The full content of this input as a String
-     */
-    public String toString() {
-        return new String(buffer.array());
     }
 }
