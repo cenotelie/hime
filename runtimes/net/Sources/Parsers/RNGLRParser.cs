@@ -419,6 +419,8 @@ namespace Hime.Redist.Parsers
 						i++;
 						break;
 					}
+				default:
+					break;
 				}
 			}
 			return result;

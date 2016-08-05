@@ -87,6 +87,8 @@ namespace Hime.Redist
 				builder.Append(((int)sequence).ToString("X4"));
 				builder.Append(" <missing>");
 				break;
+			default:
+				break;
 			}
 			builder.Append("]");
 			return builder.ToString();

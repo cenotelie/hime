@@ -281,6 +281,8 @@ namespace Hime.Redist.Lexer
 			case ParseErrorType.IncorrectUTF16NoLowSurrogate:
 				errors(new IncorrectEncodingSequence(text.GetPositionAt(index), text.GetValue(index), errorType));
 				break;
+			default:
+				break;
 			}
 		}
 
