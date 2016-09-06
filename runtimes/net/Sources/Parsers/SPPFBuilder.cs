@@ -430,9 +430,9 @@ namespace Hime.Redist.Parsers
 						cacheChildren[0] = root;
 						insertion = 1;
 					}
-						// save the new promoted node
+					// save the new promoted node
 					root = cacheChildren[handle[i]];
-                        // repack the children on the left if any
+					// repack the children on the left if any
 					int nb = result.GetChildrenCount(root);
 					Array.Copy(cacheChildren, handle[i] + 1, cacheChildren, insertion, nb);
 					Array.Copy(cacheActions, handle[i] + 1, cacheActions, insertion, nb);

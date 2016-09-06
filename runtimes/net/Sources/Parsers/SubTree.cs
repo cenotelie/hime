@@ -42,7 +42,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The nodes in this buffer
 		/// </summary>
-		private ASTSimpleTree.Node[] nodes;
+		private AST.Node[] nodes;
 		/// <summary>
 		/// The tree actions for the nodes
 		/// </summary>
@@ -120,7 +120,7 @@ namespace Hime.Redist.Parsers
 		public SubTree(Pool<SubTree> pool, int capacity)
 		{
 			this.pool = pool;
-			nodes = new ASTSimpleTree.Node[capacity];
+			nodes = new AST.Node[capacity];
 			actions = new TreeAction[capacity];
 		}
 
@@ -144,7 +144,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action applied on the root</param>
 		public void SetupRoot(TableElemRef symbol, TreeAction action)
 		{
-			nodes[0] = new ASTSimpleTree.Node(symbol);
+			nodes[0] = new AST.Node(symbol);
 			actions[0] = action;
 		}
 
@@ -199,7 +199,7 @@ namespace Hime.Redist.Parsers
 		/// If the index is 0, the root's children are commited, assuming this is a depth-1 sub-tree.
 		/// If not, the children of the child at the given index are commited.
 		/// </remarks>
-		public void CommitChildrenOf(int index, ASTSimpleTree ast)
+		public void CommitChildrenOf(int index, AST ast)
 		{
 			if (nodes[index].count != 0)
 				nodes[index].first = ast.Store(nodes, index + 1, nodes[index].count);
@@ -223,7 +223,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action</param>
 		public void SetAt(int index, TableElemRef symbol, TreeAction action)
 		{
-			nodes[index] = new ASTSimpleTree.Node(symbol);
+			nodes[index] = new AST.Node(symbol);
 			actions[index] = action;
 		}
 

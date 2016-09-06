@@ -268,17 +268,17 @@ namespace Hime.Redist.Parsers
 						insertion = 2;
 					}
 					promotion = true;
-                        // Save the new promoted node
+					// Save the new promoted node
 					cache.Move(handle[i], 0);
-                        // Repack the children on the left if any
+					// Repack the children on the left if any
 					int nb = cache.GetChildrenCountAt(0);
 					cache.MoveRange(handle[i] + 1, insertion, nb);
 					insertion += nb;
 					break;
 				default:
-                        // Commit the children if any
+					// Commit the children if any
 					cache.CommitChildrenOf(handle[i], result);
-                        // Repack the sub-root on the left
+					// Repack the sub-root on the left
 					if (insertion != handle[i])
 						cache.Move(handle[i], insertion);
 					insertion++;
