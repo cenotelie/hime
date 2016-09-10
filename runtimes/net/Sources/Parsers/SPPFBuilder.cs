@@ -54,7 +54,7 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// The GSS labels in this part
 			/// </summary>
-			public GSSLabel[] data;
+			public int[] data;
 			/// <summary>
 			/// The index of the represented GSS generation
 			/// </summary>
@@ -70,7 +70,7 @@ namespace Hime.Redist.Parsers
 			public HistoryPart()
 			{
 				generation = 0;
-				data = new GSSLabel[INIT_HISTORY_PART_SIZE];
+				data = new int[INIT_HISTORY_PART_SIZE];
 				next = 0;
 			}
 		}
@@ -92,18 +92,6 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// The pool of sub-tree with a capacity of 8 nodes
-		/// </summary>
-		private readonly Pool<SubTree> pool8;
-		/// <summary>
-		/// The pool of sub-tree with a capacity of 128 nodes
-		/// </summary>
-		private readonly Pool<SubTree> pool128;
-		/// <summary>
-		/// The pool of sub-tree with a capacity of 1024 nodes
-		/// </summary>
-		private readonly Pool<SubTree> pool1024;
-		/// <summary>
 		/// The pool of history parts
 		/// </summary>
 		private readonly Pool<HistoryPart> poolHPs;
@@ -115,15 +103,14 @@ namespace Hime.Redist.Parsers
 		/// The next available slot for a history part
 		/// </summary>
 		private int nextHP;
-
+		/// <summary>
+		/// The SPPF being built
+		/// </summary>
+		private SPPF sppf;
 		/// <summary>
 		/// The adjacency cache for the reduction
 		/// </summary>
-		private int[] cacheChildren;
-		/// <summary>
-		/// The actions cache for the reduction
-		/// </summary>
-		private TreeAction[] cacheActions;
+		private SPPFNodeRef[] cacheChildren;
 		/// <summary>
 		/// The new available slot in the current cache
 		/// </summary>
@@ -131,7 +118,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The reduction handle represented as the indices of the sub-trees in the cache
 		/// </summary>
-		private int[] handle;
+		private int[] handleIndices;
+		/// <summary>
+		/// The actions for the reduction
+		/// </summary>
+		private TreeAction[] handleActions;
 		/// <summary>
 		/// The index of the next available slot in the handle
 		/// </summary>
@@ -139,16 +130,15 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The stack of semantic objects for the reduction
 		/// </summary>
-		private GSSLabel[] stack;
+		private int[] stack;
 		/// <summary>
 		/// The number of items popped from the stack
 		/// </summary>
 		private int popCount;
-
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		private readonly ASTGraph result;
+		private readonly ASTSimpleTree result;
 
 		#region Implementation of SemanticBody
 
@@ -157,7 +147,16 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="index">Index of the symbol</param>
 		/// <returns>The symbol at the given index</returns>
-		public SemanticElement this[int index] { get { return  result.GetSemanticElementForNode(cacheChildren[handle[index]]); } }
+		public SemanticElement this[int index]
+		{
+			get
+			{
+				SPPFNodeRef reference = cacheChildren[handleIndices[index]];
+				SPPFNode sppfNode = sppf.GetNode(reference.NodeId);
+				TableElemRef label = (sppfNode as SPPFNodeNormal).GetVersion(reference.Version).Label;
+				return result.GetSemanticElementForLabel(label);
+			}
+		}
 
 		/// <summary>
 		/// Gets the length of this body
@@ -167,11 +166,6 @@ namespace Hime.Redist.Parsers
 		#endregion
 
 		/// <summary>
-		/// Gets the epsilon GSS label
-		/// </summary>
-		public GSSLabel Epsilon { get { return new GSSLabel(null); } }
-
-		/// <summary>
 		/// Initializes this SPPF
 		/// </summary>
 		/// <param name="tokens">The token table</param>
@@ -179,17 +173,15 @@ namespace Hime.Redist.Parsers
 		/// <param name="virtuals">The table of parser virtuals</param>
 		public SPPFBuilder(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 		{
-			pool8 = new Pool<SubTree>(new SubTreeFactory(8), 1024);
-			pool128 = new Pool<SubTree>(new SubTreeFactory(128), 128);
-			pool1024 = new Pool<SubTree>(new SubTreeFactory(1024), 16);
 			poolHPs = new Pool<HistoryPart>(new HistoryPartFactory(), INIT_HISTORY_SIZE);
 			history = new HistoryPart[INIT_HISTORY_SIZE];
 			nextHP = 0;
-			cacheChildren = new int[INIT_HANDLE_SIZE];
-			cacheActions = new TreeAction[INIT_HANDLE_SIZE];
-			handle = new int[INIT_HANDLE_SIZE];
-			stack = new GSSLabel[INIT_HANDLE_SIZE];
-			result = new ASTGraph(tokens, variables, virtuals);
+			sppf = new SPPF();
+			cacheChildren = new SPPFNodeRef[INIT_HANDLE_SIZE];
+			handleIndices = new int[INIT_HANDLE_SIZE];
+			handleActions = new TreeAction[INIT_HANDLE_SIZE];
+			stack = new int[INIT_HANDLE_SIZE];
+			result = new ASTSimpleTree(tokens, variables, virtuals);
 		}
 
 		/// <summary>
@@ -220,10 +212,9 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="label">The label of a GSS edge</param>
 		/// <returns>The symbol on the edge</returns>
-		public Symbol GetSymbolOn(GSSLabel label)
+		public Symbol GetSymbolOn(int label)
 		{
-			TableElemRef reference = label.IsReplaceable ? label.ReplaceableTree.GetLabelAt(0) : label.Original;
-			return result.GetSymbolFor(reference);
+			return result.GetSymbolFor(sppf.GetNode(label).OriginalSymbol);
 		}
 
 		/// <summary>
@@ -232,25 +223,17 @@ namespace Hime.Redist.Parsers
 		/// <param name="generation">The index of a GSS generation</param>
 		/// <param name="symbol">A symbol to look for</param>
 		/// <returns>The existing GSS label, or the epsilon label</returns>
-		public GSSLabel GetLabelFor(int generation, TableElemRef symbol)
+		public int GetLabelFor(int generation, TableElemRef symbol)
 		{
 			HistoryPart hp = GetHistoryPart(generation);
 			if (hp == null)
-				return Epsilon;
+				return SPPF.EPSILON;
 			for (int i = 0; i != hp.next; i++)
 			{
-				if (hp.data[i].IsReplaceable)
-				{
-					if (hp.data[i].ReplaceableTree.GetLabelAt(0) == symbol)
-						return hp.data[i];
-				}
-				else
-				{
-					if (hp.data[i].Original == symbol)
-						return hp.data[i];
-				}
+				if (sppf.GetNode(hp.data[i]).OriginalSymbol == symbol)
+					return hp.data[i];
 			}
-			return Epsilon;
+			return SPPF.EPSILON;
 		}
 
 		/// <summary>
@@ -260,22 +243,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The created node's index in the SPPF</returns>
 		public int GetSingleNode(TableElemRef symbol)
 		{
-			return result.Store(symbol);
-		}
-
-		/// <summary>
-		/// Gets a pooled sub-tree with the given maximal size
-		/// </summary>
-		/// <param name="size">The size of the sub-tree</param>
-		private SubTree GetSubTree(int size)
-		{
-			if (size <= 8)
-				return pool8.Acquire();
-			if (size <= 128)
-				return pool128.Acquire();
-			if (size <= 1024)
-				return pool1024.Acquire();
-			return new SubTree(null, size);
+			return sppf.NewNode(symbol);
 		}
 
 		/// <summary>
@@ -284,7 +252,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="first">The first label</param>
 		/// <param name="path">The path being reduced</param>
 		/// <param name="length">The reduction length</param>
-		public void ReductionPrepare(GSSLabel first, GSSPath path, int length)
+		public void ReductionPrepare(int first, GSSPath path, int length)
 		{
 			// build the stack
 			if (length > 0)
@@ -311,23 +279,24 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Adds the specified GSS label to the reduction cache with the given tree action
 		/// </summary>
-		/// <param name="label">The label to add to the cache</param>
+		/// <param name="gssLabel">The label to add to the cache</param>
 		/// <param name="action">The tree action to apply</param>
-		private void AddToCache(GSSLabel label, TreeAction action)
+		private void AddToCache(int gssLabel, TreeAction action)
 		{
 			if (action == TreeAction.Drop)
 				return;
-			if (label.IsReplaceable)
+			SPPFNode node = sppf.GetNode(gssLabel);
+			if (node.IsReplaceable)
 			{
+				SPPFNodeReplaceable replaceable = node as SPPFNodeReplaceable;
 				// this is replaceable sub-tree
-				SubTree sub = label.ReplaceableTree;
-				for (int i = 0; i != sub.GetChildrenCountAt(0); i++)
-					AddToCache(sub.GetLabelAt(i + 1).Index, sub.GetActionAt(i + 1));
+				for (int i = 0; i != replaceable.ChildrenCount; i++)
+					AddToCache(sppf.GetNode(replaceable.Children[i].NodeId) as SPPFNodeNormal, replaceable.Actions[i]);
 			}
 			else
 			{
 				// this is a simple reference to an existing SPPF node
-				AddToCache(label.NodeIndex, action);
+				AddToCache(node as SPPFNodeNormal, action);
 			}
 		}
 
@@ -336,29 +305,29 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="node">The node to add to the cache</param>
 		/// <param name="action">The tree action to apply onto the node</param>
-		private void AddToCache(int node, TreeAction action)
+		private void AddToCache(SPPFNodeNormal node, TreeAction action)
 		{
-			int count = result.GetChildrenCount(node);
-			if (cacheNext + count >= cacheChildren.Length)
+			SPPFNodeVersion version = node.DefaultVersion;
+			while (cacheNext + version.ChildrenCount + 1 >= cacheChildren.Length)
 			{
 				// the current cache is not big enough, build a bigger one
-				int[] t1 = new int[cacheChildren.Length + INIT_HANDLE_SIZE];
-				TreeAction[] t2 = new TreeAction[cacheActions.Length + INIT_HANDLE_SIZE];
-				Array.Copy(cacheChildren, t1, cacheChildren.Length);
-				Array.Copy(cacheActions, t2, cacheActions.Length);
-				cacheChildren = t1;
-				cacheActions = t2;
+				Array.Resize(ref cacheChildren, cacheChildren.Length + INIT_HANDLE_SIZE);
 			}
 			// add the node in the cache
-			cacheChildren[cacheNext] = node;
-			cacheActions[cacheNext] = action;
+			cacheChildren[cacheNext] = new SPPFNodeRef(node.Identifier, 0);
 			// setup the handle to point to the root
-			if (handleNext == handle.Length)
-				Array.Resize(ref handle, handle.Length + INIT_HANDLE_SIZE);
-			handle[handleNext++] = cacheNext;
-			// copy the root's children
-			result.GetAdjacency(node, cacheChildren, cacheNext + 1);
-			cacheNext += count + 1;
+			if (handleNext == handleIndices.Length)
+			{
+				Array.Resize(ref handleIndices, handleIndices.Length + INIT_HANDLE_SIZE);
+				Array.Resize(ref handleActions, handleActions.Length + INIT_HANDLE_SIZE);
+			}
+			handleIndices[handleNext] = cacheNext;
+			handleActions[handleNext] = action;
+			// copy the children
+			if (version.ChildrenCount > 0)
+				Array.Copy(version.Children, 0, cacheChildren, cacheNext + 1, version.ChildrenCount);
+			handleNext++;
+			cacheNext += version.ChildrenCount + 1;
 		}
 
 		/// <summary>
@@ -370,7 +339,25 @@ namespace Hime.Redist.Parsers
 		{
 			if (action == TreeAction.Drop)
 				return; // why would you do this?
-			AddToCache(result.Store(new TableElemRef(TableType.Virtual, index)), action);
+			int nodeId = sppf.NewNode(new TableElemRef(TableType.Virtual, index));
+			if (cacheNext + 1 >= cacheChildren.Length)
+			{
+				// the current cache is not big enough, build a bigger one
+				Array.Resize(ref cacheChildren, cacheChildren.Length + INIT_HANDLE_SIZE);
+			}
+			// add the node in the cache
+			cacheChildren[cacheNext] = new SPPFNodeRef(nodeId, 0);
+			// setup the handle to point to the root
+			if (handleNext == handleIndices.Length)
+			{
+				Array.Resize(ref handleIndices, handleIndices.Length + INIT_HANDLE_SIZE);
+				Array.Resize(ref handleActions, handleActions.Length + INIT_HANDLE_SIZE);
+			}
+			handleIndices[handleNext] = cacheNext;
+			handleActions[handleNext] = action;
+			// copy the children
+			handleNext++;
+			cacheNext++;
 		}
 
 		/// <summary>
@@ -378,18 +365,9 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="nullable">The sub-tree of a nullable variable</param>
 		/// <param name="action">The tree action applied onto the symbol</param>
-		public void ReductionAddNullable(GSSLabel nullable, TreeAction action)
+		public void ReductionAddNullable(int nullable, TreeAction action)
 		{
-			if (action == TreeAction.Drop)
-				return;
-			if (nullable.IsReplaceable)
-			{
-				AddToCache(new GSSLabel(nullable.ReplaceableTree.Clone()), action);
-			}
-			else
-			{
-				AddToCache(result.CopyNode(nullable.NodeIndex), action);
-			}
+			AddToCache(nullable, action);
 		}
 
 		/// <summary>
@@ -398,10 +376,10 @@ namespace Hime.Redist.Parsers
 		/// <param name="generation">The generation to reduce from</param>
 		/// <param name="varIndex">The reduced variable index</param>
 		/// <param name="replaceable">Whether the sub-tree to build must have a replaceable root or not</param>
-		/// <returns>The produced sub-tree</returns>
-		public GSSLabel Reduce(int generation, int varIndex, bool replaceable)
+		/// <returns>The identifier of the produced SPPF node</returns>
+		public int Reduce(int generation, int varIndex, bool replaceable)
 		{
-			GSSLabel label = replaceable ? ReduceReplaceable(varIndex) : ReduceNormal(varIndex);
+			int label = replaceable ? ReduceReplaceable(varIndex) : ReduceNormal(varIndex);
 			AddToHistory(generation, label);
 			return label;
 		}
@@ -410,78 +388,75 @@ namespace Hime.Redist.Parsers
 		/// Executes the reduction as a normal reduction
 		/// </summary>
 		/// <param name="varIndex">The reduced variable index</param>
-		/// <returns>The produced sub-tree</returns>
-		private GSSLabel ReduceNormal(int varIndex)
+		/// <returns>The identifier of the produced SPPF node</returns>
+		private int ReduceNormal(int varIndex)
 		{
-			int root = -1;
+			TableElemRef promotedSymbol = new TableElemRef();
+			SPPFNodeRef promotedReference = new SPPFNodeRef(SPPF.EPSILON, 0);
+
 			int insertion = 0;
 			for (int i = 0; i != handleNext; i++)
 			{
-				switch (cacheActions[handle[i]])
+				switch (handleActions[i])
 				{
 				case TreeAction.Promote:
-					if (root != -1)
+					if (promotedReference.NodeId != SPPF.EPSILON)
 					{
 						// not the first promotion
-						// store the adjacency data for the previously promoted node
-						int index = result.Store(cacheChildren, insertion);
-						result.SetAdjacency(root, index, insertion);
-						// put the previously promoted node in the cache
-						cacheChildren[0] = root;
+						// create a new version for the promoted node
+						SPPFNodeNormal oldPromotedNode = sppf.GetNode(promotedReference.NodeId) as SPPFNodeNormal;
+						SPPFNodeRef oldPromotedRef = oldPromotedNode.NewVersion(promotedSymbol, cacheChildren, insertion);
+						// register the previously promoted reference into the cache
+						cacheChildren[0] = oldPromotedRef;
 						insertion = 1;
 					}
 					// save the new promoted node
-					root = cacheChildren[handle[i]];
+					promotedReference = cacheChildren[handleIndices[i]];
+					SPPFNodeNormal promotedNode = sppf.GetNode(promotedReference.NodeId) as SPPFNodeNormal;
+					SPPFNodeVersion promotedVersion = promotedNode.GetVersion(promotedReference.Version);
+					promotedSymbol = promotedVersion.Label;
 					// repack the children on the left if any
-					int nb = result.GetChildrenCount(root);
-					Array.Copy(cacheChildren, handle[i] + 1, cacheChildren, insertion, nb);
-					Array.Copy(cacheActions, handle[i] + 1, cacheActions, insertion, nb);
-					insertion += nb;
+					Array.Copy(cacheChildren, handleIndices[i] + 1, cacheChildren, insertion, promotedVersion.ChildrenCount);
+					insertion += promotedVersion.ChildrenCount;
 					break;
 				default:
-                        // Repack the sub-root on the left
-					if (insertion != handle[i])
-						cacheChildren[insertion] = cacheChildren[handle[i]];
+					// Repack the sub-root on the left
+					if (insertion != handleIndices[i])
+						cacheChildren[insertion] = cacheChildren[handleIndices[i]];
 					insertion++;
 					break;
 				}
 			}
-			if (root == -1)
-			{
-				// no promotion, create the node for the root
-				root = result.Store(new TableElemRef(TableType.Variable, varIndex));
-			}
-			// setup the adjacency for the new root
-			result.SetAdjacency(root, result.Store(cacheChildren, insertion), insertion);
-			// create the GSS label
-			return new GSSLabel(new TableElemRef(TableType.Variable, varIndex), root);
+
+			TableElemRef originalLabel = new TableElemRef(TableType.Variable, varIndex);
+			TableElemRef currentLabel = promotedReference.NodeId != SPPF.EPSILON ? promotedSymbol : originalLabel;
+			return sppf.NewNode(originalLabel, currentLabel, cacheChildren, insertion);
 		}
 
 		/// <summary>
 		/// Executes the reduction as the reduction of a replaceable variable
 		/// </summary>
 		/// <param name="varIndex">The reduced variable index</param>
-		/// <returns>The produced sub-tree</returns>
-		private GSSLabel ReduceReplaceable(int varIndex)
+		/// <returns>The identifier of the produced SPPF node</returns>
+		private int ReduceReplaceable(int varIndex)
 		{
-			SubTree tree = GetSubTree(handleNext + 1);
-			tree.SetupRoot(new TableElemRef(TableType.Variable, varIndex), TreeAction.Replace);
-			tree.SetChildrenCountAt(0, handleNext);
+			int insertion = 0;
 			for (int i = 0; i != handleNext; i++)
 			{
-				int node = cacheChildren[handle[i]];
-				TreeAction action = cacheActions[handle[i]];
-				tree.SetAt(i + 1, new TableElemRef(TableType.None, node), action);
+				if (insertion != handleIndices[i])
+					cacheChildren[insertion] = cacheChildren[handleIndices[i]];
+				insertion++;
 			}
-			return new GSSLabel(tree);
+			TableElemRef originalLabel = new TableElemRef(TableType.Variable, varIndex);
+			return sppf.NewReplaceableNode(originalLabel, cacheChildren, handleActions, handleNext);
 		}
 
 		/// <summary>
 		/// Adds the specified GSS label to the current history
 		/// </summary>
 		/// <param name="generation">The current generation</param>
-		/// <param name="label">The label to register</param>
-		private void AddToHistory(int generation, GSSLabel label)
+		/// <param name="label">The label identifier of the SPPF node to use as a GSS label</param>
+		private void AddToHistory(int generation, int label)
 		{
 			HistoryPart hp = GetHistoryPart(generation);
 			if (hp == null)
@@ -501,12 +476,33 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Finalizes the parse tree and returns it
 		/// </summary>
-		/// <param name="root">The root's sub-tree</param>
+		/// <param name="root">The identifier of the SPPF node that serves as root</param>
 		/// <returns>The final parse tree</returns>
-		public AST GetTree(GSSLabel root)
+		public AST GetTree(int root)
 		{
-			result.SetRoot(root.NodeIndex);
+			AST.Node astRoot = BuildFinalAST(new SPPFNodeRef(root, 0));
+			result.StoreRoot(astRoot);
 			return result;
+		}
+
+		/// <summary>
+		/// Builds the final AST for the specified SPPF node reference
+		/// </summary>
+		/// <param name="reference">A reference to an SPPF node in a specific version</param>
+		/// <returns>The AST node for the SPPF reference</returns>
+		public AST.Node BuildFinalAST(SPPFNodeRef reference)
+		{
+			SPPFNode sppfNode = sppf.GetNode(reference.NodeId);
+			SPPFNodeVersion version = (sppfNode as SPPFNodeNormal).GetVersion(reference.Version);
+
+			if (version.ChildrenCount == 0)
+				return new AST.Node(version.Label);
+
+			AST.Node[] buffer = new AST.Node[version.ChildrenCount];
+			for (int i = 0; i != version.ChildrenCount; i++)
+				buffer[i] = BuildFinalAST(version.Children[i]);
+			int first = result.Store(buffer, 0, version.ChildrenCount);
+			return new AST.Node(version.Label, version.ChildrenCount, first);
 		}
 	}
 }

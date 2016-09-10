@@ -48,7 +48,7 @@ namespace Hime.Redist.Parsers
 			/// <summary>
 			/// The first label in the GSS
 			/// </summary>
-			public readonly GSSLabel first;
+			public readonly int first;
 
 			/// <summary>
 			/// Initializes this operation
@@ -56,7 +56,7 @@ namespace Hime.Redist.Parsers
 			/// <param name="node">The GSS node to reduce from</param>
 			/// <param name="prod">The LR production for the reduction</param>
 			/// <param name="first">The first label in the GSS</param>
-			public Reduction(int node, LRProduction prod, GSSLabel first)
+			public Reduction(int node, LRProduction prod, int first)
 			{
 				this.node = node;
 				this.prod = prod;
@@ -105,7 +105,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The sub-trees for the constant nullable variables
 		/// </summary>
-		private readonly GSSLabel[] nullables;
+		private readonly int[] nullables;
 		/// <summary>
 		/// The next token
 		/// </summary>
@@ -133,7 +133,7 @@ namespace Hime.Redist.Parsers
 			parserAutomaton = automaton;
 			gss = new GSS();
 			sppf = new SPPFBuilder(lexer.tokens, symVariables, symVirtuals);
-			nullables = new GSSLabel[variables.Length];
+			nullables = new int[variables.Length];
 			BuildNullables(variables.Length);
 			sppf.ClearHistory();
 		}
@@ -354,7 +354,7 @@ namespace Hime.Redist.Parsers
 						if (ok)
 						{
 							LRProduction prod = parserAutomaton.GetNullableProduction(i);
-							nullables[i] = BuildSPPF(0, prod, sppf.Epsilon, null);
+							nullables[i] = BuildSPPF(0, prod, SPPF.EPSILON, null);
 							dependencies[i] = null;
 							solved++;
 						}
@@ -575,8 +575,8 @@ namespace Hime.Redist.Parsers
 		/// <param name="production">The LR production</param>
 		/// <param name="first">The first label of the path</param>
 		/// <param name="path">The reduction path</param>
-		/// <returns>The corresponding SPPF part</returns>
-		private GSSLabel BuildSPPF(int generation, LRProduction production, GSSLabel first, GSSPath path)
+		/// <returns>The identifier of the corresponding SPPF node</returns>
+		private int BuildSPPF(int generation, LRProduction production, int first, GSSPath path)
 		{
 			Symbol variable = symVariables[production.Head];
 			sppf.ReductionPrepare(first, path, production.ReductionLength);
@@ -634,7 +634,7 @@ namespace Hime.Redist.Parsers
 				if (action.Code == LRActionCode.Shift)
 					shifts.Enqueue(new Shift(v0, action.Data));
 				else if (action.Code == LRActionCode.Reduce)
-					reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), sppf.Epsilon));
+					reductions.Enqueue(new Reduction(v0, parserAutomaton.GetProduction(action.Data), SPPF.EPSILON));
 			}
 
 			while (nextToken.TerminalID != Symbol.SID_EPSILON) // Wait for ε token
@@ -715,8 +715,8 @@ namespace Hime.Redist.Parsers
 			// Get the rule's head
 			Symbol head = symVariables[reduction.prod.Head];
 			// Resolve the sub-root
-			GSSLabel label = sppf.GetLabelFor(path.Generation, new TableElemRef(TableType.Variable, reduction.prod.Head));
-			if (label.IsEpsilon)
+			int label = sppf.GetLabelFor(path.Generation, new TableElemRef(TableType.Variable, reduction.prod.Head));
+			if (label == SPPF.EPSILON)
 			{
 				// not in history, build the SPPF here
 				label = BuildSPPF(generation, reduction.prod, reduction.first, path);
@@ -769,7 +769,7 @@ namespace Hime.Redist.Parsers
 					{
 						LRProduction prod = parserAutomaton.GetProduction(action.Data);
 						if (prod.ReductionLength == 0)
-							reductions.Enqueue(new Reduction(w, prod, sppf.Epsilon));
+							reductions.Enqueue(new Reduction(w, prod, SPPF.EPSILON));
 						else if (reduction.prod.ReductionLength != 0)
 							reductions.Enqueue(new Reduction(path.Last, prod, label));
 					}
@@ -789,7 +789,7 @@ namespace Hime.Redist.Parsers
 
 			// Create the GSS label to be used for the transitions
 			TableElemRef sym = new TableElemRef(TableType.Token, oldtoken.Index);
-			GSSLabel label = new GSSLabel(sym, sppf.GetSingleNode(sym));
+			int label = sppf.GetSingleNode(sym);
 
 			// Execute all shifts in the queue at this point
 			int count = shifts.Count;
@@ -804,7 +804,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="gen">The GSS generation to start from</param>
 		/// <param name="label">The GSS label to use for the new GSS edges</param>
 		/// <param name="shift">The shift operation</param>
-		private void ExecuteShift(int gen, GSSLabel label, Shift shift)
+		private void ExecuteShift(int gen, int label, Shift shift)
 		{
 			int w = gss.FindNode(gen, shift.to);
 			if (w != -1)
@@ -841,7 +841,7 @@ namespace Hime.Redist.Parsers
 					{
 						LRProduction prod = parserAutomaton.GetProduction(action.Data);
 						if (prod.ReductionLength == 0) // Length 0 => reduce from the head
-							reductions.Enqueue(new Reduction(w, prod, sppf.Epsilon));
+							reductions.Enqueue(new Reduction(w, prod, SPPF.EPSILON));
 						else // reduce from the second node on the path
 							reductions.Enqueue(new Reduction(shift.from, prod, label));
 					}

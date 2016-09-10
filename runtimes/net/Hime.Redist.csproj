@@ -120,11 +120,9 @@
     <Compile Include="Sources\TableType.cs" />
     <Compile Include="Sources\TableElemRef.cs" />
     <Compile Include="Sources\Parsers\LROpCodeBase.cs" />
-    <Compile Include="Sources\Parsers\GSSLabel.cs" />
     <Compile Include="Sources\Parsers\SubTreeFactory.cs" />
     <Compile Include="Sources\Lexer\PrefetchedText.cs" />
     <Compile Include="Sources\Lexer\ContextFreeLexer.cs" />
-    <Compile Include="Sources\ASTGraph.cs" />
     <Compile Include="Sources\Parsers\SPPFBuilder.cs" />
     <Compile Include="Sources\TextContext.cs" />
     <Compile Include="Sources\Utils\ROList.cs" />
@@ -134,6 +132,12 @@
     <Compile Include="Sources\Lexer\TokenMatch.cs" />
     <Compile Include="Sources\Lexer\FuzzyMatcher.cs" />
     <Compile Include="Sources\UnexpectedEndOfInput.cs" />
+    <Compile Include="Sources\Parsers\SPPF.cs" />
+    <Compile Include="Sources\Parsers\SPPFNode.cs" />
+    <Compile Include="Sources\Parsers\SPPFNodeNormal.cs" />
+    <Compile Include="Sources\Parsers\SPPFNodeReplaceable.cs" />
+    <Compile Include="Sources\Parsers\SPPFNodeVersion.cs" />
+    <Compile Include="Sources\Parsers\SPPFNodeRef.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

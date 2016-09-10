@@ -33,6 +33,10 @@ namespace Hime.Redist.Parsers
 		/// The index of the node to which this edge arrives to
 		/// </summary>
 		private readonly int to;
+		/// <summary>
+		/// The identifier of the SPPF node that serve as label for this edge
+		/// </summary>
+		private readonly int label;
 
 		/// <summary>
 		/// Gets the index of the node from which this edge starts
@@ -45,14 +49,21 @@ namespace Hime.Redist.Parsers
 		public int To { get { return to; } }
 
 		/// <summary>
+		/// Gets the identifier of the SPPF node that serve as label for this edge
+		/// </summary>
+		public int Label { get { return label; } }
+
+		/// <summary>
 		/// Initializes this edge
 		/// </summary>
 		/// <param name="from">Index of the node from which this edge starts</param>
 		/// <param name="to">Index of the node to which this edge arrives to</param>
-		public GSSEdge(int from, int to)
+		/// <param name="label">The identifier of the SPPF node that serve as label for this edge</param>
+		public GSSEdge(int from, int to, int label)
 		{
 			this.from = from;
 			this.to = to;
+			this.label = label;
 		}
 	}
 }

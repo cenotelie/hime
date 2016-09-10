@@ -55,6 +55,19 @@ namespace Hime.Redist
 				this.count = 0;
 				this.first = -1;
 			}
+
+			/// <summary>
+			/// Initializes this node
+			/// </summary>
+			/// <param name="label">The node's label</param>
+			/// <param name="count">The number of children</param>
+			/// <param name="first">The index of the first child</param>
+			public Node(TableElemRef label, int count, int first)
+			{
+				this.label = label;
+				this.count = count;
+				this.first = first;
+			}
 		}
 
 		/// <summary>

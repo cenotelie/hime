@@ -34,7 +34,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The labels on this GSS path
 		/// </summary>
-		private GSSLabel[] labels;
+		private int[] labels;
 
 		/// <summary>
 		/// Gets or sets the final target of this path
@@ -57,7 +57,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Gets or sets the i-th label of the edges traversed by this path
 		/// </summary>
-		public GSSLabel this[int index]
+		public int this[int index]
 		{
 			get { return labels[index]; }
 			set { labels[index] = value; }
@@ -69,7 +69,7 @@ namespace Hime.Redist.Parsers
 		public GSSPath(int length)
 		{
 			Last = 0;
-			labels = new GSSLabel[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
+			labels = new int[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
 		}
 
 		/// <summary>
@@ -88,7 +88,7 @@ namespace Hime.Redist.Parsers
 		public void Ensure(int length)
 		{
 			if (length > labels.Length)
-				labels = new GSSLabel[length];
+				labels = new int[length];
 		}
 
 		/// <summary>
