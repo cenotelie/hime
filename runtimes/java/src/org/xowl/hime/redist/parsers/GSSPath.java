@@ -41,7 +41,7 @@ class GSSPath {
     /**
      * The labels on this GSS path
      */
-    private GSSLabel[] labels;
+    private int[] labels;
 
     /**
      * Gets the final target of this path
@@ -85,7 +85,7 @@ class GSSPath {
      * @param index Index of the label of the edges traversed by this path
      * @return The i-th label of the edges traversed by this path
      */
-    public GSSLabel get(int index) {
+    public int get(int index) {
         return labels[index];
     }
 
@@ -95,7 +95,7 @@ class GSSPath {
      * @param index Index of the label of the edges traversed by this path
      * @param label The i-th label of the edges traversed by this path
      */
-    public void set(int index, GSSLabel label) {
+    public void set(int index, int label) {
         labels[index] = label;
     }
 
@@ -106,7 +106,7 @@ class GSSPath {
      */
     public GSSPath(int length) {
         this.last = 0;
-        this.labels = new GSSLabel[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
+        this.labels = new int[length < INIT_BUFFER_SIZE ? INIT_BUFFER_SIZE : length];
     }
 
     /**
@@ -116,7 +116,7 @@ class GSSPath {
      */
     public void ensure(int length) {
         if (length > labels.length)
-            labels = new GSSLabel[length];
+            labels = new int[length];
     }
 
     /**

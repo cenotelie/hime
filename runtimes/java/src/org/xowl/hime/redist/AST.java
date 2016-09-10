@@ -58,6 +58,19 @@ public abstract class AST {
             this.first = -1;
         }
 
+        /**
+         * Initializes this node
+         *
+         * @param label The node's label
+         * @param count The number of children
+         * @param first The index of the first child
+         */
+        public Node(int label, int count, int first) {
+            this.label = label;
+            this.count = count;
+            this.first = first;
+        }
+
         @Override
         public Node clone() {
             Node temp = new Node(label);

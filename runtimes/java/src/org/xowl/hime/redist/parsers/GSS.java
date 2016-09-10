@@ -38,10 +38,6 @@ class GSS {
      * The initial size of the paths buffer in this GSS
      */
     private static final int INIT_PATHS_COUNT = 64;
-    /**
-     * The initial size of the stack used for the traversal of this GSS
-     */
-    private static final int INIT_STACK_SIZE = 128;
 
     /**
      * Represents a set of paths
@@ -70,10 +66,6 @@ class GSS {
      */
     private final IntBigList nodeLabels;
     /**
-     * The number of live incoming edges to the GSS node for the given index
-     */
-    private final IntBigList nodeIncomings;
-    /**
      * The generations in this GSS
      */
     private final BigList<GSSGeneration> nodeGenerations;
@@ -98,22 +90,15 @@ class GSS {
     private final PathSet paths;
 
     /**
-     * Stack of GSS nodes used for the traversal of the GSS
-     */
-    private int[] stack;
-
-    /**
      * Initializes the GSS
      */
     public GSS() {
         this.nodeLabels = new IntBigList();
-        this.nodeIncomings = new IntBigList();
         this.nodeGenerations = new BigList<>(GSSGeneration.class, GSSGeneration[].class);
         this.edges = new BigList<>(GSSEdge.class, GSSEdge[].class);
         this.edgeGenerations = new BigList<>(GSSGeneration.class, GSSGeneration[].class);
         this.generation = -1;
         this.paths = new PathSet();
-        this.stack = new int[INIT_STACK_SIZE];
     }
 
     /**
@@ -184,11 +169,6 @@ class GSS {
      * @return The index of the new generation
      */
     public int createGeneration() {
-        if (generation != 0 && ((generation & 0xF) == 0)) {
-            // the current generation is not 0 (first one) and is a multiple of 16
-            // => cleanup the GSS from unreachable data
-            cleanup();
-        }
         nodeGenerations.add(new GSSGeneration(nodeLabels.size()));
         edgeGenerations.add(new GSSGeneration(edges.size()));
         generation++;
@@ -203,7 +183,6 @@ class GSS {
      */
     public int createNode(int state) {
         int node = nodeLabels.add(state);
-        nodeIncomings.add(0);
         GSSGeneration data = nodeGenerations.get(generation);
         data.increment();
         return node;
@@ -216,11 +195,10 @@ class GSS {
      * @param to    The edge's target node
      * @param label The edge's label
      */
-    public void createEdge(int from, int to, GSSLabel label) {
+    public void createEdge(int from, int to, int label) {
         edges.add(new GSSEdge(from, to, label));
         GSSGeneration data = edgeGenerations.get(generation);
         data.increment();
-        nodeIncomings.set(to, nodeIncomings.get(to) + 1);
     }
 
     /**
@@ -287,7 +265,7 @@ class GSS {
                 // Look for new additional paths from last
                 GSSGeneration gen = edgeGenerations.get(genIndex);
                 int firstEdgeTarget = -1;
-                GSSLabel firstEdgeLabel = null;
+                int firstEdgeLabel = -1;
                 for (int e = gen.getStart(); e != gen.getStart() + gen.getCount(); e++) {
                     GSSEdge edge = edges.get(e);
                     if (edge.getFrom() == last) {
@@ -341,53 +319,6 @@ class GSS {
 
         paths.count = total;
         return paths;
-    }
-
-    /**
-     * Cleanups this GSS by reclaiming the sub-trees on GSS labels that can no longer be reached
-     */
-    private void cleanup() {
-        int top = -1;
-        // first, enqueue all the non-reachable state of the last 16 generations
-        int lastState = nodeGenerations.get(generation).getStart() - 1;
-        int firstState = nodeGenerations.get(generation - 16).getStart();
-        for (int i = lastState; i != firstState - 1; i--) {
-            if (nodeIncomings.get(i) == 0) {
-                top++;
-                if (top == stack.length)
-                    stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
-                stack[top] = i;
-            }
-        }
-
-        // traverse the GSS
-        while (top != -1) {
-            // pop the next state to inspect
-            int origin = stack[top];
-            top--;
-            GSSGeneration genData = edgeGenerations.get(getGenerationOf(origin));
-            for (int i = genData.getStart(); i != genData.getStart() + genData.getCount(); i++) {
-                GSSEdge edge = edges.get(i);
-                if (edge.getFrom() != origin)
-                    continue;
-                // here the edge is starting from the origin node
-                // get the label on this edge and free it if necessary
-                SubTree tree = edge.getLabel().getTree();
-                if (tree != null)
-                    tree.free();
-                // decrement the target's incoming edges counter
-                int counter = nodeIncomings.get(edge.getTo());
-                counter--;
-                nodeIncomings.set(edge.getTo(), counter);
-                if (counter == 0) {
-                    // the target node is now unreachable, enqueue it
-                    top++;
-                    if (top == stack.length)
-                        stack = Arrays.copyOf(stack, stack.length + INIT_STACK_SIZE);
-                    stack[top] = edge.getTo();
-                }
-            }
-        }
     }
 
     /**

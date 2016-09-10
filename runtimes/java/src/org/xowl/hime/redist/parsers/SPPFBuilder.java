@@ -47,11 +47,6 @@ class SPPFBuilder implements SemanticBody {
     private static final int INIT_HISTORY_PART_SIZE = 64;
 
     /**
-     * Gets the EPSILON GSS label
-     */
-    public static final GSSLabel EPSILON = new GSSLabel(null);
-
-    /**
      * Represents a generation of GSS edges in the current history
      * The history is used to quickly find pre-existing matching GSS edges
      */
@@ -59,7 +54,7 @@ class SPPFBuilder implements SemanticBody {
         /**
          * The GSS labels in this part
          */
-        public GSSLabel[] data;
+        public int[] data;
         /**
          * The index of the represented GSS generation
          */
@@ -74,7 +69,7 @@ class SPPFBuilder implements SemanticBody {
          */
         public HistoryPart() {
             this.generation = 0;
-            this.data = new GSSLabel[INIT_HISTORY_PART_SIZE];
+            this.data = new int[INIT_HISTORY_PART_SIZE];
             this.next = 0;
         }
     }
@@ -90,18 +85,6 @@ class SPPFBuilder implements SemanticBody {
     }
 
     /**
-     * The pool of sub-tree with a capacity of 128 nodes
-     */
-    private final Pool<SubTree> pool8;
-    /**
-     * The pool of sub-tree with a capacity of 128 nodes
-     */
-    private final Pool<SubTree> pool128;
-    /**
-     * The pool of sub-tree with a capacity of 1024 nodes
-     */
-    private final Pool<SubTree> pool1024;
-    /**
      * The pool of history parts
      */
     private final Pool<HistoryPart> poolHPs;
@@ -113,15 +96,14 @@ class SPPFBuilder implements SemanticBody {
      * The next available slot for a history part
      */
     private int nextHP;
-
+    /**
+     * The SPPF being built
+     */
+    private SPPF sppf;
     /**
      * The adjacency cache for the reduction
      */
-    private int[] cacheChildren;
-    /**
-     * The actions cache for the reduction
-     */
-    private byte[] cacheActions;
+    private long[] cacheChildren;
     /**
      * The new available slot in the current cache
      */
@@ -129,7 +111,11 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The reduction handle represented as the indices of the sub-trees in the cache
      */
-    private int[] handle;
+    private int[] handleIndices;
+    /**
+     * The actions cache for the reduction
+     */
+    private byte[] handleActions;
     /**
      * The index of the next available slot in the handle
      */
@@ -137,7 +123,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The stack of semantic objects for the reduction
      */
-    private final GSSLabel[] stack;
+    private final int[] stack;
     /**
      * The number of items popped from the stack
      */
@@ -146,7 +132,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The AST being built
      */
-    private final ASTGraph result;
+    private final ASTSimpleTree result;
 
     /**
      * Gets the symbol at the i-th index
@@ -155,7 +141,10 @@ class SPPFBuilder implements SemanticBody {
      * @return The symbol at the given index
      */
     public SemanticElement at(int index) {
-        return result.getSemanticElementForNode(cacheChildren[handle[index]]);
+        long reference = cacheChildren[handleIndices[index]];
+        SPPFNode sppfNode = sppf.getNode(SPPF.refNodeId(reference));
+        int label = ((SPPFNodeNormal) sppfNode).getVersion(SPPF.refVersion(reference)).getLabel();
+        return result.getSemanticElementForLabel(label);
     }
 
     /**
@@ -176,32 +165,15 @@ class SPPFBuilder implements SemanticBody {
      * @param virtuals  The table of parser virtuals
      */
     public SPPFBuilder(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
-        this.pool8 = new Pool<>(new Factory<SubTree>() {
-            @Override
-            public SubTree createNew() {
-                return new SubTree(pool8, 8);
-            }
-        }, 1024, SubTree.class);
-        this.pool128 = new Pool<>(new Factory<SubTree>() {
-            @Override
-            public SubTree createNew() {
-                return new SubTree(pool128, 128);
-            }
-        }, 128, SubTree.class);
-        this.pool1024 = new Pool<>(new Factory<SubTree>() {
-            @Override
-            public SubTree createNew() {
-                return new SubTree(pool1024, 1024);
-            }
-        }, 16, SubTree.class);
         this.poolHPs = new Pool<>(new HistoryPartFactory(), INIT_HISTORY_SIZE, HistoryPart.class);
         this.history = new HistoryPart[INIT_HISTORY_SIZE];
         this.nextHP = 0;
-        this.cacheChildren = new int[INIT_HANDLE_SIZE];
-        this.cacheActions = new byte[INIT_HANDLE_SIZE];
-        this.handle = new int[INIT_HANDLE_SIZE];
-        this.stack = new GSSLabel[INIT_HANDLE_SIZE];
-        this.result = new ASTGraph(tokens, variables, virtuals);
+        this.sppf = new SPPF();
+        this.cacheChildren = new long[INIT_HANDLE_SIZE];
+        this.handleIndices = new int[INIT_HANDLE_SIZE];
+        this.handleActions = new byte[INIT_HANDLE_SIZE];
+        this.stack = new int[INIT_HANDLE_SIZE];
+        this.result = new ASTSimpleTree(tokens, variables, virtuals);
     }
 
     /**
@@ -232,9 +204,8 @@ class SPPFBuilder implements SemanticBody {
      * @param label The label of a GSS edge
      * @return The symbol on the edge
      */
-    public Symbol getSymbolOn(GSSLabel label) {
-        int reference = label.isReplaceable() ? label.getTree().getLabelAt(0) : label.getOriginal();
-        return result.getSymbolFor(reference);
+    public Symbol getSymbolOn(int label) {
+        return result.getSymbolFor(sppf.getNode(label).getOriginalSymbol());
     }
 
     /**
@@ -244,20 +215,15 @@ class SPPFBuilder implements SemanticBody {
      * @param symbol     A symbol to look for
      * @return The existing GSS label, or the EPSILON label
      */
-    public GSSLabel getLabelFor(int generation, int symbol) {
+    public int getLabelFor(int generation, int symbol) {
         HistoryPart hp = getHistoryPart(generation);
         if (hp == null)
-            return EPSILON;
+            return SPPF.EPSILON;
         for (int i = 0; i != hp.next; i++) {
-            if (hp.data[i].isReplaceable()) {
-                if (hp.data[i].getTree().getLabelAt(0) == symbol)
-                    return hp.data[i];
-            } else {
-                if (hp.data[i].getOriginal() == symbol)
-                    return hp.data[i];
-            }
+            if (sppf.getNode(hp.data[i]).getOriginalSymbol() == symbol)
+                return hp.data[i];
         }
-        return EPSILON;
+        return SPPF.EPSILON;
     }
 
     /**
@@ -267,23 +233,7 @@ class SPPFBuilder implements SemanticBody {
      * @return The created node's index in the SPPF
      */
     public int getSingleNode(int symbol) {
-        return result.store(symbol);
-    }
-
-    /**
-     * Gets a pooled sub-tree with the given maximal size
-     *
-     * @param size The size of the sub-tree
-     * @return A pooled sub-tree with the given maximal size
-     */
-    private SubTree getSubTree(int size) {
-        if (size <= 8)
-            return pool8.acquire();
-        if (size <= 128)
-            return pool128.acquire();
-        if (size <= 1024)
-            return pool1024.acquire();
-        return new SubTree(null, size);
+        return sppf.newNode(symbol);
     }
 
     /**
@@ -293,7 +243,7 @@ class SPPFBuilder implements SemanticBody {
      * @param path   The path being reduced
      * @param length The reduction length
      */
-    public void reductionPrepare(GSSLabel first, GSSPath path, int length) {
+    public void reductionPrepare(int first, GSSPath path, int length) {
         // build the stack
         if (length > 0) {
             for (int i = 0; i < length - 1; i++)
@@ -318,20 +268,25 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Adds the specified GSS label to the reduction cache with the given tree action
      *
-     * @param label  The label to add to the cache
-     * @param action The tree action to apply
+     * @param gssLabel The label to add to the cache
+     * @param action   The tree action to apply
      */
-    private void addToCache(GSSLabel label, byte action) {
+    private void addToCache(int gssLabel, byte action) {
         if (action == LROpCode.TREE_ACTION_DROP)
             return;
-        if (label.isReplaceable()) {
+        SPPFNode node = sppf.getNode(gssLabel);
+        if (node.isReplaceable()) {
+            SPPFNodeReplaceable replaceable = (SPPFNodeReplaceable) node;
             // this is replaceable sub-tree
-            SubTree sub = label.getTree();
-            for (int i = 0; i != sub.getChildrenCountAt(0); i++)
-                addToCache(TableElemRef.getIndex(sub.getLabelAt(i + 1)), sub.getActionAt(i + 1));
+            for (int i = 0; i != replaceable.getChildrenCount(); i++) {
+                long reference = replaceable.getChildren()[i];
+                SPPFNode child = sppf.getNode(SPPF.refNodeId(reference));
+                byte childAction = replaceable.getActions()[i];
+                addToCache((SPPFNodeNormal) child, childAction);
+            }
         } else {
             // this is a simple reference to an existing SPPF node
-            addToCache(label.getIndex(), action);
+            addToCache((SPPFNodeNormal) node, action);
         }
     }
 
@@ -341,23 +296,26 @@ class SPPFBuilder implements SemanticBody {
      * @param node   The node to add to the cache
      * @param action The tree action to apply onto the node
      */
-    private void addToCache(int node, byte action) {
-        int count = result.getChildrenCount(node);
-        if (cacheNext + count >= cacheChildren.length) {
+    private void addToCache(SPPFNodeNormal node, byte action) {
+        SPPFNodeVersion version = node.getDefaultVersion();
+        while (cacheNext + version.getChildrenCount() >= cacheChildren.length) {
             // the current cache is not big enough, build a bigger one
             cacheChildren = Arrays.copyOf(cacheChildren, cacheChildren.length + INIT_HANDLE_SIZE);
-            cacheActions = Arrays.copyOf(cacheActions, cacheActions.length + INIT_HANDLE_SIZE);
         }
         // add the node in the cache
-        cacheChildren[cacheNext] = node;
-        cacheActions[cacheNext] = action;
+        cacheChildren[cacheNext] = SPPF.reference(node.getIdentifier(), 0);
         // setup the handle to point to the root
-        if (handleNext == handle.length)
-            handle = Arrays.copyOf(handle, handle.length + INIT_HANDLE_SIZE);
-        handle[handleNext++] = cacheNext;
-        // copy the root's children
-        result.getAdjacency(node, cacheChildren, cacheNext + 1);
-        cacheNext += count + 1;
+        if (handleNext == handleIndices.length) {
+            handleIndices = Arrays.copyOf(handleIndices, handleIndices.length + INIT_HANDLE_SIZE);
+            handleActions = Arrays.copyOf(handleActions, handleActions.length + INIT_HANDLE_SIZE);
+        }
+        handleIndices[handleNext] = cacheNext;
+        handleActions[handleNext] = action;
+        // copy the children
+        if (version.getChildrenCount() > 0)
+            System.arraycopy(version.getChildren(), 0, cacheChildren, cacheNext + 1, version.getChildrenCount());
+        handleNext++;
+        cacheNext += version.getChildrenCount() + 1;
     }
 
     /**
@@ -369,7 +327,22 @@ class SPPFBuilder implements SemanticBody {
     public void reductionAddVirtual(int index, byte action) {
         if (action == LROpCode.TREE_ACTION_DROP)
             return; // why would you do this?
-        addToCache(result.store(TableElemRef.encode(TableElemRef.TABLE_VIRTUAL, index)), action);
+        int nodeId = sppf.newNode(TableElemRef.encode(TableElemRef.TABLE_VIRTUAL, index));
+        if (cacheNext + 1 >= cacheChildren.length) {
+            // the current cache is not big enough, build a bigger one
+            cacheChildren = Arrays.copyOf(cacheChildren, cacheChildren.length + INIT_HANDLE_SIZE);
+        }
+        // add the node in the cache
+        cacheChildren[cacheNext] = SPPF.reference(nodeId, 0);
+        // setup the handle to point to the root
+        if (handleNext == handleIndices.length) {
+            handleIndices = Arrays.copyOf(handleIndices, handleIndices.length + INIT_HANDLE_SIZE);
+            handleActions = Arrays.copyOf(handleActions, handleActions.length + INIT_HANDLE_SIZE);
+        }
+        handleIndices[handleNext] = cacheNext;
+        handleActions[handleNext] = action;
+        handleNext++;
+        cacheNext++;
     }
 
     /**
@@ -378,14 +351,8 @@ class SPPFBuilder implements SemanticBody {
      * @param nullable The sub-tree of a nullable variable
      * @param action   The tree action applied onto the symbol
      */
-    public void reductionAddNullable(GSSLabel nullable, byte action) {
-        if (action == LROpCode.TREE_ACTION_DROP)
-            return;
-        if (nullable.isReplaceable()) {
-            addToCache(new GSSLabel(nullable.getTree().clone()), action);
-        } else {
-            addToCache(result.copyNode(nullable.getIndex()), action);
-        }
+    public void reductionAddNullable(int nullable, byte action) {
+        addToCache(nullable, action);
     }
 
     /**
@@ -394,10 +361,10 @@ class SPPFBuilder implements SemanticBody {
      * @param generation  The generation to reduce from
      * @param varIndex    The reduced variable index
      * @param replaceable Whether the sub-tree to build must have a replaceable root or not
-     * @return The produced sub-tree
+     * @return The identifier of the produced SPPF node
      */
-    public GSSLabel reduce(int generation, int varIndex, boolean replaceable) {
-        GSSLabel label = replaceable ? reduceReplaceable(varIndex) : reduceNormal(varIndex);
+    public int reduce(int generation, int varIndex, boolean replaceable) {
+        int label = replaceable ? reduceReplaceable(varIndex) : reduceNormal(varIndex);
         addToHistory(generation, label);
         return label;
     }
@@ -406,74 +373,71 @@ class SPPFBuilder implements SemanticBody {
      * Executes the reduction as a normal reduction
      *
      * @param varIndex The reduced variable index
-     * @return The produced sub-tree
+     * @return The identifier of the produced SPPF node
      */
-    private GSSLabel reduceNormal(int varIndex) {
-        int root = -1;
+    private int reduceNormal(int varIndex) {
+        int promotedSymbol = -1;
+        long promotedReference = -1;
+
         int insertion = 0;
         for (int i = 0; i != handleNext; i++) {
-            switch (cacheActions[handle[i]]) {
+            switch (handleActions[i]) {
                 case LROpCode.TREE_ACTION_PROMOTE:
-                    if (root != -1) {
+                    if (promotedReference != -1) {
                         // not the first promotion
-                        // store the adjacency data for the previously promoted node
-                        int index = result.store(cacheChildren, insertion);
-                        result.setAdjacency(root, index, insertion);
-                        // put the previously promoted node in the cache
-                        cacheChildren[0] = root;
+                        // create a new version for the promoted node
+                        SPPFNodeNormal oldPromotedNode = (SPPFNodeNormal) sppf.getNode(SPPF.refNodeId(promotedReference));
+                        long oldPromotedRef = oldPromotedNode.newVersion(promotedSymbol, cacheChildren, insertion);
+                        // register the previously promoted reference into the cache
+                        cacheChildren[0] = oldPromotedRef;
                         insertion = 1;
                     }
                     // save the new promoted node
-                    root = cacheChildren[handle[i]];
+                    promotedReference = cacheChildren[handleIndices[i]];
+                    SPPFNodeNormal promotedNode = (SPPFNodeNormal) sppf.getNode(SPPF.refNodeId(promotedReference));
+                    SPPFNodeVersion promotedVersion = promotedNode.getVersion(SPPF.refVersion(promotedReference));
+                    promotedSymbol = promotedVersion.getLabel();
                     // repack the children on the left if any
-                    int nb = result.getChildrenCount(root);
-                    System.arraycopy(cacheChildren, handle[i] + 1, cacheChildren, insertion, nb);
-                    System.arraycopy(cacheActions, handle[i] + 1, cacheActions, insertion, nb);
-                    insertion += nb;
+                    System.arraycopy(cacheChildren, handleIndices[i] + 1, cacheChildren, insertion, promotedVersion.getChildrenCount());
+                    insertion += promotedVersion.getChildrenCount();
                     break;
                 default:
                     // Repack the sub-root on the left
-                    if (insertion != handle[i])
-                        cacheChildren[insertion] = cacheChildren[handle[i]];
+                    if (insertion != handleIndices[i])
+                        cacheChildren[insertion] = cacheChildren[handleIndices[i]];
                     insertion++;
                     break;
             }
         }
-        if (root == -1) {
-            // no promotion, create the node for the root
-            root = result.store(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex));
-        }
-        // setup the adjacency for the new root
-        result.setAdjacency(root, result.store(cacheChildren, insertion), insertion);
-        // create the GSS label
-        return new GSSLabel(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex), root);
+        int originalLabel = TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex);
+        int currentLabel = promotedReference != -1 ? promotedSymbol : originalLabel;
+        return sppf.newNode(originalLabel, currentLabel, cacheChildren, insertion);
     }
 
     /**
      * Executes the reduction as the reduction of a replaceable variable
      *
      * @param varIndex The reduced variable index
-     * @return The produced sub-tree
+     * @return TThe identifier of the produced SPPF node
      */
-    private GSSLabel reduceReplaceable(int varIndex) {
-        SubTree tree = getSubTree(handleNext + 1);
-        tree.setupRoot(TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex), LROpCode.TREE_ACTION_REPLACE);
-        tree.setChildrenCountAt(0, handleNext);
+    private int reduceReplaceable(int varIndex) {
+        int insertion = 0;
         for (int i = 0; i != handleNext; i++) {
-            int node = cacheChildren[handle[i]];
-            byte action = cacheActions[handle[i]];
-            tree.setAt(i + 1, TableElemRef.encode(TableElemRef.TABLE_NONE, node), action);
+            if (insertion != handleIndices[i])
+                cacheChildren[insertion] = cacheChildren[handleIndices[i]];
+            insertion++;
         }
-        return new GSSLabel(tree);
+        int originalLabel = TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex);
+        return sppf.newReplaceableNode(originalLabel, cacheChildren, handleActions, handleNext);
     }
 
     /**
      * Adds the specified GSS label to the current history
      *
      * @param generation The current generation
-     * @param label      The label to register
+     * @param label      The label identifier of the SPPF node to use as a GSS label
      */
-    private void addToHistory(int generation, GSSLabel label) {
+    private void addToHistory(int generation, int label) {
         HistoryPart hp = getHistoryPart(generation);
         if (hp == null) {
             hp = poolHPs.acquire();
@@ -491,11 +455,32 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Finalizes the parse tree and returns it
      *
-     * @param root The root's sub-tree
+     * @param root The identifier of the SPPF node that serves as root
      * @return The final parse tree
      */
-    public AST getTree(GSSLabel root) {
-        result.setRoot(root.getIndex());
+    public AST getTree(int root) {
+        AST.Node astRoot = buildFinalAST(SPPF.reference(root, 0));
+        result.storeRoot(astRoot);
         return result;
+    }
+
+    /**
+     * Builds the final AST for the specified SPPF node reference
+     *
+     * @param reference A reference to an SPPF node in a specific version
+     * @return The AST node for the SPPF reference
+     */
+    public AST.Node buildFinalAST(long reference) {
+        SPPFNode sppfNode = sppf.getNode(SPPF.refNodeId(reference));
+        SPPFNodeVersion version = ((SPPFNodeNormal) sppfNode).getVersion(SPPF.refVersion(reference));
+
+        if (version.getChildrenCount() == 0)
+            return new AST.Node(version.getLabel());
+
+        AST.Node[] buffer = new AST.Node[version.getChildrenCount()];
+        for (int i = 0; i != version.getChildrenCount(); i++)
+            buffer[i] = buildFinalAST(version.getChildren()[i]);
+        int first = result.store(buffer, 0, version.getChildrenCount());
+        return new AST.Node(version.getLabel(), version.getChildrenCount(), first);
     }
 }

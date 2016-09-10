@@ -36,7 +36,7 @@ class GSSEdge {
     /**
      * The label on this edge
      */
-    private final GSSLabel label;
+    private final int label;
 
     /**
      * Gets the index of the node from which this edge starts
@@ -61,7 +61,7 @@ class GSSEdge {
      *
      * @return The label on this edge
      */
-    public GSSLabel getLabel() {
+    public int getLabel() {
         return label;
     }
 
@@ -71,7 +71,7 @@ class GSSEdge {
      * @param from Index of the node from which this edge starts
      * @param to   Index of the node to which this edge arrives to
      */
-    public GSSEdge(int from, int to, GSSLabel label) {
+    public GSSEdge(int from, int to, int label) {
         this.from = from;
         this.to = to;
         this.label = label;

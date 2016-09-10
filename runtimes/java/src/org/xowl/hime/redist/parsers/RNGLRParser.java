@@ -51,7 +51,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         /**
          * The first label in the GSS
          */
-        public final GSSLabel first;
+        public final int first;
 
         /**
          * Initializes this operation
@@ -60,7 +60,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
          * @param prod  The LR production for the reduction
          * @param first The first label in the GSS
          */
-        public Reduction(int node, LRProduction prod, GSSLabel first) {
+        public Reduction(int node, LRProduction prod, int first) {
             this.node = node;
             this.prod = prod;
             this.first = first;
@@ -107,7 +107,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
     /**
      * The sub-trees for the constant nullable variables
      */
-    private final GSSLabel[] nullables;
+    private final int[] nullables;
     /**
      * The next token
      */
@@ -136,7 +136,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         this.parserAutomaton = automaton;
         this.gss = new GSS();
         this.sppf = new SPPFBuilder(lexer.getTokens(), symVariables, symVirtuals);
-        nullables = new GSSLabel[variables.length];
+        nullables = new int[variables.length];
         buildNullables(variables.length);
         this.sppf.clearHistory();
     }
@@ -314,7 +314,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                         ok = ok && (dependencies[r] == null);
                     if (ok) {
                         LRProduction prod = parserAutomaton.getNullableProduction(i);
-                        this.nullables[i] = buildSPPF(0, prod, SPPFBuilder.EPSILON, null);
+                        this.nullables[i] = buildSPPF(0, prod, SPPF.EPSILON, null);
                         dependencies[i] = null;
                         solved++;
                     } else {
@@ -507,7 +507,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      * @param path       The reduction path
      * @return The corresponding SPPF part
      */
-    private GSSLabel buildSPPF(int generation, LRProduction production, GSSLabel first, GSSPath path) {
+    private int buildSPPF(int generation, LRProduction production, int first, GSSPath path) {
         Symbol variable = symVariables.get(production.getHead());
         sppf.reductionPrepare(first, path, production.getReductionLength());
         for (int i = 0; i != production.getBytecodeLength(); i++) {
@@ -558,7 +558,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
             if (action.getCode() == LRAction.CODE_SHIFT)
                 shifts.add(new Shift(v0, action.getData()));
             else if (action.getCode() == LRAction.CODE_REDUCE)
-                reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), SPPFBuilder.EPSILON));
+                reductions.add(new Reduction(v0, parserAutomaton.getProduction(action.getData()), SPPF.EPSILON));
         }
 
         while (nextToken.getTerminalID() != Symbol.SID_EPSILON) {
@@ -635,8 +635,8 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
         // Get the rule's head
         Symbol head = symVariables.get(reduction.prod.getHead());
         // Resolve the sub-root
-        GSSLabel label = sppf.getLabelFor(path.getGeneration(), TableElemRef.encode(TableElemRef.TABLE_VARIABLE, reduction.prod.getHead()));
-        if (label.isEpsilon()) {
+        int label = sppf.getLabelFor(path.getGeneration(), TableElemRef.encode(TableElemRef.TABLE_VARIABLE, reduction.prod.getHead()));
+        if (label == SPPF.EPSILON) {
             // not in history, build the SPPF here
             label = buildSPPF(generation, reduction.prod, reduction.first, path);
         }
@@ -677,7 +677,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                 } else if (action.getCode() == LRAction.CODE_REDUCE) {
                     LRProduction prod = parserAutomaton.getProduction(action.getData());
                     if (prod.getReductionLength() == 0)
-                        reductions.add(new Reduction(w, prod, SPPFBuilder.EPSILON));
+                        reductions.add(new Reduction(w, prod, SPPF.EPSILON));
                     else if (reduction.prod.getReductionLength() != 0)
                         reductions.add(new Reduction(path.getLast(), prod, label));
                 }
@@ -697,7 +697,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
 
         // Create the GSS label to be used for the transitions
         int sym = TableElemRef.encode(TableElemRef.TABLE_TOKEN, oldtoken.getIndex());
-        GSSLabel label = new GSSLabel(sym, sppf.getSingleNode(sym));
+        int label = sppf.getSingleNode(sym);
 
         // Execute all shifts in the queue at this point
         int count = shifts.size();
@@ -713,7 +713,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
      * @param label The GSS label to use for the new GSS edges
      * @param shift The shift operation
      */
-    private void executeShift(int gen, GSSLabel label, Shift shift) {
+    private void executeShift(int gen, int label, Shift shift) {
         int w = gss.findNode(gen, shift.to);
         if (w != -1) {
             // A node for the target state is already in the GSS
@@ -742,7 +742,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                 else if (action.getCode() == LRAction.CODE_REDUCE) {
                     LRProduction prod = parserAutomaton.getProduction(action.getData());
                     if (prod.getReductionLength() == 0) // Length 0 => reduce from the head
-                        reductions.add(new Reduction(w, prod, SPPFBuilder.EPSILON));
+                        reductions.add(new Reduction(w, prod, SPPF.EPSILON));
                     else // reduce from the second node on the path
                         reductions.add(new Reduction(shift.from, prod, label));
                 }
