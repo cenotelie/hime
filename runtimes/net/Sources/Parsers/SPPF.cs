@@ -36,7 +36,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The nodes in the SPPF
 		/// </summary>
-		private BigList<SPPFNode> nodes;
+		private readonly BigList<SPPFNode> nodes;
 
 		/// <summary>
 		/// Initializes this SPPF
@@ -69,10 +69,11 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// Creates a new single node in the SPPF
 		/// </summary>
-		/// <param name="original">The original smymbol of this node</param>
+		/// <param name="original">The original symbol of this node</param>
 		/// <param name="label">The label on the first version of this node</param>
 		/// <param name="childrenBuffer">A buffer for the children</param>
 		/// <param name="childrenCount">The number of children</param>
+		/// <returns>The identifier of the new node</returns>
 		public int NewNode(TableElemRef original, TableElemRef label, SPPFNodeRef[] childrenBuffer, int childrenCount)
 		{
 			return nodes.Add(new SPPFNodeNormal(nodes.Size, original, label, childrenBuffer, childrenCount));
@@ -85,6 +86,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="childrenBuffer">A buffer for the children</param>
 		/// <param name="actionsBuffer">A buffer for the actions on the children</param>
 		/// <param name="childrenCount">The number of children</param>
+		/// <returns>The identifier of the new node</returns>
 		public int NewReplaceableNode(TableElemRef label, SPPFNodeRef[] childrenBuffer, TreeAction[] actionsBuffer, int childrenCount)
 		{
 			return nodes.Add(new SPPFNodeReplaceable(nodes.Size, label, childrenBuffer, actionsBuffer, childrenCount));

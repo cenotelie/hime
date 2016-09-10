@@ -37,7 +37,7 @@ namespace Hime.Redist.Parsers
 		private readonly SPPFNodeRef[] children;
 
 		/// <summary>
-		/// The label of the node for this version
+		/// Gets the label of the node for this version
 		/// </summary>
 		public TableElemRef Label { get { return label; } }
 

@@ -33,10 +33,6 @@ namespace Hime.Redist.Parsers
 		/// The initial size of the paths buffer in this GSS
 		/// </summary>
 		private const int INIT_PATHS_COUNT = 64;
-		/// <summary>
-		/// The initial size of the stack used for the traversal of this GSS
-		/// </summary>
-		private const int INIT_STACK_SIZE = 128;
 
 		/// <summary>
 		/// The label (GLR state) on the GSS node for the given index

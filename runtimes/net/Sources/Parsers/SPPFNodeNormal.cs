@@ -38,7 +38,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private readonly TableElemRef original;
 		/// <summary>
-		/// The different verions of this node
+		/// The different versions of this node
 		/// </summary>
 		private SPPFNodeVersion[] versions;
 		/// <summary>
@@ -88,7 +88,7 @@ namespace Hime.Redist.Parsers
 		/// Initializes this node
 		/// </summary>
 		/// <param name="identifier">The identifier of this node</param>
-		/// <param name="original">The original smymbol of this node</param>
+		/// <param name="original">The original symbol of this node</param>
 		/// <param name="label">The label on the first version of this node</param>
 		/// <param name="childrenBuffer">A buffer for the children</param>
 		/// <param name="childrenCount">The number of children</param>
