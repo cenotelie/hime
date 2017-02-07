@@ -10,7 +10,7 @@ __license__ = "LGPL v3+"
 # encoding of the XML files
 XML_ENCODING = "UTF-8"
 # identation string
-XML_IDENT = "\t"
+XML_IDENT = "    "
 # new line string
 XML_NEWLINE = "\n"
 
