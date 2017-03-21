@@ -23,9 +23,9 @@ The parser generator requires the .Net runtime (or Mono) for the generation of p
 
 ### How do I use this software? ###
 
-* [Kickstart in 5 mins](https://bitbucket.org/laurentw/hime/wiki/Kickstart)
-* [User documentation](https://bitbucket.org/laurentw/hime/wiki/Home)
-* [Grammar library](https://bitbucket.org/laurentw/hime-grams)
+* [Kickstart in 5 mins](https://bitbucket.org/cenotelie/hime/wiki/Kickstart)
+* [User documentation](https://bitbucket.org/cenotelie/hime/wiki/Home)
+* [Grammar library](https://bitbucket.org/cenotelie/hime-grams)
 
 ### Repository structure ###
 
@@ -78,14 +78,14 @@ To individually build a component, see the README associated to it.
 
 The simplest way to contribute is to:
 
-* Fork this repository on [Bitbucket](https://bitbucket.org/laurentw/hime).
-* Fix [some issue](https://bitbucket.org/laurentw/hime/issues?status=new&status=open) or implement a new feature.
+* Fork this repository on [Bitbucket](https://bitbucket.org/cenotelie/hime).
+* Fix [some issue](https://bitbucket.org/cenotelie/hime/issues?status=new&status=open) or implement a new feature.
 * Create a merge request on Bitbucket.
 
-Patches can also be submitted by email, or through the [issue management system](https://bitbucket.org/laurentw/hime/issues). Email contacts:
+Patches can also be submitted by email, or through the [issue management system](https://bitbucket.org/cenotelie/hime/issues). Email contacts:
 
 * [laurentw on Bitbucket](https://bitbucket.org/laurentw): lwouters at xowl dot org.
 
 #### For newcomers ####
 
-The [isse tracker](https://bitbucket.org/laurentw/hime/issues) contains tickets that are accessible to newcomers. Look for tickets with `[beginner]` in the title. These tickets are good ways to become more familiar with the project and the codebase.
+The [isse tracker](https://bitbucket.org/cenotelie/hime/issues) contains tickets that are accessible to newcomers. Look for tickets with `[beginner]` in the title. These tickets are good ways to become more familiar with the project and the codebase.
