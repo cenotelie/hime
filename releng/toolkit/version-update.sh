@@ -2,7 +2,7 @@
 
 YEAR=$(date +%Y)
 
-sed -i "s/AssemblyCopyright(\".*\")/AssemblyCopyright(\"Copyright © $YEAR\")/" releng/VersionInfo.cs
+sed -i "s/AssemblyCopyright(\".*\")/AssemblyCopyright(\"Copyright © Association Cénotélie $YEAR\")/" releng/VersionInfo.cs
 sed -i "s/AssemblyVersion(\".*\")/AssemblyVersion(\"$1.0\")/" releng/VersionInfo.cs
 sed -i "s/AssemblyFileVersion(\".*\")/AssemblyFileVersion(\"$1.0\")/" releng/VersionInfo.cs
 sed -i "s/PROJECT_NUMBER         = .*/PROJECT_NUMBER         = $1/" releng/doxygen.conf

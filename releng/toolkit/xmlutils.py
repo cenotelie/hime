@@ -2,7 +2,7 @@
 API for the serialization of pretty-printed XML files
 """
 
-__author__ = "Laurent Wouters <lwouters@xowl.org>"
+__author__ = "Laurent Wouters <lwouters@cenotelie.fr>"
 __copyright__ = "Copyright 2014"
 __license__ = "LGPL v3+"
 
