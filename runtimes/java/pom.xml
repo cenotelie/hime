@@ -8,7 +8,7 @@
     <version>2.0.7-SNAPSHOT</version>
     <name>Hime Runtime</name>
     <description>Redistributable Java runtime for the parsers generated with Hime</description>
-    <url>https://bitbucket.org/laurentw/hime</url>
+    <url>http://cenotelie.fr/en/project-hime.html</url>
     <licenses>
         <license>
             <name>GNU Lesser General Public License, Version 3</name>
@@ -16,21 +16,21 @@
         </license>
     </licenses>
     <organization>
-        <name>Laurent Wouters</name>
-        <url>https://wouters-net.fr/</url>
+        <name>Association Cénotélie</name>
+        <url>http://cenotelie.fr/</url>
     </organization>
     <developers>
         <developer>
             <name>Laurent Wouters</name>
-            <email>lwouters@xowl.org</email>
-            <organization>Laurent Wouters</organization>
-            <organizationUrl>https://wouters-net.fr/</organizationUrl>
+            <email>lwouters@cenotelie.fr</email>
+            <organization>Association Cénotélie</organization>
+            <organizationUrl>http://cenotelie.fr/</organizationUrl>
         </developer>
     </developers>
     <scm>
-        <connection>scm:hg:https://bitbucket.org/laurentw/hime</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org/laurentw/hime</developerConnection>
-        <url>https://bitbucket.org/laurentw/hime</url>
+        <connection>scm:hg:https://bitbucket.org/cenotelie/hime</connection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org:cenotelie/hime</developerConnection>
+        <url>https://bitbucket.org/cenotelie/hime</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
