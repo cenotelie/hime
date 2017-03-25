@@ -4,13 +4,13 @@ The Hime parser generator is a parser generator for various platforms (see below
 
 * Fast LR and GLR parsing.
 * Modern implementation of GLR with the [RNGLR algorithm](http://portal.acm.org/citation.cfm?id=1146809.1146810&coll=DL&dl=GUIDE&CFID=9339017&CFTOKEN=49072692).
-* [Simple and clear API](https://himedoc.bitbucket.io/v2.0.5/namespaceHime_1_1Redist.html) to manipulate parse trees.
-* [Extensive SDK API](https://himedoc.bitbucket.io/v2.0.5/namespaceHime_1_1SDK.html) to programmatically manipulate grammars, generate lexers and parsers and use them.
+* [Simple and clear API](http://cenotelie.fr/hime/api-net/v2.0.5/namespaceHime_1_1Redist.html) to manipulate parse trees.
+* [Extensive SDK API](http://cenotelie.fr/hime/api-net/v2.0.5/namespaceHime_1_1SDK.html) to programmatically manipulate grammars, generate lexers and parsers and use them.
 * Strong emphasis on the separation of data and code. Hime forbids the inclusion of inline code in its grammar definitions in order to have very readable grammars that can be easily understood, debugged, improved. It is still possible to have custom code invoked during parsing with semantic actions.
 
 The parser generator requires the .Net runtime (or Mono) for the generation of parsers. The generated parsers can be used with the corresponding runtime on the following platforms:
 
-* .Net framework 2.0+, or Mono on Linux and MacOS
+* .Net framework 4.5+, or Mono on Linux and MacOS
 * Java 7+
 
 
@@ -23,8 +23,8 @@ The parser generator requires the .Net runtime (or Mono) for the generation of p
 
 ### How do I use this software? ###
 
-* [Kickstart in 5 mins](https://bitbucket.org/cenotelie/hime/wiki/Kickstart)
-* [User documentation](https://bitbucket.org/cenotelie/hime/wiki/Home)
+* [Kickstart in 5 mins](http://cenotelie.fr/hime/kickstart.html)
+* [User documentation](http://cenotelie.fr/hime/index.html)
 * [Grammar library](https://bitbucket.org/cenotelie/hime-grams)
 
 ### Repository structure ###
@@ -82,9 +82,7 @@ The simplest way to contribute is to:
 * Fix [some issue](https://bitbucket.org/cenotelie/hime/issues?status=new&status=open) or implement a new feature.
 * Create a merge request on Bitbucket.
 
-Patches can also be submitted by email, or through the [issue management system](https://bitbucket.org/cenotelie/hime/issues). Email contacts:
-
-* [laurentw on Bitbucket](https://bitbucket.org/laurentw): lwouters at xowl dot org.
+Patches can also be submitted by email, or through the [issue management system](https://bitbucket.org/cenotelie/hime/issues).
 
 #### For newcomers ####
 
