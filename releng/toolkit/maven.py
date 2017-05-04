@@ -17,12 +17,12 @@ def update_hime_version(file, version, dev):
     pom = xml.dom.minidom.parse(file)
 
     group_id = pom.getElementsByTagName("groupId")[0].firstChild.data
-    if "org.xowl.hime" in group_id:
+    if "fr.cenotelie.hime" in group_id:
         pom.getElementsByTagName("version")[0].firstChild.data = version + ("-SNAPSHOT" if dev else "")
 
     for dependency in pom.getElementsByTagName("dependency"):
         group_id = dependency.getElementsByTagName("groupId")[0].firstChild.data
-        if "org.xowl.hime" in group_id:
+        if "fr.cenotelie.hime" in group_id:
             dependency.getElementsByTagName("version")[0].firstChild.data = version + ("-SNAPSHOT" if dev else "")
 
     xmlutils.output(pom, file)
