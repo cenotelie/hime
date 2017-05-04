@@ -102,6 +102,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <keyname>contact@cenotelie.fr</keyname>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
