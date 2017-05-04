@@ -103,12 +103,12 @@ namespace Hime.SDK.Output
 			writer.WriteLine();
 			writer.WriteLine("package " + nmespace + ";");
 			writer.WriteLine();
-			writer.WriteLine("import org.xowl.hime.redist.SemanticAction;");
-			writer.WriteLine("import org.xowl.hime.redist.SemanticBody;");
-			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
-			writer.WriteLine("import org.xowl.hime.redist.parsers.InitializationException;");
-			writer.WriteLine("import org.xowl.hime.redist.parsers." + automatonType + ";");
-			writer.WriteLine("import org.xowl.hime.redist.parsers." + parserType + ";");
+			writer.WriteLine("import fr.cenotelie.hime.redist.SemanticAction;");
+			writer.WriteLine("import fr.cenotelie.hime.redist.SemanticBody;");
+			writer.WriteLine("import fr.cenotelie.hime.redist.Symbol;");
+			writer.WriteLine("import fr.cenotelie.hime.redist.parsers.InitializationException;");
+			writer.WriteLine("import fr.cenotelie.hime.redist.parsers." + automatonType + ";");
+			writer.WriteLine("import fr.cenotelie.hime.redist.parsers." + parserType + ";");
 			writer.WriteLine();
 			writer.WriteLine("import java.util.Map;");
 			writer.WriteLine();

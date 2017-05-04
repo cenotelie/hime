@@ -115,7 +115,7 @@ namespace Hime.SDK.Output
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				string[] results = Directory.GetFiles(Path.Combine(path, "target"), "generated-*.jar");
+				string[] results = Directory.GetFiles(Path.Combine(path, "target"), "hime-generated-2.0.0.jar");
 				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...

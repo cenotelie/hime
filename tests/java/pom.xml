@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.xowl.hime.tests</groupId>
-    <artifactId>executor</artifactId>
-    <packaging>jar</packaging>
+    <groupId>fr.cenotelie.hime</groupId>
+    <artifactId>hime-test-executor</artifactId>
+    <packaging>bundle</packaging>
     <version>2.0.7-SNAPSHOT</version>
-    <name>Tests Executor</name>
+    <name>Hime Java Tests Executor</name>
     <description>Test executor for the Java runtime</description>
-    <url>https://bitbucket.org/laurentw/hime</url>
+    <url>http://cenotelie.fr/hime/index.html</url>
     <licenses>
         <license>
             <name>GNU Lesser General Public License, Version 3</name>
@@ -15,21 +16,21 @@
         </license>
     </licenses>
     <organization>
-        <name>Laurent Wouters</name>
-        <url>https://wouters-net.fr/</url>
+        <name>Association Cénotélie</name>
+        <url>http://cenotelie.fr/</url>
     </organization>
     <developers>
         <developer>
             <name>Laurent Wouters</name>
-            <email>lwouters@xowl.org</email>
-            <organization>Laurent Wouters</organization>
-            <organizationUrl>https://wouters-net.fr/</organizationUrl>
+            <email>lwouters@cenotelie.fr</email>
+            <organization>Association Cénotélie</organization>
+            <organizationUrl>http://cenotelie.fr/</organizationUrl>
         </developer>
     </developers>
     <scm>
-        <connection>scm:hg:https://bitbucket.org/laurentw/hime</connection>
-        <developerConnection>scm:hg:https://bitbucket.org/laurentw/hime</developerConnection>
-        <url>https://bitbucket.org/laurentw/hime</url>
+        <connection>scm:hg:https://bitbucket.org/cenotelie/hime</connection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org:cenotelie/hime</developerConnection>
+        <url>https://bitbucket.org/cenotelie/hime</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
@@ -40,8 +41,8 @@
     </distributionManagement>
     <dependencies>
         <dependency>
-            <groupId>org.xowl.hime</groupId>
-            <artifactId>redist</artifactId>
+            <groupId>fr.cenotelie.hime</groupId>
+            <artifactId>hime-redist</artifactId>
             <version>2.0.7-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -52,7 +53,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.2</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -60,17 +61,104 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <keyname>contact@cenotelie.fr</keyname>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                    <pushChanges>false</pushChanges>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>3.2.0</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>fr.cenotelie.hime.tests.executor.Program</mainClass>
+                        </manifest>
+                    </archive>
+                    <instructions>
+                        <XOWL-Product-Link>${project.url}</XOWL-Product-Link>
+                        <XOWL-SCM-Tag>${changeSet}</XOWL-SCM-Tag>
+                        <XOWL-Build-Tag>${env.BUILD_TAG}</XOWL-Build-Tag>
+                        <XOWL-Build-Timestamp>${timestamp}</XOWL-Build-Timestamp>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -81,16 +169,37 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>org.xowl.hime.tests.executor.Program</mainClass>
-                        </manifest>
-                    </archive>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-changeset</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>hgchangeset</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-timestamp</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <timestampFormat>dd/MM/yyyy HH:mm:ss</timestampFormat>
                 </configuration>
             </plugin>
         </plugins>

@@ -97,12 +97,12 @@ namespace Hime.SDK.Output
 			writer.WriteLine();
 			writer.WriteLine("package " + nmespace + ";");
 			writer.WriteLine();
-			writer.WriteLine("import org.xowl.hime.redist.Symbol;");
-			writer.WriteLine("import org.xowl.hime.redist.lexer.Automaton;");
+			writer.WriteLine("import fr.cenotelie.hime.redist.Symbol;");
+			writer.WriteLine("import fr.cenotelie.hime.redist.lexer.Automaton;");
 			if (contexts.Count > 1)
-				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextSensitiveLexer;");
+				writer.WriteLine("import fr.cenotelie.hime.redist.lexer.ContextSensitiveLexer;");
 			else
-				writer.WriteLine("import org.xowl.hime.redist.lexer.ContextFreeLexer;");
+				writer.WriteLine("import fr.cenotelie.hime.redist.lexer.ContextFreeLexer;");
 			writer.WriteLine();
 			writer.WriteLine("import java.io.InputStreamReader;");
 			writer.WriteLine();

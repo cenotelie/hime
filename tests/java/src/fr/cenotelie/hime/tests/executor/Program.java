@@ -15,13 +15,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.hime.tests.executor;
+package fr.cenotelie.hime.tests.executor;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.hime.redist.ParseError;
-import org.xowl.hime.redist.ParseResult;
-import org.xowl.hime.redist.TextContext;
-import org.xowl.hime.redist.parsers.BaseLRParser;
+import fr.cenotelie.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ParseError;
+import fr.cenotelie.hime.redist.ParseResult;
+import fr.cenotelie.hime.redist.TextContext;
+import fr.cenotelie.hime.redist.parsers.BaseLRParser;
 
 import java.io.File;
 import java.io.IOException;

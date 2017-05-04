@@ -30,14 +30,14 @@ if [ $SKIP_TEST != "true" ]
 	# Build the test components
 	xbuild /p:Configuration=Release tests/driver/Tests.Driver.csproj
 	xbuild /p:Configuration=Release tests/net/Tests.Executor.csproj
-	mvn -f tests/java/pom.xml clean verify
+	mvn -f tests/java/pom.xml clean verify -Dgpg.skip=true
 	# Setup the test components
 	mkdir tests/results
 	cp tests/driver/bin/Release/Hime.Redist.dll tests/results/Hime.Redist.dll
 	cp tests/driver/bin/Release/Hime.CentralDogma.dll tests/results/Hime.CentralDogma.dll
 	cp tests/driver/bin/Release/Tests.Driver.exe tests/results/driver.exe
 	cp tests/net/bin/Release/Tests.Executor.exe tests/results/executor.exe
-	cp tests/java/target/*.jar tests/results/executor.jar
+	cp "tests/java/target/hime-test-executor-$VERSION.jar" tests/results/executor.jar
 	cp tests/java/target/dependency/*.jar tests/results/
 	# Execute the tests
 	cd tests/results
