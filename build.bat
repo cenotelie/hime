@@ -36,7 +36,7 @@ IF "%SKIP_TEST%"=="false" (
 	COPY /B tests\driver\bin\Release\Hime.CentralDogma.dll tests\results\Hime.CentralDogma.dll > NUL
 	COPY /B tests\driver\bin\Release\Tests.Driver.exe tests\results\driver.exe > NUL
 	COPY /B tests\net\bin\Release\Tests.Executor.exe tests\results\executor.exe > NUL
-	COPY /B tests\java\target\hime-test-executor-%VERSION%.jar tests\results\executor.jar > NUL
+	COPY /B tests\java\target\hime-test-executor-*.jar tests\results\executor.jar > NUL
 	COPY /B tests\java\target\dependency\*.jar tests\results\ > NUL
 	REM Execute the tests
 	CD tests\results

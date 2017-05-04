@@ -37,7 +37,7 @@ if [ $SKIP_TEST != "true" ]
 	cp tests/driver/bin/Release/Hime.CentralDogma.dll tests/results/Hime.CentralDogma.dll
 	cp tests/driver/bin/Release/Tests.Driver.exe tests/results/driver.exe
 	cp tests/net/bin/Release/Tests.Executor.exe tests/results/executor.exe
-	cp "tests/java/target/hime-test-executor-$VERSION.jar" tests/results/executor.jar
+	cp tests/java/target/hime-test-executor-*.jar tests/results/executor.jar
 	cp tests/java/target/dependency/*.jar tests/results/
 	# Execute the tests
 	cd tests/results
