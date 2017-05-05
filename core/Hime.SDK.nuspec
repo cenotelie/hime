@@ -2,19 +2,32 @@
 <package >
   <metadata>
     <id>Hime.SDK</id>
-    <version>$version$</version>
+    <version>3.0.0.0</version>
     <title>Hime Parser Generator (SDK)</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <authors>cenotelie</authors>
+    <owners>cenotelie</owners>
     <licenseUrl>http://www.gnu.org/licenses/lgpl.txt</licenseUrl>
-    <projectUrl>https://bitbucket.org/laurentw/hime/overview</projectUrl>
-    <iconUrl>https://bitbucket.org/laurentw/hime/downloads/Logo.png</iconUrl>
+    <projectUrl>http://cenotelie.fr/hime</projectUrl>
+    <iconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <copyright>Copyright 2014</copyright>
+    <description>Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars.</description>
+    <copyright>Copyright © Association Cénotélie 2017</copyright>
     <tags>parser generator lr glr rnglr</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System"/>
+    </frameworkAssemblies>
+    <dependencies>
+      <group targetFramework="net45">
+        <dependency id="Hime.Redist" version="3.0.0.0" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
+    <file src="bin\Release\Hime.CentralDogma.*" target="lib/net45" />
+    <file src="Sources\**" target="src" />
+    <file src="Properties\**" target="src" />
+    <file src="Resources\**" target="src" />
+    <file src="..\releng\VersionInfo.cs" target="src"/>
     <file src="..\License.txt" target="License.txt"/>
   </files>
 </package>

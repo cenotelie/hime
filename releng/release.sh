@@ -15,8 +15,8 @@ xbuild /p:Configuration=Release /p:Sign=True core/Hime.SDK.csproj
 xbuild /p:Configuration=Release /p:Sign=True cli/net/HimeCC.csproj
 
 # Build the NuGet packages and push them
-nuget pack runtimes/net/Hime.Redist.csproj -Build -Symbols -Properties Configuration=Release;Sign=True
-nuget pack core/Hime.SDK.csproj -Build -Symbols -Properties Configuration=Release;Sign=True
+nuget pack runtimes/net/Hime.Redist.nuspec -Build -Symbols -Properties Configuration=Release;Sign=True
+nuget pack core/Hime.SDK.nuspec -Build -Symbols -Properties Configuration=Release;Sign=True
 nuget push  Hime.Redist.$VERSION.0.nupkg
 nuget push  Hime.SDK.$VERSION.0.nupkg
 

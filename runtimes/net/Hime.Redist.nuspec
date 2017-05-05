@@ -1,20 +1,30 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
+    <id>Hime.Redist</id>
+    <version>3.0.0.0</version>
     <title>Hime Runtime</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <authors>cenotelie</authors>
+    <owners>cenotelie</owners>
     <licenseUrl>http://www.gnu.org/licenses/lgpl.txt</licenseUrl>
-    <projectUrl>https://bitbucket.org/laurentw/hime/overview</projectUrl>
-    <iconUrl>https://bitbucket.org/laurentw/hime/downloads/Logo.png</iconUrl>
+    <projectUrl>http://cenotelie.fr/hime</projectUrl>
+    <iconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <copyright>Copyright 2014</copyright>
+    <description>Redistributable runtime library for parsers generated with Hime (LR, RNGLR).</description>
+    <copyright>Copyright © Association Cénotélie 2017</copyright>
     <tags>parser generator lr glr rnglr</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System"/>
+    </frameworkAssemblies>
+    <dependencies>
+      <group targetFramework="net45" />
+    </dependencies>
   </metadata>
   <files>
+    <file src="bin\Release\Hime.Redist.*" target="lib/net45" />
+    <file src="Sources\**" target="src" />
+    <file src="Properties\**" target="src" />
+    <file src="..\..\releng\VersionInfo.cs" target="src"/>
     <file src="..\..\License.txt" target="License.txt"/>
   </files>
 </package>
