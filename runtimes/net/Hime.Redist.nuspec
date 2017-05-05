@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Hime.Redist</id>
-    <version>3.0.0.0</version>
+    <version>3.0.1.0</version>
     <title>Hime Runtime</title>
     <authors>cenotelie</authors>
     <owners>cenotelie</owners>
