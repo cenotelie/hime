@@ -19,21 +19,17 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catCc == null)
-					BuildCategoryCc();
+				if (catCc == null) BuildCategoryCc();
 				return catCc;
 			}
 		}
-
 		private static UnicodeCategory catCc;
-
 		private static void BuildCategoryCc()
 		{
 			catCc = new UnicodeCategory("Cc");
 			catCc.AddSpan(0x0, 0x1F);
 			catCc.AddSpan(0x7F, 0x9F);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Zs
 		/// </summary>
@@ -41,14 +37,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catZs == null)
-					BuildCategoryZs();
+				if (catZs == null) BuildCategoryZs();
 				return catZs;
 			}
 		}
-
 		private static UnicodeCategory catZs;
-
 		private static void BuildCategoryZs()
 		{
 			catZs = new UnicodeCategory("Zs");
@@ -60,7 +53,6 @@ namespace Hime.SDK
 			catZs.AddSpan(0x205F, 0x205F);
 			catZs.AddSpan(0x3000, 0x3000);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Po
 		/// </summary>
@@ -68,14 +60,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPo == null)
-					BuildCategoryPo();
+				if (catPo == null) BuildCategoryPo();
 				return catPo;
 			}
 		}
-
 		private static UnicodeCategory catPo;
-
 		private static void BuildCategoryPo()
 		{
 			catPo = new UnicodeCategory("Po");
@@ -111,6 +100,7 @@ namespace Hime.SDK
 			catPo.AddSpan(0x85E, 0x85E);
 			catPo.AddSpan(0x964, 0x965);
 			catPo.AddSpan(0x970, 0x970);
+			catPo.AddSpan(0x9FD, 0x9FD);
 			catPo.AddSpan(0xAF0, 0xAF0);
 			catPo.AddSpan(0xDF4, 0xDF4);
 			catPo.AddSpan(0xE4F, 0xE4F);
@@ -162,7 +152,7 @@ namespace Hime.SDK
 			catPo.AddSpan(0x2E30, 0x2E39);
 			catPo.AddSpan(0x2E3C, 0x2E3F);
 			catPo.AddSpan(0x2E41, 0x2E41);
-			catPo.AddSpan(0x2E43, 0x2E44);
+			catPo.AddSpan(0x2E43, 0x2E49);
 			catPo.AddSpan(0x3001, 0x3003);
 			catPo.AddSpan(0x303D, 0x303D);
 			catPo.AddSpan(0x30FB, 0x30FB);
@@ -232,6 +222,8 @@ namespace Hime.SDK
 			catPo.AddSpan(0x11641, 0x11643);
 			catPo.AddSpan(0x11660, 0x1166C);
 			catPo.AddSpan(0x1173C, 0x1173E);
+			catPo.AddSpan(0x11A3F, 0x11A46);
+			catPo.AddSpan(0x11A9A, 0x11AA2);
 			catPo.AddSpan(0x11C41, 0x11C45);
 			catPo.AddSpan(0x11C70, 0x11C71);
 			catPo.AddSpan(0x12470, 0x12474);
@@ -243,7 +235,6 @@ namespace Hime.SDK
 			catPo.AddSpan(0x1DA87, 0x1DA8B);
 			catPo.AddSpan(0x1E95E, 0x1E95F);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Sc
 		/// </summary>
@@ -251,14 +242,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catSc == null)
-					BuildCategorySc();
+				if (catSc == null) BuildCategorySc();
 				return catSc;
 			}
 		}
-
 		private static UnicodeCategory catSc;
-
 		private static void BuildCategorySc()
 		{
 			catSc = new UnicodeCategory("Sc");
@@ -272,7 +260,7 @@ namespace Hime.SDK
 			catSc.AddSpan(0xBF9, 0xBF9);
 			catSc.AddSpan(0xE3F, 0xE3F);
 			catSc.AddSpan(0x17DB, 0x17DB);
-			catSc.AddSpan(0x20A0, 0x20BE);
+			catSc.AddSpan(0x20A0, 0x20BF);
 			catSc.AddSpan(0xA838, 0xA838);
 			catSc.AddSpan(0xFDFC, 0xFDFC);
 			catSc.AddSpan(0xFE69, 0xFE69);
@@ -280,7 +268,6 @@ namespace Hime.SDK
 			catSc.AddSpan(0xFFE0, 0xFFE1);
 			catSc.AddSpan(0xFFE5, 0xFFE6);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Ps
 		/// </summary>
@@ -288,14 +275,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPs == null)
-					BuildCategoryPs();
+				if (catPs == null) BuildCategoryPs();
 				return catPs;
 			}
 		}
-
 		private static UnicodeCategory catPs;
-
 		private static void BuildCategoryPs()
 		{
 			catPs = new UnicodeCategory("Ps");
@@ -375,7 +359,6 @@ namespace Hime.SDK
 			catPs.AddSpan(0xFF5F, 0xFF5F);
 			catPs.AddSpan(0xFF62, 0xFF62);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Pe
 		/// </summary>
@@ -383,14 +366,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPe == null)
-					BuildCategoryPe();
+				if (catPe == null) BuildCategoryPe();
 				return catPe;
 			}
 		}
-
 		private static UnicodeCategory catPe;
-
 		private static void BuildCategoryPe()
 		{
 			catPe = new UnicodeCategory("Pe");
@@ -467,7 +447,6 @@ namespace Hime.SDK
 			catPe.AddSpan(0xFF60, 0xFF60);
 			catPe.AddSpan(0xFF63, 0xFF63);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Sm
 		/// </summary>
@@ -475,14 +454,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catSm == null)
-					BuildCategorySm();
+				if (catSm == null) BuildCategorySm();
 				return catSm;
 			}
 		}
-
 		private static UnicodeCategory catSm;
-
 		private static void BuildCategorySm()
 		{
 			catSm = new UnicodeCategory("Sm");
@@ -551,7 +527,6 @@ namespace Hime.SDK
 			catSm.AddSpan(0x1D7C3, 0x1D7C3);
 			catSm.AddSpan(0x1EEF0, 0x1EEF1);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Pd
 		/// </summary>
@@ -559,14 +534,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPd == null)
-					BuildCategoryPd();
+				if (catPd == null) BuildCategoryPd();
 				return catPd;
 			}
 		}
-
 		private static UnicodeCategory catPd;
-
 		private static void BuildCategoryPd()
 		{
 			catPd = new UnicodeCategory("Pd");
@@ -588,7 +560,6 @@ namespace Hime.SDK
 			catPd.AddSpan(0xFE63, 0xFE63);
 			catPd.AddSpan(0xFF0D, 0xFF0D);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Nd
 		/// </summary>
@@ -596,14 +567,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catNd == null)
-					BuildCategoryNd();
+				if (catNd == null) BuildCategoryNd();
 				return catNd;
 			}
 		}
-
 		private static UnicodeCategory catNd;
-
 		private static void BuildCategoryNd()
 		{
 			catNd = new UnicodeCategory("Nd");
@@ -656,12 +624,12 @@ namespace Hime.SDK
 			catNd.AddSpan(0x11730, 0x11739);
 			catNd.AddSpan(0x118E0, 0x118E9);
 			catNd.AddSpan(0x11C50, 0x11C59);
+			catNd.AddSpan(0x11D50, 0x11D59);
 			catNd.AddSpan(0x16A60, 0x16A69);
 			catNd.AddSpan(0x16B50, 0x16B59);
 			catNd.AddSpan(0x1D7CE, 0x1D7FF);
 			catNd.AddSpan(0x1E950, 0x1E959);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Lu
 		/// </summary>
@@ -669,14 +637,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catLu == null)
-					BuildCategoryLu();
+				if (catLu == null) BuildCategoryLu();
 				return catLu;
 			}
 		}
-
 		private static UnicodeCategory catLu;
-
 		private static void BuildCategoryLu()
 		{
 			catLu = new UnicodeCategory("Lu");
@@ -1287,7 +1252,6 @@ namespace Hime.SDK
 			catLu.AddSpan(0x1D7CA, 0x1D7CA);
 			catLu.AddSpan(0x1E900, 0x1E921);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Sk
 		/// </summary>
@@ -1295,14 +1259,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catSk == null)
-					BuildCategorySk();
+				if (catSk == null) BuildCategorySk();
 				return catSk;
 			}
 		}
-
 		private static UnicodeCategory catSk;
-
 		private static void BuildCategorySk()
 		{
 			catSk = new UnicodeCategory("Sk");
@@ -1336,7 +1297,6 @@ namespace Hime.SDK
 			catSk.AddSpan(0xFFE3, 0xFFE3);
 			catSk.AddSpan(0x1F3FB, 0x1F3FF);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Pc
 		/// </summary>
@@ -1344,14 +1304,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPc == null)
-					BuildCategoryPc();
+				if (catPc == null) BuildCategoryPc();
 				return catPc;
 			}
 		}
-
 		private static UnicodeCategory catPc;
-
 		private static void BuildCategoryPc()
 		{
 			catPc = new UnicodeCategory("Pc");
@@ -1362,7 +1319,6 @@ namespace Hime.SDK
 			catPc.AddSpan(0xFE4D, 0xFE4F);
 			catPc.AddSpan(0xFF3F, 0xFF3F);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Ll
 		/// </summary>
@@ -1370,14 +1326,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catLl == null)
-					BuildCategoryLl();
+				if (catLl == null) BuildCategoryLl();
 				return catLl;
 			}
 		}
-
 		private static UnicodeCategory catLl;
-
 		private static void BuildCategoryLl()
 		{
 			catLl = new UnicodeCategory("Ll");
@@ -2002,7 +1955,6 @@ namespace Hime.SDK
 			catLl.AddSpan(0x1D7CB, 0x1D7CB);
 			catLl.AddSpan(0x1E922, 0x1E943);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category So
 		/// </summary>
@@ -2010,14 +1962,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catSo == null)
-					BuildCategorySo();
+				if (catSo == null) BuildCategorySo();
 				return catSo;
 			}
 		}
-
 		private static UnicodeCategory catSo;
-
 		private static void BuildCategorySo()
 		{
 			catSo = new UnicodeCategory("So");
@@ -2146,9 +2095,8 @@ namespace Hime.SDK
 			catSo.AddSpan(0x1DA85, 0x1DA86);
 			catSo.AddSpan(0x1F000, 0x1F0F5);
 			catSo.AddSpan(0x1F110, 0x1F3FA);
-			catSo.AddSpan(0x1F400, 0x1F9C0);
+			catSo.AddSpan(0x1F400, 0x1F9E6);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Lo
 		/// </summary>
@@ -2156,14 +2104,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catLo == null)
-					BuildCategoryLo();
+				if (catLo == null) BuildCategoryLo();
 				return catLo;
 			}
 		}
-
 		private static UnicodeCategory catLo;
-
 		private static void BuildCategoryLo()
 		{
 			catLo = new UnicodeCategory("Lo");
@@ -2188,7 +2133,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0x7CA, 0x7EA);
 			catLo.AddSpan(0x800, 0x815);
 			catLo.AddSpan(0x840, 0x858);
-			catLo.AddSpan(0x8A0, 0x8BD);
+			catLo.AddSpan(0x860, 0x8BD);
 			catLo.AddSpan(0x904, 0x939);
 			catLo.AddSpan(0x93D, 0x93D);
 			catLo.AddSpan(0x950, 0x950);
@@ -2199,6 +2144,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0x9CE, 0x9CE);
 			catLo.AddSpan(0x9DC, 0x9E1);
 			catLo.AddSpan(0x9F0, 0x9F1);
+			catLo.AddSpan(0x9FC, 0x9FC);
 			catLo.AddSpan(0xA05, 0xA39);
 			catLo.AddSpan(0xA59, 0xA5E);
 			catLo.AddSpan(0xA72, 0xA74);
@@ -2219,7 +2165,8 @@ namespace Hime.SDK
 			catLo.AddSpan(0xCBD, 0xCBD);
 			catLo.AddSpan(0xCDE, 0xCE1);
 			catLo.AddSpan(0xCF1, 0xCF2);
-			catLo.AddSpan(0xD05, 0xD3D);
+			catLo.AddSpan(0xD05, 0xD3A);
+			catLo.AddSpan(0xD3D, 0xD3D);
 			catLo.AddSpan(0xD4E, 0xD4E);
 			catLo.AddSpan(0xD54, 0xD56);
 			catLo.AddSpan(0xD5F, 0xD61);
@@ -2341,7 +2288,7 @@ namespace Hime.SDK
 			catLo.AddSpan(0x10000, 0x100FA);
 			catLo.AddSpan(0x10280, 0x102D0);
 			catLo.AddSpan(0x10300, 0x1031F);
-			catLo.AddSpan(0x10330, 0x10340);
+			catLo.AddSpan(0x1032D, 0x10340);
 			catLo.AddSpan(0x10342, 0x10349);
 			catLo.AddSpan(0x10350, 0x10375);
 			catLo.AddSpan(0x10380, 0x1039D);
@@ -2395,9 +2342,16 @@ namespace Hime.SDK
 			catLo.AddSpan(0x11644, 0x11644);
 			catLo.AddSpan(0x11680, 0x116AA);
 			catLo.AddSpan(0x11700, 0x11719);
-			catLo.AddSpan(0x118FF, 0x11C2E);
+			catLo.AddSpan(0x118FF, 0x11A00);
+			catLo.AddSpan(0x11A0B, 0x11A32);
+			catLo.AddSpan(0x11A3A, 0x11A3A);
+			catLo.AddSpan(0x11A50, 0x11A50);
+			catLo.AddSpan(0x11A5C, 0x11A89);
+			catLo.AddSpan(0x11AC0, 0x11C2E);
 			catLo.AddSpan(0x11C40, 0x11C40);
 			catLo.AddSpan(0x11C72, 0x11C8F);
+			catLo.AddSpan(0x11D00, 0x11D30);
+			catLo.AddSpan(0x11D46, 0x11D46);
 			catLo.AddSpan(0x12000, 0x12399);
 			catLo.AddSpan(0x12480, 0x16A5E);
 			catLo.AddSpan(0x16AD0, 0x16AED);
@@ -2408,7 +2362,6 @@ namespace Hime.SDK
 			catLo.AddSpan(0x1EE00, 0x1EEBB);
 			catLo.AddSpan(0x20000, 0x2FA1D);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Pi
 		/// </summary>
@@ -2416,14 +2369,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPi == null)
-					BuildCategoryPi();
+				if (catPi == null) BuildCategoryPi();
 				return catPi;
 			}
 		}
-
 		private static UnicodeCategory catPi;
-
 		private static void BuildCategoryPi()
 		{
 			catPi = new UnicodeCategory("Pi");
@@ -2439,7 +2389,6 @@ namespace Hime.SDK
 			catPi.AddSpan(0x2E1C, 0x2E1C);
 			catPi.AddSpan(0x2E20, 0x2E20);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Cf
 		/// </summary>
@@ -2447,14 +2396,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catCf == null)
-					BuildCategoryCf();
+				if (catCf == null) BuildCategoryCf();
 				return catCf;
 			}
 		}
-
 		private static UnicodeCategory catCf;
-
 		private static void BuildCategoryCf()
 		{
 			catCf = new UnicodeCategory("Cf");
@@ -2475,7 +2421,6 @@ namespace Hime.SDK
 			catCf.AddSpan(0x1D173, 0x1D17A);
 			catCf.AddSpan(0xE0001, 0xE007F);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category No
 		/// </summary>
@@ -2483,14 +2428,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catNo == null)
-					BuildCategoryNo();
+				if (catNo == null) BuildCategoryNo();
 				return catNo;
 			}
 		}
-
 		private static UnicodeCategory catNo;
-
 		private static void BuildCategoryNo()
 		{
 			catNo = new UnicodeCategory("No");
@@ -2553,7 +2495,6 @@ namespace Hime.SDK
 			catNo.AddSpan(0x1E8C7, 0x1E8CF);
 			catNo.AddSpan(0x1F100, 0x1F10C);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Pf
 		/// </summary>
@@ -2561,14 +2502,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catPf == null)
-					BuildCategoryPf();
+				if (catPf == null) BuildCategoryPf();
 				return catPf;
 			}
 		}
-
 		private static UnicodeCategory catPf;
-
 		private static void BuildCategoryPf()
 		{
 			catPf = new UnicodeCategory("Pf");
@@ -2583,7 +2521,6 @@ namespace Hime.SDK
 			catPf.AddSpan(0x2E1D, 0x2E1D);
 			catPf.AddSpan(0x2E21, 0x2E21);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Lt
 		/// </summary>
@@ -2591,14 +2528,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catLt == null)
-					BuildCategoryLt();
+				if (catLt == null) BuildCategoryLt();
 				return catLt;
 			}
 		}
-
 		private static UnicodeCategory catLt;
-
 		private static void BuildCategoryLt()
 		{
 			catLt = new UnicodeCategory("Lt");
@@ -2613,7 +2547,6 @@ namespace Hime.SDK
 			catLt.AddSpan(0x1FCC, 0x1FCC);
 			catLt.AddSpan(0x1FFC, 0x1FFC);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Lm
 		/// </summary>
@@ -2621,14 +2554,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catLm == null)
-					BuildCategoryLm();
+				if (catLm == null) BuildCategoryLm();
 				return catLm;
 			}
 		}
-
 		private static UnicodeCategory catLm;
-
 		private static void BuildCategoryLm()
 		{
 			catLm = new UnicodeCategory("Lm");
@@ -2687,9 +2617,8 @@ namespace Hime.SDK
 			catLm.AddSpan(0xFF70, 0xFF70);
 			catLm.AddSpan(0xFF9E, 0xFF9F);
 			catLm.AddSpan(0x16B40, 0x16B43);
-			catLm.AddSpan(0x16F93, 0x16FE0);
+			catLm.AddSpan(0x16F93, 0x16FE1);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Mn
 		/// </summary>
@@ -2697,14 +2626,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catMn == null)
-					BuildCategoryMn();
+				if (catMn == null) BuildCategoryMn();
 				return catMn;
 			}
 		}
-
 		private static UnicodeCategory catMn;
-
 		private static void BuildCategoryMn()
 		{
 			catMn = new UnicodeCategory("Mn");
@@ -2753,7 +2679,7 @@ namespace Hime.SDK
 			catMn.AddSpan(0xAC1, 0xAC8);
 			catMn.AddSpan(0xACD, 0xACD);
 			catMn.AddSpan(0xAE2, 0xAE3);
-			catMn.AddSpan(0xB01, 0xB01);
+			catMn.AddSpan(0xAFA, 0xB01);
 			catMn.AddSpan(0xB3C, 0xB3C);
 			catMn.AddSpan(0xB3F, 0xB3F);
 			catMn.AddSpan(0xB41, 0xB44);
@@ -2772,7 +2698,8 @@ namespace Hime.SDK
 			catMn.AddSpan(0xCC6, 0xCC6);
 			catMn.AddSpan(0xCCC, 0xCCD);
 			catMn.AddSpan(0xCE2, 0xCE3);
-			catMn.AddSpan(0xD01, 0xD01);
+			catMn.AddSpan(0xD00, 0xD01);
+			catMn.AddSpan(0xD3B, 0xD3C);
 			catMn.AddSpan(0xD41, 0xD44);
 			catMn.AddSpan(0xD4D, 0xD4D);
 			catMn.AddSpan(0xD62, 0xD63);
@@ -2945,12 +2872,23 @@ namespace Hime.SDK
 			catMn.AddSpan(0x1171D, 0x1171F);
 			catMn.AddSpan(0x11722, 0x11725);
 			catMn.AddSpan(0x11727, 0x1172B);
+			catMn.AddSpan(0x11A01, 0x11A06);
+			catMn.AddSpan(0x11A09, 0x11A0A);
+			catMn.AddSpan(0x11A33, 0x11A38);
+			catMn.AddSpan(0x11A3B, 0x11A3E);
+			catMn.AddSpan(0x11A47, 0x11A47);
+			catMn.AddSpan(0x11A51, 0x11A56);
+			catMn.AddSpan(0x11A59, 0x11A5B);
+			catMn.AddSpan(0x11A8A, 0x11A96);
+			catMn.AddSpan(0x11A98, 0x11A99);
 			catMn.AddSpan(0x11C30, 0x11C3D);
 			catMn.AddSpan(0x11C3F, 0x11C3F);
 			catMn.AddSpan(0x11C92, 0x11CA7);
 			catMn.AddSpan(0x11CAA, 0x11CB0);
 			catMn.AddSpan(0x11CB2, 0x11CB3);
 			catMn.AddSpan(0x11CB5, 0x11CB6);
+			catMn.AddSpan(0x11D31, 0x11D45);
+			catMn.AddSpan(0x11D47, 0x11D47);
 			catMn.AddSpan(0x16AF0, 0x16AF4);
 			catMn.AddSpan(0x16B30, 0x16B36);
 			catMn.AddSpan(0x16F8F, 0x16F92);
@@ -2969,7 +2907,6 @@ namespace Hime.SDK
 			catMn.AddSpan(0x1E944, 0x1E94A);
 			catMn.AddSpan(0xE0100, 0xE01EF);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Me
 		/// </summary>
@@ -2977,14 +2914,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catMe == null)
-					BuildCategoryMe();
+				if (catMe == null) BuildCategoryMe();
 				return catMe;
 			}
 		}
-
 		private static UnicodeCategory catMe;
-
 		private static void BuildCategoryMe()
 		{
 			catMe = new UnicodeCategory("Me");
@@ -2994,7 +2928,6 @@ namespace Hime.SDK
 			catMe.AddSpan(0x20E2, 0x20E4);
 			catMe.AddSpan(0xA670, 0xA672);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Mc
 		/// </summary>
@@ -3002,14 +2935,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catMc == null)
-					BuildCategoryMc();
+				if (catMc == null) BuildCategoryMc();
 				return catMc;
 			}
 		}
-
 		private static UnicodeCategory catMc;
-
 		private static void BuildCategoryMc()
 		{
 			catMc = new UnicodeCategory("Mc");
@@ -3092,6 +3022,7 @@ namespace Hime.SDK
 			catMc.AddSpan(0x1C34, 0x1C35);
 			catMc.AddSpan(0x1CE1, 0x1CE1);
 			catMc.AddSpan(0x1CF2, 0x1CF3);
+			catMc.AddSpan(0x1CF7, 0x1CF7);
 			catMc.AddSpan(0x302E, 0x302F);
 			catMc.AddSpan(0xA823, 0xA824);
 			catMc.AddSpan(0xA827, 0xA827);
@@ -3150,6 +3081,10 @@ namespace Hime.SDK
 			catMc.AddSpan(0x116B6, 0x116B6);
 			catMc.AddSpan(0x11720, 0x11721);
 			catMc.AddSpan(0x11726, 0x11726);
+			catMc.AddSpan(0x11A07, 0x11A08);
+			catMc.AddSpan(0x11A39, 0x11A39);
+			catMc.AddSpan(0x11A57, 0x11A58);
+			catMc.AddSpan(0x11A97, 0x11A97);
 			catMc.AddSpan(0x11C2F, 0x11C2F);
 			catMc.AddSpan(0x11C3E, 0x11C3E);
 			catMc.AddSpan(0x11CA9, 0x11CA9);
@@ -3159,7 +3094,6 @@ namespace Hime.SDK
 			catMc.AddSpan(0x1D165, 0x1D166);
 			catMc.AddSpan(0x1D16D, 0x1D172);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Nl
 		/// </summary>
@@ -3167,14 +3101,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catNl == null)
-					BuildCategoryNl();
+				if (catNl == null) BuildCategoryNl();
 				return catNl;
 			}
 		}
-
 		private static UnicodeCategory catNl;
-
 		private static void BuildCategoryNl()
 		{
 			catNl = new UnicodeCategory("Nl");
@@ -3191,7 +3122,6 @@ namespace Hime.SDK
 			catNl.AddSpan(0x103D1, 0x103D5);
 			catNl.AddSpan(0x12400, 0x1246E);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Zl
 		/// </summary>
@@ -3199,20 +3129,16 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catZl == null)
-					BuildCategoryZl();
+				if (catZl == null) BuildCategoryZl();
 				return catZl;
 			}
 		}
-
 		private static UnicodeCategory catZl;
-
 		private static void BuildCategoryZl()
 		{
 			catZl = new UnicodeCategory("Zl");
 			catZl.AddSpan(0x2028, 0x2028);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Zp
 		/// </summary>
@@ -3220,20 +3146,16 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catZp == null)
-					BuildCategoryZp();
+				if (catZp == null) BuildCategoryZp();
 				return catZp;
 			}
 		}
-
 		private static UnicodeCategory catZp;
-
 		private static void BuildCategoryZp()
 		{
 			catZp = new UnicodeCategory("Zp");
 			catZp.AddSpan(0x2029, 0x2029);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Cs
 		/// </summary>
@@ -3241,19 +3163,15 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catCs == null)
-					BuildCategoryCs();
+				if (catCs == null) BuildCategoryCs();
 				return catCs;
 			}
 		}
-
 		private static UnicodeCategory catCs;
-
 		private static void BuildCategoryCs()
 		{
 			catCs = new UnicodeCategory("Cs");
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Co
 		/// </summary>
@@ -3261,21 +3179,17 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catCo == null)
-					BuildCategoryCo();
+				if (catCo == null) BuildCategoryCo();
 				return catCo;
 			}
 		}
-
 		private static UnicodeCategory catCo;
-
 		private static void BuildCategoryCo()
 		{
 			catCo = new UnicodeCategory("Co");
 			catCo.AddSpan(0xE000, 0xF8FF);
 			catCo.AddSpan(0xF0000, 0x10FFFD);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category C
 		/// </summary>
@@ -3283,14 +3197,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catC == null)
-					BuildCategoryC();
+				if (catC == null) BuildCategoryC();
 				return catC;
 			}
 		}
-
 		private static UnicodeCategory catC;
-
 		private static void BuildCategoryC()
 		{
 			catC = new UnicodeCategory("C");
@@ -3299,7 +3210,6 @@ namespace Hime.SDK
 			catC.Aggregate(Cs);
 			catC.Aggregate(Co);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category Z
 		/// </summary>
@@ -3307,14 +3217,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catZ == null)
-					BuildCategoryZ();
+				if (catZ == null) BuildCategoryZ();
 				return catZ;
 			}
 		}
-
 		private static UnicodeCategory catZ;
-
 		private static void BuildCategoryZ()
 		{
 			catZ = new UnicodeCategory("Z");
@@ -3322,7 +3229,6 @@ namespace Hime.SDK
 			catZ.Aggregate(Zl);
 			catZ.Aggregate(Zp);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category P
 		/// </summary>
@@ -3330,14 +3236,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catP == null)
-					BuildCategoryP();
+				if (catP == null) BuildCategoryP();
 				return catP;
 			}
 		}
-
 		private static UnicodeCategory catP;
-
 		private static void BuildCategoryP()
 		{
 			catP = new UnicodeCategory("P");
@@ -3349,7 +3252,6 @@ namespace Hime.SDK
 			catP.Aggregate(Pi);
 			catP.Aggregate(Pf);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category S
 		/// </summary>
@@ -3357,14 +3259,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catS == null)
-					BuildCategoryS();
+				if (catS == null) BuildCategoryS();
 				return catS;
 			}
 		}
-
 		private static UnicodeCategory catS;
-
 		private static void BuildCategoryS()
 		{
 			catS = new UnicodeCategory("S");
@@ -3373,7 +3272,6 @@ namespace Hime.SDK
 			catS.Aggregate(Sk);
 			catS.Aggregate(So);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category N
 		/// </summary>
@@ -3381,14 +3279,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catN == null)
-					BuildCategoryN();
+				if (catN == null) BuildCategoryN();
 				return catN;
 			}
 		}
-
 		private static UnicodeCategory catN;
-
 		private static void BuildCategoryN()
 		{
 			catN = new UnicodeCategory("N");
@@ -3396,7 +3291,6 @@ namespace Hime.SDK
 			catN.Aggregate(No);
 			catN.Aggregate(Nl);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category L
 		/// </summary>
@@ -3404,14 +3298,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catL == null)
-					BuildCategoryL();
+				if (catL == null) BuildCategoryL();
 				return catL;
 			}
 		}
-
 		private static UnicodeCategory catL;
-
 		private static void BuildCategoryL()
 		{
 			catL = new UnicodeCategory("L");
@@ -3421,7 +3312,6 @@ namespace Hime.SDK
 			catL.Aggregate(Lt);
 			catL.Aggregate(Lm);
 		}
-
 		/// <summary>
 		/// Gets the Unicode category M
 		/// </summary>
@@ -3429,14 +3319,11 @@ namespace Hime.SDK
 		{
 			get
 			{
-				if (catM == null)
-					BuildCategoryM();
+				if (catM == null) BuildCategoryM();
 				return catM;
 			}
 		}
-
 		private static UnicodeCategory catM;
-
 		private static void BuildCategoryM()
 		{
 			catM = new UnicodeCategory("M");
@@ -3449,7 +3336,6 @@ namespace Hime.SDK
 		/// The database of Unicode categories accesible by names
 		/// </summary>
 		private static Dictionary<string, UnicodeCategory> db;
-
 		/// <summary>
 		/// Builds the category database
 		/// </summary>
@@ -3493,7 +3379,6 @@ namespace Hime.SDK
 			db.Add("L", L);
 			db.Add("M", M);
 		}
-
 		/// <summary>
 		/// Gets the category with the given name
 		/// </summary>
@@ -3501,8 +3386,7 @@ namespace Hime.SDK
 		/// <returns>The corresponding category, or null if it does not exists</returns>
 		public static UnicodeCategory GetCategory(string name)
 		{
-			if (db == null)
-				BuildDB();
+			if (db == null) BuildDB();
 			return !db.ContainsKey(name) ? null : db[name];
 		}
 	}

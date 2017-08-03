@@ -16,1897 +16,1392 @@ namespace Hime.SDK
 		/// Gets the Unicode block BasicLatin
 		/// </summary>
 		public static UnicodeBlock BasicLatin { get { return blockBasicLatin; } }
-
 		private static readonly UnicodeBlock blockBasicLatin = new UnicodeBlock("BasicLatin", 0x0, 0x7F);
-
 		/// <summary>
 		/// Gets the Unicode block Latin-1Supplement
 		/// </summary>
 		public static UnicodeBlock Latin1Supplement { get { return blockLatin1Supplement; } }
-
 		private static readonly UnicodeBlock blockLatin1Supplement = new UnicodeBlock("Latin-1Supplement", 0x80, 0xFF);
-
 		/// <summary>
 		/// Gets the Unicode block LatinExtended-A
 		/// </summary>
 		public static UnicodeBlock LatinExtendedA { get { return blockLatinExtendedA; } }
-
 		private static readonly UnicodeBlock blockLatinExtendedA = new UnicodeBlock("LatinExtended-A", 0x100, 0x17F);
-
 		/// <summary>
 		/// Gets the Unicode block LatinExtended-B
 		/// </summary>
 		public static UnicodeBlock LatinExtendedB { get { return blockLatinExtendedB; } }
-
 		private static readonly UnicodeBlock blockLatinExtendedB = new UnicodeBlock("LatinExtended-B", 0x180, 0x24F);
-
 		/// <summary>
 		/// Gets the Unicode block IPAExtensions
 		/// </summary>
 		public static UnicodeBlock IPAExtensions { get { return blockIPAExtensions; } }
-
 		private static readonly UnicodeBlock blockIPAExtensions = new UnicodeBlock("IPAExtensions", 0x250, 0x2AF);
-
 		/// <summary>
 		/// Gets the Unicode block SpacingModifierLetters
 		/// </summary>
 		public static UnicodeBlock SpacingModifierLetters { get { return blockSpacingModifierLetters; } }
-
 		private static readonly UnicodeBlock blockSpacingModifierLetters = new UnicodeBlock("SpacingModifierLetters", 0x2B0, 0x2FF);
-
 		/// <summary>
 		/// Gets the Unicode block CombiningDiacriticalMarks
 		/// </summary>
 		public static UnicodeBlock CombiningDiacriticalMarks { get { return blockCombiningDiacriticalMarks; } }
-
 		private static readonly UnicodeBlock blockCombiningDiacriticalMarks = new UnicodeBlock("CombiningDiacriticalMarks", 0x300, 0x36F);
-
 		/// <summary>
 		/// Gets the Unicode block GreekandCoptic
 		/// </summary>
 		public static UnicodeBlock GreekandCoptic { get { return blockGreekandCoptic; } }
-
 		private static readonly UnicodeBlock blockGreekandCoptic = new UnicodeBlock("GreekandCoptic", 0x370, 0x3FF);
-
 		/// <summary>
 		/// Gets the Unicode block Cyrillic
 		/// </summary>
 		public static UnicodeBlock Cyrillic { get { return blockCyrillic; } }
-
 		private static readonly UnicodeBlock blockCyrillic = new UnicodeBlock("Cyrillic", 0x400, 0x4FF);
-
 		/// <summary>
 		/// Gets the Unicode block CyrillicSupplement
 		/// </summary>
 		public static UnicodeBlock CyrillicSupplement { get { return blockCyrillicSupplement; } }
-
 		private static readonly UnicodeBlock blockCyrillicSupplement = new UnicodeBlock("CyrillicSupplement", 0x500, 0x52F);
-
 		/// <summary>
 		/// Gets the Unicode block Armenian
 		/// </summary>
 		public static UnicodeBlock Armenian { get { return blockArmenian; } }
-
 		private static readonly UnicodeBlock blockArmenian = new UnicodeBlock("Armenian", 0x530, 0x58F);
-
 		/// <summary>
 		/// Gets the Unicode block Hebrew
 		/// </summary>
 		public static UnicodeBlock Hebrew { get { return blockHebrew; } }
-
 		private static readonly UnicodeBlock blockHebrew = new UnicodeBlock("Hebrew", 0x590, 0x5FF);
-
 		/// <summary>
 		/// Gets the Unicode block Arabic
 		/// </summary>
 		public static UnicodeBlock Arabic { get { return blockArabic; } }
-
 		private static readonly UnicodeBlock blockArabic = new UnicodeBlock("Arabic", 0x600, 0x6FF);
-
 		/// <summary>
 		/// Gets the Unicode block Syriac
 		/// </summary>
 		public static UnicodeBlock Syriac { get { return blockSyriac; } }
-
 		private static readonly UnicodeBlock blockSyriac = new UnicodeBlock("Syriac", 0x700, 0x74F);
-
 		/// <summary>
 		/// Gets the Unicode block ArabicSupplement
 		/// </summary>
 		public static UnicodeBlock ArabicSupplement { get { return blockArabicSupplement; } }
-
 		private static readonly UnicodeBlock blockArabicSupplement = new UnicodeBlock("ArabicSupplement", 0x750, 0x77F);
-
 		/// <summary>
 		/// Gets the Unicode block Thaana
 		/// </summary>
 		public static UnicodeBlock Thaana { get { return blockThaana; } }
-
 		private static readonly UnicodeBlock blockThaana = new UnicodeBlock("Thaana", 0x780, 0x7BF);
-
 		/// <summary>
 		/// Gets the Unicode block NKo
 		/// </summary>
 		public static UnicodeBlock NKo { get { return blockNKo; } }
-
 		private static readonly UnicodeBlock blockNKo = new UnicodeBlock("NKo", 0x7C0, 0x7FF);
-
 		/// <summary>
 		/// Gets the Unicode block Samaritan
 		/// </summary>
 		public static UnicodeBlock Samaritan { get { return blockSamaritan; } }
-
 		private static readonly UnicodeBlock blockSamaritan = new UnicodeBlock("Samaritan", 0x800, 0x83F);
-
 		/// <summary>
 		/// Gets the Unicode block Mandaic
 		/// </summary>
 		public static UnicodeBlock Mandaic { get { return blockMandaic; } }
-
 		private static readonly UnicodeBlock blockMandaic = new UnicodeBlock("Mandaic", 0x840, 0x85F);
-
+		/// <summary>
+		/// Gets the Unicode block SyriacSupplement
+		/// </summary>
+		public static UnicodeBlock SyriacSupplement { get { return blockSyriacSupplement; } }
+		private static readonly UnicodeBlock blockSyriacSupplement = new UnicodeBlock("SyriacSupplement", 0x860, 0x86F);
 		/// <summary>
 		/// Gets the Unicode block ArabicExtended-A
 		/// </summary>
 		public static UnicodeBlock ArabicExtendedA { get { return blockArabicExtendedA; } }
-
 		private static readonly UnicodeBlock blockArabicExtendedA = new UnicodeBlock("ArabicExtended-A", 0x8A0, 0x8FF);
-
 		/// <summary>
 		/// Gets the Unicode block Devanagari
 		/// </summary>
 		public static UnicodeBlock Devanagari { get { return blockDevanagari; } }
-
 		private static readonly UnicodeBlock blockDevanagari = new UnicodeBlock("Devanagari", 0x900, 0x97F);
-
 		/// <summary>
 		/// Gets the Unicode block Bengali
 		/// </summary>
 		public static UnicodeBlock Bengali { get { return blockBengali; } }
-
 		private static readonly UnicodeBlock blockBengali = new UnicodeBlock("Bengali", 0x980, 0x9FF);
-
 		/// <summary>
 		/// Gets the Unicode block Gurmukhi
 		/// </summary>
 		public static UnicodeBlock Gurmukhi { get { return blockGurmukhi; } }
-
 		private static readonly UnicodeBlock blockGurmukhi = new UnicodeBlock("Gurmukhi", 0xA00, 0xA7F);
-
 		/// <summary>
 		/// Gets the Unicode block Gujarati
 		/// </summary>
 		public static UnicodeBlock Gujarati { get { return blockGujarati; } }
-
 		private static readonly UnicodeBlock blockGujarati = new UnicodeBlock("Gujarati", 0xA80, 0xAFF);
-
 		/// <summary>
 		/// Gets the Unicode block Oriya
 		/// </summary>
 		public static UnicodeBlock Oriya { get { return blockOriya; } }
-
 		private static readonly UnicodeBlock blockOriya = new UnicodeBlock("Oriya", 0xB00, 0xB7F);
-
 		/// <summary>
 		/// Gets the Unicode block Tamil
 		/// </summary>
 		public static UnicodeBlock Tamil { get { return blockTamil; } }
-
 		private static readonly UnicodeBlock blockTamil = new UnicodeBlock("Tamil", 0xB80, 0xBFF);
-
 		/// <summary>
 		/// Gets the Unicode block Telugu
 		/// </summary>
 		public static UnicodeBlock Telugu { get { return blockTelugu; } }
-
 		private static readonly UnicodeBlock blockTelugu = new UnicodeBlock("Telugu", 0xC00, 0xC7F);
-
 		/// <summary>
 		/// Gets the Unicode block Kannada
 		/// </summary>
 		public static UnicodeBlock Kannada { get { return blockKannada; } }
-
 		private static readonly UnicodeBlock blockKannada = new UnicodeBlock("Kannada", 0xC80, 0xCFF);
-
 		/// <summary>
 		/// Gets the Unicode block Malayalam
 		/// </summary>
 		public static UnicodeBlock Malayalam { get { return blockMalayalam; } }
-
 		private static readonly UnicodeBlock blockMalayalam = new UnicodeBlock("Malayalam", 0xD00, 0xD7F);
-
 		/// <summary>
 		/// Gets the Unicode block Sinhala
 		/// </summary>
 		public static UnicodeBlock Sinhala { get { return blockSinhala; } }
-
 		private static readonly UnicodeBlock blockSinhala = new UnicodeBlock("Sinhala", 0xD80, 0xDFF);
-
 		/// <summary>
 		/// Gets the Unicode block Thai
 		/// </summary>
 		public static UnicodeBlock Thai { get { return blockThai; } }
-
 		private static readonly UnicodeBlock blockThai = new UnicodeBlock("Thai", 0xE00, 0xE7F);
-
 		/// <summary>
 		/// Gets the Unicode block Lao
 		/// </summary>
 		public static UnicodeBlock Lao { get { return blockLao; } }
-
 		private static readonly UnicodeBlock blockLao = new UnicodeBlock("Lao", 0xE80, 0xEFF);
-
 		/// <summary>
 		/// Gets the Unicode block Tibetan
 		/// </summary>
 		public static UnicodeBlock Tibetan { get { return blockTibetan; } }
-
 		private static readonly UnicodeBlock blockTibetan = new UnicodeBlock("Tibetan", 0xF00, 0xFFF);
-
 		/// <summary>
 		/// Gets the Unicode block Myanmar
 		/// </summary>
 		public static UnicodeBlock Myanmar { get { return blockMyanmar; } }
-
 		private static readonly UnicodeBlock blockMyanmar = new UnicodeBlock("Myanmar", 0x1000, 0x109F);
-
 		/// <summary>
 		/// Gets the Unicode block Georgian
 		/// </summary>
 		public static UnicodeBlock Georgian { get { return blockGeorgian; } }
-
 		private static readonly UnicodeBlock blockGeorgian = new UnicodeBlock("Georgian", 0x10A0, 0x10FF);
-
 		/// <summary>
 		/// Gets the Unicode block HangulJamo
 		/// </summary>
 		public static UnicodeBlock HangulJamo { get { return blockHangulJamo; } }
-
 		private static readonly UnicodeBlock blockHangulJamo = new UnicodeBlock("HangulJamo", 0x1100, 0x11FF);
-
 		/// <summary>
 		/// Gets the Unicode block Ethiopic
 		/// </summary>
 		public static UnicodeBlock Ethiopic { get { return blockEthiopic; } }
-
 		private static readonly UnicodeBlock blockEthiopic = new UnicodeBlock("Ethiopic", 0x1200, 0x137F);
-
 		/// <summary>
 		/// Gets the Unicode block EthiopicSupplement
 		/// </summary>
 		public static UnicodeBlock EthiopicSupplement { get { return blockEthiopicSupplement; } }
-
 		private static readonly UnicodeBlock blockEthiopicSupplement = new UnicodeBlock("EthiopicSupplement", 0x1380, 0x139F);
-
 		/// <summary>
 		/// Gets the Unicode block Cherokee
 		/// </summary>
 		public static UnicodeBlock Cherokee { get { return blockCherokee; } }
-
 		private static readonly UnicodeBlock blockCherokee = new UnicodeBlock("Cherokee", 0x13A0, 0x13FF);
-
 		/// <summary>
 		/// Gets the Unicode block UnifiedCanadianAboriginalSyllabics
 		/// </summary>
 		public static UnicodeBlock UnifiedCanadianAboriginalSyllabics { get { return blockUnifiedCanadianAboriginalSyllabics; } }
-
 		private static readonly UnicodeBlock blockUnifiedCanadianAboriginalSyllabics = new UnicodeBlock("UnifiedCanadianAboriginalSyllabics", 0x1400, 0x167F);
-
 		/// <summary>
 		/// Gets the Unicode block Ogham
 		/// </summary>
 		public static UnicodeBlock Ogham { get { return blockOgham; } }
-
 		private static readonly UnicodeBlock blockOgham = new UnicodeBlock("Ogham", 0x1680, 0x169F);
-
 		/// <summary>
 		/// Gets the Unicode block Runic
 		/// </summary>
 		public static UnicodeBlock Runic { get { return blockRunic; } }
-
 		private static readonly UnicodeBlock blockRunic = new UnicodeBlock("Runic", 0x16A0, 0x16FF);
-
 		/// <summary>
 		/// Gets the Unicode block Tagalog
 		/// </summary>
 		public static UnicodeBlock Tagalog { get { return blockTagalog; } }
-
 		private static readonly UnicodeBlock blockTagalog = new UnicodeBlock("Tagalog", 0x1700, 0x171F);
-
 		/// <summary>
 		/// Gets the Unicode block Hanunoo
 		/// </summary>
 		public static UnicodeBlock Hanunoo { get { return blockHanunoo; } }
-
 		private static readonly UnicodeBlock blockHanunoo = new UnicodeBlock("Hanunoo", 0x1720, 0x173F);
-
 		/// <summary>
 		/// Gets the Unicode block Buhid
 		/// </summary>
 		public static UnicodeBlock Buhid { get { return blockBuhid; } }
-
 		private static readonly UnicodeBlock blockBuhid = new UnicodeBlock("Buhid", 0x1740, 0x175F);
-
 		/// <summary>
 		/// Gets the Unicode block Tagbanwa
 		/// </summary>
 		public static UnicodeBlock Tagbanwa { get { return blockTagbanwa; } }
-
 		private static readonly UnicodeBlock blockTagbanwa = new UnicodeBlock("Tagbanwa", 0x1760, 0x177F);
-
 		/// <summary>
 		/// Gets the Unicode block Khmer
 		/// </summary>
 		public static UnicodeBlock Khmer { get { return blockKhmer; } }
-
 		private static readonly UnicodeBlock blockKhmer = new UnicodeBlock("Khmer", 0x1780, 0x17FF);
-
 		/// <summary>
 		/// Gets the Unicode block Mongolian
 		/// </summary>
 		public static UnicodeBlock Mongolian { get { return blockMongolian; } }
-
 		private static readonly UnicodeBlock blockMongolian = new UnicodeBlock("Mongolian", 0x1800, 0x18AF);
-
 		/// <summary>
 		/// Gets the Unicode block UnifiedCanadianAboriginalSyllabicsExtended
 		/// </summary>
 		public static UnicodeBlock UnifiedCanadianAboriginalSyllabicsExtended { get { return blockUnifiedCanadianAboriginalSyllabicsExtended; } }
-
 		private static readonly UnicodeBlock blockUnifiedCanadianAboriginalSyllabicsExtended = new UnicodeBlock("UnifiedCanadianAboriginalSyllabicsExtended", 0x18B0, 0x18FF);
-
 		/// <summary>
 		/// Gets the Unicode block Limbu
 		/// </summary>
 		public static UnicodeBlock Limbu { get { return blockLimbu; } }
-
 		private static readonly UnicodeBlock blockLimbu = new UnicodeBlock("Limbu", 0x1900, 0x194F);
-
 		/// <summary>
 		/// Gets the Unicode block TaiLe
 		/// </summary>
 		public static UnicodeBlock TaiLe { get { return blockTaiLe; } }
-
 		private static readonly UnicodeBlock blockTaiLe = new UnicodeBlock("TaiLe", 0x1950, 0x197F);
-
 		/// <summary>
 		/// Gets the Unicode block NewTaiLue
 		/// </summary>
 		public static UnicodeBlock NewTaiLue { get { return blockNewTaiLue; } }
-
 		private static readonly UnicodeBlock blockNewTaiLue = new UnicodeBlock("NewTaiLue", 0x1980, 0x19DF);
-
 		/// <summary>
 		/// Gets the Unicode block KhmerSymbols
 		/// </summary>
 		public static UnicodeBlock KhmerSymbols { get { return blockKhmerSymbols; } }
-
 		private static readonly UnicodeBlock blockKhmerSymbols = new UnicodeBlock("KhmerSymbols", 0x19E0, 0x19FF);
-
 		/// <summary>
 		/// Gets the Unicode block Buginese
 		/// </summary>
 		public static UnicodeBlock Buginese { get { return blockBuginese; } }
-
 		private static readonly UnicodeBlock blockBuginese = new UnicodeBlock("Buginese", 0x1A00, 0x1A1F);
-
 		/// <summary>
 		/// Gets the Unicode block TaiTham
 		/// </summary>
 		public static UnicodeBlock TaiTham { get { return blockTaiTham; } }
-
 		private static readonly UnicodeBlock blockTaiTham = new UnicodeBlock("TaiTham", 0x1A20, 0x1AAF);
-
 		/// <summary>
 		/// Gets the Unicode block CombiningDiacriticalMarksExtended
 		/// </summary>
 		public static UnicodeBlock CombiningDiacriticalMarksExtended { get { return blockCombiningDiacriticalMarksExtended; } }
-
 		private static readonly UnicodeBlock blockCombiningDiacriticalMarksExtended = new UnicodeBlock("CombiningDiacriticalMarksExtended", 0x1AB0, 0x1AFF);
-
 		/// <summary>
 		/// Gets the Unicode block Balinese
 		/// </summary>
 		public static UnicodeBlock Balinese { get { return blockBalinese; } }
-
 		private static readonly UnicodeBlock blockBalinese = new UnicodeBlock("Balinese", 0x1B00, 0x1B7F);
-
 		/// <summary>
 		/// Gets the Unicode block Sundanese
 		/// </summary>
 		public static UnicodeBlock Sundanese { get { return blockSundanese; } }
-
 		private static readonly UnicodeBlock blockSundanese = new UnicodeBlock("Sundanese", 0x1B80, 0x1BBF);
-
 		/// <summary>
 		/// Gets the Unicode block Batak
 		/// </summary>
 		public static UnicodeBlock Batak { get { return blockBatak; } }
-
 		private static readonly UnicodeBlock blockBatak = new UnicodeBlock("Batak", 0x1BC0, 0x1BFF);
-
 		/// <summary>
 		/// Gets the Unicode block Lepcha
 		/// </summary>
 		public static UnicodeBlock Lepcha { get { return blockLepcha; } }
-
 		private static readonly UnicodeBlock blockLepcha = new UnicodeBlock("Lepcha", 0x1C00, 0x1C4F);
-
 		/// <summary>
 		/// Gets the Unicode block OlChiki
 		/// </summary>
 		public static UnicodeBlock OlChiki { get { return blockOlChiki; } }
-
 		private static readonly UnicodeBlock blockOlChiki = new UnicodeBlock("OlChiki", 0x1C50, 0x1C7F);
-
 		/// <summary>
 		/// Gets the Unicode block CyrillicExtended-C
 		/// </summary>
 		public static UnicodeBlock CyrillicExtendedC { get { return blockCyrillicExtendedC; } }
-
 		private static readonly UnicodeBlock blockCyrillicExtendedC = new UnicodeBlock("CyrillicExtended-C", 0x1C80, 0x1C8F);
-
 		/// <summary>
 		/// Gets the Unicode block SundaneseSupplement
 		/// </summary>
 		public static UnicodeBlock SundaneseSupplement { get { return blockSundaneseSupplement; } }
-
 		private static readonly UnicodeBlock blockSundaneseSupplement = new UnicodeBlock("SundaneseSupplement", 0x1CC0, 0x1CCF);
-
 		/// <summary>
 		/// Gets the Unicode block VedicExtensions
 		/// </summary>
 		public static UnicodeBlock VedicExtensions { get { return blockVedicExtensions; } }
-
 		private static readonly UnicodeBlock blockVedicExtensions = new UnicodeBlock("VedicExtensions", 0x1CD0, 0x1CFF);
-
 		/// <summary>
 		/// Gets the Unicode block PhoneticExtensions
 		/// </summary>
 		public static UnicodeBlock PhoneticExtensions { get { return blockPhoneticExtensions; } }
-
 		private static readonly UnicodeBlock blockPhoneticExtensions = new UnicodeBlock("PhoneticExtensions", 0x1D00, 0x1D7F);
-
 		/// <summary>
 		/// Gets the Unicode block PhoneticExtensionsSupplement
 		/// </summary>
 		public static UnicodeBlock PhoneticExtensionsSupplement { get { return blockPhoneticExtensionsSupplement; } }
-
 		private static readonly UnicodeBlock blockPhoneticExtensionsSupplement = new UnicodeBlock("PhoneticExtensionsSupplement", 0x1D80, 0x1DBF);
-
 		/// <summary>
 		/// Gets the Unicode block CombiningDiacriticalMarksSupplement
 		/// </summary>
 		public static UnicodeBlock CombiningDiacriticalMarksSupplement { get { return blockCombiningDiacriticalMarksSupplement; } }
-
 		private static readonly UnicodeBlock blockCombiningDiacriticalMarksSupplement = new UnicodeBlock("CombiningDiacriticalMarksSupplement", 0x1DC0, 0x1DFF);
-
 		/// <summary>
 		/// Gets the Unicode block LatinExtendedAdditional
 		/// </summary>
 		public static UnicodeBlock LatinExtendedAdditional { get { return blockLatinExtendedAdditional; } }
-
 		private static readonly UnicodeBlock blockLatinExtendedAdditional = new UnicodeBlock("LatinExtendedAdditional", 0x1E00, 0x1EFF);
-
 		/// <summary>
 		/// Gets the Unicode block GreekExtended
 		/// </summary>
 		public static UnicodeBlock GreekExtended { get { return blockGreekExtended; } }
-
 		private static readonly UnicodeBlock blockGreekExtended = new UnicodeBlock("GreekExtended", 0x1F00, 0x1FFF);
-
 		/// <summary>
 		/// Gets the Unicode block GeneralPunctuation
 		/// </summary>
 		public static UnicodeBlock GeneralPunctuation { get { return blockGeneralPunctuation; } }
-
 		private static readonly UnicodeBlock blockGeneralPunctuation = new UnicodeBlock("GeneralPunctuation", 0x2000, 0x206F);
-
 		/// <summary>
 		/// Gets the Unicode block SuperscriptsandSubscripts
 		/// </summary>
 		public static UnicodeBlock SuperscriptsandSubscripts { get { return blockSuperscriptsandSubscripts; } }
-
 		private static readonly UnicodeBlock blockSuperscriptsandSubscripts = new UnicodeBlock("SuperscriptsandSubscripts", 0x2070, 0x209F);
-
 		/// <summary>
 		/// Gets the Unicode block CurrencySymbols
 		/// </summary>
 		public static UnicodeBlock CurrencySymbols { get { return blockCurrencySymbols; } }
-
 		private static readonly UnicodeBlock blockCurrencySymbols = new UnicodeBlock("CurrencySymbols", 0x20A0, 0x20CF);
-
 		/// <summary>
 		/// Gets the Unicode block CombiningDiacriticalMarksforSymbols
 		/// </summary>
 		public static UnicodeBlock CombiningDiacriticalMarksforSymbols { get { return blockCombiningDiacriticalMarksforSymbols; } }
-
 		private static readonly UnicodeBlock blockCombiningDiacriticalMarksforSymbols = new UnicodeBlock("CombiningDiacriticalMarksforSymbols", 0x20D0, 0x20FF);
-
 		/// <summary>
 		/// Gets the Unicode block LetterlikeSymbols
 		/// </summary>
 		public static UnicodeBlock LetterlikeSymbols { get { return blockLetterlikeSymbols; } }
-
 		private static readonly UnicodeBlock blockLetterlikeSymbols = new UnicodeBlock("LetterlikeSymbols", 0x2100, 0x214F);
-
 		/// <summary>
 		/// Gets the Unicode block NumberForms
 		/// </summary>
 		public static UnicodeBlock NumberForms { get { return blockNumberForms; } }
-
 		private static readonly UnicodeBlock blockNumberForms = new UnicodeBlock("NumberForms", 0x2150, 0x218F);
-
 		/// <summary>
 		/// Gets the Unicode block Arrows
 		/// </summary>
 		public static UnicodeBlock Arrows { get { return blockArrows; } }
-
 		private static readonly UnicodeBlock blockArrows = new UnicodeBlock("Arrows", 0x2190, 0x21FF);
-
 		/// <summary>
 		/// Gets the Unicode block MathematicalOperators
 		/// </summary>
 		public static UnicodeBlock MathematicalOperators { get { return blockMathematicalOperators; } }
-
 		private static readonly UnicodeBlock blockMathematicalOperators = new UnicodeBlock("MathematicalOperators", 0x2200, 0x22FF);
-
 		/// <summary>
 		/// Gets the Unicode block MiscellaneousTechnical
 		/// </summary>
 		public static UnicodeBlock MiscellaneousTechnical { get { return blockMiscellaneousTechnical; } }
-
 		private static readonly UnicodeBlock blockMiscellaneousTechnical = new UnicodeBlock("MiscellaneousTechnical", 0x2300, 0x23FF);
-
 		/// <summary>
 		/// Gets the Unicode block ControlPictures
 		/// </summary>
 		public static UnicodeBlock ControlPictures { get { return blockControlPictures; } }
-
 		private static readonly UnicodeBlock blockControlPictures = new UnicodeBlock("ControlPictures", 0x2400, 0x243F);
-
 		/// <summary>
 		/// Gets the Unicode block OpticalCharacterRecognition
 		/// </summary>
 		public static UnicodeBlock OpticalCharacterRecognition { get { return blockOpticalCharacterRecognition; } }
-
 		private static readonly UnicodeBlock blockOpticalCharacterRecognition = new UnicodeBlock("OpticalCharacterRecognition", 0x2440, 0x245F);
-
 		/// <summary>
 		/// Gets the Unicode block EnclosedAlphanumerics
 		/// </summary>
 		public static UnicodeBlock EnclosedAlphanumerics { get { return blockEnclosedAlphanumerics; } }
-
 		private static readonly UnicodeBlock blockEnclosedAlphanumerics = new UnicodeBlock("EnclosedAlphanumerics", 0x2460, 0x24FF);
-
 		/// <summary>
 		/// Gets the Unicode block BoxDrawing
 		/// </summary>
 		public static UnicodeBlock BoxDrawing { get { return blockBoxDrawing; } }
-
 		private static readonly UnicodeBlock blockBoxDrawing = new UnicodeBlock("BoxDrawing", 0x2500, 0x257F);
-
 		/// <summary>
 		/// Gets the Unicode block BlockElements
 		/// </summary>
 		public static UnicodeBlock BlockElements { get { return blockBlockElements; } }
-
 		private static readonly UnicodeBlock blockBlockElements = new UnicodeBlock("BlockElements", 0x2580, 0x259F);
-
 		/// <summary>
 		/// Gets the Unicode block GeometricShapes
 		/// </summary>
 		public static UnicodeBlock GeometricShapes { get { return blockGeometricShapes; } }
-
 		private static readonly UnicodeBlock blockGeometricShapes = new UnicodeBlock("GeometricShapes", 0x25A0, 0x25FF);
-
 		/// <summary>
 		/// Gets the Unicode block MiscellaneousSymbols
 		/// </summary>
 		public static UnicodeBlock MiscellaneousSymbols { get { return blockMiscellaneousSymbols; } }
-
 		private static readonly UnicodeBlock blockMiscellaneousSymbols = new UnicodeBlock("MiscellaneousSymbols", 0x2600, 0x26FF);
-
 		/// <summary>
 		/// Gets the Unicode block Dingbats
 		/// </summary>
 		public static UnicodeBlock Dingbats { get { return blockDingbats; } }
-
 		private static readonly UnicodeBlock blockDingbats = new UnicodeBlock("Dingbats", 0x2700, 0x27BF);
-
 		/// <summary>
 		/// Gets the Unicode block MiscellaneousMathematicalSymbols-A
 		/// </summary>
 		public static UnicodeBlock MiscellaneousMathematicalSymbolsA { get { return blockMiscellaneousMathematicalSymbolsA; } }
-
 		private static readonly UnicodeBlock blockMiscellaneousMathematicalSymbolsA = new UnicodeBlock("MiscellaneousMathematicalSymbols-A", 0x27C0, 0x27EF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementalArrows-A
 		/// </summary>
 		public static UnicodeBlock SupplementalArrowsA { get { return blockSupplementalArrowsA; } }
-
 		private static readonly UnicodeBlock blockSupplementalArrowsA = new UnicodeBlock("SupplementalArrows-A", 0x27F0, 0x27FF);
-
 		/// <summary>
 		/// Gets the Unicode block BraillePatterns
 		/// </summary>
 		public static UnicodeBlock BraillePatterns { get { return blockBraillePatterns; } }
-
 		private static readonly UnicodeBlock blockBraillePatterns = new UnicodeBlock("BraillePatterns", 0x2800, 0x28FF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementalArrows-B
 		/// </summary>
 		public static UnicodeBlock SupplementalArrowsB { get { return blockSupplementalArrowsB; } }
-
 		private static readonly UnicodeBlock blockSupplementalArrowsB = new UnicodeBlock("SupplementalArrows-B", 0x2900, 0x297F);
-
 		/// <summary>
 		/// Gets the Unicode block MiscellaneousMathematicalSymbols-B
 		/// </summary>
 		public static UnicodeBlock MiscellaneousMathematicalSymbolsB { get { return blockMiscellaneousMathematicalSymbolsB; } }
-
 		private static readonly UnicodeBlock blockMiscellaneousMathematicalSymbolsB = new UnicodeBlock("MiscellaneousMathematicalSymbols-B", 0x2980, 0x29FF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementalMathematicalOperators
 		/// </summary>
 		public static UnicodeBlock SupplementalMathematicalOperators { get { return blockSupplementalMathematicalOperators; } }
-
 		private static readonly UnicodeBlock blockSupplementalMathematicalOperators = new UnicodeBlock("SupplementalMathematicalOperators", 0x2A00, 0x2AFF);
-
 		/// <summary>
 		/// Gets the Unicode block MiscellaneousSymbolsandArrows
 		/// </summary>
 		public static UnicodeBlock MiscellaneousSymbolsandArrows { get { return blockMiscellaneousSymbolsandArrows; } }
-
 		private static readonly UnicodeBlock blockMiscellaneousSymbolsandArrows = new UnicodeBlock("MiscellaneousSymbolsandArrows", 0x2B00, 0x2BFF);
-
 		/// <summary>
 		/// Gets the Unicode block Glagolitic
 		/// </summary>
 		public static UnicodeBlock Glagolitic { get { return blockGlagolitic; } }
-
 		private static readonly UnicodeBlock blockGlagolitic = new UnicodeBlock("Glagolitic", 0x2C00, 0x2C5F);
-
 		/// <summary>
 		/// Gets the Unicode block LatinExtended-C
 		/// </summary>
 		public static UnicodeBlock LatinExtendedC { get { return blockLatinExtendedC; } }
-
 		private static readonly UnicodeBlock blockLatinExtendedC = new UnicodeBlock("LatinExtended-C", 0x2C60, 0x2C7F);
-
 		/// <summary>
 		/// Gets the Unicode block Coptic
 		/// </summary>
 		public static UnicodeBlock Coptic { get { return blockCoptic; } }
-
 		private static readonly UnicodeBlock blockCoptic = new UnicodeBlock("Coptic", 0x2C80, 0x2CFF);
-
 		/// <summary>
 		/// Gets the Unicode block GeorgianSupplement
 		/// </summary>
 		public static UnicodeBlock GeorgianSupplement { get { return blockGeorgianSupplement; } }
-
 		private static readonly UnicodeBlock blockGeorgianSupplement = new UnicodeBlock("GeorgianSupplement", 0x2D00, 0x2D2F);
-
 		/// <summary>
 		/// Gets the Unicode block Tifinagh
 		/// </summary>
 		public static UnicodeBlock Tifinagh { get { return blockTifinagh; } }
-
 		private static readonly UnicodeBlock blockTifinagh = new UnicodeBlock("Tifinagh", 0x2D30, 0x2D7F);
-
 		/// <summary>
 		/// Gets the Unicode block EthiopicExtended
 		/// </summary>
 		public static UnicodeBlock EthiopicExtended { get { return blockEthiopicExtended; } }
-
 		private static readonly UnicodeBlock blockEthiopicExtended = new UnicodeBlock("EthiopicExtended", 0x2D80, 0x2DDF);
-
 		/// <summary>
 		/// Gets the Unicode block CyrillicExtended-A
 		/// </summary>
 		public static UnicodeBlock CyrillicExtendedA { get { return blockCyrillicExtendedA; } }
-
 		private static readonly UnicodeBlock blockCyrillicExtendedA = new UnicodeBlock("CyrillicExtended-A", 0x2DE0, 0x2DFF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementalPunctuation
 		/// </summary>
 		public static UnicodeBlock SupplementalPunctuation { get { return blockSupplementalPunctuation; } }
-
 		private static readonly UnicodeBlock blockSupplementalPunctuation = new UnicodeBlock("SupplementalPunctuation", 0x2E00, 0x2E7F);
-
 		/// <summary>
 		/// Gets the Unicode block CJKRadicalsSupplement
 		/// </summary>
 		public static UnicodeBlock CJKRadicalsSupplement { get { return blockCJKRadicalsSupplement; } }
-
 		private static readonly UnicodeBlock blockCJKRadicalsSupplement = new UnicodeBlock("CJKRadicalsSupplement", 0x2E80, 0x2EFF);
-
 		/// <summary>
 		/// Gets the Unicode block KangxiRadicals
 		/// </summary>
 		public static UnicodeBlock KangxiRadicals { get { return blockKangxiRadicals; } }
-
 		private static readonly UnicodeBlock blockKangxiRadicals = new UnicodeBlock("KangxiRadicals", 0x2F00, 0x2FDF);
-
 		/// <summary>
 		/// Gets the Unicode block IdeographicDescriptionCharacters
 		/// </summary>
 		public static UnicodeBlock IdeographicDescriptionCharacters { get { return blockIdeographicDescriptionCharacters; } }
-
 		private static readonly UnicodeBlock blockIdeographicDescriptionCharacters = new UnicodeBlock("IdeographicDescriptionCharacters", 0x2FF0, 0x2FFF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKSymbolsandPunctuation
 		/// </summary>
 		public static UnicodeBlock CJKSymbolsandPunctuation { get { return blockCJKSymbolsandPunctuation; } }
-
 		private static readonly UnicodeBlock blockCJKSymbolsandPunctuation = new UnicodeBlock("CJKSymbolsandPunctuation", 0x3000, 0x303F);
-
 		/// <summary>
 		/// Gets the Unicode block Hiragana
 		/// </summary>
 		public static UnicodeBlock Hiragana { get { return blockHiragana; } }
-
 		private static readonly UnicodeBlock blockHiragana = new UnicodeBlock("Hiragana", 0x3040, 0x309F);
-
 		/// <summary>
 		/// Gets the Unicode block Katakana
 		/// </summary>
 		public static UnicodeBlock Katakana { get { return blockKatakana; } }
-
 		private static readonly UnicodeBlock blockKatakana = new UnicodeBlock("Katakana", 0x30A0, 0x30FF);
-
 		/// <summary>
 		/// Gets the Unicode block Bopomofo
 		/// </summary>
 		public static UnicodeBlock Bopomofo { get { return blockBopomofo; } }
-
 		private static readonly UnicodeBlock blockBopomofo = new UnicodeBlock("Bopomofo", 0x3100, 0x312F);
-
 		/// <summary>
 		/// Gets the Unicode block HangulCompatibilityJamo
 		/// </summary>
 		public static UnicodeBlock HangulCompatibilityJamo { get { return blockHangulCompatibilityJamo; } }
-
 		private static readonly UnicodeBlock blockHangulCompatibilityJamo = new UnicodeBlock("HangulCompatibilityJamo", 0x3130, 0x318F);
-
 		/// <summary>
 		/// Gets the Unicode block Kanbun
 		/// </summary>
 		public static UnicodeBlock Kanbun { get { return blockKanbun; } }
-
 		private static readonly UnicodeBlock blockKanbun = new UnicodeBlock("Kanbun", 0x3190, 0x319F);
-
 		/// <summary>
 		/// Gets the Unicode block BopomofoExtended
 		/// </summary>
 		public static UnicodeBlock BopomofoExtended { get { return blockBopomofoExtended; } }
-
 		private static readonly UnicodeBlock blockBopomofoExtended = new UnicodeBlock("BopomofoExtended", 0x31A0, 0x31BF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKStrokes
 		/// </summary>
 		public static UnicodeBlock CJKStrokes { get { return blockCJKStrokes; } }
-
 		private static readonly UnicodeBlock blockCJKStrokes = new UnicodeBlock("CJKStrokes", 0x31C0, 0x31EF);
-
 		/// <summary>
 		/// Gets the Unicode block KatakanaPhoneticExtensions
 		/// </summary>
 		public static UnicodeBlock KatakanaPhoneticExtensions { get { return blockKatakanaPhoneticExtensions; } }
-
 		private static readonly UnicodeBlock blockKatakanaPhoneticExtensions = new UnicodeBlock("KatakanaPhoneticExtensions", 0x31F0, 0x31FF);
-
 		/// <summary>
 		/// Gets the Unicode block EnclosedCJKLettersandMonths
 		/// </summary>
 		public static UnicodeBlock EnclosedCJKLettersandMonths { get { return blockEnclosedCJKLettersandMonths; } }
-
 		private static readonly UnicodeBlock blockEnclosedCJKLettersandMonths = new UnicodeBlock("EnclosedCJKLettersandMonths", 0x3200, 0x32FF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKCompatibility
 		/// </summary>
 		public static UnicodeBlock CJKCompatibility { get { return blockCJKCompatibility; } }
-
 		private static readonly UnicodeBlock blockCJKCompatibility = new UnicodeBlock("CJKCompatibility", 0x3300, 0x33FF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionA
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionA { get { return blockCJKUnifiedIdeographsExtensionA; } }
-
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionA = new UnicodeBlock("CJKUnifiedIdeographsExtensionA", 0x3400, 0x4DBF);
-
 		/// <summary>
 		/// Gets the Unicode block YijingHexagramSymbols
 		/// </summary>
 		public static UnicodeBlock YijingHexagramSymbols { get { return blockYijingHexagramSymbols; } }
-
 		private static readonly UnicodeBlock blockYijingHexagramSymbols = new UnicodeBlock("YijingHexagramSymbols", 0x4DC0, 0x4DFF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographs
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographs { get { return blockCJKUnifiedIdeographs; } }
-
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographs = new UnicodeBlock("CJKUnifiedIdeographs", 0x4E00, 0x9FFF);
-
 		/// <summary>
 		/// Gets the Unicode block YiSyllables
 		/// </summary>
 		public static UnicodeBlock YiSyllables { get { return blockYiSyllables; } }
-
 		private static readonly UnicodeBlock blockYiSyllables = new UnicodeBlock("YiSyllables", 0xA000, 0xA48F);
-
 		/// <summary>
 		/// Gets the Unicode block YiRadicals
 		/// </summary>
 		public static UnicodeBlock YiRadicals { get { return blockYiRadicals; } }
-
 		private static readonly UnicodeBlock blockYiRadicals = new UnicodeBlock("YiRadicals", 0xA490, 0xA4CF);
-
 		/// <summary>
 		/// Gets the Unicode block Lisu
 		/// </summary>
 		public static UnicodeBlock Lisu { get { return blockLisu; } }
-
 		private static readonly UnicodeBlock blockLisu = new UnicodeBlock("Lisu", 0xA4D0, 0xA4FF);
-
 		/// <summary>
 		/// Gets the Unicode block Vai
 		/// </summary>
 		public static UnicodeBlock Vai { get { return blockVai; } }
-
 		private static readonly UnicodeBlock blockVai = new UnicodeBlock("Vai", 0xA500, 0xA63F);
-
 		/// <summary>
 		/// Gets the Unicode block CyrillicExtended-B
 		/// </summary>
 		public static UnicodeBlock CyrillicExtendedB { get { return blockCyrillicExtendedB; } }
-
 		private static readonly UnicodeBlock blockCyrillicExtendedB = new UnicodeBlock("CyrillicExtended-B", 0xA640, 0xA69F);
-
 		/// <summary>
 		/// Gets the Unicode block Bamum
 		/// </summary>
 		public static UnicodeBlock Bamum { get { return blockBamum; } }
-
 		private static readonly UnicodeBlock blockBamum = new UnicodeBlock("Bamum", 0xA6A0, 0xA6FF);
-
 		/// <summary>
 		/// Gets the Unicode block ModifierToneLetters
 		/// </summary>
 		public static UnicodeBlock ModifierToneLetters { get { return blockModifierToneLetters; } }
-
 		private static readonly UnicodeBlock blockModifierToneLetters = new UnicodeBlock("ModifierToneLetters", 0xA700, 0xA71F);
-
 		/// <summary>
 		/// Gets the Unicode block LatinExtended-D
 		/// </summary>
 		public static UnicodeBlock LatinExtendedD { get { return blockLatinExtendedD; } }
-
 		private static readonly UnicodeBlock blockLatinExtendedD = new UnicodeBlock("LatinExtended-D", 0xA720, 0xA7FF);
-
 		/// <summary>
 		/// Gets the Unicode block SylotiNagri
 		/// </summary>
 		public static UnicodeBlock SylotiNagri { get { return blockSylotiNagri; } }
-
 		private static readonly UnicodeBlock blockSylotiNagri = new UnicodeBlock("SylotiNagri", 0xA800, 0xA82F);
-
 		/// <summary>
 		/// Gets the Unicode block CommonIndicNumberForms
 		/// </summary>
 		public static UnicodeBlock CommonIndicNumberForms { get { return blockCommonIndicNumberForms; } }
-
 		private static readonly UnicodeBlock blockCommonIndicNumberForms = new UnicodeBlock("CommonIndicNumberForms", 0xA830, 0xA83F);
-
 		/// <summary>
 		/// Gets the Unicode block Phags-pa
 		/// </summary>
 		public static UnicodeBlock Phagspa { get { return blockPhagspa; } }
-
 		private static readonly UnicodeBlock blockPhagspa = new UnicodeBlock("Phags-pa", 0xA840, 0xA87F);
-
 		/// <summary>
 		/// Gets the Unicode block Saurashtra
 		/// </summary>
 		public static UnicodeBlock Saurashtra { get { return blockSaurashtra; } }
-
 		private static readonly UnicodeBlock blockSaurashtra = new UnicodeBlock("Saurashtra", 0xA880, 0xA8DF);
-
 		/// <summary>
 		/// Gets the Unicode block DevanagariExtended
 		/// </summary>
 		public static UnicodeBlock DevanagariExtended { get { return blockDevanagariExtended; } }
-
 		private static readonly UnicodeBlock blockDevanagariExtended = new UnicodeBlock("DevanagariExtended", 0xA8E0, 0xA8FF);
-
 		/// <summary>
 		/// Gets the Unicode block KayahLi
 		/// </summary>
 		public static UnicodeBlock KayahLi { get { return blockKayahLi; } }
-
 		private static readonly UnicodeBlock blockKayahLi = new UnicodeBlock("KayahLi", 0xA900, 0xA92F);
-
 		/// <summary>
 		/// Gets the Unicode block Rejang
 		/// </summary>
 		public static UnicodeBlock Rejang { get { return blockRejang; } }
-
 		private static readonly UnicodeBlock blockRejang = new UnicodeBlock("Rejang", 0xA930, 0xA95F);
-
 		/// <summary>
 		/// Gets the Unicode block HangulJamoExtended-A
 		/// </summary>
 		public static UnicodeBlock HangulJamoExtendedA { get { return blockHangulJamoExtendedA; } }
-
 		private static readonly UnicodeBlock blockHangulJamoExtendedA = new UnicodeBlock("HangulJamoExtended-A", 0xA960, 0xA97F);
-
 		/// <summary>
 		/// Gets the Unicode block Javanese
 		/// </summary>
 		public static UnicodeBlock Javanese { get { return blockJavanese; } }
-
 		private static readonly UnicodeBlock blockJavanese = new UnicodeBlock("Javanese", 0xA980, 0xA9DF);
-
 		/// <summary>
 		/// Gets the Unicode block MyanmarExtended-B
 		/// </summary>
 		public static UnicodeBlock MyanmarExtendedB { get { return blockMyanmarExtendedB; } }
-
 		private static readonly UnicodeBlock blockMyanmarExtendedB = new UnicodeBlock("MyanmarExtended-B", 0xA9E0, 0xA9FF);
-
 		/// <summary>
 		/// Gets the Unicode block Cham
 		/// </summary>
 		public static UnicodeBlock Cham { get { return blockCham; } }
-
 		private static readonly UnicodeBlock blockCham = new UnicodeBlock("Cham", 0xAA00, 0xAA5F);
-
 		/// <summary>
 		/// Gets the Unicode block MyanmarExtended-A
 		/// </summary>
 		public static UnicodeBlock MyanmarExtendedA { get { return blockMyanmarExtendedA; } }
-
 		private static readonly UnicodeBlock blockMyanmarExtendedA = new UnicodeBlock("MyanmarExtended-A", 0xAA60, 0xAA7F);
-
 		/// <summary>
 		/// Gets the Unicode block TaiViet
 		/// </summary>
 		public static UnicodeBlock TaiViet { get { return blockTaiViet; } }
-
 		private static readonly UnicodeBlock blockTaiViet = new UnicodeBlock("TaiViet", 0xAA80, 0xAADF);
-
 		/// <summary>
 		/// Gets the Unicode block MeeteiMayekExtensions
 		/// </summary>
 		public static UnicodeBlock MeeteiMayekExtensions { get { return blockMeeteiMayekExtensions; } }
-
 		private static readonly UnicodeBlock blockMeeteiMayekExtensions = new UnicodeBlock("MeeteiMayekExtensions", 0xAAE0, 0xAAFF);
-
 		/// <summary>
 		/// Gets the Unicode block EthiopicExtended-A
 		/// </summary>
 		public static UnicodeBlock EthiopicExtendedA { get { return blockEthiopicExtendedA; } }
-
 		private static readonly UnicodeBlock blockEthiopicExtendedA = new UnicodeBlock("EthiopicExtended-A", 0xAB00, 0xAB2F);
-
 		/// <summary>
 		/// Gets the Unicode block LatinExtended-E
 		/// </summary>
 		public static UnicodeBlock LatinExtendedE { get { return blockLatinExtendedE; } }
-
 		private static readonly UnicodeBlock blockLatinExtendedE = new UnicodeBlock("LatinExtended-E", 0xAB30, 0xAB6F);
-
 		/// <summary>
 		/// Gets the Unicode block CherokeeSupplement
 		/// </summary>
 		public static UnicodeBlock CherokeeSupplement { get { return blockCherokeeSupplement; } }
-
 		private static readonly UnicodeBlock blockCherokeeSupplement = new UnicodeBlock("CherokeeSupplement", 0xAB70, 0xABBF);
-
 		/// <summary>
 		/// Gets the Unicode block MeeteiMayek
 		/// </summary>
 		public static UnicodeBlock MeeteiMayek { get { return blockMeeteiMayek; } }
-
 		private static readonly UnicodeBlock blockMeeteiMayek = new UnicodeBlock("MeeteiMayek", 0xABC0, 0xABFF);
-
 		/// <summary>
 		/// Gets the Unicode block HangulSyllables
 		/// </summary>
 		public static UnicodeBlock HangulSyllables { get { return blockHangulSyllables; } }
-
 		private static readonly UnicodeBlock blockHangulSyllables = new UnicodeBlock("HangulSyllables", 0xAC00, 0xD7AF);
-
 		/// <summary>
 		/// Gets the Unicode block HangulJamoExtended-B
 		/// </summary>
 		public static UnicodeBlock HangulJamoExtendedB { get { return blockHangulJamoExtendedB; } }
-
 		private static readonly UnicodeBlock blockHangulJamoExtendedB = new UnicodeBlock("HangulJamoExtended-B", 0xD7B0, 0xD7FF);
-
 		/// <summary>
 		/// Gets the Unicode block PrivateUseArea
 		/// </summary>
 		public static UnicodeBlock PrivateUseArea { get { return blockPrivateUseArea; } }
-
 		private static readonly UnicodeBlock blockPrivateUseArea = new UnicodeBlock("PrivateUseArea", 0xE000, 0xF8FF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKCompatibilityIdeographs
 		/// </summary>
 		public static UnicodeBlock CJKCompatibilityIdeographs { get { return blockCJKCompatibilityIdeographs; } }
-
 		private static readonly UnicodeBlock blockCJKCompatibilityIdeographs = new UnicodeBlock("CJKCompatibilityIdeographs", 0xF900, 0xFAFF);
-
 		/// <summary>
 		/// Gets the Unicode block AlphabeticPresentationForms
 		/// </summary>
 		public static UnicodeBlock AlphabeticPresentationForms { get { return blockAlphabeticPresentationForms; } }
-
 		private static readonly UnicodeBlock blockAlphabeticPresentationForms = new UnicodeBlock("AlphabeticPresentationForms", 0xFB00, 0xFB4F);
-
 		/// <summary>
 		/// Gets the Unicode block ArabicPresentationForms-A
 		/// </summary>
 		public static UnicodeBlock ArabicPresentationFormsA { get { return blockArabicPresentationFormsA; } }
-
 		private static readonly UnicodeBlock blockArabicPresentationFormsA = new UnicodeBlock("ArabicPresentationForms-A", 0xFB50, 0xFDFF);
-
 		/// <summary>
 		/// Gets the Unicode block VariationSelectors
 		/// </summary>
 		public static UnicodeBlock VariationSelectors { get { return blockVariationSelectors; } }
-
 		private static readonly UnicodeBlock blockVariationSelectors = new UnicodeBlock("VariationSelectors", 0xFE00, 0xFE0F);
-
 		/// <summary>
 		/// Gets the Unicode block VerticalForms
 		/// </summary>
 		public static UnicodeBlock VerticalForms { get { return blockVerticalForms; } }
-
 		private static readonly UnicodeBlock blockVerticalForms = new UnicodeBlock("VerticalForms", 0xFE10, 0xFE1F);
-
 		/// <summary>
 		/// Gets the Unicode block CombiningHalfMarks
 		/// </summary>
 		public static UnicodeBlock CombiningHalfMarks { get { return blockCombiningHalfMarks; } }
-
 		private static readonly UnicodeBlock blockCombiningHalfMarks = new UnicodeBlock("CombiningHalfMarks", 0xFE20, 0xFE2F);
-
 		/// <summary>
 		/// Gets the Unicode block CJKCompatibilityForms
 		/// </summary>
 		public static UnicodeBlock CJKCompatibilityForms { get { return blockCJKCompatibilityForms; } }
-
 		private static readonly UnicodeBlock blockCJKCompatibilityForms = new UnicodeBlock("CJKCompatibilityForms", 0xFE30, 0xFE4F);
-
 		/// <summary>
 		/// Gets the Unicode block SmallFormVariants
 		/// </summary>
 		public static UnicodeBlock SmallFormVariants { get { return blockSmallFormVariants; } }
-
 		private static readonly UnicodeBlock blockSmallFormVariants = new UnicodeBlock("SmallFormVariants", 0xFE50, 0xFE6F);
-
 		/// <summary>
 		/// Gets the Unicode block ArabicPresentationForms-B
 		/// </summary>
 		public static UnicodeBlock ArabicPresentationFormsB { get { return blockArabicPresentationFormsB; } }
-
 		private static readonly UnicodeBlock blockArabicPresentationFormsB = new UnicodeBlock("ArabicPresentationForms-B", 0xFE70, 0xFEFF);
-
 		/// <summary>
 		/// Gets the Unicode block HalfwidthandFullwidthForms
 		/// </summary>
 		public static UnicodeBlock HalfwidthandFullwidthForms { get { return blockHalfwidthandFullwidthForms; } }
-
 		private static readonly UnicodeBlock blockHalfwidthandFullwidthForms = new UnicodeBlock("HalfwidthandFullwidthForms", 0xFF00, 0xFFEF);
-
 		/// <summary>
 		/// Gets the Unicode block Specials
 		/// </summary>
 		public static UnicodeBlock Specials { get { return blockSpecials; } }
-
 		private static readonly UnicodeBlock blockSpecials = new UnicodeBlock("Specials", 0xFFF0, 0xFFFF);
-
 		/// <summary>
 		/// Gets the Unicode block LinearBSyllabary
 		/// </summary>
 		public static UnicodeBlock LinearBSyllabary { get { return blockLinearBSyllabary; } }
-
 		private static readonly UnicodeBlock blockLinearBSyllabary = new UnicodeBlock("LinearBSyllabary", 0x10000, 0x1007F);
-
 		/// <summary>
 		/// Gets the Unicode block LinearBIdeograms
 		/// </summary>
 		public static UnicodeBlock LinearBIdeograms { get { return blockLinearBIdeograms; } }
-
 		private static readonly UnicodeBlock blockLinearBIdeograms = new UnicodeBlock("LinearBIdeograms", 0x10080, 0x100FF);
-
 		/// <summary>
 		/// Gets the Unicode block AegeanNumbers
 		/// </summary>
 		public static UnicodeBlock AegeanNumbers { get { return blockAegeanNumbers; } }
-
 		private static readonly UnicodeBlock blockAegeanNumbers = new UnicodeBlock("AegeanNumbers", 0x10100, 0x1013F);
-
 		/// <summary>
 		/// Gets the Unicode block AncientGreekNumbers
 		/// </summary>
 		public static UnicodeBlock AncientGreekNumbers { get { return blockAncientGreekNumbers; } }
-
 		private static readonly UnicodeBlock blockAncientGreekNumbers = new UnicodeBlock("AncientGreekNumbers", 0x10140, 0x1018F);
-
 		/// <summary>
 		/// Gets the Unicode block AncientSymbols
 		/// </summary>
 		public static UnicodeBlock AncientSymbols { get { return blockAncientSymbols; } }
-
 		private static readonly UnicodeBlock blockAncientSymbols = new UnicodeBlock("AncientSymbols", 0x10190, 0x101CF);
-
 		/// <summary>
 		/// Gets the Unicode block PhaistosDisc
 		/// </summary>
 		public static UnicodeBlock PhaistosDisc { get { return blockPhaistosDisc; } }
-
 		private static readonly UnicodeBlock blockPhaistosDisc = new UnicodeBlock("PhaistosDisc", 0x101D0, 0x101FF);
-
 		/// <summary>
 		/// Gets the Unicode block Lycian
 		/// </summary>
 		public static UnicodeBlock Lycian { get { return blockLycian; } }
-
 		private static readonly UnicodeBlock blockLycian = new UnicodeBlock("Lycian", 0x10280, 0x1029F);
-
 		/// <summary>
 		/// Gets the Unicode block Carian
 		/// </summary>
 		public static UnicodeBlock Carian { get { return blockCarian; } }
-
 		private static readonly UnicodeBlock blockCarian = new UnicodeBlock("Carian", 0x102A0, 0x102DF);
-
 		/// <summary>
 		/// Gets the Unicode block CopticEpactNumbers
 		/// </summary>
 		public static UnicodeBlock CopticEpactNumbers { get { return blockCopticEpactNumbers; } }
-
 		private static readonly UnicodeBlock blockCopticEpactNumbers = new UnicodeBlock("CopticEpactNumbers", 0x102E0, 0x102FF);
-
 		/// <summary>
 		/// Gets the Unicode block OldItalic
 		/// </summary>
 		public static UnicodeBlock OldItalic { get { return blockOldItalic; } }
-
 		private static readonly UnicodeBlock blockOldItalic = new UnicodeBlock("OldItalic", 0x10300, 0x1032F);
-
 		/// <summary>
 		/// Gets the Unicode block Gothic
 		/// </summary>
 		public static UnicodeBlock Gothic { get { return blockGothic; } }
-
 		private static readonly UnicodeBlock blockGothic = new UnicodeBlock("Gothic", 0x10330, 0x1034F);
-
 		/// <summary>
 		/// Gets the Unicode block OldPermic
 		/// </summary>
 		public static UnicodeBlock OldPermic { get { return blockOldPermic; } }
-
 		private static readonly UnicodeBlock blockOldPermic = new UnicodeBlock("OldPermic", 0x10350, 0x1037F);
-
 		/// <summary>
 		/// Gets the Unicode block Ugaritic
 		/// </summary>
 		public static UnicodeBlock Ugaritic { get { return blockUgaritic; } }
-
 		private static readonly UnicodeBlock blockUgaritic = new UnicodeBlock("Ugaritic", 0x10380, 0x1039F);
-
 		/// <summary>
 		/// Gets the Unicode block OldPersian
 		/// </summary>
 		public static UnicodeBlock OldPersian { get { return blockOldPersian; } }
-
 		private static readonly UnicodeBlock blockOldPersian = new UnicodeBlock("OldPersian", 0x103A0, 0x103DF);
-
 		/// <summary>
 		/// Gets the Unicode block Deseret
 		/// </summary>
 		public static UnicodeBlock Deseret { get { return blockDeseret; } }
-
 		private static readonly UnicodeBlock blockDeseret = new UnicodeBlock("Deseret", 0x10400, 0x1044F);
-
 		/// <summary>
 		/// Gets the Unicode block Shavian
 		/// </summary>
 		public static UnicodeBlock Shavian { get { return blockShavian; } }
-
 		private static readonly UnicodeBlock blockShavian = new UnicodeBlock("Shavian", 0x10450, 0x1047F);
-
 		/// <summary>
 		/// Gets the Unicode block Osmanya
 		/// </summary>
 		public static UnicodeBlock Osmanya { get { return blockOsmanya; } }
-
 		private static readonly UnicodeBlock blockOsmanya = new UnicodeBlock("Osmanya", 0x10480, 0x104AF);
-
 		/// <summary>
 		/// Gets the Unicode block Osage
 		/// </summary>
 		public static UnicodeBlock Osage { get { return blockOsage; } }
-
 		private static readonly UnicodeBlock blockOsage = new UnicodeBlock("Osage", 0x104B0, 0x104FF);
-
 		/// <summary>
 		/// Gets the Unicode block Elbasan
 		/// </summary>
 		public static UnicodeBlock Elbasan { get { return blockElbasan; } }
-
 		private static readonly UnicodeBlock blockElbasan = new UnicodeBlock("Elbasan", 0x10500, 0x1052F);
-
 		/// <summary>
 		/// Gets the Unicode block CaucasianAlbanian
 		/// </summary>
 		public static UnicodeBlock CaucasianAlbanian { get { return blockCaucasianAlbanian; } }
-
 		private static readonly UnicodeBlock blockCaucasianAlbanian = new UnicodeBlock("CaucasianAlbanian", 0x10530, 0x1056F);
-
 		/// <summary>
 		/// Gets the Unicode block LinearA
 		/// </summary>
 		public static UnicodeBlock LinearA { get { return blockLinearA; } }
-
 		private static readonly UnicodeBlock blockLinearA = new UnicodeBlock("LinearA", 0x10600, 0x1077F);
-
 		/// <summary>
 		/// Gets the Unicode block CypriotSyllabary
 		/// </summary>
 		public static UnicodeBlock CypriotSyllabary { get { return blockCypriotSyllabary; } }
-
 		private static readonly UnicodeBlock blockCypriotSyllabary = new UnicodeBlock("CypriotSyllabary", 0x10800, 0x1083F);
-
 		/// <summary>
 		/// Gets the Unicode block ImperialAramaic
 		/// </summary>
 		public static UnicodeBlock ImperialAramaic { get { return blockImperialAramaic; } }
-
 		private static readonly UnicodeBlock blockImperialAramaic = new UnicodeBlock("ImperialAramaic", 0x10840, 0x1085F);
-
 		/// <summary>
 		/// Gets the Unicode block Palmyrene
 		/// </summary>
 		public static UnicodeBlock Palmyrene { get { return blockPalmyrene; } }
-
 		private static readonly UnicodeBlock blockPalmyrene = new UnicodeBlock("Palmyrene", 0x10860, 0x1087F);
-
 		/// <summary>
 		/// Gets the Unicode block Nabataean
 		/// </summary>
 		public static UnicodeBlock Nabataean { get { return blockNabataean; } }
-
 		private static readonly UnicodeBlock blockNabataean = new UnicodeBlock("Nabataean", 0x10880, 0x108AF);
-
 		/// <summary>
 		/// Gets the Unicode block Hatran
 		/// </summary>
 		public static UnicodeBlock Hatran { get { return blockHatran; } }
-
 		private static readonly UnicodeBlock blockHatran = new UnicodeBlock("Hatran", 0x108E0, 0x108FF);
-
 		/// <summary>
 		/// Gets the Unicode block Phoenician
 		/// </summary>
 		public static UnicodeBlock Phoenician { get { return blockPhoenician; } }
-
 		private static readonly UnicodeBlock blockPhoenician = new UnicodeBlock("Phoenician", 0x10900, 0x1091F);
-
 		/// <summary>
 		/// Gets the Unicode block Lydian
 		/// </summary>
 		public static UnicodeBlock Lydian { get { return blockLydian; } }
-
 		private static readonly UnicodeBlock blockLydian = new UnicodeBlock("Lydian", 0x10920, 0x1093F);
-
 		/// <summary>
 		/// Gets the Unicode block MeroiticHieroglyphs
 		/// </summary>
 		public static UnicodeBlock MeroiticHieroglyphs { get { return blockMeroiticHieroglyphs; } }
-
 		private static readonly UnicodeBlock blockMeroiticHieroglyphs = new UnicodeBlock("MeroiticHieroglyphs", 0x10980, 0x1099F);
-
 		/// <summary>
 		/// Gets the Unicode block MeroiticCursive
 		/// </summary>
 		public static UnicodeBlock MeroiticCursive { get { return blockMeroiticCursive; } }
-
 		private static readonly UnicodeBlock blockMeroiticCursive = new UnicodeBlock("MeroiticCursive", 0x109A0, 0x109FF);
-
 		/// <summary>
 		/// Gets the Unicode block Kharoshthi
 		/// </summary>
 		public static UnicodeBlock Kharoshthi { get { return blockKharoshthi; } }
-
 		private static readonly UnicodeBlock blockKharoshthi = new UnicodeBlock("Kharoshthi", 0x10A00, 0x10A5F);
-
 		/// <summary>
 		/// Gets the Unicode block OldSouthArabian
 		/// </summary>
 		public static UnicodeBlock OldSouthArabian { get { return blockOldSouthArabian; } }
-
 		private static readonly UnicodeBlock blockOldSouthArabian = new UnicodeBlock("OldSouthArabian", 0x10A60, 0x10A7F);
-
 		/// <summary>
 		/// Gets the Unicode block OldNorthArabian
 		/// </summary>
 		public static UnicodeBlock OldNorthArabian { get { return blockOldNorthArabian; } }
-
 		private static readonly UnicodeBlock blockOldNorthArabian = new UnicodeBlock("OldNorthArabian", 0x10A80, 0x10A9F);
-
 		/// <summary>
 		/// Gets the Unicode block Manichaean
 		/// </summary>
 		public static UnicodeBlock Manichaean { get { return blockManichaean; } }
-
 		private static readonly UnicodeBlock blockManichaean = new UnicodeBlock("Manichaean", 0x10AC0, 0x10AFF);
-
 		/// <summary>
 		/// Gets the Unicode block Avestan
 		/// </summary>
 		public static UnicodeBlock Avestan { get { return blockAvestan; } }
-
 		private static readonly UnicodeBlock blockAvestan = new UnicodeBlock("Avestan", 0x10B00, 0x10B3F);
-
 		/// <summary>
 		/// Gets the Unicode block InscriptionalParthian
 		/// </summary>
 		public static UnicodeBlock InscriptionalParthian { get { return blockInscriptionalParthian; } }
-
 		private static readonly UnicodeBlock blockInscriptionalParthian = new UnicodeBlock("InscriptionalParthian", 0x10B40, 0x10B5F);
-
 		/// <summary>
 		/// Gets the Unicode block InscriptionalPahlavi
 		/// </summary>
 		public static UnicodeBlock InscriptionalPahlavi { get { return blockInscriptionalPahlavi; } }
-
 		private static readonly UnicodeBlock blockInscriptionalPahlavi = new UnicodeBlock("InscriptionalPahlavi", 0x10B60, 0x10B7F);
-
 		/// <summary>
 		/// Gets the Unicode block PsalterPahlavi
 		/// </summary>
 		public static UnicodeBlock PsalterPahlavi { get { return blockPsalterPahlavi; } }
-
 		private static readonly UnicodeBlock blockPsalterPahlavi = new UnicodeBlock("PsalterPahlavi", 0x10B80, 0x10BAF);
-
 		/// <summary>
 		/// Gets the Unicode block OldTurkic
 		/// </summary>
 		public static UnicodeBlock OldTurkic { get { return blockOldTurkic; } }
-
 		private static readonly UnicodeBlock blockOldTurkic = new UnicodeBlock("OldTurkic", 0x10C00, 0x10C4F);
-
 		/// <summary>
 		/// Gets the Unicode block OldHungarian
 		/// </summary>
 		public static UnicodeBlock OldHungarian { get { return blockOldHungarian; } }
-
 		private static readonly UnicodeBlock blockOldHungarian = new UnicodeBlock("OldHungarian", 0x10C80, 0x10CFF);
-
 		/// <summary>
 		/// Gets the Unicode block RumiNumeralSymbols
 		/// </summary>
 		public static UnicodeBlock RumiNumeralSymbols { get { return blockRumiNumeralSymbols; } }
-
 		private static readonly UnicodeBlock blockRumiNumeralSymbols = new UnicodeBlock("RumiNumeralSymbols", 0x10E60, 0x10E7F);
-
 		/// <summary>
 		/// Gets the Unicode block Brahmi
 		/// </summary>
 		public static UnicodeBlock Brahmi { get { return blockBrahmi; } }
-
 		private static readonly UnicodeBlock blockBrahmi = new UnicodeBlock("Brahmi", 0x11000, 0x1107F);
-
 		/// <summary>
 		/// Gets the Unicode block Kaithi
 		/// </summary>
 		public static UnicodeBlock Kaithi { get { return blockKaithi; } }
-
 		private static readonly UnicodeBlock blockKaithi = new UnicodeBlock("Kaithi", 0x11080, 0x110CF);
-
 		/// <summary>
 		/// Gets the Unicode block SoraSompeng
 		/// </summary>
 		public static UnicodeBlock SoraSompeng { get { return blockSoraSompeng; } }
-
 		private static readonly UnicodeBlock blockSoraSompeng = new UnicodeBlock("SoraSompeng", 0x110D0, 0x110FF);
-
 		/// <summary>
 		/// Gets the Unicode block Chakma
 		/// </summary>
 		public static UnicodeBlock Chakma { get { return blockChakma; } }
-
 		private static readonly UnicodeBlock blockChakma = new UnicodeBlock("Chakma", 0x11100, 0x1114F);
-
 		/// <summary>
 		/// Gets the Unicode block Mahajani
 		/// </summary>
 		public static UnicodeBlock Mahajani { get { return blockMahajani; } }
-
 		private static readonly UnicodeBlock blockMahajani = new UnicodeBlock("Mahajani", 0x11150, 0x1117F);
-
 		/// <summary>
 		/// Gets the Unicode block Sharada
 		/// </summary>
 		public static UnicodeBlock Sharada { get { return blockSharada; } }
-
 		private static readonly UnicodeBlock blockSharada = new UnicodeBlock("Sharada", 0x11180, 0x111DF);
-
 		/// <summary>
 		/// Gets the Unicode block SinhalaArchaicNumbers
 		/// </summary>
 		public static UnicodeBlock SinhalaArchaicNumbers { get { return blockSinhalaArchaicNumbers; } }
-
 		private static readonly UnicodeBlock blockSinhalaArchaicNumbers = new UnicodeBlock("SinhalaArchaicNumbers", 0x111E0, 0x111FF);
-
 		/// <summary>
 		/// Gets the Unicode block Khojki
 		/// </summary>
 		public static UnicodeBlock Khojki { get { return blockKhojki; } }
-
 		private static readonly UnicodeBlock blockKhojki = new UnicodeBlock("Khojki", 0x11200, 0x1124F);
-
 		/// <summary>
 		/// Gets the Unicode block Multani
 		/// </summary>
 		public static UnicodeBlock Multani { get { return blockMultani; } }
-
 		private static readonly UnicodeBlock blockMultani = new UnicodeBlock("Multani", 0x11280, 0x112AF);
-
 		/// <summary>
 		/// Gets the Unicode block Khudawadi
 		/// </summary>
 		public static UnicodeBlock Khudawadi { get { return blockKhudawadi; } }
-
 		private static readonly UnicodeBlock blockKhudawadi = new UnicodeBlock("Khudawadi", 0x112B0, 0x112FF);
-
 		/// <summary>
 		/// Gets the Unicode block Grantha
 		/// </summary>
 		public static UnicodeBlock Grantha { get { return blockGrantha; } }
-
 		private static readonly UnicodeBlock blockGrantha = new UnicodeBlock("Grantha", 0x11300, 0x1137F);
-
 		/// <summary>
 		/// Gets the Unicode block Newa
 		/// </summary>
 		public static UnicodeBlock Newa { get { return blockNewa; } }
-
 		private static readonly UnicodeBlock blockNewa = new UnicodeBlock("Newa", 0x11400, 0x1147F);
-
 		/// <summary>
 		/// Gets the Unicode block Tirhuta
 		/// </summary>
 		public static UnicodeBlock Tirhuta { get { return blockTirhuta; } }
-
 		private static readonly UnicodeBlock blockTirhuta = new UnicodeBlock("Tirhuta", 0x11480, 0x114DF);
-
 		/// <summary>
 		/// Gets the Unicode block Siddham
 		/// </summary>
 		public static UnicodeBlock Siddham { get { return blockSiddham; } }
-
 		private static readonly UnicodeBlock blockSiddham = new UnicodeBlock("Siddham", 0x11580, 0x115FF);
-
 		/// <summary>
 		/// Gets the Unicode block Modi
 		/// </summary>
 		public static UnicodeBlock Modi { get { return blockModi; } }
-
 		private static readonly UnicodeBlock blockModi = new UnicodeBlock("Modi", 0x11600, 0x1165F);
-
 		/// <summary>
 		/// Gets the Unicode block MongolianSupplement
 		/// </summary>
 		public static UnicodeBlock MongolianSupplement { get { return blockMongolianSupplement; } }
-
 		private static readonly UnicodeBlock blockMongolianSupplement = new UnicodeBlock("MongolianSupplement", 0x11660, 0x1167F);
-
 		/// <summary>
 		/// Gets the Unicode block Takri
 		/// </summary>
 		public static UnicodeBlock Takri { get { return blockTakri; } }
-
 		private static readonly UnicodeBlock blockTakri = new UnicodeBlock("Takri", 0x11680, 0x116CF);
-
 		/// <summary>
 		/// Gets the Unicode block Ahom
 		/// </summary>
 		public static UnicodeBlock Ahom { get { return blockAhom; } }
-
 		private static readonly UnicodeBlock blockAhom = new UnicodeBlock("Ahom", 0x11700, 0x1173F);
-
 		/// <summary>
 		/// Gets the Unicode block WarangCiti
 		/// </summary>
 		public static UnicodeBlock WarangCiti { get { return blockWarangCiti; } }
-
 		private static readonly UnicodeBlock blockWarangCiti = new UnicodeBlock("WarangCiti", 0x118A0, 0x118FF);
-
+		/// <summary>
+		/// Gets the Unicode block ZanabazarSquare
+		/// </summary>
+		public static UnicodeBlock ZanabazarSquare { get { return blockZanabazarSquare; } }
+		private static readonly UnicodeBlock blockZanabazarSquare = new UnicodeBlock("ZanabazarSquare", 0x11A00, 0x11A4F);
+		/// <summary>
+		/// Gets the Unicode block Soyombo
+		/// </summary>
+		public static UnicodeBlock Soyombo { get { return blockSoyombo; } }
+		private static readonly UnicodeBlock blockSoyombo = new UnicodeBlock("Soyombo", 0x11A50, 0x11AAF);
 		/// <summary>
 		/// Gets the Unicode block PauCinHau
 		/// </summary>
 		public static UnicodeBlock PauCinHau { get { return blockPauCinHau; } }
-
 		private static readonly UnicodeBlock blockPauCinHau = new UnicodeBlock("PauCinHau", 0x11AC0, 0x11AFF);
-
 		/// <summary>
 		/// Gets the Unicode block Bhaiksuki
 		/// </summary>
 		public static UnicodeBlock Bhaiksuki { get { return blockBhaiksuki; } }
-
 		private static readonly UnicodeBlock blockBhaiksuki = new UnicodeBlock("Bhaiksuki", 0x11C00, 0x11C6F);
-
 		/// <summary>
 		/// Gets the Unicode block Marchen
 		/// </summary>
 		public static UnicodeBlock Marchen { get { return blockMarchen; } }
-
 		private static readonly UnicodeBlock blockMarchen = new UnicodeBlock("Marchen", 0x11C70, 0x11CBF);
-
+		/// <summary>
+		/// Gets the Unicode block MasaramGondi
+		/// </summary>
+		public static UnicodeBlock MasaramGondi { get { return blockMasaramGondi; } }
+		private static readonly UnicodeBlock blockMasaramGondi = new UnicodeBlock("MasaramGondi", 0x11D00, 0x11D5F);
 		/// <summary>
 		/// Gets the Unicode block Cuneiform
 		/// </summary>
 		public static UnicodeBlock Cuneiform { get { return blockCuneiform; } }
-
 		private static readonly UnicodeBlock blockCuneiform = new UnicodeBlock("Cuneiform", 0x12000, 0x123FF);
-
 		/// <summary>
 		/// Gets the Unicode block CuneiformNumbersandPunctuation
 		/// </summary>
 		public static UnicodeBlock CuneiformNumbersandPunctuation { get { return blockCuneiformNumbersandPunctuation; } }
-
 		private static readonly UnicodeBlock blockCuneiformNumbersandPunctuation = new UnicodeBlock("CuneiformNumbersandPunctuation", 0x12400, 0x1247F);
-
 		/// <summary>
 		/// Gets the Unicode block EarlyDynasticCuneiform
 		/// </summary>
 		public static UnicodeBlock EarlyDynasticCuneiform { get { return blockEarlyDynasticCuneiform; } }
-
 		private static readonly UnicodeBlock blockEarlyDynasticCuneiform = new UnicodeBlock("EarlyDynasticCuneiform", 0x12480, 0x1254F);
-
 		/// <summary>
 		/// Gets the Unicode block EgyptianHieroglyphs
 		/// </summary>
 		public static UnicodeBlock EgyptianHieroglyphs { get { return blockEgyptianHieroglyphs; } }
-
 		private static readonly UnicodeBlock blockEgyptianHieroglyphs = new UnicodeBlock("EgyptianHieroglyphs", 0x13000, 0x1342F);
-
 		/// <summary>
 		/// Gets the Unicode block AnatolianHieroglyphs
 		/// </summary>
 		public static UnicodeBlock AnatolianHieroglyphs { get { return blockAnatolianHieroglyphs; } }
-
 		private static readonly UnicodeBlock blockAnatolianHieroglyphs = new UnicodeBlock("AnatolianHieroglyphs", 0x14400, 0x1467F);
-
 		/// <summary>
 		/// Gets the Unicode block BamumSupplement
 		/// </summary>
 		public static UnicodeBlock BamumSupplement { get { return blockBamumSupplement; } }
-
 		private static readonly UnicodeBlock blockBamumSupplement = new UnicodeBlock("BamumSupplement", 0x16800, 0x16A3F);
-
 		/// <summary>
 		/// Gets the Unicode block Mro
 		/// </summary>
 		public static UnicodeBlock Mro { get { return blockMro; } }
-
 		private static readonly UnicodeBlock blockMro = new UnicodeBlock("Mro", 0x16A40, 0x16A6F);
-
 		/// <summary>
 		/// Gets the Unicode block BassaVah
 		/// </summary>
 		public static UnicodeBlock BassaVah { get { return blockBassaVah; } }
-
 		private static readonly UnicodeBlock blockBassaVah = new UnicodeBlock("BassaVah", 0x16AD0, 0x16AFF);
-
 		/// <summary>
 		/// Gets the Unicode block PahawhHmong
 		/// </summary>
 		public static UnicodeBlock PahawhHmong { get { return blockPahawhHmong; } }
-
 		private static readonly UnicodeBlock blockPahawhHmong = new UnicodeBlock("PahawhHmong", 0x16B00, 0x16B8F);
-
 		/// <summary>
 		/// Gets the Unicode block Miao
 		/// </summary>
 		public static UnicodeBlock Miao { get { return blockMiao; } }
-
 		private static readonly UnicodeBlock blockMiao = new UnicodeBlock("Miao", 0x16F00, 0x16F9F);
-
 		/// <summary>
 		/// Gets the Unicode block IdeographicSymbolsandPunctuation
 		/// </summary>
 		public static UnicodeBlock IdeographicSymbolsandPunctuation { get { return blockIdeographicSymbolsandPunctuation; } }
-
 		private static readonly UnicodeBlock blockIdeographicSymbolsandPunctuation = new UnicodeBlock("IdeographicSymbolsandPunctuation", 0x16FE0, 0x16FFF);
-
 		/// <summary>
 		/// Gets the Unicode block Tangut
 		/// </summary>
 		public static UnicodeBlock Tangut { get { return blockTangut; } }
-
 		private static readonly UnicodeBlock blockTangut = new UnicodeBlock("Tangut", 0x17000, 0x187FF);
-
 		/// <summary>
 		/// Gets the Unicode block TangutComponents
 		/// </summary>
 		public static UnicodeBlock TangutComponents { get { return blockTangutComponents; } }
-
 		private static readonly UnicodeBlock blockTangutComponents = new UnicodeBlock("TangutComponents", 0x18800, 0x18AFF);
-
 		/// <summary>
 		/// Gets the Unicode block KanaSupplement
 		/// </summary>
 		public static UnicodeBlock KanaSupplement { get { return blockKanaSupplement; } }
-
 		private static readonly UnicodeBlock blockKanaSupplement = new UnicodeBlock("KanaSupplement", 0x1B000, 0x1B0FF);
-
+		/// <summary>
+		/// Gets the Unicode block KanaExtended-A
+		/// </summary>
+		public static UnicodeBlock KanaExtendedA { get { return blockKanaExtendedA; } }
+		private static readonly UnicodeBlock blockKanaExtendedA = new UnicodeBlock("KanaExtended-A", 0x1B100, 0x1B12F);
+		/// <summary>
+		/// Gets the Unicode block Nushu
+		/// </summary>
+		public static UnicodeBlock Nushu { get { return blockNushu; } }
+		private static readonly UnicodeBlock blockNushu = new UnicodeBlock("Nushu", 0x1B170, 0x1B2FF);
 		/// <summary>
 		/// Gets the Unicode block Duployan
 		/// </summary>
 		public static UnicodeBlock Duployan { get { return blockDuployan; } }
-
 		private static readonly UnicodeBlock blockDuployan = new UnicodeBlock("Duployan", 0x1BC00, 0x1BC9F);
-
 		/// <summary>
 		/// Gets the Unicode block ShorthandFormatControls
 		/// </summary>
 		public static UnicodeBlock ShorthandFormatControls { get { return blockShorthandFormatControls; } }
-
 		private static readonly UnicodeBlock blockShorthandFormatControls = new UnicodeBlock("ShorthandFormatControls", 0x1BCA0, 0x1BCAF);
-
 		/// <summary>
 		/// Gets the Unicode block ByzantineMusicalSymbols
 		/// </summary>
 		public static UnicodeBlock ByzantineMusicalSymbols { get { return blockByzantineMusicalSymbols; } }
-
 		private static readonly UnicodeBlock blockByzantineMusicalSymbols = new UnicodeBlock("ByzantineMusicalSymbols", 0x1D000, 0x1D0FF);
-
 		/// <summary>
 		/// Gets the Unicode block MusicalSymbols
 		/// </summary>
 		public static UnicodeBlock MusicalSymbols { get { return blockMusicalSymbols; } }
-
 		private static readonly UnicodeBlock blockMusicalSymbols = new UnicodeBlock("MusicalSymbols", 0x1D100, 0x1D1FF);
-
 		/// <summary>
 		/// Gets the Unicode block AncientGreekMusicalNotation
 		/// </summary>
 		public static UnicodeBlock AncientGreekMusicalNotation { get { return blockAncientGreekMusicalNotation; } }
-
 		private static readonly UnicodeBlock blockAncientGreekMusicalNotation = new UnicodeBlock("AncientGreekMusicalNotation", 0x1D200, 0x1D24F);
-
 		/// <summary>
 		/// Gets the Unicode block TaiXuanJingSymbols
 		/// </summary>
 		public static UnicodeBlock TaiXuanJingSymbols { get { return blockTaiXuanJingSymbols; } }
-
 		private static readonly UnicodeBlock blockTaiXuanJingSymbols = new UnicodeBlock("TaiXuanJingSymbols", 0x1D300, 0x1D35F);
-
 		/// <summary>
 		/// Gets the Unicode block CountingRodNumerals
 		/// </summary>
 		public static UnicodeBlock CountingRodNumerals { get { return blockCountingRodNumerals; } }
-
 		private static readonly UnicodeBlock blockCountingRodNumerals = new UnicodeBlock("CountingRodNumerals", 0x1D360, 0x1D37F);
-
 		/// <summary>
 		/// Gets the Unicode block MathematicalAlphanumericSymbols
 		/// </summary>
 		public static UnicodeBlock MathematicalAlphanumericSymbols { get { return blockMathematicalAlphanumericSymbols; } }
-
 		private static readonly UnicodeBlock blockMathematicalAlphanumericSymbols = new UnicodeBlock("MathematicalAlphanumericSymbols", 0x1D400, 0x1D7FF);
-
 		/// <summary>
 		/// Gets the Unicode block SuttonSignWriting
 		/// </summary>
 		public static UnicodeBlock SuttonSignWriting { get { return blockSuttonSignWriting; } }
-
 		private static readonly UnicodeBlock blockSuttonSignWriting = new UnicodeBlock("SuttonSignWriting", 0x1D800, 0x1DAAF);
-
 		/// <summary>
 		/// Gets the Unicode block GlagoliticSupplement
 		/// </summary>
 		public static UnicodeBlock GlagoliticSupplement { get { return blockGlagoliticSupplement; } }
-
 		private static readonly UnicodeBlock blockGlagoliticSupplement = new UnicodeBlock("GlagoliticSupplement", 0x1E000, 0x1E02F);
-
 		/// <summary>
 		/// Gets the Unicode block MendeKikakui
 		/// </summary>
 		public static UnicodeBlock MendeKikakui { get { return blockMendeKikakui; } }
-
 		private static readonly UnicodeBlock blockMendeKikakui = new UnicodeBlock("MendeKikakui", 0x1E800, 0x1E8DF);
-
 		/// <summary>
 		/// Gets the Unicode block Adlam
 		/// </summary>
 		public static UnicodeBlock Adlam { get { return blockAdlam; } }
-
 		private static readonly UnicodeBlock blockAdlam = new UnicodeBlock("Adlam", 0x1E900, 0x1E95F);
-
 		/// <summary>
 		/// Gets the Unicode block ArabicMathematicalAlphabeticSymbols
 		/// </summary>
 		public static UnicodeBlock ArabicMathematicalAlphabeticSymbols { get { return blockArabicMathematicalAlphabeticSymbols; } }
-
 		private static readonly UnicodeBlock blockArabicMathematicalAlphabeticSymbols = new UnicodeBlock("ArabicMathematicalAlphabeticSymbols", 0x1EE00, 0x1EEFF);
-
 		/// <summary>
 		/// Gets the Unicode block MahjongTiles
 		/// </summary>
 		public static UnicodeBlock MahjongTiles { get { return blockMahjongTiles; } }
-
 		private static readonly UnicodeBlock blockMahjongTiles = new UnicodeBlock("MahjongTiles", 0x1F000, 0x1F02F);
-
 		/// <summary>
 		/// Gets the Unicode block DominoTiles
 		/// </summary>
 		public static UnicodeBlock DominoTiles { get { return blockDominoTiles; } }
-
 		private static readonly UnicodeBlock blockDominoTiles = new UnicodeBlock("DominoTiles", 0x1F030, 0x1F09F);
-
 		/// <summary>
 		/// Gets the Unicode block PlayingCards
 		/// </summary>
 		public static UnicodeBlock PlayingCards { get { return blockPlayingCards; } }
-
 		private static readonly UnicodeBlock blockPlayingCards = new UnicodeBlock("PlayingCards", 0x1F0A0, 0x1F0FF);
-
 		/// <summary>
 		/// Gets the Unicode block EnclosedAlphanumericSupplement
 		/// </summary>
 		public static UnicodeBlock EnclosedAlphanumericSupplement { get { return blockEnclosedAlphanumericSupplement; } }
-
 		private static readonly UnicodeBlock blockEnclosedAlphanumericSupplement = new UnicodeBlock("EnclosedAlphanumericSupplement", 0x1F100, 0x1F1FF);
-
 		/// <summary>
 		/// Gets the Unicode block EnclosedIdeographicSupplement
 		/// </summary>
 		public static UnicodeBlock EnclosedIdeographicSupplement { get { return blockEnclosedIdeographicSupplement; } }
-
 		private static readonly UnicodeBlock blockEnclosedIdeographicSupplement = new UnicodeBlock("EnclosedIdeographicSupplement", 0x1F200, 0x1F2FF);
-
 		/// <summary>
 		/// Gets the Unicode block MiscellaneousSymbolsandPictographs
 		/// </summary>
 		public static UnicodeBlock MiscellaneousSymbolsandPictographs { get { return blockMiscellaneousSymbolsandPictographs; } }
-
 		private static readonly UnicodeBlock blockMiscellaneousSymbolsandPictographs = new UnicodeBlock("MiscellaneousSymbolsandPictographs", 0x1F300, 0x1F5FF);
-
 		/// <summary>
 		/// Gets the Unicode block Emoticons
 		/// </summary>
 		public static UnicodeBlock Emoticons { get { return blockEmoticons; } }
-
 		private static readonly UnicodeBlock blockEmoticons = new UnicodeBlock("Emoticons", 0x1F600, 0x1F64F);
-
 		/// <summary>
 		/// Gets the Unicode block OrnamentalDingbats
 		/// </summary>
 		public static UnicodeBlock OrnamentalDingbats { get { return blockOrnamentalDingbats; } }
-
 		private static readonly UnicodeBlock blockOrnamentalDingbats = new UnicodeBlock("OrnamentalDingbats", 0x1F650, 0x1F67F);
-
 		/// <summary>
 		/// Gets the Unicode block TransportandMapSymbols
 		/// </summary>
 		public static UnicodeBlock TransportandMapSymbols { get { return blockTransportandMapSymbols; } }
-
 		private static readonly UnicodeBlock blockTransportandMapSymbols = new UnicodeBlock("TransportandMapSymbols", 0x1F680, 0x1F6FF);
-
 		/// <summary>
 		/// Gets the Unicode block AlchemicalSymbols
 		/// </summary>
 		public static UnicodeBlock AlchemicalSymbols { get { return blockAlchemicalSymbols; } }
-
 		private static readonly UnicodeBlock blockAlchemicalSymbols = new UnicodeBlock("AlchemicalSymbols", 0x1F700, 0x1F77F);
-
 		/// <summary>
 		/// Gets the Unicode block GeometricShapesExtended
 		/// </summary>
 		public static UnicodeBlock GeometricShapesExtended { get { return blockGeometricShapesExtended; } }
-
 		private static readonly UnicodeBlock blockGeometricShapesExtended = new UnicodeBlock("GeometricShapesExtended", 0x1F780, 0x1F7FF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementalArrows-C
 		/// </summary>
 		public static UnicodeBlock SupplementalArrowsC { get { return blockSupplementalArrowsC; } }
-
 		private static readonly UnicodeBlock blockSupplementalArrowsC = new UnicodeBlock("SupplementalArrows-C", 0x1F800, 0x1F8FF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementalSymbolsandPictographs
 		/// </summary>
 		public static UnicodeBlock SupplementalSymbolsandPictographs { get { return blockSupplementalSymbolsandPictographs; } }
-
 		private static readonly UnicodeBlock blockSupplementalSymbolsandPictographs = new UnicodeBlock("SupplementalSymbolsandPictographs", 0x1F900, 0x1F9FF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionB
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionB { get { return blockCJKUnifiedIdeographsExtensionB; } }
-
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionB = new UnicodeBlock("CJKUnifiedIdeographsExtensionB", 0x20000, 0x2A6DF);
-
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionC
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionC { get { return blockCJKUnifiedIdeographsExtensionC; } }
-
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionC = new UnicodeBlock("CJKUnifiedIdeographsExtensionC", 0x2A700, 0x2B73F);
-
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionD
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionD { get { return blockCJKUnifiedIdeographsExtensionD; } }
-
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionD = new UnicodeBlock("CJKUnifiedIdeographsExtensionD", 0x2B740, 0x2B81F);
-
 		/// <summary>
 		/// Gets the Unicode block CJKUnifiedIdeographsExtensionE
 		/// </summary>
 		public static UnicodeBlock CJKUnifiedIdeographsExtensionE { get { return blockCJKUnifiedIdeographsExtensionE; } }
-
 		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionE = new UnicodeBlock("CJKUnifiedIdeographsExtensionE", 0x2B820, 0x2CEAF);
-
+		/// <summary>
+		/// Gets the Unicode block CJKUnifiedIdeographsExtensionF
+		/// </summary>
+		public static UnicodeBlock CJKUnifiedIdeographsExtensionF { get { return blockCJKUnifiedIdeographsExtensionF; } }
+		private static readonly UnicodeBlock blockCJKUnifiedIdeographsExtensionF = new UnicodeBlock("CJKUnifiedIdeographsExtensionF", 0x2CEB0, 0x2EBEF);
 		/// <summary>
 		/// Gets the Unicode block CJKCompatibilityIdeographsSupplement
 		/// </summary>
 		public static UnicodeBlock CJKCompatibilityIdeographsSupplement { get { return blockCJKCompatibilityIdeographsSupplement; } }
-
 		private static readonly UnicodeBlock blockCJKCompatibilityIdeographsSupplement = new UnicodeBlock("CJKCompatibilityIdeographsSupplement", 0x2F800, 0x2FA1F);
-
 		/// <summary>
 		/// Gets the Unicode block Tags
 		/// </summary>
 		public static UnicodeBlock Tags { get { return blockTags; } }
-
 		private static readonly UnicodeBlock blockTags = new UnicodeBlock("Tags", 0xE0000, 0xE007F);
-
 		/// <summary>
 		/// Gets the Unicode block VariationSelectorsSupplement
 		/// </summary>
 		public static UnicodeBlock VariationSelectorsSupplement { get { return blockVariationSelectorsSupplement; } }
-
 		private static readonly UnicodeBlock blockVariationSelectorsSupplement = new UnicodeBlock("VariationSelectorsSupplement", 0xE0100, 0xE01EF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementaryPrivateUseArea-A
 		/// </summary>
 		public static UnicodeBlock SupplementaryPrivateUseAreaA { get { return blockSupplementaryPrivateUseAreaA; } }
-
 		private static readonly UnicodeBlock blockSupplementaryPrivateUseAreaA = new UnicodeBlock("SupplementaryPrivateUseArea-A", 0xF0000, 0xFFFFF);
-
 		/// <summary>
 		/// Gets the Unicode block SupplementaryPrivateUseArea-B
 		/// </summary>
 		public static UnicodeBlock SupplementaryPrivateUseAreaB { get { return blockSupplementaryPrivateUseAreaB; } }
-
 		private static readonly UnicodeBlock blockSupplementaryPrivateUseAreaB = new UnicodeBlock("SupplementaryPrivateUseArea-B", 0x100000, 0x10FFFF);
 
 		/// <summary>
 		/// The database of Unicode blocks accesible by names
 		/// </summary>
 		private static Dictionary<string, UnicodeBlock> db;
-
 		/// <summary>
 		/// Builds the blocks database
 		/// </summary>
@@ -1932,6 +1427,7 @@ namespace Hime.SDK
 			db.Add("NKo", NKo);
 			db.Add("Samaritan", Samaritan);
 			db.Add("Mandaic", Mandaic);
+			db.Add("SyriacSupplement", SyriacSupplement);
 			db.Add("ArabicExtended-A", ArabicExtendedA);
 			db.Add("Devanagari", Devanagari);
 			db.Add("Bengali", Bengali);
@@ -2131,9 +1627,12 @@ namespace Hime.SDK
 			db.Add("Takri", Takri);
 			db.Add("Ahom", Ahom);
 			db.Add("WarangCiti", WarangCiti);
+			db.Add("ZanabazarSquare", ZanabazarSquare);
+			db.Add("Soyombo", Soyombo);
 			db.Add("PauCinHau", PauCinHau);
 			db.Add("Bhaiksuki", Bhaiksuki);
 			db.Add("Marchen", Marchen);
+			db.Add("MasaramGondi", MasaramGondi);
 			db.Add("Cuneiform", Cuneiform);
 			db.Add("CuneiformNumbersandPunctuation", CuneiformNumbersandPunctuation);
 			db.Add("EarlyDynasticCuneiform", EarlyDynasticCuneiform);
@@ -2148,6 +1647,8 @@ namespace Hime.SDK
 			db.Add("Tangut", Tangut);
 			db.Add("TangutComponents", TangutComponents);
 			db.Add("KanaSupplement", KanaSupplement);
+			db.Add("KanaExtended-A", KanaExtendedA);
+			db.Add("Nushu", Nushu);
 			db.Add("Duployan", Duployan);
 			db.Add("ShorthandFormatControls", ShorthandFormatControls);
 			db.Add("ByzantineMusicalSymbols", ByzantineMusicalSymbols);
@@ -2178,13 +1679,13 @@ namespace Hime.SDK
 			db.Add("CJKUnifiedIdeographsExtensionC", CJKUnifiedIdeographsExtensionC);
 			db.Add("CJKUnifiedIdeographsExtensionD", CJKUnifiedIdeographsExtensionD);
 			db.Add("CJKUnifiedIdeographsExtensionE", CJKUnifiedIdeographsExtensionE);
+			db.Add("CJKUnifiedIdeographsExtensionF", CJKUnifiedIdeographsExtensionF);
 			db.Add("CJKCompatibilityIdeographsSupplement", CJKCompatibilityIdeographsSupplement);
 			db.Add("Tags", Tags);
 			db.Add("VariationSelectorsSupplement", VariationSelectorsSupplement);
 			db.Add("SupplementaryPrivateUseArea-A", SupplementaryPrivateUseAreaA);
 			db.Add("SupplementaryPrivateUseArea-B", SupplementaryPrivateUseAreaB);
 		}
-
 		/// <summary>
 		/// Gets the block with the given name
 		/// </summary>
@@ -2192,8 +1693,7 @@ namespace Hime.SDK
 		/// <returns>The corresponding block, or null if it does not exists</returns>
 		public static UnicodeBlock GetBlock(string name)
 		{
-			if (db == null)
-				BuildDB();
+			if (db == null) BuildDB();
 			return !db.ContainsKey(name) ? null : db[name];
 		}
 	}
