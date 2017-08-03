@@ -4,7 +4,7 @@
     <groupId>fr.cenotelie.hime</groupId>
     <artifactId>hime-test-executor</artifactId>
     <packaging>bundle</packaging>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
     <name>Hime Java Tests Executor</name>
     <description>Test executor for the Java runtime</description>
     <url>http://cenotelie.fr/hime/index.html</url>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>fr.cenotelie.hime</groupId>
             <artifactId>hime-redist</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>3.0.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
