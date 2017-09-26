@@ -46,6 +46,30 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		public const string OPTION_SEPARATOR = "Separator";
 		/// <summary>
+		/// The output path for compilation artifacts
+		/// </summary>
+		public const string OPTION_OUTPUT_PATH = "OutputPath";
+		/// <summary>
+		/// The compilation mode to use, defaults to Source
+		/// </summary>
+		public const string OPTION_COMPILATION_MODE = "CompilationMode";
+		/// <summary>
+		/// The parser type to generate, defaults to LALR1
+		/// </summary>
+		public const string OPTION_PARSER_TYPE = "ParserType";
+		/// <summary>
+		/// The runtime to target, defaults to Net
+		/// </summary>
+		public const string OPTION_RUNTIME = "Runtime";
+		/// <summary>
+		/// The namespace to use for the generated code
+		/// </summary>
+		public const string OPTION_NAMESPACE = "Namespace";
+		/// <summary>
+		/// The access mode for the generated code, defaults to Internal
+		/// </summary>
+		public const string OPTION_ACCESS_MODIFIER = "AccessModifier";
+		/// <summary>
 		/// The name of the default lexical context
 		/// </summary>
 		public const string DEFAULT_CONTEXT_NAME = "__default";

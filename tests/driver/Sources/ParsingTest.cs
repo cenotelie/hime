@@ -135,6 +135,8 @@ namespace Hime.Tests.Driver
 			loader.AddInput(node.Children[1], originalInput);
 			return new Unit(
 				loader.Load()[0],
+				"",
+				Mode.Assembly,
 				(ParsingMethod)Enum.Parse(typeof(ParsingMethod), node.Children[2].Value),
 				"Hime.Tests.Generated." + fixture,
 				Modifier.Public);
@@ -150,7 +152,7 @@ namespace Hime.Tests.Driver
 		{
 			// Export input
 			string inputValue = node.Children[3].Value;
-			inputValue =  Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
+			inputValue = Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
 			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
 			// Export expected AST
 			if (expected != null)
@@ -191,7 +193,7 @@ namespace Hime.Tests.Driver
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
-				code = IsOnWindows() ? ExecuteCommand(reporter, "executor.exe", args.ToString (), output) : ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
+				code = IsOnWindows() ? ExecuteCommand(reporter, "executor.exe", args.ToString(), output) : ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
 			}
 			catch (Exception ex)
 			{

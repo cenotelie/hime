@@ -139,7 +139,7 @@ namespace Hime.Tests.Driver
 			{
 				if (grammar.Name == "ExpectedTree")
 				{
-					units.Add(new Unit(grammar, ParsingMethod.LALR1, "Hime.Tests.Generated", Modifier.Public));
+					units.Add(new Unit(grammar, "", Mode.Assembly, ParsingMethod.LALR1, "Hime.Tests.Generated", Modifier.Public));
 					break;
 				}
 			}
@@ -156,7 +156,7 @@ namespace Hime.Tests.Driver
 						emitter = new EmitterForJava(reporter, units);
 						break;
 				}
-				emitter.Emit("", Mode.Assembly);
+				emitter.Emit();
 			}
 		}
 

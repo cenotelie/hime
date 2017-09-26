@@ -122,7 +122,7 @@ namespace Hime.SDK.Output
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
 			bool hasError = false;
-			string output = path + GetUniqueID() + SuffixAssembly;
+			string output = OutputPath + GetUniqueID() + SuffixAssembly;
 			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
 			{
 				System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();

@@ -30,6 +30,14 @@ namespace Hime.SDK.Output
 		/// </summary>
 		private readonly Grammars.Grammar grammar;
 		/// <summary>
+		/// The output path for compilation artifacts
+		/// </summary>
+		private readonly string outputPath;
+		/// <summary>
+		/// The compilation mode to use for this
+		/// </summary>
+		private readonly Mode compilationMode;
+		/// <summary>
 		/// The parsing method to use
 		/// </summary>
 		private readonly ParsingMethod method;
@@ -67,6 +75,16 @@ namespace Hime.SDK.Output
 		/// Gets the represented grammar
 		/// </summary>
 		public Grammars.Grammar Grammar { get { return grammar; } }
+
+		/// <summary>
+		/// Gets the output path for compilation artifacts
+		/// </summary>
+		public string OutputPath { get { return outputPath; } }
+
+		/// <summary>
+		/// Gets the compilation mode for this unit
+		/// </summary>
+		public Mode CompilationMode { get { return compilationMode; } }
 
 		/// <summary>
 		/// Gets the associated parsing method to generate code against
@@ -107,12 +125,16 @@ namespace Hime.SDK.Output
 		/// Initializes this unit
 		/// </summary>
 		/// <param name="grammar">The represented grammar</param>
+		/// <param name="outputPath">The output path for compilation artifacts</param>
+		/// <param name="compilationMode">The compilation mode to use for this</param>
 		/// <param name="method">The parsing method to use</param>
 		/// <param name="nmspace">The namespace for the artifacts</param>
 		/// <param name="modifier">The modifier for the artifacts</param>
-		public Unit(Grammars.Grammar grammar, ParsingMethod method, string nmspace, Modifier modifier)
+		public Unit(Grammars.Grammar grammar, string outputPath, Mode compilationMode, ParsingMethod method, string nmspace, Modifier modifier)
 		{
 			this.grammar = grammar;
+			this.outputPath = outputPath;
+			this.compilationMode = compilationMode;
 			this.method = method;
 			this.nmspace = nmspace;
 			this.modifier = modifier;

@@ -115,14 +115,14 @@ namespace Hime.SDK.Output
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				string[] results = Directory.GetFiles(Path.Combine(path, "target"), "hime-generated-*.jar");
+				string[] results = Directory.GetFiles(Path.Combine(OutputPath, "target"), "hime-generated-*.jar");
 				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...
-			Directory.Delete(Path.Combine(path, "src"), true);
-			Directory.Delete(Path.Combine(path, "res"), true);
-			Directory.Delete(Path.Combine(path, "target"), true);
-			File.Delete(Path.Combine(path, "pom.xml"));
+			Directory.Delete(Path.Combine(OutputPath, "src"), true);
+			Directory.Delete(Path.Combine(OutputPath, "res"), true);
+			Directory.Delete(Path.Combine(OutputPath, "target"), true);
+			File.Delete(Path.Combine(OutputPath, "pom.xml"));
 			return success;
 		}
 
@@ -151,7 +151,7 @@ namespace Hime.SDK.Output
 		private void CreateMavenProject()
 		{
 			// setup the src folder
-			string src = Path.Combine(path, "src");
+			string src = Path.Combine(OutputPath, "src");
 			foreach (Unit unit in units)
 			{
 				string folder = CreateFolderFor(src, unit);
@@ -160,7 +160,7 @@ namespace Hime.SDK.Output
 			}
 
 			// setup the res folder
-			string res = Path.Combine(path, "res");
+			string res = Path.Combine(OutputPath, "res");
 			foreach (Unit unit in units)
 			{
 				string folder = CreateFolderFor(res, unit);
@@ -169,7 +169,7 @@ namespace Hime.SDK.Output
 			}
 
 			// export the pom
-			ExportResource("Java.pom.xml", Path.Combine(path, "pom.xml"));
+			ExportResource("Java.pom.xml", Path.Combine(OutputPath, "pom.xml"));
 		}
 
 		/// <summary>

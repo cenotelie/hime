@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PolicySet name="Hime">
+  <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain">
+    <TabsToSpaces>False</TabsToSpaces>
+    <EolMarker>Windows</EolMarker>
+  </TextStylePolicy>
+  <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp">
+    <IndentSwitchBody>True</IndentSwitchBody>
+    <IndentBlocksInsideExpressions>True</IndentBlocksInsideExpressions>
+    <AnonymousMethodBraceStyle>NextLine</AnonymousMethodBraceStyle>
+    <PropertyBraceStyle>NextLine</PropertyBraceStyle>
+    <PropertyGetBraceStyle>NextLine</PropertyGetBraceStyle>
+    <PropertySetBraceStyle>NextLine</PropertySetBraceStyle>
+    <EventBraceStyle>NextLine</EventBraceStyle>
+    <EventAddBraceStyle>NextLine</EventAddBraceStyle>
+    <EventRemoveBraceStyle>NextLine</EventRemoveBraceStyle>
+    <StatementBraceStyle>NextLine</StatementBraceStyle>
+    <ElseNewLinePlacement>NewLine</ElseNewLinePlacement>
+    <CatchNewLinePlacement>NewLine</CatchNewLinePlacement>
+    <FinallyNewLinePlacement>NewLine</FinallyNewLinePlacement>
+    <WhileNewLinePlacement>DoNotCare</WhileNewLinePlacement>
+    <ArrayInitializerWrapping>DoNotChange</ArrayInitializerWrapping>
+    <ArrayInitializerBraceStyle>NextLine</ArrayInitializerBraceStyle>
+    <BeforeMethodDeclarationParentheses>False</BeforeMethodDeclarationParentheses>
+    <BeforeMethodCallParentheses>False</BeforeMethodCallParentheses>
+    <BeforeConstructorDeclarationParentheses>False</BeforeConstructorDeclarationParentheses>
+    <NewLineBeforeConstructorInitializerColon>NewLine</NewLineBeforeConstructorInitializerColon>
+    <NewLineAfterConstructorInitializerColon>SameLine</NewLineAfterConstructorInitializerColon>
+    <BeforeDelegateDeclarationParentheses>False</BeforeDelegateDeclarationParentheses>
+    <NewParentheses>False</NewParentheses>
+    <SpacesBeforeBrackets>False</SpacesBeforeBrackets>
+  </CSharpFormattingPolicy>
+  <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp">
+    <TabsToSpaces>False</TabsToSpaces>
+  </TextStylePolicy>
+  <StandardHeader>
+    <Text>/*******************************************************************************
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this program.
+ * If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ ******************************************************************************/</Text>
+    <IncludeInNewFiles>True</IncludeInNewFiles>
+  </StandardHeader>
+</PolicySet>

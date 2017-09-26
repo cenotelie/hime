@@ -77,14 +77,32 @@ namespace Hime.SDK.Output
 		/// The units to emit artifacts for
 		/// </summary>
 		protected readonly List<Unit> units;
+
 		/// <summary>
-		/// The path for the emitted artifacts
+		/// Gets the main output path for this emitter
 		/// </summary>
-		protected string path;
+		protected string OutputPath
+		{
+			get
+			{
+				if (units.Count == 0)
+					return null;
+				return units[0].OutputPath;
+			}
+		}
+
 		/// <summary>
-		/// The mode of this emitter
+		/// Gets the main compilation mode for this emitter
 		/// </summary>
-		protected Mode mode;
+		protected Mode CompilationMode
+		{
+			get
+			{
+				if (units.Count == 0)
+					return Mode.Source;
+				return units[0].CompilationMode;
+			}
+		}
 
 		/// <summary>
 		/// Initializes this emitter
@@ -132,7 +150,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactLexerCode(Unit unit)
 		{
-			return path + unit.Name + SuffixLexerCode;
+			return unit.OutputPath + unit.Name + SuffixLexerCode;
 		}
 
 		/// <summary>
@@ -142,7 +160,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactLexerData(Unit unit)
 		{
-			return path + unit.Name + SUFFIX_LEXER_DATA;
+			return unit.OutputPath + unit.Name + SUFFIX_LEXER_DATA;
 		}
 
 		/// <summary>
@@ -152,7 +170,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactParserCode(Unit unit)
 		{
-			return path + unit.Name + SuffixParserCode;
+			return unit.OutputPath + unit.Name + SuffixParserCode;
 		}
 
 		/// <summary>
@@ -162,7 +180,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactParserData(Unit unit)
 		{
-			return path + unit.Name + SUFFIX_PARSER_DATA;
+			return unit.OutputPath + unit.Name + SUFFIX_PARSER_DATA;
 		}
 
 		/// <summary>
@@ -172,8 +190,8 @@ namespace Hime.SDK.Output
 		public string GetArtifactAssembly()
 		{
 			if (units.Count == 1)
-				return path + units[0].Name + SuffixAssembly;
-			return path + DEFAULT_COMPOSITE_ASSEMBLY_NAME + SuffixAssembly;
+				return OutputPath + units[0].Name + SuffixAssembly;
+			return OutputPath + DEFAULT_COMPOSITE_ASSEMBLY_NAME + SuffixAssembly;
 		}
 
 		/// <summary>
@@ -183,7 +201,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugGrammar(Unit unit)
 		{
-			return path + unit.Name + SUFFIX_DEBUG_GRAMMAR;
+			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_GRAMMAR;
 		}
 
 		/// <summary>
@@ -193,7 +211,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugDFA(Unit unit)
 		{
-			return path + unit.Name + SUFFIX_DEBUG_DFA;
+			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_DFA;
 		}
 
 		/// <summary>
@@ -203,7 +221,7 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugLRAsText(Unit unit)
 		{
-			return path + unit.Name + SUFFIX_DEBUG_LR_AS_TEXT;
+			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_LR_AS_TEXT;
 		}
 
 		/// <summary>
@@ -213,23 +231,15 @@ namespace Hime.SDK.Output
 		/// <returns>The full path and name for the lexer code artifact</returns>
 		public string GetArtifactDebugLRAsDOT(Unit unit)
 		{
-			return path + unit.Name + SUFFIX_DEBUG_LR_AS_DOT;
+			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_LR_AS_DOT;
 		}
 
 		/// <summary>
 		/// Emit the lexer and parser artifacts
 		/// </summary>
-		/// <param name="path">The output path for the emitted artifacts</param>
-		/// <param name="mode">The output mode</param>
 		/// <returns><c>true</c> if this operation succeeded</returns>
-		public bool Emit(string path, Mode mode)
+		public bool Emit()
 		{
-			// setup
-			this.path = path;
-			if (this.path.Length > 0 && !this.path.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				this.path += Path.DirectorySeparatorChar;
-			this.mode = mode;
-
 			bool errors = false;
 			for (int i = 0; i != units.Count; i++)
 			{
@@ -244,15 +254,14 @@ namespace Hime.SDK.Output
 			}
 			if (units.Count == 0)
 				return !errors;
-
-			if (mode == Mode.Assembly || mode == Mode.SourceAndAssembly)
+			if (CompilationMode == Mode.Assembly || CompilationMode == Mode.SourceAndAssembly)
 			{
 				if (!EmitAssembly())
 				{
 					reporter.Error("Failed to emit the assembly " + GetArtifactAssembly());
 					return false;
 				}
-				if (mode == Mode.Assembly)
+				if (CompilationMode == Mode.Assembly)
 				{
 					foreach (Unit unit in units)
 					{
@@ -284,7 +293,7 @@ namespace Hime.SDK.Output
 				ok = GenerateLexer(unit);
 			if (ok)
 				ok = GenerateParser(unit);
-			if (mode == Mode.Debug)
+			if (unit.CompilationMode == Mode.Debug)
 				ok = EmitDebugArtifacts(unit);
 			return ok;
 		}
