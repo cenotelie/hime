@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Hime.SDK</id>
-    <version>3.1.0.0</version>
+    <version>3.1.1.0</version>
     <title>Hime Parser Generator (SDK)</title>
     <authors>cenotelie</authors>
     <owners>cenotelie</owners>
