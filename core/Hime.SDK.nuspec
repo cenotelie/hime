@@ -23,11 +23,11 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\Hime.CentralDogma.*" target="lib/net45" />
-    <file src="Sources\**" target="src" />
-    <file src="Properties\**" target="src" />
-    <file src="Resources\**" target="src" />
-    <file src="..\releng\VersionInfo.cs" target="src"/>
-    <file src="..\License.txt" target="License.txt"/>
+    <file src="bin/Release/Hime.CentralDogma.*" target="lib/net45" />
+    <file src="Sources/**" target="src" />
+    <file src="Properties/**" target="src" />
+    <file src="Resources/**" target="src" />
+    <file src="../releng/VersionInfo.cs" target="src"/>
+    <file src="../License.txt" target="License.txt"/>
   </files>
 </package>
