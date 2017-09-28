@@ -35,13 +35,13 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\.releng\VersionInfo.cs">
+    <Compile Include="..\.releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\runtimes\net\Hime.Redist.csproj">
+    <ProjectReference Include="..\runtime-net\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>

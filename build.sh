@@ -1,5 +1,8 @@
 #!/bin/sh
 
+SCRIPT="$(readlink -f "$0")"
+ROOT="$(dirname "$SCRIPT")"
+
 # Gather parameters
 SKIP_TEST=false
 
@@ -14,36 +17,36 @@ TAG=$(hg log -l 1 --template "{node|short}\n")
 
 echo "Building Hime version $VERSION-$TAG"
 
-
-# Build the main components
-xbuild /p:Configuration=Release /t:Clean runtime-net/Hime.Redist.csproj
-xbuild /p:Configuration=Release runtime-net/Hime.Redist.csproj
-xbuild /p:Configuration=Release /t:Clean sdk/Hime.SDK.csproj
-xbuild /p:Configuration=Release sdk/Hime.SDK.csproj
-xbuild /p:Configuration=Release /t:Clean himecc/HimeCC.csproj
-xbuild /p:Configuration=Release himecc/HimeCC.csproj
-mvn -f runtime-java/pom.xml clean install -Dgpg.skip=true
-
+xbuild /p:Configuration=Release /t:Clean "$ROOT/runtime-net/Hime.Redist.csproj"
+xbuild /p:Configuration=Release "$ROOT/runtime-net/Hime.Redist.csproj"
+xbuild /p:Configuration=Release /t:Clean "$ROOT/sdk/Hime.SDK.csproj"
+xbuild /p:Configuration=Release "$ROOT/sdk/Hime.SDK.csproj"
+xbuild /p:Configuration=Release /t:Clean "$ROOT/himecc/HimeCC.csproj"
+xbuild /p:Configuration=Release "$ROOT/himecc/HimeCC.csproj"
+mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
+xbuild /p:Configuration=Release /t:Clean "$ROOT/utils-demo/Utils.Demo.csproj"
+xbuild /p:Configuration=Release "$ROOT/utils-demo/Utils.Demo.csproj"
+xbuild /p:Configuration=Release /t:Clean "$ROOT/tests-driver/Tests.Driver.csproj"
+xbuild /p:Configuration=Release "$ROOT/tests-driver/Tests.Driver.csproj"
+xbuild /p:Configuration=Release /t:Clean "$ROOT/tests-executor-net/Tests.Executor.csproj"
+xbuild /p:Configuration=Release "$ROOT/tests-executor-net/Tests.Executor.csproj"
+mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
 
 if [ $SKIP_TEST != "true" ]
   then
-	# Build the test components
-	xbuild /p:Configuration=Release tests/driver/Tests.Driver.csproj
-	xbuild /p:Configuration=Release tests/net/Tests.Executor.csproj
-	mvn -f tests/java/pom.xml clean verify -Dgpg.skip=true
 	# Setup the test components
-	mkdir tests/results
-	cp tests/driver/bin/Release/Hime.Redist.dll tests/results/Hime.Redist.dll
-	cp tests/driver/bin/Release/Hime.CentralDogma.dll tests/results/Hime.CentralDogma.dll
-	cp tests/driver/bin/Release/Tests.Driver.exe tests/results/driver.exe
-	cp tests/net/bin/Release/Tests.Executor.exe tests/results/executor.exe
-	cp tests/java/target/hime-test-executor-*.jar tests/results/executor.jar
-	cp tests/java/target/dependency/*.jar tests/results/
+	mkdir "$ROOT/tests-results"
+	cp "$ROOT/tests-driver/bin/Release/Hime.Redist.dll" "$ROOT/tests-results/Hime.Redist.dll"
+	cp "$ROOT/tests-driver/bin/Release/Hime.SDK.dll" "$ROOT/tests-results/Hime.SDK.dll"
+	cp "$ROOT/tests-driver/bin/Release/Tests.Driver.exe" "$ROOT/tests-results/driver.exe"
+	cp "$ROOT/tests-executor-net/bin/Release/Tests.Executor.exe" "$ROOT/tests-results/executor.exe"
+	cp $ROOT/tests-executor-java/target/hime-test-executor-*.jar "$ROOT/tests-results/executor.jar"
+	cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
 	# Execute the tests
-	cd tests/results
+	cd "$ROOT/tests-results"
 	mono driver.exe --targets Net Java
-	cd ../..
+	cd "$ROOT"
 	# Cleanup the tests
-	mv tests/results/TestResults.xml tests/TestResults.xml
-	rm -r tests/results
+	mv "$ROOT/tests-results/TestResults.xml" "$ROOT/TestResults.xml"
+	rm -r "$ROOT/tests-results"
 fi
