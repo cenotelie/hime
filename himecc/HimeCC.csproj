@@ -60,11 +60,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\core\Hime.SDK.csproj">
+    <ProjectReference Include="..\sdk\Hime.SDK.csproj">
       <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
       <Name>Hime.SDK</Name>
     </ProjectReference>
-    <ProjectReference Include="..\runtimes\net\Hime.Redist.csproj">
+    <ProjectReference Include="..\runtime-net\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>

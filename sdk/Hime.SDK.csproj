@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Hime.SDK</RootNamespace>
-    <AssemblyName>Hime.CentralDogma</AssemblyName>
+    <AssemblyName>Hime.SDK</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -58,7 +58,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\Hime.CentralDogma.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Hime.SDK.XML</DocumentationFile>
     <GenerateDocumentation>true</GenerateDocumentation>
     <NoWarn>1587</NoWarn>
   </PropertyGroup>
@@ -191,7 +191,7 @@
     <EmbeddedResource Include="Sources\Input\CommandLineParser.bin" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\runtimes\net\Hime.Redist.csproj">
+    <ProjectReference Include="..\runtime-net\Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>
