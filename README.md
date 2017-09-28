@@ -44,8 +44,8 @@ The parser generator requires the .Net runtime (or Mono) for the generation of p
 		* `tests/net`: Sources of the test executor for the .Net runtime implementation.
 		* `tests/java`: Sources of the test executor for the Java runtime implementation.
 * Others
-	* `extras`: Contains some extra products, e.g. standard grammars.
-	* `releng`: Contains the release engineering artifacts.
+	* `.assets`: Contains some extra products, e.g. standard grammars.
+	* `.releng`: Contains the release engineering artifacts.
 
 
 
