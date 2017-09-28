@@ -55,14 +55,14 @@
   <PropertyGroup Condition=" '$(Sign)' == 'True' ">
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)\..\..\releng\hime.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)\..\..\.releng\hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\releng\VersionInfo.cs">
+    <Compile Include="..\..\.releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="Sources\AST.cs" />

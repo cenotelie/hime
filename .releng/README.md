@@ -10,18 +10,18 @@ In this way, it is easy for users to identify the required runtime version for a
 
 The version number of the artifacts must be updated as follow:
 
-* In `releng/VersionInfo.cs` modify the `AssemblyVersion` and `AssemblyFileVersion` values. This impacts all the .Net artifacts (.Net runtime, core SDK, CLI, tests, utilities).
+* In `.releng/VersionInfo.cs` modify the `AssemblyVersion` and `AssemblyFileVersion` values. This impacts all the .Net artifacts (.Net runtime, core SDK, CLI, tests, utilities).
 * In `runtimes/java/pom.xml` modify the `project/version` element.
 * In `core/Resources/Java/pom.xml` modify the `project/dependencies/dependency/version` element.
 * In `tests/multi/java/pom.xml` modify:
 	* the `project/version` element.
 	* the `project/dependencies/dependency/version` element.
 
-This is automatically taken care of by the script `releng/toolkit/version-update.sh`.
+This is automatically taken care of by the script `.releng/toolkit/version-update.sh`.
 To update to a new version number, run:
 
 ```
-$ sh releng/toolkit/version-update.sh X.Y.Z
+$ sh .releng/toolkit/version-update.sh X.Y.Z
 ```
 
 
@@ -58,19 +58,19 @@ Configuration of the developer's Maven `settings.xml`:
 * Add a Mercurial tag vX.Y.Z.
 
 ```
-$ sh releng/toolkit/version-update.sh X.Y.Z
+$ sh .releng/toolkit/version-update.sh X.Y.Z
 ```
 
 3) Build and deploy:
 
 ```
-$ releng\release.bat
+$ .releng\release.bat
 ```
 
 or
 
 ```
-$ sh releng/release.sh
+$ sh .releng/release.sh
 ```
 
 The <name>.symbols.nupkg are automatically pushed to SymbolSource.org when the <name>.nupkg is pushed to NuGet.org

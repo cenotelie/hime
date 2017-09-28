@@ -8,7 +8,7 @@ IF "%1"=="--no-test" (
 )
 
 REM Gather version info
-FOR /f "delims=" %%a IN ('CALL releng\toolkit\version.bat') DO @SET VERSION=%%a
+FOR /f "delims=" %%a IN ('CALL .releng\toolkit\version.bat') DO @SET VERSION=%%a
 FOR /f "delims=" %%a IN ('hg log -l 1 --template "{node|short}\n"') DO @SET TAG=%%a
 
 ECHO "Building Hime version %VERSION%-%TAG%"

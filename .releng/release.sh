@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Gather version info
-VERSION=$(sh releng/toolkit/version.sh)
+VERSION=$(sh .releng/toolkit/version.sh)
 TAG=$(hg log -l 1 --template "{node|short}\n")
 
 echo "Building Hime version $VERSION-$TAG"
@@ -26,7 +26,7 @@ mvn -f runtimes/java/pom.xml clean deploy
 # Build the standalone package
 mkdir hime-$VERSION-$TAG
 cp LICENSE.txt hime-$VERSION-$TAG/README.txt
-cp releng/standalone/README.txt hime-$VERSION-$TAG/README.txt
+cp .releng/standalone/README.txt hime-$VERSION-$TAG/README.txt
 cp runtimes/java/target/*.jar hime-$VERSION-$TAG/
 cp runtimes/net/bin/Release/Hime.Redist.dll hime-$VERSION-$TAG/Hime.Redist.dll
 cp runtimes/net/bin/Release/Hime.Redist.XML hime-$VERSION-$TAG/Hime.Redist.xml

@@ -9,7 +9,7 @@ if [ "$1" = "--no-test" ]
 fi
 
 # Gather version info
-VERSION=$(sh releng/toolkit/version.sh)
+VERSION=$(sh .releng/toolkit/version.sh)
 TAG=$(hg log -l 1 --template "{node|short}\n")
 
 echo "Building Hime version $VERSION-$TAG"

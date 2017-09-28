@@ -1,7 +1,7 @@
 @ECHO OFF
 
 REM Gather version info
-FOR /f "delims=" %%a IN ('CALL releng\toolkit\version.bat') DO @SET VERSION=%%a
+FOR /f "delims=" %%a IN ('CALL .releng\toolkit\version.bat') DO @SET VERSION=%%a
 FOR /f "delims=" %%a IN ('hg log -l 1 --template "{node|short}\n"') DO @SET TAG=%%a
 
 ECHO "Building Hime version %VERSION%-%TAG%"
@@ -26,7 +26,7 @@ mvn -f runtimes\java\pom.xml clean deploy
 REM Build the standalone package
 MKDIR hime-%VERSION%-%TAG%
 COPY /B LICENSE.txt hime-%VERSION%-%TAG%\README.txt
-COPY /B releng\standalone\README.txt hime-%VERSION%-%TAG%\README.txt
+COPY /B .releng\standalone\README.txt hime-%VERSION%-%TAG%\README.txt
 COPY /B runtimes\java\target\*.jar hime-%VERSION%-%TAG%\
 COPY /B runtimes\net\bin\Release\Hime.Redist.dll hime-%VERSION%-%TAG%\Hime.Redist.dll
 COPY /B runtimes\net\b\Release\Hime.Redist.XML hime-%VERSION%-%TAG%\Hime.Redist.xml

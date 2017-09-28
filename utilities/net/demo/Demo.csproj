@@ -67,7 +67,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\releng\VersionInfo.cs">
+    <Compile Include="..\..\..\.releng\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="IExecutable.cs" />
