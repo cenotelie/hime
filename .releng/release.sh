@@ -7,10 +7,9 @@ ROOT="$(dirname "$RELENG")"
 # Gather version info
 VERSION=$(grep "<Version>" "$ROOT/sdk/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
 HASH=$(hg -R "$ROOT" --debug id -i)
+MONO=/usr/lib/mono/4.5/
 
 echo "Building Hime version $VERSION ($HASH)"
-
-FrameworkPathOverride=/usr/lib/mono/4.5/
 
 # Build
 dotnet restore "$ROOT/runtime-net"
@@ -18,7 +17,7 @@ dotnet pack "$ROOT/runtime-net" -c Release
 dotnet restore "$ROOT/sdk"
 dotnet pack "$ROOT/sdk" -c Release
 dotnet restore "$ROOT/himecc"
-dotnet pack "$ROOT/himecc" -c Release
+(export FrameworkPathOverride="$MONO"; dotnet pack "$ROOT/himecc" -c Release)
 mvn -f "$ROOT/runtime-java/pom.xml" clean install
 
 # Build the standalone package
@@ -35,6 +34,6 @@ cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.deps.json" "$RELENG/hime-$VERS
 cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.runtimeconfig.json" "$RELENG/hime-$VERSION/himecc.runtimeconfig.json"
 cp $ROOT/runtime-java/target/*.jar "$RELENG/hime-$VERSION/"
 cd "$RELENG"
-zip -r "hime-$VERSION.zip" "hime-$VERSION"
+zip -r "hime-v$VERSION.zip" "hime-$VERSION"
 cd "$ROOT"
 rm -r "$RELENG/hime-$VERSION"
