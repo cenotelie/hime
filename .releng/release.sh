@@ -18,6 +18,8 @@ dotnet restore "$ROOT/sdk"
 dotnet pack "$ROOT/sdk" -c Release
 dotnet restore "$ROOT/himecc"
 (export FrameworkPathOverride="$MONO"; dotnet pack "$ROOT/himecc" -c Release)
+(export FrameworkPathOverride="$MONO"; dotnet publish "$ROOT/himecc" -c Release -f net461)
+(export FrameworkPathOverride="$MONO"; dotnet publish "$ROOT/himecc" -c Release -f netcoreapp2.0)
 mvn -f "$ROOT/runtime-java/pom.xml" clean install
 
 # Build the standalone package
