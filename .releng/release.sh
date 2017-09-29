@@ -1,37 +1,38 @@
 #!/bin/sh
 
+SCRIPT="$(readlink -f "$0")"
+RELENG="$(dirname "$SCRIPT")"
+ROOT="$(dirname "$RELENG")"
+
 # Gather version info
-VERSION=$(sh .releng/toolkit/version.sh)
-TAG=$(hg log -l 1 --template "{node|short}\n")
+VERSION=$(grep "<Version>" "$ROOT/sdk/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
+HASH=$(hg -R "$ROOT" --debug id -i)
 
-echo "Building Hime version $VERSION-$TAG"
+echo "Building Hime version $VERSION ($HASH)"
 
-# Rebuild the .Net artifacts
-xbuild /p:Configuration=Release /t:Clean runtimes/net/Hime.Redist.csproj
-xbuild /p:Configuration=Release /t:Clean core/Hime.SDK.csproj
-xbuild /p:Configuration=Release /t:Clean cli/net/HimeCC.csproj
-xbuild /p:Configuration=Release /p:Sign=True runtimes/net/Hime.Redist.csproj
-xbuild /p:Configuration=Release /p:Sign=True core/Hime.SDK.csproj
-xbuild /p:Configuration=Release /p:Sign=True cli/net/HimeCC.csproj
+FrameworkPathOverride=/usr/lib/mono/4.5/
 
-# Build the NuGet packages and push them
-nuget pack runtimes/net/Hime.Redist.nuspec -Build -Symbols -Properties Configuration=Release;Sign=True
-nuget pack core/Hime.SDK.nuspec -Build -Symbols -Properties Configuration=Release;Sign=True
-nuget push  Hime.Redist.$VERSION.0.nupkg
-nuget push  Hime.SDK.$VERSION.0.nupkg
-
-# Rebuild the Java artifacts and push
-mvn -f runtimes/java/pom.xml clean deploy
+# Build
+dotnet restore "$ROOT/runtime-net"
+dotnet pack "$ROOT/runtime-net" -c Release
+dotnet restore "$ROOT/sdk"
+dotnet pack "$ROOT/sdk" -c Release
+dotnet restore "$ROOT/himecc"
+dotnet pack "$ROOT/himecc" -c Release
+mvn -f "$ROOT/runtime-java/pom.xml" clean install
 
 # Build the standalone package
-mkdir hime-$VERSION-$TAG
-cp LICENSE.txt hime-$VERSION-$TAG/README.txt
-cp .releng/standalone/README.txt hime-$VERSION-$TAG/README.txt
-cp runtimes/java/target/*.jar hime-$VERSION-$TAG/
-cp runtimes/net/bin/Release/Hime.Redist.dll hime-$VERSION-$TAG/Hime.Redist.dll
-cp runtimes/net/bin/Release/Hime.Redist.XML hime-$VERSION-$TAG/Hime.Redist.xml
-cp core/bin/Release/Hime.CentralDogma.dll hime-$VERSION-$TAG/Hime.CentralDogma.dll
-cp core/bin/Release/Hime.CentralDogma.XML hime-$VERSION-$TAG/Hime.CentralDogma.xml
-cp cli/net/bin/Release/himecc.exe hime-$VERSION-$TAG/himecc.exe
-zip hime-$VERSION-$TAG.zip hime-$VERSION-$TAG/*
-rm -r hime-$VERSION-$TAG
+mkdir "$RELENG/hime-$VERSION"
+cp "$ROOT/LICENSE.txt" "$RELENG/hime-$VERSION/LICENSE.txt"
+cp "$RELENG/standalone/README.txt" "$RELENG/hime-$VERSION/README.txt"
+cp "$ROOT/himecc/bin/Release/net461/netstandard.dll" "$RELENG/hime-$VERSION/netstandard.dll"
+cp "$ROOT/himecc/bin/Release/net461/System.CodeDom.dll" "$RELENG/hime-$VERSION/System.CodeDom.dll"
+cp "$ROOT/himecc/bin/Release/net461/Hime.Redist.dll" "$RELENG/hime-$VERSION/Hime.Redist.dll"
+cp "$ROOT/himecc/bin/Release/net461/Hime.SDK.dll" "$RELENG/hime-$VERSION/Hime.SDK.dll"
+cp "$ROOT/himecc/bin/Release/net461/himecc.exe" "$RELENG/hime-$VERSION/himecc.exe"
+cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.dll" "$RELENG/hime-$VERSION/himecc.dll"
+cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.deps.json" "$RELENG/hime-$VERSION/himecc.deps.json"
+cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.runtimeconfig.json" "$RELENG/hime-$VERSION/himecc.runtimeconfig.json"
+cp $ROOT/runtime-java/target/*.jar "$RELENG/hime-$VERSION/"
+zip "$RELENG/hime-$VERSION.zip" $RELENG/hime-$VERSION/*
+rm -r "$RELENG/hime-$VERSION"
