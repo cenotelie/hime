@@ -193,7 +193,7 @@ namespace Hime.Tests.Driver
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
-				code = IsOnWindows() ? ExecuteCommand(reporter, "executor.exe", args.ToString(), output) : ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
+				code = ExecuteCommand(reporter, "dotnet", "executor.dll " + args, output);
 			}
 			catch (Exception ex)
 			{

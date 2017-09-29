@@ -126,7 +126,7 @@ namespace Hime.Tests.Driver
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser outputs");
-				code = IsOnWindows() ? ExecuteCommand(reporter, "executor.exe", args.ToString(), output) : ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
+				code = ExecuteCommand(reporter, "dotnet", "executor.dll " + args, output);
 			}
 			catch (Exception ex)
 			{

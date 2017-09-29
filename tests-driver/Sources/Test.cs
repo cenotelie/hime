@@ -61,25 +61,6 @@ namespace Hime.Tests.Driver
 		public abstract void Execute(Reporter reporter, List<Runtime> targets, string fixture);
 
 		/// <summary>
-		/// Determines whether the current platform is Windows
-		/// </summary>
-		/// <returns><c>true</c> if this is a Windows platform</returns>
-		protected bool IsOnWindows()
-		{
-			switch (Environment.OSVersion.Platform)
-			{
-				case PlatformID.Win32NT:
-				case PlatformID.Win32S:
-				case PlatformID.Win32Windows:
-				case PlatformID.WinCE:
-				case PlatformID.Xbox:
-					return true;
-				default:
-					return false;
-			}
-		}
-
-		/// <summary>
 		/// Executes the specified command
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
