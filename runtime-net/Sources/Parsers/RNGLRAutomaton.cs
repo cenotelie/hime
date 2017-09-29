@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.IO;
+using System.Reflection;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
@@ -163,7 +164,11 @@ namespace Hime.Redist.Parsers
 		/// <returns>The automaton</returns>
 		public static RNGLRAutomaton Find(System.Type type, string resource)
 		{
+#if NETSTANDARD1_3
+			System.Reflection.Assembly assembly = type.GetTypeInfo().Assembly;
+#else
 			System.Reflection.Assembly assembly = type.Assembly;
+#endif
 			string[] resources = assembly.GetManifestResourceNames();
 			foreach (string existing in resources)
 			{
@@ -171,7 +176,7 @@ namespace Hime.Redist.Parsers
 				{
 					BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream(existing));
 					RNGLRAutomaton automaton = new RNGLRAutomaton(reader);
-					reader.Close();
+					reader.Dispose();
 					return automaton;
 				}
 			}

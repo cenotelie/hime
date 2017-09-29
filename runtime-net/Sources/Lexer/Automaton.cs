@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.IO;
+using System.Reflection;
 
 namespace Hime.Redist.Lexer
 {
@@ -88,7 +89,11 @@ namespace Hime.Redist.Lexer
 		/// <returns>The automaton</returns>
 		public static Automaton Find(System.Type type, string resource)
 		{
+#if NETSTANDARD1_3
+			System.Reflection.Assembly assembly = type.GetTypeInfo().Assembly;
+#else
 			System.Reflection.Assembly assembly = type.Assembly;
+#endif
 			string[] resources = assembly.GetManifestResourceNames();
 			foreach (string existing in resources)
 			{
@@ -96,7 +101,7 @@ namespace Hime.Redist.Lexer
 				{
 					BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream(existing));
 					Automaton result = new Automaton(reader);
-					reader.Close();
+					reader.Dispose();
 					return result;
 				}
 			}

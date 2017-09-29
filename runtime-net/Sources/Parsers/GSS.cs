@@ -336,9 +336,10 @@ namespace Hime.Redist.Parsers
 		/// <param name="file">The file to print to</param>
 		public void PrintTo(string file)
 		{
-			TextWriter writer = new StreamWriter(file, false, System.Text.Encoding.UTF8);
+			FileStream stream = File.Open(file, FileMode.OpenOrCreate, FileAccess.Write);
+			TextWriter writer = new StreamWriter(stream, System.Text.Encoding.UTF8);
 			PrintTo(writer);
-			writer.Close();
+			writer.Dispose();
 		}
 
 		/// <summary>
