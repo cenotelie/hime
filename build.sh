@@ -17,20 +17,34 @@ TAG=$(hg log -l 1 --template "{node|short}\n")
 
 echo "Building Hime version $VERSION-$TAG"
 
-xbuild /p:Configuration=Release /t:Clean "$ROOT/runtime-net/Hime.Redist.csproj"
-xbuild /p:Configuration=Release "$ROOT/runtime-net/Hime.Redist.csproj"
-xbuild /p:Configuration=Release /t:Clean "$ROOT/sdk/Hime.SDK.csproj"
-xbuild /p:Configuration=Release "$ROOT/sdk/Hime.SDK.csproj"
-xbuild /p:Configuration=Release /t:Clean "$ROOT/himecc/HimeCC.csproj"
-xbuild /p:Configuration=Release "$ROOT/himecc/HimeCC.csproj"
-mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
-xbuild /p:Configuration=Release /t:Clean "$ROOT/utils-demo/Utils.Demo.csproj"
-xbuild /p:Configuration=Release "$ROOT/utils-demo/Utils.Demo.csproj"
-xbuild /p:Configuration=Release /t:Clean "$ROOT/tests-driver/Tests.Driver.csproj"
-xbuild /p:Configuration=Release "$ROOT/tests-driver/Tests.Driver.csproj"
-xbuild /p:Configuration=Release /t:Clean "$ROOT/tests-executor-net/Tests.Executor.csproj"
-xbuild /p:Configuration=Release "$ROOT/tests-executor-net/Tests.Executor.csproj"
-mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
+FrameworkPathOverride=/usr/lib/mono/4.5/
+
+dotnet restore "$ROOT/runtime-net"
+dotnet pack "$ROOT/runtime-net" -c Release
+
+dotnet restore "$ROOT/sdk"
+dotnet pack "$ROOT/sdk" -c Release
+
+dotnet restore "$ROOT/himecc"
+dotnet publish "$ROOT/himecc" -c Release -f net461 -r win-x64
+dotnet publish "$ROOT/himecc" -c Release -f net461 -r linux-x64
+dotnet publish "$ROOT/himecc" -c Release -f netcoreapp2.0
+
+
+#xbuild /p:Configuration=Release /t:Clean "$ROOT/runtime-net/Hime.Redist.csproj"
+#xbuild /p:Configuration=Release "$ROOT/runtime-net/Hime.Redist.csproj"
+#xbuild /p:Configuration=Release /t:Clean "$ROOT/sdk/Hime.SDK.csproj"
+#xbuild /p:Configuration=Release "$ROOT/sdk/Hime.SDK.csproj"
+#xbuild /p:Configuration=Release /t:Clean "$ROOT/himecc/HimeCC.csproj"
+#xbuild /p:Configuration=Release "$ROOT/himecc/HimeCC.csproj"
+#mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
+#xbuild /p:Configuration=Release /t:Clean "$ROOT/utils-demo/Utils.Demo.csproj"
+#xbuild /p:Configuration=Release "$ROOT/utils-demo/Utils.Demo.csproj"
+#xbuild /p:Configuration=Release /t:Clean "$ROOT/tests-driver/Tests.Driver.csproj"
+#xbuild /p:Configuration=Release "$ROOT/tests-driver/Tests.Driver.csproj"
+#xbuild /p:Configuration=Release /t:Clean "$ROOT/tests-executor-net/Tests.Executor.csproj"
+#xbuild /p:Configuration=Release "$ROOT/tests-executor-net/Tests.Executor.csproj"
+#mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
 
 if [ $SKIP_TEST != "true" ]
   then
