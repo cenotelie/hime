@@ -7,7 +7,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Hime.HimeCC</RootNamespace>
     <AssemblyName>himecc</AssemblyName>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
@@ -18,6 +18,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
+    <PackageId>Hime.HimeCC</PackageId>
     <Title>HimeCC</Title>
     <Authors>cenotelie</Authors>
     <Description>Command line compiler for Hime grammars.</Description>

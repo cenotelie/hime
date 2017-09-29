@@ -24,7 +24,7 @@ dotnet pack "$ROOT/runtime-net" -c Release
 dotnet restore "$ROOT/sdk"
 dotnet pack "$ROOT/sdk" -c Release
 dotnet restore "$ROOT/himecc"
-dotnet publish "$ROOT/himecc" -c Release -f net461
+dotnet pack "$ROOT/himecc" -c Release
 dotnet restore "$ROOT/tests-executor-net"
 dotnet publish "$ROOT/tests-executor-net" -c Release -f net461
 dotnet restore "$ROOT/tests-driver"
