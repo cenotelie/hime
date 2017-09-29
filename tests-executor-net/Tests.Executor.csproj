@@ -1,47 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <!-- Build properties -->
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{F0364548-84EC-486D-8032-A52DF9783AD9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Hime.Tests.Executor</RootNamespace>
     <AssemblyName>Tests.Executor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <PublicSign>True</PublicSign>
+    <Version>3.1.1</Version>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
+  <PropertyGroup>
+    <!-- NuGet properties -->
+    <Title>Hime .Net Tests Executor</Title>
+    <Authors>cenotelie</Authors>
+    <Description>Executor for tests for the Hime Parser Generator on the .Net platform.</Description>
+    <Copyright>Copyright © Association Cénotélie 2017</Copyright>
+    <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
+    <PackageProjectUrl>http://cenotelie.fr/hime</PackageProjectUrl>
+    <PackageIconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
+    <PackageTags>parser generator lr glr rnglr</PackageTags>
+    <RepositoryUrl>https://bitbucket.org/cenotelie/hime</RepositoryUrl>
+    <RepositoryType>hg</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\.releng\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\runtime-net\Hime.Redist.csproj">
+    <ProjectReference Include="../runtime-net/Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>

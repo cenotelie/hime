@@ -21,13 +21,15 @@ FrameworkPathOverride=/usr/lib/mono/4.5/
 
 dotnet restore "$ROOT/runtime-net"
 dotnet pack "$ROOT/runtime-net" -c Release
-
 dotnet restore "$ROOT/sdk"
 dotnet pack "$ROOT/sdk" -c Release
-
 dotnet restore "$ROOT/himecc"
 dotnet publish "$ROOT/himecc" -c Release -f net461
 dotnet publish "$ROOT/himecc" -c Release -f netcoreapp2.0
+dotnet restore "$ROOT/test-executor-net"
+dotnet build "$ROOT/test-executor-net" -c Release
+dotnet restore "$ROOT/test-driver"
+dotnet build "$ROOT/test-driver" -c Release
 
 
 #xbuild /p:Configuration=Release /t:Clean "$ROOT/runtime-net/Hime.Redist.csproj"
