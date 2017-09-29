@@ -34,5 +34,7 @@ cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.dll" "$RELENG/hime-$VERSION/hi
 cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.deps.json" "$RELENG/hime-$VERSION/himecc.deps.json"
 cp "$ROOT/himecc/bin/Release/netcoreapp2.0/himecc.runtimeconfig.json" "$RELENG/hime-$VERSION/himecc.runtimeconfig.json"
 cp $ROOT/runtime-java/target/*.jar "$RELENG/hime-$VERSION/"
-zip "$RELENG/hime-$VERSION.zip" $RELENG/hime-$VERSION/*
+cd "$RELENG"
+zip -r "hime-$VERSION.zip" "hime-$VERSION"
+cd "$ROOT"
 rm -r "$RELENG/hime-$VERSION"
