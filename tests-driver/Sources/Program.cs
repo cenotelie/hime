@@ -223,7 +223,7 @@ namespace Hime.Tests.Driver
 			Console.WriteLine("driver " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Tests driver for the multiplatform tests of the Hime parser generator");
 			Console.WriteLine();
-			Console.WriteLine("usage: dotnet driver.dll --targets <NAMES> [--filter REGEXP]");
+			Console.WriteLine("usage: mono driver.exe --targets <NAMES> [--filter REGEXP]");
 			Console.WriteLine();
 			Console.WriteLine("\t--targets <NAMES>");
 			Console.WriteLine("\t\tExecute tests only for the provided platforms");

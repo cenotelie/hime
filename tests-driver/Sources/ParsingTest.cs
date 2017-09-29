@@ -193,7 +193,7 @@ namespace Hime.Tests.Driver
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
-				code = ExecuteCommand(reporter, "dotnet", "executor.dll " + args, output);
+				code = ExecuteCommand(reporter, "mono", "executor.dll " + args, output);
 			}
 			catch (Exception ex)
 			{

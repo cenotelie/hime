@@ -6,8 +6,9 @@
     <ProjectGuid>{F0364548-84EC-486D-8032-A52DF9783AD9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Hime.Tests.Executor</RootNamespace>
-    <AssemblyName>Tests.Executor</AssemblyName>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <AssemblyName>executor</AssemblyName>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>
