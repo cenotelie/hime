@@ -120,7 +120,8 @@ namespace Hime.SDK.Output
 		protected override bool EmitAssembly()
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
-			string redist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
+			string fileRedist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
+			string fileNetstandard = Path.Combine(Path.GetDirectoryName(fileRedist), "netstandard.dll");
 			bool hasError = false;
 			string output = OutputPath + GetUniqueID() + SuffixAssembly;
 			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
@@ -128,8 +129,8 @@ namespace Hime.SDK.Output
 				System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
 				compilerparams.GenerateExecutable = false;
 				compilerparams.GenerateInMemory = false;
-				compilerparams.ReferencedAssemblies.Add("netstandard.dll");
-				compilerparams.ReferencedAssemblies.Add(redist);
+				compilerparams.ReferencedAssemblies.Add(fileRedist);
+				compilerparams.ReferencedAssemblies.Add(fileNetstandard);
 				foreach (Unit unit in units)
 				{
 					compilerparams.EmbeddedResources.Add(GetArtifactLexerData(unit));
