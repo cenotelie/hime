@@ -26,8 +26,7 @@ dotnet restore "$ROOT/sdk"
 dotnet pack "$ROOT/sdk" -c Release
 
 dotnet restore "$ROOT/himecc"
-dotnet publish "$ROOT/himecc" -c Release -f net461 -r win-x64
-dotnet publish "$ROOT/himecc" -c Release -f net461 -r linux-x64
+dotnet publish "$ROOT/himecc" -c Release -f net461
 dotnet publish "$ROOT/himecc" -c Release -f netcoreapp2.0
 
 
