@@ -1,209 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <!-- Build properties -->
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Hime.SDK</RootNamespace>
     <AssemblyName>Hime.SDK</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\Hime.SDK.XML</DocumentationFile>
-    <GenerateDocumentation>true</GenerateDocumentation>
-    <NoWarn>1587</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Sign)' == 'True' ">
-    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)\..\.releng\hime.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
+    <PublicSign>True</PublicSign>
+    <Version>3.1.1</Version>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- NuGet properties -->
+    <Title>Hime Parser Generator (SDK)</Title>
+    <Authors>cenotelie</Authors>
+    <Description>Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars.</Description>
+    <Copyright>Copyright © Association Cénotélie 2017</Copyright>
+    <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
+    <PackageProjectUrl>http://cenotelie.fr/hime</PackageProjectUrl>
+    <PackageIconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
+    <PackageTags>parser generator lr glr rnglr</PackageTags>
+    <RepositoryUrl>https://bitbucket.org/cenotelie/hime</RepositoryUrl>
+    <RepositoryType>hg</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+    <EmbeddedResource Include="Sources/Input/HimeGrammar.gram" />
+    <EmbeddedResource Include="Sources/Input/HimeGrammarParser.bin" />
+    <EmbeddedResource Include="Sources/Input/HimeGrammarLexer.bin" />
+    <EmbeddedResource Include="Resources/Java/pom.xml" />
+    <EmbeddedResource Include="Sources/Input/CommandLine.gram" />
+    <EmbeddedResource Include="Sources/Input/CommandLineLexer.bin" />
+    <EmbeddedResource Include="Sources/Input/CommandLineParser.bin" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\.releng\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sources\Automata\DFA.cs" />
-    <Compile Include="Sources\Automata\DFAInverse.cs" />
-    <Compile Include="Sources\Automata\DFAPartition.cs" />
-    <Compile Include="Sources\Automata\DFAState.cs" />
-    <Compile Include="Sources\Automata\DFAStateGroup.cs" />
-    <Compile Include="Sources\Automata\DummyFinal.cs" />
-    <Compile Include="Sources\Automata\FinalItem.cs" />
-    <Compile Include="Sources\Automata\NFA.cs" />
-    <Compile Include="Sources\Automata\NFAState.cs" />
-    <Compile Include="Sources\Automata\NFAStateSet.cs" />
-    <Compile Include="Sources\Automata\NFATransition.cs" />
-    <Compile Include="Sources\Automata\PriorityComparer.cs" />
-    <Compile Include="Sources\Automata\State.cs" />
-    <Compile Include="Sources\CompilationTask.cs" />
-    <Compile Include="Sources\ParsingMethod.cs" />
-    <Compile Include="Sources\Grammars\Grammar.cs" />
-    <Compile Include="Sources\Reflection\DOTNodeShape.cs" />
-    <Compile Include="Sources\Reflection\DOTSerializer.cs" />
-    <Compile Include="Sources\Reflection\LexerReflection.cs" />
-    <Compile Include="Sources\UnicodeBlock.cs" />
-    <Compile Include="Sources\UnicodeCategory.cs" />
-    <Compile Include="Sources\CharSpan.cs" />
-    <Compile Include="Sources\UnicodeHelper.cs" />
-    <Compile Include="Sources\UnicodeCodePoint.cs" />
-    <Compile Include="Sources\UnicodeSpan.cs" />
-    <Compile Include="Sources\UnicodeBlocks.cs" />
-    <Compile Include="Sources\UnicodeCategories.cs" />
-    <Compile Include="Sources\Reflection\AssemblyReflection.cs" />
-    <Compile Include="Sources\Automata\LRState.cs" />
-    <Compile Include="Sources\Automata\LRTransition.cs" />
-    <Compile Include="Sources\Automata\LRReduction.cs" />
-    <Compile Include="Sources\Automata\LRAutomaton.cs" />
-    <Compile Include="Sources\Reflection\ParserReflection.cs" />
-    <Compile Include="Sources\Input\HimeGrammarLexer.cs" />
-    <Compile Include="Sources\Input\HimeGrammarParser.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Action.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Dollar.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Dummy.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Epsilon.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Symbol.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Virtual.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Variable.cs" />
-    <Compile Include="Sources\Grammars\Symbols\Terminal.cs" />
-    <Compile Include="Sources\Grammars\Symbols\TerminalSet.cs" />
-    <Compile Include="Sources\Grammars\Symbols\NullTerminal.cs" />
-    <Compile Include="Sources\Grammars\Rules\Rule.cs" />
-    <Compile Include="Sources\Grammars\Rules\RuleBody.cs" />
-    <Compile Include="Sources\Grammars\Rules\RuleBodyElement.cs" />
-    <Compile Include="Sources\Grammars\Rules\RuleBodySet.cs" />
-    <Compile Include="Sources\Grammars\Rules\RuleChoice.cs" />
-    <Compile Include="Sources\Grammars\Rules\TemplateRule.cs" />
-    <Compile Include="Sources\Grammars\Rules\TemplateRuleInstance.cs" />
-    <Compile Include="Sources\Report.cs" />
-    <Compile Include="Sources\Reporter.cs" />
-    <Compile Include="Sources\Grammars\Phrase.cs" />
-    <Compile Include="Sources\Grammars\LR\Conflict.cs" />
-    <Compile Include="Sources\Grammars\LR\Graph.cs" />
-    <Compile Include="Sources\Grammars\LR\GraphInverse.cs" />
-    <Compile Include="Sources\Grammars\LR\Item.cs" />
-    <Compile Include="Sources\Grammars\LR\State.cs" />
-    <Compile Include="Sources\Grammars\LR\StateAction.cs" />
-    <Compile Include="Sources\Grammars\LR\StateActionReduce.cs" />
-    <Compile Include="Sources\Grammars\LR\StateActionShift.cs" />
-    <Compile Include="Sources\Grammars\LR\StateKernel.cs" />
-    <Compile Include="Sources\Grammars\LR\StateReductions.cs" />
-    <Compile Include="Sources\Grammars\LR\Builder.cs" />
-    <Compile Include="Sources\Grammars\LR\KernelGraph.cs" />
-    <Compile Include="Sources\Grammars\LR\ItemLALR1.cs" />
-    <Compile Include="Sources\Grammars\LR\ItemLR0.cs" />
-    <Compile Include="Sources\Grammars\LR\ItemLR1.cs" />
-    <Compile Include="Sources\Grammars\LR\StateReductionsLALR1.cs" />
-    <Compile Include="Sources\Grammars\LR\StateReductionsLR0.cs" />
-    <Compile Include="Sources\Grammars\LR\StateReductionsLR1.cs" />
-    <Compile Include="Sources\Grammars\LR\StateActionRNReduce.cs" />
-    <Compile Include="Sources\Grammars\LR\StateReductionsRNGLALR1.cs" />
-    <Compile Include="Sources\Grammars\LR\StateReductionsRNGLR1.cs" />
-    <Compile Include="Sources\Input\Loader.cs" />
-    <Compile Include="Sources\Grammars\Loader.cs" />
-    <Compile Include="Sources\Output\Mode.cs" />
-    <Compile Include="Sources\Output\Modifier.cs" />
-    <Compile Include="Sources\Output\Helper.cs" />
-    <Compile Include="Sources\Reflection\Serializers.cs" />
-    <Compile Include="Sources\Reflection\TracingAction.cs" />
-    <Compile Include="Sources\Reflection\ActionTracer.cs" />
-    <Compile Include="Sources\Output\Runtime.cs" />
-    <Compile Include="Sources\Output\LexerDataGenerator.cs" />
-    <Compile Include="Sources\Output\LexerJavaCodeGenerator.cs" />
-    <Compile Include="Sources\Output\LexerNetCodeGenerator.cs" />
-    <Compile Include="Sources\Output\ParserLRkDataGenerator.cs" />
-    <Compile Include="Sources\Output\ParserRNGLRDataGenerator.cs" />
-    <Compile Include="Sources\Output\ParserNetCodeGenerator.cs" />
-    <Compile Include="Sources\Output\ParserJavaCodeGenerator.cs" />
-    <Compile Include="Sources\Output\Generator.cs" />
-    <Compile Include="Sources\Output\EmitterForNet.cs" />
-    <Compile Include="Sources\Output\EmitterBase.cs" />
-    <Compile Include="Sources\Output\EmitterForJava.cs" />
-    <Compile Include="Sources\Output\Unit.cs" />
-    <Compile Include="Sources\Input\CommandLineLexer.cs" />
-    <Compile Include="Sources\Input\CommandLineParser.cs" />
-    <Compile Include="Sources\Input\CommandLine.cs" />
-    <Compile Include="Sources\Grammars\LoaderContext.cs" />
-    <Compile Include="Sources\Grammars\LR\Error.cs" />
-    <Compile Include="Sources\Grammars\LR\ErrorType.cs" />
-    <Compile Include="Sources\Grammars\LR\ContextualError.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Sources\Input\HimeGrammar.gram" />
-    <EmbeddedResource Include="Sources\Input\HimeGrammarParser.bin" />
-    <EmbeddedResource Include="Sources\Input\HimeGrammarLexer.bin" />
-    <EmbeddedResource Include="Resources\Java\pom.xml" />
-    <EmbeddedResource Include="Sources\Input\CommandLine.gram" />
-    <EmbeddedResource Include="Sources\Input\CommandLineLexer.bin" />
-    <EmbeddedResource Include="Sources\Input\CommandLineParser.bin" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\runtime-net\Hime.Redist.csproj">
+    <ProjectReference Include="../runtime-net/Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
     </ProjectReference>
+    <PackageReference Include="System.CodeDom" Version="4.4.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <ItemGroup />
-  <ItemGroup />
 </Project>

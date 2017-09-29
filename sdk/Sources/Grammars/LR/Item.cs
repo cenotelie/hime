@@ -47,7 +47,6 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		/// Gets the action code for this item
 		/// </summary>
-		[System.CLSCompliant(false)]
 		public LRActionCode Action
 		{
 			get

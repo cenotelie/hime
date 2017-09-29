@@ -22,7 +22,6 @@ namespace Hime.SDK.Grammars.LR
 	/// <summary>
 	/// Represents an action in a LR state
 	/// </summary>
-	[System.CLSCompliant(false)]
 	public interface StateAction
 	{
 		/// <summary>

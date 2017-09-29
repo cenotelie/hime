@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 
@@ -29,7 +30,17 @@ namespace Hime.SDK
 		/// <summary>
 		/// Gets the compiler's version
 		/// </summary>
-		public static string Version { get { return typeof(CompilationTask).Assembly.GetName().Version.ToString(); } }
+		public static string Version
+		{
+			get
+			{
+#if NETSTANDARD1_3
+				return typeof(CompilationTask).GetTypeInfo().Assembly.GetName().Version.ToString();
+#else
+				return typeof(CompilationTask).Assembly.GetName().Version.ToString();
+#endif
+			}
+		}
 
 		/// <summary>
 		/// The name of the grammar to compile in the case where several grammars are loaded.

@@ -36,7 +36,6 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		///  Gets the type of action 
 		/// </summary>
-		[System.CLSCompliant(false)]
 		public LRActionCode ActionType { get { return LRActionCode.Shift; } }
 
 		/// <summary>
