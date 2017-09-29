@@ -26,10 +26,10 @@ dotnet pack "$ROOT/sdk" -c Release
 dotnet restore "$ROOT/himecc"
 dotnet publish "$ROOT/himecc" -c Release -f net461
 dotnet publish "$ROOT/himecc" -c Release -f netcoreapp2.0
-dotnet restore "$ROOT/test-executor-net"
-dotnet build "$ROOT/test-executor-net" -c Release
-dotnet restore "$ROOT/test-driver"
-dotnet build "$ROOT/test-driver" -c Release
+dotnet restore "$ROOT/tests-executor-net"
+dotnet build "$ROOT/tests-executor-net" -c Release
+dotnet restore "$ROOT/tests-driver"
+dotnet build "$ROOT/tests-driver" -c Release
 mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
 mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
 
