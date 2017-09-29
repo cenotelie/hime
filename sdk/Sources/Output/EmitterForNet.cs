@@ -128,8 +128,7 @@ namespace Hime.SDK.Output
 				System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
 				compilerparams.GenerateExecutable = false;
 				compilerparams.GenerateInMemory = false;
-				compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
-				compilerparams.ReferencedAssemblies.Add("System.dll");
+				compilerparams.ReferencedAssemblies.Add("netstandard.dll");
 				compilerparams.ReferencedAssemblies.Add(redist);
 				foreach (Unit unit in units)
 				{

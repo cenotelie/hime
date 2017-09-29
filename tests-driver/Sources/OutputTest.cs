@@ -126,7 +126,7 @@ namespace Hime.Tests.Driver
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser outputs");
-				code = ExecuteCommand(reporter, "mono", "executor.dll " + args, output);
+				code = ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
 			}
 			catch (Exception ex)
 			{
