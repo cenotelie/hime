@@ -24,12 +24,17 @@ mvn -f "$ROOT/runtime-java/pom.xml" clean install
 
 # Build the standalone package
 mkdir "$RELENG/hime-$VERSION"
+mkdir "$RELENG/hime-$VERSION/nuget"
 mkdir "$RELENG/hime-$VERSION/net461"
 mkdir "$RELENG/hime-$VERSION/netcore20"
 mkdir "$RELENG/hime-$VERSION/java"
 cp "$ROOT/LICENSE.txt"             "$RELENG/hime-$VERSION/LICENSE.txt"
 cp "$RELENG/standalone/README.txt" "$RELENG/hime-$VERSION/README.txt"
 cp "$RELENG/standalone/himecc"     "$RELENG/hime-$VERSION/himecc"
+cp "$ROOT/runtime-net/bin/Release/Hime.Redist.$VERSION.nupkg"         "$RELENG/hime-$VERSION/nuget/Hime.Redist.$VERSION.nupkg"
+cp "$ROOT/runtime-net/bin/Release/Hime.Redist.$VERSION.symbols.nupkg" "$RELENG/hime-$VERSION/nuget/Hime.Redist.$VERSION.symbols.nupkg"
+cp "$ROOT/sdk/bin/Release/Hime.SDK.$VERSION.nupkg"                    "$RELENG/hime-$VERSION/nuget/Hime.SDK.$VERSION.nupkg"
+cp "$ROOT/sdk/bin/Release/Hime.SDK.$VERSION.symbols.nupkg"            "$RELENG/hime-$VERSION/nuget/Hime.SDK.$VERSION.symbols.nupkg"
 cp "$ROOT/himecc/bin/Release/net461/publish/netstandard.dll"    "$RELENG/hime-$VERSION/net461/netstandard.dll"
 cp "$ROOT/himecc/bin/Release/net461/publish/System.CodeDom.dll" "$RELENG/hime-$VERSION/net461/System.CodeDom.dll"
 cp "$ROOT/himecc/bin/Release/net461/publish/Hime.Redist.dll"    "$RELENG/hime-$VERSION/net461/Hime.Redist.dll"

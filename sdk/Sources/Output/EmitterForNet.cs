@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Hime.SDK.Output
 {
@@ -119,6 +120,19 @@ namespace Hime.SDK.Output
 		/// <returns><c>true</c> if the operation succeed</returns>
 		protected override bool EmitAssembly()
 		{
+			// .Net Core => use the SDK
+			if (RuntimeInformation.FrameworkDescription.StartsWith(".NET Core"))
+				return EmitAssemblyNetCoreSDK();
+			// fallback to the framework compiler, if available
+			return EmitAssemblyFxCompiler();
+		}
+
+		/// <summary>
+		/// Emits the assembly for the generated lexer and parser using the runtime's compiler
+		/// </summary>
+		/// <returns><c>true</c> if the operation succeed</returns>
+		private bool EmitAssemblyFxCompiler()
+		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			string fileRedist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
 			string fileNetstandard = Path.Combine(Path.GetDirectoryName(fileRedist), "netstandard.dll");
@@ -157,6 +171,16 @@ namespace Hime.SDK.Output
 				File.Delete(GetArtifactAssembly());
 			File.Move(output, GetArtifactAssembly());
 			return true;
+		}
+
+		/// <summary>
+		/// Emits the assembly for the generated lexer and parser using .Net Core SDK
+		/// </summary>
+		/// <returns><c>true</c> if the operation succeed</returns>
+		private bool EmitAssemblyNetCoreSDK()
+		{
+			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
+			return false;
 		}
 	}
 }

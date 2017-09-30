@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Build properties -->
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Hime.Generated</RootNamespace>
+    <AssemblyName>Hime.Generated</AssemblyName>
+    <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="*.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Hime.Redist" Version="3.1.1"/>
+  </ItemGroup>
+  <PropertyGroup>
+    <RestoreSources>$(RestoreSources);$(HimeLocalNuget)</RestoreSources>
+  </PropertyGroup>
+</Project>
