@@ -322,6 +322,7 @@ namespace Hime.Redist.Parsers
 			return paths;
 		}
 
+#if NETSTANDARD2_0
 		/// <summary>
 		/// Prints this stack onto the console output
 		/// </summary>
@@ -341,6 +342,7 @@ namespace Hime.Redist.Parsers
 			PrintTo(writer);
 			writer.Dispose();
 		}
+#endif
 
 		/// <summary>
 		/// Prints this stack with the specified writer

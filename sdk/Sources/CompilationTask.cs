@@ -34,11 +34,7 @@ namespace Hime.SDK
 		{
 			get
 			{
-#if NETSTANDARD1_3
-				return typeof(CompilationTask).GetTypeInfo().Assembly.GetName().Version.ToString();
-#else
 				return typeof(CompilationTask).Assembly.GetName().Version.ToString();
-#endif
 			}
 		}
 

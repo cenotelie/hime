@@ -100,7 +100,7 @@ namespace Hime.Redist.Parsers
 		/// <returns>The automaton</returns>
 		public static LRkAutomaton Find(System.Type type, string resource)
 		{
-#if NETSTANDARD1_3
+#if NETSTANDARD1_0
 			System.Reflection.Assembly assembly = type.GetTypeInfo().Assembly;
 #else
 			System.Reflection.Assembly assembly = type.Assembly;
