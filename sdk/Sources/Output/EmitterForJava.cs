@@ -107,9 +107,9 @@ namespace Hime.SDK.Output
 			System.PlatformID platform = System.Environment.OSVersion.Platform;
 			bool success;
 			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
-				success = ExecuteCommand("mvn", "package");
+				success = ExecuteCommandMvn("mvn", "package");
 			else
-				success = ExecuteCommand("mvn.bat", "package");
+				success = ExecuteCommandMvn("mvn.bat", "package");
 			// extract the result
 			if (success)
 			{
@@ -173,33 +173,12 @@ namespace Hime.SDK.Output
 		}
 
 		/// <summary>
-		/// Exports the resource to the specified file
-		/// </summary>
-		/// <param name="name">The name of the resource to export</param>
-		/// <param name="file">The file to export to</param>
-		private static void ExportResource(string name, string file)
-		{
-			System.Reflection.Assembly assembly = (typeof(EmitterForJava)).Assembly;
-			BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream("Hime.SDK.Resources." + name));
-			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
-			while (true)
-			{
-				byte[] buffer = reader.ReadBytes(2048);
-				if (buffer == null || buffer.Length == 0)
-					break;
-				writer.Write(buffer);
-			}
-			writer.Close();
-			reader.Close();
-		}
-
-		/// <summary>
 		/// Executes the specified command (usually a maven command)
 		/// </summary>
 		/// <param name="verb">The program to execute</param>
 		/// <param name="arguments">The arguments</param>
 		/// <returns><c>true</c> if the command succeeded</returns>
-		private bool ExecuteCommand(string verb, string arguments)
+		private bool ExecuteCommandMvn(string verb, string arguments)
 		{
 			reporter.Info("Executing command " + verb + " " + arguments);
 			System.Diagnostics.Process process = new System.Diagnostics.Process();

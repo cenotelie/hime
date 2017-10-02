@@ -393,5 +393,26 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <returns><c>true</c> if the operation succeed</returns>
 		protected abstract bool EmitAssembly();
+
+		/// <summary>
+		/// Exports the resource to the specified file
+		/// </summary>
+		/// <param name="name">The name of the resource to export</param>
+		/// <param name="file">The file to export to</param>
+		protected static void ExportResource(string name, string file)
+		{
+			System.Reflection.Assembly assembly = (typeof(EmitterForJava)).Assembly;
+			BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream("Hime.SDK.Resources." + name));
+			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
+			while (true)
+			{
+				byte[] buffer = reader.ReadBytes(2048);
+				if (buffer == null || buffer.Length == 0)
+					break;
+				writer.Write(buffer);
+			}
+			writer.Close();
+			reader.Close();
+		}
 	}
 }

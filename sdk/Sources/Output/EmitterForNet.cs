@@ -180,7 +180,77 @@ namespace Hime.SDK.Output
 		private bool EmitAssemblyNetCoreSDK()
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
-			return false;
+			// setup the .Net Core project
+			string projectFolder = CreateNetCoreProject();
+			// compile
+			System.PlatformID platform = System.Environment.OSVersion.Platform;
+			bool success = ExecuteCommandDotnet("dotnet", projectFolder, "restore");
+			if (!success)
+				return false;
+			success = ExecuteCommandDotnet("dotnet", projectFolder, "build -c Release");
+			if (!success)
+				return false;
+			// extract the result
+			if (File.Exists(GetArtifactAssembly()))
+				File.Delete(GetArtifactAssembly());
+			//File.Move(Path.Combine(""), GetArtifactAssembly());
+			// cleanup the mess ...
+			//Directory.Delete(projectFolder);
+			return success;
+		}
+
+		/// <summary>
+		/// Creates the .Net Core project to compile
+		/// </summary>
+		/// <returns>The path to the project</returns>
+		private string CreateNetCoreProject()
+		{
+			// setup the Sources folder
+			string folder = Path.Combine(OutputPath, GetUniqueID());
+			if (!Directory.Exists(folder))
+				Directory.CreateDirectory(folder);
+			foreach (Unit unit in units)
+			{
+				File.Copy(GetArtifactLexerCode(unit), Path.Combine(folder, unit.Name + SuffixLexerCode), true);
+				File.Copy(GetArtifactParserCode(unit), Path.Combine(folder, unit.Name + SuffixParserCode), true);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(folder, unit.Name + SUFFIX_LEXER_DATA), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(folder, unit.Name + SUFFIX_PARSER_DATA), true);
+			}
+			// export the csproj file
+			ExportResource("NetCore.parser.csproj", Path.Combine(folder, "parser.csproj"));
+			return folder;
+		}
+
+		/// <summary>
+		/// Executes the specified command (usually a dotnet command)
+		/// </summary>
+		/// <param name="verb">The program to execute</param>
+		/// <param name="projectFolder">The path to the project folder</param>
+		/// <param name="arguments">The arguments</param>
+		/// <returns><c>true</c> if the command succeeded</returns>
+		private bool ExecuteCommandDotnet(string verb, string projectFolder, string arguments)
+		{
+			reporter.Info("Executing command " + verb + " " + arguments);
+			System.Diagnostics.Process process = new System.Diagnostics.Process();
+			process.StartInfo.FileName = verb;
+			process.StartInfo.Arguments = arguments;
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.UseShellExecute = false;
+			process.StartInfo.WorkingDirectory = projectFolder;
+			process.Start();
+			bool errors = false;
+			while (true)
+			{
+				string line = process.StandardOutput.ReadLine();
+				if (line == null)
+					break;
+				if (line.Contains("FAILED"))
+					errors = true;
+				reporter.Info(line);
+			}
+			process.WaitForExit();
+			process.Close();
+			return !errors;
 		}
 	}
 }
