@@ -7,7 +7,24 @@ ROOT="$(dirname "$RELENG")"
 # Gather version info
 VERSION=$(grep "<Version>" "$ROOT/sdk/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
 HASH=$(hg -R "$ROOT" --debug id -i)
+
+echo "Checking Mono is installed ..."
+MONO=$(which mono)
+if [ -z "$MONO" ]
+then
+  echo "Mono is not installed!"
+  exit 1
+fi
+MONO=$(mono --version | grep 'version')
+echo "Found $MONO"
+
+echo "Checking .Net 4.6.1 assemblies are installed ..."
 MONO=/usr/lib/mono/4.6.1-api/
+if [ ! -d "$MONO" ]; then
+  echo "Required Mono assemblies for .Net 4.6.1 not found!"
+  exit 1
+fi
+echo "OK"
 
 echo "Building Hime version $VERSION ($HASH)"
 
