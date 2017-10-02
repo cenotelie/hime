@@ -21,7 +21,7 @@ fi
 CORE=$(which dotnet)
 if [ ! -z "$CORE" ]
 then
-  dotnet "$ROOT/netcore20/himecc.dll" $@
+  (export HimeLocalNuget="$ROOT/nuget" ; dotnet "$ROOT/netcore20/himecc.dll" $@)
   exit $?
 fi
 
