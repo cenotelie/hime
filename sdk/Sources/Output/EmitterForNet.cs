@@ -195,7 +195,7 @@ namespace Hime.SDK.Output
 				File.Delete(GetArtifactAssembly());
 			File.Move(Path.Combine(Path.Combine(Path.Combine(Path.Combine(projectFolder, "bin"), "Release"), "netstandard2.0"), "Hime.Generated.dll"), GetArtifactAssembly());
 			// cleanup the mess ...
-			Directory.Delete(projectFolder);
+			Directory.Delete(projectFolder, true);
 			return success;
 		}
 
