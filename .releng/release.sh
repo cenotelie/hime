@@ -7,7 +7,7 @@ ROOT="$(dirname "$RELENG")"
 # Gather version info
 VERSION=$(grep "<Version>" "$ROOT/sdk/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
 HASH=$(hg -R "$ROOT" --debug id -i)
-MONO=/usr/lib/mono/4.5/
+MONO=/usr/lib/mono/4.6.1-api/
 
 echo "Building Hime version $VERSION ($HASH)"
 
