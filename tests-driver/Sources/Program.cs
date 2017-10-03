@@ -19,9 +19,10 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Hime.CLI;
+using Hime.Redist;
 using Hime.SDK;
 using Hime.SDK.Output;
-using Hime.Redist;
 
 namespace Hime.Tests.Driver
 {
@@ -71,7 +72,9 @@ namespace Hime.Tests.Driver
 			}
 
 			// Parse the arguments
-			ParseResult result = Hime.SDK.Input.CommandLine.ParseArguments(args);
+			ParseResult result = CommandLine.ParseArguments(args);
+			foreach (ParseError error in result.Errors)
+				Console.WriteLine(error.Message);
 			if (!result.IsSuccess || result.Errors.Count > 0)
 			{
 				Console.WriteLine("[ERROR] Could not parse the arguments");
@@ -91,11 +94,11 @@ namespace Hime.Tests.Driver
 				switch (arg.Value)
 				{
 					case "--targets":
-						foreach (string name in Hime.SDK.Input.CommandLine.GetValues(arg))
+						foreach (string name in CommandLine.GetValues(arg))
 							targets.Add((Runtime)Enum.Parse(typeof(Runtime), name));
 						break;
 					case "--filter":
-						filter = new Regex(Hime.SDK.Input.CommandLine.GetValue(arg));
+						filter = new Regex(CommandLine.GetValue(arg));
 						break;
 					default:
 						Console.WriteLine("Unknown argument " + arg.Value);

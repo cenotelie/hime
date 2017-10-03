@@ -79,6 +79,8 @@ namespace Hime.HimeCC
 
 			// Parse the arguments
 			ParseResult result = CommandLine.ParseArguments(args);
+			foreach (ParseError error in result.Errors)
+				Console.WriteLine(error.Message);
 			if (!result.IsSuccess || result.Errors.Count > 0)
 			{
 				Console.WriteLine(ErrorParsingArgs);

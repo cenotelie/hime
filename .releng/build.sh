@@ -39,6 +39,9 @@ echo "   => OK"
 echo "-- Building Hime.Redist --"
 dotnet restore "$ROOT/runtime-net"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/runtime-net" -c Release)
+echo "-- Building Hime.CLI --"
+dotnet restore "$ROOT/cli"
+(export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/cli" -c Release)
 echo "-- Building Hime.SDK --"
 dotnet restore "$ROOT/sdk"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/sdk" -c Release)
@@ -60,6 +63,7 @@ mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
 rm -rf "$ROOT/tests-results"
 mkdir "$ROOT/tests-results"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.Redist.dll" "$ROOT/tests-results/Hime.Redist.dll"
+cp "$ROOT/tests-driver/bin/Release/net461/Hime.CLI.dll" "$ROOT/tests-results/Hime.CLI.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.SDK.dll" "$ROOT/tests-results/Hime.SDK.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/driver.exe" "$ROOT/tests-results/driver.exe"
 cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor.exe"
