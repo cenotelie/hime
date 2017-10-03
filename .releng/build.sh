@@ -8,45 +8,58 @@ ROOT="$(dirname "$RELENG")"
 VERSION=$(grep "<Version>" "$ROOT/sdk/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
 HASH=$(hg -R "$ROOT" --debug id -i)
 
-echo "Checking Mono is installed ..."
+echo "Building Hime version $VERSION ($HASH)"
+
+echo "1. Checking Mono is installed ..."
 MONO=$(which mono)
 if [ -z "$MONO" ]
 then
-  echo "Mono is not installed!"
+  echo "   => Mono is not installed!"
   exit 1
 fi
 MONO=$(mono --version | grep 'version')
-echo "Found $MONO"
+echo "   => Found $MONO"
 
-echo "Checking .Net 4.6.1 assemblies are installed ..."
-MONO=/usr/lib/mono/4.6.1-api/
-if [ ! -d "$MONO" ]; then
-  echo "Required Mono assemblies for .Net 4.6.1 not found!"
+echo "2. Checking .Net Framework 4.6.1 assemblies are installed ..."
+MONO461=/usr/lib/mono/4.6.1-api
+if [ ! -f "$MONO461/mscorlib.dll" ]; then
+  echo "   => Required Mono assemblies for .Net Framework 4.6.1 not found!"
   exit 1
 fi
-echo "OK"
+echo "   => OK"
 
-echo "Building Hime version $VERSION ($HASH)"
+echo "3. Checking .Net Framework 2.0 assemblies are installed ..."
+MONO20=/usr/lib/mono/2.0-api
+if [ ! -f "$MONO20/mscorlib.dll" ]; then
+  echo "   => Required Mono assemblies for .Net Framework 2.0 not found!"
+  exit 1
+fi
+echo "   => OK"
 
 # Build
+echo "-- Building Hime.Redist --"
 dotnet restore "$ROOT/runtime-net"
-dotnet pack "$ROOT/runtime-net" -c Release
+(export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/runtime-net" -c Release)
+echo "-- Building Hime.SDK --"
 dotnet restore "$ROOT/sdk"
-dotnet pack "$ROOT/sdk" -c Release
+(export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/sdk" -c Release)
+echo "-- Building HimeCC --"
 dotnet restore "$ROOT/himecc"
-(export FrameworkPathOverride="$MONO"; dotnet pack "$ROOT/himecc" -c Release)
+(export FrameworkPathOverride="$MONO461"; dotnet build "$ROOT/himecc" -c Release -f net461)
+echo "-- Building Test Executor for .Net --"
 dotnet restore "$ROOT/tests-executor-net"
-(export FrameworkPathOverride="$MONO"; dotnet publish "$ROOT/tests-executor-net" -c Release -f net461)
+(export FrameworkPathOverride="$MONO461"; dotnet build "$ROOT/tests-executor-net" -c Release -f net461)
+echo "-- Building Tests Driver --"
 dotnet restore "$ROOT/tests-driver"
-(export FrameworkPathOverride="$MONO"; dotnet publish "$ROOT/tests-driver" -c Release -f net461)
+(export FrameworkPathOverride="$MONO461"; dotnet build "$ROOT/tests-driver" -c Release -f net461)
+echo "-- Building Hime Redist for Java --"
 mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
+echo "-- Building Test Executor for Java --"
 mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
 
 # Setup the test components
 rm -rf "$ROOT/tests-results"
 mkdir "$ROOT/tests-results"
-cp "$ROOT/tests-driver/bin/Release/net461/netstandard.dll" "$ROOT/tests-results/netstandard.dll"
-cp "$ROOT/tests-driver/bin/Release/net461/System.CodeDom.dll" "$ROOT/tests-results/System.CodeDom.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.Redist.dll" "$ROOT/tests-results/Hime.Redist.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.SDK.dll" "$ROOT/tests-results/Hime.SDK.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/driver.exe" "$ROOT/tests-results/driver.exe"
