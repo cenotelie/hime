@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -121,10 +122,23 @@ namespace Hime.SDK.Output
 		protected override bool EmitAssembly()
 		{
 			// .Net Core => use the SDK
-			if (RuntimeInformation.FrameworkDescription.StartsWith(".NET Core"))
+			if (IsRunninOnNetCore())
 				return EmitAssemblyNetCoreSDK();
 			// fallback to the framework compiler, if available
 			return EmitAssemblyFxCompiler();
+		}
+
+		/// <summary>
+		/// Get whether the current process is being run on the .Net Core framework
+		/// </summary>
+		/// <returns><c>true</c> if the current framework is .Net Core</returns>
+		private static bool IsRunninOnNetCore()
+		{
+#if NETSTANDARD2_0
+			return (RuntimeInformation.FrameworkDescription.StartsWith(".NET Core"));
+#else
+			return Process.GetCurrentProcess().MainModule.ModuleName == "dotnet";
+#endif
 		}
 
 		/// <summary>

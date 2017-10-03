@@ -322,7 +322,7 @@ namespace Hime.Redist.Parsers
 			return paths;
 		}
 
-#if NETSTANDARD2_0
+#if !NETSTANDARD1_0
 		/// <summary>
 		/// Prints this stack onto the console output
 		/// </summary>

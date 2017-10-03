@@ -451,7 +451,7 @@ namespace Hime.Redist.Parsers
 			// register the error
 			UnexpectedTokenError error = new UnexpectedTokenError(lexer.tokens[nextToken.Index], new ROList<Symbol>(expected));
 			allErrors.Add(error);
-#if NETSTANDARD2_0
+#if !NETSTANDARD1_0
 			if (ModeDebug)
 			{
 				Console.WriteLine("==== RNGLR parsing error:");
