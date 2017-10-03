@@ -101,7 +101,11 @@ namespace Hime.Redist.Lexer
 				{
 					BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream(existing));
 					Automaton result = new Automaton(reader);
+#if NETSTANDARD1_0
 					reader.Dispose();
+#else
+					reader.Close();
+#endif
 					return result;
 				}
 			}

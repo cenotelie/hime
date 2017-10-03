@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Hime.Redist</RootNamespace>
     <AssemblyName>Hime.Redist</AssemblyName>
-    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;net20</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>

@@ -112,7 +112,11 @@ namespace Hime.Redist.Parsers
 				{
 					BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream(existing));
 					LRkAutomaton automaton = new LRkAutomaton(reader);
+#if NETSTANDARD1_0
 					reader.Dispose();
+#else
+					reader.Close();
+#endif
 					return automaton;
 				}
 			}
