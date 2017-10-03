@@ -5,9 +5,25 @@ The Hime parser generator is a parser generator for the .Net platform (including
 It primarily supports the LR family of parsing methods, including GLR (Generalized-LR).
 Parsers generated with this tool need the appropriate runtime contained in this package.
 
-This package is a standalone distribution of the binaries for the .Net and Java platforms.
-It contains:
-* .Net assemblies and debug symbols for the parsers runtime, SDK API and command-line tool
-* Java artifacts and debug symbols for the parsers runtime
+This package is a standalone distribution of the binaries for the .Net and Java platforms. It contains:
 
-For more information on how to use this tool refer to https://bitbucket.org/cenotelie/hime/wiki/Home
+* nuget: contains the NuGet packages for
+    * Hime.Redist, the redistributable runtime for generated parsers on .Net. This package supports the .Net Standard 1.0, 2.0 and .Net Framework 2.0 and up.
+    * Hime.SDK, the parser generator SDK. This package supports the .Net Standard 2.0 and .Net Framework 2.0 and up.
+* net20: contains the .Net artifacts specific to the .Net Framework 2.0 implementation (and up).
+    * Hime.Redist.dll, the redistributable runtime for generated parsers on .Net.
+    * Hime.SDK.dll, the parser generator SDK.
+    * himecc.exe, the parser generator command line.
+* net461: contains the .Net artifacts specific to the .Net Framework 4.6.1 implementation (and up).
+    * Hime.Redist.dll, the redistributable runtime for generated parsers on .Net.
+    * Hime.SDK.dll, the parser generator SDK.
+    * himecc.exe, the parser generator command line.
+* netcore20: contains the .Net artifacts specific to the .Net Core 2.0 implementation.
+    * Hime.Redist.dll, the redistributable runtime for generated parsers on .Net.
+    * Hime.SDK.dll, the parser generator SDK.
+    * himecc.dll, the parser generator command line.
+* java: contains the Java artifacts
+    * hime-redist.jar, the redistributable runtime for generated parsers on Java.
+
+* himecc: Linux frontend for the himecc parser generator command line. This programs switches between a Mono runtime, or a .Net Core runtime.
+* himecc.bat: Windows frontend for the himecc parser generator command line.
