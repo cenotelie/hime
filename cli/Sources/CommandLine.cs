@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Text;
 using Hime.Redist;
 
-namespace Hime.SDK.Input
+namespace Hime.CLI
 {
 	/// <summary>
 	/// Contains utilities for the manipulation of command line arguments

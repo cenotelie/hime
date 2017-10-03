@@ -16,8 +16,9 @@
  ******************************************************************************/
 
 using System;
-using Hime.SDK;
+using Hime.CLI;
 using Hime.Redist;
+using Hime.SDK;
 
 namespace Hime.HimeCC
 {
@@ -77,7 +78,7 @@ namespace Hime.HimeCC
 			}
 
 			// Parse the arguments
-			ParseResult result = Hime.SDK.Input.CommandLine.ParseArguments(args);
+			ParseResult result = CommandLine.ParseArguments(args);
 			if (!result.IsSuccess || result.Errors.Count > 0)
 			{
 				Console.WriteLine(ErrorParsingArgs);
@@ -122,11 +123,11 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private static int GenerateCLParser()
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.CommandLine.gram");
+			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CLI.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Hime.SDK.Output.Mode.Source;
 			task.AddInputRaw(stream);
-			task.Namespace = "Hime.SDK.Input";
+			task.Namespace = "Hime.CLI";
 			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
@@ -195,12 +196,12 @@ namespace Hime.HimeCC
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
 							return null;
-						task.GrammarName = Hime.SDK.Input.CommandLine.GetValue(arg);
+						task.GrammarName = CommandLine.GetValue(arg);
 						break;
 					case ArgPath:
 						if (arg.Children.Count != 1)
 							return null;
-						task.OutputPath = Hime.SDK.Input.CommandLine.GetValue(arg);
+						task.OutputPath = CommandLine.GetValue(arg);
 						break;
 					case ArgMethodRNGLR:
 						task.Method = ParsingMethod.RNGLALR1;
@@ -208,7 +209,7 @@ namespace Hime.HimeCC
 					case ArgNamespace:
 						if (arg.Children.Count != 1)
 							return null;
-						task.Namespace = Hime.SDK.Input.CommandLine.GetValue(arg);
+						task.Namespace = CommandLine.GetValue(arg);
 						break;
 					case ArgAccessPublic:
 						task.CodeAccess = Hime.SDK.Output.Modifier.Public;

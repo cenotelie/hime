@@ -3,12 +3,12 @@
   <PropertyGroup>
     <!-- Build properties -->
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7A05384E-959E-4D54-B23A-D357AC0153B5}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Hime.HimeCC</RootNamespace>
-    <AssemblyName>himecc</AssemblyName>
-    <TargetFrameworks>net20;net461;netcoreapp2.0</TargetFrameworks>
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ProjectGuid>{591315dd-21df-4379-80f9-ee577a20a062}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Hime.CLI</RootNamespace>
+    <AssemblyName>Hime.CLI</AssemblyName>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;net20</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>
@@ -18,10 +18,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
-    <PackageId>Hime.HimeCC</PackageId>
-    <Title>HimeCC</Title>
+    <Title>Hime CLI</Title>
     <Authors>cenotelie</Authors>
-    <Description>Command line compiler for Hime grammars.</Description>
+    <Description>Facilities for the reading arguments passed on a command line.</Description>
     <Copyright>Copyright © Association Cénotélie 2017</Copyright>
     <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
     <PackageProjectUrl>http://cenotelie.fr/hime</PackageProjectUrl>
@@ -34,17 +33,14 @@
     <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Sources/CommandLine.gram" />
+    <EmbeddedResource Include="Sources/CommandLineLexer.bin" />
+    <EmbeddedResource Include="Sources/CommandLineParser.bin" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../runtime-net/Hime.Redist.csproj">
       <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
       <Name>Hime.Redist</Name>
-    </ProjectReference>
-    <ProjectReference Include="../cli/Hime.CLI.csproj">
-      <Project>{591315dd-21df-4379-80f9-ee577a20a062}</Project>
-      <Name>Hime.CLI</Name>
-    </ProjectReference>
-    <ProjectReference Include="../sdk/Hime.SDK.csproj">
-      <Project>{BA0D93DF-9EA3-4643-A18C-E463376AADA7}</Project>
-      <Name>Hime.SDK</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
