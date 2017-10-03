@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Build properties -->
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7A05384E-959E-4D54-B23A-D357AC0153B5}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Hime.Parseit</RootNamespace>
+    <AssemblyName>parseit</AssemblyName>
+    <TargetFrameworks>net20;net461;netcoreapp2.0</TargetFrameworks>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <PublicSign>True</PublicSign>
+    <Version>3.1.1</Version>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- NuGet properties -->
+    <PackageId>Hime.Parseit</PackageId>
+    <Title>Parseit</Title>
+    <Authors>cenotelie</Authors>
+    <Description>Command line to parse a piece of input using a packaged parser.</Description>
+    <Copyright>Copyright © Association Cénotélie 2017</Copyright>
+    <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
+    <PackageProjectUrl>http://cenotelie.fr/hime</PackageProjectUrl>
+    <PackageIconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
+    <PackageTags>parser generator lr glr rnglr</PackageTags>
+    <RepositoryUrl>https://bitbucket.org/cenotelie/hime</RepositoryUrl>
+    <RepositoryType>hg</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../runtime-net/Hime.Redist.csproj">
+      <Project>{8E4DE283-BA6E-4779-8C79-EB708002EDCC}</Project>
+      <Name>Hime.Redist</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

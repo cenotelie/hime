@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
+# Licensed under LGPLv3
+#
+# This frontend-script is used to run the parseit program with
+# different .Net runtimes depending on the environment.
+
+SCRIPT="$(readlink -f "$0")"
+ROOT="$(dirname "$SCRIPT")"
+
+# Try to run with Mono runtime
+MONO=$(which mono)
+if [ ! -z "$MONO" ]
+then
+  mono "$ROOT/net461/parseit.exe" $@
+  exit $?
+fi
+
+# Try to run with .Net Core runtime
+CORE=$(which dotnet)
+if [ ! -z "$CORE" ]
+then
+  (export HimeLocalNuget="$ROOT/nuget" ; dotnet "$ROOT/netcore20/parseit.dll" $@)
+  exit $?
+fi
+
+echo "Failed to find a .Net runtime (either Mono or .Net Core)."
+exit 1
