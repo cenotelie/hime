@@ -36,7 +36,6 @@ if [ ! -f "$MONO20/mscorlib.dll" ]; then
 fi
 echo "   => OK"
 
-# Build
 echo "-- Building Hime.Redist --"
 dotnet restore "$ROOT/runtime-net"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/runtime-net" -c Release)

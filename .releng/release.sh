@@ -36,7 +36,6 @@ if [ ! -f "$MONO20/mscorlib.dll" ]; then
 fi
 echo "   => OK"
 
-# Build
 echo "-- Building Hime.Redist --"
 dotnet restore "$ROOT/runtime-net"
 (export FrameworkPathOverride="$MONO20"; dotnet pack "$ROOT/runtime-net" -c Release)
@@ -52,7 +51,8 @@ echo "-- Building Hime Redist for Java --"
 mvn -f "$ROOT/runtime-java/pom.xml" clean install
 
 echo "-- Building Package --"
-# Build the standalone package
+rm -rf "$RELENG/hime-$VERSION"
+rm -f "hime-v$VERSION.zip"
 mkdir "$RELENG/hime-$VERSION"
 mkdir "$RELENG/hime-$VERSION/nuget"
 mkdir "$RELENG/hime-$VERSION/net20"
@@ -97,4 +97,4 @@ cp $ROOT/runtime-java/target/*.jar "$RELENG/hime-$VERSION/java/"
 cd "$RELENG"
 zip -r "hime-v$VERSION.zip" "hime-$VERSION"
 cd "$ROOT"
-rm -r "$RELENG/hime-$VERSION"
+rm -rf "$RELENG/hime-$VERSION"
