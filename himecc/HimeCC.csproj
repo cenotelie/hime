@@ -7,7 +7,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Hime.HimeCC</RootNamespace>
     <AssemblyName>himecc</AssemblyName>
-    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net20;net461;netcoreapp2.0</TargetFrameworks>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>

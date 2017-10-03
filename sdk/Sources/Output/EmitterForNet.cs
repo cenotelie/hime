@@ -19,7 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+#if NETSTANDARD2_0
 using System.Runtime.InteropServices;
+#endif
 
 namespace Hime.SDK.Output
 {
@@ -149,7 +151,6 @@ namespace Hime.SDK.Output
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			string fileRedist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
-			string fileNetstandard = Path.Combine(Path.GetDirectoryName(fileRedist), "netstandard.dll");
 			bool hasError = false;
 			string output = OutputPath + GetUniqueID() + SuffixAssembly;
 			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
@@ -158,7 +159,8 @@ namespace Hime.SDK.Output
 				compilerparams.GenerateExecutable = false;
 				compilerparams.GenerateInMemory = false;
 				compilerparams.ReferencedAssemblies.Add(fileRedist);
-				compilerparams.ReferencedAssemblies.Add(fileNetstandard);
+				compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
+				compilerparams.ReferencedAssemblies.Add("System.dll");
 				foreach (Unit unit in units)
 				{
 					compilerparams.EmbeddedResources.Add(GetArtifactLexerData(unit));
