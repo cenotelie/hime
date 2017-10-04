@@ -2,12 +2,13 @@
 
 ## 3.2.0
 
-Next release.
+Released on October 4th, 2017.
 
 * Features
     * [Issue #36](https://bitbucket.org/cenotelie/hime/issues/36): .Net Runtime: Changed build targets to .Net Standard 1.0, 2.0 and .Net Framework 2.0
     * [Issue #36](https://bitbucket.org/cenotelie/hime/issues/36): .Net SDK: Changed build targets to .Net Standard 2.0 and .Net Framework 2.0
     * [Issue #36](https://bitbucket.org/cenotelie/hime/issues/36): Himecc CLI: Changed build target to .Net Core 2.0, .Net Framework 2.0 and .Net Framework 4.6.1
+    * Added parseit command-line tool to parse pieces of input text
 
 ## 3.1.0
 
