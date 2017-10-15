@@ -1,5 +1,12 @@
 # Updates
 
+## 3.2.1
+
+To be released
+
+* Features
+    * [Issue #37](https://bitbucket.org/cenotelie/hime/issues/37): New API in .Net and Java runtimes to distinguish between types of symbols attached to AST nodes.
+
 ## 3.2.0
 
 Released on October 4th, 2017.
