@@ -14,53 +14,25 @@
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+
 package fr.cenotelie.hime.redist;
 
 /**
- * Represents an element of parsing data
+ * The possible types of symbol
  *
  * @author Laurent Wouters
  */
-public interface SemanticElement {
+public enum SymbolType {
     /**
-     * Gets the type of symbol this element represents
-     *
-     * @return The type of symbol this element represents
+     * A token, i.e. a piece of text matched by a lexer
      */
-    SymbolType getSymbolType();
-
+    Token,
     /**
-     * Gets the position in the input text of this element
-     *
-     * @return The position in the input text of this element
+     * A variable defined in the original grammar
      */
-    TextPosition getPosition();
-
+    Variable,
     /**
-     * Gets the span in the input text of this element
-     *
-     * @return The span in the input text of this element
+     * A virtual symbol, defined in the original grammar
      */
-    TextSpan getSpan();
-
-    /**
-     * Gets the context of this element in the input
-     *
-     * @return The context of this element in the input
-     */
-    TextContext getContext();
-
-    /**
-     * Gets the grammar symbol associated to this element
-     *
-     * @return The grammar symbol associated to this element
-     */
-    Symbol getSymbol();
-
-    /**
-     * Gets the value of this element, if any
-     *
-     * @return The value of this element, if any
-     */
-    String getValue();
+    Virtual
 }

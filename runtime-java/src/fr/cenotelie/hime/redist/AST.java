@@ -141,6 +141,25 @@ public abstract class AST {
     public abstract List<ASTNode> getChildren(int parent);
 
     /**
+     * Gets the type of symbol for the given node
+     *
+     * @param node A node
+     * @return The type of symbol for the node
+     */
+    public SymbolType getSymbolType(int node) {
+        switch (TableElemRef.getType(nodes.get(node).label)) {
+            case TableElemRef.TABLE_TOKEN:
+                return SymbolType.Token;
+            case TableElemRef.TABLE_VARIABLE:
+                return SymbolType.Variable;
+            case TableElemRef.TABLE_VIRTUAL:
+                return SymbolType.Virtual;
+        }
+        // This cannot happen
+        return null;
+    }
+
+    /**
      * Gets the position in the input text of the given node
      *
      * @param node A node
@@ -242,9 +261,9 @@ public abstract class AST {
             case TableElemRef.TABLE_TOKEN:
                 return tableTokens.at(TableElemRef.getIndex(label));
             case TableElemRef.TABLE_VARIABLE:
-                return new SymbolRef(tableVariables.get(TableElemRef.getIndex(label)));
+                return new SymbolRef(tableVariables.get(TableElemRef.getIndex(label)), SymbolType.Variable);
             case TableElemRef.TABLE_VIRTUAL:
-                return new SymbolRef(tableVirtuals.get(TableElemRef.getIndex(label)));
+                return new SymbolRef(tableVirtuals.get(TableElemRef.getIndex(label)), SymbolType.Virtual);
         }
         // This cannot happen
         return null;

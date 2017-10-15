@@ -136,6 +136,16 @@ namespace Hime.Redist
 		public abstract IEnumerator<ASTNode> GetChildren(int parent);
 
 		/// <summary>
+		/// Gets the type of symbol for the given node
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The type of symbol for the node</returns>
+		public SymbolType GetSymbolType(int node)
+		{
+			return (SymbolType) ((byte) (nodes[node].label.Type));
+		}
+
+		/// <summary>
 		/// Gets the position in the input text of the given node
 		/// </summary>
 		/// <param name="node">A node</param>
@@ -231,9 +241,9 @@ namespace Hime.Redist
 			case TableType.Token:
 				return tableTokens[label.Index];
 			case TableType.Variable:
-				return new SymbolRef(tableVariables[label.Index]);
+				return new SymbolRef(tableVariables[label.Index], SymbolType.Variable);
 			case TableType.Virtual:
-				return new SymbolRef(tableVirtuals[label.Index]);
+				return new SymbolRef(tableVirtuals[label.Index], SymbolType.Virtual);
 			}
 			// This cannot happen
 			return null;

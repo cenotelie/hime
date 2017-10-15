@@ -50,6 +50,11 @@ public class ASTNode implements SemanticElement {
     }
 
     @Override
+    public SymbolType getSymbolType() {
+        return tree.getSymbolType(index);
+    }
+
+    @Override
     public TextPosition getPosition() {
         return tree.getPosition(index);
     }

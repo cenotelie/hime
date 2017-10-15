@@ -23,6 +23,11 @@ namespace Hime.Redist
 	public interface SemanticElement
 	{
 		/// <summary>
+		/// Gets the type of symbol this element represents
+		/// </summary>
+		SymbolType SymbolType { get; }
+
+		/// <summary>
 		/// Gets the position in the input text of this element
 		/// </summary>
 		TextPosition Position { get; }

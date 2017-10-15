@@ -44,6 +44,11 @@ public class Token implements SemanticElement {
     }
 
     @Override
+    public SymbolType getSymbolType() {
+        return SymbolType.Token;
+    }
+
+    @Override
     public TextPosition getPosition() {
         return repository.getPosition(index);
     }

@@ -26,6 +26,15 @@ namespace Hime.Redist
 		/// The symbol being referenced
 		/// </summary>
 		private readonly Symbol symbol;
+		/// <summary>
+		/// The type of this symbol
+		/// </summary>
+		private readonly SymbolType type;
+
+		/// <summary>
+		/// Gets the type of symbol this element represents
+		/// </summary>
+		public SymbolType SymbolType { get { return type; } }
 
 		/// <summary>
 		/// Gets the position in the input text of this element
@@ -56,9 +65,11 @@ namespace Hime.Redist
 		/// Initializes this reference
 		/// </summary>
 		/// <param name="symbol">The symbol being referenced</param>
-		public SymbolRef(Symbol symbol)
+		/// <param name="type">The type of this symbol</param>
+		public SymbolRef(Symbol symbol, SymbolType type)
 		{
 			this.symbol = symbol;
+			this.type = type;
 		}
 
 		/// <summary>

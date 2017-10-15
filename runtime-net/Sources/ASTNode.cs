@@ -32,6 +32,11 @@ namespace Hime.Redist
 		private readonly int index;
 
 		/// <summary>
+		/// Gets the type of symbol this element represents
+		/// </summary>
+		public SymbolType SymbolType { get { return tree.GetSymbolType(index); } }
+
+		/// <summary>
 		/// Gets the children of this node
 		/// </summary>
 		public ASTFamily Children { get { return new ASTFamily(tree, index); } }

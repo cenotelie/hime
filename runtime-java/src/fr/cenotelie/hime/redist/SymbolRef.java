@@ -27,6 +27,15 @@ class SymbolRef implements SemanticElement {
      * The symbol being referenced
      */
     private final Symbol symbol;
+    /**
+     * The type of this symbol
+     */
+    private final SymbolType type;
+
+    @Override
+    public SymbolType getSymbolType() {
+        return type;
+    }
 
     @Override
     public TextPosition getPosition() {
@@ -57,9 +66,11 @@ class SymbolRef implements SemanticElement {
      * Initializes this reference
      *
      * @param symbol The symbol being referenced
+     * @param type   The type of this symbol
      */
-    public SymbolRef(Symbol symbol) {
+    public SymbolRef(Symbol symbol, SymbolType type) {
         this.symbol = symbol;
+        this.type = type;
     }
 
     @Override

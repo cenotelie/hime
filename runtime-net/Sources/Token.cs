@@ -32,6 +32,11 @@ namespace Hime.Redist
 		private readonly int index;
 
 		/// <summary>
+		/// Gets the type of symbol this element represents
+		/// </summary>
+		public SymbolType SymbolType { get { return SymbolType.Token; } }
+
+		/// <summary>
 		/// Gets the position in the input text of this token
 		/// </summary>
 		public TextPosition Position { get { return repository.GetPosition(index); } }
