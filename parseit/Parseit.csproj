@@ -11,9 +11,9 @@
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
-    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.public</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
-    <PublicSign>True</PublicSign>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">True</PublicSign>
     <Version>3.2.2</Version>
   </PropertyGroup>
   <PropertyGroup>
