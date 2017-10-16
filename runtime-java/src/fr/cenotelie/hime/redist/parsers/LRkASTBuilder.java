@@ -79,7 +79,7 @@ class LRkASTBuilder implements SemanticBody {
     /**
      * The AST being built
      */
-    private final ASTSimpleTree result;
+    private final AST result;
 
     /**
      * Gets the symbol at the i-th index
@@ -129,7 +129,7 @@ class LRkASTBuilder implements SemanticBody {
         this.stack = new SubTree[LRkParser.INIT_STACK_SIZE];
         this.stackNext = 0;
         this.handle = new int[INIT_HANDLE_SIZE];
-        this.result = new ASTSimpleTree(tokens, variables, virtuals);
+        this.result = new AST(tokens, variables, virtuals);
     }
 
     /**

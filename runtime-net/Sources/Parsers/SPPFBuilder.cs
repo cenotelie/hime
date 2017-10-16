@@ -136,7 +136,7 @@ namespace Hime.Redist.Parsers
 		/// <summary>
 		/// The AST being built
 		/// </summary>
-		private readonly ASTSimpleTree result;
+		private readonly AST result;
 
 		#region Implementation of SemanticBody
 
@@ -179,7 +179,7 @@ namespace Hime.Redist.Parsers
 			handleIndices = new int[INIT_HANDLE_SIZE];
 			handleActions = new TreeAction[INIT_HANDLE_SIZE];
 			stack = new int[INIT_HANDLE_SIZE];
-			result = new ASTSimpleTree(tokens, variables, virtuals);
+			result = new AST(tokens, variables, virtuals);
 		}
 
 		/// <summary>

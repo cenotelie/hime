@@ -207,7 +207,7 @@ namespace Hime.Redist.Parsers
 		/// Commits this buffer to the final ast
 		/// </summary>
 		/// <param name="ast">The ast to commit to</param>
-		public void Commit(ASTSimpleTree ast)
+		public void Commit(AST ast)
 		{
 			CommitChildrenOf(0, ast);
 			ast.StoreRoot(nodes[0]);

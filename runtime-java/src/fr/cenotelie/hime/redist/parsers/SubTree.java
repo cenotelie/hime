@@ -17,7 +17,6 @@
 package fr.cenotelie.hime.redist.parsers;
 
 import fr.cenotelie.hime.redist.AST;
-import fr.cenotelie.hime.redist.ASTSimpleTree;
 
 /**
  * Represents a sub-tree in an AST
@@ -193,7 +192,7 @@ class SubTree implements Cloneable {
      *
      * @param ast The ast to commit to
      */
-    public void commit(ASTSimpleTree ast) {
+    public void commit(AST ast) {
         commitChildrenOf(0, ast);
         ast.storeRoot(nodes[0]);
     }

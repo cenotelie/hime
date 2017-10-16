@@ -19,6 +19,8 @@ package fr.cenotelie.hime.redist;
 
 import fr.cenotelie.hime.redist.utils.BigList;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,7 +28,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public abstract class AST {
+public class AST {
     /**
      * Represents a node in this AST
      */
@@ -105,7 +107,7 @@ public abstract class AST {
      * @param variables The table of variables
      * @param virtuals  The table of virtuals
      */
-    AST(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
+    public AST(TokenRepository tokens, List<Symbol> variables, List<Symbol> virtuals) {
         this.tableTokens = tokens;
         this.tableVariables = variables;
         this.tableVirtuals = virtuals;
@@ -138,7 +140,14 @@ public abstract class AST {
      * @param parent A node
      * @return The children
      */
-    public abstract List<ASTNode> getChildren(int parent);
+    public List<ASTNode> getChildren(int parent) {
+        List<ASTNode> result = new ArrayList<>();
+        Node node = nodes.get(parent);
+        for (int i = 0; i != node.count; i++) {
+            result.add(new ASTNode(this, node.first + i));
+        }
+        return Collections.unmodifiableList(result);
+    }
 
     /**
      * Gets the type of symbol for the given node
@@ -282,5 +291,14 @@ public abstract class AST {
         for (int i = index; i != index + count; i++)
             this.nodes.add(nodes[i]);
         return result;
+    }
+
+    /**
+     * Stores the root of this tree
+     *
+     * @param node The root
+     */
+    public void storeRoot(Node node) {
+        root = nodes.add(node);
     }
 }

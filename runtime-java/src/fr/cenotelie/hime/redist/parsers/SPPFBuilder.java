@@ -129,7 +129,7 @@ class SPPFBuilder implements SemanticBody {
     /**
      * The AST being built
      */
-    private final ASTSimpleTree result;
+    private final AST result;
 
     /**
      * Gets the symbol at the i-th index
@@ -170,7 +170,7 @@ class SPPFBuilder implements SemanticBody {
         this.handleIndices = new int[INIT_HANDLE_SIZE];
         this.handleActions = new byte[INIT_HANDLE_SIZE];
         this.stack = new int[INIT_HANDLE_SIZE];
-        this.result = new ASTSimpleTree(tokens, variables, virtuals);
+        this.result = new AST(tokens, variables, virtuals);
     }
 
     /**

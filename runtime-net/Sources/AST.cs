@@ -21,9 +21,13 @@ using Hime.Redist.Utils;
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents a base class for AST implementations
+	/// Represents a simple AST with a tree structure
 	/// </summary>
-	abstract class AST
+	/// <remarks>
+	/// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
+	/// The linkage is represented by each node storing its number of children and the index of its first child.
+	/// </remarks>
+	class AST
 	{
 		/// <summary>
 		/// Represents a node in this AST
@@ -68,26 +72,84 @@ namespace Hime.Redist
 			}
 		}
 
+
+		/// <summary>
+		/// Represents and iterator for adjacents in this graph
+		/// </summary>
+		private class ChildEnumerator : IEnumerator<ASTNode>
+		{
+			private AST ast;
+			private int first;
+			private int current;
+			private int end;
+
+			public ChildEnumerator(AST ast, int node)
+			{
+				this.ast = ast;
+				Node n = ast.nodes[node];
+				first = n.first;
+				current = first - 1;
+				end = first + n.count;
+			}
+
+			/// <summary>
+			/// Gets the current node
+			/// </summary>
+			public ASTNode Current { get { return new ASTNode(ast, current); } }
+
+			/// <summary>
+			/// Gets the current node
+			/// </summary>
+			object System.Collections.IEnumerator.Current { get { return new ASTNode(ast, current); } }
+
+			/// <summary>
+			/// Disposes this enumerator
+			/// </summary>
+			public void Dispose()
+			{
+				ast = null;
+			}
+
+			/// <summary>
+			/// Moves to the next node
+			/// </summary>
+			/// <returns>true if there are more nodes</returns>
+			public bool MoveNext()
+			{
+				current++;
+				return (current != end);
+			}
+
+			/// <summary>
+			/// Resets this enumerator to the beginning
+			/// </summary>
+			public void Reset()
+			{
+				current = first - 1;
+			}
+		}
+
+
 		/// <summary>
 		/// The table of tokens
 		/// </summary>
-		protected readonly TokenRepository tableTokens;
+		private readonly TokenRepository tableTokens;
 		/// <summary>
 		/// The table of variables
 		/// </summary>
-		protected readonly ROList<Symbol> tableVariables;
+		private readonly ROList<Symbol> tableVariables;
 		/// <summary>
 		/// The table of virtuals
 		/// </summary>
-		protected readonly ROList<Symbol> tableVirtuals;
+		private readonly ROList<Symbol> tableVirtuals;
 		/// <summary>
 		/// The nodes' labels
 		/// </summary>
-		protected readonly BigList<Node> nodes;
+		private readonly BigList<Node> nodes;
 		/// <summary>
 		/// The index of the tree's root node
 		/// </summary>
-		protected int root;
+		private int root;
 
 
 		/// <summary>
@@ -96,7 +158,7 @@ namespace Hime.Redist
 		/// <param name="tokens">The table of tokens</param>
 		/// <param name="variables">The table of variables</param>
 		/// <param name="virtuals">The table of virtuals</param>
-		protected AST(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
+		public AST(TokenRepository tokens, ROList<Symbol> variables, ROList<Symbol> virtuals)
 		{
 			tableTokens = tokens;
 			tableVariables = variables;
@@ -126,14 +188,20 @@ namespace Hime.Redist
 		/// <param name="parent">A node</param>
 		/// <param name="i">The child's number</param>
 		/// <returns>The i-th child</returns>
-		public abstract ASTNode GetChild(int parent, int i);
+		public ASTNode GetChild(int parent, int i)
+		{
+			return new ASTNode(this, nodes[parent].first + i);
+		}
 
 		/// <summary>
 		/// Gets an enumerator for the children of the given node
 		/// </summary>
 		/// <param name="parent">A node</param>
 		/// <returns>An enumerator for the children</returns>
-		public abstract IEnumerator<ASTNode> GetChildren(int parent);
+		public IEnumerator<ASTNode> GetChildren(int parent)
+		{
+			return new ChildEnumerator(this, parent);
+		}
 
 		/// <summary>
 		/// Gets the type of symbol for the given node
@@ -259,6 +327,15 @@ namespace Hime.Redist
 		public int Store(Node[] nodes, int index, int count)
 		{
 			return this.nodes.Add(nodes, index, count);
+		}
+
+		/// <summary>
+		/// Stores the root of this tree
+		/// </summary>
+		/// <param name="node">The root</param>
+		public void StoreRoot(Node node)
+		{
+			root = nodes.Add(node);
 		}
 	}
 }
