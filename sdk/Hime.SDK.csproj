@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">True</PublicSign>
-    <Version>3.2.2</Version>
+    <Version>3.2.3</Version>
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
