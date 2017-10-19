@@ -56,7 +56,7 @@ dotnet restore "$ROOT/parseit"
 (export FrameworkPathOverride="$MONO461"; dotnet publish "$ROOT/parseit" -c Release -f net461)
 dotnet publish "$ROOT/parseit" -c Release -f netcoreapp2.0
 echo "-- Building Hime Redist for Java --"
-mvn -f "$ROOT/runtime-java/pom.xml" clean install
+mvn -f "$ROOT/runtime-java/pom.xml" clean deploy
 
 echo "-- Building Package --"
 rm -rf "$RELENG/hime-$VERSION"

@@ -65,6 +65,27 @@ ECHO -- Building Tests Driver --
 dotnet restore "%ROOT%\tests-driver"
 dotnet build "%ROOT%\tests-driver" -c Release -f net461
 ECHO -- Building Hime Redist for Java --
-mvn -f "%ROOT%\runtime-java\pom.xml" clean install -Dgpg.skip=true
+CALL mvn -f "%ROOT%\runtime-java\pom.xml" clean install -Dgpg.skip=true
+IF NOT "%ERRORLEVEL%" == "0" EXIT /b
 ECHO -- Building Test Executor for Java --
-mvn -f "%ROOT%\tests-executor-java\pom.xml" clean verify -Dgpg.skip=true
+CALL mvn -f "%ROOT%\tests-executor-java\pom.xml" clean verify -Dgpg.skip=true
+IF NOT "%ERRORLEVEL%" == "0" EXIT /b
+
+
+REM Setup the test components
+RMDIR /S /Q "%ROOT%\tests-results"
+MKDIR "%ROOT%\tests-results"
+COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.Redist.dll" "%ROOT%\tests-results\Hime.Redist.dll"
+COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.CLI.dll" "%ROOT%\tests-results\Hime.CLI.dll"
+COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.SDK.dll" "%ROOT%\tests-results\Hime.SDK.dll"
+COPY /B "%ROOT%\tests-driver\bin\Release\net461\driver.exe" "%ROOT%\tests-results\driver.exe"
+COPY /B "%ROOT%\tests-executor-net\bin\Release\net461\executor.exe" "%ROOT%\tests-results\executor.exe"
+COPY /B %ROOT%\tests-executor-java\target\hime-test-executor-*.jar "%ROOT%\tests-results\executor.jar"
+COPY /B %ROOT%\tests-executor-java\target\dependency\*.jar "%ROOT%\tests-results\"
+REM Execute the tests
+CD "%ROOT%/tests-results"
+driver.exe --targets Net Java
+CD "%ROOT%"
+REM Cleanup the tests
+MOVE "%ROOT%\tests-results\TestResults.xml" "%ROOT%\TestResults.xml"
+RMDIR /S /Q "%ROOT%\tests-results"
