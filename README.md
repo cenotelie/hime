@@ -74,7 +74,6 @@ This requires:
 During the build, a common set of tests are executed on all runtime implementations.
 The results are output in the JUnit format in `TestResults.xml` at the repository's root.
 
-> **Warning**: The build process on Windows is not supported at this time.
 
 ## How can I contribute? ##
 

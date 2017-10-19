@@ -1,5 +1,13 @@
 # Updates
 
+## 3.2.2
+
+Released on October 19th, 2017.
+
+* Fixes
+    * [Issue #38](https://bitbucket.org/cenotelie/hime/issues/38): Use strong-name signing when building on Windows.
+    * [Issue #40](https://bitbucket.org/cenotelie/hime/issues/40): Support build and release on Windows.
+
 ## 3.2.1
 
 Released on October 15th, 2017.
