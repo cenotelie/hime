@@ -199,7 +199,6 @@ namespace Hime.SDK.Output
 			// setup the .Net Core project
 			string projectFolder = CreateNetCoreProject();
 			// compile
-			System.PlatformID platform = System.Environment.OSVersion.Platform;
 			bool success = ExecuteCommandDotnet("dotnet", projectFolder, "restore");
 			if (!success)
 				return false;
