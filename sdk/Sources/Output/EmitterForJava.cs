@@ -109,7 +109,7 @@ namespace Hime.SDK.Output
 			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
 				success = ExecuteCommandMvn("mvn", "package");
 			else
-				success = ExecuteCommandMvn("mvn.bat", "package");
+				success = ExecuteCommandMvn("mvn.cmd", "package");
 			// extract the result
 			if (success)
 			{
