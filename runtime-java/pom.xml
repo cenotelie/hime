@@ -133,10 +133,10 @@
                 </executions>
                 <configuration>
                     <instructions>
-                        <XOWL-Product-Link>${project.url}</XOWL-Product-Link>
-                        <XOWL-SCM-Tag>${changeSet}</XOWL-SCM-Tag>
-                        <XOWL-Build-Tag>${env.BUILD_TAG}</XOWL-Build-Tag>
-                        <XOWL-Build-Timestamp>${timestamp}</XOWL-Build-Timestamp>
+                        <Bundle-Product-Link>${project.url}</Bundle-Product-Link>
+                        <Bundle-SCM-Tag>${changeSet}</Bundle-SCM-Tag>
+                        <Bundle-Build-Tag>${env.BUILD_TAG}</Bundle-Build-Tag>
+                        <Bundle-Build-Timestamp>${timestamp}</Bundle-Build-Timestamp>
                     </instructions>
                 </configuration>
             </plugin>
