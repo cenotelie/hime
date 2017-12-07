@@ -144,3 +144,109 @@ pub trait Text {
         return self.get_context_for(position, span.length);
     }
 }
+
+/// Specifies the type of error
+pub enum ParseErrorType {
+    /// Lexical error occurring when the end of input has been encountered while more characters were expected
+    UnexpectedEndOfInput,
+    /// Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
+    UnexpectedChar,
+    /// Syntactic error occurring when an unexpected token is encountered by the parser
+    UnexpectedToken
+}
+
+/// Represents an error in a parser
+pub trait ParseError {
+    /// Gets the error's type
+    fn get_type() -> ParseErrorType;
+
+    /// Gets the error's position in the input
+    fn get_position() -> TextPosition;
+
+    /// Gets the error's length in the input (in number of characters)
+    fn get_length() -> usize;
+
+    /// Gets the error's message
+    fn get_message() -> String;
+}
+
+/// The possible types of symbol
+pub enum SymbolType
+{
+    /// A token, i.e. a piece of text matched by a lexer
+    Token,
+    /// A variable defined in the original grammar
+    Variable,
+    /// A virtual symbol, defined in the original grammar
+    Virtual
+}
+
+/// Symbol ID for inexistant symbol
+pub const SID_NOTHING: u32 = 0;
+/// Symbol ID of the Epsilon terminal
+pub const SID_EPSILON: u32 = 1;
+/// Symbol ID of the Dollar terminal
+pub const SID_DOLLAR: u32 = 2;
+
+/// Represents a grammar symbol (terminal, variable or virtual)
+pub struct Symbol {
+    /// The symbol's unique identifier
+    id: u32,
+    /// The symbol's name
+    name: &'static str
+}
+
+impl Symbol {
+    /// Gets the symbol's unique identifier
+    fn get_id(&self) -> u32 {
+        self.id
+    }
+
+    /// Gets the symbol's name
+    fn get_name(&self) -> &str {
+        self.name
+    }
+}
+
+/// Implementation of `Display` for `Symbol`
+impl ::std::fmt::Display for Symbol {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "{}", self.name)
+    }
+}
+
+/// Represents an element of parsing data
+pub trait SemanticElement {
+    /// Gets the type of symbol this element represents
+    fn get_symbol_type(&self) -> SymbolType;
+
+    /// Gets the position in the input text of this element
+    fn get_position(&self) -> TextPosition;
+
+    /// Gets the span in the input text of this element
+    fn get_span(&self) -> TextSpan;
+
+    /// Gets the context of this element in the input
+    fn get_context(&self) -> TextContext;
+
+    /// Gets the grammar symbol associated to this element
+    fn get_symbol(&self) -> Symbol;
+
+    /// Gets the value of this element, if any
+    fn get_value(&self) -> Option<String>;
+}
+
+/// Represents the metadata of a token
+struct TokenRepositoryCell {
+    terminal: usize,
+    span: TextSpan
+}
+
+/// A repository of matched tokens
+struct TokenRepository {
+
+}
+
+pub struct Token {
+
+}

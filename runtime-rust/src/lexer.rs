@@ -207,6 +207,19 @@ impl Text for PrefetchedText {
     }
 }
 
+#[test]
+fn test_prefetched_text_lines() {
+    let prefetched = PrefetchedText::new("this is\na new line");
+    assert_eq!(prefetched.lines.len(), 2);
+    assert_eq!(prefetched.lines[0], 0);
+    assert_eq!(prefetched.lines[1], 8);
+}
+
+#[test]
+fn test_prefetched_text_substring() {
+    let prefetched = PrefetchedText::new("this is\na new line");
+    assert_eq!(utf16_to_string(&prefetched.content, 8, 5), "a new");
+}
 
 /// Represents the information of a terminal matched at the state of a lexer's automaton
 pub struct MatchedTerminal {
@@ -378,17 +391,50 @@ impl Automaton {
     }
 }
 
-
-#[test]
-fn test_prefetched_text_lines() {
-    let prefetched = PrefetchedText::new("this is\na new line");
-    assert_eq!(prefetched.lines.len(), 2);
-    assert_eq!(prefetched.lines[0], 0);
-    assert_eq!(prefetched.lines[1], 8);
+/// Represents a match in the input
+struct TokenMatch {
+    /// The matching DFA state
+    state: u32,
+    /// Length of the matched input
+    length: u32
 }
 
-#[test]
-fn test_prefetched_text_substring() {
-    let prefetched = PrefetchedText::new("this is\na new line");
-    assert_eq!(utf16_to_string(&prefetched.content, 8, 5), "a new");
+/// Represents the kernel of a token, i.e. the identifying information of a token
+pub struct TokenKernel {
+    /// The identifier of the matched terminal
+    terminal_id: u32,
+    /// The token's index in its repository
+    index: u32
+}
+
+/// Handler for lexical errors
+pub trait LexicalErrorHandler<T: ParseError> {
+    fn add_lexical_error(&self, error: T);
+}
+
+pub trait ContextProvider {
+    /// Gets the priority of the specified context required by the specified terminal
+    /// The priority is a positive integer. The lesser the value the higher the priority.
+    /// A negative value represents the unavailability of the required context.
+    fn get_context_priority(&self, context: u16, terminal_id: u32) -> usize;
+}
+
+/// The default context provider
+struct DefaultContextProvider {}
+
+impl ContextProvider for DefaultContextProvider {
+    fn get_context_priority(&self, context: u16, terminal_id: u32) -> usize {
+        if context == DEFAULT_CONTEXT { ::std::usize::MAX } else { 0 }
+    }
+}
+
+/// Represents a base lexer
+pub trait Lexer<T: Iterator<Item=Token>> {
+    /// Gets the terminals matched by this lexer
+    fn get_terminals(&self) -> &[Symbol];
+
+    /// Gets the lexer's input text
+    fn get_input(&self) -> &Text;
+
+    fn get_output(&self) -> &utils::Iterable<Item=Token, IteratorType=T>;
 }
