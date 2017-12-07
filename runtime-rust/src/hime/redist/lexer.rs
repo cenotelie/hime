@@ -135,8 +135,7 @@ impl Text for PrefetchedText {
 
     /// Gets the substring beginning at the given index with the given length
     fn get_value(&self, index: usize, length: usize) -> String {
-        String::from("")
-        //TODO: finish here
+        utf16_to_string(&self.content, index, length)
     }
 
     /// Gets the starting index of the i-th line
@@ -164,94 +163,53 @@ impl Text for PrefetchedText {
 
     /// Gets the context description for the current text at the specified position
     fn get_context_for(&self, position: TextPosition, length: usize) -> TextContext {
-        /*let content = self.get_line_content(position.line);
-        if content.len() == 0 {
+        // gather the data for the line
+        let line_index = self.get_line_index(position.line);
+        let line_length = self.get_line_length(position.line);
+        if line_length == 0 {
             return TextContext {
-                content,
+                content: String::from(""),
                 pointer: String::from("^")
             };
         }
-        let mut end = content.len() - 1;
-        while end != 1 && (content[end] == 0x000D || content[end] == 0x000A || content[end] == 0x2028 || content[end] == 0x2029) {
+
+        // gather the start and end indices of the line's content to output
+        let mut end = line_index + line_length - 1;
+        while end != line_index + 1 && (self.content[end] == 0x000A || self.content[end] == 0x000B || self.content[end] == 0x000C || self.content[end] == 0x000D || self.content[end] == 0x0085 || self.content[end] == 0x2028 || self.content[end] == 0x2029) {
             end = end - 1;
         }
-        let mut start = 0;
-        while start < end && is_white_space(content[start]) {
+        let mut start = line_index;
+        while start < end && is_white_space(self.content[start]) {
             start = start + 1;
         }
-        if position.column - 1 < start {
-            start = 0;
+        if line_index + position.column - 1 < start {
+            start = line_index;
         }
-        if position.column - 1 > end {
-            end = content.len() - 1;
+        if line_index + position.column - 1 > end {
+            end = line_index + line_length - 1;
         }
+
+        // build the pointer
         let mut pointer = String::new();
-        for i in start..position.column {
-            pointer.push(if content[i] == 0x0009 { '\t' } else { ' ' });
+        for i in start..(line_index + position.column) {
+            pointer.push(if self.content[i] == 0x0009 { '\t' } else { ' ' });
         }
         pointer.push('^');
-        for i in 1..length {
+        for _i in 1..length {
             pointer.push('^');
-        }*/
+        }
+
+        // return the output
         TextContext {
-            content: String::from(""),
-            pointer: String::from("^")
+            content: utf16_to_string(&self.content, start, end - start + 1),
+            pointer
         }
-        //TODO: finish here
     }
 }
 
 
-/*
-impl PrefetchedText {
-    /// Initializes a new empty text buffer
-    pub fn new() -> TextBuffer {
-        TextBuffer {
-            content: utils::BigList::<u16>::new(0)
-        }
-    }
 
-    /// Initializes a new buffer with the content of the specified string
-    pub fn init(input: &str) -> TextBuffer {
-        let mut content = utils::BigList::<u16>::new(0);
-        for c in input.chars() {
-            let value = c as u32;
-            if value <= 0xFFFF {
-                content.add(value as u16);
-            } else {
-                let temp = value - 0x10000;
-                let lead = (temp >> 10) + 0xD800;
-                let trail = (temp & 0x03FF) + 0xDC00;
-                content.add(lead as u16);
-                content.add(trail as u16);
-            }
-        }
-        TextBuffer {
-            content
-        }
-    }
 
-    /// Gets the length of the buffer
-    pub fn length(&self) -> usize {
-        self.content.size()
-    }
-}
-
-/// Implementation of the indexer operator for immutable TextBuffer
-impl ::std::ops::Index<usize> for TextBuffer {
-    type Output = u16;
-    fn index(&self, index: usize) -> &u16 {
-        &self.content[index]
-    }
-}
-
-/// Implementation of the indexer [] operator for mutable TextBuffer
-impl ::std::ops::IndexMut<usize> for TextBuffer {
-    fn index_mut(&mut self, index: usize) -> &mut u16 {
-        &mut self.content[index]
-    }
-}
-*/
 
 
 #[test]
