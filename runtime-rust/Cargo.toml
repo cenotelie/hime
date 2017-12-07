@@ -1,0 +1,15 @@
+[package]
+name = "hime_redist"
+version = "0.1.0"
+authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
+description = "Redistributable runtime library for parsers generated with Hime (LR, RNGLR)."
+#documentation = "..."
+homepage = "https://cenotelie.fr/hime"
+repository = "https://bitbucket.org/cenotelie/hime"
+readme = "README.md"
+keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
+# Categories are a fixed list available at crates.io/category_slugs, and
+categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
+license = "LGPL-3.0"
+
+[dependencies]
