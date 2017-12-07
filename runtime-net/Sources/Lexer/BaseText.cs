@@ -201,7 +201,7 @@ namespace Hime.Redist.Lexer
 			if (content.Length == 0)
 				return new TextContext("", "^");
 			int end = content.Length - 1;
-			while (end != 1 && (content[end] == '\n' || content[end] == '\r'))
+			while (end != 1 && (content[end] == '\u000A' || content[end] == '\u000B' || content[end] == '\u000C' || content[end]  == '\u000D' || content[end]  == '\u0085' || content[end]  == '\u2028' || content[end]  == '\u2029'))
 				end--;
 			int start = 0;
 			while (start < end && char.IsWhiteSpace(content[start]))

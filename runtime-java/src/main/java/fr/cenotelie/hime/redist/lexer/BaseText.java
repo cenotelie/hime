@@ -158,7 +158,7 @@ public abstract class BaseText implements Text {
         if (content.length() == 0)
             return new TextContext("", "^");
         int end = content.length() - 1;
-        while (end != -1 && (content.charAt(end) == '\n' || content.charAt(end) == '\r'))
+        while (end != -1 && (content.charAt(end) == '\r' || content.charAt(end) == '\n' || content.charAt(end) == '\u000B' || content.charAt(end) == '\u000C' || content.charAt(end) == '\u0085' || content.charAt(end) == '\u2028' || content.charAt(end) == '\u2029'))
             end--;
         int start = 0;
         while (start < end && Character.isWhitespace(content.charAt(start)))
