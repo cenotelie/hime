@@ -409,5 +409,43 @@ impl<'a, T: 'a + Text> utils::Iterable<'a> for TokenRepository<T> {
 }
 
 impl<T: Text> TokenRepository<T> {
+    /// Registers a new token in this repository
+    pub fn add(&mut self, terminal: usize, index: usize, length: usize) -> usize {
+        self.cells.add(TokenRepositoryCell {
+            terminal,
+            span: TextSpan { index, length }
+        })
+    }
+}
 
+impl<'a, T: 'a + Text> SemanticElement for Token<'a, T> {
+    /// Gets the type of symbol this element represents
+    fn get_symbol_type(&self) -> SymbolType {
+        SymbolType::Token
+    }
+
+    /// Gets the position in the input text of this element
+    fn get_position(&self) -> TextPosition {
+        self.repository.text.get_position_at(self.repository.cells[self.index].span.index)
+    }
+
+    /// Gets the span in the input text of this element
+    fn get_span(&self) -> TextSpan {
+        self.repository.cells[self.index].span
+    }
+
+    /// Gets the context of this element in the input
+    fn get_context(&self) -> TextContext {
+        self.repository.text.get_context_for(self.get_position(), self.repository.cells[self.index].span.length)
+    }
+
+    /// Gets the grammar symbol associated to this element
+    fn get_symbol(&self) -> Symbol {
+        self.repository.terminals[self.repository.cells[self.index].terminal]
+    }
+
+    /// Gets the value of this element, if any
+    fn get_value(&self) -> Option<String> {
+        Some(self.repository.text.get_value_for(self.repository.cells[self.index].span))
+    }
 }
