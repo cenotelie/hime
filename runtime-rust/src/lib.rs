@@ -281,6 +281,19 @@ impl Symbol {
     }
 }
 
+/// Implementation of `Clone` for `Symbol`
+impl ::std::clone::Clone for Symbol {
+    fn clone(&self) -> Self {
+        Symbol {
+            id: self.id,
+            name: self.name
+        }
+    }
+}
+
+/// Implementation of `Copy` for `Symbol`
+impl ::std::marker::Copy for Symbol {}
+
 /// Implementation of `Display` for `Symbol`
 impl ::std::fmt::Display for Symbol {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
@@ -311,11 +324,90 @@ pub trait SemanticElement {
 
 /// Represents the metadata of a token
 struct TokenRepositoryCell {
+    /// The terminal's index
     terminal: usize,
+    /// The span of this token
     span: TextSpan
 }
 
-/// A repository of matched tokens
-struct TokenRepository {}
+/// Implementation of `Clone` for `TokenRepositoryCell`
+impl ::std::clone::Clone for TokenRepositoryCell {
+    fn clone(&self) -> Self {
+        TokenRepositoryCell {
+            terminal: self.terminal,
+            span: self.span
+        }
+    }
+}
 
-pub struct Token {}
+/// Implementation of `Copy` for `TokenRepositoryCell`
+impl ::std::marker::Copy for TokenRepositoryCell {}
+
+/// A repository of matched tokens
+struct TokenRepository<T: Text> {
+    /// The terminal symbols matched in this content
+    terminals: utils::BigList<Symbol>,
+    /// The base text
+    text: T,
+    /// The token data in this content
+    cells: utils::BigList<TokenRepositoryCell>
+}
+
+/// Represents a token as an output element of a lexer
+pub struct Token<'a, T: 'a + Text> {
+    /// The repository containing this token
+    repository: &'a TokenRepository<T>,
+    /// The index of this token in the text
+    index: usize
+}
+
+/// Implementation of `Clone` for `Token`
+impl<'a, T: 'a + Text> ::std::clone::Clone for Token<'a, T> {
+    fn clone(&self) -> Self {
+        Token {
+            repository: self.repository,
+            index: self.index
+        }
+    }
+}
+
+/// Implementation of `Copy` for `Token`
+impl<'a, T: 'a + Text> ::std::marker::Copy for Token<'a, T> {}
+
+/// the iterator over the tokens in a repository
+struct TokenRepositoryIterator<'a, T: 'a + Text> {
+    /// The repository containing this token
+    repository: &'a TokenRepository<T>,
+    /// The current index within the repository
+    index: usize
+}
+
+/// Implementation of `Iterator` for `TokenRepositoryIterator`
+impl<'a, T: 'a + Text> Iterator for TokenRepositoryIterator<'a, T> {
+    type Item = Token<'a, T>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= self.repository.cells.size() {
+            None
+        } else {
+            let result = Token { repository: self.repository, index: self.index };
+            self.index = self.index + 1;
+            Some(result)
+        }
+    }
+}
+
+/// Implementation of `Iterable` for `TokenRepository`
+impl<'a, T: 'a + Text> utils::Iterable<'a> for TokenRepository<T> {
+    type Item = Token<'a, T>;
+    type IteratorType = TokenRepositoryIterator<'a, T>;
+    fn iter(&'a self) -> Self::IteratorType {
+        TokenRepositoryIterator {
+            repository: self,
+            index: 0
+        }
+    }
+}
+
+impl<T: Text> TokenRepository<T> {
+
+}

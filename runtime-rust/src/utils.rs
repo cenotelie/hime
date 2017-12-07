@@ -102,7 +102,9 @@ impl<T: Copy> ::std::ops::IndexMut<usize> for BigList<T> {
 
 /// An iterator over a BigList
 pub struct BigListIterator<'a, T: 'a + Copy> {
+    /// The parent list
     list: &'a BigList<T>,
+    /// The current index within the list
     index: usize
 }
 

@@ -425,7 +425,7 @@ impl ContextProvider for DefaultContextProvider {
 }
 
 /// Represents a base lexer
-pub trait Lexer<T: Iterator<Item=Token>> {
+pub trait Lexer<'a, T: 'a + Text, X: utils::Iterable<'a, Item=Token<'a, T>>> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &[Symbol];
 
@@ -433,7 +433,7 @@ pub trait Lexer<T: Iterator<Item=Token>> {
     fn get_input(&self) -> &Text;
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &utils::Iterable<Item=Token, IteratorType=T>;
+    fn get_output(&self) -> &X;
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
@@ -445,4 +445,7 @@ pub trait Lexer<T: Iterator<Item=Token>> {
 
     /// Gets the function for handling lexical errors
     fn get_lexical_error_handler(&self) -> fn(Box<ParseError>);
+
+    /// Gets the next token in the input
+    fn get_next_token() -> Token<'a, T>;
 }
