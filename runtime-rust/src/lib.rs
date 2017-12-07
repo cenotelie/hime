@@ -158,16 +158,89 @@ pub enum ParseErrorType {
 /// Represents an error in a parser
 pub trait ParseError {
     /// Gets the error's type
-    fn get_type() -> ParseErrorType;
+    fn get_type(&self) -> ParseErrorType;
 
     /// Gets the error's position in the input
-    fn get_position() -> TextPosition;
+    fn get_position(&self) -> TextPosition;
 
     /// Gets the error's length in the input (in number of characters)
-    fn get_length() -> usize;
+    fn get_length(&self) -> usize;
 
     /// Gets the error's message
-    fn get_message() -> String;
+    fn get_message(&self) -> String;
+}
+
+/// Represents the unexpected of the input text while more characters were expected
+struct ParseErrorEndOfInput {
+    /// The error's position in the input text
+    position: TextPosition
+}
+
+impl ParseError for ParseErrorEndOfInput {
+    /// Gets the error's type
+    fn get_type(&self) -> ParseErrorType {
+        ParseErrorType::UnexpectedEndOfInput
+    }
+
+    /// Gets the error's position in the input
+    fn get_position(&self) -> TextPosition {
+        *(&self.position)
+    }
+
+    /// Gets the error's length in the input (in number of characters)
+    fn get_length(&self) -> usize {
+        0
+    }
+
+    /// Gets the error's message
+    fn get_message(&self) -> String {
+        String::from("Unexpected end of input")
+    }
+}
+
+/// Represents an unexpected character error in the input stream of a lexer
+struct ParseErrorUnexpectedChar {
+    /// The error's position in the input text
+    position: TextPosition,
+    /// The unexpected character
+    unexpected: [Utf16C; 2]
+}
+
+impl ParseError for ParseErrorUnexpectedChar {
+    /// Gets the error's type
+    fn get_type(&self) -> ParseErrorType {
+        ParseErrorType::UnexpectedChar
+    }
+
+    /// Gets the error's position in the input
+    fn get_position(&self) -> TextPosition {
+        *(&self.position)
+    }
+
+    /// Gets the error's length in the input (in number of characters)
+    fn get_length(&self) -> usize {
+        if self.unexpected[1] == 0x00 { 1 } else { 2 }
+    }
+
+    /// Gets the error's message
+    fn get_message(&self) -> String {
+        let mut result = String::new();
+        result.push_str("Unexpected character '");
+        if self.unexpected[1] == 0x00 {
+            result.push_str(&String::from_utf16(&self.unexpected[0..1]).unwrap());
+            result.push_str("' (U+");
+            result.push_str(&format!("{:X}", self.unexpected[0]));
+        } else {
+            let lead = self.unexpected[0] as u32;
+            let trail = self.unexpected[1] as u32;
+            let cp = ((trail - 0xDC00) | ((lead - 0xD800) << 10)) + 0x10000;
+            result.push_str(&String::from_utf16(&self.unexpected).unwrap());
+            result.push_str("' (U+");
+            result.push_str(&format!("{:X}", cp));
+        }
+        result.push_str(")");
+        result
+    }
 }
 
 /// The possible types of symbol
@@ -243,10 +316,6 @@ struct TokenRepositoryCell {
 }
 
 /// A repository of matched tokens
-struct TokenRepository {
+struct TokenRepository {}
 
-}
-
-pub struct Token {
-
-}
+pub struct Token {}

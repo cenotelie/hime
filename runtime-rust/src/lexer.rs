@@ -407,10 +407,6 @@ pub struct TokenKernel {
     index: u32
 }
 
-/// Handler for lexical errors
-pub trait LexicalErrorHandler<T: ParseError> {
-    fn add_lexical_error(&self, error: T);
-}
 
 pub trait ContextProvider {
     /// Gets the priority of the specified context required by the specified terminal
@@ -436,5 +432,17 @@ pub trait Lexer<T: Iterator<Item=Token>> {
     /// Gets the lexer's input text
     fn get_input(&self) -> &Text;
 
+    /// Gets the lexer's output stream of tokens
     fn get_output(&self) -> &utils::Iterable<Item=Token, IteratorType=T>;
+
+    /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+    /// A distance of 0 indicates no recovery.
+    fn get_recovery_distance(&self) -> u32;
+
+    /// Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+    /// A distance of 0 indicates no recovery.
+    fn set_recovery_distance(&mut self, distance: u32);
+
+    /// Gets the function for handling lexical errors
+    fn get_lexical_error_handler(&self) -> fn(Box<ParseError>);
 }
