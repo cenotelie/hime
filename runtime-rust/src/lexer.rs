@@ -231,7 +231,7 @@ pub struct MatchedTerminal {
 
 
 /// Identifier of in-existant state in an automaton
-const DEAD_STATE: usize = 0xFFFF;
+const DEAD_STATE: u32 = 0xFFFF;
 /// Identifier of the default context
 const DEFAULT_CONTEXT: u16 = 0;
 
@@ -322,8 +322,8 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets the target of the cached transition for the specified value
-    pub fn get_cached_transition(&self, value: Utf16C) -> usize {
-        self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize] as usize
+    pub fn get_cached_transition(&self, value: Utf16C) -> u32 {
+        self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize] as u32
     }
 
     pub fn get_bulk_transition(&self, index: usize) -> AutomatonTransition {
@@ -336,14 +336,14 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets the target of a transition from this state on the specified value
-    pub fn get_target_by(&self, value: Utf16C) -> usize {
+    pub fn get_target_by(&self, value: Utf16C) -> u32 {
         if value <= 255 {
             return self.get_cached_transition(value);
         }
         let mut current = self.offset + 3 + self.table[self.offset] as usize * 2 + 256;
         for _i in 0..(self.table[self.offset + 2] as usize) {
             if value >= self.table[current] && value <= self.table[current + 1] {
-                return self.table[current + 2] as usize;
+                return self.table[current + 2] as u32;
             }
             current = current + 3;
         }
@@ -383,10 +383,10 @@ impl Automaton {
     }
 
     /// Get the data of the specified state
-    pub fn get_state(&self, state: usize) -> AutomatonState {
+    pub fn get_state(&self, state: u32) -> AutomatonState {
         AutomatonState {
             table: &self.states,
-            offset: self.table[state] as usize
+            offset: self.table[state as usize] as usize
         }
     }
 }
@@ -425,7 +425,7 @@ impl ContextProvider for DefaultContextProvider {
 }
 
 /// Represents a base lexer
-pub trait Lexer<'a, T: 'a + Text, X: utils::Iterable<'a, Item=Token<'a, T>>> {
+pub trait Lexer<'a, T: 'a + Text, X: 'a + utils::Iterable<'a, Item=Token<'a, T>>> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &[Symbol];
 
@@ -448,4 +448,30 @@ pub trait Lexer<'a, T: 'a + Text, X: utils::Iterable<'a, Item=Token<'a, T>>> {
 
     /// Gets the next token in the input
     fn get_next_token() -> Token<'a, T>;
+}
+
+/// Runs the lexer's DFA to match a terminal in the input ahead
+fn run_dfa<T: Text>(input: &Text, index: usize, automaton: &Automaton) -> TokenMatch {
+    if input.is_end(index) {
+        return TokenMatch { state: 0, length: 0 };
+    }
+    let mut result = TokenMatch { state: DEAD_STATE, length: 0 };
+    let mut state: u32 = 0;
+    let mut i = index;
+    while state != DEAD_STATE {
+        let state_data = automaton.get_state(state);
+        // Is this state a matching state ?
+        if state_data.get_terminals_count() != 0 {
+            result = TokenMatch { state, length: (i - index) as u32 };
+        }
+        // No further transition => exit
+        if state_data.is_dead_end() { break; }
+        // At the end of the buffer
+        if input.is_end(i) { break; }
+        let current = input.get_at(i);
+        i = i + 1;
+        // Try to find a transition from this state with the read character
+        state = state_data.get_target_by(current);
+    }
+    result
 }
