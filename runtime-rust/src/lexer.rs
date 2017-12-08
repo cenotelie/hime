@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+use ::std::io;
 use super::utils;
 use super::*;
 
@@ -103,6 +104,36 @@ impl PrefetchedText {
                 content.add(lead as Utf16C);
                 content.add(trail as Utf16C);
             }
+        }
+        let lines = find_lines_in(&content);
+        PrefetchedText {
+            content,
+            lines
+        }
+    }
+
+    /// Initializes this text from a UTF-16 stream
+    pub fn from_utf16_stream(input: &mut io::Read, big_endian: bool) -> PrefetchedText {
+        let reader = &mut io::BufReader::new(input);
+        let mut content = utils::BigList::<Utf16C>::new(0);
+        let iterator = utils::Utf16IteratorRaw::new(reader, big_endian);
+        for c in iterator {
+            content.add(c);
+        }
+        let lines = find_lines_in(&content);
+        PrefetchedText {
+            content,
+            lines
+        }
+    }
+
+    /// Initializes this text from a UTF-8 stream
+    pub fn from_utf8_stream(input: &mut io::Read, big_endian: bool) -> PrefetchedText {
+        let reader = &mut io::BufReader::new(input);
+        let mut content = utils::BigList::<Utf16C>::new(0);
+        let iterator = utils::Utf16IteratorOverUtf8::new(reader);
+        for c in iterator {
+            content.add(c);
         }
         let lines = find_lines_in(&content);
         PrefetchedText {
