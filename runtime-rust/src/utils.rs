@@ -201,43 +201,49 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
             return result;
         }
         // read the next byte
-        let mut c: u32 = 0; // the Unicode character
         let mut bytes: [u8; 1] = [0; 1];
         {
             let read = self.input.read(&mut bytes);
-            if read.is_err() || read.unwrap() < 1 { return None; }
-        }
-        let b0: u8 = bytes[0];
-        if b0 >> 3 == 0b11110 {
-            // this is 4 bytes encoding
-            let mut others: [u8; 3] = [0; 3];
-            let read = self.input.read(&mut others);
             if read.is_err() || read.unwrap() < 3 { return None; }
-            c = ((b0 as u32) & 0b00000111) << 18
-                | ((others[0] as u32) & 0b00111111) << 12
-                | ((others[1] as u32) & 0b00111111) << 6
-                | ((others[0] as u32) & 0b00111111);
-        } else if b0 >> 4 == 0b1110 {
-            // this is a 3 bytes encoding
-            let mut others: [u8; 2] = [0; 2];
-            let read = self.input.read(&mut others);
-            if read.is_err() || read.unwrap() < 2 { return None; }
-            c = ((b0 as u32) & 0b00001111) << 12
-                | ((others[1] as u32) & 0b00111111) << 6
-                | ((others[0] as u32) & 0b00111111);
-        } else if b0 >> 5 == 0b110 {
-            // this is a 2 bytes encoding
-            let read = self.input.read(&mut bytes);
-            if read.is_err() || read.unwrap() < 1 { return None; }
-            c = ((b0 as u32) & 0b00011111) << 6
-                | ((bytes[0] as u32) & 0b00111111);
-        } else if b0 >> 7 == 0 {
-            // this is a 1 byte encoding
-            c = b0 as u32;
-        } else {
-            // UTF-8 encoding error
-            return None;
         }
+        let b0 = bytes[0] as u8;
+
+        let c = match b0 {
+            _ if b0 >> 3 == 0b11110 => {
+                // this is 4 bytes encoding
+                let mut others: [u8; 3] = [0; 3];
+                let read = self.input.read(&mut others);
+                if read.is_err() || read.unwrap() < 3 { return None; }
+                ((b0 as u32) & 0b00000111) << 18
+                    | ((others[0] as u32) & 0b00111111) << 12
+                    | ((others[1] as u32) & 0b00111111) << 6
+                    | ((others[0] as u32) & 0b00111111)
+            }
+            _ if b0 >> 4 == 0b1110 => {
+                // this is a 3 bytes encoding
+                let mut others: [u8; 2] = [0; 2];
+                let read = self.input.read(&mut others);
+                if read.is_err() || read.unwrap() < 2 { return None; }
+                ((b0 as u32) & 0b00001111) << 12
+                    | ((others[1] as u32) & 0b00111111) << 6
+                    | ((others[0] as u32) & 0b00111111)
+            }
+            _ if b0 >> 5 == 0b110 => {
+                // this is a 2 bytes encoding
+                let read = self.input.read(&mut bytes);
+                if read.is_err() || read.unwrap() < 1 { return None; }
+                ((b0 as u32) & 0b00011111) << 6
+                    | ((bytes[0] as u32) & 0b00111111)
+            }
+            _ if b0 >> 7 == 0 => {
+                // this is a 1 byte encoding
+                b0 as u32
+            }
+            _ => {
+                return None;
+            }
+        };
+
         // now we have the decoded unicode character
         // encode it in UTF-16
         if (c >= 0xD7FF && c < 0xE000) || c >= 0x110000 {

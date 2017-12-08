@@ -128,7 +128,7 @@ impl PrefetchedText {
     }
 
     /// Initializes this text from a UTF-8 stream
-    pub fn from_utf8_stream(input: &mut io::Read, big_endian: bool) -> PrefetchedText {
+    pub fn from_utf8_stream(input: &mut io::Read) -> PrefetchedText {
         let reader = &mut io::BufReader::new(input);
         let mut content = utils::BigList::<Utf16C>::new(0);
         let iterator = utils::Utf16IteratorOverUtf8::new(reader);
@@ -505,4 +505,55 @@ fn run_dfa<T: Text>(input: &Text, index: usize, automaton: &Automaton) -> TokenM
         state = state_data.get_target_by(current);
     }
     result
+}
+
+/// Represents a DFA stack head
+struct FuzzyMatcherHead {
+    /// The associated DFA state
+    state: u32,
+    /// The data representing this head
+    errors: Option<Vec<u32>>
+}
+
+/// Implementation of `Clone` for `FuzzyMatcherHead`
+impl ::std::clone::Clone for FuzzyMatcherHead {
+    fn clone(&self) -> Self {
+        FuzzyMatcherHead {
+            state: self.state,
+            errors: self.errors.clone()
+        }
+    }
+}
+
+impl FuzzyMatcherHead {
+    /// Initializes this head with a state and a 0 distance
+    fn new(state: u32) -> FuzzyMatcherHead {
+        FuzzyMatcherHead { state, errors: None }
+    }
+
+    /// Initializes this head from a previous one
+    fn new_previous(previous: &FuzzyMatcherHead, state: u32) -> FuzzyMatcherHead {
+        FuzzyMatcherHead {
+            state,
+            errors: previous.errors.clone()
+        }
+    }
+
+    /// Initializes this erroneous head from a previous one
+    fn new_error(previous: &FuzzyMatcherHead, state: u32, offset: usize, distance: usize) -> FuzzyMatcherHead {
+        let mut errors = Vec::<u32>::with_capacity(distance);
+        if previous.errors.is_some() {
+            let others = previous.errors.as_ref().unwrap();
+            for i in 0..others.len() {
+                errors.push(others[i]);
+            }
+        }
+        errors.push(offset as u32);
+        FuzzyMatcherHead { state, errors: Some(errors) }
+    }
+
+    /// Gets the Levenshtein distance of this head form the input
+    fn get_distance(&self) -> usize {
+        if self.errors.is_none() { 0 } else { self.errors.as_ref().unwrap().len() }
+    }
 }
