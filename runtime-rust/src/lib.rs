@@ -30,7 +30,7 @@ pub struct TextSpan {
 }
 
 /// Implementation of `Clone` for `TextSpan`
-impl ::std::clone::Clone for TextSpan {
+impl std::clone::Clone for TextSpan {
     fn clone(&self) -> Self {
         TextSpan {
             index: self.index,
@@ -40,11 +40,11 @@ impl ::std::clone::Clone for TextSpan {
 }
 
 /// Implementation of `Copy` for `TextSpan`
-impl ::std::marker::Copy for TextSpan {}
+impl std::marker::Copy for TextSpan {}
 
 /// Implementation of `Display` for `TextSpan`
-impl ::std::fmt::Display for TextSpan {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+impl std::fmt::Display for TextSpan {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "@{}+{}", self.index, self.length)
     }
 }
@@ -58,7 +58,7 @@ pub struct TextPosition {
 }
 
 /// Implementation of `Clone` for `TextPosition`
-impl ::std::clone::Clone for TextPosition {
+impl std::clone::Clone for TextPosition {
     fn clone(&self) -> Self {
         TextPosition {
             line: self.line,
@@ -68,11 +68,11 @@ impl ::std::clone::Clone for TextPosition {
 }
 
 /// Implementation of `Copy` for `TextPosition`
-impl ::std::marker::Copy for TextPosition {}
+impl std::marker::Copy for TextPosition {}
 
 /// Implementation of `Display` for `TextPosition`
-impl ::std::fmt::Display for TextPosition {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+impl std::fmt::Display for TextPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "({}, {})", self.line, self.column)
     }
 }
@@ -282,7 +282,7 @@ impl Symbol {
 }
 
 /// Implementation of `Clone` for `Symbol`
-impl ::std::clone::Clone for Symbol {
+impl std::clone::Clone for Symbol {
     fn clone(&self) -> Self {
         Symbol {
             id: self.id,
@@ -292,11 +292,11 @@ impl ::std::clone::Clone for Symbol {
 }
 
 /// Implementation of `Copy` for `Symbol`
-impl ::std::marker::Copy for Symbol {}
+impl std::marker::Copy for Symbol {}
 
 /// Implementation of `Display` for `Symbol`
-impl ::std::fmt::Display for Symbol {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+impl std::fmt::Display for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "{}", self.name)
     }
 }
@@ -331,7 +331,7 @@ struct TokenRepositoryCell {
 }
 
 /// Implementation of `Clone` for `TokenRepositoryCell`
-impl ::std::clone::Clone for TokenRepositoryCell {
+impl std::clone::Clone for TokenRepositoryCell {
     fn clone(&self) -> Self {
         TokenRepositoryCell {
             terminal: self.terminal,
@@ -341,7 +341,7 @@ impl ::std::clone::Clone for TokenRepositoryCell {
 }
 
 /// Implementation of `Copy` for `TokenRepositoryCell`
-impl ::std::marker::Copy for TokenRepositoryCell {}
+impl std::marker::Copy for TokenRepositoryCell {}
 
 /// A repository of matched tokens
 struct TokenRepository<T: Text> {
@@ -362,7 +362,7 @@ pub struct Token<'a, T: 'a + Text> {
 }
 
 /// Implementation of `Clone` for `Token`
-impl<'a, T: 'a + Text> ::std::clone::Clone for Token<'a, T> {
+impl<'a, T: 'a + Text> std::clone::Clone for Token<'a, T> {
     fn clone(&self) -> Self {
         Token {
             repository: self.repository,
@@ -372,7 +372,7 @@ impl<'a, T: 'a + Text> ::std::clone::Clone for Token<'a, T> {
 }
 
 /// Implementation of `Copy` for `Token`
-impl<'a, T: 'a + Text> ::std::marker::Copy for Token<'a, T> {}
+impl<'a, T: 'a + Text> std::marker::Copy for Token<'a, T> {}
 
 /// the iterator over the tokens in a repository
 struct TokenRepositoryIterator<'a, T: 'a + Text> {

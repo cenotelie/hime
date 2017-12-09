@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+use std;
 use std::io;
 
 /// Defines the `Iterable` trait for structures that can be iterated over
@@ -88,7 +89,7 @@ impl<T: Copy> BigList<T> {
 }
 
 /// Implementation of the indexer operator for immutable BigList
-impl<T: Copy> ::std::ops::Index<usize> for BigList<T> {
+impl<T: Copy> std::ops::Index<usize> for BigList<T> {
     type Output = T;
     fn index(&self, index: usize) -> &T {
         &self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
@@ -96,7 +97,7 @@ impl<T: Copy> ::std::ops::Index<usize> for BigList<T> {
 }
 
 /// Implementation of the indexer [] operator for mutable BigList
-impl<T: Copy> ::std::ops::IndexMut<usize> for BigList<T> {
+impl<T: Copy> std::ops::IndexMut<usize> for BigList<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
     }

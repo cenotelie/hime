@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-use ::std::io;
+use std::io;
 use super::utils;
 use super::*;
 
@@ -451,7 +451,7 @@ struct DefaultContextProvider {}
 
 impl ContextProvider for DefaultContextProvider {
     fn get_context_priority(&self, context: u16, terminal_id: u32) -> usize {
-        if context == DEFAULT_CONTEXT { ::std::usize::MAX } else { 0 }
+        if context == DEFAULT_CONTEXT { std::usize::MAX } else { 0 }
     }
 }
 
@@ -516,7 +516,7 @@ struct FuzzyMatcherHead {
 }
 
 /// Implementation of `Clone` for `FuzzyMatcherHead`
-impl ::std::clone::Clone for FuzzyMatcherHead {
+impl std::clone::Clone for FuzzyMatcherHead {
     fn clone(&self) -> Self {
         FuzzyMatcherHead {
             state: self.state,
@@ -651,8 +651,7 @@ impl<'a> FuzzyMatcher<'a> {
             offset += 1;
             at_end = self.text.is_end(self.origin_index + offset);
             current = if at_end { 0 as Utf16C } else { self.text.get_at(self.origin_index + offset) };
-            let generation = self.heads.clone();
-            self.heads.clear();
+            let generation = std::mem::replace(&mut self.heads, Vec::<FuzzyMatcherHead>::new());
             for head in generation {
                 if at_end {
                     self.inspect_at_end(&head, offset);
