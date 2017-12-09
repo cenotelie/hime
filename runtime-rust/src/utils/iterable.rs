@@ -22,18 +22,12 @@
 ///
 /// # Examples
 ///
-/// Basic usage:
-///
-/// ```
-/// let s = {...}; an iterable structure
-/// for x in s.iter() {
-///    println!("{}", x);
-/// }
-/// ```
-///
 /// Implementing `Iterable` for your type:
 ///
 /// ```
+/// extern crate hime_redist;
+/// use ::hime_redist::utils::iterable::Iterable;
+///
 /// #[derive(Debug)]
 /// struct MyCollection(Vec<i32>);
 ///
@@ -49,27 +43,50 @@
 ///     }
 /// }
 ///
-/// // and we'll implement IntoIterator
-/// impl IntoIterator for MyCollection {
-///     type Item = i32;
-///     type IntoIter = ::std::vec::IntoIter<i32>;
+/// // implement an iterator for this collection
+/// struct MyCollectionIterator<'a> {
+///     collection: &'a MyCollection,
+///     index: usize
+/// }
 ///
-///     fn into_iter(self) -> Self::IntoIter {
-///         self.0.into_iter()
+/// impl<'a> Iterator for MyCollectionIterator<'a> {
+///     type Item = i32;
+///     fn next(&mut self) -> Option<Self::Item> {
+///         if self.index >= self.collection.0.len() {
+///             None
+///         } else {
+///             let result = self.collection.0[self.index];
+///             self.index = self.index + 1;
+///             Some(result)
+///         }
 ///     }
 /// }
 ///
-/// // Now we can make a new collection...
-/// let mut c = MyCollection::new();
+/// // and we'll implement Iterable
+/// impl<'a> Iterable<'a> for MyCollection {
+///     type Item = i32;
+///     type IteratorType = MyCollectionIterator<'a>;
+///     fn iter(&'a self) -> Self::IteratorType {
+///         MyCollectionIterator {
+///             collection: &self,
+///             index: 0
+///         }
+///     }
+/// }
 ///
-/// // ... add some stuff to it ...
-/// c.add(0);
-/// c.add(1);
-/// c.add(2);
+/// fn main() {
+///     // Now we can make a new collection...
+///     let mut c = MyCollection::new();
 ///
-/// // ... and then turn it into an Iterator:
-/// for (i, n) in c.into_iter().enumerate() {
-///     assert_eq!(i as i32, n);
+///     // ... add some stuff to it ...
+///     c.add(0);
+///     c.add(1);
+///     c.add(2);
+///
+///     // ... and then turn it into an Iterator:
+///     for (i, n) in c.iter().enumerate() {
+///         assert_eq!(i as i32, n);
+///     }
 /// }
 /// ```
 pub trait Iterable<'a> {

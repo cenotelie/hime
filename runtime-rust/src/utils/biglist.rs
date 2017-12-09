@@ -17,7 +17,7 @@
 
 use std::ops::Index;
 use std::ops::IndexMut;
-use super::iterable;
+use super::iterable::Iterable;
 
 
 /// The number of bits allocated to the lowest part of the index (within a chunk)
@@ -121,7 +121,7 @@ impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
 }
 
 /// Implementation of `Iterable` for `BigList`
-impl<'a, T: 'a + Copy> iterable::Iterable<'a> for BigList<T> {
+impl<'a, T: 'a + Copy> Iterable<'a> for BigList<T> {
     type Item = T;
     type IteratorType = BigListIterator<'a, T>;
     fn iter(&'a self) -> Self::IteratorType {
