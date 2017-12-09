@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! This module defines utility facilities for the Hime runtime.
+//! Utility APIs for the Hime Runtime.
 
 pub mod iterable;
 pub mod biglist;

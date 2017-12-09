@@ -15,6 +15,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Redistributable runtime for Hime-generated parsers
+//! This crate contains the runtime for lexers and parsers generated using [Hime](https://cenotelie.fr/hime).
+//! For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/hime).
+//! The code for this library is available on [Bitbucket](https://bitbucket.org/cenotelie/hime).
+//! This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
+
 pub mod utils;
 pub mod text;
 pub mod errors;

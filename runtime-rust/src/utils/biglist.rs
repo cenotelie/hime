@@ -30,7 +30,7 @@ const LOWER_MASK: usize = CHUNKS_SIZE - 1;
 const INIT_CHUNK_COUNT: usize = CHUNKS_SIZE;
 
 /// Represents a list of items that is efficient in storage and addition.
-/// Items cannot be removed or inserted.
+/// Items cannot be neither be removed nor inserted.
 pub struct BigList<T: Copy> {
     /// the neutral element
     neutral: T,

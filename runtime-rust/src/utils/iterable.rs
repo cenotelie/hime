@@ -92,7 +92,7 @@
 pub trait Iterable<'a> {
     /// The type of the elements being iterated over.
     type Item;
-    /// Which kind of iterator are we turning this into?
+    /// The type of the iterator.
     type IteratorType: Iterator<Item=Self::Item>;
     /// Creates an iterator over this `Iterable` structure.
     fn iter(&'a self) -> Self::IteratorType;
