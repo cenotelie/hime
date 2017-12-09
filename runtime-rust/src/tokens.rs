@@ -15,8 +15,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-use super::utils::iterable::Iterable;
 use super::symbols::SemanticElement;
+use super::symbols::Symbol;
+use super::symbols::SymbolType;
+use super::text::interface::Text;
+use super::text::interface::TextContext;
+use super::text::interface::TextPosition;
+use super::text::interface::TextSpan;
+use super::utils::biglist::BigList;
+use super::utils::iterable::Iterable;
 
 /// Represents the metadata of a token
 struct TokenRepositoryCell {
@@ -42,11 +49,11 @@ impl Copy for TokenRepositoryCell {}
 /// A repository of matched tokens
 pub struct TokenRepository<T: Text> {
     /// The terminal symbols matched in this content
-    terminals: utils::BigList<Symbol>,
+    terminals: BigList<Symbol>,
     /// The base text
     text: T,
     /// The token data in this content
-    cells: utils::BigList<TokenRepositoryCell>
+    cells: BigList<TokenRepositoryCell>
 }
 
 /// Represents a token as an output element of a lexer
@@ -71,7 +78,7 @@ impl<'a, T: 'a + Text> Clone for Token<'a, T> {
 impl<'a, T: 'a + Text> Copy for Token<'a, T> {}
 
 /// the iterator over the tokens in a repository
-struct TokenRepositoryIterator<'a, T: 'a + Text> {
+pub struct TokenRepositoryIterator<'a, T: 'a + Text> {
     /// The repository containing this token
     repository: &'a TokenRepository<T>,
     /// The current index within the repository
