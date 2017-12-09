@@ -15,9 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-pub mod utils;
-pub mod text;
-pub mod errors;
-pub mod symbols;
-pub mod tokens;
-//pub mod lexer;
+//! Data structures and traits related to the handling of text.
+//! Hime parsers only works on UTF-16 encoded text.
+//! This module provides facilities for interactions with UTF-16 text.
+
+pub mod utf16;
+pub mod interface;
+pub mod implementations;

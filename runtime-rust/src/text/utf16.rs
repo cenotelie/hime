@@ -15,143 +15,29 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-use std;
+//! Hime parsers only works on UTF-16 encoded text.
+//! This module provides facilities for interactions with UTF-16 text.
+
 use std::io;
 
-/// Defines the `Iterable` trait for structures that can be iterated over
-pub trait Iterable<'a> {
-    type Item;
-    type IteratorType: Iterator<Item=Self::Item>;
-    fn iter(&'a self) -> Self::IteratorType;
-}
-
-/// The number of bits allocated to the lowest part of the index (within a chunk)
-const UPPER_SHIFT: usize = 8;
-/// The size of the chunks
-const CHUNKS_SIZE: usize = 1 << UPPER_SHIFT;
-/// Bit mask for the lowest part of the index (within a chunk)
-const LOWER_MASK: usize = CHUNKS_SIZE - 1;
-/// Initial size of the higher array (pointers to the chunks)
-const INIT_CHUNK_COUNT: usize = CHUNKS_SIZE;
-
-/// Represents a list of items that is efficient in storage and addition.
-/// Items cannot be removed or inserted.
-pub struct BigList<T: Copy> {
-    /// the neutral element
-    neutral: T,
-    /// The data
-    chunks: Vec<[T; CHUNKS_SIZE]>,
-    /// The index of the current chunk
-    chunk_index: usize,
-    /// The index of the next available cell within the current chunk
-    cell_index: usize
-}
-
-/// Implementation of BigList
-impl<T: Copy> BigList<T> {
-    /// Creates a (empty) list
-    pub fn new(neutral: T) -> BigList<T> {
-        let mut my_chunks = Vec::<[T; CHUNKS_SIZE]>::with_capacity(INIT_CHUNK_COUNT);
-        my_chunks.push([neutral; CHUNKS_SIZE]);
-        BigList {
-            neutral,
-            chunks: my_chunks,
-            chunk_index: 0,
-            cell_index: 0
-        }
-    }
-
-    pub fn size(&self) -> usize {
-        (self.chunk_index * CHUNKS_SIZE) + self.cell_index
-    }
-
-    /// Adds a value at the end of the list
-    pub fn add(&mut self, value: T) -> usize {
-        if self.cell_index == CHUNKS_SIZE {
-            self.add_chunk();
-        }
-        self.chunks[self.chunk_index][self.cell_index] = value;
-        let result = self.chunk_index << UPPER_SHIFT | self.cell_index;
-        self.cell_index = self.cell_index + 1;
-        result
-    }
-
-    /// Adds a new chunk to this list
-    fn add_chunk(&mut self) {
-        if self.chunk_index == self.chunks.len() - 1 {
-            // we are currently on the last chunk for the allocated ones
-            // allocate a new one
-            self.chunks.push([self.neutral; CHUNKS_SIZE]);
-        }
-        self.chunk_index = self.chunk_index + 1;
-        self.cell_index = 0;
-    }
-}
-
-/// Implementation of the indexer operator for immutable BigList
-impl<T: Copy> std::ops::Index<usize> for BigList<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        &self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
-    }
-}
-
-/// Implementation of the indexer [] operator for mutable BigList
-impl<T: Copy> std::ops::IndexMut<usize> for BigList<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        &mut self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
-    }
-}
-
-/// An iterator over a BigList
-pub struct BigListIterator<'a, T: 'a + Copy> {
-    /// The parent list
-    list: &'a BigList<T>,
-    /// The current index within the list
-    index: usize
-}
-
-/// Implementation of the `Iterator` trait for `BigListIterator`
-impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
-    type Item = T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.list.size() {
-            None
-        } else {
-            let result = self.list[self.index];
-            self.index = self.index + 1;
-            Some(result)
-        }
-    }
-}
-
-/// Implementation of `Iterable` for `BigList`
-impl<'a, T: 'a + Copy> Iterable<'a> for BigList<T> {
-    type Item = T;
-    type IteratorType = BigListIterator<'a, T>;
-    fn iter(&'a self) -> Self::IteratorType {
-        BigListIterator {
-            list: &self,
-            index: 0
-        }
-    }
-}
-
-#[test]
-fn test_big_list() {
-    let mut list = BigList::<char>::new('\0');
-    assert_eq!(list.size(), 0);
-    list.add('t');
-    assert_eq!(list.size(), 1);
-    assert_eq!(list[0], 't');
-    for x in list.iter() {
-        assert_eq!(x, 't');
-    }
-}
+/// `Utf16C` represents a single UTF-16 code unit.
+/// A UTF-16 code unit is always represented as a 16 bits unsigned integer.
+/// UTF-16 code units may not represent by themselves valid Unicode code points (characters).
+/// A Unicode code point (a character) is a 32-bits unsigned integer in the ranges:
+/// U+0000 to U+D7FF and U+E000 to U+FFFF and U+10000 to U+10FFFF.
+/// Unicode code points in the range U+D800 to U+DFFF are reserved and cannot be used.
+/// UTF-16 can be used to encode a single Unicode code point in either one or two UTF-16 code units.
+///
+/// See [UTF-16](https://en.wikipedia.org/wiki/UTF-16) for more details.
+pub type Utf16C = u16;
 
 
-/// Provides an iterator of UTF-16 code points
-/// over an input of bytes assumed to represent UTF-16 code points
+/// `Utf16IteratorRaw` provides an iterator of UTF-16 code units
+/// over an input of bytes assumed to represent UTF-16 code units
+///
+/// Example:
+/// ```
+/// ```
 pub struct Utf16IteratorRaw<'a> {
     /// whether to use big-endian or little-endian
     big_endian: bool,
@@ -160,7 +46,7 @@ pub struct Utf16IteratorRaw<'a> {
 }
 
 impl<'a> Iterator for Utf16IteratorRaw<'a> {
-    type Item = super::Utf16C;
+    type Item = Utf16C;
     fn next(&mut self) -> Option<Self::Item> {
         // read two bytes
         let mut bytes: [u8; 2] = [0; 2];
@@ -189,11 +75,11 @@ pub struct Utf16IteratorOverUtf8<'a> {
     /// The input reader
     input: &'a mut io::Read,
     /// The next UTF-16 code point, if any
-    next: Option<super::Utf16C>
+    next: Option<Utf16C>
 }
 
 impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
-    type Item = super::Utf16C;
+    type Item = Utf16C;
     fn next(&mut self) -> Option<Self::Item> {
         // do we have a cached
         if !self.next.is_none() {
@@ -253,15 +139,15 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
         }
         if c <= 0xFFFF {
             // simple case
-            return Some(c as super::Utf16C);
+            return Some(c as Utf16C);
         }
         // we need to encode
         let temp = c - 0x10000;
         let lead = (temp >> 10) + 0xD800;
         let trail = (temp & 0x03FF) + 0xDC00;
         // store the trail and return the lead
-        self.next = Some(trail as super::Utf16C);
-        Some(lead as super::Utf16C)
+        self.next = Some(trail as Utf16C);
+        Some(lead as Utf16C)
     }
 }
 

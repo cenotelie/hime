@@ -15,9 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-pub mod utils;
-pub mod text;
-pub mod errors;
-pub mod symbols;
-pub mod tokens;
-//pub mod lexer;
+//! This module defines utility facilities for the Hime runtime.
+
+pub mod iterable;
+pub mod biglist;
