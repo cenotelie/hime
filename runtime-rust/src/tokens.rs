@@ -51,7 +51,7 @@ impl Copy for TokenRepositoryCell {}
 /// A repository of matched tokens
 pub struct TokenRepository<T: Text> {
     /// The terminal symbols matched in this content
-    terminals: BigList<Symbol>,
+    terminals: Vec<Symbol>,
     /// The base text
     text: T,
     /// The token data in this content

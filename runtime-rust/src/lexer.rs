@@ -26,42 +26,7 @@ use super::*;
 
 
 
-/// Represents the kernel of a token, i.e. the identifying information of a token
-pub struct TokenKernel {
-    /// The identifier of the matched terminal
-    terminal_id: u32,
-    /// The token's index in its repository
-    index: u32
-}
 
-
-
-
-/// Represents a base lexer
-pub trait Lexer<'a, T: 'a + Text, X: 'a + utils::Iterable<'a, Item=Token<'a, T>>> {
-    /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &[Symbol];
-
-    /// Gets the lexer's input text
-    fn get_input(&self) -> &Text;
-
-    /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &X;
-
-    /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
-    /// A distance of 0 indicates no recovery.
-    fn get_recovery_distance(&self) -> u32;
-
-    /// Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
-    /// A distance of 0 indicates no recovery.
-    fn set_recovery_distance(&mut self, distance: u32);
-
-    /// Gets the function for handling lexical errors
-    fn get_lexical_error_handler(&self) -> fn(Box<ParseError>);
-
-    /// Gets the next token in the input
-    fn get_next_token() -> Token<'a, T>;
-}
 
 /// Runs the lexer's DFA to match a terminal in the input ahead
 fn run_dfa<T: Text>(input: &Text, index: usize, automaton: &Automaton) -> TokenMatch {
