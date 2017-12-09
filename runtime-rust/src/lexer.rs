@@ -35,21 +35,7 @@ pub struct TokenKernel {
 }
 
 
-pub trait ContextProvider {
-    /// Gets the priority of the specified context required by the specified terminal
-    /// The priority is a positive integer. The lesser the value the higher the priority.
-    /// A negative value represents the unavailability of the required context.
-    fn get_context_priority(&self, context: u16, terminal_id: u32) -> usize;
-}
 
-/// The default context provider
-struct DefaultContextProvider {}
-
-impl ContextProvider for DefaultContextProvider {
-    fn get_context_priority(&self, context: u16, terminal_id: u32) -> usize {
-        if context == DEFAULT_CONTEXT { std::usize::MAX } else { 0 }
-    }
-}
 
 /// Represents a base lexer
 pub trait Lexer<'a, T: 'a + Text, X: 'a + utils::Iterable<'a, Item=Token<'a, T>>> {

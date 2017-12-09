@@ -21,8 +21,6 @@ use super::super::utils::bin::*;
 
 /// Identifier of an invalid state in an automaton
 pub const DEAD_STATE: u32 = 0xFFFF;
-/// Identifier of the default context
-pub const DEFAULT_CONTEXT: u16 = 0;
 
 /// Represents the information of a terminal matched at the state of a lexer's automaton
 pub struct MatchedTerminal {

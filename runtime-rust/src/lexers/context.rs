@@ -15,7 +15,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Defines the API for lexers
+use std::usize;
 
-pub mod automaton;
-pub mod context;
+/// Identifier of the default context
+pub const DEFAULT_CONTEXT: u16 = 0;
+
+/// Defines the context provider as a function that gets
+/// the priority of the specified context required by the specified terminal.
+/// The priority is an unsigned integer. The lesser the value the higher the priority.
+/// The absence of value represents the unavailability of the required context.
+pub type ContextProvider = fn(u16, u32) -> Option<usize>;
+
+/// Gets the priority of the specified context required by the specified terminal
+/// The priority is an unsigned integer. The lesser the value the higher the priority.
+/// The absence of value represents the unavailability of the required context.
+pub fn default_context_provider(context: u16, _terminal_id: u32) -> Option<usize> {
+    if context == DEFAULT_CONTEXT { Some(usize::MAX) } else { Some(0) }
+}
