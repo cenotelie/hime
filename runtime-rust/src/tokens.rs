@@ -114,12 +114,41 @@ impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<T> {
 }
 
 impl<T: Text> TokenRepository<T> {
+    /// Creates a new repository
+    pub fn new(terminals: Vec<Symbol>, text: T) -> TokenRepository<T> {
+        TokenRepository {
+            terminals,
+            text,
+            cells: BigList::<TokenRepositoryCell>::new(TokenRepositoryCell { terminal: 0, span: TextSpan { index: 0, length: 0 } })
+        }
+    }
+
     /// Registers a new token in this repository
     pub fn add(&mut self, terminal: usize, index: usize, length: usize) -> usize {
         self.cells.add(TokenRepositoryCell {
             terminal,
             span: TextSpan { index, length }
         })
+    }
+
+    /// Gets the terminals
+    pub fn get_terminals(&self) -> &Vec<Symbol> {
+        &self.terminals
+    }
+
+    /// Gets the input text
+    pub fn get_input(&self) -> &T {
+        &self.text
+    }
+
+    /// Gets the number of tokens in this repository
+    pub fn get_tokens_count(&self) -> usize {
+        self.cells.size()
+    }
+
+    /// Gets the terminal's identifier for the i-th token
+    pub fn get_symbol_id_for(&self, index: usize) -> u32 {
+        self.terminals[self.cells[index].terminal].id
     }
 }
 

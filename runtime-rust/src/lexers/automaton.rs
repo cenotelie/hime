@@ -188,12 +188,12 @@ pub struct TokenMatch {
 }
 
 /// Runs the lexer's DFA to match a terminal in the input ahead
-pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> TokenMatch {
+pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<TokenMatch> {
     if input.is_end(index) {
-        return TokenMatch { state: 0, length: 0 };
+        return Some(TokenMatch { state: 0, length: 0 });
     }
 
-    let mut result = TokenMatch { state: DEAD_STATE, length: 0 };
+    let mut result = None;
     let mut state = 0;
     let mut i = index;
 
@@ -201,7 +201,7 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> TokenMatch 
         let state_data = automaton.get_state(state);
         // Is this state a matching state ?
         if state_data.get_terminals_count() > 0 {
-            result = TokenMatch { state, length: (i - index) as u32 };
+            result = Some(TokenMatch { state, length: (i - index) as u32 });
         }
         // No further transition => exit
         if state_data.is_dead_end() {

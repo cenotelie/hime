@@ -20,14 +20,6 @@ use super::utils;
 use super::*;
 
 
-
-
-
-
-
-
-
-
 /// Runs the lexer's DFA to match a terminal in the input ahead
 fn run_dfa<T: Text>(input: &Text, index: usize, automaton: &Automaton) -> TokenMatch {
     if input.is_end(index) {

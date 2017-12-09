@@ -29,7 +29,7 @@ pub struct TokenKernel {
 }
 
 /// The public interface of a lexer
-pub trait Lexer<'a, T: 'a + Text> {
+pub trait Lexer<T: Text> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &Vec<Symbol>;
 
@@ -48,5 +48,5 @@ pub trait Lexer<'a, T: 'a + Text> {
     fn set_recovery_distance(&mut self, distance: u32);
 
     /// Gets the next token in the input
-    fn get_next_token(&mut self, contexts: ContextProvider) -> TokenKernel;
+    fn get_next_token(&mut self, contexts: ContextProvider) -> Option<TokenKernel>;
 }

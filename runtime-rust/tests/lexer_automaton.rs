@@ -36,6 +36,8 @@ fn test_running() {
     let automaton = Automaton::new(LEXER_AUTOMATON);
     let input = PrefetchedText::new("var");
     let result = run_dfa(&automaton, &input, 0);
-    assert_ne!(result.state, DEAD_STATE);
-    assert_eq!(result.length, 3);
+    assert!(result.is_some());
+    let data = result.unwrap();
+    assert_ne!(data.state, DEAD_STATE);
+    assert_eq!(data.length, 3);
 }
