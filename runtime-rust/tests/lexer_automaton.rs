@@ -17,11 +17,13 @@
 
 extern crate hime_redist;
 
-/*
+use ::hime_redist::lexers::automaton::Automaton;
+
+/// Static resource for the serialized lexer automaton
 const LEXER_AUTOMATON: &'static [u8] = include_bytes!("HimeGrammarLexer.bin");
 
 #[test]
 fn test_lexer_automaton() {
-    let automaton = ::hime_redist::lexer::Automaton::new(LEXER_AUTOMATON);
+    let automaton = Automaton::new(LEXER_AUTOMATON);
     assert_eq!(automaton.get_states_count(), 157);
-}*/
+}

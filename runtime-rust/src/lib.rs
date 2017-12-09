@@ -26,4 +26,5 @@ pub mod text;
 pub mod errors;
 pub mod symbols;
 pub mod tokens;
+pub mod lexers;
 //pub mod lexer;

@@ -15,8 +15,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Utility APIs for the Hime Runtime.
+//! Defines the API for lexers
 
-pub mod iterable;
-pub mod biglist;
-pub mod bin;
+pub mod automaton;
