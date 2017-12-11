@@ -33,6 +33,7 @@ pub struct MatchedTerminal {
 /// Represents a transition in the automaton of a lexer
 /// A transition is matched by a range of UTF-16 code points
 /// Its target is a state in the automaton
+#[derive(Copy, Clone)]
 pub struct AutomatonTransition {
     /// Start of the range
     start: Utf16C,
@@ -41,20 +42,6 @@ pub struct AutomatonTransition {
     /// The transition's target
     target: u32
 }
-
-/// Implementation of `Clone` for `AutomatonTransition`
-impl Clone for AutomatonTransition {
-    fn clone(&self) -> Self {
-        AutomatonTransition {
-            start: self.start,
-            end: self.end,
-            target: self.target
-        }
-    }
-}
-
-/// Implementation of `Copy` for `AutomatonTransition`
-impl Copy for AutomatonTransition {}
 
 impl AutomatonTransition {
     /// Get whether this transition matches the specified character

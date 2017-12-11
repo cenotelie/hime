@@ -29,21 +29,12 @@ use super::super::text::interface::Text;
 use super::super::text::utf16::Utf16C;
 
 /// Represents a DFA stack head
+#[derive(Clone)]
 struct FuzzyMatcherHead {
     /// The associated DFA state
     state: u32,
     /// The data representing this head
     errors: Option<Vec<u32>>
-}
-
-/// Implementation of `Clone` for `FuzzyMatcherHead`
-impl Clone for FuzzyMatcherHead {
-    fn clone(&self) -> Self {
-        FuzzyMatcherHead {
-            state: self.state,
-            errors: self.errors.clone()
-        }
-    }
 }
 
 impl FuzzyMatcherHead {

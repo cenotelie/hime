@@ -23,25 +23,13 @@ use std::fmt::Error;
 use super::utf16::Utf16C;
 
 /// Represents a span of text in an input as a starting index and length
+#[derive(Copy, Clone)]
 pub struct TextSpan {
     /// The starting index
     pub index: usize,
     /// The length
     pub length: usize
 }
-
-/// Implementation of `Clone` for `TextSpan`
-impl Clone for TextSpan {
-    fn clone(&self) -> Self {
-        TextSpan {
-            index: self.index,
-            length: self.length
-        }
-    }
-}
-
-/// Implementation of `Copy` for `TextSpan`
-impl Copy for TextSpan {}
 
 /// Implementation of `Display` for `TextSpan`
 impl Display for TextSpan {
@@ -51,25 +39,13 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
+#[derive(Copy, Clone)]
 pub struct TextPosition {
     /// The line number
     pub line: usize,
     /// The column number
     pub column: usize
 }
-
-/// Implementation of `Clone` for `TextPosition`
-impl Clone for TextPosition {
-    fn clone(&self) -> Self {
-        TextPosition {
-            line: self.line,
-            column: self.column
-        }
-    }
-}
-
-/// Implementation of `Copy` for `TextPosition`
-impl Copy for TextPosition {}
 
 /// Implementation of `Display` for `TextPosition`
 impl Display for TextPosition {

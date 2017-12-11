@@ -44,25 +44,13 @@ pub const SID_EPSILON: u32 = 1;
 pub const SID_DOLLAR: u32 = 2;
 
 /// Represents a grammar symbol (terminal, variable or virtual)
+#[derive(Copy, Clone)]
 pub struct Symbol {
     /// The symbol's unique identifier
     pub id: u32,
     /// The symbol's name
     pub name: &'static str
 }
-
-/// Implementation of `Clone` for `Symbol`
-impl Clone for Symbol {
-    fn clone(&self) -> Self {
-        Symbol {
-            id: self.id,
-            name: self.name
-        }
-    }
-}
-
-/// Implementation of `Copy` for `Symbol`
-impl Copy for Symbol {}
 
 /// Implementation of `Display` for `Symbol`
 impl Display for Symbol {

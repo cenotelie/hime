@@ -28,25 +28,13 @@ use super::utils::biglist::BigList;
 use super::utils::iterable::Iterable;
 
 /// Represents the metadata of a token
+#[derive(Copy, Clone)]
 struct TokenRepositoryCell {
     /// The terminal's index
     terminal: usize,
     /// The span of this token
     span: TextSpan
 }
-
-/// Implementation of `Clone` for `TokenRepositoryCell`
-impl Clone for TokenRepositoryCell {
-    fn clone(&self) -> Self {
-        TokenRepositoryCell {
-            terminal: self.terminal,
-            span: self.span
-        }
-    }
-}
-
-/// Implementation of `Copy` for `TokenRepositoryCell`
-impl Copy for TokenRepositoryCell {}
 
 /// A repository of matched tokens
 pub struct TokenRepository<T: Text> {
