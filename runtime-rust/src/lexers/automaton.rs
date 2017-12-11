@@ -36,11 +36,11 @@ pub struct MatchedTerminal {
 #[derive(Copy, Clone)]
 pub struct AutomatonTransition {
     /// Start of the range
-    start: Utf16C,
+    pub start: Utf16C,
     /// End of the range
-    end: Utf16C,
+    pub end: Utf16C,
     /// The transition's target
-    target: u32
+    pub target: u32
 }
 
 impl AutomatonTransition {
@@ -65,6 +65,7 @@ impl AutomatonTransition {
 /// u16: start of the range
 /// u16: end of the range
 /// u16: next state's index
+#[derive(Copy, Clone)]
 pub struct AutomatonState<'a> {
     /// The automaton table
     table: &'a [u16],

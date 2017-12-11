@@ -51,6 +51,9 @@ pub trait ParseError {
     fn get_message(&self) -> String;
 }
 
+/// A handler (or register) of lexical and parsing errors
+pub type ParseErrorHandler = fn(&ParseError);
+
 /// Represents the unexpected of the input text while more characters were expected
 #[derive(Copy, Clone)]
 pub struct ParseErrorEndOfInput {
