@@ -15,36 +15,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-use std::io;
-use super::utils;
-use super::*;
+use std::mem::replace;
 
-
-/// Runs the lexer's DFA to match a terminal in the input ahead
-fn run_dfa<T: Text>(input: &Text, index: usize, automaton: &Automaton) -> TokenMatch {
-    if input.is_end(index) {
-        return TokenMatch { state: 0, length: 0 };
-    }
-    let mut result = TokenMatch { state: DEAD_STATE, length: 0 };
-    let mut state: u32 = 0;
-    let mut i = index;
-    while state != DEAD_STATE {
-        let state_data = automaton.get_state(state);
-        // Is this state a matching state ?
-        if state_data.get_terminals_count() != 0 {
-            result = TokenMatch { state, length: (i - index) as u32 };
-        }
-        // No further transition => exit
-        if state_data.is_dead_end() { break; }
-        // At the end of the buffer
-        if input.is_end(i) { break; }
-        let current = input.get_at(i);
-        i = i + 1;
-        // Try to find a transition from this state with the read character
-        state = state_data.get_target_by(current);
-    }
-    result
-}
+use super::automaton::Automaton;
+use super::automaton::DEAD_STATE;
+use super::automaton::TokenMatch;
+use super::super::errors::ParseError;
+use super::super::errors::ParseErrorUnexpectedChar;
+use super::super::text::interface::Text;
+use super::super::text::utf16::Utf16C;
 
 /// Represents a DFA stack head
 struct FuzzyMatcherHead {
@@ -55,7 +34,7 @@ struct FuzzyMatcherHead {
 }
 
 /// Implementation of `Clone` for `FuzzyMatcherHead`
-impl std::clone::Clone for FuzzyMatcherHead {
+impl Clone for FuzzyMatcherHead {
     fn clone(&self) -> Self {
         FuzzyMatcherHead {
             state: self.state,
@@ -190,7 +169,7 @@ impl<'a> FuzzyMatcher<'a> {
             offset += 1;
             at_end = self.text.is_end(self.origin_index + offset);
             current = if at_end { 0 as Utf16C } else { self.text.get_at(self.origin_index + offset) };
-            let generation = std::mem::replace(&mut self.heads, Vec::<FuzzyMatcherHead>::new());
+            let generation = replace(&mut self.heads, Vec::<FuzzyMatcherHead>::new());
             for head in generation {
                 if at_end {
                     self.inspect_at_end(&head, offset);
@@ -227,10 +206,10 @@ impl<'a> FuzzyMatcher<'a> {
 
     /// Constructs the solution when failed to fix the error
     fn on_failure(&mut self) -> TokenMatch {
-        self.errors.push(Box::new(ParseErrorUnexpectedChar {
-            unexpected: [self.text.get_at(self.origin_index), 0],
-            position: self.text.get_position_at(self.origin_index)
-        }));
+        self.errors.push(Box::new(ParseErrorUnexpectedChar::new(
+            self.text.get_position_at(self.origin_index),
+            [self.text.get_at(self.origin_index), 0]
+        )));
         TokenMatch { state: DEAD_STATE, length: 1 }
     }
 

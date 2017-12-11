@@ -117,3 +117,10 @@ impl ParseError for ParseErrorUnexpectedChar {
         result
     }
 }
+
+impl ParseErrorUnexpectedChar {
+    /// Creates a new error
+    pub fn new(position: TextPosition, unexpected: [Utf16C; 2]) -> ParseErrorUnexpectedChar {
+        ParseErrorUnexpectedChar { position, unexpected }
+    }
+}
