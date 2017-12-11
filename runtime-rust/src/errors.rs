@@ -52,6 +52,7 @@ pub trait ParseError {
 }
 
 /// Represents the unexpected of the input text while more characters were expected
+#[derive(Copy, Clone)]
 pub struct ParseErrorEndOfInput {
     /// The error's position in the input text
     position: TextPosition
@@ -87,6 +88,7 @@ impl ParseErrorEndOfInput {
 }
 
 /// Represents an unexpected character error in the input stream of a lexer
+#[derive(Copy, Clone)]
 pub struct ParseErrorUnexpectedChar {
     /// The error's position in the input text
     position: TextPosition,
@@ -139,6 +141,7 @@ impl ParseErrorUnexpectedChar {
 }
 
 /// Represents an incorrect encoding sequence error in the input of a lexer
+#[derive(Copy, Clone)]
 pub struct ParseErrorIncorrectEncodingSequence {
     /// The error's position in the input text
     position: TextPosition,

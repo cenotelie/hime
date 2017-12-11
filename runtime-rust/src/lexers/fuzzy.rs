@@ -89,7 +89,7 @@ struct FuzzyMatcher<'a> {
     /// The input text
     text: &'a Text,
     /// Delegate for raising errors
-    errors: fn(Box<ParseError>),
+    errors: fn(&ParseError),
     /// The maximum Levenshtein distance between the input and the DFA
     max_distance: usize,
     /// The index in the input from which the error was raised
@@ -104,7 +104,7 @@ struct FuzzyMatcher<'a> {
 
 impl<'a> FuzzyMatcher<'a> {
     /// Initializes this matcher
-    pub fn new(automaton: Automaton, separator: u32, text: &'a Text, errors: fn(Box<ParseError>), max_distance: usize, origin_index: usize) -> FuzzyMatcher<'a> {
+    pub fn new(automaton: Automaton, separator: u32, text: &'a Text, errors: fn(&ParseError), max_distance: usize, origin_index: usize) -> FuzzyMatcher<'a> {
         FuzzyMatcher {
             automaton,
             separator,
@@ -203,16 +203,16 @@ impl<'a> FuzzyMatcher<'a> {
             let c = self.text.get_at(index - 1);
             if c >= 0xD800 && c <= 0xDBFF {
                 // a trailing UTF-16 high surrogate
-                (self.errors)(Box::new(ParseErrorIncorrectEncodingSequence::new(
+                (self.errors)(&ParseErrorIncorrectEncodingSequence::new(
                     self.text.get_position_at(index - 1),
                     ParseErrorType::IncorrectUTF16NoLowSurrogate,
                     c
-                )));
+                ));
             } else {
                 // usual unexpected end of input
-                (self.errors)(Box::new(ParseErrorEndOfInput::new(
+                (self.errors)(&ParseErrorEndOfInput::new(
                     self.text.get_position_at(index)
-                )));
+                ));
             }
         } else {
             let c = self.text.get_at(index);
@@ -222,17 +222,17 @@ impl<'a> FuzzyMatcher<'a> {
                 let c2 = self.text.get_at(index + 1);
                 if c2 >= 0xDC00 && c2 <= 0xDFFF {
                     // an unexpected high and low surrogate pair
-                    (self.errors)(Box::new(ParseErrorUnexpectedChar::new(
+                    (self.errors)(&ParseErrorUnexpectedChar::new(
                         self.text.get_position_at(index),
                         [c, c2]
-                    )));
+                    ));
                 } else {
                     // high surrogate without the low surrogate
-                    (self.errors)(Box::new(ParseErrorIncorrectEncodingSequence::new(
+                    (self.errors)(&ParseErrorIncorrectEncodingSequence::new(
                         self.text.get_position_at(index),
                         ParseErrorType::IncorrectUTF16NoLowSurrogate,
                         c
-                    )));
+                    ));
                 }
             } else if c >= 0xDC00 && c <= 0xDFFF && index > 0 {
                 // a UTF-16 low surrogate
@@ -240,34 +240,34 @@ impl<'a> FuzzyMatcher<'a> {
                 let c2 = self.text.get_at(index - 1);
                 if c2 >= 0xD800 && c2 <= 0xDBFF {
                     // an unexpected high and low surrogate pair
-                    (self.errors)(Box::new(ParseErrorUnexpectedChar::new(
+                    (self.errors)(&ParseErrorUnexpectedChar::new(
                         self.text.get_position_at(index - 1),
                         [c2, c]
-                    )));
+                    ));
                 } else {
                     // a low surrogate without the high surrogate
-                    (self.errors)(Box::new(ParseErrorIncorrectEncodingSequence::new(
+                    (self.errors)(&ParseErrorIncorrectEncodingSequence::new(
                         self.text.get_position_at(index),
                         ParseErrorType::IncorrectUTF16NoHighSurrogate,
                         c
-                    )));
+                    ));
                 }
             } else {
                 // a simple unexpected character
-                (self.errors)(Box::new(ParseErrorUnexpectedChar::new(
+                (self.errors)(&ParseErrorUnexpectedChar::new(
                     self.text.get_position_at(index),
                     [c, 0]
-                )));
+                ));
             }
         }
     }
 
     /// Constructs the solution when failed to fix the error
     fn on_failure(&mut self) -> TokenMatch {
-        (self.errors)(Box::new(ParseErrorUnexpectedChar::new(
+        (self.errors)(&ParseErrorUnexpectedChar::new(
             self.text.get_position_at(self.origin_index),
             [self.text.get_at(self.origin_index), 0]
-        )));
+        ));
         TokenMatch { state: DEAD_STATE, length: 1 }
     }
 
