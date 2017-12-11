@@ -21,13 +21,19 @@ use text::utf16::Utf16C;
 use text::interface::TextPosition;
 
 /// Specifies the type of error
+#[derive(PartialEq)]
+#[derive(Copy, Clone)]
 pub enum ParseErrorType {
     /// Lexical error occurring when the end of input has been encountered while more characters were expected
-    UnexpectedEndOfInput,
+    UnexpectedEndOfInput = 1,
     /// Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
-    UnexpectedChar,
+    UnexpectedChar = 2,
     /// Syntactic error occurring when an unexpected token is encountered by the parser
-    UnexpectedToken
+    UnexpectedToken = 3,
+    /// Lexical error occurring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+    IncorrectUTF16NoLowSurrogate = 4,
+    /// Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
+    IncorrectUTF16NoHighSurrogate = 5
 }
 
 /// Represents an error in a parser
@@ -70,6 +76,13 @@ impl ParseError for ParseErrorEndOfInput {
     /// Gets the error's message
     fn get_message(&self) -> String {
         String::from("Unexpected end of input")
+    }
+}
+
+impl ParseErrorEndOfInput {
+    /// Creates a new error
+    pub fn new(position: TextPosition) -> ParseErrorEndOfInput {
+        ParseErrorEndOfInput { position }
     }
 }
 
@@ -122,5 +135,58 @@ impl ParseErrorUnexpectedChar {
     /// Creates a new error
     pub fn new(position: TextPosition, unexpected: [Utf16C; 2]) -> ParseErrorUnexpectedChar {
         ParseErrorUnexpectedChar { position, unexpected }
+    }
+}
+
+/// Represents an incorrect encoding sequence error in the input of a lexer
+pub struct ParseErrorIncorrectEncodingSequence {
+    /// The error's position in the input text
+    position: TextPosition,
+    /// The precise error type
+    error_type: ParseErrorType,
+    /// The incorrect sequence
+    sequence: Utf16C
+}
+
+impl ParseError for ParseErrorIncorrectEncodingSequence {
+    /// Gets the error's type
+    fn get_type(&self) -> ParseErrorType {
+        *(&self.error_type)
+    }
+
+    /// Gets the error's position in the input
+    fn get_position(&self) -> TextPosition {
+        *(&self.position)
+    }
+
+    /// Gets the error's length in the input (in number of characters)
+    fn get_length(&self) -> usize { 1 }
+
+    /// Gets the error's message
+    fn get_message(&self) -> String {
+        let mut result = String::new();
+        result.push_str("Incorrect encoding sequence: [");
+        if self.error_type == ParseErrorType::IncorrectUTF16NoHighSurrogate {
+            result.push_str("<missing> ");
+            result.push_str("0x");
+            result.push_str(&format!("{:X}", self.sequence));
+        } else if self.error_type == ParseErrorType::IncorrectUTF16NoLowSurrogate {
+            result.push_str("0x");
+            result.push_str(&format!("{:X}", self.sequence));
+            result.push_str(" <missing>");
+        }
+        result.push_str("]");
+        result
+    }
+}
+
+impl ParseErrorIncorrectEncodingSequence {
+    /// Initializes this error
+    pub fn new(position: TextPosition, error_type: ParseErrorType, sequence: Utf16C) -> ParseErrorIncorrectEncodingSequence {
+        ParseErrorIncorrectEncodingSequence {
+            position,
+            error_type,
+            sequence
+        }
     }
 }
