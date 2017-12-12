@@ -41,11 +41,11 @@ pub trait Lexer<T: Text> {
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    fn get_recovery_distance(&self) -> u32;
+    fn get_recovery_distance(&self) -> usize;
 
     /// Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    fn set_recovery_distance(&mut self, distance: u32);
+    fn set_recovery_distance(&mut self, distance: usize);
 
     /// Gets the next token in the input
     fn get_next_token(&mut self, contexts: ContextProvider) -> Option<TokenKernel>;

@@ -16,16 +16,20 @@
  ******************************************************************************/
 
 use super::automaton::Automaton;
+use super::automaton::TokenMatch;
 use super::automaton::run_dfa;
 use super::context::ContextProvider;
+use super::fuzzy::FuzzyMatcher;
 use super::interface::Lexer;
 use super::interface::TokenKernel;
+use super::super::errors::ParseErrorHandler;
+use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::symbols::Symbol;
 use super::super::text::interface::Text;
 use super::super::tokens::TokenRepository;
 
 /// The default maximum Levenshtein distance to go to for the recovery of a matching failure
-const DEFAULT_RECOVERY_MATCHING_DISTANCE: u32 = 3;
+const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Represents a context-free lexer (lexing rules do not depend on the context)
 pub struct ContextFreeLexer<T: Text> {
@@ -41,7 +45,9 @@ pub struct ContextFreeLexer<T: Text> {
     index: usize,
     /// The maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    recovery: u32
+    recovery: usize,
+    /// Delegate for raising errors
+    errors: ParseErrorHandler
 }
 
 impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
@@ -62,13 +68,13 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    fn get_recovery_distance(&self) -> u32 {
+    fn get_recovery_distance(&self) -> usize {
         self.recovery
     }
 
     /// Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    fn set_recovery_distance(&mut self, distance: u32) {
+    fn set_recovery_distance(&mut self, distance: usize) {
         self.recovery = distance;
     }
 
@@ -91,14 +97,15 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
 
 impl<T: Text> ContextFreeLexer<T> {
     /// Creates a new lexer
-    pub fn new(terminals: Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<T> {
+    pub fn new(terminals: Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32, errors: ParseErrorHandler) -> ContextFreeLexer<T> {
         ContextFreeLexer {
             repository: TokenRepository::new(terminals, text),
             automaton,
             has_run: false,
             separator_id,
             index: 0,
-            recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE
+            recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
+            errors
         }
     }
 
@@ -106,10 +113,10 @@ impl<T: Text> ContextFreeLexer<T> {
     fn find_tokens(&mut self) {
         let mut index = 0;
         loop {
-            let result = run_dfa(&self.automaton, self.repository.get_input(), index);
+            let mut result = run_dfa(&self.automaton, self.repository.get_input(), index);
             if result.is_none() {
                 // failed to match, retry with error handling
-                // TODO: complete here
+                result = self.on_error(index);
             }
             if result.is_none() {
                 // skip this character
@@ -131,6 +138,35 @@ impl<T: Text> ContextFreeLexer<T> {
                     index += the_match.length as usize;
                 }
             }
+        }
+    }
+
+    /// When an error occurred
+    fn on_error(&self, origin_index: usize) -> Option<TokenMatch> {
+        if self.recovery <= 0 {
+            (self.errors)(&ParseErrorUnexpectedChar::new(
+                self.repository.get_input().get_position_at(origin_index),
+                [self.repository.get_input().get_at(origin_index), 0]
+            ));
+            None
+        } else {
+            let mut separator_index = 0;
+            for i in 0..self.repository.get_terminals().len() {
+                let terminal = self.repository.get_terminals()[i];
+                if terminal.id == self.separator_id {
+                    separator_index = i;
+                    break;
+                }
+            }
+            let matcher = FuzzyMatcher::new(
+                &self.automaton,
+                separator_index as u32,
+                self.repository.get_input(),
+                self.errors,
+                self.recovery,
+                origin_index
+            );
+            Some(matcher.run())
         }
     }
 }

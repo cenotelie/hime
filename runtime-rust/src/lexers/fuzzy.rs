@@ -84,7 +84,7 @@ impl FuzzyMatcherHead {
 /// When multiple solutions are at the same Levenshtein distance to the input, the longest one is preferred.
 pub struct FuzzyMatcher<'a> {
     /// This lexer's automaton
-    automaton: Automaton,
+    automaton: &'a Automaton,
     /// Terminal index of the SEPARATOR terminal
     separator: u32,
     /// The input text
@@ -151,7 +151,7 @@ impl FuzzyMatcherResult {
 
 impl<'a> FuzzyMatcher<'a> {
     /// Initializes this matcher
-    pub fn new(automaton: Automaton, separator: u32, text: &'a Text, errors: ParseErrorHandler, max_distance: usize, origin_index: usize) -> FuzzyMatcher<'a> {
+    pub fn new(automaton: &'a Automaton, separator: u32, text: &'a Text, errors: ParseErrorHandler, max_distance: usize, origin_index: usize) -> FuzzyMatcher<'a> {
         FuzzyMatcher {
             automaton,
             separator,
