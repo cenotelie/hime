@@ -37,7 +37,7 @@ pub enum ParseErrorType {
 }
 
 /// Represents an error in a parser
-pub trait ParseError {
+pub trait ParseError: Clone {
     /// Gets the error's type
     fn get_type(&self) -> ParseErrorType;
 
@@ -50,9 +50,6 @@ pub trait ParseError {
     /// Gets the error's message
     fn get_message(&self) -> String;
 }
-
-/// A handler (or register) of lexical and parsing errors
-pub type ParseErrorHandler = fn(&ParseError);
 
 /// Represents the unexpected of the input text while more characters were expected
 #[derive(Copy, Clone)]
@@ -194,5 +191,41 @@ impl ParseErrorIncorrectEncodingSequence {
             error_type,
             sequence
         }
+    }
+}
+
+/// Represents an entity that can handle lexical and syntactic errors
+pub struct ParseErrors {
+    /// The list of end-of-input errors
+    errors_eoi: Vec<ParseErrorEndOfInput>,
+    /// The list of unexpected character error
+    errors_unexpected_chars: Vec<ParseErrorUnexpectedChar>,
+    /// The list of incorrect encoding sequence error
+    errors_incorrect_encoding: Vec<ParseErrorIncorrectEncodingSequence>
+}
+
+impl ParseErrors {
+    /// Creates a new instance of the Errors structure
+    pub fn new() -> ParseErrors {
+        ParseErrors {
+            errors_eoi: Vec::<ParseErrorEndOfInput>::new(),
+            errors_unexpected_chars: Vec::<ParseErrorUnexpectedChar>::new(),
+            errors_incorrect_encoding: Vec::<ParseErrorIncorrectEncodingSequence>::new()
+        }
+    }
+
+    /// Handles the end-of-input error
+    pub fn push_error_eoi(&mut self, error: ParseErrorEndOfInput) {
+        self.errors_eoi.push(error);
+    }
+
+    /// Handles the unexpected character error
+    pub fn push_error_unexpected_char(&mut self, error: ParseErrorUnexpectedChar) {
+        self.errors_unexpected_chars.push(error);
+    }
+
+    /// Handles the incorrect encoding sequence error
+    pub fn push_error_incorrect_encoding(&mut self, error: ParseErrorIncorrectEncodingSequence) {
+        self.errors_incorrect_encoding.push(error);
     }
 }

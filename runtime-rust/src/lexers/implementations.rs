@@ -22,7 +22,7 @@ use super::context::ContextProvider;
 use super::fuzzy::FuzzyMatcher;
 use super::interface::Lexer;
 use super::interface::TokenKernel;
-use super::super::errors::ParseErrorHandler;
+use super::super::errors::ParseErrors;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::symbols::Symbol;
 use super::super::text::interface::Text;
@@ -47,7 +47,7 @@ pub struct ContextFreeLexer<T: Text> {
     /// A distance of 0 indicates no recovery.
     recovery: usize,
     /// Delegate for raising errors
-    errors: ParseErrorHandler
+    errors: ParseErrors
 }
 
 impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
@@ -97,7 +97,7 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
 
 impl<T: Text> ContextFreeLexer<T> {
     /// Creates a new lexer
-    pub fn new(terminals: Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32, errors: ParseErrorHandler) -> ContextFreeLexer<T> {
+    pub fn new(terminals: Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<T> {
         ContextFreeLexer {
             repository: TokenRepository::new(terminals, text),
             automaton,
@@ -105,7 +105,7 @@ impl<T: Text> ContextFreeLexer<T> {
             separator_id,
             index: 0,
             recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
-            errors
+            errors: ParseErrors::new()
         }
     }
 
@@ -142,9 +142,9 @@ impl<T: Text> ContextFreeLexer<T> {
     }
 
     /// When an error occurred
-    fn on_error(&self, origin_index: usize) -> Option<TokenMatch> {
+    fn on_error(&mut self, origin_index: usize) -> Option<TokenMatch> {
         if self.recovery <= 0 {
-            (self.errors)(&ParseErrorUnexpectedChar::new(
+            self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                 self.repository.get_input().get_position_at(origin_index),
                 [self.repository.get_input().get_at(origin_index), 0]
             ));
@@ -158,11 +158,11 @@ impl<T: Text> ContextFreeLexer<T> {
                     break;
                 }
             }
-            let matcher = FuzzyMatcher::new(
+            let mut matcher = FuzzyMatcher::new(
                 &self.automaton,
                 separator_index as u32,
                 self.repository.get_input(),
-                self.errors,
+                &mut self.errors,
                 self.recovery,
                 origin_index
             );

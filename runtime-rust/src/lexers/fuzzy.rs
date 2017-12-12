@@ -21,7 +21,7 @@ use super::automaton::Automaton;
 use super::automaton::AutomatonState;
 use super::automaton::DEAD_STATE;
 use super::automaton::TokenMatch;
-use super::super::errors::ParseErrorHandler;
+use super::super::errors::ParseErrors;
 use super::super::errors::ParseErrorType;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::errors::ParseErrorEndOfInput;
@@ -90,7 +90,7 @@ pub struct FuzzyMatcher<'a> {
     /// The input text
     text: &'a Text,
     /// Delegate for raising errors
-    errors: ParseErrorHandler,
+    errors: &'a mut ParseErrors,
     /// The maximum Levenshtein distance between the input and the DFA
     max_distance: usize,
     /// The index in the input from which the error was raised
@@ -151,7 +151,7 @@ impl FuzzyMatcherResult {
 
 impl<'a> FuzzyMatcher<'a> {
     /// Initializes this matcher
-    pub fn new(automaton: &'a Automaton, separator: u32, text: &'a Text, errors: ParseErrorHandler, max_distance: usize, origin_index: usize) -> FuzzyMatcher<'a> {
+    pub fn new(automaton: &'a Automaton, separator: u32, text: &'a Text, errors: &'a mut ParseErrors, max_distance: usize, origin_index: usize) -> FuzzyMatcher<'a> {
         FuzzyMatcher {
             automaton,
             separator,
@@ -163,7 +163,7 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Runs this matcher
-    pub fn run(&self) -> TokenMatch {
+    pub fn run(&mut self) -> TokenMatch {
         let mut offset = 0;
         let mut at_end = self.text.is_end(self.origin_index + offset);
         let mut current = if at_end { 0 as Utf16C } else { self.text.get_at(self.origin_index + offset) };
@@ -197,7 +197,7 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Constructs the solution when succeeded to fix the error
-    fn on_success(&self, result: &FuzzyMatcherResult) -> TokenMatch {
+    fn on_success(&mut self, result: &FuzzyMatcherResult) -> TokenMatch {
         let mut last_error_index = self.max_distance + 1;
         for i in 0..result.match_head.as_ref().unwrap().get_distance() {
             let error_index = self.origin_index + result.match_head.as_ref().unwrap().get_error(i) as usize;
@@ -213,21 +213,21 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Reports on the lexical error at the specified index
-    fn on_error(&self, index: usize) {
+    fn on_error(&mut self, index: usize) {
         if self.text.is_end(index) {
             // the end of input was not expected
             // there is necessarily some input before because an empty input would have matched the $
             let c = self.text.get_at(index - 1);
             if c >= 0xD800 && c <= 0xDBFF {
                 // a trailing UTF-16 high surrogate
-                (self.errors)(&ParseErrorIncorrectEncodingSequence::new(
+                self.errors.push_error_incorrect_encoding(ParseErrorIncorrectEncodingSequence::new(
                     self.text.get_position_at(index - 1),
                     ParseErrorType::IncorrectUTF16NoLowSurrogate,
                     c
                 ));
             } else {
                 // usual unexpected end of input
-                (self.errors)(&ParseErrorEndOfInput::new(
+                self.errors.push_error_eoi(ParseErrorEndOfInput::new(
                     self.text.get_position_at(index)
                 ));
             }
@@ -239,13 +239,13 @@ impl<'a> FuzzyMatcher<'a> {
                 let c2 = self.text.get_at(index + 1);
                 if c2 >= 0xDC00 && c2 <= 0xDFFF {
                     // an unexpected high and low surrogate pair
-                    (self.errors)(&ParseErrorUnexpectedChar::new(
+                    self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                         self.text.get_position_at(index),
                         [c, c2]
                     ));
                 } else {
                     // high surrogate without the low surrogate
-                    (self.errors)(&ParseErrorIncorrectEncodingSequence::new(
+                    self.errors.push_error_incorrect_encoding(ParseErrorIncorrectEncodingSequence::new(
                         self.text.get_position_at(index),
                         ParseErrorType::IncorrectUTF16NoLowSurrogate,
                         c
@@ -257,13 +257,13 @@ impl<'a> FuzzyMatcher<'a> {
                 let c2 = self.text.get_at(index - 1);
                 if c2 >= 0xD800 && c2 <= 0xDBFF {
                     // an unexpected high and low surrogate pair
-                    (self.errors)(&ParseErrorUnexpectedChar::new(
+                    self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                         self.text.get_position_at(index - 1),
                         [c2, c]
                     ));
                 } else {
                     // a low surrogate without the high surrogate
-                    (self.errors)(&ParseErrorIncorrectEncodingSequence::new(
+                    self.errors.push_error_incorrect_encoding(ParseErrorIncorrectEncodingSequence::new(
                         self.text.get_position_at(index),
                         ParseErrorType::IncorrectUTF16NoHighSurrogate,
                         c
@@ -271,7 +271,7 @@ impl<'a> FuzzyMatcher<'a> {
                 }
             } else {
                 // a simple unexpected character
-                (self.errors)(&ParseErrorUnexpectedChar::new(
+                self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                     self.text.get_position_at(index),
                     [c, 0]
                 ));
@@ -280,8 +280,8 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Constructs the solution when failed to fix the error
-    fn on_failure(&self) -> TokenMatch {
-        (self.errors)(&ParseErrorUnexpectedChar::new(
+    fn on_failure(&mut self) -> TokenMatch {
+        self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             self.text.get_position_at(self.origin_index),
             [self.text.get_at(self.origin_index), 0]
         ));
