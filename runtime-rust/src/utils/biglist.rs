@@ -15,6 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for the definition of `BigList`,
+//! an append-only structure for storing items without any re-allocations.
+
 use std::ops::Index;
 use std::ops::IndexMut;
 use super::iterable::Iterable;

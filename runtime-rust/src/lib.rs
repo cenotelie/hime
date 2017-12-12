@@ -15,11 +15,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Redistributable runtime for Hime-generated parsers
-//! This crate contains the runtime for lexers and parsers generated using [Hime](https://cenotelie.fr/hime).
+//! This crate provides the redistributable runtime for Hime-generated parsers
+//! It contains the runtime APIs for lexers and parsers generated using [Hime](https://cenotelie.fr/hime).
 //! For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/hime).
 //! The code for this library is available on [Bitbucket](https://bitbucket.org/cenotelie/hime).
 //! This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
+//!
+//! # Usage
+//! This crate is [on crates.io](https://crates.io/crates/hime_redist) and can be
+//! used by adding `hime_redist` to your dependencies in your project's `Cargo.toml`.
+//! ```toml
+//! [dependencies]
+//! hime_redist = "3.3.0"
+//! ```
+//! and this to your crate root:
+//! ```rust
+//! extern crate hime_redist;
+//! ```
 
 pub mod utils;
 pub mod text;

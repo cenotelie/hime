@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for the `Iterable` trait
+
 /// Defines the `Iterable` trait for structures that can be iterated over.
 /// Contrary to the `IntoIterator` trait, this trait does not mandate the underlying structure
 /// be consumed in the process. This trait enables the user to retrieve an iterator to iterate
