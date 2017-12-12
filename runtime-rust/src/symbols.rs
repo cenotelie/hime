@@ -26,6 +26,7 @@ use super::text::interface::TextPosition;
 use super::text::interface::TextSpan;
 
 /// The possible types of symbol
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub enum SymbolType
 {
     /// A token, i.e. a piece of text matched by a lexer
