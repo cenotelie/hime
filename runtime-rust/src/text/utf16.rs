@@ -15,8 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Hime parsers only works on UTF-16 encoded text.
-//! This module provides facilities for interactions with UTF-16 text.
+//! Module for UTF-16 text handling
 
 use std::io;
 

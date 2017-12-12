@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for lexers' interface APIs
+
 use super::context::ContextProvider;
 use super::super::errors::ParseErrors;
 use super::super::symbols::Symbol;

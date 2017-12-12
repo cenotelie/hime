@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Defines the API for lexers
+//! Module for lexers API
 
 pub mod automaton;
 pub mod context;

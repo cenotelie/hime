@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Structures and APIs for handling grammar symbols.
+//! Module for the definition of grammar symbols
 
 use std::fmt::Display;
 use std::fmt::Error;

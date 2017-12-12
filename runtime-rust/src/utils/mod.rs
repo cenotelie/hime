@@ -15,8 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Utility APIs for the Hime Runtime.
-//! This module defines several utility APIs for the implementation of the Hime runtime in Rust.
+//! Module for utility APIs
 
 pub mod iterable;
 pub mod biglist;

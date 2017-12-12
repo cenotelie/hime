@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for lexers' automata
+
 use super::super::text::Utf16C;
 use super::super::text::Text;
 use super::super::utils::bin::*;

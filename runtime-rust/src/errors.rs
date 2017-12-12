@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Definition of lexical and syntactic errors for Hime
+//! Module for the definition of lexical and syntactic errors
 
 use text::Utf16C;
 use text::TextPosition;

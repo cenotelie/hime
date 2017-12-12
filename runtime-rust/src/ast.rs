@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for Abstract-Syntax Trees
+
 use super::symbols::Symbol;
 use super::text::Text;
 use super::tokens::TokenRepository;

@@ -24,11 +24,14 @@
 //! # Usage
 //! This crate is [on crates.io](https://crates.io/crates/hime_redist) and can be
 //! used by adding `hime_redist` to your dependencies in your project's `Cargo.toml`.
+//!
 //! ```toml
 //! [dependencies]
 //! hime_redist = "3.3.0"
 //! ```
+//!
 //! and this to your crate root:
+//!
 //! ```rust
 //! extern crate hime_redist;
 //! ```

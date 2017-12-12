@@ -15,9 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Data structures and traits related to the handling of text.
-//! Hime parsers only works on UTF-16 encoded text.
-//! This module provides facilities for interactions with UTF-16 text.
+//! Module for text-handling APIs
 
 pub mod utf16;
 pub mod impls;
@@ -73,10 +71,17 @@ impl Display for TextPosition {
 /// Represents the context description of a position in a piece of text.
 /// A context is composed of two pieces of text, the line content and the pointer.
 /// For example, given the piece of text:
-/// "public Struct Context"
+///
+/// ```
+/// public Struct Context
+/// ```
+///
 /// A context pointing to the second word will look like:
+///
+/// ```
 /// content = "public Struct Context"
-/// pointer = "       ^"
+/// pointer = "       ^^^^^^"
+/// ```
 pub struct TextContext {
     /// The text content being represented
     pub content: String,

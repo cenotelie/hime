@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Structures and APIs for handling lexical tokens.
+//! Module for the definition of lexical tokens
 
 use super::symbols::SemanticElement;
 use super::symbols::Symbol;

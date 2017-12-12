@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for lexers' implementation
+
 use super::automaton::Automaton;
 use super::automaton::TokenMatch;
 use super::automaton::run_dfa;

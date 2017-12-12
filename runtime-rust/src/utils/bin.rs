@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for binary manipulation APIs
+
 /// reads a u16 from an array of bytes
 pub fn read_u16(buffer: &[u8], index: usize) -> u16 {
     ((buffer[index + 1] as u16) << 8 | (buffer[index] as u16))

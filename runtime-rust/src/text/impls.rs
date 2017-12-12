@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for the implementations of text APIs
+
 use std::io::Read;
 use std::io::BufReader;
 

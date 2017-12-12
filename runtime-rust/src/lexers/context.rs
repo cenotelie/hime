@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for the management of lexers' context
+
 use std::usize;
 
 /// Identifier of the default context

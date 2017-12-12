@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Module for the lexers' fuzzy DFA matcher
+
 use std::mem::replace;
 
 use super::automaton::Automaton;
