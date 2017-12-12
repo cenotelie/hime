@@ -20,12 +20,12 @@ use std::io::BufReader;
 
 use super::super::utils::iterable::Iterable;
 use super::super::utils::biglist::BigList;
-use super::utf16::Utf16C;
 use super::utf16::Utf16IteratorRaw;
 use super::utf16::Utf16IteratorOverUtf8;
-use super::interface::Text;
-use super::interface::TextContext;
-use super::interface::TextPosition;
+use super::Text;
+use super::TextContext;
+use super::TextPosition;
+use super::Utf16C;
 
 /// Determines whether [c1, c2] form a line ending sequence
 /// Recognized sequences are:

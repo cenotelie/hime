@@ -15,8 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-use super::super::text::utf16::Utf16C;
-use super::super::text::interface::Text;
+use super::super::text::Utf16C;
+use super::super::text::Text;
 use super::super::utils::bin::*;
 
 /// Identifier of an invalid state in an automaton

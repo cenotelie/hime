@@ -26,8 +26,8 @@ use super::super::errors::ParseErrorType;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::errors::ParseErrorEndOfInput;
 use super::super::errors::ParseErrorIncorrectEncodingSequence;
-use super::super::text::interface::Text;
-use super::super::text::utf16::Utf16C;
+use super::super::text::Text;
+use super::super::text::Utf16C;
 
 /// Represents a DFA stack head
 #[derive(Clone)]

@@ -20,24 +20,10 @@
 
 use std::io;
 
-/// `Utf16C` represents a single UTF-16 code unit.
-/// A UTF-16 code unit is always represented as a 16 bits unsigned integer.
-/// UTF-16 code units may not represent by themselves valid Unicode code points (characters).
-/// A Unicode code point (a character) is a 32-bits unsigned integer in the ranges:
-/// U+0000 to U+D7FF and U+E000 to U+FFFF and U+10000 to U+10FFFF.
-/// Unicode code points in the range U+D800 to U+DFFF are reserved and cannot be used.
-/// UTF-16 can be used to encode a single Unicode code point in either one or two UTF-16 code units.
-///
-/// See [UTF-16](https://en.wikipedia.org/wiki/UTF-16) for more details.
-pub type Utf16C = u16;
-
+use super::Utf16C;
 
 /// `Utf16IteratorRaw` provides an iterator of UTF-16 code units
 /// over an input of bytes assumed to represent UTF-16 code units
-///
-/// Example:
-/// ```
-/// ```
 pub struct Utf16IteratorRaw<'a> {
     /// whether to use big-endian or little-endian
     big_endian: bool,

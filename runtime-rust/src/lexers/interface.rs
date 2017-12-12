@@ -18,7 +18,7 @@
 use super::context::ContextProvider;
 use super::super::errors::ParseErrors;
 use super::super::symbols::Symbol;
-use super::super::text::interface::Text;
+use super::super::text::Text;
 use super::super::tokens::TokenRepository;
 
 /// Represents the kernel of a token, i.e. the identifying information of a token

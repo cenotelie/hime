@@ -21,9 +21,9 @@ use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
 
-use super::text::interface::TextContext;
-use super::text::interface::TextPosition;
-use super::text::interface::TextSpan;
+use super::text::TextContext;
+use super::text::TextPosition;
+use super::text::TextSpan;
 
 /// The possible types of symbol
 #[derive(Copy, Clone, Eq, PartialEq)]

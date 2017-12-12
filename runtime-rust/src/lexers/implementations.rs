@@ -26,7 +26,7 @@ use super::super::errors::ParseErrors;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::symbols::Symbol;
 use super::super::symbols::SID_DOLLAR;
-use super::super::text::interface::Text;
+use super::super::text::Text;
 use super::super::tokens::TokenRepository;
 
 /// The default maximum Levenshtein distance to go to for the recovery of a matching failure

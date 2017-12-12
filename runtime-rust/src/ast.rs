@@ -16,13 +16,13 @@
  ******************************************************************************/
 
 use super::symbols::Symbol;
-use super::text::interface::Text;
+use super::text::Text;
 use super::tokens::TokenRepository;
 use super::utils::biglist::BigList;
 
 /// Represents a type of symbol table
 #[derive(Copy, Clone, Eq, PartialEq)]
-enum TableType {
+pub enum TableType {
     /// Marks as other (used for SPPF nodes)
     None = 0,
     /// Table of tokens
@@ -46,7 +46,7 @@ impl From<usize> for TableType {
 
 /// Represents a compact reference to an element in a table
 #[derive(Copy, Clone, Eq, PartialEq)]
-struct TableElemRef {
+pub struct TableElemRef {
     /// The backend data
     data: usize
 }

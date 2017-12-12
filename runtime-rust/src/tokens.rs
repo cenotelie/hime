@@ -20,10 +20,10 @@
 use super::symbols::SemanticElement;
 use super::symbols::Symbol;
 use super::symbols::SymbolType;
-use super::text::interface::Text;
-use super::text::interface::TextContext;
-use super::text::interface::TextPosition;
-use super::text::interface::TextSpan;
+use super::text::Text;
+use super::text::TextContext;
+use super::text::TextPosition;
+use super::text::TextSpan;
 use super::utils::biglist::BigList;
 use super::utils::iterable::Iterable;
 

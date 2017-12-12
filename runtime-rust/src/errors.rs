@@ -17,8 +17,8 @@
 
 //! Definition of lexical and syntactic errors for Hime
 
-use text::utf16::Utf16C;
-use text::interface::TextPosition;
+use text::Utf16C;
+use text::TextPosition;
 
 /// Specifies the type of error
 #[derive(PartialEq)]
