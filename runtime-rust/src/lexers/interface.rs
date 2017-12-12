@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 use super::context::ContextProvider;
+use super::super::errors::ParseErrors;
 use super::super::symbols::Symbol;
 use super::super::text::interface::Text;
 use super::super::tokens::TokenRepository;
@@ -38,6 +39,9 @@ pub trait Lexer<T: Text> {
 
     /// Gets the lexer's output stream of tokens
     fn get_output(&self) -> &TokenRepository<T>;
+
+    /// Gets the lexer's errors
+    fn get_errors(&self) -> &ParseErrors;
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.

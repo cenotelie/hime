@@ -66,6 +66,10 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
         &self.repository
     }
 
+    fn get_errors(&self) -> &ParseErrors {
+        &self.errors
+    }
+
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
     fn get_recovery_distance(&self) -> usize {
