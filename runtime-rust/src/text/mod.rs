@@ -72,13 +72,13 @@ impl Display for TextPosition {
 /// A context is composed of two pieces of text, the line content and the pointer.
 /// For example, given the piece of text:
 ///
-/// ```
+/// ```hime
 /// public Struct Context
 /// ```
 ///
 /// A context pointing to the second word will look like:
 ///
-/// ```
+/// ```hime
 /// content = "public Struct Context"
 /// pointer = "       ^^^^^^"
 /// ```
