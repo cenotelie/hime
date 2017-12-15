@@ -17,13 +17,13 @@
 
 //! Module for lexers' implementation
 
+use super::ContextProvider;
+use super::Lexer;
+use super::TokenKernel;
 use super::automaton::Automaton;
 use super::automaton::TokenMatch;
 use super::automaton::run_dfa;
-use super::context::ContextProvider;
 use super::fuzzy::FuzzyMatcher;
-use super::interface::Lexer;
-use super::interface::TokenKernel;
 use super::super::errors::ParseErrors;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::symbols::Symbol;
@@ -50,7 +50,7 @@ pub struct ContextFreeLexer<T: Text> {
     /// A distance of 0 indicates no recovery.
     recovery: usize,
     /// Delegate for raising errors
-    errors: ParseErrors
+    errors: ParseErrors,
 }
 
 /// Runs the fuzzy DFA matcher
@@ -58,7 +58,7 @@ fn run_fuzzy_matcher<T: Text>(repository: &TokenRepository<T>, automaton: &Autom
     if recovery <= 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.get_input().get_position_at(origin_index),
-            [repository.get_input().get_at(origin_index), 0]
+            [repository.get_input().get_at(origin_index), 0],
         ));
         None
     } else {
@@ -76,7 +76,7 @@ fn run_fuzzy_matcher<T: Text>(repository: &TokenRepository<T>, automaton: &Autom
             repository.get_input(),
             errors,
             recovery,
-            origin_index
+            origin_index,
         );
         Some(matcher.run())
     }
@@ -142,7 +142,7 @@ impl<T: Text> ContextFreeLexer<T> {
             separator_id,
             index: 0,
             recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
-            errors: ParseErrors::new()
+            errors: ParseErrors::new(),
         }
     }
 
@@ -195,7 +195,7 @@ pub struct ContextSensitiveLexer<T: Text> {
     /// A distance of 0 indicates no recovery.
     recovery: usize,
     /// Delegate for raising errors
-    errors: ParseErrors
+    errors: ParseErrors,
 }
 
 
@@ -279,7 +279,7 @@ impl<T: Text> ContextSensitiveLexer<T> {
             separator_id,
             input_index: 0,
             recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
-            errors: ParseErrors::new()
+            errors: ParseErrors::new(),
         }
     }
 

@@ -18,7 +18,62 @@
 //! Module for lexers API
 
 pub mod automaton;
-pub mod context;
-pub mod interface;
 pub mod fuzzy;
-pub mod implementations;
+pub mod impls;
+
+use std::usize;
+
+use super::errors::ParseErrors;
+use super::symbols::Symbol;
+use super::text::Text;
+use super::tokens::TokenRepository;
+
+/// Identifier of the default context
+pub const DEFAULT_CONTEXT: u16 = 0;
+
+/// Defines the context provider as a function that gets
+/// the priority of the specified context required by the specified terminal.
+/// The priority is an unsigned integer. The lesser the value the higher the priority.
+/// The absence of value represents the unavailability of the required context.
+pub type ContextProvider = fn(u16, u32) -> Option<usize>;
+
+/// Gets the priority of the specified context required by the specified terminal
+/// The priority is an unsigned integer. The lesser the value the higher the priority.
+/// The absence of value represents the unavailability of the required context.
+pub fn default_context_provider(context: u16, _terminal_id: u32) -> Option<usize> {
+    if context == DEFAULT_CONTEXT { Some(usize::MAX) } else { Some(0) }
+}
+
+/// Represents the kernel of a token, i.e. the identifying information of a token
+pub struct TokenKernel {
+    /// The identifier of the matched terminal
+    pub terminal_id: u32,
+    /// The token's index in its repository
+    pub index: u32,
+}
+
+/// The public interface of a lexer
+pub trait Lexer<T: Text> {
+    /// Gets the terminals matched by this lexer
+    fn get_terminals(&self) -> &Vec<Symbol>;
+
+    /// Gets the lexer's input text
+    fn get_input(&self) -> &Text;
+
+    /// Gets the lexer's output stream of tokens
+    fn get_output(&self) -> &TokenRepository<T>;
+
+    /// Gets the lexer's errors
+    fn get_errors(&self) -> &ParseErrors;
+
+    /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+    /// A distance of 0 indicates no recovery.
+    fn get_recovery_distance(&self) -> usize;
+
+    /// Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
+    /// A distance of 0 indicates no recovery.
+    fn set_recovery_distance(&mut self, distance: usize);
+
+    /// Gets the next token in the input
+    fn get_next_token(&mut self, contexts: ContextProvider) -> Option<TokenKernel>;
+}
