@@ -32,7 +32,7 @@ pub enum TableType {
     /// Table of variables
     Variable = 2,
     /// Tables of virtuals
-    Virtual = 3
+    Virtual = 3,
 }
 
 impl From<usize> for TableType {
@@ -80,7 +80,7 @@ pub struct AstCell {
     /// The number of children
     pub count: u32,
     /// The index of the first child
-    pub first: u32
+    pub first: u32,
 }
 
 impl AstCell {
@@ -102,11 +102,60 @@ pub struct Ast<T: Text> {
     /// The table of tokens
     tokens: TokenRepository<T>,
     /// The table of variables
-    variables: Vec<Symbol>,
+    variables: &'static Vec<Symbol>,
     /// The table of virtuals
-    virtuals: Vec<Symbol>,
+    virtuals: &'static Vec<Symbol>,
     /// The nodes' labels
     nodes: BigList<AstCell>,
     /// The index of the tree's root node
-    root: usize
+    root: usize,
 }
+
+impl<T: Text> Ast<T> {}
+
+/// Represents a node in an Abstract Syntax Tree
+#[derive(Clone)]
+pub struct AstNode<'a, T: 'a + Text> {
+    /// The original parse tree
+    tree: &'a Ast<T>,
+    /// The index of this node in the parse tree
+    index: usize,
+}
+
+/// Represents a family of children for an ASTNode
+#[derive(Clone)]
+pub struct AstFamily<'a, T: 'a + Text> {
+    /// The original parse tree
+    tree: &'a Ast<T>,
+    /// The index of the parent node in the parse tree
+    parent: usize,
+}
+
+/// Represents and iterator for adjacents in this graph
+pub struct AstFamilyIterator<'a, T: 'a + Text> {
+    /// The original parse tree
+    tree: &'a Ast<T>,
+    /// The index of the first child in the parse tree
+    first: usize,
+    /// The index of the current child in the parse tree
+    current: usize,
+    /// the index of the last child (excluded) in the parse tree
+    end: usize,
+}
+
+
+/*
+/// Implementation of the `Iterator` trait for `BigListIterator`
+impl<'a, T: Text> Iterator for AstFamilyIterator<'a, T> {
+    type Item = AstN;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= self.list.size() {
+            None
+        } else {
+            let result = self.list[self.index];
+            self.index = self.index + 1;
+            Some(result)
+        }
+    }
+}
+*/

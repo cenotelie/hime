@@ -39,7 +39,7 @@ struct TokenRepositoryCell {
 /// A repository of matched tokens
 pub struct TokenRepository<T: Text> {
     /// The terminal symbols matched in this content
-    terminals: Vec<Symbol>,
+    terminals: &'static Vec<Symbol>,
     /// The base text
     text: T,
     /// The token data in this content
@@ -103,7 +103,7 @@ impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<T> {
 
 impl<T: Text> TokenRepository<T> {
     /// Creates a new repository
-    pub fn new(terminals: Vec<Symbol>, text: T) -> TokenRepository<T> {
+    pub fn new(terminals: &'static Vec<Symbol>, text: T) -> TokenRepository<T> {
         TokenRepository {
             terminals,
             text,

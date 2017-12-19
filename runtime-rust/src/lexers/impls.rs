@@ -134,7 +134,7 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
 
 impl<T: Text> ContextFreeLexer<T> {
     /// Creates a new lexer
-    pub fn new(terminals: Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<T> {
+    pub fn new(terminals: &'static Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<T> {
         ContextFreeLexer {
             repository: TokenRepository::new(terminals, text),
             automaton,
@@ -271,7 +271,7 @@ impl<T: Text> Lexer<T> for ContextSensitiveLexer<T> {
 
 impl<T: Text> ContextSensitiveLexer<T> {
     /// Creates a new lexer
-    pub fn new(terminals: Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<T> {
+    pub fn new(terminals: &'static Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<T> {
         ContextSensitiveLexer {
             repository: TokenRepository::new(terminals, text),
             automaton,
