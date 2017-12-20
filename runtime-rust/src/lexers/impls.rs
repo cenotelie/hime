@@ -34,27 +34,8 @@ use super::super::tokens::TokenRepository;
 /// The default maximum Levenshtein distance to go to for the recovery of a matching failure
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
-/// Represents a context-free lexer (lexing rules do not depend on the context)
-pub struct ContextFreeLexer<T: Text> {
-    /// The token repository for this lexer
-    repository: TokenRepository<T>,
-    /// The DFA automaton for this lexer
-    automaton: Automaton,
-    /// Whether the lexer has run yet
-    has_run: bool,
-    /// Symbol ID of the SEPARATOR terminal
-    separator_id: u32,
-    /// The next token in this repository
-    index: usize,
-    /// The maximum Levenshtein distance to go to for the recovery of a matching failure.
-    /// A distance of 0 indicates no recovery.
-    recovery: usize,
-    /// Delegate for raising errors
-    errors: ParseErrors,
-}
-
 /// Runs the fuzzy DFA matcher
-fn run_fuzzy_matcher<T: Text>(repository: &TokenRepository<T>, automaton: &Automaton, separator_id: u32, recovery: usize, errors: &mut ParseErrors, origin_index: usize) -> Option<TokenMatch> {
+fn run_fuzzy_matcher<'a, T: 'a + Text>(repository: &TokenRepository<'a, T>, automaton: &Automaton, separator_id: u32, recovery: usize, errors: &mut ParseErrors, origin_index: usize) -> Option<TokenMatch> {
     if recovery <= 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.get_input().get_position_at(origin_index),
@@ -82,7 +63,26 @@ fn run_fuzzy_matcher<T: Text>(repository: &TokenRepository<T>, automaton: &Autom
     }
 }
 
-impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
+/// Represents a context-free lexer (lexing rules do not depend on the context)
+pub struct ContextFreeLexer<'a, T: 'a + Text> {
+    /// The token repository for this lexer
+    repository: &'a mut TokenRepository<'a, T>,
+    /// The repository for errors
+    errors: &'a mut ParseErrors,
+    /// The DFA automaton for this lexer
+    automaton: Automaton,
+    /// Whether the lexer has run yet
+    has_run: bool,
+    /// Symbol ID of the SEPARATOR terminal
+    separator_id: u32,
+    /// The next token in this repository
+    index: usize,
+    /// The maximum Levenshtein distance to go to for the recovery of a matching failure.
+    /// A distance of 0 indicates no recovery.
+    recovery: usize
+}
+
+impl<'a, T: 'a + Text> Lexer<'a, T> for ContextFreeLexer<'a, T> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &Vec<Symbol> {
         self.repository.get_terminals()
@@ -94,7 +94,7 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
     }
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<T> {
+    fn get_output(&self) -> &TokenRepository<'a, T> {
         &self.repository
     }
 
@@ -132,17 +132,17 @@ impl<T: Text> Lexer<T> for ContextFreeLexer<T> {
     }
 }
 
-impl<T: Text> ContextFreeLexer<T> {
+impl<'a, T: 'a + Text> ContextFreeLexer<'a, T> {
     /// Creates a new lexer
-    pub fn new(terminals: &'static Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<T> {
+    pub fn new(repository: &'a mut TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<'a, T> {
         ContextFreeLexer {
-            repository: TokenRepository::new(terminals, text),
+            repository,
+            errors,
             automaton,
             has_run: false,
             separator_id,
             index: 0,
-            recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
-            errors: ParseErrors::new(),
+            recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE
         }
     }
 
@@ -180,9 +180,11 @@ impl<T: Text> ContextFreeLexer<T> {
 }
 
 /// Represents a context-sensitive lexer (lexing rules do not depend on the context)
-pub struct ContextSensitiveLexer<T: Text> {
+pub struct ContextSensitiveLexer<'a, T: 'a + Text> {
     /// The token repository for this lexer
-    repository: TokenRepository<T>,
+    repository: &'a mut TokenRepository<'a, T>,
+    /// The repository for errors
+    errors: &'a mut ParseErrors,
     /// The DFA automaton for this lexer
     automaton: Automaton,
     /// Whether the lexer has run yet
@@ -193,13 +195,11 @@ pub struct ContextSensitiveLexer<T: Text> {
     input_index: usize,
     /// The maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    recovery: usize,
-    /// Delegate for raising errors
-    errors: ParseErrors,
+    recovery: usize
 }
 
 
-impl<T: Text> Lexer<T> for ContextSensitiveLexer<T> {
+impl<'a, T: 'a + Text> Lexer<'a, T> for ContextSensitiveLexer<'a, T> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &Vec<Symbol> {
         self.repository.get_terminals()
@@ -211,7 +211,7 @@ impl<T: Text> Lexer<T> for ContextSensitiveLexer<T> {
     }
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<T> {
+    fn get_output(&self) -> &TokenRepository<'a, T> {
         &self.repository
     }
 
@@ -269,17 +269,17 @@ impl<T: Text> Lexer<T> for ContextSensitiveLexer<T> {
     }
 }
 
-impl<T: Text> ContextSensitiveLexer<T> {
+impl<'a, T: 'a + Text> ContextSensitiveLexer<'a, T> {
     /// Creates a new lexer
-    pub fn new(terminals: &'static Vec<Symbol>, text: T, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<T> {
+    pub fn new(repository: &'a mut TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<'a, T> {
         ContextSensitiveLexer {
-            repository: TokenRepository::new(terminals, text),
+            repository,
+            errors,
             automaton,
             has_run: false,
             separator_id,
             input_index: 0,
-            recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
-            errors: ParseErrors::new(),
+            recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE
         }
     }
 

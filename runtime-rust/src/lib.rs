@@ -43,3 +43,4 @@ pub mod symbols;
 pub mod tokens;
 pub mod lexers;
 pub mod ast;
+pub mod result;

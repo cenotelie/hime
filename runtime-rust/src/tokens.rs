@@ -36,20 +36,35 @@ struct TokenRepositoryCell {
     span: TextSpan
 }
 
-/// A repository of matched tokens
-pub struct TokenRepository<T: Text> {
-    /// The terminal symbols matched in this content
-    terminals: &'static Vec<Symbol>,
-    /// The base text
-    text: T,
+/// Implementation data of a repository of matched tokens
+pub struct TokenRepositoryImpl {
     /// The token data in this content
     cells: BigList<TokenRepositoryCell>
+}
+
+impl TokenRepositoryImpl {
+    /// Creates a new implementation of a token repository
+    pub fn new() -> TokenRepositoryImpl {
+        TokenRepositoryImpl {
+            cells: BigList::new(TokenRepositoryCell { terminal: 0, span: TextSpan { index: 0, length: 0 } })
+        }
+    }
+}
+
+/// The proxy structure for a repository of matched tokens
+pub struct TokenRepository<'a, T: 'a + Text> {
+    /// The table of grammar terminals
+    terminals: &'static Vec<Symbol>,
+    /// The input text
+    text: &'a T,
+    /// The table of matched tokens
+    tokens: &'a mut TokenRepositoryImpl
 }
 
 /// Represents a token as an output element of a lexer
 pub struct Token<'a, T: 'a + Text> {
     /// The repository containing this token
-    repository: &'a TokenRepository<T>,
+    repository: &'a TokenRepository<'a, T>,
     /// The index of this token in the text
     index: usize
 }
@@ -70,7 +85,7 @@ impl<'a, T: 'a + Text> Copy for Token<'a, T> {}
 /// the iterator over the tokens in a repository
 pub struct TokenRepositoryIterator<'a, T: 'a + Text> {
     /// The repository containing this token
-    repository: &'a TokenRepository<T>,
+    repository: &'a TokenRepository<'a, T>,
     /// The current index within the repository
     index: usize
 }
@@ -79,7 +94,7 @@ pub struct TokenRepositoryIterator<'a, T: 'a + Text> {
 impl<'a, T: 'a + Text> Iterator for TokenRepositoryIterator<'a, T> {
     type Item = Token<'a, T>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.repository.cells.size() {
+        if self.index >= self.repository.tokens.cells.size() {
             None
         } else {
             let result = Token { repository: self.repository, index: self.index };
@@ -90,7 +105,7 @@ impl<'a, T: 'a + Text> Iterator for TokenRepositoryIterator<'a, T> {
 }
 
 /// Implementation of `Iterable` for `TokenRepository`
-impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<T> {
+impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<'a, T> {
     type Item = Token<'a, T>;
     type IteratorType = TokenRepositoryIterator<'a, T>;
     fn iter(&'a self) -> Self::IteratorType {
@@ -101,19 +116,19 @@ impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<T> {
     }
 }
 
-impl<T: Text> TokenRepository<T> {
+impl<'a, T: 'a + Text> TokenRepository<'a, T> {
     /// Creates a new repository
-    pub fn new(terminals: &'static Vec<Symbol>, text: T) -> TokenRepository<T> {
+    pub fn new(terminals: &'static Vec<Symbol>, text: &'a T, tokens: &'a mut TokenRepositoryImpl) -> TokenRepository<'a, T> {
         TokenRepository {
             terminals,
             text,
-            cells: BigList::<TokenRepositoryCell>::new(TokenRepositoryCell { terminal: 0, span: TextSpan { index: 0, length: 0 } })
+            tokens
         }
     }
 
     /// Registers a new token in this repository
     pub fn add(&mut self, terminal: usize, index: usize, length: usize) -> usize {
-        self.cells.add(TokenRepositoryCell {
+        self.tokens.cells.add(TokenRepositoryCell {
             terminal,
             span: TextSpan { index, length }
         })
@@ -131,12 +146,12 @@ impl<T: Text> TokenRepository<T> {
 
     /// Gets the number of tokens in this repository
     pub fn get_tokens_count(&self) -> usize {
-        self.cells.size()
+        self.tokens.cells.size()
     }
 
     /// Gets the terminal's identifier for the i-th token
     pub fn get_symbol_id_for(&self, index: usize) -> u32 {
-        self.terminals[self.cells[index].terminal].id
+        self.terminals[self.tokens.cells[index].terminal].id
     }
 }
 
@@ -148,26 +163,26 @@ impl<'a, T: 'a + Text> SemanticElement for Token<'a, T> {
 
     /// Gets the position in the input text of this element
     fn get_position(&self) -> TextPosition {
-        self.repository.text.get_position_at(self.repository.cells[self.index].span.index)
+        self.repository.text.get_position_at(self.repository.tokens.cells[self.index].span.index)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> TextSpan {
-        self.repository.cells[self.index].span
+        self.repository.tokens.cells[self.index].span
     }
 
     /// Gets the context of this element in the input
     fn get_context(&self) -> TextContext {
-        self.repository.text.get_context_for(self.get_position(), self.repository.cells[self.index].span.length)
+        self.repository.text.get_context_for(self.get_position(), self.repository.tokens.cells[self.index].span.length)
     }
 
     /// Gets the grammar symbol associated to this element
     fn get_symbol(&self) -> Symbol {
-        self.repository.terminals[self.repository.cells[self.index].terminal]
+        self.repository.terminals[self.repository.tokens.cells[self.index].terminal]
     }
 
     /// Gets the value of this element, if any
     fn get_value(&self) -> Option<String> {
-        Some(self.repository.text.get_value_for(self.repository.cells[self.index].span))
+        Some(self.repository.text.get_value_for(self.repository.tokens.cells[self.index].span))
     }
 }

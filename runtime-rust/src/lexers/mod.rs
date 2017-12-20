@@ -53,7 +53,7 @@ pub struct TokenKernel {
 }
 
 /// The public interface of a lexer
-pub trait Lexer<T: Text> {
+pub trait Lexer<'a, T: 'a + Text> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &Vec<Symbol>;
 
@@ -61,7 +61,7 @@ pub trait Lexer<T: Text> {
     fn get_input(&self) -> &Text;
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<T>;
+    fn get_output(&self) -> &TokenRepository<'a, T>;
 
     /// Gets the lexer's errors
     fn get_errors(&self) -> &ParseErrors;

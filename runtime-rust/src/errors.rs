@@ -17,8 +17,11 @@
 
 //! Module for the definition of lexical and syntactic errors
 
+use std::ops::Index;
+
 use text::Utf16C;
 use text::TextPosition;
+use utils::iterable::Iterable;
 
 /// Specifies the type of error
 #[derive(PartialEq)]
@@ -37,7 +40,7 @@ pub enum ParseErrorType {
 }
 
 /// Represents an error in a parser
-pub trait ParseError: Clone {
+pub trait ParseError {
     /// Gets the error's type
     fn get_type(&self) -> ParseErrorType;
 
@@ -194,6 +197,15 @@ impl ParseErrorIncorrectEncodingSequence {
     }
 }
 
+/// Represents a reference to a parse error
+#[derive(Copy, Clone)]
+struct ParseErrorRef {
+    /// The type of error
+    error_type: ParseErrorType,
+    /// The index of the error in its table
+    index: usize
+}
+
 /// Represents an entity that can handle lexical and syntactic errors
 pub struct ParseErrors {
     /// The list of end-of-input errors
@@ -201,7 +213,9 @@ pub struct ParseErrors {
     /// The list of unexpected character error
     errors_unexpected_chars: Vec<ParseErrorUnexpectedChar>,
     /// The list of incorrect encoding sequence error
-    errors_incorrect_encoding: Vec<ParseErrorIncorrectEncodingSequence>
+    errors_incorrect_encoding: Vec<ParseErrorIncorrectEncodingSequence>,
+    /// The overall errors
+    all: Vec<ParseErrorRef>
 }
 
 impl ParseErrors {
@@ -210,22 +224,90 @@ impl ParseErrors {
         ParseErrors {
             errors_eoi: Vec::<ParseErrorEndOfInput>::new(),
             errors_unexpected_chars: Vec::<ParseErrorUnexpectedChar>::new(),
-            errors_incorrect_encoding: Vec::<ParseErrorIncorrectEncodingSequence>::new()
+            errors_incorrect_encoding: Vec::<ParseErrorIncorrectEncodingSequence>::new(),
+            all: Vec::<ParseErrorRef>::new()
         }
     }
 
     /// Handles the end-of-input error
     pub fn push_error_eoi(&mut self, error: ParseErrorEndOfInput) {
         self.errors_eoi.push(error);
+        self.all.push(ParseErrorRef {
+            error_type: ParseErrorType::UnexpectedEndOfInput,
+            index: self.errors_eoi.len() - 1
+        });
     }
 
     /// Handles the unexpected character error
     pub fn push_error_unexpected_char(&mut self, error: ParseErrorUnexpectedChar) {
         self.errors_unexpected_chars.push(error);
+        self.all.push(ParseErrorRef {
+            error_type: ParseErrorType::UnexpectedChar,
+            index: self.errors_unexpected_chars.len() - 1
+        });
     }
 
     /// Handles the incorrect encoding sequence error
     pub fn push_error_incorrect_encoding(&mut self, error: ParseErrorIncorrectEncodingSequence) {
         self.errors_incorrect_encoding.push(error);
+        self.all.push(ParseErrorRef {
+            error_type: error.error_type,
+            index: self.errors_incorrect_encoding.len() - 1
+        });
+    }
+
+    /// Gets the number of errors
+    pub fn get_count(&self) -> usize {
+        self.all.len()
+    }
+}
+
+/// Implementation of the indexer operator for immutable `ParseErrors`
+impl Index<usize> for ParseErrors {
+    type Output = ParseError;
+    fn index(&self, index: usize) -> &Self::Output {
+        let reference = self.all[index];
+        match reference.error_type {
+            ParseErrorType::UnexpectedEndOfInput => &self.errors_eoi[reference.index],
+            ParseErrorType::UnexpectedChar => &self.errors_unexpected_chars[reference.index],
+            ParseErrorType::UnexpectedToken => &self.errors_unexpected_chars[reference.index],
+            ParseErrorType::IncorrectUTF16NoLowSurrogate => &self.errors_incorrect_encoding[reference.index],
+            ParseErrorType::IncorrectUTF16NoHighSurrogate => &self.errors_incorrect_encoding[reference.index],
+        }
+    }
+}
+
+
+/// Represents an iterator over parse errors
+pub struct ParseErrorsIterator<'a> {
+    /// The parent parse errors
+    parent: &'a ParseErrors,
+    /// The current index
+    index: usize
+}
+
+/// Implementation of the `Iterator` trait for `ParseErrorsIterator`
+impl<'a> Iterator for ParseErrorsIterator<'a> {
+    type Item = &'a ParseError;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= self.parent.all.len() {
+            None
+        } else {
+            let result = &self.parent[self.index];
+            self.index = self.index + 1;
+            Some(result)
+        }
+    }
+}
+
+/// Implementation of `Iterable` for `ParseErrors`
+impl<'a> Iterable<'a> for ParseErrors {
+    type Item = &'a ParseError;
+    type IteratorType = ParseErrorsIterator<'a>;
+    fn iter(&'a self) -> Self::IteratorType {
+        ParseErrorsIterator {
+            parent: &self,
+            index: 0
+        }
     }
 }

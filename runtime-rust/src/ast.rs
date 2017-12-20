@@ -32,7 +32,7 @@ pub enum TableType {
     /// Table of variables
     Variable = 2,
     /// Tables of virtuals
-    Virtual = 3,
+    Virtual = 3
 }
 
 impl From<usize> for TableType {
@@ -80,7 +80,7 @@ pub struct AstCell {
     /// The number of children
     pub count: u32,
     /// The index of the first child
-    pub first: u32,
+    pub first: u32
 }
 
 impl AstCell {
@@ -98,9 +98,9 @@ impl AstCell {
 /// Represents a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
-pub struct Ast<T: Text> {
+pub struct Ast<'a, T: 'a + Text> {
     /// The table of tokens
-    tokens: TokenRepository<T>,
+    tokens: TokenRepository<'a, T>,
     /// The table of variables
     variables: &'static Vec<Symbol>,
     /// The table of virtuals
@@ -108,39 +108,39 @@ pub struct Ast<T: Text> {
     /// The nodes' labels
     nodes: BigList<AstCell>,
     /// The index of the tree's root node
-    root: usize,
+    root: usize
 }
 
-impl<T: Text> Ast<T> {}
+impl<'a, T: 'a + Text> Ast<'a, T> {}
 
 /// Represents a node in an Abstract Syntax Tree
 #[derive(Clone)]
 pub struct AstNode<'a, T: 'a + Text> {
     /// The original parse tree
-    tree: &'a Ast<T>,
+    tree: &'a Ast<'a, T>,
     /// The index of this node in the parse tree
-    index: usize,
+    index: usize
 }
 
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
 pub struct AstFamily<'a, T: 'a + Text> {
     /// The original parse tree
-    tree: &'a Ast<T>,
+    tree: &'a Ast<'a, T>,
     /// The index of the parent node in the parse tree
-    parent: usize,
+    parent: usize
 }
 
 /// Represents and iterator for adjacents in this graph
 pub struct AstFamilyIterator<'a, T: 'a + Text> {
     /// The original parse tree
-    tree: &'a Ast<T>,
+    tree: &'a Ast<'a, T>,
     /// The index of the first child in the parse tree
     first: usize,
     /// The index of the current child in the parse tree
     current: usize,
     /// the index of the last child (excluded) in the parse tree
-    end: usize,
+    end: usize
 }
 
 
