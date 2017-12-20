@@ -66,7 +66,7 @@ fn run_fuzzy_matcher<'a, T: 'a + Text>(repository: &TokenRepository<'a, T>, auto
 /// Represents a context-free lexer (lexing rules do not depend on the context)
 pub struct ContextFreeLexer<'a, T: 'a + Text> {
     /// The token repository for this lexer
-    repository: &'a mut TokenRepository<'a, T>,
+    repository: TokenRepository<'a, T>,
     /// The repository for errors
     errors: &'a mut ParseErrors,
     /// The DFA automaton for this lexer
@@ -134,7 +134,7 @@ impl<'a, T: 'a + Text> Lexer<'a, T> for ContextFreeLexer<'a, T> {
 
 impl<'a, T: 'a + Text> ContextFreeLexer<'a, T> {
     /// Creates a new lexer
-    pub fn new(repository: &'a mut TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<'a, T> {
+    pub fn new(repository: TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<'a, T> {
         ContextFreeLexer {
             repository,
             errors,
@@ -182,7 +182,7 @@ impl<'a, T: 'a + Text> ContextFreeLexer<'a, T> {
 /// Represents a context-sensitive lexer (lexing rules do not depend on the context)
 pub struct ContextSensitiveLexer<'a, T: 'a + Text> {
     /// The token repository for this lexer
-    repository: &'a mut TokenRepository<'a, T>,
+    repository: TokenRepository<'a, T>,
     /// The repository for errors
     errors: &'a mut ParseErrors,
     /// The DFA automaton for this lexer
@@ -271,7 +271,7 @@ impl<'a, T: 'a + Text> Lexer<'a, T> for ContextSensitiveLexer<'a, T> {
 
 impl<'a, T: 'a + Text> ContextSensitiveLexer<'a, T> {
     /// Creates a new lexer
-    pub fn new(repository: &'a mut TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<'a, T> {
+    pub fn new(repository: TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<'a, T> {
         ContextSensitiveLexer {
             repository,
             errors,
