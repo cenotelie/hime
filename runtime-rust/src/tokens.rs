@@ -25,6 +25,7 @@ use super::text::TextContext;
 use super::text::TextPosition;
 use super::text::TextSpan;
 use super::utils::biglist::BigList;
+use super::utils::EitherMut;
 use super::utils::iterable::Iterable;
 
 /// Represents the metadata of a token
@@ -51,12 +52,6 @@ impl TokenRepositoryImpl {
     }
 }
 
-/// Represents a reference to the implementation of a token repository that can be either mutable or immutable
-enum TokenRepositoryImplRef<'a> {
-    Immutable(&'a TokenRepositoryImpl),
-    Mutable(&'a mut TokenRepositoryImpl),
-}
-
 /// The proxy structure for a repository of matched tokens
 pub struct TokenRepository<'a> {
     /// The table of grammar terminals
@@ -64,7 +59,7 @@ pub struct TokenRepository<'a> {
     /// The input text
     text: &'a Text,
     /// The table of matched tokens
-    data: TokenRepositoryImplRef<'a>
+    data: EitherMut<'a, TokenRepositoryImpl>
 }
 
 /// Represents a token as an output element of a lexer
@@ -100,7 +95,7 @@ pub struct TokenRepositoryIterator<'a> {
 impl<'a> Iterator for TokenRepositoryIterator<'a> {
     type Item = Token<'a>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.repository.get_impl().cells.size() {
+        if self.index >= self.repository.data.get().cells.size() {
             None
         } else {
             let result = Token { repository: self.repository, index: self.index };
@@ -128,7 +123,7 @@ impl<'a> TokenRepository<'a> {
         TokenRepository {
             terminals,
             text,
-            data: TokenRepositoryImplRef::Immutable(tokens)
+            data: EitherMut::Immutable(tokens)
         }
     }
 
@@ -137,29 +132,14 @@ impl<'a> TokenRepository<'a> {
         TokenRepository {
             terminals,
             text,
-            data: TokenRepositoryImplRef::Mutable(tokens)
-        }
-    }
-
-    /// Gets the mutable implementation of the repository
-    fn get_impl_mut(&mut self) -> Option<&mut TokenRepositoryImpl> {
-        match self.data {
-            TokenRepositoryImplRef::Mutable(ref mut data) => Some(data),
-            TokenRepositoryImplRef::Immutable(ref _data) => None
-        }
-    }
-
-    /// Get the immutable implementation of the repository
-    fn get_impl(&self) -> &TokenRepositoryImpl {
-        match self.data {
-            TokenRepositoryImplRef::Mutable(ref data) => data,
-            TokenRepositoryImplRef::Immutable(ref data) => data
+            data: EitherMut::Mutable(tokens)
         }
     }
 
     /// Registers a new token in this repository
     pub fn add(&mut self, terminal: usize, index: usize, length: usize) -> usize {
-        match self.get_impl_mut() {
+        let x = self.data.get_mut();
+        match x {
             None => panic!("Got a mutable token repository with an immutable implementation"),
             Some(data) => data.cells.add(TokenRepositoryCell {
                 terminal,
@@ -180,12 +160,12 @@ impl<'a> TokenRepository<'a> {
 
     /// Gets the number of tokens in this repository
     pub fn get_tokens_count(&self) -> usize {
-        self.get_impl().cells.size()
+        self.data.get().cells.size()
     }
 
     /// Gets the terminal's identifier for the i-th token
     pub fn get_symbol_id_for(&self, index: usize) -> u32 {
-        self.terminals[self.get_impl().cells[index].terminal].id
+        self.terminals[self.data.get().cells[index].terminal].id
     }
 }
 
@@ -197,26 +177,26 @@ impl<'a> SemanticElement for Token<'a> {
 
     /// Gets the position in the input text of this element
     fn get_position(&self) -> TextPosition {
-        self.repository.text.get_position_at(self.repository.get_impl().cells[self.index].span.index)
+        self.repository.text.get_position_at(self.repository.data.get().cells[self.index].span.index)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> TextSpan {
-        self.repository.get_impl().cells[self.index].span
+        self.repository.data.get().cells[self.index].span
     }
 
     /// Gets the context of this element in the input
     fn get_context(&self) -> TextContext {
-        self.repository.text.get_context_for(self.get_position(), self.repository.get_impl().cells[self.index].span.length)
+        self.repository.text.get_context_for(self.get_position(), self.repository.data.get().cells[self.index].span.length)
     }
 
     /// Gets the grammar symbol associated to this element
     fn get_symbol(&self) -> Symbol {
-        self.repository.terminals[self.repository.get_impl().cells[self.index].terminal]
+        self.repository.terminals[self.repository.data.get().cells[self.index].terminal]
     }
 
     /// Gets the value of this element, if any
     fn get_value(&self) -> Option<String> {
-        Some(self.repository.text.get_value_for(self.repository.get_impl().cells[self.index].span))
+        Some(self.repository.text.get_value_for(self.repository.data.get().cells[self.index].span))
     }
 }

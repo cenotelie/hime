@@ -20,7 +20,7 @@ extern crate hime_redist;
 use ::hime_redist::lexers::automaton::DEAD_STATE;
 use ::hime_redist::lexers::automaton::Automaton;
 use ::hime_redist::lexers::automaton::run_dfa;
-use ::hime_redist::text::impls::PrefetchedText;
+use ::hime_redist::text::Text;
 
 /// Static resource for the serialized lexer automaton
 const LEXER_AUTOMATON: &'static [u8] = include_bytes!("HimeGrammarLexer.bin");
@@ -34,7 +34,7 @@ fn test_loaded() {
 #[test]
 fn test_running() {
     let automaton = Automaton::new(LEXER_AUTOMATON);
-    let input = PrefetchedText::new("var");
+    let input = Text::new("var");
     let result = run_dfa(&automaton, &input, 0);
     assert!(result.is_some());
     let data = result.unwrap();
