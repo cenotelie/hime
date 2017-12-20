@@ -26,7 +26,7 @@ use super::tokens::TokenRepository;
 use super::tokens::TokenRepositoryImpl;
 
 /// Represents the output of a parser
-pub struct ParseResult<T: Text> {
+pub struct ParseResult {
     /// The table of grammar terminals
     terminals: &'static Vec<Symbol>,
     /// The table of grammar variables
@@ -34,7 +34,7 @@ pub struct ParseResult<T: Text> {
     /// The table of grammar virtuals
     virtuals: &'static Vec<Symbol>,
     /// The input text
-    text: T,
+    text: Text,
     /// The errors found in the input
     errors: ParseErrors,
     /// The table of matched tokens
@@ -43,9 +43,9 @@ pub struct ParseResult<T: Text> {
     ast: AstImpl
 }
 
-impl<T: Text> ParseResult<T> {
+impl ParseResult {
     /// Initialize a new parse result
-    pub fn new(terminals: &'static Vec<Symbol>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, text: T) -> ParseResult<T> {
+    pub fn new(terminals: &'static Vec<Symbol>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, text: Text) -> ParseResult {
         ParseResult {
             terminals,
             variables,
@@ -72,7 +72,7 @@ impl<T: Text> ParseResult<T> {
         self.virtuals
     }
 
-    pub fn get_input(&self) -> &T {
+    pub fn get_input(&self) -> &Text {
         &self.text
     }
 
@@ -87,7 +87,7 @@ impl<T: Text> ParseResult<T> {
     }
 
     /// Gets the token repository associated with this result
-    pub fn get_tokens(&mut self) -> TokenRepository<T> {
+    pub fn get_tokens(&mut self) -> TokenRepository {
         TokenRepository::new(&self.terminals, &self.text, &mut self.tokens)
     }
 

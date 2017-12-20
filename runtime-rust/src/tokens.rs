@@ -52,25 +52,25 @@ impl TokenRepositoryImpl {
 }
 
 /// The proxy structure for a repository of matched tokens
-pub struct TokenRepository<'a, T: 'a + Text> {
+pub struct TokenRepository<'a> {
     /// The table of grammar terminals
     terminals: &'static Vec<Symbol>,
     /// The input text
-    text: &'a T,
+    text: &'a Text,
     /// The table of matched tokens
     tokens: &'a mut TokenRepositoryImpl
 }
 
 /// Represents a token as an output element of a lexer
-pub struct Token<'a, T: 'a + Text> {
+pub struct Token<'a> {
     /// The repository containing this token
-    repository: &'a TokenRepository<'a, T>,
+    repository: &'a TokenRepository<'a>,
     /// The index of this token in the text
     index: usize
 }
 
 /// Implementation of `Clone` for `Token`
-impl<'a, T: 'a + Text> Clone for Token<'a, T> {
+impl<'a> Clone for Token<'a> {
     fn clone(&self) -> Self {
         Token {
             repository: self.repository,
@@ -80,19 +80,19 @@ impl<'a, T: 'a + Text> Clone for Token<'a, T> {
 }
 
 /// Implementation of `Copy` for `Token`
-impl<'a, T: 'a + Text> Copy for Token<'a, T> {}
+impl<'a> Copy for Token<'a> {}
 
 /// the iterator over the tokens in a repository
-pub struct TokenRepositoryIterator<'a, T: 'a + Text> {
+pub struct TokenRepositoryIterator<'a> {
     /// The repository containing this token
-    repository: &'a TokenRepository<'a, T>,
+    repository: &'a TokenRepository<'a>,
     /// The current index within the repository
     index: usize
 }
 
 /// Implementation of `Iterator` for `TokenRepositoryIterator`
-impl<'a, T: 'a + Text> Iterator for TokenRepositoryIterator<'a, T> {
-    type Item = Token<'a, T>;
+impl<'a> Iterator for TokenRepositoryIterator<'a> {
+    type Item = Token<'a>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.repository.tokens.cells.size() {
             None
@@ -105,9 +105,9 @@ impl<'a, T: 'a + Text> Iterator for TokenRepositoryIterator<'a, T> {
 }
 
 /// Implementation of `Iterable` for `TokenRepository`
-impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<'a, T> {
-    type Item = Token<'a, T>;
-    type IteratorType = TokenRepositoryIterator<'a, T>;
+impl<'a> Iterable<'a> for TokenRepository<'a> {
+    type Item = Token<'a>;
+    type IteratorType = TokenRepositoryIterator<'a>;
     fn iter(&'a self) -> Self::IteratorType {
         TokenRepositoryIterator {
             repository: self,
@@ -116,9 +116,9 @@ impl<'a, T: 'a + Text> Iterable<'a> for TokenRepository<'a, T> {
     }
 }
 
-impl<'a, T: 'a + Text> TokenRepository<'a, T> {
+impl<'a> TokenRepository<'a> {
     /// Creates a new repository
-    pub fn new(terminals: &'static Vec<Symbol>, text: &'a T, tokens: &'a mut TokenRepositoryImpl) -> TokenRepository<'a, T> {
+    pub fn new(terminals: &'static Vec<Symbol>, text: &'a Text, tokens: &'a mut TokenRepositoryImpl) -> TokenRepository<'a> {
         TokenRepository {
             terminals,
             text,
@@ -140,7 +140,7 @@ impl<'a, T: 'a + Text> TokenRepository<'a, T> {
     }
 
     /// Gets the input text
-    pub fn get_input(&self) -> &T {
+    pub fn get_input(&self) -> &Text {
         &self.text
     }
 
@@ -155,7 +155,7 @@ impl<'a, T: 'a + Text> TokenRepository<'a, T> {
     }
 }
 
-impl<'a, T: 'a + Text> SemanticElement for Token<'a, T> {
+impl<'a> SemanticElement for Token<'a> {
     /// Gets the type of symbol this element represents
     fn get_symbol_type(&self) -> SymbolType {
         SymbolType::Token

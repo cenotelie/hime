@@ -118,9 +118,9 @@ impl AstImpl {
 /// Represents a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
-pub struct Ast<'a, T: 'a + Text> {
+pub struct Ast<'a> {
     /// The table of tokens
-    tokens: TokenRepository<'a, T>,
+    tokens: TokenRepository<'a>,
     /// The table of variables
     variables: &'static Vec<Symbol>,
     /// The table of virtuals
@@ -129,9 +129,9 @@ pub struct Ast<'a, T: 'a + Text> {
     data: &'a mut AstImpl
 }
 
-impl<'a, T: 'a + Text> Ast<'a, T> {
+impl<'a> Ast<'a> {
     /// Creates a new AST proxy structure
-    pub fn new(tokens: TokenRepository<'a, T>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a mut AstImpl) -> Ast<'a, T> {
+    pub fn new(tokens: TokenRepository<'a>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a mut AstImpl) -> Ast<'a> {
         Ast {
             tokens,
             variables,
@@ -143,26 +143,26 @@ impl<'a, T: 'a + Text> Ast<'a, T> {
 
 /// Represents a node in an Abstract Syntax Tree
 #[derive(Clone)]
-pub struct AstNode<'a, T: 'a + Text> {
+pub struct AstNode<'a> {
     /// The original parse tree
-    tree: &'a Ast<'a, T>,
+    tree: &'a Ast<'a>,
     /// The index of this node in the parse tree
     index: usize
 }
 
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
-pub struct AstFamily<'a, T: 'a + Text> {
+pub struct AstFamily<'a> {
     /// The original parse tree
-    tree: &'a Ast<'a, T>,
+    tree: &'a Ast<'a>,
     /// The index of the parent node in the parse tree
     parent: usize
 }
 
 /// Represents and iterator for adjacents in this graph
-pub struct AstFamilyIterator<'a, T: 'a + Text> {
+pub struct AstFamilyIterator<'a> {
     /// The original parse tree
-    tree: &'a Ast<'a, T>,
+    tree: &'a Ast<'a>,
     /// The index of the first child in the parse tree
     first: usize,
     /// The index of the current child in the parse tree
@@ -174,7 +174,7 @@ pub struct AstFamilyIterator<'a, T: 'a + Text> {
 
 /*
 /// Implementation of the `Iterator` trait for `BigListIterator`
-impl<'a, T: Text> Iterator for AstFamilyIterator<'a, T> {
+impl<'a: Text> Iterator for AstFamilyIterator<'a> {
     type Item = AstN;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.list.size() {

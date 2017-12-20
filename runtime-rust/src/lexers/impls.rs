@@ -35,7 +35,7 @@ use super::super::tokens::TokenRepository;
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Runs the fuzzy DFA matcher
-fn run_fuzzy_matcher<'a, T: 'a + Text>(repository: &TokenRepository<'a, T>, automaton: &Automaton, separator_id: u32, recovery: usize, errors: &mut ParseErrors, origin_index: usize) -> Option<TokenMatch> {
+fn run_fuzzy_matcher<'a>(repository: &TokenRepository<'a>, automaton: &Automaton, separator_id: u32, recovery: usize, errors: &mut ParseErrors, origin_index: usize) -> Option<TokenMatch> {
     if recovery <= 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.get_input().get_position_at(origin_index),
@@ -64,9 +64,9 @@ fn run_fuzzy_matcher<'a, T: 'a + Text>(repository: &TokenRepository<'a, T>, auto
 }
 
 /// Represents a context-free lexer (lexing rules do not depend on the context)
-pub struct ContextFreeLexer<'a, T: 'a + Text> {
+pub struct ContextFreeLexer<'a> {
     /// The token repository for this lexer
-    repository: TokenRepository<'a, T>,
+    repository: TokenRepository<'a>,
     /// The repository for errors
     errors: &'a mut ParseErrors,
     /// The DFA automaton for this lexer
@@ -82,7 +82,7 @@ pub struct ContextFreeLexer<'a, T: 'a + Text> {
     recovery: usize
 }
 
-impl<'a, T: 'a + Text> Lexer<'a, T> for ContextFreeLexer<'a, T> {
+impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &Vec<Symbol> {
         self.repository.get_terminals()
@@ -94,7 +94,7 @@ impl<'a, T: 'a + Text> Lexer<'a, T> for ContextFreeLexer<'a, T> {
     }
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<'a, T> {
+    fn get_output(&self) -> &TokenRepository<'a> {
         &self.repository
     }
 
@@ -132,9 +132,9 @@ impl<'a, T: 'a + Text> Lexer<'a, T> for ContextFreeLexer<'a, T> {
     }
 }
 
-impl<'a, T: 'a + Text> ContextFreeLexer<'a, T> {
+impl<'a> ContextFreeLexer<'a> {
     /// Creates a new lexer
-    pub fn new(repository: TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<'a, T> {
+    pub fn new(repository: TokenRepository<'a>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<'a> {
         ContextFreeLexer {
             repository,
             errors,
@@ -180,9 +180,9 @@ impl<'a, T: 'a + Text> ContextFreeLexer<'a, T> {
 }
 
 /// Represents a context-sensitive lexer (lexing rules do not depend on the context)
-pub struct ContextSensitiveLexer<'a, T: 'a + Text> {
+pub struct ContextSensitiveLexer<'a> {
     /// The token repository for this lexer
-    repository: TokenRepository<'a, T>,
+    repository: TokenRepository<'a>,
     /// The repository for errors
     errors: &'a mut ParseErrors,
     /// The DFA automaton for this lexer
@@ -199,7 +199,7 @@ pub struct ContextSensitiveLexer<'a, T: 'a + Text> {
 }
 
 
-impl<'a, T: 'a + Text> Lexer<'a, T> for ContextSensitiveLexer<'a, T> {
+impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     /// Gets the terminals matched by this lexer
     fn get_terminals(&self) -> &Vec<Symbol> {
         self.repository.get_terminals()
@@ -211,7 +211,7 @@ impl<'a, T: 'a + Text> Lexer<'a, T> for ContextSensitiveLexer<'a, T> {
     }
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<'a, T> {
+    fn get_output(&self) -> &TokenRepository<'a> {
         &self.repository
     }
 
@@ -269,9 +269,9 @@ impl<'a, T: 'a + Text> Lexer<'a, T> for ContextSensitiveLexer<'a, T> {
     }
 }
 
-impl<'a, T: 'a + Text> ContextSensitiveLexer<'a, T> {
+impl<'a> ContextSensitiveLexer<'a> {
     /// Creates a new lexer
-    pub fn new(repository: TokenRepository<'a, T>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<'a, T> {
+    pub fn new(repository: TokenRepository<'a>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<'a> {
         ContextSensitiveLexer {
             repository,
             errors,
