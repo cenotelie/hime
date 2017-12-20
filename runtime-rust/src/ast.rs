@@ -155,6 +155,14 @@ impl<'a> Ast<'a> {
             data: EitherMut::Mutable(data)
         }
     }
+
+    /// Sets the root for the AST
+    pub fn set_root(&mut self, root: usize) {
+        match self.data.get_mut() {
+            None => panic!("Got a mutable AST with an immutable implementation"),
+            Some(x) => x.root = Some(root)
+        }
+    }
 }
 
 /// Represents a node in an Abstract Syntax Tree
