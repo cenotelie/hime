@@ -87,17 +87,32 @@ impl ParseResult {
     }
 
     /// Gets the token repository associated with this result
-    pub fn get_tokens(&mut self) -> TokenRepository {
-        TokenRepository::new(&self.terminals, &self.text, &mut self.tokens)
+    pub fn get_tokens(&self) -> TokenRepository {
+        TokenRepository::new(&self.terminals, &self.text, &self.tokens)
     }
 
-    /*/// Gets the resulting AST
-    pub fn get_ast(&mut self) -> Ast<T> {
+    /// Gets the token repository associated with this result
+    pub fn get_tokens_mut(&mut self) -> TokenRepository {
+        TokenRepository::new_mut(&self.terminals, &self.text, &mut self.tokens)
+    }
+
+    /// Gets the resulting AST
+    pub fn get_ast(&self) -> Ast {
         Ast::new(
-            self.get_tokens(),
+            TokenRepository::new(&self.terminals, &self.text, &self.tokens),
+            self.variables,
+            self.virtuals,
+            &self.ast
+        )
+    }
+
+    /// Gets the resulting AST
+    pub fn get_ast_mut(&mut self) -> Ast {
+        Ast::new_mut(
+            TokenRepository::new(&self.terminals, &self.text, &self.tokens),
             self.variables,
             self.virtuals,
             &mut self.ast
         )
-    }*/
+    }
 }

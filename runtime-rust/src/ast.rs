@@ -20,6 +20,7 @@
 use super::symbols::Symbol;
 use super::text::Text;
 use super::tokens::TokenRepository;
+use super::utils::EitherMut;
 use super::utils::biglist::BigList;
 
 /// Represents a type of symbol table
@@ -126,17 +127,27 @@ pub struct Ast<'a> {
     /// The table of virtuals
     virtuals: &'static Vec<Symbol>,
     /// The data of the implementation
-    data: &'a mut AstImpl
+    data: EitherMut<'a, AstImpl>
 }
 
 impl<'a> Ast<'a> {
     /// Creates a new AST proxy structure
-    pub fn new(tokens: TokenRepository<'a>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a mut AstImpl) -> Ast<'a> {
+    pub fn new(tokens: TokenRepository<'a>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a AstImpl) -> Ast<'a> {
         Ast {
             tokens,
             variables,
             virtuals,
-            data
+            data: EitherMut::Immutable(data)
+        }
+    }
+
+    /// Creates a new AST proxy structure
+    pub fn new_mut(tokens: TokenRepository<'a>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a mut AstImpl) -> Ast<'a> {
+        Ast {
+            tokens,
+            variables,
+            virtuals,
+            data: EitherMut::Mutable(data)
         }
     }
 }
