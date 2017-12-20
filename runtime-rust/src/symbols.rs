@@ -66,13 +66,13 @@ pub trait SemanticElement {
     fn get_symbol_type(&self) -> SymbolType;
 
     /// Gets the position in the input text of this element
-    fn get_position(&self) -> TextPosition;
+    fn get_position(&self) -> Option<TextPosition>;
 
     /// Gets the span in the input text of this element
-    fn get_span(&self) -> TextSpan;
+    fn get_span(&self) -> Option<TextSpan>;
 
     /// Gets the context of this element in the input
-    fn get_context(&self) -> TextContext;
+    fn get_context(&self) -> Option<TextContext>;
 
     /// Gets the grammar symbol associated to this element
     fn get_symbol(&self) -> Symbol;

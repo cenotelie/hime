@@ -17,11 +17,16 @@
 
 //! Module for Abstract-Syntax Trees
 
+use super::symbols::SemanticElement;
 use super::symbols::Symbol;
-use super::text::Text;
+use super::symbols::SymbolType;
+use super::text::TextContext;
+use super::text::TextPosition;
+use super::text::TextSpan;
 use super::tokens::TokenRepository;
 use super::utils::EitherMut;
 use super::utils::biglist::BigList;
+use super::utils::iterable::Iterable;
 
 /// Represents a type of symbol table
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -77,11 +82,11 @@ impl TableElemRef {
 #[derive(Copy, Clone)]
 pub struct AstCell {
     /// The node's label
-    pub label: TableElemRef,
+    label: TableElemRef,
     /// The number of children
-    pub count: u32,
+    count: u32,
     /// The index of the first child
-    pub first: u32
+    first: u32
 }
 
 impl AstCell {
@@ -161,6 +166,96 @@ pub struct AstNode<'a> {
     index: usize
 }
 
+impl<'a> AstNode<'a> {
+    /// Gets the children of this node
+    pub fn children(&self) -> AstFamily {
+        AstFamily {
+            tree: self.tree,
+            parent: self.index
+        }
+    }
+}
+
+impl<'a> SemanticElement for AstNode<'a> {
+    /// Gets the type of symbol this element represents
+    fn get_symbol_type(&self) -> SymbolType {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => SymbolType::Token,
+            TableType::Variable => SymbolType::Variable,
+            TableType::Virtual => SymbolType::Virtual,
+            _ => SymbolType::Virtual
+        }
+    }
+
+    /// Gets the position in the input text of this element
+    fn get_position(&self) -> Option<TextPosition> {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.tree.tokens.get_token(cell.label.get_index());
+                token.get_position()
+            },
+            _ => None
+        }
+    }
+
+    /// Gets the span in the input text of this element
+    fn get_span(&self) -> Option<TextSpan> {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.tree.tokens.get_token(cell.label.get_index());
+                token.get_span()
+            },
+            _ => None
+        }
+    }
+
+    /// Gets the context of this element in the input
+    fn get_context(&self) -> Option<TextContext> {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.tree.tokens.get_token(cell.label.get_index());
+                token.get_context()
+            },
+            _ => None
+        }
+    }
+
+    /// Gets the grammar symbol associated to this element
+    fn get_symbol(&self) -> Symbol {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.tree.tokens.get_token(cell.label.get_index());
+                token.get_symbol()
+            },
+            TableType::Variable => {
+                self.tree.variables[cell.label.get_index()]
+            },
+            TableType::Virtual => {
+                self.tree.virtuals[cell.label.get_index()]
+            }
+            _ => panic!("Undefined symbol")
+        }
+    }
+
+    /// Gets the value of this element, if any
+    fn get_value(&self) -> Option<String> {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.tree.tokens.get_token(cell.label.get_index());
+                token.get_value()
+            },
+            _ => None
+        }
+    }
+}
+
+
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
 pub struct AstFamily<'a> {
@@ -174,27 +269,52 @@ pub struct AstFamily<'a> {
 pub struct AstFamilyIterator<'a> {
     /// The original parse tree
     tree: &'a Ast<'a>,
-    /// The index of the first child in the parse tree
-    first: usize,
     /// The index of the current child in the parse tree
     current: usize,
     /// the index of the last child (excluded) in the parse tree
     end: usize
 }
 
-
-/*
-/// Implementation of the `Iterator` trait for `BigListIterator`
-impl<'a: Text> Iterator for AstFamilyIterator<'a> {
-    type Item = AstN;
+/// Implementation of the `Iterator` trait for `AstFamilyIterator`
+impl<'a> Iterator for AstFamilyIterator<'a> {
+    type Item = AstNode<'a>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.list.size() {
+        if self.current >= self.end {
             None
         } else {
-            let result = self.list[self.index];
-            self.index = self.index + 1;
+            let result = AstNode { tree: self.tree, index: self.current };
+            self.current += 1;
             Some(result)
         }
     }
 }
-*/
+
+/// Implementation of the `Iterable` trait for `AstFamily`
+impl<'a> Iterable<'a> for AstFamily<'a> {
+    type Item = AstNode<'a>;
+    type IteratorType = AstFamilyIterator<'a>;
+    fn iter(&'a self) -> Self::IteratorType {
+        let cell = self.tree.data.get().nodes[self.parent];
+        AstFamilyIterator {
+            tree: self.tree,
+            current: cell.first as usize,
+            end: (cell.first + cell.count) as usize
+        }
+    }
+}
+
+impl<'a> AstFamily<'a> {
+    /// Gets the number of children in this family
+    pub fn count(&self) -> usize {
+        self.tree.data.get().nodes[self.parent].count as usize
+    }
+
+    /// Gets the i-th child
+    pub fn at(&self, index: usize) -> AstNode {
+        let cell = self.tree.data.get().nodes[self.parent];
+        AstNode {
+            tree: self.tree,
+            index: cell.first as usize + index
+        }
+    }
+}

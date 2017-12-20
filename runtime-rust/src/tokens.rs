@@ -167,6 +167,11 @@ impl<'a> TokenRepository<'a> {
     pub fn get_symbol_id_for(&self, index: usize) -> u32 {
         self.terminals[self.data.get().cells[index].terminal].id
     }
+
+    /// Gets the i-th token
+    pub fn get_token(&'a self, index: usize) -> Token<'a> {
+        Token { repository: &self, index }
+    }
 }
 
 impl<'a> SemanticElement for Token<'a> {
@@ -176,18 +181,18 @@ impl<'a> SemanticElement for Token<'a> {
     }
 
     /// Gets the position in the input text of this element
-    fn get_position(&self) -> TextPosition {
-        self.repository.text.get_position_at(self.repository.data.get().cells[self.index].span.index)
+    fn get_position(&self) -> Option<TextPosition> {
+        Some(self.repository.text.get_position_at(self.repository.data.get().cells[self.index].span.index))
     }
 
     /// Gets the span in the input text of this element
-    fn get_span(&self) -> TextSpan {
-        self.repository.data.get().cells[self.index].span
+    fn get_span(&self) -> Option<TextSpan> {
+        Some(self.repository.data.get().cells[self.index].span)
     }
 
     /// Gets the context of this element in the input
-    fn get_context(&self) -> TextContext {
-        self.repository.text.get_context_for(self.get_position(), self.repository.data.get().cells[self.index].span.length)
+    fn get_context(&self) -> Option<TextContext> {
+        Some(self.repository.text.get_context_for(self.get_position().unwrap(), self.repository.data.get().cells[self.index].span.length))
     }
 
     /// Gets the grammar symbol associated to this element
