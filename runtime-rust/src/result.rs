@@ -18,6 +18,7 @@
 //! Module for the definition of a parse result
 
 use super::ast::Ast;
+use super::ast::AstImpl;
 use super::errors::ParseErrors;
 use super::symbols::Symbol;
 use super::text::Text;
@@ -34,10 +35,12 @@ pub struct ParseResult<T: Text> {
     virtuals: &'static Vec<Symbol>,
     /// The input text
     text: T,
+    /// The errors found in the input
+    errors: ParseErrors,
     /// The table of matched tokens
     tokens: TokenRepositoryImpl,
-    /// The errors found in the input
-    errors: ParseErrors
+    /// The produced AST
+    ast: AstImpl
 }
 
 impl<T: Text> ParseResult<T> {
@@ -48,14 +51,29 @@ impl<T: Text> ParseResult<T> {
             variables,
             virtuals,
             text,
+            errors: ParseErrors::new(),
             tokens: TokenRepositoryImpl::new(),
-            errors: ParseErrors::new()
+            ast: AstImpl::new()
         }
     }
 
-    /// Gets the token repository associated with this result
-    pub fn get_tokens(&mut self) -> TokenRepository<T> {
-        TokenRepository::new(&self.terminals, &self.text, &mut self.tokens)
+    /// Gets the grammar terminals
+    pub fn get_terminals(&self) -> &'static Vec<Symbol> {
+        self.terminals
+    }
+
+    /// Gets the grammar variables
+    pub fn get_variables(&self) -> &'static Vec<Symbol> {
+        self.variables
+    }
+
+    /// Gets the grammar virtuals
+    pub fn get_virtuals(&self) -> &'static Vec<Symbol> {
+        self.virtuals
+    }
+
+    pub fn get_input(&self) -> &T {
+        &self.text
     }
 
     /// Gets the collection of errors
@@ -67,4 +85,19 @@ impl<T: Text> ParseResult<T> {
     pub fn get_errors_mut(&mut self) -> &mut ParseErrors {
         &mut self.errors
     }
+
+    /// Gets the token repository associated with this result
+    pub fn get_tokens(&mut self) -> TokenRepository<T> {
+        TokenRepository::new(&self.terminals, &self.text, &mut self.tokens)
+    }
+
+    /*/// Gets the resulting AST
+    pub fn get_ast(&mut self) -> Ast<T> {
+        Ast::new(
+            self.get_tokens(),
+            self.variables,
+            self.virtuals,
+            &mut self.ast
+        )
+    }*/
 }

@@ -95,6 +95,26 @@ impl AstCell {
     }
 }
 
+/// Implementation of a simple AST with a tree structure
+/// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
+/// The linkage is represented by each node storing its number of children and the index of its first child.
+pub struct AstImpl {
+    /// The nodes' labels
+    nodes: BigList<AstCell>,
+    /// The index of the tree's root node
+    root: Option<usize>
+}
+
+impl AstImpl {
+    /// Creates a new implementation
+    pub fn new() -> AstImpl {
+        AstImpl {
+            nodes: BigList::<AstCell>::new(AstCell::new(TableElemRef::new(TableType::None, 0), 0, 0)),
+            root: None
+        }
+    }
+}
+
 /// Represents a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
@@ -105,13 +125,21 @@ pub struct Ast<'a, T: 'a + Text> {
     variables: &'static Vec<Symbol>,
     /// The table of virtuals
     virtuals: &'static Vec<Symbol>,
-    /// The nodes' labels
-    nodes: BigList<AstCell>,
-    /// The index of the tree's root node
-    root: usize
+    /// The data of the implementation
+    data: &'a mut AstImpl
 }
 
-impl<'a, T: 'a + Text> Ast<'a, T> {}
+impl<'a, T: 'a + Text> Ast<'a, T> {
+    /// Creates a new AST proxy structure
+    pub fn new(tokens: TokenRepository<'a, T>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a mut AstImpl) -> Ast<'a, T> {
+        Ast {
+            tokens,
+            variables,
+            virtuals,
+            data
+        }
+    }
+}
 
 /// Represents a node in an Abstract Syntax Tree
 #[derive(Clone)]
