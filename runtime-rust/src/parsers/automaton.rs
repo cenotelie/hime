@@ -170,13 +170,13 @@ impl<'a> LRAction<'a> {
 /// array of LROpCode
 pub struct LRProduction {
     /// Index of the rule's head in the parser's array of variables
-    head: usize,
+    pub head: usize,
     /// Action of the rule's head (replace or not)
-    head_action: TreeAction,
+    pub head_action: TreeAction,
     /// Size of the rule's body by only counting terminals and variables
-    reduction_length: usize,
+    pub reduction_length: usize,
     /// Bytecode for the rule's production
-    bytecode: Vec<LROpCode>
+    pub bytecode: Vec<LROpCode>
 }
 
 impl LRProduction {
