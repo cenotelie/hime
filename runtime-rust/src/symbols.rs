@@ -20,6 +20,7 @@
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
+use std::ops::Index;
 
 use super::text::TextContext;
 use super::text::TextPosition;
@@ -80,3 +81,12 @@ pub trait SemanticElement {
     /// Gets the value of this element, if any
     fn get_value(&self) -> Option<String>;
 }
+
+/// Represents the semantic body of a rule being reduced
+pub trait SemanticBody: Index<usize, Output=SemanticElement> {
+    /// Gets the length of this body
+    fn length() -> usize;
+}
+
+/// Delegate for a user-defined semantic action
+pub type SemanticAction = fn(head: Symbol, body: &SemanticBody<Output=SemanticElement>);
