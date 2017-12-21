@@ -24,7 +24,6 @@ use super::automaton::AutomatonState;
 use super::automaton::DEAD_STATE;
 use super::automaton::TokenMatch;
 use super::super::errors::ParseErrors;
-use super::super::errors::ParseErrorType;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::errors::ParseErrorEndOfInput;
 use super::super::errors::ParseErrorIncorrectEncodingSequence;
@@ -222,9 +221,9 @@ impl<'a> FuzzyMatcher<'a> {
             let c = self.text.get_at(index - 1);
             if c >= 0xD800 && c <= 0xDBFF {
                 // a trailing UTF-16 high surrogate
-                self.errors.push_error_incorrect_encoding(ParseErrorIncorrectEncodingSequence::new(
+                self.errors.push_error_no_low_utf16_surrogate(ParseErrorIncorrectEncodingSequence::new(
                     self.text.get_position_at(index - 1),
-                    ParseErrorType::IncorrectUTF16NoLowSurrogate,
+                    false,
                     c
                 ));
             } else {
@@ -247,9 +246,9 @@ impl<'a> FuzzyMatcher<'a> {
                     ));
                 } else {
                     // high surrogate without the low surrogate
-                    self.errors.push_error_incorrect_encoding(ParseErrorIncorrectEncodingSequence::new(
+                    self.errors.push_error_no_low_utf16_surrogate(ParseErrorIncorrectEncodingSequence::new(
                         self.text.get_position_at(index),
-                        ParseErrorType::IncorrectUTF16NoLowSurrogate,
+                        false,
                         c
                     ));
                 }
@@ -265,9 +264,9 @@ impl<'a> FuzzyMatcher<'a> {
                     ));
                 } else {
                     // a low surrogate without the high surrogate
-                    self.errors.push_error_incorrect_encoding(ParseErrorIncorrectEncodingSequence::new(
+                    self.errors.push_error_no_high_utf16_surrogate(ParseErrorIncorrectEncodingSequence::new(
                         self.text.get_position_at(index),
-                        ParseErrorType::IncorrectUTF16NoHighSurrogate,
+                        true,
                         c
                     ));
                 }
