@@ -57,7 +57,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="terminal">The terminal</param>
 		/// <remarks>
-		/// If the terminal is terminal is already added to the reduction collection it is removed from it.
+		/// If the terminal is already added to the reduction collection it is removed from it.
 		/// </remarks>
 		public void AddUniqueShift(Symbol terminal)
 		{

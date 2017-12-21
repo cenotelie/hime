@@ -144,7 +144,7 @@ namespace Hime.Redist.Parsers
 			return table[state * ncols + columns[sid]];
 		}
 
-		/// <summary>columns
+		/// <summary>
 		/// Gets the production at the given index
 		/// </summary>
 		/// <param name="index">Production's index</param>

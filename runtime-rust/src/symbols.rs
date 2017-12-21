@@ -45,7 +45,7 @@ pub const SID_EPSILON: u32 = 1;
 pub const SID_DOLLAR: u32 = 2;
 
 /// Represents a grammar symbol (terminal, variable or virtual)
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Symbol {
     /// The symbol's unique identifier
     pub id: u32,
