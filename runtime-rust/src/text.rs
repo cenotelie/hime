@@ -17,12 +17,12 @@
 
 //! Module for text-handling APIs
 
-use std::result::Result;
 use std::fmt::Display;
-use std::fmt::Formatter;
 use std::fmt::Error;
+use std::fmt::Formatter;
 use std::io::BufReader;
 use std::io::Read;
+use std::result::Result;
 
 use super::utils::biglist::BigList;
 use super::utils::iterable::Iterable;
@@ -91,7 +91,6 @@ pub struct TextContext {
     pub pointer: String
 }
 
-
 /// Represents the input of parser with some metadata for line endings
 /// All line numbers and column numbers are 1-based.
 /// Indices in the content are 0-based.
@@ -119,10 +118,7 @@ impl Text {
             }
         }
         let lines = find_lines_in(&content);
-        Text {
-            content,
-            lines
-        }
+        Text { content, lines }
     }
 
     /// Initializes this text from a UTF-16 stream
@@ -134,10 +130,7 @@ impl Text {
             content.add(c);
         }
         let lines = find_lines_in(&content);
-        Text {
-            content,
-            lines
-        }
+        Text { content, lines }
     }
 
     /// Initializes this text from a UTF-8 stream
@@ -149,12 +142,8 @@ impl Text {
             content.add(c);
         }
         let lines = find_lines_in(&content);
-        Text {
-            content,
-            lines
-        }
+        Text { content, lines }
     }
-
 
     /// Gets the number of lines
     pub fn get_line_count(&self) -> usize {
@@ -233,7 +222,12 @@ impl Text {
 
         // gather the start and end indices of the line's content to output
         let mut end = line_index + line_length - 1;
-        while end != line_index + 1 && (self.content[end] == 0x000A || self.content[end] == 0x000B || self.content[end] == 0x000C || self.content[end] == 0x000D || self.content[end] == 0x0085 || self.content[end] == 0x2028 || self.content[end] == 0x2029) {
+        while end != line_index + 1
+            && (self.content[end] == 0x000A || self.content[end] == 0x000B
+                || self.content[end] == 0x000C || self.content[end] == 0x000D
+                || self.content[end] == 0x0085 || self.content[end] == 0x2028
+                || self.content[end] == 0x2029)
+        {
             end = end - 1;
         }
         let mut start = line_index;
@@ -326,7 +320,9 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
         let mut bytes: [u8; 1] = [0; 1];
         {
             let read = self.input.read(&mut bytes);
-            if read.is_err() || read.unwrap() < 3 { return None; }
+            if read.is_err() || read.unwrap() < 3 {
+                return None;
+            }
         }
         let b0 = bytes[0] as u8;
 
@@ -335,9 +331,10 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 // this is 4 bytes encoding
                 let mut others: [u8; 3] = [0; 3];
                 let read = self.input.read(&mut others);
-                if read.is_err() || read.unwrap() < 3 { return None; }
-                ((b0 as u32) & 0b00000111) << 18
-                    | ((others[0] as u32) & 0b00111111) << 12
+                if read.is_err() || read.unwrap() < 3 {
+                    return None;
+                }
+                ((b0 as u32) & 0b00000111) << 18 | ((others[0] as u32) & 0b00111111) << 12
                     | ((others[1] as u32) & 0b00111111) << 6
                     | ((others[0] as u32) & 0b00111111)
             }
@@ -345,17 +342,19 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 // this is a 3 bytes encoding
                 let mut others: [u8; 2] = [0; 2];
                 let read = self.input.read(&mut others);
-                if read.is_err() || read.unwrap() < 2 { return None; }
-                ((b0 as u32) & 0b00001111) << 12
-                    | ((others[1] as u32) & 0b00111111) << 6
+                if read.is_err() || read.unwrap() < 2 {
+                    return None;
+                }
+                ((b0 as u32) & 0b00001111) << 12 | ((others[1] as u32) & 0b00111111) << 6
                     | ((others[0] as u32) & 0b00111111)
             }
             _ if b0 >> 5 == 0b110 => {
                 // this is a 2 bytes encoding
                 let read = self.input.read(&mut bytes);
-                if read.is_err() || read.unwrap() < 1 { return None; }
-                ((b0 as u32) & 0b00011111) << 6
-                    | ((bytes[0] as u32) & 0b00111111)
+                if read.is_err() || read.unwrap() < 1 {
+                    return None;
+                }
+                ((b0 as u32) & 0b00011111) << 6 | ((bytes[0] as u32) & 0b00111111)
             }
             _ if b0 >> 7 == 0 => {
                 // this is a 1 byte encoding
@@ -411,7 +410,7 @@ fn is_white_space(c: Utf16C) -> bool {
 }
 
 /// Finds all the lines in this content
-fn find_lines_in<'a, T: Iterable<'a, Item=Utf16C>>(iterable: &'a T) -> Vec<usize> {
+fn find_lines_in<'a, T: Iterable<'a, Item = Utf16C>>(iterable: &'a T) -> Vec<usize> {
     let mut result = Vec::<usize>::new();
     let mut c1;
     let mut c2 = 0;
@@ -421,7 +420,11 @@ fn find_lines_in<'a, T: Iterable<'a, Item=Utf16C>>(iterable: &'a T) -> Vec<usize
         c1 = c2;
         c2 = x;
         if is_line_ending(c1, c2) {
-            result.push(if c1 == 0x000D && c2 != 0x000A { i } else { i + 1 });
+            result.push(if c1 == 0x000D && c2 != 0x000A {
+                i
+            } else {
+                i + 1
+            });
         }
         i = i + 1;
     }

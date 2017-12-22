@@ -20,8 +20,8 @@
 use std::ops::Index;
 
 use symbols::Symbol;
-use text::Utf16C;
 use text::TextPosition;
+use text::Utf16C;
 use utils::iterable::Iterable;
 
 /// Common trait for data about an error
@@ -84,7 +84,11 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
 
     /// Gets the error's length in the input (in number of characters)
     fn get_length(&self) -> usize {
-        if self.unexpected[1] == 0x00 { 1 } else { 2 }
+        if self.unexpected[1] == 0x00 {
+            1
+        } else {
+            2
+        }
     }
 
     /// Gets the error's message
@@ -111,7 +115,10 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
 impl ParseErrorUnexpectedChar {
     /// Creates a new error
     pub fn new(position: TextPosition, unexpected: [Utf16C; 2]) -> ParseErrorUnexpectedChar {
-        ParseErrorUnexpectedChar { position, unexpected }
+        ParseErrorUnexpectedChar {
+            position,
+            unexpected
+        }
     }
 }
 
@@ -133,7 +140,9 @@ impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
     }
 
     /// Gets the error's length in the input (in number of characters)
-    fn get_length(&self) -> usize { 1 }
+    fn get_length(&self) -> usize {
+        1
+    }
 
     /// Gets the error's message
     fn get_message(&self) -> String {
@@ -155,7 +164,11 @@ impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
 
 impl ParseErrorIncorrectEncodingSequence {
     /// Initializes this error
-    pub fn new(position: TextPosition, missing_high: bool, sequence: Utf16C) -> ParseErrorIncorrectEncodingSequence {
+    pub fn new(
+        position: TextPosition,
+        missing_high: bool,
+        sequence: Utf16C
+    ) -> ParseErrorIncorrectEncodingSequence {
         ParseErrorIncorrectEncodingSequence {
             position,
             missing_high,
@@ -211,7 +224,13 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedToken {
 
 impl ParseErrorUnexpectedToken {
     /// Initializes this error
-    pub fn new(position: TextPosition, length: usize, value: String, terminal: Symbol, expected: Vec<Symbol>) -> ParseErrorUnexpectedToken {
+    pub fn new(
+        position: TextPosition,
+        length: usize,
+        value: String,
+        terminal: Symbol,
+        expected: Vec<Symbol>
+    ) -> ParseErrorUnexpectedToken {
         ParseErrorUnexpectedToken {
             position,
             length,
@@ -245,7 +264,7 @@ impl ParseErrorDataTrait for ParseError {
             &ParseError::UnexpectedChar(ref x) => x.get_position(),
             &ParseError::UnexpectedToken(ref x) => x.get_position(),
             &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_position(),
-            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_position(),
+            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_position()
         }
     }
 
@@ -256,7 +275,7 @@ impl ParseErrorDataTrait for ParseError {
             &ParseError::UnexpectedChar(ref x) => x.get_length(),
             &ParseError::UnexpectedToken(ref x) => x.get_length(),
             &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_length(),
-            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_length(),
+            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_length()
         }
     }
 
@@ -267,7 +286,7 @@ impl ParseErrorDataTrait for ParseError {
             &ParseError::UnexpectedChar(ref x) => x.get_message(),
             &ParseError::UnexpectedToken(ref x) => x.get_message(),
             &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_message(),
-            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_message(),
+            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_message()
         }
     }
 }
@@ -302,13 +321,21 @@ impl ParseErrors {
     }
 
     /// Handles the incorrect encoding sequence error
-    pub fn push_error_no_low_utf16_surrogate(&mut self, error: ParseErrorIncorrectEncodingSequence) {
-        self.errors.push(ParseError::IncorrectUTF16NoLowSurrogate((error)));
+    pub fn push_error_no_low_utf16_surrogate(
+        &mut self,
+        error: ParseErrorIncorrectEncodingSequence
+    ) {
+        self.errors
+            .push(ParseError::IncorrectUTF16NoLowSurrogate((error)));
     }
 
     /// Handles the incorrect encoding sequence error
-    pub fn push_error_no_high_utf16_surrogate(&mut self, error: ParseErrorIncorrectEncodingSequence) {
-        self.errors.push(ParseError::IncorrectUTF16NoHighSurrogate((error)));
+    pub fn push_error_no_high_utf16_surrogate(
+        &mut self,
+        error: ParseErrorIncorrectEncodingSequence
+    ) {
+        self.errors
+            .push(ParseError::IncorrectUTF16NoHighSurrogate((error)));
     }
 
     /// Gets the number of errors

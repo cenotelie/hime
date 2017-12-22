@@ -45,7 +45,12 @@ pub struct ParseResult {
 
 impl ParseResult {
     /// Initialize a new parse result
-    pub fn new(terminals: &'static Vec<Symbol>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, text: Text) -> ParseResult {
+    pub fn new(
+        terminals: &'static Vec<Symbol>,
+        variables: &'static Vec<Symbol>,
+        virtuals: &'static Vec<Symbol>,
+        text: Text
+    ) -> ParseResult {
         ParseResult {
             terminals,
             variables,

@@ -47,7 +47,7 @@ impl From<usize> for TableType {
             1 => TableType::Token,
             2 => TableType::Variable,
             3 => TableType::Virtual,
-            _ => TableType::None,
+            _ => TableType::None
         }
     }
 }
@@ -92,12 +92,20 @@ pub struct AstCell {
 impl AstCell {
     /// Initializes this node
     pub fn new_empty(label: TableElemRef) -> AstCell {
-        AstCell { label, count: 0, first: 0 }
+        AstCell {
+            label,
+            count: 0,
+            first: 0
+        }
     }
 
     /// Initializes this node
     pub fn new(label: TableElemRef, count: u32, first: u32) -> AstCell {
-        AstCell { label, count, first }
+        AstCell {
+            label,
+            count,
+            first
+        }
     }
 }
 
@@ -115,7 +123,11 @@ impl AstImpl {
     /// Creates a new implementation
     pub fn new() -> AstImpl {
         AstImpl {
-            nodes: BigList::<AstCell>::new(AstCell::new(TableElemRef::new(TableType::None, 0), 0, 0)),
+            nodes: BigList::<AstCell>::new(AstCell::new(
+                TableElemRef::new(TableType::None, 0),
+                0,
+                0
+            )),
             root: None
         }
     }
@@ -137,7 +149,12 @@ pub struct Ast<'a> {
 
 impl<'a> Ast<'a> {
     /// Creates a new AST proxy structure
-    pub fn new(tokens: TokenRepository<'a>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a AstImpl) -> Ast<'a> {
+    pub fn new(
+        tokens: TokenRepository<'a>,
+        variables: &'static Vec<Symbol>,
+        virtuals: &'static Vec<Symbol>,
+        data: &'a AstImpl
+    ) -> Ast<'a> {
         Ast {
             tokens,
             variables,
@@ -147,7 +164,12 @@ impl<'a> Ast<'a> {
     }
 
     /// Creates a new AST proxy structure
-    pub fn new_mut(tokens: TokenRepository<'a>, variables: &'static Vec<Symbol>, virtuals: &'static Vec<Symbol>, data: &'a mut AstImpl) -> Ast<'a> {
+    pub fn new_mut(
+        tokens: TokenRepository<'a>,
+        variables: &'static Vec<Symbol>,
+        virtuals: &'static Vec<Symbol>,
+        data: &'a mut AstImpl
+    ) -> Ast<'a> {
         Ast {
             tokens,
             variables,
@@ -203,7 +225,7 @@ impl<'a> SemanticElement for AstNode<'a> {
             TableType::Token => {
                 let token = self.tree.tokens.get_token(cell.label.get_index());
                 token.get_position()
-            },
+            }
             _ => None
         }
     }
@@ -215,7 +237,7 @@ impl<'a> SemanticElement for AstNode<'a> {
             TableType::Token => {
                 let token = self.tree.tokens.get_token(cell.label.get_index());
                 token.get_span()
-            },
+            }
             _ => None
         }
     }
@@ -227,7 +249,7 @@ impl<'a> SemanticElement for AstNode<'a> {
             TableType::Token => {
                 let token = self.tree.tokens.get_token(cell.label.get_index());
                 token.get_context()
-            },
+            }
             _ => None
         }
     }
@@ -239,13 +261,9 @@ impl<'a> SemanticElement for AstNode<'a> {
             TableType::Token => {
                 let token = self.tree.tokens.get_token(cell.label.get_index());
                 token.get_symbol()
-            },
-            TableType::Variable => {
-                self.tree.variables[cell.label.get_index()]
-            },
-            TableType::Virtual => {
-                self.tree.virtuals[cell.label.get_index()]
             }
+            TableType::Variable => self.tree.variables[cell.label.get_index()],
+            TableType::Virtual => self.tree.virtuals[cell.label.get_index()],
             _ => panic!("Undefined symbol")
         }
     }
@@ -257,12 +275,11 @@ impl<'a> SemanticElement for AstNode<'a> {
             TableType::Token => {
                 let token = self.tree.tokens.get_token(cell.label.get_index());
                 token.get_value()
-            },
+            }
             _ => None
         }
     }
 }
-
 
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
@@ -290,7 +307,10 @@ impl<'a> Iterator for AstFamilyIterator<'a> {
         if self.current >= self.end {
             None
         } else {
-            let result = AstNode { tree: self.tree, index: self.current };
+            let result = AstNode {
+                tree: self.tree,
+                index: self.current
+            };
             self.current += 1;
             Some(result)
         }

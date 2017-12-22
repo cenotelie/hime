@@ -17,10 +17,9 @@
 
 //! Module for the definition of `BigList`
 
+use super::iterable::Iterable;
 use std::ops::Index;
 use std::ops::IndexMut;
-use super::iterable::Iterable;
-
 
 /// The number of bits allocated to the lowest part of the index (within a chunk)
 const UPPER_SHIFT: usize = 8;

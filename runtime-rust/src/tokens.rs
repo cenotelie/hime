@@ -24,8 +24,8 @@ use super::text::Text;
 use super::text::TextContext;
 use super::text::TextPosition;
 use super::text::TextSpan;
-use super::utils::biglist::BigList;
 use super::utils::EitherMut;
+use super::utils::biglist::BigList;
 use super::utils::iterable::Iterable;
 
 /// Represents the metadata of a token
@@ -47,7 +47,13 @@ impl TokenRepositoryImpl {
     /// Creates a new implementation of a token repository
     pub fn new() -> TokenRepositoryImpl {
         TokenRepositoryImpl {
-            cells: BigList::new(TokenRepositoryCell { terminal: 0, span: TextSpan { index: 0, length: 0 } })
+            cells: BigList::new(TokenRepositoryCell {
+                terminal: 0,
+                span: TextSpan {
+                    index: 0,
+                    length: 0
+                }
+            })
         }
     }
 }
@@ -98,7 +104,10 @@ impl<'a> Iterator for TokenRepositoryIterator<'a> {
         if self.index >= self.repository.data.get().cells.size() {
             None
         } else {
-            let result = Token { repository: self.repository, index: self.index };
+            let result = Token {
+                repository: self.repository,
+                index: self.index
+            };
             self.index = self.index + 1;
             Some(result)
         }
@@ -119,7 +128,11 @@ impl<'a> Iterable<'a> for TokenRepository<'a> {
 
 impl<'a> TokenRepository<'a> {
     /// Creates a new repository
-    pub fn new(terminals: &'static Vec<Symbol>, text: &'a Text, tokens: &'a TokenRepositoryImpl) -> TokenRepository<'a> {
+    pub fn new(
+        terminals: &'static Vec<Symbol>,
+        text: &'a Text,
+        tokens: &'a TokenRepositoryImpl
+    ) -> TokenRepository<'a> {
         TokenRepository {
             terminals,
             text,
@@ -128,7 +141,11 @@ impl<'a> TokenRepository<'a> {
     }
 
     /// Creates a new mutable repository
-    pub fn new_mut(terminals: &'static Vec<Symbol>, text: &'a Text, tokens: &'a mut TokenRepositoryImpl) -> TokenRepository<'a> {
+    pub fn new_mut(
+        terminals: &'static Vec<Symbol>,
+        text: &'a Text,
+        tokens: &'a mut TokenRepositoryImpl
+    ) -> TokenRepository<'a> {
         TokenRepository {
             terminals,
             text,
@@ -170,7 +187,10 @@ impl<'a> TokenRepository<'a> {
 
     /// Gets the i-th token
     pub fn get_token(&'a self, index: usize) -> Token<'a> {
-        Token { repository: &self, index }
+        Token {
+            repository: &self,
+            index
+        }
     }
 }
 
@@ -182,7 +202,11 @@ impl<'a> SemanticElement for Token<'a> {
 
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
-        Some(self.repository.text.get_position_at(self.repository.data.get().cells[self.index].span.index))
+        Some(
+            self.repository
+                .text
+                .get_position_at(self.repository.data.get().cells[self.index].span.index)
+        )
     }
 
     /// Gets the span in the input text of this element
@@ -192,7 +216,10 @@ impl<'a> SemanticElement for Token<'a> {
 
     /// Gets the context of this element in the input
     fn get_context(&self) -> Option<TextContext> {
-        Some(self.repository.text.get_context_for(self.get_position().unwrap(), self.repository.data.get().cells[self.index].span.length))
+        Some(self.repository.text.get_context_for(
+            self.get_position().unwrap(),
+            self.repository.data.get().cells[self.index].span.length
+        ))
     }
 
     /// Gets the grammar symbol associated to this element
@@ -202,6 +229,10 @@ impl<'a> SemanticElement for Token<'a> {
 
     /// Gets the value of this element, if any
     fn get_value(&self) -> Option<String> {
-        Some(self.repository.text.get_value_for(self.repository.data.get().cells[self.index].span))
+        Some(
+            self.repository
+                .text
+                .get_value_for(self.repository.data.get().cells[self.index].span)
+        )
     }
 }

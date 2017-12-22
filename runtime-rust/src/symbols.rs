@@ -28,8 +28,7 @@ use super::text::TextSpan;
 
 /// The possible types of symbol
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub enum SymbolType
-{
+pub enum SymbolType {
     /// A token, i.e. a piece of text matched by a lexer
     Token,
     /// A variable defined in the original grammar
@@ -83,10 +82,10 @@ pub trait SemanticElement {
 }
 
 /// Represents the semantic body of a rule being reduced
-pub trait SemanticBody: Index<usize, Output=SemanticElement> {
+pub trait SemanticBody: Index<usize, Output = SemanticElement> {
     /// Gets the length of this body
     fn length() -> usize;
 }
 
 /// Delegate for a user-defined semantic action
-pub type SemanticAction = fn(head: Symbol, body: &SemanticBody<Output=SemanticElement>);
+pub type SemanticAction = fn(head: Symbol, body: &SemanticBody<Output = SemanticElement>);

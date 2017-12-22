@@ -19,11 +19,11 @@
 
 use super::LRActionCode;
 use super::LROpCode;
-use super::TreeAction;
 use super::LR_ACTION_CODE_REDUCE;
 use super::LR_ACTION_CODE_SHIFT;
 use super::TREE_ACTION_NONE;
 use super::TREE_ACTION_REPLACE;
+use super::TreeAction;
 use super::super::symbols::Symbol;
 use super::super::utils::bin::*;
 
@@ -111,11 +111,17 @@ impl LRContexts {
         match self.openings {
             None => {
                 let mut content = Vec::<LRContextOpening>::new();
-                content.push(LRContextOpening { identifier, context });
+                content.push(LRContextOpening {
+                    identifier,
+                    context
+                });
                 self.openings = Some(content);
-            },
+            }
             Some(ref mut data) => {
-                data.push(LRContextOpening { identifier, context });
+                data.push(LRContextOpening {
+                    identifier,
+                    context
+                });
             }
         }
     }
@@ -153,7 +159,7 @@ impl<'a> LRAction<'a> {
 
     /// Gets the data associated with the action
     /// If the code is Reduce, it is the index of the LRProduction
-	/// If the code is Shift, it is the index of the next state
+    /// If the code is Shift, it is the index of the next state
     pub fn get_data(&self) -> u16 {
         self.table[self.offset + 1]
     }
@@ -184,7 +190,11 @@ impl LRProduction {
     pub fn new(data: &[u8], index: &mut usize) -> LRProduction {
         let head = read_u16(data, *index) as usize;
         *index += 2;
-        let head_action = if data[*index] == 1 { TREE_ACTION_REPLACE } else { TREE_ACTION_NONE };
+        let head_action = if data[*index] == 1 {
+            TREE_ACTION_REPLACE
+        } else {
+            TREE_ACTION_NONE
+        };
         *index += 1;
         let reduction_length = data[*index] as usize;
         *index += 1;

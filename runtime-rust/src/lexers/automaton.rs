@@ -17,8 +17,8 @@
 
 //! Module for lexers' automata
 
-use super::super::text::Utf16C;
 use super::super::text::Text;
+use super::super::text::Utf16C;
 use super::super::utils::bin::*;
 
 /// Identifier of an invalid state in an automaton
@@ -152,7 +152,11 @@ impl Automaton {
         let table = read_table_u32(data, 4, states_count);
         let rest = (data.len() - 4 - states_count * 4) / 2;
         let states = read_table_u16(data, 4 + states_count * 4, rest);
-        Automaton { table, states, states_count }
+        Automaton {
+            table,
+            states,
+            states_count
+        }
     }
 
     /// Gets the number of states in the automaton
@@ -180,7 +184,10 @@ pub struct TokenMatch {
 /// Runs the lexer's DFA to match a terminal in the input ahead
 pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<TokenMatch> {
     if input.is_end(index) {
-        return Some(TokenMatch { state: 0, length: 0 });
+        return Some(TokenMatch {
+            state: 0,
+            length: 0
+        });
     }
 
     let mut result = None;
@@ -191,7 +198,10 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<Toke
         let state_data = automaton.get_state(state);
         // Is this state a matching state ?
         if state_data.get_terminals_count() > 0 {
-            result = Some(TokenMatch { state, length: (i - index) as u32 });
+            result = Some(TokenMatch {
+                state,
+                length: (i - index) as u32
+            });
         }
         // No further transition => exit
         if state_data.is_dead_end() {

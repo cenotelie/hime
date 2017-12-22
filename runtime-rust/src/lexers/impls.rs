@@ -24,10 +24,10 @@ use super::automaton::Automaton;
 use super::automaton::TokenMatch;
 use super::automaton::run_dfa;
 use super::fuzzy::FuzzyMatcher;
-use super::super::errors::ParseErrors;
 use super::super::errors::ParseErrorUnexpectedChar;
-use super::super::symbols::Symbol;
+use super::super::errors::ParseErrors;
 use super::super::symbols::SID_DOLLAR;
+use super::super::symbols::Symbol;
 use super::super::text::Text;
 use super::super::tokens::TokenRepository;
 
@@ -35,11 +35,18 @@ use super::super::tokens::TokenRepository;
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Runs the fuzzy DFA matcher
-fn run_fuzzy_matcher<'a>(repository: &TokenRepository<'a>, automaton: &Automaton, separator_id: u32, recovery: usize, errors: &mut ParseErrors, origin_index: usize) -> Option<TokenMatch> {
+fn run_fuzzy_matcher<'a>(
+    repository: &TokenRepository<'a>,
+    automaton: &Automaton,
+    separator_id: u32,
+    recovery: usize,
+    errors: &mut ParseErrors,
+    origin_index: usize
+) -> Option<TokenMatch> {
     if recovery <= 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.get_input().get_position_at(origin_index),
-            [repository.get_input().get_at(origin_index), 0],
+            [repository.get_input().get_at(origin_index), 0]
         ));
         None
     } else {
@@ -57,7 +64,7 @@ fn run_fuzzy_matcher<'a>(repository: &TokenRepository<'a>, automaton: &Automaton
             repository.get_input(),
             errors,
             recovery,
-            origin_index,
+            origin_index
         );
         Some(matcher.run())
     }
@@ -126,7 +133,10 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
             return None;
         }
         let id = self.repository.get_symbol_id_for(self.index);
-        let result = TokenKernel { terminal_id: id, index: self.index as u32 };
+        let result = TokenKernel {
+            terminal_id: id,
+            index: self.index as u32
+        };
         self.index += 1;
         Some(result)
     }
@@ -134,7 +144,12 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
 
 impl<'a> ContextFreeLexer<'a> {
     /// Creates a new lexer
-    pub fn new(repository: TokenRepository<'a>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextFreeLexer<'a> {
+    pub fn new(
+        repository: TokenRepository<'a>,
+        errors: &'a mut ParseErrors,
+        automaton: Automaton,
+        separator_id: u32
+    ) -> ContextFreeLexer<'a> {
         ContextFreeLexer {
             repository,
             errors,
@@ -153,7 +168,14 @@ impl<'a> ContextFreeLexer<'a> {
             let mut result = run_dfa(&self.automaton, self.repository.get_input(), index);
             if result.is_none() {
                 // failed to match, retry with error handling
-                result = run_fuzzy_matcher(&self.repository, &self.automaton, self.separator_id, self.recovery, &mut self.errors, index);
+                result = run_fuzzy_matcher(
+                    &self.repository,
+                    &self.automaton,
+                    self.separator_id,
+                    self.recovery,
+                    &mut self.errors,
+                    index
+                );
             }
             if result.is_none() {
                 // skip this character
@@ -168,9 +190,13 @@ impl<'a> ContextFreeLexer<'a> {
                     return;
                 } else {
                     // matched something
-                    let terminal = self.automaton.get_state(the_match.state).get_terminal(0).index as usize;
+                    let terminal = self.automaton
+                        .get_state(the_match.state)
+                        .get_terminal(0)
+                        .index as usize;
                     if self.repository.get_terminals()[terminal].id != self.separator_id {
-                        self.repository.add(terminal, index, the_match.length as usize);
+                        self.repository
+                            .add(terminal, index, the_match.length as usize);
                     }
                     index += the_match.length as usize;
                 }
@@ -197,7 +223,6 @@ pub struct ContextSensitiveLexer<'a> {
     /// A distance of 0 indicates no recovery.
     recovery: usize
 }
-
 
 impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     /// Gets the terminals matched by this lexer
@@ -238,10 +263,21 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
             return None;
         }
         loop {
-            let mut result = run_dfa(&self.automaton, self.repository.get_input(), self.input_index);
+            let mut result = run_dfa(
+                &self.automaton,
+                self.repository.get_input(),
+                self.input_index
+            );
             if result.is_none() {
                 // failed to match, retry with error handling
-                result = run_fuzzy_matcher(&self.repository, &self.automaton, self.separator_id, self.recovery, &mut self.errors, self.input_index);
+                result = run_fuzzy_matcher(
+                    &self.repository,
+                    &self.automaton,
+                    self.separator_id,
+                    self.recovery,
+                    &mut self.errors,
+                    self.input_index
+                );
             }
             if result.is_none() {
                 // skip this character
@@ -253,15 +289,25 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
                     // the index of the $ symbol is always 1
                     let token_index = self.repository.add(1, self.input_index, 0);
                     self.has_run = true;
-                    return Some(TokenKernel { terminal_id: SID_DOLLAR, index: token_index as u32 });
+                    return Some(TokenKernel {
+                        terminal_id: SID_DOLLAR,
+                        index: token_index as u32
+                    });
                 } else {
                     // matched something
                     let terminal_index = self.get_terminal_for(the_match.state, contexts);
                     let terminal_id = self.repository.get_terminals()[terminal_index as usize].id;
                     self.input_index += the_match.length as usize;
                     if terminal_id != self.separator_id {
-                        let token_index = self.repository.add(terminal_index as usize, self.input_index, the_match.length as usize);
-                        return Some(TokenKernel { terminal_id, index: token_index as u32 });
+                        let token_index = self.repository.add(
+                            terminal_index as usize,
+                            self.input_index,
+                            the_match.length as usize
+                        );
+                        return Some(TokenKernel {
+                            terminal_id,
+                            index: token_index as u32
+                        });
                     }
                 }
             }
@@ -271,7 +317,12 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
 
 impl<'a> ContextSensitiveLexer<'a> {
     /// Creates a new lexer
-    pub fn new(repository: TokenRepository<'a>, errors: &'a mut ParseErrors, automaton: Automaton, separator_id: u32) -> ContextSensitiveLexer<'a> {
+    pub fn new(
+        repository: TokenRepository<'a>,
+        errors: &'a mut ParseErrors,
+        automaton: Automaton,
+        separator_id: u32
+    ) -> ContextSensitiveLexer<'a> {
         ContextSensitiveLexer {
             repository,
             errors,

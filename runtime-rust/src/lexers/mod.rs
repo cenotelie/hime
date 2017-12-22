@@ -41,7 +41,11 @@ pub type ContextProvider = fn(u16, u32) -> Option<usize>;
 /// The priority is an unsigned integer. The lesser the value the higher the priority.
 /// The absence of value represents the unavailability of the required context.
 pub fn default_context_provider(context: u16, _terminal_id: u32) -> Option<usize> {
-    if context == DEFAULT_CONTEXT { Some(usize::MAX) } else { Some(0) }
+    if context == DEFAULT_CONTEXT {
+        Some(usize::MAX)
+    } else {
+        Some(0)
+    }
 }
 
 /// Represents the kernel of a token, i.e. the identifying information of a token
@@ -49,7 +53,7 @@ pub struct TokenKernel {
     /// The identifier of the matched terminal
     pub terminal_id: u32,
     /// The token's index in its repository
-    pub index: u32,
+    pub index: u32
 }
 
 /// The public interface of a lexer
