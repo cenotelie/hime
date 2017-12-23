@@ -18,8 +18,8 @@
 //! Module for Abstract-Syntax Trees
 
 use super::symbols::SemanticElement;
+use super::symbols::SemanticElementTrait;
 use super::symbols::Symbol;
-use super::symbols::SymbolType;
 use super::text::TextContext;
 use super::text::TextPosition;
 use super::text::TextSpan;
@@ -178,6 +178,16 @@ impl<'a> Ast<'a> {
         }
     }
 
+    /// Gets the semantic element corresponding to the specified label
+    pub fn get_semantic_element_for_label(&self, label: TableElemRef) -> SemanticElement {
+        match label.get_type() {
+            TableType::None => panic!("Not a semantic element"),
+            TableType::Token => SemanticElement::Token(self.tokens.get_token(label.get_index())),
+            TableType::Variable => SemanticElement::Variable(self.variables[label.get_index()]),
+            TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.get_index()])
+        }
+    }
+
     /// Gets the root node of this tree
     pub fn get_root(&self) -> AstNode {
         let data = self.data.get();
@@ -236,18 +246,7 @@ impl<'a> AstNode<'a> {
     }
 }
 
-impl<'a> SemanticElement for AstNode<'a> {
-    /// Gets the type of symbol this element represents
-    fn get_symbol_type(&self) -> SymbolType {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
-            TableType::Token => SymbolType::Token,
-            TableType::Variable => SymbolType::Variable,
-            TableType::Virtual => SymbolType::Virtual,
-            _ => SymbolType::Virtual
-        }
-    }
-
+impl<'a> SemanticElementTrait for AstNode<'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
         let cell = self.tree.data.get().nodes[self.index];

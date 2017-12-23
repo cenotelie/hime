@@ -17,9 +17,8 @@
 
 //! Module for the definition of lexical tokens
 
-use super::symbols::SemanticElement;
+use super::symbols::SemanticElementTrait;
 use super::symbols::Symbol;
-use super::symbols::SymbolType;
 use super::text::Text;
 use super::text::TextContext;
 use super::text::TextPosition;
@@ -194,12 +193,7 @@ impl<'a> TokenRepository<'a> {
     }
 }
 
-impl<'a> SemanticElement for Token<'a> {
-    /// Gets the type of symbol this element represents
-    fn get_symbol_type(&self) -> SymbolType {
-        SymbolType::Token
-    }
-
+impl<'a> SemanticElementTrait for Token<'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
         Some(

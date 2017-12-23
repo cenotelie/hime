@@ -20,11 +20,11 @@
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
-use std::ops::Index;
 
 use super::text::TextContext;
 use super::text::TextPosition;
 use super::text::TextSpan;
+use super::tokens::Token;
 
 /// The possible types of symbol
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -60,11 +60,8 @@ impl Display for Symbol {
     }
 }
 
-/// Represents an element of parsing data
-pub trait SemanticElement {
-    /// Gets the type of symbol this element represents
-    fn get_symbol_type(&self) -> SymbolType;
-
+/// A trait for a parsing element
+pub trait SemanticElementTrait {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition>;
 
@@ -81,11 +78,77 @@ pub trait SemanticElement {
     fn get_value(&self) -> Option<String>;
 }
 
+/// Represents an element of parsing data
+pub enum SemanticElement<'a> {
+    /// A token, i.e. a piece of text matched by a lexer
+    Token(Token<'a>),
+    /// A variable defined in the original grammar
+    Variable(Symbol),
+    /// A virtual symbol, defined in the original grammar
+    Virtual(Symbol)
+}
+
+impl<'a> SemanticElementTrait for SemanticElement<'a> {
+    fn get_position(&self) -> Option<TextPosition> {
+        match self {
+            &SemanticElement::Token(ref token) => token.get_position(),
+            &SemanticElement::Variable(ref _symbol) => None,
+            &SemanticElement::Virtual(ref _symbol) => None
+        }
+    }
+
+    fn get_span(&self) -> Option<TextSpan> {
+        match self {
+            &SemanticElement::Token(ref token) => token.get_span(),
+            &SemanticElement::Variable(ref _symbol) => None,
+            &SemanticElement::Virtual(ref _symbol) => None
+        }
+    }
+
+    fn get_context(&self) -> Option<TextContext> {
+        match self {
+            &SemanticElement::Token(ref token) => token.get_context(),
+            &SemanticElement::Variable(ref _symbol) => None,
+            &SemanticElement::Virtual(ref _symbol) => None
+        }
+    }
+
+    fn get_symbol(&self) -> Symbol {
+        match self {
+            &SemanticElement::Token(ref token) => token.get_symbol(),
+            &SemanticElement::Variable(ref symbol) => *symbol,
+            &SemanticElement::Virtual(ref symbol) => *symbol
+        }
+    }
+
+    fn get_value(&self) -> Option<String> {
+        match self {
+            &SemanticElement::Token(ref token) => token.get_value(),
+            &SemanticElement::Variable(ref _symbol) => None,
+            &SemanticElement::Virtual(ref _symbol) => None
+        }
+    }
+}
+
+impl<'a> SemanticElement<'a> {
+    /// Gets the type of the associated symbol
+    pub fn get_symbol_type(&self) -> SymbolType {
+        match self {
+            &SemanticElement::Token(ref _token) => SymbolType::Token,
+            &SemanticElement::Variable(ref _symbol) => SymbolType::Variable,
+            &SemanticElement::Virtual(ref _symbol) => SymbolType::Virtual
+        }
+    }
+}
+
 /// Represents the semantic body of a rule being reduced
-pub trait SemanticBody: Index<usize, Output = SemanticElement> {
+pub trait SemanticBody {
+    /// Gets the symbol at the i-th index
+    fn get_element_at(&self, index: usize) -> SemanticElement;
+
     /// Gets the length of this body
-    fn length() -> usize;
+    fn length(&self) -> usize;
 }
 
 /// Delegate for a user-defined semantic action
-pub type SemanticAction = fn(head: Symbol, body: &SemanticBody<Output = SemanticElement>);
+pub type SemanticAction = fn(head: Symbol, body: &SemanticBody);

@@ -19,6 +19,7 @@
 
 pub mod automaton;
 pub mod subtree;
+pub mod lrk;
 
 /// Represents a tree action
 pub type TreeAction = u16;
