@@ -17,7 +17,7 @@
 
 extern crate hime_redist;
 
-use hime_redist::parsers::automaton::LRkAutomaton;
+use hime_redist::parsers::LRkAutomaton;
 
 /// Static resource for the serialized parser automaton
 const PARSER_AUTOMATON: &'static [u8] = include_bytes!("HimeGrammarParser.bin");

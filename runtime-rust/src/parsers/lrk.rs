@@ -17,17 +17,107 @@
 
 //! Module for LR(k) parsers
 
-use super::TREE_ACTION_DROP;
-use super::TREE_ACTION_NONE;
-use super::TREE_ACTION_PROMOTE;
-use super::TREE_ACTION_REPLACE;
-use super::TreeAction;
+use super::*;
 use super::subtree::SubTree;
 use super::super::ast::Ast;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
+use super::super::lexers::Lexer;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
+
+/// Represents the LR(k) parsing table and productions
+pub struct LRkAutomaton {
+    /// The number of columns in the LR table
+    columns_count: usize,
+    /// The number of states in the LR table
+    states_count: usize,
+    /// Map of symbol ID to column index in the LR table
+    columns_map: LRColumnMap,
+    /// The contexts information
+    contexts: Vec<LRContexts>,
+    /// The LR table
+    table: Vec<u16>,
+    /// The table of LR productions
+    productions: Vec<LRProduction>
+}
+
+impl LRkAutomaton {
+    /// Initializes a new automaton from the given binary data
+    pub fn new(data: &[u8]) -> LRkAutomaton {
+        let columns_count = read_u16(data, 0) as usize;
+        let states_count = read_u16(data, 2) as usize;
+        let productions_count = read_u16(data, 4) as usize;
+        let columns_map = LRColumnMap::new(data, 6, columns_count);
+        let mut contexts = Vec::<LRContexts>::with_capacity(states_count);
+        let mut index = 6 + columns_count * 2;
+        for _i in 0..states_count {
+            let mut context = LRContexts::new();
+            let count = read_u16(data, index);
+            index += 2;
+            for _j in 0..count {
+                context.add(read_u16(data, index), read_u16(data, index + 2));
+                index += 4
+            }
+            contexts.push(context);
+        }
+        let table = read_table_u16(data, index, states_count * columns_count * 2);
+        index += states_count * columns_count * 4;
+        let mut productions = Vec::<LRProduction>::with_capacity(productions_count);
+        for _i in 0..productions_count {
+            let production = LRProduction::new(data, &mut index);
+            productions.push(production);
+        }
+        LRkAutomaton {
+            columns_count,
+            states_count,
+            columns_map,
+            contexts,
+            table,
+            productions
+        }
+    }
+
+    /// Gets the number of states in this automaton
+    pub fn get_states_count(&self) -> usize {
+        self.states_count
+    }
+
+    /// Gets the contexts opened by the specified state
+    pub fn get_contexts(&self, state: u32) -> &LRContexts {
+        &self.contexts[state as usize]
+    }
+
+    /// Gets the LR(k) action for the given state and sid
+    pub fn get_action(&self, state: u32, identifier: u32) -> LRAction {
+        let column = self.columns_map.get(identifier) as usize;
+        LRAction {
+            table: &self.table,
+            offset: state as usize * self.columns_count + column
+        }
+    }
+
+    /// Gets the i-th production
+    pub fn get_production(&self, index: usize) -> &LRProduction {
+        &self.productions[index]
+    }
+
+    /// Gets the expected terminals for the specified state
+    pub fn get_expected(&self, state: u32, terminals: &'static Vec<Symbol>) -> LRExpected {
+        let mut expected = LRExpected::new();
+        let mut offset = self.columns_count * state as usize * 2;
+        for terminal in terminals.iter() {
+            let action = self.table[offset];
+            if action == LR_ACTION_CODE_SHIFT {
+                expected.shifts.push(*terminal);
+            } else if action == LR_ACTION_CODE_REDUCE {
+                expected.reductions.push(*terminal);
+            }
+            offset += 2;
+        }
+        expected
+    }
+}
 
 const ESTIMATION_BIAS: usize = 5;
 
@@ -234,4 +324,10 @@ impl<'a> LRkAstBuilder<'a> {
         // finalize the sub-tree data
         reduction.cache.set_children_count_at(0, insertion - 1);
     }
+}
+
+/// Represents a base for all LR(k) parsers
+pub struct LRkParser<'a> {
+    /// Lexer associated to this parser
+    lexer: &'a mut Lexer<'a>
 }
