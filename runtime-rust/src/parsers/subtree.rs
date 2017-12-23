@@ -17,8 +17,11 @@
 
 //! Module for AST subtree in parsers
 
+use super::TREE_ACTION_REPLACE;
 use super::TreeAction;
+use super::super::ast::Ast;
 use super::super::ast::AstCell;
+use super::super::ast::TableElemRef;
 
 /// Represents a sub-tree in an AST
 /// A sub-tree is composed of a root with its children.
@@ -27,7 +30,125 @@ use super::super::ast::AstCell;
 /// The internal representation of a sub-tree is based on arrays.
 /// The organization is that a node's children are immediately following it in the array.
 /// For example, the tree `A(B(CD)E(FG))` is represented as `[ABCDEFG]`.
+#[derive(Clone)]
 pub struct SubTree {
+    /// The nodes in this buffer
     nodes: Vec<AstCell>,
+    /// The tree actions for the nodes
     actions: Vec<TreeAction>
+}
+
+impl SubTree {
+    /// Creates a new sub-tree with the expected size
+    pub fn new(size: usize) -> SubTree {
+        SubTree {
+            nodes: Vec::<AstCell>::with_capacity(size),
+            actions: Vec::<TreeAction>::with_capacity(size)
+        }
+    }
+
+    /// Gets the label of the node at the given index
+    pub fn get_label_at(&self, index: usize) -> TableElemRef {
+        self.nodes[index].label
+    }
+
+    /// Gets the tree action applied onto the node at the given index
+    pub fn get_action_at(&self, index: usize) -> TreeAction {
+        self.actions[index]
+    }
+
+    /// Sets the tree action applied onto the node at the given index
+    pub fn set_action_at(&mut self, index: usize, action: TreeAction) {
+        self.actions[index] = action;
+    }
+
+    /// Gets the number of children of the node at the given index
+    pub fn get_children_count_at(&self, index: usize) -> u32 {
+        self.nodes[index].count
+    }
+
+    /// Sets the number of children of the node at the given index
+    pub fn set_children_count_at(&mut self, index: usize, count: u32) {
+        self.nodes[index].count = count;
+    }
+
+    /// Gets the total number of nodes in this sub-tree
+    pub fn get_size(&self) -> usize {
+        if self.actions[0] != TREE_ACTION_REPLACE {
+            (self.nodes[0].count + 1) as usize
+        } else {
+            let mut size = 1;
+            for _i in 0..self.nodes[0].count {
+                size += (self.nodes[size].count + 1) as usize;
+            }
+            size
+        }
+    }
+
+    /// Initializes the root of this sub-tree
+    pub fn setup_root(&mut self, symbol: TableElemRef, action: TreeAction) {
+        self.nodes.push(AstCell {
+            label: symbol,
+            count: 0,
+            first: 0
+        });
+        self.actions.push(action);
+    }
+
+    /// Copy the content of this sub-tree to the given sub-tree's buffer beginning at the given index
+    /// This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
+    /// The results of this method in the case of a depth 2 sub-tree is undetermined.
+    pub fn copy_to(&self, destination: &mut SubTree) {
+        for i in 0..(self.nodes[0].count + 1) as usize {
+            destination.nodes.push(self.nodes[i]);
+            destination.actions.push(self.actions[i]);
+        }
+    }
+
+    /// Copy the root's children of this sub-tree to the given sub-tree's buffer beginning at the given index
+    /// This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
+    /// The results of this method in the case of a depth 2 sub-tree is undetermined.
+    pub fn copy_children_to(&self, destination: &mut SubTree) {
+        for i in 1..(self.nodes[0].count + 1) as usize {
+            destination.nodes.push(self.nodes[i]);
+            destination.actions.push(self.actions[i]);
+        }
+    }
+
+    /// Commits the children of a sub-tree in this buffer to the final ast
+    /// If the index is 0, the root's children are committed, assuming this is a depth-1 sub-tree.
+    /// If not, the children of the child at the given index are committed.
+    pub fn commit_children_of(&mut self, index: usize, ast: &mut Ast) {
+        self.nodes[index].first =
+            ast.store(&self.nodes, index + 1, self.nodes[index].count as usize) as u32;
+    }
+
+    /// Commits this buffer to the final ast
+    pub fn commit(&mut self, ast: &mut Ast) {
+        self.commit_children_of(0, ast);
+        ast.store_root(self.nodes[0]);
+    }
+
+    /// Pushes a new node into this buffer
+    pub fn push(&mut self, symbol: TableElemRef, action: TreeAction) {
+        self.nodes.push(AstCell {
+            label: symbol,
+            count: 0,
+            first: 0
+        });
+        self.actions.push(action);
+    }
+
+    /// Moves an item within the buffer
+    pub fn move_node(&mut self, from: usize, to: usize) {
+        self.nodes[to] = self.nodes[from];
+    }
+
+    /// Moves a range of items within the buffer
+    pub fn move_range(&mut self, from: usize, to: usize, length: usize) {
+        for i in 0..length {
+            self.nodes[to + i] = self.nodes[from + i];
+            self.actions[to + i] = self.actions[from + i];
+        }
+    }
 }

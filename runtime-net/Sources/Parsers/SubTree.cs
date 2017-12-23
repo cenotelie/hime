@@ -194,8 +194,8 @@ namespace Hime.Redist.Parsers
 		/// <param name="index">The starting index of the sub-tree</param>
 		/// <param name="ast">The ast to commit to</param>
 		/// <remarks>
-		/// If the index is 0, the root's children are commited, assuming this is a depth-1 sub-tree.
-		/// If not, the children of the child at the given index are commited.
+		/// If the index is 0, the root's children are committed, assuming this is a depth-1 sub-tree.
+		/// If not, the children of the child at the given index are committed.
 		/// </remarks>
 		public void CommitChildrenOf(int index, AST ast)
 		{

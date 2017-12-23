@@ -82,11 +82,11 @@ impl TableElemRef {
 #[derive(Copy, Clone)]
 pub struct AstCell {
     /// The node's label
-    label: TableElemRef,
+    pub label: TableElemRef,
     /// The number of children
-    count: u32,
+    pub count: u32,
     /// The index of the first child
-    first: u32
+    pub first: u32
 }
 
 impl AstCell {
@@ -178,11 +178,41 @@ impl<'a> Ast<'a> {
         }
     }
 
-    /// Sets the root for the AST
-    pub fn set_root(&mut self, root: usize) {
+    /// Gets the root node of this tree
+    pub fn get_root(&self) -> AstNode {
+        let data = self.data.get();
+        match data.root {
+            None => panic!("No root defined!"),
+            Some(x) => AstNode {
+                tree: self,
+                index: x
+            }
+        }
+    }
+
+    /// Stores some children nodes in this AST
+    pub fn store(&mut self, nodes: &Vec<AstCell>, index: usize, count: usize) -> usize {
+        if count == 0 {
+            0
+        } else {
+            match self.data.get_mut() {
+                None => panic!("Got a mutable AST with an immutable implementation"),
+                Some(data) => {
+                    let result = data.nodes.add(nodes[index]);
+                    for i in 1..count {
+                        data.nodes.add(nodes[index + i]);
+                    }
+                    result
+                }
+            }
+        }
+    }
+
+    /// Stores the root of this tree
+    pub fn store_root(&mut self, node: AstCell) {
         match self.data.get_mut() {
             None => panic!("Got a mutable AST with an immutable implementation"),
-            Some(x) => x.root = Some(root)
+            Some(data) => data.root = Some(data.nodes.add(node))
         }
     }
 }
