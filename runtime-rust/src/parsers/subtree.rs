@@ -63,26 +63,18 @@ impl SubTree {
     }
 
     /// Gets the number of children of the node at the given index
-    pub fn get_children_count_at(&self, index: usize) -> u32 {
-        self.nodes[index].count
+    pub fn get_children_count_at(&self, index: usize) -> usize {
+        self.nodes[index].count as usize
     }
 
     /// Sets the number of children of the node at the given index
-    pub fn set_children_count_at(&mut self, index: usize, count: u32) {
-        self.nodes[index].count = count;
+    pub fn set_children_count_at(&mut self, index: usize, count: usize) {
+        self.nodes[index].count = count as u32;
     }
 
     /// Gets the total number of nodes in this sub-tree
     pub fn get_size(&self) -> usize {
-        if self.actions[0] != TREE_ACTION_REPLACE {
-            (self.nodes[0].count + 1) as usize
-        } else {
-            let mut size = 1;
-            for _i in 0..self.nodes[0].count {
-                size += (self.nodes[size].count + 1) as usize;
-            }
-            size
-        }
+        self.nodes.len()
     }
 
     /// Initializes the root of this sub-tree
@@ -99,7 +91,7 @@ impl SubTree {
     /// This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
     /// The results of this method in the case of a depth 2 sub-tree is undetermined.
     pub fn copy_to(&self, destination: &mut SubTree) {
-        for i in 0..(self.nodes[0].count + 1) as usize {
+        for i in 0..self.nodes.len() as usize {
             destination.nodes.push(self.nodes[i]);
             destination.actions.push(self.actions[i]);
         }
@@ -107,9 +99,8 @@ impl SubTree {
 
     /// Copy the root's children of this sub-tree to the given sub-tree's buffer beginning at the given index
     /// This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
-    /// The results of this method in the case of a depth 2 sub-tree is undetermined.
     pub fn copy_children_to(&self, destination: &mut SubTree) {
-        for i in 1..(self.nodes[0].count + 1) as usize {
+        for i in 1..self.nodes.len() as usize {
             destination.nodes.push(self.nodes[i]);
             destination.actions.push(self.actions[i]);
         }
