@@ -191,6 +191,11 @@ impl<'a> TokenRepository<'a> {
             index
         }
     }
+
+    /// Gets the number of tokens
+    pub fn get_count(&self) -> usize {
+        self.data.get().cells.size()
+    }
 }
 
 impl<'a> SemanticElementTrait for Token<'a> {

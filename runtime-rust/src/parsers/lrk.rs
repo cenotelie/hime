@@ -17,11 +17,14 @@
 
 //! Module for LR(k) parsers
 
+use std::usize;
+
 use super::*;
 use super::subtree::SubTree;
 use super::super::ast::Ast;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
+use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
 use super::super::symbols::SemanticAction;
@@ -342,10 +345,7 @@ struct LRkHead {
     identifier: u32
 }
 
-/// Represents a base for all LR(k) parsers
-pub struct LRkParser<'a> {
-    /// Lexer associated to this parser
-    lexer: &'a mut Lexer<'a>,
+struct LRkParserData<'a> {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
@@ -356,26 +356,112 @@ pub struct LRkParser<'a> {
     actions: Vec<SemanticAction>
 }
 
-impl<'a> LRkParser<'a> {
-    /// Initializes a new instance of the parser
-    pub fn new(
-        lexer: &'a mut Lexer<'a>,
-        automaton: LRkAutomaton,
-        ast: Ast<'a>,
-        actions: Vec<SemanticAction>
-    ) -> LRkParser<'a> {
-        LRkParser {
-            lexer,
-            automaton,
-            stack: Vec::<LRkHead>::new(),
-            builder: LRkAstBuilder::new(ast),
-            actions
+impl<'a> ContextProvider for LRkParserData<'a> {
+    /// Gets the priority of the specified context required by the specified terminal
+    /// The priority is an unsigned integer. The lesser the value the higher the priority.
+    /// The absence of value represents the unavailability of the required context.
+    fn get_context_priority(
+        &self,
+        token_count: usize,
+        context: u16,
+        terminal_id: u32
+    ) -> Option<usize> {
+        // the default context is always active
+        if context == DEFAULT_CONTEXT {
+            return Some(usize::MAX);
+        }
+        if token_count == 0 {
+            // this is the first token, does it open the context?
+            let contexts = self.automaton.get_contexts(0);
+            return if contexts.opens(terminal_id, context) {
+                Some(0)
+            } else {
+                None
+            };
+        }
+        // retrieve the action for this terminal
+        let state = self.stack[self.stack.len() - 1].state;
+        let mut action = self.automaton.get_action(state, terminal_id);
+        // if the terminal is unexpected, do not validate
+        if action.get_code() == LR_ACTION_CODE_NONE {
+            return None;
+        }
+        // does the context opens with the terminal?
+        if action.get_code() == LR_ACTION_CODE_SHIFT
+            && self.automaton
+                .get_contexts(state)
+                .opens(terminal_id, context)
+        {
+            return Some(0);
+        }
+        let production = if action.get_code() == LR_ACTION_CODE_REDUCE {
+            Some(self.automaton.get_production(action.get_data() as usize))
+        } else {
+            None
+        };
+        // look into the stack for the opening of the context
+        let mut i = self.stack.len() - 2;
+        loop {
+            let state = self.stack[i].state;
+            let id = self.stack[i + 1].identifier;
+            if self.automaton.get_contexts(state).opens(id, context) {
+                // the context opens here
+                // but is it closed by the reduction (if any)?
+                match production {
+                    None => return Some(self.stack.len() - 1 - i),
+                    Some(data) => {
+                        if i < self.stack.len() - 1 - data.reduction_length {
+                            return Some(self.stack.len() - 1 - i);
+                        }
+                    }
+                }
+            }
+            if i == 0 {
+                break;
+            }
+            i -= 1;
+        }
+        // at this point, the requested context is not yet open or is closed by a reduction
+        // now, if the action is something else than a reduction (shift, accept or error),
+        // the context can never be produced
+        // for the context to open, a new state must be pushed onto the stack
+        // this means that the provided terminal must trigger a chain of at least one reduction
+        if action.get_code() != LR_ACTION_CODE_REDUCE {
+            return None;
+        }
+        // there is at least one reduction, simulate
+        let mut my_stack = self.stack.clone();
+        while action.get_code() == LR_ACTION_CODE_REDUCE {
+            // execute the reduction
+            let production = self.automaton.get_production(action.get_data() as usize);
+            let variable = self.builder.get_variables()[production.head];
+            let length = my_stack.len();
+            my_stack.truncate(length - production.reduction_length);
+            // this must be a shift
+            action = self.automaton
+                .get_action(my_stack[my_stack.len() - 1].state, variable.id);
+            my_stack.push(LRkHead {
+                state: action.get_data() as u32,
+                identifier: variable.id
+            });
+            // now, get the new action for the terminal
+            action = self.automaton
+                .get_action(action.get_data() as u32, terminal_id);
+        }
+        // is this a shift action that opens the context?
+        if action.get_code() == LR_ACTION_CODE_SHIFT
+            && self.automaton
+                .get_contexts(my_stack[my_stack.len() - 1].state)
+                .opens(terminal_id, context)
+        {
+            Some(0)
+        } else {
+            None
         }
     }
+}
 
-    /// Parses the input
-    pub fn parse(&mut self) {}
-
+impl<'a> LRkParserData<'a> {
     /// Parses on the specified token kernel
     fn parse_on_token(&mut self, kernel: TokenKernel) -> LRActionCode {
         let stack = &mut self.stack;
@@ -396,7 +482,7 @@ impl<'a> LRkParser<'a> {
             }
             // now reduce
             let production = self.automaton.get_production(action.get_data() as usize);
-            let variable = LRkParser::reduce(production, &mut self.builder, &self.actions);
+            let variable = LRkParserData::reduce(production, &mut self.builder, &self.actions);
             let length = stack.len();
             stack.truncate(length - production.reduction_length);
             let action = self.automaton.get_action(
@@ -425,6 +511,7 @@ impl<'a> LRkParser<'a> {
         let mut i = 0;
         while i < production.bytecode.len() {
             let op_code = production.bytecode[i];
+            i += 1;
             match get_op_code_base(op_code) {
                 LR_OP_CODE_BASE_SEMANTIC_ACTION => {
                     let action = actions[production.bytecode[i + 1] as usize];
@@ -441,6 +528,59 @@ impl<'a> LRkParser<'a> {
                 }
             }
         }
+        builder.reduce();
         variable
+    }
+}
+
+/// Represents a base for all LR(k) parsers
+pub struct LRkParser<'a> {
+    /// Lexer associated to this parser
+    lexer: &'a mut Lexer<'a>,
+    /// The parser's data
+    data: LRkParserData<'a>
+}
+
+impl<'a> LRkParser<'a> {
+    /// Initializes a new instance of the parser
+    pub fn new(
+        lexer: &'a mut Lexer<'a>,
+        automaton: LRkAutomaton,
+        ast: Ast<'a>,
+        actions: Vec<SemanticAction>
+    ) -> LRkParser<'a> {
+        LRkParser {
+            lexer,
+            data: LRkParserData {
+                automaton,
+                stack: Vec::<LRkHead>::new(),
+                builder: LRkAstBuilder::new(ast),
+                actions
+            }
+        }
+    }
+
+    /// Gets the next token in the kernel
+    fn get_next_token(&mut self) -> Option<TokenKernel> {
+        let data = &self.data;
+        let lexer = &mut self.lexer;
+        lexer.get_next_token(data)
+    }
+}
+
+impl<'a> Parser for LRkParser<'a> {
+    fn parse(&mut self) {
+        let mut token = self.get_next_token().unwrap();
+        loop {
+            let action = self.data.parse_on_token(token);
+            if action == LR_ACTION_CODE_SHIFT {
+                token = self.get_next_token().unwrap();
+            } else if action == LR_ACTION_CODE_ACCEPT {
+                return;
+            } else {
+                // this is an error
+                panic!("Error");
+            }
+        }
     }
 }

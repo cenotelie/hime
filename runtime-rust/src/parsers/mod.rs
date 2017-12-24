@@ -20,6 +20,7 @@
 pub mod subtree;
 pub mod lrk;
 
+use super::lexers::ContextProvider;
 use super::symbols::Symbol;
 use super::utils::bin::*;
 
@@ -296,4 +297,7 @@ impl LRExpected {
     }
 }
 
-pub trait Parser {}
+pub trait Parser {
+    /// Parses the input
+    fn parse(&mut self);
+}

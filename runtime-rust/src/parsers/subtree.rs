@@ -17,7 +17,6 @@
 
 //! Module for AST subtree in parsers
 
-use super::TREE_ACTION_REPLACE;
 use super::TreeAction;
 use super::super::ast::Ast;
 use super::super::ast::AstCell;

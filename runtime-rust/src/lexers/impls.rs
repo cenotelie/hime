@@ -123,7 +123,7 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     }
 
     /// Gets the next token in the input
-    fn get_next_token(&mut self, _contexts: ContextProvider) -> Option<TokenKernel> {
+    fn get_next_token(&mut self, _contexts: &ContextProvider) -> Option<TokenKernel> {
         if !self.has_run {
             // lex all tokens now
             self.find_tokens();
@@ -258,7 +258,7 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     }
 
     /// Gets the next token in the input
-    fn get_next_token(&mut self, contexts: ContextProvider) -> Option<TokenKernel> {
+    fn get_next_token(&mut self, contexts: &ContextProvider) -> Option<TokenKernel> {
         if self.has_run {
             return None;
         }
@@ -335,7 +335,7 @@ impl<'a> ContextSensitiveLexer<'a> {
     }
 
     /// Gets the index of the terminal with the highest priority that is possible in the contexts
-    fn get_terminal_for(&self, state: u32, contexts: ContextProvider) -> u16 {
+    fn get_terminal_for(&self, state: u32, contexts: &ContextProvider) -> u16 {
         let state_data = self.automaton.get_state(state);
         let mut matched = state_data.get_terminal(0);
         let mut result = matched.index;
@@ -344,7 +344,8 @@ impl<'a> ContextSensitiveLexer<'a> {
             // the separator trumps all
             return result;
         }
-        let mut priority = contexts(matched.context, id);
+        let mut priority =
+            contexts.get_context_priority(self.repository.get_count(), matched.context, id);
         for i in 1..state_data.get_terminals_count() {
             matched = state_data.get_terminal(i);
             id = self.repository.get_terminals()[matched.index as usize].id;
@@ -352,7 +353,8 @@ impl<'a> ContextSensitiveLexer<'a> {
                 // the separator trumps all
                 return matched.index;
             }
-            let priority_candidate = contexts(matched.context, id);
+            let priority_candidate =
+                contexts.get_context_priority(self.repository.get_count(), matched.context, id);
             if priority_candidate.is_none() {
                 continue;
             }
