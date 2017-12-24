@@ -178,6 +178,11 @@ impl<'a> Ast<'a> {
         }
     }
 
+    /// Gets the grammar variables for this AST
+    pub fn get_variables(&self) -> &'static Vec<Symbol> {
+        &self.variables
+    }
+
     /// Gets the semantic element corresponding to the specified label
     pub fn get_semantic_element_for_label(&self, label: TableElemRef) -> SemanticElement {
         match label.get_type() {

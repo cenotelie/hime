@@ -295,3 +295,5 @@ impl LRExpected {
         }
     }
 }
+
+pub trait Parser {}

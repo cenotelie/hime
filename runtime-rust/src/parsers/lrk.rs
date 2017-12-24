@@ -23,6 +23,8 @@ use super::super::ast::Ast;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
 use super::super::lexers::Lexer;
+use super::super::lexers::TokenKernel;
+use super::super::symbols::SemanticAction;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 
@@ -177,6 +179,11 @@ impl<'a> LRkAstBuilder<'a> {
         }
     }
 
+    /// Gets the grammar variables for this AST
+    pub fn get_variables(&self) -> &'static Vec<Symbol> {
+        self.result.get_variables()
+    }
+
     /// Push a token onto the stack
     pub fn push_token(&mut self, index: usize) {
         let mut single = SubTree::new(1);
@@ -326,8 +333,114 @@ impl<'a> LRkAstBuilder<'a> {
     }
 }
 
+/// The head of a LR(k) parser
+#[derive(Copy, Clone)]
+struct LRkHead {
+    /// The automaton's state
+    state: u32,
+    /// The symbol identifier
+    identifier: u32
+}
+
 /// Represents a base for all LR(k) parsers
 pub struct LRkParser<'a> {
     /// Lexer associated to this parser
-    lexer: &'a mut Lexer<'a>
+    lexer: &'a mut Lexer<'a>,
+    /// The parser's automaton
+    automaton: LRkAutomaton,
+    /// The parser's stack
+    stack: Vec<LRkHead>,
+    /// The AST builder
+    builder: LRkAstBuilder<'a>,
+    /// The semantic actions
+    actions: Vec<SemanticAction>
+}
+
+impl<'a> LRkParser<'a> {
+    /// Initializes a new instance of the parser
+    pub fn new(
+        lexer: &'a mut Lexer<'a>,
+        automaton: LRkAutomaton,
+        ast: Ast<'a>,
+        actions: Vec<SemanticAction>
+    ) -> LRkParser<'a> {
+        LRkParser {
+            lexer,
+            automaton,
+            stack: Vec::<LRkHead>::new(),
+            builder: LRkAstBuilder::new(ast),
+            actions
+        }
+    }
+
+    /// Parses the input
+    pub fn parse(&mut self) {}
+
+    /// Parses on the specified token kernel
+    fn parse_on_token(&mut self, kernel: TokenKernel) -> LRActionCode {
+        let stack = &mut self.stack;
+
+        loop {
+            let head = stack[stack.len() - 1];
+            let action = self.automaton.get_action(head.state, kernel.terminal_id);
+            if action.get_code() == LR_ACTION_CODE_SHIFT {
+                stack.push(LRkHead {
+                    state: action.get_data() as u32,
+                    identifier: kernel.terminal_id
+                });
+                self.builder.push_token(kernel.index as usize);
+                return action.get_code();
+            }
+            if action.get_code() != LR_ACTION_CODE_REDUCE {
+                return action.get_code();
+            }
+            // now reduce
+            let production = self.automaton.get_production(action.get_data() as usize);
+            let variable = LRkParser::reduce(production, &mut self.builder, &self.actions);
+            let length = stack.len();
+            stack.truncate(length - production.reduction_length);
+            let action = self.automaton.get_action(
+                stack[stack.len() - 1].state,
+                self.builder.get_variables()[production.head].id
+            );
+            stack.push(LRkHead {
+                state: action.get_data() as u32,
+                identifier: variable.id
+            });
+        }
+    }
+
+    /// Executes the given LR reduction
+    fn reduce(
+        production: &LRProduction,
+        builder: &mut LRkAstBuilder<'a>,
+        actions: &Vec<SemanticAction>
+    ) -> Symbol {
+        let variable = builder.get_variables()[production.head];
+        builder.reduction_prepare(
+            production.head,
+            production.reduction_length,
+            production.head_action
+        );
+        let mut i = 0;
+        while i < production.bytecode.len() {
+            let op_code = production.bytecode[i];
+            match get_op_code_base(op_code) {
+                LR_OP_CODE_BASE_SEMANTIC_ACTION => {
+                    let action = actions[production.bytecode[i + 1] as usize];
+                    i += 1;
+                    action(variable, builder);
+                }
+                LR_OP_CODE_BASE_ADD_VIRTUAL => {
+                    let index = production.bytecode[i + 1] as usize;
+                    i += 1;
+                    builder.reduction_add_virtual(index, get_op_code_tree_action(op_code));
+                }
+                _ => {
+                    builder.reduction_pop(get_op_code_tree_action(op_code));
+                }
+            }
+        }
+        variable
+    }
 }
