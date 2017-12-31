@@ -1,0 +1,184 @@
+/*******************************************************************************
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
+using System.Collections.Generic;
+using System.IO;
+
+namespace Hime.SDK.Output
+{
+	/// <summary>
+	/// Represents an emitter of lexer and parser for a given grammar on the Rust language
+	/// </summary>
+	public class EmitterForRust : EmitterBase
+	{
+		/// <summary>
+		/// Gets the suffix for the emitted lexer code files
+		/// </summary>
+		public override string SuffixLexerCode { get { return ".rs"; } }
+
+		/// <summary>
+		/// Gets suffix for the emitted parser code files
+		/// </summary>
+		public override string SuffixParserCode { get { return ".rs"; } }
+
+		/// <summary>
+		/// Gets suffix for the emitted assemblies
+		/// </summary>
+		public override string SuffixAssembly { get { return ".crate"; } }
+
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="units">The units to emit data for</param>
+		public EmitterForRust(List<Unit> units) : base(new Reporter(), units)
+		{
+		}
+
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterForRust(Unit unit) : base(new Reporter(), unit)
+		{
+		}
+
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <param name="units">The units to emit data for</param>
+		public EmitterForRust(Reporter reporter, List<Unit> units) : base(reporter, units)
+		{
+		}
+
+		/// <summary>
+		/// Initializes this emitter
+		/// </summary>
+		/// <param name="reporter">The reporter to use</param>
+		/// <param name="unit">The unit to emit data for</param>
+		public EmitterForRust(Reporter reporter, Unit unit) : base(reporter, unit)
+		{
+		}
+
+		/// <summary>
+		/// Gets the runtime-specific generator of lexer code
+		/// </summary>
+		/// <param name="unit">The unit to generate a lexer for</param>
+		/// <returns>The runtime-specific generator of lexer code</returns>
+		protected override Generator GetLexerCodeGenerator(Unit unit)
+		{
+			return new LexerRustCodeGenerator(unit, unit.Name + SUFFIX_LEXER_DATA);
+		}
+
+		/// <summary>
+		/// Gets the runtime-specific generator of parser code
+		/// </summary>
+		/// <param name="unit">The unit to generate a parser for</param>
+		/// <returns>The runtime-specific generator of parser code</returns>
+		protected override Generator GetParserCodeGenerator(Unit unit)
+		{
+			return new ParserRustCodeGenerator(unit, unit.Name + SUFFIX_PARSER_DATA);
+		}
+
+		/// <summary>
+		/// Emits the assembly for the generated lexer and parser
+		/// </summary>
+		/// <returns><c>true</c> if the operation succeed</returns>
+		protected override bool EmitAssembly()
+		{
+			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
+			// setup the cargo project
+			CreateCargoProject();
+			// compile
+			System.PlatformID platform = System.Environment.OSVersion.Platform;
+			bool success;
+			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
+				success = ExecuteCommandCargo("mvn", "package");
+			else
+				success = ExecuteCommandCargo("cmd.exe", "/c mvn.cmd package");
+			// extract the result
+			if (success)
+			{
+				if (File.Exists(GetArtifactAssembly()))
+					File.Delete(GetArtifactAssembly());
+				string[] results = Directory.GetFiles(Path.Combine(OutputPath, "target"), "hime-generated-*.jar");
+				File.Move(results[0], GetArtifactAssembly());
+			}
+			// cleanup the mess ...
+			Directory.Delete(Path.Combine(OutputPath, "src"), true);
+			Directory.Delete(Path.Combine(OutputPath, "res"), true);
+			Directory.Delete(Path.Combine(OutputPath, "target"), true);
+			File.Delete(Path.Combine(OutputPath, "pom.xml"));
+			return success;
+		}
+
+		/// <summary>
+		/// Creates the maven project to compile
+		/// </summary>
+		private void CreateCargoProject()
+		{
+			// setup the src folder
+			string src = Path.Combine(OutputPath, "src");
+			foreach (Unit unit in units)
+			{
+				File.Copy(GetArtifactLexerCode(unit), Path.Combine(src, unit.Name + SuffixLexerCode), true);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(src, unit.Name + SUFFIX_LEXER_DATA), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(src, unit.Name + SUFFIX_PARSER_DATA), true);
+			}
+			// export the toml
+			ExportResource("Rust.Cargo.toml", Path.Combine(OutputPath, "Cargo.toml"));
+		}
+
+		/// <summary>
+		/// Executes the specified command (usually a maven command)
+		/// </summary>
+		/// <param name="verb">The program to execute</param>
+		/// <param name="arguments">The arguments</param>
+		/// <returns><c>true</c> if the command succeeded</returns>
+		private bool ExecuteCommandCargo(string verb, string arguments)
+		{
+			reporter.Info("Executing command " + verb + " " + arguments);
+			System.Diagnostics.Process process = new System.Diagnostics.Process();
+			process.StartInfo.FileName = verb;
+			process.StartInfo.Arguments = arguments;
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.UseShellExecute = false;
+			process.Start();
+			bool errors = false;
+			while (true)
+			{
+				string line = process.StandardOutput.ReadLine();
+				if (string.IsNullOrEmpty(line))
+					break;
+				if (line.StartsWith("[ERROR]"))
+				{
+					reporter.Error(line.Substring(8));
+					errors = true;
+				}
+				else if (line.StartsWith("[WARNING]"))
+					reporter.Warn(line.Substring(10));
+				else if (line.StartsWith("[INFO]"))
+					reporter.Info(line.Substring(7));
+				else
+					reporter.Info(line);
+			}
+			process.WaitForExit();
+			process.Close();
+			return !errors;
+		}
+	}
+}

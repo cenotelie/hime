@@ -56,8 +56,8 @@ namespace Hime.SDK.Grammars.LR
 				// There is already a shift action for the lookahead => conflict
 				if (state.HasTransition(item.Lookahead))
 					RaiseConflictShiftReduce(state, item, item.Lookahead);
-                // There is already a reduction action for the lookahead => conflict
-                else if (reductions.ContainsKey(item.Lookahead))
+				// There is already a reduction action for the lookahead => conflict
+				else if (reductions.ContainsKey(item.Lookahead))
 					RaiseConflictReduceReduce(state, item, reductions[item.Lookahead], item.Lookahead);
 				else // No conflict
 				{

@@ -70,7 +70,8 @@ IF NOT "%ERRORLEVEL%" == "0" EXIT /b
 ECHO -- Building Test Executor for Java --
 CALL mvn -f "%ROOT%\tests-executor-java\pom.xml" clean verify -Dgpg.skip=true
 IF NOT "%ERRORLEVEL%" == "0" EXIT /b
-
+ECHO -- Building Hime Redist for Rust --
+cargo test --manifest-path "%ROOT%\runtime-rust\Cargo.toml"
 
 REM Setup the test components
 RMDIR /S /Q "%ROOT%\tests-results"

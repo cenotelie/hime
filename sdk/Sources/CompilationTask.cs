@@ -277,124 +277,130 @@ namespace Hime.SDK
 				reporter.Error("No grammar in inputs");
 				return;
 			}
-            List<Output.Unit> units = ExecuteDoPrepareUnits(inputs);
-            if (units.Count == 0)
-                return;
-            ExecuteDoEmit(units);
+			List<Output.Unit> units = ExecuteDoPrepareUnits(inputs);
+			if (units.Count == 0)
+				return;
+			ExecuteDoEmit(units);
 		}
 
-        /// <summary>
-        /// Prepares the compilation units given grammar inputs
-        /// </summary>
-        /// <param name="inputs">The loaded grammars</param>
-        /// <returns>The compilation units</returns>
-        protected List<Output.Unit> ExecuteDoPrepareUnits(List<Grammars.Grammar> inputs)
-        {
-            List<Output.Unit> units = new List<Output.Unit>();
-            if (grammarName != null)
-            {
-                foreach (Grammars.Grammar potential in inputs)
-                {
-                    if (potential.Name == GrammarName)
-                    {
-                        units.Add(new Output.Unit(
-                            potential,
-                            GetOutputPathFor(potential),
-                            GetCompilationModeFor(potential),
-                            GetParsingMethodFor(potential),
-                            GetNamespaceFor(potential),
-                            GetAccessModifierFor(potential)));
-                        break;
-                    }
-                }
-                if (units.Count == 0)
-                {
-                    reporter.Error("Grammar " + grammarName + " cannot be found");
-                    return units;
-                }
-            }
-            else
-            {
-                foreach (Grammars.Grammar potential in inputs)
-                {
-                    units.Add(new Output.Unit(
-                        potential,
-                        GetOutputPathFor(potential),
-                        GetCompilationModeFor(potential),
-                        GetParsingMethodFor(potential),
-                        GetNamespaceFor(potential),
-                        GetAccessModifierFor(potential)));
-                }
-            }
-            return units;
-        }
+		/// <summary>
+		/// Prepares the compilation units given grammar inputs
+		/// </summary>
+		/// <param name="inputs">The loaded grammars</param>
+		/// <returns>The compilation units</returns>
+		protected List<Output.Unit> ExecuteDoPrepareUnits(List<Grammars.Grammar> inputs)
+		{
+			List<Output.Unit> units = new List<Output.Unit>();
+			if (grammarName != null)
+			{
+				foreach (Grammars.Grammar potential in inputs)
+				{
+					if (potential.Name == GrammarName)
+					{
+						units.Add(new Output.Unit(
+							potential,
+							GetOutputPathFor(potential),
+							GetCompilationModeFor(potential),
+							GetParsingMethodFor(potential),
+							GetNamespaceFor(potential),
+							GetAccessModifierFor(potential)));
+						break;
+					}
+				}
+				if (units.Count == 0)
+				{
+					reporter.Error("Grammar " + grammarName + " cannot be found");
+					return units;
+				}
+			}
+			else
+			{
+				foreach (Grammars.Grammar potential in inputs)
+				{
+					units.Add(new Output.Unit(
+						potential,
+						GetOutputPathFor(potential),
+						GetCompilationModeFor(potential),
+						GetParsingMethodFor(potential),
+						GetNamespaceFor(potential),
+						GetAccessModifierFor(potential)));
+				}
+			}
+			return units;
+		}
 
-        /// <summary>
-        /// Emits the artifacts for multiple compilation units
-        /// </summary>
-        /// <param name="units">The compilation units</param>
-        protected void ExecuteDoEmit(List<Output.Unit> units)
-        {
-            if (units.Count == 1)
-            {
-                // only one target
-                ExecuteDoEmitSingleUnit(units[0]);
-            }
-            else if (outputMode.HasValue && outputTarget.HasValue)
-            {
-                // same mode and same target for all units
-                // (may generate a single assembly for all units, if requested)
-                ExecuteDoEmitSameModeSameTarget(units);
-            }
-            else
-            {
-                // treat all units as separate
-                foreach (Output.Unit unit in units)
-                    ExecuteDoEmitSingleUnit(unit);
-            }
-        }
+		/// <summary>
+		/// Emits the artifacts for multiple compilation units
+		/// </summary>
+		/// <param name="units">The compilation units</param>
+		protected void ExecuteDoEmit(List<Output.Unit> units)
+		{
+			if (units.Count == 1)
+			{
+				// only one target
+				ExecuteDoEmitSingleUnit(units[0]);
+			}
+			else if (outputMode.HasValue && outputTarget.HasValue)
+			{
+				// same mode and same target for all units
+				// (may generate a single assembly for all units, if requested)
+				ExecuteDoEmitSameModeSameTarget(units);
+			}
+			else
+			{
+				// treat all units as separate
+				foreach (Output.Unit unit in units)
+					ExecuteDoEmitSingleUnit(unit);
+			}
+		}
 
-        /// <summary>
-        /// Emits the artifacts for a single compilation unit
-        /// </summary>
-        /// <param name="unit">The compilation unit</param>
-        protected void ExecuteDoEmitSingleUnit(Output.Unit unit)
-        {
-            Output.EmitterBase emitter = null;
-            switch (GetTargetRuntimeFor(unit.Grammar))
-            {
-                case Output.Runtime.Net:
-                    emitter = new Output.EmitterForNet(reporter, unit);
-                    break;
-                case Output.Runtime.Java:
-                    emitter = new Output.EmitterForJava(reporter, unit);
-                    break;
-            }
-            bool success = emitter.Emit();
-            if (!success)
-                reporter.Error("Failed to emit some output");
-        }
+		/// <summary>
+		/// Emits the artifacts for a single compilation unit
+		/// </summary>
+		/// <param name="unit">The compilation unit</param>
+		protected void ExecuteDoEmitSingleUnit(Output.Unit unit)
+		{
+			Output.EmitterBase emitter = null;
+			switch (GetTargetRuntimeFor(unit.Grammar))
+			{
+				case Output.Runtime.Net:
+					emitter = new Output.EmitterForNet(reporter, unit);
+					break;
+				case Output.Runtime.Java:
+					emitter = new Output.EmitterForJava(reporter, unit);
+					break;
+				case Output.Runtime.Rust:
+					emitter = new Output.EmitterForRust(reporter, unit);
+					break;
+			}
+			bool success = emitter.Emit();
+			if (!success)
+				reporter.Error("Failed to emit some output");
+		}
 
-        /// <summary>
-        /// Emits the artifacts for multiple compilation units with the same compilation mode and target runtime
-        /// </summary>
-        /// <param name="units">The compilation units</param>
-        protected void ExecuteDoEmitSameModeSameTarget(List<Output.Unit> units)
-        {
-            Output.EmitterBase emitter = null;
-            switch (GetTargetRuntimeFor(units[0].Grammar))
-            {
-                case Output.Runtime.Net:
-                    emitter = new Output.EmitterForNet(reporter, units);
-                    break;
-                case Output.Runtime.Java:
-                    emitter = new Output.EmitterForJava(reporter, units);
-                    break;
-            }
-            bool success = emitter.Emit();
-            if (!success)
-                reporter.Error("Failed to emit some output");
-        }
+		/// <summary>
+		/// Emits the artifacts for multiple compilation units with the same compilation mode and target runtime
+		/// </summary>
+		/// <param name="units">The compilation units</param>
+		protected void ExecuteDoEmitSameModeSameTarget(List<Output.Unit> units)
+		{
+			Output.EmitterBase emitter = null;
+			switch (GetTargetRuntimeFor(units[0].Grammar))
+			{
+				case Output.Runtime.Net:
+					emitter = new Output.EmitterForNet(reporter, units);
+					break;
+				case Output.Runtime.Java:
+					emitter = new Output.EmitterForJava(reporter, units);
+					break;
+				case Output.Runtime.Rust:
+					emitter = new Output.EmitterForRust(reporter, units);
+					break;
+			}
+			bool success = emitter.Emit();
+			if (!success)
+				reporter.Error("Failed to emit some output");
+		}
 
 
 
@@ -461,6 +467,8 @@ namespace Hime.SDK
 				return Output.Runtime.Net;
 			if (value.Equals("Java"))
 				return Output.Runtime.Java;
+			if (value.Equals("Rust"))
+				return Output.Runtime.Rust;
 			return Output.Runtime.Net;
 		}
 

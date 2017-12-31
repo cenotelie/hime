@@ -35,6 +35,7 @@ namespace Hime.HimeCC
 		private const string ArgOutputNoSources = "-o:nosources";
 		private const string ArgOutputDebug = "-o:debug";
 		private const string ArgTargetJava = "-t:java";
+		private const string ArgTargetRust = "-t:rust";
 		private const string ArgGrammar = "-g";
 		private const string ArgPath = "-p";
 		private const string ArgMethodRNGLR = "-m:rnglr";
@@ -195,6 +196,9 @@ namespace Hime.HimeCC
 					case ArgTargetJava:
 						task.Target = Hime.SDK.Output.Runtime.Java;
 						break;
+					case ArgTargetRust:
+						task.Target = Hime.SDK.Output.Runtime.Rust;
+						break;
 					case ArgGrammar:
 						if (arg.Children.Count != 1)
 							return null;
@@ -258,6 +262,8 @@ namespace Hime.HimeCC
 			Console.WriteLine(ArgOutputDebug + "\tGenerate debug artifacts in addition to the sources");
 			Console.WriteLine();
 			Console.WriteLine(ArgTargetJava + "\tTarget the Java runtime instead of .Net");
+			Console.WriteLine();
+			Console.WriteLine(ArgTargetRust + "\tTarget the Rust language instead of .Net");
 			Console.WriteLine();
 			Console.WriteLine(ArgGrammar + " <grammar>\tSelect the top grammar to compile if more than one are given");
 			Console.WriteLine();

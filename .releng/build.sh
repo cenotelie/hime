@@ -58,6 +58,8 @@ echo "-- Building Hime Redist for Java --"
 mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
 echo "-- Building Test Executor for Java --"
 mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
+echo "-- Building Hime Redist for Rust --"
+cargo test --manifest-path "$ROOT/runtime-rust/Cargo.toml"
 
 # Setup the test components
 rm -rf "$ROOT/tests-results"

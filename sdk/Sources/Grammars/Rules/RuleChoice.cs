@@ -115,15 +115,15 @@ namespace Hime.SDK.Grammars
 			// Here the first symbol in the current choice is a variable
 			Variable variable = symbol as Variable;
 			bool mod = false; // keep track of modifications
-			// foreach first in the FIRSTS set of the variable
+							  // foreach first in the FIRSTS set of the variable
 			foreach (Terminal first in variable.Firsts)
 			{
 				// If the symbol is ε
 				if (first == Epsilon.Instance)
-                    // Add the Firsts set of the next choice to the current Firsts set
+					// Add the Firsts set of the next choice to the current Firsts set
 					mod |= setFirsts.AddRange(next.setFirsts);
 				else
-                    // Symbol is not ε : Add the symbol to the Firsts set
+					// Symbol is not ε : Add the symbol to the Firsts set
 					mod |= setFirsts.Add(first);
 			}
 			return mod;

@@ -135,7 +135,7 @@ namespace Hime.SDK.Output
 		private static string CreateFolderFor(string origin, Unit unit)
 		{
 			string current = origin;
-			string[] parts = unit.Namespace.Split(new [] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = unit.Namespace.Split(new[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
 			for (int i = 0; i != parts.Length; i++)
 			{
 				current = Path.Combine(current, parts[i]);

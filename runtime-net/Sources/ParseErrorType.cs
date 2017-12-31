@@ -41,6 +41,6 @@ namespace Hime.Redist
 		/// <summary>
 		/// Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
 		/// </summary>
-        IncorrectUTF16NoHighSurrogate
+		IncorrectUTF16NoHighSurrogate
 	}
 }

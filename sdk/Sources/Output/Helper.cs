@@ -67,6 +67,17 @@ namespace Hime.SDK.Output
 		}
 
 		/// <summary>
+		/// Sanitizes the name of a symbol for output in Rust code
+		/// </summary>
+		/// <param name="name">A name to sanitize</param>
+		/// <returns>The sanitized name of the symbol</returns>
+		public static string SanitizeNameRust(string name)
+		{
+			string result = RemoveSpecials(name);
+			return "ID_" + result;
+		}
+
+		/// <summary>
 		/// Removes the specials characters that can arise a the specified symbol name
 		/// </summary>
 		/// <param name="name">A symbol name</param>
@@ -90,7 +101,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The reserved C# keywords
 		/// </summary>
-		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new [] { "abstract",
+		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new[] { "abstract",
 			"as",
 			"base",
 			"bool",
@@ -172,7 +183,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The reserved Java keywords
 		/// </summary>
-		private static readonly ROList<string> keywordsJava = new ROList<string>(new List<string>(new [] { "abstract",
+		private static readonly ROList<string> keywordsJava = new ROList<string>(new List<string>(new[] { "abstract",
 			"continue",
 			"for",
 			"new",

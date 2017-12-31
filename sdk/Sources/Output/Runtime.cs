@@ -29,6 +29,10 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The Java platform
 		/// </summary>
-		Java
+		Java,
+		/// <summary>
+		/// The Rust language
+		/// </summary>
+		Rust
 	}
 }

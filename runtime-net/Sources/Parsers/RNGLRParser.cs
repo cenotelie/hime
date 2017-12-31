@@ -247,7 +247,7 @@ namespace Hime.Redist.Parsers
 			// queue of GLR states to inspect:
 			List<int> queueGSSHead = new List<int>();   // the related GSS head
 			List<int[]> queueVStack = new List<int[]>(); // the virtual stack
-			// first reduction
+														 // first reduction
 			foreach (Shift shift in shifts)
 			{
 				int count = parserAutomaton.GetActionsCount(shift.to, onTerminalID);
@@ -255,7 +255,7 @@ namespace Hime.Redist.Parsers
 				{
 					// enqueue the info, top GSS stack node and target GLR state
 					queueGSSHead.Add(shift.from);
-					queueVStack.Add(new [] { shift.to });
+					queueVStack.Add(new[] { shift.to });
 				}
 			}
 			// now, close the queue
@@ -306,7 +306,7 @@ namespace Hime.Redist.Parsers
 							int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 							// enqueue the info, top GSS stack node and target GLR state
 							queueGSSHead.Add(path.Last);
-							queueVStack.Add(new [] { next });
+							queueVStack.Add(new[] { next });
 						}
 					}
 				}
@@ -401,24 +401,24 @@ namespace Hime.Redist.Parsers
 				LROpCode op = production[i];
 				switch (op.Base)
 				{
-				case LROpCodeBase.SemanticAction:
-					{
-						i++;
+					case LROpCodeBase.SemanticAction:
+						{
+							i++;
+							break;
+						}
+					case LROpCodeBase.AddVirtual:
+						{
+							i++;
+							break;
+						}
+					case LROpCodeBase.AddNullVariable:
+						{
+							result.Add(production[i + 1].DataValue);
+							i++;
+							break;
+						}
+					default:
 						break;
-					}
-				case LROpCodeBase.AddVirtual:
-					{
-						i++;
-						break;
-					}
-				case LROpCodeBase.AddNullVariable:
-					{
-						result.Add(production[i + 1].DataValue);
-						i++;
-						break;
-					}
-				default:
-					break;
 				}
 			}
 			return result;
@@ -502,7 +502,7 @@ namespace Hime.Redist.Parsers
 							int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 							// enqueue the info, top GSS stack node and target GLR state
 							queueGSSHead.Add(path.Last);
-							queueVStack.Add(new [] { next });
+							queueVStack.Add(new[] { next });
 						}
 					}
 				}
@@ -557,7 +557,7 @@ namespace Hime.Redist.Parsers
 								int next = GetNextByVar(gss.GetRepresentedState(path.Last), symVariables[production.Head].ID);
 								// enqueue the info, top GSS stack node and target GLR state
 								queueGSSHead.Add(path.Last);
-								queueVStack.Add(new [] { next });
+								queueVStack.Add(new[] { next });
 							}
 						}
 					}
@@ -585,30 +585,30 @@ namespace Hime.Redist.Parsers
 				LROpCode op = production[i];
 				switch (op.Base)
 				{
-				case LROpCodeBase.SemanticAction:
-					{
-						SemanticAction action = symActions[production[i + 1].DataValue];
-						i++;
-						action.Invoke(variable, sppf);
+					case LROpCodeBase.SemanticAction:
+						{
+							SemanticAction action = symActions[production[i + 1].DataValue];
+							i++;
+							action.Invoke(variable, sppf);
+							break;
+						}
+					case LROpCodeBase.AddVirtual:
+						{
+							int index = production[i + 1].DataValue;
+							sppf.ReductionAddVirtual(index, op.TreeAction);
+							i++;
+							break;
+						}
+					case LROpCodeBase.AddNullVariable:
+						{
+							int index = production[i + 1].DataValue;
+							sppf.ReductionAddNullable(nullables[index], op.TreeAction);
+							i++;
+							break;
+						}
+					default:
+						sppf.ReductionPop(op.TreeAction);
 						break;
-					}
-				case LROpCodeBase.AddVirtual:
-					{
-						int index = production[i + 1].DataValue;
-						sppf.ReductionAddVirtual(index, op.TreeAction);
-						i++;
-						break;
-					}
-				case LROpCodeBase.AddNullVariable:
-					{
-						int index = production[i + 1].DataValue;
-						sppf.ReductionAddNullable(nullables[index], op.TreeAction);
-						i++;
-						break;
-					}
-				default:
-					sppf.ReductionPop(op.TreeAction);
-					break;
 				}
 			}
 			return sppf.Reduce(generation, production.Head, production.HeadAction == TreeAction.Replace);
@@ -696,7 +696,7 @@ namespace Hime.Redist.Parsers
 			if (reduction.prod.ReductionLength == 0)
 				paths = gss.GetPaths(reduction.node, 0, out count);
 			else
-                // The given GSS node is the second on the path, so start from it with length - 1
+				// The given GSS node is the second on the path, so start from it with length - 1
 				paths = gss.GetPaths(reduction.node, reduction.prod.ReductionLength - 1, out count);
 
 			// Execute the reduction on all paths
