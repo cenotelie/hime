@@ -85,21 +85,15 @@ namespace Hime.SDK.Output
 		public void Generate(string file)
 		{
 			StreamWriter writer = new StreamWriter(file, true, new System.Text.UTF8Encoding(false));
+			string mod = modifier == Modifier.Public ? "public " : "";
 
-			// writer.WriteLine();
-			// writer.WriteLine("package " + nmespace + ";");
-			// writer.WriteLine();
-			// writer.WriteLine("import fr.cenotelie.hime.redist.SemanticAction;");
-			// writer.WriteLine("import fr.cenotelie.hime.redist.SemanticBody;");
-			// writer.WriteLine("import fr.cenotelie.hime.redist.Symbol;");
-			// writer.WriteLine("import fr.cenotelie.hime.redist.parsers.InitializationException;");
-			// writer.WriteLine("import fr.cenotelie.hime.redist.parsers." + automatonType + ";");
-			// writer.WriteLine("import fr.cenotelie.hime.redist.parsers." + parserType + ";");
-			// writer.WriteLine();
-			// writer.WriteLine("import java.util.Map;");
-			// writer.WriteLine();
+			writer.WriteLine("/// Static resource for the serialized parser automaton");
+			writer.WriteLine("const PARSER_AUTOMATON: &'static [u8] = include_bytes!(\"" + binResource + "\");");
+			writer.WriteLine();
 
-			// string mod = modifier == Modifier.Public ? "public " : "";
+			GenerateCodeSymbols(writer);
+			GenerateCodeVariables(writer);
+			GenerateCodeVirtuals(writer);
 
 			// writer.WriteLine("/**");
 			// writer.WriteLine(" * Represents a parser");
@@ -111,9 +105,7 @@ namespace Hime.SDK.Output
 			// writer.WriteLine("     */");
 			// writer.WriteLine("    private static final " + automatonType + " commonAutomaton = " + automatonType + ".find(" + name + "Parser.class, \"" + binResource + "\");");
 
-			// GenerateCodeSymbols(writer);
-			// GenerateCodeVariables(writer);
-			// GenerateCodeVirtuals(writer);
+
 			// GenerateCodeActions(writer);
 			// GeneratorCodeConstructors(writer);
 
@@ -133,35 +125,28 @@ namespace Hime.SDK.Output
 			{
 				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.SanitizeNameJava(var.Name));
+				nameVariables.Add(var, Helper.SanitizeNameRust(var.Name));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
-				string name = Helper.SanitizeNameJava(var.Name);
+				string name = Helper.SanitizeNameRust(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
 					name += Helper.VIRTUAL_SUFFIX;
 				nameVirtuals.Add(var, name);
 			}
 
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * Contains the constant IDs for the variables and virtuals in this parser");
-			stream.WriteLine("     */");
-			stream.WriteLine("    public static class ID {");
 			foreach (KeyValuePair<Grammars.Variable, string> pair in nameVariables)
 			{
-				stream.WriteLine("        /**");
-				stream.WriteLine("         * The unique identifier for variable " + pair.Key.Name);
-				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("/// The unique identifier for variable " + pair.Key.Name);
+				stream.WriteLine("pub const {0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
+			stream.WriteLine();
 			foreach (KeyValuePair<Grammars.Virtual, string> pair in nameVirtuals)
 			{
-				stream.WriteLine("        /**");
-				stream.WriteLine("         * The unique identifier for virtual " + pair.Key.Name);
-				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("/// The unique identifier for virtual " + pair.Key.Name);
+				stream.WriteLine("pub const {0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
-			stream.WriteLine("    }");
+			stream.WriteLine();
 		}
 
 		/// <summary>
@@ -170,23 +155,20 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeVariables(StreamWriter stream)
 		{
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * The collection of variables matched by this parser");
-			stream.WriteLine("     *");
-			stream.WriteLine("     * The variables are in an order consistent with the automaton,");
-			stream.WriteLine("     * so that variable indices in the automaton can be used to retrieve the variables in this table");
-			stream.WriteLine("     */");
-			stream.WriteLine("    private static final Symbol[] variables = {");
+			stream.WriteLine("/// The collection of variables matched by this parser");
+			stream.WriteLine("/// The variables are in an order consistent with the automaton,");
+			stream.WriteLine("/// so that variable indices in the automaton can be used to retrieve the variables in this table");
+			stream.WriteLine("const VARIABLES: &'static [Symbol] = &[");
 			bool first = true;
 			foreach (Grammars.Variable var in grammar.Variables)
 			{
 				if (!first)
-					stream.WriteLine(", ");
-				stream.Write("        ");
-				stream.Write("new Symbol(0x" + var.ID.ToString("X4") + ", \"" + var.Name + "\")");
+					stream.WriteLine(",");
+				stream.Write("    Symbol { id: 0x" + var.ID.ToString("X4") + ", name: \"" + var.Name + "\" }");
 				first = false;
 			}
-			stream.WriteLine(" };");
+			stream.WriteLine("];");
+			stream.WriteLine();
 		}
 
 		/// <summary>
@@ -195,23 +177,20 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeVirtuals(StreamWriter stream)
 		{
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * The collection of virtuals matched by this parser");
-			stream.WriteLine("     *");
-			stream.WriteLine("     * The virtuals are in an order consistent with the automaton,");
-			stream.WriteLine("     * so that virtual indices in the automaton can be used to retrieve the virtuals in this table");
-			stream.WriteLine("     */");
-			stream.WriteLine("    private static final Symbol[] virtuals = {");
+			stream.WriteLine("/// The collection of virtuals matched by this parser");
+			stream.WriteLine("/// The virtuals are in an order consistent with the automaton,");
+			stream.WriteLine("/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table");
+			stream.WriteLine("const VIRTUALS: &'static [Symbol] = &[");
 			bool first = true;
 			foreach (Grammars.Virtual v in grammar.Virtuals)
 			{
 				if (!first)
-					stream.WriteLine(", ");
-				stream.Write("        ");
-				stream.Write("new Symbol(0x" + v.ID.ToString("X4") + ", \"" + v.Name + "\")");
+					stream.WriteLine(",");
+				stream.Write("    Symbol { id: 0x" + v.ID.ToString("X4") + ", name: \"" + v.Name + "\" }");
 				first = false;
 			}
-			stream.WriteLine(" };");
+			stream.WriteLine("];");
+			stream.WriteLine();
 		}
 
 		/// <summary>

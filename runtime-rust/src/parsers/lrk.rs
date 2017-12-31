@@ -108,7 +108,7 @@ impl LRkAutomaton {
     }
 
     /// Gets the expected terminals for the specified state
-    pub fn get_expected(&self, state: u32, terminals: &'static Vec<Symbol>) -> LRExpected {
+    pub fn get_expected(&self, state: u32, terminals: &'static [Symbol]) -> LRExpected {
         let mut expected = LRExpected::new();
         let mut offset = self.columns_count * state as usize * 2;
         for terminal in terminals.iter() {
@@ -183,7 +183,7 @@ impl<'a> LRkAstBuilder<'a> {
     }
 
     /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'static Vec<Symbol> {
+    pub fn get_variables(&self) -> &'static [Symbol] {
         self.result.get_variables()
     }
 

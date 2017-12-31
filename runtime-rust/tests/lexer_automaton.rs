@@ -17,10 +17,10 @@
 
 extern crate hime_redist;
 
-use ::hime_redist::lexers::automaton::DEAD_STATE;
-use ::hime_redist::lexers::automaton::Automaton;
-use ::hime_redist::lexers::automaton::run_dfa;
-use ::hime_redist::text::Text;
+use hime_redist::lexers::automaton::Automaton;
+use hime_redist::lexers::automaton::DEAD_STATE;
+use hime_redist::lexers::automaton::run_dfa;
+use hime_redist::text::Text;
 
 /// Static resource for the serialized lexer automaton
 const LEXER_AUTOMATON: &'static [u8] = include_bytes!("HimeGrammarLexer.bin");

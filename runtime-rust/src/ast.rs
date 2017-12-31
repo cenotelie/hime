@@ -140,9 +140,9 @@ pub struct Ast<'a> {
     /// The table of tokens
     tokens: TokenRepository<'a>,
     /// The table of variables
-    variables: &'static Vec<Symbol>,
+    variables: &'static [Symbol],
     /// The table of virtuals
-    virtuals: &'static Vec<Symbol>,
+    virtuals: &'static [Symbol],
     /// The data of the implementation
     data: EitherMut<'a, AstImpl>
 }
@@ -151,8 +151,8 @@ impl<'a> Ast<'a> {
     /// Creates a new AST proxy structure
     pub fn new(
         tokens: TokenRepository<'a>,
-        variables: &'static Vec<Symbol>,
-        virtuals: &'static Vec<Symbol>,
+        variables: &'static [Symbol],
+        virtuals: &'static [Symbol],
         data: &'a AstImpl
     ) -> Ast<'a> {
         Ast {
@@ -166,8 +166,8 @@ impl<'a> Ast<'a> {
     /// Creates a new AST proxy structure
     pub fn new_mut(
         tokens: TokenRepository<'a>,
-        variables: &'static Vec<Symbol>,
-        virtuals: &'static Vec<Symbol>,
+        variables: &'static [Symbol],
+        virtuals: &'static [Symbol],
         data: &'a mut AstImpl
     ) -> Ast<'a> {
         Ast {
@@ -179,7 +179,7 @@ impl<'a> Ast<'a> {
     }
 
     /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'static Vec<Symbol> {
+    pub fn get_variables(&self) -> &'static [Symbol] {
         &self.variables
     }
 

@@ -91,7 +91,7 @@ pub struct ContextFreeLexer<'a> {
 
 impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &Vec<Symbol> {
+    fn get_terminals(&self) -> &[Symbol] {
         self.repository.get_terminals()
     }
 
@@ -226,7 +226,7 @@ pub struct ContextSensitiveLexer<'a> {
 
 impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &Vec<Symbol> {
+    fn get_terminals(&self) -> &[Symbol] {
         self.repository.get_terminals()
     }
 

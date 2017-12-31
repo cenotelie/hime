@@ -60,7 +60,7 @@ impl TokenRepositoryImpl {
 /// The proxy structure for a repository of matched tokens
 pub struct TokenRepository<'a> {
     /// The table of grammar terminals
-    terminals: &'static Vec<Symbol>,
+    terminals: &'static [Symbol],
     /// The input text
     text: &'a Text,
     /// The table of matched tokens
@@ -128,7 +128,7 @@ impl<'a> Iterable<'a> for TokenRepository<'a> {
 impl<'a> TokenRepository<'a> {
     /// Creates a new repository
     pub fn new(
-        terminals: &'static Vec<Symbol>,
+        terminals: &'static [Symbol],
         text: &'a Text,
         tokens: &'a TokenRepositoryImpl
     ) -> TokenRepository<'a> {
@@ -141,7 +141,7 @@ impl<'a> TokenRepository<'a> {
 
     /// Creates a new mutable repository
     pub fn new_mut(
-        terminals: &'static Vec<Symbol>,
+        terminals: &'static [Symbol],
         text: &'a Text,
         tokens: &'a mut TokenRepositoryImpl
     ) -> TokenRepository<'a> {
@@ -165,7 +165,7 @@ impl<'a> TokenRepository<'a> {
     }
 
     /// Gets the terminals
-    pub fn get_terminals(&self) -> &Vec<Symbol> {
+    pub fn get_terminals(&self) -> &[Symbol] {
         &self.terminals
     }
 

@@ -134,7 +134,7 @@ namespace Hime.SDK.Output
 			{
 				if (!first)
 					writer.WriteLine(",");
-				writer.Write("     Symbol { id: 0x" + terminal.ID.ToString("X4") + ", name: \"" + terminal.ToString().Replace("\"", "\\\"") + "\" }");
+				writer.Write("    Symbol { id: 0x" + terminal.ID.ToString("X4") + ", name: \"" + terminal.ToString().Replace("\"", "\\\"") + "\" }");
 				first = false;
 			}
 			writer.WriteLine("];");

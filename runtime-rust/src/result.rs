@@ -28,11 +28,11 @@ use super::tokens::TokenRepositoryImpl;
 /// Represents the output of a parser
 pub struct ParseResult {
     /// The table of grammar terminals
-    terminals: &'static Vec<Symbol>,
+    terminals: &'static [Symbol],
     /// The table of grammar variables
-    variables: &'static Vec<Symbol>,
+    variables: &'static [Symbol],
     /// The table of grammar virtuals
-    virtuals: &'static Vec<Symbol>,
+    virtuals: &'static [Symbol],
     /// The input text
     text: Text,
     /// The errors found in the input
@@ -46,9 +46,9 @@ pub struct ParseResult {
 impl ParseResult {
     /// Initialize a new parse result
     pub fn new(
-        terminals: &'static Vec<Symbol>,
-        variables: &'static Vec<Symbol>,
-        virtuals: &'static Vec<Symbol>,
+        terminals: &'static [Symbol],
+        variables: &'static [Symbol],
+        virtuals: &'static [Symbol],
         text: Text
     ) -> ParseResult {
         ParseResult {
@@ -63,17 +63,17 @@ impl ParseResult {
     }
 
     /// Gets the grammar terminals
-    pub fn get_terminals(&self) -> &'static Vec<Symbol> {
+    pub fn get_terminals(&self) -> &'static [Symbol] {
         self.terminals
     }
 
     /// Gets the grammar variables
-    pub fn get_variables(&self) -> &'static Vec<Symbol> {
+    pub fn get_variables(&self) -> &'static [Symbol] {
         self.variables
     }
 
     /// Gets the grammar virtuals
-    pub fn get_virtuals(&self) -> &'static Vec<Symbol> {
+    pub fn get_virtuals(&self) -> &'static [Symbol] {
         self.virtuals
     }
 
