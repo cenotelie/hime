@@ -358,7 +358,7 @@ struct LRkHead {
     identifier: u32
 }
 
-struct LRkParserData {
+struct LRkParserData<'c> {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
@@ -366,10 +366,10 @@ struct LRkParserData {
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
-    actions: Vec<Box<FnMut(Symbol, &SemanticBody)>>
+    actions: Vec<Box<FnMut(Symbol, &SemanticBody) + 'c>>
 }
 
-impl ContextProvider for LRkParserData {
+impl<'c> ContextProvider for LRkParserData<'c> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -474,7 +474,7 @@ impl ContextProvider for LRkParserData {
     }
 }
 
-impl LRkParserData {
+impl<'c> LRkParserData<'c> {
     /// Parses on the specified token kernel
     fn parse_on_token(&mut self, kernel: TokenKernel, builder: &mut LRkAstBuilder) -> LRActionCode {
         let stack = &mut self.stack;
@@ -513,7 +513,7 @@ impl LRkParserData {
     fn reduce(
         production: &LRProduction,
         builder: &mut LRkAstBuilder,
-        actions: &mut Vec<Box<FnMut(Symbol, &SemanticBody)>>
+        actions: &mut Vec<Box<FnMut(Symbol, &SemanticBody) + 'c>>
     ) -> Symbol {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
@@ -547,21 +547,21 @@ impl LRkParserData {
 }
 
 /// Represents a base for all LR(k) parsers
-pub struct LRkParser<'a> {
+pub struct LRkParser<'l, 'c> {
     /// The parser's data
-    data: LRkParserData,
+    data: LRkParserData<'c>,
     /// The AST builder
-    builder: LRkAstBuilder<'a>
+    builder: LRkAstBuilder<'l>
 }
 
-impl<'a> LRkParser<'a> {
+impl<'l, 'c> LRkParser<'l, 'c> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'a mut Lexer<'a>,
+        lexer: &'l mut Lexer<'l>,
         automaton: LRkAutomaton,
-        ast: Ast<'a>,
-        actions: Vec<Box<FnMut(Symbol, &SemanticBody)>>
-    ) -> LRkParser<'a> {
+        ast: Ast<'l>,
+        actions: Vec<Box<FnMut(Symbol, &SemanticBody) + 'c>>
+    ) -> LRkParser<'l, 'c> {
         LRkParser {
             data: LRkParserData {
                 automaton,
@@ -580,7 +580,7 @@ impl<'a> LRkParser<'a> {
     }
 }
 
-impl<'a> Parser for LRkParser<'a> {
+impl<'l, 'c> Parser for LRkParser<'l, 'c> {
     fn parse(&mut self) {
         let mut token = self.get_next_token().unwrap();
         loop {
