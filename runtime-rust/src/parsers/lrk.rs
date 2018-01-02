@@ -367,7 +367,7 @@ struct LRkParserData {
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
-    actions: Vec<SemanticAction>
+    actions: Vec<Box<FnMut(Symbol, &SemanticBody)>>
 }
 
 impl ContextProvider for LRkParserData {
@@ -496,7 +496,7 @@ impl LRkParserData {
             }
             // now reduce
             let production = self.automaton.get_production(action.get_data() as usize);
-            let variable = LRkParserData::reduce(production, builder, &self.actions);
+            let variable = LRkParserData::reduce(production, builder, &mut self.actions);
             let length = stack.len();
             stack.truncate(length - production.reduction_length);
             let action = self.automaton.get_action(
@@ -514,7 +514,7 @@ impl LRkParserData {
     fn reduce(
         production: &LRProduction,
         builder: &mut LRkAstBuilder,
-        actions: &Vec<SemanticAction>
+        actions: &mut Vec<Box<FnMut(Symbol, &SemanticBody)>>
     ) -> Symbol {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
@@ -528,7 +528,7 @@ impl LRkParserData {
             i += 1;
             match get_op_code_base(op_code) {
                 LR_OP_CODE_BASE_SEMANTIC_ACTION => {
-                    let action = actions[production.bytecode[i + 1] as usize];
+                    let action = &mut actions[production.bytecode[i + 1] as usize];
                     i += 1;
                     action(variable, builder);
                 }
@@ -561,7 +561,7 @@ impl<'a> LRkParser<'a> {
         lexer: &'a mut Lexer<'a>,
         automaton: LRkAutomaton,
         ast: Ast<'a>,
-        actions: Vec<SemanticAction>
+        actions: Vec<Box<FnMut(Symbol, &SemanticBody)>>
     ) -> LRkParser<'a> {
         LRkParser {
             data: LRkParserData {

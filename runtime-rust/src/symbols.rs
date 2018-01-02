@@ -151,4 +151,4 @@ pub trait SemanticBody {
 }
 
 /// Delegate for a user-defined semantic action
-pub type SemanticAction = fn(head: Symbol, body: &SemanticBody);
+pub type SemanticAction = FnMut(Symbol, &SemanticBody);
