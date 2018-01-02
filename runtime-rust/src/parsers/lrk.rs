@@ -27,7 +27,6 @@ use super::super::ast::TableType;
 use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
-use super::super::symbols::SemanticAction;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 
@@ -144,20 +143,20 @@ impl LRkAstReduction {
 }
 
 /// Represents the builder of Parse Trees for LR(k) parsers
-struct LRkAstBuilder<'a> {
+struct LRkAstBuilder<'l> {
     /// Lexer associated to this parser
-    lexer: &'a mut Lexer<'a>,
+    lexer: &'l mut Lexer<'l>,
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
-    result: Ast<'a>,
+    result: Ast<'l>,
     /// The reduction handle represented as the indices of the sub-trees in the cache
     handle: Vec<usize>,
     /// The data of the current reduction
     reduction: Option<LRkAstReduction>
 }
 
-impl<'a> SemanticBody for LRkAstBuilder<'a> {
+impl<'l> SemanticBody for LRkAstBuilder<'l> {
     fn length(&self) -> usize {
         self.handle.len()
     }
@@ -184,9 +183,9 @@ impl<'a> SemanticBody for LRkAstBuilder<'a> {
     }
 }
 
-impl<'a> LRkAstBuilder<'a> {
+impl<'l> LRkAstBuilder<'l> {
     /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'a mut Lexer<'a>, result: Ast<'a>) -> LRkAstBuilder<'a> {
+    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> LRkAstBuilder<'l> {
         LRkAstBuilder {
             lexer,
             stack: Vec::<SubTree>::new(),
