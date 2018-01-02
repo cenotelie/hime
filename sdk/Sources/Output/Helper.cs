@@ -74,7 +74,7 @@ namespace Hime.SDK.Output
 		public static string SanitizeNameRust(string name)
 		{
 			string result = RemoveSpecials(name);
-			return "ID_" + result;
+			return "ID_" + result.ToUpper();
 		}
 
 		/// <summary>

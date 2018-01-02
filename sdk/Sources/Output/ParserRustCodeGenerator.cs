@@ -85,7 +85,6 @@ namespace Hime.SDK.Output
 		public void Generate(string file)
 		{
 			StreamWriter writer = new StreamWriter(file, true, new System.Text.UTF8Encoding(false));
-			string mod = modifier == Modifier.Public ? "public " : "";
 
 			writer.WriteLine("/// Static resource for the serialized parser automaton");
 			writer.WriteLine("const PARSER_AUTOMATON: &'static [u8] = include_bytes!(\"" + binResource + "\");");
@@ -94,6 +93,8 @@ namespace Hime.SDK.Output
 			GenerateCodeSymbols(writer);
 			GenerateCodeVariables(writer);
 			GenerateCodeVirtuals(writer);
+
+			GeneratorCodeConstructors(writer);
 
 			// writer.WriteLine("/**");
 			// writer.WriteLine(" * Represents a parser");
@@ -107,7 +108,7 @@ namespace Hime.SDK.Output
 
 
 			// GenerateCodeActions(writer);
-			// GeneratorCodeConstructors(writer);
+			
 
 			// writer.WriteLine("}");
 			writer.Close();
@@ -131,7 +132,7 @@ namespace Hime.SDK.Output
 			{
 				string name = Helper.SanitizeNameRust(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
-					name += Helper.VIRTUAL_SUFFIX;
+					name += Helper.VIRTUAL_SUFFIX.ToUpper();
 				nameVirtuals.Add(var, name);
 			}
 
@@ -262,50 +263,31 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GeneratorCodeConstructors(StreamWriter stream)
 		{
-			string ex = parserType.StartsWith("RNGLR") ? "throws InitializationException " : "";
+			stream.WriteLine("/// Parses the specified string with this parser");
+			stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
+			stream.WriteLine("    let text = Text::new(input);");
+			stream.WriteLine("    let result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
+			stream.WriteLine("    let lexer = new_lexer(&mut result);");
+			stream.WriteLine("    let automaton = let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
+			stream.WriteLine("    result");
+			stream.WriteLine("}");
+			stream.WriteLine();
 
-			if (grammar.Actions.Count == 0)
-			{
-				stream.WriteLine("    /**");
-				stream.WriteLine("     * Initializes a new instance of the parser");
-				stream.WriteLine("     *");
-				stream.WriteLine("     * @param lexer The input lexer");
-				stream.WriteLine("     */");
-				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, null, lexer);");
-				stream.WriteLine("    }");
-			}
-			else
-			{
-				stream.WriteLine("    /**");
-				stream.WriteLine("     * Initializes a new instance of the parser");
-				stream.WriteLine("     *");
-				stream.WriteLine("     * @param lexer The input lexer");
-				stream.WriteLine("     */");
-				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
-				stream.WriteLine("    }");
+			stream.WriteLine("/// Parses the specified stream of UTF-16 encoding points");
+			stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+			stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
+			stream.WriteLine("    let result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
+			stream.WriteLine("    result");
+			stream.WriteLine("}");
+			stream.WriteLine();
 
-				stream.WriteLine("    /**");
-				stream.WriteLine("     * Initializes a new instance of the parser");
-				stream.WriteLine("     *");
-				stream.WriteLine("     * @param lexer The input lexer");
-				stream.WriteLine("     * @param actions The set of semantic actions");
-				stream.WriteLine("     */");
-				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Actions actions) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
-				stream.WriteLine("    }");
-
-				stream.WriteLine("    /**");
-				stream.WriteLine("     * Initializes a new instance of the parser");
-				stream.WriteLine("     *");
-				stream.WriteLine("     * @param lexer The input lexer");
-				stream.WriteLine("     * @param actions The set of semantic actions");
-				stream.WriteLine("     */");
-				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Map<String, SemanticAction> actions) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
-				stream.WriteLine("    }");
-			}
+			stream.WriteLine("/// Parses the specified stream of UTF-8 encoding points");
+			stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+			stream.WriteLine("    let text = Text::from_utf8_stream(input);");
+			stream.WriteLine("    let result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
+			stream.WriteLine("    result");
+			stream.WriteLine("}");
+			stream.WriteLine();
 		}
 	}
 }

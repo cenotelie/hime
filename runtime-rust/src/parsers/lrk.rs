@@ -145,6 +145,8 @@ impl LRkAstReduction {
 
 /// Represents the builder of Parse Trees for LR(k) parsers
 struct LRkAstBuilder<'a> {
+    /// Lexer associated to this parser
+    lexer: &'a mut Lexer<'a>,
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
@@ -165,7 +167,18 @@ impl<'a> SemanticBody for LRkAstBuilder<'a> {
             None => panic!("Not in a reduction"),
             Some(ref data) => {
                 let label = data.cache.get_label_at(self.handle[index]);
-                self.result.get_semantic_element_for_label(label)
+                match label.get_type() {
+                    TableType::None => panic!("Not a semantic element"),
+                    TableType::Token => {
+                        SemanticElement::Token(self.lexer.get_output().get_token(label.get_index()))
+                    }
+                    TableType::Variable => {
+                        SemanticElement::Variable(self.result.get_variables()[label.get_index()])
+                    }
+                    TableType::Virtual => {
+                        SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
+                    }
+                }
             }
         }
     }
@@ -173,8 +186,9 @@ impl<'a> SemanticBody for LRkAstBuilder<'a> {
 
 impl<'a> LRkAstBuilder<'a> {
     /// Initializes the builder with the given stack size
-    pub fn new(result: Ast<'a>) -> LRkAstBuilder {
+    pub fn new(lexer: &'a mut Lexer<'a>, result: Ast<'a>) -> LRkAstBuilder<'a> {
         LRkAstBuilder {
+            lexer,
             stack: Vec::<SubTree>::new(),
             result,
             handle: Vec::<usize>::new(),
@@ -345,18 +359,18 @@ struct LRkHead {
     identifier: u32
 }
 
-struct LRkParserData<'a> {
+struct LRkParserData {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
     stack: Vec<LRkHead>,
-    /// The AST builder
-    builder: LRkAstBuilder<'a>,
+    /// The grammar variables
+    variables: &'static [Symbol],
     /// The semantic actions
     actions: Vec<SemanticAction>
 }
 
-impl<'a> ContextProvider for LRkParserData<'a> {
+impl ContextProvider for LRkParserData {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -434,7 +448,7 @@ impl<'a> ContextProvider for LRkParserData<'a> {
         while action.get_code() == LR_ACTION_CODE_REDUCE {
             // execute the reduction
             let production = self.automaton.get_production(action.get_data() as usize);
-            let variable = self.builder.get_variables()[production.head];
+            let variable = self.variables[production.head];
             let length = my_stack.len();
             my_stack.truncate(length - production.reduction_length);
             // this must be a shift
@@ -461,9 +475,9 @@ impl<'a> ContextProvider for LRkParserData<'a> {
     }
 }
 
-impl<'a> LRkParserData<'a> {
+impl LRkParserData {
     /// Parses on the specified token kernel
-    fn parse_on_token(&mut self, kernel: TokenKernel) -> LRActionCode {
+    fn parse_on_token(&mut self, kernel: TokenKernel, builder: &mut LRkAstBuilder) -> LRActionCode {
         let stack = &mut self.stack;
 
         loop {
@@ -474,7 +488,7 @@ impl<'a> LRkParserData<'a> {
                     state: action.get_data() as u32,
                     identifier: kernel.terminal_id
                 });
-                self.builder.push_token(kernel.index as usize);
+                builder.push_token(kernel.index as usize);
                 return action.get_code();
             }
             if action.get_code() != LR_ACTION_CODE_REDUCE {
@@ -482,12 +496,12 @@ impl<'a> LRkParserData<'a> {
             }
             // now reduce
             let production = self.automaton.get_production(action.get_data() as usize);
-            let variable = LRkParserData::reduce(production, &mut self.builder, &self.actions);
+            let variable = LRkParserData::reduce(production, builder, &self.actions);
             let length = stack.len();
             stack.truncate(length - production.reduction_length);
             let action = self.automaton.get_action(
                 stack[stack.len() - 1].state,
-                self.builder.get_variables()[production.head].id
+                builder.get_variables()[production.head].id
             );
             stack.push(LRkHead {
                 state: action.get_data() as u32,
@@ -499,7 +513,7 @@ impl<'a> LRkParserData<'a> {
     /// Executes the given LR reduction
     fn reduce(
         production: &LRProduction,
-        builder: &mut LRkAstBuilder<'a>,
+        builder: &mut LRkAstBuilder,
         actions: &Vec<SemanticAction>
     ) -> Symbol {
         let variable = builder.get_variables()[production.head];
@@ -535,10 +549,10 @@ impl<'a> LRkParserData<'a> {
 
 /// Represents a base for all LR(k) parsers
 pub struct LRkParser<'a> {
-    /// Lexer associated to this parser
-    lexer: &'a mut Lexer<'a>,
     /// The parser's data
-    data: LRkParserData<'a>
+    data: LRkParserData,
+    /// The AST builder
+    builder: LRkAstBuilder<'a>
 }
 
 impl<'a> LRkParser<'a> {
@@ -550,21 +564,20 @@ impl<'a> LRkParser<'a> {
         actions: Vec<SemanticAction>
     ) -> LRkParser<'a> {
         LRkParser {
-            lexer,
             data: LRkParserData {
                 automaton,
                 stack: Vec::<LRkHead>::new(),
-                builder: LRkAstBuilder::new(ast),
+                variables: ast.get_variables(),
                 actions
-            }
+            },
+            builder: LRkAstBuilder::new(lexer, ast)
         }
     }
 
     /// Gets the next token in the kernel
     fn get_next_token(&mut self) -> Option<TokenKernel> {
         let data = &self.data;
-        let lexer = &mut self.lexer;
-        lexer.get_next_token(data)
+        self.builder.lexer.get_next_token(data)
     }
 }
 
@@ -572,7 +585,7 @@ impl<'a> Parser for LRkParser<'a> {
     fn parse(&mut self) {
         let mut token = self.get_next_token().unwrap();
         loop {
-            let action = self.data.parse_on_token(token);
+            let action = self.data.parse_on_token(token, &mut self.builder);
             if action == LR_ACTION_CODE_SHIFT {
                 token = self.get_next_token().unwrap();
             } else if action == LR_ACTION_CODE_ACCEPT {

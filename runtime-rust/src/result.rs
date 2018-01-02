@@ -43,7 +43,7 @@ pub struct ParseResult {
     ast: AstImpl
 }
 
-impl ParseResult {
+impl<'a> ParseResult {
     /// Initialize a new parse result
     pub fn new(
         terminals: &'static [Symbol],
@@ -86,19 +86,9 @@ impl ParseResult {
         &self.errors
     }
 
-    /// Gets the collection of errors
-    pub fn get_errors_mut(&mut self) -> &mut ParseErrors {
-        &mut self.errors
-    }
-
     /// Gets the token repository associated with this result
     pub fn get_tokens(&self) -> TokenRepository {
         TokenRepository::new(&self.terminals, &self.text, &self.tokens)
-    }
-
-    /// Gets the token repository associated with this result
-    pub fn get_tokens_mut(&mut self) -> TokenRepository {
-        TokenRepository::new_mut(&self.terminals, &self.text, &mut self.tokens)
     }
 
     /// Gets the resulting AST
@@ -111,13 +101,12 @@ impl ParseResult {
         )
     }
 
-    /// Gets the resulting AST
-    pub fn get_ast_mut(&mut self) -> Ast {
-        Ast::new_mut(
-            TokenRepository::new(&self.terminals, &self.text, &self.tokens),
-            self.variables,
-            self.virtuals,
-            &mut self.ast
+    /// Gets the mutable data required for parsing
+    pub fn get_parsing_data(&mut self) -> (TokenRepository, &mut ParseErrors, Ast) {
+        (
+            TokenRepository::new_mut(&self.terminals, &self.text, &mut self.tokens),
+            &mut self.errors,
+            Ast::new_mut(self.variables, self.virtuals, &mut self.ast)
         )
     }
 }

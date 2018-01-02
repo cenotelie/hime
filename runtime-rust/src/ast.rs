@@ -17,12 +17,12 @@
 
 //! Module for Abstract-Syntax Trees
 
-use super::symbols::SemanticElement;
 use super::symbols::SemanticElementTrait;
 use super::symbols::Symbol;
 use super::text::TextContext;
 use super::text::TextPosition;
 use super::text::TextSpan;
+use super::tokens::Token;
 use super::tokens::TokenRepository;
 use super::utils::EitherMut;
 use super::utils::biglist::BigList;
@@ -138,7 +138,7 @@ impl AstImpl {
 /// The linkage is represented by each node storing its number of children and the index of its first child.
 pub struct Ast<'a> {
     /// The table of tokens
-    tokens: TokenRepository<'a>,
+    tokens: Option<TokenRepository<'a>>,
     /// The table of variables
     variables: &'static [Symbol],
     /// The table of virtuals
@@ -156,7 +156,7 @@ impl<'a> Ast<'a> {
         data: &'a AstImpl
     ) -> Ast<'a> {
         Ast {
-            tokens,
+            tokens: Some(tokens),
             variables,
             virtuals,
             data: EitherMut::Immutable(data)
@@ -165,16 +165,23 @@ impl<'a> Ast<'a> {
 
     /// Creates a new AST proxy structure
     pub fn new_mut(
-        tokens: TokenRepository<'a>,
         variables: &'static [Symbol],
         virtuals: &'static [Symbol],
         data: &'a mut AstImpl
     ) -> Ast<'a> {
         Ast {
-            tokens,
+            tokens: None,
             variables,
             virtuals,
             data: EitherMut::Mutable(data)
+        }
+    }
+
+    /// Gets the i-th token in the associated repository
+    fn get_token(&self, index: usize) -> Token {
+        match self.tokens {
+            None => panic!("Missing token repository"),
+            Some(ref x) => x.get_token(index)
         }
     }
 
@@ -183,14 +190,9 @@ impl<'a> Ast<'a> {
         &self.variables
     }
 
-    /// Gets the semantic element corresponding to the specified label
-    pub fn get_semantic_element_for_label(&self, label: TableElemRef) -> SemanticElement {
-        match label.get_type() {
-            TableType::None => panic!("Not a semantic element"),
-            TableType::Token => SemanticElement::Token(self.tokens.get_token(label.get_index())),
-            TableType::Variable => SemanticElement::Variable(self.variables[label.get_index()]),
-            TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.get_index()])
-        }
+    /// Gets the grammar virtuals for this AST
+    pub fn get_virtuals(&self) -> &'static [Symbol] {
+        &self.virtuals
     }
 
     /// Gets the root node of this tree
@@ -257,7 +259,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
             TableType::Token => {
-                let token = self.tree.tokens.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.get_index());
                 token.get_position()
             }
             _ => None
@@ -269,7 +271,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
             TableType::Token => {
-                let token = self.tree.tokens.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.get_index());
                 token.get_span()
             }
             _ => None
@@ -281,7 +283,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
             TableType::Token => {
-                let token = self.tree.tokens.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.get_index());
                 token.get_context()
             }
             _ => None
@@ -293,7 +295,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
             TableType::Token => {
-                let token = self.tree.tokens.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.get_index());
                 token.get_symbol()
             }
             TableType::Variable => self.tree.variables[cell.label.get_index()],
@@ -307,7 +309,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
             TableType::Token => {
-                let token = self.tree.tokens.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.get_index());
                 token.get_value()
             }
             _ => None
