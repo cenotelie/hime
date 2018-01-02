@@ -358,7 +358,7 @@ struct LRkHead {
     identifier: u32
 }
 
-struct LRkParserData<'c> {
+struct LRkParserData<F: FnMut(usize, Symbol, &SemanticBody)> {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
@@ -366,10 +366,10 @@ struct LRkParserData<'c> {
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
-    actions: Vec<Box<FnMut(Symbol, &SemanticBody) + 'c>>
+    actions: F
 }
 
-impl<'c> ContextProvider for LRkParserData<'c> {
+impl<F: FnMut(usize, Symbol, &SemanticBody)> ContextProvider for LRkParserData<F> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -474,7 +474,7 @@ impl<'c> ContextProvider for LRkParserData<'c> {
     }
 }
 
-impl<'c> LRkParserData<'c> {
+impl<F: FnMut(usize, Symbol, &SemanticBody)> LRkParserData<F> {
     /// Parses on the specified token kernel
     fn parse_on_token(&mut self, kernel: TokenKernel, builder: &mut LRkAstBuilder) -> LRActionCode {
         let stack = &mut self.stack;
@@ -510,11 +510,7 @@ impl<'c> LRkParserData<'c> {
     }
 
     /// Executes the given LR reduction
-    fn reduce(
-        production: &LRProduction,
-        builder: &mut LRkAstBuilder,
-        actions: &mut Vec<Box<FnMut(Symbol, &SemanticBody) + 'c>>
-    ) -> Symbol {
+    fn reduce(production: &LRProduction, builder: &mut LRkAstBuilder, actions: &mut F) -> Symbol {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
             production.head,
@@ -527,9 +523,9 @@ impl<'c> LRkParserData<'c> {
             i += 1;
             match get_op_code_base(op_code) {
                 LR_OP_CODE_BASE_SEMANTIC_ACTION => {
-                    let action = &mut actions[production.bytecode[i + 1] as usize];
+                    let index = production.bytecode[i + 1] as usize;
                     i += 1;
-                    action(variable, builder);
+                    actions(index, variable, builder);
                 }
                 LR_OP_CODE_BASE_ADD_VIRTUAL => {
                     let index = production.bytecode[i + 1] as usize;
@@ -547,25 +543,30 @@ impl<'c> LRkParserData<'c> {
 }
 
 /// Represents a base for all LR(k) parsers
-pub struct LRkParser<'l, 'c> {
+pub struct LRkParser<'l, F: FnMut(usize, Symbol, &SemanticBody)> {
     /// The parser's data
-    data: LRkParserData<'c>,
+    data: LRkParserData<F>,
     /// The AST builder
     builder: LRkAstBuilder<'l>
 }
 
-impl<'l, 'c> LRkParser<'l, 'c> {
+impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> LRkParser<'l, F> {
     /// Initializes a new instance of the parser
     pub fn new(
         lexer: &'l mut Lexer<'l>,
         automaton: LRkAutomaton,
         ast: Ast<'l>,
-        actions: Vec<Box<FnMut(Symbol, &SemanticBody) + 'c>>
-    ) -> LRkParser<'l, 'c> {
+        actions: F
+    ) -> LRkParser<'l, F> {
+        let mut stack = Vec::<LRkHead>::new();
+        stack.push(LRkHead {
+            state: 0,
+            identifier: 0
+        });
         LRkParser {
             data: LRkParserData {
                 automaton,
-                stack: Vec::<LRkHead>::new(),
+                stack,
                 variables: ast.get_variables(),
                 actions
             },
@@ -580,7 +581,7 @@ impl<'l, 'c> LRkParser<'l, 'c> {
     }
 }
 
-impl<'l, 'c> Parser for LRkParser<'l, 'c> {
+impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> Parser for LRkParser<'l, F> {
     fn parse(&mut self) {
         let mut token = self.get_next_token().unwrap();
         loop {
