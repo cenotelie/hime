@@ -17,6 +17,9 @@
 
 //! Module for the definition of lexical and syntactic errors
 
+use std::fmt::Display;
+use std::fmt::Error;
+use std::fmt::Formatter;
 use std::ops::Index;
 
 use symbols::Symbol;
@@ -288,6 +291,12 @@ impl ParseErrorDataTrait for ParseError {
             &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_message(),
             &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_message()
         }
+    }
+}
+
+impl Display for ParseError {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "@{} {}", self.get_position(), self.get_message())
     }
 }
 

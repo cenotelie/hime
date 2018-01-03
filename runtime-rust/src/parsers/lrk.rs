@@ -661,13 +661,13 @@ impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> Parser for LRkParser<'l, F> {
                 let error = self.build_error(kernel);
                 let errors = self.builder.lexer.get_errors();
                 errors.push_error_unexpected_token(error);
-                if errors.get_count() >= MAX_ERROR_COUNT || kernel.terminal_id == SID_NOTHING {
-                    return;
-                }
                 kernel = TokenKernel {
                     terminal_id: SID_NOTHING,
                     index: 0
                 };
+                if errors.get_count() >= MAX_ERROR_COUNT || kernel.terminal_id == SID_NOTHING {
+                    return;
+                }
             }
         }
     }
