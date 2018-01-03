@@ -138,7 +138,7 @@ namespace Hime.Redist.Parsers
 		}
 
 		/// <summary>
-		/// Raises an error on an unexepcted token
+		/// Raises an error on an unexpected token
 		/// </summary>
 		/// <param name="kernel">The unexpected token's kernel</param>
 		/// <returns>The next token kernel in the case the error is recovered</returns>

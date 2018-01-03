@@ -165,7 +165,7 @@ impl<'a> TokenRepository<'a> {
     }
 
     /// Gets the terminals
-    pub fn get_terminals(&self) -> &[Symbol] {
+    pub fn get_terminals(&self) -> &'static [Symbol] {
         &self.terminals
     }
 

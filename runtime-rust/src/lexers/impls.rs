@@ -91,7 +91,7 @@ pub struct ContextFreeLexer<'a> {
 
 impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &[Symbol] {
+    fn get_terminals(&self) -> &'static [Symbol] {
         self.repository.get_terminals()
     }
 
@@ -106,8 +106,8 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     }
 
     /// Gets the lexer's errors
-    fn get_errors(&self) -> &ParseErrors {
-        &self.errors
+    fn get_errors(&mut self) -> &mut ParseErrors {
+        &mut self.errors
     }
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
@@ -226,7 +226,7 @@ pub struct ContextSensitiveLexer<'a> {
 
 impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &[Symbol] {
+    fn get_terminals(&self) -> &'static [Symbol] {
         self.repository.get_terminals()
     }
 
@@ -241,8 +241,8 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     }
 
     /// Gets the lexer's errors
-    fn get_errors(&self) -> &ParseErrors {
-        &self.errors
+    fn get_errors(&mut self) -> &mut ParseErrors {
+        &mut self.errors
     }
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.

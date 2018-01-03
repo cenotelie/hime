@@ -63,6 +63,7 @@ impl ContextProvider for DefaultContextProvider {
 }
 
 /// Represents the kernel of a token, i.e. the identifying information of a token
+#[derive(Copy, Clone)]
 pub struct TokenKernel {
     /// The identifier of the matched terminal
     pub terminal_id: u32,
@@ -73,7 +74,7 @@ pub struct TokenKernel {
 /// The public interface of a lexer
 pub trait Lexer<'a> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &[Symbol];
+    fn get_terminals(&self) -> &'static [Symbol];
 
     /// Gets the lexer's input text
     fn get_input(&self) -> &Text;
@@ -82,7 +83,7 @@ pub trait Lexer<'a> {
     fn get_output(&self) -> &TokenRepository<'a>;
 
     /// Gets the lexer's errors
-    fn get_errors(&self) -> &ParseErrors;
+    fn get_errors(&mut self) -> &mut ParseErrors;
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.

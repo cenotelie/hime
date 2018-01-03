@@ -24,6 +24,9 @@ use super::lexers::ContextProvider;
 use super::symbols::Symbol;
 use super::utils::bin::*;
 
+/// The maximum number of errors
+pub const MAX_ERROR_COUNT: usize = 100;
+
 /// Represents a tree action
 pub type TreeAction = u16;
 

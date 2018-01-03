@@ -24,11 +24,14 @@ use super::subtree::SubTree;
 use super::super::ast::Ast;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
+use super::super::errors::ParseErrorUnexpectedToken;
 use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
+use super::super::symbols::SID_NOTHING;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
+use super::super::symbols::SemanticElementTrait;
 
 /// Represents the LR(k) parsing table and productions
 pub struct LRkAutomaton {
@@ -475,6 +478,41 @@ impl<F: FnMut(usize, Symbol, &SemanticBody)> ContextProvider for LRkParserData<F
 }
 
 impl<F: FnMut(usize, Symbol, &SemanticBody)> LRkParserData<F> {
+    /// Checks whether the specified terminal is indeed expected for a reduction
+    /// This check is required because in the case of a base LALR graph,
+    /// some terminals expected for reduction in the automaton are coming from other paths.
+    fn check_is_expected(&self, terminal: Symbol) -> bool {
+        // copy the stack to use for the simulation
+        let mut my_stack = self.stack.clone();
+        let mut action = self.automaton
+            .get_action(my_stack[my_stack.len() - 1].state, terminal.id);
+        while action.get_code() != LR_ACTION_CODE_NONE {
+            if action.get_code() == LR_ACTION_CODE_SHIFT {
+                // yep, the terminal was expected
+                return true;
+            }
+            if action.get_code() == LR_ACTION_CODE_REDUCE {
+                // execute the reduction
+                let production = self.automaton.get_production(action.get_data() as usize);
+                let variable = self.variables[production.head];
+                let length = my_stack.len();
+                my_stack.truncate(length - production.reduction_length);
+                // this must be a shift
+                action = self.automaton
+                    .get_action(my_stack[my_stack.len() - 1].state, variable.id);
+                my_stack.push(LRkHead {
+                    state: action.get_data() as u32,
+                    identifier: variable.id
+                });
+                // now, get the new action for the terminal
+                action = self.automaton
+                    .get_action(action.get_data() as u32, terminal.id);
+            }
+        }
+        // nope, that was a pathological case in a LALR graph
+        false
+    }
+
     /// Parses on the specified token kernel
     fn parse_on_token(&mut self, kernel: TokenKernel, builder: &mut LRkAstBuilder) -> LRActionCode {
         let stack = &mut self.stack;
@@ -579,20 +617,57 @@ impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> LRkParser<'l, F> {
         let data = &self.data;
         self.builder.lexer.get_next_token(data)
     }
+
+    /// Builds the unexpected token error
+    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken {
+        let token = self.builder
+            .lexer
+            .get_output()
+            .get_token(kernel.index as usize);
+        let expected_on_head = self.data.automaton.get_expected(
+            self.data.stack[self.data.stack.len() - 1].state,
+            self.builder.lexer.get_terminals()
+        );
+        let mut my_expected = Vec::<Symbol>::new();
+        for x in expected_on_head.shifts.iter() {
+            my_expected.push(*x);
+        }
+        for x in expected_on_head.reductions.iter() {
+            if self.data.check_is_expected(*x) {
+                my_expected.push(*x);
+            }
+        }
+        ParseErrorUnexpectedToken::new(
+            token.get_position().unwrap(),
+            token.get_span().unwrap().length,
+            token.get_value().unwrap(),
+            token.get_symbol(),
+            my_expected
+        )
+    }
 }
 
 impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> Parser for LRkParser<'l, F> {
     fn parse(&mut self) {
-        let mut token = self.get_next_token().unwrap();
+        let mut kernel = self.get_next_token().unwrap();
         loop {
-            let action = self.data.parse_on_token(token, &mut self.builder);
+            let action = self.data.parse_on_token(kernel, &mut self.builder);
             if action == LR_ACTION_CODE_SHIFT {
-                token = self.get_next_token().unwrap();
+                kernel = self.get_next_token().unwrap();
             } else if action == LR_ACTION_CODE_ACCEPT {
                 return;
             } else {
                 // this is an error
-                panic!("Error");
+                let error = self.build_error(kernel);
+                let errors = self.builder.lexer.get_errors();
+                errors.push_error_unexpected_token(error);
+                if errors.get_count() >= MAX_ERROR_COUNT || kernel.terminal_id == SID_NOTHING {
+                    return;
+                }
+                kernel = TokenKernel {
+                    terminal_id: SID_NOTHING,
+                    index: 0
+                };
             }
         }
     }
