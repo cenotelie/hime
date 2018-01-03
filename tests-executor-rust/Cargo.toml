@@ -1,15 +1,16 @@
 [package]
-name = "hime_redist"
+name = "tests_executor_rust"
 version = "3.2.3"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
-description = "Redistributable runtime library for parsers generated with Hime (LR, RNGLR)."
-documentation = "https://cenotelie.fr/hime"
+description = "Executor for tests for the Hime Parser Generator in Rust."
 homepage = "https://cenotelie.fr/hime"
 repository = "https://bitbucket.org/cenotelie/hime"
-readme = "README.md"
 keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
-include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 
 [dependencies]
+hime_redist = "3.2.3"
+
+[patch.crates-io]
+hime_redist = { path = "../runtime-rust" }
