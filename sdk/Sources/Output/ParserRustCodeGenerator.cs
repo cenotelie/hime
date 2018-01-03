@@ -231,7 +231,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
-				stream.WriteLine("pub fn parse_text(text: Text) -> ParseResult {");
+				stream.WriteLine("fn parse_text(text: Text) -> ParseResult {");
 				stream.WriteLine("    let my_actions = |_index: usize, _head: Symbol, _body: &SemanticBody| ();");
 				stream.WriteLine("    let mut result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
 				stream.WriteLine("    {");
@@ -247,25 +247,43 @@ namespace Hime.SDK.Output
 			else
 			{
 				stream.WriteLine("/// Parses the specified string with this parser");
-				stream.WriteLine("pub fn parse_string(input: &str, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
+				stream.WriteLine("    let mut actions = NoActions {};");
+				stream.WriteLine("    parse_string_with(input, &mut actions)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified string with this parser");
+				stream.WriteLine("pub fn parse_string_with(input: &str, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::new(input);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+				stream.WriteLine("    let mut actions = NoActions {};");
+				stream.WriteLine("    parse_utf16_with(input, &mut actions)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
+				stream.WriteLine("pub fn parse_utf16_with(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf8(input: &mut Read, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+				stream.WriteLine("    let mut actions = NoActions {};");
+				stream.WriteLine("    parse_utf8_with(input, &mut actions)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
+				stream.WriteLine("pub fn parse_utf8_with(input: &mut Read, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
-				stream.WriteLine("pub fn parse_text(text: Text, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("fn parse_text(text: Text, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
 				int i = 0;
 				foreach (Grammars.Action action in grammar.Actions)
