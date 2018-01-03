@@ -89,28 +89,11 @@ namespace Hime.SDK.Output
 			writer.WriteLine("/// Static resource for the serialized parser automaton");
 			writer.WriteLine("const PARSER_AUTOMATON: &'static [u8] = include_bytes!(\"" + binResource + "\");");
 			writer.WriteLine();
-
 			GenerateCodeSymbols(writer);
 			GenerateCodeVariables(writer);
 			GenerateCodeVirtuals(writer);
-
+			GenerateCodeActions(writer);
 			GeneratorCodeConstructors(writer);
-
-			// writer.WriteLine("/**");
-			// writer.WriteLine(" * Represents a parser");
-			// writer.WriteLine(" */");
-			// writer.WriteLine(mod + "class " + name + "Parser extends " + parserType + " {");
-
-			// writer.WriteLine("    /**");
-			// writer.WriteLine("     * The automaton for this parser");
-			// writer.WriteLine("     */");
-			// writer.WriteLine("    private static final " + automatonType + " commonAutomaton = " + automatonType + ".find(" + name + "Parser.class, \"" + binResource + "\");");
-
-
-			// GenerateCodeActions(writer);
-			
-
-			// writer.WriteLine("}");
 			writer.Close();
 		}
 
@@ -202,59 +185,23 @@ namespace Hime.SDK.Output
 		{
 			if (grammar.Actions.Count == 0)
 				return;
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * Represents a set of semantic actions in this parser");
-			stream.WriteLine("     */");
-			stream.WriteLine("    public static class Actions {");
+			stream.WriteLine("/// Represents a set of semantic actions in this parser");
+			stream.WriteLine("pub trait Actions {");
 			foreach (Grammars.Action action in grammar.Actions)
 			{
-				stream.WriteLine("        /**");
-				stream.WriteLine("         * The " + action.Name + " semantic action");
-				stream.WriteLine("         */");
-				stream.WriteLine("        public void " + action.Name + "(Symbol head, SemanticBody body) { }");
+				stream.WriteLine("    /// The " + action.Name + " semantic action");
+				stream.WriteLine("    fn " + action.Name + "(&mut self, head: Symbol, body: &SemanticBody);");
 			}
+			stream.WriteLine("}");
 			stream.WriteLine();
-			stream.WriteLine("    }");
-
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * Represents a set of empty semantic actions (do nothing)");
-			stream.WriteLine("     */");
-			stream.WriteLine("    private static final Actions noActions = new Actions();");
-
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * Gets the set of semantic actions in the form a table consistent with the automaton");
-			stream.WriteLine("     *");
-			stream.WriteLine("     * @param input A set of semantic actions");
-			stream.WriteLine("     * @return A table of semantic actions");
-			stream.WriteLine("     */");
-			stream.WriteLine("    private static SemanticAction[] getUserActions(final Actions input) {");
-			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + grammar.Actions.Count + "];");
-			int i = 0;
+			stream.WriteLine("/// The structure that implements no action");
+			stream.WriteLine("pub struct NoActions {}");
+			stream.WriteLine();
+			stream.WriteLine("impl Actions for NoActions {");
 			foreach (Grammars.Action action in grammar.Actions)
-			{
-				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + action.Name + "(head, body); } };");
-				i++;
-			}
-			stream.WriteLine("        return result;");
-			stream.WriteLine("    }");
-
-			stream.WriteLine("    /**");
-			stream.WriteLine("     * Gets the set of semantic actions in the form a table consistent with the automaton");
-			stream.WriteLine("     *");
-			stream.WriteLine("     * @param input A set of semantic actions");
-			stream.WriteLine("     * @return A table of semantic actions");
-			stream.WriteLine("     */");
-			stream.WriteLine("    private static SemanticAction[] getUserActions(Map<String, SemanticAction> input)");
-			stream.WriteLine("    {");
-			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + grammar.Actions.Count + "];");
-			i = 0;
-			foreach (Grammars.Action action in grammar.Actions)
-			{
-				stream.WriteLine("        result[" + i + "] = input.get(\"" + action.Name + "\");");
-				i++;
-			}
-			stream.WriteLine("        return result;");
-			stream.WriteLine("    }");
+				stream.WriteLine("    fn " + action.Name + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
+			stream.WriteLine("}");
+			stream.WriteLine();
 		}
 
 		/// <summary>
@@ -263,31 +210,83 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GeneratorCodeConstructors(StreamWriter stream)
 		{
-			stream.WriteLine("/// Parses the specified string with this parser");
-			stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
-			stream.WriteLine("    let text = Text::new(input);");
-			stream.WriteLine("    let result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
-			stream.WriteLine("    let lexer = new_lexer(&mut result);");
-			stream.WriteLine("    let automaton = let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
-			stream.WriteLine("    result");
-			stream.WriteLine("}");
-			stream.WriteLine();
-
-			stream.WriteLine("/// Parses the specified stream of UTF-16 encoding points");
-			stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
-			stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
-			stream.WriteLine("    let result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
-			stream.WriteLine("    result");
-			stream.WriteLine("}");
-			stream.WriteLine();
-
-			stream.WriteLine("/// Parses the specified stream of UTF-8 encoding points");
-			stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
-			stream.WriteLine("    let text = Text::from_utf8_stream(input);");
-			stream.WriteLine("    let result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
-			stream.WriteLine("    result");
-			stream.WriteLine("}");
-			stream.WriteLine();
+			if (grammar.Actions.Count == 0)
+			{
+				stream.WriteLine("/// Parses the specified string with this parser");
+				stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
+				stream.WriteLine("    let text = Text::new(input);");
+				stream.WriteLine("    parse_text(text)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
+				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
+				stream.WriteLine("    parse_text(text)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
+				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
+				stream.WriteLine("    parse_text(text)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified text with this parser");
+				stream.WriteLine("pub fn parse_text(text: Text) -> ParseResult {");
+				stream.WriteLine("    let my_actions = |_index: usize, _head: Symbol, _body: &SemanticBody| ();");
+				stream.WriteLine("    let mut result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
+				stream.WriteLine("    {");
+				stream.WriteLine("        let data = result.get_parsing_data();");
+				stream.WriteLine("        let mut lexer = new_lexer(data.0, data.1);");
+				stream.WriteLine("        let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
+				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, my_actions);");
+				stream.WriteLine("        parser.parse();");
+				stream.WriteLine("    }");
+				stream.WriteLine("    result");
+				stream.WriteLine("}");
+			}
+			else
+			{
+				stream.WriteLine("/// Parses the specified string with this parser");
+				stream.WriteLine("pub fn parse_string(input: &str, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("    let text = Text::new(input);");
+				stream.WriteLine("    parse_text(text, actions)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
+				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
+				stream.WriteLine("    parse_text(text, actions)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
+				stream.WriteLine("pub fn parse_utf8(input: &mut Read, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
+				stream.WriteLine("    parse_text(text, actions)");
+				stream.WriteLine("}");
+				stream.WriteLine();
+				stream.WriteLine("/// Parses the specified text with this parser");
+				stream.WriteLine("pub fn parse_text(text: Text, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("    let my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
+				int i = 0;
+				foreach (Grammars.Action action in grammar.Actions)
+				{
+					stream.WriteLine("        " + i + " => actions." + action.Name + "(head, body),");
+					i++;
+				}
+				stream.WriteLine("        _ => ()");
+				stream.WriteLine("    };");
+				stream.WriteLine();
+				stream.WriteLine("    let mut result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
+				stream.WriteLine("    {");
+				stream.WriteLine("        let data = result.get_parsing_data();");
+				stream.WriteLine("        let mut lexer = new_lexer(data.0, data.1);");
+				stream.WriteLine("        let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
+				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, my_actions);");
+				stream.WriteLine("        parser.parse();");
+				stream.WriteLine("    }");
+				stream.WriteLine("    result");
+				stream.WriteLine("}");
+			}
 		}
 	}
 }

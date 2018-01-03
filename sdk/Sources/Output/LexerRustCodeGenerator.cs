@@ -78,7 +78,6 @@ namespace Hime.SDK.Output
 		public void Generate(string file)
 		{
 			string baseLexer = contexts.Count > 1 ? "ContextSensitiveLexer" : "ContextFreeLexer";
-			string mod = modifier == Modifier.Public ? "pub " : "";
 			StreamWriter writer = new StreamWriter(file, true, new System.Text.UTF8Encoding(false));
 
 			writer.WriteLine("/*");
@@ -91,15 +90,15 @@ namespace Hime.SDK.Output
 			writer.WriteLine("use std::io::Read;");
 			writer.WriteLine();
 			writer.WriteLine("extern crate hime_redist;");
+			writer.WriteLine();
 			writer.WriteLine("use ::hime_redist::errors::ParseErrors;");
-			writer.WriteLine("use ::hime_redist::lexers::Lexer;");
 			writer.WriteLine("use ::hime_redist::lexers::automaton::Automaton;");
 			writer.WriteLine("use ::hime_redist::lexers::impls::" + baseLexer + ";");
 			writer.WriteLine("use ::hime_redist::parsers::Parser;");
 			writer.WriteLine("use ::hime_redist::parsers::lrk::LRkAutomaton;");
 			writer.WriteLine("use ::hime_redist::parsers::lrk::LRkParser;");
 			writer.WriteLine("use ::hime_redist::result::ParseResult;");
-			writer.WriteLine("use ::hime_redist::symbols::SemanticAction;");
+			writer.WriteLine("use ::hime_redist::symbols::SemanticBody;");
 			writer.WriteLine("use ::hime_redist::symbols::Symbol;");
 			writer.WriteLine("use ::hime_redist::text::Text;");
 			writer.WriteLine("use ::hime_redist::tokens::TokenRepository;");
@@ -149,37 +148,14 @@ namespace Hime.SDK.Output
 				sep = separator.ID.ToString("X4");
 
 			writer.WriteLine("/// Creates a new lexer");
-			writer.WriteLine("fn new_lexer(result: &mut ParseResult) -> " + baseLexer + " {");
+			writer.WriteLine("fn new_lexer<'a>(");
+			writer.WriteLine("    repository: TokenRepository<'a>,");
+			writer.WriteLine("    errors: &'a mut ParseErrors");
+			writer.WriteLine(") -> " + baseLexer + "<'a> {");
 			writer.WriteLine("    let automaton = Automaton::new(LEXER_AUTOMATON);");
-			writer.WriteLine("    " + baseLexer + "::new(");
-			writer.WriteLine("        result.get_tokens(),");
-			writer.WriteLine("        result.get_errors_mut(),");
-			writer.WriteLine("        automaton,");
-			writer.WriteLine("        0x" + sep + ")");
+			writer.WriteLine("    " + baseLexer + "::new(repository, errors, automaton, 0x" + sep + ")");
 			writer.WriteLine("}");
 			writer.WriteLine();
-
-			// writer.WriteLine("    /**");
-			// writer.WriteLine("     * Initializes a new instance of the lexer");
-			// writer.WriteLine("     *");
-			// writer.WriteLine("     * @param input The lexer's input");
-			// writer.WriteLine("     */");
-
-
-			// writer.WriteLine("pub " + name + "Lexer(String input) {");
-			// writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
-			// writer.WriteLine("    }");
-
-			// writer.WriteLine("    /**");
-			// writer.WriteLine("     * Initializes a new instance of the lexer");
-			// writer.WriteLine("     *");
-			// writer.WriteLine("     * @param input The lexer's input");
-			// writer.WriteLine("     */");
-			// writer.WriteLine("    public " + name + "Lexer(InputStreamReader input) {");
-			// writer.WriteLine("        super(commonAutomaton, terminals, 0x" + sep + ", input);");
-			// writer.WriteLine("    }");
-			// writer.WriteLine("}");
-
 			writer.Close();
 		}
 	}
