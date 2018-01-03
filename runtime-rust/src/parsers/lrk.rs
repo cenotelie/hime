@@ -349,6 +349,15 @@ impl<'l> LRkAstBuilder<'l> {
         // finalize the sub-tree data
         reduction.cache.set_children_count_at(0, insertion - 1);
     }
+
+    /// Commits the tree's root
+    pub fn commit_root(&mut self) {
+        let length = self.stack.len();
+        if length > 1 {
+            let head = &mut self.stack[length - 2];
+            head.commit(&mut self.result);
+        }
+    }
 }
 
 /// The head of a LR(k) parser
@@ -651,11 +660,17 @@ impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> Parser for LRkParser<'l, F> {
         let mut kernel_maybe = self.get_next_token();
         loop {
             match kernel_maybe {
-                None => return,
+                None => {
+                    self.builder.commit_root();
+                    return;
+                }
                 Some(kernel) => {
                     let action = self.data.parse_on_token(kernel, &mut self.builder);
                     match action {
-                        LR_ACTION_CODE_ACCEPT => return,
+                        LR_ACTION_CODE_ACCEPT => {
+                            self.builder.commit_root();
+                            return;
+                        }
                         LR_ACTION_CODE_SHIFT => {
                             kernel_maybe = self.get_next_token();
                         }

@@ -17,6 +17,10 @@
 
 //! Module for Abstract-Syntax Trees
 
+use std::fmt::Display;
+use std::fmt::Error;
+use std::fmt::Formatter;
+
 use super::symbols::SemanticElementTrait;
 use super::symbols::Symbol;
 use super::text::TextContext;
@@ -313,6 +317,29 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
                 token.get_value()
             }
             _ => None
+        }
+    }
+}
+
+impl<'a> Display for AstNode<'a> {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.tree.get_token(cell.label.get_index());
+                let symbol = token.get_symbol();
+                let value = token.get_value();
+                write!(f, "{} = {}", symbol.name, value.unwrap())
+            }
+            TableType::Variable => {
+                let symbol = self.tree.variables[cell.label.get_index()];
+                write!(f, "{}", symbol.name)
+            }
+            TableType::Virtual => {
+                let symbol = self.tree.virtuals[cell.label.get_index()];
+                write!(f, "{}", symbol.name)
+            }
+            _ => panic!("Undefined symbol")
         }
     }
 }
