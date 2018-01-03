@@ -28,7 +28,6 @@ use super::super::errors::ParseErrorUnexpectedToken;
 use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
-use super::super::symbols::SID_NOTHING;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 use super::super::symbols::SemanticElementTrait;
@@ -100,7 +99,7 @@ impl LRkAutomaton {
         let column = self.columns_map.get(identifier) as usize;
         LRAction {
             table: &self.table,
-            offset: state as usize * self.columns_count + column
+            offset: (state as usize * self.columns_count + column) * 2
         }
     }
 
@@ -649,24 +648,26 @@ impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> LRkParser<'l, F> {
 
 impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> Parser for LRkParser<'l, F> {
     fn parse(&mut self) {
-        let mut kernel = self.get_next_token().unwrap();
+        let mut kernel_maybe = self.get_next_token();
         loop {
-            let action = self.data.parse_on_token(kernel, &mut self.builder);
-            if action == LR_ACTION_CODE_SHIFT {
-                kernel = self.get_next_token().unwrap();
-            } else if action == LR_ACTION_CODE_ACCEPT {
-                return;
-            } else {
-                // this is an error
-                let error = self.build_error(kernel);
-                let errors = self.builder.lexer.get_errors();
-                errors.push_error_unexpected_token(error);
-                kernel = TokenKernel {
-                    terminal_id: SID_NOTHING,
-                    index: 0
-                };
-                if errors.get_count() >= MAX_ERROR_COUNT || kernel.terminal_id == SID_NOTHING {
-                    return;
+            match kernel_maybe {
+                None => return,
+                Some(kernel) => {
+                    let action = self.data.parse_on_token(kernel, &mut self.builder);
+                    match action {
+                        LR_ACTION_CODE_ACCEPT => return,
+                        LR_ACTION_CODE_SHIFT => {
+                            kernel_maybe = self.get_next_token();
+                        }
+                        _ => {
+                            // this is an error
+                            let error = self.build_error(kernel);
+                            let errors = self.builder.lexer.get_errors();
+                            errors.push_error_unexpected_token(error);
+                            // TODO: try to recover here
+                            return;
+                        }
+                    }
                 }
             }
         }
