@@ -26,6 +26,11 @@ namespace Hime.SDK.Output
 	public class EmitterForRust : EmitterBase
 	{
 		/// <summary>
+		/// The path to a local Rust target runtime
+		/// </summary>
+		private string runtime;
+
+		/// <summary>
 		/// Gets the suffix for the emitted lexer code files
 		/// </summary>
 		public override string SuffixLexerCode { get { return ".rs"; } }
@@ -61,8 +66,10 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
 		/// <param name="units">The units to emit data for</param>
-		public EmitterForRust(Reporter reporter, List<Unit> units) : base(reporter, units)
+		/// <param name="runtime">The path to a local Rust target runtime</param>
+		public EmitterForRust(Reporter reporter, List<Unit> units, string runtime) : base(reporter, units)
 		{
+			this.runtime = runtime;
 		}
 
 		/// <summary>
@@ -70,8 +77,10 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="reporter">The reporter to use</param>
 		/// <param name="unit">The unit to emit data for</param>
-		public EmitterForRust(Reporter reporter, Unit unit) : base(reporter, unit)
+		/// <param name="runtime">The path to a local Rust target runtime</param>
+		public EmitterForRust(Reporter reporter, Unit unit, string runtime) : base(reporter, unit)
 		{
+			this.runtime = runtime;
 		}
 
 		/// <summary>
@@ -104,26 +113,81 @@ namespace Hime.SDK.Output
 			// setup the cargo project
 			CreateCargoProject();
 			// compile
-			System.PlatformID platform = System.Environment.OSVersion.Platform;
-			bool success;
-			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
-				success = ExecuteCommandCargo("mvn", "package");
-			else
-				success = ExecuteCommandCargo("cmd.exe", "/c mvn.cmd package");
+			bool success = ExecuteCommandCargo("cargo", "package");
 			// extract the result
 			if (success)
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				string[] results = Directory.GetFiles(Path.Combine(OutputPath, "target"), "hime-generated-*.jar");
+				string[] results = Directory.GetFiles(Path.Combine(OutputPath, "target"), "hime_generated-*.crate");
 				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...
 			Directory.Delete(Path.Combine(OutputPath, "src"), true);
-			Directory.Delete(Path.Combine(OutputPath, "res"), true);
 			Directory.Delete(Path.Combine(OutputPath, "target"), true);
-			File.Delete(Path.Combine(OutputPath, "pom.xml"));
+			File.Delete(Path.Combine(OutputPath, "Cargo.lock"));
+			File.Delete(Path.Combine(OutputPath, "Cargo.toml"));
 			return success;
+		}
+
+		/// <summary>
+		/// The data about a cargo module
+		/// </summary>
+		private struct Module
+		{
+			/// <summary>
+			/// The path to the module file
+			/// </summary>
+			public readonly string path;
+			/// <summary>
+			/// The name of the module file
+			/// </summary>
+			public readonly string file;
+
+			/// <summary>
+			/// Initializes this data
+			/// </summary>
+			/// <param name="path">The path to the module file</param>
+			/// <param name="file">The name of the module file</param>
+			public Module(string path, string file)
+			{
+				this.path = path;
+				this.file = file;
+			}
+		}
+
+		/// <summary>
+		/// Creates the physical folder for the specified unit
+		/// </summary>
+		/// <param name="origin">The directory to start from</param>
+		/// <param name="unit">The unit</param>
+		/// <returns>The resulting target file</returns>
+		private static Module CreateModuleFor(string origin, Unit unit)
+		{
+			string current = origin;
+			string[] parts = unit.Namespace.Split(new[] { "::" }, System.StringSplitOptions.RemoveEmptyEntries);
+			for (int i = 0; i != parts.Length - 1; i++)
+			{
+				string target = Path.Combine(current, parts[i]);
+				if (!Directory.Exists(target))
+				{
+					// Creates the directory for the module
+					Directory.CreateDirectory(target);
+					// Register the module
+					string file = i == 0 ? "lib.rs" : "mod.rs";
+					File.AppendAllText(Path.Combine(target, file), "pub mod " + parts[i] + "\n");
+					// Creates the module file
+					File.Create(Path.Combine(target, "mod.rs"));
+				}
+				current = target;
+			}
+			// for the last part
+			{
+				// Register the module
+				string file = parts.Length == 1 ? "lib.rs" : "mod.rs";
+				File.AppendAllText(Path.Combine(current, file), "pub mod " + parts[parts.Length - 1] + "\n");
+			}
+			return new Module(current, parts[parts.Length - 1] + ".rs");
 		}
 
 		/// <summary>
@@ -133,14 +197,20 @@ namespace Hime.SDK.Output
 		{
 			// setup the src folder
 			string src = Path.Combine(OutputPath, "src");
+			File.Create(Path.Combine(src, "lib.rs"));
 			foreach (Unit unit in units)
 			{
-				File.Copy(GetArtifactLexerCode(unit), Path.Combine(src, unit.Name + SuffixLexerCode), true);
-				File.Copy(GetArtifactLexerData(unit), Path.Combine(src, unit.Name + SUFFIX_LEXER_DATA), true);
-				File.Copy(GetArtifactParserData(unit), Path.Combine(src, unit.Name + SUFFIX_PARSER_DATA), true);
+				Module module = CreateModuleFor(src, unit);
+				File.Copy(GetArtifactLexerCode(unit), Path.Combine(module.path, module.file), true);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(module.path, unit.Name + SUFFIX_LEXER_DATA), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(module.path, unit.Name + SUFFIX_PARSER_DATA), true);
 			}
 			// export the toml
 			ExportResource("Rust.Cargo.toml", Path.Combine(OutputPath, "Cargo.toml"));
+			if (runtime != null)
+			{
+				File.AppendAllText(Path.Combine(OutputPath, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime + "\" }\n");
+			}
 		}
 
 		/// <summary>
@@ -164,17 +234,9 @@ namespace Hime.SDK.Output
 				string line = process.StandardOutput.ReadLine();
 				if (string.IsNullOrEmpty(line))
 					break;
-				if (line.StartsWith("[ERROR]"))
-				{
-					reporter.Error(line.Substring(8));
+				if (line.StartsWith("error"))
 					errors = true;
-				}
-				else if (line.StartsWith("[WARNING]"))
-					reporter.Warn(line.Substring(10));
-				else if (line.StartsWith("[INFO]"))
-					reporter.Info(line.Substring(7));
-				else
-					reporter.Info(line);
+				reporter.Info(line);
 			}
 			process.WaitForExit();
 			process.Close();

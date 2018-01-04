@@ -8,6 +8,7 @@ repository = "https://bitbucket.org/cenotelie/hime"
 keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
+include = ["Cargo.toml", "src/**/*.rs", "src/**/*.bin"]
 
 [dependencies]
 hime_redist = "3.2.3"

@@ -13,3 +13,6 @@ license = "LGPL-3.0"
 include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 
 [dependencies]
+
+[badges]
+maintenance = { status = "actively-developed" }

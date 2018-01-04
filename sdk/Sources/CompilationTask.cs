@@ -51,6 +51,10 @@ namespace Hime.SDK
 		/// </summary>
 		private Output.Runtime? outputTarget;
 		/// <summary>
+		/// The path to a local Rust target runtime
+		/// </summary>
+		private string outputTargetRust;
+		/// <summary>
 		/// The path for the compiler's output
 		/// </summary>
 		private string outputPath;
@@ -101,6 +105,15 @@ namespace Hime.SDK
 		{
 			get { return outputTarget.HasValue ? outputTarget.Value : Output.Runtime.Net; }
 			set { outputTarget = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the path to a local Rust target runtime
+		/// </summary>
+		public string TargetRustRuntime
+		{
+			get { return outputTargetRust; }
+			set { outputTargetRust = value; }
 		}
 
 		/// <summary>
@@ -370,7 +383,7 @@ namespace Hime.SDK
 					emitter = new Output.EmitterForJava(reporter, unit);
 					break;
 				case Output.Runtime.Rust:
-					emitter = new Output.EmitterForRust(reporter, unit);
+					emitter = new Output.EmitterForRust(reporter, unit, outputTargetRust);
 					break;
 			}
 			bool success = emitter.Emit();
@@ -394,7 +407,7 @@ namespace Hime.SDK
 					emitter = new Output.EmitterForJava(reporter, units);
 					break;
 				case Output.Runtime.Rust:
-					emitter = new Output.EmitterForRust(reporter, units);
+					emitter = new Output.EmitterForRust(reporter, units, outputTargetRust);
 					break;
 			}
 			bool success = emitter.Emit();
