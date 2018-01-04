@@ -17,6 +17,9 @@
 
 //! Main module
 
+extern crate hime_redist;
+extern crate libloading;
+
 /// Main entry point
 fn main() {
     println!("Hello, world!");

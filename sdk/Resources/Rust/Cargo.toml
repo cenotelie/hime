@@ -10,5 +10,8 @@ categories = ["algorithms", "parsing", "parser-implementations", "text-processin
 license = "LGPL-3.0"
 include = ["Cargo.toml", "src/**/*.rs", "src/**/*.bin"]
 
+[lib]
+crate-type=["rlib", "dylib"]
+
 [dependencies]
 hime_redist = "3.2.3"
