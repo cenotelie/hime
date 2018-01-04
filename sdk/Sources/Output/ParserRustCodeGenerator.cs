@@ -30,10 +30,6 @@ namespace Hime.SDK.Output
 		/// </summary>
 		private readonly string nmespace;
 		/// <summary>
-		/// The visibility modifier for the generated code
-		/// </summary>
-		private readonly Modifier modifier;
-		/// <summary>
 		/// The name of the generated lexer
 		/// </summary>
 		private readonly string name;
@@ -53,6 +49,14 @@ namespace Hime.SDK.Output
 		/// The type of the automaton
 		/// </summary>
 		private readonly string automatonType;
+		/// <summary>
+		/// Whether the target output is an assembly
+		/// </summary>
+		private readonly bool outputAssembly;
+		/// <summary>
+		/// The modifier for public functions
+		/// </summary>
+		private readonly string modifier;
 
 		/// <summary>
 		/// Initializes this code generator
@@ -62,7 +66,6 @@ namespace Hime.SDK.Output
 		public ParserRustCodeGenerator(Unit unit, string binResource)
 		{
 			nmespace = unit.Namespace;
-			modifier = unit.Modifier;
 			name = unit.Name;
 			this.binResource = binResource;
 			grammar = unit.Grammar;
@@ -76,6 +79,8 @@ namespace Hime.SDK.Output
 				parserType = "LRkParser";
 				automatonType = "LRkAutomaton";
 			}
+			this.outputAssembly = unit.CompilationMode == Mode.Assembly || unit.CompilationMode == Mode.SourceAndAssembly;
+			this.modifier = outputAssembly ? "pub extern \"C\" " : "pub ";
 		}
 
 		/// <summary>
@@ -213,19 +218,34 @@ namespace Hime.SDK.Output
 			if (grammar.Actions.Count == 0)
 			{
 				stream.WriteLine("/// Parses the specified string with this parser");
-				stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_string\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_string(input: &str) -> ParseResult {");
 				stream.WriteLine("    let text = Text::new(input);");
 				stream.WriteLine("    parse_text(text)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf16\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
 				stream.WriteLine("    parse_text(text)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf8\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_utf8(input: &mut Read) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
 				stream.WriteLine("    parse_text(text)");
 				stream.WriteLine("}");
@@ -247,37 +267,67 @@ namespace Hime.SDK.Output
 			else
 			{
 				stream.WriteLine("/// Parses the specified string with this parser");
-				stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_string\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_string(input: &str) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
 				stream.WriteLine("    parse_string_with(input, &mut actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified string with this parser");
-				stream.WriteLine("pub fn parse_string_with(input: &str, actions: &mut Actions) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_string_with\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_string_with(input: &str, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::new(input);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf16\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
 				stream.WriteLine("    parse_utf16_with(input, &mut actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf16_with(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf16_with\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_utf16_with(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf8\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_utf8(input: &mut Read) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
 				stream.WriteLine("    parse_utf8_with(input, &mut actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
-				stream.WriteLine("pub fn parse_utf8_with(input: &mut Read, actions: &mut Actions) -> ParseResult {");
+				if (outputAssembly)
+				{
+					stream.WriteLine("#[no_mangle]");
+					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf8_with\"]");
+				}
+				stream.WriteLine(modifier + "fn parse_utf8_with(input: &mut Read, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");

@@ -215,9 +215,9 @@ namespace Hime.SDK.Output
 			foreach (Unit unit in units)
 			{
 				Module module = CreateModuleFor(src, unit);
-				File.Move(GetArtifactLexerCode(unit), Path.Combine(module.path, module.file));
-				File.Move(GetArtifactLexerData(unit), Path.Combine(module.path, unit.Name + SUFFIX_LEXER_DATA));
-				File.Move(GetArtifactParserData(unit), Path.Combine(module.path, unit.Name + SUFFIX_PARSER_DATA));
+				File.Copy(GetArtifactLexerCode(unit), Path.Combine(module.path, module.file), true);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(module.path, unit.Name + SUFFIX_LEXER_DATA), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(module.path, unit.Name + SUFFIX_PARSER_DATA), true);
 			}
 			// export the toml
 			ExportResource("Rust.Cargo.toml", Path.Combine(path, "Cargo.toml"));
