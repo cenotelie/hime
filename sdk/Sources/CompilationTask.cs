@@ -173,6 +173,7 @@ namespace Hime.SDK
 			this.grammarName = null;
 			this.outputMode = null;
 			this.outputTarget = null;
+			this.outputTargetRust = null;
 			this.outputPath = null;
 			this.outputNamespace = null;
 			this.outputAccess = null;

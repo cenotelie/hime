@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
- //! Main module
+//! Main module
 
 /// Main entry point
 fn main() {

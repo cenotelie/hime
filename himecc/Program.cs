@@ -198,7 +198,7 @@ namespace Hime.HimeCC
 						break;
 					case ArgTargetRust:
 						task.Target = Hime.SDK.Output.Runtime.Rust;
-						if (arg.Children.Count > 1)
+						if (arg.Children.Count >= 1)
 							task.TargetRustRuntime = arg.Children[0].Value;
 						break;
 					case ArgGrammar:

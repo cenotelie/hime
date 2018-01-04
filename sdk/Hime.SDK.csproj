@@ -38,6 +38,7 @@
     <EmbeddedResource Include="Sources/Input/HimeGrammarLexer.bin" />
     <EmbeddedResource Include="Resources/Java/pom.xml" />
     <EmbeddedResource Include="Resources/NetCore/parser.csproj" />
+    <EmbeddedResource Include="Resources/Rust/Cargo.toml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../runtime-net/Hime.Redist.csproj">

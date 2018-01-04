@@ -111,22 +111,28 @@ namespace Hime.SDK.Output
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			// setup the cargo project
-			CreateCargoProject();
+			string target = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			reporter.Info("Assembling into " + target);
+			CreateCargoProject(target);
 			// compile
-			bool success = ExecuteCommandCargo("cargo", "package");
+			bool success = ExecuteCommandCargo("cargo", "build --manifest-path " + Path.Combine(target, "Cargo.toml"));
+			if (!success)
+			{
+				// build failed for some reason ...
+				return false;
+			}
+			// package without building
+			success = ExecuteCommandCargo("cargo", "package --no-verify --manifest-path " + Path.Combine(target, "Cargo.toml"));
 			// extract the result
 			if (success)
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				string[] results = Directory.GetFiles(Path.Combine(OutputPath, "target"), "hime_generated-*.crate");
+				string[] results = Directory.GetFiles(Path.Combine(Path.Combine(target, "target"), "package"), "hime_generated-*.crate");
 				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...
-			Directory.Delete(Path.Combine(OutputPath, "src"), true);
-			Directory.Delete(Path.Combine(OutputPath, "target"), true);
-			File.Delete(Path.Combine(OutputPath, "Cargo.lock"));
-			File.Delete(Path.Combine(OutputPath, "Cargo.toml"));
+			Directory.Delete(target, true);
 			return success;
 		}
 
@@ -175,9 +181,9 @@ namespace Hime.SDK.Output
 					Directory.CreateDirectory(target);
 					// Register the module
 					string file = i == 0 ? "lib.rs" : "mod.rs";
-					File.AppendAllText(Path.Combine(target, file), "pub mod " + parts[i] + "\n");
+					File.AppendAllText(Path.Combine(target, file), "pub mod " + parts[i] + ";\n");
 					// Creates the module file
-					File.Create(Path.Combine(target, "mod.rs"));
+					File.Create(Path.Combine(target, "mod.rs")).Close();
 				}
 				current = target;
 			}
@@ -185,7 +191,7 @@ namespace Hime.SDK.Output
 			{
 				// Register the module
 				string file = parts.Length == 1 ? "lib.rs" : "mod.rs";
-				File.AppendAllText(Path.Combine(current, file), "pub mod " + parts[parts.Length - 1] + "\n");
+				File.AppendAllText(Path.Combine(current, file), "pub mod " + parts[parts.Length - 1] + ";\n");
 			}
 			return new Module(current, parts[parts.Length - 1] + ".rs");
 		}
@@ -193,23 +199,31 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Creates the maven project to compile
 		/// </summary>
-		private void CreateCargoProject()
+		/// <param name="path">The path to the target directory</param>
+		private void CreateCargoProject(string path)
 		{
 			// setup the src folder
-			string src = Path.Combine(OutputPath, "src");
-			File.Create(Path.Combine(src, "lib.rs"));
+			Directory.CreateDirectory(path);
+			string src = Path.Combine(path, "src");
+			Directory.CreateDirectory(src);
+			FileStream lib = File.Create(Path.Combine(src, "lib.rs"));
+			StreamWriter writer = new StreamWriter(lib);
+			writer.WriteLine("//! Generated parsers");
+			writer.WriteLine("extern crate hime_redist;");
+			writer.Flush();
+			lib.Close();
 			foreach (Unit unit in units)
 			{
 				Module module = CreateModuleFor(src, unit);
-				File.Copy(GetArtifactLexerCode(unit), Path.Combine(module.path, module.file), true);
-				File.Copy(GetArtifactLexerData(unit), Path.Combine(module.path, unit.Name + SUFFIX_LEXER_DATA), true);
-				File.Copy(GetArtifactParserData(unit), Path.Combine(module.path, unit.Name + SUFFIX_PARSER_DATA), true);
+				File.Move(GetArtifactLexerCode(unit), Path.Combine(module.path, module.file));
+				File.Move(GetArtifactLexerData(unit), Path.Combine(module.path, unit.Name + SUFFIX_LEXER_DATA));
+				File.Move(GetArtifactParserData(unit), Path.Combine(module.path, unit.Name + SUFFIX_PARSER_DATA));
 			}
 			// export the toml
-			ExportResource("Rust.Cargo.toml", Path.Combine(OutputPath, "Cargo.toml"));
+			ExportResource("Rust.Cargo.toml", Path.Combine(path, "Cargo.toml"));
 			if (runtime != null)
 			{
-				File.AppendAllText(Path.Combine(OutputPath, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime + "\" }\n");
+				File.AppendAllText(Path.Combine(path, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime + "\" }\n");
 			}
 		}
 
