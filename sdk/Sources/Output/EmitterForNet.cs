@@ -199,10 +199,10 @@ namespace Hime.SDK.Output
 			// setup the .Net Core project
 			string projectFolder = CreateNetCoreProject();
 			// compile
-			bool success = ExecuteCommandDotnet("dotnet", projectFolder, "restore");
+			bool success = ExecuteCommandDotnet("dotnet", "restore " + projectFolder);
 			if (!success)
 				return false;
-			success = ExecuteCommandDotnet("dotnet", projectFolder, "build -c Release");
+			success = ExecuteCommandDotnet("dotnet", "build " + projectFolder + " -c Release");
 			if (!success)
 				return false;
 			// extract the result
@@ -220,30 +220,30 @@ namespace Hime.SDK.Output
 		/// <returns>The path to the project</returns>
 		private string CreateNetCoreProject()
 		{
+			string target = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			reporter.Info("Assembling into " + target);
 			// setup the Sources folder
-			string folder = Path.Combine(OutputPath, GetUniqueID());
-			if (!Directory.Exists(folder))
-				Directory.CreateDirectory(folder);
+			if (!Directory.Exists(target))
+				Directory.CreateDirectory(target);
 			foreach (Unit unit in units)
 			{
-				File.Copy(GetArtifactLexerCode(unit), Path.Combine(folder, unit.Name + SuffixLexerCode), true);
-				File.Copy(GetArtifactParserCode(unit), Path.Combine(folder, unit.Name + SuffixParserCode), true);
-				File.Copy(GetArtifactLexerData(unit), Path.Combine(folder, unit.Name + SUFFIX_LEXER_DATA), true);
-				File.Copy(GetArtifactParserData(unit), Path.Combine(folder, unit.Name + SUFFIX_PARSER_DATA), true);
+				File.Copy(GetArtifactLexerCode(unit), Path.Combine(target, unit.Name + SuffixLexerCode), true);
+				File.Copy(GetArtifactParserCode(unit), Path.Combine(target, unit.Name + SuffixParserCode), true);
+				File.Copy(GetArtifactLexerData(unit), Path.Combine(target, unit.Name + SUFFIX_LEXER_DATA), true);
+				File.Copy(GetArtifactParserData(unit), Path.Combine(target, unit.Name + SUFFIX_PARSER_DATA), true);
 			}
 			// export the csproj file
-			ExportResource("NetCore.parser.csproj", Path.Combine(folder, "parser.csproj"));
-			return folder;
+			ExportResource("NetCore.parser.csproj", Path.Combine(target, "parser.csproj"));
+			return target;
 		}
 
 		/// <summary>
 		/// Executes the specified command (usually a dotnet command)
 		/// </summary>
 		/// <param name="verb">The program to execute</param>
-		/// <param name="projectFolder">The path to the project folder</param>
 		/// <param name="arguments">The arguments</param>
 		/// <returns><c>true</c> if the command succeeded</returns>
-		private bool ExecuteCommandDotnet(string verb, string projectFolder, string arguments)
+		private bool ExecuteCommandDotnet(string verb, string arguments)
 		{
 			reporter.Info("Executing command " + verb + " " + arguments);
 			System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -251,7 +251,6 @@ namespace Hime.SDK.Output
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.WorkingDirectory = projectFolder;
 			process.Start();
 			bool errors = false;
 			while (true)

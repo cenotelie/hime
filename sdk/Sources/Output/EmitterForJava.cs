@@ -102,27 +102,24 @@ namespace Hime.SDK.Output
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			// setup the maven project
-			CreateMavenProject();
+			string projectFolder = CreateMavenProject();
 			// compile
 			System.PlatformID platform = System.Environment.OSVersion.Platform;
 			bool success;
 			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
-				success = ExecuteCommandMvn("mvn", "package");
+				success = ExecuteCommandMvn("mvn", "package -f " + Path.Combine(projectFolder, "pom.xml"));
 			else
-				success = ExecuteCommandMvn("cmd.exe", "/c mvn.cmd package");
+				success = ExecuteCommandMvn("cmd.exe", "/c mvn.cmd package -f " + Path.Combine(projectFolder, "pom.xml"));
 			// extract the result
 			if (success)
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				string[] results = Directory.GetFiles(Path.Combine(OutputPath, "target"), "hime-generated-*.jar");
+				string[] results = Directory.GetFiles(Path.Combine(projectFolder, "target"), "hime-generated-*.jar");
 				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...
-			Directory.Delete(Path.Combine(OutputPath, "src"), true);
-			Directory.Delete(Path.Combine(OutputPath, "res"), true);
-			Directory.Delete(Path.Combine(OutputPath, "target"), true);
-			File.Delete(Path.Combine(OutputPath, "pom.xml"));
+			Directory.Delete(projectFolder, true);
 			return success;
 		}
 
@@ -135,7 +132,7 @@ namespace Hime.SDK.Output
 		private static string CreateFolderFor(string origin, Unit unit)
 		{
 			string current = origin;
-			string[] parts = unit.Namespace.Split(new[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = Helper.GetNamespaceForJava(unit.Namespace == null ? unit.Grammar.Name : unit.Namespace).Split(new[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
 			for (int i = 0; i != parts.Length; i++)
 			{
 				current = Path.Combine(current, parts[i]);
@@ -148,10 +145,13 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Creates the maven project to compile
 		/// </summary>
-		private void CreateMavenProject()
+		/// <returns>The resulting folder</returns>
+		private string CreateMavenProject()
 		{
+			string target = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			reporter.Info("Assembling into " + target);
 			// setup the src folder
-			string src = Path.Combine(OutputPath, "src");
+			string src = Path.Combine(target, "src");
 			foreach (Unit unit in units)
 			{
 				string folder = CreateFolderFor(src, unit);
@@ -160,7 +160,7 @@ namespace Hime.SDK.Output
 			}
 
 			// setup the res folder
-			string res = Path.Combine(OutputPath, "res");
+			string res = Path.Combine(target, "res");
 			foreach (Unit unit in units)
 			{
 				string folder = CreateFolderFor(res, unit);
@@ -169,7 +169,8 @@ namespace Hime.SDK.Output
 			}
 
 			// export the pom
-			ExportResource("Java.pom.xml", Path.Combine(OutputPath, "pom.xml"));
+			ExportResource("Java.pom.xml", Path.Combine(target, "pom.xml"));
+			return target;
 		}
 
 		/// <summary>

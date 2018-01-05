@@ -72,6 +72,8 @@ CALL mvn -f "%ROOT%\tests-executor-java\pom.xml" clean verify -Dgpg.skip=true
 IF NOT "%ERRORLEVEL%" == "0" EXIT /b
 ECHO -- Building Hime Redist for Rust --
 cargo test --manifest-path "%ROOT%\runtime-rust\Cargo.toml"
+ECHO -- Building Test Executor for Rust --
+cargo build --release --manifest-path "%ROOT%\tests-executor-rust\Cargo.toml"
 
 REM Setup the test components
 RMDIR /S /Q "%ROOT%\tests-results"
@@ -80,12 +82,13 @@ COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.Redist.dll" "%ROOT%\tests-r
 COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.CLI.dll" "%ROOT%\tests-results\Hime.CLI.dll"
 COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.SDK.dll" "%ROOT%\tests-results\Hime.SDK.dll"
 COPY /B "%ROOT%\tests-driver\bin\Release\net461\driver.exe" "%ROOT%\tests-results\driver.exe"
-COPY /B "%ROOT%\tests-executor-net\bin\Release\net461\executor.exe" "%ROOT%\tests-results\executor.exe"
-COPY /B %ROOT%\tests-executor-java\target\hime-test-executor-*.jar "%ROOT%\tests-results\executor.jar"
+COPY /B "%ROOT%\tests-executor-net\bin\Release\net461\executor.exe" "%ROOT%\tests-results\executor-net.exe"
+COPY /B %ROOT%\tests-executor-java\target\hime-test-executor-*.jar "%ROOT%\tests-results\executor-java.jar"
 COPY /B %ROOT%\tests-executor-java\target\dependency\*.jar "%ROOT%\tests-results\"
+COPY /B "%ROOT%\tests-executor-rust\target\release\tests_executor_rust.exe" "%ROOT%\tests-results\executor-rust.exe"
 REM Execute the tests
 CD "%ROOT%/tests-results"
-driver.exe --targets Net Java
+driver.exe --targets Net Java Rust
 CD "%ROOT%"
 REM Cleanup the tests
 MOVE "%ROOT%\tests-results\TestResults.xml" "%ROOT%\TestResults.xml"

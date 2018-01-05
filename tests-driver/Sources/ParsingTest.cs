@@ -193,7 +193,7 @@ namespace Hime.Tests.Driver
 				// add verb argument
 				args.Append(" ");
 				args.Append(verb);
-				code = ExecuteCommand(reporter, "mono", "executor.exe " + args, output);
+				code = ExecuteCommand(reporter, "mono", "executor-net.exe " + args, output);
 			}
 			catch (Exception ex)
 			{
@@ -228,10 +228,10 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				System.Text.StringBuilder args = new System.Text.StringBuilder("-jar executor.jar");
+				System.Text.StringBuilder args = new System.Text.StringBuilder("-jar executor-java.jar");
 				// add parser name argument
-				args.Append(" Hime.Tests.Generated.");
-				args.Append(fixture);
+				args.Append(" hime.tests.generated.");
+				args.Append(Hime.SDK.Output.Helper.GetNamespacePartForJava(fixture));
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser");

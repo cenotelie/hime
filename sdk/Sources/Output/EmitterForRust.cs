@@ -142,11 +142,9 @@ namespace Hime.SDK.Output
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
 			// setup the cargo project
-			string target = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-			reporter.Info("Assembling into " + target);
-			CreateCargoProject(target);
+			string projectFolder = CreateCargoProject();
 			// compile
-			bool success = ExecuteCommandCargo("cargo", "build --release --manifest-path " + Path.Combine(target, "Cargo.toml"));
+			bool success = ExecuteCommandCargo("cargo", "build --release --manifest-path " + Path.Combine(projectFolder, "Cargo.toml"));
 			if (!success)
 			{
 				// build failed for some reason ...
@@ -155,19 +153,19 @@ namespace Hime.SDK.Output
 			// export the system binary
 			if (File.Exists(GetArtifactSystemAssembly()))
 				File.Delete(GetArtifactSystemAssembly());
-			File.Move(Path.Combine(Path.Combine(Path.Combine(target, "target"), "release"), "libhime_generated" + SuffixSystemAssembly), GetArtifactSystemAssembly());
+			File.Move(Path.Combine(Path.Combine(Path.Combine(projectFolder, "target"), "release"), "libhime_generated" + SuffixSystemAssembly), GetArtifactSystemAssembly());
 			// package without building
-			success = ExecuteCommandCargo("cargo", "package --no-verify --manifest-path " + Path.Combine(target, "Cargo.toml"));
+			success = ExecuteCommandCargo("cargo", "package --no-verify --manifest-path " + Path.Combine(projectFolder, "Cargo.toml"));
 			// extract the result
 			if (success)
 			{
 				if (File.Exists(GetArtifactAssembly()))
 					File.Delete(GetArtifactAssembly());
-				string[] results = Directory.GetFiles(Path.Combine(Path.Combine(target, "target"), "package"), "hime_generated-*.crate");
+				string[] results = Directory.GetFiles(Path.Combine(Path.Combine(projectFolder, "target"), "package"), "hime_generated-*.crate");
 				File.Move(results[0], GetArtifactAssembly());
 			}
 			// cleanup the mess ...
-			Directory.Delete(target, true);
+			Directory.Delete(projectFolder, true);
 			return success;
 		}
 
@@ -250,12 +248,14 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Creates the maven project to compile
 		/// </summary>
-		/// <param name="path">The path to the target directory</param>
-		private void CreateCargoProject(string path)
+		/// <returns>The resulting folder</returns>
+		private string CreateCargoProject()
 		{
+			string target = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			reporter.Info("Assembling into " + target);
 			// setup the src folder
-			Directory.CreateDirectory(path);
-			string src = Path.Combine(path, "src");
+			Directory.CreateDirectory(target);
+			string src = Path.Combine(target, "src");
 			Directory.CreateDirectory(src);
 			FileStream lib = File.Create(Path.Combine(src, "lib.rs"));
 			StreamWriter writer = new StreamWriter(lib);
@@ -271,11 +271,12 @@ namespace Hime.SDK.Output
 				File.Copy(GetArtifactParserData(unit), Path.Combine(module.path, unit.Name + SUFFIX_PARSER_DATA), true);
 			}
 			// export the toml
-			ExportResource("Rust.Cargo.toml", Path.Combine(path, "Cargo.toml"));
+			ExportResource("Rust.Cargo.toml", Path.Combine(target, "Cargo.toml"));
 			if (runtime != null)
 			{
-				File.AppendAllText(Path.Combine(path, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime + "\" }\n");
+				File.AppendAllText(Path.Combine(target, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime + "\" }\n");
 			}
+			return target;
 		}
 
 		/// <summary>

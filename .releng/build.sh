@@ -60,6 +60,8 @@ echo "-- Building Test Executor for Java --"
 mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
 echo "-- Building Hime Redist for Rust --"
 cargo test --manifest-path "$ROOT/runtime-rust/Cargo.toml"
+echo "-- Building Test Executor for Rust --"
+cargo build --release --manifest-path "$ROOT/tests-executor-rust/Cargo.toml"
 
 # Setup the test components
 rm -rf "$ROOT/tests-results"
@@ -68,12 +70,13 @@ cp "$ROOT/tests-driver/bin/Release/net461/Hime.Redist.dll" "$ROOT/tests-results/
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.CLI.dll" "$ROOT/tests-results/Hime.CLI.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.SDK.dll" "$ROOT/tests-results/Hime.SDK.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/driver.exe" "$ROOT/tests-results/driver.exe"
-cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor.exe"
-cp $ROOT/tests-executor-java/target/hime-test-executor-*.jar "$ROOT/tests-results/executor.jar"
+cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor-net.exe"
+cp $ROOT/tests-executor-java/target/hime-test-executor-*.jar "$ROOT/tests-results/executor-java.jar"
 cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
+cp "$ROOT/tests-executor-rust/target/release/tests_executor_rust" "$ROOT/tests-results/executor-rust"
 # Execute the tests
 cd "$ROOT/tests-results"
-mono driver.exe --targets Net Java
+mono driver.exe --targets Net Java Rust
 cd "$ROOT"
 # Cleanup the tests
 mv "$ROOT/tests-results/TestResults.xml" "$ROOT/TestResults.xml"

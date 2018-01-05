@@ -127,7 +127,7 @@ public class Program {
      */
     private ASTNode getExpectedAST() {
         String expectedText = readAllText("expected.txt");
-        BaseLRParser expectedParser = getParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+        BaseLRParser expectedParser = getParser("hime.tests.generated.ExpectedTreeParser", expectedText);
         ParseResult result = expectedParser.parse();
         for (ParseError error : result.getErrors()) {
             System.out.println(error.toString());
