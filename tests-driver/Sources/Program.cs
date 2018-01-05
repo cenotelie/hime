@@ -116,10 +116,10 @@ namespace Hime.Tests.Driver
 			BuildTestParsers();
 
 			// execute
-			//foreach (Fixture fixture in fixtures)
-			//	fixture.Execute(reporter, targets);
+			foreach (Fixture fixture in fixtures)
+				fixture.Execute(reporter, targets);
 
-			//ExportReport();
+			ExportReport();
 		}
 
 		/// <summary>
