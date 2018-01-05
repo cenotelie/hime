@@ -157,7 +157,7 @@ namespace Hime.SDK.Output
 		/// Gets the full path and name for the lexer data artifact
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the lexer data artifact</returns>
 		public string GetArtifactLexerData(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SUFFIX_LEXER_DATA;
@@ -167,7 +167,7 @@ namespace Hime.SDK.Output
 		/// Gets the full path and name for the parser code artifact
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the parser code artifact</returns>
 		public string GetArtifactParserCode(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SuffixParserCode;
@@ -177,7 +177,7 @@ namespace Hime.SDK.Output
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the parser data artifact</returns>
 		public string GetArtifactParserData(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SUFFIX_PARSER_DATA;
@@ -186,7 +186,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Gets the full path and name for the assembly artifact
 		/// </summary>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the assembly artifact</returns>
 		public string GetArtifactAssembly()
 		{
 			if (units.Count == 1)
@@ -198,37 +198,37 @@ namespace Hime.SDK.Output
 		/// Gets the full path and name for the parser data artifact
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the parser data artifact</returns>
 		public string GetArtifactDebugGrammar(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_GRAMMAR;
 		}
 
 		/// <summary>
-		/// Gets the full path and name for the parser data artifact
+		/// Gets the full path and name for the debug lexer DFA artifact
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the debug lexer DFA artifact</returns>
 		public string GetArtifactDebugDFA(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_DFA;
 		}
 
 		/// <summary>
-		/// Gets the full path and name for the parser data artifact
+		/// Gets the full path and name for the debug LR automaton artifact (as text)
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the debug LR automaton artifact (as text)</returns>
 		public string GetArtifactDebugLRAsText(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_LR_AS_TEXT;
 		}
 
 		/// <summary>
-		/// Gets the full path and name for the parser data artifact
+		/// Gets the full path and name for the debug LR automaton artifact (ase DOT)
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		/// <returns>The full path and name for the lexer code artifact</returns>
+		/// <returns>The full path and name for the debug LR automaton artifact (ase DOT)</returns>
 		public string GetArtifactDebugLRAsDOT(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SUFFIX_DEBUG_LR_AS_DOT;
@@ -352,15 +352,15 @@ namespace Hime.SDK.Output
 			Generator generator = null;
 			switch (unit.Method)
 			{
-			case ParsingMethod.LR0:
-			case ParsingMethod.LR1:
-			case ParsingMethod.LALR1:
-				generator = new ParserLRkDataGenerator(unit);
-				break;
-			case ParsingMethod.RNGLR1:
-			case ParsingMethod.RNGLALR1:
-				generator = new ParserRNGLRDataGenerator(unit);
-				break;
+				case ParsingMethod.LR0:
+				case ParsingMethod.LR1:
+				case ParsingMethod.LALR1:
+					generator = new ParserLRkDataGenerator(unit);
+					break;
+				case ParsingMethod.RNGLR1:
+				case ParsingMethod.RNGLALR1:
+					generator = new ParserRNGLRDataGenerator(unit);
+					break;
 			}
 
 			// generate the parser's data

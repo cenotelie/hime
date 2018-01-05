@@ -46,6 +46,33 @@ namespace Hime.SDK.Output
 		public override string SuffixAssembly { get { return ".crate"; } }
 
 		/// <summary>
+		/// Gets suffix for the emitted system assemblies
+		/// </summary>
+		public string SuffixSystemAssembly
+		{
+			get
+			{
+				System.PlatformID platform = System.Environment.OSVersion.Platform;
+				if (platform == System.PlatformID.MacOSX)
+					return ".dylib";
+				if (platform == System.PlatformID.Unix)
+					return ".so";
+				return ".dll";
+			}
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the system assembly artifact
+		/// </summary>
+		/// <returns>The full path and name for the system assembly artifact</returns>
+		public string GetArtifactSystemAssembly()
+		{
+			if (units.Count == 1)
+				return OutputPath + units[0].Name + SuffixSystemAssembly;
+			return OutputPath + DEFAULT_COMPOSITE_ASSEMBLY_NAME + SuffixSystemAssembly;
+		}
+
+		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="units">The units to emit data for</param>
@@ -119,12 +146,16 @@ namespace Hime.SDK.Output
 			reporter.Info("Assembling into " + target);
 			CreateCargoProject(target);
 			// compile
-			bool success = ExecuteCommandCargo("cargo", "build --manifest-path " + Path.Combine(target, "Cargo.toml"));
+			bool success = ExecuteCommandCargo("cargo", "build --release --manifest-path " + Path.Combine(target, "Cargo.toml"));
 			if (!success)
 			{
 				// build failed for some reason ...
 				return false;
 			}
+			// export the system binary
+			if (File.Exists(GetArtifactSystemAssembly()))
+				File.Delete(GetArtifactSystemAssembly());
+			File.Move(Path.Combine(Path.Combine(Path.Combine(target, "target"), "release"), "libhime_generated" + SuffixSystemAssembly), GetArtifactSystemAssembly());
 			// package without building
 			success = ExecuteCommandCargo("cargo", "package --no-verify --manifest-path " + Path.Combine(target, "Cargo.toml"));
 			// extract the result
