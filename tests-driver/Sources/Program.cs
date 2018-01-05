@@ -17,6 +17,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.CLI;
@@ -114,10 +116,10 @@ namespace Hime.Tests.Driver
 			BuildTestParsers();
 
 			// execute
-			foreach (Fixture fixture in fixtures)
-				fixture.Execute(reporter, targets);
+			//foreach (Fixture fixture in fixtures)
+			//	fixture.Execute(reporter, targets);
 
-			ExportReport();
+			//ExportReport();
 		}
 
 		/// <summary>
@@ -157,6 +159,9 @@ namespace Hime.Tests.Driver
 						break;
 					case Runtime.Java:
 						emitter = new EmitterForJava(reporter, units);
+						break;
+					case Runtime.Rust:
+						emitter = new EmitterForRust(reporter, units, Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)), "runtime-rust"));
 						break;
 				}
 				emitter.Emit();

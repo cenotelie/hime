@@ -58,22 +58,23 @@ namespace Hime.SDK.Output
 		/// Initializes this code generator
 		/// </summary>
 		/// <param name="unit">The unit to generate code for</param>
+		/// <param name="nmespace">The nmespace of the generated code</param>
 		/// <param name="binResource">Path to the automaton's binary resource</param>
-		public ParserRustCodeGenerator(Unit unit, string binResource)
+		public ParserRustCodeGenerator(Unit unit, string nmespace, string binResource)
 		{
-			nmespace = unit.Namespace;
-			name = unit.Name;
+			this.nmespace = nmespace;
+			this.name = unit.Name;
 			this.binResource = binResource;
-			grammar = unit.Grammar;
+			this.grammar = unit.Grammar;
 			if (unit.Method == ParsingMethod.RNGLR1 || unit.Method == ParsingMethod.RNGLALR1)
 			{
-				parserType = "RNGLRParser";
-				automatonType = "RNGLRAutomaton";
+				this.parserType = "RNGLRParser";
+				this.automatonType = "RNGLRAutomaton";
 			}
 			else
 			{
-				parserType = "LRkParser";
-				automatonType = "LRkAutomaton";
+				this.parserType = "LRkParser";
+				this.automatonType = "LRkAutomaton";
 			}
 			this.outputAssembly = unit.CompilationMode == Mode.Assembly || unit.CompilationMode == Mode.SourceAndAssembly;
 		}
@@ -109,11 +110,11 @@ namespace Hime.SDK.Output
 			{
 				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.SanitizeNameRust(var.Name));
+				nameVariables.Add(var, Helper.GetSymbolNameForRust(var.Name));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
-				string name = Helper.SanitizeNameRust(var.Name);
+				string name = Helper.GetSymbolNameForRust(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
 					name += Helper.VIRTUAL_SUFFIX.ToUpper();
 				nameVirtuals.Add(var, name);

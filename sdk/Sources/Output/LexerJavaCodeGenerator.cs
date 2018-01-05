@@ -62,13 +62,13 @@ namespace Hime.SDK.Output
 		/// <param name="binResource">Path to the automaton's binary resource</param>
 		public LexerJavaCodeGenerator(Unit unit, string binResource)
 		{
-			nmespace = unit.Namespace;
-			modifier = unit.Modifier;
-			name = unit.Name;
+			this.nmespace = Helper.GetNamespaceForJava(unit.Namespace == null ? unit.Grammar.Name : unit.Namespace);
+			this.modifier = unit.Modifier;
+			this.name = unit.Name;
 			this.binResource = binResource;
-			terminals = unit.Expected;
-			contexts = unit.Grammar.Contexts;
-			separator = unit.Separator;
+			this.terminals = unit.Expected;
+			this.contexts = unit.Grammar.Contexts;
+			this.separator = unit.Separator;
 		}
 
 		/// <summary>
@@ -131,7 +131,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("        /**");
 				writer.WriteLine("         * The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("         */");
-				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.SanitizeNameJava(terminal.Name), terminal.ID.ToString("X4"));
+				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.GetSymbolNameForJava(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine("    }");
 

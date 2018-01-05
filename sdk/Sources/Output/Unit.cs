@@ -94,7 +94,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Gets the namespace to use for the generated code
 		/// </summary>
-		public string Namespace { get { return nmspace ?? grammar.Name; } }
+		public string Namespace { get { return nmspace; } }
 
 		/// <summary>
 		/// Gets the visibility modifier to use for the generated code

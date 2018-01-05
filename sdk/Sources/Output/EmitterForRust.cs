@@ -49,16 +49,20 @@ namespace Hime.SDK.Output
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="units">The units to emit data for</param>
-		public EmitterForRust(List<Unit> units) : base(new Reporter(), units)
+		/// <param name="runtime">The path to a local Rust target runtime</param>
+		public EmitterForRust(List<Unit> units, string runtime) : base(new Reporter(), units)
 		{
+			this.runtime = runtime;
 		}
 
 		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
-		public EmitterForRust(Unit unit) : base(new Reporter(), unit)
+		/// <param name="runtime">The path to a local Rust target runtime</param>
+		public EmitterForRust(Unit unit, string runtime) : base(new Reporter(), unit)
 		{
+			this.runtime = runtime;
 		}
 
 		/// <summary>
@@ -100,7 +104,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserRustCodeGenerator(unit, unit.Name + SUFFIX_PARSER_DATA);
+			return new ParserRustCodeGenerator(unit, GetModuleName(unit), unit.Name + SUFFIX_PARSER_DATA);
 		}
 
 		/// <summary>
@@ -134,6 +138,22 @@ namespace Hime.SDK.Output
 			// cleanup the mess ...
 			Directory.Delete(target, true);
 			return success;
+		}
+
+		/// <summary>
+		/// Gets the name of the Rust module for the specified unit
+		/// </summary>
+		/// <param name="unit">The unit</param>
+		/// <returns>The name of the Rust module</returns>
+		private static string GetModuleName(Unit unit)
+		{
+			if (unit.Namespace == null)
+				return Helper.GetNamespacePartForRust(unit.Grammar.Name);
+			string result = Helper.GetNamespaceForRust(unit.Namespace);
+			if (result.Length == 0)
+				return Helper.GetNamespacePartForRust(unit.Grammar.Name);
+			else
+				return result + "::" + Helper.GetNamespacePartForRust(unit.Grammar.Name);
 		}
 
 		/// <summary>
@@ -171,7 +191,7 @@ namespace Hime.SDK.Output
 		private static Module CreateModuleFor(string origin, Unit unit)
 		{
 			string current = origin;
-			string[] parts = unit.Namespace.Split(new[] { "::" }, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = GetModuleName(unit).Split(new[] { "::" }, System.StringSplitOptions.RemoveEmptyEntries);
 			for (int i = 0; i != parts.Length - 1; i++)
 			{
 				string target = Path.Combine(current, parts[i]);

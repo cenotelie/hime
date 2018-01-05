@@ -45,7 +45,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string SanitizeNameCS(string name)
+		public static string GetSymbolNameForCS(string name)
 		{
 			string result = RemoveSpecials(name);
 			if (keywordsCS.Contains(result))
@@ -58,7 +58,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string SanitizeNameJava(string name)
+		public static string GetSymbolNameForJava(string name)
 		{
 			string result = RemoveSpecials(name);
 			if (keywordsJava.Contains(result))
@@ -71,10 +71,213 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string SanitizeNameRust(string name)
+		public static string GetSymbolNameForRust(string name)
 		{
 			string result = RemoveSpecials(name);
 			return "ID_" + result.ToUpper();
+		}
+
+		/// <summary>
+		/// Gets the C# compatible name for the specified namespace
+		/// </summary>
+		/// <param name="input">The original namespace</param>
+		/// <returns>The resulting namespace</returns>
+		public static string GetNamespaceForCS(string input)
+		{
+			if (input.Contains("::"))
+				input = input.Replace("::", ".");
+			string[] parts = input.Split(new[] { "." }, System.StringSplitOptions.RemoveEmptyEntries);
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != parts.Length; i++)
+			{
+				if (i != 0)
+					builder.Append(".");
+				builder.Append(GetNamespacePartForCS(parts[i]));
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Gets the C# compatible name for a part of a namespace
+		/// </summary>
+		/// <param name="input">The original name</param>
+		/// <returns>The resulting name</returns>
+		public static string GetNamespacePartForCS(string input)
+		{
+			input = RemoveSpecials(input);
+			bool forceUpper = true;
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != input.Length; i++)
+			{
+				char c = input[i];
+				if (i == 0)
+				{
+					if (c == '_')
+					{
+						builder.Append(c);
+					}
+					else if (c >= 'A' && c <= 'Z')
+					{
+						builder.Append(c);
+						forceUpper = false;
+					}
+					else if (c >= 'a' && c <= 'z')
+					{
+						builder.Append(char.ToUpperInvariant(c));
+						forceUpper = false;
+					}
+					else if (c >= '0' && c <= '9')
+					{
+						builder.Append("_");
+						builder.Append(c);
+					}
+				}
+				else
+				{
+					if (c >= 'A' && c <= 'Z')
+					{
+						builder.Append(c);
+						forceUpper = false;
+					}
+					else if (c >= 'a' && c <= 'z')
+					{
+						builder.Append(forceUpper ? char.ToUpperInvariant(c) : c);
+						forceUpper = false;
+					}
+					else if (c >= '0' && c <= '9')
+					{
+						builder.Append(c);
+						forceUpper = true;
+					}
+					else
+					{
+						forceUpper = true;
+					}
+				}
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Gets the Java compatible name for the specified namespace
+		/// </summary>
+		/// <param name="input">The original namespace</param>
+		/// <returns>The resulting namespace</returns>
+		public static string GetNamespaceForJava(string input)
+		{
+			if (input.Contains("::"))
+				input = input.Replace("::", ".");
+			string[] parts = input.Split(new[] { "." }, System.StringSplitOptions.RemoveEmptyEntries);
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != parts.Length; i++)
+			{
+				if (i != 0)
+					builder.Append(".");
+				builder.Append(GetNamespacePartForJava(parts[i]));
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Gets the Java compatible name for a part of a namespace
+		/// </summary>
+		/// <param name="input">The original name</param>
+		/// <returns>The resulting name</returns>
+		public static string GetNamespacePartForJava(string input)
+		{
+			input = RemoveSpecials(input);
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != input.Length; i++)
+			{
+				char c = input[i];
+				if (i == 0)
+				{
+					if (c >= 'A' && c <= 'Z')
+						builder.Append(char.ToLowerInvariant(c));
+					else if (c >= 'a' && c <= 'z')
+						builder.Append(c);
+					else if (c >= '0' && c <= '9')
+					{
+						builder.Append("_");
+						builder.Append(c);
+					}
+					else
+						builder.Append('_');
+				}
+				else
+				{
+					if (c >= 'A' && c <= 'Z')
+						builder.Append(char.ToLowerInvariant(c));
+					else if (c >= 'a' && c <= 'z')
+						builder.Append(c);
+					else if (c >= '0' && c <= '9')
+						builder.Append(c);
+					else
+						builder.Append('_');
+				}
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Gets the Rust compatible name for the specified namespace
+		/// </summary>
+		/// <param name="input">The original namespace</param>
+		/// <returns>The resulting namespace</returns>
+		public static string GetNamespaceForRust(string input)
+		{
+			if (input.Contains("."))
+				input = input.Replace(".", "::");
+			string[] parts = input.Split(new[] { "::" }, System.StringSplitOptions.RemoveEmptyEntries);
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != parts.Length; i++)
+			{
+				if (i != 0)
+					builder.Append("::");
+				builder.Append(GetNamespacePartForRust(parts[i]));
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Gets the Rust compatible name for a part of a namespace
+		/// </summary>
+		/// <param name="input">The original name</param>
+		/// <returns>The resulting name</returns>
+		public static string GetNamespacePartForRust(string input)
+		{
+			input = RemoveSpecials(input);
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			for (int i = 0; i != input.Length; i++)
+			{
+				char c = input[i];
+				if (i == 0)
+				{
+					if (c >= 'A' && c <= 'Z')
+						builder.Append(char.ToLowerInvariant(c));
+					else if (c >= 'a' && c <= 'z')
+						builder.Append(c);
+					else if (c >= '0' && c <= '9')
+					{
+						builder.Append("_");
+						builder.Append(c);
+					}
+					else
+						builder.Append('_');
+				}
+				else
+				{
+					if (c >= 'A' && c <= 'Z')
+						builder.Append(char.ToLowerInvariant(c));
+					else if (c >= 'a' && c <= 'z')
+						builder.Append(c);
+					else if (c >= '0' && c <= '9')
+						builder.Append(c);
+					else
+						builder.Append('_');
+				}
+			}
+			return builder.ToString();
 		}
 
 		/// <summary>

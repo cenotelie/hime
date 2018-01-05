@@ -61,20 +61,20 @@ namespace Hime.SDK.Output
 		/// <param name="binResource">Path to the automaton's binary resource</param>
 		public ParserNetCodeGenerator(Unit unit, string binResource)
 		{
-			nmespace = unit.Namespace;
-			modifier = unit.Modifier;
-			name = unit.Name;
+			this.nmespace = Helper.GetNamespaceForCS(unit.Namespace == null ? unit.Grammar.Name : unit.Namespace);
+			this.modifier = unit.Modifier;
+			this.name = unit.Name;
 			this.binResource = binResource;
-			grammar = unit.Grammar;
+			this.grammar = unit.Grammar;
 			if (unit.Method == ParsingMethod.RNGLR1 || unit.Method == ParsingMethod.RNGLALR1)
 			{
-				parserType = "RNGLRParser";
-				automatonType = "RNGLRAutomaton";
+				this.parserType = "RNGLRParser";
+				this.automatonType = "RNGLRAutomaton";
 			}
 			else
 			{
-				parserType = "LRkParser";
-				automatonType = "LRkAutomaton";
+				this.parserType = "LRkParser";
+				this.automatonType = "LRkAutomaton";
 			}
 		}
 
@@ -140,11 +140,11 @@ namespace Hime.SDK.Output
 			{
 				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.SanitizeNameCS(var.Name));
+				nameVariables.Add(var, Helper.GetSymbolNameForCS(var.Name));
 			}
 			foreach (Grammars.Virtual var in grammar.Virtuals)
 			{
-				string name = Helper.SanitizeNameCS(var.Name);
+				string name = Helper.GetSymbolNameForCS(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
 					name += Helper.VIRTUAL_SUFFIX;
 				nameVirtuals.Add(var, name);

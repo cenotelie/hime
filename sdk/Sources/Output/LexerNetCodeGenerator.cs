@@ -62,13 +62,13 @@ namespace Hime.SDK.Output
 		/// <param name="binResource">Path to the automaton's binary resource</param>
 		public LexerNetCodeGenerator(Unit unit, string binResource)
 		{
-			nmespace = unit.Namespace;
-			modifier = unit.Modifier;
-			name = unit.Name;
+			this.nmespace = Helper.GetNamespaceForCS(unit.Namespace == null ? unit.Grammar.Name : unit.Namespace);
+			this.modifier = unit.Modifier;
+			this.name = unit.Name;
 			this.binResource = binResource;
-			terminals = unit.Expected;
-			contexts = unit.Grammar.Contexts;
-			separator = unit.Separator;
+			this.terminals = unit.Expected;
+			this.contexts = unit.Grammar.Contexts;
+			this.separator = unit.Separator;
 		}
 
 		/// <summary>
@@ -126,7 +126,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("\t\t\t/// <summary>");
 				writer.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("\t\t\t/// </summary>");
-				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.SanitizeNameCS(terminal.Name), terminal.ID.ToString("X4"));
+				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.GetSymbolNameForCS(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine("\t\t}");
 
