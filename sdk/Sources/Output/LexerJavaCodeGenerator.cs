@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.IO;
+using System.Text;
 using Hime.Redist.Utils;
 using Hime.SDK.Grammars;
 
@@ -90,7 +91,7 @@ namespace Hime.SDK.Output
 		public void Generate(string file)
 		{
 			string baseLexer = contexts.Count > 1 ? "ContextSensitiveLexer" : "ContextFreeLexer";
-			StreamWriter writer = new StreamWriter(file, false, new System.Text.UTF8Encoding(false));
+			StreamWriter writer = new StreamWriter(file, false, new UTF8Encoding(false));
 
 			WriteHeader(writer);
 

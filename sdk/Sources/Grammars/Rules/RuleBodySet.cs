@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using Hime.Redist;
 
 namespace Hime.SDK.Grammars
 {
@@ -55,7 +56,7 @@ namespace Hime.SDK.Grammars
 		/// Applies the given action to all bodies in this set
 		/// </summary>
 		/// <param name="action">The action to apply</param>
-		public void ApplyAction(Hime.Redist.TreeAction action)
+		public void ApplyAction(TreeAction action)
 		{
 			foreach (RuleBody body in this)
 				body.ApplyAction(action);

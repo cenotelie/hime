@@ -15,7 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Text;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Output
@@ -86,8 +88,8 @@ namespace Hime.SDK.Output
 		{
 			if (input.Contains("::"))
 				input = input.Replace("::", ".");
-			string[] parts = input.Split(new[] { "." }, System.StringSplitOptions.RemoveEmptyEntries);
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			string[] parts = input.Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != parts.Length; i++)
 			{
 				if (i != 0)
@@ -106,7 +108,7 @@ namespace Hime.SDK.Output
 		{
 			input = RemoveSpecials(input);
 			bool forceUpper = true;
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != input.Length; i++)
 			{
 				char c = input[i];
@@ -167,8 +169,8 @@ namespace Hime.SDK.Output
 		{
 			if (input.Contains("::"))
 				input = input.Replace("::", ".");
-			string[] parts = input.Split(new[] { "." }, System.StringSplitOptions.RemoveEmptyEntries);
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			string[] parts = input.Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != parts.Length; i++)
 			{
 				if (i != 0)
@@ -186,7 +188,7 @@ namespace Hime.SDK.Output
 		public static string GetNamespacePartForJava(string input)
 		{
 			input = RemoveSpecials(input);
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != input.Length; i++)
 			{
 				char c = input[i];
@@ -228,8 +230,8 @@ namespace Hime.SDK.Output
 		{
 			if (input.Contains("."))
 				input = input.Replace(".", "::");
-			string[] parts = input.Split(new[] { "::" }, System.StringSplitOptions.RemoveEmptyEntries);
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			string[] parts = input.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != parts.Length; i++)
 			{
 				if (i != 0)
@@ -247,7 +249,7 @@ namespace Hime.SDK.Output
 		public static string GetNamespacePartForRust(string input)
 		{
 			input = RemoveSpecials(input);
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != input.Length; i++)
 			{
 				char c = input[i];
@@ -287,7 +289,7 @@ namespace Hime.SDK.Output
 		/// <returns>The cleaned-up name</returns>
 		private static string RemoveSpecials(string name)
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			foreach (char c in name)
 			{
 				if (c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))

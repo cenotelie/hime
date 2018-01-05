@@ -15,6 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
+using System.Text;
+
 namespace Hime.Redist.Lexer
 {
 	/// <summary>
@@ -94,7 +97,7 @@ namespace Hime.Redist.Lexer
 			if (line >= lines.Length)
 			{
 				int[] t = new int[lines.Length + INIT_LINE_COUNT_CACHE_SIZE];
-				System.Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
+				Buffer.BlockCopy(lines, 0, t, 0, lines.Length * 4);
 				lines = t;
 			}
 			lines[line] = index;
@@ -207,7 +210,7 @@ namespace Hime.Redist.Lexer
 				start = 0;
 			if (position.Column - 1 > end)
 				end = content.Length - 1;
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			for (int i = start; i != position.Column - 1; i++)
 				builder.Append(content[i] == '\t' ? '\t' : ' ');
 			builder.Append("^");

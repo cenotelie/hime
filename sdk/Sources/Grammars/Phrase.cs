@@ -15,7 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Hime.SDK.Grammars
 {
@@ -71,7 +73,7 @@ namespace Hime.SDK.Grammars
 		/// Gets the enumerator of terminals in this phrase
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return content.GetEnumerator();
 		}
@@ -93,7 +95,7 @@ namespace Hime.SDK.Grammars
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("\u3016");
+			StringBuilder builder = new StringBuilder("\u3016");
 			bool first = true;
 			foreach (Terminal terminal in content)
 			{

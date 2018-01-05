@@ -165,9 +165,9 @@ namespace Hime.Redist.Parsers
 		public static RNGLRAutomaton Find(System.Type type, string resource)
 		{
 #if NETSTANDARD1_0
-			System.Reflection.Assembly assembly = type.GetTypeInfo().Assembly;
+			Assembly assembly = type.GetTypeInfo().Assembly;
 #else
-			System.Reflection.Assembly assembly = type.Assembly;
+			Assembly assembly = type.Assembly;
 #endif
 			string[] resources = assembly.GetManifestResourceNames();
 			foreach (string existing in resources)

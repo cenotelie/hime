@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -338,7 +339,7 @@ namespace Hime.Redist.Parsers
 		public void PrintTo(string file)
 		{
 			FileStream stream = File.Open(file, FileMode.OpenOrCreate, FileAccess.Write);
-			TextWriter writer = new StreamWriter(stream, System.Text.Encoding.UTF8);
+			TextWriter writer = new StreamWriter(stream, Encoding.UTF8);
 			PrintTo(writer);
 			writer.Dispose();
 		}

@@ -17,8 +17,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Hime.Redist;
 using Hime.SDK;
+using Hime.SDK.Grammars;
 using Hime.SDK.Input;
 using Hime.SDK.Output;
 
@@ -87,7 +90,7 @@ namespace Hime.Tests.Driver
 			}
 			if (node.Children.Count >= 5)
 			{
-				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				StringBuilder builder = new StringBuilder();
 				BuildExpected(builder, node.Children[4]);
 				expected = builder.ToString();
 			}
@@ -98,7 +101,7 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		/// <param name="builder">A text builder</param>
 		/// <param name="node">The current node to build</param>
-		private void BuildExpected(System.Text.StringBuilder builder, ASTNode node)
+		private void BuildExpected(StringBuilder builder, ASTNode node)
 		{
 			builder.Append(node.Value);
 			if (node.Children[0].Children.Count > 0)
@@ -131,7 +134,7 @@ namespace Hime.Tests.Driver
 		/// <returns>The compilation unit</returns>
 		public override Unit GetUnit(string fixture)
 		{
-			Loader loader = new Loader();
+			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
 			loader.AddInput(node.Children[1], originalInput);
 			return new Unit(
 				loader.Load()[0],
@@ -153,10 +156,10 @@ namespace Hime.Tests.Driver
 			// Export input
 			string inputValue = node.Children[3].Value;
 			inputValue = Hime.SDK.Grammars.Loader.ReplaceEscapees(inputValue.Substring(1, inputValue.Length - 2));
-			System.IO.File.WriteAllText("input.txt", inputValue, new System.Text.UTF8Encoding(false));
+			File.WriteAllText("input.txt", inputValue, new UTF8Encoding(false));
 			// Export expected AST
 			if (expected != null)
-				System.IO.File.WriteAllText("expected.txt", expected, new System.Text.UTF8Encoding(false));
+				File.WriteAllText("expected.txt", expected, new UTF8Encoding(false));
 			// Execute for each runtime
 			foreach (Runtime runtime in targets)
 			{
@@ -185,7 +188,7 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				System.Text.StringBuilder args = new System.Text.StringBuilder("Hime.Tests.Generated.");
+				StringBuilder args = new StringBuilder("Hime.Tests.Generated.");
 				args.Append(fixture);
 				args.Append(".");
 				args.Append(Name);
@@ -228,10 +231,10 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				System.Text.StringBuilder args = new System.Text.StringBuilder("-jar executor-java.jar");
+				StringBuilder args = new StringBuilder("-jar executor-java.jar");
 				// add parser name argument
 				args.Append(" hime.tests.generated.");
-				args.Append(Hime.SDK.Output.Helper.GetNamespacePartForJava(fixture));
+				args.Append(Helper.GetNamespacePartForJava(fixture));
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser");

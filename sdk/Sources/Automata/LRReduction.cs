@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Text;
 using Hime.Redist;
 
 namespace Hime.SDK.Automata
@@ -73,7 +74,7 @@ namespace Hime.SDK.Automata
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
+			StringBuilder builder = new StringBuilder("[");
 			builder.Append(head);
 			builder.Append(" ->");
 			for (int i = 0; i != length; i++)

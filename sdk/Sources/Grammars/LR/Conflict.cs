@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Text;
+
 namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
@@ -61,7 +63,7 @@ namespace Hime.SDK.Grammars.LR
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("Conflict ");
+			StringBuilder builder = new StringBuilder("Conflict ");
 			if (type == ErrorType.ConflictShiftReduce)
 				builder.Append("Shift/Reduce");
 			else

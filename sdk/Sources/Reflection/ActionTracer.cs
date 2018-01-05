@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Reflection;
 using Hime.Redist;
 using Hime.Redist.Utils;
 
@@ -56,9 +57,9 @@ namespace Hime.SDK.Reflection
 			System.Type innerType = parserType.GetNestedType("Actions");
 			System.Type typeSymbol = typeof(Symbol);
 			System.Type typeBody = typeof(SemanticBody);
-			foreach (System.Reflection.MethodInfo method in innerType.GetMethods())
+			foreach (MethodInfo method in innerType.GetMethods())
 			{
-				System.Reflection.ParameterInfo[] parameters = method.GetParameters();
+				ParameterInfo[] parameters = method.GetParameters();
 				if (parameters.Length != 2)
 					continue;
 				if (parameters[0].ParameterType != typeSymbol)

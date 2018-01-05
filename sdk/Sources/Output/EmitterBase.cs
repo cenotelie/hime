@@ -17,6 +17,8 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using Hime.SDK.Reflection;
 
 namespace Hime.SDK.Output
 {
@@ -306,18 +308,18 @@ namespace Hime.SDK.Output
 		private bool EmitDebugArtifacts(Unit unit)
 		{
 			reporter.Info("Exporting grammar debug data at " + GetArtifactDebugGrammar(unit) + " ...");
-			Reflection.Serializers.Export(unit.Grammar, GetArtifactDebugGrammar(unit));
+			Serializers.Export(unit.Grammar, GetArtifactDebugGrammar(unit));
 			if (unit.DFA != null)
 			{
 				reporter.Info("Exporting DFA debug data at " + GetArtifactDebugDFA(unit) + " ...");
-				Reflection.Serializers.ExportDOT(unit.DFA, GetArtifactDebugDFA(unit));
+				Serializers.ExportDOT(unit.DFA, GetArtifactDebugDFA(unit));
 			}
 			if (unit.Graph != null)
 			{
 				reporter.Info("Exporting LR graph debug data (txt) at " + GetArtifactDebugLRAsText(unit) + " ...");
-				Reflection.Serializers.Export(unit.Graph, unit.Grammar, GetArtifactDebugLRAsText(unit));
+				Serializers.Export(unit.Graph, unit.Grammar, GetArtifactDebugLRAsText(unit));
 				reporter.Info("Exporting LR graph debug data (dot) at " + GetArtifactDebugLRAsDOT(unit) + " ...");
-				Reflection.Serializers.ExportDOT(unit.Graph, GetArtifactDebugLRAsDOT(unit));
+				Serializers.ExportDOT(unit.Graph, GetArtifactDebugLRAsDOT(unit));
 			}
 			return true;
 		}
@@ -401,7 +403,7 @@ namespace Hime.SDK.Output
 		/// <param name="file">The file to export to</param>
 		protected static void ExportResource(string name, string file)
 		{
-			System.Reflection.Assembly assembly = (typeof(EmitterForJava)).Assembly;
+			Assembly assembly = (typeof(EmitterForJava)).Assembly;
 			BinaryReader reader = new BinaryReader(assembly.GetManifestResourceStream("Hime.SDK.Resources." + name));
 			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
 			while (true)

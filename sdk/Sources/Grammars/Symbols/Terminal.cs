@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections.Generic;
+
 namespace Hime.SDK.Grammars
 {
 	/// <summary>
@@ -82,7 +84,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// Represents a comparer that works on the priority of the terminals
 		/// </summary>
-		public class PriorityComparer : System.Collections.Generic.IComparer<Terminal>
+		public class PriorityComparer : IComparer<Terminal>
 		{
 			/// <summary>
 			/// Compare the specified terminals

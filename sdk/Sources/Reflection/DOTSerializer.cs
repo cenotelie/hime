@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.IO;
+using System.Text;
 
 namespace Hime.SDK.Reflection
 {
@@ -36,7 +37,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to serialize to</param>
 		public DOTSerializer(string name, string file)
 		{
-			writer = new StreamWriter(file, false, System.Text.Encoding.UTF8);
+			writer = new StreamWriter(file, false, Encoding.UTF8);
 			writer.WriteLine("digraph " + name + " {");
 		}
 
@@ -99,7 +100,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="items">Items of this structure</param>
 		public void WriteStructure(string id, string label, string[] items)
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("    ");
+			StringBuilder builder = new StringBuilder("    ");
 			builder.Append(id);
 			builder.Append(" [label=\"{ ");
 			builder.Append(SanitizeString(label));

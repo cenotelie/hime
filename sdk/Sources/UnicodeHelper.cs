@@ -15,8 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -47,7 +49,7 @@ namespace Hime.SDK
 		/// </returns>
 		public static ICollection<UnicodeBlock> GetLatestBlocks()
 		{
-			System.Net.WebClient client = new System.Net.WebClient();
+			WebClient client = new WebClient();
 			byte[] buffer = client.DownloadData(URL_UNICODE_BLOCKS);
 			string content = Encoding.UTF8.GetString(buffer);
 			string[] lines = content.Split('\n');
@@ -62,8 +64,8 @@ namespace Hime.SDK
 				Match m = exp.Match(line);
 				if (!m.Success)
 					continue;
-				int begin = System.Convert.ToInt32(m.Groups["begin"].Value, 16);
-				int end = System.Convert.ToInt32(m.Groups["end"].Value, 16);
+				int begin = Convert.ToInt32(m.Groups["begin"].Value, 16);
+				int end = Convert.ToInt32(m.Groups["end"].Value, 16);
 				string name = m.Groups["name"].Value;
 				// filter out the Surrogate-related blocks
 				if (name.Contains("Surrogate"))
@@ -82,7 +84,7 @@ namespace Hime.SDK
 		/// </returns>
 		public static ICollection<UnicodeCategory> GetLatestCategories()
 		{
-			System.Net.WebClient client = new System.Net.WebClient();
+			WebClient client = new WebClient();
 			byte[] buffer = client.DownloadData(URL_UNICODE_DATA);
 			string content = Encoding.UTF8.GetString(buffer);
 			string[] lines = content.Split('\n');
@@ -98,7 +100,7 @@ namespace Hime.SDK
 				Match m = exp.Match(line);
 				if (!m.Success)
 					continue;
-				int cp = System.Convert.ToInt32(m.Groups["code"].Value, 16);
+				int cp = Convert.ToInt32(m.Groups["code"].Value, 16);
 				string cat = m.Groups["cat"].Value;
 				if (cat == currentName)
 				{

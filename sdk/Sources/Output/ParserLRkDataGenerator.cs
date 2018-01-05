@@ -17,8 +17,11 @@
 
 using System.Collections.Generic;
 using System.IO;
+using Hime.Redist;
 using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
+using Hime.SDK.Grammars;
+using Hime.SDK.Grammars.LR;
 
 namespace Hime.SDK.Output
 {
@@ -30,27 +33,27 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// LR graph for the parser
 		/// </summary>
-		private readonly Grammars.LR.Graph graph;
+		private readonly Graph graph;
 		/// <summary>
 		/// The terminals matched by the associated lexer
 		/// </summary>
-		private readonly ROList<Grammars.Terminal> terminals;
+		private readonly ROList<Terminal> terminals;
 		/// <summary>
 		/// The variables to be exported
 		/// </summary>
-		private readonly List<Grammars.Variable> variables;
+		private readonly List<Variable> variables;
 		/// <summary>
 		/// The virtual symbols to be exported
 		/// </summary>
-		private readonly List<Grammars.Virtual> virtuals;
+		private readonly List<Virtual> virtuals;
 		/// <summary>
 		/// The action symbols to be exported
 		/// </summary>
-		private readonly List<Grammars.Action> actions;
+		private readonly List<Action> actions;
 		/// <summary>
 		/// The grammar rules
 		/// </summary>
-		private readonly List<Grammars.Rule> rules;
+		private readonly List<Rule> rules;
 
 		/// <summary>
 		/// Initializes this parser generator
@@ -60,10 +63,10 @@ namespace Hime.SDK.Output
 		{
 			graph = unit.Graph;
 			terminals = unit.Expected;
-			variables = new List<Grammars.Variable>(unit.Grammar.Variables);
-			virtuals = new List<Grammars.Virtual>(unit.Grammar.Virtuals);
-			actions = new List<Grammars.Action>(unit.Grammar.Actions);
-			rules = new List<Grammars.Rule>(unit.Grammar.Rules);
+			variables = new List<Variable>(unit.Grammar.Variables);
+			virtuals = new List<Virtual>(unit.Grammar.Virtuals);
+			actions = new List<Action>(unit.Grammar.Actions);
+			rules = new List<Rule>(unit.Grammar.Rules);
 		}
 
 		/// <summary>
@@ -78,24 +81,24 @@ namespace Hime.SDK.Output
 			writer.Write((ushort)graph.States.Count);                   // Nb or rows
 			writer.Write((ushort)rules.Count);                          // Nb or rules
 
-			foreach (Grammars.Terminal terminal in terminals)
+			foreach (Terminal terminal in terminals)
 				writer.Write((ushort)terminal.ID);
-			foreach (Grammars.Variable variable in variables)
+			foreach (Variable variable in variables)
 				writer.Write((ushort)variable.ID);
 
-			foreach (Grammars.LR.State state in graph.States)
+			foreach (State state in graph.States)
 			{
 				int count = 0;
-				foreach (Grammars.Symbol symbol in state.Transitions)
+				foreach (Hime.SDK.Grammars.Symbol symbol in state.Transitions)
 				{
-					Grammars.Terminal terminal = symbol as Grammars.Terminal;
+					Terminal terminal = symbol as Terminal;
 					if (terminal != null)
 						count += state.GetContextsOpenedBy(terminal).Count;
 				}
 				writer.Write((ushort)count);
-				foreach (Grammars.Symbol symbol in state.Transitions)
+				foreach (Hime.SDK.Grammars.Symbol symbol in state.Transitions)
 				{
-					Grammars.Terminal terminal = symbol as Grammars.Terminal;
+					Terminal terminal = symbol as Terminal;
 					if (terminal != null)
 					{
 						foreach (int context in state.GetContextsOpenedBy(terminal))
@@ -107,10 +110,10 @@ namespace Hime.SDK.Output
 				}
 			}
 
-			foreach (Grammars.LR.State state in graph.States)
+			foreach (State state in graph.States)
 				GenerateDataLRTable(writer, state);
 
-			foreach (Grammars.Rule rule in rules)
+			foreach (Rule rule in rules)
 				GenerateDataProduction(writer, rule);
 
 			writer.Close();
@@ -121,13 +124,13 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="writer">The output writer</param>
 		/// <param name="state">The LR state</param>
-		private void GenerateDataLRTable(BinaryWriter writer, Grammars.LR.State state)
+		private void GenerateDataLRTable(BinaryWriter writer, State state)
 		{
-			Dictionary<Grammars.Terminal, Grammars.Rule> reductions = new Dictionary<Grammars.Terminal, Grammars.Rule>();
-			foreach (Grammars.LR.StateActionReduce reduction in state.Reductions)
+			Dictionary<Terminal, Rule> reductions = new Dictionary<Terminal, Rule>();
+			foreach (StateActionReduce reduction in state.Reductions)
 				reductions.Add(reduction.Lookahead, reduction.ToReduceRule);
 			// write action on epsilon
-			if (reductions.ContainsKey(Grammars.Epsilon.Instance) || reductions.ContainsKey(Grammars.NullTerminal.Instance))
+			if (reductions.ContainsKey(Epsilon.Instance) || reductions.ContainsKey(NullTerminal.Instance))
 				writer.Write((ushort)LRActionCode.Accept);
 			else
 				writer.Write((ushort)LRActionCode.None);
@@ -135,7 +138,7 @@ namespace Hime.SDK.Output
 			// write actions for terminals
 			for (int i = 1; i != terminals.Count; i++)
 			{
-				Grammars.Terminal t = terminals[i];
+				Terminal t = terminals[i];
 				if (state.HasTransition(t))
 				{
 					writer.Write((ushort)LRActionCode.Shift);
@@ -146,10 +149,10 @@ namespace Hime.SDK.Output
 					writer.Write((ushort)LRActionCode.Reduce);
 					writer.Write((ushort)rules.IndexOf(reductions[t]));
 				}
-				else if (reductions.ContainsKey(Grammars.NullTerminal.Instance))
+				else if (reductions.ContainsKey(NullTerminal.Instance))
 				{
 					writer.Write((ushort)LRActionCode.Reduce);
-					writer.Write((ushort)rules.IndexOf(reductions[Grammars.NullTerminal.Instance]));
+					writer.Write((ushort)rules.IndexOf(reductions[NullTerminal.Instance]));
 				}
 				else
 				{
@@ -158,7 +161,7 @@ namespace Hime.SDK.Output
 				}
 			}
 			// write actions for variables
-			foreach (Grammars.Variable variable in variables)
+			foreach (Variable variable in variables)
 			{
 				if (state.HasTransition(variable))
 				{
@@ -178,45 +181,45 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="writer">The output writer</param>
 		/// <param name="rule">A grammar rule</param>
-		private void GenerateDataProduction(BinaryWriter writer, Grammars.Rule rule)
+		private void GenerateDataProduction(BinaryWriter writer, Rule rule)
 		{
 			writer.Write((ushort)variables.IndexOf(rule.Head));
 			if (rule.IsGenerated)
-				writer.Write((byte)Hime.Redist.TreeAction.Replace);
+				writer.Write((byte)TreeAction.Replace);
 			else
-				writer.Write((byte)Hime.Redist.TreeAction.None);
+				writer.Write((byte)TreeAction.None);
 			writer.Write((byte)rule.Body.Choices[0].Length);
 			byte length = 0;
-			foreach (Grammars.RuleBodyElement elem in rule.Body)
+			foreach (RuleBodyElement elem in rule.Body)
 			{
-				if (elem.Symbol is Grammars.Virtual || elem.Symbol is Grammars.Action)
+				if (elem.Symbol is Virtual || elem.Symbol is Action)
 					length += 2;
 				else
 					length += 1;
 			}
 			writer.Write(length);
-			foreach (Grammars.RuleBodyElement elem in rule.Body)
+			foreach (RuleBodyElement elem in rule.Body)
 			{
-				if (elem.Symbol is Grammars.Virtual)
+				if (elem.Symbol is Virtual)
 				{
-					if (elem.Action == Hime.Redist.TreeAction.Drop)
+					if (elem.Action == TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.AddVirtualDrop);
-					else if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.AddVirtualPromote);
 					else
 						writer.Write((ushort)LROpCodeValues.AddVirtualNoAction);
-					writer.Write((ushort)virtuals.IndexOf(elem.Symbol as Grammars.Virtual));
+					writer.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
 				}
-				else if (elem.Symbol is Grammars.Action)
+				else if (elem.Symbol is Action)
 				{
 					writer.Write((ushort)LROpCodeValues.SemanticAction);
-					writer.Write((ushort)actions.IndexOf(elem.Symbol as Grammars.Action));
+					writer.Write((ushort)actions.IndexOf(elem.Symbol as Action));
 				}
 				else
 				{
-					if (elem.Action == Hime.Redist.TreeAction.Drop)
+					if (elem.Action == TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.PopStackDrop);
-					else if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.PopStackPromote);
 					else
 						writer.Write((ushort)LROpCodeValues.PopStackNoAction);

@@ -17,6 +17,8 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Hime.SDK.Grammars;
 
 namespace Hime.SDK.Output
 {
@@ -44,7 +46,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The grammar to generate a parser for
 		/// </summary>
-		private readonly Grammars.Grammar grammar;
+		private readonly Grammar grammar;
 		/// <summary>
 		/// The type of the parser to generate
 		/// </summary>
@@ -96,7 +98,7 @@ namespace Hime.SDK.Output
 		/// <param name="file">The target file to generate code in</param>
 		public void Generate(string file)
 		{
-			StreamWriter writer = new StreamWriter(file, false, new System.Text.UTF8Encoding(false));
+			StreamWriter writer = new StreamWriter(file, false, new UTF8Encoding(false));
 
 			WriteHeader(writer);
 
@@ -141,15 +143,15 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
-			Dictionary<Grammars.Variable, string> nameVariables = new Dictionary<Grammars.Variable, string>();
-			Dictionary<Grammars.Virtual, string> nameVirtuals = new Dictionary<Grammars.Virtual, string>();
-			foreach (Grammars.Variable var in grammar.Variables)
+			Dictionary<Variable, string> nameVariables = new Dictionary<Variable, string>();
+			Dictionary<Virtual, string> nameVirtuals = new Dictionary<Virtual, string>();
+			foreach (Variable var in grammar.Variables)
 			{
-				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
 				nameVariables.Add(var, Helper.GetSymbolNameForJava(var.Name));
 			}
-			foreach (Grammars.Virtual var in grammar.Virtuals)
+			foreach (Virtual var in grammar.Virtuals)
 			{
 				string name = Helper.GetSymbolNameForJava(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
@@ -161,14 +163,14 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     * Contains the constant IDs for the variables and virtuals in this parser");
 			stream.WriteLine("     */");
 			stream.WriteLine("    public static class ID {");
-			foreach (KeyValuePair<Grammars.Variable, string> pair in nameVariables)
+			foreach (KeyValuePair<Variable, string> pair in nameVariables)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for variable " + pair.Key.Name);
 				stream.WriteLine("         */");
 				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
-			foreach (KeyValuePair<Grammars.Virtual, string> pair in nameVirtuals)
+			foreach (KeyValuePair<Virtual, string> pair in nameVirtuals)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for virtual " + pair.Key.Name);
@@ -192,7 +194,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     */");
 			stream.WriteLine("    private static final Symbol[] variables = {");
 			bool first = true;
-			foreach (Grammars.Variable var in grammar.Variables)
+			foreach (Variable var in grammar.Variables)
 			{
 				if (!first)
 					stream.WriteLine(", ");
@@ -217,7 +219,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     */");
 			stream.WriteLine("    private static final Symbol[] virtuals = {");
 			bool first = true;
-			foreach (Grammars.Virtual v in grammar.Virtuals)
+			foreach (Virtual v in grammar.Virtuals)
 			{
 				if (!first)
 					stream.WriteLine(", ");
@@ -240,7 +242,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     * Represents a set of semantic actions in this parser");
 			stream.WriteLine("     */");
 			stream.WriteLine("    public static class Actions {");
-			foreach (Grammars.Action action in grammar.Actions)
+			foreach (Action action in grammar.Actions)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The " + action.Name + " semantic action");
@@ -264,7 +266,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("    private static SemanticAction[] getUserActions(final Actions input) {");
 			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + grammar.Actions.Count + "];");
 			int i = 0;
-			foreach (Grammars.Action action in grammar.Actions)
+			foreach (Action action in grammar.Actions)
 			{
 				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + action.Name + "(head, body); } };");
 				i++;
@@ -282,7 +284,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("    {");
 			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + grammar.Actions.Count + "];");
 			i = 0;
-			foreach (Grammars.Action action in grammar.Actions)
+			foreach (Action action in grammar.Actions)
 			{
 				stream.WriteLine("        result[" + i + "] = input.get(\"" + action.Name + "\");");
 				i++;

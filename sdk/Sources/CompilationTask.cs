@@ -19,6 +19,9 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using Hime.Redist;
+using Hime.SDK.Grammars;
+using Hime.SDK.Output;
 
 namespace Hime.SDK
 {
@@ -45,11 +48,11 @@ namespace Hime.SDK
 		/// <summary>
 		/// The compiler's output mode
 		/// </summary>
-		private Output.Mode? outputMode;
+		private Mode? outputMode;
 		/// <summary>
 		/// The target runtime
 		/// </summary>
-		private Output.Runtime? outputTarget;
+		private Runtime? outputTarget;
 		/// <summary>
 		/// The path to a local Rust target runtime
 		/// </summary>
@@ -65,7 +68,7 @@ namespace Hime.SDK
 		/// <summary>
 		/// The access modifier for the generated code
 		/// </summary>
-		private Output.Modifier? outputAccess;
+		private Modifier? outputAccess;
 		/// <summary>
 		/// The parsing method use
 		/// </summary>
@@ -92,18 +95,18 @@ namespace Hime.SDK
 		/// <summary>
 		/// Gets ot sets the compiler's mode
 		/// </summary>
-		public Output.Mode Mode
+		public Mode Mode
 		{
-			get { return outputMode.HasValue ? outputMode.Value : Output.Mode.Source; }
+			get { return outputMode.HasValue ? outputMode.Value : Mode.Source; }
 			set { outputMode = value; }
 		}
 
 		/// <summary>
 		/// Gets or sets the target runtime
 		/// </summary>
-		public Output.Runtime Target
+		public Runtime Target
 		{
-			get { return outputTarget.HasValue ? outputTarget.Value : Output.Runtime.Net; }
+			get { return outputTarget.HasValue ? outputTarget.Value : Runtime.Net; }
 			set { outputTarget = value; }
 		}
 
@@ -140,9 +143,9 @@ namespace Hime.SDK
 		/// Gets or sets the access modifiers for the generated Lexer and Parser classes.
 		/// The default value is Internal.
 		/// </summary>
-		public Output.Modifier CodeAccess
+		public Modifier CodeAccess
 		{
-			get { return outputAccess.HasValue ? outputAccess.Value : Output.Modifier.Internal; }
+			get { return outputAccess.HasValue ? outputAccess.Value : Modifier.Internal; }
 			set { outputAccess = value; }
 		}
 
@@ -253,7 +256,7 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="node">The parse tree of a grammar</param>
 		/// <param name="input">The input that contains the grammar</param>
-		public void AddInput(Hime.Redist.ASTNode node, Hime.Redist.Text input)
+		public void AddInput(ASTNode node, Text input)
 		{
 			loader.AddInput(node, input);
 		}
@@ -282,7 +285,7 @@ namespace Hime.SDK
 		{
 			reporter.Info("Hime.SDK " + Version);
 			// Load data
-			List<Grammars.Grammar> inputs = loader.Load();
+			List<Grammar> inputs = loader.Load();
 			if (inputs == null)
 				return;
 			// resolve the target grammars to compile
@@ -291,7 +294,7 @@ namespace Hime.SDK
 				reporter.Error("No grammar in inputs");
 				return;
 			}
-			List<Output.Unit> units = ExecuteDoPrepareUnits(inputs);
+			List<Unit> units = ExecuteDoPrepareUnits(inputs);
 			if (units.Count == 0)
 				return;
 			ExecuteDoEmit(units);
@@ -302,16 +305,16 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="inputs">The loaded grammars</param>
 		/// <returns>The compilation units</returns>
-		protected List<Output.Unit> ExecuteDoPrepareUnits(List<Grammars.Grammar> inputs)
+		protected List<Unit> ExecuteDoPrepareUnits(List<Grammar> inputs)
 		{
-			List<Output.Unit> units = new List<Output.Unit>();
+			List<Unit> units = new List<Unit>();
 			if (grammarName != null)
 			{
-				foreach (Grammars.Grammar potential in inputs)
+				foreach (Grammar potential in inputs)
 				{
 					if (potential.Name == GrammarName)
 					{
-						units.Add(new Output.Unit(
+						units.Add(new Unit(
 							potential,
 							GetOutputPathFor(potential),
 							GetCompilationModeFor(potential),
@@ -329,9 +332,9 @@ namespace Hime.SDK
 			}
 			else
 			{
-				foreach (Grammars.Grammar potential in inputs)
+				foreach (Grammar potential in inputs)
 				{
-					units.Add(new Output.Unit(
+					units.Add(new Unit(
 						potential,
 						GetOutputPathFor(potential),
 						GetCompilationModeFor(potential),
@@ -347,7 +350,7 @@ namespace Hime.SDK
 		/// Emits the artifacts for multiple compilation units
 		/// </summary>
 		/// <param name="units">The compilation units</param>
-		protected void ExecuteDoEmit(List<Output.Unit> units)
+		protected void ExecuteDoEmit(List<Unit> units)
 		{
 			if (units.Count == 1)
 			{
@@ -363,7 +366,7 @@ namespace Hime.SDK
 			else
 			{
 				// treat all units as separate
-				foreach (Output.Unit unit in units)
+				foreach (Unit unit in units)
 					ExecuteDoEmitSingleUnit(unit);
 			}
 		}
@@ -372,19 +375,19 @@ namespace Hime.SDK
 		/// Emits the artifacts for a single compilation unit
 		/// </summary>
 		/// <param name="unit">The compilation unit</param>
-		protected void ExecuteDoEmitSingleUnit(Output.Unit unit)
+		protected void ExecuteDoEmitSingleUnit(Unit unit)
 		{
-			Output.EmitterBase emitter = null;
+			EmitterBase emitter = null;
 			switch (GetTargetRuntimeFor(unit.Grammar))
 			{
-				case Output.Runtime.Net:
-					emitter = new Output.EmitterForNet(reporter, unit);
+				case Runtime.Net:
+					emitter = new EmitterForNet(reporter, unit);
 					break;
-				case Output.Runtime.Java:
-					emitter = new Output.EmitterForJava(reporter, unit);
+				case Runtime.Java:
+					emitter = new EmitterForJava(reporter, unit);
 					break;
-				case Output.Runtime.Rust:
-					emitter = new Output.EmitterForRust(reporter, unit, outputTargetRust);
+				case Runtime.Rust:
+					emitter = new EmitterForRust(reporter, unit, outputTargetRust);
 					break;
 			}
 			bool success = emitter.Emit();
@@ -396,19 +399,19 @@ namespace Hime.SDK
 		/// Emits the artifacts for multiple compilation units with the same compilation mode and target runtime
 		/// </summary>
 		/// <param name="units">The compilation units</param>
-		protected void ExecuteDoEmitSameModeSameTarget(List<Output.Unit> units)
+		protected void ExecuteDoEmitSameModeSameTarget(List<Unit> units)
 		{
-			Output.EmitterBase emitter = null;
+			EmitterBase emitter = null;
 			switch (GetTargetRuntimeFor(units[0].Grammar))
 			{
-				case Output.Runtime.Net:
-					emitter = new Output.EmitterForNet(reporter, units);
+				case Runtime.Net:
+					emitter = new EmitterForNet(reporter, units);
 					break;
-				case Output.Runtime.Java:
-					emitter = new Output.EmitterForJava(reporter, units);
+				case Runtime.Java:
+					emitter = new EmitterForJava(reporter, units);
 					break;
-				case Output.Runtime.Rust:
-					emitter = new Output.EmitterForRust(reporter, units, outputTargetRust);
+				case Runtime.Rust:
+					emitter = new EmitterForRust(reporter, units, outputTargetRust);
 					break;
 			}
 			bool success = emitter.Emit();
@@ -423,7 +426,7 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The output path for the grammar</returns>
-		private string GetOutputPathFor(Grammars.Grammar grammar)
+		private string GetOutputPathFor(Grammar grammar)
 		{
 			string path = GetOutputPathForBase(grammar);
 			if (path.Length > 0 && !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
@@ -436,11 +439,11 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The output path for the grammar</returns>
-		private string GetOutputPathForBase(Grammars.Grammar grammar)
+		private string GetOutputPathForBase(Grammar grammar)
 		{
 			if (outputPath != null)
 				return outputPath;
-			string value = grammar.GetOption(Grammars.Grammar.OPTION_OUTPUT_PATH);
+			string value = grammar.GetOption(Grammar.OPTION_OUTPUT_PATH);
 			if (value != null)
 				return value;
 			return "";
@@ -451,20 +454,20 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The compilation mode for the grammar</returns>
-		private Output.Mode GetCompilationModeFor(Grammars.Grammar grammar)
+		private Mode GetCompilationModeFor(Grammar grammar)
 		{
 			if (outputMode.HasValue)
 				return outputMode.Value;
-			string value = grammar.GetOption(Grammars.Grammar.OPTION_COMPILATION_MODE);
+			string value = grammar.GetOption(Grammar.OPTION_COMPILATION_MODE);
 			if (value == null)
-				return Output.Mode.Source;
+				return Mode.Source;
 			if (value.Equals("Assembly"))
-				return Output.Mode.Assembly;
+				return Mode.Assembly;
 			if (value.Equals("SourceAndAssembly"))
-				return Output.Mode.SourceAndAssembly;
+				return Mode.SourceAndAssembly;
 			if (value.Equals("Debug"))
-				return Output.Mode.Debug;
-			return Output.Mode.Source;
+				return Mode.Debug;
+			return Mode.Source;
 		}
 
 		/// <summary>
@@ -472,18 +475,18 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The target runtime for the grammar</returns>
-		private Output.Runtime GetTargetRuntimeFor(Grammars.Grammar grammar)
+		private Runtime GetTargetRuntimeFor(Grammar grammar)
 		{
 			if (outputTarget.HasValue)
 				return outputTarget.Value;
-			string value = grammar.GetOption(Grammars.Grammar.OPTION_RUNTIME);
+			string value = grammar.GetOption(Grammar.OPTION_RUNTIME);
 			if (value == null)
-				return Output.Runtime.Net;
+				return Runtime.Net;
 			if (value.Equals("Java"))
-				return Output.Runtime.Java;
+				return Runtime.Java;
 			if (value.Equals("Rust"))
-				return Output.Runtime.Rust;
-			return Output.Runtime.Net;
+				return Runtime.Rust;
+			return Runtime.Net;
 		}
 
 		/// <summary>
@@ -491,11 +494,11 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The parsing method for the grammar</returns>
-		private ParsingMethod GetParsingMethodFor(Grammars.Grammar grammar)
+		private ParsingMethod GetParsingMethodFor(Grammar grammar)
 		{
 			if (method.HasValue)
 				return method.Value;
-			string value = grammar.GetOption(Grammars.Grammar.OPTION_PARSER_TYPE);
+			string value = grammar.GetOption(Grammar.OPTION_PARSER_TYPE);
 			if (value == null)
 				return ParsingMethod.LALR1;
 			if (value.Equals("RNGLR"))
@@ -508,11 +511,11 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The namespace for the grammar</returns>
-		private string GetNamespaceFor(Grammars.Grammar grammar)
+		private string GetNamespaceFor(Grammar grammar)
 		{
 			if (outputNamespace != null)
 				return outputNamespace;
-			string value = grammar.GetOption(Grammars.Grammar.OPTION_NAMESPACE);
+			string value = grammar.GetOption(Grammar.OPTION_NAMESPACE);
 			if (value != null)
 				return value;
 			return grammar.Name;
@@ -523,16 +526,16 @@ namespace Hime.SDK
 		/// </summary>
 		/// <param name="grammar">A grammar</param>
 		/// <returns>The access modifier for the grammar</returns>
-		private Output.Modifier GetAccessModifierFor(Grammars.Grammar grammar)
+		private Modifier GetAccessModifierFor(Grammar grammar)
 		{
 			if (outputAccess.HasValue)
 				return outputAccess.Value;
-			string value = grammar.GetOption(Grammars.Grammar.OPTION_ACCESS_MODIFIER);
+			string value = grammar.GetOption(Grammar.OPTION_ACCESS_MODIFIER);
 			if (value == null)
-				return Output.Modifier.Internal;
+				return Modifier.Internal;
 			if (value.Equals("Public"))
-				return Output.Modifier.Public;
-			return Output.Modifier.Internal;
+				return Modifier.Public;
+			return Modifier.Internal;
 		}
 	}
 }

@@ -16,6 +16,8 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Text;
+using Hime.Redist;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars
@@ -154,7 +156,7 @@ namespace Hime.SDK.Grammars
 		/// Applies the given action to all elements in this body
 		/// </summary>
 		/// <param name="action">The action to apply</param>
-		public void ApplyAction(Hime.Redist.TreeAction action)
+		public void ApplyAction(TreeAction action)
 		{
 			foreach (RuleBodyElement part in parts)
 				part.Action = action;
@@ -215,7 +217,7 @@ namespace Hime.SDK.Grammars
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			foreach (RuleBodyElement part in parts)
 			{
 				builder.Append(" ");

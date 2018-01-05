@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -100,7 +101,7 @@ namespace Hime.Redist
 			/// <summary>
 			/// Gets the current node
 			/// </summary>
-			object System.Collections.IEnumerator.Current { get { return new ASTNode(ast, current); } }
+			object IEnumerator.Current { get { return new ASTNode(ast, current); } }
 
 			/// <summary>
 			/// Disposes this enumerator

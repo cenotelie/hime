@@ -16,10 +16,13 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.Redist;
+using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
 using Hime.SDK;
 using Hime.SDK.Output;
@@ -86,10 +89,10 @@ namespace Hime.Tests.Driver
 		{
 			reporter.Info("Loading fixture " + name);
 			Stream stream = typeof(Program).Assembly.GetManifestResourceStream(name);
-			TextReader reader = new StreamReader(stream, System.Text.Encoding.UTF8);
+			TextReader reader = new StreamReader(stream, Encoding.UTF8);
 			string content = reader.ReadToEnd();
 			reader.Close();
-			Hime.Redist.Parsers.BaseLRParser parser = parserFixture.GetParser(content);
+			BaseLRParser parser = parserFixture.GetParser(content);
 			ParseResult result = parser.Parse();
 			foreach (ParseError error in result.Errors)
 				reporter.Error(error, result.Input, error.Position);
@@ -152,7 +155,7 @@ namespace Hime.Tests.Driver
 			root.Attributes["tests"].Value = (aggregated.passed + aggregated.errors + aggregated.failed).ToString();
 			root.Attributes["failures"].Value = aggregated.failed.ToString();
 			root.Attributes["errors"].Value = aggregated.errors.ToString();
-			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(CultureInfo.InvariantCulture);
 
 			return aggregated;
 		}

@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 
 namespace Hime.Redist.Lexer
@@ -82,7 +83,7 @@ namespace Hime.Redist.Lexer
 				data = new int[distance + 1];
 				data[0] = state;
 				data[data.Length - 1] = offset;
-				System.Array.Copy(previous.data, 1, data, 1, previous.data.Length - 1);
+				Array.Copy(previous.data, 1, data, 1, previous.data.Length - 1);
 				for (int i = previous.data.Length; i != data.Length; i++)
 					data[i] = offset;
 			}
@@ -427,7 +428,7 @@ namespace Hime.Redist.Lexer
 			if (!found)
 			{
 				if (insertionsCount == insertions.Length)
-					System.Array.Resize(ref insertions, insertions.Length * 2);
+					Array.Resize(ref insertions, insertions.Length * 2);
 				insertions[insertionsCount++] = target;
 			}
 		}

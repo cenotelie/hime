@@ -16,7 +16,9 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using Hime.Redist;
 using Hime.Redist.Utils;
+using Hime.SDK.Automata;
 
 namespace Hime.SDK.Grammars
 {
@@ -283,7 +285,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="name">The fragment's name</param>
 		/// <param name="nfa">The fragment's NFA</param>
 		/// <returns>The new fragment</returns>
-		public Terminal AddFragment(string name, Automata.NFA nfa)
+		public Terminal AddFragment(string name, NFA nfa)
 		{
 			Terminal fragment = new Terminal(nextSID, name, name, nfa, 0);
 			nextSID++;
@@ -307,7 +309,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="value">The terminal's value</param>
 		/// <param name="nfa">The terminal's NFA</param>
 		/// <returns>The new terminal</returns>
-		public Terminal AddTerminalAnon(string value, Automata.NFA nfa)
+		public Terminal AddTerminalAnon(string value, NFA nfa)
 		{
 			string tName = PREFIX_GENERATED_TERMINAL + GenerateID();
 			return AddTerminal(tName, value, nfa, DEFAULT_CONTEXT_NAME);
@@ -320,7 +322,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="nfa">The terminal's NFA</param>
 		/// <param name="context">The terminal's context</param>
 		/// <returns>The new terminal</returns>
-		public Terminal AddTerminalNamed(string name, Automata.NFA nfa, string context)
+		public Terminal AddTerminalNamed(string name, NFA nfa, string context)
 		{
 			return AddTerminal(name, name, nfa, context);
 		}
@@ -333,7 +335,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="nfa">The terminal's NFA</param>
 		/// <param name="context">The terminal's context</param>
 		/// <returns>The new terminal</returns>
-		private Terminal AddTerminal(string tName, string value, Automata.NFA nfa, string context)
+		private Terminal AddTerminal(string tName, string value, NFA nfa, string context)
 		{
 			Terminal terminal = new Terminal(nextSID, tName, value, nfa, ResolveContext(context));
 			nextSID++;
@@ -451,7 +453,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">The rule's definition AST</param>
 		/// <returns>The new template rule</returns>
-		public TemplateRule AddTemplateRule(Hime.Redist.ASTNode node)
+		public TemplateRule AddTemplateRule(ASTNode node)
 		{
 			TemplateRule rule = new TemplateRule(this, node);
 			templateRules.Add(rule);
@@ -668,18 +670,18 @@ namespace Hime.SDK.Grammars
 		/// Builds the complete DFA that matches the terminals in this grammar
 		/// </summary>
 		/// <returns>The DFA</returns>
-		public Automata.DFA BuildDFA()
+		public DFA BuildDFA()
 		{
 			// Construct a global NFA for all the terminals
-			Automata.NFA final = Automata.NFA.NewMinimal();
+			NFA final = NFA.NewMinimal();
 			foreach (Terminal terminal in terminalsByName.Values)
 			{
-				Automata.NFA sub = terminal.NFA.Clone();
+				NFA sub = terminal.NFA.Clone();
 				final.InsertSubNFA(sub);
-				final.StateEntry.AddTransition(Automata.NFA.EPSILON, sub.StateEntry);
+				final.StateEntry.AddTransition(NFA.EPSILON, sub.StateEntry);
 			}
 			// Construct the equivalent DFA and minimize it
-			Automata.DFA finalDFA = new Automata.DFA(final);
+			DFA finalDFA = new DFA(final);
 			finalDFA = finalDFA.Minimize();
 			finalDFA.RepackTransitions();
 			finalDFA.Prune();
@@ -720,8 +722,8 @@ namespace Hime.SDK.Grammars
 			// Create the real axiom rule variable and rule
 			Variable axiom = AddVariable(GENERATED_AXIOM);
 			List<RuleBodyElement> parts = new List<RuleBodyElement>();
-			parts.Add(new RuleBodyElement(variables[axiomName], Hime.Redist.TreeAction.Promote));
-			parts.Add(new RuleBodyElement(Dollar.Instance, Hime.Redist.TreeAction.Drop));
+			parts.Add(new RuleBodyElement(variables[axiomName], TreeAction.Promote));
+			parts.Add(new RuleBodyElement(Dollar.Instance, TreeAction.Drop));
 			axiom.AddRule(new Rule(axiom, new RuleBody(parts), false, 0));
 			return null;
 		}

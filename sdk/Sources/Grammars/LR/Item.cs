@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Text;
 using Hime.Redist.Parsers;
 
 namespace Hime.SDK.Grammars.LR
@@ -170,7 +171,7 @@ namespace Hime.SDK.Grammars.LR
 		/// </returns>
 		public string ToString(bool withLookaheads)
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("[");
+			StringBuilder builder = new StringBuilder("[");
 			builder.Append(rule.Head.ToString());
 			builder.Append(" ->");
 			int i = 0;

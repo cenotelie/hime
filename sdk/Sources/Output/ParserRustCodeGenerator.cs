@@ -17,6 +17,8 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Hime.SDK.Grammars;
 
 namespace Hime.SDK.Output
 {
@@ -40,7 +42,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The grammar to generate a parser for
 		/// </summary>
-		private readonly Grammars.Grammar grammar;
+		private readonly Grammar grammar;
 		/// <summary>
 		/// The type of the parser to generate
 		/// </summary>
@@ -85,7 +87,7 @@ namespace Hime.SDK.Output
 		/// <param name="file">The target file to generate code in</param>
 		public void Generate(string file)
 		{
-			StreamWriter writer = new StreamWriter(file, true, new System.Text.UTF8Encoding(false));
+			StreamWriter writer = new StreamWriter(file, true, new UTF8Encoding(false));
 
 			writer.WriteLine("/// Static resource for the serialized parser automaton");
 			writer.WriteLine("const PARSER_AUTOMATON: &'static [u8] = include_bytes!(\"" + binResource + "\");");
@@ -104,15 +106,15 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
-			Dictionary<Grammars.Variable, string> nameVariables = new Dictionary<Grammars.Variable, string>();
-			Dictionary<Grammars.Virtual, string> nameVirtuals = new Dictionary<Grammars.Virtual, string>();
-			foreach (Grammars.Variable var in grammar.Variables)
+			Dictionary<Variable, string> nameVariables = new Dictionary<Variable, string>();
+			Dictionary<Virtual, string> nameVirtuals = new Dictionary<Virtual, string>();
+			foreach (Variable var in grammar.Variables)
 			{
-				if (var.Name.StartsWith(Grammars.Grammar.PREFIX_GENERATED_VARIABLE))
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
 				nameVariables.Add(var, Helper.GetSymbolNameForRust(var.Name));
 			}
-			foreach (Grammars.Virtual var in grammar.Virtuals)
+			foreach (Virtual var in grammar.Virtuals)
 			{
 				string name = Helper.GetSymbolNameForRust(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
@@ -120,13 +122,13 @@ namespace Hime.SDK.Output
 				nameVirtuals.Add(var, name);
 			}
 
-			foreach (KeyValuePair<Grammars.Variable, string> pair in nameVariables)
+			foreach (KeyValuePair<Variable, string> pair in nameVariables)
 			{
 				stream.WriteLine("/// The unique identifier for variable " + pair.Key.Name);
 				stream.WriteLine("pub const {0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
 			stream.WriteLine();
-			foreach (KeyValuePair<Grammars.Virtual, string> pair in nameVirtuals)
+			foreach (KeyValuePair<Virtual, string> pair in nameVirtuals)
 			{
 				stream.WriteLine("/// The unique identifier for virtual " + pair.Key.Name);
 				stream.WriteLine("pub const {0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
@@ -145,7 +147,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("/// so that variable indices in the automaton can be used to retrieve the variables in this table");
 			stream.WriteLine("const VARIABLES: &'static [Symbol] = &[");
 			bool first = true;
-			foreach (Grammars.Variable var in grammar.Variables)
+			foreach (Variable var in grammar.Variables)
 			{
 				if (!first)
 					stream.WriteLine(",");
@@ -167,7 +169,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table");
 			stream.WriteLine("const VIRTUALS: &'static [Symbol] = &[");
 			bool first = true;
-			foreach (Grammars.Virtual v in grammar.Virtuals)
+			foreach (Virtual v in grammar.Virtuals)
 			{
 				if (!first)
 					stream.WriteLine(",");
@@ -188,7 +190,7 @@ namespace Hime.SDK.Output
 				return;
 			stream.WriteLine("/// Represents a set of semantic actions in this parser");
 			stream.WriteLine("pub trait Actions {");
-			foreach (Grammars.Action action in grammar.Actions)
+			foreach (Action action in grammar.Actions)
 			{
 				stream.WriteLine("    /// The " + action.Name + " semantic action");
 				stream.WriteLine("    fn " + action.Name + "(&mut self, head: Symbol, body: &SemanticBody);");
@@ -199,7 +201,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("pub struct NoActions {}");
 			stream.WriteLine();
 			stream.WriteLine("impl Actions for NoActions {");
-			foreach (Grammars.Action action in grammar.Actions)
+			foreach (Action action in grammar.Actions)
 				stream.WriteLine("    fn " + action.Name + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
 			stream.WriteLine("}");
 			stream.WriteLine();
@@ -332,7 +334,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("fn parse_text(text: Text, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
 				int i = 0;
-				foreach (Grammars.Action action in grammar.Actions)
+				foreach (Action action in grammar.Actions)
 				{
 					stream.WriteLine("        " + i + " => actions." + action.Name + "(head, body),");
 					i++;

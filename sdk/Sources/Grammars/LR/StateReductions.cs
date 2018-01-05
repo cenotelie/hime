@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
@@ -73,7 +74,7 @@ namespace Hime.SDK.Grammars.LR
 		/// Gets the enumerator.
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return content.GetEnumerator();
 		}

@@ -19,7 +19,9 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.Encoding;
 using Hime.Redist;
+using Hime.Redist.Parsers;
 
 namespace Hime.Parseit
 {
@@ -42,15 +44,15 @@ namespace Hime.Parseit
 				return 0;
 			}
 
-			TextReader input = new StreamReader(Console.OpenStandardInput(), System.Text.Encoding.UTF8, false);
-			Assembly assembly = Assembly.LoadFile(System.IO.Path.GetFullPath(args[0]));
+			TextReader input = new StreamReader(Console.OpenStandardInput(), UTF8, false);
+			Assembly assembly = Assembly.LoadFile(Path.GetFullPath(args[0]));
 			Type parserType = assembly.GetType(args[1]);
 			ConstructorInfo parserCtor = parserType.GetConstructors()[0];
 			ParameterInfo[] parameters = parserCtor.GetParameters();
 			Type lexerType = parameters[0].ParameterType;
 			ConstructorInfo lexerCtor = lexerType.GetConstructor(new [] { typeof(TextReader) });
 			object lexer = lexerCtor.Invoke(new object[] { input });
-			Hime.Redist.Parsers.BaseLRParser parser = (Hime.Redist.Parsers.BaseLRParser) parserCtor.Invoke(new [] { lexer });
+			BaseLRParser parser = (BaseLRParser) parserCtor.Invoke(new [] { lexer });
 
 			ParseResult result = parser.Parse();
 			StringBuilder builder = new StringBuilder();
@@ -64,7 +66,7 @@ namespace Hime.Parseit
 		/// </summary>
 		private static void PrintHelp()
 		{
-			Console.WriteLine("parseit " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
+			Console.WriteLine("parseit " + Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Command line to parse a piece of input using a packaged parser");
 			Console.WriteLine();
 			Console.WriteLine("usage: parseit <parserAssembly> <parserName>");

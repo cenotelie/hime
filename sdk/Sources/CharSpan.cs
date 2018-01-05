@@ -15,6 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
+using System.Globalization;
+
 namespace Hime.SDK
 {
 	/// <summary>
@@ -103,15 +106,15 @@ namespace Hime.SDK
 				rest = NULL;
 				if (original.spanEnd == splitter.spanEnd)
 					return NULL;
-				return new CharSpan(System.Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
+				return new CharSpan(Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
 			}
 			if (original.spanEnd == splitter.spanEnd)
 			{
 				rest = NULL;
-				return new CharSpan(original.spanBegin, System.Convert.ToChar(splitter.spanBegin - 1));
+				return new CharSpan(original.spanBegin, Convert.ToChar(splitter.spanBegin - 1));
 			}
-			rest = new CharSpan(System.Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
-			return new CharSpan(original.spanBegin, System.Convert.ToChar(splitter.spanBegin - 1));
+			rest = new CharSpan(Convert.ToChar(splitter.spanEnd + 1), original.spanEnd);
+			return new CharSpan(original.spanBegin, Convert.ToChar(splitter.spanBegin - 1));
 		}
 
 		/// <summary>
@@ -184,7 +187,7 @@ namespace Hime.SDK
 		/// <returns>The string representation</returns>
 		private static string CharToString_NonPrintable(char c)
 		{
-			string result = "U+" + System.Convert.ToUInt16(c).ToString("X");
+			string result = "U+" + Convert.ToUInt16(c).ToString("X");
 			return result;
 		}
 

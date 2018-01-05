@@ -16,9 +16,12 @@
  ******************************************************************************/
 
 using System;
+using System.IO;
+using System.Reflection;
 using Hime.CLI;
 using Hime.Redist;
 using Hime.SDK;
+using Hime.SDK.Output;
 
 namespace Hime.HimeCC
 {
@@ -126,12 +129,12 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private static int GenerateCLParser()
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CLI.CommandLine.gram");
+			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CLI.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.SDK.Output.Mode.Source;
+			task.Mode = Mode.Source;
 			task.AddInputRaw(stream);
 			task.Namespace = "Hime.CLI";
-			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
+			task.CodeAccess = Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
 			return report.Errors.Count;
@@ -143,13 +146,13 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private static int GenerateCDParser()
 		{
-			System.IO.Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
+			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			CompilationTask task = new CompilationTask();
-			task.Mode = Hime.SDK.Output.Mode.Source;
+			task.Mode = Mode.Source;
 			task.AddInputRaw(stream);
 			task.GrammarName = "HimeGrammar";
 			task.Namespace = "Hime.SDK.Input";
-			task.CodeAccess = Hime.SDK.Output.Modifier.Internal;
+			task.CodeAccess = Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();
 			return report.Errors.Count;
@@ -184,20 +187,20 @@ namespace Hime.HimeCC
 				switch (arg.Value)
 				{
 					case ArgOutputAssembly:
-						if (task.Mode == Hime.SDK.Output.Mode.Source)
-							task.Mode = Hime.SDK.Output.Mode.SourceAndAssembly;
+						if (task.Mode == Mode.Source)
+							task.Mode = Mode.SourceAndAssembly;
 						break;
 					case ArgOutputNoSources:
-						task.Mode = Hime.SDK.Output.Mode.Assembly;
+						task.Mode = Mode.Assembly;
 						break;
 					case ArgOutputDebug:
-						task.Mode = Hime.SDK.Output.Mode.Debug;
+						task.Mode = Mode.Debug;
 						break;
 					case ArgTargetJava:
-						task.Target = Hime.SDK.Output.Runtime.Java;
+						task.Target = Runtime.Java;
 						break;
 					case ArgTargetRust:
-						task.Target = Hime.SDK.Output.Runtime.Rust;
+						task.Target = Runtime.Rust;
 						if (arg.Children.Count >= 1)
 							task.TargetRustRuntime = arg.Children[0].Value;
 						break;
@@ -220,7 +223,7 @@ namespace Hime.HimeCC
 						task.Namespace = CommandLine.GetValue(arg);
 						break;
 					case ArgAccessPublic:
-						task.CodeAccess = Hime.SDK.Output.Modifier.Public;
+						task.CodeAccess = Modifier.Public;
 						break;
 					default:
 						Console.WriteLine("Unknown argument " + arg.Value);
@@ -250,7 +253,7 @@ namespace Hime.HimeCC
 		/// </summary>
 		private static void PrintHelp()
 		{
-			Console.WriteLine("himecc " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
+			Console.WriteLine("himecc " + Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Hime parser generator, generates lexers and parsers in C# 2.0.");
 			Console.WriteLine();
 			Console.WriteLine("usage: himecc <files> [options]");

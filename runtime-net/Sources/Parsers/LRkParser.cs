@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using Hime.Redist.Lexer;
 using Hime.Redist.Utils;
 
 namespace Hime.Redist.Parsers
@@ -81,7 +82,7 @@ namespace Hime.Redist.Parsers
 		public int GetContextPriority(int context, int onTerminalID)
 		{
 			// the default context is always active
-			if (context == Lexer.Automaton.DEFAULT_CONTEXT)
+			if (context == Automaton.DEFAULT_CONTEXT)
 				return int.MaxValue;
 			if (lexer.tokens.Size == 0)
 			{

@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 using Hime.Redist.Utils;
 
@@ -83,7 +84,7 @@ namespace Hime.Redist
 			/// <summary>
 			/// Gets the current token
 			/// </summary>
-			object System.Collections.IEnumerator.Current { get { return repository[current]; } }
+			object IEnumerator.Current { get { return repository[current]; } }
 
 			/// <summary>
 			/// Moves to the next elmeent
@@ -214,7 +215,7 @@ namespace Hime.Redist
 		/// Gets an enumerator of the tokens in this repository
 		/// </summary>
 		/// <returns>An enumerator of the tokens in this repository</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return new LinearEnumerator(this);
 		}

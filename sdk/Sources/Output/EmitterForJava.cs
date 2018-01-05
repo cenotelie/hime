@@ -15,7 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Hime.SDK.Output
@@ -104,9 +106,9 @@ namespace Hime.SDK.Output
 			// setup the maven project
 			string projectFolder = CreateMavenProject();
 			// compile
-			System.PlatformID platform = System.Environment.OSVersion.Platform;
+			PlatformID platform = Environment.OSVersion.Platform;
 			bool success;
-			if (platform == System.PlatformID.Unix || platform == System.PlatformID.MacOSX)
+			if (platform == PlatformID.Unix || platform == PlatformID.MacOSX)
 				success = ExecuteCommandMvn("mvn", "package -f " + Path.Combine(projectFolder, "pom.xml"));
 			else
 				success = ExecuteCommandMvn("cmd.exe", "/c mvn.cmd package -f " + Path.Combine(projectFolder, "pom.xml"));
@@ -132,7 +134,7 @@ namespace Hime.SDK.Output
 		private static string CreateFolderFor(string origin, Unit unit)
 		{
 			string current = origin;
-			string[] parts = Helper.GetNamespaceForJava(unit.Namespace == null ? unit.Grammar.Name : unit.Namespace).Split(new[] { '.' }, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = Helper.GetNamespaceForJava(unit.Namespace == null ? unit.Grammar.Name : unit.Namespace).Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 			for (int i = 0; i != parts.Length; i++)
 			{
 				current = Path.Combine(current, parts[i]);
@@ -182,7 +184,7 @@ namespace Hime.SDK.Output
 		private bool ExecuteCommandMvn(string verb, string arguments)
 		{
 			reporter.Info("Executing command " + verb + " " + arguments);
-			System.Diagnostics.Process process = new System.Diagnostics.Process();
+			Process process = new Process();
 			process.StartInfo.FileName = verb;
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;

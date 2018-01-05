@@ -15,8 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using Hime.Redist.Lexer;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Output
@@ -92,7 +94,7 @@ namespace Hime.SDK.Output
 			// build the transition data
 			ushort[] cache = new ushort[256];
 			for (int i = 0; i != 256; i++)
-				cache[i] = Hime.Redist.Lexer.Automaton.DEAD_STATE;
+				cache[i] = Automaton.DEAD_STATE;
 			ushort cached = 0; // the number of cached transitions
 			ushort slow = 0; // the number of non-cached transitions
 			foreach (CharSpan span in state.Transitions)
@@ -154,7 +156,7 @@ namespace Hime.SDK.Output
 				if (begin <= 255)
 					begin = 256;
 				writer.Write(begin);
-				writer.Write(System.Convert.ToUInt16(span.End));
+				writer.Write(Convert.ToUInt16(span.End));
 				writer.Write((ushort)state.GetChildBy(span).ID);
 			}
 		}

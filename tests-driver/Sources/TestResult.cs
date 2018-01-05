@@ -17,6 +17,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using System.Xml;
 
 namespace Hime.Tests.Driver
@@ -87,11 +89,11 @@ namespace Hime.Tests.Driver
 			root.Attributes.Append(doc.CreateAttribute("name"));
 			root.Attributes.Append(doc.CreateAttribute("classname"));
 			root.Attributes.Append(doc.CreateAttribute("time"));
-			root.Attributes["time"].Value = spentTime.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			root.Attributes["time"].Value = spentTime.TotalSeconds.ToString(CultureInfo.InvariantCulture);
 			if (executorResult == RESULT_FAILURE_PARSING)
 			{
 				XmlElement error = doc.CreateElement("error");
-				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				StringBuilder builder = new StringBuilder();
 				foreach (string line in output)
 				{
 					builder.Append(line);
@@ -103,7 +105,7 @@ namespace Hime.Tests.Driver
 			else if (executorResult == RESULT_FAILURE_VERB)
 			{
 				XmlElement error = doc.CreateElement("failure");
-				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				StringBuilder builder = new StringBuilder();
 				foreach (string line in output)
 				{
 					builder.Append(line);

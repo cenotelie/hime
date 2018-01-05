@@ -15,9 +15,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Text;
 using Hime.Redist;
 using Hime.Redist.Utils;
+using Hime.SDK.Automata;
 using Hime.SDK.Input;
 
 namespace Hime.SDK.Grammars
@@ -161,7 +164,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="automata">The target NFA</param>
 		/// <param name="span">The unicode span to add</param>
-		private static void AddUnicodeSpanToNFA(Automata.NFA automata, UnicodeSpan span)
+		private static void AddUnicodeSpanToNFA(NFA automata, UnicodeSpan span)
 		{
 			char[] b = span.Begin.GetUTF16();
 			char[] e = span.End.GetUTF16();
@@ -183,7 +186,7 @@ namespace Hime.SDK.Grammars
 				{
 					automata.StateEntry.AddTransition(new CharSpan(b[0], (char)0xFFFF), automata.StateExit);
 				}
-				Automata.NFAState intermediate = automata.AddNewState();
+				NFAState intermediate = automata.AddNewState();
 				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, e[0]), intermediate);
 				intermediate.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
 			}
@@ -193,7 +196,7 @@ namespace Hime.SDK.Grammars
 				if (b[0] == e[0])
 				{
 					// same first surrogate
-					Automata.NFAState intermediate = automata.AddNewState();
+					NFAState intermediate = automata.AddNewState();
 					automata.StateEntry.AddTransition(new CharSpan(b[0], b[0]), intermediate);
 					intermediate.AddTransition(new CharSpan(b[1], e[1]), automata.StateExit);
 				}
@@ -201,11 +204,11 @@ namespace Hime.SDK.Grammars
 				{
 					// the first surrogates are consecutive encodings
 					// build lower half
-					Automata.NFAState i1 = automata.AddNewState();
+					NFAState i1 = automata.AddNewState();
 					automata.StateEntry.AddTransition(new CharSpan(b[0], b[0]), i1);
 					i1.AddTransition(new CharSpan(b[1], (char)0xDFFF), automata.StateExit);
 					// build upper half
-					Automata.NFAState i2 = automata.AddNewState();
+					NFAState i2 = automata.AddNewState();
 					automata.StateEntry.AddTransition(new CharSpan(e[0], e[0]), i2);
 					i2.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
 				}
@@ -213,15 +216,15 @@ namespace Hime.SDK.Grammars
 				{
 					// there is at least one surrogate value between the first surrogates of begin and end
 					// build lower part
-					Automata.NFAState ia = automata.AddNewState();
+					NFAState ia = automata.AddNewState();
 					automata.StateEntry.AddTransition(new CharSpan(b[0], b[0]), ia);
 					ia.AddTransition(new CharSpan(b[1], (char)0xDFFF), automata.StateExit);
 					// build intermediate part
-					Automata.NFAState im = automata.AddNewState();
+					NFAState im = automata.AddNewState();
 					automata.StateEntry.AddTransition(new CharSpan((char)(b[0] + 1), (char)(e[0] - 1)), im);
 					im.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
 					// build upper part
-					Automata.NFAState iz = automata.AddNewState();
+					NFAState iz = automata.AddNewState();
 					automata.StateEntry.AddTransition(new CharSpan(e[0], e[0]), iz);
 					iz.AddTransition(new CharSpan((char)0xDC00, e[1]), automata.StateExit);
 				}
@@ -257,7 +260,7 @@ namespace Hime.SDK.Grammars
 				LoadOption(child);
 			// determine the casing of the grammar
 			string value = grammar.GetOption("CaseSensitive");
-			caseInsensitive = (value != null && value.Equals("false", System.StringComparison.InvariantCultureIgnoreCase));
+			caseInsensitive = (value != null && value.Equals("false", StringComparison.InvariantCultureIgnoreCase));
 		}
 
 		/// <summary>
@@ -320,7 +323,7 @@ namespace Hime.SDK.Grammars
 			{
 				// The terminal does not already exists
 				// Build the NFA
-				Automata.NFA nfa = BuildNFA(node.Children[1]);
+				NFA nfa = BuildNFA(node.Children[1]);
 				// Create the terminal in the grammar
 				fragment = grammar.AddFragment(nameNode.Value, nfa);
 				// Marks the final NFA state with the new terminal
@@ -347,7 +350,7 @@ namespace Hime.SDK.Grammars
 			{
 				// The terminal does not already exists
 				// Build the NFA
-				Automata.NFA nfa = BuildNFA(node.Children[1]);
+				NFA nfa = BuildNFA(node.Children[1]);
 				// Create the terminal in the grammar
 				terminal = grammar.AddTerminalNamed(nameNode.Value, nfa, context);
 				// Marks the final NFA state with the new terminal
@@ -365,7 +368,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFA(ASTNode node)
+		private NFA BuildNFA(ASTNode node)
 		{
 			Hime.Redist.Symbol symbol = node.Symbol;
 
@@ -389,45 +392,45 @@ namespace Hime.SDK.Grammars
 
 			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
 			{
-				Automata.NFA inner = BuildNFA(node.Children[0]);
-				return Automata.NFA.NewOptional(inner, false);
+				NFA inner = BuildNFA(node.Children[0]);
+				return NFA.NewOptional(inner, false);
 			}
 			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_ZEROMORE)
 			{
-				Automata.NFA inner = BuildNFA(node.Children[0]);
-				return Automata.NFA.NewRepeatZeroMore(inner, false);
+				NFA inner = BuildNFA(node.Children[0]);
+				return NFA.NewRepeatZeroMore(inner, false);
 			}
 			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_ONEMORE)
 			{
-				Automata.NFA inner = BuildNFA(node.Children[0]);
-				return Automata.NFA.NewRepeatOneOrMore(inner, false);
+				NFA inner = BuildNFA(node.Children[0]);
+				return NFA.NewRepeatOneOrMore(inner, false);
 			}
 			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_UNION)
 			{
-				Automata.NFA left = BuildNFA(node.Children[0]);
-				Automata.NFA right = BuildNFA(node.Children[1]);
-				return Automata.NFA.NewUnion(left, right, false);
+				NFA left = BuildNFA(node.Children[0]);
+				NFA right = BuildNFA(node.Children[1]);
+				return NFA.NewUnion(left, right, false);
 			}
 			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_DIFFERENCE)
 			{
-				Automata.NFA left = BuildNFA(node.Children[0]);
-				Automata.NFA right = BuildNFA(node.Children[1]);
-				return Automata.NFA.NewDifference(left, right, false);
+				NFA left = BuildNFA(node.Children[0]);
+				NFA right = BuildNFA(node.Children[1]);
+				return NFA.NewDifference(left, right, false);
 			}
 			if (symbol.Name == "range")
 			{
-				Automata.NFA inner = BuildNFA(node.Children[0]);
-				int min = System.Convert.ToInt32(node.Children[1].Value);
+				NFA inner = BuildNFA(node.Children[0]);
+				int min = Convert.ToInt32(node.Children[1].Value);
 				int max = min;
 				if (node.Children.Count > 2)
-					max = System.Convert.ToInt32(node.Children[2].Value);
-				return Automata.NFA.NewRepeatRange(inner, min, max);
+					max = Convert.ToInt32(node.Children[2].Value);
+				return NFA.NewRepeatRange(inner, min, max);
 			}
 			if (symbol.Name == "concat")
 			{
-				Automata.NFA left = BuildNFA(node.Children[0]);
-				Automata.NFA right = BuildNFA(node.Children[1]);
-				return Automata.NFA.NewConcatenation(left, right, false);
+				NFA left = BuildNFA(node.Children[0]);
+				NFA right = BuildNFA(node.Children[1]);
+				return NFA.NewConcatenation(left, right, false);
 			}
 
 			// nothing found ...
@@ -440,10 +443,10 @@ namespace Hime.SDK.Grammars
 		/// Builds a NFA that does nothing
 		/// </summary>
 		/// <returns>A NFA</returns>
-		private static Automata.NFA BuildEpsilonNFA()
+		private static NFA BuildEpsilonNFA()
 		{
-			Automata.NFA final = Automata.NFA.NewMinimal();
-			final.StateEntry.AddTransition(Automata.NFA.EPSILON, final.StateExit);
+			NFA final = NFA.NewMinimal();
+			final.StateEntry.AddTransition(NFA.EPSILON, final.StateExit);
 			return final;
 		}
 
@@ -452,9 +455,9 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromText(ASTNode node)
+		private NFA BuildNFAFromText(ASTNode node)
 		{
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			automata.StateExit = automata.StateEntry;
 
 			// build the raw piece of text
@@ -474,7 +477,7 @@ namespace Hime.SDK.Grammars
 			// build the result
 			foreach (char c in value)
 			{
-				Automata.NFAState temp = automata.AddNewState();
+				NFAState temp = automata.AddNewState();
 				if (insensitive && char.IsLetter(c))
 				{
 					char c2 = char.IsLower(c) ? char.ToUpper(c) : char.ToLower(c);
@@ -493,12 +496,12 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromCodepoint(ASTNode node)
+		private NFA BuildNFAFromCodepoint(ASTNode node)
 		{
 			// extract the code point value
 			string value = node.Value;
 			value = value.Substring(2, value.Length - 2);
-			int cpValue = System.Convert.ToInt32(value, 16);
+			int cpValue = Convert.ToInt32(value, 16);
 			if (cpValue < 0 || (cpValue >= 0xD800 && cpValue <= 0xDFFF) || cpValue >= 0x110000)
 			{
 				OnError(node.Position, "The value U+{0} is not a supported unicode code point", cpValue.ToString("X"));
@@ -506,7 +509,7 @@ namespace Hime.SDK.Grammars
 			}
 			UnicodeCodePoint cp = new UnicodeCodePoint(cpValue);
 			// build the NFA
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			char[] data = cp.GetUTF16();
 			if (data.Length == 1)
 			{
@@ -514,7 +517,7 @@ namespace Hime.SDK.Grammars
 			}
 			else
 			{
-				Automata.NFAState intermediate = automata.AddNewState();
+				NFAState intermediate = automata.AddNewState();
 				automata.StateEntry.AddTransition(new CharSpan(data[0], data[0]), intermediate);
 				intermediate.AddTransition(new CharSpan(data[1], data[1]), automata.StateExit);
 			}
@@ -526,7 +529,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromClass(ASTNode node)
+		private NFA BuildNFAFromClass(ASTNode node)
 		{
 			// extract the value
 			string value = node.Value;
@@ -577,7 +580,7 @@ namespace Hime.SDK.Grammars
 				}
 			}
 			// build the result
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			if (positive)
 			{
 				foreach (CharSpan span in spans)
@@ -608,7 +611,7 @@ namespace Hime.SDK.Grammars
 					automata.StateEntry.AddTransition(new CharSpan(b, (char)0xFFFF), automata.StateExit);
 				}
 				// surrogate pairs
-				Automata.NFAState intermediate = automata.AddNewState();
+				NFAState intermediate = automata.AddNewState();
 				automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
 				intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
 			}
@@ -620,7 +623,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromUnicodeCategory(ASTNode node)
+		private NFA BuildNFAFromUnicodeCategory(ASTNode node)
 		{
 			// extract the value
 			string value = node.Value.Substring(3, node.Value.Length - 4);
@@ -631,7 +634,7 @@ namespace Hime.SDK.Grammars
 				return BuildEpsilonNFA();
 			}
 			// build the result
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			foreach (UnicodeSpan span in category.Spans)
 				AddUnicodeSpanToNFA(automata, span);
 			return automata;
@@ -642,7 +645,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromUnicodeBlock(ASTNode node)
+		private NFA BuildNFAFromUnicodeBlock(ASTNode node)
 		{
 			// extract the value
 			string value = node.Value.Substring(3, node.Value.Length - 4);
@@ -653,7 +656,7 @@ namespace Hime.SDK.Grammars
 				return BuildEpsilonNFA();
 			}
 			// build the result
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			AddUnicodeSpanToNFA(automata, block.Span);
 			return automata;
 		}
@@ -663,18 +666,18 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromUnicodeSpan(ASTNode node)
+		private NFA BuildNFAFromUnicodeSpan(ASTNode node)
 		{
 			// extract the values
-			int spanBegin = System.Convert.ToInt32(node.Children[0].Value.Substring(2), 16);
-			int spanEnd = System.Convert.ToInt32(node.Children[1].Value.Substring(2), 16);
+			int spanBegin = Convert.ToInt32(node.Children[0].Value.Substring(2), 16);
+			int spanEnd = Convert.ToInt32(node.Children[1].Value.Substring(2), 16);
 			if (spanBegin > spanEnd)
 			{
 				OnError(node.Position, "Invalid unicode character span, the end is before the beginning");
 				return BuildEpsilonNFA();
 			}
 			// build the result
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			AddUnicodeSpanToNFA(automata, new UnicodeSpan(spanBegin, spanEnd));
 			return automata;
 		}
@@ -683,14 +686,14 @@ namespace Hime.SDK.Grammars
 		/// Builds a NFA that matches everything (a single character)
 		/// </summary>
 		/// <returns>The equivalent NFA</returns>
-		private static Automata.NFA BuildNFAFromAny()
+		private static NFA BuildNFAFromAny()
 		{
-			Automata.NFA automata = Automata.NFA.NewMinimal();
+			NFA automata = NFA.NewMinimal();
 			// plane 0 transitions
 			automata.StateEntry.AddTransition(new CharSpan((char)0x0000, (char)0xD7FF), automata.StateExit);
 			automata.StateEntry.AddTransition(new CharSpan((char)0xE000, (char)0xFFFF), automata.StateExit);
 			// surrogate pairs
-			Automata.NFAState intermediate = automata.AddNewState();
+			NFAState intermediate = automata.AddNewState();
 			automata.StateEntry.AddTransition(new CharSpan((char)0xD800, (char)0xDBFF), intermediate);
 			intermediate.AddTransition(new CharSpan((char)0xDC00, (char)0xDFFF), automata.StateExit);
 			return automata;
@@ -701,7 +704,7 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		/// <param name="node">An AST node representing a NFA</param>
 		/// <returns>The equivalent NFA</returns>
-		private Automata.NFA BuildNFAFromReference(ASTNode node)
+		private NFA BuildNFAFromReference(ASTNode node)
 		{
 			// is it a reference to a fragment?
 			Terminal reference = grammar.GetFragment(node.Value);
@@ -971,7 +974,7 @@ namespace Hime.SDK.Grammars
 			if (terminal == null)
 			{
 				// Create the terminal
-				Automata.NFA nfa = BuildNFAFromText(node);
+				NFA nfa = BuildNFAFromText(node);
 				terminal = grammar.AddTerminalAnon(value, nfa);
 				nfa.StateExit.AddItem(terminal);
 			}
@@ -990,7 +993,7 @@ namespace Hime.SDK.Grammars
 		{
 			if (!value.Contains("\\"))
 				return value;
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i != value.Length; i++)
 			{
 				char c = value[i];
@@ -1034,7 +1037,7 @@ namespace Hime.SDK.Grammars
 						l = 8;
 					else if (l > 4)
 						l = 4;
-					int cp = System.Convert.ToInt32(value.Substring(i + 1, l), 16);
+					int cp = Convert.ToInt32(value.Substring(i + 1, l), 16);
 					builder.Append((new UnicodeCodePoint(cp)).GetUTF16());
 					i += l;
 				}

@@ -17,6 +17,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Diagnostics;
 using System.Xml;
 using Hime.SDK;
 using Hime.SDK.Output;
@@ -71,7 +73,7 @@ namespace Hime.Tests.Driver
 		protected int ExecuteCommand(Reporter reporter, string command, string arguments, List<string> output)
 		{
 			reporter.Info("Executing command: " + command + " " + arguments);
-			System.Diagnostics.Process process = new System.Diagnostics.Process();
+			Process process = new Process();
 			process.StartInfo.FileName = command;
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;
@@ -120,7 +122,7 @@ namespace Hime.Tests.Driver
 			root.Attributes["tests"].Value = results.Count.ToString();
 			root.Attributes["failures"].Value = aggregated.failed.ToString();
 			root.Attributes["errors"].Value = aggregated.errors.ToString();
-			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(CultureInfo.InvariantCulture);
 
 			return aggregated;
 		}

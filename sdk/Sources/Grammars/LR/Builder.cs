@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars.LR
@@ -156,7 +157,7 @@ namespace Hime.SDK.Grammars.LR
 							ContextualError error = new ContextualError(state);
 							foreach (Item item in state.Items)
 							{
-								if (item.Action == Hime.Redist.Parsers.LRActionCode.Shift && item.GetNextSymbol() == terminal)
+								if (item.Action == LRActionCode.Shift && item.GetNextSymbol() == terminal)
 									error.AddItem(item);
 							}
 							errors.Add(error);

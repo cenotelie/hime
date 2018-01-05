@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.IO;
 using Hime.Redist.Utils;
 
@@ -111,7 +112,7 @@ namespace Hime.Redist.Lexer
 		protected override void FindLines()
 		{
 			if (!atEnd)
-				MakeAvailable(System.Int32.MaxValue);
+				MakeAvailable(Int32.MaxValue);
 			lines = new int[INIT_LINE_COUNT_CACHE_SIZE];
 			lines[0] = 0;
 			line = 1;

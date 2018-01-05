@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Text;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars
@@ -57,7 +58,7 @@ namespace Hime.SDK.Grammars
 		public TemplateRuleInstance(TemplateRule tRule, List<Symbol> parameters, Grammar grammar)
 		{
 			// Build the head variable name
-			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+			StringBuilder builder = new StringBuilder();
 			builder.Append(tRule.HeadName);
 			builder.Append("<");
 			for (int i = 0; i != parameters.Count; i++)

@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Text;
+
 namespace Hime.SDK.Grammars.LR
 {
 	/// <summary>
@@ -43,7 +45,7 @@ namespace Hime.SDK.Grammars.LR
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("Context error in ");
+			StringBuilder builder = new StringBuilder("Context error in ");
 			builder.Append(errorState.ID);
 			builder.Append(", the context ");
 			builder.Append(Terminal.Context);

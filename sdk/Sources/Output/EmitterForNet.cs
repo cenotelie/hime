@@ -16,12 +16,15 @@
  ******************************************************************************/
 
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 #if NETSTANDARD2_0
 using System.Runtime.InteropServices;
 #endif
+using Hime.Redist;
 
 namespace Hime.SDK.Output
 {
@@ -150,12 +153,12 @@ namespace Hime.SDK.Output
 		private bool EmitAssemblyFxCompiler()
 		{
 			reporter.Info("Building assembly " + GetArtifactAssembly() + " ...");
-			string fileRedist = System.Reflection.Assembly.GetAssembly(typeof(Hime.Redist.ParseResult)).Location;
+			string fileRedist = Assembly.GetAssembly(typeof(ParseResult)).Location;
 			bool hasError = false;
 			string output = OutputPath + GetUniqueID() + SuffixAssembly;
-			using (System.CodeDom.Compiler.CodeDomProvider compiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#"))
+			using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{
-				System.CodeDom.Compiler.CompilerParameters compilerparams = new System.CodeDom.Compiler.CompilerParameters();
+				CompilerParameters compilerparams = new CompilerParameters();
 				compilerparams.GenerateExecutable = false;
 				compilerparams.GenerateInMemory = false;
 				compilerparams.ReferencedAssemblies.Add(fileRedist);
@@ -173,8 +176,8 @@ namespace Hime.SDK.Output
 					files.Add(GetArtifactLexerCode(unit));
 					files.Add(GetArtifactParserCode(unit));
 				}
-				System.CodeDom.Compiler.CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, files.ToArray());
-				foreach (System.CodeDom.Compiler.CompilerError error in results.Errors)
+				CompilerResults results = compiler.CompileAssemblyFromFile(compilerparams, files.ToArray());
+				foreach (CompilerError error in results.Errors)
 				{
 					reporter.Error(error.ToString());
 					hasError = true;
@@ -246,7 +249,7 @@ namespace Hime.SDK.Output
 		private bool ExecuteCommandDotnet(string verb, string arguments)
 		{
 			reporter.Info("Executing command " + verb + " " + arguments);
-			System.Diagnostics.Process process = new System.Diagnostics.Process();
+			Process process = new Process();
 			process.StartInfo.FileName = verb;
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;

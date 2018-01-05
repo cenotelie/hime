@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Hime.Redist.Utils
@@ -83,7 +84,7 @@ namespace Hime.Redist.Utils
 		/// Gets the enumerator
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return inner.GetEnumerator();
 		}

@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Text;
 using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
 
@@ -267,7 +268,7 @@ namespace Hime.SDK.Grammars.LR
 		/// </returns>
 		public override string ToString()
 		{
-			System.Text.StringBuilder builder = new System.Text.StringBuilder("State ");
+			StringBuilder builder = new StringBuilder("State ");
 			builder.Append(ID);
 			builder.Append(" = {");
 			foreach (Item item in items)

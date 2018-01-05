@@ -15,7 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
+using Hime.Redist;
 
 namespace Hime.SDK.Grammars
 {
@@ -65,7 +67,7 @@ namespace Hime.SDK.Grammars
 		public RuleChoice(Symbol symbol)
 		{
 			parts = new List<RuleBodyElement>();
-			parts.Add(new RuleBodyElement(symbol, Hime.Redist.TreeAction.None));
+			parts.Add(new RuleBodyElement(symbol, TreeAction.None));
 			setFirsts = new TerminalSet();
 		}
 
@@ -82,7 +84,7 @@ namespace Hime.SDK.Grammars
 		/// Gets the enumerator of the inner parts
 		/// </summary>
 		/// <returns>The enumerator</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return parts.GetEnumerator();
 		}
@@ -93,7 +95,7 @@ namespace Hime.SDK.Grammars
 		/// <param name="element">An element</param>
 		public void Append(Symbol element)
 		{
-			parts.Add(new RuleBodyElement(element, Hime.Redist.TreeAction.None));
+			parts.Add(new RuleBodyElement(element, TreeAction.None));
 		}
 
 		/// <summary>

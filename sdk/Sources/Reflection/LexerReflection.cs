@@ -15,6 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -119,7 +120,7 @@ namespace Hime.SDK.Reflection
 				for (int j = 0; j != 256; j++)
 				{
 					int next = stateData.GetCachedTransition(j);
-					char c = System.Convert.ToChar(j);
+					char c = Convert.ToChar(j);
 					if (next != Automaton.DEAD_STATE)
 						current.AddTransition(new CharSpan(c, c), dfa.States[next]);
 				}
@@ -127,7 +128,7 @@ namespace Hime.SDK.Reflection
 				for (int j = 0; j != stateData.BulkTransitionsCount; j++)
 				{
 					AutomatonTransition transition = stateData.GetBulkTransition(j);
-					current.AddTransition(new CharSpan(System.Convert.ToChar(transition.Start), System.Convert.ToChar(transition.End)), dfa.States[transition.Target]);
+					current.AddTransition(new CharSpan(Convert.ToChar(transition.Start), Convert.ToChar(transition.End)), dfa.States[transition.Target]);
 				}
 				current.RepackTransitions();
 			}

@@ -17,6 +17,8 @@
 
 using System.Collections.Generic;
 using Hime.Redist.Utils;
+using Hime.SDK.Grammars;
+using Hime.SDK.Grammars.LR;
 
 namespace Hime.SDK.Output
 {
@@ -28,7 +30,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The represented grammar
 		/// </summary>
-		private readonly Grammars.Grammar grammar;
+		private readonly Grammar grammar;
 		/// <summary>
 		/// The output path for compilation artifacts
 		/// </summary>
@@ -56,15 +58,15 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The seperator terminal
 		/// </summary>
-		private Grammars.Terminal separator;
+		private Terminal separator;
 		/// <summary>
 		/// The terminals matched by the DFA and expected by the parser
 		/// </summary>
-		private List<Grammars.Terminal> expected;
+		private List<Terminal> expected;
 		/// <summary>
 		/// The LR graph to emit in a parser
 		/// </summary>
-		private Grammars.LR.Graph graph;
+		private Graph graph;
 
 		/// <summary>
 		/// Gets the unit's name
@@ -74,7 +76,7 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Gets the represented grammar
 		/// </summary>
-		public Grammars.Grammar Grammar { get { return grammar; } }
+		public Grammar Grammar { get { return grammar; } }
 
 		/// <summary>
 		/// Gets the output path for compilation artifacts
@@ -109,17 +111,17 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// Gets the separator terminal for the associated lexer
 		/// </summary>
-		public Grammars.Terminal Separator { get { return separator; } }
+		public Terminal Separator { get { return separator; } }
 
 		/// <summary>
 		/// Gets the expected terminals produced by the associated lexer
 		/// </summary>
-		public ROList<Grammars.Terminal> Expected { get { return new ROList<Grammars.Terminal>(expected); } }
+		public ROList<Terminal> Expected { get { return new ROList<Terminal>(expected); } }
 
 		/// <summary>
 		/// Gets the LR graph for the associated parser
 		/// </summary>
-		public Grammars.LR.Graph Graph { get { return graph; } }
+		public Graph Graph { get { return graph; } }
 
 		/// <summary>
 		/// Initializes this unit
@@ -130,7 +132,7 @@ namespace Hime.SDK.Output
 		/// <param name="method">The parsing method to use</param>
 		/// <param name="nmspace">The namespace for the artifacts</param>
 		/// <param name="modifier">The modifier for the artifacts</param>
-		public Unit(Grammars.Grammar grammar, string outputPath, Mode compilationMode, ParsingMethod method, string nmspace, Modifier modifier)
+		public Unit(Grammar grammar, string outputPath, Mode compilationMode, ParsingMethod method, string nmspace, Modifier modifier)
 		{
 			this.grammar = grammar;
 			this.outputPath = outputPath;
@@ -163,14 +165,14 @@ namespace Hime.SDK.Output
 		/// <returns><c>true</c> if the operation succeeded</returns>
 		private bool BuildExpected()
 		{
-			expected = new List<Grammars.Terminal>();
-			expected.Add(Grammars.Epsilon.Instance);
-			expected.Add(Grammars.Dollar.Instance);
+			expected = new List<Terminal>();
+			expected.Add(Epsilon.Instance);
+			expected.Add(Dollar.Instance);
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				foreach (Automata.FinalItem item in state.Items)
 				{
-					Grammars.Terminal terminal = item as Grammars.Terminal;
+					Terminal terminal = item as Terminal;
 					if (!expected.Contains(terminal))
 						expected.Add(terminal);
 				}
@@ -185,7 +187,7 @@ namespace Hime.SDK.Output
 		/// <returns><c>true</c> if the operation succeeded</returns>
 		private bool BuildSeparator(Reporter reporter)
 		{
-			string name = grammar.GetOption(Grammars.Grammar.OPTION_SEPARATOR);
+			string name = grammar.GetOption(Grammar.OPTION_SEPARATOR);
 			if (name == null)
 			{
 				// no separator defined ... this is ok
@@ -206,12 +208,12 @@ namespace Hime.SDK.Output
 			if (expected.Contains(separator))
 				return true;
 			// the separator will not be produced by the lexer, try to investigate why
-			List<Grammars.Terminal> supercedings = new List<Grammars.Terminal>();
+			List<Terminal> supercedings = new List<Terminal>();
 			foreach (Automata.DFAState state in dfa.States)
 			{
 				if (state.Items.Contains(separator))
 				{
-					foreach (Grammars.Terminal item in state.Items)
+					foreach (Terminal item in state.Items)
 					{
 						if (item == separator)
 							break;
@@ -265,7 +267,7 @@ namespace Hime.SDK.Output
 		{
 			// build the LR graph
 			reporter.Info("Preparing " + grammar.Name + " parser's data ...");
-			Grammars.LR.Builder builder = new Grammars.LR.Builder(grammar);
+			Builder builder = new Builder(grammar);
 			graph = builder.Build(method);
 			// report the conflicts
 			if (method == ParsingMethod.RNGLR1 || method == ParsingMethod.RNGLALR1)
@@ -276,11 +278,11 @@ namespace Hime.SDK.Output
 			}
 			else
 			{
-				foreach (Grammars.LR.Conflict conflict in builder.Conflicts)
+				foreach (Conflict conflict in builder.Conflicts)
 					reporter.Error(conflict);
 			}
 			// report the errors
-			foreach (Grammars.LR.Error error in builder.Errors)
+			foreach (Error error in builder.Errors)
 				reporter.Error(error);
 			if (builder.Errors.Count > 0)
 				return false;

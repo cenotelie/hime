@@ -17,8 +17,11 @@
 
 using System.Collections.Generic;
 using System.IO;
+using Hime.Redist;
 using Hime.Redist.Parsers;
 using Hime.Redist.Utils;
+using Hime.SDK.Grammars;
+using Hime.SDK.Grammars.LR;
 
 namespace Hime.SDK.Output
 {
@@ -30,27 +33,27 @@ namespace Hime.SDK.Output
 		/// <summary>
 		/// The grammar to generate a parser for
 		/// </summary>
-		private readonly Grammars.Grammar grammar;
+		private readonly Grammar grammar;
 		/// <summary>
 		/// LR graph for the parser
 		/// </summary>
-		private readonly Grammars.LR.Graph graph;
+		private readonly Graph graph;
 		/// <summary>
 		/// The terminals matched by the associated lexer
 		/// </summary>
-		private readonly ROList<Grammars.Terminal> terminals;
+		private readonly ROList<Terminal> terminals;
 		/// <summary>
 		/// The variables to be exported
 		/// </summary>
-		private readonly List<Grammars.Variable> variables;
+		private readonly List<Variable> variables;
 		/// <summary>
 		/// The virtual symbols to be exported
 		/// </summary>
-		private readonly List<Grammars.Virtual> virtuals;
+		private readonly List<Virtual> virtuals;
 		/// <summary>
 		/// The action symbols to be exported
 		/// </summary>
-		private readonly List<Grammars.Action> actions;
+		private readonly List<Action> actions;
 
 		/// <summary>
 		/// Initializes this parser generator
@@ -61,9 +64,9 @@ namespace Hime.SDK.Output
 			grammar = unit.Grammar;
 			graph = unit.Graph;
 			terminals = unit.Expected;
-			variables = new List<Grammars.Variable>(unit.Grammar.Variables);
-			virtuals = new List<Grammars.Virtual>(unit.Grammar.Virtuals);
-			actions = new List<Grammars.Action>(unit.Grammar.Actions);
+			variables = new List<Variable>(unit.Grammar.Variables);
+			virtuals = new List<Virtual>(unit.Grammar.Virtuals);
+			actions = new List<Action>(unit.Grammar.Actions);
 		}
 
 		/// <summary>
@@ -73,26 +76,26 @@ namespace Hime.SDK.Output
 		public void Generate(string file)
 		{
 			// complete list of rules, including new ones for the right-nullable parts
-			List<KeyValuePair<Grammars.Rule, int>> rules = new List<KeyValuePair<Grammars.Rule, int>>();
+			List<KeyValuePair<Rule, int>> rules = new List<KeyValuePair<Rule, int>>();
 			// index of the nullable rule for the variable with the same index
 			List<int> nullables = new List<int>();
 
-			foreach (Grammars.Variable variable in grammar.Variables)
+			foreach (Variable variable in grammar.Variables)
 			{
 				// temporary list for this variable
-				List<KeyValuePair<Grammars.Rule, int>> temp = new List<KeyValuePair<Grammars.Rule, int>>();
-				foreach (Grammars.Rule rule in variable.Rules)
+				List<KeyValuePair<Rule, int>> temp = new List<KeyValuePair<Rule, int>>();
+				foreach (Rule rule in variable.Rules)
 				{
 					// Add normal rule
-					temp.Add(new KeyValuePair<Grammars.Rule, int>(rule, rule.Body.Choices[0].Length));
+					temp.Add(new KeyValuePair<Rule, int>(rule, rule.Body.Choices[0].Length));
 					// Look for right-nullable choices
 					for (int i = 1; i < rule.Body.Choices[0].Length; i++)
-						if (rule.Body.Choices[i].Firsts.Contains(Grammars.Epsilon.Instance))
-							temp.Add(new KeyValuePair<Grammars.Rule, int>(rule, i));
+						if (rule.Body.Choices[i].Firsts.Contains(Epsilon.Instance))
+							temp.Add(new KeyValuePair<Rule, int>(rule, i));
 				}
 				int nullIndex = 0xFFFF;
 				// nullable variable?
-				if (variable.Firsts.Contains(Grammars.Epsilon.Instance))
+				if (variable.Firsts.Contains(Epsilon.Instance))
 				{
 
 					// look for a nullable rule
@@ -110,10 +113,10 @@ namespace Hime.SDK.Output
 						// no 0-length reduction rule => create a new 0-length reduction with a nullable rule
 						for (int i = 0; i != temp.Count; i++)
 						{
-							Grammars.Rule rule = temp[i].Key;
-							if (rule.Body.Choices[0].Firsts.Contains(Grammars.Epsilon.Instance))
+							Rule rule = temp[i].Key;
+							if (rule.Body.Choices[0].Firsts.Contains(Epsilon.Instance))
 							{
-								temp.Add(new KeyValuePair<Grammars.Rule, int>(rule, 0));
+								temp.Add(new KeyValuePair<Rule, int>(rule, 0));
 								nullIndex = rules.Count + temp.Count - 1;
 								break;
 							}
@@ -129,36 +132,36 @@ namespace Hime.SDK.Output
 			uint total = 0;
 			List<uint> offsets = new List<uint>(); // for each state, the offset in the action table
 			List<ushort> counts = new List<ushort>(); // for each state, the number of actions
-			foreach (Grammars.LR.State state in graph.States)
+			foreach (State state in graph.States)
 				total = GenerateDataOffsetTable(offsets, counts, total, state);
 
 			BinaryWriter writer = new BinaryWriter(new FileStream(file, FileMode.Create));
 
-			writer.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammars.Grammar.OPTION_AXIOM))));
+			writer.Write((ushort)variables.IndexOf(grammar.GetVariable(grammar.GetOption(Grammar.OPTION_AXIOM))));
 			writer.Write((ushort)(terminals.Count + variables.Count));  // Nb of columns
 			writer.Write((ushort)graph.States.Count);                   // Nb or rows
 			writer.Write(total);                   						// Nb of actions
 			writer.Write((ushort)rules.Count);                          // Nb of rules
 			writer.Write((ushort)nullables.Count);                      // Nb of nullables
 
-			foreach (Grammars.Terminal terminal in terminals)
+			foreach (Terminal terminal in terminals)
 				writer.Write((ushort)terminal.ID);
-			foreach (Grammars.Variable variable in variables)
+			foreach (Variable variable in variables)
 				writer.Write((ushort)variable.ID);
 
-			foreach (Grammars.LR.State state in graph.States)
+			foreach (State state in graph.States)
 			{
 				int count = 0;
-				foreach (Grammars.Symbol symbol in state.Transitions)
+				foreach (Hime.SDK.Grammars.Symbol symbol in state.Transitions)
 				{
-					Grammars.Terminal terminal = symbol as Grammars.Terminal;
+					Terminal terminal = symbol as Terminal;
 					if (terminal != null)
 						count += state.GetContextsOpenedBy(terminal).Count;
 				}
 				writer.Write((ushort)count);
-				foreach (Grammars.Symbol symbol in state.Transitions)
+				foreach (Hime.SDK.Grammars.Symbol symbol in state.Transitions)
 				{
-					Grammars.Terminal terminal = symbol as Grammars.Terminal;
+					Terminal terminal = symbol as Terminal;
 					if (terminal != null)
 					{
 						foreach (int context in state.GetContextsOpenedBy(terminal))
@@ -176,10 +179,10 @@ namespace Hime.SDK.Output
 				writer.Write(offsets[i]);
 			}
 
-			foreach (Grammars.LR.State state in graph.States)
+			foreach (State state in graph.States)
 				GenerateDataActionTable(writer, rules, state);
 
-			foreach (KeyValuePair<Grammars.Rule, int> pair in rules)
+			foreach (KeyValuePair<Rule, int> pair in rules)
 				GenerateDataProduction(writer, pair.Key, pair.Value);
 
 			foreach (int index in nullables)
@@ -196,17 +199,17 @@ namespace Hime.SDK.Output
 		/// <param name="total">The total length at this point</param>
 		/// <param name="state">The state to inspect</param>
 		/// <returns>The total length of the table so far</returns>
-		private uint GenerateDataOffsetTable(List<uint> offsets, List<ushort> counts, uint total, Grammars.LR.State state)
+		private uint GenerateDataOffsetTable(List<uint> offsets, List<ushort> counts, uint total, State state)
 		{
-			Dictionary<Grammars.Terminal, int> reductionCounters = new Dictionary<Grammars.Terminal, int>();
-			foreach (Grammars.LR.StateActionReduce reduce in state.Reductions)
+			Dictionary<Terminal, int> reductionCounters = new Dictionary<Terminal, int>();
+			foreach (StateActionReduce reduce in state.Reductions)
 			{
 				if (reductionCounters.ContainsKey(reduce.Lookahead))
 					reductionCounters[reduce.Lookahead] = reductionCounters[reduce.Lookahead] + 1;
 				else
 					reductionCounters.Add(reduce.Lookahead, 1);
 			}
-			foreach (Grammars.Terminal terminal in terminals)
+			foreach (Terminal terminal in terminals)
 			{
 				int count = state.HasTransition(terminal) ? 1 : 0;
 				if (reductionCounters.ContainsKey(terminal))
@@ -215,7 +218,7 @@ namespace Hime.SDK.Output
 				counts.Add((ushort)count);
 				total += (uint)count;
 			}
-			foreach (Grammars.Variable variable in variables)
+			foreach (Variable variable in variables)
 			{
 				int count = state.HasTransition(variable) ? 1 : 0;
 				offsets.Add(total);
@@ -231,16 +234,16 @@ namespace Hime.SDK.Output
 		/// <param name="writer">The output writer</param>
 		/// <param name="rules">The rules</param>
 		/// <param name="state">The state to inspect</param>
-		private void GenerateDataActionTable(BinaryWriter writer, List<KeyValuePair<Grammars.Rule, int>> rules, Grammars.LR.State state)
+		private void GenerateDataActionTable(BinaryWriter writer, List<KeyValuePair<Rule, int>> rules, State state)
 		{
-			Dictionary<Grammars.Terminal, List<Grammars.LR.StateActionRNReduce>> reductions = new Dictionary<Grammars.Terminal, List<Grammars.LR.StateActionRNReduce>>();
-			foreach (Grammars.LR.StateActionReduce reduce in state.Reductions)
+			Dictionary<Terminal, List<StateActionRNReduce>> reductions = new Dictionary<Terminal, List<StateActionRNReduce>>();
+			foreach (StateActionReduce reduce in state.Reductions)
 			{
 				if (!reductions.ContainsKey(reduce.Lookahead))
-					reductions.Add(reduce.Lookahead, new List<Grammars.LR.StateActionRNReduce>());
-				reductions[reduce.Lookahead].Add(reduce as Grammars.LR.StateActionRNReduce);
+					reductions.Add(reduce.Lookahead, new List<StateActionRNReduce>());
+				reductions[reduce.Lookahead].Add(reduce as StateActionRNReduce);
 			}
-			if (reductions.ContainsKey(Grammars.Epsilon.Instance))
+			if (reductions.ContainsKey(Epsilon.Instance))
 			{
 				// There can be only one reduction on epsilon
 				writer.Write((ushort)LRActionCode.Accept);
@@ -248,7 +251,7 @@ namespace Hime.SDK.Output
 			}
 			for (int i = 1; i != terminals.Count; i++)
 			{
-				Grammars.Terminal terminal = terminals[i];
+				Terminal terminal = terminals[i];
 				if (state.HasTransition(terminal))
 				{
 					writer.Write((ushort)LRActionCode.Shift);
@@ -256,14 +259,14 @@ namespace Hime.SDK.Output
 				}
 				if (reductions.ContainsKey(terminal))
 				{
-					foreach (Grammars.LR.StateActionRNReduce reduce in reductions[terminal])
+					foreach (StateActionRNReduce reduce in reductions[terminal])
 					{
 						writer.Write((ushort)LRActionCode.Reduce);
-						writer.Write((ushort)rules.IndexOf(new KeyValuePair<Grammars.Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
+						writer.Write((ushort)rules.IndexOf(new KeyValuePair<Rule, int>(reduce.ToReduceRule, reduce.ReduceLength)));
 					}
 				}
 			}
-			foreach (Grammars.Variable variable in variables)
+			foreach (Variable variable in variables)
 			{
 				if (state.HasTransition(variable))
 				{
@@ -279,19 +282,19 @@ namespace Hime.SDK.Output
 		/// <param name="writer">The output writer</param>
 		/// <param name="rule">A grammar rule</param>
 		/// <param name="length">The reduction's length</param>
-		private void GenerateDataProduction(BinaryWriter writer, Grammars.Rule rule, int length)
+		private void GenerateDataProduction(BinaryWriter writer, Rule rule, int length)
 		{
 			writer.Write((ushort)variables.IndexOf(rule.Head));
 			if (rule.IsGenerated)
-				writer.Write((byte)Hime.Redist.TreeAction.Replace);
+				writer.Write((byte)TreeAction.Replace);
 			else
-				writer.Write((byte)Hime.Redist.TreeAction.None);
+				writer.Write((byte)TreeAction.None);
 			writer.Write((byte)length);
 			byte bcl = 0;
 			int pop = 0;
-			foreach (Grammars.RuleBodyElement elem in rule.Body)
+			foreach (RuleBodyElement elem in rule.Body)
 			{
-				if (elem.Symbol is Grammars.Virtual || elem.Symbol is Grammars.Action)
+				if (elem.Symbol is Virtual || elem.Symbol is Action)
 					bcl += 2;
 				else if (pop >= length)
 					bcl += 2;
@@ -303,30 +306,30 @@ namespace Hime.SDK.Output
 			}
 			writer.Write(bcl);
 			pop = 0;
-			foreach (Grammars.RuleBodyElement elem in rule.Body)
+			foreach (RuleBodyElement elem in rule.Body)
 			{
-				if (elem.Symbol is Grammars.Virtual)
+				if (elem.Symbol is Virtual)
 				{
-					if (elem.Action == Hime.Redist.TreeAction.Drop)
+					if (elem.Action == TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.AddVirtualDrop);
-					else if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.AddVirtualPromote);
 					else
 						writer.Write((ushort)LROpCodeValues.AddVirtualNoAction);
-					writer.Write((ushort)virtuals.IndexOf(elem.Symbol as Grammars.Virtual));
+					writer.Write((ushort)virtuals.IndexOf(elem.Symbol as Virtual));
 				}
-				else if (elem.Symbol is Grammars.Action)
+				else if (elem.Symbol is Action)
 				{
 					writer.Write((ushort)LROpCodeValues.SemanticAction);
-					writer.Write((ushort)actions.IndexOf(elem.Symbol as Grammars.Action));
+					writer.Write((ushort)actions.IndexOf(elem.Symbol as Action));
 				}
 				else if (pop >= length)
 				{
 					// Here the symbol must be a variable
-					ushort index = (ushort)variables.IndexOf(elem.Symbol as Grammars.Variable);
-					if (elem.Action == Hime.Redist.TreeAction.Drop)
+					ushort index = (ushort)variables.IndexOf(elem.Symbol as Variable);
+					if (elem.Action == TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.AddNullVariableDrop);
-					else if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.AddNullVariablePromote);
 					else
 						writer.Write((ushort)LROpCodeValues.AddNullVariableNoAction);
@@ -334,9 +337,9 @@ namespace Hime.SDK.Output
 				}
 				else
 				{
-					if (elem.Action == Hime.Redist.TreeAction.Drop)
+					if (elem.Action == TreeAction.Drop)
 						writer.Write((ushort)LROpCodeValues.PopStackDrop);
-					else if (elem.Action == Hime.Redist.TreeAction.Promote)
+					else if (elem.Action == TreeAction.Promote)
 						writer.Write((ushort)LROpCodeValues.PopStackPromote);
 					else
 						writer.Write((ushort)LROpCodeValues.PopStackNoAction);

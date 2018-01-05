@@ -15,7 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Hime.SDK.Output
@@ -52,10 +54,10 @@ namespace Hime.SDK.Output
 		{
 			get
 			{
-				System.PlatformID platform = System.Environment.OSVersion.Platform;
-				if (platform == System.PlatformID.MacOSX)
+				PlatformID platform = Environment.OSVersion.Platform;
+				if (platform == PlatformID.MacOSX)
 					return ".dylib";
-				if (platform == System.PlatformID.Unix)
+				if (platform == PlatformID.Unix)
 					return ".so";
 				return ".dll";
 			}
@@ -220,7 +222,7 @@ namespace Hime.SDK.Output
 		private static Module CreateModuleFor(string origin, Unit unit)
 		{
 			string current = origin;
-			string[] parts = GetModuleName(unit).Split(new[] { "::" }, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] parts = GetModuleName(unit).Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
 			for (int i = 0; i != parts.Length - 1; i++)
 			{
 				string target = Path.Combine(current, parts[i]);
@@ -288,7 +290,7 @@ namespace Hime.SDK.Output
 		private bool ExecuteCommandCargo(string verb, string arguments)
 		{
 			reporter.Info("Executing command " + verb + " " + arguments);
-			System.Diagnostics.Process process = new System.Diagnostics.Process();
+			Process process = new Process();
 			process.StartInfo.FileName = verb;
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;

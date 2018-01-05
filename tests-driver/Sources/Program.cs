@@ -17,13 +17,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Hime.CLI;
 using Hime.Redist;
 using Hime.SDK;
+using Hime.SDK.Grammars;
+using Hime.SDK.Input;
 using Hime.SDK.Output;
 
 namespace Hime.Tests.Driver
@@ -134,13 +138,13 @@ namespace Hime.Tests.Driver
 					units.Add(test.GetUnit(fixture.Name));
 
 			// build the unit for the expected trees
-			System.IO.Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
-			System.IO.Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
+			Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
+			Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
 			loader.AddInputRaw(stream1);
 			loader.AddInputRaw(stream2);
-			List<Hime.SDK.Grammars.Grammar> grammars = loader.Load();
-			foreach (Hime.SDK.Grammars.Grammar grammar in grammars)
+			List<Grammar> grammars = loader.Load();
+			foreach (Grammar grammar in grammars)
 			{
 				if (grammar.Name == "ExpectedTree")
 				{
@@ -179,7 +183,7 @@ namespace Hime.Tests.Driver
 			doc.AppendChild(aggregated.child);
 
 			// export document
-			XmlTextWriter writer = new XmlTextWriter("TestResults.xml", System.Text.Encoding.UTF8);
+			XmlTextWriter writer = new XmlTextWriter("TestResults.xml", Encoding.UTF8);
 			writer.Formatting = Formatting.Indented;
 			writer.Indentation = 1;
 			writer.IndentChar = '\t';
@@ -218,7 +222,7 @@ namespace Hime.Tests.Driver
 			root.Attributes["tests"].Value = (aggregated.passed + aggregated.errors + aggregated.failed).ToString();
 			root.Attributes["failures"].Value = aggregated.failed.ToString();
 			root.Attributes["errors"].Value = aggregated.errors.ToString();
-			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+			root.Attributes["time"].Value = aggregated.spent.TotalSeconds.ToString(CultureInfo.InvariantCulture);
 
 			return aggregated;
 		}
@@ -228,7 +232,7 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		private static void PrintHelp()
 		{
-			Console.WriteLine("driver " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
+			Console.WriteLine("driver " + Assembly.GetExecutingAssembly().GetName().Version + " (LGPL 3)");
 			Console.WriteLine("Tests driver for the multiplatform tests of the Hime parser generator");
 			Console.WriteLine();
 			Console.WriteLine("usage: mono driver.exe --targets <NAMES> [--filter REGEXP]");
