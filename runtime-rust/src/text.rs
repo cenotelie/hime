@@ -307,11 +307,22 @@ struct Utf16IteratorOverUtf8<'a> {
     next: Option<Utf16C>
 }
 
+impl<'a> Utf16IteratorOverUtf8<'a> {
+    /// Reads the input into the buffer
+    fn read(input: &mut Read, buffer: &mut[u8]) -> usize {
+        let read = input.read(buffer);
+        match read {
+            Err(e) => panic!("{}", e),
+            Ok(size) => size
+        }
+    }
+}
+
 impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
     type Item = Utf16C;
     fn next(&mut self) -> Option<Self::Item> {
         // do we have a cached
-        if !self.next.is_none() {
+        if self.next.is_some() {
             let result = self.next;
             self.next = None;
             return result;
@@ -319,8 +330,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
         // read the next byte
         let mut bytes: [u8; 1] = [0; 1];
         {
-            let read = self.input.read(&mut bytes);
-            if read.is_err() || read.unwrap() < 3 {
+            if Utf16IteratorOverUtf8::read(&mut self.input, &mut bytes) == 0 {
                 return None;
             }
         }
@@ -330,8 +340,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
             _ if b0 >> 3 == 0b11110 => {
                 // this is 4 bytes encoding
                 let mut others: [u8; 3] = [0; 3];
-                let read = self.input.read(&mut others);
-                if read.is_err() || read.unwrap() < 3 {
+                if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 3 {
                     return None;
                 }
                 ((b0 as u32) & 0b00000111) << 18 | ((others[0] as u32) & 0b00111111) << 12
@@ -341,8 +350,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
             _ if b0 >> 4 == 0b1110 => {
                 // this is a 3 bytes encoding
                 let mut others: [u8; 2] = [0; 2];
-                let read = self.input.read(&mut others);
-                if read.is_err() || read.unwrap() < 2 {
+                if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 2 {
                     return None;
                 }
                 ((b0 as u32) & 0b00001111) << 12 | ((others[1] as u32) & 0b00111111) << 6
@@ -350,8 +358,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
             }
             _ if b0 >> 5 == 0b110 => {
                 // this is a 2 bytes encoding
-                let read = self.input.read(&mut bytes);
-                if read.is_err() || read.unwrap() < 1 {
+                if Utf16IteratorOverUtf8::read(&mut self.input, &mut bytes) < 1 {
                     return None;
                 }
                 ((b0 as u32) & 0b00011111) << 6 | ((bytes[0] as u32) & 0b00111111)

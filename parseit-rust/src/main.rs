@@ -40,36 +40,25 @@ fn main() {
         print_help();
         return;
     }
-    let result = do_parse(&args[0], &args[1]);
-    match result {
-        None => (),
-        Some(x) => {
-            let mut text = String::new();
-            serialize_result(&mut text, x);
-            println!("{}", text);
-        }
-    }
+    let mut input = io::stdin();
+    let text = do_parse(&mut input, &args[0], &args[1]);
+    println!("{}", text);
 }
 
 /// Parses the input
-fn do_parse(lib_name: &str, parser_module: &str) -> Option<ParseResult> {
+fn do_parse(input: &mut io::Read, lib_name: &str, parser_module: &str) -> String {
     let mut function_name = String::new();
     function_name.push_str(parser_module);
     function_name.push_str("::parse_utf8");
-    let lib_result = libloading::Library::new(lib_name);
-    if lib_result.is_err() {
-        return None;
-    }
-    let lib = lib_result.unwrap();
-    let mut input = io::stdin();
+    let library = libloading::Library::new(lib_name).unwrap_or_else(|error| panic!("{}", error));
     unsafe {
-        let maybe_func: io::Result<
-            libloading::Symbol<unsafe extern "C" fn(&mut io::Read) -> ParseResult>,
-        > = lib.get(function_name.as_bytes());
-        match maybe_func {
-            Err(_x) => None,
-            Ok(parser) => Some(parser(&mut input)),
-        }
+        let parser: libloading::Symbol<unsafe fn(&mut io::Read) -> ParseResult> = library
+            .get(function_name.as_bytes())
+            .unwrap_or_else(|error| panic!("{}", error));
+        let result = parser(input);
+        let mut text = String::new();
+        serialize_result(&mut text, result);
+        text
     }
 }
 
