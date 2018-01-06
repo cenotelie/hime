@@ -16,7 +16,9 @@
  ******************************************************************************/
 
 using System;
+using System.IO;
 using System.Reflection;
+using System.Text;
 
 using Hime.Redist;
 
@@ -83,8 +85,8 @@ namespace Hime.Tests.Executor
 		/// <returns>The test result</returns>
 		public int Execute(string parserName, string verb)
 		{
-			byte[] buffer = System.IO.File.ReadAllBytes("input.txt");
-			string input = new string(System.Text.Encoding.UTF8.GetChars(buffer));
+			byte[] buffer = File.ReadAllBytes("input.txt");
+			string input = new string(Encoding.UTF8.GetChars(buffer));
 			Hime.Redist.Parsers.BaseLRParser parser = GetParser(parserName, input);
 			switch (verb)
 			{
@@ -106,7 +108,7 @@ namespace Hime.Tests.Executor
 		/// <returns>The expected AST, or null if an error occurred</returns>
 		private static ASTNode? GetExpectedAST()
 		{
-			string expectedText = System.IO.File.ReadAllText("expected.txt", System.Text.Encoding.UTF8);
+			string expectedText = File.ReadAllText("expected.txt", Encoding.UTF8);
 			Hime.Redist.Parsers.BaseLRParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
 			ParseResult result = expectedParser.Parse();
 			foreach (ParseError error in result.Errors)
@@ -125,7 +127,7 @@ namespace Hime.Tests.Executor
 		/// <returns>The expected output lines</returns>
 		private static string[] GetExpectedOutput()
 		{
-			return System.IO.File.ReadAllLines("expected.txt", System.Text.Encoding.UTF8);
+			return File.ReadAllLines("expected.txt", Encoding.UTF8);
 		}
 
 		/// <summary>
@@ -328,7 +330,7 @@ namespace Hime.Tests.Executor
 		/// <returns>The parser</returns>
 		private static Hime.Redist.Parsers.BaseLRParser GetParser(string parserName, string input)
 		{
-			Assembly assembly = Assembly.LoadFile(System.IO.Path.GetFullPath("Parsers.dll"));
+			Assembly assembly = Assembly.LoadFile(Path.GetFullPath("Parsers.dll"));
 			Type parserType = assembly.GetType(parserName);
 			ConstructorInfo parserCtor = parserType.GetConstructors()[0];
 			ParameterInfo[] parameters = parserCtor.GetParameters();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2018 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -52,7 +52,7 @@ fn do_parse(input: &mut io::Read, lib_name: &str, parser_module: &str) -> String
     function_name.push_str("::parse_utf8");
     let library = libloading::Library::new(lib_name).unwrap_or_else(|error| panic!("{}", error));
     unsafe {
-        let parser: libloading::Symbol<unsafe fn(&mut io::Read) -> ParseResult> = library
+        let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
             .get(function_name.as_bytes())
             .unwrap_or_else(|error| panic!("{}", error));
         let result = parser(input);

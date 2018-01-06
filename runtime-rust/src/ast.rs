@@ -135,6 +135,11 @@ impl AstImpl {
             root: None
         }
     }
+
+    /// Gets whether a root has been defined for this AST
+    pub fn has_root(&self) -> bool {
+        self.root.is_some()
+    }
 }
 
 /// Represents a simple AST with a tree structure
@@ -197,6 +202,11 @@ impl<'a> Ast<'a> {
     /// Gets the grammar virtuals for this AST
     pub fn get_virtuals(&self) -> &'static [Symbol] {
         &self.virtuals
+    }
+
+    /// Gets whether a root has been defined for this AST
+    pub fn has_root(&self) -> bool {
+        self.data.get().has_root()
     }
 
     /// Gets the root node of this tree

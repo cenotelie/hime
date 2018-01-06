@@ -516,9 +516,7 @@ namespace Hime.SDK
 			if (outputNamespace != null)
 				return outputNamespace;
 			string value = grammar.GetOption(Grammar.OPTION_NAMESPACE);
-			if (value != null)
-				return value;
-			return grammar.Name;
+			return value;
 		}
 
 		/// <summary>

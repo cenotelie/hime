@@ -309,7 +309,7 @@ struct Utf16IteratorOverUtf8<'a> {
 
 impl<'a> Utf16IteratorOverUtf8<'a> {
     /// Reads the input into the buffer
-    fn read(input: &mut Read, buffer: &mut[u8]) -> usize {
+    fn read(input: &mut Read, buffer: &mut [u8]) -> usize {
         let read = input.read(buffer);
         match read {
             Err(e) => panic!("{}", e),

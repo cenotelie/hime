@@ -77,8 +77,14 @@ impl<'a> ParseResult {
         self.virtuals
     }
 
+    /// Gets the input text for this result
     pub fn get_input(&self) -> &Text {
         &self.text
+    }
+
+    /// Gets whether this result denotes a successful parsing
+    pub fn is_success(&self) -> bool {
+        self.ast.has_root()
     }
 
     /// Gets the collection of errors
