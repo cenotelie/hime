@@ -171,6 +171,9 @@ namespace Hime.Tests.Driver
 					case Runtime.Java:
 						results.Add(runtime, ExecuteOnJava(reporter, fixture));
 						break;
+					case Runtime.Rust:
+						results.Add(runtime, ExecuteOnRust(reporter, fixture));
+						break;
 				}
 			}
 		}
@@ -242,6 +245,48 @@ namespace Hime.Tests.Driver
 				args.Append(" ");
 				args.Append(verb);
 				code = ExecuteCommand(reporter, "java", args.ToString(), output);
+			}
+			catch (Exception ex)
+			{
+				output.Add(ex.ToString());
+			}
+			result.Finish(code, output);
+			switch (code)
+			{
+				case TestResult.RESULT_SUCCESS:
+					reporter.Info("\t=> Success");
+					break;
+				case TestResult.RESULT_FAILURE_PARSING:
+					reporter.Info("\t=> Error");
+					break;
+				case TestResult.RESULT_FAILURE_VERB:
+					reporter.Info("\t=> Failure");
+					break;
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// Executes this test on the Rust runtime
+		/// </summary>
+		/// <param name="reporter">The reported to use</param>
+		/// <param name="fixture">The parent fixture's name</param>
+		/// <returns>The test result</returns>
+		private TestResult ExecuteOnRust(Reporter reporter, string fixture)
+		{
+			TestResult result = new TestResult();
+			List<string> output = new List<string>();
+			int code = TestResult.RESULT_FAILURE_PARSING;
+			try
+			{
+				StringBuilder args = new StringBuilder("hime::tests::generated::");
+				args.Append(Helper.GetNamespacePartForRust(fixture));
+				args.Append("::");
+				args.Append(Helper.GetNamespacePartForRust(Name));
+				// add verb argument
+				args.Append(" ");
+				args.Append(verb);
+				code = ExecuteCommand(reporter, "executor-rust", args.ToString(), output);
 			}
 			catch (Exception ex)
 			{

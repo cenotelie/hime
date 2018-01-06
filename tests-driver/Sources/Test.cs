@@ -74,6 +74,8 @@ namespace Hime.Tests.Driver
 		{
 			reporter.Info("Executing command: " + command + " " + arguments);
 			Process process = new Process();
+			// inject useful environment variables
+			process.StartInfo.EnvironmentVariables.Add("RUST_BACKTRACE", "1");
 			process.StartInfo.FileName = command;
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;

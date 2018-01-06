@@ -118,20 +118,20 @@ namespace Hime.SDK.Output
 			{
 				string name = Helper.GetSymbolNameForRust(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
-					name += Helper.VIRTUAL_SUFFIX.ToUpper();
+					name += Helper.VIRTUAL_SUFFIX.ToUpperInvariant();
 				nameVirtuals.Add(var, name);
 			}
 
 			foreach (KeyValuePair<Variable, string> pair in nameVariables)
 			{
 				stream.WriteLine("/// The unique identifier for variable " + pair.Key.Name);
-				stream.WriteLine("pub const {0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("pub const ID_VARIABLE_{0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
 			stream.WriteLine();
 			foreach (KeyValuePair<Virtual, string> pair in nameVirtuals)
 			{
 				stream.WriteLine("/// The unique identifier for virtual " + pair.Key.Name);
-				stream.WriteLine("pub const {0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("pub const ID_VIRTUAL_{0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
 			}
 			stream.WriteLine();
 		}

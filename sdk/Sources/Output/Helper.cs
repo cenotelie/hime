@@ -75,8 +75,7 @@ namespace Hime.SDK.Output
 		/// <returns>The sanitized name of the symbol</returns>
 		public static string GetSymbolNameForRust(string name)
 		{
-			string result = RemoveSpecials(name);
-			return "ID_" + result.ToUpper();
+			return RemoveSpecials(name.ToUpperInvariant());
 		}
 
 		/// <summary>

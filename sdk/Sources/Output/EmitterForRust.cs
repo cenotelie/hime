@@ -232,7 +232,7 @@ namespace Hime.SDK.Output
 					Directory.CreateDirectory(target);
 					// Register the module
 					string file = i == 0 ? "lib.rs" : "mod.rs";
-					File.AppendAllText(Path.Combine(target, file), "pub mod " + parts[i] + ";\n");
+					File.AppendAllText(Path.Combine(current, file), "pub mod " + parts[i] + ";\n");
 					// Creates the module file
 					File.Create(Path.Combine(target, "mod.rs")).Close();
 				}
@@ -263,6 +263,7 @@ namespace Hime.SDK.Output
 			StreamWriter writer = new StreamWriter(lib);
 			writer.WriteLine("//! Generated parsers");
 			writer.WriteLine("extern crate hime_redist;");
+			writer.WriteLine();
 			writer.Flush();
 			lib.Close();
 			foreach (Unit unit in units)

@@ -24,6 +24,7 @@ use std::env;
 use std::fs;
 use std::io;
 use std::io::Read;
+use std::path;
 use std::process;
 
 use hime_redist::ast::AstNode;
@@ -51,9 +52,31 @@ const RESULT_FAILURE_PARSING: i32 = 2;
 /// Main entry point
 fn main() {
     let args = read_args();
-    let library = libloading::Library::new("Parsers").unwrap_or_else(|error| panic!("{}", error));
+    let exe_path = env::current_exe().unwrap_or_else(|error| panic!("{}", error));
+    let my_path = exe_path.parent().unwrap();
+    let library_name = get_parser_library_name(my_path);
+    let library =
+        libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
     let result = execute(&library, &args[0], &args[1]);
     process::exit(result);
+}
+
+/// Gets the name of the shared parser library
+#[cfg(any(linux, unix))]
+fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
+    my_path.join("Parsers.so")
+}
+
+/// Gets the name of the shared parser library
+#[cfg(macos)]
+fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
+    my_path.join("Parsers.dylib")
+}
+
+/// Gets the name of the shared parser library
+#[cfg(windows)]
+fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
+    my_path.join("Parsers.dll")
 }
 
 /// Reads the arguments
