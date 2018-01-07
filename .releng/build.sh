@@ -39,9 +39,6 @@ echo "   => OK"
 echo "-- Building Hime.Redist --"
 dotnet restore "$ROOT/runtime-net"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/runtime-net" -c Release)
-echo "-- Building Hime.CLI --"
-dotnet restore "$ROOT/cli"
-(export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/cli" -c Release)
 echo "-- Building Hime.SDK --"
 dotnet restore "$ROOT/sdk"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/sdk" -c Release)
@@ -67,7 +64,6 @@ cargo build --release --manifest-path "$ROOT/tests-executor-rust/Cargo.toml"
 rm -rf "$ROOT/tests-results"
 mkdir "$ROOT/tests-results"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.Redist.dll" "$ROOT/tests-results/Hime.Redist.dll"
-cp "$ROOT/tests-driver/bin/Release/net461/Hime.CLI.dll" "$ROOT/tests-results/Hime.CLI.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/Hime.SDK.dll" "$ROOT/tests-results/Hime.SDK.dll"
 cp "$ROOT/tests-driver/bin/Release/net461/driver.exe" "$ROOT/tests-results/driver.exe"
 cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor-net.exe"
@@ -76,7 +72,7 @@ cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
 cp "$ROOT/tests-executor-rust/target/release/tests_executor_rust" "$ROOT/tests-results/executor-rust"
 # Execute the tests
 cd "$ROOT/tests-results"
-mono driver.exe --targets Net Java Rust
+mono driver.exe
 cd "$ROOT"
 # Cleanup the tests
 mv "$ROOT/tests-results/TestResults.xml" "$ROOT/TestResults.xml"

@@ -84,8 +84,7 @@ namespace Hime.Tests.Driver
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
 		/// <param name="name">The fixture's name</param>
-		/// <param name="filter">The filter for the tests to execute</param>
-		public Fixture(Reporter reporter, string name, Regex filter)
+		public Fixture(Reporter reporter, string name)
 		{
 			reporter.Info("Loading fixture " + name);
 			Stream stream = typeof(Program).Assembly.GetManifestResourceStream(name);
@@ -111,8 +110,7 @@ namespace Hime.Tests.Driver
 						test = new ParsingTest(testNode, result.Input);
 						break;
 				}
-				if (filter.IsMatch(name + "." + test.Name))
-					tests.Add(test);
+				tests.Add(test);
 			}
 		}
 
@@ -120,11 +118,10 @@ namespace Hime.Tests.Driver
 		/// Executes this fixture
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
-		/// <param name="targets">The targets to execute on</param>
-		public void Execute(Reporter reporter, List<Runtime> targets)
+		public void Execute(Reporter reporter)
 		{
 			foreach (Test test in tests)
-				test.Execute(reporter, targets, name);
+				test.Execute(reporter, name);
 		}
 
 		/// <summary>

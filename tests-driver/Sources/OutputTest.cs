@@ -78,9 +78,8 @@ namespace Hime.Tests.Driver
 		/// Executes this test
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
-		/// <param name="targets">The targets to execute on</param>
 		/// <param name="fixture">The parent fixture's name</param>
-		public override void Execute(Reporter reporter, List<Runtime> targets, string fixture)
+		public override void Execute(Reporter reporter, string fixture)
 		{
 			// Export input
 			string inputValue = node.Children[3].Value;
@@ -97,21 +96,9 @@ namespace Hime.Tests.Driver
 			}
 			File.WriteAllLines("expected.txt", expected, new UTF8Encoding(false));
 			// Execute for each runtime
-			foreach (Runtime runtime in targets)
-			{
-				switch (runtime)
-				{
-					case Runtime.Net:
-						results.Add(runtime, ExecuteOnNet(reporter, fixture));
-						break;
-					case Runtime.Java:
-						results.Add(runtime, ExecuteOnJava(reporter, fixture));
-						break;
-					case Runtime.Rust:
-						results.Add(runtime, ExecuteOnRust(reporter, fixture));
-						break;
-				}
-			}
+			results.Add(Runtime.Net, ExecuteOnNet(reporter, fixture));
+			results.Add(Runtime.Java, ExecuteOnJava(reporter, fixture));
+			results.Add(Runtime.Rust, ExecuteOnRust(reporter, fixture));
 		}
 
 		/// <summary>

@@ -48,9 +48,6 @@ ECHO -- Building Hime.Redist --
 dotnet restore "%ROOT%\runtime-net"
 SET "FrameworkPathOverride=%MONO20%"
 dotnet build "%ROOT%\runtime-net" -c Release
-ECHO -- Building Hime.CLI --
-dotnet restore "%ROOT%\cli"
-dotnet build "%ROOT%\cli" -c Release
 ECHO -- Building Hime.SDK --
 dotnet restore "%ROOT%\sdk"
 dotnet build "%ROOT%\sdk" -c Release
@@ -79,7 +76,6 @@ REM Setup the test components
 RMDIR /S /Q "%ROOT%\tests-results"
 MKDIR "%ROOT%\tests-results"
 COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.Redist.dll" "%ROOT%\tests-results\Hime.Redist.dll"
-COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.CLI.dll" "%ROOT%\tests-results\Hime.CLI.dll"
 COPY /B "%ROOT%\tests-driver\bin\Release\net461\Hime.SDK.dll" "%ROOT%\tests-results\Hime.SDK.dll"
 COPY /B "%ROOT%\tests-driver\bin\Release\net461\driver.exe" "%ROOT%\tests-results\driver.exe"
 COPY /B "%ROOT%\tests-executor-net\bin\Release\net461\executor.exe" "%ROOT%\tests-results\executor-net.exe"
@@ -88,7 +84,7 @@ COPY /B %ROOT%\tests-executor-java\target\dependency\*.jar "%ROOT%\tests-results
 COPY /B "%ROOT%\tests-executor-rust\target\release\tests_executor_rust.exe" "%ROOT%\tests-results\executor-rust.exe"
 REM Execute the tests
 CD "%ROOT%/tests-results"
-driver.exe --targets Net Java Rust
+driver.exe
 CD "%ROOT%"
 REM Cleanup the tests
 MOVE "%ROOT%\tests-results\TestResults.xml" "%ROOT%\TestResults.xml"

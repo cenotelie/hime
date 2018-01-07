@@ -58,9 +58,8 @@ namespace Hime.Tests.Driver
 		/// Executes this test
 		/// </summary>
 		/// <param name="reporter">The reported to use</param>
-		/// <param name="targets">The targets to execute on</param>
 		/// <param name="fixture">The parent fixture's name</param>
-		public abstract void Execute(Reporter reporter, List<Runtime> targets, string fixture);
+		public abstract void Execute(Reporter reporter, string fixture);
 
 		/// <summary>
 		/// Executes the specified command
