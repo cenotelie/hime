@@ -57,8 +57,19 @@ fn main() {
     let library_name = get_parser_library_name(my_path);
     let library =
         libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
-    let result = execute(&library, &args[0], &args[1]);
+    let result = execute(my_path, &library, &args[0], &args[1]);
     process::exit(result);
+}
+
+#[test]
+fn test_single() {
+    let test_name = "hime::tests::generated::errors::test_position_lineendings_windows";
+    let verb = VERB_OUTPUTS;
+    let my_path = path::Path::new("/home/laurent/dev/hime-main/tests-results");
+    let library_name = get_parser_library_name(my_path);
+    let library =
+        libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
+    let result = execute(my_path, &library, test_name, verb);
 }
 
 /// Gets the name of the shared parser library
@@ -91,8 +102,9 @@ fn read_args() -> Vec<String> {
 }
 
 /// Gets the serialized expected AST
-fn get_expected_ast(library: &libloading::Library) -> ParseResult {
-    let file_input = fs::File::open("expected.txt").unwrap_or_else(|error| panic!("{}", error));
+fn get_expected_ast(my_path: &path::Path, library: &libloading::Library) -> ParseResult {
+    let file = my_path.join("expected.txt");
+    let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
@@ -103,8 +115,9 @@ fn get_expected_ast(library: &libloading::Library) -> ParseResult {
 }
 
 /// Gets the serialized expected output
-fn get_expected_output() -> String {
-    let file_input = fs::File::open("expected.txt").unwrap_or_else(|error| panic!("{}", error));
+fn get_expected_output(my_path: &path::Path) -> String {
+    let file = my_path.join("expected.txt");
+    let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     let mut result = String::new();
     let _length = input_reader
@@ -114,11 +127,16 @@ fn get_expected_output() -> String {
 }
 
 /// Gets the parsed input
-fn get_parsed_input(library: &libloading::Library, parser_name: &str) -> ParseResult {
+fn get_parsed_input(
+    my_path: &path::Path,
+    library: &libloading::Library,
+    parser_name: &str
+) -> ParseResult {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
     function_name.push_str("::parse_utf8");
-    let file_input = fs::File::open("input.txt").unwrap_or_else(|error| panic!("{}", error));
+    let file = my_path.join("input.txt");
+    let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
@@ -129,24 +147,33 @@ fn get_parsed_input(library: &libloading::Library, parser_name: &str) -> ParseRe
 }
 
 /// Executes the specified test
-fn execute(library: &libloading::Library, parser_name: &str, verb: &str) -> i32 {
+fn execute(
+    my_path: &path::Path,
+    library: &libloading::Library,
+    parser_name: &str,
+    verb: &str
+) -> i32 {
     match verb {
-        VERB_MATCHES => execute_test_matches(library, parser_name),
-        VERB_NOMATCHES => execute_test_no_matches(library, parser_name),
-        VERB_FAILS => execute_test_fails(library, parser_name),
-        VERB_OUTPUTS => execute_test_outputs(library, parser_name),
+        VERB_MATCHES => execute_test_matches(my_path, library, parser_name),
+        VERB_NOMATCHES => execute_test_no_matches(my_path, library, parser_name),
+        VERB_FAILS => execute_test_fails(my_path, library, parser_name),
+        VERB_OUTPUTS => execute_test_outputs(my_path, library, parser_name),
         _ => RESULT_FAILURE_PARSING
     }
 }
 
 /// Executes the test as a parsing test with a matching condition
-fn execute_test_matches(library: &libloading::Library, parser_name: &str) -> i32 {
-    let expected = get_expected_ast(library);
+fn execute_test_matches(
+    my_path: &path::Path,
+    library: &libloading::Library,
+    parser_name: &str
+) -> i32 {
+    let expected = get_expected_ast(my_path, library);
     if expected.get_errors().get_count() > 0 {
         println!("Failed to parse the expected AST");
         return RESULT_FAILURE_PARSING;
     }
-    let real_result = get_parsed_input(library, parser_name);
+    let real_result = get_parsed_input(my_path, library, parser_name);
     for error in real_result.get_errors().iter() {
         println!("{}", error.get_message());
         let context = real_result.get_input().get_context_at(error.get_position());
@@ -173,13 +200,17 @@ fn execute_test_matches(library: &libloading::Library, parser_name: &str) -> i32
 }
 
 /// Executes the test as a parsing test with a non-matching condition
-fn execute_test_no_matches(library: &libloading::Library, parser_name: &str) -> i32 {
-    let expected = get_expected_ast(library);
+fn execute_test_no_matches(
+    my_path: &path::Path,
+    library: &libloading::Library,
+    parser_name: &str
+) -> i32 {
+    let expected = get_expected_ast(my_path, library);
     if expected.get_errors().get_count() > 0 {
         println!("Failed to parse the expected AST");
         return RESULT_FAILURE_PARSING;
     }
-    let real_result = get_parsed_input(library, parser_name);
+    let real_result = get_parsed_input(my_path, library, parser_name);
     for error in real_result.get_errors().iter() {
         println!("{}", error.get_message());
         let context = real_result.get_input().get_context_at(error.get_position());
@@ -206,8 +237,12 @@ fn execute_test_no_matches(library: &libloading::Library, parser_name: &str) -> 
 }
 
 /// Executes the test as a parsing test with a failing condition
-fn execute_test_fails(library: &libloading::Library, parser_name: &str) -> i32 {
-    let real_result = get_parsed_input(library, parser_name);
+fn execute_test_fails(
+    my_path: &path::Path,
+    library: &libloading::Library,
+    parser_name: &str
+) -> i32 {
+    let real_result = get_parsed_input(my_path, library, parser_name);
     if !real_result.is_success() {
         return RESULT_SUCCESS;
     }
@@ -219,10 +254,14 @@ fn execute_test_fails(library: &libloading::Library, parser_name: &str) -> i32 {
 }
 
 /// Executes the test as an output test
-fn execute_test_outputs(library: &libloading::Library, parser_name: &str) -> i32 {
-    let output = get_expected_output();
+fn execute_test_outputs(
+    my_path: &path::Path,
+    library: &libloading::Library,
+    parser_name: &str
+) -> i32 {
+    let output = get_expected_output(my_path);
     let expected_lines: Vec<&str> = output.split("\n").collect();
-    let real_result = get_parsed_input(library, parser_name);
+    let real_result = get_parsed_input(my_path, library, parser_name);
     if expected_lines.is_empty() || (expected_lines.len() == 1 && expected_lines[0].len() == 0) {
         // expect empty output
         if real_result.is_success() && real_result.get_errors().get_count() == 0 {

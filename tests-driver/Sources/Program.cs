@@ -68,15 +68,47 @@ namespace Hime.Tests.Driver
 			foreach (string resource in resources)
 				if (resource.StartsWith("Hime.Tests.Driver.Resources.Suites."))
 					fixtures.Add(new Fixture(reporter, resource));
-			// Builds the test parsers
-			BuildTestParsers();
-			if (args.Length == 1 && args[0] == "--no-exec")
+
+			if (args.Length == 1 && args[0] == "--build")
+			{
+				// build only, stop here
+				BuildTestParsers();
 				return;
-			// Execute the tests
-			foreach (Fixture fixture in fixtures)
-				fixture.Execute(reporter);
-			// Export the test report
-			ExportReport();
+			}
+			else if (args.Length == 2 && args[0] == "--prepare")
+			{
+				// assume tests are already built
+				// prepare the input and output of a specific test
+				string[] parts = args[1].Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+				if (parts.Length == 2)
+				{
+					// prepare the test
+					foreach (Fixture fixture in fixtures)
+					{
+						if (fixture.Name == parts[0])
+						{
+							foreach (Test test in fixture.Tests)
+							{
+								if (test.Name == parts[1])
+								{
+									test.Execute(reporter, fixture.Name);
+									return;
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				// Build and execute all tests
+				BuildTestParsers();
+				// Execute the tests
+				foreach (Fixture fixture in fixtures)
+					fixture.Execute(reporter);
+				// Export the test report
+				ExportReport();
+			}
 		}
 
 		/// <summary>
