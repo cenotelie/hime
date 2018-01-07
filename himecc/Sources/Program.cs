@@ -18,7 +18,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Hime.CLI;
 using Hime.Redist;
 using Hime.SDK;
 using Hime.SDK.Output;

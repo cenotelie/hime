@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Hime.Redist;
 using Hime.Redist.Parsers;
 
-namespace Hime.CLI
+namespace Hime.HimeCC
 {
 	/// <summary>
 	/// Represents a parser
