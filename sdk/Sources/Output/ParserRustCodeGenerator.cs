@@ -255,8 +255,8 @@ namespace Hime.SDK.Output
 				stream.WriteLine("    {");
 				stream.WriteLine("        let data = result.get_parsing_data();");
 				stream.WriteLine("        let mut lexer = new_lexer(data.0, data.1);");
-				stream.WriteLine("        let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
-				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, &mut my_actions);");
+				stream.WriteLine("        let automaton = " + automatonType + "::new(PARSER_AUTOMATON);");
+				stream.WriteLine("        let mut parser = " + parserType + "::new(&mut lexer, automaton, data.2, &mut my_actions);");
 				stream.WriteLine("        parser.parse();");
 				stream.WriteLine("    }");
 				stream.WriteLine("    result");
@@ -346,8 +346,8 @@ namespace Hime.SDK.Output
 				stream.WriteLine("    {");
 				stream.WriteLine("        let data = result.get_parsing_data();");
 				stream.WriteLine("        let mut lexer = new_lexer(data.0, data.1);");
-				stream.WriteLine("        let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
-				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, &mut my_actions);");
+				stream.WriteLine("        let automaton = " + automatonType + "::new(PARSER_AUTOMATON);");
+				stream.WriteLine("        let mut parser = " + parserType + "::new(&mut lexer, automaton, data.2, &mut my_actions);");
 				stream.WriteLine("        parser.parse();");
 				stream.WriteLine("    }");
 				stream.WriteLine("    result");

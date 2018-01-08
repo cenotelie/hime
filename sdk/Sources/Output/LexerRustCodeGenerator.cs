@@ -47,6 +47,10 @@ namespace Hime.SDK.Output
 		/// The separator terminal
 		/// </summary>
 		private readonly Terminal separator;
+		/// <summary>
+		/// Whether the lexer is associated to a RNGLR parser
+		/// </summary>
+		private readonly bool isParserRNGLR;
 
 		/// <summary>
 		/// Initializes this code generator
@@ -60,6 +64,7 @@ namespace Hime.SDK.Output
 			this.terminals = unit.Expected;
 			this.contexts = unit.Grammar.Contexts;
 			this.separator = unit.Separator;
+			this.isParserRNGLR = (unit.Method == ParsingMethod.RNGLR1 || unit.Method == ParsingMethod.RNGLALR1);
 		}
 
 		/// <summary>
@@ -81,8 +86,16 @@ namespace Hime.SDK.Output
 			writer.WriteLine("use hime_redist::lexers::automaton::Automaton;");
 			writer.WriteLine("use hime_redist::lexers::impls::" + baseLexer + ";");
 			writer.WriteLine("use hime_redist::parsers::Parser;");
-			writer.WriteLine("use hime_redist::parsers::lrk::LRkAutomaton;");
-			writer.WriteLine("use hime_redist::parsers::lrk::LRkParser;");
+			if (isParserRNGLR)
+			{
+				writer.WriteLine("use hime_redist::parsers::rnglr::RNGLRAutomaton;");
+				writer.WriteLine("use hime_redist::parsers::rnglr::RNGLRParser;");
+			}
+			else
+			{
+				writer.WriteLine("use hime_redist::parsers::lrk::LRkAutomaton;");
+				writer.WriteLine("use hime_redist::parsers::lrk::LRkParser;");
+			}
 			writer.WriteLine("use hime_redist::result::ParseResult;");
 			writer.WriteLine("use hime_redist::symbols::SemanticBody;");
 			writer.WriteLine("use hime_redist::symbols::Symbol;");

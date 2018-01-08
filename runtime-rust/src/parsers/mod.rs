@@ -19,6 +19,7 @@
 
 pub mod subtree;
 pub mod lrk;
+pub mod rnglr;
 
 use super::lexers::ContextProvider;
 use super::symbols::Symbol;
