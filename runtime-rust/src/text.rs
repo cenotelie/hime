@@ -177,12 +177,12 @@ impl Text {
 
     /// Gets the starting index of the i-th line
     pub fn get_line_index(&self, line: usize) -> usize {
-        self.lines[line]
+        self.lines[line - 1]
     }
 
     /// Gets the length of the i-th line
     pub fn get_line_length(&self, line: usize) -> usize {
-        if line == self.lines.len() - 1 {
+        if line == self.lines.len() {
             self.content.size() - self.lines[line - 1]
         } else {
             self.lines[line] - self.lines[line - 1]
@@ -243,7 +243,7 @@ impl Text {
 
         // build the pointer
         let mut pointer = String::new();
-        for i in start..(line_index + position.column) {
+        for i in start..(line_index + position.column - 1) {
             pointer.push(if self.content[i] == 0x0009 { '\t' } else { ' ' });
         }
         pointer.push('^');
@@ -345,7 +345,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 }
                 ((b0 as u32) & 0b00000111) << 18 | ((others[0] as u32) & 0b00111111) << 12
                     | ((others[1] as u32) & 0b00111111) << 6
-                    | ((others[0] as u32) & 0b00111111)
+                    | ((others[2] as u32) & 0b00111111)
             }
             _ if b0 >> 4 == 0b1110 => {
                 // this is a 3 bytes encoding
@@ -353,8 +353,8 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 2 {
                     return None;
                 }
-                ((b0 as u32) & 0b00001111) << 12 | ((others[1] as u32) & 0b00111111) << 6
-                    | ((others[0] as u32) & 0b00111111)
+                ((b0 as u32) & 0b00001111) << 12 | ((others[0] as u32) & 0b00111111) << 6
+                    | ((others[1] as u32) & 0b00111111)
             }
             _ if b0 >> 5 == 0b110 => {
                 // this is a 2 bytes encoding
@@ -474,4 +474,25 @@ fn test_text_lines() {
 fn test_text_substring() {
     let text = Text::new("this is\na new line");
     assert_eq!(utf16_to_string(&text.content, 8, 5), "a new");
+}
+
+#[test]
+fn test_read_utf8() {
+    let bytes: [u8; 13] = [
+        0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78
+    ];
+    let mut content = Vec::<Utf16C>::new();
+    let reader = &mut bytes.as_ref();
+    let iterator = Utf16IteratorOverUtf8::new(reader);
+    for c in iterator {
+        content.push(c);
+    }
+    assert_eq!(7, content.len());
+    assert_eq!(0x78, content[0]);
+    assert_eq!(0x2028, content[1]);
+    assert_eq!(0x2028, content[2]);
+    assert_eq!(0x78, content[3]);
+    assert_eq!(0x2028, content[4]);
+    assert_eq!(0x79, content[5]);
+    assert_eq!(0x78, content[6]);
 }

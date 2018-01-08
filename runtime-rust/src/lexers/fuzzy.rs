@@ -69,9 +69,9 @@ impl FuzzyMatcherHead {
             for i in 0..others.len() {
                 errors.push(others[i]);
             }
-            for _i in others.len()..distance {
-                errors.push(offset as u32);
-            }
+        }
+        while errors.len() < distance {
+            errors.push(offset as u32);
         }
         FuzzyMatcherHead {
             state,
@@ -241,7 +241,7 @@ impl<'a> FuzzyMatcher<'a> {
 
     /// Constructs the solution when succeeded to fix the error
     fn on_success(&mut self, result: &FuzzyMatcherResult) -> TokenMatch {
-        let mut last_error_index = self.max_distance + 1;
+        let mut last_error_index = result.match_length + 1;
         for i in 0..result.match_head.as_ref().unwrap().get_distance() {
             let error_index =
                 self.origin_index + result.match_head.as_ref().unwrap().get_error(i) as usize;

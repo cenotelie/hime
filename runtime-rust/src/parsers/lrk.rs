@@ -369,7 +369,7 @@ struct LRkHead {
     identifier: u32
 }
 
-struct LRkParserData<F: FnMut(usize, Symbol, &SemanticBody)> {
+struct LRkParserData<'a> {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
@@ -377,10 +377,10 @@ struct LRkParserData<F: FnMut(usize, Symbol, &SemanticBody)> {
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
-    actions: F
+    actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
 }
 
-impl<F: FnMut(usize, Symbol, &SemanticBody)> ContextProvider for LRkParserData<F> {
+impl<'a> ContextProvider for LRkParserData<'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -485,7 +485,7 @@ impl<F: FnMut(usize, Symbol, &SemanticBody)> ContextProvider for LRkParserData<F
     }
 }
 
-impl<F: FnMut(usize, Symbol, &SemanticBody)> LRkParserData<F> {
+impl<'a> LRkParserData<'a> {
     /// Checks whether the specified terminal is indeed expected for a reduction
     /// This check is required because in the case of a base LALR graph,
     /// some terminals expected for reduction in the automaton are coming from other paths.
@@ -556,7 +556,7 @@ impl<F: FnMut(usize, Symbol, &SemanticBody)> LRkParserData<F> {
     }
 
     /// Executes the given LR reduction
-    fn reduce(production: &LRProduction, builder: &mut LRkAstBuilder, actions: &mut F) -> Symbol {
+    fn reduce(production: &LRProduction, builder: &mut LRkAstBuilder, actions: &mut FnMut(usize, Symbol, &SemanticBody)) -> Symbol {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
             production.head,
@@ -589,21 +589,21 @@ impl<F: FnMut(usize, Symbol, &SemanticBody)> LRkParserData<F> {
 }
 
 /// Represents a base for all LR(k) parsers
-pub struct LRkParser<'l, F: FnMut(usize, Symbol, &SemanticBody)> {
+pub struct LRkParser<'l, 'a : 'l> {
     /// The parser's data
-    data: LRkParserData<F>,
+    data: LRkParserData<'a>,
     /// The AST builder
     builder: LRkAstBuilder<'l>
 }
 
-impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> LRkParser<'l, F> {
+impl<'l, 'a : 'l> LRkParser<'l, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
         lexer: &'l mut Lexer<'l>,
         automaton: LRkAutomaton,
         ast: Ast<'l>,
-        actions: F
-    ) -> LRkParser<'l, F> {
+        actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
+    ) -> LRkParser<'l, 'a> {
         let mut stack = Vec::<LRkHead>::new();
         stack.push(LRkHead {
             state: 0,
@@ -655,7 +655,7 @@ impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> LRkParser<'l, F> {
     }
 }
 
-impl<'l, F: FnMut(usize, Symbol, &SemanticBody)> Parser for LRkParser<'l, F> {
+impl<'l, 'a> Parser for LRkParser<'l, 'a> {
     fn parse(&mut self) {
         let mut kernel_maybe = self.get_next_token();
         loop {

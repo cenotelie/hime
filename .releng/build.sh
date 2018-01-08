@@ -72,7 +72,7 @@ cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
 cp "$ROOT/tests-executor-rust/target/release/tests_executor_rust" "$ROOT/tests-results/executor-rust"
 # Execute the tests
 cd "$ROOT/tests-results"
-mono driver.exe
+mono driver.exe --all
 cd "$ROOT"
 # Cleanup the tests
 mv "$ROOT/tests-results/TestResults.xml" "$ROOT/TestResults.xml"

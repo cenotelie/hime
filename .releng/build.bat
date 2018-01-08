@@ -84,7 +84,7 @@ COPY /B %ROOT%\tests-executor-java\target\dependency\*.jar "%ROOT%\tests-results
 COPY /B "%ROOT%\tests-executor-rust\target\release\tests_executor_rust.exe" "%ROOT%\tests-results\executor-rust.exe"
 REM Execute the tests
 CD "%ROOT%/tests-results"
-driver.exe
+driver.exe --all
 CD "%ROOT%"
 REM Cleanup the tests
 MOVE "%ROOT%\tests-results\TestResults.xml" "%ROOT%\TestResults.xml"

@@ -250,13 +250,13 @@ namespace Hime.SDK.Output
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
 				stream.WriteLine("fn parse_text(text: Text) -> ParseResult {");
-				stream.WriteLine("    let my_actions = |_index: usize, _head: Symbol, _body: &SemanticBody| ();");
+				stream.WriteLine("    let mut my_actions = |_index: usize, _head: Symbol, _body: &SemanticBody| ();");
 				stream.WriteLine("    let mut result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
 				stream.WriteLine("    {");
 				stream.WriteLine("        let data = result.get_parsing_data();");
 				stream.WriteLine("        let mut lexer = new_lexer(data.0, data.1);");
 				stream.WriteLine("        let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
-				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, my_actions);");
+				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, &mut my_actions);");
 				stream.WriteLine("        parser.parse();");
 				stream.WriteLine("    }");
 				stream.WriteLine("    result");
@@ -332,7 +332,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
 				stream.WriteLine("fn parse_text(text: Text, actions: &mut Actions) -> ParseResult {");
-				stream.WriteLine("    let my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
+				stream.WriteLine("    let mut my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
 				int i = 0;
 				foreach (Action action in grammar.Actions)
 				{
@@ -347,7 +347,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("        let data = result.get_parsing_data();");
 				stream.WriteLine("        let mut lexer = new_lexer(data.0, data.1);");
 				stream.WriteLine("        let automaton = LRkAutomaton::new(PARSER_AUTOMATON);");
-				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, my_actions);");
+				stream.WriteLine("        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, &mut my_actions);");
 				stream.WriteLine("        parser.parse();");
 				stream.WriteLine("    }");
 				stream.WriteLine("    result");

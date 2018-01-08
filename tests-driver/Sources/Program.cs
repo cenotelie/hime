@@ -69,40 +69,27 @@ namespace Hime.Tests.Driver
 				if (resource.StartsWith("Hime.Tests.Driver.Resources.Suites."))
 					fixtures.Add(new Fixture(reporter, resource));
 
-			if (args.Length == 1 && args[0] == "--build")
+			if (args.Length == 3 && args[0] == "--single")
 			{
-				// build only, stop here
-				BuildTestParsers();
-				return;
-			}
-			else if (args.Length == 2 && args[0] == "--prepare")
-			{
-				// assume tests are already built
-				// prepare the input and output of a specific test
-				string[] parts = args[1].Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-				if (parts.Length == 2)
+				// build a single test and execute
+				foreach (Fixture fixture in fixtures)
 				{
-					// prepare the test
-					foreach (Fixture fixture in fixtures)
+					if (fixture.Name != args[1])
+						continue;
+					foreach (Test test in fixture.Tests)
 					{
-						if (fixture.Name == parts[0])
-						{
-							foreach (Test test in fixture.Tests)
-							{
-								if (test.Name == parts[1])
-								{
-									test.Execute(reporter, fixture.Name);
-									return;
-								}
-							}
-						}
+						if (test.Name != args[2])
+							continue;
+						BuildTestParsers(args[1], args[2]);
+						test.Execute(reporter, fixture.Name);
+						return;
 					}
 				}
 			}
-			else
+			else if (args.Length == 1 && args[0] == "--all")
 			{
-				// Build and execute all tests
-				BuildTestParsers();
+				// Build all tests
+				BuildTestParsers(null, null);
 				// Execute the tests
 				foreach (Fixture fixture in fixtures)
 					fixture.Execute(reporter);
@@ -114,15 +101,12 @@ namespace Hime.Tests.Driver
 		/// <summary>
 		/// Builds the test parsers
 		/// </summary>
-		private void BuildTestParsers()
+		private void BuildTestParsers(string fixtureName, string testName)
 		{
 			// get all units from the tests
 			List<Unit> units = new List<Unit>();
-			foreach (Fixture fixture in fixtures)
-				foreach (Test test in fixture.Tests)
-					units.Add(test.GetUnit(fixture.Name));
 
-			// build the unit for the expected trees
+			// add the unit for the expected tree parser
 			Stream stream1 = typeof(Program).Assembly.GetManifestResourceStream("Hime.Tests.Driver.Resources.Fixture.gram");
 			Stream stream2 = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.SDK.Sources.Input.HimeGrammar.gram");
 			Hime.SDK.Input.Loader loader = new Hime.SDK.Input.Loader();
@@ -137,6 +121,21 @@ namespace Hime.Tests.Driver
 					break;
 				}
 			}
+
+			// add the unit for the parsers
+			foreach (Fixture fixture in fixtures)
+			{
+				if (fixtureName != null && fixture.Name != fixtureName)
+					continue;
+				foreach (Test test in fixture.Tests)
+				{
+					if (testName != null && test.Name != testName)
+						continue;
+					units.Add(test.GetUnit(fixture.Name));
+				}
+			}
+
+			// emit the artifacts
 			(new EmitterForNet(reporter, units)).Emit();
 			(new EmitterForJava(reporter, units)).Emit();
 			(new EmitterForRust(reporter, units, Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)), "runtime-rust"))).Emit();

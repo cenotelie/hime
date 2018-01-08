@@ -17,6 +17,8 @@
 
 //! Main module
 
+// Used for tests debugging
+// extern crate hime_generated;
 extern crate hime_redist;
 extern crate libloading;
 
@@ -108,7 +110,7 @@ fn get_expected_ast(my_path: &path::Path, library: &libloading::Library) -> Pars
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
-            .get(b"hime::tests::generated::expectedtreeparser::parse_utf8")
+            .get(b"hime::tests::generated::expectedtree::parse_utf8")
             .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
     }
@@ -260,7 +262,7 @@ fn execute_test_outputs(
     parser_name: &str
 ) -> i32 {
     let output = get_expected_output(my_path);
-    let expected_lines: Vec<&str> = output.split("\n").collect();
+    let expected_lines: Vec<&str> = find_lines_in(&output);
     let real_result = get_parsed_input(my_path, library, parser_name);
     if expected_lines.is_empty() || (expected_lines.len() == 1 && expected_lines[0].len() == 0) {
         // expect empty output
@@ -279,7 +281,7 @@ fn execute_test_outputs(
 
     let mut i = 0;
     for error in real_result.get_errors().iter() {
-        let message = error.get_message();
+        let message = format!("{}", error);
         let context = real_result.get_input().get_context_at(error.get_position());
         if i + 2 >= expected_lines.len() {
             println!("Unexpected error:");
@@ -381,6 +383,47 @@ fn unescape(value: String) -> String {
                 on_escape = false;
             }
         }
+    }
+    result
+}
+
+/// Determines whether [c1, c2] form a line ending sequence
+/// Recognized sequences are:
+/// [U+000D, U+000A] (this is Windows-style \r \n)
+/// [U+????, U+000A] (this is unix style \n)
+/// [U+000D, U+????] (this is MacOS style \r, without \n after)
+/// Others:
+/// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
+fn is_line_ending(c1: char, c2: char) -> bool {
+    (c2 == '\u{000B}' || c2 == '\u{000C}' || c2 == '\u{0085}' || c2 == '\u{2028}'
+        || c2 == '\u{2029}') || (c1 == '\u{000D}' || c2 == '\u{000A}')
+}
+
+/// Finds all the lines in this content
+fn find_lines_in(input: &str) -> Vec<&str> {
+    let mut result = Vec::<&str>::new();
+    let mut c1;
+    let mut c2: char = '\0';
+    let mut start = 0;
+    for (i, x) in input.chars().enumerate() {
+        c1 = c2;
+        c2 = x;
+        if is_line_ending(c1, c2) {
+            let end = if c1 == '\u{000D}' && c2 != '\u{000A}' {
+                i - 1
+            } else {
+                i
+            };
+            result.push(&input[start..end]);
+            start = end + (if c1 == '\u{000D}' && c2 == '\u{000A}' {
+                2
+            } else {
+                1
+            });
+        }
+    }
+    if input.len() > start {
+        result.push(&input[start..input.len()]);
     }
     result
 }
