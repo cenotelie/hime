@@ -556,7 +556,11 @@ impl<'a> LRkParserData<'a> {
     }
 
     /// Executes the given LR reduction
-    fn reduce(production: &LRProduction, builder: &mut LRkAstBuilder, actions: &mut FnMut(usize, Symbol, &SemanticBody)) -> Symbol {
+    fn reduce(
+        production: &LRProduction,
+        builder: &mut LRkAstBuilder,
+        actions: &mut FnMut(usize, Symbol, &SemanticBody)
+    ) -> Symbol {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
             production.head,
@@ -589,14 +593,14 @@ impl<'a> LRkParserData<'a> {
 }
 
 /// Represents a base for all LR(k) parsers
-pub struct LRkParser<'l, 'a : 'l> {
+pub struct LRkParser<'l, 'a: 'l> {
     /// The parser's data
     data: LRkParserData<'a>,
     /// The AST builder
     builder: LRkAstBuilder<'l>
 }
 
-impl<'l, 'a : 'l> LRkParser<'l, 'a> {
+impl<'l, 'a: 'l> LRkParser<'l, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
         lexer: &'l mut Lexer<'l>,
