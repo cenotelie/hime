@@ -455,11 +455,7 @@ fn utf16_to_string(content: &BigList<Utf16C>, start: usize, length: usize) -> St
         buffer.push(content[i]);
     }
     let result = String::from_utf16(&buffer);
-    if result.is_ok() {
-        result.unwrap()
-    } else {
-        String::new()
-    }
+    result.unwrap_or(String::new())
 }
 
 #[test]

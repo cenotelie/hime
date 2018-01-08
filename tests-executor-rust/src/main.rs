@@ -66,12 +66,13 @@ fn main() {
 #[test]
 fn test_single() {
     let test_name = "hime::tests::generated::errors::test_position_lineendings_windows";
-    let verb = VERB_OUTPUTS;
+    let verb = VERB_MATCHES;
     let my_path = path::Path::new("/home/laurent/dev/hime-main/tests-results");
     let library_name = get_parser_library_name(my_path);
     let library =
         libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
     let result = execute(my_path, &library, test_name, verb);
+    assert_eq!(RESULT_SUCCESS, result);
 }
 
 /// Gets the name of the shared parser library
@@ -321,7 +322,7 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
     let name = expected
         .get_value()
         .unwrap_or_else(|| panic!("Malformed expected AST"));
-    if node.get_symbol().name.eq(&name) {
+    if !node.get_symbol().name.eq(&name) {
         return false;
     }
     let expected_children = expected.children();
@@ -338,7 +339,8 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
                 .get_value()
                 .unwrap_or_else(|| panic!("Malformed expected AST"))
         );
-        let value_real = node.get_value().unwrap();
+        let value_real = node.get_value()
+            .unwrap_or_else(|| panic!("Malformed input AST"));
         if test.eq("=") && !value_expected.eq(&value_real)
             || test.eq("!=") && value_expected.eq(&value_real)
         {
@@ -365,25 +367,26 @@ fn unescape(value: String) -> String {
     let mut result = String::new();
     let mut on_escape = false;
     for data in value.chars().enumerate() {
-        if data.0 == 0 || data.0 == value.len() - 1 {
-            // drop the first and last characters
-            continue;
-        }
-        match data.1 {
-            '\\' => {
-                if on_escape {
-                    result.push('\\');
-                    on_escape = false;
-                } else {
-                    on_escape = true
+        if data.0 != 0 {
+            // drop the first character
+            match data.1 {
+                '\\' => {
+                    if on_escape {
+                        result.push('\\');
+                        on_escape = false;
+                    } else {
+                        on_escape = true
+                    }
                 }
-            }
-            c => {
-                result.push(c);
-                on_escape = false;
+                c => {
+                    result.push(c);
+                    on_escape = false;
+                }
             }
         }
     }
+    let length = result.len();
+    result.truncate(length - 1);
     result
 }
 
