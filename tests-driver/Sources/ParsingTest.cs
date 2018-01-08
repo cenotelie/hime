@@ -291,6 +291,9 @@ namespace Hime.Tests.Driver
 				case TestResult.RESULT_FAILURE_VERB:
 					reporter.Info("\t=> Failure");
 					break;
+				default:
+					reporter.Info("\t=> Error");
+					break;
 			}
 			return result;
 		}

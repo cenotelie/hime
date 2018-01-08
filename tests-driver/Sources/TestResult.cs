@@ -90,9 +90,9 @@ namespace Hime.Tests.Driver
 			root.Attributes.Append(doc.CreateAttribute("classname"));
 			root.Attributes.Append(doc.CreateAttribute("time"));
 			root.Attributes["time"].Value = spentTime.TotalSeconds.ToString(CultureInfo.InvariantCulture);
-			if (executorResult == RESULT_FAILURE_PARSING)
+			if (executorResult == RESULT_FAILURE_VERB)
 			{
-				XmlElement error = doc.CreateElement("error");
+				XmlElement error = doc.CreateElement("failure");
 				StringBuilder builder = new StringBuilder();
 				foreach (string line in output)
 				{
@@ -102,9 +102,9 @@ namespace Hime.Tests.Driver
 				error.AppendChild(doc.CreateTextNode(builder.ToString()));
 				root.AppendChild(error);
 			}
-			else if (executorResult == RESULT_FAILURE_VERB)
+			else if (executorResult != RESULT_SUCCESS)
 			{
-				XmlElement error = doc.CreateElement("failure");
+				XmlElement error = doc.CreateElement("error");
 				StringBuilder builder = new StringBuilder();
 				foreach (string line in output)
 				{

@@ -78,6 +78,7 @@ namespace Hime.Tests.Driver
 			process.StartInfo.FileName = command;
 			process.StartInfo.Arguments = arguments;
 			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.RedirectStandardError = true;
 			process.StartInfo.UseShellExecute = false;
 			process.Start();
 			while (true)
@@ -87,6 +88,14 @@ namespace Hime.Tests.Driver
 					break;
 				output.Add(line);
 				reporter.Info(line);
+			}
+			while (true)
+			{
+				string line = process.StandardError.ReadLine();
+				if (string.IsNullOrEmpty(line))
+					break;
+				output.Add(line);
+				reporter.Error(line);
 			}
 			process.WaitForExit();
 			int code = process.ExitCode;
