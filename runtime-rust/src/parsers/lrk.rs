@@ -236,9 +236,8 @@ impl<'l> LRkAstBuilder<'l> {
     ) {
         if sub.get_action_at(0) == TREE_ACTION_REPLACE {
             let children_count = sub.get_children_count_at(0);
-            let mut cache_index = reduction.cache.get_size();
             // copy the children to the cache
-            sub.copy_children_to(&mut reduction.cache);
+            let mut cache_index = sub.copy_children_to(&mut reduction.cache);
             // setup the handle
             let mut sub_index = 1;
             for _i in 0..children_count {
@@ -250,9 +249,8 @@ impl<'l> LRkAstBuilder<'l> {
         } else if action == TREE_ACTION_DROP {
             return;
         } else {
-            let cache_index = reduction.cache.get_size();
             // copy the complete sub-tree to the cache
-            sub.copy_to(&mut reduction.cache);
+            let cache_index = sub.copy_to(&mut reduction.cache);
             handle.push(cache_index);
             if action != TREE_ACTION_NONE {
                 reduction.cache.set_action_at(cache_index, action);
@@ -278,8 +276,7 @@ impl<'l> LRkAstBuilder<'l> {
             match self.reduction {
                 None => panic!("Not in a reduction"),
                 Some(ref mut reduction) => {
-                    let cache_index = reduction.cache.get_size();
-                    reduction
+                    let cache_index = reduction
                         .cache
                         .push(TableElemRef::new(TableType::Virtual, index), action);
                     self.handle.push(cache_index);

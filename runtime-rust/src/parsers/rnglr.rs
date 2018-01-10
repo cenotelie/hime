@@ -32,7 +32,6 @@ use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 use super::super::symbols::SemanticElementTrait;
 
-
 /// Represents the RNGLR parsing table and productions
 pub struct RNGLRAutomaton {
     /// The number of columns in the LR table
@@ -62,10 +61,7 @@ struct RNGLRAstBuilder<'l> {
 impl<'l> RNGLRAstBuilder<'l> {
     /// Initializes the builder with the given stack size
     pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> RNGLRAstBuilder<'l> {
-        RNGLRAstBuilder {
-            lexer,
-            result
-        }
+        RNGLRAstBuilder { lexer, result }
     }
 }
 
@@ -77,14 +73,14 @@ struct RNGLRParserData<'a> {
 }
 
 /// Represents a base for all RNGLR parsers
-pub struct RNGLRParser<'l, 'a : 'l> {
+pub struct RNGLRParser<'l, 'a: 'l> {
     /// The parser's data
     data: RNGLRParserData<'a>,
     /// The AST builder
     builder: RNGLRAstBuilder<'l>
 }
 
-impl<'l, 'a : 'l> RNGLRParser<'l, 'a> {
+impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
         lexer: &'l mut Lexer<'l>,
@@ -93,16 +89,12 @@ impl<'l, 'a : 'l> RNGLRParser<'l, 'a> {
         actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
     ) -> RNGLRParser<'l, 'a> {
         RNGLRParser {
-            data: RNGLRParserData {
-                automaton,
-                actions
-            },
+            data: RNGLRParserData { automaton, actions },
             builder: RNGLRAstBuilder::new(lexer, ast)
         }
     }
 }
 
 impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
-    fn parse(&mut self) {
-    }
+    fn parse(&mut self) {}
 }

@@ -17,6 +17,7 @@
 
 //! Module for AST subtree in parsers
 
+use super::TREE_ACTION_REPLACE;
 use super::TreeAction;
 use super::super::ast::Ast;
 use super::super::ast::AstCell;
@@ -73,7 +74,15 @@ impl SubTree {
 
     /// Gets the total number of nodes in this sub-tree
     pub fn get_size(&self) -> usize {
-        self.nodes.len()
+        if self.actions[0] == TREE_ACTION_REPLACE {
+            let mut size = 1;
+            for _i in 0..self.nodes[0].count {
+                size += self.nodes[size].count as usize + 1;
+            }
+            size
+        } else {
+            self.nodes[0].count as usize
+        }
     }
 
     /// Initializes the root of this sub-tree
@@ -89,20 +98,35 @@ impl SubTree {
     /// Copy the content of this sub-tree to the given sub-tree's buffer beginning at the given index
     /// This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
     /// The results of this method in the case of a depth 2 sub-tree is undetermined.
-    pub fn copy_to(&self, destination: &mut SubTree) {
-        for i in 0..self.nodes.len() as usize {
-            destination.nodes.push(self.nodes[i]);
-            destination.actions.push(self.actions[i]);
+    pub fn copy_to(&self, destination: &mut SubTree) -> usize {
+        let result = destination.nodes.len();
+        destination.nodes.push(self.nodes[0]);
+        destination.actions.push(self.actions[0]);
+        for i in 0..self.nodes[0].count as usize {
+            destination.nodes.push(self.nodes[i + 1]);
+            destination.actions.push(self.actions[i + 1]);
         }
+        result
     }
 
     /// Copy the root's children of this sub-tree to the given sub-tree's buffer beginning at the given index
-    /// This methods only applies in the case of a depth 1 sub-tree (only a root and its children).
-    pub fn copy_children_to(&self, destination: &mut SubTree) {
-        for i in 1..self.nodes.len() as usize {
-            destination.nodes.push(self.nodes[i]);
-            destination.actions.push(self.actions[i]);
+    /// This methods only applies in the case of a depth 2 sub-tree.
+    pub fn copy_children_to(&self, destination: &mut SubTree) -> usize {
+        let result = destination.nodes.len();
+        let mut index = 1;
+        for _i in 0..self.nodes[0].count {
+            // for all direct children
+            destination.nodes.push(self.nodes[index]);
+            destination.actions.push(self.actions[index]);
+            let count = self.nodes[index].count as usize;
+            for j in 0..count {
+                // for all sub-children
+                destination.nodes.push(self.nodes[index + j + 1]);
+                destination.actions.push(self.actions[index + j + 1]);
+            }
+            index += count + 1;
         }
+        result
     }
 
     /// Commits the children of a sub-tree in this buffer to the final ast
@@ -120,13 +144,15 @@ impl SubTree {
     }
 
     /// Pushes a new node into this buffer
-    pub fn push(&mut self, symbol: TableElemRef, action: TreeAction) {
+    pub fn push(&mut self, symbol: TableElemRef, action: TreeAction) -> usize {
+        let result = self.nodes.len();
         self.nodes.push(AstCell {
             label: symbol,
             count: 0,
             first: 0
         });
         self.actions.push(action);
+        result
     }
 
     /// Moves an item within the buffer
