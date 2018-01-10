@@ -66,7 +66,7 @@ fn run_fuzzy_matcher<'a>(
             recovery,
             origin_index
         );
-        Some(matcher.run())
+        matcher.run()
     }
 }
 

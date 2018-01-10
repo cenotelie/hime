@@ -570,12 +570,12 @@ impl<'a> LRkParserData<'a> {
             i += 1;
             match get_op_code_base(op_code) {
                 LR_OP_CODE_BASE_SEMANTIC_ACTION => {
-                    let index = production.bytecode[i + 1] as usize;
+                    let index = production.bytecode[i] as usize;
                     i += 1;
                     actions(index, variable, builder);
                 }
                 LR_OP_CODE_BASE_ADD_VIRTUAL => {
-                    let index = production.bytecode[i + 1] as usize;
+                    let index = production.bytecode[i] as usize;
                     i += 1;
                     builder.reduction_add_virtual(index, get_op_code_tree_action(op_code));
                 }

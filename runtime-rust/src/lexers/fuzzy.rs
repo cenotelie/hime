@@ -198,7 +198,7 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Runs this matcher
-    pub fn run(&mut self) -> TokenMatch {
+    pub fn run(&mut self) -> Option<TokenMatch> {
         let mut offset = 0;
         let mut at_end = self.text.is_end(self.origin_index + offset);
         let mut current = if at_end {
@@ -240,7 +240,7 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Constructs the solution when succeeded to fix the error
-    fn on_success(&mut self, result: &FuzzyMatcherResult) -> TokenMatch {
+    fn on_success(&mut self, result: &FuzzyMatcherResult) -> Option<TokenMatch> {
         let mut last_error_index = result.match_length + 1;
         for i in 0..result.match_head.as_ref().unwrap().get_distance() {
             let error_index =
@@ -250,10 +250,10 @@ impl<'a> FuzzyMatcher<'a> {
             }
             last_error_index = error_index;
         }
-        TokenMatch {
+        Some(TokenMatch {
             state: result.match_head.as_ref().unwrap().state,
             length: result.match_length as u32
-        }
+        })
     }
 
     /// Reports on the lexical error at the specified index
@@ -332,16 +332,13 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Constructs the solution when failed to fix the error
-    fn on_failure(&mut self) -> TokenMatch {
+    fn on_failure(&mut self) -> Option<TokenMatch> {
         self.errors
             .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                 self.text.get_position_at(self.origin_index),
                 [self.text.get_at(self.origin_index), 0]
             ));
-        TokenMatch {
-            state: DEAD_STATE,
-            length: 1
-        }
+        None
     }
 
     /// Inspects a head while at the end of the input
@@ -562,6 +559,6 @@ impl<'a> FuzzyMatcher<'a> {
 }
 
 /// Computes the comparable length of the specified match
-fn get_comparable_length(head: &FuzzyMatcherHead, length: usize) -> usize {
-    length - head.get_distance()
+fn get_comparable_length(head: &FuzzyMatcherHead, length: usize) -> isize {
+    length as isize - head.get_distance() as isize
 }
