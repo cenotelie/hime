@@ -229,9 +229,9 @@ impl<'a> Ast<'a> {
             match self.data.get_mut() {
                 None => panic!("Got a mutable AST with an immutable implementation"),
                 Some(data) => {
-                    let result = data.nodes.add(nodes[index]);
+                    let result = data.nodes.push(nodes[index]);
                     for i in 1..count {
-                        data.nodes.add(nodes[index + i]);
+                        data.nodes.push(nodes[index + i]);
                     }
                     result
                 }
@@ -243,7 +243,7 @@ impl<'a> Ast<'a> {
     pub fn store_root(&mut self, node: AstCell) {
         match self.data.get_mut() {
             None => panic!("Got a mutable AST with an immutable implementation"),
-            Some(data) => data.root = Some(data.nodes.add(node))
+            Some(data) => data.root = Some(data.nodes.push(node))
         }
     }
 }
@@ -406,7 +406,7 @@ impl<'a> Iterable<'a> for AstFamily<'a> {
 
 impl<'a> AstFamily<'a> {
     /// Gets the number of children in this family
-    pub fn count(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.tree.data.get().nodes[self.parent].count as usize
     }
 

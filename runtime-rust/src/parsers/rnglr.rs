@@ -317,15 +317,15 @@ impl GSS {
 
     /// Opens a new generation in this GSS
     pub fn create_generation(&mut self) -> usize {
-        self.node_generations.add(GSSGeneration {
-            start: self.node_labels.size(),
+        self.node_generations.push(GSSGeneration {
+            start: self.node_labels.len(),
             count: 0
         });
-        self.edges_generations.add(GSSGeneration {
-            start: self.edges.size(),
+        self.edges_generations.push(GSSGeneration {
+            start: self.edges.len(),
             count: 0
         });
-        if self.node_generations.size() == 1 {
+        if self.node_generations.len() == 1 {
             // this is the first generation
             self.current_generation = 0;
         } else {
@@ -336,7 +336,7 @@ impl GSS {
 
     /// Creates a new node in the GSS
     pub fn create_node(&mut self, state: u32) -> usize {
-        let node = self.node_labels.add(state);
+        let node = self.node_labels.push(state);
         self.node_generations[self.current_generation].count += 1;
         node
     }

@@ -100,7 +100,7 @@ pub struct TokenRepositoryIterator<'a> {
 impl<'a> Iterator for TokenRepositoryIterator<'a> {
     type Item = Token<'a>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.repository.data.get().cells.size() {
+        if self.index >= self.repository.data.get().cells.len() {
             None
         } else {
             let result = Token {
@@ -157,7 +157,7 @@ impl<'a> TokenRepository<'a> {
         let x = self.data.get_mut();
         match x {
             None => panic!("Got a mutable token repository with an immutable implementation"),
-            Some(data) => data.cells.add(TokenRepositoryCell {
+            Some(data) => data.cells.push(TokenRepositoryCell {
                 terminal,
                 span: TextSpan { index, length }
             })
@@ -176,7 +176,7 @@ impl<'a> TokenRepository<'a> {
 
     /// Gets the number of tokens in this repository
     pub fn get_tokens_count(&self) -> usize {
-        self.data.get().cells.size()
+        self.data.get().cells.len()
     }
 
     /// Gets the terminal's identifier for the i-th token
@@ -194,7 +194,7 @@ impl<'a> TokenRepository<'a> {
 
     /// Gets the number of tokens
     pub fn get_count(&self) -> usize {
-        self.data.get().cells.size()
+        self.data.get().cells.len()
     }
 }
 

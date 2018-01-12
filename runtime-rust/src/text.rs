@@ -108,13 +108,13 @@ impl Text {
         for c in input.chars() {
             let value = c as u32;
             if value <= 0xFFFF {
-                content.add(value as u16);
+                content.push(value as u16);
             } else {
                 let temp = value - 0x10000;
                 let lead = (temp >> 10) + 0xD800;
                 let trail = (temp & 0x03FF) + 0xDC00;
-                content.add(lead as Utf16C);
-                content.add(trail as Utf16C);
+                content.push(lead as Utf16C);
+                content.push(trail as Utf16C);
             }
         }
         let lines = find_lines_in(&content);
@@ -127,7 +127,7 @@ impl Text {
         let mut content = BigList::<Utf16C>::new(0);
         let iterator = Utf16IteratorRaw::new(reader, big_endian);
         for c in iterator {
-            content.add(c);
+            content.push(c);
         }
         let lines = find_lines_in(&content);
         Text { content, lines }
@@ -139,7 +139,7 @@ impl Text {
         let mut content = BigList::<Utf16C>::new(0);
         let iterator = Utf16IteratorOverUtf8::new(reader);
         for c in iterator {
-            content.add(c);
+            content.push(c);
         }
         let lines = find_lines_in(&content);
         Text { content, lines }
@@ -152,12 +152,12 @@ impl Text {
 
     /// Gets the size in number of characters
     pub fn get_size(&self) -> usize {
-        self.content.size()
+        self.content.len()
     }
 
     /// Gets whether the specified index is after the end of the text represented by this object
     pub fn is_end(&self, index: usize) -> bool {
-        index >= self.content.size()
+        index >= self.content.len()
     }
 
     /// Gets the character at the specified index
@@ -183,7 +183,7 @@ impl Text {
     /// Gets the length of the i-th line
     pub fn get_line_length(&self, line: usize) -> usize {
         if line == self.lines.len() {
-            self.content.size() - self.lines[line - 1]
+            self.content.len() - self.lines[line - 1]
         } else {
             self.lines[line] - self.lines[line - 1]
         }

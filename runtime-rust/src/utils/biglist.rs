@@ -57,12 +57,12 @@ impl<T: Copy> BigList<T> {
         }
     }
 
-    pub fn size(&self) -> usize {
+    pub fn len(&self) -> usize {
         (self.chunk_index * CHUNKS_SIZE) + self.cell_index
     }
 
     /// Adds a value at the end of the list
-    pub fn add(&mut self, value: T) -> usize {
+    pub fn push(&mut self, value: T) -> usize {
         if self.cell_index == CHUNKS_SIZE {
             self.add_chunk();
         }
@@ -111,7 +111,7 @@ pub struct BigListIterator<'a, T: 'a + Copy> {
 impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.list.size() {
+        if self.index >= self.list.len() {
             None
         } else {
             let result = self.list[self.index];
@@ -136,9 +136,9 @@ impl<'a, T: 'a + Copy> Iterable<'a> for BigList<T> {
 #[test]
 fn test_big_list() {
     let mut list = BigList::<char>::new('\0');
-    assert_eq!(list.size(), 0);
-    list.add('t');
-    assert_eq!(list.size(), 1);
+    assert_eq!(list.len(), 0);
+    list.push('t');
+    assert_eq!(list.len(), 1);
     assert_eq!(list[0], 't');
     for x in list.iter() {
         assert_eq!(x, 't');
