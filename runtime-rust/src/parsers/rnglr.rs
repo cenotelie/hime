@@ -31,6 +31,7 @@ use super::super::lexers::TokenKernel;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 use super::super::symbols::SemanticElementTrait;
+use super::super::utils::biglist::BigList;
 
 /// Represents a cell in a RNGLR parse table
 #[derive(Copy, Clone)]
@@ -195,6 +196,149 @@ impl RNGLRAutomaton {
             }
         }
         expected
+    }
+}
+
+/// Represents an edge in a Graph-Structured Stack
+#[derive(Copy, Clone)]
+struct GSSEdge {
+    /// The index of the node from which this edge starts
+    from: usize,
+    /// The index of the node to which this edge arrives to
+    to: usize,
+    /// The identifier of the SPPF node that serve as label for this edge
+    label: usize
+}
+
+/// Represents a generation in a Graph-Structured Stack
+/// Because GSS nodes and edges are always created sequentially,
+/// a generation basically describes a span in a buffer of GSS nodes or edges
+#[derive(Copy, Clone)]
+struct GSSGeneration {
+    /// The start index of this generation in the list of nodes
+    start: usize,
+    /// The number of nodes in this generation
+    count: usize
+}
+
+/// Represents a path in a GSS
+#[derive(Clone)]
+struct GSSPath {
+    /// The final target of this path
+    last_node: usize,
+    /// The generation containing the final target of this path
+    generation: usize,
+    /// The labels on this GSS path
+    labels: Option<Vec<usize>>
+}
+
+impl GSSPath {
+    /// Initializes this path
+    pub fn new(length: usize) -> GSSPath {
+        GSSPath {
+            last_node: 0,
+            generation: 0,
+            labels: if length == 0 {
+                None
+            } else {
+                Some(Vec::<usize>::with_capacity(length))
+            }
+        }
+    }
+}
+
+/// Represents Graph-Structured Stacks for GLR parsers
+struct GSS {
+    /// The label (GLR state) on the GSS node for the given index
+    node_labels: BigList<u32>,
+    /// The generations of nodes in this GSS
+    node_generations: BigList<GSSGeneration>,
+    /// The edges in this GSS
+    edges: BigList<GSSEdge>,
+    /// The generations for the edges
+    edges_generations: BigList<GSSGeneration>,
+    /// Index of the current generation
+    current_generation: usize
+}
+
+impl GSS {
+    /// Initializes the GSS
+    pub fn new() -> GSS {
+        GSS {
+            node_labels: BigList::<u32>::new(0),
+            node_generations: BigList::<GSSGeneration>::new(GSSGeneration { start: 0, count: 0 }),
+            edges: BigList::<GSSEdge>::new(GSSEdge {
+                from: 0,
+                to: 0,
+                label: 0
+            }),
+            edges_generations: BigList::<GSSGeneration>::new(GSSGeneration { start: 0, count: 0 }),
+            current_generation: 0
+        }
+    }
+
+    /// Gets the data of the current generation
+    pub fn get_current_generation(&self) -> GSSGeneration {
+        self.node_generations[self.current_generation]
+    }
+
+    /// Gets the data of the specified generation of nodes
+    pub fn get_generation(&self, generation: usize) -> GSSGeneration {
+        self.node_generations[generation]
+    }
+
+    /// Gets the GLR state represented by the specified node
+    pub fn get_represented_state(&self, node: usize) -> u32 {
+        self.node_labels[node]
+    }
+
+    /// Finds in the given generation a node representing the given GLR state
+    pub fn find_node(&self, generation: usize, state: u32) -> Option<usize> {
+        let data = self.node_generations[generation];
+        for i in data.start..(data.start + data.count) {
+            if self.node_labels[i] == state {
+                return Some(i);
+            }
+        }
+        None
+    }
+
+    /// Determines whether this instance has the required edge
+    pub fn has_edge(&self, generation: usize, from: usize, to: usize) -> bool {
+        let data = self.edges_generations[generation];
+        for i in data.start..(data.start + data.count) {
+            let edge = self.edges[i];
+            if edge.from == from && edge.to == to {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Opens a new generation in this GSS
+    pub fn create_generation(&mut self) -> usize {
+        self.node_generations.add(GSSGeneration {
+            start: self.node_labels.size(),
+            count: 0
+        });
+        self.edges_generations.add(GSSGeneration {
+            start: self.edges.size(),
+            count: 0
+        });
+        if self.node_generations.size() == 1 {
+            // this is the first generation
+            self.current_generation = 0;
+        } else {
+            self.current_generation += 1;
+        }
+        self.current_generation
+    }
+
+    /// Creates a new node in the GSS
+    pub fn create_node(&mut self, state: u32) -> usize {
+        let node = self.node_labels.add(state);
+        self.node_generations[self.current_generation].count += 1;
+        node
     }
 }
 
