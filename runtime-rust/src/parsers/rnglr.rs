@@ -234,16 +234,43 @@ struct GSSPath {
 
 impl GSSPath {
     /// Initializes this path
-    pub fn new(length: usize) -> GSSPath {
+    pub fn new(last_node: usize, generation: usize, length: usize) -> GSSPath {
         GSSPath {
-            last_node: 0,
-            generation: 0,
+            last_node,
+            generation,
             labels: if length == 0 {
                 None
             } else {
                 Some(Vec::<usize>::with_capacity(length))
             }
         }
+    }
+
+    /// Initializes this path
+    pub fn new_length0(last_node: usize, generation: usize) -> GSSPath {
+        GSSPath {
+            last_node,
+            generation,
+            labels: None
+        }
+    }
+
+    /// Initializes this path
+    pub fn from(previous: &GSSPath, last_node: usize, generation: usize, label: usize) -> GSSPath {
+        let mut result = GSSPath {
+            last_node,
+            generation,
+            labels: previous.labels.clone()
+        };
+        result.labels.as_mut().unwrap().push(label);
+        result
+    }
+
+    /// Pushes the next label
+    pub fn push(&mut self, last_node: usize, generation: usize, label: usize) {
+        self.last_node = last_node;
+        self.generation = generation;
+        self.labels.as_mut().unwrap().push(label);
     }
 }
 
@@ -339,6 +366,99 @@ impl GSS {
         let node = self.node_labels.push(state);
         self.node_generations[self.current_generation].count += 1;
         node
+    }
+
+    /// Creates a new edge in the GSS
+    pub fn create_edge(&mut self, from: usize, to: usize, label: usize) {
+        self.edges.push(GSSEdge { from, to, label });
+        self.edges_generations[self.current_generation].count += 1;
+    }
+
+    /// Retrieve the generation of the given node in this GSS
+    fn get_generation_of(&self, node: usize) -> usize {
+        for i in 0..self.current_generation {
+            let data = self.node_generations[i];
+            if node >= data.start && node < data.start + data.count {
+                return i;
+            }
+        }
+        panic!("Node not found");
+    }
+
+    /// Gets all paths in the GSS starting at the given node and with the given length
+    pub fn get_paths(&self, from: usize, length: usize) -> Vec<GSSPath> {
+        let mut paths = Vec::<GSSPath>::new();
+        if length == 0 {
+            // 0-length path, simply return a single path with the 'from' node
+            paths.push(GSSPath::new_length0(from, 0));
+            return paths;
+        }
+
+        // Initialize the first path
+        paths.push(GSSPath::new(from, self.get_generation_of(from), length));
+        // For the remaining hops
+        for i in 0..length {
+            // Insertion index for the compaction process
+            let mut m = 0;
+            let total = paths.len();
+            for p in 0..total {
+                // for all paths
+                let last = paths[p].last_node;
+                let gen_index = paths[p].generation;
+                // Look for new additional paths from last
+                let gen = self.edges_generations[gen_index];
+                let mut first_edge: Option<GSSEdge> = None;
+                for e in gen.start..(gen.start + gen.count) {
+                    let edge = self.edges[e];
+                    if edge.from == last {
+                        match &first_edge {
+                            &None => {
+                                // This is the first edge
+                                first_edge = Some(edge);
+                            }
+                            &Some(_x) => {
+                                // Not the first edge
+                                // Clone and extend the new path
+                                let new_path = GSSPath::from(
+                                    &paths[p],
+                                    edge.to,
+                                    self.get_generation_of(edge.to),
+                                    edge.label
+                                );
+                                paths.push(new_path);
+                            }
+                        }
+                    }
+                }
+                // Check whether there was at least one edge
+                match first_edge {
+                    None => {}
+                    Some(edge) => {
+                        // Continue the current path
+                        if m != p {
+                            // swap m and p paths
+                            paths.swap(m, p);
+                        }
+                        paths[m].push(edge.to, self.get_generation_of(edge.to), edge.label);
+                        // goto next
+                        m += 1;
+                    }
+                }
+            }
+            // inspected all current paths
+            if m != total {
+                // if some previous paths have been removed
+                // => compact the list if needed
+                for p in total..paths.len() {
+                    paths.swap(m, p);
+                    m += 1;
+                }
+                // truncates the paths to those inserted
+                // m is now the exact number of paths
+                paths.truncate(m);
+            }
+        }
+        paths
     }
 }
 
