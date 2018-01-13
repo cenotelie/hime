@@ -204,7 +204,7 @@ impl<'a> FuzzyMatcher<'a> {
         let mut current = if at_end {
             0 as Utf16C
         } else {
-            self.text.get_at(self.origin_index + offset)
+            self.text.at(self.origin_index + offset)
         };
         let mut result = FuzzyMatcherResult::new();
         {
@@ -221,7 +221,7 @@ impl<'a> FuzzyMatcher<'a> {
             current = if at_end {
                 0 as Utf16C
             } else {
-                self.text.get_at(self.origin_index + offset)
+                self.text.at(self.origin_index + offset)
             };
             let generation = replace(&mut result.heads, Vec::<FuzzyMatcherHead>::new());
             for head in generation {
@@ -261,7 +261,7 @@ impl<'a> FuzzyMatcher<'a> {
         if self.text.is_end(index) {
             // the end of input was not expected
             // there is necessarily some input before because an empty input would have matched the $
-            let c = self.text.get_at(index - 1);
+            let c = self.text.at(index - 1);
             if c >= 0xD800 && c <= 0xDBFF {
                 // a trailing UTF-16 high surrogate
                 self.errors.push_error_no_low_utf16_surrogate(
@@ -277,11 +277,11 @@ impl<'a> FuzzyMatcher<'a> {
                     .push_error_eoi(ParseErrorEndOfInput::new(self.text.get_position_at(index)));
             }
         } else {
-            let c = self.text.get_at(index);
+            let c = self.text.at(index);
             if c >= 0xD800 && c <= 0xDBFF && !self.text.is_end(index + 1) {
                 // a UTF-16 high surrogate
                 // if next next character is a low surrogate, also get it
-                let c2 = self.text.get_at(index + 1);
+                let c2 = self.text.at(index + 1);
                 if c2 >= 0xDC00 && c2 <= 0xDFFF {
                     // an unexpected high and low surrogate pair
                     self.errors
@@ -302,7 +302,7 @@ impl<'a> FuzzyMatcher<'a> {
             } else if c >= 0xDC00 && c <= 0xDFFF && index > 0 {
                 // a UTF-16 low surrogate
                 // if the previous character is a high surrogate, also get it
-                let c2 = self.text.get_at(index - 1);
+                let c2 = self.text.at(index - 1);
                 if c2 >= 0xD800 && c2 <= 0xDBFF {
                     // an unexpected high and low surrogate pair
                     self.errors
@@ -336,7 +336,7 @@ impl<'a> FuzzyMatcher<'a> {
         self.errors
             .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                 self.text.get_position_at(self.origin_index),
-                [self.text.get_at(self.origin_index), 0]
+                [self.text.at(self.origin_index), 0]
             ));
         None
     }

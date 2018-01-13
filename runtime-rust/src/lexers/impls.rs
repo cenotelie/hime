@@ -46,7 +46,7 @@ fn run_fuzzy_matcher<'a>(
     if recovery <= 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.get_input().get_position_at(origin_index),
-            [repository.get_input().get_at(origin_index), 0]
+            [repository.get_input().at(origin_index), 0]
         ));
         None
     } else {

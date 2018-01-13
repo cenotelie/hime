@@ -151,7 +151,7 @@ impl Text {
     }
 
     /// Gets the size in number of characters
-    pub fn get_size(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.content.len()
     }
 
@@ -161,7 +161,7 @@ impl Text {
     }
 
     /// Gets the character at the specified index
-    pub fn get_at(&self, index: usize) -> Utf16C {
+    pub fn at(&self, index: usize) -> Utf16C {
         self.content[index]
     }
 

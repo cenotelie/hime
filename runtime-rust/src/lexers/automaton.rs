@@ -211,7 +211,7 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<Toke
         if input.is_end(i) {
             break;
         }
-        let current = input.get_at(i);
+        let current = input.at(i);
         i += 1;
         state = state_data.get_target_by(current);
     }
