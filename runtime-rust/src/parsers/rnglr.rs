@@ -462,18 +462,371 @@ impl GSS {
     }
 }
 
-/// Represents the builder of Parse Trees for RNGLR parsers
-struct RNGLRAstBuilder<'l> {
+/// Represents a reference to a Shared-Packed Parse Forest node in a specific version
+#[derive(Copy, Clone)]
+struct SPPFNodeRef {
+    /// The identifier of the node
+    node_id: u32,
+    /// The version to refer to
+    version: u32
+}
+
+/// Represents a version of a node in a Shared-Packed Parse Forest
+#[derive(Clone)]
+struct SPPFNodeVersion {
+    /// The label of the node for this version
+    label: TableElemRef,
+    /// The children of the node for this version
+    children: Option<Vec<SPPFNodeRef>>
+}
+
+impl SPPFNodeVersion {
+    /// Initializes this node version without children
+    pub fn new(label: TableElemRef) -> SPPFNodeVersion {
+        SPPFNodeVersion {
+            label,
+            children: None
+        }
+    }
+
+    /// Initializes this node version
+    pub fn from(label: TableElemRef, buffer: &Vec<SPPFNodeRef>, count: usize) -> SPPFNodeVersion {
+        if count == 0 {
+            SPPFNodeVersion {
+                label,
+                children: None
+            }
+        } else {
+            let mut children = Vec::<SPPFNodeRef>::with_capacity(count);
+            for i in 0..count {
+                children.push(buffer[i]);
+            }
+            SPPFNodeVersion {
+                label,
+                children: Some(children)
+            }
+        }
+    }
+}
+
+/// Represents the interface for a node in a Shared-Packed Parse Forest
+trait SPPFNodeTrait {
+    /// Gets the identifier of this node
+    fn get_node_id(&self) -> u32;
+
+    /// Gets the original symbol for this node
+    fn get_original_symbol(&self) -> TableElemRef;
+}
+
+/// Represents a node in a Shared-Packed Parse Forest
+/// A node can have multiple versions
+#[derive(Clone)]
+struct SPPFNodeNormal {
+    /// The identifier of this node
+    node_id: u32,
+    /// The original label of this node
+    original: TableElemRef,
+    /// The different versions of this node
+    versions: Vec<SPPFNodeVersion>
+}
+
+impl SPPFNodeTrait for SPPFNodeNormal {
+    fn get_node_id(&self) -> u32 {
+        self.node_id
+    }
+
+    fn get_original_symbol(&self) -> TableElemRef {
+        self.original
+    }
+}
+
+impl SPPFNodeNormal {
+    /// Initializes this node
+    pub fn new(identifier: u32, label: TableElemRef) -> SPPFNodeNormal {
+        let mut versions = Vec::<SPPFNodeVersion>::new();
+        versions.push(SPPFNodeVersion::new(label));
+        SPPFNodeNormal {
+            node_id: identifier,
+            original: label,
+            versions
+        }
+    }
+
+    /// Initializes this node
+    pub fn new_with_children(
+        identifier: u32,
+        label: TableElemRef,
+        buffer: &Vec<SPPFNodeRef>,
+        count: usize
+    ) -> SPPFNodeNormal {
+        let mut versions = Vec::<SPPFNodeVersion>::new();
+        versions.push(SPPFNodeVersion::from(label, buffer, count));
+        SPPFNodeNormal {
+            node_id: identifier,
+            original: label,
+            versions
+        }
+    }
+
+    /// Adds a new version to this node
+    pub fn new_version(
+        &mut self,
+        label: TableElemRef,
+        buffer: &Vec<SPPFNodeRef>,
+        count: usize
+    ) -> SPPFNodeRef {
+        self.versions
+            .push(SPPFNodeVersion::from(label, buffer, count));
+        SPPFNodeRef {
+            node_id: self.node_id,
+            version: (self.versions.len() - 1) as u32
+        }
+    }
+}
+
+/// Represents a node in a Shared-Packed Parse Forest that can be replaced by its children
+#[derive(Clone)]
+struct SPPFNodeReplaceable {
+    /// The identifier of this node
+    node_id: u32,
+    /// The original label of this node
+    original: TableElemRef,
+    /// The children of this node
+    children: Option<Vec<SPPFNodeRef>>,
+    /// The tree actions on the children of this node
+    actions: Option<Vec<TreeAction>>
+}
+
+impl SPPFNodeTrait for SPPFNodeReplaceable {
+    fn get_node_id(&self) -> u32 {
+        self.node_id
+    }
+
+    fn get_original_symbol(&self) -> TableElemRef {
+        self.original
+    }
+}
+
+impl SPPFNodeReplaceable {
+    /// Initializes this node
+    pub fn new(
+        identifier: u32,
+        label: TableElemRef,
+        children_buffer: &Vec<SPPFNodeRef>,
+        actions_buffer: &Vec<TreeAction>,
+        count: usize
+    ) -> SPPFNodeReplaceable {
+        if count == 0 {
+            SPPFNodeReplaceable {
+                node_id: identifier,
+                original: label,
+                children: None,
+                actions: None
+            }
+        } else {
+            let mut children = Vec::<SPPFNodeRef>::with_capacity(count);
+            let mut actions = Vec::<TreeAction>::with_capacity(count);
+            for i in 0..count {
+                children.push(children_buffer[i]);
+                actions.push(actions_buffer[i]);
+            }
+            SPPFNodeReplaceable {
+                node_id: identifier,
+                original: label,
+                children: Some(children),
+                actions: Some(actions)
+            }
+        }
+    }
+}
+
+/// Represents a node in a Shared-Packed Parse Forest
+#[derive(Clone)]
+enum SPPFNode {
+    /// A normal node
+    Normal(SPPFNodeNormal),
+    /// A replaceable node
+    Replaceable(SPPFNodeReplaceable)
+}
+
+impl SPPFNodeTrait for SPPFNode {
+    fn get_node_id(&self) -> u32 {
+        match self {
+            &SPPFNode::Normal(ref node) => node.node_id,
+            &SPPFNode::Replaceable(ref node) => node.node_id
+        }
+    }
+
+    fn get_original_symbol(&self) -> TableElemRef {
+        match self {
+            &SPPFNode::Normal(ref node) => node.original,
+            &SPPFNode::Replaceable(ref node) => node.original
+        }
+    }
+}
+
+impl SPPFNode {
+    /// Gets whether this node must be replaced by its children
+    pub fn is_replaceable(&self) -> bool {
+        match self {
+            &SPPFNode::Normal(ref _node) => false,
+            &SPPFNode::Replaceable(ref _node) => true
+        }
+    }
+}
+
+/// Represents the epsilon node
+const EPSILON: u32 = 0xFFFFFFFF;
+
+/// Represents a Shared-Packed Parse Forest
+struct SPPF {
+    /// The nodes in the SPPF
+    nodes: Vec<SPPFNode>
+}
+
+impl SPPF {
+    /// Initializes this SPPF
+    pub fn new() -> SPPF {
+        SPPF {
+            nodes: Vec::<SPPFNode>::new()
+        }
+    }
+
+    /// Gets the SPPF node for the specified identifier
+    pub fn get_node(&self, identifier: u32) -> &SPPFNode {
+        &self.nodes[identifier as usize]
+    }
+
+    /// Creates a new single node in the SPPF
+    pub fn new_normal_node(
+        &mut self,
+        label: TableElemRef,
+        buffer: &Vec<SPPFNodeRef>,
+        count: usize
+    ) -> u32 {
+        let identifier = self.nodes.len() as u32;
+        self.nodes
+            .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
+                identifier,
+                label,
+                buffer,
+                count
+            )));
+        identifier
+    }
+
+    /// Creates a new replaceable node in the SPPF
+    pub fn new_replaceable_node(
+        &mut self,
+        label: TableElemRef,
+        children_buffer: &Vec<SPPFNodeRef>,
+        actions_buffer: &Vec<TreeAction>,
+        count: usize
+    ) -> u32 {
+        let identifier = self.nodes.len() as u32;
+        self.nodes
+            .push(SPPFNode::Replaceable(SPPFNodeReplaceable::new(
+                identifier,
+                label,
+                children_buffer,
+                actions_buffer,
+                count
+            )));
+        identifier
+    }
+}
+
+/// Represents a generation of GSS edges in the current history
+/// The history is used to quickly find pre-existing matching GSS edges
+struct HistoryPart {
+    /// The GSS labels in this part
+    data: Vec<usize>,
+    /// The index of the represented GSS generation
+    generation: usize
+}
+
+/// The data about a reduction for a SPPF
+struct SPPFReduction {
+    /// The length of the reduction
+    pub length: usize,
+    /// The adjacency cache for the reduction
+    pub cache: Vec<SPPFNodeRef>,
+    /// The number of items popped from the stack
+    pub pop_count: usize
+}
+
+/// Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
+/// A SPPF is a compact representation of multiple variants of an AST at once.
+/// GLR algorithms originally builds the complete SPPF.
+/// However we only need to build one of the variant, i.e. an AST for the user.
+struct SPPFBuilder<'l> {
     /// Lexer associated to this parser
     lexer: &'l mut Lexer<'l>,
+    /// The history
+    history: Vec<HistoryPart>,
+    /// The SPPF being built
+    sppf: SPPF,
+    /// The reduction handle represented as the indices of the sub-trees in the cache
+    handle_indices: Vec<usize>,
+    /// The actions for the reduction
+    handle_actions: Vec<TreeAction>,
+    /// The data of the current reduction
+    reduction: Option<SPPFReduction>,
+    /// The stack of semantic objects for the reduction
+    stack: Vec<usize>,
     /// The AST being built
     result: Ast<'l>
 }
 
-impl<'l> RNGLRAstBuilder<'l> {
+impl<'l> SPPFBuilder<'l> {
     /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> RNGLRAstBuilder<'l> {
-        RNGLRAstBuilder { lexer, result }
+    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
+        SPPFBuilder {
+            lexer,
+            history: Vec::<HistoryPart>::new(),
+            sppf: SPPF::new(),
+            handle_indices: Vec::<usize>::new(),
+            handle_actions: Vec::<TreeAction>::new(),
+            reduction: None,
+            stack: Vec::<usize>::new(),
+            result
+        }
+    }
+}
+
+impl<'l> SemanticBody for SPPFBuilder<'l> {
+    fn length(&self) -> usize {
+        self.handle_indices.len()
+    }
+
+    fn get_element_at(&self, index: usize) -> SemanticElement {
+        match self.reduction {
+            None => panic!("Not in a reduction"),
+            Some(ref data) => {
+                let reference = data.cache[self.handle_indices[index]];
+                let node = self.sppf.get_node(reference.node_id);
+                match node {
+                    &SPPFNode::Normal(ref data) => {
+                        let label = data.versions[reference.version as usize].label;
+                        match label.get_type() {
+                            TableType::None => panic!("Not a semantic element"),
+                            TableType::Token => SemanticElement::Token(
+                                self.lexer.get_output().get_token(label.get_index())
+                            ),
+                            TableType::Variable => SemanticElement::Variable(
+                                self.result.get_variables()[label.get_index()]
+                            ),
+                            TableType::Virtual => SemanticElement::Virtual(
+                                self.result.get_virtuals()[label.get_index()]
+                            )
+                        }
+                    }
+                    &SPPFNode::Replaceable(ref _data) => {
+                        panic!("Expected a normal SPPF node");
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -489,7 +842,7 @@ pub struct RNGLRParser<'l, 'a: 'l> {
     /// The parser's data
     data: RNGLRParserData<'a>,
     /// The AST builder
-    builder: RNGLRAstBuilder<'l>
+    builder: SPPFBuilder<'l>
 }
 
 impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
@@ -502,7 +855,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     ) -> RNGLRParser<'l, 'a> {
         RNGLRParser {
             data: RNGLRParserData { automaton, actions },
-            builder: RNGLRAstBuilder::new(lexer, ast)
+            builder: SPPFBuilder::new(lexer, ast)
         }
     }
 }

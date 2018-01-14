@@ -127,7 +127,7 @@ impl LRkAutomaton {
 
 const ESTIMATION_BIAS: usize = 5;
 
-/// the data about a reduction
+/// The data about a reduction
 struct LRkAstReduction {
     /// The length of the reduction
     pub length: usize,
