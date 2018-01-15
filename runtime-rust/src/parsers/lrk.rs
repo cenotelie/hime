@@ -130,11 +130,11 @@ const ESTIMATION_BIAS: usize = 5;
 /// The data about a reduction
 struct LRkAstReduction {
     /// The length of the reduction
-    pub length: usize,
+    length: usize,
     /// The sub-tree build-up cache
-    pub cache: SubTree,
+    cache: SubTree,
     /// The number of items popped from the stack
-    pub pop_count: usize
+    pop_count: usize
 }
 
 impl LRkAstReduction {

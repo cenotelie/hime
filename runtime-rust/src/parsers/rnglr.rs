@@ -698,7 +698,15 @@ impl SPPF {
     }
 
     /// Creates a new single node in the SPPF
-    pub fn new_normal_node(
+    pub fn new_normal_node(&mut self, label: TableElemRef) -> usize {
+        let identifier = self.nodes.len();
+        self.nodes
+            .push(SPPFNode::Normal(SPPFNodeNormal::new(identifier, label)));
+        identifier
+    }
+
+    /// Creates a new single node in the SPPF
+    pub fn new_normal_node_with_children(
         &mut self,
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
@@ -748,11 +756,13 @@ struct HistoryPart {
 /// The data about a reduction for a SPPF
 struct SPPFReduction {
     /// The length of the reduction
-    pub length: usize,
+    length: usize,
     /// The adjacency cache for the reduction
-    pub cache: Vec<SPPFNodeRef>,
+    cache: Vec<SPPFNodeRef>,
+    /// The stack of semantic objects for the reduction
+    stack: Vec<usize>,
     /// The number of items popped from the stack
-    pub pop_count: usize
+    pop_count: usize
 }
 
 /// Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
@@ -772,8 +782,6 @@ struct SPPFBuilder<'l> {
     handle_actions: Vec<TreeAction>,
     /// The data of the current reduction
     reduction: Option<SPPFReduction>,
-    /// The stack of semantic objects for the reduction
-    stack: Vec<usize>,
     /// The AST being built
     result: Ast<'l>
 }
@@ -824,7 +832,6 @@ impl<'l> SPPFBuilder<'l> {
             handle_indices: Vec::<usize>::new(),
             handle_actions: Vec::<TreeAction>::new(),
             reduction: None,
-            stack: Vec::<usize>::new(),
             result
         }
     }
@@ -873,6 +880,29 @@ impl<'l> SPPFBuilder<'l> {
             }
         }
         EPSILON
+    }
+
+    /// Creates a single node in the result SPPF an returns it
+    pub fn get_single_node(&mut self, symbol: TableElemRef) -> usize {
+        self.sppf.new_normal_node(symbol)
+    }
+
+    /// Prepares for the forthcoming reduction operations
+    pub fn reduction_prepare(&mut self, first: usize, path: &GSSPath, length: usize) {
+        let mut stack = Vec::<usize>::new();
+        if length > 0 {
+            let path_labels = path.labels.as_ref().unwrap();
+            for i in 0..(length - 1) {
+                stack.push(path_labels[length - 2 - i]);
+            }
+            stack.push(first);
+        }
+        self.reduction = Some(SPPFReduction {
+            cache: Vec::<SPPFNodeRef>::new(),
+            stack,
+            pop_count: 0,
+            length
+        });
     }
 }
 
