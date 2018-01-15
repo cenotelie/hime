@@ -759,6 +759,10 @@ struct SPPFReduction {
     length: usize,
     /// The adjacency cache for the reduction
     cache: Vec<SPPFNodeRef>,
+    /// The reduction handle represented as the indices of the sub-trees in the cache
+    handle_indices: Vec<usize>,
+    /// The actions for the reduction
+    handle_actions: Vec<TreeAction>,
     /// The stack of semantic objects for the reduction
     stack: Vec<usize>,
     /// The number of items popped from the stack
@@ -776,10 +780,6 @@ struct SPPFBuilder<'l> {
     history: Vec<HistoryPart>,
     /// The SPPF being built
     sppf: SPPF,
-    /// The reduction handle represented as the indices of the sub-trees in the cache
-    handle_indices: Vec<usize>,
-    /// The actions for the reduction
-    handle_actions: Vec<TreeAction>,
     /// The data of the current reduction
     reduction: Option<SPPFReduction>,
     /// The AST being built
@@ -788,14 +788,17 @@ struct SPPFBuilder<'l> {
 
 impl<'l> SemanticBody for SPPFBuilder<'l> {
     fn length(&self) -> usize {
-        self.handle_indices.len()
+        match self.reduction {
+            None => panic!("Not in a reduction"),
+            Some(ref data) => data.handle_indices.len()
+        }
     }
 
     fn get_element_at(&self, index: usize) -> SemanticElement {
         match self.reduction {
             None => panic!("Not in a reduction"),
             Some(ref data) => {
-                let reference = data.cache[self.handle_indices[index]];
+                let reference = data.cache[data.handle_indices[index]];
                 let node = self.sppf.get_node(reference.node_id as usize);
                 match node {
                     &SPPFNode::Normal(ref data) => {
@@ -829,8 +832,6 @@ impl<'l> SPPFBuilder<'l> {
             lexer,
             history: Vec::<HistoryPart>::new(),
             sppf: SPPF::new(),
-            handle_indices: Vec::<usize>::new(),
-            handle_actions: Vec::<TreeAction>::new(),
             reduction: None,
             result
         }
@@ -898,11 +899,113 @@ impl<'l> SPPFBuilder<'l> {
             stack.push(first);
         }
         self.reduction = Some(SPPFReduction {
-            cache: Vec::<SPPFNodeRef>::new(),
+            cache: Vec::<SPPFNodeRef>::with_capacity(length),
+            handle_indices: Vec::<usize>::with_capacity(length),
+            handle_actions: Vec::<TreeAction>::with_capacity(length),
             stack,
             pop_count: 0,
             length
         });
+    }
+
+    /// Adds the specified GSS label to the reduction cache with the given tree action
+    fn reduction_add_to_cache(
+        reduction: &mut SPPFReduction,
+        sppf: &SPPF,
+        gss_label: usize,
+        action: TreeAction
+    ) {
+        if action == TREE_ACTION_DROP {
+            return;
+        }
+        let node = sppf.get_node(gss_label);
+        match node {
+            &SPPFNode::Normal(ref normal) => {
+                // this is a simple reference to an existing SPPF node
+                SPPFBuilder::reduction_add_to_cache_node(reduction, normal, action);
+            }
+            &SPPFNode::Replaceable(ref replaceable) => {
+                // this is replaceable sub-tree
+                match &replaceable.children {
+                    &None => {}
+                    &Some(ref children) => {
+                        let actions = replaceable.actions.as_ref().unwrap();
+                        for i in 0..children.len() {
+                            SPPFBuilder::reduction_add_to_cache(
+                                reduction,
+                                sppf,
+                                children[i].node_id as usize,
+                                actions[i]
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Adds the specified GSS label to the reduction cache with the given tree action
+    fn reduction_add_to_cache_node(
+        reduction: &mut SPPFReduction,
+        node: &SPPFNodeNormal,
+        action: TreeAction
+    ) {
+        // add the node in the cache
+        reduction.cache.push(SPPFNodeRef {
+            node_id: node.node_id as u32,
+            version: 0
+        });
+        // setup the handle to point to the root
+        reduction.handle_indices.push(reduction.cache.len() - 1);
+        reduction.handle_actions.push(action);
+        // copy the children
+        match &node.versions[0].children {
+            &None => {}
+            &Some(ref children) => for child in children.iter() {
+                reduction.cache.push(*child);
+            }
+        }
+    }
+
+    /// During a reduction, pops the top symbol from the stack and gives it a tree action
+    pub fn reduction_pop(&mut self, action: TreeAction) {
+        match self.reduction {
+            None => panic!("Not in a reduction"),
+            Some(ref mut reduction) => {
+                let label = reduction.stack[reduction.pop_count];
+                reduction.pop_count += 1;
+                SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, label, action);
+            }
+        }
+    }
+
+    /// During a reduction, inserts a virtual symbol
+    pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
+        if action != TREE_ACTION_DROP {
+            match self.reduction {
+                None => panic!("Not in a reduction"),
+                Some(ref mut reduction) => {
+                    let node_id = self.sppf
+                        .new_normal_node(TableElemRef::new(TableType::Virtual, index));
+                    reduction.cache.push(SPPFNodeRef {
+                        node_id: node_id as u32,
+                        version: 0
+                    });
+                    reduction.handle_indices.push(reduction.cache.len() - 1);
+                    reduction.handle_actions.push(action);
+                }
+            }
+        }
+    }
+
+    /// During a reduction, inserts the sub-tree of a nullable variable
+    pub fn reduction_add_nullable(&mut self, nullable: usize, action: TreeAction) {
+        match self.reduction {
+            None => panic!("Not in a reduction"),
+            Some(ref mut reduction) => {
+                SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
+            }
+        }
     }
 }
 
