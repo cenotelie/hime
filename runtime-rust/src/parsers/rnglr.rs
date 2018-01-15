@@ -512,7 +512,7 @@ impl SPPFNodeVersion {
 /// Represents the interface for a node in a Shared-Packed Parse Forest
 trait SPPFNodeTrait {
     /// Gets the identifier of this node
-    fn get_node_id(&self) -> u32;
+    fn get_node_id(&self) -> usize;
 
     /// Gets the original symbol for this node
     fn get_original_symbol(&self) -> TableElemRef;
@@ -523,7 +523,7 @@ trait SPPFNodeTrait {
 #[derive(Clone)]
 struct SPPFNodeNormal {
     /// The identifier of this node
-    node_id: u32,
+    node_id: usize,
     /// The original label of this node
     original: TableElemRef,
     /// The different versions of this node
@@ -531,7 +531,7 @@ struct SPPFNodeNormal {
 }
 
 impl SPPFNodeTrait for SPPFNodeNormal {
-    fn get_node_id(&self) -> u32 {
+    fn get_node_id(&self) -> usize {
         self.node_id
     }
 
@@ -542,7 +542,7 @@ impl SPPFNodeTrait for SPPFNodeNormal {
 
 impl SPPFNodeNormal {
     /// Initializes this node
-    pub fn new(identifier: u32, label: TableElemRef) -> SPPFNodeNormal {
+    pub fn new(identifier: usize, label: TableElemRef) -> SPPFNodeNormal {
         let mut versions = Vec::<SPPFNodeVersion>::new();
         versions.push(SPPFNodeVersion::new(label));
         SPPFNodeNormal {
@@ -554,7 +554,7 @@ impl SPPFNodeNormal {
 
     /// Initializes this node
     pub fn new_with_children(
-        identifier: u32,
+        identifier: usize,
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
         count: usize
@@ -578,7 +578,7 @@ impl SPPFNodeNormal {
         self.versions
             .push(SPPFNodeVersion::from(label, buffer, count));
         SPPFNodeRef {
-            node_id: self.node_id,
+            node_id: self.node_id as u32,
             version: (self.versions.len() - 1) as u32
         }
     }
@@ -588,7 +588,7 @@ impl SPPFNodeNormal {
 #[derive(Clone)]
 struct SPPFNodeReplaceable {
     /// The identifier of this node
-    node_id: u32,
+    node_id: usize,
     /// The original label of this node
     original: TableElemRef,
     /// The children of this node
@@ -598,7 +598,7 @@ struct SPPFNodeReplaceable {
 }
 
 impl SPPFNodeTrait for SPPFNodeReplaceable {
-    fn get_node_id(&self) -> u32 {
+    fn get_node_id(&self) -> usize {
         self.node_id
     }
 
@@ -610,7 +610,7 @@ impl SPPFNodeTrait for SPPFNodeReplaceable {
 impl SPPFNodeReplaceable {
     /// Initializes this node
     pub fn new(
-        identifier: u32,
+        identifier: usize,
         label: TableElemRef,
         children_buffer: &Vec<SPPFNodeRef>,
         actions_buffer: &Vec<TreeAction>,
@@ -650,7 +650,7 @@ enum SPPFNode {
 }
 
 impl SPPFNodeTrait for SPPFNode {
-    fn get_node_id(&self) -> u32 {
+    fn get_node_id(&self) -> usize {
         match self {
             &SPPFNode::Normal(ref node) => node.node_id,
             &SPPFNode::Replaceable(ref node) => node.node_id
@@ -676,7 +676,7 @@ impl SPPFNode {
 }
 
 /// Represents the epsilon node
-const EPSILON: u32 = 0xFFFFFFFF;
+const EPSILON: usize = 0xFFFFFFFF;
 
 /// Represents a Shared-Packed Parse Forest
 struct SPPF {
@@ -693,8 +693,8 @@ impl SPPF {
     }
 
     /// Gets the SPPF node for the specified identifier
-    pub fn get_node(&self, identifier: u32) -> &SPPFNode {
-        &self.nodes[identifier as usize]
+    pub fn get_node(&self, identifier: usize) -> &SPPFNode {
+        &self.nodes[identifier]
     }
 
     /// Creates a new single node in the SPPF
@@ -703,8 +703,8 @@ impl SPPF {
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
         count: usize
-    ) -> u32 {
-        let identifier = self.nodes.len() as u32;
+    ) -> usize {
+        let identifier = self.nodes.len();
         self.nodes
             .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
                 identifier,
@@ -722,8 +722,8 @@ impl SPPF {
         children_buffer: &Vec<SPPFNodeRef>,
         actions_buffer: &Vec<TreeAction>,
         count: usize
-    ) -> u32 {
-        let identifier = self.nodes.len() as u32;
+    ) -> usize {
+        let identifier = self.nodes.len();
         self.nodes
             .push(SPPFNode::Replaceable(SPPFNodeReplaceable::new(
                 identifier,
@@ -778,22 +778,6 @@ struct SPPFBuilder<'l> {
     result: Ast<'l>
 }
 
-impl<'l> SPPFBuilder<'l> {
-    /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
-        SPPFBuilder {
-            lexer,
-            history: Vec::<HistoryPart>::new(),
-            sppf: SPPF::new(),
-            handle_indices: Vec::<usize>::new(),
-            handle_actions: Vec::<TreeAction>::new(),
-            reduction: None,
-            stack: Vec::<usize>::new(),
-            result
-        }
-    }
-}
-
 impl<'l> SemanticBody for SPPFBuilder<'l> {
     fn length(&self) -> usize {
         self.handle_indices.len()
@@ -804,7 +788,7 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
             None => panic!("Not in a reduction"),
             Some(ref data) => {
                 let reference = data.cache[self.handle_indices[index]];
-                let node = self.sppf.get_node(reference.node_id);
+                let node = self.sppf.get_node(reference.node_id as usize);
                 match node {
                     &SPPFNode::Normal(ref data) => {
                         let label = data.versions[reference.version as usize].label;
@@ -827,6 +811,68 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
                 }
             }
         }
+    }
+}
+
+impl<'l> SPPFBuilder<'l> {
+    /// Initializes the builder with the given stack size
+    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
+        SPPFBuilder {
+            lexer,
+            history: Vec::<HistoryPart>::new(),
+            sppf: SPPF::new(),
+            handle_indices: Vec::<usize>::new(),
+            handle_actions: Vec::<TreeAction>::new(),
+            reduction: None,
+            stack: Vec::<usize>::new(),
+            result
+        }
+    }
+
+    /// Gets the history part for the given GSS generation
+    fn get_history_part(&mut self, generation: usize) -> Option<&mut HistoryPart> {
+        let my_history = &mut self.history;
+        for i in 0..my_history.len() {
+            if my_history[i].generation == generation {
+                return Some(&mut my_history[i]);
+            }
+        }
+        None
+    }
+
+    /// Clears the current history
+    pub fn clear_history(&mut self) {
+        self.history.clear();
+    }
+
+    /// Gets the symbol on the specified GSS edge label
+    pub fn get_symbol_on(&self, label: usize) -> Symbol {
+        let node_label = self.sppf.get_node(label).get_original_symbol();
+        match node_label.get_type() {
+            TableType::None => panic!("Not a semantic element"),
+            TableType::Token => self.lexer
+                .get_output()
+                .get_token(node_label.get_index())
+                .get_symbol(),
+            TableType::Variable => self.result.get_variables()[node_label.get_index()],
+            TableType::Virtual => self.result.get_virtuals()[node_label.get_index()]
+        }
+    }
+
+    /// Gets the GSS label already in history for the given GSS generation and symbol
+    pub fn get_label_for(&self, generation: usize, reference: TableElemRef) -> usize {
+        for i in 0..self.history.len() {
+            let hp = &self.history[i];
+            if hp.generation == generation {
+                for id in hp.data.iter() {
+                    let node_symbol = self.sppf.get_node(*id).get_original_symbol();
+                    if node_symbol == reference {
+                        return *id;
+                    }
+                }
+            }
+        }
+        EPSILON
     }
 }
 
