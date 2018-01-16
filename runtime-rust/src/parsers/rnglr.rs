@@ -508,6 +508,14 @@ impl SPPFNodeVersion {
             }
         }
     }
+
+    /// Gets the number of children
+    pub fn len(&self) -> usize {
+        match &self.children {
+            &None => 0,
+            &Some(ref children) => children.len()
+        }
+    }
 }
 
 /// Represents the interface for a node in a Shared-Packed Parse Forest
@@ -556,6 +564,7 @@ impl SPPFNodeNormal {
     /// Initializes this node
     pub fn new_with_children(
         identifier: usize,
+        original: TableElemRef,
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
         count: usize
@@ -564,7 +573,7 @@ impl SPPFNodeNormal {
         versions.push(SPPFNodeVersion::from(label, buffer, count));
         SPPFNodeNormal {
             node_id: identifier,
-            original: label,
+            original,
             versions
         }
     }
@@ -698,6 +707,11 @@ impl SPPF {
         &self.nodes[identifier]
     }
 
+    /// Gets the SPPF node for the specified identifier
+    pub fn get_node_mut(&mut self, identifier: usize) -> &mut SPPFNode {
+        &mut self.nodes[identifier]
+    }
+
     /// Creates a new single node in the SPPF
     pub fn new_normal_node(&mut self, label: TableElemRef) -> usize {
         let identifier = self.nodes.len();
@@ -709,6 +723,7 @@ impl SPPF {
     /// Creates a new single node in the SPPF
     pub fn new_normal_node_with_children(
         &mut self,
+        original: TableElemRef,
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
         count: usize
@@ -717,6 +732,7 @@ impl SPPF {
         self.nodes
             .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
                 identifier,
+                original,
                 label,
                 buffer,
                 count
@@ -1019,6 +1035,112 @@ impl<'l> SPPFBuilder<'l> {
             None => panic!("Not in a reduction"),
             Some(ref mut reduction) => {
                 SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
+            }
+        }
+    }
+
+    /// Finalizes the reduction operation
+    pub fn reduce(&mut self, generation: usize, variable_index: usize, replaceable: bool) -> usize {
+        let label = if replaceable {
+            self.reduce_replaceable(variable_index)
+        } else {
+            self.reduce_normal(variable_index)
+        };
+        self.add_to_history(generation, label);
+        label
+    }
+
+    /// Executes the reduction as a normal reduction
+    pub fn reduce_normal(&mut self, variable_index: usize) -> usize {
+        match self.reduction {
+            None => panic!("Not in a reduction"),
+            Some(ref mut reduction) => {
+                let mut promoted: Option<(TableElemRef, SPPFNodeRef)> = None;
+                let mut insertion = 0;
+
+                for i in 0..reduction.handle_indices.len() {
+                    if reduction.handle_actions[i] == TREE_ACTION_PROMOTE {
+                        match promoted {
+                            None => {}
+                            Some((symbol, node_ref)) => {
+                                // not the first promotion
+                                // create a new version for the promoted node
+                                let old_promoted_node =
+                                    self.sppf.get_node_mut(node_ref.node_id as usize);
+                                let old_promoted_ref = match old_promoted_node {
+                                    &mut SPPFNode::Replaceable(ref _data) => {
+                                        panic!("Expected a normal node")
+                                    }
+                                    &mut SPPFNode::Normal(ref mut normal) => {
+                                        normal.new_version(symbol, &reduction.cache, insertion)
+                                    }
+                                };
+                                // register the previously promoted reference into the cache
+                                reduction.cache[0] = old_promoted_ref;
+                                insertion = 1;
+                            }
+                        }
+                        // save the new promoted node
+                        let promoted_reference = reduction.cache[reduction.handle_indices[i]];
+                        let promoted_node = self.sppf.get_node(promoted_reference.node_id as usize);
+                        match promoted_node {
+                            &SPPFNode::Replaceable(ref _data) => panic!("Expected normal node"),
+                            &SPPFNode::Normal(ref normal) => {
+                                let promoted_version =
+                                    &normal.versions[promoted_reference.version as usize];
+                                promoted = Some((promoted_version.label, promoted_reference));
+                                // repack the children on the left if any
+                                for c in 0..promoted_version.len() {
+                                    reduction.cache[insertion] =
+                                        reduction.cache[reduction.handle_indices[i] + 1 + c];
+                                    insertion += 1;
+                                }
+                            }
+                        }
+                    } else {
+                        // Repack the sub-root on the left
+                        if insertion != reduction.handle_indices[i] {
+                            reduction.cache[insertion] =
+                                reduction.cache[reduction.handle_indices[i]];
+                        }
+                        insertion += 1;
+                    }
+                }
+
+                let original_label = TableElemRef::new(TableType::Variable, variable_index);
+                let current_label = match promoted {
+                    None => original_label,
+                    Some((symbol, node_ref)) => symbol
+                };
+                self.sppf.new_normal_node_with_children(
+                    original_label,
+                    current_label,
+                    &reduction.cache,
+                    insertion
+                )
+            }
+        }
+    }
+
+    /// Executes the reduction as the reduction of a replaceable variable
+    pub fn reduce_replaceable(&mut self, variable_index: usize) -> usize {
+        match self.reduction {
+            None => panic!("Not in a reduction"),
+            Some(ref mut reduction) => {
+                let mut insertion = 0;
+                for i in 0..reduction.handle_indices.len() {
+                    if insertion != reduction.handle_indices[i] {
+                        reduction.cache[insertion] = reduction.cache[reduction.handle_indices[i]];
+                    }
+                    insertion += 1;
+                }
+                let label = TableElemRef::new(TableType::Variable, variable_index);
+                self.sppf.new_replaceable_node(
+                    label,
+                    &reduction.cache,
+                    &reduction.handle_actions,
+                    reduction.handle_indices.len()
+                )
             }
         }
     }
