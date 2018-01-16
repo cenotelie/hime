@@ -22,6 +22,7 @@ use std::usize;
 use super::*;
 use super::subtree::SubTree;
 use super::super::ast::Ast;
+use super::super::ast::AstCell;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
 use super::super::errors::ParseErrorUnexpectedToken;
@@ -853,6 +854,20 @@ impl<'l> SPPFBuilder<'l> {
         self.history.clear();
     }
 
+    /// Adds the specified GSS label to the current history
+    pub fn add_to_history(&mut self, generation: usize, label: usize) {
+        let my_history = &mut self.history;
+        for i in 0..my_history.len() {
+            if my_history[i].generation == generation {
+                my_history[i].data.push(label);
+                return;
+            }
+        }
+        let mut data = Vec::<usize>::new();
+        data.push(label);
+        my_history.push(HistoryPart { generation, data });
+    }
+
     /// Gets the symbol on the specified GSS edge label
     pub fn get_symbol_on(&self, label: usize) -> Symbol {
         let node_label = self.sppf.get_node(label).get_original_symbol();
@@ -1004,6 +1019,50 @@ impl<'l> SPPFBuilder<'l> {
             None => panic!("Not in a reduction"),
             Some(ref mut reduction) => {
                 SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
+            }
+        }
+    }
+
+    /// Finalizes the parse tree
+    pub fn commit_root(&mut self, root: usize) {
+        let sppf = &self.sppf;
+        let result = &mut self.result;
+        let cell_root = SPPFBuilder::build_final_ast(
+            sppf,
+            SPPFNodeRef {
+                node_id: root as u32,
+                version: 0
+            },
+            result
+        );
+        result.store_root(cell_root);
+    }
+
+    /// Builds thSe final AST for the specified PPF node reference
+    fn build_final_ast(sppf: &SPPF, reference: SPPFNodeRef, result: &mut Ast) -> AstCell {
+        match sppf.get_node(reference.node_id as usize) {
+            &SPPFNode::Replaceable(ref _data) => panic!("Expected normal SPPF node"),
+            &SPPFNode::Normal(ref data) => {
+                let version = &data.versions[reference.version as usize];
+                match &version.children {
+                    &None => AstCell {
+                        label: version.label,
+                        first: 0,
+                        count: 0
+                    },
+                    &Some(ref children) => {
+                        let mut buffer = Vec::<AstCell>::with_capacity(children.len());
+                        for i in 0..children.len() {
+                            buffer.push(SPPFBuilder::build_final_ast(sppf, children[i], result));
+                        }
+                        let first = result.store(&buffer, 0, buffer.len());
+                        AstCell {
+                            label: version.label,
+                            first: first as u32,
+                            count: children.len() as u32
+                        }
+                    }
+                }
             }
         }
     }
