@@ -854,6 +854,11 @@ impl<'l> SPPFBuilder<'l> {
         }
     }
 
+    /// Gets the grammar variables for this AST
+    pub fn get_variables(&self) -> &'static [Symbol] {
+        self.result.get_variables()
+    }
+
     /// Gets the history part for the given GSS generation
     fn get_history_part(&mut self, generation: usize) -> Option<&mut HistoryPart> {
         let my_history = &mut self.history;
@@ -1278,6 +1283,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         };
         RNGLRParser::build_nullables(
             &mut parser.builder,
+            &mut parser.data.actions,
             &mut parser.nullables,
             &parser.data.automaton,
             parser.data.variables
@@ -1288,6 +1294,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     /// Builds the constant sub-trees of nullable variables
     fn build_nullables(
         builder: &mut SPPFBuilder<'l>,
+        actions: &mut FnMut(usize, Symbol, &SemanticBody),
         nullables: &mut Vec<usize>,
         automaton: &RNGLRAutomaton,
         variables: &[Symbol]
@@ -1318,6 +1325,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                             let production = automaton.get_nullable_production(i);
                             nullables[i] = RNGLRParser::build_sppf(
                                 builder,
+                                actions,
+                                nullables,
                                 0,
                                 production.unwrap(),
                                 EPSILON,
@@ -1395,12 +1404,46 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     /// Builds the SPPF
     fn build_sppf(
         builder: &mut SPPFBuilder<'l>,
+        actions: &mut FnMut(usize, Symbol, &SemanticBody),
+        nullables: &Vec<usize>,
         generation: usize,
         production: &LRProduction,
         first: usize,
         path: GSSPath
     ) -> usize {
-        0
+        let variable = builder.get_variables()[production.head];
+        builder.reduction_prepare(first, &path, production.reduction_length);
+        let mut i = 0;
+        while i < production.bytecode.len() {
+            let op_code = production.bytecode[i];
+            i += 1;
+            match get_op_code_base(op_code) {
+                LR_OP_CODE_BASE_SEMANTIC_ACTION => {
+                    let index = production.bytecode[i] as usize;
+                    i += 1;
+                    actions(index, variable, builder);
+                }
+                LR_OP_CODE_BASE_ADD_VIRTUAL => {
+                    let index = production.bytecode[i] as usize;
+                    i += 1;
+                    builder.reduction_add_virtual(index, get_op_code_tree_action(op_code));
+                }
+                LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
+                    let index = production.bytecode[i] as usize;
+                    i += 1;
+                    builder
+                        .reduction_add_nullable(nullables[index], get_op_code_tree_action(op_code));
+                }
+                _ => {
+                    builder.reduction_pop(get_op_code_tree_action(op_code));
+                }
+            }
+        }
+        builder.reduce(
+            generation,
+            production.head,
+            production.head_action == TREE_ACTION_REPLACE
+        )
     }
 }
 
