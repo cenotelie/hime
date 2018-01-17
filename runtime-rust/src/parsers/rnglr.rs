@@ -17,18 +17,18 @@
 
 //! Module for RNGLR parsers
 
+use std::collections::VecDeque;
 use std::usize;
 
 use super::*;
-use super::subtree::SubTree;
 use super::super::ast::Ast;
 use super::super::ast::AstCell;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
 use super::super::errors::ParseErrorUnexpectedToken;
-use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
+use super::super::symbols::SID_EPSILON;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 use super::super::symbols::SemanticElementTrait;
@@ -398,7 +398,7 @@ impl GSS {
         // Initialize the first path
         paths.push(GSSPath::new(from, self.get_generation_of(from), length));
         // For the remaining hops
-        for i in 0..length {
+        for _i in 0..length {
             // Insertion index for the compaction process
             let mut m = 0;
             let total = paths.len();
@@ -1115,7 +1115,7 @@ impl<'l> SPPFBuilder<'l> {
                 let original_label = TableElemRef::new(TableType::Variable, variable_index);
                 let current_label = match promoted {
                     None => original_label,
-                    Some((symbol, node_ref)) => symbol
+                    Some((symbol, _node_ref)) => symbol
                 };
                 self.sppf.new_normal_node_with_children(
                     original_label,
@@ -1200,6 +1200,7 @@ impl<'l> SPPFBuilder<'l> {
 /// the first label then is epsilon
 /// For others, the node is the SECOND GSS node on the path, not the head.
 /// The first label is then the label on the transition from the head.
+#[derive(Copy, Clone)]
 struct RNGLRReduction {
     /// The GSS node to reduce from
     node: usize,
@@ -1210,6 +1211,7 @@ struct RNGLRReduction {
 }
 
 /// Represents a shift operation to be performed
+#[derive(Copy, Clone)]
 struct RNGLRShift {
     /// GSS node to shift from
     from: usize,
@@ -1222,12 +1224,10 @@ struct RNGLRParserData<'a> {
     automaton: RNGLRAutomaton,
     /// The GSS for this parser
     gss: GSS,
-    /// The next token
-    next_token: Option<TokenKernel>,
     /// The queue of reduction operations
-    reductions: Vec<RNGLRReduction>,
+    reductions: VecDeque<RNGLRReduction>,
     /// The queue of shift operations
-    shifts: Vec<RNGLRShift>,
+    shifts: VecDeque<RNGLRShift>,
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
@@ -1240,15 +1240,87 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
     /// The absence of value represents the unavailability of the required context.
     fn get_context_priority(
         &self,
-        token_count: usize,
-        context: u16,
-        terminal_id: u32
+        _token_count: usize,
+        _context: u16,
+        _terminal_id: u32
     ) -> Option<usize> {
         unimplemented!()
     }
 }
 
-impl<'a> RNGLRParserData<'a> {}
+impl<'a> RNGLRParserData<'a> {
+    /// Executes a shift operation
+    fn parse_shift(
+        &mut self,
+        generation: usize,
+        label: usize,
+        shift: RNGLRShift,
+        next_token: TokenKernel
+    ) {
+        let w = self.gss.find_node(generation, shift.to as u32);
+        match w {
+            Some(w) => {
+                // A node for the target state is already in the GSS
+                self.gss.create_edge(w, shift.from, label);
+                // Look for the new reductions at this state
+                let count = self.automaton
+                    .get_actions_count(shift.to as u32, next_token.terminal_id);
+                for i in 0..count {
+                    let action =
+                        self.automaton
+                            .get_action(shift.to as u32, next_token.terminal_id, i);
+                    if action.get_code() == LR_ACTION_CODE_REDUCE {
+                        let production = self.automaton.get_production(action.get_data() as usize);
+                        // length 0 reduction are not considered here because they already exist at this point
+                        if production.reduction_length > 0 {
+                            self.reductions.push_back(RNGLRReduction {
+                                node: shift.from,
+                                production: action.get_data() as usize,
+                                first: label
+                            });
+                        }
+                    }
+                }
+            }
+            None => {
+                // Create the new corresponding node in the GSS
+                let w = self.gss.create_node(shift.to as u32);
+                self.gss.create_edge(w, shift.from, label);
+                // Look for all the reductions and shifts at this state
+                let count = self.automaton
+                    .get_actions_count(shift.to as u32, next_token.terminal_id);
+                for i in 0..count {
+                    let action =
+                        self.automaton
+                            .get_action(shift.to as u32, next_token.terminal_id, i);
+                    if action.get_code() == LR_ACTION_CODE_SHIFT {
+                        self.shifts.push_back(RNGLRShift {
+                            from: w,
+                            to: action.get_data() as usize
+                        });
+                    } else if action.get_code() == LR_ACTION_CODE_REDUCE {
+                        let production = self.automaton.get_production(action.get_data() as usize);
+                        if production.reduction_length == 0 {
+                            // Length 0 => reduce from the head
+                            self.reductions.push_back(RNGLRReduction {
+                                node: w,
+                                production: action.get_data() as usize,
+                                first: EPSILON
+                            });
+                        } else {
+                            // reduce from the second node on the path
+                            self.reductions.push_back(RNGLRReduction {
+                                node: shift.from,
+                                production: action.get_data() as usize,
+                                first: label
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 /// Represents a base for all RNGLR parsers
 pub struct RNGLRParser<'l, 'a: 'l> {
@@ -1272,9 +1344,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             data: RNGLRParserData {
                 automaton,
                 gss: GSS::new(),
-                next_token: None,
-                reductions: Vec::<RNGLRReduction>::new(),
-                shifts: Vec::<RNGLRShift>::new(),
+                reductions: VecDeque::<RNGLRReduction>::new(),
+                shifts: VecDeque::<RNGLRShift>::new(),
                 variables: ast.get_variables(),
                 actions
             },
@@ -1299,7 +1370,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         automaton: &RNGLRAutomaton,
         variables: &[Symbol]
     ) {
-        for i in 0..variables.len() {
+        for _i in 0..variables.len() {
             nullables.push(0xFFFFFFFF);
         }
 
@@ -1445,8 +1516,145 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             production.head_action == TREE_ACTION_REPLACE
         )
     }
+
+    /// Gets the next token in the kernel
+    fn get_next_token(&mut self) -> Option<TokenKernel> {
+        let data = &self.data;
+        self.builder.lexer.get_next_token(data)
+    }
+
+    /// Executes the reduction operations from the given GSS generation
+    fn parse_reductions(&mut self, generation: usize) {
+        self.builder.clear_history();
+        while !self.data.reductions.is_empty() {
+            let reduction = self.data.reductions.pop_front().unwrap();
+            self.parse_reduction(generation, reduction);
+        }
+    }
+
+    /// Executes a reduction operation for all found path
+    fn parse_reduction(&mut self, generation: usize, reduction: RNGLRReduction) {
+        let paths = {
+            let production = self.data.automaton.get_production(reduction.production);
+            if production.reduction_length == 0 {
+                self.data.gss.get_paths(reduction.node, 0)
+            } else {
+                // The given GSS node is the second on the path, so start from it with length - 1
+                self.data
+                    .gss
+                    .get_paths(reduction.node, production.reduction_length - 1)
+            }
+        };
+        for i in 0..paths.len() {
+            self.parse_reduction_path(generation, reduction, &paths[i]);
+        }
+    }
+
+    /// Executes a reduction operation for a given path
+    fn parse_reduction_path(
+        &mut self,
+        generation: usize,
+        reduction: RNGLRReduction,
+        path: &GSSPath
+    ) {
+
+    }
+
+    /// Executes the shift operations for the given token
+    fn parse_shifts(&mut self, old_token: TokenKernel, next_token: TokenKernel) -> usize {
+        // Create next generation
+        let new_gen = self.data.gss.create_generation();
+        // Create the GSS label to be used for the transitions
+        let symbol = TableElemRef::new(TableType::Token, old_token.index as usize);
+        let label = self.builder.get_single_node(symbol);
+        // Execute all shifts in the queue at this point
+        let count = self.data.shifts.len();
+        for _i in 0..count {
+            let shift = self.data.shifts.pop_front().unwrap();
+            self.data.parse_shift(new_gen, label, shift, next_token);
+        }
+        new_gen
+    }
+
+    /// Builds the unexpected token error
+    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken {
+        let token = self.builder
+            .lexer
+            .get_output()
+            .get_token(kernel.index as usize);
+        let mut my_expected = Vec::<Symbol>::new();
+        ParseErrorUnexpectedToken::new(
+            token.get_position().unwrap(),
+            token.get_span().unwrap().length,
+            token.get_value().unwrap(),
+            token.get_symbol(),
+            my_expected
+        )
+    }
 }
 
 impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
-    fn parse(&mut self) {}
+    fn parse(&mut self) {
+        let mut generation = self.data.gss.create_generation();
+        let state0 = self.data.gss.create_node(0);
+        // cannot fail because on empty input we at least get the epsilon token
+        let mut next_token = self.get_next_token().unwrap();
+
+        // bootstrap the shifts and reductions queues
+        {
+            let count = self.data
+                .automaton
+                .get_actions_count(0, next_token.terminal_id);
+            for i in 0..count {
+                let action = self.data.automaton.get_action(0, next_token.terminal_id, i);
+                if action.get_code() == LR_ACTION_CODE_SHIFT {
+                    self.data.shifts.push_back(RNGLRShift {
+                        from: state0,
+                        to: action.get_data() as usize
+                    });
+                } else if action.get_code() == LR_ACTION_CODE_REDUCE {
+                    self.data.reductions.push_back(RNGLRReduction {
+                        node: state0,
+                        production: action.get_data() as usize,
+                        first: EPSILON
+                    });
+                }
+            }
+        }
+
+        // Wait for ε token
+        while next_token.terminal_id != SID_EPSILON {
+            // the stem length (initial number of nodes in the generation before reductions)
+            let _stem = self.data.gss.get_generation(generation).count;
+            // apply all reduction actions
+            self.parse_reductions(generation);
+            // no scheduled shift actions?
+            if self.data.shifts.is_empty() {
+                // this is an error
+                let error = self.build_error(next_token);
+                let errors = self.builder.lexer.get_errors();
+                errors.push_error_unexpected_token(error);
+                // TODO: try to recover here
+                return;
+            }
+            // look for the next next-token
+            let old_token = next_token;
+            next_token = self.get_next_token().unwrap();
+            // apply the scheduled shift actions
+            generation = self.parse_shifts(old_token, next_token);
+        }
+
+        let generation_data = self.data.gss.get_generation(generation);
+        for i in generation_data.start..(generation_data.start + generation_data.count) {
+            let state = self.data.gss.get_represented_state(i);
+            if self.data.automaton.is_accepting_state(state) {
+                // Has reduction _Axiom_ -> axiom $ . on ε
+                let paths = self.data.gss.get_paths(i, 2);
+                let root = paths[0].labels.as_ref().unwrap()[1];
+                self.builder.commit_root(root);
+            }
+        }
+        // At end of input but was still waiting for tokens
+        return;
+    }
 }
