@@ -521,9 +521,6 @@ impl SPPFNodeVersion {
 
 /// Represents the interface for a node in a Shared-Packed Parse Forest
 trait SPPFNodeTrait {
-    /// Gets the identifier of this node
-    fn get_node_id(&self) -> usize;
-
     /// Gets the original symbol for this node
     fn get_original_symbol(&self) -> TableElemRef;
 }
@@ -532,8 +529,6 @@ trait SPPFNodeTrait {
 /// A node can have multiple versions
 #[derive(Clone)]
 struct SPPFNodeNormal {
-    /// The identifier of this node
-    node_id: usize,
     /// The original label of this node
     original: TableElemRef,
     /// The different versions of this node
@@ -541,10 +536,6 @@ struct SPPFNodeNormal {
 }
 
 impl SPPFNodeTrait for SPPFNodeNormal {
-    fn get_node_id(&self) -> usize {
-        self.node_id
-    }
-
     fn get_original_symbol(&self) -> TableElemRef {
         self.original
     }
@@ -552,11 +543,10 @@ impl SPPFNodeTrait for SPPFNodeNormal {
 
 impl SPPFNodeNormal {
     /// Initializes this node
-    pub fn new(identifier: usize, label: TableElemRef) -> SPPFNodeNormal {
+    pub fn new(label: TableElemRef) -> SPPFNodeNormal {
         let mut versions = Vec::<SPPFNodeVersion>::new();
         versions.push(SPPFNodeVersion::new(label));
         SPPFNodeNormal {
-            node_id: identifier,
             original: label,
             versions
         }
@@ -564,7 +554,6 @@ impl SPPFNodeNormal {
 
     /// Initializes this node
     pub fn new_with_children(
-        identifier: usize,
         original: TableElemRef,
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
@@ -572,11 +561,7 @@ impl SPPFNodeNormal {
     ) -> SPPFNodeNormal {
         let mut versions = Vec::<SPPFNodeVersion>::new();
         versions.push(SPPFNodeVersion::from(label, buffer, count));
-        SPPFNodeNormal {
-            node_id: identifier,
-            original,
-            versions
-        }
+        SPPFNodeNormal { original, versions }
     }
 
     /// Adds a new version to this node
@@ -585,21 +570,17 @@ impl SPPFNodeNormal {
         label: TableElemRef,
         buffer: &Vec<SPPFNodeRef>,
         count: usize
-    ) -> SPPFNodeRef {
+    ) -> usize {
+        let result = self.versions.len();
         self.versions
             .push(SPPFNodeVersion::from(label, buffer, count));
-        SPPFNodeRef {
-            node_id: self.node_id as u32,
-            version: (self.versions.len() - 1) as u32
-        }
+        result
     }
 }
 
 /// Represents a node in a Shared-Packed Parse Forest that can be replaced by its children
 #[derive(Clone)]
 struct SPPFNodeReplaceable {
-    /// The identifier of this node
-    node_id: usize,
     /// The original label of this node
     original: TableElemRef,
     /// The children of this node
@@ -609,10 +590,6 @@ struct SPPFNodeReplaceable {
 }
 
 impl SPPFNodeTrait for SPPFNodeReplaceable {
-    fn get_node_id(&self) -> usize {
-        self.node_id
-    }
-
     fn get_original_symbol(&self) -> TableElemRef {
         self.original
     }
@@ -621,7 +598,6 @@ impl SPPFNodeTrait for SPPFNodeReplaceable {
 impl SPPFNodeReplaceable {
     /// Initializes this node
     pub fn new(
-        identifier: usize,
         label: TableElemRef,
         children_buffer: &Vec<SPPFNodeRef>,
         actions_buffer: &Vec<TreeAction>,
@@ -629,7 +605,6 @@ impl SPPFNodeReplaceable {
     ) -> SPPFNodeReplaceable {
         if count == 0 {
             SPPFNodeReplaceable {
-                node_id: identifier,
                 original: label,
                 children: None,
                 actions: None
@@ -642,7 +617,6 @@ impl SPPFNodeReplaceable {
                 actions.push(actions_buffer[i]);
             }
             SPPFNodeReplaceable {
-                node_id: identifier,
                 original: label,
                 children: Some(children),
                 actions: Some(actions)
@@ -661,13 +635,6 @@ enum SPPFNode {
 }
 
 impl SPPFNodeTrait for SPPFNode {
-    fn get_node_id(&self) -> usize {
-        match self {
-            &SPPFNode::Normal(ref node) => node.node_id,
-            &SPPFNode::Replaceable(ref node) => node.node_id
-        }
-    }
-
     fn get_original_symbol(&self) -> TableElemRef {
         match self {
             &SPPFNode::Normal(ref node) => node.original,
@@ -725,7 +692,7 @@ impl SPPF {
     pub fn new_normal_node(&mut self, label: TableElemRef) -> usize {
         let identifier = self.nodes.len();
         self.nodes
-            .push(SPPFNode::Normal(SPPFNodeNormal::new(identifier, label)));
+            .push(SPPFNode::Normal(SPPFNodeNormal::new(label)));
         identifier
     }
 
@@ -740,7 +707,6 @@ impl SPPF {
         let identifier = self.nodes.len();
         self.nodes
             .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
-                identifier,
                 original,
                 label,
                 buffer,
@@ -760,7 +726,6 @@ impl SPPF {
         let identifier = self.nodes.len();
         self.nodes
             .push(SPPFNode::Replaceable(SPPFNodeReplaceable::new(
-                identifier,
                 label,
                 children_buffer,
                 actions_buffer,
@@ -944,7 +909,7 @@ impl<'l> SPPFBuilder<'l> {
         match node {
             &SPPFNode::Normal(ref normal) => {
                 // this is a simple reference to an existing SPPF node
-                SPPFBuilder::reduction_add_to_cache_node(reduction, normal, action);
+                SPPFBuilder::reduction_add_to_cache_node(reduction, normal, gss_label, action);
             }
             &SPPFNode::Replaceable(ref replaceable) => {
                 // this is replaceable sub-tree
@@ -970,11 +935,12 @@ impl<'l> SPPFBuilder<'l> {
     fn reduction_add_to_cache_node(
         reduction: &mut SPPFReduction,
         node: &SPPFNodeNormal,
+        node_id: usize,
         action: TreeAction
     ) {
         // add the node in the cache
         reduction.cache.push(SPPFNodeRef {
-            node_id: node.node_id as u32,
+            node_id: node_id as u32,
             version: 0
         });
         // setup the handle to point to the root
@@ -1049,11 +1015,14 @@ impl<'l> SPPFBuilder<'l> {
                         // not the first promotion
                         // create a new version for the promoted node
                         let old_promoted_node = self.sppf.get_node_mut(node_ref.node_id as usize);
-                        let old_promoted_ref = old_promoted_node.as_normal_mut().new_version(
-                            symbol,
-                            &reduction.cache,
-                            insertion
-                        );
+                        let old_promoted_ref = SPPFNodeRef {
+                            node_id: node_ref.node_id,
+                            version: old_promoted_node.as_normal_mut().new_version(
+                                symbol,
+                                &reduction.cache,
+                                insertion
+                            ) as u32
+                        };
                         // register the previously promoted reference into the cache
                         reduction.cache[0] = old_promoted_ref;
                         insertion = 1;
