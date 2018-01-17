@@ -1391,6 +1391,112 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
 }
 
 impl<'a> RNGLRParserData<'a> {
+    /// Checks whether the specified terminal is indeed expected for a reduction
+    /// This check is required because in the case of a base LALR graph,
+    /// some terminals expected for reduction in the automaton are coming from other paths.
+    fn check_is_expected(&self, gss_node: usize, terminal: Symbol) -> bool {
+        // queue of GLR states to inspect:
+        let mut queue_gss_heads = Vec::<usize>::new(); // the related GSS head
+        let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
+
+        // first reduction
+        {
+            let count = self.automaton
+                .get_actions_count(self.gss.get_represented_state(gss_node), terminal.id);
+            for j in 0..count {
+                let action = self.automaton.get_action(
+                    self.gss.get_represented_state(gss_node),
+                    terminal.id,
+                    j
+                );
+                if action.get_code() != LR_ACTION_CODE_REDUCE {
+                    continue;
+                }
+                let production = self.automaton.get_production(action.get_data() as usize);
+                let paths = self.gss.get_paths(gss_node, production.reduction_length);
+                for path in paths.iter() {
+                    // get the target GLR state
+                    let next = self.get_next_by_var(
+                        self.gss.get_represented_state(path.last_node),
+                        self.variables[production.head].id
+                    );
+                    // enqueue the info, top GSS stack node and target GLR state
+                    queue_gss_heads.push(path.last_node);
+                    let mut virtual_stack = Vec::<u32>::with_capacity(1);
+                    virtual_stack.push(next.unwrap());
+                    queue_vstack.push(virtual_stack);
+                }
+            }
+        }
+
+        // now, close the queue
+        let mut i = 0;
+        while i < queue_gss_heads.len() {
+            let head = queue_vstack[i][queue_vstack[i].len() - 1];
+            let gss_node = queue_gss_heads[i];
+            let count = self.automaton.get_actions_count(head, terminal.id);
+            if count == 0 {
+                i += 1;
+                continue;
+            }
+            for j in 0..count {
+                let action = self.automaton.get_action(head, terminal.id, j);
+                if action.get_code() == LR_ACTION_CODE_SHIFT {
+                    // yep, the terminal was expected
+                    return true;
+                }
+                if action.get_code() != LR_ACTION_CODE_REDUCE {
+                    continue;
+                }
+                // execute the reduction
+                let production = self.automaton.get_production(action.get_data() as usize);
+                if production.reduction_length == 0 {
+                    // 0-length reduction => start from the current head
+                    let mut virtual_stack = queue_vstack[i].clone();
+                    let next = self.get_next_by_var(head, self.variables[production.head].id);
+                    virtual_stack.push(next.unwrap());
+                    // enqueue
+                    queue_gss_heads.push(gss_node);
+                    queue_vstack.push(virtual_stack);
+                } else if production.reduction_length < queue_vstack[i].len() {
+                    // we are still the virtual stack
+                    let mut virtual_stack = Vec::<u32>::with_capacity(
+                        queue_vstack[i].len() - production.reduction_length + 1
+                    );
+                    for k in 0..(queue_vstack[i].len() - production.reduction_length) {
+                        virtual_stack.push(queue_vstack[i][k]);
+                    }
+                    let next = self.get_next_by_var(head, self.variables[production.head].id);
+                    virtual_stack.push(next.unwrap());
+                    // enqueue
+                    queue_gss_heads.push(gss_node);
+                    queue_vstack.push(virtual_stack);
+                } else {
+                    // we reach the GSS
+                    let paths = self.gss.get_paths(
+                        gss_node,
+                        production.reduction_length - queue_vstack[i].len()
+                    );
+                    for path in paths.iter() {
+                        // get the target GLR state
+                        let next = self.get_next_by_var(
+                            self.gss.get_represented_state(path.last_node),
+                            self.variables[production.head].id
+                        );
+                        // enqueue the info, top GSS stack node and target GLR state
+                        queue_gss_heads.push(path.last_node);
+                        let mut virtual_stack = Vec::<u32>::with_capacity(1);
+                        virtual_stack.push(next.unwrap());
+                        queue_vstack.push(virtual_stack);
+                    }
+                }
+            }
+            i += 1;
+        }
+        // nope, that was a pathological case in a LALR graph
+        return false;
+    }
+
     /// Gets the next RNGLR state by a shift with the given variable ID
     fn get_next_by_var(&self, state: u32, variable_id: u32) -> Option<u32> {
         let count = self.automaton.get_actions_count(state, variable_id);
@@ -1840,12 +1946,38 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     }
 
     /// Builds the unexpected token error
-    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken {
+    fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken {
         let token = self.builder
             .lexer
             .get_output()
             .get_token(kernel.index as usize);
         let mut my_expected = Vec::<Symbol>::new();
+        let generation_data = self.data.gss.get_current_generation();
+        for i in 0..generation_data.count {
+            let expected_on_head = self.data.automaton.get_expected(
+                self.data
+                    .gss
+                    .get_represented_state(generation_data.start + i),
+                self.builder.lexer.get_terminals()
+            );
+            // register the terminals for shift actions
+            for symbol in expected_on_head.shifts.iter() {
+                if !my_expected.contains(symbol) {
+                    my_expected.push(*symbol);
+                }
+            }
+            if i < stem {
+                // the state was in the stem, also look for reductions
+                for symbol in expected_on_head.reductions.iter() {
+                    if !my_expected.contains(symbol)
+                        && self.data
+                            .check_is_expected(generation_data.start + i, *symbol)
+                    {
+                        my_expected.push(*symbol);
+                    }
+                }
+            }
+        }
         ParseErrorUnexpectedToken::new(
             token.get_position().unwrap(),
             token.get_span().unwrap().length,
@@ -1889,13 +2021,13 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
         // Wait for ε token
         while self.data.next_token.terminal_id != SID_EPSILON {
             // the stem length (initial number of nodes in the generation before reductions)
-            let _stem = self.data.gss.get_generation(generation).count;
+            let stem = self.data.gss.get_generation(generation).count;
             // apply all reduction actions
             self.parse_reductions(generation);
             // no scheduled shift actions?
             if self.data.shifts.is_empty() {
                 // this is an error
-                let error = self.build_error(self.data.next_token);
+                let error = self.build_error(self.data.next_token, stem);
                 let errors = self.builder.lexer.get_errors();
                 errors.push_error_unexpected_token(error);
                 // TODO: try to recover here
