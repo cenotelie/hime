@@ -201,6 +201,15 @@ impl RNGLRAutomaton {
     }
 }
 
+/// Represents a label for a GSS edge
+#[derive(Copy, Clone)]
+struct GSSLabel {
+    /// The identifier of the SPPF node
+    sppf_node: u32,
+    /// The symbol identifier of the original symbol on the SPPF node
+    symbol_id: u32
+}
+
 /// Represents an edge in a Graph-Structured Stack
 #[derive(Copy, Clone)]
 struct GSSEdge {
@@ -208,10 +217,8 @@ struct GSSEdge {
     from: u32,
     /// The index of the node to which this edge arrives to
     to: u32,
-    /// The identifier of the SPPF node that serve as label for this edge
-    label_node: u32,
-    /// The symbol identifier of the original symbol on the SPPF node
-    label_symbol_id: u32
+    /// The label for this edge
+    label: GSSLabel
 }
 
 /// Represents a generation in a Graph-Structured Stack
@@ -233,7 +240,7 @@ struct GSSPath {
     /// The generation containing the final target of this path
     generation: usize,
     /// The labels on this GSS path
-    labels: Option<Vec<usize>>
+    labels: Option<Vec<GSSLabel>>
 }
 
 impl GSSPath {
@@ -245,7 +252,7 @@ impl GSSPath {
             labels: if length == 0 {
                 None
             } else {
-                Some(Vec::<usize>::with_capacity(length))
+                Some(Vec::<GSSLabel>::with_capacity(length))
             }
         }
     }
@@ -260,7 +267,12 @@ impl GSSPath {
     }
 
     /// Initializes this path
-    pub fn from(previous: &GSSPath, last_node: usize, generation: usize, label: usize) -> GSSPath {
+    pub fn from(
+        previous: &GSSPath,
+        last_node: usize,
+        generation: usize,
+        label: GSSLabel
+    ) -> GSSPath {
         let mut result = GSSPath {
             last_node,
             generation,
@@ -271,7 +283,7 @@ impl GSSPath {
     }
 
     /// Pushes the next label
-    pub fn push(&mut self, last_node: usize, generation: usize, label: usize) {
+    pub fn push(&mut self, last_node: usize, generation: usize, label: GSSLabel) {
         self.last_node = last_node;
         self.generation = generation;
         self.labels.as_mut().unwrap().push(label);
@@ -301,8 +313,10 @@ impl GSS {
             edges: BigList::<GSSEdge>::new(GSSEdge {
                 from: 0,
                 to: 0,
-                label_node: 0,
-                label_symbol_id: SID_EPSILON
+                label: GSSLabel {
+                    sppf_node: 0,
+                    symbol_id: SID_EPSILON
+                }
             }),
             edges_generations: BigList::<GSSGeneration>::new(GSSGeneration { start: 0, count: 0 }),
             current_generation: 0
@@ -374,12 +388,11 @@ impl GSS {
     }
 
     /// Creates a new edge in the GSS
-    pub fn create_edge(&mut self, from: usize, to: usize, label_node: usize, label_symbol_id: u32) {
+    pub fn create_edge(&mut self, from: usize, to: usize, label: GSSLabel) {
         self.edges.push(GSSEdge {
             from: from as u32,
             to: to as u32,
-            label_node: label_node as u32,
-            label_symbol_id
+            label
         });
         self.edges_generations[self.current_generation].count += 1;
     }
@@ -433,7 +446,7 @@ impl GSS {
                                     &paths[p],
                                     edge.to as usize,
                                     self.get_generation_of(edge.to as usize),
-                                    edge.label_node as usize
+                                    edge.label
                                 );
                                 paths.push(new_path);
                             }
@@ -452,7 +465,7 @@ impl GSS {
                         paths[m].push(
                             edge.to as usize,
                             self.get_generation_of(edge.to as usize),
-                            edge.label_node as usize
+                            edge.label
                         );
                         // goto next
                         m += 1;
@@ -674,7 +687,10 @@ impl SPPFNode {
 }
 
 /// Represents the epsilon node
-const EPSILON: usize = 0xFFFFFFFF;
+const EPSILON: GSSLabel = GSSLabel {
+    sppf_node: 0xFFFFFFFF,
+    symbol_id: SID_EPSILON
+};
 
 /// Represents a Shared-Packed Parse Forest
 struct SPPF {
@@ -765,7 +781,7 @@ struct SPPFReduction {
     /// The actions for the reduction
     handle_actions: Vec<TreeAction>,
     /// The stack of semantic objects for the reduction
-    stack: Vec<usize>,
+    stack: Vec<GSSLabel>,
     /// The number of items popped from the stack
     pop_count: usize
 }
@@ -875,8 +891,8 @@ impl<'l> SPPFBuilder<'l> {
     }
 
     /// Prepares for the forthcoming reduction operations
-    pub fn reduction_prepare(&mut self, first: usize, path: &GSSPath, length: usize) {
-        let mut stack = Vec::<usize>::new();
+    pub fn reduction_prepare(&mut self, first: GSSLabel, path: &GSSPath, length: usize) {
+        let mut stack = Vec::<GSSLabel>::new();
         if length > 0 {
             let path_labels = path.labels.as_ref().unwrap();
             for i in 0..(length - 1) {
@@ -897,17 +913,17 @@ impl<'l> SPPFBuilder<'l> {
     fn reduction_add_to_cache(
         reduction: &mut SPPFReduction,
         sppf: &SPPF,
-        gss_label: usize,
+        sppf_node: usize,
         action: TreeAction
     ) {
         if action == TREE_ACTION_DROP {
             return;
         }
-        let node = sppf.get_node(gss_label);
+        let node = sppf.get_node(sppf_node);
         match node {
             &SPPFNode::Normal(ref normal) => {
                 // this is a simple reference to an existing SPPF node
-                SPPFBuilder::reduction_add_to_cache_node(reduction, normal, gss_label, action);
+                SPPFBuilder::reduction_add_to_cache_node(reduction, normal, sppf_node, action);
             }
             &SPPFNode::Replaceable(ref replaceable) => {
                 // this is replaceable sub-tree
@@ -960,7 +976,12 @@ impl<'l> SPPFBuilder<'l> {
             .unwrap_or_else(|| panic!("Not in a reduction"));
         let label = reduction.stack[reduction.pop_count];
         reduction.pop_count += 1;
-        SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, label, action);
+        SPPFBuilder::reduction_add_to_cache(
+            reduction,
+            &self.sppf,
+            label.sppf_node as usize,
+            action
+        );
     }
 
     /// During a reduction, inserts a virtual symbol
@@ -1135,7 +1156,7 @@ struct RNGLRReduction {
     /// The LR production for the reduction
     production: usize,
     /// The first label in the GSS
-    first: usize
+    first: GSSLabel
 }
 
 /// Represents a shift operation to be performed
@@ -1270,12 +1291,12 @@ impl<'a> RNGLRParserData<'a> {
     }
 
     /// Executes a shift operation
-    fn parse_shift(&mut self, generation: usize, label: usize, label_sid: u32, shift: RNGLRShift) {
+    fn parse_shift(&mut self, generation: usize, label: GSSLabel, shift: RNGLRShift) {
         let w = self.gss.find_node(generation, shift.to as u32);
         match w {
             Some(w) => {
                 // A node for the target state is already in the GSS
-                self.gss.create_edge(w, shift.from, label, label_sid);
+                self.gss.create_edge(w, shift.from, label);
                 // Look for the new reductions at this state
                 let count = self.automaton
                     .get_actions_count(shift.to as u32, self.next_token.terminal_id);
@@ -1299,7 +1320,7 @@ impl<'a> RNGLRParserData<'a> {
             None => {
                 // Create the new corresponding node in the GSS
                 let w = self.gss.create_node(shift.to as u32);
-                self.gss.create_edge(w, shift.from, label, label_sid);
+                self.gss.create_edge(w, shift.from, label);
                 // Look for all the reductions and shifts at this state
                 let count = self.automaton
                     .get_actions_count(shift.to as u32, self.next_token.terminal_id);
@@ -1498,7 +1519,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         nullables: &Vec<usize>,
         generation: usize,
         production: &LRProduction,
-        first: usize,
+        first: GSSLabel,
         path: &GSSPath
     ) -> usize {
         let variable = builder.get_variables()[production.head];
@@ -1583,22 +1604,25 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         // Get the rule's head
         let head = self.data.variables[production.head];
         // Resolve the sub-root
-        let maybe_label = self.builder.get_label_for(
+        let maybe_sppf = self.builder.get_label_for(
             path.generation,
             TableElemRef::new(TableType::Variable, production.head)
         );
-        let label = if maybe_label.is_some() {
-            maybe_label.unwrap()
-        } else {
-            RNGLRParser::build_sppf(
-                &mut self.builder,
-                &mut self.data.actions,
-                &self.nullables,
-                generation,
-                production,
-                reduction.first,
-                path
-            )
+        let label = GSSLabel {
+            sppf_node: if maybe_sppf.is_some() {
+                maybe_sppf.unwrap() as u32
+            } else {
+                RNGLRParser::build_sppf(
+                    &mut self.builder,
+                    &mut self.data.actions,
+                    &self.nullables,
+                    generation,
+                    production,
+                    reduction.first,
+                    path
+                ) as u32
+            },
+            symbol_id: head.id
         };
 
         // Get the target state by transition on the rule's head
@@ -1612,7 +1636,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 // A node for the target state is already in the GSS
                 if !self.data.gss.has_edge(generation, w, path.last_node) {
                     // But the new edge does not exist
-                    self.data.gss.create_edge(w, path.last_node, label, head.id);
+                    self.data.gss.create_edge(w, path.last_node, label);
                     // Look for the new reductions at this state
                     if production.reduction_length != 0 {
                         let count = self.data
@@ -1644,7 +1668,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             None => {
                 // Create the new corresponding node in the GSS
                 let w = self.data.gss.create_node(to);
-                self.data.gss.create_edge(w, path.last_node, label, head.id);
+                self.data.gss.create_edge(w, path.last_node, label);
                 // Look for all the reductions and shifts at this state
                 let count = self.data
                     .automaton
@@ -1688,13 +1712,16 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         let new_gen = self.data.gss.create_generation();
         // Create the GSS label to be used for the transitions
         let symbol = TableElemRef::new(TableType::Token, old_token.index as usize);
-        let label = self.builder.get_single_node(symbol);
+        let sppf_node = self.builder.get_single_node(symbol);
+        let label = GSSLabel {
+            sppf_node: sppf_node as u32,
+            symbol_id: old_token.terminal_id
+        };
         // Execute all shifts in the queue at this point
         let count = self.data.shifts.len();
         for _i in 0..count {
             let shift = self.data.shifts.pop_front().unwrap();
-            self.data
-                .parse_shift(new_gen, label, old_token.terminal_id, shift);
+            self.data.parse_shift(new_gen, label, shift);
         }
         new_gen
     }
@@ -1775,7 +1802,7 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
                 // Has reduction _Axiom_ -> axiom $ . on ε
                 let paths = self.data.gss.get_paths(i, 2);
                 let root = paths[0].labels.as_ref().unwrap()[1];
-                self.builder.commit_root(root);
+                self.builder.commit_root(root.sppf_node as usize);
             }
         }
         // At end of input but was still waiting for tokens
