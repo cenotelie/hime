@@ -1190,19 +1190,69 @@ impl<'l> SPPFBuilder<'l> {
     }
 }
 
+/// Represents a reduction operation to be performed
+/// For reduction of length 0, the node is the GSS node on which it is applied,
+/// the first label then is epsilon
+/// For others, the node is the SECOND GSS node on the path, not the head.
+/// The first label is then the label on the transition from the head.
+struct RNGLRReduction {
+    /// The GSS node to reduce from
+    node: usize,
+    /// The LR production for the reduction
+    production: usize,
+    /// The first label in the GSS
+    first: usize
+}
+
+/// Represents a shift operation to be performed
+struct RNGLRShift {
+    /// GSS node to shift from
+    from: usize,
+    /// The target RNGLR state
+    to: usize
+}
+
 struct RNGLRParserData<'a> {
     /// The parser's automaton
     automaton: RNGLRAutomaton,
+    /// The GSS for this parser
+    gss: GSS,
+    /// The next token
+    next_token: Option<TokenKernel>,
+    /// The queue of reduction operations
+    reductions: Vec<RNGLRReduction>,
+    /// The queue of shift operations
+    shifts: Vec<RNGLRShift>,
+    /// The grammar variables
+    variables: &'static [Symbol],
     /// The semantic actions
     actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
 }
+
+impl<'a> ContextProvider for RNGLRParserData<'a> {
+    /// Gets the priority of the specified context required by the specified terminal
+    /// The priority is an unsigned integer. The lesser the value the higher the priority.
+    /// The absence of value represents the unavailability of the required context.
+    fn get_context_priority(
+        &self,
+        token_count: usize,
+        context: u16,
+        terminal_id: u32
+    ) -> Option<usize> {
+        unimplemented!()
+    }
+}
+
+impl<'a> RNGLRParserData<'a> {}
 
 /// Represents a base for all RNGLR parsers
 pub struct RNGLRParser<'l, 'a: 'l> {
     /// The parser's data
     data: RNGLRParserData<'a>,
     /// The AST builder
-    builder: SPPFBuilder<'l>
+    builder: SPPFBuilder<'l>,
+    /// The sub-trees for the constant nullable variables
+    nullables: Vec<usize>
 }
 
 impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
@@ -1213,10 +1263,144 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         ast: Ast<'l>,
         actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
     ) -> RNGLRParser<'l, 'a> {
-        RNGLRParser {
-            data: RNGLRParserData { automaton, actions },
-            builder: SPPFBuilder::new(lexer, ast)
+        let mut parser = RNGLRParser {
+            data: RNGLRParserData {
+                automaton,
+                gss: GSS::new(),
+                next_token: None,
+                reductions: Vec::<RNGLRReduction>::new(),
+                shifts: Vec::<RNGLRShift>::new(),
+                variables: ast.get_variables(),
+                actions
+            },
+            builder: SPPFBuilder::new(lexer, ast),
+            nullables: Vec::<usize>::new()
+        };
+        RNGLRParser::build_nullables(
+            &mut parser.builder,
+            &mut parser.nullables,
+            &parser.data.automaton,
+            parser.data.variables
+        );
+        parser
+    }
+
+    /// Builds the constant sub-trees of nullable variables
+    fn build_nullables(
+        builder: &mut SPPFBuilder<'l>,
+        nullables: &mut Vec<usize>,
+        automaton: &RNGLRAutomaton,
+        variables: &[Symbol]
+    ) {
+        for i in 0..variables.len() {
+            nullables.push(0xFFFFFFFF);
         }
+
+        // Get the dependency table
+        let mut dependencies = RNGLRParser::build_nullables_dependencies(automaton, variables);
+        // Solve and build
+        let mut remaining = 1;
+        while remaining > 0 {
+            remaining = 0;
+            let mut resolved = 0;
+            for i in 0..variables.len() {
+                let mut was_unresolved = false;
+                let mut is_resolved = false;
+                {
+                    let dep = &dependencies[i];
+                    if dep.is_some() {
+                        was_unresolved = true;
+                        let mut ok = true;
+                        for r in dep.as_ref().unwrap().iter() {
+                            ok = ok && dependencies[*r].is_none();
+                        }
+                        if ok {
+                            let production = automaton.get_nullable_production(i);
+                            nullables[i] = RNGLRParser::build_sppf(
+                                builder,
+                                0,
+                                production.unwrap(),
+                                EPSILON,
+                                GSSPath::new(0, 0, 0)
+                            );
+                            is_resolved = true;
+                        }
+                    }
+                }
+                if was_unresolved {
+                    if is_resolved {
+                        dependencies[i] = None;
+                        resolved += 1;
+                    } else {
+                        remaining += 1;
+                    }
+                }
+            }
+            if resolved == 0 && remaining > 0 {
+                // There is dependency cycle ...
+                // That should not be possible ...
+                panic!("Failed to initialize the parser, found a cycle in the nullable variables");
+            }
+        }
+    }
+
+    /// Builds the dependency table between nullable variables
+    fn build_nullables_dependencies(
+        automaton: &RNGLRAutomaton,
+        variables: &[Symbol]
+    ) -> Vec<Option<Vec<usize>>> {
+        let mut result = Vec::<Option<Vec<usize>>>::with_capacity(variables.len());
+        for i in 0..variables.len() {
+            let production = automaton.get_nullable_production(i);
+            match production {
+                None => {
+                    result.push(None);
+                }
+                Some(nullable_production) => {
+                    result.push(Some(RNGLRParser::build_nullable_dependencies_for(
+                        nullable_production
+                    )));
+                }
+            }
+        }
+        result
+    }
+
+    /// Gets the dependencies on nullable variables
+    fn build_nullable_dependencies_for(production: &LRProduction) -> Vec<usize> {
+        let mut result = Vec::<usize>::new();
+        let mut i = 0;
+        while i < production.bytecode.len() {
+            let op_code = production.bytecode[i];
+            i += 1;
+            match get_op_code_base(op_code) {
+                LR_OP_CODE_BASE_SEMANTIC_ACTION => {
+                    i += 1;
+                }
+                LR_OP_CODE_BASE_ADD_VIRTUAL => {
+                    i += 1;
+                }
+                LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
+                    result.push(production.bytecode[i + 1] as usize);
+                    i += 1;
+                }
+                _ => {
+                    break;
+                }
+            }
+        }
+        result
+    }
+
+    /// Builds the SPPF
+    fn build_sppf(
+        builder: &mut SPPFBuilder<'l>,
+        generation: usize,
+        production: &LRProduction,
+        first: usize,
+        path: GSSPath
+    ) -> usize {
+        0
     }
 }
 
