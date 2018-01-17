@@ -328,7 +328,7 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
     let expected_children = expected.children();
     let predicate = expected_children.at(0);
     let predicate_children = predicate.children();
-    if predicate_children.count() > 0 {
+    if predicate_children.len() > 0 {
         let test = predicate_children
             .at(0)
             .get_value()
@@ -351,10 +351,10 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
     let comparable = expected_children.at(1);
     let comparable_children = comparable.children();
     let node_children = node.children();
-    if comparable_children.count() != node_children.count() {
+    if comparable_children.len() != node_children.len() {
         return false;
     }
-    for i in 0..node_children.count() {
+    for i in 0..node_children.len() {
         if !compare(comparable_children.at(i), node_children.at(i)) {
             return false;
         }
