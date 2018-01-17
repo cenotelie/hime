@@ -1210,9 +1210,9 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
         }
 
         // try to only look at stack heads that expect the terminal
-        let mut queue = VecDeque::<usize>::new();
-        let mut productions = VecDeque::<usize>::new();
-        let mut distances = VecDeque::<usize>::new();
+        let mut queue = Vec::<usize>::new();
+        let mut productions = Vec::<usize>::new();
+        let mut distances = Vec::<usize>::new();
         for shift in self.shifts.iter() {
             let count = self.automaton
                 .get_actions_count(shift.to as u32, terminal_id);
@@ -1236,9 +1236,9 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     }
                     // no, enqueue
                     if !queue.contains(&shift.from) {
-                        queue.push_back(shift.from);
-                        productions.push_back(0xFFFFFFFF);
-                        distances.push_back(2);
+                        queue.push(shift.from);
+                        productions.push(0xFFFFFFFF);
+                        distances.push(2);
                     }
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
                     let production = self.automaton.get_production(action.get_data() as usize);
@@ -1253,9 +1253,9 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     }
                     // no, enqueue
                     if !queue.contains(&shift.from) {
-                        queue.push_back(shift.from);
-                        productions.push_back(action.get_data() as usize);
-                        distances.push_back(2);
+                        queue.push(shift.from);
+                        productions.push(action.get_data() as usize);
+                        distances.push(2);
                     }
                 }
             }
@@ -1265,14 +1265,127 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
             return None;
         }
         // explore the current GSS to find the specified context
-        for i in 0..queue.len() {
-            let paths = self.gss.get_paths(queue[i], 1);
+        let mut i = 0;
+        while i < queue.len() {
+            let from = queue[i];
+            let distance = distances[i];
+            let production = productions[i];
+            i += 1;
+            let paths = self.gss.get_paths(from, 1);
             for path in paths.iter() {
-                let from = path.last_node;
-                //let symbol_id = self.sp
+                let last_node = path.last_node;
+                let symbol_id = path.labels.as_ref().unwrap()[0].symbol_id;
+                let contexts = self.automaton
+                    .get_contexts(self.gss.get_represented_state(from));
+                // was the context opened on this transition?
+                if contexts.opens(symbol_id, context) {
+                    if production == 0xFFFFFFFF {
+                        return Some(distance);
+                    }
+                    let production_data = self.automaton.get_production(production);
+                    if production_data.reduction_length < distance {
+                        return Some(distance);
+                    }
+                }
+                // no, enqueue
+                if !queue.contains(&last_node) {
+                    queue.push(last_node);
+                    productions.push(production);
+                    distances.push(distance + 1);
+                }
             }
         }
-
+        // at this point, the requested context is not yet open
+        // can it be open by a token with the specified terminal ID?
+        // queue of GLR states to inspect:
+        let mut queue_gss_heads = Vec::<usize>::new(); // the related GSS head
+        let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
+        for shift in self.shifts.iter() {
+            let count = self.automaton
+                .get_actions_count(shift.to as u32, terminal_id);
+            if count > 0 {
+                // enqueue the info, top GSS stack node and target GLR state
+                queue_gss_heads.push(shift.from);
+                let mut stack = Vec::<u32>::with_capacity(1);
+                stack.push(shift.to as u32);
+                queue_vstack.push(stack);
+            }
+        }
+        // now, close the queue
+        i = 0;
+        while i < queue_gss_heads.len() {
+            let head = queue_vstack[i][queue_vstack[i].len() - 1];
+            let gss_node = queue_gss_heads[i];
+            let count = self.automaton.get_actions_count(head, terminal_id);
+            if count == 0 {
+                i += 1;
+                continue;
+            }
+            for j in 0..count {
+                let action = self.automaton.get_action(head, terminal_id, j);
+                if action.get_code() != LR_ACTION_CODE_REDUCE {
+                    continue;
+                }
+                // execute the reduction
+                let production = self.automaton.get_production(action.get_data() as usize);
+                if production.reduction_length == 0 {
+                    // 0-length reduction => start from the current head
+                    let mut virtual_stack = queue_vstack[i].clone();
+                    let next = self.get_next_by_var(head, self.variables[production.head].id);
+                    virtual_stack.push(next.unwrap());
+                    // enqueue
+                    queue_gss_heads.push(gss_node);
+                    queue_vstack.push(virtual_stack);
+                } else if production.reduction_length < queue_vstack[i].len() {
+                    // we are still the virtual stack
+                    let mut virtual_stack = Vec::<u32>::with_capacity(
+                        queue_vstack[i].len() - production.reduction_length + 1
+                    );
+                    for k in 0..(queue_vstack[i].len() - production.reduction_length) {
+                        virtual_stack.push(queue_vstack[i][k]);
+                    }
+                    let next = self.get_next_by_var(head, self.variables[production.head].id);
+                    virtual_stack.push(next.unwrap());
+                    // enqueue
+                    queue_gss_heads.push(gss_node);
+                    queue_vstack.push(virtual_stack);
+                } else {
+                    // we reach the GSS
+                    let paths = self.gss.get_paths(
+                        gss_node,
+                        production.reduction_length - queue_vstack[i].len()
+                    );
+                    for path in paths.iter() {
+                        // get the target GLR state
+                        let next = self.get_next_by_var(
+                            self.gss.get_represented_state(path.last_node),
+                            self.variables[production.head].id
+                        );
+                        // enqueue the info, top GSS stack node and target GLR state
+                        queue_gss_heads.push(path.last_node);
+                        let mut virtual_stack = Vec::<u32>::with_capacity(1);
+                        virtual_stack.push(next.unwrap());
+                        queue_vstack.push(virtual_stack);
+                    }
+                }
+            }
+            i += 1;
+        }
+        for virtual_stack in queue_vstack {
+            let state = virtual_stack[virtual_stack.len() - 1];
+            let count = self.automaton.get_actions_count(state, terminal_id);
+            for i in 0..count {
+                let action = self.automaton.get_action(state, terminal_id, i);
+                if action.get_code() == LR_ACTION_CODE_SHIFT {
+                    let contexts = self.automaton.get_contexts(state);
+                    if contexts.opens(terminal_id, context) {
+                        // the context opens here
+                        return Some(0);
+                    }
+                }
+            }
+        }
+        // the context is still unavailable
         None
     }
 }
