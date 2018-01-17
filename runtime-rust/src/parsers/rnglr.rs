@@ -205,11 +205,13 @@ impl RNGLRAutomaton {
 #[derive(Copy, Clone)]
 struct GSSEdge {
     /// The index of the node from which this edge starts
-    from: usize,
+    from: u32,
     /// The index of the node to which this edge arrives to
-    to: usize,
+    to: u32,
     /// The identifier of the SPPF node that serve as label for this edge
-    label: usize
+    label_node: u32,
+    /// The symbol identifier of the original symbol on the SPPF node
+    label_symbol_id: u32
 }
 
 /// Represents a generation in a Graph-Structured Stack
@@ -299,7 +301,8 @@ impl GSS {
             edges: BigList::<GSSEdge>::new(GSSEdge {
                 from: 0,
                 to: 0,
-                label: 0
+                label_node: 0,
+                label_symbol_id: SID_EPSILON
             }),
             edges_generations: BigList::<GSSGeneration>::new(GSSGeneration { start: 0, count: 0 }),
             current_generation: 0
@@ -337,7 +340,7 @@ impl GSS {
         let data = self.edges_generations[generation];
         for i in data.start..(data.start + data.count) {
             let edge = self.edges[i];
-            if edge.from == from && edge.to == to {
+            if edge.from as usize == from && edge.to as usize == to {
                 return true;
             }
         }
@@ -371,8 +374,13 @@ impl GSS {
     }
 
     /// Creates a new edge in the GSS
-    pub fn create_edge(&mut self, from: usize, to: usize, label: usize) {
-        self.edges.push(GSSEdge { from, to, label });
+    pub fn create_edge(&mut self, from: usize, to: usize, label_node: usize, label_symbol_id: u32) {
+        self.edges.push(GSSEdge {
+            from: from as u32,
+            to: to as u32,
+            label_node: label_node as u32,
+            label_symbol_id
+        });
         self.edges_generations[self.current_generation].count += 1;
     }
 
@@ -412,7 +420,7 @@ impl GSS {
                 let mut first_edge: Option<GSSEdge> = None;
                 for e in gen.start..(gen.start + gen.count) {
                     let edge = self.edges[e];
-                    if edge.from == last {
+                    if edge.from as usize == last {
                         match &first_edge {
                             &None => {
                                 // This is the first edge
@@ -423,9 +431,9 @@ impl GSS {
                                 // Clone and extend the new path
                                 let new_path = GSSPath::from(
                                     &paths[p],
-                                    edge.to,
-                                    self.get_generation_of(edge.to),
-                                    edge.label
+                                    edge.to as usize,
+                                    self.get_generation_of(edge.to as usize),
+                                    edge.label_node as usize
                                 );
                                 paths.push(new_path);
                             }
@@ -441,7 +449,11 @@ impl GSS {
                             // swap m and p paths
                             paths.swap(m, p);
                         }
-                        paths[m].push(edge.to, self.get_generation_of(edge.to), edge.label);
+                        paths[m].push(
+                            edge.to as usize,
+                            self.get_generation_of(edge.to as usize),
+                            edge.label_node as usize
+                        );
                         // goto next
                         m += 1;
                     }
@@ -839,20 +851,6 @@ impl<'l> SPPFBuilder<'l> {
         let mut data = Vec::<usize>::new();
         data.push(label);
         my_history.push(HistoryPart { generation, data });
-    }
-
-    /// Gets the symbol on the specified GSS edge label
-    pub fn get_symbol_on(&self, label: usize) -> Symbol {
-        let node_label = self.sppf.get_node(label).get_original_symbol();
-        match node_label.get_type() {
-            TableType::None => panic!("Not a semantic element"),
-            TableType::Token => self.lexer
-                .get_output()
-                .get_token(node_label.get_index())
-                .get_symbol(),
-            TableType::Variable => self.result.get_variables()[node_label.get_index()],
-            TableType::Virtual => self.result.get_virtuals()[node_label.get_index()]
-        }
     }
 
     /// Gets the GSS label already in history for the given GSS generation and symbol
@@ -1272,12 +1270,12 @@ impl<'a> RNGLRParserData<'a> {
     }
 
     /// Executes a shift operation
-    fn parse_shift(&mut self, generation: usize, label: usize, shift: RNGLRShift) {
+    fn parse_shift(&mut self, generation: usize, label: usize, label_sid: u32, shift: RNGLRShift) {
         let w = self.gss.find_node(generation, shift.to as u32);
         match w {
             Some(w) => {
                 // A node for the target state is already in the GSS
-                self.gss.create_edge(w, shift.from, label);
+                self.gss.create_edge(w, shift.from, label, label_sid);
                 // Look for the new reductions at this state
                 let count = self.automaton
                     .get_actions_count(shift.to as u32, self.next_token.terminal_id);
@@ -1301,7 +1299,7 @@ impl<'a> RNGLRParserData<'a> {
             None => {
                 // Create the new corresponding node in the GSS
                 let w = self.gss.create_node(shift.to as u32);
-                self.gss.create_edge(w, shift.from, label);
+                self.gss.create_edge(w, shift.from, label, label_sid);
                 // Look for all the reductions and shifts at this state
                 let count = self.automaton
                     .get_actions_count(shift.to as u32, self.next_token.terminal_id);
@@ -1614,7 +1612,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 // A node for the target state is already in the GSS
                 if !self.data.gss.has_edge(generation, w, path.last_node) {
                     // But the new edge does not exist
-                    self.data.gss.create_edge(w, path.last_node, label);
+                    self.data.gss.create_edge(w, path.last_node, label, head.id);
                     // Look for the new reductions at this state
                     if production.reduction_length != 0 {
                         let count = self.data
@@ -1646,7 +1644,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             None => {
                 // Create the new corresponding node in the GSS
                 let w = self.data.gss.create_node(to);
-                self.data.gss.create_edge(w, path.last_node, label);
+                self.data.gss.create_edge(w, path.last_node, label, head.id);
                 // Look for all the reductions and shifts at this state
                 let count = self.data
                     .automaton
@@ -1695,7 +1693,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         let count = self.data.shifts.len();
         for _i in 0..count {
             let shift = self.data.shifts.pop_front().unwrap();
-            self.data.parse_shift(new_gen, label, shift);
+            self.data
+                .parse_shift(new_gen, label, old_token.terminal_id, shift);
         }
         new_gen
     }
