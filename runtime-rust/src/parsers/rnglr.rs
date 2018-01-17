@@ -904,19 +904,19 @@ impl<'l> SPPFBuilder<'l> {
     }
 
     /// Gets the GSS label already in history for the given GSS generation and symbol
-    pub fn get_label_for(&self, generation: usize, reference: TableElemRef) -> usize {
+    pub fn get_label_for(&self, generation: usize, reference: TableElemRef) -> Option<usize> {
         for i in 0..self.history.len() {
             let hp = &self.history[i];
             if hp.generation == generation {
                 for id in hp.data.iter() {
                     let node_symbol = self.sppf.get_node(*id).get_original_symbol();
                     if node_symbol == reference {
-                        return *id;
+                        return Some(*id);
                     }
                 }
             }
         }
-        EPSILON
+        None
     }
 
     /// Creates a single node in the result SPPF an returns it
@@ -1249,6 +1249,18 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
 }
 
 impl<'a> RNGLRParserData<'a> {
+    /// Gets the next RNGLR state by a shift with the given variable ID
+    fn get_next_by_var(&self, state: u32, variable_id: u32) -> Option<u32> {
+        let count = self.automaton.get_actions_count(state, variable_id);
+        for i in 0..count {
+            let action = self.automaton.get_action(state, variable_id, i);
+            if action.get_code() == LR_ACTION_CODE_SHIFT {
+                return Some(action.get_data() as u32);
+            }
+        }
+        None
+    }
+
     /// Executes a shift operation
     fn parse_shift(
         &mut self,
@@ -1394,6 +1406,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                         }
                         if ok {
                             let production = automaton.get_nullable_production(i);
+                            let path = GSSPath::new(0, 0, 0);
                             nullables[i] = RNGLRParser::build_sppf(
                                 builder,
                                 actions,
@@ -1401,7 +1414,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                                 0,
                                 production.unwrap(),
                                 EPSILON,
-                                GSSPath::new(0, 0, 0)
+                                &path
                             );
                             is_resolved = true;
                         }
@@ -1480,10 +1493,10 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         generation: usize,
         production: &LRProduction,
         first: usize,
-        path: GSSPath
+        path: &GSSPath
     ) -> usize {
         let variable = builder.get_variables()[production.head];
-        builder.reduction_prepare(first, &path, production.reduction_length);
+        builder.reduction_prepare(first, path, production.reduction_length);
         let mut i = 0;
         while i < production.bytecode.len() {
             let op_code = production.bytecode[i];
@@ -1524,16 +1537,21 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     }
 
     /// Executes the reduction operations from the given GSS generation
-    fn parse_reductions(&mut self, generation: usize) {
+    fn parse_reductions(&mut self, generation: usize, next_token: TokenKernel) {
         self.builder.clear_history();
         while !self.data.reductions.is_empty() {
             let reduction = self.data.reductions.pop_front().unwrap();
-            self.parse_reduction(generation, reduction);
+            self.parse_reduction(generation, reduction, next_token);
         }
     }
 
     /// Executes a reduction operation for all found path
-    fn parse_reduction(&mut self, generation: usize, reduction: RNGLRReduction) {
+    fn parse_reduction(
+        &mut self,
+        generation: usize,
+        reduction: RNGLRReduction,
+        next_token: TokenKernel
+    ) {
         let paths = {
             let production = self.data.automaton.get_production(reduction.production);
             if production.reduction_length == 0 {
@@ -1546,7 +1564,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             }
         };
         for i in 0..paths.len() {
-            self.parse_reduction_path(generation, reduction, &paths[i]);
+            self.parse_reduction_path(generation, reduction, &paths[i], next_token);
         }
     }
 
@@ -1555,9 +1573,108 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         &mut self,
         generation: usize,
         reduction: RNGLRReduction,
-        path: &GSSPath
+        path: &GSSPath,
+        next_token: TokenKernel
     ) {
+        let production = self.data.automaton.get_production(reduction.production);
+        // Get the rule's head
+        let head = self.data.variables[production.head];
+        // Resolve the sub-root
+        let maybe_label = self.builder.get_label_for(
+            path.generation,
+            TableElemRef::new(TableType::Variable, production.head)
+        );
+        let label = if maybe_label.is_some() {
+            maybe_label.unwrap()
+        } else {
+            RNGLRParser::build_sppf(
+                &mut self.builder,
+                &mut self.data.actions,
+                &self.nullables,
+                generation,
+                production,
+                reduction.first,
+                path
+            )
+        };
 
+        // Get the target state by transition on the rule's head
+        let to = self.data
+            .get_next_by_var(self.data.gss.get_represented_state(path.last_node), head.id)
+            .unwrap();
+        // Find a node for the target state in the GSS
+        let w = self.data.gss.find_node(generation, to);
+        match w {
+            Some(w) => {
+                // A node for the target state is already in the GSS
+                if !self.data.gss.has_edge(generation, w, path.last_node) {
+                    // But the new edge does not exist
+                    self.data.gss.create_edge(w, path.last_node, label);
+                    // Look for the new reductions at this state
+                    if production.reduction_length != 0 {
+                        let count = self.data
+                            .automaton
+                            .get_actions_count(to, next_token.terminal_id);
+                        for i in 0..count {
+                            let action =
+                                self.data
+                                    .automaton
+                                    .get_action(to, next_token.terminal_id, i);
+                            if action.get_code() == LR_ACTION_CODE_REDUCE {
+                                let new_production = self.data
+                                    .automaton
+                                    .get_production(action.get_data() as usize);
+                                // length 0 reduction are not considered here because they already exist at this point
+                                if new_production.reduction_length > 0 {
+                                    self.data.reductions.push_back(RNGLRReduction {
+                                        node: path.last_node,
+                                        production: action.get_data() as usize,
+                                        first: label
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            None => {
+                // Create the new corresponding node in the GSS
+                let w = self.data.gss.create_node(to);
+                self.data.gss.create_edge(w, path.last_node, label);
+                // Look for all the reductions and shifts at this state
+                let count = self.data
+                    .automaton
+                    .get_actions_count(to, next_token.terminal_id);
+                for i in 0..count {
+                    let action = self.data
+                        .automaton
+                        .get_action(to, next_token.terminal_id, i);
+                    if action.get_code() == LR_ACTION_CODE_SHIFT {
+                        self.data.shifts.push_back(RNGLRShift {
+                            from: w,
+                            to: action.get_data() as usize
+                        });
+                    } else if action.get_code() == LR_ACTION_CODE_REDUCE {
+                        let new_production = self.data
+                            .automaton
+                            .get_production(action.get_data() as usize);
+                        if new_production.reduction_length == 0 {
+                            self.data.reductions.push_back(RNGLRReduction {
+                                node: w,
+                                production: action.get_data() as usize,
+                                first: EPSILON
+                            });
+                        } else {
+                            self.data.reductions.push_back(RNGLRReduction {
+                                node: path.last_node,
+                                production: action.get_data() as usize,
+                                first: label
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// Executes the shift operations for the given token
@@ -1627,7 +1744,7 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
             // the stem length (initial number of nodes in the generation before reductions)
             let _stem = self.data.gss.get_generation(generation).count;
             // apply all reduction actions
-            self.parse_reductions(generation);
+            self.parse_reductions(generation, next_token);
             // no scheduled shift actions?
             if self.data.shifts.is_empty() {
                 // this is an error
