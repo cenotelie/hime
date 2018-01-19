@@ -1215,12 +1215,10 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
         let mut queue = Vec::<usize>::new();
         let mut productions = Vec::<usize>::new();
         let mut distances = Vec::<usize>::new();
+        let mut found_on_previous_shift = false;
         for shift in self.shifts.iter() {
             let count = self.automaton
                 .get_actions_count(shift.to as u32, terminal_id);
-            if count == 0 {
-                continue;
-            }
             for i in 0..count {
                 let action = self.automaton.get_action(shift.to as u32, terminal_id, i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
@@ -1234,7 +1232,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                         .get_contexts(self.gss.get_represented_state(shift.from));
                     if contexts2.opens(self.get_next_token_id(), context) {
                         // found the context opening on the previous shift (and was not immediately closed by a reduction)
-                        return Some(1);
+                        found_on_previous_shift = true;
+                        break;
                     }
                     // no, enqueue
                     if !queue.contains(&shift.from) {
@@ -1250,7 +1249,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     if contexts.opens(self.get_next_token_id(), context) {
                         if production.reduction_length == 0 {
                             // the reduction does not close the context
-                            return Some(1);
+                            found_on_previous_shift = true;
+                            break;
                         }
                     }
                     // no, enqueue
@@ -1261,6 +1261,9 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     }
                 }
             }
+        }
+        if found_on_previous_shift {
+            return Some(1);
         }
         if queue.is_empty() {
             // the track is empty, the terminal is unexpected
@@ -1278,7 +1281,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                 let last_node = path.last_node;
                 let symbol_id = path.labels.as_ref().unwrap()[0].symbol_id;
                 let contexts = self.automaton
-                    .get_contexts(self.gss.get_represented_state(from));
+                    .get_contexts(self.gss.get_represented_state(last_node));
                 // was the context opened on this transition?
                 if contexts.opens(symbol_id, context) {
                     if production == 0xFFFFFFFF {
