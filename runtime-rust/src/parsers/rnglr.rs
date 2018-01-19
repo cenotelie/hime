@@ -894,9 +894,11 @@ impl<'l> SPPFBuilder<'l> {
     pub fn reduction_prepare(&mut self, first: GSSLabel, path: &GSSPath, length: usize) {
         let mut stack = Vec::<GSSLabel>::new();
         if length > 0 {
-            let path_labels = path.labels.as_ref().unwrap();
-            for i in 0..(length - 1) {
-                stack.push(path_labels[length - 2 - i]);
+            if length > 1 {
+                let path_labels = path.labels.as_ref().unwrap();
+                for i in 0..(length - 1) {
+                    stack.push(path_labels[length - 2 - i]);
+                }
             }
             stack.push(first);
         }
