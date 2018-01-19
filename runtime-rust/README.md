@@ -12,7 +12,7 @@ used by adding `hime_redist` to your dependencies in your project's `Cargo.toml`
 
 ```toml
 [dependencies]
-hime_redist = "3.2.3"
+hime_redist = "3.3.0"
 ```
 
 Generated lexer and parser codes will import this crate and provide a simple API to parse input text.
