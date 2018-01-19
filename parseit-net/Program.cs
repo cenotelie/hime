@@ -19,7 +19,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Text.Encoding;
 using Hime.Redist;
 using Hime.Redist.Parsers;
 
@@ -44,7 +43,7 @@ namespace Hime.Parseit
 				return 0;
 			}
 
-			TextReader input = new StreamReader(Console.OpenStandardInput(), UTF8, false);
+			TextReader input = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8, false);
 			Assembly assembly = Assembly.LoadFile(Path.GetFullPath(args[0]));
 			Type parserType = assembly.GetType(args[1]);
 			ConstructorInfo parserCtor = parserType.GetConstructors()[0];
