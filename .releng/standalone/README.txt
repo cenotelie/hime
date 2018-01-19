@@ -31,6 +31,8 @@ This package is a standalone distribution of the binaries for the .Net and Java 
     * parseit.dll, the command-line parser of input text.
 * java: contains the Java artifacts
     * hime-redist.jar, the redistributable runtime for generated parsers on Java.
+* rust: contains the artifacts for Rust
+    * hime_redist.crate, the redistributable runtime for the generated parsers in Rust.
 
 * himecc: Linux frontend for the himecc parser generator command line. This programs switches between a Mono runtime, or a .Net Core runtime.
 * himecc.bat: Windows frontend for the himecc parser generator command line.
