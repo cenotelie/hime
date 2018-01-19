@@ -399,7 +399,7 @@ impl GSS {
 
     /// Retrieve the generation of the given node in this GSS
     fn get_generation_of(&self, node: usize) -> usize {
-        for i in 0..self.current_generation {
+        for i in (0..self.current_generation + 1).rev() {
             let data = self.node_generations[i];
             if node >= data.start && node < data.start + data.count {
                 return i;
@@ -1174,7 +1174,7 @@ struct RNGLRParserData<'a> {
     /// The GSS for this parser
     gss: GSS,
     /// The next token
-    next_token: TokenKernel,
+    next_token: Option<TokenKernel>,
     /// The queue of reduction operations
     reductions: VecDeque<RNGLRReduction>,
     /// The queue of shift operations
@@ -1230,7 +1230,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     // looking at the immediate history, does the context opens from the shift just before?
                     let contexts2 = self.automaton
                         .get_contexts(self.gss.get_represented_state(shift.from));
-                    if contexts2.opens(self.next_token.terminal_id, context) {
+                    if contexts2.opens(self.get_next_token_id(), context) {
                         // found the context opening on the previous shift (and was not immediately closed by a reduction)
                         return Some(1);
                     }
@@ -1245,7 +1245,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     // looking at the immediate history, does the context opens from the shift just before?
                     let contexts = self.automaton
                         .get_contexts(self.gss.get_represented_state(shift.from));
-                    if contexts.opens(self.next_token.terminal_id, context) {
+                    if contexts.opens(self.get_next_token_id(), context) {
                         if production.reduction_length == 0 {
                             // the reduction does not close the context
                             return Some(1);
@@ -1391,6 +1391,14 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
 }
 
 impl<'a> RNGLRParserData<'a> {
+    /// Gets the terminal's identifier for the next token
+    fn get_next_token_id(&self) -> u32 {
+        match &self.next_token {
+            &None => SID_EPSILON,
+            &Some(ref kernel) => kernel.terminal_id
+        }
+    }
+
     /// Checks whether the specified terminal is indeed expected for a reduction
     /// This check is required because in the case of a base LALR graph,
     /// some terminals expected for reduction in the automaton are coming from other paths.
@@ -1518,11 +1526,11 @@ impl<'a> RNGLRParserData<'a> {
                 self.gss.create_edge(w, shift.from, label);
                 // Look for the new reductions at this state
                 let count = self.automaton
-                    .get_actions_count(shift.to as u32, self.next_token.terminal_id);
+                    .get_actions_count(shift.to as u32, self.get_next_token_id());
                 for i in 0..count {
                     let action =
                         self.automaton
-                            .get_action(shift.to as u32, self.next_token.terminal_id, i);
+                            .get_action(shift.to as u32, self.get_next_token_id(), i);
                     if action.get_code() == LR_ACTION_CODE_REDUCE {
                         let production = self.automaton.get_production(action.get_data() as usize);
                         // length 0 reduction are not considered here because they already exist at this point
@@ -1542,11 +1550,11 @@ impl<'a> RNGLRParserData<'a> {
                 self.gss.create_edge(w, shift.from, label);
                 // Look for all the reductions and shifts at this state
                 let count = self.automaton
-                    .get_actions_count(shift.to as u32, self.next_token.terminal_id);
+                    .get_actions_count(shift.to as u32, self.get_next_token_id());
                 for i in 0..count {
                     let action =
                         self.automaton
-                            .get_action(shift.to as u32, self.next_token.terminal_id, i);
+                            .get_action(shift.to as u32, self.get_next_token_id(), i);
                     if action.get_code() == LR_ACTION_CODE_SHIFT {
                         self.shifts.push_back(RNGLRShift {
                             from: w,
@@ -1598,10 +1606,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             data: RNGLRParserData {
                 automaton,
                 gss: GSS::new(),
-                next_token: TokenKernel {
-                    terminal_id: SID_EPSILON,
-                    index: 0
-                },
+                next_token: None,
                 reductions: VecDeque::<RNGLRReduction>::new(),
                 shifts: VecDeque::<RNGLRShift>::new(),
                 variables: ast.get_variables(),
@@ -1782,7 +1787,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             let data = &self.data;
             self.builder.lexer.get_next_token(data)
         };
-        self.data.next_token = next_token.unwrap();
+        self.data.next_token = next_token;
     }
 
     /// Executes the reduction operations from the given GSS generation
@@ -1860,11 +1865,11 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                     if production.reduction_length != 0 {
                         let count = self.data
                             .automaton
-                            .get_actions_count(to, self.data.next_token.terminal_id);
+                            .get_actions_count(to, self.data.get_next_token_id());
                         for i in 0..count {
                             let action = self.data.automaton.get_action(
                                 to,
-                                self.data.next_token.terminal_id,
+                                self.data.get_next_token_id(),
                                 i
                             );
                             if action.get_code() == LR_ACTION_CODE_REDUCE {
@@ -1891,12 +1896,12 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 // Look for all the reductions and shifts at this state
                 let count = self.data
                     .automaton
-                    .get_actions_count(to, self.data.next_token.terminal_id);
+                    .get_actions_count(to, self.data.get_next_token_id());
                 for i in 0..count {
                     let action =
                         self.data
                             .automaton
-                            .get_action(to, self.data.next_token.terminal_id, i);
+                            .get_action(to, self.data.get_next_token_id(), i);
                     if action.get_code() == LR_ACTION_CODE_SHIFT {
                         self.data.shifts.push_back(RNGLRShift {
                             from: w,
@@ -1998,11 +2003,11 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
         {
             let count = self.data
                 .automaton
-                .get_actions_count(0, self.data.next_token.terminal_id);
+                .get_actions_count(0, self.data.get_next_token_id());
             for i in 0..count {
                 let action = self.data
                     .automaton
-                    .get_action(0, self.data.next_token.terminal_id, i);
+                    .get_action(0, self.data.get_next_token_id(), i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.data.shifts.push_back(RNGLRShift {
                         from: state0,
@@ -2019,7 +2024,7 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
         }
 
         // Wait for ε token
-        while self.data.next_token.terminal_id != SID_EPSILON {
+        while self.data.get_next_token_id() != SID_EPSILON {
             // the stem length (initial number of nodes in the generation before reductions)
             let stem = self.data.gss.get_generation(generation).count;
             // apply all reduction actions
@@ -2027,14 +2032,14 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
             // no scheduled shift actions?
             if self.data.shifts.is_empty() {
                 // this is an error
-                let error = self.build_error(self.data.next_token, stem);
+                let error = self.build_error(self.data.next_token.unwrap(), stem);
                 let errors = self.builder.lexer.get_errors();
                 errors.push_error_unexpected_token(error);
                 // TODO: try to recover here
                 return;
             }
             // look for the next next-token
-            let old_token = self.data.next_token;
+            let old_token = self.data.next_token.unwrap();
             self.get_next_token();
             // apply the scheduled shift actions
             generation = self.parse_shifts(old_token);
