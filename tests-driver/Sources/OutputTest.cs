@@ -202,7 +202,11 @@ namespace Hime.Tests.Driver
 				args.Append(Helper.GetNamespacePartForRust(Name));
 				// add verb argument
 				args.Append(" outputs");
-				code = ExecuteCommand(reporter, "executor-rust", args.ToString(), output);
+				string command = "executor-rust";
+				PlatformID platform = Environment.OSVersion.Platform;
+				if (platform != PlatformID.Unix && platform != PlatformID.MacOSX)
+					command += ".exe";
+				code = ExecuteCommand(reporter, command, args.ToString(), output);
 			}
 			catch (Exception ex)
 			{
