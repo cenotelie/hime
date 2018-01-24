@@ -277,7 +277,7 @@ namespace Hime.SDK.Output
 			ExportResource("Rust.Cargo.toml", Path.Combine(target, "Cargo.toml"));
 			if (runtime != null)
 			{
-				File.AppendAllText(Path.Combine(target, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime + "\" }\n");
+				File.AppendAllText(Path.Combine(target, "Cargo.toml"), "\n\n[patch.crates-io]\nhime_redist = { path = \"" + runtime.Replace("\\", "\\\\") + "\" }\n");
 			}
 			return target;
 		}
