@@ -13,7 +13,6 @@ sed -i -b "s/<Version>.*<\/Version>/<Version>$1<\/Version>/" "$ROOT/himecc/HimeC
 sed -i -b "s/<Version>.*<\/Version>/<Version>$1<\/Version>/" "$ROOT/parseit-net/Parseit.csproj"
 sed -i -b "s/<Version>.*<\/Version>/<Version>$1<\/Version>/" "$ROOT/tests-driver/Tests.Driver.csproj"
 sed -i -b "s/<Version>.*<\/Version>/<Version>$1<\/Version>/" "$ROOT/tests-executor-net/Tests.Executor.csproj"
-sed -i -b "s/<Version>.*<\/Version>/<Version>$1<\/Version>/" "$ROOT/utils-demo/Utils.Demo.csproj"
 sed -i -b "s/Version=\".*\"/Version=\"$1\"/"                 "$ROOT/sdk/Resources/NetCore/parser.csproj"
 
 # Update copyright for .csproj files
@@ -23,7 +22,6 @@ sed -i -b "s/<Copyright>.*<\/Copyright>/<Copyright>Copyright © Association Cén
 sed -i -b "s/<Copyright>.*<\/Copyright>/<Copyright>Copyright © Association Cénotélie $YEAR<\/Copyright>/" "$ROOT/parseit-net/Parseit.csproj"
 sed -i -b "s/<Copyright>.*<\/Copyright>/<Copyright>Copyright © Association Cénotélie $YEAR<\/Copyright>/" "$ROOT/tests-driver/Tests.Driver.csproj"
 sed -i -b "s/<Copyright>.*<\/Copyright>/<Copyright>Copyright © Association Cénotélie $YEAR<\/Copyright>/" "$ROOT/tests-executor-net/Tests.Executor.csproj"
-sed -i -b "s/<Copyright>.*<\/Copyright>/<Copyright>Copyright © Association Cénotélie $YEAR<\/Copyright>/" "$ROOT/utils-demo/Utils.Demo.csproj"
 
 # Update version and copyright for pom.xml files
 python "$ROOT/.releng/version.py" "$ROOT/runtime-java/pom.xml" $1 $2
