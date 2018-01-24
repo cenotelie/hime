@@ -36,7 +36,6 @@ The parser generator (himecc) can run on:
 
 ## How do I use this software? ##
 
-* [Kickstart in 5 mins](http://cenotelie.fr/hime/kickstart.html)
 * [Complete user documentation](http://cenotelie.fr/hime/index.html)
 * [Grammar library](https://bitbucket.org/cenotelie/hime-grams)
 
@@ -48,7 +47,7 @@ The parser generator (himecc) can run on:
 	* `runtime-java`: Contains the Java sources for the Java implementation of the runtime library.
 	* `runtime-rust`: Contains the Rust sources for the Rust implementation of the runtime library.
 	* `sdk`: Contains the C# sources of the SDK API, i.e. the parser generator.
-	`himecc`: Contains the C# sources of the .Net CLI interface of the parser generator (himecc).
+	* `himecc`: Contains the C# sources of the .Net CLI interface of the parser generator (himecc).
 	* `parseit-net`: Sources of the .Net version of the CLI tool for parsing bits of texts using a previously generated parser assembly.
 	* `parseit-rust`: Sources of the Rust version of the CLI tool for parsing bits of texts using a previously generated parser assembly.
 	* `tests-driver`: Sources of the tests driver for all runtime tests.
