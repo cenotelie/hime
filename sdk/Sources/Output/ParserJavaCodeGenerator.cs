@@ -330,7 +330,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("     * @param actions The set of semantic actions");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Actions actions) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
+				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(actions), lexer);");
 				stream.WriteLine("    }");
 
 				stream.WriteLine("    /**");
@@ -340,7 +340,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("     * @param actions The set of semantic actions");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Map<String, SemanticAction> actions) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
+				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(actions), lexer);");
 				stream.WriteLine("    }");
 			}
 		}
