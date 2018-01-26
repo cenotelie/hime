@@ -149,11 +149,11 @@ namespace Hime.SDK.Output
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.GetSymbolNameForJava(var.Name));
+				nameVariables.Add(var, Helper.GetJavaConstantName(var.Name));
 			}
 			foreach (Virtual var in grammar.Virtuals)
 			{
-				string name = Helper.GetSymbolNameForJava(var.Name);
+				string name = Helper.GetJavaConstantName(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
 					name += Helper.VIRTUAL_SUFFIX;
 				nameVirtuals.Add(var, name);
@@ -247,7 +247,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The " + action.Name + " semantic action");
 				stream.WriteLine("         */");
-				stream.WriteLine("        public void " + action.Name + "(Symbol head, SemanticBody body) { }");
+				stream.WriteLine("        public void " + Helper.GetJavaFunctionName(action.Name) + "(Symbol head, SemanticBody body) { }");
 			}
 			stream.WriteLine();
 			stream.WriteLine("    }");
@@ -268,7 +268,7 @@ namespace Hime.SDK.Output
 			int i = 0;
 			foreach (Action action in grammar.Actions)
 			{
-				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + action.Name + "(head, body); } };");
+				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + Helper.GetJavaFunctionName(action.Name) + "(head, body); } };");
 				i++;
 			}
 			stream.WriteLine("        return result;");

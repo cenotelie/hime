@@ -142,11 +142,11 @@ namespace Hime.SDK.Output
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.GetSymbolNameForCS(var.Name));
+				nameVariables.Add(var, Helper.GetCSConstantName(var.Name));
 			}
 			foreach (Virtual var in grammar.Virtuals)
 			{
-				string name = Helper.GetSymbolNameForCS(var.Name);
+				string name = Helper.GetCSConstantName(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
 					name += Helper.VIRTUAL_SUFFIX;
 				nameVirtuals.Add(var, name);
@@ -244,7 +244,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The " + action.Name + " semantic action");
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic virtual void " + action.Name + "(Symbol head, SemanticBody body) { }");
+				stream.WriteLine("\t\t\tpublic virtual void " + Helper.GetCSFunctionName(action.Name) + "(Symbol head, SemanticBody body) { }");
 			}
 			stream.WriteLine();
 			stream.WriteLine("\t\t}");
@@ -265,7 +265,7 @@ namespace Hime.SDK.Output
 			int i = 0;
 			foreach (Action action in grammar.Actions)
 			{
-				stream.WriteLine("\t\t\tresult[" + i + "] = new SemanticAction(input." + action.Name + ");");
+				stream.WriteLine("\t\t\tresult[" + i + "] = new SemanticAction(input." + Helper.GetCSFunctionName(action.Name) + ");");
 				i++;
 			}
 			stream.WriteLine("\t\t\treturn result;");

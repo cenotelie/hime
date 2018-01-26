@@ -112,11 +112,11 @@ namespace Hime.SDK.Output
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.GetSymbolNameForRust(var.Name));
+				nameVariables.Add(var, Helper.GetRustConstantName(var.Name));
 			}
 			foreach (Virtual var in grammar.Virtuals)
 			{
-				string name = Helper.GetSymbolNameForRust(var.Name);
+				string name = Helper.GetRustConstantName(var.Name);
 				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
 					name += Helper.VIRTUAL_SUFFIX.ToUpperInvariant();
 				nameVirtuals.Add(var, name);
@@ -193,7 +193,7 @@ namespace Hime.SDK.Output
 			foreach (Action action in grammar.Actions)
 			{
 				stream.WriteLine("    /// The " + action.Name + " semantic action");
-				stream.WriteLine("    fn " + action.Name + "(&mut self, head: Symbol, body: &SemanticBody);");
+				stream.WriteLine("    fn " + Helper.GetRustFunctionName(action.Name) + "(&mut self, head: Symbol, body: &SemanticBody);");
 			}
 			stream.WriteLine("}");
 			stream.WriteLine();
@@ -202,7 +202,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine();
 			stream.WriteLine("impl Actions for NoActions {");
 			foreach (Action action in grammar.Actions)
-				stream.WriteLine("    fn " + action.Name + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
+				stream.WriteLine("    fn " + Helper.GetRustFunctionName(action.Name) + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
 			stream.WriteLine("}");
 			stream.WriteLine();
 		}
@@ -336,7 +336,7 @@ namespace Hime.SDK.Output
 				int i = 0;
 				foreach (Action action in grammar.Actions)
 				{
-					stream.WriteLine("        " + i + " => actions." + action.Name + "(head, body),");
+					stream.WriteLine("        " + i + " => actions." + Helper.GetRustFunctionName(action.Name) + "(head, body),");
 					i++;
 				}
 				stream.WriteLine("        _ => ()");

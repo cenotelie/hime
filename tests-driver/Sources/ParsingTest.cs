@@ -179,7 +179,7 @@ namespace Hime.Tests.Driver
 			try
 			{
 				StringBuilder args = new StringBuilder("Hime.Tests.Generated.");
-				args.Append(fixture);
+				args.Append(Helper.GetNamespacePartForCS(fixture));
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser");

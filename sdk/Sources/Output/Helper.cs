@@ -47,7 +47,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetSymbolNameForCS(string name)
+		public static string GetCSConstantName(string name)
 		{
 			string result = RemoveSpecials(name);
 			if (keywordsCS.Contains(result))
@@ -56,11 +56,21 @@ namespace Hime.SDK.Output
 		}
 
 		/// <summary>
+		/// Sanitizes the name of a symbol into the name of a function in Java
+		/// </summary>
+		/// <param name="name">A name to sanitize</param>
+		/// <returns>The sanitized name of the symbol</returns>
+		public static string GetCSFunctionName(string name)
+		{
+			return GetNamespacePartForCS(name);
+		}
+
+		/// <summary>
 		/// Sanitizes the name of a symbol for output in Java code
 		/// </summary>
 		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetSymbolNameForJava(string name)
+		public static string GetJavaConstantName(string name)
 		{
 			string result = RemoveSpecials(name);
 			if (keywordsJava.Contains(result))
@@ -69,13 +79,33 @@ namespace Hime.SDK.Output
 		}
 
 		/// <summary>
-		/// Sanitizes the name of a symbol for output in Rust code
+		/// Sanitizes the name of a symbol into the name of a function in Java
 		/// </summary>
 		/// <param name="name">A name to sanitize</param>
 		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetSymbolNameForRust(string name)
+		public static string GetJavaFunctionName(string name)
+		{
+			return GetNamespacePartForJava(name);
+		}
+
+		/// <summary>
+		/// Sanitizes the name of a symbol into the name of a constant in Rust
+		/// </summary>
+		/// <param name="name">A name to sanitize</param>
+		/// <returns>The sanitized name of the symbol</returns>
+		public static string GetRustConstantName(string name)
 		{
 			return RemoveSpecials(name.ToUpperInvariant());
+		}
+
+		/// <summary>
+		/// Sanitizes the name of a symbol into the name of a function in Rust
+		/// </summary>
+		/// <param name="name">A name to sanitize</param>
+		/// <returns>The sanitized name of the symbol</returns>
+		public static string GetRustFunctionName(string name)
+		{
+			return GetNamespacePartForRust(name);
 		}
 
 		/// <summary>
