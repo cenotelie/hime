@@ -196,10 +196,7 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				StringBuilder args = new StringBuilder("hime::tests::generated::");
-				args.Append(Helper.GetNamespacePartForRust(fixture));
-				args.Append("::");
-				args.Append(Helper.GetNamespacePartForRust(Name));
+				StringBuilder args = new StringBuilder(Helper.GetNamespacePartForRust(Name));
 				// add verb argument
 				args.Append(" outputs");
 				string command = "executor-rust";

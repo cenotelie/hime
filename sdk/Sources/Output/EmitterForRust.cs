@@ -133,7 +133,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserRustCodeGenerator(unit, GetModuleName(unit), unit.Name + SUFFIX_PARSER_DATA);
+			return new ParserRustCodeGenerator(unit, Helper.GetNamespacePartForRust(unit.Grammar.Name), unit.Name + SUFFIX_PARSER_DATA);
 		}
 
 		/// <summary>
@@ -155,7 +155,11 @@ namespace Hime.SDK.Output
 			// export the system binary
 			if (File.Exists(GetArtifactSystemAssembly()))
 				File.Delete(GetArtifactSystemAssembly());
-			File.Move(Path.Combine(Path.Combine(Path.Combine(projectFolder, "target"), "release"), "libhime_generated" + SuffixSystemAssembly), GetArtifactSystemAssembly());
+			string targetName = "hime_generated";
+			PlatformID platform = Environment.OSVersion.Platform;
+			if (platform == PlatformID.MacOSX || platform == PlatformID.Unix)
+				targetName = "libhime_generated";
+			File.Move(Path.Combine(Path.Combine(Path.Combine(projectFolder, "target"), "release"), targetName + SuffixSystemAssembly), GetArtifactSystemAssembly());
 			// package without building
 			success = ExecuteCommandCargo("cargo", "package --no-verify --manifest-path " + Path.Combine(projectFolder, "Cargo.toml"));
 			// extract the result

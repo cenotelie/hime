@@ -65,7 +65,7 @@ fn main() {
 
 #[test]
 fn test_single() {
-    let test_name = "hime::tests::generated::errors::test_position_lineendings_windows";
+    let test_name = "test_position_lineendings_windows";
     let verb = VERB_MATCHES;
     let my_path = path::Path::new("/home/laurent/dev/hime-main/tests-results");
     let library_name = get_parser_library_name(my_path);
@@ -111,7 +111,7 @@ fn get_expected_ast(my_path: &path::Path, library: &libloading::Library) -> Pars
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
-            .get(b"hime::tests::generated::expectedtree::parse_utf8")
+            .get(b"expectedtree_parse_utf8")
             .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
     }
@@ -137,7 +137,7 @@ fn get_parsed_input(
 ) -> ParseResult {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
-    function_name.push_str("::parse_utf8");
+    function_name.push_str("_parse_utf8");
     let file = my_path.join("input.txt");
     let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);

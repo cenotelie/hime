@@ -219,7 +219,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_string\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_string\"]");
 				}
 				stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
 				stream.WriteLine("    let text = Text::new(input);");
@@ -230,7 +230,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf16\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf16\"]");
 				}
 				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
@@ -241,7 +241,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf8\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf8\"]");
 				}
 				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
@@ -268,7 +268,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_string\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_string\"]");
 				}
 				stream.WriteLine("pub fn parse_string(input: &str) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
@@ -279,7 +279,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_string_with\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_string_with\"]");
 				}
 				stream.WriteLine("pub fn parse_string_with(input: &str, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::new(input);");
@@ -290,7 +290,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf16\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf16\"]");
 				}
 				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
@@ -301,7 +301,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf16_with\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf16_with\"]");
 				}
 				stream.WriteLine("pub fn parse_utf16_with(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
@@ -312,7 +312,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf8\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf8\"]");
 				}
 				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
@@ -323,7 +323,7 @@ namespace Hime.SDK.Output
 				if (outputAssembly)
 				{
 					stream.WriteLine("#[no_mangle]");
-					stream.WriteLine("#[export_name = \"\x01" + nmespace + "::parse_utf8_with\"]");
+					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf8_with\"]");
 				}
 				stream.WriteLine("pub fn parse_utf8_with(input: &mut Read, actions: &mut Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
