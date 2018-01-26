@@ -68,6 +68,8 @@ ECHO -- Building Hime Redist for Java --
 CALL mvn -f "%ROOT%\runtime-java\pom.xml" clean verify
 IF NOT "%ERRORLEVEL%" == "0" EXIT /b
 ECHO -- Building Hime Redist for Rust --
+cargo clean --manifest-path "%ROOT%\runtime-rust\Cargo.toml"
+cargo update --manifest-path "%ROOT%\runtime-rust\Cargo.toml"
 cargo build --release --manifest-path "%ROOT%\runtime-rust\Cargo.toml"
 cargo package --no-verify --manifest-path "%ROOT%\runtime-rust\Cargo.toml"
 

@@ -55,6 +55,8 @@ dotnet publish "$ROOT/parseit-net" -c Release -f netcoreapp2.0
 echo "-- Building Hime Redist for Java --"
 mvn -f "$ROOT/runtime-java/pom.xml" clean verify
 echo "-- Building Hime Redist for Rust --"
+cargo clean --manifest-path "$ROOT/runtime-rust/Cargo.toml"
+cargo update --manifest-path "$ROOT/runtime-rust/Cargo.toml"
 cargo build --release --manifest-path "$ROOT/runtime-rust/Cargo.toml"
 cargo package --no-verify --manifest-path "$ROOT/runtime-rust/Cargo.toml"
 
