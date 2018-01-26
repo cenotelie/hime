@@ -137,8 +137,13 @@ namespace Hime.Tests.Driver
 
 			// emit the artifacts
 			(new EmitterForNet(reporter, units)).Emit();
+			File.Move("Parsers.dll", "parsers-net.dll");
 			(new EmitterForJava(reporter, units)).Emit();
-			(new EmitterForRust(reporter, units, Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)), "runtime-rust"))).Emit();
+			File.Move("Parsers.jar", "parsers-java.jar");
+			EmitterForRust emitterForRust = new EmitterForRust(reporter, units, Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)), "runtime-rust"));
+			emitterForRust.Emit();
+			File.Move("Parsers.crate", "parsers-rust.crate");
+			File.Move("Parsers" + emitterForRust.SuffixSystemAssembly, "parsers-rust" + emitterForRust.SuffixSystemAssembly);
 		}
 
 		/// <summary>

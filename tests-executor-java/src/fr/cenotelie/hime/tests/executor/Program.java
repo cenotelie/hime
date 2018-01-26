@@ -332,7 +332,7 @@ public class Program {
      * @return The parser
      */
     private BaseLRParser getParser(String parserName, String input) {
-        loadJar("Parsers.jar");
+        loadJar("parsers-java.jar");
         try {
             Class lexerClass = Class.forName(parserName.substring(0, parserName.length() - 6) + "Lexer");
             Class parserClass = Class.forName(parserName);
