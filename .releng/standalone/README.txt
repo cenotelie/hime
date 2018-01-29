@@ -9,23 +9,19 @@ This package is a standalone distribution of the binaries for the .Net and Java 
 
 * nuget: contains the NuGet packages for
     * Hime.Redist, the redistributable runtime for generated parsers on .Net. This package supports the .Net Standard 1.0, 2.0 and .Net Framework 2.0 and up.
-    * Hime.CIL, the command-line parsing library.
     * Hime.SDK, the parser generator SDK. This package supports the .Net Standard 2.0 and .Net Framework 2.0 and up.
 * net20: contains the .Net artifacts specific to the .Net Framework 2.0 implementation (and up).
     * Hime.Redist.dll, the redistributable runtime for generated parsers on .Net.
-    * Hime.CLI.dll, the command-line parsing library.
     * Hime.SDK.dll, the parser generator SDK.
     * himecc.exe, the parser generator command line.
     * parseit.exe, the command-line parser of input text.
 * net461: contains the .Net artifacts specific to the .Net Framework 4.6.1 implementation (and up).
     * Hime.Redist.dll, the redistributable runtime for generated parsers on .Net.
-    * Hime.CLI.dll, the command-line parsing library.
     * Hime.SDK.dll, the parser generator SDK.
     * himecc.exe, the parser generator command line.
     * parseit.exe, the command-line parser of input text.
 * netcore20: contains the .Net artifacts specific to the .Net Core 2.0 implementation.
     * Hime.Redist.dll, the redistributable runtime for generated parsers on .Net.
-    * Hime.CLI.dll, the command-line parsing library.
     * Hime.SDK.dll, the parser generator SDK.
     * himecc.dll, the parser generator command line.
     * parseit.dll, the command-line parser of input text.
