@@ -4,8 +4,7 @@ The Hime parser generator is a parser generator that targets the .Net platform, 
 
 * Fast LR and GLR parsing.
 * Modern implementation of GLR with the [RNGLR algorithm](http://portal.acm.org/citation.cfm?id=1146809.1146810&coll=DL&dl=GUIDE&CFID=9339017&CFTOKEN=49072692).
-* [Simple and clear API](https://cenotelie.fr/hime/api-net/v3.1.0/namespaceHime_1_1Redist.html) to manipulate parse trees.
-* [Extensive SDK API](https://cenotelie.fr/hime/api-net/v3.1.0/namespaceHime_1_1SDK.html) to programmatically manipulate grammars, generate lexers and parsers and use them.
+* Robust runtime implementations in .Net, Java and Rust published in public repositories (Nuget, Maven Central, crates.io).
 * Strong emphasis on the separation of data and code. Hime forbids the inclusion of inline code in its grammar definitions in order to have very readable grammars that can be easily understood, debugged, improved. It is still possible to have custom code invoked during parsing with semantic actions.
 
 The generated parsers can be embedded on software that target:
