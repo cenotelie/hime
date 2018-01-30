@@ -345,6 +345,24 @@ namespace Hime.Redist
 		}
 
 		/// <summary>
+		/// Gets the parent of the specified node, if any
+		/// </summary>
+		/// <param name="node">A node</param>
+		/// <returns>The parent node, if any</returns>
+		public ASTNode? FindParentOf(int node)
+		{
+			if (node == root)
+				return null;
+			for (int i = 0; i != nodes.Size; i++)
+			{
+				Node candidate = nodes[i];
+				if (candidate.count > 0 && node >= candidate.first && node < candidate.first + candidate.count)
+					return new ASTNode(this, i);
+			}
+			return null;
+		}
+
+		/// <summary>
 		/// Stores some children nodes in this AST
 		/// </summary>
 		/// <param name="nodes">The nodes to store</param>

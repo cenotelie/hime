@@ -32,6 +32,11 @@ namespace Hime.Redist
 		private readonly int index;
 
 		/// <summary>
+		/// Gets the parent node, if any
+		/// </summary>
+		public ASTNode? Parent { get { return tree.FindParentOf(index); } }
+
+		/// <summary>
 		/// Gets the type of symbol this element represents
 		/// </summary>
 		public SymbolType SymbolType { get { return tree.GetSymbolType(index); } }

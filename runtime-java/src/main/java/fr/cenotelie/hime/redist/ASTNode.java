@@ -39,6 +39,15 @@ public class ASTNode implements SemanticElement {
     private List<ASTNode> children;
 
     /**
+     * Gets the parent of this node, if any
+     *
+     * @return The parent of this node, if any
+     */
+    public ASTNode getParent() {
+        return tree.findParentOf(index);
+    }
+
+    /**
      * Gets the children of this node
      *
      * @return The children of this node

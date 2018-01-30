@@ -258,6 +258,26 @@ impl<'a> Ast<'a> {
         }
     }
 
+    /// Gets the parent of the specified node, if any
+    pub fn find_parent_of(&self, node: usize) -> Option<AstNode> {
+        let data = self.data.get();
+        if data.root.is_none() {
+            return None;
+        }
+        for i in 0..data.nodes.len() {
+            let candidate = data.nodes[i];
+            if candidate.count > 0 && node >= candidate.first as usize
+                && node < (candidate.first + candidate.count) as usize
+            {
+                return Some(AstNode {
+                    tree: self,
+                    index: i
+                });
+            }
+        }
+        None
+    }
+
     /// Stores some children nodes in this AST
     pub fn store(&mut self, nodes: &Vec<AstCell>, index: usize, count: usize) -> usize {
         if count == 0 {
@@ -295,6 +315,11 @@ pub struct AstNode<'a> {
 }
 
 impl<'a> AstNode<'a> {
+    /// Gets the parent of this node, if any
+    pub fn parent(&self) -> Option<AstNode> {
+        self.tree.find_parent_of(self.index)
+    }
+
     /// Gets the children of this node
     pub fn children(&self) -> AstFamily {
         AstFamily {

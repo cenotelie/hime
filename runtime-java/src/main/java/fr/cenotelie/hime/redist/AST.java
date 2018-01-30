@@ -306,6 +306,23 @@ public class AST {
     }
 
     /**
+     * Gets the parent of the specified node, if any
+     *
+     * @param node A node
+     * @return The parent node, if any
+     */
+    public ASTNode findParentOf(int node) {
+        if (root == node)
+            return null;
+        for (int i = 0; i != nodes.size(); i++) {
+            Node candidate = nodes.get(i);
+            if (candidate.count > 0 && node >= candidate.first && node < candidate.first + candidate.count)
+                return new ASTNode(this, i);
+        }
+        return null;
+    }
+
+    /**
      * Stores some children nodes in this AST
      *
      * @param nodes The nodes to store
