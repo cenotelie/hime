@@ -29,7 +29,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// The index of this token in the text
 		/// </summary>
-		private readonly int index;
+		internal readonly int index;
 
 		/// <summary>
 		/// Gets the type of symbol this element represents

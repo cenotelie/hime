@@ -221,6 +221,43 @@ impl<'a> Ast<'a> {
         }
     }
 
+    /// Gets the AST node (if any) that has the specified token as label
+    pub fn find_node_for(&self, token: &Token<'a>) -> Option<AstNode> {
+        let data = self.data.get();
+        for i in 0..data.nodes.len() {
+            let node = data.nodes[i];
+            if node.label.get_type() == TableType::Token && node.label.get_index() == token.index {
+                return Some(AstNode {
+                    tree: self,
+                    index: i
+                });
+            }
+        }
+        None
+    }
+
+    /// Gets the AST node (if any) that has
+    /// a token label that contains the specified index in the input text
+    pub fn find_node_at_index(&self, index: usize) -> Option<AstNode> {
+        let token = self.tokens.as_ref().unwrap().find_token_at(index);
+        match token {
+            None => None,
+            Some(token) => self.find_node_for(&token)
+        }
+    }
+
+    /// Gets the AST node (if any) that has
+    /// a token label that contains the specified index in the input text
+    pub fn find_node_at_position(&self, position: TextPosition) -> Option<AstNode> {
+        let tokens = self.tokens.as_ref().unwrap();
+        let index = tokens.get_input().get_line_index(position.line) + position.column - 1;
+        let token = tokens.find_token_at(index);
+        match token {
+            None => None,
+            Some(token) => self.find_node_for(&token)
+        }
+    }
+
     /// Stores some children nodes in this AST
     pub fn store(&mut self, nodes: &Vec<AstCell>, index: usize, count: usize) -> usize {
         if count == 0 {

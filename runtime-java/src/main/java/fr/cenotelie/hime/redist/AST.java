@@ -289,6 +289,23 @@ public class AST {
     }
 
     /**
+     * Gets the AST node (if any) that has the specified token as label
+     *
+     * @param token The token to look for
+     * @return The AST node, if any
+     */
+    public ASTNode findNodeFor(Token token) {
+        if (token == null)
+            return null;
+        for (int i = 0; i != nodes.size(); i++) {
+            Node node = nodes.get(i);
+            if (TableElemRef.getType(node.label) == TableElemRef.TABLE_TOKEN && TableElemRef.getIndex(node.label) == token.index)
+                return new ASTNode(this, i);
+        }
+        return null;
+    }
+
+    /**
      * Stores some children nodes in this AST
      *
      * @param nodes The nodes to store

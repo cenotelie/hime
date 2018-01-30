@@ -72,7 +72,7 @@ pub struct Token<'a> {
     /// The repository containing this token
     repository: &'a TokenRepository<'a>,
     /// The index of this token in the text
-    index: usize
+    pub index: usize
 }
 
 /// Implementation of `Clone` for `Token`

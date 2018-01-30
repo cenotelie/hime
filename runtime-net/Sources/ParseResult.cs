@@ -104,5 +104,43 @@ namespace Hime.Redist
 			int index = text.GetLineIndex(position.Line) + position.Column - 1;
 			return ast.FindTokenAt(index);
 		}
+
+		/// <summary>
+		/// Gets the AST node (if any) that has the specified token as label
+		/// </summary>
+		/// <param name="token">The token to look for</param>
+		/// <returns>The AST node, if any</returns>
+		public ASTNode? FindNodeFor(Token token)
+		{
+			if (ast == null)
+				return null;
+			return ast.FindNodeFor(token);
+		}
+
+		/// <summary>
+		/// Gets the AST node (if any) that has a token label that contains the specified index in the input text
+		/// </summary>
+		/// <param name="index">An index within the input text</param>
+		/// <returns>The AST node, if any</returns>
+		public ASTNode? FindNodeAt(int index)
+		{
+			if (ast == null)
+				return null;
+			Token? token = FindTokenAt(index);
+			return token != null ? ast.FindNodeFor(token.Value) : null;
+		}
+
+		/// <summary>
+		/// Gets the AST node (if any) that has a token label that contains the specified position in the input text
+		/// </summary>
+		/// <param name="position">A position within the input text</param>
+		/// <returns>The AST node, if any</returns>
+		public ASTNode? FindNodeAt(TextPosition position)
+		{
+			if (ast == null)
+				return null;
+			Token? token = FindTokenAt(position);
+			return token != null ? ast.FindNodeFor(token.Value) : null;
+		}
 	}
 }

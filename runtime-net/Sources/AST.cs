@@ -211,7 +211,7 @@ namespace Hime.Redist
 		/// <returns>The type of symbol for the node</returns>
 		public SymbolType GetSymbolType(int node)
 		{
-			return (SymbolType) ((byte) (nodes[node].label.Type));
+			return (SymbolType)((byte)(nodes[node].label.Type));
 		}
 
 		/// <summary>
@@ -277,12 +277,12 @@ namespace Hime.Redist
 		{
 			switch (label.Type)
 			{
-			case TableType.Token:
-				return tableTokens.GetSymbol(label.Index);
-			case TableType.Variable:
-				return tableVariables[label.Index];
-			case TableType.Virtual:
-				return tableVirtuals[label.Index];
+				case TableType.Token:
+					return tableTokens.GetSymbol(label.Index);
+				case TableType.Variable:
+					return tableVariables[label.Index];
+				case TableType.Virtual:
+					return tableVirtuals[label.Index];
 			}
 			// This cannot happen
 			return new Symbol(0, string.Empty);
@@ -307,12 +307,12 @@ namespace Hime.Redist
 		{
 			switch (label.Type)
 			{
-			case TableType.Token:
-				return tableTokens[label.Index];
-			case TableType.Variable:
-				return new SymbolRef(tableVariables[label.Index], SymbolType.Variable);
-			case TableType.Virtual:
-				return new SymbolRef(tableVirtuals[label.Index], SymbolType.Virtual);
+				case TableType.Token:
+					return tableTokens[label.Index];
+				case TableType.Variable:
+					return new SymbolRef(tableVariables[label.Index], SymbolType.Variable);
+				case TableType.Virtual:
+					return new SymbolRef(tableVirtuals[label.Index], SymbolType.Virtual);
 			}
 			// This cannot happen
 			return null;
@@ -326,6 +326,22 @@ namespace Hime.Redist
 		public Token? FindTokenAt(int index)
 		{
 			return tableTokens.FindTokenAt(index);
+		}
+
+		/// <summary>
+		/// Gets the AST node (if any) that has the specified token as label
+		/// </summary>
+		/// <param name="token">The token to look for</param>
+		/// <returns>The AST node, if any</returns>
+		public ASTNode? FindNodeFor(Token token)
+		{
+			for (int i = 0; i != nodes.Size; i++)
+			{
+				Node node = nodes[i];
+				if (node.label.Type == TableType.Token && node.label.Index == token.index)
+					return new ASTNode(this, i);
+			}
+			return null;
 		}
 
 		/// <summary>

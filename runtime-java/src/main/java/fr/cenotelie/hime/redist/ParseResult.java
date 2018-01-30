@@ -124,4 +124,40 @@ public class ParseResult {
         int index = text.getLineIndex(position.getLine()) + position.getColumn() - 1;
         return ast.findTokenAt(index);
     }
+
+    /**
+     * Gets the AST node (if any) that has the specified token as label
+     *
+     * @param token The token to look for
+     * @return The AST node, if any
+     */
+    public ASTNode findNodeFor(Token token) {
+        if (ast == null)
+            return null;
+        return ast.findNodeFor(token);
+    }
+
+    /**
+     * Gets the AST node (if any) that has a token label that contains the specified index in the input text
+     *
+     * @param index An index within the input text
+     * @return The AST node, if any
+     */
+    public ASTNode findNodeAt(int index) {
+        if (ast == null)
+            return null;
+        return ast.findNodeFor(findTokenAt(index));
+    }
+
+    /**
+     * Gets the AST node (if any) that has a token label that contains the specified position in the input text
+     *
+     * @param position A position within the input text
+     * @return The AST node, if any
+     */
+    public ASTNode findNodeAt(TextPosition position) {
+        if (ast == null)
+            return null;
+        return ast.findNodeFor(findTokenAt(position));
+    }
 }

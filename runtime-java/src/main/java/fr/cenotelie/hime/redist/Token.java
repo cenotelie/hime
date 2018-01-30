@@ -30,7 +30,7 @@ public class Token implements SemanticElement {
     /**
      * The index of this token in the text
      */
-    private final int index;
+    final int index;
 
     /**
      * Initializes this token
