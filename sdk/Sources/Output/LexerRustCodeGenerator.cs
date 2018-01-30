@@ -113,7 +113,7 @@ namespace Hime.SDK.Output
 				if (terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				writer.WriteLine("/// The unique identifier for terminal " + terminal.Name);
-				writer.WriteLine("pub const ID_TERMINAL_{0}: u32 = 0x{1};", Helper.GetRustConstantName(terminal.Name), terminal.ID.ToString("X4"));
+				writer.WriteLine("pub const ID_TERMINAL_{0}: u32 = 0x{1};", Helper.ToUpperCase(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine();
 
@@ -123,7 +123,7 @@ namespace Hime.SDK.Output
 			{
 				string context = contexts[i];
 				writer.WriteLine("/// The unique identifier for context " + context);
-				writer.WriteLine("pub const CONTEXT_{0}: u16 = 0x{1};", Helper.GetRustConstantName(context), i.ToString("X4"));
+				writer.WriteLine("pub const CONTEXT_{0}: u16 = 0x{1};", Helper.ToUpperCase(context), i.ToString("X4"));
 			}
 			writer.WriteLine();
 

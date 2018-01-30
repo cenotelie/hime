@@ -115,7 +115,7 @@ namespace Hime.Tests.Driver
 			try
 			{
 				StringBuilder args = new StringBuilder("Hime.Tests.Generated.");
-				args.Append(Helper.GetNamespacePartForCS(fixture));
+				args.Append(Helper.ToUpperCamelCase(fixture));
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser outputs");
@@ -157,7 +157,7 @@ namespace Hime.Tests.Driver
 				StringBuilder args = new StringBuilder("-jar executor-java.jar");
 				// add parser name argument
 				args.Append(" hime.tests.generated.");
-				args.Append(Helper.GetNamespacePartForJava(fixture));
+				args.Append(Helper.ToSnakeCase(fixture));
 				args.Append(".");
 				args.Append(Name);
 				args.Append("Parser outputs");
@@ -196,7 +196,7 @@ namespace Hime.Tests.Driver
 			int code = TestResult.RESULT_FAILURE_PARSING;
 			try
 			{
-				StringBuilder args = new StringBuilder(Helper.GetNamespacePartForRust(Name));
+				StringBuilder args = new StringBuilder(Helper.ToSnakeCase(Name));
 				// add verb argument
 				args.Append(" outputs");
 				string command = "executor-rust";

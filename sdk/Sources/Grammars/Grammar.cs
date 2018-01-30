@@ -38,7 +38,7 @@ namespace Hime.SDK.Grammars
 		/// <summary>
 		/// The name of the generated axiom variable
 		/// </summary>
-		public const string GENERATED_AXIOM = "__axiom";
+		public const string GENERATED_AXIOM = PREFIX_GENERATED_VARIABLE + "Axiom";
 		/// <summary>
 		/// Name of the grammar option specifying the grammar's axiom variable
 		/// </summary>

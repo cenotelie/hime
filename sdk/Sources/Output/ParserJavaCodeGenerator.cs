@@ -125,7 +125,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine("    /**");
 			writer.WriteLine("     * The automaton for this parser");
 			writer.WriteLine("     */");
-			writer.WriteLine("    private static final " + automatonType + " commonAutomaton = " + automatonType + ".find(" + name + "Parser.class, \"" + binResource + "\");");
+			writer.WriteLine("    private static final " + automatonType + " COMMON_AUTOMATON = " + automatonType + ".find(" + name + "Parser.class, \"" + binResource + "\");");
 
 			GenerateCodeSymbols(writer);
 			GenerateCodeVariables(writer);
@@ -143,39 +143,25 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
-			Dictionary<Variable, string> nameVariables = new Dictionary<Variable, string>();
-			Dictionary<Virtual, string> nameVirtuals = new Dictionary<Virtual, string>();
-			foreach (Variable var in grammar.Variables)
-			{
-				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
-					continue;
-				nameVariables.Add(var, Helper.GetJavaConstantName(var.Name));
-			}
-			foreach (Virtual var in grammar.Virtuals)
-			{
-				string name = Helper.GetJavaConstantName(var.Name);
-				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
-					name += Helper.VIRTUAL_SUFFIX;
-				nameVirtuals.Add(var, name);
-			}
-
 			stream.WriteLine("    /**");
 			stream.WriteLine("     * Contains the constant IDs for the variables and virtuals in this parser");
 			stream.WriteLine("     */");
 			stream.WriteLine("    public static class ID {");
-			foreach (KeyValuePair<Variable, string> pair in nameVariables)
+			foreach (Variable var in grammar.Variables)
 			{
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
 				stream.WriteLine("        /**");
-				stream.WriteLine("         * The unique identifier for variable " + pair.Key.Name);
+				stream.WriteLine("         * The unique identifier for variable " + var.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("        public static final int VARIABLE_{0} = 0x{1};", Helper.ToUpperCase(var.Name), var.ID.ToString("X4"));
 			}
-			foreach (KeyValuePair<Virtual, string> pair in nameVirtuals)
+			foreach (Virtual var in grammar.Virtuals)
 			{
 				stream.WriteLine("        /**");
-				stream.WriteLine("         * The unique identifier for virtual " + pair.Key.Name);
+				stream.WriteLine("         * The unique identifier for virtual " + var.Name);
 				stream.WriteLine("         */");
-				stream.WriteLine("        public static final int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("        public static final int VIRTUAL_{0} = 0x{1};", Helper.ToUpperCase(var.Name), var.ID.ToString("X4"));
 			}
 			stream.WriteLine("    }");
 		}
@@ -247,7 +233,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The " + action.Name + " semantic action");
 				stream.WriteLine("         */");
-				stream.WriteLine("        public void " + Helper.GetJavaFunctionName(action.Name) + "(Symbol head, SemanticBody body) { }");
+				stream.WriteLine("        public void " + Helper.ToLowerCamelCase(action.Name) + "(Symbol head, SemanticBody body) { }");
 			}
 			stream.WriteLine();
 			stream.WriteLine("    }");
@@ -268,7 +254,7 @@ namespace Hime.SDK.Output
 			int i = 0;
 			foreach (Action action in grammar.Actions)
 			{
-				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + Helper.GetJavaFunctionName(action.Name) + "(head, body); } };");
+				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + Helper.ToLowerCamelCase(action.Name) + "(head, body); } };");
 				i++;
 			}
 			stream.WriteLine("        return result;");
@@ -309,7 +295,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("     * @param lexer The input lexer");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, null, lexer);");
+				stream.WriteLine("        super(COMMON_AUTOMATON, variables, virtuals, null, lexer);");
 				stream.WriteLine("    }");
 			}
 			else
@@ -320,7 +306,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("     * @param lexer The input lexer");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(noActions), lexer);");
+				stream.WriteLine("        super(COMMON_AUTOMATON, variables, virtuals, getUserActions(noActions), lexer);");
 				stream.WriteLine("    }");
 
 				stream.WriteLine("    /**");
@@ -330,7 +316,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("     * @param actions The set of semantic actions");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Actions actions) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(actions), lexer);");
+				stream.WriteLine("        super(COMMON_AUTOMATON, variables, virtuals, getUserActions(actions), lexer);");
 				stream.WriteLine("    }");
 
 				stream.WriteLine("    /**");
@@ -340,7 +326,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("     * @param actions The set of semantic actions");
 				stream.WriteLine("     */");
 				stream.WriteLine("    public " + name + "Parser(" + name + "Lexer lexer, Map<String, SemanticAction> actions) " + ex + "{");
-				stream.WriteLine("        super(commonAutomaton, variables, virtuals, getUserActions(actions), lexer);");
+				stream.WriteLine("        super(COMMON_AUTOMATON, variables, virtuals, getUserActions(actions), lexer);");
 				stream.WriteLine("    }");
 			}
 		}

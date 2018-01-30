@@ -133,7 +133,7 @@ namespace Hime.SDK.Output
 		/// <returns>The runtime-specific generator of parser code</returns>
 		protected override Generator GetParserCodeGenerator(Unit unit)
 		{
-			return new ParserRustCodeGenerator(unit, Helper.GetNamespacePartForRust(unit.Grammar.Name), unit.Name + SUFFIX_PARSER_DATA);
+			return new ParserRustCodeGenerator(unit, Helper.ToSnakeCase(unit.Grammar.Name), unit.Name + SUFFIX_PARSER_DATA);
 		}
 
 		/// <summary>
@@ -183,12 +183,12 @@ namespace Hime.SDK.Output
 		private static string GetModuleName(Unit unit)
 		{
 			if (unit.Namespace == null)
-				return Helper.GetNamespacePartForRust(unit.Grammar.Name);
+				return Helper.ToSnakeCase(unit.Grammar.Name);
 			string result = Helper.GetNamespaceForRust(unit.Namespace);
 			if (result.Length == 0)
-				return Helper.GetNamespacePartForRust(unit.Grammar.Name);
+				return Helper.ToSnakeCase(unit.Grammar.Name);
 			else
-				return result + "::" + Helper.GetNamespacePartForRust(unit.Grammar.Name);
+				return result + "::" + Helper.ToSnakeCase(unit.Grammar.Name);
 		}
 
 		/// <summary>

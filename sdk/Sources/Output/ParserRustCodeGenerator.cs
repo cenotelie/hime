@@ -106,32 +106,18 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
-			Dictionary<Variable, string> nameVariables = new Dictionary<Variable, string>();
-			Dictionary<Virtual, string> nameVirtuals = new Dictionary<Virtual, string>();
 			foreach (Variable var in grammar.Variables)
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				nameVariables.Add(var, Helper.GetRustConstantName(var.Name));
-			}
-			foreach (Virtual var in grammar.Virtuals)
-			{
-				string name = Helper.GetRustConstantName(var.Name);
-				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
-					name += Helper.VIRTUAL_SUFFIX.ToUpperInvariant();
-				nameVirtuals.Add(var, name);
-			}
-
-			foreach (KeyValuePair<Variable, string> pair in nameVariables)
-			{
-				stream.WriteLine("/// The unique identifier for variable " + pair.Key.Name);
-				stream.WriteLine("pub const ID_VARIABLE_{0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("/// The unique identifier for variable " + var.Name);
+				stream.WriteLine("pub const ID_VARIABLE_{0}: u32 = 0x{1};", Helper.ToUpperCase(var.Name), var.ID.ToString("X4"));
 			}
 			stream.WriteLine();
-			foreach (KeyValuePair<Virtual, string> pair in nameVirtuals)
+			foreach (Virtual var in grammar.Virtuals)
 			{
-				stream.WriteLine("/// The unique identifier for virtual " + pair.Key.Name);
-				stream.WriteLine("pub const ID_VIRTUAL_{0}: u32 = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("/// The unique identifier for virtual " + var.Name);
+				stream.WriteLine("pub const ID_VIRTUAL_{0}: u32 = 0x{1};", Helper.ToUpperCase(var.Name), var.ID.ToString("X4"));
 			}
 			stream.WriteLine();
 		}
@@ -193,7 +179,7 @@ namespace Hime.SDK.Output
 			foreach (Action action in grammar.Actions)
 			{
 				stream.WriteLine("    /// The " + action.Name + " semantic action");
-				stream.WriteLine("    fn " + Helper.GetRustFunctionName(action.Name) + "(&mut self, head: Symbol, body: &SemanticBody);");
+				stream.WriteLine("    fn " + Helper.ToSnakeCase(action.Name) + "(&mut self, head: Symbol, body: &SemanticBody);");
 			}
 			stream.WriteLine("}");
 			stream.WriteLine();
@@ -202,7 +188,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine();
 			stream.WriteLine("impl Actions for NoActions {");
 			foreach (Action action in grammar.Actions)
-				stream.WriteLine("    fn " + Helper.GetRustFunctionName(action.Name) + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
+				stream.WriteLine("    fn " + Helper.ToSnakeCase(action.Name) + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
 			stream.WriteLine("}");
 			stream.WriteLine();
 		}
@@ -336,7 +322,7 @@ namespace Hime.SDK.Output
 				int i = 0;
 				foreach (Action action in grammar.Actions)
 				{
-					stream.WriteLine("        " + i + " => actions." + Helper.GetRustFunctionName(action.Name) + "(head, body),");
+					stream.WriteLine("        " + i + " => actions." + Helper.ToSnakeCase(action.Name) + "(head, body),");
 					i++;
 				}
 				stream.WriteLine("        _ => ()");

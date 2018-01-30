@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Hime.Redist.Utils;
 
 namespace Hime.SDK.Output
 {
@@ -27,87 +26,6 @@ namespace Hime.SDK.Output
 	/// </summary>
 	public static class Helper
 	{
-		/// <summary>
-		/// The prefixing string for reserved C# keywords
-		/// </summary>
-		private const string CS_KEYWORD_PREFIXING = "_";
-
-		/// <summary>
-		/// The prefixing string for reserved Java keywords
-		/// </summary>
-		private const string JAVA_KEYWORD_PREFIXING = "_";
-
-		/// <summary>
-		/// The suffix for virtual symbols that have the same name as a variable
-		/// </summary>
-		public const string VIRTUAL_SUFFIX = "_virtual";
-
-		/// <summary>
-		/// Sanitizes the name of a symbol for output in C# code
-		/// </summary>
-		/// <param name="name">A name to sanitize</param>
-		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetCSConstantName(string name)
-		{
-			string result = RemoveSpecials(name);
-			if (keywordsCS.Contains(result))
-				return CS_KEYWORD_PREFIXING + result;
-			return result;
-		}
-
-		/// <summary>
-		/// Sanitizes the name of a symbol into the name of a function in Java
-		/// </summary>
-		/// <param name="name">A name to sanitize</param>
-		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetCSFunctionName(string name)
-		{
-			return GetNamespacePartForCS(name);
-		}
-
-		/// <summary>
-		/// Sanitizes the name of a symbol for output in Java code
-		/// </summary>
-		/// <param name="name">A name to sanitize</param>
-		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetJavaConstantName(string name)
-		{
-			string result = RemoveSpecials(name);
-			if (keywordsJava.Contains(result))
-				return JAVA_KEYWORD_PREFIXING + result;
-			return result;
-		}
-
-		/// <summary>
-		/// Sanitizes the name of a symbol into the name of a function in Java
-		/// </summary>
-		/// <param name="name">A name to sanitize</param>
-		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetJavaFunctionName(string name)
-		{
-			return GetNamespacePartForJava(name);
-		}
-
-		/// <summary>
-		/// Sanitizes the name of a symbol into the name of a constant in Rust
-		/// </summary>
-		/// <param name="name">A name to sanitize</param>
-		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetRustConstantName(string name)
-		{
-			return RemoveSpecials(name.ToUpperInvariant());
-		}
-
-		/// <summary>
-		/// Sanitizes the name of a symbol into the name of a function in Rust
-		/// </summary>
-		/// <param name="name">A name to sanitize</param>
-		/// <returns>The sanitized name of the symbol</returns>
-		public static string GetRustFunctionName(string name)
-		{
-			return GetNamespacePartForRust(name);
-		}
-
 		/// <summary>
 		/// Gets the C# compatible name for the specified namespace
 		/// </summary>
@@ -123,68 +41,7 @@ namespace Hime.SDK.Output
 			{
 				if (i != 0)
 					builder.Append(".");
-				builder.Append(GetNamespacePartForCS(parts[i]));
-			}
-			return builder.ToString();
-		}
-
-		/// <summary>
-		/// Gets the C# compatible name for a part of a namespace
-		/// </summary>
-		/// <param name="input">The original name</param>
-		/// <returns>The resulting name</returns>
-		public static string GetNamespacePartForCS(string input)
-		{
-			input = RemoveSpecials(input);
-			bool forceUpper = true;
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i != input.Length; i++)
-			{
-				char c = input[i];
-				if (i == 0)
-				{
-					if (c == '_')
-					{
-						builder.Append(c);
-					}
-					else if (c >= 'A' && c <= 'Z')
-					{
-						builder.Append(c);
-						forceUpper = false;
-					}
-					else if (c >= 'a' && c <= 'z')
-					{
-						builder.Append(char.ToUpperInvariant(c));
-						forceUpper = false;
-					}
-					else if (c >= '0' && c <= '9')
-					{
-						builder.Append("_");
-						builder.Append(c);
-					}
-				}
-				else
-				{
-					if (c >= 'A' && c <= 'Z')
-					{
-						builder.Append(c);
-						forceUpper = false;
-					}
-					else if (c >= 'a' && c <= 'z')
-					{
-						builder.Append(forceUpper ? char.ToUpperInvariant(c) : c);
-						forceUpper = false;
-					}
-					else if (c >= '0' && c <= '9')
-					{
-						builder.Append(c);
-						forceUpper = true;
-					}
-					else
-					{
-						forceUpper = true;
-					}
-				}
+				builder.Append(ToUpperCamelCase(parts[i]));
 			}
 			return builder.ToString();
 		}
@@ -204,48 +61,7 @@ namespace Hime.SDK.Output
 			{
 				if (i != 0)
 					builder.Append(".");
-				builder.Append(GetNamespacePartForJava(parts[i]));
-			}
-			return builder.ToString();
-		}
-
-		/// <summary>
-		/// Gets the Java compatible name for a part of a namespace
-		/// </summary>
-		/// <param name="input">The original name</param>
-		/// <returns>The resulting name</returns>
-		public static string GetNamespacePartForJava(string input)
-		{
-			input = RemoveSpecials(input);
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i != input.Length; i++)
-			{
-				char c = input[i];
-				if (i == 0)
-				{
-					if (c >= 'A' && c <= 'Z')
-						builder.Append(char.ToLowerInvariant(c));
-					else if (c >= 'a' && c <= 'z')
-						builder.Append(c);
-					else if (c >= '0' && c <= '9')
-					{
-						builder.Append("_");
-						builder.Append(c);
-					}
-					else
-						builder.Append('_');
-				}
-				else
-				{
-					if (c >= 'A' && c <= 'Z')
-						builder.Append(char.ToLowerInvariant(c));
-					else if (c >= 'a' && c <= 'z')
-						builder.Append(c);
-					else if (c >= '0' && c <= '9')
-						builder.Append(c);
-					else
-						builder.Append('_');
-				}
+				builder.Append(ToSnakeCase(parts[i]));
 			}
 			return builder.ToString();
 		}
@@ -265,208 +81,197 @@ namespace Hime.SDK.Output
 			{
 				if (i != 0)
 					builder.Append("::");
-				builder.Append(GetNamespacePartForRust(parts[i]));
+				builder.Append(ToSnakeCase(parts[i]));
 			}
 			return builder.ToString();
 		}
 
 		/// <summary>
-		/// Gets the Rust compatible name for a part of a namespace
+		/// Converts a name to upper camel case
 		/// </summary>
-		/// <param name="input">The original name</param>
-		/// <returns>The resulting name</returns>
-		public static string GetNamespacePartForRust(string input)
+		/// <param name="name">The original name</param>
+		/// <returns>The corresponding snake case name</returns>
+		public static string ToUpperCamelCase(string name)
 		{
-			input = RemoveSpecials(input);
+			if (name == null || name.Length == 0)
+				return name;
 			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i != input.Length; i++)
+			bool newWord = false;
+			char c = name[0];
+			if (c >= 'A' && c <= 'Z')
+				builder.Append(c);
+			else if (c >= 'a' && c <= 'z')
+				builder.Append(char.ToUpperInvariant(c));
+			else if (c >= '0' && c <= '9')
 			{
-				char c = input[i];
-				if (i == 0)
+				builder.Append("_");
+				builder.Append(c);
+				newWord = true;
+			}
+			else
+			{
+				newWord = true;
+			}
+
+			for (int i = 1; i != name.Length; i++)
+			{
+				c = name[i];
+				if (c >= 'A' && c <= 'Z')
 				{
-					if (c >= 'A' && c <= 'Z')
-						builder.Append(char.ToLowerInvariant(c));
-					else if (c >= 'a' && c <= 'z')
-						builder.Append(c);
-					else if (c >= '0' && c <= '9')
-					{
-						builder.Append("_");
-						builder.Append(c);
-					}
-					else
-						builder.Append('_');
+					builder.Append(c);
+					newWord = false;
+				}
+				else if (c >= 'a' && c <= 'z')
+				{
+					builder.Append(newWord ? char.ToUpperInvariant(c) : c);
+					newWord = false;
+				}
+				else if (c >= '0' && c <= '9')
+				{
+					builder.Append(c);
+					newWord = true;
 				}
 				else
 				{
-					if (c >= 'A' && c <= 'Z')
-						builder.Append(char.ToLowerInvariant(c));
-					else if (c >= 'a' && c <= 'z')
-						builder.Append(c);
-					else if (c >= '0' && c <= '9')
-						builder.Append(c);
-					else
-						builder.Append('_');
+					newWord = true;
 				}
 			}
 			return builder.ToString();
 		}
 
 		/// <summary>
-		/// Removes the specials characters that can arise a the specified symbol name
+		/// Converts a name to lower camel case
 		/// </summary>
-		/// <param name="name">A symbol name</param>
-		/// <returns>The cleaned-up name</returns>
-		private static string RemoveSpecials(string name)
+		/// <param name="name">The original name</param>
+		/// <returns>The corresponding snake case name</returns>
+		public static string ToLowerCamelCase(string name)
 		{
+			if (name == null || name.Length == 0)
+				return name;
 			StringBuilder builder = new StringBuilder();
-			foreach (char c in name)
+			bool newWord = false;
+			char c = name[0];
+			if (c >= 'A' && c <= 'Z')
+				builder.Append(char.ToLowerInvariant(c));
+			else if (c >= 'a' && c <= 'z')
+				builder.Append(c);
+			else if (c >= '0' && c <= '9')
 			{
-				if (c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-					builder.Append(c);
+				builder.Append("_");
+				builder.Append(c);
+				newWord = true;
+			}
+
+			for (int i = 1; i != name.Length; i++)
+			{
+				c = name[i];
+				if (c >= 'A' && c <= 'Z')
+				{
+					builder.Append(builder.Length == 0 ? char.ToLowerInvariant(c) : c);
+					newWord = false;
+				}
+				else if (c >= 'a' && c <= 'z')
+				{
+					builder.Append(newWord ? char.ToUpperInvariant(c) : c);
+					newWord = false;
+				}
 				else if (c >= '0' && c <= '9')
+				{
 					builder.Append(c);
-				else if (c == '<' || c == '>' || c == '-')
-					builder.Append('_');
-				// drop anything else
+					newWord = true;
+				}
+				else
+				{
+					newWord = true;
+				}
 			}
 			return builder.ToString();
 		}
 
 		/// <summary>
-		/// The reserved C# keywords
+		/// Converts a name to upper case
 		/// </summary>
-		private static readonly ROList<string> keywordsCS = new ROList<string>(new List<string>(new[] { "abstract",
-			"as",
-			"base",
-			"bool",
-			"break",
-			"byte",
-			"case",
-			"catch",
-			"char",
-			"checked",
-			"class",
-			"const",
-			"continue",
-			"decimal",
-			"default",
-			"delegate",
-			"do",
-			"double",
-			"else",
-			"enum",
-			"event",
-			"explicit",
-			"extern",
-			"false",
-			"finally",
-			"fixed",
-			"float",
-			"for",
-			"foreach",
-			"goto",
-			"if",
-			"implicit",
-			"in",
-			"int",
-			"interface",
-			"internal",
-			"is",
-			"lock",
-			"long",
-			"namespace",
-			"new",
-			"null",
-			"object",
-			"operator",
-			"out",
-			"override",
-			"params",
-			"private",
-			"protected",
-			"public",
-			"readonly",
-			"ref",
-			"return",
-			"sbyte",
-			"sealed",
-			"short",
-			"sizeof",
-			"stackalloc",
-			"static",
-			"string",
-			"struct",
-			"switch",
-			"this",
-			"throw",
-			"true",
-			"try",
-			"typeof",
-			"uint",
-			"ulong",
-			"unchecked",
-			"unsafe",
-			"ushort",
-			"using",
-			"virtual",
-			"void",
-			"volatile",
-			"while"
-		}));
+		/// <param name="name">The original name</param>
+		/// <returns>The corresponding snake case name</returns>
+		public static string ToUpperCase(string name)
+		{
+			if (name == null || name.Length == 0)
+				return name;
+			StringBuilder builder = new StringBuilder();
+			char c = name[0];
+			if (c >= 'A' && c <= 'Z')
+				builder.Append(c);
+			else if (c >= 'a' && c <= 'z')
+				builder.Append(char.ToUpperInvariant(c));
+			else if (c >= '0' && c <= '9')
+			{
+				builder.Append("_");
+				builder.Append(c);
+			}
+			else
+				builder.Append('_');
+
+			for (int i = 1; i != name.Length; i++)
+			{
+				c = name[i];
+				if (c >= 'A' && c <= 'Z')
+				{
+					if ((name[i - 1] >= 'a' && name[i - 1] <= 'z') || (name[i - 1] >= '0' && name[i - 1] <= '9'))
+						// preceded by a lower-case character or a number, this is a new word
+						builder.Append("_");
+					builder.Append(c);
+				}
+				else if (c >= 'a' && c <= 'z')
+					builder.Append(char.ToUpperInvariant(c));
+				else if (c >= '0' && c <= '9')
+					builder.Append(c);
+				else
+					builder.Append('_');
+			}
+			return builder.ToString();
+		}
 
 		/// <summary>
-		/// The reserved Java keywords
+		/// Converts a name to snake case
 		/// </summary>
-		private static readonly ROList<string> keywordsJava = new ROList<string>(new List<string>(new[] { "abstract",
-			"continue",
-			"for",
-			"new",
-			"switch",
-			"assert",
-			"default",
-			"if",
-			"package",
-			"synchronized",
-			"boolean",
-			"do",
-			"goto",
-			"private",
-			"this",
-			"break",
-			"double",
-			"implements",
-			"protected",
-			"throw",
-			"byte",
-			"else",
-			"import",
-			"public",
-			"throws",
-			"case",
-			"enum",
-			"instanceof",
-			"return",
-			"transient",
-			"catch",
-			"extends",
-			"int",
-			"short",
-			"try",
-			"char",
-			"final",
-			"interface",
-			"static",
-			"void",
-			"class",
-			"finally",
-			"long",
-			"strictfp",
-			"volatile",
-			"const",
-			"float",
-			"native",
-			"super",
-			"while"
-		}));
+		/// <param name="name">The original name</param>
+		/// <returns>The corresponding snake case name</returns>
+		public static string ToSnakeCase(string name)
+		{
+			if (name == null || name.Length == 0)
+				return name;
+			StringBuilder builder = new StringBuilder();
+			char c = name[0];
+			if (c >= 'A' && c <= 'Z')
+				builder.Append(char.ToLowerInvariant(c));
+			else if (c >= 'a' && c <= 'z')
+				builder.Append(c);
+			else if (c >= '0' && c <= '9')
+			{
+				builder.Append("_");
+				builder.Append(c);
+			}
+			else
+				builder.Append('_');
+
+			for (int i = 1; i != name.Length; i++)
+			{
+				c = name[i];
+				if (c >= 'A' && c <= 'Z')
+				{
+					if ((name[i - 1] >= 'a' && name[i - 1] <= 'z') || (name[i - 1] >= '0' && name[i - 1] <= '9'))
+						// preceded by a lower-case character or a number, this is a new word
+						builder.Append("_");
+					builder.Append(char.ToLowerInvariant(c));
+				}
+				else if (c >= 'a' && c <= 'z')
+					builder.Append(c);
+				else if (c >= '0' && c <= '9')
+					builder.Append(c);
+				else
+					builder.Append('_');
+			}
+			return builder.ToString();
+		}
 	}
 }

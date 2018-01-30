@@ -127,7 +127,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("\t\t\t/// <summary>");
 				writer.WriteLine("\t\t\t/// The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("\t\t\t/// </summary>");
-				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.GetCSConstantName(terminal.Name), terminal.ID.ToString("X4"));
+				writer.WriteLine("\t\t\tpublic const int Terminal{0} = 0x{1};", Helper.ToUpperCamelCase(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine("\t\t}");
 
@@ -139,14 +139,14 @@ namespace Hime.SDK.Output
 			writer.WriteLine("\t\t\t/// <summary>");
 			writer.WriteLine("\t\t\t/// The unique identifier for the default context");
 			writer.WriteLine("\t\t\t/// </summary>");
-			writer.WriteLine("\t\t\tpublic const int DEFAULT = 0;");
+			writer.WriteLine("\t\t\tpublic const int Default = 0;");
 			for (int i = 1; i != contexts.Count; i++)
 			{
 				string context = contexts[i];
 				writer.WriteLine("\t\t\t/// <summary>");
 				writer.WriteLine("\t\t\t/// The unique identifier for context " + context);
 				writer.WriteLine("\t\t\t/// </summary>");
-				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", context, i.ToString("X4"));
+				writer.WriteLine("\t\t\tpublic const int {0} = 0x{1};", Helper.ToUpperCamelCase(context), i.ToString("X4"));
 			}
 			writer.WriteLine("\t\t}");
 

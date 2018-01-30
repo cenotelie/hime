@@ -132,7 +132,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("        /**");
 				writer.WriteLine("         * The unique identifier for terminal " + terminal.Name);
 				writer.WriteLine("         */");
-				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.GetJavaConstantName(terminal.Name), terminal.ID.ToString("X4"));
+				writer.WriteLine("        public static final int TERMINAL_{0} = 0x{1};", Helper.ToUpperCase(terminal.Name), terminal.ID.ToString("X4"));
 			}
 			writer.WriteLine("    }");
 
@@ -150,7 +150,7 @@ namespace Hime.SDK.Output
 				writer.WriteLine("        /**");
 				writer.WriteLine("         * The unique identifier for context " + context);
 				writer.WriteLine("         */");
-				writer.WriteLine("        public static final int {0} = 0x{1};", context, i.ToString("X4"));
+				writer.WriteLine("        public static final int {0} = 0x{1};", Helper.ToUpperCase(context), i.ToString("X4"));
 			}
 			writer.WriteLine("    }");
 

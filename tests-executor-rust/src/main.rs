@@ -111,7 +111,7 @@ fn get_expected_ast(my_path: &path::Path, library: &libloading::Library) -> Pars
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
-            .get(b"expectedtree_parse_utf8")
+            .get(b"expected_tree_parse_utf8")
             .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
     }

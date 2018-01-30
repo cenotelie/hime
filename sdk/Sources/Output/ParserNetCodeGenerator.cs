@@ -136,40 +136,26 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeSymbols(StreamWriter stream)
 		{
-			Dictionary<Variable, string> nameVariables = new Dictionary<Variable, string>();
-			Dictionary<Virtual, string> nameVirtuals = new Dictionary<Virtual, string>();
-			foreach (Variable var in grammar.Variables)
-			{
-				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
-					continue;
-				nameVariables.Add(var, Helper.GetCSConstantName(var.Name));
-			}
-			foreach (Virtual var in grammar.Virtuals)
-			{
-				string name = Helper.GetCSConstantName(var.Name);
-				while (nameVariables.ContainsValue(name) || nameVirtuals.ContainsValue(name))
-					name += Helper.VIRTUAL_SUFFIX;
-				nameVirtuals.Add(var, name);
-			}
-
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Contains the constant IDs for the variables and virtuals in this parser");
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\tpublic class ID");
 			stream.WriteLine("\t\t{");
-			foreach (KeyValuePair<Variable, string> pair in nameVariables)
+			foreach (Variable var in grammar.Variables)
 			{
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
 				stream.WriteLine("\t\t\t/// <summary>");
-				stream.WriteLine("\t\t\t/// The unique identifier for variable " + pair.Key.Name);
+				stream.WriteLine("\t\t\t/// The unique identifier for variable " + var.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int Variable{0} = 0x{1};", Helper.ToUpperCamelCase(var.Name), var.ID.ToString("X4"));
 			}
-			foreach (KeyValuePair<Virtual, string> pair in nameVirtuals)
+			foreach (Virtual var in grammar.Virtuals)
 			{
 				stream.WriteLine("\t\t\t/// <summary>");
-				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + pair.Key.Name);
+				stream.WriteLine("\t\t\t/// The unique identifier for virtual " + var.Name);
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic const int {0} = 0x{1};", pair.Value, pair.Key.ID.ToString("X4"));
+				stream.WriteLine("\t\t\tpublic const int Virtual{0} = 0x{1};", Helper.ToUpperCamelCase(var.Name), var.ID.ToString("X4"));
 			}
 			stream.WriteLine("\t\t}");
 		}
@@ -244,7 +230,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The " + action.Name + " semantic action");
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic virtual void " + Helper.GetCSFunctionName(action.Name) + "(Symbol head, SemanticBody body) { }");
+				stream.WriteLine("\t\t\tpublic virtual void " + Helper.ToUpperCamelCase(action.Name) + "(Symbol head, SemanticBody body) { }");
 			}
 			stream.WriteLine();
 			stream.WriteLine("\t\t}");
@@ -265,7 +251,7 @@ namespace Hime.SDK.Output
 			int i = 0;
 			foreach (Action action in grammar.Actions)
 			{
-				stream.WriteLine("\t\t\tresult[" + i + "] = new SemanticAction(input." + Helper.GetCSFunctionName(action.Name) + ");");
+				stream.WriteLine("\t\t\tresult[" + i + "] = new SemanticAction(input." + Helper.ToUpperCamelCase(action.Name) + ");");
 				i++;
 			}
 			stream.WriteLine("\t\t\treturn result;");
