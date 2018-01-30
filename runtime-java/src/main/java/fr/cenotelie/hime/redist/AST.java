@@ -279,6 +279,16 @@ public class AST {
     }
 
     /**
+     * Gets the token (if any) that contains the specified index in the input text
+     *
+     * @param index An index within the input text
+     * @return The token, if any
+     */
+    public Token findTokenAt(int index) {
+        return tableTokens.findTokenAt(index);
+    }
+
+    /**
      * Stores some children nodes in this AST
      *
      * @param nodes The nodes to store

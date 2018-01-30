@@ -203,6 +203,41 @@ namespace Hime.Redist
 		}
 
 		/// <summary>
+		/// Gets the token (if any) that contains the specified index in the input text
+		/// </summary>
+		/// <param name="index">An index within the input text</param>
+		/// <returns>The token, if any</returns>
+		public Token? FindTokenAt(int index)
+		{
+			int count = cells.Size;
+			if (count == 0)
+				return null;
+			int l = 0;
+			int r = count - 1;
+			while (l <= r)
+			{
+				int m = (l + r) / 2;
+				Cell cell = cells[m];
+				if (index < cell.span.Index)
+				{
+					// look on the left
+					r = m - 1;
+				}
+				else if (index < cell.span.Index + cell.span.Length)
+				{
+					// within the token
+					return new Token(this, m);
+				}
+				else
+				{
+					// look on the right
+					l = m + 1;
+				}
+			}
+			return null;
+		}
+
+		/// <summary>
 		/// Gets an enumerator of the tokens in this repository
 		/// </summary>
 		/// <returns>An enumerator of the tokens in this repository</returns>

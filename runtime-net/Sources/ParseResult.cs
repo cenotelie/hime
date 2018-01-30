@@ -79,5 +79,30 @@ namespace Hime.Redist
 				return ast.Root;
 			}
 		}
+
+		/// <summary>
+		/// Gets the token (if any) that contains the specified index in the input text
+		/// </summary>
+		/// <param name="index">An index within the input text</param>
+		/// <returns>The token, if any</returns>
+		public Token? FindTokenAt(int index)
+		{
+			if (ast == null)
+				return null;
+			return ast.FindTokenAt(index);
+		}
+
+		/// <summary>
+		/// Gets the token (if any) that contains the specified position in the input text
+		/// </summary>
+		/// <param name="position">A position within the input text</param>
+		/// <returns>The token, if any</returns>
+		public Token? FindTokenAt(TextPosition position)
+		{
+			if (ast == null)
+				return null;
+			int index = text.GetLineIndex(position.Line) + position.Column - 1;
+			return ast.FindTokenAt(index);
+		}
 	}
 }

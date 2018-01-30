@@ -99,4 +99,29 @@ public class ParseResult {
             return null;
         return ast.getRoot();
     }
+
+    /**
+     * Gets the token (if any) that contains the specified index in the input text
+     *
+     * @param index An index within the input text
+     * @return The token, if any
+     */
+    public Token findTokenAt(int index) {
+        if (ast == null)
+            return null;
+        return ast.findTokenAt(index);
+    }
+
+    /**
+     * Gets the token (if any) that contains the specified position in the input text
+     *
+     * @param position A position within the input text
+     * @return The token, if any
+     */
+    public Token findTokenAt(TextPosition position) {
+        if (ast == null)
+            return null;
+        int index = text.getLineIndex(position.getLine()) + position.getColumn() - 1;
+        return ast.findTokenAt(index);
+    }
 }

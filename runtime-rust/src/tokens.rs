@@ -196,6 +196,35 @@ impl<'a> TokenRepository<'a> {
     pub fn get_count(&self) -> usize {
         self.data.get().cells.len()
     }
+
+    /// Gets the token (if any) that contains the specified index in the input text
+    pub fn find_token_at(&self, index: usize) -> Option<Token> {
+        let data = self.data.get();
+        let count = data.cells.len();
+        if count == 0 {
+            return None;
+        }
+        let mut l: usize = 0;
+        let mut r = count - 1;
+        while l <= r {
+            let m = (l + r) / 2;
+            let cell = data.cells[m];
+            if index < cell.span.index {
+                // look on the left
+                r = m - 1;
+            } else if index < cell.span.index + cell.span.length {
+                // within the token
+                return Some(Token {
+                    repository: self,
+                    index: m
+                });
+            } else {
+                // look on the right
+                l = m + 1;
+            }
+        }
+        None
+    }
 }
 
 impl<'a> SemanticElementTrait for Token<'a> {

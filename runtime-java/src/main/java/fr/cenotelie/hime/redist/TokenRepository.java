@@ -192,6 +192,35 @@ public class TokenRepository implements Iterable<Token> {
         return text.getValue(cell.inputIndex, cell.inputLength);
     }
 
+    /**
+     * Gets the token (if any) that contains the specified index in the input text
+     *
+     * @param index An index within the input text
+     * @return The token, if any
+     */
+    public Token findTokenAt(int index) {
+        int count = cells.size();
+        if (count == 0)
+            return null;
+        int l = 0;
+        int r = count - 1;
+        while (l <= r) {
+            int m = (l + r) / 2;
+            Cell cell = cells.get(m);
+            if (index < cell.inputIndex) {
+                // look on the left
+                r = m - 1;
+            } else if (index < cell.inputIndex + cell.inputLength) {
+                // within the token
+                return new Token(this, m);
+            } else {
+                // look on the right
+                l = m + 1;
+            }
+        }
+        return null;
+    }
+
     @Override
     public Iterator<Token> iterator() {
         return new LinearEnumerator();

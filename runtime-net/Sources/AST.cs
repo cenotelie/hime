@@ -319,6 +319,16 @@ namespace Hime.Redist
 		}
 
 		/// <summary>
+		/// Gets the token (if any) that contains the specified index in the input text
+		/// </summary>
+		/// <param name="index">An index within the input text</param>
+		/// <returns>The token, if any</returns>
+		public Token? FindTokenAt(int index)
+		{
+			return tableTokens.FindTokenAt(index);
+		}
+
+		/// <summary>
 		/// Stores some children nodes in this AST
 		/// </summary>
 		/// <param name="nodes">The nodes to store</param>
