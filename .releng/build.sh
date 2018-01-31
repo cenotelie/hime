@@ -5,7 +5,7 @@ RELENG="$(dirname "$SCRIPT")"
 ROOT="$(dirname "$RELENG")"
 
 # Gather version info
-VERSION=$(grep "<Version>" "$ROOT/sdk/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
+VERSION=$(grep "<Version>" "$ROOT/sdk-net/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
 HASH=$(hg -R "$ROOT" --debug id -i)
 
 echo "Building Hime version $VERSION ($HASH)"
@@ -40,8 +40,8 @@ echo "-- Building Hime.Redist --"
 dotnet restore "$ROOT/runtime-net"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/runtime-net" -c Release)
 echo "-- Building Hime.SDK --"
-dotnet restore "$ROOT/sdk"
-(export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/sdk" -c Release)
+dotnet restore "$ROOT/sdk-net"
+(export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/sdk-net" -c Release)
 echo "-- Building HimeCC --"
 dotnet restore "$ROOT/himecc"
 (export FrameworkPathOverride="$MONO461"; dotnet build "$ROOT/himecc" -c Release -f net461)

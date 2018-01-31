@@ -5,7 +5,7 @@ SET "RELENG=%~dp0"
 SET "RELENG=%RELENG:~0,-1%"
 SET "ROOT=%RELENG:~0,-8%"
 
-FINDSTR "<Version>" "%ROOT%\sdk\Hime.SDK.csproj" > match
+FINDSTR "<Version>" "%ROOT%\sdk-net-net\Hime.SDK.csproj" > match
 FOR /F "tokens=3-5 delims=<>." %%A IN (match) DO @SET "VERSION=%%A.%%B.%%C"
 DEL match
 FOR /f "delims=" %%a IN ('hg -R "%ROOT%" --debug id -i') DO @SET HASH=%%a
@@ -49,8 +49,8 @@ dotnet restore "%ROOT%\runtime-net"
 SET "FrameworkPathOverride=%MONO20%"
 dotnet build "%ROOT%\runtime-net" -c Release
 ECHO -- Building Hime.SDK --
-dotnet restore "%ROOT%\sdk"
-dotnet build "%ROOT%\sdk" -c Release
+dotnet restore "%ROOT%\sdk-net"
+dotnet build "%ROOT%\sdk-net" -c Release
 ECHO -- Building HimeCC --
 dotnet restore "%ROOT%\himecc"
 SET "FrameworkPathOverride=%MONO461%"

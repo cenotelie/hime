@@ -45,7 +45,7 @@ The parser generator (himecc) can run on:
 	* `runtime-net`: Contains the C# sources for the .Net implementation of the runtime library.
 	* `runtime-java`: Contains the Java sources for the Java implementation of the runtime library.
 	* `runtime-rust`: Contains the Rust sources for the Rust implementation of the runtime library.
-	* `sdk`: Contains the C# sources of the SDK API, i.e. the parser generator.
+	* `sdk-net`: Contains the C# sources of the SDK API, i.e. the parser generator.
 	* `himecc`: Contains the C# sources of the .Net CLI interface of the parser generator (himecc).
 	* `parseit-net`: Sources of the .Net version of the CLI tool for parsing bits of texts using a previously generated parser assembly.
 	* `parseit-rust`: Sources of the Rust version of the CLI tool for parsing bits of texts using a previously generated parser assembly.
