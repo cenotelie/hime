@@ -158,7 +158,7 @@ namespace Hime.SDK
 
 			writer.WriteLine();
 			writer.WriteLine("\t\t/// <summary>");
-			writer.WriteLine("\t\t/// The database of Unicode blocks accesible by names");
+			writer.WriteLine("\t\t/// The database of Unicode blocks accessible by names");
 			writer.WriteLine("\t\t/// </summary>");
 			writer.WriteLine("\t\tprivate static Dictionary<string, UnicodeBlock> db;");
 
@@ -216,7 +216,7 @@ namespace Hime.SDK
 				writer.WriteLine("\ton \"" + values + "\"");
 				writer.WriteLine("\tyields e(X='" + values + "')");
 
-				if (block.Span.Begin.Value <= 0xFFFF)
+				if (block.Span.End.Value <= 0xFFFF)
 					values = "\\u" + block.Span.End.Value.ToString("X4");
 				else
 					values = "\\u" + block.Span.End.Value.ToString("X8");

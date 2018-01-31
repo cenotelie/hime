@@ -36,7 +36,7 @@ namespace Hime.SDK
 		public Report Result { get { return report; } }
 
 		/// <summary>
-		/// Initializes the reporter for the given type
+		/// Initializes the reporter
 		/// </summary>
 		public Reporter()
 		{

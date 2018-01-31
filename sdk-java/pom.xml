@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.cenotelie.hime</groupId>
-    <artifactId>hime-redist</artifactId>
+    <artifactId>hime-sdk</artifactId>
     <packaging>bundle</packaging>
     <version>3.3.1-SNAPSHOT</version>
-    <name>Hime Runtime</name>
-    <description>Redistributable Java runtime for the parsers generated with Hime</description>
+    <name>Hime SDK</name>
+    <description>Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars.</description>
     <url>http://cenotelie.fr/hime</url>
     <licenses>
         <license>
@@ -38,6 +38,14 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>fr.cenotelie.hime</groupId>
+            <artifactId>hime-redist</artifactId>
+            <version>3.3.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
