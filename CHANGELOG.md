@@ -1,5 +1,12 @@
 # Updates
 
+## 3.3.0
+
+Rekease in January 24th, 2018.
+
+* Features
+    * Implementation of the Rust runtime. Hime can now generate lexers and parser with Rust as a target. The `-t:rust` option must be passed to `himecc` for this.
+
 ## 3.2.2
 
 Released on October 19th, 2017.
