@@ -15,6 +15,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Module for loading Hime grammars
+//! Module for the generation of code and binary data
 
-pub mod parser;
+pub mod helper;

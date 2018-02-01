@@ -36,9 +36,12 @@
 //! ```
 
 extern crate hime_redist;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod unicode;
 pub mod input;
+pub mod output;
 
 use std::cmp::Ordering;
 

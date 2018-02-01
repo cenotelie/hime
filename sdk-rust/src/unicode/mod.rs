@@ -17,6 +17,8 @@
 
 //! Module for the Unicode support
 
+pub mod blocks;
+
 use std::cmp::Ordering;
 
 use hime_redist::text::Utf16C;
