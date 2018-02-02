@@ -26,7 +26,7 @@ const DIGIT9: u8 = 0x39;
 const UNDERSCORE: u8 = 0x5F;
 const TO_LOWER: u8 = LOWER_A - UPPER_A;
 
-/// Converts a name to lower camel case
+/// Converts a name to upper camel case
 pub fn to_upper_camel_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     let mut new_word = false;

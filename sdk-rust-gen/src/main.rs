@@ -42,6 +42,7 @@ use std::io::Write;
 fn main() {
     let blocks = get_latest_blocks();
     generate_blocks_db(&blocks).unwrap();
+    generate_blocks_tests(&blocks).unwrap();
     let categories = get_latest_categories();
 }
 
@@ -156,9 +157,15 @@ pub fn generate_blocks_db(blocks: &Vec<UnicodeBlock>) -> Result<(), Error> {
         )?;
         write!(&mut file, "\n")?;
     }
-    write!(&mut file, "/// The database of Unicode blocks accessible by names\n")?;
+    write!(
+        &mut file,
+        "/// The database of Unicode blocks accessible by names\n"
+    )?;
     write!(&mut file, "lazy_static! {{\n")?;
-    write!(&mut file, "    static ref DATABASE: HashMap<&'static str, UnicodeBlock> = {{\n")?;
+    write!(
+        &mut file,
+        "    static ref DATABASE: HashMap<&'static str, UnicodeBlock> = {{\n"
+    )?;
     write!(&mut file, "        let mut m = HashMap::new();\n")?;
     for block in blocks {
         let name = helper::to_upper_case(&block.name);
@@ -173,9 +180,54 @@ pub fn generate_blocks_db(blocks: &Vec<UnicodeBlock>) -> Result<(), Error> {
     write!(&mut file, "}}\n")?;
     write!(&mut file, "\n")?;
     write!(&mut file, "/// Retrieves the definition of a block\n")?;
-    write!(&mut file, "pub fn get_block(key: &str) -> Option<&UnicodeBlock> {{\n")?;
+    write!(
+        &mut file,
+        "pub fn get_block(key: &str) -> Option<&UnicodeBlock> {{\n"
+    )?;
     write!(&mut file, "    DATABASE.get(key)\n")?;
     write!(&mut file, "}}\n")?;
+    file.flush()?;
+    Ok(())
+}
+
+/// Generates the code for the Unicode blocks data
+pub fn generate_blocks_tests(blocks: &Vec<UnicodeBlock>) -> Result<(), Error> {
+    let mut file = File::create("UnicodeBlocks.suite").unwrap();
+    for block in blocks.iter() {
+        let name = block.name.replace("-", "");
+        let len1 = if block.span.begin.value <= 0xFFFF {
+            4
+        } else {
+            8
+        };
+        let len2 = if block.span.end.value <= 0xFFFF { 4 } else { 8 };
+        write!(&mut file, "test Test_UnicodeBlock_{0}_LeftBound:\n", name)?;
+        write!(&mut file, "\tgrammar Test_UnicodeBlock_{0}_LeftBound {{ options {{Axiom=\"e\";}} terminals {{X->ub{{{1}}};}} rules {{ e->X; }} }}\n", name, block.name)?;
+        write!(&mut file, "\tparser LALR1\n")?;
+        write!(
+            &mut file,
+            "\ton \"\\u{:01$X}\"\n",
+            block.span.begin.value, len1
+        )?;
+        write!(
+            &mut file,
+            "\tyields e(X='\\u{:01$X}')\n",
+            block.span.begin.value, len1
+        )?;
+        write!(&mut file, "test Test_UnicodeBlock_{0}_RightBound:\n", name)?;
+        write!(&mut file, "\tgrammar Test_UnicodeBlock_{0}_RightBound {{ options {{Axiom=\"e\";}} terminals {{X->ub{{{1}}};}} rules {{ e->X; }} }}\n", name, block.name)?;
+        write!(&mut file, "\tparser LALR1\n")?;
+        write!(
+            &mut file,
+            "\ton \"\\u{:01$X}\"\n",
+            block.span.end.value, len2
+        )?;
+        write!(
+            &mut file,
+            "\tyields e(X='\\u{:01$X}')\n",
+            block.span.end.value, len2
+        )?;
+    }
     file.flush()?;
     Ok(())
 }
