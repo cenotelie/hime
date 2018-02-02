@@ -18,6 +18,7 @@
 //! Module for the Unicode support
 
 pub mod blocks;
+pub mod categories;
 
 use std::cmp::Ordering;
 
