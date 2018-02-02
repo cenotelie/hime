@@ -42,6 +42,8 @@ extern crate lazy_static;
 pub mod unicode;
 pub mod input;
 pub mod output;
+pub mod automata;
+pub mod grammar;
 
 use std::cmp::Ordering;
 
@@ -146,6 +148,20 @@ impl CharSpan {
             )
         }
     }
+}
+
+/// Represents a parsing method
+pub enum ParsingMethod {
+    /// The LR(0) parsing method
+    LR0,
+    /// The LR(1) parsing method
+    LR1,
+    /// The LALR(1) parsing method
+    LALR1,
+    /// The RNGLR parsing method based on a LR(1) graph
+    RNGLR1,
+    /// The RNGLR parsing method based on a LALR(1) graph
+    RNGLALR1
 }
 
 /// Represents a compilation report

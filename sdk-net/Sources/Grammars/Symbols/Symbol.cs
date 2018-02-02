@@ -25,7 +25,7 @@ namespace Hime.SDK.Grammars
 	public class Symbol
 	{
 		/// <summary>
-		/// Gets the unique indentifier (within a grammar) of this symbol
+		/// Gets the unique identifier (within a grammar) of this symbol
 		/// </summary>
 		public int ID { get; protected set; }
 
