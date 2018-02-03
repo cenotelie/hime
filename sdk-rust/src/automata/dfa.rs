@@ -153,7 +153,7 @@ impl<'s> DFAState<'s> {
 /// Represents a Deterministic Finite-state Automaton
 pub struct DFA<'s> {
     /// The list of states in this automaton
-    states: Vec<DFAState<'s>>
+    pub states: Vec<DFAState<'s>>
 }
 
 impl<'s> DFA<'s> {
@@ -188,6 +188,66 @@ impl<'s> DFA<'s> {
             new_partition = current.refine();
         }
         new_partition.into_dfa()
+    }
+
+    /// Prunes all the unreachable states from this automaton
+    pub fn prune(&self) -> DFA<'s> {
+        let inverse = DFAInverse::new(self);
+        let finals = inverse.close_by_antecedents(&inverse.finals);
+        let entry_index = finals
+            .iter()
+            .enumerate()
+            .find(|&(_i, state)| state.is_entry())
+            .unwrap()
+            .0;
+        let mut result = DFA::new();
+        // re-create the states
+        // re-create the entry state
+        {
+            let new_state = result.add_state();
+            new_state.add_items(&finals[entry_index]);
+        }
+        for state in finals.iter() {
+            if !state.is_entry() {
+                let new_state = result.add_state();
+                new_state.add_items(state);
+            }
+        }
+        // re-create the links
+        for (i, state) in finals.iter().enumerate() {
+            let from_index = if state.is_entry() {
+                0
+            } else if i < entry_index {
+                i + 1
+            } else {
+                i
+            };
+            let from = &mut result.states[from_index];
+            for transition in state.transitions.iter() {
+                let old_target = &self.states[transition.next];
+                let old_data = finals
+                    .iter()
+                    .enumerate()
+                    .find(|&(_i, state)| state.id == old_target.id);
+                match old_data {
+                    None => {}
+                    Some((j, _s)) => {
+                        let target_index = if old_target.is_entry() {
+                            0
+                        } else if j < entry_index {
+                            j + 1
+                        } else {
+                            j
+                        };
+                        from.transitions.push(Transition {
+                            key: transition.key,
+                            next: target_index
+                        });
+                    }
+                }
+            }
+        }
+        result
     }
 }
 
@@ -328,7 +388,8 @@ impl<'d, 's: 'd> DFAPartition<'d, 's> {
                 return false;
             }
             // Here State1 and State2 have both a transition of the same value
-            // If the target of these transitions are in the same group in the old partition : same transition
+            // If the target of these transitions are in the same group
+            // in the old partition : same transition
             let group1 =
                 self.get_group_of(&self.dfa.states[state1.get_next_by(transition.key).unwrap()]);
             let group2 =
@@ -352,53 +413,132 @@ impl<'d, 's: 'd> DFAPartition<'d, 's> {
 
     /// Gets the group of the given state in this partition
     fn get_group_of(&self, state: &'d DFAState<'s>) -> Option<&DFAStateGroup<'d, 's>> {
-        for group in self.groups.iter() {
-            if group.states.contains(&state) {
-                return Some(group);
-            }
-        }
-        None
-    }
-
-    /// Gets the group of the given state in this partition
-    fn get_group_index_of(&self, state: &'d DFAState<'s>) -> usize {
-        for (i, group) in self.groups.iter().enumerate() {
-            if group.states.contains(&state) {
-                return i;
-            }
-        }
-        0
+        self.groups
+            .iter()
+            .find(|&group| group.states.contains(&state))
     }
 
     /// Gets the new dfa represented by this partition
     pub fn into_dfa(self) -> DFA<'s> {
         let mut dfa = DFA::new();
-        // for the entry group only
-        for group in self.groups.iter() {
-            if group.is_entry() {
-                let target_state = dfa.add_state();
-                target_state.add_items(group.representative());
-            }
+        // get the index of the group with the entry state
+        let entry_index = self.groups
+            .iter()
+            .enumerate()
+            .find(|&(_i, group)| group.is_entry())
+            .unwrap()
+            .0;
+        // for the entry group, add the resulting entry state
+        {
+            let target_state = dfa.add_state();
+            target_state.add_items(self.groups[entry_index].representative());
         }
-        // for all other groups
+        // for all other groups, add the corresponding new state
         for group in self.groups.iter() {
             if !group.is_entry() {
                 let target_state = dfa.add_state();
                 target_state.add_items(group.representative());
             }
         }
-        // do linkage
+        // re-link the new states
         for (i, group) in self.groups.iter().enumerate() {
-            let from = &mut dfa.states[if group.is_entry() { 0 } else { i + 1 }];
+            let from_index = if group.is_entry() {
+                0
+            } else if i < entry_index {
+                i + 1
+            } else {
+                i
+            };
+            let from = &mut dfa.states[from_index];
             for transition in group.representative().transitions.iter() {
-                let j = self.get_group_index_of(&self.dfa.states[transition.next]);
-                let to_group = &self.groups[j];
+                let j = self.groups
+                    .iter()
+                    .enumerate()
+                    .find(|&(_j, group)| group.states.contains(&&self.dfa.states[transition.next]))
+                    .unwrap()
+                    .0;
+                let to_index = if self.groups[j].is_entry() {
+                    0
+                } else if j < entry_index {
+                    j + 1
+                } else {
+                    j
+                };
                 from.transitions.push(Transition {
                     key: transition.key,
-                    next: if to_group.is_entry() { 0 } else { j + 1 }
+                    next: to_index
                 });
             }
         }
         dfa
+    }
+}
+
+/// Represents the inverse graph of a DFA
+struct DFAInverse<'d, 's: 'd> {
+    /// The final states
+    finals: Vec<&'d DFAState<'s>>,
+    /// The reachable states
+    reachable: Vec<&'d DFAState<'s>>,
+    /// The inverse graph data
+    inverse: HashMap<StateId, Vec<&'d DFAState<'s>>>
+}
+
+impl<'d, 's: 'd> DFAInverse<'d, 's> {
+    /// Builds this inverse graph from the specified DFA
+    pub fn new(dfa: &'d DFA<'s>) -> DFAInverse<'d, 's> {
+        let mut inverse = DFAInverse {
+            finals: Vec::<&'d DFAState<'s>>::new(),
+            reachable: Vec::<&'d DFAState<'s>>::new(),
+            inverse: HashMap::<StateId, Vec<&'d DFAState<'s>>>::new()
+        };
+        // transitive closure of the first state
+        inverse.reachable.push(&dfa.states[0]);
+        inverse.inverse.insert(0, Vec::<&'d DFAState<'s>>::new());
+        let mut i = 0;
+        while i < inverse.reachable.len() {
+            let current = inverse.reachable[i];
+            for transition in current.transitions.iter() {
+                let next_id = transition.next;
+                if !inverse.inverse.contains_key(&next_id) {
+                    inverse.reachable.push(&dfa.states[next_id]);
+                    inverse
+                        .inverse
+                        .insert(next_id, Vec::<&'d DFAState<'s>>::new());
+                }
+                inverse.inverse.get_mut(&next_id).unwrap().push(current);
+            }
+            if current.is_final() {
+                inverse.finals.push(current);
+            }
+            i += 1;
+        }
+        inverse
+    }
+
+    /// Closes the specified list of states through inverse transitions
+    pub fn close_by_antecedents(&self, states: &Vec<&'d DFAState<'s>>) -> Vec<&'d DFAState<'s>> {
+        let mut result = Vec::<&'d DFAState<'s>>::new();
+        // transitive closure of the final states by their antecedents
+        // final states are all reachable
+        for state in states.iter() {
+            result.push(state);
+        }
+        let mut i = 0;
+        while i < result.len() {
+            let state = result[i];
+            if !self.inverse.contains_key(&state.id) {
+                continue;
+            }
+            for antecedent in self.inverse.get(&state.id).unwrap().iter() {
+                if !result.contains(antecedent) && self.reachable.contains(antecedent) {
+                    // this antecedent is reachable and not yet in the closure
+                    // => add it to the closure
+                    result.push(antecedent);
+                }
+            }
+            i += 1;
+        }
+        result
     }
 }
