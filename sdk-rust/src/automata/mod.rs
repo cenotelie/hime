@@ -18,6 +18,7 @@
 //! Module for the automata
 
 pub mod dfa;
+pub mod nfa;
 
 use super::CharSpan;
 
