@@ -299,4 +299,16 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
         }
         result
     }
+
+    /// Gets all the final markers of all the states in this set
+    pub fn get_finals(&self) -> Vec<&'s FinalItem> {
+        let mut finals = Vec::<&'s FinalItem>::new();
+        self.states.iter().for_each(|&id| {
+            self.nfa.states[id]
+                .items
+                .iter()
+                .for_each(|&item| finals.push(item))
+        });
+        finals
+    }
 }

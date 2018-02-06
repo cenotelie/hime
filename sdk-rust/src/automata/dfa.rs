@@ -20,6 +20,8 @@
 use super::FinalItem;
 use super::StateId;
 use super::Transition;
+use super::nfa::NFA;
+use super::nfa::NFAStateSet;
 use super::super::CharSpan;
 use std::collections::HashMap;
 
@@ -162,6 +164,49 @@ impl<'s> DFA<'s> {
         DFA {
             states: Vec::<DFAState<'s>>::new()
         }
+    }
+
+    /// Initializes this DFA as equivalent to the given NFA
+    pub fn from_nfa<'n>(nfa: &'n NFA<'s>) -> DFA<'s> {
+        let mut dfa = DFA::new();
+        let mut sets = Vec::<NFAStateSet<'n, 's>>::new();
+        // Create the first NFA set, add the entry and close it
+        let mut initial = NFAStateSet::new(nfa);
+        initial.add(0);
+        initial.close();
+        dfa.add_state();
+
+        let mut i = 0;
+        while i < sets.len() {
+            sets[i]
+                .get_finals()
+                .iter()
+                .for_each(|&item| dfa.states[i].items.push(item));
+            let transitions = sets[i].get_transitions();
+            for (key, child) in transitions.into_iter() {
+                let maybe_index = sets.iter()
+                    .enumerate()
+                    .find(|&(_i, set)| *set == child)
+                    .map(|(i, _set)| i);
+                match maybe_index {
+                    None => {
+                        // the child does not exist
+                        let id = dfa.states.len();
+                        sets.push(child);
+                        dfa.add_state();
+                        dfa.states[i].transitions.push(Transition { key, next: id });
+                    }
+                    Some(index) => {
+                        // the child already exist
+                        dfa.states[i]
+                            .transitions
+                            .push(Transition { key, next: index });
+                    }
+                }
+            }
+            i += 1;
+        }
+        dfa
     }
 
     /// Creates a new state in this DFA
