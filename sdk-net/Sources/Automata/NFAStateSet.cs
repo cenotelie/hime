@@ -103,9 +103,9 @@ namespace Hime.SDK.Automata
 		/// </summary>
 		public void Normalize()
 		{
-			// Trace if modification has occured
+			// Trace if modification has occurred
 			bool modification = true;
-			// Repeat while modifications occured
+			// Repeat while modifications occurred
 			while (modification)
 			{
 				modification = false;

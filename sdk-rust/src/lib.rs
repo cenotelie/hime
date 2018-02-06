@@ -81,70 +81,70 @@ impl CharSpan {
     }
 
     /// Gets the intersection between two spans
-    pub fn intersect(left: CharSpan, right: CharSpan) -> CharSpan {
+    pub fn intersect(left: CharSpan, right: CharSpan) -> Option<CharSpan> {
         if left.begin < right.begin {
             if left.end < right.begin {
-                CHAR_SPAN_NULL
+                None
             } else if left.end < right.end {
-                CharSpan {
+                Some(CharSpan {
                     begin: right.begin,
                     end: left.end
-                }
+                })
             } else {
-                CharSpan {
+                Some(CharSpan {
                     begin: right.begin,
                     end: right.end
-                }
+                })
             }
         } else {
             if right.end < left.begin {
-                CHAR_SPAN_NULL
+                None
             } else if right.end < left.end {
-                CharSpan {
+                Some(CharSpan {
                     begin: left.begin,
                     end: right.end
-                }
+                })
             } else {
-                CharSpan {
+                Some(CharSpan {
                     begin: left.begin,
                     end: left.end
-                }
+                })
             }
         }
     }
 
     /// Splits the original span with the given splitter
-    pub fn split(original: CharSpan, splitter: CharSpan) -> (CharSpan, CharSpan) {
+    pub fn split(original: CharSpan, splitter: CharSpan) -> (Option<CharSpan>, Option<CharSpan>) {
         if original.begin == splitter.begin {
             if original.end == splitter.end {
-                (CHAR_SPAN_NULL, CHAR_SPAN_NULL)
+                (None, None)
             } else {
                 (
-                    CharSpan {
+                    None,
+                    Some(CharSpan {
                         begin: splitter.end + 1,
                         end: original.end
-                    },
-                    CHAR_SPAN_NULL
+                    })
                 )
             }
         } else if original.end == splitter.end {
             (
-                CharSpan {
+                Some(CharSpan {
                     begin: original.begin,
                     end: splitter.begin - 1
-                },
-                CHAR_SPAN_NULL
+                }),
+                None
             )
         } else {
             (
-                CharSpan {
+                Some(CharSpan {
                     begin: original.begin,
                     end: splitter.begin - 1
-                },
-                CharSpan {
+                }),
+                Some(CharSpan {
                     begin: splitter.end + 1,
                     end: original.end
-                }
+                })
             )
         }
     }

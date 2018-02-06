@@ -194,21 +194,33 @@ impl<'s> NFA<'s> {
 pub struct NFAStateSet<'n, 's: 'n> {
     /// The parent NFA
     nfa: &'n NFA<'s>,
-    /// The backend storage for the states in this set
-    states: Vec<&'n NFAState<'s>>
+    /// The identifiers of the states in this set
+    states: Vec<StateId>
 }
+
+impl<'n, 's: 'n> PartialEq for NFAStateSet<'n, 's> {
+    fn eq(&self, other: &NFAStateSet<'n, 's>) -> bool {
+        (self.nfa as *const NFA<'s>) == (other.nfa as *const NFA<'s>)
+            && self.states.len() == other.states.len()
+            && self.states
+                .iter()
+                .fold(true, |acc, &id| acc && other.states.contains(&id))
+    }
+}
+
+impl<'n, 's: 'n> Eq for NFAStateSet<'n, 's> {}
 
 impl<'n, 's: 'n> NFAStateSet<'n, 's> {
     /// Creates a new set
     pub fn new(nfa: &'n NFA<'s>) -> NFAStateSet<'n, 's> {
         NFAStateSet {
             nfa,
-            states: Vec::<&'n NFAState<'s>>::new()
+            states: Vec::<StateId>::new()
         }
     }
 
     /// Adds the given state in this set if it is not already present
-    pub fn add(&mut self, state: &'n NFAState<'s>) {
+    pub fn add(&mut self, state: StateId) {
         if !self.states.contains(&state) {
             self.states.push(state);
         }
@@ -220,13 +232,10 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
         // Close the set
         let mut i = 0;
         while i < self.states.len() {
-            let state = self.states[i];
-            for transition in state.transitions.iter() {
+            let id = self.states[i];
+            for transition in self.nfa.states[id].transitions.iter() {
                 if transition.key == EPSILON {
-                    let target = &self.nfa.states[transition.next];
-                    if !self.states.contains(&target) {
-                        self.states.push(target);
-                    }
+                    self.add(transition.next);
                 }
             }
             i += 1;
@@ -235,13 +244,13 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
         let positive = self.states
             .iter()
             .enumerate()
-            .find(|&(_i, state)| state.mark > 0)
-            .map(|(i, _state)| i);
+            .find(|&(_i, &id)| self.nfa.states[id].mark > 0)
+            .map(|(i, _id)| i);
         let negative = self.states
             .iter()
             .enumerate()
-            .find(|&(_i, state)| state.mark < 0)
-            .map(|(i, _state)| i);
+            .find(|&(_i, &id)| self.nfa.states[id].mark < 0)
+            .map(|(i, _id)| i);
         // With both negative and positive states
         // remove the states immediately reached with epsilon from the positive state
         if positive.is_some() && negative.is_some() {
@@ -250,12 +259,44 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
                     let index = self.states
                         .iter()
                         .enumerate()
-                        .find(|&(_i, state)| state.id == transition.next)
+                        .find(|&(_i, &id)| id == transition.next)
                         .unwrap()
                         .0;
                     self.states.remove(index);
                 }
             }
         }
+    }
+
+    /// Gets transitions from this set to other sets
+    pub fn get_transitions(&self) -> Vec<(CharSpan, NFAStateSet<'n, 's>)> {
+        let mut transitions = Vec::<Transition>::new();
+        self.states.iter().for_each(|&id| {
+            self.nfa.states[id]
+                .transitions
+                .iter()
+                .for_each(|&transition| transitions.push(transition))
+        });
+        // normalize the original transitions
+        if !transitions.is_empty() {
+            transitions = super::normalize(transitions);
+        }
+        transitions.sort();
+
+        let mut result = Vec::<(CharSpan, NFAStateSet<'n, 's>)>::new();
+        let mut i = 0;
+        while i < transitions.len() {
+            let key = transitions[i].key;
+            let mut child = NFAStateSet::new(self.nfa);
+            child.add(transitions[i].next);
+            i += 1;
+            while i < transitions.len() && transitions[i].key == key {
+                child.add(transitions[i].next);
+                i += 1;
+            }
+            child.close();
+            result.push((key, child));
+        }
+        result
     }
 }
