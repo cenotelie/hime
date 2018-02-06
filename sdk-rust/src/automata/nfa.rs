@@ -17,7 +17,6 @@
 
 //! Module for the NFA automata
 
-use super::DUMMY;
 use super::FinalItem;
 use super::StateId;
 use super::Transition;
@@ -37,6 +36,18 @@ pub const NFA_ENTRY: StateId = 0;
 
 /// The identifier of the exit state in an NFA
 pub const NFA_EXIT: StateId = 1;
+
+/// Represents a fake marker of a final state in an automaton
+struct DummyItem {}
+
+impl FinalItem for DummyItem {
+    fn priority(&self) -> usize {
+        0
+    }
+}
+
+/// The single dummy item, a fake marker of a final state in an automaton
+const DUMMY: DummyItem = DummyItem {};
 
 /// Represents a state in a Non-deterministic Finite Automaton
 pub struct NFAState<'s> {

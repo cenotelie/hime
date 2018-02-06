@@ -30,18 +30,6 @@ pub trait FinalItem {
     fn priority(&self) -> usize;
 }
 
-/// Represents a fake marker of a final state in an automaton
-struct DummyItem {}
-
-impl FinalItem for DummyItem {
-    fn priority(&self) -> usize {
-        0
-    }
-}
-
-/// The single dummy item, a fake marker of a final state in an automaton
-const DUMMY: DummyItem = DummyItem {};
-
 /// Defines the type of state's identifier
 type StateId = usize;
 
