@@ -26,29 +26,29 @@ use super::super::CharSpan;
 use std::collections::HashMap;
 
 /// Represents a state in a Deterministic Finite Automaton
-pub struct DFAState<'s> {
+pub struct DFAState {
     /// This state's id
     pub id: StateId,
     /// List of the items on this state
-    pub items: Vec<&'s FinalItem>,
+    pub items: Vec<FinalItem>,
     /// The transitions from this state
     pub transitions: Vec<Transition>
 }
 
-impl<'s> PartialEq for DFAState<'s> {
-    fn eq(&self, other: &DFAState<'s>) -> bool {
+impl PartialEq for DFAState {
+    fn eq(&self, other: &DFAState) -> bool {
         self.id == other.id
     }
 }
 
-impl<'s> Eq for DFAState<'s> {}
+impl Eq for DFAState {}
 
-impl<'s> DFAState<'s> {
+impl DFAState {
     /// Initialize this state
-    pub fn new(id: StateId) -> DFAState<'s> {
+    pub fn new(id: StateId) -> DFAState {
         DFAState {
             id,
-            items: Vec::<&'s FinalItem>::new(),
+            items: Vec::<FinalItem>::new(),
             transitions: Vec::<Transition>::new()
         }
     }
@@ -64,7 +64,7 @@ impl<'s> DFAState<'s> {
     }
 
     /// Checks whether this state has the same final items as the specified one
-    pub fn same_items(&self, state: &DFAState<'s>) -> bool {
+    pub fn same_items(&self, state: &DFAState) -> bool {
         if self.items.len() != state.items.len() {
             return false;
         }
@@ -83,7 +83,7 @@ impl<'s> DFAState<'s> {
     }
 
     /// Adds to this state the same items as the specified one
-    pub fn add_items(&mut self, state: &DFAState<'s>) {
+    pub fn add_items(&mut self, state: &DFAState) {
         for item in state.items.iter() {
             self.items.push(*item);
         }
@@ -153,23 +153,23 @@ impl<'s> DFAState<'s> {
 }
 
 /// Represents a Deterministic Finite-state Automaton
-pub struct DFA<'s> {
+pub struct DFA {
     /// The list of states in this automaton
-    pub states: Vec<DFAState<'s>>
+    pub states: Vec<DFAState>
 }
 
-impl<'s> DFA<'s> {
+impl DFA {
     /// Creates a new empty DFA
-    pub fn new() -> DFA<'s> {
+    pub fn new() -> DFA {
         DFA {
-            states: Vec::<DFAState<'s>>::new()
+            states: Vec::<DFAState>::new()
         }
     }
 
     /// Initializes this DFA as equivalent to the given NFA
-    pub fn from_nfa<'n>(nfa: &'n NFA<'s>) -> DFA<'s> {
+    pub fn from_nfa<'n>(nfa: &'n NFA) -> DFA {
         let mut dfa = DFA::new();
-        let mut sets = Vec::<NFAStateSet<'n, 's>>::new();
+        let mut sets = Vec::<NFAStateSet<'n>>::new();
         // Create the first NFA set, add the entry and close it
         let mut initial = NFAStateSet::new(nfa);
         initial.add(0);
@@ -210,7 +210,7 @@ impl<'s> DFA<'s> {
     }
 
     /// Creates a new state in this DFA
-    pub fn add_state(&mut self) -> &mut DFAState<'s> {
+    pub fn add_state(&mut self) -> &mut DFAState {
         let id = self.states.len();
         self.states.push(DFAState::new(id));
         &mut self.states[id - 1]
@@ -236,7 +236,7 @@ impl<'s> DFA<'s> {
     }
 
     /// Prunes all the unreachable states from this automaton
-    pub fn prune(&self) -> DFA<'s> {
+    pub fn prune(&self) -> DFA {
         let inverse = DFAInverse::new(self);
         let finals = inverse.close_by_antecedents(&inverse.finals);
         let entry_index = finals
@@ -297,26 +297,23 @@ impl<'s> DFA<'s> {
 }
 
 /// Represents a group of DFA states within a partition
-struct DFAStateGroup<'d, 's: 'd> {
+struct DFAStateGroup<'d> {
     /// The states in this group
-    states: Vec<&'d DFAState<'s>>
+    states: Vec<&'d DFAState>
 }
 
 /// Represents a partition of a DFA
 /// This is used to compute minimal DFAs
-struct DFAPartition<'d, 's: 'd> {
+struct DFAPartition<'d> {
     /// The parent DFA
-    dfa: &'d DFA<'s>,
+    dfa: &'d DFA,
     /// The groups in this partition
-    groups: Vec<DFAStateGroup<'d, 's>>
+    groups: Vec<DFAStateGroup<'d>>
 }
 
 /// Initializes this partition as the first partition of the given DFA
 /// The first partition is according to final, non-final states
-fn partition_dfa_into<'d: 'p, 'p, 's: 'd + 'p>(
-    dfa: &'d DFA<'s>,
-    partition: &'p mut DFAPartition<'d, 's>
-) {
+fn partition_dfa_into<'d: 'p, 'p>(dfa: &'d DFA, partition: &'p mut DFAPartition<'d>) {
     // Partition the DFA states between final and non-finals
     let has_non_finals = dfa.states
         .iter()
@@ -351,16 +348,16 @@ fn partition_dfa_into<'d: 'p, 'p, 's: 'd + 'p>(
     }
 }
 
-impl<'d, 's: 'd> DFAStateGroup<'d, 's> {
+impl<'d> DFAStateGroup<'d> {
     /// Initializes a new group
-    pub fn new() -> DFAStateGroup<'d, 's> {
+    pub fn new() -> DFAStateGroup<'d> {
         DFAStateGroup {
-            states: Vec::<&'d DFAState<'s>>::new()
+            states: Vec::<&'d DFAState>::new()
         }
     }
 
     /// Gets the representative state of this group
-    pub fn representative(&self) -> &'d DFAState<'s> {
+    pub fn representative(&self) -> &'d DFAState {
         self.states[0]
     }
 
@@ -375,17 +372,17 @@ impl<'d, 's: 'd> DFAStateGroup<'d, 's> {
     }
 }
 
-impl<'d, 's: 'd> DFAPartition<'d, 's> {
+impl<'d> DFAPartition<'d> {
     /// Initializes this partition
-    pub fn new(dfa: &'d DFA<'s>) -> DFAPartition<'d, 's> {
+    pub fn new(dfa: &'d DFA) -> DFAPartition<'d> {
         DFAPartition {
             dfa,
-            groups: Vec::<DFAStateGroup<'d, 's>>::new()
+            groups: Vec::<DFAStateGroup<'d>>::new()
         }
     }
 
     /// Refines this partition into another one
-    pub fn refine(&self) -> DFAPartition<'d, 's> {
+    pub fn refine(&self) -> DFAPartition<'d> {
         let mut new_partition = DFAPartition::new(self.dfa);
         // For each group in the current partition
         // Split the group and add the resulting groups to the new partition
@@ -402,7 +399,7 @@ impl<'d, 's: 'd> DFAPartition<'d, 's> {
     }
 
     /// Adds a state to this partition, coming from the given old partition
-    pub fn add_state(&mut self, state: &'d DFAState<'s>, old_partition: &DFAPartition<'d, 's>) {
+    pub fn add_state(&mut self, state: &'d DFAState, old_partition: &DFAPartition<'d>) {
         let mut added = false;
         // For each group in the resulting groups set
         for group in self.groups.iter_mut() {
@@ -422,7 +419,7 @@ impl<'d, 's: 'd> DFAPartition<'d, 's> {
     }
 
     /// Determines whether two states should be in the same group
-    fn in_same_group(&self, state1: &'d DFAState<'s>, state2: &'d DFAState<'s>) -> bool {
+    fn in_same_group(&self, state1: &'d DFAState, state2: &'d DFAState) -> bool {
         if state1.transitions.len() != state2.transitions.len() {
             return false;
         }
@@ -457,14 +454,14 @@ impl<'d, 's: 'd> DFAPartition<'d, 's> {
     }
 
     /// Gets the group of the given state in this partition
-    fn get_group_of(&self, state: &'d DFAState<'s>) -> Option<&DFAStateGroup<'d, 's>> {
+    fn get_group_of(&self, state: &'d DFAState) -> Option<&DFAStateGroup<'d>> {
         self.groups
             .iter()
             .find(|&group| group.states.contains(&state))
     }
 
     /// Gets the new dfa represented by this partition
-    pub fn into_dfa(self) -> DFA<'s> {
+    pub fn into_dfa(self) -> DFA {
         let mut dfa = DFA::new();
         // get the index of the group with the entry state
         let entry_index = self.groups
@@ -520,26 +517,26 @@ impl<'d, 's: 'd> DFAPartition<'d, 's> {
 }
 
 /// Represents the inverse graph of a DFA
-struct DFAInverse<'d, 's: 'd> {
+struct DFAInverse<'d> {
     /// The final states
-    finals: Vec<&'d DFAState<'s>>,
+    finals: Vec<&'d DFAState>,
     /// The reachable states
-    reachable: Vec<&'d DFAState<'s>>,
+    reachable: Vec<&'d DFAState>,
     /// The inverse graph data
-    inverse: HashMap<StateId, Vec<&'d DFAState<'s>>>
+    inverse: HashMap<StateId, Vec<&'d DFAState>>
 }
 
-impl<'d, 's: 'd> DFAInverse<'d, 's> {
+impl<'d> DFAInverse<'d> {
     /// Builds this inverse graph from the specified DFA
-    pub fn new(dfa: &'d DFA<'s>) -> DFAInverse<'d, 's> {
+    pub fn new(dfa: &'d DFA) -> DFAInverse<'d> {
         let mut inverse = DFAInverse {
-            finals: Vec::<&'d DFAState<'s>>::new(),
-            reachable: Vec::<&'d DFAState<'s>>::new(),
-            inverse: HashMap::<StateId, Vec<&'d DFAState<'s>>>::new()
+            finals: Vec::<&'d DFAState>::new(),
+            reachable: Vec::<&'d DFAState>::new(),
+            inverse: HashMap::<StateId, Vec<&'d DFAState>>::new()
         };
         // transitive closure of the first state
         inverse.reachable.push(&dfa.states[0]);
-        inverse.inverse.insert(0, Vec::<&'d DFAState<'s>>::new());
+        inverse.inverse.insert(0, Vec::<&'d DFAState>::new());
         let mut i = 0;
         while i < inverse.reachable.len() {
             let current = inverse.reachable[i];
@@ -547,9 +544,7 @@ impl<'d, 's: 'd> DFAInverse<'d, 's> {
                 let next_id = transition.next;
                 if !inverse.inverse.contains_key(&next_id) {
                     inverse.reachable.push(&dfa.states[next_id]);
-                    inverse
-                        .inverse
-                        .insert(next_id, Vec::<&'d DFAState<'s>>::new());
+                    inverse.inverse.insert(next_id, Vec::<&'d DFAState>::new());
                 }
                 inverse.inverse.get_mut(&next_id).unwrap().push(current);
             }
@@ -562,8 +557,8 @@ impl<'d, 's: 'd> DFAInverse<'d, 's> {
     }
 
     /// Closes the specified list of states through inverse transitions
-    pub fn close_by_antecedents(&self, states: &Vec<&'d DFAState<'s>>) -> Vec<&'d DFAState<'s>> {
-        let mut result = Vec::<&'d DFAState<'s>>::new();
+    pub fn close_by_antecedents(&self, states: &Vec<&'d DFAState>) -> Vec<&'d DFAState> {
+        let mut result = Vec::<&'d DFAState>::new();
         // transitive closure of the final states by their antecedents
         // final states are all reachable
         for state in states.iter() {

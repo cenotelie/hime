@@ -25,13 +25,10 @@ use std::cmp::Ordering;
 use super::CharSpan;
 
 /// Represents a marker for the final state of an automaton
-pub trait FinalItem {
-    /// Gets the priority of this item
-    fn priority(&self) -> usize;
-}
+pub type FinalItem = usize;
 
 /// Defines the type of state's identifier
-type StateId = usize;
+pub type StateId = usize;
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord)]
 pub struct Transition {

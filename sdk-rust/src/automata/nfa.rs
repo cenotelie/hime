@@ -37,44 +37,35 @@ pub const NFA_ENTRY: StateId = 0;
 /// The identifier of the exit state in an NFA
 pub const NFA_EXIT: StateId = 1;
 
-/// Represents a fake marker of a final state in an automaton
-struct DummyItem {}
-
-impl FinalItem for DummyItem {
-    fn priority(&self) -> usize {
-        0
-    }
-}
-
 /// The single dummy item, a fake marker of a final state in an automaton
-const DUMMY: DummyItem = DummyItem {};
+const DUMMY: FinalItem = 0xFFFFFFFF;
 
 /// Represents a state in a Non-deterministic Finite Automaton
-pub struct NFAState<'s> {
+pub struct NFAState {
     /// This state's id
     pub id: StateId,
     /// List of the items on this state
-    pub items: Vec<&'s FinalItem>,
+    pub items: Vec<FinalItem>,
     /// The transitions from this state
     pub transitions: Vec<Transition>,
     /// The watermark of this state, if any
     pub mark: isize
 }
 
-impl<'s> PartialEq for NFAState<'s> {
-    fn eq(&self, other: &NFAState<'s>) -> bool {
+impl PartialEq for NFAState {
+    fn eq(&self, other: &NFAState) -> bool {
         self.id == other.id
     }
 }
 
-impl<'s> Eq for NFAState<'s> {}
+impl Eq for NFAState {}
 
-impl<'s> NFAState<'s> {
+impl NFAState {
     /// Creates a new state
-    pub fn new(id: StateId) -> NFAState<'s> {
+    pub fn new(id: StateId) -> NFAState {
         NFAState {
             id,
-            items: Vec::<&'s FinalItem>::new(),
+            items: Vec::<FinalItem>::new(),
             transitions: Vec::<Transition>::new(),
             mark: MARK_NEUTRAL
         }
@@ -91,7 +82,7 @@ impl<'s> NFAState<'s> {
     }
 
     /// Adds to this state the same items as the specified one
-    pub fn add_items(&mut self, state: &NFAState<'s>) {
+    pub fn add_items(&mut self, state: &NFAState) {
         for item in state.items.iter() {
             self.items.push(*item);
         }
@@ -119,29 +110,29 @@ impl<'s> NFAState<'s> {
 }
 
 /// Represents a Non-deterministic Finite-state Automaton
-pub struct NFA<'s> {
+pub struct NFA {
     /// The list of states in this automaton
-    pub states: Vec<NFAState<'s>>
+    pub states: Vec<NFAState>
 }
 
-impl<'s> NFA<'s> {
+impl NFA {
     /// Creates a new empty NFA
-    pub fn new_empty() -> NFA<'s> {
+    pub fn new_empty() -> NFA {
         NFA {
-            states: Vec::<NFAState<'s>>::new()
+            states: Vec::<NFAState>::new()
         }
     }
 
     /// Creates a minimal NFA with an entry and an exit state
-    pub fn new_minimal() -> NFA<'s> {
-        let mut states = Vec::<NFAState<'s>>::new();
+    pub fn new_minimal() -> NFA {
+        let mut states = Vec::<NFAState>::new();
         states.push(NFAState::new(NFA_ENTRY));
         states.push(NFAState::new(NFA_EXIT));
         NFA { states }
     }
 
     /// Creates an automaton that represents makes the given sub-automaton optional
-    pub fn new_optional(sub: &NFA<'s>) -> NFA<'s> {
+    pub fn new_optional(sub: &NFA) -> NFA {
         let mut result = NFA::new_minimal();
         let sub_first = result.include_nfa(sub);
         result.states[NFA_ENTRY].transitions.push(Transition {
@@ -162,7 +153,7 @@ impl<'s> NFA<'s> {
     }
 
     /// Creates an automaton that repeats the sub-automaton zero or more times
-    pub fn new_repeat_zero_or_more(sub: &NFA<'s>) -> NFA<'s> {
+    pub fn new_repeat_zero_or_more(sub: &NFA) -> NFA {
         let mut result = NFA::new_minimal();
         let sub_first = result.include_nfa(sub);
         result.states[NFA_ENTRY].transitions.push(Transition {
@@ -187,7 +178,7 @@ impl<'s> NFA<'s> {
     }
 
     /// Creates an automaton that repeats the sub-automaton one or more times
-    pub fn new_repeat_one_or_more(sub: &NFA<'s>) -> NFA<'s> {
+    pub fn new_repeat_one_or_more(sub: &NFA) -> NFA {
         let mut result = NFA::new_minimal();
         let sub_first = result.include_nfa(sub);
         result.states[NFA_ENTRY].transitions.push(Transition {
@@ -209,7 +200,7 @@ impl<'s> NFA<'s> {
 
     /// Creates an automaton that repeats the sub-automaton a number of times
     /// in the given range [min, max]
-    pub fn new_repeat_range(sub: &NFA<'s>, min: usize, max: usize) -> NFA<'s> {
+    pub fn new_repeat_range(sub: &NFA, min: usize, max: usize) -> NFA {
         let mut result = NFA::new_minimal();
         let mut last = NFA_ENTRY;
         for _i in 0..min {
@@ -258,7 +249,7 @@ impl<'s> NFA<'s> {
     }
 
     /// Creates an automaton that is the union of the two sub-automaton
-    pub fn new_union(left: &NFA<'s>, right: &NFA<'s>) -> NFA<'s> {
+    pub fn new_union(left: &NFA, right: &NFA) -> NFA {
         let mut result = NFA::new_minimal();
         let left_first = result.include_nfa(left);
         let right_first = result.include_nfa(right);
@@ -286,7 +277,7 @@ impl<'s> NFA<'s> {
     }
 
     /// Creates an automaton that concatenates the two sub-automaton
-    pub fn new_concatenation(left: &NFA<'s>, right: &NFA<'s>) -> NFA<'s> {
+    pub fn new_concatenation(left: &NFA, right: &NFA) -> NFA {
         let mut result = NFA::new_minimal();
         let left_first = result.include_nfa(left);
         let right_first = result.include_nfa(right);
@@ -310,8 +301,7 @@ impl<'s> NFA<'s> {
     }
 
     /// Creates an automaton that is the difference between the left and right sub-automata
-    pub fn new_difference(left: &NFA<'s>, right: &NFA<'s>) -> NFA<'s> {
-        let dummy = &DUMMY as &FinalItem;
+    pub fn new_difference(left: &NFA, right: &NFA) -> NFA {
         let mut result = NFA::new_minimal();
         let positive = result.add_state().id;
         let negative = result.add_state().id;
@@ -343,7 +333,7 @@ impl<'s> NFA<'s> {
             key: EPSILON,
             next: NFA_EXIT
         });
-        result.states[NFA_EXIT].items.push(dummy);
+        result.states[NFA_EXIT].items.push(DUMMY);
 
         let mut dfa = DFA::from_nfa(&result);
         dfa = dfa.prune();
@@ -354,20 +344,13 @@ impl<'s> NFA<'s> {
             key: EPSILON,
             next: sub_first + NFA_ENTRY
         });
-        let mut sub_exit = 0;
-        for (i, state) in dfa.states.iter().enumerate() {
-            let mut found = false;
-            for item in state.items.iter() {
-                if (*item as *const FinalItem) == (dummy as *const FinalItem) {
-                    sub_exit = sub_first + i;
-                    found = true;
-                    break;
-                }
-            }
-            if found {
-                break;
-            }
-        }
+        let sub_exit = sub_first
+            + dfa.states
+                .iter()
+                .enumerate()
+                .find(|&(_i, state)| state.items.contains(&DUMMY))
+                .map(|(i, _state)| i)
+                .unwrap();
         result.states[sub_exit].items.clear();
         result.states[sub_exit].transitions.push(Transition {
             key: EPSILON,
@@ -377,19 +360,19 @@ impl<'s> NFA<'s> {
     }
 
     /// Adds a new state to this automaton
-    pub fn add_state(&mut self) -> &mut NFAState<'s> {
+    pub fn add_state(&mut self) -> &mut NFAState {
         let id = self.states.len();
         self.states.push(NFAState::new(id));
         &mut self.states[id]
     }
 
     /// Clones this automaton
-    pub fn clone_with_finals(&self) -> NFA<'s> {
+    pub fn clone_with_finals(&self) -> NFA {
         self.clone(true)
     }
 
     /// Clones this automaton
-    pub fn clone(&self, keep_finals: bool) -> NFA<'s> {
+    pub fn clone(&self, keep_finals: bool) -> NFA {
         let mut result = NFA::new_empty();
         for original in self.states.iter() {
             let target = result.add_state();
@@ -410,7 +393,7 @@ impl<'s> NFA<'s> {
 
     /// Inserts all the states of the given automaton into this one
     /// This does not make a copy of the states, this directly includes them
-    pub fn include_nfa(&mut self, nfa: &NFA<'s>) -> usize {
+    pub fn include_nfa(&mut self, nfa: &NFA) -> usize {
         let shift = self.states.len();
         // copy the states
         for state in nfa.states.iter() {
@@ -429,7 +412,7 @@ impl<'s> NFA<'s> {
 
     /// Inserts all the states of the given automaton into this one
     /// This does not make a copy of the states, this directly includes them
-    pub fn include_dfa(&mut self, dfa: &DFA<'s>) -> usize {
+    pub fn include_dfa(&mut self, dfa: &DFA) -> usize {
         let shift = self.states.len();
         // copy the states
         for state in dfa.states.iter() {
@@ -448,16 +431,16 @@ impl<'s> NFA<'s> {
 
 /// Represents a set of states in a Non-deterministic Finite Automaton
 /// A state can only appear once in a set
-pub struct NFAStateSet<'n, 's: 'n> {
+pub struct NFAStateSet<'n> {
     /// The parent NFA
-    nfa: &'n NFA<'s>,
+    nfa: &'n NFA,
     /// The identifiers of the states in this set
     states: Vec<StateId>
 }
 
-impl<'n, 's: 'n> PartialEq for NFAStateSet<'n, 's> {
-    fn eq(&self, other: &NFAStateSet<'n, 's>) -> bool {
-        (self.nfa as *const NFA<'s>) == (other.nfa as *const NFA<'s>)
+impl<'n> PartialEq for NFAStateSet<'n> {
+    fn eq(&self, other: &NFAStateSet<'n>) -> bool {
+        (self.nfa as *const NFA) == (other.nfa as *const NFA)
             && self.states.len() == other.states.len()
             && self.states
                 .iter()
@@ -465,11 +448,11 @@ impl<'n, 's: 'n> PartialEq for NFAStateSet<'n, 's> {
     }
 }
 
-impl<'n, 's: 'n> Eq for NFAStateSet<'n, 's> {}
+impl<'n> Eq for NFAStateSet<'n> {}
 
-impl<'n, 's: 'n> NFAStateSet<'n, 's> {
+impl<'n> NFAStateSet<'n> {
     /// Creates a new set
-    pub fn new(nfa: &'n NFA<'s>) -> NFAStateSet<'n, 's> {
+    pub fn new(nfa: &'n NFA) -> NFAStateSet<'n> {
         NFAStateSet {
             nfa,
             states: Vec::<StateId>::new()
@@ -526,7 +509,7 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
     }
 
     /// Gets transitions from this set to other sets
-    pub fn get_transitions(&self) -> Vec<(CharSpan, NFAStateSet<'n, 's>)> {
+    pub fn get_transitions(&self) -> Vec<(CharSpan, NFAStateSet<'n>)> {
         let mut transitions = Vec::<Transition>::new();
         self.states.iter().for_each(|&id| {
             self.nfa.states[id]
@@ -540,7 +523,7 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
         }
         transitions.sort();
 
-        let mut result = Vec::<(CharSpan, NFAStateSet<'n, 's>)>::new();
+        let mut result = Vec::<(CharSpan, NFAStateSet<'n>)>::new();
         let mut i = 0;
         while i < transitions.len() {
             let key = transitions[i].key;
@@ -558,8 +541,8 @@ impl<'n, 's: 'n> NFAStateSet<'n, 's> {
     }
 
     /// Gets all the final markers of all the states in this set
-    pub fn get_finals(&self) -> Vec<&'s FinalItem> {
-        let mut finals = Vec::<&'s FinalItem>::new();
+    pub fn get_finals(&self) -> Vec<FinalItem> {
+        let mut finals = Vec::<FinalItem>::new();
         self.states.iter().for_each(|&id| {
             self.nfa.states[id]
                 .items
