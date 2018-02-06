@@ -17,6 +17,7 @@
 
 //! Module for the NFA automata
 
+use super::DUMMY;
 use super::FinalItem;
 use super::StateId;
 use super::Transition;
@@ -30,6 +31,12 @@ pub const EPSILON: CharSpan = CHAR_SPAN_NULL;
 
 /// The neutral mark for a NFA state (the state is not marked)
 pub const MARK_NEUTRAL: isize = 0;
+
+/// The identifier of the entry state in an NFA
+pub const NFA_ENTRY: StateId = 0;
+
+/// The identifier of the exit state in an NFA
+pub const NFA_EXIT: StateId = 1;
 
 /// Represents a state in a Non-deterministic Finite Automaton
 pub struct NFAState<'s> {
@@ -103,48 +110,259 @@ impl<'s> NFAState<'s> {
 /// Represents a Non-deterministic Finite-state Automaton
 pub struct NFA<'s> {
     /// The list of states in this automaton
-    pub states: Vec<NFAState<'s>>,
-    /// The identifier of the exit state, if any
-    pub exit: Option<StateId>
+    pub states: Vec<NFAState<'s>>
 }
 
 impl<'s> NFA<'s> {
     /// Creates a new empty NFA
     pub fn new_empty() -> NFA<'s> {
         NFA {
-            states: Vec::<NFAState<'s>>::new(),
-            exit: None
+            states: Vec::<NFAState<'s>>::new()
         }
     }
 
     /// Creates a minimal NFA with an entry and an exit state
     pub fn new_minimal() -> NFA<'s> {
         let mut states = Vec::<NFAState<'s>>::new();
-        states.push(NFAState::new(0));
-        states.push(NFAState::new(1));
-        NFA {
-            states,
-            exit: Some(1)
-        }
+        states.push(NFAState::new(NFA_ENTRY));
+        states.push(NFAState::new(NFA_EXIT));
+        NFA { states }
     }
 
-    /// Initializes this automaton as a copy of the given DFA
-    /// This automaton will not have an exit state
-    pub fn from_dfa(dfa: &DFA<'s>) -> NFA<'s> {
-        let mut states = Vec::<NFAState<'s>>::new();
-        for dfa_state in dfa.states.iter() {
-            let mut nfa_state = NFAState::new(dfa_state.id);
-            dfa_state
-                .items
-                .iter()
-                .for_each(|&item| nfa_state.items.push(item));
-            dfa_state
-                .transitions
-                .iter()
-                .for_each(|&transition| nfa_state.transitions.push(transition));
-            states.push(nfa_state);
+    /// Creates an automaton that represents makes the given sub-automaton optional
+    pub fn new_optional(sub: &NFA<'s>) -> NFA<'s> {
+        let mut result = NFA::new_minimal();
+        let sub_first = result.include_nfa(sub);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: sub_first + NFA_ENTRY
+        });
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: NFA_EXIT
+        });
+        result.states[sub_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        result
+    }
+
+    /// Creates an automaton that repeats the sub-automaton zero or more times
+    pub fn new_repeat_zero_or_more(sub: &NFA<'s>) -> NFA<'s> {
+        let mut result = NFA::new_minimal();
+        let sub_first = result.include_nfa(sub);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: sub_first + NFA_ENTRY
+        });
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: NFA_EXIT
+        });
+        result.states[sub_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        result.states[NFA_EXIT].transitions.push(Transition {
+            key: EPSILON,
+            next: sub_first + NFA_ENTRY
+        });
+        result
+    }
+
+    /// Creates an automaton that repeats the sub-automaton one or more times
+    pub fn new_repeat_one_or_more(sub: &NFA<'s>) -> NFA<'s> {
+        let mut result = NFA::new_minimal();
+        let sub_first = result.include_nfa(sub);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: sub_first + NFA_ENTRY
+        });
+        result.states[sub_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        result.states[NFA_EXIT].transitions.push(Transition {
+            key: EPSILON,
+            next: sub_first + NFA_ENTRY
+        });
+        result
+    }
+
+    /// Creates an automaton that repeats the sub-automaton a number of times
+    /// in the given range [min, max]
+    pub fn new_repeat_range(sub: &NFA<'s>, min: usize, max: usize) -> NFA<'s> {
+        let mut result = NFA::new_minimal();
+        let mut last = NFA_ENTRY;
+        for _i in 0..min {
+            let sub_first = result.include_nfa(sub);
+            result.states[last].transitions.push(Transition {
+                key: EPSILON,
+                next: sub_first + NFA_ENTRY
+            });
+            last = sub_first + NFA_EXIT;
         }
-        NFA { states, exit: None }
+        for _i in min..max {
+            let optional_entry = result.add_state().id;
+            let optional_exit = result.add_state().id;
+            let sub_first = result.include_nfa(sub);
+            result.states[optional_entry].transitions.push(Transition {
+                key: EPSILON,
+                next: sub_first + NFA_ENTRY
+            });
+            result.states[optional_entry].transitions.push(Transition {
+                key: EPSILON,
+                next: optional_exit
+            });
+            result.states[sub_first + NFA_EXIT]
+                .transitions
+                .push(Transition {
+                    key: EPSILON,
+                    next: optional_exit
+                });
+            result.states[last].transitions.push(Transition {
+                key: EPSILON,
+                next: optional_entry
+            });
+            last = optional_exit;
+        }
+        result.states[last].transitions.push(Transition {
+            key: EPSILON,
+            next: NFA_EXIT
+        });
+        if min == 0 {
+            result.states[NFA_ENTRY].transitions.push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        }
+        result
+    }
+
+    /// Creates an automaton that is the union of the two sub-automaton
+    pub fn new_union(left: &NFA<'s>, right: &NFA<'s>) -> NFA<'s> {
+        let mut result = NFA::new_minimal();
+        let left_first = result.include_nfa(left);
+        let right_first = result.include_nfa(right);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: left_first + NFA_ENTRY
+        });
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: right_first + NFA_ENTRY
+        });
+        result.states[left_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        result.states[right_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        result
+    }
+
+    /// Creates an automaton that concatenates the two sub-automaton
+    pub fn new_concatenation(left: &NFA<'s>, right: &NFA<'s>) -> NFA<'s> {
+        let mut result = NFA::new_minimal();
+        let left_first = result.include_nfa(left);
+        let right_first = result.include_nfa(right);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: left_first + NFA_ENTRY
+        });
+        result.states[left_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: right_first + NFA_ENTRY
+            });
+        result.states[right_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: NFA_EXIT
+            });
+        result
+    }
+
+    /// Creates an automaton that is the difference between the left and right sub-automata
+    pub fn new_difference(left: &NFA<'s>, right: &NFA<'s>) -> NFA<'s> {
+        let dummy = &DUMMY as &FinalItem;
+        let mut result = NFA::new_minimal();
+        let positive = result.add_state().id;
+        let negative = result.add_state().id;
+        result.states[positive].mark = 1;
+        result.states[negative].mark = -1;
+        let left_first = result.include_nfa(left);
+        let right_first = result.include_nfa(right);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: left_first + NFA_ENTRY
+        });
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: right_first + NFA_ENTRY
+        });
+        result.states[left_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: positive
+            });
+        result.states[right_first + NFA_EXIT]
+            .transitions
+            .push(Transition {
+                key: EPSILON,
+                next: negative
+            });
+        result.states[positive].transitions.push(Transition {
+            key: EPSILON,
+            next: NFA_EXIT
+        });
+        result.states[NFA_EXIT].items.push(dummy);
+
+        let mut dfa = DFA::from_nfa(&result);
+        dfa = dfa.prune();
+
+        let mut result = NFA::new_minimal();
+        let sub_first = result.include_dfa(&dfa);
+        result.states[NFA_ENTRY].transitions.push(Transition {
+            key: EPSILON,
+            next: sub_first + NFA_ENTRY
+        });
+        let mut sub_exit = 0;
+        for (i, state) in dfa.states.iter().enumerate() {
+            let mut found = false;
+            for item in state.items.iter() {
+                if (*item as *const FinalItem) == (dummy as *const FinalItem) {
+                    sub_exit = sub_first + i;
+                    found = true;
+                    break;
+                }
+            }
+            if found {
+                break;
+            }
+        }
+        result.states[sub_exit].items.clear();
+        result.states[sub_exit].transitions.push(Transition {
+            key: EPSILON,
+            next: NFA_EXIT
+        });
+        result
     }
 
     /// Adds a new state to this automaton
@@ -176,16 +394,44 @@ impl<'s> NFA<'s> {
                 .iter()
                 .for_each(|&transition| target.transitions.push(transition));
         }
-        result.exit = self.exit;
         result
     }
 
     /// Inserts all the states of the given automaton into this one
     /// This does not make a copy of the states, this directly includes them
-    pub fn include(&mut self, nfa: NFA<'s>) {
-        nfa.states
-            .into_iter()
-            .for_each(|state| self.states.push(state));
+    pub fn include_nfa(&mut self, nfa: &NFA<'s>) -> usize {
+        let shift = self.states.len();
+        // copy the states
+        for state in nfa.states.iter() {
+            let target = self.add_state();
+            target.mark = state.mark;
+            state.items.iter().for_each(|&item| target.items.push(item));
+            state.transitions.iter().for_each(|&transition| {
+                target.transitions.push(Transition {
+                    key: transition.key,
+                    next: transition.next + shift
+                })
+            });
+        }
+        shift
+    }
+
+    /// Inserts all the states of the given automaton into this one
+    /// This does not make a copy of the states, this directly includes them
+    pub fn include_dfa(&mut self, dfa: &DFA<'s>) -> usize {
+        let shift = self.states.len();
+        // copy the states
+        for state in dfa.states.iter() {
+            let target = self.add_state();
+            state.items.iter().for_each(|&item| target.items.push(item));
+            state.transitions.iter().for_each(|&transition| {
+                target.transitions.push(Transition {
+                    key: transition.key,
+                    next: transition.next + shift
+                })
+            });
+        }
+        shift
     }
 }
 

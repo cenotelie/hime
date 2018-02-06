@@ -27,20 +27,20 @@ use super::CharSpan;
 /// Represents a marker for the final state of an automaton
 pub trait FinalItem {
     /// Gets the priority of this item
-    fn priority(&self) -> isize;
+    fn priority(&self) -> usize;
 }
 
 /// Represents a fake marker of a final state in an automaton
-pub struct DummyItem {}
+struct DummyItem {}
 
 impl FinalItem for DummyItem {
-    fn priority(&self) -> isize {
-        -1
+    fn priority(&self) -> usize {
+        0
     }
 }
 
 /// The single dummy item, a fake marker of a final state in an automaton
-pub const DUMMY: DummyItem = DummyItem {};
+const DUMMY: DummyItem = DummyItem {};
 
 /// Defines the type of state's identifier
 type StateId = usize;
