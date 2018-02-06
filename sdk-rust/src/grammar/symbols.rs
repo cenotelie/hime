@@ -21,10 +21,13 @@ use std::cmp::Ordering;
 use std::hash::Hash;
 use std::hash::Hasher;
 
+use super::SymbolId;
+use super::super::automata::nfa::NFA;
+
 /// Represents a symbol in a grammar
 pub trait Symbol {
     /// Gets the unique identifier (within a grammar) of this symbol
-    fn id(&self) -> usize;
+    fn id(&self) -> SymbolId;
     /// Gets the name of this symbol
     fn name(&self) -> &str;
 }
@@ -66,12 +69,19 @@ pub struct Action {
 }
 
 impl Symbol for Action {
-    fn id(&self) -> usize {
+    fn id(&self) -> SymbolId {
         self.id
     }
 
     fn name(&self) -> &str {
         &self.name
+    }
+}
+
+impl Action {
+    /// Creates a new action
+    pub fn new(id: SymbolId, name: String) -> Action {
+        Action { id, name }
     }
 }
 
@@ -84,12 +94,19 @@ pub struct Virtual {
 }
 
 impl Symbol for Virtual {
-    fn id(&self) -> usize {
+    fn id(&self) -> SymbolId {
         self.id
     }
 
     fn name(&self) -> &str {
         &self.name
+    }
+}
+
+impl Virtual {
+    /// Creates a new action
+    pub fn new(id: SymbolId, name: String) -> Virtual {
+        Virtual { id, name }
     }
 }
 
@@ -102,15 +119,73 @@ pub struct Terminal {
     /// The inline value of this terminal
     value: String,
     /// The context of this terminal
-    context: usize
+    context: usize,
+    /// The NFA that is used to match this terminal
+    nfa: NFA
 }
 
 impl Symbol for Terminal {
-    fn id(&self) -> usize {
+    fn id(&self) -> SymbolId {
         self.id
     }
 
     fn name(&self) -> &str {
         &self.name
+    }
+}
+
+impl Terminal {
+    /// Creates a new action
+    pub fn new(id: SymbolId, name: String, value: String, context: usize, nfa: NFA) -> Terminal {
+        Terminal {
+            id,
+            name,
+            value,
+            context,
+            nfa
+        }
+    }
+}
+
+/// Represents the absence of terminal, used as a marker by LR-related algorithms
+pub const TERMINAL_NULL: SymbolId = 0;
+/// Represents a fake terminal, used as a marker by LR-related algorithms
+pub const TERMINAL_DUMMY: SymbolId = 0xFFFFFFFF;
+/// Represents the epsilon symbol in a grammar, i.e. a terminal with an empty value
+pub const TERMINAL_EPSILON: SymbolId = 1;
+/// Represents the absence of terminal, used as a marker by LR-related algorithms
+pub const TERMINAL_DOLLAR: SymbolId = 2;
+
+/// Represents a variable in a grammar
+pub struct Variable {
+    /// The unique identifier (within a grammar) of this symbol
+    id: usize,
+    /// The name of this symbol
+    name: String,
+    /// The FIRSTS set for this variable
+    firsts: Vec<SymbolId>,
+    /// The FOLLOWERS set for this variable
+    followers: Vec<SymbolId>
+}
+
+impl Symbol for Variable {
+    fn id(&self) -> SymbolId {
+        self.id
+    }
+
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+impl Variable {
+    /// Creates a new action
+    pub fn new(id: SymbolId, name: String) -> Variable {
+        Variable {
+            id,
+            name,
+            firsts: Vec::<SymbolId>::new(),
+            followers: Vec::<SymbolId>::new()
+        }
     }
 }

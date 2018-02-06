@@ -18,3 +18,6 @@
 //! Module for the definition of Hime grammars
 
 pub mod symbols;
+
+/// The identifier of a grammar symbol
+pub type SymbolId = usize;
