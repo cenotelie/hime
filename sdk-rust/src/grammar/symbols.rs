@@ -104,7 +104,7 @@ impl Symbol for Virtual {
 }
 
 impl Virtual {
-    /// Creates a new action
+    /// Creates a new virtual
     pub fn new(id: SymbolId, name: String) -> Virtual {
         Virtual { id, name }
     }
@@ -135,7 +135,7 @@ impl Symbol for Terminal {
 }
 
 impl Terminal {
-    /// Creates a new action
+    /// Creates a new terminal
     pub fn new(id: SymbolId, name: String, value: String, context: usize, nfa: NFA) -> Terminal {
         Terminal {
             id,
@@ -144,6 +144,11 @@ impl Terminal {
             context,
             nfa: Some(nfa)
         }
+    }
+
+    /// Gets the terminal's value
+    pub fn value(&self) -> &str {
+        &self.value
     }
 }
 
@@ -214,7 +219,7 @@ impl Symbol for Variable {
 }
 
 impl Variable {
-    /// Creates a new action
+    /// Creates a new variable
     pub fn new(id: SymbolId, name: String) -> Variable {
         Variable {
             id,

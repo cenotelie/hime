@@ -47,8 +47,7 @@ pub mod grammar;
 
 use std::cmp::Ordering;
 
-use hime_redist::text::Text;
-use hime_redist::text::TextPosition;
+use hime_redist::text::TextContext;
 use hime_redist::text::Utf16C;
 
 /// Represents a range of characters
@@ -164,66 +163,146 @@ pub enum ParsingMethod {
     RNGLALR1
 }
 
+/// The data about an even in a report
+pub struct EventData {
+    /// The message for this event
+    message: String,
+    /// The context for this event, if any
+    context: Option<TextContext>
+}
+
+pub enum Event {
+    /// An information event
+    Info(EventData),
+    /// A warning event
+    Warning(EventData),
+    /// An error event
+    Error(EventData)
+}
+
+impl Event {
+    /// Creates a new information event
+    pub fn new_info(message: String) -> Event {
+        Event::Info(EventData {
+            message,
+            context: None
+        })
+    }
+
+    /// Creates a new information event with some context
+    pub fn new_info_with_context(message: String, context: TextContext) -> Event {
+        Event::Info(EventData {
+            message,
+            context: Some(context)
+        })
+    }
+
+    /// Creates a new warning event
+    pub fn new_warning(message: String) -> Event {
+        Event::Warning(EventData {
+            message,
+            context: None
+        })
+    }
+
+    /// Creates a new warning event with some context
+    pub fn new_warning_with_context(message: String, context: TextContext) -> Event {
+        Event::Warning(EventData {
+            message,
+            context: Some(context)
+        })
+    }
+
+    /// Creates a new error event
+    pub fn new_error(message: String) -> Event {
+        Event::Error(EventData {
+            message,
+            context: None
+        })
+    }
+
+    /// Creates a new error event with some context
+    pub fn new_error_with_context(message: String, context: TextContext) -> Event {
+        Event::Error(EventData {
+            message,
+            context: Some(context)
+        })
+    }
+
+    /// Gets the message for this event
+    pub fn message(&self) -> &str {
+        match self {
+            &Event::Info(ref data) => &data.message,
+            &Event::Warning(ref data) => &data.message,
+            &Event::Error(ref data) => &data.message
+        }
+    }
+
+    /// Gets the context for this event
+    pub fn context(&self) -> Option<&TextContext> {
+        match self {
+            &Event::Info(ref data) => data.context.as_ref(),
+            &Event::Warning(ref data) => data.context.as_ref(),
+            &Event::Error(ref data) => data.context.as_ref()
+        }
+    }
+}
+
 /// Represents a compilation report
 pub struct Report {
-    /// The list of info messages in this report
-    pub infos: Vec<String>,
-    /// The list of warnings in this report
-    pub warnings: Vec<String>,
-    /// The list of errors in this report
-    pub errors: Vec<String>
+    pub events: Vec<Event>
 }
 
 impl Report {
     /// Initializes a new report
     pub fn new() -> Report {
         Report {
-            infos: Vec::<String>::new(),
-            warnings: Vec::<String>::new(),
-            errors: Vec::<String>::new()
+            events: Vec::<Event>::new()
         }
     }
 
     /// Adds a new info entry to the log
     pub fn info(&mut self, message: String) {
         println!("[INFO] {0}", message);
-        self.infos.push(message);
+        self.events.push(Event::new_info(message));
     }
 
     /// Adds a new info entry to the log
-    pub fn info_from_input(&mut self, message: String, input: &Text, position: TextPosition) {
-        self.info(message);
-        Report::output_context(input, position);
+    pub fn info_with_context(&mut self, message: String, context: TextContext) {
+        println!("[INFO] {0}", message);
+        println!("\t{0}", context.content);
+        println!("\t{0}", context.pointer);
+        self.events
+            .push(Event::new_info_with_context(message, context))
     }
 
     /// Adds a new warning entry to the log
     pub fn warn(&mut self, message: String) {
         println!("[WARNING] {0}", message);
-        self.warnings.push(message);
+        self.events.push(Event::new_warning(message));
     }
 
     /// Adds a new warning entry to the log
-    pub fn warn_from_input(&mut self, message: String, input: &Text, position: TextPosition) {
-        self.warn(message);
-        Report::output_context(input, position);
+    pub fn warn_with_context(&mut self, message: String, context: TextContext) {
+        println!("[WARNING] {0}", message);
+        println!("\t{0}", context.content);
+        println!("\t{0}", context.pointer);
+        self.events
+            .push(Event::new_warning_with_context(message, context))
     }
 
     /// Adds a new error entry to the log
     pub fn error(&mut self, message: String) {
-        println!("[WARNING] {0}", message);
-        self.errors.push(message);
+        println!("[ERROR] {0}", message);
+        self.events.push(Event::new_error(message));
     }
 
     /// Adds a new error entry to the log
-    pub fn error_from_input(&mut self, message: String, input: &Text, position: TextPosition) {
-        self.error(message);
-        Report::output_context(input, position);
-    }
-
-    /// Outputs the context of a message in the console
-    fn output_context(input: &Text, position: TextPosition) {
-        let context = input.get_context_at(position);
+    pub fn error_with_context(&mut self, message: String, context: TextContext) {
+        println!("[ERROR] {0}", message);
         println!("\t{0}", context.content);
         println!("\t{0}", context.pointer);
+        self.events
+            .push(Event::new_error_with_context(message, context))
     }
 }
