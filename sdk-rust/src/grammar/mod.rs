@@ -396,7 +396,7 @@ impl Grammar {
                 self.fragments.push(symbol.clone());
                 id_map.insert(symbol.id(), symbol.id());
             } else {
-                self.fragments.push(symbol.clone_with_id(self.next_id));
+                self.fragments.push(symbol.clone_with_id(self.next_id, 0));
                 id_map.insert(symbol.id(), self.next_id);
                 self.next_id += 1;
             }
@@ -424,10 +424,14 @@ impl Grammar {
                     parent.name
                 ));
             } else if keep_sid {
-                self.terminals.push(symbol.clone());
+                let target_context = self.resolve_context(&parent.contexts[symbol.context()]);
+                self.terminals
+                    .push(symbol.clone_with_id(symbol.id(), target_context));
                 id_map.insert(symbol.id(), symbol.id());
             } else {
-                self.terminals.push(symbol.clone_with_id(self.next_id));
+                let target_context = self.resolve_context(&parent.contexts[symbol.context()]);
+                self.terminals
+                    .push(symbol.clone_with_id(self.next_id, target_context));
                 id_map.insert(symbol.id(), self.next_id);
                 self.next_id += 1;
             }
@@ -516,10 +520,13 @@ impl Grammar {
             if !self.rules.contains_key(&target) {
                 self.rules.insert(target, Vec::<Rule>::new());
             }
-            let container = self.rules.get_mut(&target).unwrap();
-            rules
-                .iter()
-                .for_each(|rule| container.push(rule.clone_with_ids(id_map)));
+            for rule in rules.iter() {
+                let target_context = self.resolve_context(&parent.contexts[rule.context()]);
+                self.rules
+                    .get_mut(&target)
+                    .unwrap()
+                    .push(rule.clone_with_ids(id_map, target_context));
+            }
         }
     }
 }

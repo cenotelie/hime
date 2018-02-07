@@ -178,12 +178,12 @@ impl Terminal {
     }
 
     /// Clones this symbol with a new identifier
-    pub fn clone_with_id(&self, id: SymbolId) -> Self {
+    pub fn clone_with_id(&self, id: SymbolId, context: usize) -> Self {
         let mut result = Terminal {
             id,
             name: self.name.clone(),
             value: self.value.clone(),
-            context: self.context,
+            context,
             nfa: self.nfa.clone()
         };
         if result.nfa.is_some() {

@@ -173,13 +173,23 @@ impl Rule {
         }
     }
 
+    /// Gets whether this rule has been generated
+    pub fn is_generated(&self) -> bool {
+        self.generated
+    }
+
+    /// Gets the lexical context pushed by this rule
+    pub fn context(&self) -> usize {
+        self.context
+    }
+
     /// Clones with an updated identifier
-    pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>) -> Rule {
+    pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>, context: usize) -> Rule {
         Rule {
             head: *map.get(&self.head).unwrap(),
             body: self.body.clone_with_ids(map),
             generated: self.generated,
-            context: self.context
+            context
         }
     }
 }
