@@ -121,7 +121,7 @@ pub struct Terminal {
     /// The context of this terminal
     context: usize,
     /// The NFA that is used to match this terminal
-    nfa: NFA
+    nfa: Option<NFA>
 }
 
 impl Symbol for Terminal {
@@ -142,19 +142,54 @@ impl Terminal {
             name,
             value,
             context,
-            nfa
+            nfa: Some(nfa)
         }
     }
 }
 
 /// Represents the absence of terminal, used as a marker by LR-related algorithms
-pub const TERMINAL_NULL: SymbolId = 0;
+lazy_static! {
+    pub static ref TERMINAL_NULL: Terminal = Terminal {
+        id: 0,
+        name: "#".to_owned(),
+        value: "#".to_owned(),
+        context: 0,
+        nfa: None
+    };
+}
+
 /// Represents a fake terminal, used as a marker by LR-related algorithms
-pub const TERMINAL_DUMMY: SymbolId = 0xFFFFFFFF;
+lazy_static! {
+    pub static ref TERMINAL_DUMMY: Terminal = Terminal {
+        id: 0,
+        name: "#".to_owned(),
+        value: "#".to_owned(),
+        context: 0,
+        nfa: None
+    };
+}
+
 /// Represents the epsilon symbol in a grammar, i.e. a terminal with an empty value
-pub const TERMINAL_EPSILON: SymbolId = 1;
-/// Represents the absence of terminal, used as a marker by LR-related algorithms
-pub const TERMINAL_DOLLAR: SymbolId = 2;
+lazy_static! {
+    pub static ref TERMINAL_EPSILON: Terminal = Terminal {
+        id: 1,
+        name: "ε".to_owned(),
+        value: "ε".to_owned(),
+        context: 0,
+        nfa: None
+    };
+}
+
+/// Represents the dollar symbol in a grammar, i.e. the marker of end of input
+lazy_static! {
+    pub static ref TERMINAL_DOLLAR: Terminal = Terminal {
+        id: 2,
+        name: "$".to_owned(),
+        value: "$".to_owned(),
+        context: 0,
+        nfa: None
+    };
+}
 
 /// Represents a variable in a grammar
 pub struct Variable {
@@ -186,6 +221,31 @@ impl Variable {
             name,
             firsts: Vec::<SymbolId>::new(),
             followers: Vec::<SymbolId>::new()
+        }
+    }
+}
+
+/// A reference to a grammar symbol
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SymbolReference {
+    /// A reference to a terminal
+    Terminal(SymbolId),
+    /// A reference to a variable
+    Variable(SymbolId),
+    /// A reference to a virtual
+    Virtual(SymbolId),
+    /// A reference to an action
+    Action(SymbolId)
+}
+
+impl SymbolReference {
+    /// Get the identifier of the symbol
+    pub fn id(&self) -> SymbolId {
+        match self {
+            &SymbolReference::Terminal(ref id) => *id,
+            &SymbolReference::Variable(ref id) => *id,
+            &SymbolReference::Virtual(ref id) => *id,
+            &SymbolReference::Action(ref id) => *id
         }
     }
 }
