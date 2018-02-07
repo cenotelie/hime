@@ -18,6 +18,7 @@
 //! Module for the grammar symbols
 
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::hash::Hash;
 use std::hash::Hasher;
 
@@ -62,6 +63,7 @@ impl Hash for Symbol {
 }
 
 /// Represents a symbol for a semantic action in a grammar
+#[derive(Clone)]
 pub struct Action {
     /// The unique identifier (within a grammar) of this symbol
     id: usize,
@@ -95,6 +97,7 @@ impl Action {
 }
 
 /// Represents a virtual symbol in a grammar
+#[derive(Clone)]
 pub struct Virtual {
     /// The unique identifier (within a grammar) of this symbol
     id: usize,
@@ -237,6 +240,7 @@ lazy_static! {
 }
 
 /// Represents a variable in a grammar
+#[derive(Clone)]
 pub struct Variable {
     /// The unique identifier (within a grammar) of this symbol
     id: usize,
@@ -290,6 +294,16 @@ impl SymbolReference {
             &SymbolReference::Variable(ref id) => *id,
             &SymbolReference::Virtual(ref id) => *id,
             &SymbolReference::Action(ref id) => *id
+        }
+    }
+
+    /// Clones with an updated identifier
+    pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>) -> SymbolReference {
+        match self {
+            &SymbolReference::Terminal(ref id) => SymbolReference::Terminal(*map.get(id).unwrap()),
+            &SymbolReference::Variable(ref id) => SymbolReference::Variable(*map.get(id).unwrap()),
+            &SymbolReference::Virtual(ref id) => SymbolReference::Virtual(*map.get(id).unwrap()),
+            &SymbolReference::Action(ref id) => SymbolReference::Action(*map.get(id).unwrap())
         }
     }
 }

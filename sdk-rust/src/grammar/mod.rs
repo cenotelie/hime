@@ -339,6 +339,10 @@ impl Grammar {
         self.inherit_options(parent);
         self.inherit_fragments(parent, report, keep_sid, &mut id_map);
         self.inherit_terminals(parent, report, keep_sid, &mut id_map);
+        self.inherit_variables(parent, keep_sid, &mut id_map);
+        self.inherit_virtuals(parent, keep_sid, &mut id_map);
+        self.inherit_actions(parent, keep_sid, &mut id_map);
+        self.inherit_rules(parent, &id_map);
 
         if keep_sid {
             self.next_id = self.fragments
@@ -376,29 +380,30 @@ impl Grammar {
         keep_sid: bool,
         id_map: &mut HashMap<SymbolId, SymbolId>
     ) {
-        for fragment in parent.fragments.iter() {
+        for symbol in parent.fragments.iter() {
             let contains = self.fragments
                 .iter()
-                .find(|ref symbol| symbol.name().eq(fragment.name()))
+                .find(|ref symbol| symbol.name().eq(symbol.name()))
                 .is_some();
             if contains {
                 report.error(format!(
                     "In grammar {:}, the terminal fragment {:} is redefined when imported from {:}",
                     self.name,
-                    fragment.name(),
+                    symbol.name(),
                     parent.name
                 ));
             } else if keep_sid {
-                self.fragments.push(fragment.clone());
+                self.fragments.push(symbol.clone());
+                id_map.insert(symbol.id(), symbol.id());
             } else {
-                self.fragments.push(fragment.clone_with_id(self.next_id));
-                id_map.insert(fragment.id(), self.next_id);
+                self.fragments.push(symbol.clone_with_id(self.next_id));
+                id_map.insert(symbol.id(), self.next_id);
                 self.next_id += 1;
             }
         }
     }
 
-    /// Inherits the fragments from the parent grammar
+    /// Inherits the terminals from the parent grammar
     fn inherit_terminals(
         &mut self,
         parent: &Grammar,
@@ -406,25 +411,115 @@ impl Grammar {
         keep_sid: bool,
         id_map: &mut HashMap<SymbolId, SymbolId>
     ) {
-        for terminal in parent.terminals.iter() {
+        for symbol in parent.terminals.iter() {
             let contains = self.terminals
                 .iter()
-                .find(|ref symbol| symbol.name().eq(terminal.name()))
+                .find(|ref symbol| symbol.name().eq(symbol.name()))
                 .is_some();
             if contains {
                 report.error(format!(
                     "In grammar {:}, the named terminal {:} is redefined when imported from {:}",
                     self.name,
-                    terminal.name(),
+                    symbol.name(),
                     parent.name
                 ));
             } else if keep_sid {
-                self.terminals.push(terminal.clone());
+                self.terminals.push(symbol.clone());
+                id_map.insert(symbol.id(), symbol.id());
             } else {
-                self.terminals.push(terminal.clone_with_id(self.next_id));
-                id_map.insert(terminal.id(), self.next_id);
+                self.terminals.push(symbol.clone_with_id(self.next_id));
+                id_map.insert(symbol.id(), self.next_id);
                 self.next_id += 1;
             }
+        }
+    }
+
+    /// Inherits the variables from the parent grammar
+    fn inherit_variables(
+        &mut self,
+        parent: &Grammar,
+        keep_sid: bool,
+        id_map: &mut HashMap<SymbolId, SymbolId>
+    ) {
+        for symbol in parent.variables.iter() {
+            let maybe_id = self.variables
+                .iter()
+                .find(|ref symbol| symbol.name().eq(symbol.name()))
+                .map(|ref variable| variable.id());
+            if maybe_id.is_some() {
+                id_map.insert(symbol.id(), maybe_id.unwrap());
+            } else if keep_sid {
+                self.variables.push(symbol.clone());
+                id_map.insert(symbol.id(), symbol.id());
+            } else {
+                self.variables.push(symbol.clone_with_id(self.next_id));
+                id_map.insert(symbol.id(), self.next_id);
+                self.next_id += 1;
+            }
+        }
+    }
+
+    /// Inherits the virtuals from the parent grammar
+    fn inherit_virtuals(
+        &mut self,
+        parent: &Grammar,
+        keep_sid: bool,
+        id_map: &mut HashMap<SymbolId, SymbolId>
+    ) {
+        for symbol in parent.virtuals.iter() {
+            let maybe_id = self.virtuals
+                .iter()
+                .find(|ref symbol| symbol.name().eq(symbol.name()))
+                .map(|ref variable| variable.id());
+            if maybe_id.is_some() {
+                id_map.insert(symbol.id(), maybe_id.unwrap());
+            } else if keep_sid {
+                self.virtuals.push(symbol.clone());
+                id_map.insert(symbol.id(), symbol.id());
+            } else {
+                self.virtuals.push(symbol.clone_with_id(self.next_id));
+                id_map.insert(symbol.id(), self.next_id);
+                self.next_id += 1;
+            }
+        }
+    }
+
+    /// Inherits the actions from the parent grammar
+    fn inherit_actions(
+        &mut self,
+        parent: &Grammar,
+        keep_sid: bool,
+        id_map: &mut HashMap<SymbolId, SymbolId>
+    ) {
+        for symbol in parent.actions.iter() {
+            let maybe_id = self.actions
+                .iter()
+                .find(|ref symbol| symbol.name().eq(symbol.name()))
+                .map(|ref variable| variable.id());
+            if maybe_id.is_some() {
+                id_map.insert(symbol.id(), maybe_id.unwrap());
+            } else if keep_sid {
+                self.actions.push(symbol.clone());
+                id_map.insert(symbol.id(), symbol.id());
+            } else {
+                self.actions.push(symbol.clone_with_id(self.next_id));
+                id_map.insert(symbol.id(), self.next_id);
+                self.next_id += 1;
+            }
+        }
+    }
+
+    /// Inherits the grammar rules from the parent grammar
+    fn inherit_rules(&mut self, parent: &Grammar, id_map: &HashMap<SymbolId, SymbolId>) {
+        for (variable_id, rules) in parent.rules.iter() {
+            let target = *id_map.get(variable_id).unwrap();
+            if !self.rules.contains_key(&target) {
+                self.rules.insert(target, Vec::<Rule>::new());
+            }
+            let container = self.rules.get_mut(&target).unwrap();
+            rules
+                .iter()
+                .for_each(|rule| container.push(rule.clone_with_ids(id_map)));
         }
     }
 }

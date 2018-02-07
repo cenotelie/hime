@@ -20,6 +20,7 @@
 use super::SymbolId;
 use super::symbols::SymbolReference;
 
+use std::collections::HashMap;
 use std::ops::Index;
 
 /// Represents a tree action
@@ -46,6 +47,14 @@ impl RuleBodyElement {
     /// Creates a new element
     pub fn new(symbol: SymbolReference, action: TreeAction) -> RuleBodyElement {
         RuleBodyElement { symbol, action }
+    }
+
+    /// Clones with an updated identifier
+    pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>) -> RuleBodyElement {
+        RuleBodyElement {
+            symbol: self.symbol.clone_with_ids(map),
+            action: self.action
+        }
     }
 }
 
@@ -85,6 +94,16 @@ impl RuleBody {
         let mut parts = Vec::<RuleBodyElement>::new();
         parts.push(first);
         RuleBody { parts }
+    }
+
+    /// Clones with an updated identifier
+    pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>) -> RuleBody {
+        RuleBody {
+            parts: self.parts
+                .iter()
+                .map(|ref part| part.clone_with_ids(map))
+                .collect()
+        }
     }
 
     /// Gets the length of this body
@@ -151,6 +170,16 @@ impl Rule {
             body,
             generated,
             context
+        }
+    }
+
+    /// Clones with an updated identifier
+    pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>) -> Rule {
+        Rule {
+            head: *map.get(&self.head).unwrap(),
+            body: self.body.clone_with_ids(map),
+            generated: self.generated,
+            context: self.context
         }
     }
 }
