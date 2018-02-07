@@ -26,6 +26,7 @@ use super::super::CharSpan;
 use std::collections::HashMap;
 
 /// Represents a state in a Deterministic Finite Automaton
+#[derive(Clone)]
 pub struct DFAState {
     /// This state's id
     pub id: StateId,
@@ -153,6 +154,7 @@ impl DFAState {
 }
 
 /// Represents a Deterministic Finite-state Automaton
+#[derive(Clone)]
 pub struct DFA {
     /// The list of states in this automaton
     pub states: Vec<DFAState>

@@ -32,6 +32,8 @@ use grammar::symbols::Virtual;
 
 use automata::nfa::NFA;
 
+use super::Report;
+
 /// The identifier of a grammar symbol
 pub type SymbolId = usize;
 
@@ -331,8 +333,31 @@ impl Grammar {
     }
 
     /// Inherit from the given parent
-    pub fn inherit_from(&mut self, parent: &Grammar) {
+    pub fn inherit_from(&mut self, parent: &Grammar, report: &mut Report) {
+        let keep_sid = self.next_id == 3;
+        let mut id_map = HashMap::<SymbolId, SymbolId>::new();
         self.inherit_options(parent);
+        self.inherit_fragments(parent, report, keep_sid, &mut id_map);
+        self.inherit_terminals(parent, report, keep_sid, &mut id_map);
+
+        if keep_sid {
+            self.next_id = self.fragments
+                .iter()
+                .fold(self.next_id, |next_id, ref symbol| next_id.max(symbol.id()));
+            self.next_id = self.terminals
+                .iter()
+                .fold(self.next_id, |next_id, ref symbol| next_id.max(symbol.id()));
+            self.next_id = self.variables
+                .iter()
+                .fold(self.next_id, |next_id, ref symbol| next_id.max(symbol.id()));
+            self.next_id = self.virtuals
+                .iter()
+                .fold(self.next_id, |next_id, ref symbol| next_id.max(symbol.id()));
+            self.next_id = self.actions
+                .iter()
+                .fold(self.next_id, |next_id, ref symbol| next_id.max(symbol.id()));
+            self.next_id += 1;
+        }
     }
 
     /// Inherits the options from the parent grammar
@@ -341,5 +366,65 @@ impl Grammar {
             .options
             .iter()
             .for_each(|&(ref name, ref value)| self.add_option(&name, &value));
+    }
+
+    /// Inherits the fragments from the parent grammar
+    fn inherit_fragments(
+        &mut self,
+        parent: &Grammar,
+        report: &mut Report,
+        keep_sid: bool,
+        id_map: &mut HashMap<SymbolId, SymbolId>
+    ) {
+        for fragment in parent.fragments.iter() {
+            let contains = self.fragments
+                .iter()
+                .find(|ref symbol| symbol.name().eq(fragment.name()))
+                .is_some();
+            if contains {
+                report.error(format!(
+                    "In grammar {:}, the terminal fragment {:} is redefined when imported from {:}",
+                    self.name,
+                    fragment.name(),
+                    parent.name
+                ));
+            } else if keep_sid {
+                self.fragments.push(fragment.clone());
+            } else {
+                self.fragments.push(fragment.clone_with_id(self.next_id));
+                id_map.insert(fragment.id(), self.next_id);
+                self.next_id += 1;
+            }
+        }
+    }
+
+    /// Inherits the fragments from the parent grammar
+    fn inherit_terminals(
+        &mut self,
+        parent: &Grammar,
+        report: &mut Report,
+        keep_sid: bool,
+        id_map: &mut HashMap<SymbolId, SymbolId>
+    ) {
+        for terminal in parent.terminals.iter() {
+            let contains = self.terminals
+                .iter()
+                .find(|ref symbol| symbol.name().eq(terminal.name()))
+                .is_some();
+            if contains {
+                report.error(format!(
+                    "In grammar {:}, the named terminal {:} is redefined when imported from {:}",
+                    self.name,
+                    terminal.name(),
+                    parent.name
+                ));
+            } else if keep_sid {
+                self.terminals.push(terminal.clone());
+            } else {
+                self.terminals.push(terminal.clone_with_id(self.next_id));
+                id_map.insert(terminal.id(), self.next_id);
+                self.next_id += 1;
+            }
+        }
     }
 }

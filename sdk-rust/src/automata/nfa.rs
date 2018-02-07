@@ -41,6 +41,7 @@ pub const NFA_EXIT: StateId = 1;
 const DUMMY: FinalItem = 0xFFFFFFFF;
 
 /// Represents a state in a Non-deterministic Finite Automaton
+#[derive(Clone)]
 pub struct NFAState {
     /// This state's id
     pub id: StateId,
@@ -110,6 +111,7 @@ impl NFAState {
 }
 
 /// Represents a Non-deterministic Finite-state Automaton
+#[derive(Clone)]
 pub struct NFA {
     /// The list of states in this automaton
     pub states: Vec<NFAState>

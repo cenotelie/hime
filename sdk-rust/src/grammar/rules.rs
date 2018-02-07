@@ -49,16 +49,15 @@ impl RuleBodyElement {
     }
 }
 
-/// Represents a choice in a rule, i.e. the remainder of a rule's body
-pub struct RuleChoice {
+/// Represents the body of a grammar rule
+#[derive(Clone)]
+pub struct RuleBody {
     /// The elements in this body
-    parts: Vec<RuleBodyElement>,
-    /// The FIRSTS set of terminals
-    firsts: Vec<SymbolId>
+    parts: Vec<RuleBodyElement>
 }
 
-impl PartialEq for RuleChoice {
-    fn eq(&self, other: &RuleChoice) -> bool {
+impl PartialEq for RuleBody {
+    fn eq(&self, other: &RuleBody) -> bool {
         if self.parts.len() != other.parts.len() {
             return false;
         }
@@ -71,102 +70,68 @@ impl PartialEq for RuleChoice {
     }
 }
 
-impl Eq for RuleChoice {}
+impl Eq for RuleBody {}
 
-impl RuleChoice {
+impl RuleBody {
     /// Creates a new choice
-    pub fn new() -> RuleChoice {
-        RuleChoice {
-            parts: Vec::<RuleBodyElement>::new(),
-            firsts: Vec::<SymbolId>::new()
+    pub fn new() -> RuleBody {
+        RuleBody {
+            parts: Vec::<RuleBodyElement>::new()
         }
     }
 
     /// Creates a new choice
-    pub fn new_single(first: RuleBodyElement) -> RuleChoice {
+    pub fn new_single(first: RuleBodyElement) -> RuleBody {
         let mut parts = Vec::<RuleBodyElement>::new();
         parts.push(first);
-        RuleChoice {
-            parts,
-            firsts: Vec::<SymbolId>::new()
-        }
+        RuleBody { parts }
     }
 
     /// Gets the length of this body
     pub fn len(&self) -> usize {
         self.parts.len()
     }
-}
-
-impl Index<usize> for RuleChoice {
-    type Output = RuleBodyElement;
-    fn index(&self, index: usize) -> &RuleBodyElement {
-        &self.parts[index]
-    }
-}
-
-/// Represents the body of a grammar rule
-pub struct RuleBody {
-    /// The main definition for this body
-    original: RuleChoice,
-    /// The choices in this body
-    choices: Vec<RuleChoice>
-}
-
-impl RuleBody {
-    /// Creates a new body
-    pub fn new() -> RuleBody {
-        RuleBody {
-            original: RuleChoice::new(),
-            choices: Vec::<RuleChoice>::new()
-        }
-    }
 
     /// Computes the choices for this rule body
-    pub fn compute_choices(&mut self) {
-        for part in self.original.parts.iter() {
+    pub fn get_choices(&self) -> Vec<RuleBody> {
+        let mut choices = Vec::<RuleBody>::new();
+        for part in self.parts.iter() {
             match part.symbol {
                 SymbolReference::Action(_id) => {}
                 SymbolReference::Virtual(_id) => {}
                 SymbolReference::Variable(_id) => {
                     // Append the symbol to all the choices definition
-                    for choice in self.choices.iter_mut() {
+                    for choice in choices.iter_mut() {
                         choice.parts.push(*part);
                     }
                     // Create a new choice with only the symbol
-                    self.choices.push(RuleChoice::new_single(*part));
+                    choices.push(RuleBody::new_single(*part));
                 }
                 SymbolReference::Terminal(_id) => {
                     // Append the symbol to all the choices definition
-                    for choice in self.choices.iter_mut() {
+                    for choice in choices.iter_mut() {
                         choice.parts.push(*part);
                     }
                     // Create a new choice with only the symbol
-                    self.choices.push(RuleChoice::new_single(*part));
+                    choices.push(RuleBody::new_single(*part));
                 }
             }
         }
         // Create a new empty choice
-        self.choices.push(RuleChoice::new());
+        choices.push(RuleBody::new());
+        choices
     }
 }
 
 impl Index<usize> for RuleBody {
     type Output = RuleBodyElement;
     fn index(&self, index: usize) -> &RuleBodyElement {
-        &self.original.parts[index]
+        &self.parts[index]
     }
 }
-
-impl PartialEq for RuleBody {
-    fn eq(&self, other: &RuleBody) -> bool {
-        self.original.eq(&other.original)
-    }
-}
-
-impl Eq for RuleBody {}
 
 /// Represents a grammar rule
+#[derive(Clone)]
 pub struct Rule {
     /// The rule's head variable
     head: SymbolId,

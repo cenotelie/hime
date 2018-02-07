@@ -23,6 +23,7 @@ use std::hash::Hasher;
 
 use super::SymbolId;
 use super::super::automata::nfa::NFA;
+use super::super::automata::nfa::NFA_EXIT;
 
 /// Represents a symbol in a grammar
 pub trait Symbol {
@@ -83,6 +84,14 @@ impl Action {
     pub fn new(id: SymbolId, name: String) -> Action {
         Action { id, name }
     }
+
+    /// Clones this symbol with a new identifier
+    pub fn clone_with_id(&self, id: SymbolId) -> Self {
+        Action {
+            id,
+            name: self.name.clone()
+        }
+    }
 }
 
 /// Represents a virtual symbol in a grammar
@@ -108,9 +117,18 @@ impl Virtual {
     pub fn new(id: SymbolId, name: String) -> Virtual {
         Virtual { id, name }
     }
+
+    /// Clones this symbol with a new identifier
+    pub fn clone_with_id(&self, id: SymbolId) -> Self {
+        Virtual {
+            id,
+            name: self.name.clone()
+        }
+    }
 }
 
 /// Represents a terminal symbol in a grammar
+#[derive(Clone)]
 pub struct Terminal {
     /// The unique identifier (within a grammar) of this symbol
     id: usize,
@@ -149,6 +167,28 @@ impl Terminal {
     /// Gets the terminal's value
     pub fn value(&self) -> &str {
         &self.value
+    }
+
+    /// Gets the context for this terminal
+    pub fn context(&self) -> usize {
+        self.context
+    }
+
+    /// Clones this symbol with a new identifier
+    pub fn clone_with_id(&self, id: SymbolId) -> Self {
+        let mut result = Terminal {
+            id,
+            name: self.name.clone(),
+            value: self.value.clone(),
+            context: self.context,
+            nfa: self.nfa.clone()
+        };
+        if result.nfa.is_some() {
+            let exit_state = &mut result.nfa.as_mut().unwrap().states[NFA_EXIT];
+            exit_state.items.clear();
+            exit_state.items.push(id);
+        }
+        result
     }
 }
 
@@ -201,11 +241,7 @@ pub struct Variable {
     /// The unique identifier (within a grammar) of this symbol
     id: usize,
     /// The name of this symbol
-    name: String,
-    /// The FIRSTS set for this variable
-    firsts: Vec<SymbolId>,
-    /// The FOLLOWERS set for this variable
-    followers: Vec<SymbolId>
+    name: String
 }
 
 impl Symbol for Variable {
@@ -221,11 +257,14 @@ impl Symbol for Variable {
 impl Variable {
     /// Creates a new variable
     pub fn new(id: SymbolId, name: String) -> Variable {
+        Variable { id, name }
+    }
+
+    /// Clones this symbol with a new identifier
+    pub fn clone_with_id(&self, id: SymbolId) -> Self {
         Variable {
             id,
-            name,
-            firsts: Vec::<SymbolId>::new(),
-            followers: Vec::<SymbolId>::new()
+            name: self.name.clone()
         }
     }
 }
