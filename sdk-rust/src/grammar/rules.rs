@@ -96,6 +96,11 @@ impl RuleBody {
         RuleBody { parts }
     }
 
+    /// Appends a single element to this body
+    pub fn append(&mut self, element: RuleBodyElement) {
+        self.parts.push(element);
+    }
+
     /// Clones with an updated identifier
     pub fn clone_with_ids(&self, map: &HashMap<SymbolId, SymbolId>) -> RuleBody {
         RuleBody {
@@ -171,6 +176,11 @@ impl Rule {
             generated,
             context
         }
+    }
+
+    /// Gets the rule's head variable
+    pub fn head(&self) -> SymbolId {
+        self.head
     }
 
     /// Gets whether this rule has been generated

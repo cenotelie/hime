@@ -23,9 +23,13 @@ pub mod rules;
 use std::collections::HashMap;
 
 use grammar::rules::Rule;
+use grammar::rules::RuleBody;
+use grammar::rules::RuleBodyElement;
+use grammar::rules::TreeAction;
 use grammar::symbols::Action;
 use grammar::symbols::Symbol;
 use grammar::symbols::SymbolReference;
+use grammar::symbols::TERMINAL_DOLLAR;
 use grammar::symbols::Terminal;
 use grammar::symbols::Variable;
 use grammar::symbols::Virtual;
@@ -332,6 +336,18 @@ impl Grammar {
         result
     }
 
+    /// Adds a rule to this grammar
+    pub fn add_rule(&mut self, rule: Rule) {
+        let head = rule.head();
+        if !self.rules.contains_key(&head) {
+            self.rules.insert(head, Vec::<Rule>::new());
+        }
+        let container = self.rules.get_mut(&head).unwrap();
+        if !container.contains(&rule) {
+            container.push(rule);
+        }
+    }
+
     /// Inherit from the given parent
     pub fn inherit_from(&mut self, parent: &Grammar, report: &mut Report) {
         let keep_sid = self.next_id == 3;
@@ -528,5 +544,57 @@ impl Grammar {
                     .push(rule.clone_with_ids(id_map, target_context));
             }
         }
+    }
+
+    /// Prepares this grammar for code and data generation
+    pub fn prepare(&mut self, report: &mut Report) -> bool {
+        let result = self.add_real_axiom(report);
+
+        result
+    }
+
+    /// Adds the real axiom to this grammar
+    fn add_real_axiom(&mut self, report: &mut Report) -> bool {
+        // Search for Axiom option
+        let maybe_id = self.get_axiom_id(report);
+        if maybe_id.is_none() {
+            return false;
+        }
+        // Create the real axiom rule variable and rule
+        let axiom = self.resolve_virtual(GENERATED_AXIOM);
+        let mut body = RuleBody::new();
+        body.append(RuleBodyElement::new(
+            SymbolReference::Variable(maybe_id.unwrap()),
+            TreeAction::Promote
+        ));
+        body.append(RuleBodyElement::new(
+            SymbolReference::Terminal(TERMINAL_DOLLAR.id()),
+            TreeAction::Drop
+        ));
+        let rule = Rule::new(axiom.id(), body, false, 0);
+        self.add_rule(rule);
+        return true;
+    }
+
+    /// Gets the identifier of the axiom variable, if any
+    fn get_axiom_id(&self, report: &mut Report) -> Option<usize> {
+        let option = self.get_option(OPTION_AXIOM);
+        if option.is_none() {
+            report.error(format!(
+                "No axiom variable has been defined for grammar {:}",
+                self.name
+            ));
+            return None;
+        }
+        // Search for the variable specified as the Axiom
+        let variable = self.get_variable(option.unwrap());
+        if variable.is_none() {
+            report.error(format!(
+                "The specified axiom variable {:} is undefined",
+                option.unwrap()
+            ));
+            return None;
+        }
+        Some(variable.unwrap().id())
     }
 }
