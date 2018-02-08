@@ -280,7 +280,7 @@ namespace Hime.SDK.Output
 				}
 				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
-				stream.WriteLine("    parse_utf16_with(input, &mut actions)");
+				stream.WriteLine("    parse_utf16_with(input, big_endian, &mut actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified stream of UTF-16 with this parser");
