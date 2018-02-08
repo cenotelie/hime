@@ -241,11 +241,11 @@ namespace Hime.SDK.Grammars
 			for (int i = 2; i < node.Children.Count; i++)
 			{
 				ASTNode child = node.Children[i];
-				if (child.Symbol.ID == HimeGrammarLexer.ID.BLOCK_OPTIONS)
+				if (child.Symbol.ID == HimeGrammarLexer.ID.TerminalBlockOptions)
 					LoadBlockOptions(child);
-				else if (child.Symbol.ID == HimeGrammarLexer.ID.BLOCK_TERMINALS)
+				else if (child.Symbol.ID == HimeGrammarLexer.ID.TerminalBlockTerminals)
 					LoadBlockTerminals(child);
-				else if (child.Symbol.ID == HimeGrammarLexer.ID.BLOCK_RULES)
+				else if (child.Symbol.ID == HimeGrammarLexer.ID.TerminalBlockRules)
 					LoadBlockRules(child);
 			}
 		}
@@ -285,15 +285,15 @@ namespace Hime.SDK.Grammars
 			{
 				switch (child.Symbol.ID)
 				{
-				case HimeGrammarLexer.ID.BLOCK_CONTEXT:
-					LoadTerminalContext(child);
-					break;
-				case HimeGrammarParser.ID.terminal_fragment:
-					LoadTerminalFragment(child);
-					break;
-				case HimeGrammarParser.ID.terminal_rule:
-					LoadTerminalRule(child, Grammar.DEFAULT_CONTEXT_NAME);
-					break;
+					case HimeGrammarLexer.ID.TerminalBlockContext:
+						LoadTerminalContext(child);
+						break;
+					case HimeGrammarParser.ID.VariableTerminalFragment:
+						LoadTerminalFragment(child);
+						break;
+					case HimeGrammarParser.ID.VariableTerminalRule:
+						LoadTerminalRule(child, Grammar.DEFAULT_CONTEXT_NAME);
+						break;
 				}
 			}
 		}
@@ -372,46 +372,46 @@ namespace Hime.SDK.Grammars
 		{
 			Hime.Redist.Symbol symbol = node.Symbol;
 
-			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_TEXT)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalLiteralText)
 				return BuildNFAFromText(node);
-			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_CODEPOINT)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalUnicodeCodepoint)
 				return BuildNFAFromCodepoint(node);
-			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_CLASS)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalLiteralClass)
 				return BuildNFAFromClass(node);
-			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_CATEGORY)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalUnicodeCategory)
 				return BuildNFAFromUnicodeCategory(node);
-			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_BLOCK)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalUnicodeBlock)
 				return BuildNFAFromUnicodeBlock(node);
-			if (symbol.ID == HimeGrammarLexer.ID.UNICODE_SPAN_MARKER)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalUnicodeSpanMarker)
 				return BuildNFAFromUnicodeSpan(node);
-			if (symbol.ID == HimeGrammarLexer.ID.LITERAL_ANY)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalLiteralAny)
 				return BuildNFAFromAny();
 
-			if (symbol.ID == HimeGrammarLexer.ID.NAME)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalName)
 				return BuildNFAFromReference(node);
 
-			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalOperatorOptional)
 			{
 				NFA inner = BuildNFA(node.Children[0]);
 				return NFA.NewOptional(inner, false);
 			}
-			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_ZEROMORE)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalOperatorZeromore)
 			{
 				NFA inner = BuildNFA(node.Children[0]);
 				return NFA.NewRepeatZeroMore(inner, false);
 			}
-			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_ONEMORE)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalOperatorOnemore)
 			{
 				NFA inner = BuildNFA(node.Children[0]);
 				return NFA.NewRepeatOneOrMore(inner, false);
 			}
-			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_UNION)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalOperatorUnion)
 			{
 				NFA left = BuildNFA(node.Children[0]);
 				NFA right = BuildNFA(node.Children[1]);
 				return NFA.NewUnion(left, right, false);
 			}
-			if (symbol.ID == HimeGrammarLexer.ID.OPERATOR_DIFFERENCE)
+			if (symbol.ID == HimeGrammarLexer.ID.TerminalOperatorDifference)
 			{
 				NFA left = BuildNFA(node.Children[0]);
 				NFA right = BuildNFA(node.Children[1]);
@@ -732,19 +732,19 @@ namespace Hime.SDK.Grammars
 			// Load new variables for the rules' head
 			foreach (ASTNode child in node.Children)
 			{
-				if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_simple)
+				if (child.Symbol.ID == HimeGrammarParser.ID.VariableCfRuleSimple)
 				{
 					string name = child.Children[0].Value;
 					if (grammar.GetVariable(name) == null)
 						grammar.AddVariable(name);
 				}
-				else if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_template)
+				else if (child.Symbol.ID == HimeGrammarParser.ID.VariableCfRuleTemplate)
 					context.AddTemplateRule(grammar.AddTemplateRule(child));
 			}
 			// Load the grammar rules
 			foreach (ASTNode child in node.Children)
 			{
-				if (child.Symbol.ID == HimeGrammarParser.ID.cf_rule_simple)
+				if (child.Symbol.ID == HimeGrammarParser.ID.VariableCfRuleSimple)
 					LoadRule(context, child);
 			}
 		}
@@ -771,7 +771,7 @@ namespace Hime.SDK.Grammars
 		/// <returns>The set of possible rule definitions</returns>
 		public RuleBodySet BuildDefinitions(LoaderContext context, ASTNode node)
 		{
-			if (node.Symbol.ID == HimeGrammarParser.ID.rule_def_context)
+			if (node.Symbol.ID == HimeGrammarParser.ID.VariableRuleDefContext)
 			{
 				int contextID = grammar.ResolveContext(node.Children[0].Value);
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[1]);
@@ -782,13 +782,13 @@ namespace Hime.SDK.Grammars
 				setVar.Add(new RuleBody(subVar));
 				return setVar;
 			}
-			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_OPTIONAL)
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalOperatorOptional)
 			{
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				setInner.Insert(0, new RuleBody());
 				return setInner;
 			}
-			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_ZEROMORE)
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalOperatorZeromore)
 			{
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				Variable subVar = grammar.GenerateVariable();
@@ -804,7 +804,7 @@ namespace Hime.SDK.Grammars
 				setVar.Add(new RuleBody(subVar));
 				return setVar;
 			}
-			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_ONEMORE)
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalOperatorOnemore)
 			{
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				Variable subVar = grammar.GenerateVariable();
@@ -819,19 +819,19 @@ namespace Hime.SDK.Grammars
 				setVar.Add(new RuleBody(subVar));
 				return setVar;
 			}
-			else if (node.Symbol.ID == HimeGrammarLexer.ID.OPERATOR_UNION)
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalOperatorUnion)
 			{
 				RuleBodySet setLeft = BuildDefinitions(context, node.Children[0]);
 				RuleBodySet setRight = BuildDefinitions(context, node.Children[1]);
 				return RuleBodySet.Union(setLeft, setRight);
 			}
-			else if (node.Symbol.ID == HimeGrammarLexer.ID.TREE_ACTION_PROMOTE)
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalTreeActionPromote)
 			{
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				setInner.ApplyAction(TreeAction.Promote);
 				return setInner;
 			}
-			else if (node.Symbol.ID == HimeGrammarLexer.ID.TREE_ACTION_DROP)
+			else if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalTreeActionDrop)
 			{
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				setInner.ApplyAction(TreeAction.Drop);
@@ -860,15 +860,15 @@ namespace Hime.SDK.Grammars
 		/// <returns>The set of possible rule definitions</returns>
 		private RuleBodySet BuildAtomicDefinition(LoaderContext context, ASTNode node)
 		{
-			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_action)
+			if (node.Symbol.ID == HimeGrammarParser.ID.VariableRuleSymAction)
 				return BuildAtomicAction(node);
-			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_virtual)
+			if (node.Symbol.ID == HimeGrammarParser.ID.VariableRuleSymVirtual)
 				return BuildAtomicVirtual(node);
-			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_ref_simple)
+			if (node.Symbol.ID == HimeGrammarParser.ID.VariableRuleSymRefSimple)
 				return BuildAtomicSimpleReference(context, node);
-			if (node.Symbol.ID == HimeGrammarParser.ID.rule_sym_ref_template)
+			if (node.Symbol.ID == HimeGrammarParser.ID.VariableRuleSymRefTemplate)
 				return BuildAtomicTemplateReference(context, node);
-			if (node.Symbol.ID == HimeGrammarLexer.ID.LITERAL_TEXT)
+			if (node.Symbol.ID == HimeGrammarLexer.ID.TerminalLiteralText)
 				return BuildAtomicInlineText(node);
 			// nothing found ...
 			OnError(node.Position, "Failed to recognize syntactic rule");

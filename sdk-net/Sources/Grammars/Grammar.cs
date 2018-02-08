@@ -152,7 +152,7 @@ namespace Hime.SDK.Grammars
 		public ICollection<Terminal> Terminals { get { return terminalsByName.Values; } }
 
 		/// <summary>
-		/// Gets teh grammar's variables
+		/// Gets the grammar's variables
 		/// </summary>
 		public ICollection<Variable> Variables { get { return variables.Values; } }
 

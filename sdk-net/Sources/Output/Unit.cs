@@ -177,6 +177,7 @@ namespace Hime.SDK.Output
 						expected.Add(terminal);
 				}
 			}
+			expected.Sort(new Symbol.IdComparer<Terminal>());
 			return true;
 		}
 
