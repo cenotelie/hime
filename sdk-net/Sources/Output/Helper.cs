@@ -118,7 +118,15 @@ namespace Hime.SDK.Output
 				c = name[i];
 				if (c >= 'A' && c <= 'Z')
 				{
-					builder.Append(c);
+					if (builder.Length == 0 || newWord)
+						builder.Append(c);
+					else
+					{
+						if (name[i - 1] >= 'A' && name[i - 1] <= 'Z')
+							builder.Append(char.ToLowerInvariant(c));
+						else
+							builder.Append(c);
+					}
 					newWord = false;
 				}
 				else if (c >= 'a' && c <= 'z')
@@ -167,7 +175,17 @@ namespace Hime.SDK.Output
 				c = name[i];
 				if (c >= 'A' && c <= 'Z')
 				{
-					builder.Append(builder.Length == 0 ? char.ToLowerInvariant(c) : c);
+					if (builder.Length == 0)
+						builder.Append(char.ToLowerInvariant(c));
+					else if (newWord)
+						builder.Append(c);
+					else
+					{
+						if (name[i - 1] >= 'A' && name[i - 1] <= 'Z')
+							builder.Append(char.ToLowerInvariant(c));
+						else
+							builder.Append(c);
+					}
 					newWord = false;
 				}
 				else if (c >= 'a' && c <= 'z')
