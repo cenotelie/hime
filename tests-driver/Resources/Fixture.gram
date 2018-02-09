@@ -22,7 +22,13 @@ grammar Fixture : HimeGrammar
 		Axiom = "fixture";
 		Separator = "SEPARATOR";
 	}
-	terminals { }
+	terminals
+	{
+		context tree
+		{
+			NODE_NAME -> NAME | 'ε'; // for the head of sub rules
+		}
+	}
 	rules
 	{
 		fixture			-> header^ test* ;
@@ -37,7 +43,7 @@ grammar Fixture : HimeGrammar
 		test_fails		-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'fails'! ;
 		test_output		-> 'test'! NAME ':'! cf_grammar 'parser'! NAME 'on'! LITERAL_STRING 'outputs'! LITERAL_STRING* ;
 
-		tree		-> NAME^ check children ;
+		tree		-> #tree { NODE_NAME^ } check children ;
 		check		-> ;
 		check		-> '=' LITERAL_TEXT ;
 		check		-> '!=' LITERAL_TEXT ;

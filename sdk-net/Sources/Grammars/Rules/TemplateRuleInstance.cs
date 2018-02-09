@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using Hime.Redist;
 using Hime.Redist.Utils;
 
 namespace Hime.SDK.Grammars
@@ -92,7 +93,7 @@ namespace Hime.SDK.Grammars
 			RuleBodySet set = newContext.Loader.BuildDefinitions(newContext, templateRule.DefinitionNode);
 			// Add recognized rules to the variable
 			foreach (RuleBody def in set)
-				variable.AddRule(new Rule(variable, def, false, 0));
+				variable.AddRule(new Rule(variable, TreeAction.None, def, 0));
 		}
 
 		/// <summary>

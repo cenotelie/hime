@@ -373,11 +373,11 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		/// <param name="generation">The generation to reduce from</param>
 		/// <param name="varIndex">The reduced variable index</param>
-		/// <param name="replaceable">Whether the sub-tree to build must have a replaceable root or not</param>
+		/// <param name="headAction">The tree action applied in the rule's head</param>
 		/// <returns>The identifier of the produced SPPF node</returns>
-		public int Reduce(int generation, int varIndex, bool replaceable)
+		public int Reduce(int generation, int varIndex, TreeAction headAction)
 		{
-			int label = replaceable ? ReduceReplaceable(varIndex) : ReduceNormal(varIndex);
+			int label = headAction == TreeAction.ReplaceByChildren ? ReduceReplaceable(varIndex) : ReduceNormal(varIndex, headAction);
 			AddToHistory(generation, label);
 			return label;
 		}
@@ -386,8 +386,9 @@ namespace Hime.Redist.Parsers
 		/// Executes the reduction as a normal reduction
 		/// </summary>
 		/// <param name="varIndex">The reduced variable index</param>
+		/// <param name="headAction">The tree action applied in the rule's head</param>
 		/// <returns>The identifier of the produced SPPF node</returns>
-		private int ReduceNormal(int varIndex)
+		private int ReduceNormal(int varIndex, TreeAction headAction)
 		{
 			TableElemRef promotedSymbol = new TableElemRef();
 			SPPFNodeRef promotedReference = new SPPFNodeRef(SPPF.EPSILON, 0);
@@ -397,37 +398,43 @@ namespace Hime.Redist.Parsers
 			{
 				switch (handleActions[i])
 				{
-				case TreeAction.Promote:
-					if (promotedReference.NodeId != SPPF.EPSILON)
-					{
-						// not the first promotion
-						// create a new version for the promoted node
-						SPPFNodeNormal oldPromotedNode = sppf.GetNode(promotedReference.NodeId) as SPPFNodeNormal;
-						SPPFNodeRef oldPromotedRef = oldPromotedNode.NewVersion(promotedSymbol, cacheChildren, insertion);
-						// register the previously promoted reference into the cache
-						cacheChildren[0] = oldPromotedRef;
-						insertion = 1;
-					}
-					// save the new promoted node
-					promotedReference = cacheChildren[handleIndices[i]];
-					SPPFNodeNormal promotedNode = sppf.GetNode(promotedReference.NodeId) as SPPFNodeNormal;
-					SPPFNodeVersion promotedVersion = promotedNode.GetVersion(promotedReference.Version);
-					promotedSymbol = promotedVersion.Label;
-					// repack the children on the left if any
-					Array.Copy(cacheChildren, handleIndices[i] + 1, cacheChildren, insertion, promotedVersion.ChildrenCount);
-					insertion += promotedVersion.ChildrenCount;
-					break;
-				default:
-					// Repack the sub-root on the left
-					if (insertion != handleIndices[i])
-						cacheChildren[insertion] = cacheChildren[handleIndices[i]];
-					insertion++;
-					break;
+					case TreeAction.Promote:
+						if (promotedReference.NodeId != SPPF.EPSILON)
+						{
+							// not the first promotion
+							// create a new version for the promoted node
+							SPPFNodeNormal oldPromotedNode = sppf.GetNode(promotedReference.NodeId) as SPPFNodeNormal;
+							SPPFNodeRef oldPromotedRef = oldPromotedNode.NewVersion(promotedSymbol, cacheChildren, insertion);
+							// register the previously promoted reference into the cache
+							cacheChildren[0] = oldPromotedRef;
+							insertion = 1;
+						}
+						// save the new promoted node
+						promotedReference = cacheChildren[handleIndices[i]];
+						SPPFNodeNormal promotedNode = sppf.GetNode(promotedReference.NodeId) as SPPFNodeNormal;
+						SPPFNodeVersion promotedVersion = promotedNode.GetVersion(promotedReference.Version);
+						promotedSymbol = promotedVersion.Label;
+						// repack the children on the left if any
+						Array.Copy(cacheChildren, handleIndices[i] + 1, cacheChildren, insertion, promotedVersion.ChildrenCount);
+						insertion += promotedVersion.ChildrenCount;
+						break;
+					default:
+						// Repack the sub-root on the left
+						if (insertion != handleIndices[i])
+							cacheChildren[insertion] = cacheChildren[handleIndices[i]];
+						insertion++;
+						break;
 				}
 			}
 
 			TableElemRef originalLabel = new TableElemRef(TableType.Variable, varIndex);
-			TableElemRef currentLabel = promotedReference.NodeId != SPPF.EPSILON ? promotedSymbol : originalLabel;
+			TableElemRef currentLabel = originalLabel;
+			if (promotedReference.NodeId != SPPF.EPSILON)
+				// a promotion occurred
+				currentLabel = promotedSymbol;
+			else if (headAction == TreeAction.ReplaceByEpsilon)
+				// this variable must be replaced in the final AST
+				currentLabel = new TableElemRef(TableType.None, 0);
 			return sppf.NewNode(originalLabel, currentLabel, cacheChildren, insertion);
 		}
 

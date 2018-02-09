@@ -239,3 +239,15 @@ test Test_Grammar_OperatorComposition4_GLR:
 	parser RNGLALR1
 	on "bab"
 	yields e(B A B)
+
+test Test_Grammar_SubRule_LR:
+	grammar Test_Grammar_SubRule_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; X->'x'; Y->'y'; Z->'z';} rules { e -> A {X Y Z} B; } }
+	parser LALR1
+	on "axyzb"
+	yields e(A ε(X Y Z) B)
+
+test Test_Grammar_SubRule_GLR:
+	grammar Test_Grammar_SubRule_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; X->'x'; Y->'y'; Z->'z';} rules { e -> A {X Y Z} B; } }
+	parser RNGLALR1
+	on "axyzb"
+	yields e(A ε(X Y Z) B)

@@ -23,11 +23,11 @@ namespace Hime.Redist
 	public enum SymbolType
 	{
 		/// <summary>
-		/// A token, i.e. a piece of text matched by a lexer
+		/// A terminal symbol, defined in the original grammar
 		/// </summary>
-		Token = 1,
+		Terminal = 1,
 		/// <summary>
-		/// A variable defined in the original grammar
+		/// A variable symbol, defined in the original grammar
 		/// </summary>
 		Variable = 2,
 		/// <summary>

@@ -165,7 +165,7 @@ namespace Hime.Redist.Parsers
 		/// <param name="action">The tree action applied onto the symbol</param>
 		private void ReductionAddSub(SubTree sub, TreeAction action)
 		{
-			if (sub.GetActionAt(0) == TreeAction.Replace)
+			if (sub.GetActionAt(0) == TreeAction.ReplaceByChildren)
 			{
 				int directChildrenCount = sub.GetChildrenCountAt(0);
 				while (handleNext + directChildrenCount >= handle.Length)
@@ -228,7 +228,7 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		public void Reduce()
 		{
-			if (cache.GetActionAt(0) == TreeAction.Replace)
+			if (cache.GetActionAt(0) == TreeAction.ReplaceByChildren)
 			{
 				cache.SetChildrenCountAt(0, handleNext);
 			}
@@ -247,6 +247,9 @@ namespace Hime.Redist.Parsers
 		/// </summary>
 		private void ReduceTree()
 		{
+			// apply the epsilon replace, if any
+			if (cache.GetActionAt(0) == TreeAction.ReplaceByEpsilon)
+				cache.SetAt(0, new TableElemRef(TableType.None, 0), TreeAction.None);
 			// promotion data
 			bool promotion = false;
 			int insertion = 1;
@@ -254,33 +257,33 @@ namespace Hime.Redist.Parsers
 			{
 				switch (cache.GetActionAt(handle[i]))
 				{
-				case TreeAction.Promote:
-					if (promotion)
-					{
-						// This is not the first promotion
-						// Commit the previously promoted node's children
-						cache.SetChildrenCountAt(0, insertion - 1);
-						cache.CommitChildrenOf(0, result);
-						// Reput the previously promoted node in the cache
-						cache.Move(0, 1);
-						insertion = 2;
-					}
-					promotion = true;
-					// Save the new promoted node
-					cache.Move(handle[i], 0);
-					// Repack the children on the left if any
-					int nb = cache.GetChildrenCountAt(0);
-					cache.MoveRange(handle[i] + 1, insertion, nb);
-					insertion += nb;
-					break;
-				default:
-					// Commit the children if any
-					cache.CommitChildrenOf(handle[i], result);
-					// Repack the sub-root on the left
-					if (insertion != handle[i])
-						cache.Move(handle[i], insertion);
-					insertion++;
-					break;
+					case TreeAction.Promote:
+						if (promotion)
+						{
+							// This is not the first promotion
+							// Commit the previously promoted node's children
+							cache.SetChildrenCountAt(0, insertion - 1);
+							cache.CommitChildrenOf(0, result);
+							// Reput the previously promoted node in the cache
+							cache.Move(0, 1);
+							insertion = 2;
+						}
+						promotion = true;
+						// Save the new promoted node
+						cache.Move(handle[i], 0);
+						// Repack the children on the left if any
+						int nb = cache.GetChildrenCountAt(0);
+						cache.MoveRange(handle[i] + 1, insertion, nb);
+						insertion += nb;
+						break;
+					default:
+						// Commit the children if any
+						cache.CommitChildrenOf(handle[i], result);
+						// Repack the sub-root on the left
+						if (insertion != handle[i])
+							cache.Move(handle[i], insertion);
+						insertion++;
+						break;
 				}
 			}
 			// finalize the sub-tree data

@@ -99,81 +99,85 @@ namespace Hime.SDK.Input
 			/// </summary>
 			public const int VariableRuleDefContext = 0x0031;
 			/// <summary>
+			/// The unique identifier for variable rule_def_sub
+			/// </summary>
+			public const int VariableRuleDefSub = 0x0032;
+			/// <summary>
 			/// The unique identifier for variable rule_def_element
 			/// </summary>
-			public const int VariableRuleDefElement = 0x0032;
+			public const int VariableRuleDefElement = 0x0033;
 			/// <summary>
 			/// The unique identifier for variable rule_def_tree_action
 			/// </summary>
-			public const int VariableRuleDefTreeAction = 0x0033;
+			public const int VariableRuleDefTreeAction = 0x0034;
 			/// <summary>
 			/// The unique identifier for variable rule_def_repetition
 			/// </summary>
-			public const int VariableRuleDefRepetition = 0x0034;
+			public const int VariableRuleDefRepetition = 0x0035;
 			/// <summary>
 			/// The unique identifier for variable rule_def_fragment
 			/// </summary>
-			public const int VariableRuleDefFragment = 0x0035;
+			public const int VariableRuleDefFragment = 0x0036;
 			/// <summary>
 			/// The unique identifier for variable rule_def_choice
 			/// </summary>
-			public const int VariableRuleDefChoice = 0x0036;
+			public const int VariableRuleDefChoice = 0x0037;
 			/// <summary>
 			/// The unique identifier for variable rule_definition
 			/// </summary>
-			public const int VariableRuleDefinition = 0x0037;
+			public const int VariableRuleDefinition = 0x0038;
 			/// <summary>
 			/// The unique identifier for variable rule_template_params
 			/// </summary>
-			public const int VariableRuleTemplateParams = 0x0038;
+			public const int VariableRuleTemplateParams = 0x0039;
 			/// <summary>
 			/// The unique identifier for variable cf_rule_template
 			/// </summary>
-			public const int VariableCfRuleTemplate = 0x0039;
+			public const int VariableCfRuleTemplate = 0x003A;
 			/// <summary>
 			/// The unique identifier for variable cf_rule_simple
 			/// </summary>
-			public const int VariableCfRuleSimple = 0x003A;
+			public const int VariableCfRuleSimple = 0x003B;
 			/// <summary>
 			/// The unique identifier for variable cf_rule
 			/// </summary>
-			public const int VariableCfRule = 0x003B;
+			public const int VariableCfRule = 0x003C;
 			/// <summary>
 			/// The unique identifier for variable grammar_options
 			/// </summary>
-			public const int VariableGrammarOptions = 0x003C;
+			public const int VariableGrammarOptions = 0x003D;
 			/// <summary>
 			/// The unique identifier for variable grammar_terminals
 			/// </summary>
-			public const int VariableGrammarTerminals = 0x003D;
+			public const int VariableGrammarTerminals = 0x003E;
 			/// <summary>
 			/// The unique identifier for variable grammar_cf_rules
 			/// </summary>
-			public const int VariableGrammarCfRules = 0x003E;
+			public const int VariableGrammarCfRules = 0x003F;
 			/// <summary>
 			/// The unique identifier for variable grammar_parency
 			/// </summary>
-			public const int VariableGrammarParency = 0x003F;
+			public const int VariableGrammarParency = 0x0040;
 			/// <summary>
 			/// The unique identifier for variable cf_grammar
 			/// </summary>
-			public const int VariableCfGrammar = 0x0040;
+			public const int VariableCfGrammar = 0x0041;
 			/// <summary>
 			/// The unique identifier for variable file
 			/// </summary>
-			public const int VariableFile = 0x0041;
+			public const int VariableFile = 0x0042;
 			/// <summary>
 			/// The unique identifier for virtual range
 			/// </summary>
-			public const int VirtualRange = 0x0046;
+			public const int VirtualRange = 0x0047;
 			/// <summary>
 			/// The unique identifier for virtual concat
 			/// </summary>
-			public const int VirtualConcat = 0x004A;
+			public const int VirtualConcat = 0x004B;
 			/// <summary>
 			/// The unique identifier for virtual emptypart
 			/// </summary>
-			public const int VirtualEmptypart = 0x0057;
+			public const int VirtualEmptypart = 0x0058;
 		}
 		/// <summary>
 		/// The collection of variables matched by this parser
@@ -202,36 +206,37 @@ namespace Hime.SDK.Input
 			new Symbol(0x002F, "rule_sym_ref_simple"), 
 			new Symbol(0x0030, "rule_def_atom"), 
 			new Symbol(0x0031, "rule_def_context"), 
-			new Symbol(0x0032, "rule_def_element"), 
-			new Symbol(0x0033, "rule_def_tree_action"), 
-			new Symbol(0x0034, "rule_def_repetition"), 
-			new Symbol(0x0035, "rule_def_fragment"), 
-			new Symbol(0x0036, "rule_def_choice"), 
-			new Symbol(0x0037, "rule_definition"), 
-			new Symbol(0x0038, "rule_template_params"), 
-			new Symbol(0x0039, "cf_rule_template"), 
-			new Symbol(0x003A, "cf_rule_simple"), 
-			new Symbol(0x003B, "cf_rule"), 
-			new Symbol(0x003C, "grammar_options"), 
-			new Symbol(0x003D, "grammar_terminals"), 
-			new Symbol(0x003E, "grammar_cf_rules"), 
-			new Symbol(0x003F, "grammar_parency"), 
-			new Symbol(0x0040, "cf_grammar"), 
-			new Symbol(0x0041, "file"), 
-			new Symbol(0x004B, "__V75"), 
+			new Symbol(0x0032, "rule_def_sub"), 
+			new Symbol(0x0033, "rule_def_element"), 
+			new Symbol(0x0034, "rule_def_tree_action"), 
+			new Symbol(0x0035, "rule_def_repetition"), 
+			new Symbol(0x0036, "rule_def_fragment"), 
+			new Symbol(0x0037, "rule_def_choice"), 
+			new Symbol(0x0038, "rule_definition"), 
+			new Symbol(0x0039, "rule_template_params"), 
+			new Symbol(0x003A, "cf_rule_template"), 
+			new Symbol(0x003B, "cf_rule_simple"), 
+			new Symbol(0x003C, "cf_rule"), 
+			new Symbol(0x003D, "grammar_options"), 
+			new Symbol(0x003E, "grammar_terminals"), 
+			new Symbol(0x003F, "grammar_cf_rules"), 
+			new Symbol(0x0040, "grammar_parency"), 
+			new Symbol(0x0041, "cf_grammar"), 
+			new Symbol(0x0042, "file"), 
 			new Symbol(0x004C, "__V76"), 
 			new Symbol(0x004D, "__V77"), 
-			new Symbol(0x0050, "__V80"), 
-			new Symbol(0x0053, "__V83"), 
-			new Symbol(0x0056, "__V86"), 
-			new Symbol(0x0058, "__V88"), 
+			new Symbol(0x004E, "__V78"), 
+			new Symbol(0x0051, "__V81"), 
+			new Symbol(0x0054, "__V84"), 
+			new Symbol(0x0057, "__V87"), 
 			new Symbol(0x0059, "__V89"), 
 			new Symbol(0x005A, "__V90"), 
 			new Symbol(0x005B, "__V91"), 
 			new Symbol(0x005C, "__V92"), 
-			new Symbol(0x005E, "__V94"), 
-			new Symbol(0x0060, "__V96"), 
-			new Symbol(0x0061, "__VAxiom") };
+			new Symbol(0x005D, "__V93"), 
+			new Symbol(0x005F, "__V95"), 
+			new Symbol(0x0061, "__V97"), 
+			new Symbol(0x0062, "__VAxiom") };
 		/// <summary>
 		/// The collection of virtuals matched by this parser
 		/// </summary>
@@ -240,9 +245,9 @@ namespace Hime.SDK.Input
 		/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table
 		/// </remarks>
 		private static readonly Symbol[] virtuals = {
-			new Symbol(0x0046, "range"), 
-			new Symbol(0x004A, "concat"), 
-			new Symbol(0x0057, "emptypart") };
+			new Symbol(0x0047, "range"), 
+			new Symbol(0x004B, "concat"), 
+			new Symbol(0x0058, "emptypart") };
 		/// <summary>
 		/// Initializes a new instance of the parser
 		/// </summary>

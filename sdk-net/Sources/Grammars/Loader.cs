@@ -760,7 +760,7 @@ namespace Hime.SDK.Grammars
 			Variable var = grammar.GetVariable(name);
 			RuleBodySet defs = BuildDefinitions(context, node.Children[1]);
 			foreach (RuleBody def in defs)
-				var.AddRule(new Rule(var, def, false, 0));
+				var.AddRule(new Rule(var, TreeAction.None, def, 0));
 		}
 
 		/// <summary>
@@ -777,7 +777,17 @@ namespace Hime.SDK.Grammars
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[1]);
 				Variable subVar = grammar.GenerateVariable();
 				foreach (RuleBody def in setInner)
-					subVar.AddRule(new Rule(subVar, def, true, contextID));
+					subVar.AddRule(new Rule(subVar, TreeAction.ReplaceByChildren, def, contextID));
+				RuleBodySet setVar = new RuleBodySet();
+				setVar.Add(new RuleBody(subVar));
+				return setVar;
+			}
+			else if (node.Symbol.ID == HimeGrammarParser.ID.VariableRuleDefSub)
+			{
+				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
+				Variable subVar = grammar.GenerateVariable();
+				foreach (RuleBody def in setInner)
+					subVar.AddRule(new Rule(subVar, TreeAction.ReplaceByEpsilon, def, 0));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				return setVar;
@@ -793,12 +803,12 @@ namespace Hime.SDK.Grammars
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				Variable subVar = grammar.GenerateVariable();
 				foreach (RuleBody def in setInner)
-					subVar.AddRule(new Rule(subVar, def, true, 0));
+					subVar.AddRule(new Rule(subVar, TreeAction.ReplaceByChildren, def, 0));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				setVar = RuleBodySet.Multiply(setVar, setInner);
 				foreach (RuleBody def in setVar)
-					subVar.AddRule(new Rule(subVar, def, true, 0));
+					subVar.AddRule(new Rule(subVar, TreeAction.ReplaceByChildren, def, 0));
 				setVar = new RuleBodySet();
 				setVar.Add(new RuleBody());
 				setVar.Add(new RuleBody(subVar));
@@ -809,12 +819,12 @@ namespace Hime.SDK.Grammars
 				RuleBodySet setInner = BuildDefinitions(context, node.Children[0]);
 				Variable subVar = grammar.GenerateVariable();
 				foreach (RuleBody def in setInner)
-					subVar.AddRule(new Rule(subVar, def, true, 0));
+					subVar.AddRule(new Rule(subVar, TreeAction.ReplaceByChildren, def, 0));
 				RuleBodySet setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				setVar = RuleBodySet.Multiply(setVar, setInner);
 				foreach (RuleBody def in setVar)
-					subVar.AddRule(new Rule(subVar, def, true, 0));
+					subVar.AddRule(new Rule(subVar, TreeAction.ReplaceByChildren, def, 0));
 				setVar = new RuleBodySet();
 				setVar.Add(new RuleBody(subVar));
 				return setVar;

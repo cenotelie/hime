@@ -187,10 +187,7 @@ namespace Hime.SDK.Output
 		private void GenerateDataProduction(BinaryWriter writer, Rule rule)
 		{
 			writer.Write((ushort)variables.IndexOf(rule.Head));
-			if (rule.IsGenerated)
-				writer.Write((byte)TreeAction.Replace);
-			else
-				writer.Write((byte)TreeAction.None);
+			writer.Write((byte)rule.HeadAction);
 			writer.Write((byte)rule.Body.Choices[0].Length);
 			byte length = 0;
 			foreach (RuleBodyElement elem in rule.Body)
