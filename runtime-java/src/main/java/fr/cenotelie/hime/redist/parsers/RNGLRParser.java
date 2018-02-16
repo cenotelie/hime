@@ -533,7 +533,7 @@ public class RNGLRParser extends BaseLRParser implements IContextProvider {
                     break;
             }
         }
-        return sppf.reduce(generation, production.getHead(), production.getHeadAction() == LROpCode.TREE_ACTION_REPLACE);
+        return sppf.reduce(generation, production.getHead(), production.getHeadAction());
     }
 
     /**

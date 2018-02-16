@@ -186,7 +186,7 @@ class LRkASTBuilder implements SemanticBody {
      * @param action The tree action applied onto the symbol
      */
     private void reductionAddSub(SubTree sub, byte action) {
-        if (sub.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE) {
+        if (sub.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE_BY_CHILDREN) {
             int directChildrenCount = sub.getChildrenCountAt(0);
             while (handleNext + directChildrenCount >= handle.length)
                 handle = Arrays.copyOf(handle, handle.length + INIT_HANDLE_SIZE);
@@ -241,7 +241,7 @@ class LRkASTBuilder implements SemanticBody {
      * Finalizes the reduction operation
      */
     public void reduce() {
-        if (cache.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE) {
+        if (cache.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE_BY_CHILDREN) {
             cache.setChildrenCountAt(0, handleNext);
         } else {
             reduceTree();
@@ -256,6 +256,8 @@ class LRkASTBuilder implements SemanticBody {
      * Applies the promotion tree actions to the cache and commits to the final AST
      */
     private void reduceTree() {
+        if (cache.getActionAt(0) == LROpCode.TREE_ACTION_REPLACE_BY_EPSILON)
+            cache.setAt(0, TableElemRef.encode(TableElemRef.TABLE_NONE, 0), LROpCode.TREE_ACTION_NONE);
         // promotion data
         boolean promotion = false;
         int insertion = 1;

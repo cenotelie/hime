@@ -37,9 +37,9 @@ class LROpCode {
      */
     public static final byte TREE_ACTION_NONE = 0;
     /**
-     * Replace the node with its children
+     * Replace the node by its children
      */
-    public static final byte TREE_ACTION_REPLACE = 1;
+    public static final byte TREE_ACTION_REPLACE_BY_CHILDREN = 1;
     /**
      * Drop the node and all its descendants
      */
@@ -48,6 +48,10 @@ class LROpCode {
      * Promote the node, i.e. replace its parent with it and insert its children where it was
      */
     public static final byte TREE_ACTION_PROMOTE = 3;
+    /**
+     * Replace the node by epsilon
+     */
+    public static final byte TREE_ACTION_REPLACE_BY_EPSILON = 4;
 
     /**
      * Pop an AST from the stack

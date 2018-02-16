@@ -18,11 +18,11 @@
 package fr.cenotelie.hime.redist;
 
 /**
- * Represents a reference to a symbol
+ * Represents a label an AST node
  *
  * @author Laurent Wouters
  */
-class SymbolRef implements SemanticElement {
+class ASTLabel implements SemanticElement {
     /**
      * The symbol being referenced
      */
@@ -68,7 +68,7 @@ class SymbolRef implements SemanticElement {
      * @param symbol The symbol being referenced
      * @param type   The type of this symbol
      */
-    public SymbolRef(Symbol symbol, SymbolType type) {
+    public ASTLabel(Symbol symbol, SymbolType type) {
         this.symbol = symbol;
         this.type = type;
     }
