@@ -159,17 +159,12 @@ struct LRkAstBuilder<'l> {
 }
 
 impl<'l> SemanticBody for LRkAstBuilder<'l> {
-    fn length(&self) -> usize {
-        self.handle.len()
-    }
-
     fn get_element_at(&self, index: usize) -> SemanticElement {
         match self.reduction {
             None => panic!("Not in a reduction"),
             Some(ref data) => {
                 let label = data.cache.get_label_at(self.handle[index]);
                 match label.get_type() {
-                    TableType::None => panic!("Not a semantic element"),
                     TableType::Token => {
                         SemanticElement::Token(self.lexer.get_output().get_token(label.get_index()))
                     }
@@ -179,9 +174,14 @@ impl<'l> SemanticBody for LRkAstBuilder<'l> {
                     TableType::Virtual => {
                         SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
                     }
+                    TableType::None => SemanticElement::Terminal(self.lexer.get_terminals()[0])
                 }
             }
         }
+    }
+
+    fn length(&self) -> usize {
+        self.handle.len()
     }
 }
 
@@ -234,7 +234,7 @@ impl<'l> LRkAstBuilder<'l> {
         sub: &SubTree,
         action: TreeAction
     ) {
-        if sub.get_action_at(0) == TREE_ACTION_REPLACE {
+        if sub.get_action_at(0) == TREE_ACTION_REPLACE_BY_CHILDREN {
             let children_count = sub.get_children_count_at(0);
             // copy the children to the cache
             let mut cache_index = sub.copy_children_to(&mut reduction.cache);
@@ -291,7 +291,7 @@ impl<'l> LRkAstBuilder<'l> {
         match self.reduction {
             None => panic!("Not in a reduction"),
             Some(ref mut reduction) => {
-                if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE {
+                if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_CHILDREN {
                     reduction.cache.set_children_count_at(0, self.handle.len());
                 } else {
                     LRkAstBuilder::reduce_tree(reduction, &self.handle, &mut self.result);
@@ -309,6 +309,13 @@ impl<'l> LRkAstBuilder<'l> {
 
     /// Applies the promotion tree actions to the cache and commits to the final AST
     pub fn reduce_tree(reduction: &mut LRkAstReduction, handle: &Vec<usize>, result: &mut Ast) {
+        // apply the epsilon replace, if any
+        if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_EPSILON {
+            reduction
+                .cache
+                .set_label_at(0, TableElemRef::new(TableType::None, 0));
+            reduction.cache.set_action_at(0, TREE_ACTION_NONE);
+        }
         // promotion data
         let mut promotion = false;
         let mut insertion = 1;

@@ -804,13 +804,6 @@ struct SPPFBuilder<'l> {
 }
 
 impl<'l> SemanticBody for SPPFBuilder<'l> {
-    fn length(&self) -> usize {
-        let reduction = self.reduction
-            .as_ref()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
-        reduction.handle_indices.len()
-    }
-
     fn get_element_at(&self, index: usize) -> SemanticElement {
         let reduction = self.reduction
             .as_ref()
@@ -819,7 +812,6 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
         let node = self.sppf.get_node(reference.node_id as usize).as_normal();
         let label = node.versions[reference.version as usize].label;
         match label.get_type() {
-            TableType::None => panic!("Not a semantic element"),
             TableType::Token => {
                 SemanticElement::Token(self.lexer.get_output().get_token(label.get_index()))
             }
@@ -829,7 +821,15 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
             TableType::Virtual => {
                 SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
             }
+            TableType::None => SemanticElement::Terminal(self.lexer.get_terminals()[0])
         }
+    }
+
+    fn length(&self) -> usize {
+        let reduction = self.reduction
+            .as_ref()
+            .unwrap_or_else(|| panic!("Not in a reduction"));
+        reduction.handle_indices.len()
     }
 }
 
@@ -1010,18 +1010,23 @@ impl<'l> SPPFBuilder<'l> {
     }
 
     /// Finalizes the reduction operation
-    pub fn reduce(&mut self, generation: usize, variable_index: usize, replaceable: bool) -> usize {
-        let label = if replaceable {
+    pub fn reduce(
+        &mut self,
+        generation: usize,
+        variable_index: usize,
+        head_action: TreeAction
+    ) -> usize {
+        let label = if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
             self.reduce_replaceable(variable_index)
         } else {
-            self.reduce_normal(variable_index)
+            self.reduce_normal(variable_index, head_action)
         };
         self.add_to_history(generation, label);
         label
     }
 
     /// Executes the reduction as a normal reduction
-    pub fn reduce_normal(&mut self, variable_index: usize) -> usize {
+    pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
         let reduction = self.reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
@@ -1073,7 +1078,11 @@ impl<'l> SPPFBuilder<'l> {
 
         let original_label = TableElemRef::new(TableType::Variable, variable_index);
         let current_label = match promoted {
-            None => original_label,
+            None => if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
+                TableElemRef::new(TableType::None, 0)
+            } else {
+                original_label
+            },
             Some((symbol, _node_ref)) => symbol
         };
         self.sppf.new_normal_node_with_children(
@@ -1779,11 +1788,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 }
             }
         }
-        builder.reduce(
-            generation,
-            production.head,
-            production.head_action == TREE_ACTION_REPLACE
-        )
+        builder.reduce(generation, production.head, production.head_action)
     }
 
     /// Gets the next token in the kernel

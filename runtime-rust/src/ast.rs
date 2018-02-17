@@ -376,7 +376,12 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
             }
             TableType::Variable => self.tree.variables[cell.label.get_index()],
             TableType::Virtual => self.tree.virtuals[cell.label.get_index()],
-            _ => panic!("Undefined symbol")
+            TableType::None => {
+                match self.tree.tokens {
+                    None => panic!("Missing token repository"),
+                    Some(ref repository) => repository.get_terminals()[0] // terminal epsilon
+                }
+            }
         }
     }
 
@@ -411,7 +416,13 @@ impl<'a> Display for AstNode<'a> {
                 let symbol = self.tree.virtuals[cell.label.get_index()];
                 write!(f, "{}", symbol.name)
             }
-            _ => panic!("Undefined symbol")
+            TableType::None => match self.tree.tokens {
+                None => panic!("Missing token repository"),
+                Some(ref repository) => {
+                    let symbol = repository.get_terminals()[0];
+                    write!(f, "{}", symbol.name)
+                }
+            }
         }
     }
 }
