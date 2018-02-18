@@ -30,6 +30,9 @@ python "$ROOT/.releng/version.py" "$ROOT/tests-executor-java/pom.xml" $1 $2
 
 # Update version for Cargo.toml files
 sed -i -b "s/version = \".*\"/version = \"$1\"/"         "$ROOT/runtime-rust/Cargo.toml"
+sed -i -b "s/hime_redist = \".*\"/hime_redist = \"$1\"/" "$ROOT/runtime-rust/README.md"
+sed -i -b "s/hime_redist\/.*\/hime_redist/hime_redist\/$1\/hime_redist/" "$ROOT/runtime-rust/README.md"
+sed -i -b "s/hime_redist = \".*\"/hime_redist = \"$1\"/" "$ROOT/runtime-rust/src/lib.rs"
 sed -i -b "s/version = \".*\"/version = \"$1\"/"         "$ROOT/tests-executor-rust/Cargo.toml"
 sed -i -b "s/hime_redist = \".*\"/hime_redist = \"$1\"/" "$ROOT/tests-executor-rust/Cargo.toml"
 sed -i -b "s/version = \".*\"/version = \"$1\"/"         "$ROOT/parseit-rust/Cargo.toml"
