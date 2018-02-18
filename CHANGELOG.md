@@ -1,8 +1,24 @@
 # Updates
 
+## 3.3.1
+
+Release in February 18th, 2018.
+
+* Features
+    * [Issue #39](https://bitbucket.org/cenotelie/hime/issues/39): API to lookup tokens and AST nodes from text position.
+    * [Issue #47](https://bitbucket.org/cenotelie/hime/issues/47): Support for sub-rules.
+
+* Fixes
+    * [Issue #41](https://bitbucket.org/cenotelie/hime/issues/41): Build issue of generated Rust parsers on Windows.
+    * [Issue #42](https://bitbucket.org/cenotelie/hime/issues/42): Java semantic actions ignored.
+    * [Issue #43](https://bitbucket.org/cenotelie/hime/issues/43): Idiomatic naming of methods generated for semantic actions.
+    * [Issue #44](https://bitbucket.org/cenotelie/hime/issues/44): .Net tests failing on Windows.
+    * [Issue #48](https://bitbucket.org/cenotelie/hime/issues/48): Build issue of generated parser with actions in Rust.
+    * [Issue #49](https://bitbucket.org/cenotelie/hime/issues/49): Incorrect AST for context-sensitive lexers in Rust.
+
 ## 3.3.0
 
-Rekease in January 24th, 2018.
+Release in January 24th, 2018.
 
 * Features
     * Implementation of the Rust runtime. Hime can now generate lexers and parser with Rust as a target. The `-t:rust` option must be passed to `himecc` for this.
