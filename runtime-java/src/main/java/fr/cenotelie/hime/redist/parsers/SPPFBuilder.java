@@ -355,13 +355,13 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Finalizes the reduction operation
      *
-     * @param generation  The generation to reduce from
-     * @param varIndex    The reduced variable index
-     * @param replaceable Whether the sub-tree to build must have a replaceable root or not
+     * @param generation The generation to reduce from
+     * @param varIndex   The reduced variable index
+     * @param headAction The tree action applied in the rule's head
      * @return The identifier of the produced SPPF node
      */
-    public int reduce(int generation, int varIndex, boolean replaceable) {
-        int label = replaceable ? reduceReplaceable(varIndex) : reduceNormal(varIndex);
+    public int reduce(int generation, int varIndex, byte headAction) {
+        int label = headAction == LROpCode.TREE_ACTION_REPLACE_BY_CHILDREN ? reduceReplaceable(varIndex) : reduceNormal(varIndex, headAction);
         addToHistory(generation, label);
         return label;
     }
@@ -369,10 +369,11 @@ class SPPFBuilder implements SemanticBody {
     /**
      * Executes the reduction as a normal reduction
      *
-     * @param varIndex The reduced variable index
+     * @param varIndex   The reduced variable index
+     * @param headAction The tree action applied in the rule's head
      * @return The identifier of the produced SPPF node
      */
-    private int reduceNormal(int varIndex) {
+    private int reduceNormal(int varIndex, byte headAction) {
         int promotedSymbol = -1;
         long promotedReference = -1;
 
@@ -407,7 +408,13 @@ class SPPFBuilder implements SemanticBody {
             }
         }
         int originalLabel = TableElemRef.encode(TableElemRef.TABLE_VARIABLE, varIndex);
-        int currentLabel = promotedReference != -1 ? promotedSymbol : originalLabel;
+        int currentLabel = originalLabel;
+        if (promotedReference != -1)
+            // a promotion occurred
+            currentLabel = promotedSymbol;
+        else if (headAction == LROpCode.TREE_ACTION_REPLACE_BY_EPSILON)
+            // this variable must be replaced in the final AST
+            currentLabel = TableElemRef.encode(TableElemRef.TABLE_NONE, 0);
         return sppf.newNode(originalLabel, currentLabel, cacheChildren, insertion);
     }
 

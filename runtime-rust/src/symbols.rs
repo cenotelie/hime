@@ -29,9 +29,9 @@ use super::tokens::Token;
 /// The possible types of symbol
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub enum SymbolType {
-    /// A token, i.e. a piece of text matched by a lexer
-    Token,
-    /// A variable defined in the original grammar
+    /// A terminal symbol, defined in the original grammar
+    Terminal,
+    /// A variable symbol, defined in the original grammar
     Variable,
     /// A virtual symbol, defined in the original grammar
     Virtual
@@ -82,7 +82,9 @@ pub trait SemanticElementTrait {
 pub enum SemanticElement<'a> {
     /// A token, i.e. a piece of text matched by a lexer
     Token(Token<'a>),
-    /// A variable defined in the original grammar
+    /// A terminal symbol, defined in the original grammar
+    Terminal(Symbol),
+    /// A variable symbol defined in the original grammar
     Variable(Symbol),
     /// A virtual symbol, defined in the original grammar
     Virtual(Symbol)
@@ -92,6 +94,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
     fn get_position(&self) -> Option<TextPosition> {
         match self {
             &SemanticElement::Token(ref token) => token.get_position(),
+            &SemanticElement::Terminal(ref _symbol) => None,
             &SemanticElement::Variable(ref _symbol) => None,
             &SemanticElement::Virtual(ref _symbol) => None
         }
@@ -100,6 +103,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
     fn get_span(&self) -> Option<TextSpan> {
         match self {
             &SemanticElement::Token(ref token) => token.get_span(),
+            &SemanticElement::Terminal(ref _symbol) => None,
             &SemanticElement::Variable(ref _symbol) => None,
             &SemanticElement::Virtual(ref _symbol) => None
         }
@@ -108,6 +112,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
     fn get_context(&self) -> Option<TextContext> {
         match self {
             &SemanticElement::Token(ref token) => token.get_context(),
+            &SemanticElement::Terminal(ref _symbol) => None,
             &SemanticElement::Variable(ref _symbol) => None,
             &SemanticElement::Virtual(ref _symbol) => None
         }
@@ -116,6 +121,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
     fn get_symbol(&self) -> Symbol {
         match self {
             &SemanticElement::Token(ref token) => token.get_symbol(),
+            &SemanticElement::Terminal(ref symbol) => *symbol,
             &SemanticElement::Variable(ref symbol) => *symbol,
             &SemanticElement::Virtual(ref symbol) => *symbol
         }
@@ -124,6 +130,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
     fn get_value(&self) -> Option<String> {
         match self {
             &SemanticElement::Token(ref token) => token.get_value(),
+            &SemanticElement::Terminal(ref _symbol) => None,
             &SemanticElement::Variable(ref _symbol) => None,
             &SemanticElement::Virtual(ref _symbol) => None
         }
@@ -134,7 +141,8 @@ impl<'a> SemanticElement<'a> {
     /// Gets the type of the associated symbol
     pub fn get_symbol_type(&self) -> SymbolType {
         match self {
-            &SemanticElement::Token(ref _token) => SymbolType::Token,
+            &SemanticElement::Token(ref _token) => SymbolType::Terminal,
+            &SemanticElement::Terminal(ref _symbol) => SymbolType::Terminal,
             &SemanticElement::Variable(ref _symbol) => SymbolType::Variable,
             &SemanticElement::Virtual(ref _symbol) => SymbolType::Virtual
         }

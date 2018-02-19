@@ -158,7 +158,7 @@ public class AST {
     public SymbolType getSymbolType(int node) {
         switch (TableElemRef.getType(nodes.get(node).label)) {
             case TableElemRef.TABLE_TOKEN:
-                return SymbolType.Token;
+                return SymbolType.Terminal;
             case TableElemRef.TABLE_VARIABLE:
                 return SymbolType.Variable;
             case TableElemRef.TABLE_VIRTUAL:
@@ -244,6 +244,8 @@ public class AST {
                 return tableVariables.get(TableElemRef.getIndex(label));
             case TableElemRef.TABLE_VIRTUAL:
                 return tableVirtuals.get(TableElemRef.getIndex(label));
+            case TableElemRef.TABLE_NONE:
+                return tableTokens.getTerminals().get(0);  // terminal epsilon
         }
         // This cannot happen
         return null;
@@ -270,9 +272,11 @@ public class AST {
             case TableElemRef.TABLE_TOKEN:
                 return tableTokens.at(TableElemRef.getIndex(label));
             case TableElemRef.TABLE_VARIABLE:
-                return new SymbolRef(tableVariables.get(TableElemRef.getIndex(label)), SymbolType.Variable);
+                return new ASTLabel(tableVariables.get(TableElemRef.getIndex(label)), SymbolType.Variable);
             case TableElemRef.TABLE_VIRTUAL:
-                return new SymbolRef(tableVirtuals.get(TableElemRef.getIndex(label)), SymbolType.Virtual);
+                return new ASTLabel(tableVirtuals.get(TableElemRef.getIndex(label)), SymbolType.Virtual);
+            case TableElemRef.TABLE_NONE:
+                return new ASTLabel(tableTokens.getTerminals().get(0), SymbolType.Terminal);
         }
         // This cannot happen
         return null;

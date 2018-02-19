@@ -24,11 +24,11 @@ package fr.cenotelie.hime.redist;
  */
 public enum SymbolType {
     /**
-     * A token, i.e. a piece of text matched by a lexer
+     * A terminal symbol, defined in the original grammar
      */
-    Token,
+    Terminal,
     /**
-     * A variable defined in the original grammar
+     * A variable symbol, defined in the original grammar
      */
     Variable,
     /**

@@ -18,9 +18,9 @@
 namespace Hime.Redist
 {
 	/// <summary>
-	/// Represents a reference to a symbol
+	/// Represents a label an AST node
 	/// </summary>
-	struct SymbolRef : SemanticElement
+	struct ASTLabel : SemanticElement
 	{
 		/// <summary>
 		/// The symbol being referenced
@@ -66,7 +66,7 @@ namespace Hime.Redist
 		/// </summary>
 		/// <param name="symbol">The symbol being referenced</param>
 		/// <param name="type">The type of this symbol</param>
-		public SymbolRef(Symbol symbol, SymbolType type)
+		public ASTLabel(Symbol symbol, SymbolType type)
 		{
 			this.symbol = symbol;
 			this.type = type;

@@ -34,7 +34,7 @@ namespace Hime.Redist
 		/// <summary>
 		/// Gets the type of symbol this element represents
 		/// </summary>
-		public SymbolType SymbolType { get { return SymbolType.Token; } }
+		public SymbolType SymbolType { get { return SymbolType.Terminal; } }
 
 		/// <summary>
 		/// Gets the position in the input text of this token

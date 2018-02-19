@@ -141,6 +141,11 @@ namespace Hime.Redist
 		public Token this[int index] { get { return new Token(this, index); } }
 
 		/// <summary>
+		/// Gets the terminal symbols matched in this content
+		/// </summary>
+		internal ROList<Symbol> Terminals { get { return terminals; } }
+
+		/// <summary>
 		/// Initializes this text
 		/// </summary>
 		/// <param name="terminals">The terminal symbols</param>

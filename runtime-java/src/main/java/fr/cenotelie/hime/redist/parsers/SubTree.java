@@ -99,7 +99,7 @@ class SubTree implements Cloneable {
      * @return The total number of nodes in this sub-tree
      */
     public int size() {
-        if (actions[0] != LROpCode.TREE_ACTION_REPLACE) {
+        if (actions[0] != LROpCode.TREE_ACTION_REPLACE_BY_CHILDREN) {
             return nodes[0].count + 1;
         }
         int size = 1;

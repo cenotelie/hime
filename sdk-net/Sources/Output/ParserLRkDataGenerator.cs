@@ -67,6 +67,9 @@ namespace Hime.SDK.Output
 			virtuals = new List<Virtual>(unit.Grammar.Virtuals);
 			actions = new List<Action>(unit.Grammar.Actions);
 			rules = new List<Rule>(unit.Grammar.Rules);
+			variables.Sort(new Grammars.Symbol.IdComparer<Variable>());
+			virtuals.Sort(new Grammars.Symbol.IdComparer<Virtual>());
+			actions.Sort(new Grammars.Symbol.IdComparer<Action>());
 		}
 
 		/// <summary>
@@ -184,10 +187,7 @@ namespace Hime.SDK.Output
 		private void GenerateDataProduction(BinaryWriter writer, Rule rule)
 		{
 			writer.Write((ushort)variables.IndexOf(rule.Head));
-			if (rule.IsGenerated)
-				writer.Write((byte)TreeAction.Replace);
-			else
-				writer.Write((byte)TreeAction.None);
+			writer.Write((byte)rule.HeadAction);
 			writer.Write((byte)rule.Body.Choices[0].Length);
 			byte length = 0;
 			foreach (RuleBodyElement elem in rule.Body)

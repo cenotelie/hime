@@ -5,7 +5,7 @@ SET "RELENG=%~dp0"
 SET "RELENG=%RELENG:~0,-1%"
 SET "ROOT=%RELENG:~0,-8%"
 
-FINDSTR "<Version>" "%ROOT%\sdk-net-net\Hime.SDK.csproj" > match
+FINDSTR "<Version>" "%ROOT%\sdk-net\Hime.SDK.csproj" > match
 FOR /F "tokens=3-5 delims=<>." %%A IN (match) DO @SET "VERSION=%%A.%%B.%%C"
 DEL match
 FOR /f "delims=" %%a IN ('hg -R "%ROOT%" --debug id -i') DO @SET HASH=%%a

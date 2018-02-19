@@ -152,7 +152,7 @@ namespace Hime.SDK.Grammars
 		public ICollection<Terminal> Terminals { get { return terminalsByName.Values; } }
 
 		/// <summary>
-		/// Gets teh grammar's variables
+		/// Gets the grammar's variables
 		/// </summary>
 		public ICollection<Variable> Variables { get { return variables.Values; } }
 
@@ -607,7 +607,7 @@ namespace Hime.SDK.Grammars
 							symbol = actions[part.Symbol.Name];
 						parts.Add(new RuleBodyElement(symbol, part.Action));
 					}
-					clone.AddRule(new Rule(clone, new RuleBody(parts), rule.IsGenerated, ResolveContext(parent.contexts[rule.Context])));
+					clone.AddRule(new Rule(clone, rule.HeadAction, new RuleBody(parts), ResolveContext(parent.contexts[rule.Context])));
 				}
 			}
 		}
@@ -724,7 +724,7 @@ namespace Hime.SDK.Grammars
 			List<RuleBodyElement> parts = new List<RuleBodyElement>();
 			parts.Add(new RuleBodyElement(variables[axiomName], TreeAction.Promote));
 			parts.Add(new RuleBodyElement(Dollar.Instance, TreeAction.Drop));
-			axiom.AddRule(new Rule(axiom, new RuleBody(parts), false, 0));
+			axiom.AddRule(new Rule(axiom, TreeAction.None, new RuleBody(parts), 0));
 			return null;
 		}
 

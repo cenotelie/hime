@@ -5,7 +5,7 @@ SET "RELENG=%~dp0"
 SET "RELENG=%RELENG:~0,-1%"
 SET "ROOT=%RELENG:~0,-8%"
 
-FINDSTR "<Version>" "%ROOT%\sdk-net-net\Hime.SDK.csproj" > match
+FINDSTR "<Version>" "%ROOT%\sdk-net\Hime.SDK.csproj" > match
 FOR /F "tokens=3-5 delims=<>." %%A IN (match) DO @SET "VERSION=%%A.%%B.%%C"
 DEL match
 FOR /f "delims=" %%a IN ('hg -R "%ROOT%" --debug id -i') DO @SET HASH=%%a
@@ -57,7 +57,7 @@ dotnet publish "%ROOT%\himecc" -c Release -f net20
 SET "FrameworkPathOverride=%MONO461%"
 dotnet publish "%ROOT%\himecc" -c Release -f net461
 dotnet publish "%ROOT%\himecc" -c Release -f netcoreapp2.0
-ECHO -- Building Parsit --
+ECHO -- Building Parseit --
 dotnet restore "%ROOT%\parseit-net"
 dotnet publish "%ROOT%\himecc" -c Release -f net20
 dotnet publish "%ROOT%\parseit-net" -c Release -f net20
@@ -91,8 +91,8 @@ COPY "%RELENG%\standalone\parseit"                                              
 COPY "%RELENG%\standalone\parseit.bat"                                             "%RELENG%\hime-%VERSION%\parseit.bat"
 COPY "%ROOT%\runtime-net\bin\Release\Hime.Redist.%VERSION%.nupkg"                  "%RELENG%\hime-%VERSION%\nuget\Hime.Redist.%VERSION%.nupkg"
 COPY "%ROOT%\runtime-net\bin\Release\Hime.Redist.%VERSION%.symbols.nupkg"          "%RELENG%\hime-%VERSION%\nuget\Hime.Redist.%VERSION%.symbols.nupkg"
-COPY "%ROOT%\sdk-net-net\bin\Release\Hime.SDK.%VERSION%.nupkg"                     "%RELENG%\hime-%VERSION%\nuget\Hime.SDK.%VERSION%.nupkg"
-COPY "%ROOT%\sdk-net-net\bin\Release\Hime.SDK.%VERSION%.symbols.nupkg"             "%RELENG%\hime-%VERSION%\nuget\Hime.SDK.%VERSION%.symbols.nupkg"
+COPY "%ROOT%\sdk-net\bin\Release\Hime.SDK.%VERSION%.nupkg"                     "%RELENG%\hime-%VERSION%\nuget\Hime.SDK.%VERSION%.nupkg"
+COPY "%ROOT%\sdk-net\bin\Release\Hime.SDK.%VERSION%.symbols.nupkg"             "%RELENG%\hime-%VERSION%\nuget\Hime.SDK.%VERSION%.symbols.nupkg"
 COPY "%ROOT%\himecc\bin\Release\net20\publish\Hime.Redist.dll"                     "%RELENG%\hime-%VERSION%\net20\Hime.Redist.dll"
 COPY "%ROOT%\himecc\bin\Release\net20\publish\Hime.Redist.pdb"                     "%RELENG%\hime-%VERSION%\net20\Hime.Redist.pdb"
 COPY "%ROOT%\himecc\bin\Release\net20\publish\Hime.SDK.dll"                        "%RELENG%\hime-%VERSION%\net20\Hime.SDK.dll"
@@ -102,7 +102,7 @@ COPY "%ROOT%\himecc\bin\Release\net20\publish\himecc.pdb"                       
 COPY "%ROOT%\parseit-net\bin\Release\net20\publish\parseit.exe"                    "%RELENG%\hime-%VERSION%\net20\parseit.exe"
 COPY "%ROOT%\parseit-net\bin\Release\net20\publish\parseit.pdb"                    "%RELENG%\hime-%VERSION%\net20\parseit.pdb"
 COPY "%ROOT%\runtime-net\bin\Release\net20\Hime.Redist.xml"                        "%RELENG%\hime-%VERSION%\net20\Hime.Redist.xml"
-COPY "%ROOT%\sdk-net-net\bin\Release\net20\Hime.SDK.xml"                           "%RELENG%\hime-%VERSION%\net20\Hime.SDK.xml"
+COPY "%ROOT%\sdk-net\bin\Release\net20\Hime.SDK.xml"                           "%RELENG%\hime-%VERSION%\net20\Hime.SDK.xml"
 COPY "%ROOT%\himecc\bin\Release\net461\publish\Hime.Redist.dll"                    "%RELENG%\hime-%VERSION%\net461\Hime.Redist.dll"
 COPY "%ROOT%\himecc\bin\Release\net461\publish\Hime.Redist.pdb"                    "%RELENG%\hime-%VERSION%\net461\Hime.Redist.pdb"
 COPY "%ROOT%\himecc\bin\Release\net461\publish\Hime.SDK.dll"                       "%RELENG%\hime-%VERSION%\net461\Hime.SDK.dll"
@@ -112,7 +112,7 @@ COPY "%ROOT%\himecc\bin\Release\net461\publish\himecc.pdb"                      
 COPY "%ROOT%\parseit-net\bin\Release\net461\publish\parseit.exe"                   "%RELENG%\hime-%VERSION%\net461\parseit.exe"
 COPY "%ROOT%\parseit-net\bin\Release\net461\publish\parseit.pdb"                   "%RELENG%\hime-%VERSION%\net461\parseit.pdb"
 COPY "%ROOT%\runtime-net\bin\Release\net20\Hime.Redist.xml"                        "%RELENG%\hime-%VERSION%\net461\Hime.Redist.xml"
-COPY "%ROOT%\sdk-net-net\bin\Release\net20\Hime.SDK.xml"                           "%RELENG%\hime-%VERSION%\net461\Hime.SDK.xml"
+COPY "%ROOT%\sdk-net\bin\Release\net20\Hime.SDK.xml"                           "%RELENG%\hime-%VERSION%\net461\Hime.SDK.xml"
 COPY "%ROOT%\himecc\bin\Release\netcoreapp2.0\publish\System.CodeDom.dll"          "%RELENG%\hime-%VERSION%\netcore20\System.CodeDom.dll"
 COPY "%ROOT%\himecc\bin\Release\netcoreapp2.0\publish\Hime.Redist.dll"             "%RELENG%\hime-%VERSION%\netcore20\Hime.Redist.dll"
 COPY "%ROOT%\himecc\bin\Release\netcoreapp2.0\publish\Hime.Redist.pdb"             "%RELENG%\hime-%VERSION%\netcore20\Hime.Redist.pdb"
@@ -127,7 +127,7 @@ COPY "%ROOT%\parseit-net\bin\Release\netcoreapp2.0\publish\parseit.pdb"         
 COPY "%ROOT%\parseit-net\bin\Release\netcoreapp2.0\publish\parseit.deps.json"          "%RELENG%\hime-%VERSION%\netcore20\parseit.deps.json"
 COPY "%ROOT%\parseit-net\bin\Release\netcoreapp2.0\publish\parseit.runtimeconfig.json" "%RELENG%\hime-%VERSION%\netcore20\parseit.runtimeconfig.json"
 COPY "%ROOT%\runtime-net\bin\Release\netstandard2.0\Hime.Redist.xml"               "%RELENG%\hime-%VERSION%\netcore20\Hime.Redist.xml"
-COPY "%ROOT%\sdk-net-net\bin\Release\netstandard2.0\Hime.SDK.xml"                  "%RELENG%\hime-%VERSION%\netcore20\Hime.SDK.xml"
+COPY "%ROOT%\sdk-net\bin\Release\netstandard2.0\Hime.SDK.xml"                  "%RELENG%\hime-%VERSION%\netcore20\Hime.SDK.xml"
 COPY %ROOT%\runtime-java\target\*.jar                                              "%RELENG%\hime-%VERSION%\java\"
 COPY %ROOT%\runtime-rust\target\package\*.crate                                    "%RELENG%\hime-%VERSION%\rust\"
 CD "%RELENG%"

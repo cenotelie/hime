@@ -55,6 +55,18 @@ namespace Hime.SDK.Output
 		/// The type of the automaton
 		/// </summary>
 		private readonly string automatonType;
+		/// <summary>
+		/// The variables to be exported
+		/// </summary>
+		private readonly List<Variable> variables;
+		/// <summary>
+		/// The virtual symbols to be exported
+		/// </summary>
+		private readonly List<Virtual> virtuals;
+		/// <summary>
+		/// The action symbols to be exported
+		/// </summary>
+		private readonly List<Action> actions;
 
 		/// <summary>
 		/// Initializes this code generator
@@ -78,6 +90,12 @@ namespace Hime.SDK.Output
 				this.parserType = "LRkParser";
 				this.automatonType = "LRkAutomaton";
 			}
+			variables = new List<Variable>(unit.Grammar.Variables);
+			virtuals = new List<Virtual>(unit.Grammar.Virtuals);
+			actions = new List<Action>(unit.Grammar.Actions);
+			variables.Sort(new Grammars.Symbol.IdComparer<Variable>());
+			virtuals.Sort(new Grammars.Symbol.IdComparer<Virtual>());
+			actions.Sort(new Grammars.Symbol.IdComparer<Action>());
 		}
 
 		/// <summary>
@@ -147,7 +165,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     * Contains the constant IDs for the variables and virtuals in this parser");
 			stream.WriteLine("     */");
 			stream.WriteLine("    public static class ID {");
-			foreach (Variable var in grammar.Variables)
+			foreach (Variable var in variables)
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
@@ -156,7 +174,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("         */");
 				stream.WriteLine("        public static final int VARIABLE_{0} = 0x{1};", Helper.ToUpperCase(var.Name), var.ID.ToString("X4"));
 			}
-			foreach (Virtual var in grammar.Virtuals)
+			foreach (Virtual var in virtuals)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The unique identifier for virtual " + var.Name);
@@ -180,7 +198,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     */");
 			stream.WriteLine("    private static final Symbol[] variables = {");
 			bool first = true;
-			foreach (Variable var in grammar.Variables)
+			foreach (Variable var in variables)
 			{
 				if (!first)
 					stream.WriteLine(", ");
@@ -205,7 +223,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     */");
 			stream.WriteLine("    private static final Symbol[] virtuals = {");
 			bool first = true;
-			foreach (Virtual v in grammar.Virtuals)
+			foreach (Virtual v in virtuals)
 			{
 				if (!first)
 					stream.WriteLine(", ");
@@ -222,13 +240,13 @@ namespace Hime.SDK.Output
 		/// <param name="stream">The output stream</param>
 		private void GenerateCodeActions(StreamWriter stream)
 		{
-			if (grammar.Actions.Count == 0)
+			if (actions.Count == 0)
 				return;
 			stream.WriteLine("    /**");
 			stream.WriteLine("     * Represents a set of semantic actions in this parser");
 			stream.WriteLine("     */");
 			stream.WriteLine("    public static class Actions {");
-			foreach (Action action in grammar.Actions)
+			foreach (Action action in actions)
 			{
 				stream.WriteLine("        /**");
 				stream.WriteLine("         * The " + action.Name + " semantic action");
@@ -250,9 +268,9 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     * @return A table of semantic actions");
 			stream.WriteLine("     */");
 			stream.WriteLine("    private static SemanticAction[] getUserActions(final Actions input) {");
-			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + grammar.Actions.Count + "];");
+			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + actions.Count + "];");
 			int i = 0;
-			foreach (Action action in grammar.Actions)
+			foreach (Action action in actions)
 			{
 				stream.WriteLine("        result[" + i + "] = new SemanticAction() { @Override public void execute(Symbol head, SemanticBody body) { input." + Helper.ToLowerCamelCase(action.Name) + "(head, body); } };");
 				i++;
@@ -268,9 +286,9 @@ namespace Hime.SDK.Output
 			stream.WriteLine("     */");
 			stream.WriteLine("    private static SemanticAction[] getUserActions(Map<String, SemanticAction> input)");
 			stream.WriteLine("    {");
-			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + grammar.Actions.Count + "];");
+			stream.WriteLine("        SemanticAction[] result = new SemanticAction[" + actions.Count + "];");
 			i = 0;
-			foreach (Action action in grammar.Actions)
+			foreach (Action action in actions)
 			{
 				stream.WriteLine("        result[" + i + "] = input.get(\"" + action.Name + "\");");
 				i++;
@@ -287,7 +305,7 @@ namespace Hime.SDK.Output
 		{
 			string ex = parserType.StartsWith("RNGLR") ? "throws InitializationException " : "";
 
-			if (grammar.Actions.Count == 0)
+			if (actions.Count == 0)
 			{
 				stream.WriteLine("    /**");
 				stream.WriteLine("     * Initializes a new instance of the parser");

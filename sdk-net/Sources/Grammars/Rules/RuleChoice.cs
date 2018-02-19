@@ -99,6 +99,15 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
+		/// Append the specified choice
+		/// </summary>
+		/// <param name="choice">A choice</param>
+		public void Append(RuleChoice choice)
+		{
+			parts.AddRange(choice.parts);
+		}
+
+		/// <summary>
 		/// Computes the FIRSTS set for this rule body
 		/// </summary>
 		/// <returns><c>true</c> if there has been modifications</returns>

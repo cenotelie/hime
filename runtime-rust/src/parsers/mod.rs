@@ -28,17 +28,19 @@ use super::utils::bin::*;
 /// The maximum number of errors
 pub const MAX_ERROR_COUNT: usize = 100;
 
-/// Represents a tree action
+/// Represents a tree action for an AST node
 pub type TreeAction = u16;
 
 /// Keep the node as is
 pub const TREE_ACTION_NONE: TreeAction = 0;
-/// Replace the node with its children
-pub const TREE_ACTION_REPLACE: TreeAction = 1;
+/// Replace the node by its children
+pub const TREE_ACTION_REPLACE_BY_CHILDREN: TreeAction = 1;
 /// Drop the node and all its descendants
 pub const TREE_ACTION_DROP: TreeAction = 2;
 /// Promote the node, i.e. replace its parent with it and insert its children where it was
 pub const TREE_ACTION_PROMOTE: TreeAction = 3;
+/// Replace the node by epsilon
+pub const TREE_ACTION_REPLACE_BY_EPSILON: TreeAction = 4;
 
 /// Represent an op-code for a LR production
 /// An op-code can be either an instruction or raw data
@@ -239,11 +241,7 @@ impl LRProduction {
     pub fn new(data: &[u8], index: &mut usize) -> LRProduction {
         let head = read_u16(data, *index) as usize;
         *index += 2;
-        let head_action = if data[*index] == 1 {
-            TREE_ACTION_REPLACE
-        } else {
-            TREE_ACTION_NONE
-        };
+        let head_action = data[*index] as TreeAction;
         *index += 1;
         let reduction_length = data[*index] as usize;
         *index += 1;

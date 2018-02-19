@@ -141,6 +141,15 @@ public class TokenRepository implements Iterable<Token> {
     }
 
     /**
+     * Gets the terminal symbols matched in this content
+     *
+     * @return The terminal symbols matched in this content
+     */
+    List<Symbol> getTerminals() {
+        return terminals;
+    }
+
+    /**
      * Gets the position in the input text of the given token
      *
      * @param index A token's index

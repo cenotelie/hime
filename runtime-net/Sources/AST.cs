@@ -283,6 +283,8 @@ namespace Hime.Redist
 					return tableVariables[label.Index];
 				case TableType.Virtual:
 					return tableVirtuals[label.Index];
+				case TableType.None:
+					return tableTokens.Terminals[0]; // terminal epsilon
 			}
 			// This cannot happen
 			return new Symbol(0, string.Empty);
@@ -310,9 +312,11 @@ namespace Hime.Redist
 				case TableType.Token:
 					return tableTokens[label.Index];
 				case TableType.Variable:
-					return new SymbolRef(tableVariables[label.Index], SymbolType.Variable);
+					return new ASTLabel(tableVariables[label.Index], SymbolType.Variable);
 				case TableType.Virtual:
-					return new SymbolRef(tableVirtuals[label.Index], SymbolType.Virtual);
+					return new ASTLabel(tableVirtuals[label.Index], SymbolType.Virtual);
+				case TableType.None:
+					return new ASTLabel(tableTokens.Terminals[0], SymbolType.Terminal);
 			}
 			// This cannot happen
 			return null;

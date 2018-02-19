@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 using System.Text;
+using Hime.Redist;
 
 namespace Hime.SDK.Grammars
 {
@@ -33,9 +34,9 @@ namespace Hime.SDK.Grammars
 		/// </summary>
 		private readonly RuleBody body;
 		/// <summary>
-		/// Whether this rule has been generated
+		/// The action on the rule's head
 		/// </summary>
-		private readonly bool generated;
+		private readonly TreeAction headAction;
 		/// <summary>
 		/// The lexical context pushed by this rule
 		/// </summary>
@@ -52,9 +53,9 @@ namespace Hime.SDK.Grammars
 		public RuleBody Body { get { return body; } }
 
 		/// <summary>
-		/// Gets a value indicating whether the rule is generated
+		/// Gets the action on the rule's head
 		/// </summary>
-		public bool IsGenerated { get { return generated; } }
+		public TreeAction HeadAction { get { return headAction; } }
 
 		/// <summary>
 		/// Gets the lexical context pushed by this rule
@@ -65,14 +66,14 @@ namespace Hime.SDK.Grammars
 		/// Initializes this rule
 		/// </summary>
 		/// <param name='head'>The rule's head</param>
+		/// <param name='headAction'>Whether this rule is generated</param>
 		/// <param name='body'>The rule's body</param>
-		/// <param name='generated'>Whether this rule is generated</param>
 		/// <param name='context'>The lexical context pushed by this rule</param>
-		public Rule(Variable head, RuleBody body, bool generated, int context)
+		public Rule(Variable head, TreeAction headAction, RuleBody body, int context)
 		{
 			this.head = head;
+			this.headAction = headAction;
 			this.body = body;
-			this.generated = generated;
 			this.context = context;
 		}
 

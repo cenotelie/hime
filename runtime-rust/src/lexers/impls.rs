@@ -297,17 +297,19 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
                     // matched something
                     let terminal_index = self.get_terminal_for(the_match.state, contexts);
                     let terminal_id = self.repository.get_terminals()[terminal_index as usize].id;
-                    self.input_index += the_match.length as usize;
                     if terminal_id != self.separator_id {
                         let token_index = self.repository.add(
                             terminal_index as usize,
                             self.input_index,
                             the_match.length as usize
                         );
+                        self.input_index += the_match.length as usize;
                         return Some(TokenKernel {
                             terminal_id,
                             index: token_index as u32
                         });
+                    } else {
+                        self.input_index += the_match.length as usize;
                     }
                 }
             }

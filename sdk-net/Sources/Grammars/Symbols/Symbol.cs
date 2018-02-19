@@ -46,6 +46,20 @@ namespace Hime.SDK.Grammars
 		}
 
 		/// <summary>
+		/// Compares two symbols for ordering according to their identifier
+		/// </summary>
+		public class IdComparer<T> : IComparer<T> where T : Symbol
+		{
+			/// <summary>
+			/// Compares two symbols for ordering according to their identifier
+			/// </summary>
+			public int Compare(T x, T y)
+			{
+				return x.ID.CompareTo(y.ID);
+			}
+		}
+
+		/// <summary>
 		/// Represents an equality comparer for grammar symbols
 		/// </summary>
 		public class EqualityComparer : IEqualityComparer<Symbol>

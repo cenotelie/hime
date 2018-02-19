@@ -17,7 +17,7 @@
 
 //! Module for AST subtree in parsers
 
-use super::TREE_ACTION_REPLACE;
+use super::TREE_ACTION_REPLACE_BY_CHILDREN;
 use super::TreeAction;
 use super::super::ast::Ast;
 use super::super::ast::AstCell;
@@ -52,6 +52,11 @@ impl SubTree {
         self.nodes[index].label
     }
 
+    /// Sets the label of the node at the given index
+    pub fn set_label_at(&mut self, index: usize, label: TableElemRef) {
+        self.nodes[index].label = label;
+    }
+
     /// Gets the tree action applied onto the node at the given index
     pub fn get_action_at(&self, index: usize) -> TreeAction {
         self.actions[index]
@@ -74,7 +79,7 @@ impl SubTree {
 
     /// Gets the total number of nodes in this sub-tree
     pub fn get_size(&self) -> usize {
-        if self.actions[0] == TREE_ACTION_REPLACE {
+        if self.actions[0] == TREE_ACTION_REPLACE_BY_CHILDREN {
             let mut size = 1;
             for _i in 0..self.nodes[0].count {
                 size += self.nodes[size].count as usize + 1;

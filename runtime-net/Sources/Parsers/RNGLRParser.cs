@@ -612,7 +612,7 @@ namespace Hime.Redist.Parsers
 						break;
 				}
 			}
-			return sppf.Reduce(generation, production.Head, production.HeadAction == TreeAction.Replace);
+			return sppf.Reduce(generation, production.Head, production.HeadAction);
 		}
 
 		/// <summary>

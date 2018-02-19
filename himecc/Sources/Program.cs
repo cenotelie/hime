@@ -128,11 +128,11 @@ namespace Hime.HimeCC
 		/// <returns>The number of errors (should be 0)</returns>
 		private static int GenerateCLParser()
 		{
-			Stream stream = typeof(CompilationTask).Assembly.GetManifestResourceStream("Hime.CLI.CommandLine.gram");
+			Stream stream = typeof(Program).Assembly.GetManifestResourceStream("Hime.HimeCC.Sources.CommandLine.gram");
 			CompilationTask task = new CompilationTask();
 			task.Mode = Mode.Source;
 			task.AddInputRaw(stream);
-			task.Namespace = "Hime.CLI";
+			task.Namespace = "Hime.HimeCC";
 			task.CodeAccess = Modifier.Internal;
 			task.Method = ParsingMethod.LALR1;
 			Report report = task.Execute();

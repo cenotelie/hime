@@ -45,7 +45,7 @@ public class Token implements SemanticElement {
 
     @Override
     public SymbolType getSymbolType() {
-        return SymbolType.Token;
+        return SymbolType.Terminal;
     }
 
     @Override
