@@ -33,7 +33,6 @@ use regex::Regex;
 use std::u32;
 use tokio_core::reactor::Core;
 
-use std::ascii::AsciiExt;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Error;
@@ -43,6 +42,7 @@ use std::io::Write;
 fn main() {
     let blocks = get_latest_blocks();
     generate_blocks_db(&blocks).unwrap();
+    generate_blocks_doc(&blocks).unwrap();
     generate_blocks_tests(&blocks).unwrap();
     let categories = get_latest_categories();
     generate_categories_db(&categories).unwrap();
@@ -194,6 +194,34 @@ pub fn generate_blocks_db(blocks: &Vec<UnicodeBlock>) -> Result<(), Error> {
     )?;
     write!(&mut file, "    DATABASE.get(key)\n")?;
     write!(&mut file, "}}\n")?;
+    file.flush()?;
+    Ok(())
+}
+
+/// Generates the Unicode blocks documentation
+pub fn generate_blocks_doc(blocks: &Vec<UnicodeBlock>) -> Result<(), Error> {
+    let mut file = File::create("lang-ublocks.html").unwrap();
+    for block in blocks.iter() {
+        let len1 = if block.span.begin.value <= 0xFFFF {
+            4
+        } else {
+            8
+        };
+        let len2 = if block.span.end.value <= 0xFFFF { 4 } else { 8 };
+        write!(&mut file, "<tr>\n")?;
+        write!(&mut file, "    <td>{0}</td>\n", block.name)?;
+        write!(
+            &mut file,
+            "    <td>U+{:01$X}</td>\n",
+            block.span.begin.value, len1
+        )?;
+        write!(
+            &mut file,
+            "    <td>U+{:01$X}</td>\n",
+            block.span.end.value, len2
+        )?;
+        write!(&mut file, "</tr>\n")?;
+    }
     file.flush()?;
     Ok(())
 }
