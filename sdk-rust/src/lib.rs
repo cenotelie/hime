@@ -306,3 +306,9 @@ impl Report {
             .push(Event::new_error_with_context(message, context))
     }
 }
+
+/// The version of this SDK
+pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
+/// Represents a compilation task for the generation of lexers and parsers from grammars
+pub struct CompilationTask {}
