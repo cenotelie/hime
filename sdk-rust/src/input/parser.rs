@@ -19,12 +19,28 @@ use hime_redist::tokens::TokenRepository;
 /// Static resource for the serialized lexer automaton
 const LEXER_AUTOMATON: &'static [u8] = include_bytes!("HimeGrammarLexer.bin");
 
+/// The unique identifier for terminal SEPARATOR
+pub const ID_TERMINAL_SEPARATOR: u32 = 0x0007;
 /// The unique identifier for terminal NAME
 pub const ID_TERMINAL_NAME: u32 = 0x0009;
-/// The unique identifier for terminal NAME_FIRST
-pub const ID_TERMINAL_NAME_FIRST: u32 = 0x0008;
+/// The unique identifier for terminal INTEGER
+pub const ID_TERMINAL_INTEGER: u32 = 0x000A;
+/// The unique identifier for terminal LITERAL_STRING
+pub const ID_TERMINAL_LITERAL_STRING: u32 = 0x000C;
 /// The unique identifier for terminal LITERAL_ANY
 pub const ID_TERMINAL_LITERAL_ANY: u32 = 0x000D;
+/// The unique identifier for terminal LITERAL_TEXT
+pub const ID_TERMINAL_LITERAL_TEXT: u32 = 0x000E;
+/// The unique identifier for terminal LITERAL_CLASS
+pub const ID_TERMINAL_LITERAL_CLASS: u32 = 0x000F;
+/// The unique identifier for terminal UNICODE_BLOCK
+pub const ID_TERMINAL_UNICODE_BLOCK: u32 = 0x0010;
+/// The unique identifier for terminal UNICODE_CATEGORY
+pub const ID_TERMINAL_UNICODE_CATEGORY: u32 = 0x0011;
+/// The unique identifier for terminal UNICODE_CODEPOINT
+pub const ID_TERMINAL_UNICODE_CODEPOINT: u32 = 0x0012;
+/// The unique identifier for terminal UNICODE_SPAN_MARKER
+pub const ID_TERMINAL_UNICODE_SPAN_MARKER: u32 = 0x0013;
 /// The unique identifier for terminal OPERATOR_OPTIONAL
 pub const ID_TERMINAL_OPERATOR_OPTIONAL: u32 = 0x0014;
 /// The unique identifier for terminal OPERATOR_ZEROMORE
@@ -39,42 +55,14 @@ pub const ID_TERMINAL_OPERATOR_DIFFERENCE: u32 = 0x0018;
 pub const ID_TERMINAL_TREE_ACTION_PROMOTE: u32 = 0x0019;
 /// The unique identifier for terminal TREE_ACTION_DROP
 pub const ID_TERMINAL_TREE_ACTION_DROP: u32 = 0x001A;
-/// The unique identifier for terminal SEPARATOR
-pub const ID_TERMINAL_SEPARATOR: u32 = 0x0007;
-/// The unique identifier for terminal NEW_LINE
-pub const ID_TERMINAL_NEW_LINE: u32 = 0x0003;
-/// The unique identifier for terminal WHITE_SPACE
-pub const ID_TERMINAL_WHITE_SPACE: u32 = 0x0004;
-/// The unique identifier for terminal INTEGER
-pub const ID_TERMINAL_INTEGER: u32 = 0x000A;
-/// The unique identifier for terminal LITERAL_STRING
-pub const ID_TERMINAL_LITERAL_STRING: u32 = 0x000C;
-/// The unique identifier for terminal UNICODE_SPAN_MARKER
-pub const ID_TERMINAL_UNICODE_SPAN_MARKER: u32 = 0x0013;
-/// The unique identifier for terminal ESCAPEES
-pub const ID_TERMINAL_ESCAPEES: u32 = 0x000B;
-/// The unique identifier for terminal COMMENT_LINE
-pub const ID_TERMINAL_COMMENT_LINE: u32 = 0x0005;
-/// The unique identifier for terminal UNICODE_CODEPOINT
-pub const ID_TERMINAL_UNICODE_CODEPOINT: u32 = 0x0012;
-/// The unique identifier for terminal LITERAL_CLASS
-pub const ID_TERMINAL_LITERAL_CLASS: u32 = 0x000F;
-/// The unique identifier for terminal LITERAL_TEXT
-pub const ID_TERMINAL_LITERAL_TEXT: u32 = 0x000E;
-/// The unique identifier for terminal COMMENT_BLOCK
-pub const ID_TERMINAL_COMMENT_BLOCK: u32 = 0x0006;
-/// The unique identifier for terminal UNICODE_BLOCK
-pub const ID_TERMINAL_UNICODE_BLOCK: u32 = 0x0010;
-/// The unique identifier for terminal UNICODE_CATEGORY
-pub const ID_TERMINAL_UNICODE_CATEGORY: u32 = 0x0011;
-/// The unique identifier for terminal BLOCK_RULES
-pub const ID_TERMINAL_BLOCK_RULES: u32 = 0x001D;
 /// The unique identifier for terminal BLOCK_OPTIONS
 pub const ID_TERMINAL_BLOCK_OPTIONS: u32 = 0x001B;
-/// The unique identifier for terminal BLOCK_CONTEXT
-pub const ID_TERMINAL_BLOCK_CONTEXT: u32 = 0x001E;
 /// The unique identifier for terminal BLOCK_TERMINALS
 pub const ID_TERMINAL_BLOCK_TERMINALS: u32 = 0x001C;
+/// The unique identifier for terminal BLOCK_RULES
+pub const ID_TERMINAL_BLOCK_RULES: u32 = 0x001D;
+/// The unique identifier for terminal BLOCK_CONTEXT
+pub const ID_TERMINAL_BLOCK_CONTEXT: u32 = 0x001E;
 
 /// The unique identifier for the default context
 pub const CONTEXT_DEFAULT: u16 = 0;
@@ -92,16 +80,48 @@ const TERMINALS: &'static [Symbol] = &[
         name: "$"
     },
     Symbol {
+        id: 0x0007,
+        name: "SEPARATOR"
+    },
+    Symbol {
         id: 0x0009,
         name: "NAME"
     },
     Symbol {
-        id: 0x0008,
-        name: "NAME_FIRST"
+        id: 0x000A,
+        name: "INTEGER"
+    },
+    Symbol {
+        id: 0x000C,
+        name: "LITERAL_STRING"
     },
     Symbol {
         id: 0x000D,
         name: "LITERAL_ANY"
+    },
+    Symbol {
+        id: 0x000E,
+        name: "LITERAL_TEXT"
+    },
+    Symbol {
+        id: 0x000F,
+        name: "LITERAL_CLASS"
+    },
+    Symbol {
+        id: 0x0010,
+        name: "UNICODE_BLOCK"
+    },
+    Symbol {
+        id: 0x0011,
+        name: "UNICODE_CATEGORY"
+    },
+    Symbol {
+        id: 0x0012,
+        name: "UNICODE_CODEPOINT"
+    },
+    Symbol {
+        id: 0x0013,
+        name: "UNICODE_SPAN_MARKER"
     },
     Symbol {
         id: 0x0014,
@@ -132,136 +152,80 @@ const TERMINALS: &'static [Symbol] = &[
         name: "TREE_ACTION_DROP"
     },
     Symbol {
-        id: 0x0042,
-        name: "="
+        id: 0x001B,
+        name: "BLOCK_OPTIONS"
     },
     Symbol {
-        id: 0x0043,
-        name: ";"
-    },
-    Symbol {
-        id: 0x0044,
-        name: "("
-    },
-    Symbol {
-        id: 0x0045,
-        name: ")"
-    },
-    Symbol {
-        id: 0x0047,
-        name: "{"
-    },
-    Symbol {
-        id: 0x0048,
-        name: ","
-    },
-    Symbol {
-        id: 0x0049,
-        name: "}"
-    },
-    Symbol {
-        id: 0x0051,
-        name: "@"
-    },
-    Symbol {
-        id: 0x0052,
-        name: "<"
-    },
-    Symbol {
-        id: 0x0054,
-        name: ">"
-    },
-    Symbol {
-        id: 0x0055,
-        name: "#"
-    },
-    Symbol {
-        id: 0x005D,
-        name: ":"
-    },
-    Symbol {
-        id: 0x0007,
-        name: "SEPARATOR"
-    },
-    Symbol {
-        id: 0x0003,
-        name: "NEW_LINE"
-    },
-    Symbol {
-        id: 0x0004,
-        name: "WHITE_SPACE"
-    },
-    Symbol {
-        id: 0x000A,
-        name: "INTEGER"
-    },
-    Symbol {
-        id: 0x000C,
-        name: "LITERAL_STRING"
-    },
-    Symbol {
-        id: 0x0013,
-        name: "UNICODE_SPAN_MARKER"
-    },
-    Symbol {
-        id: 0x004E,
-        name: "->"
-    },
-    Symbol {
-        id: 0x000B,
-        name: "ESCAPEES"
-    },
-    Symbol {
-        id: 0x0005,
-        name: "COMMENT_LINE"
-    },
-    Symbol {
-        id: 0x0012,
-        name: "UNICODE_CODEPOINT"
-    },
-    Symbol {
-        id: 0x000F,
-        name: "LITERAL_CLASS"
-    },
-    Symbol {
-        id: 0x000E,
-        name: "LITERAL_TEXT"
-    },
-    Symbol {
-        id: 0x0006,
-        name: "COMMENT_BLOCK"
-    },
-    Symbol {
-        id: 0x0010,
-        name: "UNICODE_BLOCK"
-    },
-    Symbol {
-        id: 0x0011,
-        name: "UNICODE_CATEGORY"
+        id: 0x001C,
+        name: "BLOCK_TERMINALS"
     },
     Symbol {
         id: 0x001D,
         name: "BLOCK_RULES"
     },
     Symbol {
-        id: 0x001B,
-        name: "BLOCK_OPTIONS"
-    },
-    Symbol {
         id: 0x001E,
         name: "BLOCK_CONTEXT"
     },
     Symbol {
-        id: 0x005F,
-        name: "grammar"
+        id: 0x0043,
+        name: "="
+    },
+    Symbol {
+        id: 0x0044,
+        name: ";"
+    },
+    Symbol {
+        id: 0x0045,
+        name: "("
+    },
+    Symbol {
+        id: 0x0046,
+        name: ")"
+    },
+    Symbol {
+        id: 0x0048,
+        name: "{"
+    },
+    Symbol {
+        id: 0x0049,
+        name: ","
+    },
+    Symbol {
+        id: 0x004A,
+        name: "}"
     },
     Symbol {
         id: 0x004F,
+        name: "->"
+    },
+    Symbol {
+        id: 0x0050,
         name: "fragment"
     },
     Symbol {
-        id: 0x001C,
-        name: "BLOCK_TERMINALS"
+        id: 0x0052,
+        name: "@"
+    },
+    Symbol {
+        id: 0x0053,
+        name: "<"
+    },
+    Symbol {
+        id: 0x0055,
+        name: ">"
+    },
+    Symbol {
+        id: 0x0056,
+        name: "#"
+    },
+    Symbol {
+        id: 0x005E,
+        name: ":"
+    },
+    Symbol {
+        id: 0x0060,
+        name: "grammar"
     },
 ];
 
@@ -315,45 +279,47 @@ pub const ID_VARIABLE_RULE_SYM_REF_SIMPLE: u32 = 0x002F;
 pub const ID_VARIABLE_RULE_DEF_ATOM: u32 = 0x0030;
 /// The unique identifier for variable rule_def_context
 pub const ID_VARIABLE_RULE_DEF_CONTEXT: u32 = 0x0031;
+/// The unique identifier for variable rule_def_sub
+pub const ID_VARIABLE_RULE_DEF_SUB: u32 = 0x0032;
 /// The unique identifier for variable rule_def_element
-pub const ID_VARIABLE_RULE_DEF_ELEMENT: u32 = 0x0032;
+pub const ID_VARIABLE_RULE_DEF_ELEMENT: u32 = 0x0033;
 /// The unique identifier for variable rule_def_tree_action
-pub const ID_VARIABLE_RULE_DEF_TREE_ACTION: u32 = 0x0033;
+pub const ID_VARIABLE_RULE_DEF_TREE_ACTION: u32 = 0x0034;
 /// The unique identifier for variable rule_def_repetition
-pub const ID_VARIABLE_RULE_DEF_REPETITION: u32 = 0x0034;
+pub const ID_VARIABLE_RULE_DEF_REPETITION: u32 = 0x0035;
 /// The unique identifier for variable rule_def_fragment
-pub const ID_VARIABLE_RULE_DEF_FRAGMENT: u32 = 0x0035;
+pub const ID_VARIABLE_RULE_DEF_FRAGMENT: u32 = 0x0036;
 /// The unique identifier for variable rule_def_choice
-pub const ID_VARIABLE_RULE_DEF_CHOICE: u32 = 0x0036;
+pub const ID_VARIABLE_RULE_DEF_CHOICE: u32 = 0x0037;
 /// The unique identifier for variable rule_definition
-pub const ID_VARIABLE_RULE_DEFINITION: u32 = 0x0037;
+pub const ID_VARIABLE_RULE_DEFINITION: u32 = 0x0038;
 /// The unique identifier for variable rule_template_params
-pub const ID_VARIABLE_RULE_TEMPLATE_PARAMS: u32 = 0x0038;
+pub const ID_VARIABLE_RULE_TEMPLATE_PARAMS: u32 = 0x0039;
 /// The unique identifier for variable cf_rule_template
-pub const ID_VARIABLE_CF_RULE_TEMPLATE: u32 = 0x0039;
+pub const ID_VARIABLE_CF_RULE_TEMPLATE: u32 = 0x003A;
 /// The unique identifier for variable cf_rule_simple
-pub const ID_VARIABLE_CF_RULE_SIMPLE: u32 = 0x003A;
+pub const ID_VARIABLE_CF_RULE_SIMPLE: u32 = 0x003B;
 /// The unique identifier for variable cf_rule
-pub const ID_VARIABLE_CF_RULE: u32 = 0x003B;
+pub const ID_VARIABLE_CF_RULE: u32 = 0x003C;
 /// The unique identifier for variable grammar_options
-pub const ID_VARIABLE_GRAMMAR_OPTIONS: u32 = 0x003C;
+pub const ID_VARIABLE_GRAMMAR_OPTIONS: u32 = 0x003D;
 /// The unique identifier for variable grammar_terminals
-pub const ID_VARIABLE_GRAMMAR_TERMINALS: u32 = 0x003D;
+pub const ID_VARIABLE_GRAMMAR_TERMINALS: u32 = 0x003E;
 /// The unique identifier for variable grammar_cf_rules
-pub const ID_VARIABLE_GRAMMAR_CF_RULES: u32 = 0x003E;
+pub const ID_VARIABLE_GRAMMAR_CF_RULES: u32 = 0x003F;
 /// The unique identifier for variable grammar_parency
-pub const ID_VARIABLE_GRAMMAR_PARENCY: u32 = 0x003F;
+pub const ID_VARIABLE_GRAMMAR_PARENCY: u32 = 0x0040;
 /// The unique identifier for variable cf_grammar
-pub const ID_VARIABLE_CF_GRAMMAR: u32 = 0x0040;
+pub const ID_VARIABLE_CF_GRAMMAR: u32 = 0x0041;
 /// The unique identifier for variable file
-pub const ID_VARIABLE_FILE: u32 = 0x0041;
+pub const ID_VARIABLE_FILE: u32 = 0x0042;
 
 /// The unique identifier for virtual range
-pub const ID_VIRTUAL_RANGE: u32 = 0x0046;
+pub const ID_VIRTUAL_RANGE: u32 = 0x0047;
 /// The unique identifier for virtual concat
-pub const ID_VIRTUAL_CONCAT: u32 = 0x004A;
+pub const ID_VIRTUAL_CONCAT: u32 = 0x004B;
 /// The unique identifier for virtual emptypart
-pub const ID_VIRTUAL_EMPTYPART: u32 = 0x0057;
+pub const ID_VIRTUAL_EMPTYPART: u32 = 0x0058;
 
 /// The collection of variables matched by this parser
 /// The variables are in an order consistent with the automaton,
@@ -437,71 +403,71 @@ const VARIABLES: &'static [Symbol] = &[
     },
     Symbol {
         id: 0x0032,
-        name: "rule_def_element"
+        name: "rule_def_sub"
     },
     Symbol {
         id: 0x0033,
-        name: "rule_def_tree_action"
+        name: "rule_def_element"
     },
     Symbol {
         id: 0x0034,
-        name: "rule_def_repetition"
+        name: "rule_def_tree_action"
     },
     Symbol {
         id: 0x0035,
-        name: "rule_def_fragment"
+        name: "rule_def_repetition"
     },
     Symbol {
         id: 0x0036,
-        name: "rule_def_choice"
+        name: "rule_def_fragment"
     },
     Symbol {
         id: 0x0037,
-        name: "rule_definition"
+        name: "rule_def_choice"
     },
     Symbol {
         id: 0x0038,
-        name: "rule_template_params"
+        name: "rule_definition"
     },
     Symbol {
         id: 0x0039,
-        name: "cf_rule_template"
+        name: "rule_template_params"
     },
     Symbol {
         id: 0x003A,
-        name: "cf_rule_simple"
+        name: "cf_rule_template"
     },
     Symbol {
         id: 0x003B,
-        name: "cf_rule"
+        name: "cf_rule_simple"
     },
     Symbol {
         id: 0x003C,
-        name: "grammar_options"
+        name: "cf_rule"
     },
     Symbol {
         id: 0x003D,
-        name: "grammar_terminals"
+        name: "grammar_options"
     },
     Symbol {
         id: 0x003E,
-        name: "grammar_cf_rules"
+        name: "grammar_terminals"
     },
     Symbol {
         id: 0x003F,
-        name: "grammar_parency"
+        name: "grammar_cf_rules"
     },
     Symbol {
         id: 0x0040,
-        name: "cf_grammar"
+        name: "grammar_parency"
     },
     Symbol {
         id: 0x0041,
-        name: "file"
+        name: "cf_grammar"
     },
     Symbol {
-        id: 0x004B,
-        name: "__V75"
+        id: 0x0042,
+        name: "file"
     },
     Symbol {
         id: 0x004C,
@@ -512,20 +478,20 @@ const VARIABLES: &'static [Symbol] = &[
         name: "__V77"
     },
     Symbol {
-        id: 0x0050,
-        name: "__V80"
+        id: 0x004E,
+        name: "__V78"
     },
     Symbol {
-        id: 0x0053,
-        name: "__V83"
+        id: 0x0051,
+        name: "__V81"
     },
     Symbol {
-        id: 0x0056,
-        name: "__V86"
+        id: 0x0054,
+        name: "__V84"
     },
     Symbol {
-        id: 0x0058,
-        name: "__V88"
+        id: 0x0057,
+        name: "__V87"
     },
     Symbol {
         id: 0x0059,
@@ -544,15 +510,19 @@ const VARIABLES: &'static [Symbol] = &[
         name: "__V92"
     },
     Symbol {
-        id: 0x005E,
-        name: "__V94"
+        id: 0x005D,
+        name: "__V93"
     },
     Symbol {
-        id: 0x0060,
-        name: "__V96"
+        id: 0x005F,
+        name: "__V95"
     },
     Symbol {
         id: 0x0061,
+        name: "__V97"
+    },
+    Symbol {
+        id: 0x0062,
         name: "__VAxiom"
     },
 ];
@@ -562,15 +532,15 @@ const VARIABLES: &'static [Symbol] = &[
 /// so that virtual indices in the automaton can be used to retrieve the virtuals in this table
 const VIRTUALS: &'static [Symbol] = &[
     Symbol {
-        id: 0x0046,
+        id: 0x0047,
         name: "range"
     },
     Symbol {
-        id: 0x004A,
+        id: 0x004B,
         name: "concat"
     },
     Symbol {
-        id: 0x0057,
+        id: 0x0058,
         name: "emptypart"
     },
 ];

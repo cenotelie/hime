@@ -1,9 +1,9 @@
-# Hime Rust Runtime #
+# Hime SDK #
 
 The Rust implementation of the SDK for the generation of lexers and parsers from [Hime](https://bitbucket.org/cenotelie/hime) grammars.
 For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/hime).
 The code for this library is available on [Bitbucket](https://bitbucket.org/cenotelie/hime).
-The API documentation is available on [docs.rs](https://docs.rs/hime_redist/3.3.1/hime_sdk/).
+The API documentation is available on [docs.rs](https://docs.rs/hime_redist/3.3.2/hime_sdk/).
 This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
 
 ## Usage ##
@@ -13,7 +13,7 @@ used by adding `hime_sdk` to your dependencies in your project's `Cargo.toml`.
 
 ```toml
 [dependencies]
-hime_sdk = "3.3.1"
+hime_sdk = "3.3.2"
 ```
 
 ## How can I contribute? ##

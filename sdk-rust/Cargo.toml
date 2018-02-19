@@ -1,6 +1,6 @@
 [package]
 name = "hime_sdk"
-version = "3.3.1"
+version = "3.3.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars."
 homepage = "https://cenotelie.fr/hime"
@@ -11,7 +11,7 @@ license = "LGPL-3.0"
 
 [dependencies]
 lazy_static = "1.0"
-hime_redist = "3.3.1"
+hime_redist = "3.3.2"
 
 [patch.crates-io]
 hime_redist = { path = "../runtime-rust" }
