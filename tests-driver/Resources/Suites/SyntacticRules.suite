@@ -251,3 +251,27 @@ test Test_Grammar_SubRule_GLR:
 	parser RNGLALR1
 	on "axyzb"
 	yields e(A ε(X Y Z) B)
+
+test Test_Grammar_SubRule_Recursive_LR:
+	grammar Test_Grammar_SubRule_Recursive_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; X->'x'; Y->'y'; Z->'z';} rules { e -> A {X {Y} Z} B; } }
+	parser LALR1
+	on "axyzb"
+	yields e(A ε(X ε(Y) Z) B)
+
+test Test_Grammar_SubRule_Recursive_GLR:
+	grammar Test_Grammar_SubRule_Recursive_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; X->'x'; Y->'y'; Z->'z';} rules { e -> A {X {Y} Z} B; } }
+	parser RNGLALR1
+	on "axyzb"
+	yields e(A ε(X ε(Y) Z) B)
+
+test Test_Grammar_SubRule_Promote_LR:
+	grammar Test_Grammar_SubRule_Promote_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; X->'x'; Y->'y'; Z->'z';} rules { e -> A {X Y^ Z} B; } }
+	parser LALR1
+	on "axyzb"
+	yields e(A Y(X Z) B)
+
+test Test_Grammar_SubRule_Promote_GLR:
+	grammar Test_Grammar_SubRule_Promote_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; X->'x'; Y->'y'; Z->'z';} rules { e -> A {X Y^ Z} B; } }
+	parser RNGLALR1
+	on "axyzb"
+	yields e(A Y(X Z) B)
