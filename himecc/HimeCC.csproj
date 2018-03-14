@@ -13,7 +13,7 @@
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">True</PublicSign>
+    <PublicSign>True</PublicSign>
     <Version>3.3.2</Version>
   </PropertyGroup>
   <PropertyGroup>
