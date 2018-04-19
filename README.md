@@ -35,7 +35,7 @@ The parser generator (himecc) can run on:
 
 ## How do I use this software? ##
 
-* [Complete user documentation](http://cenotelie.fr/hime/index.html)
+* [Complete user documentation](http://cenotelie.fr/hime)
 * [Grammar library](https://bitbucket.org/cenotelie/hime-grams)
 
 
