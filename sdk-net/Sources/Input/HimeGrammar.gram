@@ -52,7 +52,7 @@ grammar HimeGrammar
         LITERAL_STRING          -> '"' ( [^"] | '\\"' | ESCAPEES )* '"';
         LITERAL_ANY             -> '.';
         LITERAL_TEXT            -> '~'? '\'' ( [^\\'] | '\\\'' | ESCAPEES )+ '\'';
-        LITERAL_CLASS           -> '[' ( [^\\\[\]] | '\\[' | '\\]' | ESCAPEES )+ ']';
+        LITERAL_CLASS           -> '[' ( [^\\\[\]] | '\\[' | '\\]' | '\\-' | '\\^' | ESCAPEES )+ ']';
         UNICODE_BLOCK           -> 'ub' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
         UNICODE_CATEGORY        -> 'uc' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
         UNICODE_CODEPOINT       -> 'U+' [a-fA-F0-9]+;
