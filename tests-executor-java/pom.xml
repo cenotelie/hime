@@ -7,7 +7,7 @@
     <version>3.3.2-SNAPSHOT</version>
     <name>Hime Java Tests Executor</name>
     <description>Test executor for the Java runtime</description>
-    <url>http://cenotelie.fr/hime</url>
+    <url>https://cenotelie.fr/projects/hime</url>
     <licenses>
         <license>
             <name>GNU Lesser General Public License, Version 3</name>

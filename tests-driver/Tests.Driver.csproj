@@ -23,7 +23,7 @@
     <Description>Test driver for the tests suite of the Hime Parser Generator.</Description>
     <Copyright>Copyright © Association Cénotélie 2018</Copyright>
     <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
-    <PackageProjectUrl>http://cenotelie.fr/hime</PackageProjectUrl>
+    <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
     <PackageIconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
     <PackageTags>parser generator lr glr rnglr</PackageTags>
     <RepositoryUrl>https://bitbucket.org/cenotelie/hime</RepositoryUrl>
