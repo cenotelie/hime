@@ -472,7 +472,7 @@ namespace Hime.SDK.Grammars
 			{
 				value = value.Substring(1, value.Length - 2);
 			}
-			value = ReplaceEscapees(value).Replace("\\'", "'");
+			value = ReplaceEscapees(value);
 
 			// build the result
 			foreach (char c in value)
@@ -534,49 +534,53 @@ namespace Hime.SDK.Grammars
 			// extract the value
 			string value = node.Value;
 			value = value.Substring(1, value.Length - 2);
-			value = ReplaceEscapees(value).Replace("\\[", "[").Replace("\\]", "]");
 			bool positive = true;
-			if (value[0] == '^')
+			if (value.Length > 0 && value[0] == '^')
 			{
 				value = value.Substring(1);
 				positive = false;
 			}
 			// build the character spans
 			List<CharSpan> spans = new List<CharSpan>();
-			for (int i = 0; i != value.Length; i++)
+			for (int i = 0; i != value.Length;)
 			{
 				// read the first full unicode character
-				char b = value[i];
-				if (b >= 0xD800 && b <= 0xDFFF)
+				CharValue b = GetCharValue(value, i);
+				i += b.length;
+				if (b.chars[0] >= 0xD800 && b.chars[0] <= 0xDFFF)
 				{
-					OnError(node.Position, "Unsupported non-plane 0 Unicode character ({0}) in character class", b + value[i + 1]);
+					OnError(node.Position, "Unsupported non-plane 0 Unicode character ({0}) in character class", new String(b.chars));
 					return BuildEpsilonNFA();
 				}
-				if ((i != value.Length - 1) && (value[i + 1] == '-'))
+				if ((i <= value.Length - 2) && (value[i] == '-'))
 				{
 					// this is a range, match the '-'
-					i += 2;
-					char e = value[i];
-					if (e >= 0xD800 && e <= 0xDFFF)
+					i++;
+					CharValue e = GetCharValue(value, i);
+					i += e.length;
+					if (e.chars[0] >= 0xD800 && e.chars[0] <= 0xDFFF)
 					{
-						OnError(node.Position, "Unsupported non-plane 0 Unicode character ({0}) in character class", e + value[i + 1]);
+						OnError(node.Position, "Unsupported non-plane 0 Unicode character ({0}) in character class", new String(e.chars));
 						return BuildEpsilonNFA();
 					}
-					if (b < 0xD800 && e > 0xDFFF)
+					char begin = b.chars.Length == 1 ? b.chars[0] : b.chars[1];
+					char end = e.chars.Length == 1 ? e.chars[0] : e.chars[1];
+					if (begin < 0xD800 && end > 0xDFFF)
 					{
 						// oooh you ...
-						spans.Add(new CharSpan(b, (char)0xD7FF));
-						spans.Add(new CharSpan((char)0xE000, e));
+						spans.Add(new CharSpan(begin, (char)0xD7FF));
+						spans.Add(new CharSpan((char)0xE000, end));
 					}
 					else
 					{
-						spans.Add(new CharSpan(b, e));
+						spans.Add(new CharSpan(begin, end));
 					}
 				}
 				else
 				{
 					// this is a normal character
-					spans.Add(new CharSpan(b, b));
+					char begin = b.chars.Length == 1 ? b.chars[0] : b.chars[1];
+					spans.Add(new CharSpan(begin, begin));
 				}
 			}
 			// build the result
@@ -978,7 +982,7 @@ namespace Hime.SDK.Grammars
 			// Construct the terminal name
 			string value = node.Value;
 			value = value.Substring(1, value.Length - 2);
-			value = ReplaceEscapees(value).Replace("\\'", "'");
+			value = ReplaceEscapees(value);
 			// Check for previous instance in the grammar
 			Terminal terminal = grammar.GetTerminalByValue(value);
 			if (terminal == null)
@@ -1004,57 +1008,106 @@ namespace Hime.SDK.Grammars
 			if (!value.Contains("\\"))
 				return value;
 			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i != value.Length; i++)
+			for (int i = 0; i != value.Length;)
 			{
-				char c = value[i];
-				if (c != '\\')
-				{
-					builder.Append(c);
-					continue;
-				}
-				i++;
-				c = value[i];
-				if (c == '\\')
-					builder.Append(c);
-				else if (c == '0')
-					builder.Append('\0'); /*Unicode character 0*/
-				else if (c == 'a')
-					builder.Append('\a'); /*Alert (character 7)*/
-				else if (c == 'b')
-					builder.Append('\b'); /*Backspace (character 8)*/
-				else if (c == 'f')
-					builder.Append('\f'); /*Form feed (character 12)*/
-				else if (c == 'n')
-					builder.Append('\n'); /*New line (character 10)*/
-				else if (c == 'r')
-					builder.Append('\r'); /*Carriage return (character 13)*/
-				else if (c == 't')
-					builder.Append('\t'); /*Horizontal tab (character 9)*/
-				else if (c == 'v')
-					builder.Append('\v'); /*Vertical quote (character 11)*/
-				else if (c == 'u')
-				{
-					int l = 0;
-					while (i + 1 + l < value.Length)
-					{
-						c = value[i + 1 + l];
-						if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-							l++;
-						else
-							break;
-					}
-					if (l >= 8)
-						l = 8;
-					else if (l > 4)
-						l = 4;
-					int cp = Convert.ToInt32(value.Substring(i + 1, l), 16);
-					builder.Append((new UnicodeCodePoint(cp)).GetUTF16());
-					i += l;
-				}
+				CharValue cv = GetCharValue(value, i);
+				if (cv.chars.Length == 2 && cv.chars[0] == '\\')
+					builder.Append(cv.chars[1]);
 				else
-					builder.Append("\\" + c);
+					builder.Append(cv.chars);
+				i += cv.length;
 			}
 			return builder.ToString();
+		}
+
+		/// <summary>
+		/// The value for a complex character
+		/// </summary>
+		private struct CharValue
+		{
+			/// <summary>
+			/// The final value
+			/// </summary>
+			public readonly char[] chars;
+			/// <summary>
+			/// The length in the input string
+			/// </summary>
+			public readonly int length;
+
+			/// <summary>
+			/// Initializes this value
+			/// </summary>
+			/// <param name="c">The final value</param>
+			/// <param name="length">The length in the input string</param>
+			public CharValue(char c, int length)
+			{
+				this.chars = new char[] { c };
+				this.length = length;
+			}
+
+			/// <summary>
+			/// Initializes this value
+			/// </summary>
+			/// <param name="c">The final value</param>
+			/// <param name="length">The length in the input string</param>
+			public CharValue(char[] c, int length)
+			{
+				this.chars = c;
+				this.length = length;
+			}
+		}
+
+		/// <summary>
+		/// Gets the character value
+		/// </summary>
+		/// <param name="value">A string</param>
+		/// <param name="i">The current index to look at</param>
+		/// <returns>The character value</returns>
+		private static CharValue GetCharValue(string value, int i)
+		{
+			char c = value[i];
+			if (c != '\\')
+				return new CharValue(c, 1);
+
+			c = value[i + 1];
+			if (c == '\\')
+				return new CharValue(c, 2);
+			else if (c == '0')
+				return new CharValue('\0', 2); /*Unicode character 0*/
+			else if (c == 'a')
+				return new CharValue('\a', 2); /*Alert (character 7)*/
+			else if (c == 'b')
+				return new CharValue('\b', 2); /*Backspace (character 8)*/
+			else if (c == 'f')
+				return new CharValue('\f', 2); /*Form feed (character 12)*/
+			else if (c == 'n')
+				return new CharValue('\n', 2); /*New line (character 10)*/
+			else if (c == 'r')
+				return new CharValue('\r', 2); /*Carriage return (character 13)*/
+			else if (c == 't')
+				return new CharValue('\t', 2); /*Horizontal tab (character 9)*/
+			else if (c == 'v')
+				return new CharValue('\v', 2); /*Vertical quote (character 11)*/
+			else if (c == 'u')
+			{
+				int l = 0;
+				while (i + 2 + l < value.Length)
+				{
+					c = value[i + 2 + l];
+					if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+						l++;
+					else
+						break;
+				}
+				if (l >= 8)
+					l = 8;
+				else if (l > 4)
+					l = 4;
+				int cp = Convert.ToInt32(value.Substring(i + 2, l), 16);
+				return new CharValue((new UnicodeCodePoint(cp)).GetUTF16(), 2 + l);
+			}
+			else
+				return new CharValue(new char[] { '\\', c }, 2);
 		}
 	}
 }

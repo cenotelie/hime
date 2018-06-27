@@ -70,3 +70,27 @@ test Issue034_RNGLR_Tree_Actions:
 	parser RNGLALR1
 	on "axbx"
 	yields A(X X)
+
+test Issue052_CharacterClassEscapedHyphenMiddle:
+	grammar Issue052_CharacterClassEscapedHyphenMiddle { options {Axiom="e";} terminals { X->[a\-b]; } rules {
+		e -> X ;
+	} }
+	parser LALR1
+	on "-"
+	yields e(X)
+
+test Issue052_CharacterClassHyphenEnd:
+	grammar Issue052_CharacterClassHyphenEnd { options {Axiom="e";} terminals { X->[ab-]; } rules {
+		e -> X ;
+	} }
+	parser LALR1
+	on "-"
+	yields e(X)
+
+test Issue052_CharacterClassEscapedHyphenEnd:
+	grammar Issue052_CharacterClassEscapedHyphenEnd { options {Axiom="e";} terminals { X->[ab\-]; } rules {
+		e -> X ;
+	} }
+	parser LALR1
+	on "-"
+	yields e(X)

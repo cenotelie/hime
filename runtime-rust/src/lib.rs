@@ -16,8 +16,8 @@
  ******************************************************************************/
 
 //! This crate provides the redistributable runtime for Hime-generated parsers
-//! It contains the runtime APIs for lexers and parsers generated using [Hime](https://cenotelie.fr/hime).
-//! For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/hime).
+//! It contains the runtime APIs for lexers and parsers generated using [Hime](https://cenotelie.fr/projects/hime).
+//! For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/projects/hime).
 //! The code for this library is available on [Bitbucket](https://bitbucket.org/cenotelie/hime).
 //! This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
 //!
@@ -27,7 +27,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! hime_redist = "3.3.2"
+//! hime_redist = "3.3.3"
 //! ```
 //!
 //! and this to your crate root:
