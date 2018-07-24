@@ -37,7 +37,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to serialize to</param>
 		public DOTSerializer(string name, string file)
 		{
-			writer = new StreamWriter(file, false, Encoding.UTF8);
+			writer = new StreamWriter(file, false, new UTF8Encoding(false));
 			writer.WriteLine("digraph " + name + " {");
 		}
 

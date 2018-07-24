@@ -339,7 +339,7 @@ namespace Hime.Redist.Parsers
 		public void PrintTo(string file)
 		{
 			FileStream stream = File.Open(file, FileMode.OpenOrCreate, FileAccess.Write);
-			TextWriter writer = new StreamWriter(stream, Encoding.UTF8);
+			TextWriter writer = new StreamWriter(stream, new UTF8Encoding(false));
 			PrintTo(writer);
 			writer.Dispose();
 		}

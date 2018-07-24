@@ -39,7 +39,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to export to</param>
 		public static void Export(Grammar grammar, string file)
 		{
-			StreamWriter writer = new StreamWriter(file, false, Encoding.UTF8);
+			StreamWriter writer = new StreamWriter(file, false, new UTF8Encoding(false));
 			writer.WriteLine("Name: {0}", grammar.Name);
 			writer.WriteLine("Options:");
 			foreach (string option in grammar.Options)
@@ -79,7 +79,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to export to</param>
 		public static void Export(Graph graph, Grammar grammar, string file)
 		{
-			StreamWriter writer = new StreamWriter(file, false, Encoding.UTF8);
+			StreamWriter writer = new StreamWriter(file, false, new UTF8Encoding(false));
 			foreach (Hime.SDK.Grammars.LR.State state in graph.States)
 				ExportLRState(writer, state, grammar);
 			writer.Close();
@@ -140,7 +140,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="file">File to export to</param>
 		public static void Export(ASTNode root, string file)
 		{
-			StreamWriter writer = new StreamWriter(file, false, Encoding.UTF8);
+			StreamWriter writer = new StreamWriter(file, false, new UTF8Encoding(false));
 			ExportNode(writer, "", root);
 			writer.Close();
 		}
