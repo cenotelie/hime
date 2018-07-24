@@ -89,7 +89,7 @@ namespace Hime.SDK.Reflection
 		/// <param name="label">Label for the edge</param>
 		public void WriteEdge(string tail, string head, string label)
 		{
-			writer.WriteLine("    " + tail + " -> " + head + " [label=\"" + label + "\"];");
+			writer.WriteLine("    " + tail + " -> " + head + " [label=\"" + SanitizeString(label) + "\"];");
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace Hime.SDK.Reflection
 			foreach (string item in items)
 			{
 				builder.Append(" | { | ");
-				builder.Append(SanitizeString(item).Replace("|", "\\|").Replace("<", "\\<").Replace(">", "\\>").Replace("{", "\\{").Replace("}", "\\}"));
+				builder.Append(SanitizeString(item));
 				builder.Append(" }");
 			}
 			builder.Append(" }\", shape=\"record\"];");
@@ -128,7 +128,21 @@ namespace Hime.SDK.Reflection
 		/// </summary>
 		private static string SanitizeString(string original)
 		{
-			return original.Replace("\"", "\\\"").Replace("\\", "\\\\");
+			StringBuilder builder = new StringBuilder();
+			for (int i = 0; i != original.Length; i++)
+			{
+				char c = original[i];
+				if (c == '\\' || c == '"' || c == '|' || c == '<' || c == '>' || c == '{' || c == '}')
+				{
+					builder.Append("\\");
+					builder.Append(c);
+				}
+				else
+				{
+					builder.Append(c);
+				}
+			}
+			return builder.ToString();
 		}
 	}
 }
