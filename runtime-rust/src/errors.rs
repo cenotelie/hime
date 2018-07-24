@@ -316,17 +316,17 @@ impl ParseErrors {
 
     /// Handles the end-of-input error
     pub fn push_error_eoi(&mut self, error: ParseErrorEndOfInput) {
-        self.errors.push(ParseError::UnexpectedEndOfInput((error)));
+        self.errors.push(ParseError::UnexpectedEndOfInput(error));
     }
 
     /// Handles the unexpected character error
     pub fn push_error_unexpected_char(&mut self, error: ParseErrorUnexpectedChar) {
-        self.errors.push(ParseError::UnexpectedChar((error)));
+        self.errors.push(ParseError::UnexpectedChar(error));
     }
 
     /// Handles the unexpected token error
     pub fn push_error_unexpected_token(&mut self, error: ParseErrorUnexpectedToken) {
-        self.errors.push(ParseError::UnexpectedToken((error)));
+        self.errors.push(ParseError::UnexpectedToken(error));
     }
 
     /// Handles the incorrect encoding sequence error
@@ -335,7 +335,7 @@ impl ParseErrors {
         error: ParseErrorIncorrectEncodingSequence
     ) {
         self.errors
-            .push(ParseError::IncorrectUTF16NoLowSurrogate((error)));
+            .push(ParseError::IncorrectUTF16NoLowSurrogate(error));
     }
 
     /// Handles the incorrect encoding sequence error
@@ -344,7 +344,7 @@ impl ParseErrors {
         error: ParseErrorIncorrectEncodingSequence
     ) {
         self.errors
-            .push(ParseError::IncorrectUTF16NoHighSurrogate((error)));
+            .push(ParseError::IncorrectUTF16NoHighSurrogate(error));
     }
 
     /// Gets the number of errors
