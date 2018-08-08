@@ -1,5 +1,13 @@
 # Updates
 
+## 3.3.2
+
+Release in May 18th, 2018.
+
+* Fixes
+    * [Issue #50](https://bitbucket.org/cenotelie/hime/issues/50): --regenerate option does not work in himecc.
+    * [Issue #52](https://bitbucket.org/cenotelie/hime/issues/52): Regex character class does not allow unescaped hyphen at final position.
+
 ## 3.3.1
 
 Release in February 18th, 2018.
