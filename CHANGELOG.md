@@ -1,5 +1,16 @@
 # Updates
 
+## 3.4.0
+
+Release in August 9th, 2018.
+
+* Features:
+    * [Issue #51](https://bitbucket.org/cenotelie/hime/issues/51): Visitor generation
+* Fixes:
+    * [Issue #54](https://bitbucket.org/cenotelie/hime/issues/54): Proper escaping of labels in DOT edges
+    * [Issue #55](https://bitbucket.org/cenotelie/hime/issues/55): Do not emit BOM for Hime outputs
+    * [Issue #56](https://bitbucket.org/cenotelie/hime/issues/56): Comment line grammar issue
+
 ## 3.3.2
 
 Release in May 18th, 2018.
