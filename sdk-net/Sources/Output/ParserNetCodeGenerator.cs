@@ -352,7 +352,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t{");
 			foreach (Terminal terminal in terminals)
 			{
-				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				stream.WriteLine("\t\t\tpublic virtual void OnTerminal" + Helper.ToUpperCamelCase(terminal.Name) + "(ASTNode node) {}");
 			}
@@ -387,7 +387,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t\t{");
 			foreach (Terminal terminal in terminals)
 			{
-				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				stream.WriteLine("\t\t\t\tcase 0x" + terminal.ID.ToString("X4") + ": visitor.OnTerminal" + Helper.ToUpperCamelCase(terminal.Name) + "(node); break;");
 			}

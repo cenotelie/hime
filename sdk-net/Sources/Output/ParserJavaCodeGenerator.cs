@@ -371,7 +371,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("    public static class Visitor {");
 			foreach (Terminal terminal in terminals)
 			{
-				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				stream.WriteLine("        public void onTerminal" + Helper.ToUpperCamelCase(terminal.Name) + "(ASTNode node) {}");
 			}
@@ -403,7 +403,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("        switch(node.getSymbol().getID()) {");
 			foreach (Terminal terminal in terminals)
 			{
-				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				stream.WriteLine("            case 0x" + terminal.ID.ToString("X4") + ": visitor.onTerminal" + Helper.ToUpperCamelCase(terminal.Name) + "(node); break;");
 			}

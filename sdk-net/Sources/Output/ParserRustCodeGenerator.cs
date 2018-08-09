@@ -377,7 +377,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("pub trait Visitor {");
 			foreach (Terminal terminal in terminals)
 			{
-				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				stream.WriteLine("    fn on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&self, node: &AstNode);");
 			}
@@ -409,7 +409,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("    match node.get_symbol().id {");
 			foreach (Terminal terminal in terminals)
 			{
-				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
 				stream.WriteLine("        0x" + terminal.ID.ToString("X4") + " => visitor.on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&node),");
 			}
