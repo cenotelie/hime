@@ -30,7 +30,7 @@ grammar HimeGrammar
                                 |  U+2028 /* LS */
                                 |  U+2029 /* PS */ ;
         fragment WHITE_SPACE    -> U+0020 | U+0009 | U+000B | U+000C ;
-        fragment COMMENT_LINE   -> '//' (.* - (.* NEW_LINE .*)) NEW_LINE ;
+        fragment COMMENT_LINE   -> '//' (.* - (.* NEW_LINE .*)) ;
         fragment COMMENT_BLOCK  -> '/*' (.* - (.* '*/' .*)) '*/' ;
         SEPARATOR               -> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
 
