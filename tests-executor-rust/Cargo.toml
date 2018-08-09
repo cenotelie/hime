@@ -1,6 +1,6 @@
 [package]
 name = "tests_executor_rust"
-version = "3.4.0"
+version = "3.4.1"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Executor for tests for the Hime Parser Generator in Rust."
 homepage = "https://cenotelie.fr/projects/hime"
@@ -10,7 +10,7 @@ categories = ["algorithms", "parsing", "parser-implementations", "text-processin
 license = "LGPL-3.0"
 
 [dependencies]
-hime_redist = "3.4.0"
+hime_redist = "3.4.1"
 libloading = "0.4.3"
 # Used for tests debugging
 # hime_generated = { path = "../tests-results/hime_generated-3.3.1" }

@@ -1,6 +1,6 @@
 [package]
 name = "hime_redist"
-version = "3.4.0"
+version = "3.4.1"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Redistributable runtime library for parsers generated with Hime (LR, RNGLR)."
 documentation = "https://cenotelie.fr/projects/hime"

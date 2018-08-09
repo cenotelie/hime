@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <PublicSign>True</PublicSign>
-    <Version>3.4.0</Version>
+    <Version>3.4.1</Version>
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
