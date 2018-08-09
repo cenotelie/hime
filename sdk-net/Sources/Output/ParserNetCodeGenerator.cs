@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Hime.Redist.Utils;
 using Hime.SDK.Grammars;
 
 namespace Hime.SDK.Output
@@ -56,6 +57,10 @@ namespace Hime.SDK.Output
 		/// </summary>
 		private readonly string automatonType;
 		/// <summary>
+		/// The terminals for the lexer
+		/// </summary>
+		private readonly ROList<Terminal> terminals;
+		/// <summary>
 		/// The variables to be exported
 		/// </summary>
 		private readonly List<Variable> variables;
@@ -90,6 +95,7 @@ namespace Hime.SDK.Output
 				this.parserType = "LRkParser";
 				this.automatonType = "LRkAutomaton";
 			}
+			terminals = unit.Expected;
 			variables = new List<Variable>(unit.Grammar.Variables);
 			virtuals = new List<Virtual>(unit.Grammar.Virtuals);
 			actions = new List<Action>(unit.Grammar.Actions);
@@ -141,7 +147,8 @@ namespace Hime.SDK.Output
 			GenerateCodeVariables(writer);
 			GenerateCodeVirtuals(writer);
 			GenerateCodeActions(writer);
-			GeneratorCodeConstructors(writer);
+			GenerateCodeConstructors(writer);
+			GenerateCodeVisitor(writer);
 
 			writer.WriteLine("\t}");
 			writer.WriteLine("}");
@@ -248,7 +255,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine("\t\t\t/// <summary>");
 				stream.WriteLine("\t\t\t/// The " + action.Name + " semantic action");
 				stream.WriteLine("\t\t\t/// </summary>");
-				stream.WriteLine("\t\t\tpublic virtual void " + Helper.ToUpperCamelCase(action.Name) + "(Symbol head, SemanticBody body) { }");
+				stream.WriteLine("\t\t\tpublic virtual void " + Helper.ToUpperCamelCase(action.Name) + "(Symbol head, SemanticBody body) {}");
 			}
 			stream.WriteLine();
 			stream.WriteLine("\t\t}");
@@ -297,7 +304,7 @@ namespace Hime.SDK.Output
 		/// Generates the code for the constructors
 		/// </summary>
 		/// <param name="stream">The output stream</param>
-		private void GeneratorCodeConstructors(StreamWriter stream)
+		private void GenerateCodeConstructors(StreamWriter stream)
 		{
 			if (actions.Count == 0)
 			{
@@ -329,6 +336,73 @@ namespace Hime.SDK.Output
 				stream.WriteLine("\t\t/// <param name=\"actions\">The set of semantic actions</param>");
 				stream.WriteLine("\t\tpublic " + name + "Parser(" + name + "Lexer lexer, Dictionary<string, SemanticAction> actions) : base (commonAutomaton, variables, virtuals, GetUserActions(actions), lexer) { }");
 			}
+		}
+
+		/// <summary>
+		/// Generates the visitor for the parse result
+		/// </summary>
+		/// <param name="stream">The output stream</param>
+		private void GenerateCodeVisitor(StreamWriter stream)
+		{
+			stream.WriteLine("");
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Visitor interface");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tpublic class Visitor");
+			stream.WriteLine("\t\t{");
+			foreach (Terminal terminal in terminals)
+			{
+				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+					continue;
+				stream.WriteLine("\t\t\tpublic virtual void OnTerminal" + Helper.ToUpperCamelCase(terminal.Name) + "(ASTNode node) {}");
+			}
+			foreach (Variable var in variables)
+			{
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
+				stream.WriteLine("\t\t\tpublic virtual void OnVariable" + Helper.ToUpperCamelCase(var.Name) + "(ASTNode node) {}");
+			}
+			foreach (Virtual var in virtuals)
+			{
+				stream.WriteLine("\t\t\tpublic virtual void OnVirtual" + Helper.ToUpperCamelCase(var.Name) + "(ASTNode node) {}");
+			}
+			stream.WriteLine("\t\t}");
+			stream.WriteLine("");
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Walk the AST using a visitor");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tpublic static void Visit(ParseResult result, Visitor visitor)");
+			stream.WriteLine("\t\t{");
+			stream.WriteLine("\t\t\tVisitASTNode(result.Root, visitor);");
+			stream.WriteLine("\t\t}");
+			stream.WriteLine("");
+			stream.WriteLine("\t\t/// <summary>");
+			stream.WriteLine("\t\t/// Walk the AST using a visitor");
+			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\tpublic static void VisitASTNode(ASTNode node, Visitor visitor)");
+			stream.WriteLine("\t\t{");
+			stream.WriteLine("\t\t\tfor (int i = 0; i < node.Children.Count; i++)");
+			stream.WriteLine("\t\t\t\tVisitASTNode(node.Children[i], visitor);");
+			stream.WriteLine("\t\t\tswitch(node.Symbol.ID)");
+			stream.WriteLine("\t\t\t{");
+			foreach (Terminal terminal in terminals)
+			{
+				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+					continue;
+				stream.WriteLine("\t\t\t\tcase 0x" + terminal.ID.ToString("X4") + ": visitor.OnTerminal" + Helper.ToUpperCamelCase(terminal.Name) + "(node); break;");
+			}
+			foreach (Variable var in variables)
+			{
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
+				stream.WriteLine("\t\t\t\tcase 0x" + var.ID.ToString("X4") + ": visitor.OnVariable" + Helper.ToUpperCamelCase(var.Name) + "(node); break;");
+			}
+			foreach (Virtual var in virtuals)
+			{
+				stream.WriteLine("\t\t\t\tcase 0x" + var.ID.ToString("X4") + ": visitor.OnVirtual" + Helper.ToUpperCamelCase(var.Name) + "(node); break;");
+			}
+			stream.WriteLine("\t\t\t}");
+			stream.WriteLine("\t\t}");
 		}
 	}
 }

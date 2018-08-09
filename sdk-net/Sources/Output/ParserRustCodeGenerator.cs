@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Hime.Redist.Utils;
 using Hime.SDK.Grammars;
 
 namespace Hime.SDK.Output
@@ -56,6 +57,10 @@ namespace Hime.SDK.Output
 		/// </summary>
 		private readonly bool outputAssembly;
 		/// <summary>
+		/// The terminals for the lexer
+		/// </summary>
+		private readonly ROList<Terminal> terminals;
+		/// <summary>
 		/// The variables to be exported
 		/// </summary>
 		private readonly List<Variable> variables;
@@ -91,6 +96,7 @@ namespace Hime.SDK.Output
 				this.automatonType = "LRkAutomaton";
 			}
 			this.outputAssembly = unit.CompilationMode == Mode.Assembly || unit.CompilationMode == Mode.SourceAndAssembly;
+			terminals = unit.Expected;
 			variables = new List<Variable>(unit.Grammar.Variables);
 			virtuals = new List<Virtual>(unit.Grammar.Virtuals);
 			actions = new List<Action>(unit.Grammar.Actions);
@@ -114,7 +120,8 @@ namespace Hime.SDK.Output
 			GenerateCodeVariables(writer);
 			GenerateCodeVirtuals(writer);
 			GenerateCodeActions(writer);
-			GeneratorCodeConstructors(writer);
+			GenerateCodeConstructors(writer);
+			GenerateCodeVisitor(writer);
 			writer.Close();
 		}
 
@@ -215,7 +222,7 @@ namespace Hime.SDK.Output
 		/// Generates the code for the constructors
 		/// </summary>
 		/// <param name="stream">The output stream</param>
-		private void GeneratorCodeConstructors(StreamWriter stream)
+		private void GenerateCodeConstructors(StreamWriter stream)
 		{
 			if (actions.Count == 0)
 			{
@@ -357,6 +364,68 @@ namespace Hime.SDK.Output
 				stream.WriteLine("    result");
 				stream.WriteLine("}");
 			}
+		}
+
+		/// <summary>
+		/// Generates the visitor for the parse result
+		/// </summary>
+		/// <param name="stream">The output stream</param>
+		private void GenerateCodeVisitor(StreamWriter stream)
+		{
+			stream.WriteLine("");
+			stream.WriteLine("/// Visitor interface");
+			stream.WriteLine("pub trait Visitor {");
+			foreach (Terminal terminal in terminals)
+			{
+				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+					continue;
+				stream.WriteLine("    fn on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&self, node: &AstNode);");
+			}
+			foreach (Variable var in variables)
+			{
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
+				stream.WriteLine("    fn on_variable_" + Helper.ToSnakeCase(var.Name) + "(&self, node: &AstNode);");
+			}
+			foreach (Virtual var in virtuals)
+			{
+				stream.WriteLine("    fn on_virtual_" + Helper.ToSnakeCase(var.Name) + "(&self, node: &AstNode);");
+			}
+			stream.WriteLine("}");
+			stream.WriteLine("");
+			stream.WriteLine("/// Walk the AST using a visitor");
+			stream.WriteLine("pub fn visit(result: &ParseResult, visitor: &Visitor) {");
+			stream.WriteLine("    let ast = result.get_ast();");
+			stream.WriteLine("    let root = ast.get_root();");
+			stream.WriteLine("    visit_ast_node(root, visitor);");
+			stream.WriteLine("}");
+			stream.WriteLine("");
+			stream.WriteLine("/// Walk the AST using a visitor");
+			stream.WriteLine("pub fn visit_ast_node<'a>(node: AstNode<'a>, visitor: &Visitor) {");
+			stream.WriteLine("    let children = node.children();");
+			stream.WriteLine("    for child in children.iter() {");
+			stream.WriteLine("        visit_ast_node(child, visitor);");
+			stream.WriteLine("    }");
+			stream.WriteLine("    match node.get_symbol().id {");
+			foreach (Terminal terminal in terminals)
+			{
+				if (terminal.ID < 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
+					continue;
+				stream.WriteLine("        0x" + terminal.ID.ToString("X4") + " => visitor.on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&node),");
+			}
+			foreach (Variable var in variables)
+			{
+				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
+					continue;
+				stream.WriteLine("        0x" + var.ID.ToString("X4") + " => visitor.on_variable_" + Helper.ToSnakeCase(var.Name) + "(&node),");
+			}
+			foreach (Virtual var in virtuals)
+			{
+				stream.WriteLine("        0x" + var.ID.ToString("X4") + " => visitor.on_virtual_" + Helper.ToSnakeCase(var.Name) + "(&node),");
+			}
+			stream.WriteLine("        _ => ()");
+			stream.WriteLine("    };");
+			stream.WriteLine("}");
 		}
 	}
 }

@@ -82,6 +82,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine();
 			writer.WriteLine("use std::io::Read;");
 			writer.WriteLine();
+			writer.WriteLine("use hime_redist::ast::AstNode;");
 			writer.WriteLine("use hime_redist::errors::ParseErrors;");
 			writer.WriteLine("use hime_redist::lexers::automaton::Automaton;");
 			writer.WriteLine("use hime_redist::lexers::impls::" + baseLexer + ";");
@@ -98,9 +99,11 @@ namespace Hime.SDK.Output
 			}
 			writer.WriteLine("use hime_redist::result::ParseResult;");
 			writer.WriteLine("use hime_redist::symbols::SemanticBody;");
+			writer.WriteLine("use hime_redist::symbols::SemanticElementTrait;");
 			writer.WriteLine("use hime_redist::symbols::Symbol;");
 			writer.WriteLine("use hime_redist::text::Text;");
 			writer.WriteLine("use hime_redist::tokens::TokenRepository;");
+			writer.WriteLine("use hime_redist::utils::iterable::Iterable;");
 			writer.WriteLine();
 
 			writer.WriteLine("/// Static resource for the serialized lexer automaton");
