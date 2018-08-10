@@ -393,14 +393,14 @@ namespace Hime.SDK.Output
 			}
 			stream.WriteLine("}");
 			stream.WriteLine("");
-			stream.WriteLine("/// Walk the AST using a visitor");
+			stream.WriteLine("/// Walk the AST of a result using a visitor");
 			stream.WriteLine("pub fn visit(result: &ParseResult, visitor: &Visitor) {");
 			stream.WriteLine("    let ast = result.get_ast();");
 			stream.WriteLine("    let root = ast.get_root();");
 			stream.WriteLine("    visit_ast_node(root, visitor);");
 			stream.WriteLine("}");
 			stream.WriteLine("");
-			stream.WriteLine("/// Walk the AST using a visitor");
+			stream.WriteLine("/// Walk the sub-AST from the specified node using a visitor");
 			stream.WriteLine("pub fn visit_ast_node<'a>(node: AstNode<'a>, visitor: &Visitor) {");
 			stream.WriteLine("    let children = node.children();");
 			stream.WriteLine("    for child in children.iter() {");

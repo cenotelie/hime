@@ -369,7 +369,9 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t}");
 			stream.WriteLine("");
 			stream.WriteLine("\t\t/// <summary>");
-			stream.WriteLine("\t\t/// Walk the AST using a visitor");
+			stream.WriteLine("\t\t/// Walk the AST of a result using a visitor");
+			stream.WriteLine("\t\t/// <param name=\"result\">The parse result</param>");
+			stream.WriteLine("\t\t/// <param name=\"visitor\">The visitor to use</param>");
 			stream.WriteLine("\t\t/// </summary>");
 			stream.WriteLine("\t\tpublic static void Visit(ParseResult result, Visitor visitor)");
 			stream.WriteLine("\t\t{");
@@ -377,8 +379,10 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t}");
 			stream.WriteLine("");
 			stream.WriteLine("\t\t/// <summary>");
-			stream.WriteLine("\t\t/// Walk the AST using a visitor");
+			stream.WriteLine("\t\t/// Walk the sub-AST from the specified node using a visitor");
 			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t/// <param name=\"node\">The AST node to start from</param>");
+			stream.WriteLine("\t\t/// <param name=\"visitor\">The visitor to use</param>");
 			stream.WriteLine("\t\tpublic static void VisitASTNode(ASTNode node, Visitor visitor)");
 			stream.WriteLine("\t\t{");
 			stream.WriteLine("\t\t\tfor (int i = 0; i < node.Children.Count; i++)");
