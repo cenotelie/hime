@@ -23,9 +23,9 @@ use super::text::Text;
 use super::text::TextContext;
 use super::text::TextPosition;
 use super::text::TextSpan;
-use super::utils::EitherMut;
 use super::utils::biglist::BigList;
 use super::utils::iterable::Iterable;
+use super::utils::EitherMut;
 
 /// Represents the metadata of a token
 #[derive(Copy, Clone)]

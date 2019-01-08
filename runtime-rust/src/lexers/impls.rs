@@ -17,19 +17,19 @@
 
 //! Module for lexers' implementation
 
+use super::super::errors::ParseErrorUnexpectedChar;
+use super::super::errors::ParseErrors;
+use super::super::symbols::Symbol;
+use super::super::symbols::SID_DOLLAR;
+use super::super::text::Text;
+use super::super::tokens::TokenRepository;
+use super::automaton::run_dfa;
+use super::automaton::Automaton;
+use super::automaton::TokenMatch;
+use super::fuzzy::FuzzyMatcher;
 use super::ContextProvider;
 use super::Lexer;
 use super::TokenKernel;
-use super::automaton::Automaton;
-use super::automaton::TokenMatch;
-use super::automaton::run_dfa;
-use super::fuzzy::FuzzyMatcher;
-use super::super::errors::ParseErrorUnexpectedChar;
-use super::super::errors::ParseErrors;
-use super::super::symbols::SID_DOLLAR;
-use super::super::symbols::Symbol;
-use super::super::text::Text;
-use super::super::tokens::TokenRepository;
 
 /// The default maximum Levenshtein distance to go to for the recovery of a matching failure
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
@@ -190,7 +190,8 @@ impl<'a> ContextFreeLexer<'a> {
                     return;
                 } else {
                     // matched something
-                    let terminal = self.automaton
+                    let terminal = self
+                        .automaton
                         .get_state(the_match.state)
                         .get_terminal(0)
                         .index as usize;

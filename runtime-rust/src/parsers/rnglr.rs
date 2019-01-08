@@ -20,20 +20,20 @@
 use std::collections::VecDeque;
 use std::usize;
 
-use super::*;
 use super::super::ast::Ast;
 use super::super::ast::AstCell;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
 use super::super::errors::ParseErrorUnexpectedToken;
-use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
-use super::super::symbols::SID_EPSILON;
+use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 use super::super::symbols::SemanticElementTrait;
+use super::super::symbols::SID_EPSILON;
 use super::super::utils::biglist::BigList;
+use super::*;
 
 /// Represents a cell in a RNGLR parse table
 #[derive(Copy, Clone)]
@@ -735,10 +735,7 @@ impl SPPF {
         let identifier = self.nodes.len();
         self.nodes
             .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
-                original,
-                label,
-                buffer,
-                count
+                original, label, buffer, count,
             )));
         identifier
     }
@@ -805,7 +802,8 @@ struct SPPFBuilder<'l> {
 
 impl<'l> SemanticBody for SPPFBuilder<'l> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_ref()
             .unwrap_or_else(|| panic!("Not in a reduction"));
         let reference = reduction.cache[reduction.handle_indices[index]];
@@ -826,7 +824,8 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
     }
 
     fn length(&self) -> usize {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_ref()
             .unwrap_or_else(|| panic!("Not in a reduction"));
         reduction.handle_indices.len()
@@ -965,15 +964,18 @@ impl<'l> SPPFBuilder<'l> {
         // copy the children
         match &node.versions[0].children {
             &None => {}
-            &Some(ref children) => for child in children.iter() {
-                reduction.cache.push(*child);
+            &Some(ref children) => {
+                for child in children.iter() {
+                    reduction.cache.push(*child);
+                }
             }
         }
     }
 
     /// During a reduction, pops the top symbol from the stack and gives it a tree action
     pub fn reduction_pop(&mut self, action: TreeAction) {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
         let label = reduction.stack[reduction.pop_count];
@@ -988,10 +990,12 @@ impl<'l> SPPFBuilder<'l> {
 
     /// During a reduction, inserts a virtual symbol
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
-        let node_id = self.sppf
+        let node_id = self
+            .sppf
             .new_normal_node(TableElemRef::new(TableType::Virtual, index));
         reduction.cache.push(SPPFNodeRef {
             node_id: node_id as u32,
@@ -1003,7 +1007,8 @@ impl<'l> SPPFBuilder<'l> {
 
     /// During a reduction, inserts the sub-tree of a nullable variable
     pub fn reduction_add_nullable(&mut self, nullable: usize, action: TreeAction) {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
         SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
@@ -1027,7 +1032,8 @@ impl<'l> SPPFBuilder<'l> {
 
     /// Executes the reduction as a normal reduction
     pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
         let mut promoted: Option<(TableElemRef, SPPFNodeRef)> = None;
@@ -1056,7 +1062,8 @@ impl<'l> SPPFBuilder<'l> {
                 }
                 // save the new promoted node
                 let promoted_reference = reduction.cache[reduction.handle_indices[i]];
-                let promoted_node = self.sppf
+                let promoted_node = self
+                    .sppf
                     .get_node(promoted_reference.node_id as usize)
                     .as_normal();
                 let promoted_version = &promoted_node.versions[promoted_reference.version as usize];
@@ -1078,11 +1085,13 @@ impl<'l> SPPFBuilder<'l> {
 
         let original_label = TableElemRef::new(TableType::Variable, variable_index);
         let current_label = match promoted {
-            None => if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
-                TableElemRef::new(TableType::None, 0)
-            } else {
-                original_label
-            },
+            None => {
+                if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
+                    TableElemRef::new(TableType::None, 0)
+                } else {
+                    original_label
+                }
+            }
             Some((symbol, _node_ref)) => symbol
         };
         self.sppf.new_normal_node_with_children(
@@ -1095,7 +1104,8 @@ impl<'l> SPPFBuilder<'l> {
 
     /// Executes the reduction as the reduction of a replaceable variable
     pub fn reduce_replaceable(&mut self, variable_index: usize) -> usize {
-        let reduction = self.reduction
+        let reduction = self
+            .reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
         let mut insertion = 0;
@@ -1226,7 +1236,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
         let mut distances = Vec::<usize>::new();
         let mut found_on_previous_shift = false;
         for shift in self.shifts.iter() {
-            let count = self.automaton
+            let count = self
+                .automaton
                 .get_actions_count(shift.to as u32, terminal_id);
             for i in 0..count {
                 let action = self.automaton.get_action(shift.to as u32, terminal_id, i);
@@ -1237,7 +1248,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                         return Some(0);
                     }
                     // looking at the immediate history, does the context opens from the shift just before?
-                    let contexts2 = self.automaton
+                    let contexts2 = self
+                        .automaton
                         .get_contexts(self.gss.get_represented_state(shift.from));
                     if contexts2.opens(self.get_next_token_id(), context) {
                         // found the context opening on the previous shift (and was not immediately closed by a reduction)
@@ -1253,7 +1265,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
                     let production = self.automaton.get_production(action.get_data() as usize);
                     // looking at the immediate history, does the context opens from the shift just before?
-                    let contexts = self.automaton
+                    let contexts = self
+                        .automaton
                         .get_contexts(self.gss.get_represented_state(shift.from));
                     if contexts.opens(self.get_next_token_id(), context) {
                         if production.reduction_length == 0 {
@@ -1289,7 +1302,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
             for path in paths.iter() {
                 let last_node = path.last_node;
                 let symbol_id = path.labels.as_ref().unwrap()[0].symbol_id;
-                let contexts = self.automaton
+                let contexts = self
+                    .automaton
                     .get_contexts(self.gss.get_represented_state(last_node));
                 // was the context opened on this transition?
                 if contexts.opens(symbol_id, context) {
@@ -1315,7 +1329,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
         let mut queue_gss_heads = Vec::<usize>::new(); // the related GSS head
         let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
         for shift in self.shifts.iter() {
-            let count = self.automaton
+            let count = self
+                .automaton
                 .get_actions_count(shift.to as u32, terminal_id);
             if count > 0 {
                 // enqueue the info, top GSS stack node and target GLR state
@@ -1423,7 +1438,8 @@ impl<'a> RNGLRParserData<'a> {
 
         // first reduction
         {
-            let count = self.automaton
+            let count = self
+                .automaton
                 .get_actions_count(self.gss.get_represented_state(gss_node), terminal.id);
             for j in 0..count {
                 let action = self.automaton.get_action(
@@ -1539,7 +1555,8 @@ impl<'a> RNGLRParserData<'a> {
                 // A node for the target state is already in the GSS
                 self.gss.create_edge(w, shift.from, label);
                 // Look for the new reductions at this state
-                let count = self.automaton
+                let count = self
+                    .automaton
                     .get_actions_count(shift.to as u32, self.get_next_token_id());
                 for i in 0..count {
                     let action =
@@ -1563,7 +1580,8 @@ impl<'a> RNGLRParserData<'a> {
                 let w = self.gss.create_node(shift.to as u32);
                 self.gss.create_edge(w, shift.from, label);
                 // Look for all the reductions and shifts at this state
-                let count = self.automaton
+                let count = self
+                    .automaton
                     .get_actions_count(shift.to as u32, self.get_next_token_id());
                 for i in 0..count {
                     let action =
@@ -1860,7 +1878,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
         };
 
         // Get the target state by transition on the rule's head
-        let to = self.data
+        let to = self
+            .data
             .get_next_by_var(self.data.gss.get_represented_state(path.last_node), head.id)
             .unwrap();
         // Find a node for the target state in the GSS
@@ -1873,7 +1892,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                     self.data.gss.create_edge(w, path.last_node, label);
                     // Look for the new reductions at this state
                     if production.reduction_length != 0 {
-                        let count = self.data
+                        let count = self
+                            .data
                             .automaton
                             .get_actions_count(to, self.data.get_next_token_id());
                         for i in 0..count {
@@ -1883,7 +1903,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                                 i
                             );
                             if action.get_code() == LR_ACTION_CODE_REDUCE {
-                                let new_production = self.data
+                                let new_production = self
+                                    .data
                                     .automaton
                                     .get_production(action.get_data() as usize);
                                 // length 0 reduction are not considered here because they already exist at this point
@@ -1904,7 +1925,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 let w = self.data.gss.create_node(to);
                 self.data.gss.create_edge(w, path.last_node, label);
                 // Look for all the reductions and shifts at this state
-                let count = self.data
+                let count = self
+                    .data
                     .automaton
                     .get_actions_count(to, self.data.get_next_token_id());
                 for i in 0..count {
@@ -1918,7 +1940,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                             to: action.get_data() as usize
                         });
                     } else if action.get_code() == LR_ACTION_CODE_REDUCE {
-                        let new_production = self.data
+                        let new_production = self
+                            .data
                             .automaton
                             .get_production(action.get_data() as usize);
                         if new_production.reduction_length == 0 {
@@ -1962,7 +1985,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
 
     /// Builds the unexpected token error
     fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken {
-        let token = self.builder
+        let token = self
+            .builder
             .lexer
             .get_output()
             .get_token(kernel.index as usize);
@@ -1985,7 +2009,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 // the state was in the stem, also look for reductions
                 for symbol in expected_on_head.reductions.iter() {
                     if !my_expected.contains(symbol)
-                        && self.data
+                        && self
+                            .data
                             .check_is_expected(generation_data.start + i, *symbol)
                     {
                         my_expected.push(*symbol);
@@ -2011,11 +2036,13 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
 
         // bootstrap the shifts and reductions queues
         {
-            let count = self.data
+            let count = self
+                .data
                 .automaton
                 .get_actions_count(0, self.data.get_next_token_id());
             for i in 0..count {
-                let action = self.data
+                let action = self
+                    .data
                     .automaton
                     .get_action(0, self.data.get_next_token_id(), i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {

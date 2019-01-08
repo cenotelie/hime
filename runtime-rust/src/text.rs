@@ -223,9 +223,12 @@ impl Text {
         // gather the start and end indices of the line's content to output
         let mut end = line_index + line_length - 1;
         while end != line_index + 1
-            && (self.content[end] == 0x000A || self.content[end] == 0x000B
-                || self.content[end] == 0x000C || self.content[end] == 0x000D
-                || self.content[end] == 0x0085 || self.content[end] == 0x2028
+            && (self.content[end] == 0x000A
+                || self.content[end] == 0x000B
+                || self.content[end] == 0x000C
+                || self.content[end] == 0x000D
+                || self.content[end] == 0x0085
+                || self.content[end] == 0x2028
                 || self.content[end] == 0x2029)
         {
             end = end - 1;
@@ -343,7 +346,8 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 3 {
                     return None;
                 }
-                ((b0 as u32) & 0b00000111) << 18 | ((others[0] as u32) & 0b00111111) << 12
+                ((b0 as u32) & 0b00000111) << 18
+                    | ((others[0] as u32) & 0b00111111) << 12
                     | ((others[1] as u32) & 0b00111111) << 6
                     | ((others[2] as u32) & 0b00111111)
             }
@@ -353,7 +357,8 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 2 {
                     return None;
                 }
-                ((b0 as u32) & 0b00001111) << 12 | ((others[0] as u32) & 0b00111111) << 6
+                ((b0 as u32) & 0b00001111) << 12
+                    | ((others[0] as u32) & 0b00111111) << 6
                     | ((others[1] as u32) & 0b00111111)
             }
             _ if b0 >> 5 == 0b110 => {
@@ -475,7 +480,7 @@ fn test_text_substring() {
 #[test]
 fn test_read_utf8() {
     let bytes: [u8; 13] = [
-        0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78
+        0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78,
     ];
     let mut content = Vec::<Utf16C>::new();
     let reader = &mut bytes.as_ref();

@@ -36,12 +36,12 @@
 //! extern crate hime_redist;
 //! ```
 
-pub mod utils;
-pub mod text;
-pub mod errors;
-pub mod symbols;
-pub mod tokens;
-pub mod lexers;
 pub mod ast;
-pub mod result;
+pub mod errors;
+pub mod lexers;
 pub mod parsers;
+pub mod result;
+pub mod symbols;
+pub mod text;
+pub mod tokens;
+pub mod utils;

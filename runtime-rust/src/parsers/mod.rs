@@ -17,9 +17,9 @@
 
 //! Module for parsers API
 
-pub mod subtree;
 pub mod lrk;
 pub mod rnglr;
+pub mod subtree;
 
 use super::lexers::ContextProvider;
 use super::symbols::Symbol;

@@ -19,18 +19,18 @@
 
 use std::usize;
 
-use super::*;
-use super::subtree::SubTree;
 use super::super::ast::Ast;
 use super::super::ast::TableElemRef;
 use super::super::ast::TableType;
 use super::super::errors::ParseErrorUnexpectedToken;
-use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::lexers::Lexer;
 use super::super::lexers::TokenKernel;
+use super::super::lexers::DEFAULT_CONTEXT;
 use super::super::symbols::SemanticBody;
 use super::super::symbols::SemanticElement;
 use super::super::symbols::SemanticElementTrait;
+use super::subtree::SubTree;
+use super::*;
 
 /// Represents the LR(k) parsing table and productions
 pub struct LRkAutomaton {
@@ -416,7 +416,8 @@ impl<'a> ContextProvider for LRkParserData<'a> {
         }
         // does the context opens with the terminal?
         if action.get_code() == LR_ACTION_CODE_SHIFT
-            && self.automaton
+            && self
+                .automaton
                 .get_contexts(state)
                 .opens(terminal_id, context)
         {
@@ -466,19 +467,22 @@ impl<'a> ContextProvider for LRkParserData<'a> {
             let length = my_stack.len();
             my_stack.truncate(length - production.reduction_length);
             // this must be a shift
-            action = self.automaton
+            action = self
+                .automaton
                 .get_action(my_stack[my_stack.len() - 1].state, variable.id);
             my_stack.push(LRkHead {
                 state: action.get_data() as u32,
                 identifier: variable.id
             });
             // now, get the new action for the terminal
-            action = self.automaton
+            action = self
+                .automaton
                 .get_action(action.get_data() as u32, terminal_id);
         }
         // is this a shift action that opens the context?
         if action.get_code() == LR_ACTION_CODE_SHIFT
-            && self.automaton
+            && self
+                .automaton
                 .get_contexts(my_stack[my_stack.len() - 1].state)
                 .opens(terminal_id, context)
         {
@@ -496,7 +500,8 @@ impl<'a> LRkParserData<'a> {
     fn check_is_expected(&self, terminal: Symbol) -> bool {
         // copy the stack to use for the simulation
         let mut my_stack = self.stack.clone();
-        let mut action = self.automaton
+        let mut action = self
+            .automaton
             .get_action(my_stack[my_stack.len() - 1].state, terminal.id);
         while action.get_code() != LR_ACTION_CODE_NONE {
             if action.get_code() == LR_ACTION_CODE_SHIFT {
@@ -510,14 +515,16 @@ impl<'a> LRkParserData<'a> {
                 let length = my_stack.len();
                 my_stack.truncate(length - production.reduction_length);
                 // this must be a shift
-                action = self.automaton
+                action = self
+                    .automaton
                     .get_action(my_stack[my_stack.len() - 1].state, variable.id);
                 my_stack.push(LRkHead {
                     state: action.get_data() as u32,
                     identifier: variable.id
                 });
                 // now, get the new action for the terminal
-                action = self.automaton
+                action = self
+                    .automaton
                     .get_action(action.get_data() as u32, terminal.id);
             }
         }
@@ -636,7 +643,8 @@ impl<'l, 'a: 'l> LRkParser<'l, 'a> {
 
     /// Builds the unexpected token error
     fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken {
-        let token = self.builder
+        let token = self
+            .builder
             .lexer
             .get_output()
             .get_token(kernel.index as usize);

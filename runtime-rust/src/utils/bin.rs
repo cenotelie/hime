@@ -24,8 +24,10 @@ pub fn read_u16(buffer: &[u8], index: usize) -> u16 {
 
 /// reads a u32 from an array of bytes
 pub fn read_u32(buffer: &[u8], index: usize) -> u32 {
-    ((buffer[index + 3] as u32) << 24 | (buffer[index + 2] as u32) << 16
-        | (buffer[index + 1] as u32) << 8 | (buffer[index] as u32))
+    ((buffer[index + 3] as u32) << 24
+        | (buffer[index + 2] as u32) << 16
+        | (buffer[index + 1] as u32) << 8
+        | (buffer[index] as u32))
 }
 
 /// Reads a table of u16 from a byte buffer

@@ -28,9 +28,9 @@ use super::text::TextPosition;
 use super::text::TextSpan;
 use super::tokens::Token;
 use super::tokens::TokenRepository;
-use super::utils::EitherMut;
 use super::utils::biglist::BigList;
 use super::utils::iterable::Iterable;
+use super::utils::EitherMut;
 
 /// Represents a type of symbol table
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -266,7 +266,8 @@ impl<'a> Ast<'a> {
         }
         for i in 0..data.nodes.len() {
             let candidate = data.nodes[i];
-            if candidate.count > 0 && node >= candidate.first as usize
+            if candidate.count > 0
+                && node >= candidate.first as usize
                 && node < (candidate.first + candidate.count) as usize
             {
                 return Some(AstNode {

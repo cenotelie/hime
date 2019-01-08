@@ -19,16 +19,16 @@
 
 use std::mem::replace;
 
-use super::automaton::Automaton;
-use super::automaton::AutomatonState;
-use super::automaton::DEAD_STATE;
-use super::automaton::TokenMatch;
 use super::super::errors::ParseErrorEndOfInput;
 use super::super::errors::ParseErrorIncorrectEncodingSequence;
 use super::super::errors::ParseErrorUnexpectedChar;
 use super::super::errors::ParseErrors;
 use super::super::text::Text;
 use super::super::text::Utf16C;
+use super::automaton::Automaton;
+use super::automaton::AutomatonState;
+use super::automaton::TokenMatch;
+use super::automaton::DEAD_STATE;
 
 /// Represents a DFA stack head
 #[derive(Clone)]
@@ -169,10 +169,7 @@ impl FuzzyMatcherResult {
             }
         }
         self.heads.push(FuzzyMatcherHead::new_error(
-            previous,
-            state,
-            offset,
-            distance
+            previous, state, offset, distance,
         ));
     }
 }
@@ -534,10 +531,7 @@ impl<'a> FuzzyMatcher<'a> {
     ) {
         if result.match_head.is_none() {
             result.match_head = Some(FuzzyMatcherHead::new_error(
-                previous,
-                target,
-                offset,
-                distance
+                previous, target, offset, distance,
             ));
             result.match_length = offset;
         } else {
@@ -547,10 +541,7 @@ impl<'a> FuzzyMatcher<'a> {
             let candidate_cl = get_comparable_length(previous, offset - d);
             if candidate_cl > current_cl {
                 result.match_head = Some(FuzzyMatcherHead::new_error(
-                    previous,
-                    target,
-                    offset,
-                    distance
+                    previous, target, offset, distance,
                 ));
                 result.match_length = offset;
             }
