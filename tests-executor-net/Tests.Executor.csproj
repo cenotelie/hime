@@ -21,7 +21,7 @@
     <Title>Hime .Net Tests Executor</Title>
     <Authors>cenotelie</Authors>
     <Description>Executor for tests for the Hime Parser Generator on the .Net platform.</Description>
-    <Copyright>Copyright © Association Cénotélie 2018</Copyright>
+    <Copyright>Copyright © Association Cénotélie 2019</Copyright>
     <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
     <PackageIconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</PackageIconUrl>

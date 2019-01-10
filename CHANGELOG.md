@@ -1,5 +1,14 @@
 # Updates
 
+## 3.4.1
+
+Release in January 10th, 2019
+
+* Fixes:
+    * [Issue #57](https://bitbucket.org/cenotelie/hime/issues/57): Incorrect doc in generated code
+    * [Issue #59](https://bitbucket.org/cenotelie/hime/issues/59): Rust: Support for referencing AST nodes without lifetime
+    * [Issue #60](https://bitbucket.org/cenotelie/hime/issues/60): Rust: Support for getting the index of the token associated to a node
+
 ## 3.4.0
 
 Release in August 9th, 2018.
