@@ -1,6 +1,6 @@
 [package]
 name = "parseit"
-version = "3.4.1"
+version = "3.4.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Command line to parse a piece of input using a packaged parser."
 homepage = "https://cenotelie.fr/projects/hime"
@@ -10,7 +10,7 @@ categories = ["algorithms", "parsing", "parser-implementations", "text-processin
 license = "LGPL-3.0"
 
 [dependencies]
-hime_redist = "3.4.1"
+hime_redist = "3.4.2"
 libloading = "0.4.3"
 
 [patch.crates-io]
