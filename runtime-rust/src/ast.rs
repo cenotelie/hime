@@ -221,6 +221,14 @@ impl<'a> Ast<'a> {
         }
     }
 
+    /// Gets a specific node in this tree
+    pub fn get_node(&self, id: usize) -> AstNode {
+        AstNode {
+            tree: self,
+            index: id
+        }
+    }
+
     /// Gets the AST node (if any) that has the specified token as label
     pub fn find_node_for(&self, token: &Token<'a>) -> Option<AstNode> {
         let data = self.data.get();
@@ -316,6 +324,11 @@ pub struct AstNode<'a> {
 }
 
 impl<'a> AstNode<'a> {
+    /// Gets the identifier of this node
+    pub fn id(&self) -> usize {
+        self.index
+    }
+
     /// Gets the parent of this node, if any
     pub fn parent(&self) -> Option<AstNode> {
         self.tree.find_parent_of(self.index)
