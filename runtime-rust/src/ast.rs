@@ -329,6 +329,15 @@ impl<'a> AstNode<'a> {
         self.index
     }
 
+    /// Gets the index of the token born by this node, if any
+    pub fn get_token_index(&self) -> Option<usize> {
+        let cell = self.tree.data.get().nodes[self.index];
+        match cell.label.get_type() {
+            TableType::Token => Some(cell.label.get_index()),
+            _ => None
+        }
+    }
+
     /// Gets the parent of this node, if any
     pub fn parent(&self) -> Option<AstNode> {
         self.tree.find_parent_of(self.index)
