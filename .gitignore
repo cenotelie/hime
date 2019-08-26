@@ -1,12 +1,10 @@
-syntax: regexp
-
 # .Net build folders
-.*/bin/.*
-.*/obj/.*
+**/bin/
+**/obj/
 # Maven build folders
-.*/target/.*
-.*/out/.*
-.*\.class
+**/target/
+**/out/
+.class
 # Python binaries
 .*/__pycache__/.*
 .*\.pyc
@@ -15,11 +13,11 @@ Cargo.lock
 
 
 # Visual Studio / Mono
-.*\.suo
-.*\.userprefs
+.suo
+.userprefs
 # IntelliJ / PyCharm
-.*/.idea/.*
-.*\.iml
+**/.idea
+.iml
 
 # GEdit temp file
-.*~
+*~
