@@ -27,9 +27,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:hg:https://bitbucket.org/cenotelie/hime</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org:cenotelie/hime</developerConnection>
-        <url>https://bitbucket.org/cenotelie/hime</url>
+        <connection>scm:git:https://github.com/cenotelie/hime</connection>
+        <developerConnection>scm:git:ssh://git@github.com:cenotelie/hime</developerConnection>
+        <url>https://github.com/cenotelie/hime</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
@@ -37,6 +37,10 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
     <dependencies>
         <dependency>
@@ -90,7 +94,7 @@
                     </archive>
                     <instructions>
                         <XOWL-Product-Link>${project.url}</XOWL-Product-Link>
-                        <XOWL-SCM-Tag>${changeSet}</XOWL-SCM-Tag>
+                        <XOWL-SCM-Tag>${buildNumber}</XOWL-SCM-Tag>
                         <XOWL-Build-Tag>${env.BUILD_TAG}</XOWL-Build-Tag>
                         <XOWL-Build-Timestamp>${timestamp}</XOWL-Build-Timestamp>
                     </instructions>
@@ -118,7 +122,7 @@
                         <id>generate-changeset</id>
                         <phase>validate</phase>
                         <goals>
-                            <goal>hgchangeset</goal>
+                            <goal>create</goal>
                         </goals>
                     </execution>
                     <execution>

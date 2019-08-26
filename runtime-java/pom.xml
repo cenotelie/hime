@@ -27,9 +27,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:hg:https://bitbucket.org/cenotelie/hime</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org:cenotelie/hime</developerConnection>
-        <url>https://bitbucket.org/cenotelie/hime</url>
+        <connection>scm:git:https://github.com/cenotelie/hime</connection>
+        <developerConnection>scm:git:ssh://git@github.com:cenotelie/hime</developerConnection>
+        <url>https://github.com/cenotelie/hime</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
@@ -37,6 +37,10 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
     <build>
         <plugins>
@@ -133,7 +137,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Product-Link>${project.url}</Bundle-Product-Link>
-                        <Bundle-SCM-Tag>${changeSet}</Bundle-SCM-Tag>
+                        <Bundle-SCM-Tag>${buildNumber}</Bundle-SCM-Tag>
                         <Bundle-Build-Tag>${env.BUILD_TAG}</Bundle-Build-Tag>
                         <Bundle-Build-Timestamp>${timestamp}</Bundle-Build-Timestamp>
                     </instructions>
@@ -147,6 +151,7 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
@@ -158,7 +163,7 @@
                         <id>generate-changeset</id>
                         <phase>validate</phase>
                         <goals>
-                            <goal>hgchangeset</goal>
+                            <goal>create</goal>
                         </goals>
                     </execution>
                     <execution>
