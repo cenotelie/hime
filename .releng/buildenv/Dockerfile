@@ -46,6 +46,10 @@ ENV RUST_BACKTRACE=1
 # Setup ownership/permissions
 RUN chmod -R a+rwX /home/builder
 
+# Environment
+ENV HOME=/home/builder
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
 # Specify volumes
 VOLUME /src
 VOLUME /home/builder/.cargo/registry

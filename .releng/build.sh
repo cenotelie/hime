@@ -52,9 +52,9 @@ echo "-- Building Tests Driver --"
 dotnet restore "$ROOT/tests-driver"
 (export FrameworkPathOverride="$MONO461"; dotnet build "$ROOT/tests-driver" -c Release -f net461)
 echo "-- Building Hime Redist for Java --"
-mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true
+mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true -Duser.home="$HOME"
 echo "-- Building Test Executor for Java --"
-mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true
+mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true -Duser.home="$HOME"
 echo "-- Building Hime Redist for Rust --"
 cargo clean --manifest-path "$ROOT/runtime-rust/Cargo.toml"
 cargo update --manifest-path "$ROOT/runtime-rust/Cargo.toml"
