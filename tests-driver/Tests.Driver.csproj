@@ -24,9 +24,9 @@
     <Copyright>Copyright © Association Cénotélie 2019</Copyright>
     <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
-    <PackageIconUrl>https://bitbucket.org/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
     <PackageTags>parser generator lr glr rnglr</PackageTags>
-    <RepositoryUrl>https://bitbucket.org/cenotelie/hime</RepositoryUrl>
+    <RepositoryUrl>https://github.com/cenotelie/hime</RepositoryUrl>
     <RepositoryType>hg</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <IncludeSource>true</IncludeSource>

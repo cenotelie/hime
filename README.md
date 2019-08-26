@@ -31,12 +31,12 @@ The parser generator (himecc) can run on:
 * [.Net SDK on NuGet](https://www.nuget.org/packages/Hime.Redist/)
 * [Java Runtime on Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fr.cenotelie.hime%22)
 * [Rust Runtime on crates.io](https://crates.io/crates/hime_redist)
-* [Downloadable distribution](https://bitbucket.org/cenotelie/hime/downloads/), including all runtimes and the generator (himecc).
+* [Downloadable distribution](https://github.com/cenotelie/hime/downloads/), including all runtimes and the generator (himecc).
 
 ## How do I use this software? ##
 
 * [Complete user documentation](https://cenotelie.fr/projects/hime)
-* [Grammar library](https://bitbucket.org/cenotelie/hime-grams)
+* [Grammar library](https://github.com/cenotelie/hime-grams)
 
 
 ## Repository structure ##
@@ -87,10 +87,10 @@ The results are output in the JUnit format in `TestResults.xml` at the repositor
 
 The simplest way to contribute is to:
 
-* Fork this repository on [Bitbucket](https://bitbucket.org/cenotelie/hime).
-* Fix [some issue](https://bitbucket.org/cenotelie/hime/issues?status=new&status=open) or implement a new feature.
-* Create a merge request on Bitbucket.
+* Fork this repository on [GitHub](https://github.com/cenotelie/hime).
+* Fix [some issue](https://github.com/cenotelie/hime/issues?status=new&status=open) or implement a new feature.
+* Create a merge request on GitHub.
 
-Patches can also be submitted by email, or through the [issue management system](https://bitbucket.org/cenotelie/hime/issues).
+Patches can also be submitted by email, or through the [issue management system](https://github.com/cenotelie/hime/issues).
 
-The [isse tracker](https://bitbucket.org/cenotelie/hime/issues) contains tickets that are accessible to newcomers. Look for tickets with `[beginner]` in the title. These tickets are good ways to become more familiar with the project and the codebase.
+The [isse tracker](https://github.com/cenotelie/hime/issues) contains tickets that are accessible to newcomers. Look for tickets with `[beginner]` in the title. These tickets are good ways to become more familiar with the project and the codebase.

@@ -1,5 +1,5 @@
 Hime Parser Generator
-https://bitbucket.org/cenotelie/hime/
+https://github.com/cenotelie/hime/
 
 The Hime parser generator is a parser generator for the .Net platform (including Mono on Linux and MacOS) and Java.
 It primarily supports the LR family of parsing methods, including GLR (Generalized-LR).

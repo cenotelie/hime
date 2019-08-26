@@ -27,17 +27,11 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:hg:https://bitbucket.org/cenotelie/hime</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org:cenotelie/hime</developerConnection>
-        <url>https://bitbucket.org/cenotelie/hime</url>
+        <connection>scm:hg:https://github.com/cenotelie/hime</connection>
+        <developerConnection>scm:hg:ssh://hg@github.org:cenotelie/hime</developerConnection>
+        <url>https://github.com/cenotelie/hime</url>
         <tag>HEAD</tag>
     </scm>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>fr.cenotelie.hime</groupId>
