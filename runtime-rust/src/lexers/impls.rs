@@ -43,7 +43,7 @@ fn run_fuzzy_matcher<'a>(
     errors: &mut ParseErrors,
     origin_index: usize
 ) -> Option<TokenMatch> {
-    if recovery <= 0 {
+    if recovery == 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.get_input().get_position_at(origin_index),
             [repository.get_input().at(origin_index), 0]
@@ -123,7 +123,7 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     }
 
     /// Gets the next token in the input
-    fn get_next_token(&mut self, _contexts: &ContextProvider) -> Option<TokenKernel> {
+    fn get_next_token(&mut self, _contexts: &dyn ContextProvider) -> Option<TokenKernel> {
         if !self.has_run {
             // lex all tokens now
             self.find_tokens();
@@ -259,7 +259,7 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     }
 
     /// Gets the next token in the input
-    fn get_next_token(&mut self, contexts: &ContextProvider) -> Option<TokenKernel> {
+    fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel> {
         if self.has_run {
             return None;
         }
@@ -338,7 +338,7 @@ impl<'a> ContextSensitiveLexer<'a> {
     }
 
     /// Gets the index of the terminal with the highest priority that is possible in the contexts
-    fn get_terminal_for(&self, state: u32, contexts: &ContextProvider) -> u16 {
+    fn get_terminal_for(&self, state: u32, contexts: &dyn ContextProvider) -> u16 {
         let state_data = self.automaton.get_state(state);
         let mut matched = state_data.get_terminal(0);
         let mut result = matched.index;

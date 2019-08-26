@@ -92,47 +92,47 @@ pub enum SemanticElement<'a> {
 
 impl<'a> SemanticElementTrait for SemanticElement<'a> {
     fn get_position(&self) -> Option<TextPosition> {
-        match self {
-            &SemanticElement::Token(ref token) => token.get_position(),
-            &SemanticElement::Terminal(ref _symbol) => None,
-            &SemanticElement::Variable(ref _symbol) => None,
-            &SemanticElement::Virtual(ref _symbol) => None
+        match *self {
+            SemanticElement::Token(ref token) => token.get_position(),
+            SemanticElement::Terminal(ref _symbol) => None,
+            SemanticElement::Variable(ref _symbol) => None,
+            SemanticElement::Virtual(ref _symbol) => None
         }
     }
 
     fn get_span(&self) -> Option<TextSpan> {
-        match self {
-            &SemanticElement::Token(ref token) => token.get_span(),
-            &SemanticElement::Terminal(ref _symbol) => None,
-            &SemanticElement::Variable(ref _symbol) => None,
-            &SemanticElement::Virtual(ref _symbol) => None
+        match *self {
+            SemanticElement::Token(ref token) => token.get_span(),
+            SemanticElement::Terminal(ref _symbol) => None,
+            SemanticElement::Variable(ref _symbol) => None,
+            SemanticElement::Virtual(ref _symbol) => None
         }
     }
 
     fn get_context(&self) -> Option<TextContext> {
-        match self {
-            &SemanticElement::Token(ref token) => token.get_context(),
-            &SemanticElement::Terminal(ref _symbol) => None,
-            &SemanticElement::Variable(ref _symbol) => None,
-            &SemanticElement::Virtual(ref _symbol) => None
+        match *self {
+            SemanticElement::Token(ref token) => token.get_context(),
+            SemanticElement::Terminal(ref _symbol) => None,
+            SemanticElement::Variable(ref _symbol) => None,
+            SemanticElement::Virtual(ref _symbol) => None
         }
     }
 
     fn get_symbol(&self) -> Symbol {
-        match self {
-            &SemanticElement::Token(ref token) => token.get_symbol(),
-            &SemanticElement::Terminal(ref symbol) => *symbol,
-            &SemanticElement::Variable(ref symbol) => *symbol,
-            &SemanticElement::Virtual(ref symbol) => *symbol
+        match *self {
+            SemanticElement::Token(ref token) => token.get_symbol(),
+            SemanticElement::Terminal(ref symbol) => *symbol,
+            SemanticElement::Variable(ref symbol) => *symbol,
+            SemanticElement::Virtual(ref symbol) => *symbol
         }
     }
 
     fn get_value(&self) -> Option<String> {
-        match self {
-            &SemanticElement::Token(ref token) => token.get_value(),
-            &SemanticElement::Terminal(ref _symbol) => None,
-            &SemanticElement::Variable(ref _symbol) => None,
-            &SemanticElement::Virtual(ref _symbol) => None
+        match *self {
+            SemanticElement::Token(ref token) => token.get_value(),
+            SemanticElement::Terminal(ref _symbol) => None,
+            SemanticElement::Variable(ref _symbol) => None,
+            SemanticElement::Virtual(ref _symbol) => None
         }
     }
 }
@@ -140,11 +140,11 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
 impl<'a> SemanticElement<'a> {
     /// Gets the type of the associated symbol
     pub fn get_symbol_type(&self) -> SymbolType {
-        match self {
-            &SemanticElement::Token(ref _token) => SymbolType::Terminal,
-            &SemanticElement::Terminal(ref _symbol) => SymbolType::Terminal,
-            &SemanticElement::Variable(ref _symbol) => SymbolType::Variable,
-            &SemanticElement::Virtual(ref _symbol) => SymbolType::Virtual
+        match *self {
+            SemanticElement::Token(ref _token) => SymbolType::Terminal,
+            SemanticElement::Terminal(ref _symbol) => SymbolType::Terminal,
+            SemanticElement::Variable(ref _symbol) => SymbolType::Variable,
+            SemanticElement::Virtual(ref _symbol) => SymbolType::Virtual
         }
     }
 }
@@ -159,4 +159,4 @@ pub trait SemanticBody {
 }
 
 /// Delegate for a user-defined semantic action
-pub type SemanticAction = FnMut(Symbol, &SemanticBody);
+pub type SemanticAction = dyn FnMut(Symbol, &dyn SemanticBody);

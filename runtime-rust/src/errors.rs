@@ -22,10 +22,10 @@ use std::fmt::Error;
 use std::fmt::Formatter;
 use std::ops::Index;
 
-use symbols::Symbol;
-use text::TextPosition;
-use text::Utf16C;
-use utils::iterable::Iterable;
+use crate::symbols::Symbol;
+use crate::text::TextPosition;
+use crate::text::Utf16C;
+use crate::utils::iterable::Iterable;
 
 /// Common trait for data about an error
 pub trait ParseErrorDataTrait {
@@ -49,7 +49,7 @@ pub struct ParseErrorEndOfInput {
 impl ParseErrorDataTrait for ParseErrorEndOfInput {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
-        *(&self.position)
+        self.position
     }
 
     /// Gets the error's length in the input (in number of characters)
@@ -82,7 +82,7 @@ pub struct ParseErrorUnexpectedChar {
 impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
-        *(&self.position)
+        self.position
     }
 
     /// Gets the error's length in the input (in number of characters)
@@ -103,8 +103,8 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
             result.push_str("' (U+");
             result.push_str(&format!("{:X}", self.unexpected[0]));
         } else {
-            let lead = self.unexpected[0] as u32;
-            let trail = self.unexpected[1] as u32;
+            let lead = u32::from(self.unexpected[0]);
+            let trail = u32::from(self.unexpected[1]);
             let cp = ((trail - 0xDC00) | ((lead - 0xD800) << 10)) + 0x10000;
             result.push_str(&String::from_utf16(&self.unexpected).unwrap());
             result.push_str("' (U+");
@@ -139,7 +139,7 @@ pub struct ParseErrorIncorrectEncodingSequence {
 impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
-        *(&self.position)
+        self.position
     }
 
     /// Gets the error's length in the input (in number of characters)
@@ -198,7 +198,7 @@ pub struct ParseErrorUnexpectedToken {
 impl ParseErrorDataTrait for ParseErrorUnexpectedToken {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
-        *(&self.position)
+        self.position
     }
 
     /// Gets the error's length in the input (in number of characters)
@@ -212,7 +212,7 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedToken {
         result.push_str("Unexpected token \"");
         result.push_str(&self.value);
         result.push_str("\"");
-        if self.expected.len() > 0 {
+        if !self.expected.is_empty() {
             result.push_str("; expected: ");
             for (i, x) in self.expected.iter().enumerate() {
                 if i != 0 {
@@ -262,34 +262,34 @@ pub enum ParseError {
 impl ParseErrorDataTrait for ParseError {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
-        match self {
-            &ParseError::UnexpectedEndOfInput(ref x) => x.get_position(),
-            &ParseError::UnexpectedChar(ref x) => x.get_position(),
-            &ParseError::UnexpectedToken(ref x) => x.get_position(),
-            &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_position(),
-            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_position()
+        match *self {
+            ParseError::UnexpectedEndOfInput(ref x) => x.get_position(),
+            ParseError::UnexpectedChar(ref x) => x.get_position(),
+            ParseError::UnexpectedToken(ref x) => x.get_position(),
+            ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_position(),
+            ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_position()
         }
     }
 
     /// Gets the error's length in the input (in number of characters)
     fn get_length(&self) -> usize {
-        match self {
-            &ParseError::UnexpectedEndOfInput(ref x) => x.get_length(),
-            &ParseError::UnexpectedChar(ref x) => x.get_length(),
-            &ParseError::UnexpectedToken(ref x) => x.get_length(),
-            &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_length(),
-            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_length()
+        match *self {
+            ParseError::UnexpectedEndOfInput(ref x) => x.get_length(),
+            ParseError::UnexpectedChar(ref x) => x.get_length(),
+            ParseError::UnexpectedToken(ref x) => x.get_length(),
+            ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_length(),
+            ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_length()
         }
     }
 
     /// Gets the error's message
     fn get_message(&self) -> String {
-        match self {
-            &ParseError::UnexpectedEndOfInput(ref x) => x.get_message(),
-            &ParseError::UnexpectedChar(ref x) => x.get_message(),
-            &ParseError::UnexpectedToken(ref x) => x.get_message(),
-            &ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_message(),
-            &ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_message()
+        match *self {
+            ParseError::UnexpectedEndOfInput(ref x) => x.get_message(),
+            ParseError::UnexpectedChar(ref x) => x.get_message(),
+            ParseError::UnexpectedToken(ref x) => x.get_message(),
+            ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_message(),
+            ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_message()
         }
     }
 }
@@ -301,6 +301,7 @@ impl Display for ParseError {
 }
 
 /// Represents an entity that can handle lexical and syntactic errors
+#[derive(Default)]
 pub struct ParseErrors {
     /// The overall errors
     errors: Vec<ParseError>
@@ -377,7 +378,7 @@ impl<'a> Iterator for ParseErrorsIterator<'a> {
             None
         } else {
             let result = &self.parent[self.index];
-            self.index = self.index + 1;
+            self.index += 1;
             Some(result)
         }
     }

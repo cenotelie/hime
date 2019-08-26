@@ -95,7 +95,7 @@ impl RNGLRAutomaton {
         let mut cells = Vec::<RNGLRAutomatonCell>::with_capacity(columns_count * states_count);
         for _i in 0..(columns_count * states_count) {
             cells.push(RNGLRAutomatonCell {
-                count: read_u16(data, index) as u32,
+                count: u32::from(read_u16(data, index)),
                 index: read_u32(data, index + 2)
             });
             index += 6;
@@ -399,7 +399,7 @@ impl GSS {
 
     /// Retrieve the generation of the given node in this GSS
     fn get_generation_of(&self, node: usize) -> usize {
-        for i in (0..self.current_generation + 1).rev() {
+        for i in (0..=self.current_generation).rev() {
             let data = self.node_generations[i];
             if node >= data.start && node < data.start + data.count {
                 return i;
@@ -434,12 +434,12 @@ impl GSS {
                 for e in gen.start..(gen.start + gen.count) {
                     let edge = self.edges[e];
                     if edge.from as usize == last {
-                        match &first_edge {
-                            &None => {
+                        match first_edge {
+                            None => {
                                 // This is the first edge
                                 first_edge = Some(edge);
                             }
-                            &Some(_x) => {
+                            Some(_x) => {
                                 // Not the first edge
                                 // Clone and extend the new path
                                 let new_path = GSSPath::from(
@@ -517,7 +517,7 @@ impl SPPFNodeVersion {
     }
 
     /// Initializes this node version
-    pub fn from(label: TableElemRef, buffer: &Vec<SPPFNodeRef>, count: usize) -> SPPFNodeVersion {
+    pub fn from(label: TableElemRef, buffer: &[SPPFNodeRef], count: usize) -> SPPFNodeVersion {
         if count == 0 {
             SPPFNodeVersion {
                 label,
@@ -525,8 +525,8 @@ impl SPPFNodeVersion {
             }
         } else {
             let mut children = Vec::<SPPFNodeRef>::with_capacity(count);
-            for i in 0..count {
-                children.push(buffer[i]);
+            for x in buffer.iter().take(count) {
+                children.push(*x);
             }
             SPPFNodeVersion {
                 label,
@@ -537,9 +537,9 @@ impl SPPFNodeVersion {
 
     /// Gets the number of children
     pub fn len(&self) -> usize {
-        match &self.children {
-            &None => 0,
-            &Some(ref children) => children.len()
+        match self.children {
+            None => 0,
+            Some(ref children) => children.len()
         }
     }
 }
@@ -581,7 +581,7 @@ impl SPPFNodeNormal {
     pub fn new_with_children(
         original: TableElemRef,
         label: TableElemRef,
-        buffer: &Vec<SPPFNodeRef>,
+        buffer: &[SPPFNodeRef],
         count: usize
     ) -> SPPFNodeNormal {
         let mut versions = Vec::<SPPFNodeVersion>::new();
@@ -593,7 +593,7 @@ impl SPPFNodeNormal {
     pub fn new_version(
         &mut self,
         label: TableElemRef,
-        buffer: &Vec<SPPFNodeRef>,
+        buffer: &[SPPFNodeRef],
         count: usize
     ) -> usize {
         let result = self.versions.len();
@@ -624,8 +624,8 @@ impl SPPFNodeReplaceable {
     /// Initializes this node
     pub fn new(
         label: TableElemRef,
-        children_buffer: &Vec<SPPFNodeRef>,
-        actions_buffer: &Vec<TreeAction>,
+        children_buffer: &[SPPFNodeRef],
+        actions_buffer: &[TreeAction],
         count: usize
     ) -> SPPFNodeReplaceable {
         if count == 0 {
@@ -661,9 +661,9 @@ enum SPPFNode {
 
 impl SPPFNodeTrait for SPPFNode {
     fn get_original_symbol(&self) -> TableElemRef {
-        match self {
-            &SPPFNode::Normal(ref node) => node.original,
-            &SPPFNode::Replaceable(ref node) => node.original
+        match *self {
+            SPPFNode::Normal(ref node) => node.original,
+            SPPFNode::Replaceable(ref node) => node.original
         }
     }
 }
@@ -671,24 +671,24 @@ impl SPPFNodeTrait for SPPFNode {
 impl SPPFNode {
     /// Gets this node as a normal node
     pub fn as_normal(&self) -> &SPPFNodeNormal {
-        match self {
-            &SPPFNode::Normal(ref node) => node,
-            &SPPFNode::Replaceable(ref _node) => panic!("Expected a normal node")
+        match *self {
+            SPPFNode::Normal(ref node) => node,
+            SPPFNode::Replaceable(ref _node) => panic!("Expected a normal node")
         }
     }
 
     /// Gets this node as a normal node
     pub fn as_normal_mut(&mut self) -> &mut SPPFNodeNormal {
-        match self {
-            &mut SPPFNode::Normal(ref mut node) => node,
-            &mut SPPFNode::Replaceable(ref _node) => panic!("Expected a normal node")
+        match *self {
+            SPPFNode::Normal(ref mut node) => node,
+            SPPFNode::Replaceable(ref _node) => panic!("Expected a normal node")
         }
     }
 }
 
 /// Represents the epsilon node
 const EPSILON: GSSLabel = GSSLabel {
-    sppf_node: 0xFFFFFFFF,
+    sppf_node: 0xFFFF_FFFF,
     symbol_id: SID_EPSILON
 };
 
@@ -729,13 +729,13 @@ impl SPPF {
         &mut self,
         original: TableElemRef,
         label: TableElemRef,
-        buffer: &Vec<SPPFNodeRef>,
+        buffer: &[SPPFNodeRef],
         count: usize
     ) -> usize {
         let identifier = self.nodes.len();
         self.nodes
             .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
-                original, label, buffer, count,
+                original, label, buffer, count
             )));
         identifier
     }
@@ -744,8 +744,8 @@ impl SPPF {
     pub fn new_replaceable_node(
         &mut self,
         label: TableElemRef,
-        children_buffer: &Vec<SPPFNodeRef>,
-        actions_buffer: &Vec<TreeAction>,
+        children_buffer: &[SPPFNodeRef],
+        actions_buffer: &[TreeAction],
         count: usize
     ) -> usize {
         let identifier = self.nodes.len();
@@ -789,7 +789,7 @@ struct SPPFReduction {
 /// However we only need to build one of the variant, i.e. an AST for the user.
 struct SPPFBuilder<'l> {
     /// Lexer associated to this parser
-    lexer: &'l mut Lexer<'l>,
+    lexer: &'l mut dyn Lexer<'l>,
     /// The history
     history: Vec<HistoryPart>,
     /// The SPPF being built
@@ -834,7 +834,7 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
 
 impl<'l> SPPFBuilder<'l> {
     /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
+    pub fn new(lexer: &'l mut dyn Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
         SPPFBuilder {
             lexer,
             history: Vec::<HistoryPart>::new(),
@@ -857,9 +857,9 @@ impl<'l> SPPFBuilder<'l> {
     /// Adds the specified GSS label to the current history
     pub fn add_to_history(&mut self, generation: usize, label: usize) {
         let my_history = &mut self.history;
-        for i in 0..my_history.len() {
-            if my_history[i].generation == generation {
-                my_history[i].data.push(label);
+        for item in my_history.iter_mut() {
+            if item.generation == generation {
+                item.data.push(label);
                 return;
             }
         }
@@ -921,16 +921,16 @@ impl<'l> SPPFBuilder<'l> {
             return;
         }
         let node = sppf.get_node(sppf_node);
-        match node {
-            &SPPFNode::Normal(ref normal) => {
+        match *node {
+            SPPFNode::Normal(ref normal) => {
                 // this is a simple reference to an existing SPPF node
                 SPPFBuilder::reduction_add_to_cache_node(reduction, normal, sppf_node, action);
             }
-            &SPPFNode::Replaceable(ref replaceable) => {
+            SPPFNode::Replaceable(ref replaceable) => {
                 // this is replaceable sub-tree
-                match &replaceable.children {
-                    &None => {}
-                    &Some(ref children) => {
+                match replaceable.children {
+                    None => {}
+                    Some(ref children) => {
                         let actions = replaceable.actions.as_ref().unwrap();
                         for i in 0..children.len() {
                             SPPFBuilder::reduction_add_to_cache(
@@ -962,9 +962,9 @@ impl<'l> SPPFBuilder<'l> {
         reduction.handle_indices.push(reduction.cache.len() - 1);
         reduction.handle_actions.push(action);
         // copy the children
-        match &node.versions[0].children {
-            &None => {}
-            &Some(ref children) => {
+        match node.versions[0].children {
+            None => {}
+            Some(ref children) => {
                 for child in children.iter() {
                     reduction.cache.push(*child);
                 }
@@ -1108,12 +1108,10 @@ impl<'l> SPPFBuilder<'l> {
             .reduction
             .as_mut()
             .unwrap_or_else(|| panic!("Not in a reduction"));
-        let mut insertion = 0;
         for i in 0..reduction.handle_indices.len() {
-            if insertion != reduction.handle_indices[i] {
-                reduction.cache[insertion] = reduction.cache[reduction.handle_indices[i]];
+            if i != reduction.handle_indices[i] {
+                reduction.cache[i] = reduction.cache[reduction.handle_indices[i]];
             }
-            insertion += 1;
         }
         let label = TableElemRef::new(TableType::Variable, variable_index);
         self.sppf.new_replaceable_node(
@@ -1143,16 +1141,16 @@ impl<'l> SPPFBuilder<'l> {
     fn build_final_ast(sppf: &SPPF, reference: SPPFNodeRef, result: &mut Ast) -> AstCell {
         let node = sppf.get_node(reference.node_id as usize).as_normal();
         let version = &node.versions[reference.version as usize];
-        match &version.children {
-            &None => AstCell {
+        match version.children {
+            None => AstCell {
                 label: version.label,
                 first: 0,
                 count: 0
             },
-            &Some(ref children) => {
+            Some(ref children) => {
                 let mut buffer = Vec::<AstCell>::with_capacity(children.len());
-                for i in 0..children.len() {
-                    buffer.push(SPPFBuilder::build_final_ast(sppf, children[i], result));
+                for child in children.iter() {
+                    buffer.push(SPPFBuilder::build_final_ast(sppf, *child, result));
                 }
                 let first = result.store(&buffer, 0, buffer.len());
                 AstCell {
@@ -1203,13 +1201,14 @@ struct RNGLRParserData<'a> {
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
-    actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
+    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
 }
 
 impl<'a> ContextProvider for RNGLRParserData<'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
+    #[allow(clippy::cognitive_complexity)]
     fn get_context_priority(
         &self,
         token_count: usize,
@@ -1259,7 +1258,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     // no, enqueue
                     if !queue.contains(&shift.from) {
                         queue.push(shift.from);
-                        productions.push(0xFFFFFFFF);
+                        productions.push(0xFFFF_FFFF);
                         distances.push(2);
                     }
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
@@ -1268,12 +1267,12 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     let contexts = self
                         .automaton
                         .get_contexts(self.gss.get_represented_state(shift.from));
-                    if contexts.opens(self.get_next_token_id(), context) {
-                        if production.reduction_length == 0 {
-                            // the reduction does not close the context
-                            found_on_previous_shift = true;
-                            break;
-                        }
+                    if contexts.opens(self.get_next_token_id(), context)
+                        && production.reduction_length == 0
+                    {
+                        // the reduction does not close the context
+                        found_on_previous_shift = true;
+                        break;
                     }
                     // no, enqueue
                     if !queue.contains(&shift.from) {
@@ -1307,7 +1306,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     .get_contexts(self.gss.get_represented_state(last_node));
                 // was the context opened on this transition?
                 if contexts.opens(symbol_id, context) {
-                    if production == 0xFFFFFFFF {
+                    if production == 0xFFFF_FFFF {
                         return Some(distance);
                     }
                     let production_data = self.automaton.get_production(production);
@@ -1422,9 +1421,9 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
 impl<'a> RNGLRParserData<'a> {
     /// Gets the terminal's identifier for the next token
     fn get_next_token_id(&self) -> u32 {
-        match &self.next_token {
-            &None => SID_EPSILON,
-            &Some(ref kernel) => kernel.terminal_id
+        match self.next_token {
+            None => SID_EPSILON,
+            Some(ref kernel) => kernel.terminal_id
         }
     }
 
@@ -1532,7 +1531,7 @@ impl<'a> RNGLRParserData<'a> {
             i += 1;
         }
         // nope, that was a pathological case in a LALR graph
-        return false;
+        false
     }
 
     /// Gets the next RNGLR state by a shift with the given variable ID
@@ -1541,7 +1540,7 @@ impl<'a> RNGLRParserData<'a> {
         for i in 0..count {
             let action = self.automaton.get_action(state, variable_id, i);
             if action.get_code() == LR_ACTION_CODE_SHIFT {
-                return Some(action.get_data() as u32);
+                return Some(u32::from(action.get_data()));
             }
         }
         None
@@ -1629,10 +1628,10 @@ pub struct RNGLRParser<'l, 'a: 'l> {
 impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'l mut Lexer<'l>,
+        lexer: &'l mut dyn Lexer<'l>,
         automaton: RNGLRAutomaton,
         ast: Ast<'l>,
-        actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> RNGLRParser<'l, 'a> {
         let mut parser = RNGLRParser {
             data: RNGLRParserData {
@@ -1660,13 +1659,13 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     /// Builds the constant sub-trees of nullable variables
     fn build_nullables(
         builder: &mut SPPFBuilder<'l>,
-        actions: &mut FnMut(usize, Symbol, &SemanticBody),
+        actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &mut Vec<usize>,
         automaton: &RNGLRAutomaton,
         variables: &[Symbol]
     ) {
         for _i in 0..variables.len() {
-            nullables.push(0xFFFFFFFF);
+            nullables.push(0xFFFF_FFFF);
         }
 
         // Get the dependency table
@@ -1771,8 +1770,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     /// Builds the SPPF
     fn build_sppf(
         builder: &mut SPPFBuilder<'l>,
-        actions: &mut FnMut(usize, Symbol, &SemanticBody),
-        nullables: &Vec<usize>,
+        actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
+        nullables: &[usize],
         generation: usize,
         production: &LRProduction,
         first: GSSLabel,
@@ -1840,8 +1839,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                     .get_paths(reduction.node, production.reduction_length - 1)
             }
         };
-        for i in 0..paths.len() {
-            self.parse_reduction_path(generation, reduction, &paths[i]);
+        for path in &paths {
+            self.parse_reduction_path(generation, reduction, path);
         }
     }
 
@@ -2093,6 +2092,5 @@ impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
             }
         }
         // At end of input but was still waiting for tokens
-        return;
     }
 }

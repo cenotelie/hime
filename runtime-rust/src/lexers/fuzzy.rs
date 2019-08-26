@@ -66,8 +66,8 @@ impl FuzzyMatcherHead {
         let mut errors = Vec::<u32>::with_capacity(distance);
         if previous.errors.is_some() {
             let others = previous.errors.as_ref().unwrap();
-            for i in 0..others.len() {
-                errors.push(others[i]);
+            for x in others.iter() {
+                errors.push(*x);
             }
         }
         while errors.len() < distance {
@@ -169,7 +169,7 @@ impl FuzzyMatcherResult {
             }
         }
         self.heads.push(FuzzyMatcherHead::new_error(
-            previous, state, offset, distance,
+            previous, state, offset, distance
         ));
     }
 }
@@ -212,7 +212,7 @@ impl<'a> FuzzyMatcher<'a> {
                 self.inspect(&mut result, &head_begin, offset, current);
             }
         }
-        while result.heads.len() > 0 {
+        while !result.heads.is_empty() {
             offset += 1;
             at_end = self.text.is_end(self.origin_index + offset);
             current = if at_end {
@@ -348,7 +348,7 @@ impl<'a> FuzzyMatcher<'a> {
         let state_data = self.automaton.get_state(head.state);
         // is it a matching state
         if state_data.get_terminals_count() > 0
-            && state_data.get_terminal(0).index as u32 != self.separator
+            && u32::from(state_data.get_terminal(0).index) != self.separator
         {
             self.on_matching_head(result, head, offset);
         }
@@ -370,7 +370,7 @@ impl<'a> FuzzyMatcher<'a> {
         let state_data = self.automaton.get_state(head.state);
         // is it a matching state
         if state_data.get_terminals_count() > 0
-            && state_data.get_terminal(0).index as u32 != self.separator
+            && u32::from(state_data.get_terminal(0).index) != self.separator
         {
             self.on_matching_head(result, head, offset);
         }
@@ -471,6 +471,7 @@ impl<'a> FuzzyMatcher<'a> {
     }
 
     /// Explores an insertion
+    #[allow(clippy::too_many_arguments)]
     fn explore_insertion(
         &self,
         result: &mut FuzzyMatcherResult,
@@ -483,7 +484,7 @@ impl<'a> FuzzyMatcher<'a> {
     ) {
         let state_data = self.automaton.get_state(head.state);
         if state_data.get_terminals_count() > 0
-            && state_data.get_terminal(0).index as u32 != self.separator
+            && u32::from(state_data.get_terminal(0).index) != self.separator
         {
             self.on_matching_insertion(result, head, offset, state, distance);
         }
@@ -531,7 +532,7 @@ impl<'a> FuzzyMatcher<'a> {
     ) {
         if result.match_head.is_none() {
             result.match_head = Some(FuzzyMatcherHead::new_error(
-                previous, target, offset, distance,
+                previous, target, offset, distance
             ));
             result.match_length = offset;
         } else {
@@ -541,7 +542,7 @@ impl<'a> FuzzyMatcher<'a> {
             let candidate_cl = get_comparable_length(previous, offset - d);
             if candidate_cl > current_cl {
                 result.match_head = Some(FuzzyMatcherHead::new_error(
-                    previous, target, offset, distance,
+                    previous, target, offset, distance
                 ));
                 result.match_length = offset;
             }

@@ -72,13 +72,13 @@ impl TableElemRef {
     }
 
     /// Gets the element's type
-    pub fn get_type(&self) -> TableType {
+    pub fn get_type(self) -> TableType {
         TableType::from(self.data >> 30)
     }
 
     /// Gets the element's index in its respective table
-    pub fn get_index(&self) -> usize {
-        (self.data & 0x3FFFFFFF)
+    pub fn get_index(self) -> usize {
+        (self.data & 0x3FFF_FFFF)
     }
 }
 
@@ -139,6 +139,12 @@ impl AstImpl {
     /// Gets whether a root has been defined for this AST
     pub fn has_root(&self) -> bool {
         self.root.is_some()
+    }
+}
+
+impl Default for AstImpl {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -269,9 +275,7 @@ impl<'a> Ast<'a> {
     /// Gets the parent of the specified node, if any
     pub fn find_parent_of(&self, node: usize) -> Option<AstNode> {
         let data = self.data.get();
-        if data.root.is_none() {
-            return None;
-        }
+        data.root?;
         for i in 0..data.nodes.len() {
             let candidate = data.nodes[i];
             if candidate.count > 0
@@ -288,7 +292,7 @@ impl<'a> Ast<'a> {
     }
 
     /// Stores some children nodes in this AST
-    pub fn store(&mut self, nodes: &Vec<AstCell>, index: usize, count: usize) -> usize {
+    pub fn store(&mut self, nodes: &[AstCell], index: usize, count: usize) -> usize {
         if count == 0 {
             0
         } else {
@@ -501,6 +505,11 @@ impl<'a> Iterable<'a> for AstFamily<'a> {
 }
 
 impl<'a> AstFamily<'a> {
+    /// Gets whether the family is empty
+    pub fn is_empty(&self) -> bool {
+        self.tree.data.get().nodes[self.parent].count == 0
+    }
+
     /// Gets the number of children in this family
     pub fn len(&self) -> usize {
         self.tree.data.get().nodes[self.parent].count as usize

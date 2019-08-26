@@ -57,6 +57,12 @@ impl<T: Copy> BigList<T> {
         }
     }
 
+    /// Gets whether the list is empty
+    pub fn is_empty(&self) -> bool {
+        self.chunk_index == 0 && self.cell_index == 0
+    }
+
+    /// Gets the list total length
     pub fn len(&self) -> usize {
         (self.chunk_index * CHUNKS_SIZE) + self.cell_index
     }
@@ -68,7 +74,7 @@ impl<T: Copy> BigList<T> {
         }
         self.chunks[self.chunk_index][self.cell_index] = value;
         let result = self.chunk_index << UPPER_SHIFT | self.cell_index;
-        self.cell_index = self.cell_index + 1;
+        self.cell_index += 1;
         result
     }
 
@@ -79,7 +85,7 @@ impl<T: Copy> BigList<T> {
             // allocate a new one
             self.chunks.push([self.neutral; CHUNKS_SIZE]);
         }
-        self.chunk_index = self.chunk_index + 1;
+        self.chunk_index += 1;
         self.cell_index = 0;
     }
 }
@@ -115,7 +121,7 @@ impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
             None
         } else {
             let result = self.list[self.index];
-            self.index = self.index + 1;
+            self.index += 1;
             Some(result)
         }
     }

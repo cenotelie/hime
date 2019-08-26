@@ -32,17 +32,17 @@ pub enum EitherMut<'a, T: 'a> {
 impl<'a, T: 'a> EitherMut<'a, T> {
     /// Gets a mutable reference
     pub fn get_mut(&mut self) -> Option<&mut T> {
-        match self {
-            &mut EitherMut::Mutable(ref mut data) => Some(data),
-            &mut EitherMut::Immutable(ref _data) => None
+        match *self {
+            EitherMut::Mutable(ref mut data) => Some(data),
+            EitherMut::Immutable(ref _data) => None
         }
     }
 
     /// Get an immutable reference
     pub fn get(&self) -> &T {
-        match self {
-            &EitherMut::Mutable(ref data) => data,
-            &EitherMut::Immutable(ref data) => data
+        match *self {
+            EitherMut::Mutable(ref data) => data,
+            EitherMut::Immutable(ref data) => data
         }
     }
 }

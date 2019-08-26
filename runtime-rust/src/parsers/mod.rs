@@ -126,11 +126,11 @@ impl LRColumnMap {
             self.cache[identifier as usize]
         } else {
             for i in 0..self.others.len() {
-                if self.others[i].identifier as u32 == identifier {
+                if u32::from(self.others[i].identifier) == identifier {
                     return self.others[i].column;
                 }
             }
-            return 0;
+            0
         }
     }
 }
@@ -145,7 +145,7 @@ struct LRContextOpening {
 }
 
 /// Represents the contexts opening by transitions from a state
-
+#[derive(Default)]
 pub struct LRContexts {
     /// The contexts, if any
     openings: Option<Vec<LRContextOpening>>
@@ -183,7 +183,7 @@ impl LRContexts {
             None => false,
             Some(ref data) => {
                 for x in data.iter() {
-                    if x.identifier as u32 == terminal_id && x.context == context {
+                    if u32::from(x.identifier) == terminal_id && x.context == context {
                         return true;
                     }
                 }
@@ -241,7 +241,7 @@ impl LRProduction {
     pub fn new(data: &[u8], index: &mut usize) -> LRProduction {
         let head = read_u16(data, *index) as usize;
         *index += 2;
-        let head_action = data[*index] as TreeAction;
+        let head_action = u16::from(data[*index]);
         *index += 1;
         let reduction_length = data[*index] as usize;
         *index += 1;
@@ -262,6 +262,7 @@ impl LRProduction {
 }
 
 /// Container for the expected terminals for a LR state
+#[derive(Default)]
 pub struct LRExpected {
     /// The terminals expected for shift actions
     pub shifts: Vec<Symbol>,

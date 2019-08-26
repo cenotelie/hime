@@ -122,7 +122,7 @@ impl Text {
     }
 
     /// Initializes this text from a UTF-16 stream
-    pub fn from_utf16_stream(input: &mut Read, big_endian: bool) -> Text {
+    pub fn from_utf16_stream(input: &mut dyn Read, big_endian: bool) -> Text {
         let reader = &mut BufReader::new(input);
         let mut content = BigList::<Utf16C>::new(0);
         let iterator = Utf16IteratorRaw::new(reader, big_endian);
@@ -134,7 +134,7 @@ impl Text {
     }
 
     /// Initializes this text from a UTF-8 stream
-    pub fn from_utf8_stream(input: &mut Read) -> Text {
+    pub fn from_utf8_stream(input: &mut dyn Read) -> Text {
         let reader = &mut BufReader::new(input);
         let mut content = BigList::<Utf16C>::new(0);
         let iterator = Utf16IteratorOverUtf8::new(reader);
@@ -148,6 +148,11 @@ impl Text {
     /// Gets the number of lines
     pub fn get_line_count(&self) -> usize {
         self.lines.len()
+    }
+
+    /// Gets whether the text is empty
+    pub fn is_empty(&self) -> bool {
+        self.content.is_empty()
     }
 
     /// Gets the size in number of characters
@@ -231,11 +236,11 @@ impl Text {
                 || self.content[end] == 0x2028
                 || self.content[end] == 0x2029)
         {
-            end = end - 1;
+            end -= 1;
         }
         let mut start = line_index;
         while start < end && is_white_space(self.content[start]) {
-            start = start + 1;
+            start += 1;
         }
         if line_index + position.column - 1 < start {
             start = line_index;
@@ -264,7 +269,7 @@ impl Text {
     /// Gets the context description for the current text at the specified span
     pub fn get_context_of(&self, span: TextSpan) -> TextContext {
         let position = self.get_position_at(span.index);
-        return self.get_context_for(position, span.length);
+        self.get_context_for(position, span.length)
     }
 }
 
@@ -274,7 +279,7 @@ struct Utf16IteratorRaw<'a> {
     /// whether to use big-endian or little-endian
     big_endian: bool,
     /// The input reader
-    input: &'a mut Read
+    input: &'a mut dyn Read
 }
 
 impl<'a> Iterator for Utf16IteratorRaw<'a> {
@@ -287,16 +292,16 @@ impl<'a> Iterator for Utf16IteratorRaw<'a> {
             return None;
         }
         if self.big_endian {
-            Some((bytes[1] as u16) << 8 | (bytes[0] as u16))
+            Some(u16::from(bytes[1]) << 8 | u16::from(bytes[0]))
         } else {
-            Some((bytes[0] as u16) << 8 | (bytes[1] as u16))
+            Some(u16::from(bytes[0]) << 8 | u16::from(bytes[1]))
         }
     }
 }
 
 impl<'a> Utf16IteratorRaw<'a> {
     /// Creates a new instance of the iterator
-    pub fn new(input: &'a mut Read, big_endian: bool) -> Utf16IteratorRaw {
+    pub fn new(input: &'a mut dyn Read, big_endian: bool) -> Utf16IteratorRaw {
         Utf16IteratorRaw { big_endian, input }
     }
 }
@@ -305,14 +310,14 @@ impl<'a> Utf16IteratorRaw<'a> {
 /// over an input of bytes assumed to represent UTF-8 code points
 struct Utf16IteratorOverUtf8<'a> {
     /// The input reader
-    input: &'a mut Read,
+    input: &'a mut dyn Read,
     /// The next UTF-16 code point, if any
     next: Option<Utf16C>
 }
 
 impl<'a> Utf16IteratorOverUtf8<'a> {
     /// Reads the input into the buffer
-    fn read(input: &mut Read, buffer: &mut [u8]) -> usize {
+    fn read(input: &mut dyn Read, buffer: &mut [u8]) -> usize {
         let read = input.read(buffer);
         match read {
             Err(e) => panic!("{}", e),
@@ -346,10 +351,10 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 3 {
                     return None;
                 }
-                ((b0 as u32) & 0b00000111) << 18
-                    | ((others[0] as u32) & 0b00111111) << 12
-                    | ((others[1] as u32) & 0b00111111) << 6
-                    | ((others[2] as u32) & 0b00111111)
+                (u32::from(b0) & 0b0000_0111) << 18
+                    | (u32::from(others[0]) & 0b0011_1111) << 12
+                    | (u32::from(others[1]) & 0b0011_1111) << 6
+                    | (u32::from(others[2]) & 0b0011_1111)
             }
             _ if b0 >> 4 == 0b1110 => {
                 // this is a 3 bytes encoding
@@ -357,20 +362,20 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
                 if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 2 {
                     return None;
                 }
-                ((b0 as u32) & 0b00001111) << 12
-                    | ((others[0] as u32) & 0b00111111) << 6
-                    | ((others[1] as u32) & 0b00111111)
+                (u32::from(b0) & 0b0000_1111) << 12
+                    | (u32::from(others[0]) & 0b0011_1111) << 6
+                    | (u32::from(others[1]) & 0b0011_1111)
             }
             _ if b0 >> 5 == 0b110 => {
                 // this is a 2 bytes encoding
                 if Utf16IteratorOverUtf8::read(&mut self.input, &mut bytes) < 1 {
                     return None;
                 }
-                ((b0 as u32) & 0b00011111) << 6 | ((bytes[0] as u32) & 0b00111111)
+                (u32::from(b0) & 0b0001_1111) << 6 | (u32::from(bytes[0]) & 0b0011_1111)
             }
             _ if b0 >> 7 == 0 => {
                 // this is a 1 byte encoding
-                b0 as u32
+                u32::from(b0)
             }
             _ => {
                 return None;
@@ -379,7 +384,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
 
         // now we have the decoded unicode character
         // encode it in UTF-16
-        if (c >= 0xD800 && c < 0xE000) || c >= 0x110000 {
+        if (c >= 0xD800 && c < 0xE000) || c >= 0x0011_0000 {
             // not a valid unicode character
             return None;
         }
@@ -399,7 +404,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
 
 impl<'a> Utf16IteratorOverUtf8<'a> {
     /// Creates a new instance of the iterator
-    pub fn new(input: &'a mut Read) -> Utf16IteratorOverUtf8 {
+    pub fn new(input: &'a mut dyn Read) -> Utf16IteratorOverUtf8 {
         Utf16IteratorOverUtf8 { input, next: None }
     }
 }
@@ -426,9 +431,8 @@ fn find_lines_in<'a, T: Iterable<'a, Item = Utf16C>>(iterable: &'a T) -> Vec<usi
     let mut result = Vec::<usize>::new();
     let mut c1;
     let mut c2 = 0;
-    let mut i = 0;
     result.push(0);
-    for x in iterable.iter() {
+    for (i, x) in iterable.iter().enumerate() {
         c1 = c2;
         c2 = x;
         if is_line_ending(c1, c2) {
@@ -438,19 +442,18 @@ fn find_lines_in<'a, T: Iterable<'a, Item = Utf16C>>(iterable: &'a T) -> Vec<usi
                 i + 1
             });
         }
-        i = i + 1;
     }
     result
 }
 
 /// Finds the index of the line at the given input index in the content
-fn find_line_at(lines: &Vec<usize>, index: usize) -> usize {
-    for i in 1..lines.len() {
-        if index < lines[i] {
+fn find_line_at(lines: &[usize], index: usize) -> usize {
+    for (i, line) in lines.iter().skip(1).enumerate() {
+        if index < *line {
             return i - 1;
         }
     }
-    return lines.len() - 1;
+    lines.len() - 1
 }
 
 /// Converts an excerpt of a UTF-16 buffer to a string
@@ -460,7 +463,7 @@ fn utf16_to_string(content: &BigList<Utf16C>, start: usize, length: usize) -> St
         buffer.push(content[i]);
     }
     let result = String::from_utf16(&buffer);
-    result.unwrap_or(String::new())
+    result.unwrap_or_default()
 }
 
 #[test]
@@ -480,7 +483,7 @@ fn test_text_substring() {
 #[test]
 fn test_read_utf8() {
     let bytes: [u8; 13] = [
-        0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78,
+        0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78
     ];
     let mut content = Vec::<Utf16C>::new();
     let reader = &mut bytes.as_ref();

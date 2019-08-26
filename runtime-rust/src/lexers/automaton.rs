@@ -47,7 +47,7 @@ pub struct AutomatonTransition {
 
 impl AutomatonTransition {
     /// Get whether this transition matches the specified character
-    pub fn matches(&self, c: Utf16C) -> bool {
+    pub fn matches(self, c: Utf16C) -> bool {
         c >= self.start && c <= self.end
     }
 }
@@ -101,7 +101,9 @@ impl<'a> AutomatonState<'a> {
 
     /// Gets the target of the cached transition for the specified value
     pub fn get_cached_transition(&self, value: Utf16C) -> u32 {
-        self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize] as u32
+        u32::from(
+            self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize]
+        )
     }
 
     /// Gets the i-th non-cached transition in this state
@@ -110,7 +112,7 @@ impl<'a> AutomatonState<'a> {
         AutomatonTransition {
             start: self.table[offset],
             end: self.table[offset + 1],
-            target: self.table[offset + 2] as u32
+            target: u32::from(self.table[offset + 2])
         }
     }
 
@@ -125,7 +127,7 @@ impl<'a> AutomatonState<'a> {
                 return transition.target;
             }
         }
-        return DEAD_STATE;
+        DEAD_STATE
     }
 }
 

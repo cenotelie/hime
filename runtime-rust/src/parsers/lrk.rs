@@ -147,7 +147,7 @@ impl LRkAstReduction {
 /// Represents the builder of Parse Trees for LR(k) parsers
 struct LRkAstBuilder<'l> {
     /// Lexer associated to this parser
-    lexer: &'l mut Lexer<'l>,
+    lexer: &'l mut dyn Lexer<'l>,
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
@@ -187,7 +187,7 @@ impl<'l> SemanticBody for LRkAstBuilder<'l> {
 
 impl<'l> LRkAstBuilder<'l> {
     /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'l mut Lexer<'l>, result: Ast<'l>) -> LRkAstBuilder<'l> {
+    pub fn new(lexer: &'l mut dyn Lexer<'l>, result: Ast<'l>) -> LRkAstBuilder<'l> {
         LRkAstBuilder {
             lexer,
             stack: Vec::<SubTree>::new(),
@@ -247,7 +247,7 @@ impl<'l> LRkAstBuilder<'l> {
                 sub_index += size;
             }
         } else if action == TREE_ACTION_DROP {
-            return;
+            // do nothing
         } else {
             // copy the complete sub-tree to the cache
             let cache_index = sub.copy_to(&mut reduction.cache);
@@ -308,7 +308,7 @@ impl<'l> LRkAstBuilder<'l> {
     }
 
     /// Applies the promotion tree actions to the cache and commits to the final AST
-    pub fn reduce_tree(reduction: &mut LRkAstReduction, handle: &Vec<usize>, result: &mut Ast) {
+    pub fn reduce_tree(reduction: &mut LRkAstReduction, handle: &[usize], result: &mut Ast) {
         // apply the epsilon replace, if any
         if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_EPSILON {
             reduction
@@ -319,8 +319,9 @@ impl<'l> LRkAstBuilder<'l> {
         // promotion data
         let mut promotion = false;
         let mut insertion = 1;
-        for i in 0..handle.len() {
-            match reduction.cache.get_action_at(handle[i]) {
+        for item in handle.iter() {
+            let item = *item;
+            match reduction.cache.get_action_at(item) {
                 TREE_ACTION_PROMOTE => {
                     if promotion {
                         // This is not the first promotion
@@ -333,18 +334,18 @@ impl<'l> LRkAstBuilder<'l> {
                     }
                     promotion = true;
                     // Save the new promoted node
-                    reduction.cache.move_node(handle[i], 0);
+                    reduction.cache.move_node(item, 0);
                     // Repack the children on the left if any
                     let nb = reduction.cache.get_children_count_at(0);
-                    reduction.cache.move_range(handle[i] + 1, insertion, nb);
+                    reduction.cache.move_range(item + 1, insertion, nb);
                     insertion += nb;
                 }
                 _ => {
                     // Commit the children if any
-                    reduction.cache.commit_children_of(handle[i], result);
+                    reduction.cache.commit_children_of(item, result);
                     // Repack the sub-root on the left
-                    if insertion != handle[i] {
-                        reduction.cache.move_node(handle[i], insertion);
+                    if insertion != item {
+                        reduction.cache.move_node(item, insertion);
                     }
                     insertion += 1;
                 }
@@ -381,7 +382,7 @@ struct LRkParserData<'a> {
     /// The grammar variables
     variables: &'static [Symbol],
     /// The semantic actions
-    actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
+    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
 }
 
 impl<'a> ContextProvider for LRkParserData<'a> {
@@ -471,13 +472,13 @@ impl<'a> ContextProvider for LRkParserData<'a> {
                 .automaton
                 .get_action(my_stack[my_stack.len() - 1].state, variable.id);
             my_stack.push(LRkHead {
-                state: action.get_data() as u32,
+                state: u32::from(action.get_data()),
                 identifier: variable.id
             });
             // now, get the new action for the terminal
             action = self
                 .automaton
-                .get_action(action.get_data() as u32, terminal_id);
+                .get_action(u32::from(action.get_data()), terminal_id);
         }
         // is this a shift action that opens the context?
         if action.get_code() == LR_ACTION_CODE_SHIFT
@@ -519,13 +520,13 @@ impl<'a> LRkParserData<'a> {
                     .automaton
                     .get_action(my_stack[my_stack.len() - 1].state, variable.id);
                 my_stack.push(LRkHead {
-                    state: action.get_data() as u32,
+                    state: u32::from(action.get_data()),
                     identifier: variable.id
                 });
                 // now, get the new action for the terminal
                 action = self
                     .automaton
-                    .get_action(action.get_data() as u32, terminal.id);
+                    .get_action(u32::from(action.get_data()), terminal.id);
             }
         }
         // nope, that was a pathological case in a LALR graph
@@ -541,7 +542,7 @@ impl<'a> LRkParserData<'a> {
             let action = self.automaton.get_action(head.state, kernel.terminal_id);
             if action.get_code() == LR_ACTION_CODE_SHIFT {
                 stack.push(LRkHead {
-                    state: action.get_data() as u32,
+                    state: u32::from(action.get_data()),
                     identifier: kernel.terminal_id
                 });
                 builder.push_token(kernel.index as usize);
@@ -560,7 +561,7 @@ impl<'a> LRkParserData<'a> {
                 builder.get_variables()[production.head].id
             );
             stack.push(LRkHead {
-                state: action.get_data() as u32,
+                state: u32::from(action.get_data()),
                 identifier: variable.id
             });
         }
@@ -570,7 +571,7 @@ impl<'a> LRkParserData<'a> {
     fn reduce(
         production: &LRProduction,
         builder: &mut LRkAstBuilder,
-        actions: &mut FnMut(usize, Symbol, &SemanticBody)
+        actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> Symbol {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
@@ -614,10 +615,10 @@ pub struct LRkParser<'l, 'a: 'l> {
 impl<'l, 'a: 'l> LRkParser<'l, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'l mut Lexer<'l>,
+        lexer: &'l mut dyn Lexer<'l>,
         automaton: LRkAutomaton,
         ast: Ast<'l>,
-        actions: &'a mut FnMut(usize, Symbol, &SemanticBody)
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> LRkParser<'l, 'a> {
         let mut stack = Vec::<LRkHead>::new();
         stack.push(LRkHead {

@@ -42,6 +42,12 @@ pub struct TokenRepositoryImpl {
     cells: BigList<TokenRepositoryCell>
 }
 
+impl Default for TokenRepositoryImpl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TokenRepositoryImpl {
     /// Creates a new implementation of a token repository
     pub fn new() -> TokenRepositoryImpl {
@@ -107,7 +113,7 @@ impl<'a> Iterator for TokenRepositoryIterator<'a> {
                 repository: self.repository,
                 index: self.index
             };
-            self.index = self.index + 1;
+            self.index += 1;
             Some(result)
         }
     }

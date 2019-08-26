@@ -94,5 +94,5 @@ pub trait Lexer<'a> {
     fn set_recovery_distance(&mut self, distance: usize);
 
     /// Gets the next token in the input
-    fn get_next_token(&mut self, contexts: &ContextProvider) -> Option<TokenKernel>;
+    fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel>;
 }
