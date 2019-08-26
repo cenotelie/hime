@@ -8,6 +8,7 @@ repository = "https://github.com/cenotelie/hime"
 keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
+edition = "2018"
 
 [dependencies]
 hime_redist = "3.4.2"

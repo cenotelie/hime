@@ -36,13 +36,13 @@ use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::utils::iterable::Iterable;
 
 /// The parser must produce an AST that matches the expected one
-const VERB_MATCHES: &'static str = "matches";
+const VERB_MATCHES: &str = "matches";
 /// The parser must produce an AST that do NOT match the expected one
-const VERB_NOMATCHES: &'static str = "nomatches";
+const VERB_NOMATCHES: &str = "nomatches";
 /// The parser must fail
-const VERB_FAILS: &'static str = "fails";
+const VERB_FAILS: &str = "fails";
 /// The parser have the specified output
-const VERB_OUTPUTS: &'static str = "outputs";
+const VERB_OUTPUTS: &str = "outputs";
 
 /// The test was successful
 const RESULT_SUCCESS: i32 = 0;
@@ -110,7 +110,7 @@ fn get_expected_ast(my_path: &path::Path, library: &libloading::Library) -> Pars
     let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
-        let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
             .get(b"expected_tree_parse_utf8")
             .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
@@ -142,7 +142,7 @@ fn get_parsed_input(
     let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
-        let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
             .get(function_name.as_bytes())
             .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
@@ -265,7 +265,7 @@ fn execute_test_outputs(
     let output = get_expected_output(my_path);
     let expected_lines: Vec<&str> = find_lines_in(&output);
     let real_result = get_parsed_input(my_path, library, parser_name);
-    if expected_lines.is_empty() || (expected_lines.len() == 1 && expected_lines[0].len() == 0) {
+    if expected_lines.is_empty() || (expected_lines.len() == 1 && expected_lines[0].is_empty()) {
         // expect empty output
         if real_result.is_success() && real_result.get_errors().get_count() == 0 {
             return RESULT_SUCCESS;
@@ -311,8 +311,8 @@ fn execute_test_outputs(
     if i == expected_lines.len() {
         return RESULT_SUCCESS;
     }
-    for j in i..expected_lines.len() {
-        println!("Missing output: {}", expected_lines[j]);
+    for line in expected_lines.iter().skip(i) {
+        println!("Missing output: {}", line);
     }
     RESULT_FAILURE_VERB
 }
@@ -328,7 +328,7 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
     let expected_children = expected.children();
     let predicate = expected_children.at(0);
     let predicate_children = predicate.children();
-    if predicate_children.len() > 0 {
+    if !predicate_children.is_empty() {
         let test = predicate_children
             .at(0)
             .get_value()
@@ -339,7 +339,8 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
                 .get_value()
                 .unwrap_or_else(|| panic!("Malformed expected AST"))
         );
-        let value_real = node.get_value()
+        let value_real = node
+            .get_value()
             .unwrap_or_else(|| panic!("Malformed input AST"));
         if test.eq("=") && !value_expected.eq(&value_real)
             || test.eq("!=") && value_expected.eq(&value_real)
@@ -398,8 +399,12 @@ fn unescape(value: String) -> String {
 /// Others:
 /// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
 fn is_line_ending(c1: char, c2: char) -> bool {
-    (c2 == '\u{000B}' || c2 == '\u{000C}' || c2 == '\u{0085}' || c2 == '\u{2028}'
-        || c2 == '\u{2029}') || (c1 == '\u{000D}' || c2 == '\u{000A}')
+    (c2 == '\u{000B}'
+        || c2 == '\u{000C}'
+        || c2 == '\u{0085}'
+        || c2 == '\u{2028}'
+        || c2 == '\u{2029}')
+        || (c1 == '\u{000D}' || c2 == '\u{000A}')
 }
 
 /// Finds all the lines in this content
@@ -418,11 +423,12 @@ fn find_lines_in(input: &str) -> Vec<&str> {
                 i
             };
             result.push(&input[start..end]);
-            start = end + (if c1 == '\u{000D}' && c2 == '\u{000A}' {
-                2
-            } else {
-                1
-            });
+            start = end
+                + (if c1 == '\u{000D}' && c2 == '\u{000A}' {
+                    2
+                } else {
+                    1
+                });
         }
     }
     if input.len() > start {
