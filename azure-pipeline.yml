@@ -1,0 +1,20 @@
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build and test
+  jobs:  
+  - job: Build
+    displayName: Build and test
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: cenotelie/hime-build-env:latest
+    steps:
+    - script: .releng/build.sh
