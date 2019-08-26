@@ -448,7 +448,7 @@ fn find_lines_in<'a, T: Iterable<'a, Item = Utf16C>>(iterable: &'a T) -> Vec<usi
 
 /// Finds the index of the line at the given input index in the content
 fn find_line_at(lines: &[usize], index: usize) -> usize {
-    for (i, line) in lines.iter().skip(1).enumerate() {
+    for (i, line) in lines.iter().enumerate().skip(1) {
         if index < *line {
             return i - 1;
         }
